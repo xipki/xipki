@@ -2,6 +2,12 @@ package org.xipki.ca.sdk;
 
 import java.math.BigInteger;
 
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public class ConfirmCertRequestEntry {
 
   private BigInteger certReqId;

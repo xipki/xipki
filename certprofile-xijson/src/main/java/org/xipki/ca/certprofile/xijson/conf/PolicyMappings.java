@@ -21,8 +21,8 @@ import com.alibaba.fastjson.annotation.JSONField;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.CertPolicyId;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.util.LinkedList;
 import java.util.List;

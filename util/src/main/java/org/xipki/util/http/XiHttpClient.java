@@ -81,7 +81,6 @@ public class XiHttpClient {
     }
   } // method httpGet
 
-
   public byte[] httpPost(String url, String requestContentType, byte[] request,
                          String expectedRespContentType)
       throws IOException {

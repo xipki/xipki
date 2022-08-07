@@ -23,7 +23,9 @@ import org.xipki.ca.protocol.ProtocolProxyConfWrapper;
 import org.xipki.ca.protocol.cmp.CmpControl;
 import org.xipki.ca.protocol.cmp.CmpProxyConf;
 import org.xipki.ca.protocol.cmp.CmpResponder;
-import org.xipki.util.*;
+import org.xipki.util.IoUtil;
+import org.xipki.util.StringUtil;
+import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
 
@@ -42,7 +44,7 @@ public class ProtocolServletFilter implements Filter {
 
   private static final Logger LOG = LoggerFactory.getLogger(ProtocolServletFilter.class);
 
-  private static final String DFLT_CFG = "etc/cmp-proxy.json";
+  private static final String DFLT_CFG = "etc/cmp-gateway.json";
 
   private HttpCmpServlet servlet;
 
@@ -51,6 +53,7 @@ public class ProtocolServletFilter implements Filter {
   @Override
   public void init(FilterConfig filterConfig)
       throws ServletException {
+    LOG.info("XiPKI CMP Gateway version {}", StringUtil.getVersion(getClass()));
     XipkiBaseDir.init();
 
     CmpProxyConf conf0;
@@ -62,7 +65,7 @@ public class ProtocolServletFilter implements Filter {
     }
 
     try {
-      CmpControl cmpControl = new CmpControl(conf0.getCmpControl());
+      CmpControl cmpControl = new CmpControl(conf0.getCmp());
       conf = new ProtocolProxyConfWrapper(conf0);
 
       CmpResponder responder = new CmpResponder(cmpControl, conf.getSdkClient(),

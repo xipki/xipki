@@ -18,11 +18,7 @@
 package org.xipki.ca.api.mgmt.entry;
 
 import org.xipki.ca.api.NameId;
-import org.xipki.util.PermissionConstants;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.CompareUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.*;
 
 import java.util.Collections;
 import java.util.Set;

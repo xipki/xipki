@@ -32,12 +32,14 @@ import org.xipki.ca.protocol.PopControl;
 import org.xipki.ca.protocol.Requestor;
 import org.xipki.ca.protocol.RequestorAuthenticator;
 import org.xipki.ca.protocol.SdkClient;
-import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.*;
-import org.xipki.security.*;
-import org.xipki.util.*;
+import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.CrlReason;
+import org.xipki.security.SecurityFactory;
 import org.xipki.security.cmp.CmpUtf8Pairs;
 import org.xipki.security.cmp.CmpUtil;
+import org.xipki.util.DateUtil;
+import org.xipki.util.*;
 import org.xipki.util.exception.InsufficientPermissionException;
 
 import java.io.IOException;
@@ -56,7 +58,6 @@ import static org.bouncycastle.asn1.cmp.PKIStatus.*;
  * @since 6.0.0
  */
 
-// TODO: merge BaseCmpResponder and this class
 public class CmpResponder extends BaseCmpResponder {
 
   private static final Logger LOG = LoggerFactory.getLogger(BaseCmpResponder.class);
@@ -145,7 +146,8 @@ public class CmpResponder extends BaseCmpResponder {
           try {
             seq = ASN1Sequence.getInstance(controls.getEncoded());
           } catch (IOException ex) {
-            addErrCertResp(failureResps, i, certReqId, systemFailure, "could not parse the controls");
+            addErrCertResp(failureResps, i, certReqId, systemFailure,
+                "could not parse the controls");
             continue;
           }
 
@@ -160,7 +162,8 @@ public class CmpResponder extends BaseCmpResponder {
         }
 
         if (oldCertIdAtv == null) {
-          addErrCertResp(failureResps, i, certReqId, badCertTemplate, "no getCtrl oldCertID is specified");
+          addErrCertResp(failureResps, i, certReqId, badCertTemplate,
+              "no getCtrl oldCertID is specified");
           continue;
         }
 
@@ -322,7 +325,8 @@ public class CmpResponder extends BaseCmpResponder {
         event.setStatus(AuditStatus.FAILED);
         PKIFreeText statusStr = statusObj.getStatusString();
         if (statusStr != null) {
-          event.addEventData(CaAuditConstants.NAME_message, statusStr.getStringAtUTF8(0).getString());
+          event.addEventData(CaAuditConstants.NAME_message,
+              statusStr.getStringAtUTF8(0).getString());
         }
       }
     }

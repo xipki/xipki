@@ -35,6 +35,7 @@ import java.net.URLConnection;
  * The SDK client.
  *
  * @author Lijun Liao
+ * @since 6.0.0
  */
 
 public class MyHttpClient {

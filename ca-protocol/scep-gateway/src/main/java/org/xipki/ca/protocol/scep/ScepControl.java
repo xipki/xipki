@@ -26,7 +26,7 @@ package org.xipki.ca.protocol.scep;
 
 public class ScepControl {
 
-  private static final long DFLT_MAX_SIGNINGTIME_BIAS = 5L * 60 * 1000; // 5 minutes
+  private static final long DFLT_MAX_SIGNINGTIME_BIAS = 5L * 60; // 5 minutes
 
   private boolean includeCaCert = true;
 
@@ -36,7 +36,7 @@ public class ScepControl {
 
   private boolean supportGetCrl = false;
 
-  private long maxSigningTimeBiasInMs = DFLT_MAX_SIGNINGTIME_BIAS;
+  private long maxSigningTimeBias = DFLT_MAX_SIGNINGTIME_BIAS;
 
   public boolean isIncludeCaCert() {
     return includeCaCert;
@@ -70,12 +70,12 @@ public class ScepControl {
     this.supportGetCrl = supportGetCrl;
   }
 
-  public long getMaxSigningTimeBiasInMs() {
-    return maxSigningTimeBiasInMs;
+  public long getMaxSigningTimeBias() {
+    return maxSigningTimeBias;
   }
 
-  public void setMaxSigningTimeBiasInMs(long maxSigningTimeBiasInMs) {
-    this.maxSigningTimeBiasInMs = maxSigningTimeBiasInMs;
+  public void setMaxSigningTimeBias(long maxSigningTimeBias) {
+    this.maxSigningTimeBias = maxSigningTimeBias;
   }
 
 }

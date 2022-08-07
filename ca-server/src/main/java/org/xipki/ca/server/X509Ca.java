@@ -33,7 +33,9 @@ import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
-import org.xipki.ca.api.*;
+import org.xipki.ca.api.CertWithDbId;
+import org.xipki.ca.api.CertificateInfo;
+import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
@@ -61,9 +63,9 @@ import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import static org.xipki.util.exception.OperationException.ErrorCode.*;
 import static org.xipki.util.Args.notEmpty;
 import static org.xipki.util.Args.notNull;
+import static org.xipki.util.exception.OperationException.ErrorCode.*;
 
 /**
  * X509CA.

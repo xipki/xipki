@@ -4,6 +4,13 @@ import com.alibaba.fastjson.JSON;
 
 import java.util.List;
 
+/**
+ * Response for the operations unrevoking certificates and removing certificates.
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public class UnrevokeOrRemoveCertsResponse extends SdkResponse {
 
   private List<SingleCertSerialEntry> entries;

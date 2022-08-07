@@ -27,17 +27,17 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.security.Securities;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.*;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.HttpConstants;
+import org.xipki.util.LogUtil;
+import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.cert.CertificateException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * The Servlet Filter of OCSP servlets.

@@ -1,7 +1,6 @@
 {
 	"master":true,
-	// If set to true, please also set writer.level to debug
-	//  in the file META-INF/classes/tinylog.properties.
+	// If set to true, please set writer.level to debug in the file META-INF/classes/tinylog.properties.
 	"logReqResp": false,
 	// shard id, between 0 and 127. CA systems using same database must have
 	// different shard ids.

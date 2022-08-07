@@ -10,6 +10,12 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public class RestProxyConf extends ProtocolProxyConf {
 
   public static RestProxyConf readConfFromFile(String fileName)

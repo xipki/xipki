@@ -3,6 +3,12 @@ package org.xipki.ca.protocol.dummy;
 import org.xipki.ca.protocol.Requestor;
 import org.xipki.security.X509Cert;
 
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public class DummyCertRequestor implements Requestor {
 
   private X509Cert cert;

@@ -37,8 +37,8 @@ import org.xipki.qa.BenchmarkHttpClient.SslConf;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.BenchmarkExecutor;
-import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.io.File;
 import java.io.IOException;

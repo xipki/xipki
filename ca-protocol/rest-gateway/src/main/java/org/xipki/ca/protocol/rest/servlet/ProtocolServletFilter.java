@@ -23,6 +23,7 @@ import org.xipki.ca.protocol.ProtocolProxyConfWrapper;
 import org.xipki.ca.protocol.rest.RestProxyConf;
 import org.xipki.ca.protocol.rest.RestResponder;
 import org.xipki.util.IoUtil;
+import org.xipki.util.StringUtil;
 import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
@@ -36,12 +37,13 @@ import java.io.IOException;
  * CA ServletFilter.
  *
  * @author Lijun Liao
+ * @since 6.0.0
  */
 public class ProtocolServletFilter implements Filter {
 
   private static final Logger LOG = LoggerFactory.getLogger(ProtocolServletFilter.class);
 
-  private static final String DFLT_CFG = "etc/rest-proxy.json";
+  private static final String DFLT_CFG = "etc/rest-gateway.json";
 
   private HttpRestServlet servlet;
 
@@ -50,6 +52,7 @@ public class ProtocolServletFilter implements Filter {
   @Override
   public void init(FilterConfig filterConfig)
       throws ServletException {
+    LOG.info("XiPKI REST Gateway version {}", StringUtil.getVersion(getClass()));
     XipkiBaseDir.init();
 
     RestProxyConf conf0;

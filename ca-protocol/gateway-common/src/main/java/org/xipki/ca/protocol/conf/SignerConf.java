@@ -6,6 +6,12 @@ import org.xipki.util.exception.InvalidConfException;
 
 import java.util.List;
 
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public class SignerConf extends ValidatableConf {
 
   private List<FileOrBinary> certs;

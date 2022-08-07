@@ -18,9 +18,9 @@
 package org.xipki.password;
 
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.StringUtil;
 import org.xipki.util.ValidatableConf;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;
 import java.util.List;

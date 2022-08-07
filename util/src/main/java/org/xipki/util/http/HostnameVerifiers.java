@@ -17,8 +17,8 @@
 
 package org.xipki.util.http;
 
-import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.StringUtil;
+import org.xipki.util.exception.ObjectCreationException;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;

@@ -4,24 +4,30 @@ import org.xipki.audit.Audits;
 import org.xipki.security.Securities;
 import org.xipki.util.exception.InvalidConfException;
 
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public abstract class ProtocolProxyConf {
 
-  private boolean logReqResp;
+  protected boolean logReqResp;
 
-  private String authenticator;
+  protected String authenticator;
 
-  private PopControlConf pop;
+  protected PopControlConf pop;
 
-  private SdkClientConf sdkClient;
+  protected SdkClientConf sdkClient;
 
-  private Audits.AuditConf audit;
+  protected Audits.AuditConf audit;
 
-  private Securities.SecurityConf security;
+  protected Securities.SecurityConf security;
 
   /**
    * The signer. If only signed with PMAC; this may be {@code null}.
    */
-  private SignerConf signer;
+  protected SignerConf signer;
 
   public boolean isLogReqResp() {
     return logReqResp;
@@ -70,7 +76,6 @@ public abstract class ProtocolProxyConf {
   public void setSecurity(Securities.SecurityConf security) {
     this.security = security;
   }
-
 
   public SignerConf getSigner() {
     return signer;

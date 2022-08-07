@@ -17,8 +17,8 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
+import org.xipki.util.exception.InvalidConfException;
 
 /**
  * Extension AuthorityKeyIdentifier.

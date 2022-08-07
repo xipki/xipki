@@ -84,7 +84,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 import java.util.Map.Entry;
 
-import static org.xipki.util.Args.*;
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
 
 /**
  * CMP agent to communicate with CA.
@@ -496,8 +497,8 @@ class CmpAgent {
     return certs;
   } // method caCerts
 
-  RevokeCertResponse revokeCertificate(String caName, Requestor requestor, RevokeCertRequest request,
-      ReqRespDebug debug)
+  RevokeCertResponse revokeCertificate(
+      String caName, Requestor requestor, RevokeCertRequest request, ReqRespDebug debug)
           throws CmpClientException, PkiErrorException {
     Responder responder = getResponder(requestor);
     PKIMessage reqMessage = buildRevokeCertRequest(requestor, responder,
@@ -880,7 +881,6 @@ class CmpAgent {
     return new PKIMessage(header, body);
   } // method buildPkiMessage
 
-
   private static void checkProtection(VerifiedPkiMessage response)
       throws PkiErrorException {
     notNull(response, "response");
@@ -1157,7 +1157,8 @@ class CmpAgent {
       byte[] encValue = ev.getEncValue().getOctets();
       return dataCipher.doFinal(encValue);
     } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
-             | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
+             | InvalidAlgorithmParameterException | IllegalBlockSizeException
+             | BadPaddingException ex) {
       throw new XiSecurityException("Error while decrypting the EncryptedValue", ex);
     }
   } // method decrypt

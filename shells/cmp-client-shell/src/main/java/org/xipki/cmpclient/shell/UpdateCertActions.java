@@ -310,7 +310,8 @@ public class UpdateCertActions {
       }
 
       X509Cert oldCert = X509Util.parseCert(new File(oldCertFile));
-      CertId oldCertId = new CertId(new GeneralName(oldCert.getIssuer()), oldCert.getSerialNumber());
+      CertId oldCertId = new CertId(new GeneralName(oldCert.getIssuer()),
+                            oldCert.getSerialNumber());
 
       Controls controls = new Controls(
           new AttributeTypeAndValue(CMPObjectIdentifiers.regCtrl_oldCertID, oldCertId));

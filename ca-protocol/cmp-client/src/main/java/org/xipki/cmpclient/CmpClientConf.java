@@ -18,8 +18,8 @@
 package org.xipki.cmpclient;
 
 import org.xipki.util.FileOrBinary;
-import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.SslConf;
 
 import java.util.LinkedList;

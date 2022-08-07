@@ -18,11 +18,11 @@
 package org.xipki.ca.api.mgmt;
 
 import org.xipki.ca.api.CertWithDbId;
-import org.xipki.util.exception.InsufficientPermissionException;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.util.Args;
 import org.xipki.util.PermissionConstants;
+import org.xipki.util.exception.InsufficientPermissionException;
 
 /**
  * Requestor info interface.
@@ -118,7 +118,6 @@ public interface RequestorInfo {
     }
 
   } // method CmpRequestorInfo
-
 
   NameId getIdent();
 

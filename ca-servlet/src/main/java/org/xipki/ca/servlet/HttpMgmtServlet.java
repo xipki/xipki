@@ -29,8 +29,8 @@ import org.xipki.ca.api.mgmt.MgmtMessage.SignerEntryWrapper;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.security.X509Cert;
 import org.xipki.util.HttpConstants;
-import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.IoUtil;
+import org.xipki.util.exception.InvalidConfException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

@@ -1,7 +1,10 @@
 package org.xipki.ca.sdk;
 
-import java.math.BigInteger;
-import java.util.List;
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
 
 public class UpdateCertRequestEntry extends EnrollCertRequestEntry {
 

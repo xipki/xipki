@@ -22,9 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.XiSecurityException;
-import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;
 import java.io.InputStream;

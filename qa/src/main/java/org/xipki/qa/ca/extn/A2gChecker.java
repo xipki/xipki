@@ -23,7 +23,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x509.qualified.BiometricData;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
-import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.ca.api.profile.Certprofile.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
@@ -40,6 +39,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.exception.BadCertTemplateException;
 
 import java.io.IOException;
 import java.math.BigInteger;

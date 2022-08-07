@@ -3,6 +3,12 @@ package org.xipki.ca.protocol.conf;
 import com.alibaba.fastjson.JSON;
 import org.xipki.util.http.SslConf;
 
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public class SdkClientConf {
 
   private String serverUrl;

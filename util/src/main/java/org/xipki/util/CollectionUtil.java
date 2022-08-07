@@ -123,7 +123,6 @@ public class CollectionUtil {
     return ret;
   }
 
-
   public static <T extends Comparable<? super T>> List<T> sort(Collection<T> col) {
     if (col == null) {
       return null;

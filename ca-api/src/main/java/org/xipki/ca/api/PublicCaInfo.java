@@ -20,12 +20,12 @@ package org.xipki.ca.api;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralNames;
-import org.xipki.util.exception.OperationException;
-import org.xipki.util.exception.OperationException.ErrorCode;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
+import org.xipki.util.exception.OperationException;
+import org.xipki.util.exception.OperationException.ErrorCode;
 
 import java.math.BigInteger;
 import java.util.Arrays;

@@ -7,6 +7,12 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Date;
 
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public class EnrollCertRequestEntry {
 
   private BigInteger certReqId;

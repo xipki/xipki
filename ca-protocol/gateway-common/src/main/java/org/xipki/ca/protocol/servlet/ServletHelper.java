@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.LogUtil;
 import org.xipki.util.LruCache;
 import org.xipki.util.StringUtil;
 
@@ -45,7 +46,7 @@ import java.security.cert.X509Certificate;
  * @since 2.1.0
  */
 
-public class TlsHelper {
+public class ServletHelper {
 
   private static class Reference {
     private final Object obj;
@@ -66,7 +67,7 @@ public class TlsHelper {
     }
   }
 
-  private static final Logger LOG = LoggerFactory.getLogger(TlsHelper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ServletHelper.class);
 
   private static final LruCache<String, X509Cert> clientCerts = new LruCache<>(50);
   private static final LruCache<Reference, X509Cert> clientCerts0 = new LruCache<>(50);
@@ -149,5 +150,20 @@ public class TlsHelper {
     }
 
   } // method getTlsClientCert
+
+  public static void logReqResp(String prefix, Logger log, boolean logReqResp, boolean viaPost,
+      HttpServletRequest req, byte[] requestBytes, byte[] respBody) {
+    if (logReqResp && log.isDebugEnabled()) {
+      String requestURI = req.getRequestURI();
+
+      if (viaPost) {
+        log.debug("{} HTTP POST path: {}\nRequest:\n{}\nResponse:\n{}",
+            prefix, requestURI, LogUtil.base64Encode(requestBytes), LogUtil.base64Encode(respBody));
+      } else {
+        log.debug("{} HTTP GET path: {}\nResponse:\n{}", prefix, requestURI,
+            LogUtil.base64Encode(respBody));
+      }
+    }
+  }
 
 }

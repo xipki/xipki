@@ -17,24 +17,29 @@
 
 package org.xipki.ca.server;
 
-import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
-import org.xipki.ca.api.*;
-import org.xipki.ca.api.mgmt.*;
+import org.xipki.ca.api.CertificateInfo;
+import org.xipki.ca.api.mgmt.CaMgmtException;
+import org.xipki.ca.api.mgmt.CaStatus;
+import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
+import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.sdk.*;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.CrlReason;
-import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.X509Cert;
+import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 import org.xipki.util.exception.InsufficientPermissionException;
@@ -46,10 +51,10 @@ import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static org.xipki.util.exception.OperationException.ErrorCode.*;
-import static org.xipki.ca.sdk.SdkConstants.*;
 import static org.xipki.ca.sdk.CaAuditConstants.*;
+import static org.xipki.ca.sdk.SdkConstants.*;
 import static org.xipki.util.PermissionConstants.*;
+import static org.xipki.util.exception.OperationException.ErrorCode.*;
 
 /**
  * SDK responder.
@@ -622,7 +627,6 @@ public class SdkResponder {
     }
   }
 
-
   private SdkResponse getCert(X509Ca ca, byte[] request, String msgId)
       throws OperationException {
     GetCertRequest req = GetCertRequest.decode(request);
@@ -651,7 +655,6 @@ public class SdkResponder {
     resp.setPayload(cert.getEncoded());
     return resp;
   }
-
 
   private static void assertPermitted(RequestorInfo requestor, int permission)
       throws OperationException {

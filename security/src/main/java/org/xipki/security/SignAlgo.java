@@ -503,7 +503,7 @@ public enum SignAlgo {
 
   public static SignAlgo getInstance(String nameOrOid)
       throws NoSuchAlgorithmException {
-    SignAlgo alg = map.get(nameOrOid.toUpperCase());
+    SignAlgo alg = map.get(nameOrOid.toUpperCase().replace("-", ""));
     if (alg == null) {
       throw new NoSuchAlgorithmException(
           "Unknown HashAlgo OID/name '" + nameOrOid + "'");

@@ -5,6 +5,12 @@ import org.xipki.util.Hex;
 
 import java.io.IOException;
 
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public class X500NameType {
 
   private X500Name name;

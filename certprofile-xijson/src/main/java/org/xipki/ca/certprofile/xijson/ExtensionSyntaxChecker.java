@@ -19,12 +19,12 @@ package org.xipki.ca.certprofile.xijson;
 
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.ca.api.profile.TextVadidator;
 import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax;
 import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax.SubFieldSyntax;
 import org.xipki.security.X509ExtensionType.FieldType;
 import org.xipki.security.X509ExtensionType.Tag;
+import org.xipki.util.exception.BadCertTemplateException;
 
 import java.util.ArrayList;
 import java.util.List;

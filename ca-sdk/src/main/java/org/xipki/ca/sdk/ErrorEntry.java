@@ -2,6 +2,12 @@ package org.xipki.ca.sdk;
 
 import org.xipki.util.exception.OperationException;
 
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public class ErrorEntry {
 
   private int code;

@@ -21,7 +21,6 @@ import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
-import org.xipki.util.exception.OperationException;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
@@ -31,6 +30,7 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
+import org.xipki.util.exception.OperationException;
 
 import java.util.ArrayList;
 import java.util.List;

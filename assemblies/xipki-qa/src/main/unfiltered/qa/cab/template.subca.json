@@ -24,19 +24,7 @@
 			"certchain":[{
 				"file":"output/rootca1.crt"
 			}],
-			"cmpControl":{
-				"send.ca":true,
-				"send.certchain":false,
-				"messagetime.bias":300,
-				"rr.aki.required":true,
-				"group.enroll":true,
-				"protection.sigalgo":"REPLACEME-CMP_SIGALGO"
-			},
-			"popControl":{
-				"value":"sigalgo=REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2"
-			},
-			"cmpResponderName":"responder1",
-			"keypairGenNames":["software"],
+			"kceypairGenNames":["software"],
 			"ctlogControl":{
 				"enabled":true,
 				"servers":"https://localhost:8443/ctlog/ctlogrsa;https://localhost:8443/ctlog/ctlogec",
@@ -52,7 +40,6 @@
 			"maxValidity":"5y",
 			"nextCrlNo":2,
 			"permissions":["all"],
-			"protocolSupport":["cmp","rest"],
 			"saveRequest":false,
 			"signerType":"${token.type}",
 			"signerConf":{
@@ -71,17 +58,7 @@
 			"ocsp-publisher"
 		],
 		"requestors":[{
-			"ra":true,
 			"requestorName":"requestor1",
-			"permissions":[
-				"all"
-			],
-			"profiles":[
-				"all"
-			]
-		},{
-			"ra":true,
-			"requestorName":"requestor-mac1",
 			"permissions":[
 				"all"
 			],

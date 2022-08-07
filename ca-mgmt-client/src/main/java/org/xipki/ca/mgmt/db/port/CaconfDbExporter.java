@@ -24,8 +24,8 @@ import org.xipki.ca.api.mgmt.entry.CaConfColumn;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.StringUtil;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;
 import java.io.OutputStream;

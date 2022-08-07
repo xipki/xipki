@@ -1,5 +1,11 @@
 package org.xipki.ca.protocol;
 
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public class KeyCertPair {
 
   private final byte[] key;

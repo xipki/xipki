@@ -10,9 +10,15 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public class ScepProxyConf extends ProtocolProxyConf {
 
-  private ScepControl scepControl;
+  private ScepControl scep;
 
   public static ScepProxyConf readConfFromFile(String fileName)
       throws IOException, InvalidConfException {
@@ -24,12 +30,18 @@ public class ScepProxyConf extends ProtocolProxyConf {
     }
   }
 
-  public ScepControl getScepControl() {
-    return scepControl;
+  public ScepControl getScep() {
+    return scep;
   }
 
-  public void setScepControl(ScepControl scepControl) {
-    this.scepControl = scepControl;
+  public void setScep(ScepControl scep) {
+    this.scep = scep;
   }
 
+  @Override
+  public void validate() throws InvalidConfException {
+    super.validate();
+    notNull(signer, "signer");
+    notNull(scep, "scep");
+  }
 }

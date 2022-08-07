@@ -4,6 +4,13 @@ import com.alibaba.fastjson.JSON;
 
 import java.util.List;
 
+/**
+ * Response for the operations enrolling certificates and polling certificates.
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public class EnrollOrPollCertsResponse extends SdkResponse {
 
   private String transactionId;

@@ -48,20 +48,19 @@ import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
 import org.xipki.ca.protocol.PopControl;
-import org.xipki.ca.protocol.RequestorAuthenticator;
 import org.xipki.ca.protocol.Requestor;
+import org.xipki.ca.protocol.RequestorAuthenticator;
 import org.xipki.ca.protocol.SdkClient;
 import org.xipki.security.*;
 import org.xipki.security.cmp.CmpUtil;
 import org.xipki.security.cmp.ProtectionResult;
 import org.xipki.security.cmp.ProtectionVerificationResult;
-import org.xipki.util.Base64;
 import org.xipki.util.*;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
+import org.xipki.util.exception.InsufficientPermissionException;
 import org.xipki.util.exception.OperationException;
 import org.xipki.util.exception.OperationException.ErrorCode;
-import org.xipki.util.exception.InsufficientPermissionException;
 
 import javax.crypto.*;
 import javax.crypto.spec.GCMParameterSpec;
@@ -70,7 +69,10 @@ import java.security.*;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.xipki.ca.sdk.CaAuditConstants.*;
@@ -112,7 +114,6 @@ abstract class BaseCmpResponder {
   public static final String TYPE_rr_revoke = "rr_revoke";
 
   public static final String TYPE_rr_unrevoke = "rr_unrevoke";
-
 
   private static final Logger LOG = LoggerFactory.getLogger(BaseCmpResponder.class);
 
@@ -236,7 +237,8 @@ abstract class BaseCmpResponder {
   protected abstract PKIBody confirmCertificates(String caName, ASN1OctetString transactionId,
       CertConfirmContent certConf, String msgId);
 
-  protected abstract PKIBody revokePendingCertificates(String caName, ASN1OctetString transactionId);
+  protected abstract PKIBody revokePendingCertificates(
+      String caName, ASN1OctetString transactionId);
 
   private Requestor getCertRequestor(
       X500Name requestorSender, byte[] senderKID, CMPCertificate[] extraCerts) {
@@ -433,7 +435,8 @@ abstract class BaseCmpResponder {
     X500Name x500Name = getX500Name(recipient);
     if (x500Name != null) {
       if (!signer.getCertificate().getSubject().equals(x500Name)) {
-        LOG.warn("tid={}: I am not the intended recipient, but '{}'", tid, reqHeader.getRecipient());
+        LOG.warn("tid={}: I am not the intended recipient, but '{}'",
+            tid, reqHeader.getRecipient());
         failureCode = PKIFailureInfo.badRequest;
         statusText = "I am not the intended recipient";
       }
@@ -498,7 +501,8 @@ abstract class BaseCmpResponder {
             errorStatus = "request is protected by MAC but the algorithm is forbidden";
             break;
           default:
-            throw new IllegalStateException("should not reach here, unknown ProtectionResult " + pr);
+            throw new IllegalStateException(
+                "should not reach here, unknown ProtectionResult " + pr);
         }
 
         requestor = (Requestor) verificationResult.getRequestor();
@@ -643,7 +647,8 @@ abstract class BaseCmpResponder {
     GeneralName respSender = pkiMessage.getHeader().getSender();
     try {
       if (requestor.getCert() != null) {
-        return CmpUtil.addProtection(pkiMessage, signer, respSender, cmpControl.isSendResponderCert());
+        return CmpUtil.addProtection(pkiMessage, signer, respSender,
+                cmpControl.isSendResponderCert());
       } else {
         PBMParameter parameter = new PBMParameter(randomSalt(),
             cmpControl.getResponsePbmOwf().getAlgorithmIdentifier(),
@@ -723,12 +728,14 @@ abstract class BaseCmpResponder {
   protected static CertRepMessage buildErrCertResp(ASN1Integer certReqId, int pkiFailureInfo,
       String pkiStatusText) {
     return new CertRepMessage(null,
-        new CertResponse[]{new CertResponse(certReqId, generateRejectionStatus(pkiFailureInfo, pkiStatusText))});
+        new CertResponse[]{new CertResponse(certReqId,
+            generateRejectionStatus(pkiFailureInfo, pkiStatusText))});
   }
 
-  protected static void addErrCertResp(Map<Integer, CertResponse> resps, int index, ASN1Integer certReqId,
-      int pkiFailureInfo, String pkiStatusText) {
-    resps.put(index, new CertResponse(certReqId, generateRejectionStatus(pkiFailureInfo, pkiStatusText)));
+  protected static void addErrCertResp(Map<Integer, CertResponse> resps, int index,
+      ASN1Integer certReqId, int pkiFailureInfo, String pkiStatusText) {
+    resps.put(index, new CertResponse(certReqId,
+        generateRejectionStatus(pkiFailureInfo, pkiStatusText)));
   }
 
   protected boolean verifyPop(CertificateRequestMessage certRequest, SubjectPublicKeyInfo spki) {

@@ -39,7 +39,10 @@ import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.util.*;
+import org.xipki.util.Args;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.IoUtil;
+import org.xipki.util.PemEncoder;
 import org.xipki.util.PemEncoder.PemLabel;
 import org.xipki.util.exception.ObjectCreationException;
 

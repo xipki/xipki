@@ -23,10 +23,10 @@ import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
 import org.xipki.security.CertpathValidationModel;
 import org.xipki.util.FileOrBinary;
-import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.Validity;
 import org.xipki.util.Validity.Unit;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;
 import java.io.InputStream;

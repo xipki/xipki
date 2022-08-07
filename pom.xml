@@ -70,7 +70,6 @@
     <module>ca-mgmt-api</module>
     <module>ca-server</module>
     <module>ca-protocol</module>
-    <!--module>ca-protocol-servlet</module-->
     <module>ca-servlet</module>
     <module>ca-mgmt-client</module>
     <module>certprofile-xijson</module>

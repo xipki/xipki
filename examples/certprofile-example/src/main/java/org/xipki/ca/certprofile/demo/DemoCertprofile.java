@@ -25,7 +25,6 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
-import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
@@ -33,6 +32,7 @@ import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.util.ConfPairs;
+import org.xipki.util.exception.BadCertTemplateException;
 
 import java.util.Date;
 import java.util.List;

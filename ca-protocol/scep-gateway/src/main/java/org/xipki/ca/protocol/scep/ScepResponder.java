@@ -37,18 +37,20 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.AuditEvent;
-import org.xipki.audit.AuditStatus;
+import org.xipki.audit.*;
 import org.xipki.ca.protocol.*;
 import org.xipki.ca.sdk.*;
-import org.xipki.security.*;
-import org.xipki.util.exception.OperationException;
 import org.xipki.scep.message.*;
-import org.xipki.scep.message.EnvelopedDataDecryptor.EnvelopedDataDecryptorInstance;
 import org.xipki.scep.transaction.*;
+import org.xipki.scep.util.ScepConstants;
+import org.xipki.security.*;
+import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.exception.OperationException;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.EOFException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -60,8 +62,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import static org.xipki.util.exception.OperationException.ErrorCode.*;
 import static org.xipki.util.Args.notNull;
+import static org.xipki.util.exception.OperationException.ErrorCode.*;
 
 /**
  * SCEP responder.
@@ -72,17 +74,17 @@ import static org.xipki.util.Args.notNull;
  */
 public class ScepResponder {
 
-  public static final String NAME_decryption = "decryption";
+  private static final String NAME_decryption = "decryption";
 
-  public static final String NAME_fail_info = "fail_info";
+  private static final String NAME_fail_info = "fail_info";
 
-  public static final String NAME_failure_message = "failure_message";
+  private static final String NAME_failure_message = "failure_message";
 
-  public static final String NAME_message_type = "message_type";
+  private static final String NAME_message_type = "message_type";
 
-  public static final String NAME_pki_status = "pki_status";
+  private static final String NAME_pki_status = "pki_status";
 
-  public static final String NAME_signature = "signature";
+  private static final String NAME_signature = "signature";
 
   private static class FailInfoException extends Exception {
 
@@ -111,6 +113,12 @@ public class ScepResponder {
   private static final Logger LOG = LoggerFactory.getLogger(ScepResponder.class);
 
   private static final long DFLT_MAX_SIGNINGTIME_BIAS = 5L * 60 * 1000; // 5 minutes
+
+  private static final String CGI_PROGRAM = "/pkiclient.exe";
+
+  private static final int CGI_PROGRAM_LEN = CGI_PROGRAM.length();
+
+  private static final String CT_RESPONSE = ScepConstants.CT_PKI_MESSAGE;
 
   private final ScepControl control;
 
@@ -150,7 +158,8 @@ public class ScepResponder {
 
     Key signingKey = signer.getSigningKey();
     if (!(signingKey instanceof PrivateKey)) {
-      throw new IllegalArgumentException("Unsupported signer type: the signing key is not a PrivateKey");
+      throw new IllegalArgumentException(
+          "Unsupported signer type: the signing key is not a PrivateKey");
     }
 
     if (!(signer.getCertificate().getPublicKey() instanceof RSAPublicKey)) {
@@ -161,10 +170,10 @@ public class ScepResponder {
     this.responderCert = signer.getCertificate();
     this.envelopedDataDecryptor =
         new EnvelopedDataDecryptor(
-            new EnvelopedDataDecryptorInstance(responderCert, responderKey));
+            new EnvelopedDataDecryptor.EnvelopedDataDecryptorInstance(responderCert, responderKey));
   } // constructor
 
-  public CaCaps getCaCaps() {
+  private CaCaps getCaCaps() {
     return caCaps;
   }
 
@@ -176,7 +185,173 @@ public class ScepResponder {
     return authenticator.getCertRequestor(cert);
   }
 
-  public byte[] getCaCertResp(String caName)
+  public RestResponse service(String path, byte[] request,
+                               HttpRequestMetadataRetriever metadataRetriever) {
+    String caName = null;
+    String certprofileName = null;
+    if (path.length() > 1) {
+      String scepPath = path;
+      if (scepPath.endsWith(CGI_PROGRAM)) {
+        // skip also the first char (which is always '/')
+        String tpath = scepPath.substring(1, scepPath.length() - CGI_PROGRAM_LEN);
+        String[] tokens = tpath.split("/");
+        if (tokens.length == 2) {
+          caName = tokens[0];
+          certprofileName = tokens[1].toLowerCase();
+        }
+      } // end if
+    } // end if
+
+    if (caName == null || certprofileName == null) {
+      return new RestResponse(HttpServletResponse.SC_NOT_FOUND);
+    }
+
+    AuditService auditService = Audits.getAuditService();
+    AuditEvent event = new AuditEvent(new Date());
+    event.setApplicationName("SCEP");
+    event.setName(CaAuditConstants.NAME_perf);
+    event.addEventData("name", caName + "/" + certprofileName);
+
+    String msgId = RandomUtil.nextHexLong();
+    event.addEventData(CaAuditConstants.NAME_mid, msgId);
+
+    AuditLevel auditLevel = AuditLevel.INFO;
+    AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
+    String auditMessage = null;
+
+    String operation = metadataRetriever.getParameter("operation");
+    event.addEventData("operation", operation);
+
+    RestResponse ret;
+
+    try {
+      byte[] respBody;
+      String contentType;
+
+      if ("PKIOperation".equalsIgnoreCase(operation)) {
+        CMSSignedData reqMessage;
+        // parse the request
+        try {
+          reqMessage = new CMSSignedData(request);
+        } catch (Exception ex) {
+          final String msg = "invalid request";
+          LogUtil.error(LOG, ex, msg);
+          auditMessage = msg;
+          auditStatus = AuditStatus.FAILED;
+          return new RestResponse(HttpServletResponse.SC_BAD_REQUEST);
+        }
+
+        ContentInfo ci;
+        try {
+          ci = servicePkiOperation(caName, reqMessage, certprofileName, msgId, event);
+        } catch (MessageDecodingException ex) {
+          final String msg = "could not decrypt and/or verify the request";
+          LogUtil.error(LOG, ex, msg);
+          auditMessage = msg;
+          auditStatus = AuditStatus.FAILED;
+          return new RestResponse(HttpServletResponse.SC_BAD_REQUEST);
+        } catch (OperationException ex) {
+          OperationException.ErrorCode code = ex.getErrorCode();
+
+          int httpCode;
+          switch (code) {
+            case ALREADY_ISSUED:
+            case CERT_REVOKED:
+            case CERT_UNREVOKED:
+              httpCode = HttpServletResponse.SC_FORBIDDEN;
+              break;
+            case BAD_CERT_TEMPLATE:
+            case BAD_REQUEST:
+            case BAD_POP:
+            case INVALID_EXTENSION:
+            case UNKNOWN_CERT:
+            case UNKNOWN_CERT_PROFILE:
+              httpCode = HttpServletResponse.SC_BAD_REQUEST;
+              break;
+            case NOT_PERMITTED:
+              httpCode = HttpServletResponse.SC_UNAUTHORIZED;
+              break;
+            case SYSTEM_UNAVAILABLE:
+              httpCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+              break;
+            case CRL_FAILURE:
+            case DATABASE_FAILURE:
+            case SYSTEM_FAILURE:
+            default:
+              httpCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+              break;
+          }
+
+          auditMessage = ex.getMessage();
+          LogUtil.error(LOG, ex, auditMessage);
+          auditStatus = AuditStatus.FAILED;
+          return new RestResponse(httpCode);
+        }
+
+        respBody = ci.getEncoded();
+        contentType = CT_RESPONSE;
+      } else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation)) {
+        // CA-Ident is ignored
+        contentType = ScepConstants.CT_TEXT_PLAIN;
+        respBody = getCaCaps().getBytes();
+      } else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation)) {
+        // CA-Ident is ignored
+        contentType = ScepConstants.CT_X509_CA_RA_CERT;
+        respBody = getCaCertResp(caName);
+      } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation)) {
+        auditMessage = "SCEP operation '" + operation + "' is not permitted";
+        auditStatus = AuditStatus.FAILED;
+        return new RestResponse(HttpServletResponse.SC_FORBIDDEN);
+      } else {
+        auditMessage = "unknown SCEP operation '" + operation + "'";
+        auditStatus = AuditStatus.FAILED;
+        return new RestResponse(HttpServletResponse.SC_BAD_REQUEST);
+      }
+      ret = new RestResponse(HttpServletResponse.SC_OK, contentType, null, respBody);
+    } catch (Throwable th) {
+      if (th instanceof EOFException) {
+        final String msg = "connection reset by peer";
+        if (LOG.isWarnEnabled()) {
+          LogUtil.warn(LOG, th, msg);
+        }
+        LOG.debug(msg, th);
+      } else {
+        LOG.error("Throwable thrown, this should not happen!", th);
+      }
+
+      auditLevel = AuditLevel.ERROR;
+      auditStatus = AuditStatus.FAILED;
+      auditMessage = "internal error";
+      ret = new RestResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    } finally {
+      audit(auditService, event, auditLevel, auditStatus, auditMessage);
+    }
+
+    return ret;
+  } // method service0
+
+  private static void audit(AuditService auditService, AuditEvent event,
+                            AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage) {
+    AuditLevel curLevel = event.getLevel();
+    if (curLevel == null) {
+      event.setLevel(auditLevel);
+    } else if (curLevel.getValue() > auditLevel.getValue()) {
+      event.setLevel(auditLevel);
+    }
+
+    if (auditStatus != null) {
+      event.setStatus(auditStatus);
+    }
+
+    if (auditMessage != null) {
+      event.addEventData(CaAuditConstants.NAME_message, auditMessage);
+    }
+
+    event.finish();
+    auditService.logEvent(event);
+  } // method audit
+
+  private byte[] getCaCertResp(String caName)
       throws OperationException {
     try {
       byte[] cacert = sdk.cacert(caName);
@@ -198,14 +373,15 @@ public class ScepResponder {
     }
   }
 
-  public ContentInfo servicePkiOperation(
+  private ContentInfo servicePkiOperation(
       String caName, CMSSignedData requestContent, String certprofileName,
       String msgId, AuditEvent event)
       throws MessageDecodingException, OperationException {
     DecodedPkiMessage req = DecodedPkiMessage.decode(
         requestContent, envelopedDataDecryptor, null);
 
-    PkiMessage rep = servicePkiOperation0(caName, requestContent, req, certprofileName, msgId, event);
+    PkiMessage rep = servicePkiOperation0(caName, requestContent, req,
+                        certprofileName, msgId, event);
     audit(event, NAME_pki_status, rep.getPkiStatus().toString());
     if (rep.getPkiStatus() == PkiStatus.FAILURE) {
       event.setStatus(AuditStatus.FAILED);
@@ -237,7 +413,8 @@ public class ScepResponder {
       audit(event, NAME_decryption, "failed");
     }
 
-    PkiMessage rep = new PkiMessage(req.getTransactionId(), MessageType.CertRep, Nonce.randomNonce());
+    PkiMessage rep = new PkiMessage(req.getTransactionId(), MessageType.CertRep,
+                        Nonce.randomNonce());
     rep.setRecipientNonce(req.getSenderNonce());
 
     if (req.getFailureMessage() != null) {
@@ -261,7 +438,7 @@ public class ScepResponder {
     }
 
     Date signingTime = req.getSigningTime();
-    long maxSigningTimeBiasInMs = control.getMaxSigningTimeBiasInMs();
+    long maxSigningTimeBiasInMs = 1000L * control.getMaxSigningTimeBias();
     if (maxSigningTimeBiasInMs > 0) {
       boolean isTimeBad;
       if (signingTime == null) {
@@ -672,7 +849,6 @@ public class ScepResponder {
   private static void audit(AuditEvent audit, String name, String value) {
     audit.addEventData(name, (value == null) ? "null" : value);
   }
-
 
   private static String getChallengePassword(CertificationRequestInfo csr) {
     notNull(csr, "csr");

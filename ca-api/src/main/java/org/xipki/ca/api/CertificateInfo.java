@@ -96,7 +96,6 @@ public class CertificateInfo {
     return requestor;
   }
 
-
   public boolean isRevoked() {
     return revocationInfo != null;
   }

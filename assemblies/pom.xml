@@ -21,5 +21,8 @@
     <module>xipki-ca</module>
     <module>xipki-p11proxy</module>
     <module>xipki-qa</module>
+    <module>xipki-cmp-gateway</module>
+    <module>xipki-rest-gateway</module>
+    <module>xipki-scep-gateway</module>
   </modules>
 </project>

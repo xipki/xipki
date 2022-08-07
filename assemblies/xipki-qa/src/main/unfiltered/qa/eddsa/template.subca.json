@@ -24,17 +24,6 @@
 			"certchain":[{
 				"file":"output/rootca1.crt"
 			}],
-			"cmpControl":{
-				"send.ca":true,
-				"messagetime.bias":300,
-				"rr.aki.required":true,
-				"group.enroll":true,
-				"protection.sigalgo":"SHA256withECDSA"
-			},
-			"popControl":{
-				"value":"sigalgo=Ed25519:Ed448:DHPOP-X25519:DHPOP-X448,dh.type=pkcs12,dh.password=1234,dh.keystore=file:qa/keys/dhpop.p12"
-			},
-			"cmpResponderName":"responder1",
 			"keypairGenNames":["software"],
 			"expirationPeriod":365,
 			"revokeSuspendedControl":{
@@ -46,7 +35,6 @@
 			"maxValidity":"5y",
 			"nextCrlNo":2,
 			"permissions":["all"],
-			"protocolSupport":["cmp","rest"],
 			"saveRequest":false,
 			"signerType":"${token.type}",
 			"signerConf":{
@@ -67,17 +55,7 @@
 			"ocsp-publisher"
 		],
 		"requestors":[{
-			"ra":true,
 			"requestorName":"requestor1",
-			"permissions":[
-				"all"
-			],
-			"profiles":[
-				"all"
-			]
-		},{
-			"ra":true,
-			"requestorName":"requestor-mac1",
 			"permissions":[
 				"all"
 			],

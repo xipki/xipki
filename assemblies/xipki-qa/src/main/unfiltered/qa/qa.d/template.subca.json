@@ -21,17 +21,6 @@
 			"certchain":[{
 				"file":"output/rootca1.crt"
 			}],
-			"cmpControl":{
-				"send.ca":true,
-				"send.certchain":false,
-				"messagetime.bias":300,
-				"rr.aki.required":true,
-				"group.enroll":true,
-				"protection.sigalgo":"REPLACEME-CMP_SIGALGO"
-			},
-			"popControl":{
-				"value":"sigalgo=REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2"
-			},
 			"ctlog-control":{
 				"enabled":true,
 				"sslcontext.name":"localhost",
@@ -76,7 +65,6 @@
 			"ocsp-publisher"
 		],
 		"requestors":[{
-			"ra":true,
 			"requestorName":"requestor1",
 			"permissions":[
 				"all"
@@ -84,16 +72,7 @@
 			"profiles":[
 				"all"
 			]
-		},{
-			"ra":true,
-			"requestorName":"requestor-mac1",
-			"permissions":[
-				"all"
-			],
-			"profiles":[
-				"all"
-			]
-		}]
+		}
 	}]
 }
 

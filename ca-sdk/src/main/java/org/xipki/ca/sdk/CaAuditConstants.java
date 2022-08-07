@@ -21,7 +21,7 @@ package org.xipki.ca.sdk;
  * Constants used to identify the audit event.
  *
  * @author Lijun Liao
- * @since 3.0.1
+ * @since 6.0.0
  */
 
 public class CaAuditConstants {

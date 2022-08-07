@@ -22,11 +22,13 @@ import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.CollectionAlgorithmValidator;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
-import org.xipki.util.*;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * CMP control.
@@ -97,20 +99,32 @@ public class CmpControl {
       throw new InvalidConfException("invalid signature algorithm", ex);
     }
 
-    // PasswordBasedMac
-    List<String> listOwfAlgos = conf.getRequestPbmOwfs();
-    // PasswordBasedMac.mac
-    List<String> listMacAlgos = conf.getRequestPbmMacs();
-    Integer pbmIterationCount = conf.getResponsePbmIterationCount();
-    initPbm(listOwfAlgos, listMacAlgos, pbmIterationCount);
-  } // constructor
+    // PBM
+    try {
+      if (conf.getResponsePbmMac() != null) {
+        this.responsePbmMac = SignAlgo.getInstance(conf.getResponsePbmMac());
+      }
 
-  private void initPbm(
-      List<String> pbmOwfs, List<String> pbmMacs, Integer pbmIterationCount)
-      throws InvalidConfException {
+      if (conf.getResponsePbmOwf() != null) {
+        this.responsePbmOwf = HashAlgo.getInstance(conf.getResponsePbmOwf());
+      }
+    } catch (NoSuchAlgorithmException ex) {
+      throw new InvalidConfException(ex);
+    }
+
+    // PasswordBasedMac
+    List<String> pbmOwfs = conf.getRequestPbmOwfs();
+    // PasswordBasedMac.mac
+    List<String> pbmMacs = conf.getRequestPbmMacs();
+    Integer pbmIterationCount = conf.getResponsePbmIterationCount();
     if (pbmIterationCount == null) {
       pbmIterationCount = DFLT_PBM_ITERATIONCOUNT;
     }
+
+    if (pbmIterationCount <= 0) {
+      throw new InvalidConfException("invalid pbmIterationCount " + pbmIterationCount);
+    }
+    this.responsePbmIterationCount = pbmIterationCount;
 
     if (CollectionUtil.isEmpty(pbmOwfs)) {
       pbmOwfs = Collections.singletonList("SHA256");
@@ -119,11 +133,6 @@ public class CmpControl {
     if (CollectionUtil.isEmpty(pbmMacs)) {
       pbmMacs = Collections.singletonList("HMACSHA256");
     }
-
-    if (pbmIterationCount <= 0) {
-      throw new InvalidConfException("invalid pbmIterationCount " + pbmIterationCount);
-    }
-    this.responsePbmIterationCount = pbmIterationCount;
 
     this.requestPbmOwfs = new ArrayList<>(pbmOwfs.size());
     List<String> canonicalizedAlgos = new ArrayList<>(pbmOwfs.size());
@@ -138,7 +147,7 @@ public class CmpControl {
       canonicalizedAlgos.add(ha.getJceName());
       requestPbmOwfs.add(ha);
 
-      if (i == 0) {
+      if (i == 0 && responsePbmOwf == null) {
         responsePbmOwf = ha;
       }
     }
@@ -157,7 +166,7 @@ public class CmpControl {
       canonicalizedAlgos.add(signAlgo.getJceName());
       requestPbmMacs.add(signAlgo);
 
-      if (i == 0) {
+      if (i == 0 && responsePbmMac == null) {
         responsePbmMac = signAlgo;
       }
     }

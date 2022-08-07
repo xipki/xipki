@@ -31,14 +31,11 @@ import org.xipki.security.util.SignerUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.exception.ObjectCreationException;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Enumeration;
 import java.util.Set;
 
-import static org.xipki.util.Args.*;
+import static org.xipki.util.Args.positive;
 
 /**
  * An implementation of {@link SecurityFactory}.

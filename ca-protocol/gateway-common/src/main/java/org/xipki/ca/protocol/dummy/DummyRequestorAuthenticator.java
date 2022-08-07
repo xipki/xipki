@@ -4,6 +4,12 @@ import org.xipki.ca.protocol.Requestor;
 import org.xipki.ca.protocol.RequestorAuthenticator;
 import org.xipki.security.X509Cert;
 
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public class DummyRequestorAuthenticator implements RequestorAuthenticator {
   @Override
   public Requestor getPasswordRequestorByKeyId(byte[] keyId) {

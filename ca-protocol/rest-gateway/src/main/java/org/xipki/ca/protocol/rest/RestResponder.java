@@ -28,21 +28,18 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
-import org.xipki.ca.protocol.PopControl;
-import org.xipki.ca.protocol.Requestor;
-import org.xipki.ca.protocol.RequestorAuthenticator;
-import org.xipki.ca.protocol.SdkClient;
+import org.xipki.ca.protocol.*;
 import org.xipki.ca.sdk.*;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.util.HttpRequestMetadataRetriever;
-import org.xipki.util.exception.OperationException;
-import org.xipki.util.exception.OperationException.ErrorCode;
 import org.xipki.security.CrlReason;
+import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
+import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.*;
 import org.xipki.util.PemEncoder.PemLabel;
+import org.xipki.util.exception.OperationException;
+import org.xipki.util.exception.OperationException.ErrorCode;
 
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
@@ -61,42 +58,6 @@ import static org.xipki.util.exception.OperationException.ErrorCode.*;
  */
 
 public class RestResponder {
-
-  public static class RestResponse {
-
-    private final int statusCode;
-
-    private final String contentType;
-
-    private final Map<String, String> headers;
-
-    private final byte[] body;
-
-    public RestResponse(int statusCode, String contentType, Map<String, String> headers,
-        byte[] body) {
-      this.statusCode = statusCode;
-      this.contentType = contentType;
-      this.headers = headers;
-      this.body = body;
-    }
-
-    public int getStatusCode() {
-      return statusCode;
-    }
-
-    public String getContentType() {
-      return contentType;
-    }
-
-    public Map<String, String> getHeaders() {
-      return headers;
-    }
-
-    public byte[] getBody() {
-      return body;
-    }
-
-  } // class RestResponse
 
   private static class HttpRespAuditException extends Exception {
 
@@ -179,7 +140,7 @@ public class RestResponder {
   }
 
   public RestResponse service(String path, AuditEvent event, byte[] request,
-      HttpRequestMetadataRetriever httpRetriever) {
+                              HttpRequestMetadataRetriever httpRetriever) {
     event.setApplicationName(CaAuditConstants.APPNAME);
     event.setName(CaAuditConstants.NAME_perf);
 
@@ -201,7 +162,8 @@ public class RestResponder {
         if (sepIndex == -1 || sepIndex == coreUri.length() - 1) {
           String message = "invalid path " + path;
           LOG.error(message);
-          throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.ERROR, AuditStatus.FAILED);
+          throw new HttpRespAuditException(NOT_FOUND, message,
+              AuditLevel.ERROR, AuditStatus.FAILED);
         }
 
         // skip also the first char ('/')
@@ -261,7 +223,8 @@ public class RestResponder {
       } else {
         X509Cert clientCert = httpRetriever.getTlsClientCert();
         if (clientCert == null) {
-          throw new HttpRespAuditException(UNAUTHORIZED, "no client certificate", AuditLevel.INFO, AuditStatus.FAILED);
+          throw new HttpRespAuditException(UNAUTHORIZED, "no client certificate",
+              AuditLevel.INFO, AuditStatus.FAILED);
         }
         requestor = getRequestor(clientCert);
 
@@ -353,13 +316,15 @@ public class RestResponder {
               extensions = X509Util.getExtensions(certTemp);
             } else {
               String message = "unsupported media type " + ct;
-              throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, AuditLevel.INFO, AuditStatus.FAILED);
+              throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message,
+                  AuditLevel.INFO, AuditStatus.FAILED);
             }
           } else {
             String ct = httpRetriever.getHeader("Content-Type");
             if (!RestAPIConstants.CT_pkcs10.equalsIgnoreCase(ct)) {
               String message = "unsupported media type " + ct;
-              throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, AuditLevel.INFO, AuditStatus.FAILED);
+              throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message,
+                  AuditLevel.INFO, AuditStatus.FAILED);
             }
 
             CertificationRequest csr = CertificationRequest.getInstance(request);
@@ -384,14 +349,16 @@ public class RestResponder {
             template.extensions(extensions);
           } catch (IOException e) {
             String message  ="could not encode extensions";
-            throw new HttpRespAuditException(BAD_REQUEST, message, AuditLevel.INFO, AuditStatus.FAILED);
+            throw new HttpRespAuditException(BAD_REQUEST, message,
+                AuditLevel.INFO, AuditStatus.FAILED);
           }
 
           try {
             template.subjectPublicKey(subjectPublicKeyInfo);
           } catch (IOException e) {
             String message  ="could not encode SubjectPublicKeyInfo";
-            throw new HttpRespAuditException(BAD_REQUEST, message, AuditLevel.INFO, AuditStatus.FAILED);
+            throw new HttpRespAuditException(BAD_REQUEST, message,
+                AuditLevel.INFO, AuditStatus.FAILED);
           }
 
           EnrollCertsRequest sdkReq = new EnrollCertsRequest();
@@ -403,15 +370,15 @@ public class RestResponder {
           List<EnrollOrPullCertResponseEntry> entries = sdkResp.getEntries();
           int n = entries == null ? 0 : entries.size();
           if (n != 1) {
-            throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, "expected 1 cert, but received " + n,
-                AuditLevel.INFO, AuditStatus.FAILED);
+            throw new HttpRespAuditException(INTERNAL_SERVER_ERROR,
+                "expected 1 cert, but received " + n, AuditLevel.INFO, AuditStatus.FAILED);
           }
 
           EnrollOrPullCertResponseEntry entry = entries.get(0);
           byte[] certBytes = entry.getCert();
           if (certBytes == null) {
-            throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, "expected 1 cert, but received none",
-                AuditLevel.INFO, AuditStatus.FAILED);
+            throw new HttpRespAuditException(INTERNAL_SERVER_ERROR,
+                "expected 1 cert, but received none", AuditLevel.INFO, AuditStatus.FAILED);
           }
 
           if (RestAPIConstants.CMD_enroll_cert_cagenkeypair.equals(command)) {
@@ -421,8 +388,8 @@ public class RestResponder {
 
             byte[] keyBytes = entry.getPrivateKey();
             if (keyBytes == null) {
-              throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, "expected 1 private key, but received none",
-                  AuditLevel.INFO, AuditStatus.FAILED);
+              throw new HttpRespAuditException(INTERNAL_SERVER_ERROR,
+                  "expected 1 private key, but received none", AuditLevel.INFO, AuditStatus.FAILED);
             }
 
             keyBytes = PemEncoder.encode(keyBytes, PemLabel.PRIVATE_KEY);
@@ -512,7 +479,8 @@ public class RestResponder {
             } catch (NumberFormatException ex) {
               String message = "invalid crlNumber '" + strCrlNumber + "'";
               LOG.warn(message);
-              throw new HttpRespAuditException(BAD_REQUEST, message, AuditLevel.INFO, AuditStatus.FAILED);
+              throw new HttpRespAuditException(BAD_REQUEST, message,
+                  AuditLevel.INFO, AuditStatus.FAILED);
             }
           }
 
@@ -520,7 +488,8 @@ public class RestResponder {
           if (respBytes == null) {
             String message = "could not get CRL";
             LOG.warn(message);
-            throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, message, AuditLevel.INFO, AuditStatus.FAILED);
+            throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, message,
+                AuditLevel.INFO, AuditStatus.FAILED);
           }
 
           respCt = RestAPIConstants.CT_pkix_crl;

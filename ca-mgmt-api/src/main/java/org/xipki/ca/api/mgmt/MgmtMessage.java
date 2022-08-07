@@ -24,7 +24,10 @@ import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.*;
+import org.xipki.util.Base64;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.Validity;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.security.cert.CertificateException;

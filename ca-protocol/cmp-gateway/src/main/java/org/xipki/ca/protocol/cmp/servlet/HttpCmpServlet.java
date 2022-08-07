@@ -23,10 +23,13 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
 import org.xipki.ca.protocol.cmp.CmpResponder;
 import org.xipki.ca.protocol.servlet.HttpRespAuditException;
-import org.xipki.ca.protocol.servlet.TlsHelper;
+import org.xipki.ca.protocol.servlet.ServletHelper;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.security.X509Cert;
-import org.xipki.util.*;
+import org.xipki.util.Args;
+import org.xipki.util.HttpConstants;
+import org.xipki.util.IoUtil;
+import org.xipki.util.LogUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -69,7 +72,7 @@ public class HttpCmpServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-    X509Cert clientCert = TlsHelper.getTlsClientCert(req);
+    X509Cert clientCert = ServletHelper.getTlsClientCert(req);
     AuditService auditService = Audits.getAuditService();
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName(CaAuditConstants.APPNAME);
@@ -102,10 +105,10 @@ public class HttpCmpServlet extends HttpServlet {
 
       event.addEventData(CaAuditConstants.NAME_ca, caName);
 
-      byte[] reqContent = IoUtil.read(req.getInputStream());
+      byte[] requestBytes = IoUtil.read(req.getInputStream());
       PKIMessage pkiReq;
       try {
-        pkiReq = PKIMessage.getInstance(reqContent);
+        pkiReq = PKIMessage.getInstance(requestBytes);
       } catch (Exception ex) {
         LogUtil.error(LOG, ex, "could not parse the request (PKIMessage)");
         throw new HttpRespAuditException(HttpServletResponse.SC_BAD_REQUEST,
@@ -118,15 +121,11 @@ public class HttpCmpServlet extends HttpServlet {
         parameters.put(entry.getKey(), entry.getValue()[0]);
       }
 
-      PKIMessage pkiResp = responder.processPkiMessage(caName, pkiReq, clientCert, parameters, event);
+      PKIMessage pkiResp = responder.processPkiMessage(
+                              caName, pkiReq, clientCert, parameters, event);
       byte[] encodedPkiResp = pkiResp.getEncoded();
-
-      if (logReqResp && LOG.isDebugEnabled()) {
-        LOG.debug("HTTP POST CA CMP path: {}\nRequest:\n{}\nResponse:\n{}",
-            req.getRequestURI(),
-            Base64.encodeToString(reqContent, true),
-            Base64.encodeToString(encodedPkiResp, true));
-      }
+      ServletHelper.logReqResp("CMP Gateway", LOG, logReqResp, true, req,
+          requestBytes, encodedPkiResp);
 
       resp.setContentType(CT_RESPONSE);
       resp.setContentLength(encodedPkiResp.length);

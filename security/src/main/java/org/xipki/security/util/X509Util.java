@@ -866,7 +866,6 @@ public class X509Util {
     return sb.toString();
   } // method formatCert
 
-
   public static Extensions getExtensions(CertificationRequestInfo csr) {
     notNull(csr, "csr");
     ASN1Set attrs = csr.getAttributes();

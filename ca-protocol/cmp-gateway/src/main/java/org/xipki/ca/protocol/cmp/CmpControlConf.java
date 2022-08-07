@@ -44,13 +44,13 @@ public class CmpControlConf {
 
   private List<String> requestSigAlgos;
 
-  private String responsePbmOwf;
-
   private List<String> requestPbmOwfs;
+
+  private List<String> requestPbmMacs;
 
   private String responsePbmMac;
 
-  private List<String> requestPbmMacs;
+  private String responsePbmOwf;
 
   private Integer responsePbmIterationCount;
 

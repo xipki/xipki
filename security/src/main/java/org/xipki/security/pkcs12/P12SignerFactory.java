@@ -23,8 +23,8 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.security.*;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
-import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.StringUtil;
+import org.xipki.util.exception.ObjectCreationException;
 
 import javax.crypto.NoSuchPaddingException;
 import java.io.ByteArrayInputStream;

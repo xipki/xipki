@@ -25,7 +25,6 @@ import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x509.qualified.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.profile.*;
 import org.xipki.ca.certprofile.xijson.AdmissionExtension.AdmissionSyntaxOption;
@@ -40,6 +39,7 @@ import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.exception.BadCertTemplateException;
 
 import java.io.ByteArrayInputStream;
 import java.security.NoSuchAlgorithmException;

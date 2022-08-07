@@ -130,7 +130,6 @@ public class Actions {
       return certs;
     }
 
-
     protected static HashAlgo getHashAlgo(String algoStr)
         throws ObjectCreationException {
       try {

@@ -217,7 +217,6 @@ public final class CmpClientImpl implements CmpClient {
     return true;
   } // method init
 
-
   private static CmpClientConf parse(InputStream configStream)
       throws CmpClientException {
     CmpClientConf conf;
@@ -236,7 +235,6 @@ public final class CmpClientImpl implements CmpClient {
 
     return conf;
   } // method parse
-
 
   @Override
   public void close() {

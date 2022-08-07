@@ -19,14 +19,14 @@ package org.xipki.ca.server;
 
 import org.xipki.audit.AuditEvent;
 import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.sdk.CaAuditConstants;
-import org.xipki.util.exception.OperationException;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
+import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.db.CertStore.SerialWithId;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
+import org.xipki.util.exception.OperationException;
 
 import java.io.Closeable;
 import java.math.BigInteger;
@@ -37,8 +37,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static org.xipki.util.exception.OperationException.ErrorCode.NOT_PERMITTED;
 import static org.xipki.util.Args.notNull;
+import static org.xipki.util.exception.OperationException.ErrorCode.NOT_PERMITTED;
 
 /**
  * X509CA revoker module.

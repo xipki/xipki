@@ -17,7 +17,10 @@
 
 package org.xipki.util.http;
 
-import org.xipki.util.*;
+import org.xipki.util.Base64;
+import org.xipki.util.CompareUtil;
+import org.xipki.util.FileOrBinary;
+import org.xipki.util.StringUtil;
 import org.xipki.util.exception.ObjectCreationException;
 
 import javax.net.ssl.HostnameVerifier;

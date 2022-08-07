@@ -26,7 +26,6 @@ import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.util.PermissionConstants;
 import org.xipki.ca.api.mgmt.PopControl;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.SubjectDnSpec;

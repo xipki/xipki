@@ -25,7 +25,6 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.util.exception.ObjectCreationException;
 
 import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.util.Set;

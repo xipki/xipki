@@ -18,8 +18,8 @@
 package org.xipki.datasource;
 
 import org.xipki.util.FileOrValue;
-import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
+import org.xipki.util.exception.InvalidConfException;
 
 /**
  * Configuration of DataSource.

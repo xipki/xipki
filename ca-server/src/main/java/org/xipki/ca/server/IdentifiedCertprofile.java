@@ -23,7 +23,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.PublicCaInfo;
@@ -41,6 +40,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.Validity;
+import org.xipki.util.exception.BadCertTemplateException;
 
 import java.io.Closeable;
 import java.math.BigInteger;

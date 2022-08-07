@@ -1,5 +1,10 @@
 package org.xipki.util;
 
+/**
+ * SQL utilities.
+ *
+ * @author Lijun Liao
+ */
 public class SqlUtil {
 
   public static String buildInsertSql(String table, String columns) {

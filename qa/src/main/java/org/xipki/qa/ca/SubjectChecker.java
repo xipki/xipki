@@ -21,7 +21,6 @@ import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.ca.api.profile.Certprofile.RdnControl;
 import org.xipki.ca.api.profile.Certprofile.StringType;
 import org.xipki.ca.api.profile.Certprofile.SubjectControl;
@@ -29,6 +28,7 @@ import org.xipki.ca.api.profile.TextVadidator;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.exception.BadCertTemplateException;
 
 import java.util.*;
 

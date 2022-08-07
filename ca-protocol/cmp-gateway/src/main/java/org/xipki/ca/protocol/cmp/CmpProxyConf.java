@@ -10,9 +10,15 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public class CmpProxyConf extends ProtocolProxyConf {
 
-  private CmpControlConf cmpControl;
+  private CmpControlConf cmp;
 
   public static CmpProxyConf readConfFromFile(String fileName)
       throws IOException, InvalidConfException {
@@ -24,17 +30,17 @@ public class CmpProxyConf extends ProtocolProxyConf {
     }
   }
 
-  public CmpControlConf getCmpControl() {
-    return cmpControl;
+  public CmpControlConf getCmp() {
+    return cmp;
   }
 
-  public void setCmpControl(CmpControlConf cmpControl) {
-    this.cmpControl = cmpControl;
+  public void setCmp(CmpControlConf cmpControl) {
+    this.cmp = cmp;
   }
 
   public void validate() throws InvalidConfException {
     super.validate();
-    notNull(cmpControl, "cmpControl");
+    notNull(cmp, "cmp");
   }
 
 }

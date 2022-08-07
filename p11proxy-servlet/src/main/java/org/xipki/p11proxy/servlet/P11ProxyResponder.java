@@ -97,14 +97,7 @@ public class P11ProxyResponder {
     actions.add(ACTION_DIGEST_SECRETKEY);
     actionsRequireNonNullRequest = Collections.unmodifiableSet(actions);
 
-    String ver;
-    try {
-      ver = StringUtil.toUtf8String(
-              IoUtil.read(P11ProxyResponder.class.getResourceAsStream("/version"))).trim();
-    } catch (Exception ex) {
-      ver = "UNKNOWN";
-    }
-    version = ver;
+    version = StringUtil.getVersion(P11ProxyResponder.class);
   } // method static
 
   public P11ProxyResponder() {

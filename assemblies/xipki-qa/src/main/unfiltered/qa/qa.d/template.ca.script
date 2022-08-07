@@ -35,12 +35,6 @@ ca:publisher-add \
   --type ocsp \
   --conf datasource=ocsp,publish.goodcerts=true
 
-# Signer
-ca:signer-add \
-  --name responder1 \
-  --type pkcs12 \
-  --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=REPLACEME-CMP_SIGALGO
-
 # Keypair Generation
 ca:keypairgen-add \
   --name pkcs11 \
@@ -98,12 +92,8 @@ ca:gen-rootca \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://myorg.org/rootca1.der \
   --crl-uri "http://localhost:8080/crl/?type=crl&name=rootca1" \
-  --cmp-control "send.ca=true,send.certchain=false,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO" \
-  --pop-control "sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
   --crl-control "interval.hours=24,fullcrl.intervals=90,overlap=90d,interval.time=02:00" \
-  --cmp-responder responder1 \
   --validity-mode cutoff \
-  --support-cmp yes --support-rest yes \
   --save-cert yes \
   --save-req yes \
   --save-keypair yes \
@@ -320,10 +310,6 @@ ca:ca-add \
   --signer-conf "$CA_SIGNER_CONF" \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://myorg.org/subca1.der \
-  --cmp-control "send.ca=true,send.certchain=false,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO" \
-  --pop-control "sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
-  --cmp-responder responder1 \
-  --support-cmp yes --support-rest yes \
   --save-cert yes \
   --save-req yes \
   --save-keypair yes \
@@ -404,13 +390,8 @@ ca:ca-add \
   --ca-cert-uri http://myorg.org/subcawithcrl1.der \
   --crl-uri "http://localhost:8080/crl/?type=crl&name=subcawithcrl1" \
   --deltacrl-uri "http://localhost:8080/crl/?type=deltacrl&name=subcawithcrl1" \
-  --cmp-control "send.ca=true,send.certchain=false,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO" \
-  --pop-control "sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
   --crl-control "interval.hours=24,fullcrl.intervals=7,overlap=3d,interval.time=02:00" \
-  --scep-control "cacert.included=true,certchain.included=false,signercert.included=true,support.getcrl=true" \
-  --cmp-responder responder1 \
   --validity-mode lax \
-  --support-cmp yes --support-rest yes --support-scep yes \
   --save-cert yes \
   --save-req yes \
   --save-keypair yes \
@@ -447,11 +428,5 @@ ca:careq-add \
   --ra yes \
   --profile all \
   --ca subcawithcrl1
-
-## add user to system
-ca:user-add --name user1 --password password1
-
-## Add user to CA subcawithcrl1
-ca:causer-add --user user1 --ca subcawithcrl1 --profile all --permission all
 
 source file:./qa/qa.d/scep-server.script

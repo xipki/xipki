@@ -26,8 +26,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.StringUtil;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.util.*;
 

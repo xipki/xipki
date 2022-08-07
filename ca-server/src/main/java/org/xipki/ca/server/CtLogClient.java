@@ -21,8 +21,6 @@ import com.alibaba.fastjson.JSON;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.exception.OperationException;
-import org.xipki.util.exception.OperationException.ErrorCode;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.ctlog.CtLog;
@@ -31,6 +29,8 @@ import org.xipki.security.ctlog.CtLogMessages.AddPreChainRequest;
 import org.xipki.security.ctlog.CtLogMessages.AddPreChainResponse;
 import org.xipki.util.*;
 import org.xipki.util.Curl.CurlResult;
+import org.xipki.util.exception.OperationException;
+import org.xipki.util.exception.OperationException.ErrorCode;
 import org.xipki.util.http.SslContextConf;
 
 import java.io.IOException;

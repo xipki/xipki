@@ -4,6 +4,12 @@ import com.alibaba.fastjson.JSON;
 
 import java.math.BigInteger;
 
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public class GetCertRequest extends SdkRequest {
 
   /**

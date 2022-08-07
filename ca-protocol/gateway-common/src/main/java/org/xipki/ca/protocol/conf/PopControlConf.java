@@ -17,12 +17,13 @@
 
 package org.xipki.ca.protocol.conf;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * POP (proof-of-possession) control configuration.
  *
  * @author Lijun Liao
+ * @since 6.0.0
  */
 public class PopControlConf {
 

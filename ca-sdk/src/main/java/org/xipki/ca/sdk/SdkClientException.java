@@ -21,6 +21,7 @@ package org.xipki.ca.sdk;
  * SDK client exception.
  *
  * @author Lijun Liao
+ * @since 6.0.0
  */
 
 public class SdkClientException extends Exception {

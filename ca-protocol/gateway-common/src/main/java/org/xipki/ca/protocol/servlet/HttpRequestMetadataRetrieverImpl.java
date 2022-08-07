@@ -51,7 +51,7 @@ public class HttpRequestMetadataRetrieverImpl implements HttpRequestMetadataRetr
   @Override
   public X509Cert getTlsClientCert()
       throws IOException {
-    return TlsHelper.getTlsClientCert(req);
+    return ServletHelper.getTlsClientCert(req);
   }
 
 }

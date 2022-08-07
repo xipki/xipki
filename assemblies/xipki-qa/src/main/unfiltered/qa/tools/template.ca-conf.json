@@ -6,13 +6,6 @@
 		"ca.signerConf":"REPLACEME-CA_SIGNERCONF",
         "tls.profile":"REPLACEME-TLS_PROFILE"
 	},
-	"signers":[{
-		"name":"responder1",
-		"type":"pkcs12",
-		"conf":{
-			"value":"password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA256withECDSA"
-		}
-	}],
 	"requestors":[{
 		"name":"requestor1",
 		"type":"cert",
@@ -20,7 +13,6 @@
 			"file":"xipki/keycerts/tlskeys/client/tls-client-cert.der"
 		}
 	}],
-	"users":[],
 	"publishers":[],
 	"profiles":[{
 		"name":"rootca",
@@ -46,18 +38,9 @@
 					"http://localhost:8080/ocsp/responder1"
 				]
 			},
-			"cmpControl":{
-				"send.ca":true,
-				"send.certchain":false,
-				"messagetime.bias":300,
-				"rr.aki.required":true,
-				"group.enroll":true,
-				"protection.sigalgo":"SHA256withRSA:SHA256withECDSA"
-			},
-                        "popControl":{
-                                "value":"sigalgo=SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2:ED25519:ED448:DHPOP-X25519"
-                        },
-			"cmpResponderName":"responder1",
+            "popControl":{
+                "value":"sigalgo=SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2:ED25519:ED448:DHPOP-X25519"
+            },
 			"crlControl":{
 				"interval.hours": 24,
 				"fullcrl.intervals":7,
@@ -77,12 +60,6 @@
 			"permissions":["all"],
 			"protocolSupport":["cmp"],
 			"saveRequest":false,
-			"scepControl":{
-				"cacert.included":true,
-				"certchain.included":false,
-				"signercert.included":true,
-				"support.getcrl":true
-			},
 			"signerType":"${token.type}",
 			"signerConf":{
 				"value":"${ca.signerConf}"
@@ -96,7 +73,6 @@
 		],
 		"publishers":[],
 		"requestors":[{
-			"ra":true,
 			"requestorName":"requestor1",
 			"permissions":[
 				"all"

@@ -26,36 +26,20 @@
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk18on</artifactId>
+      <version>${bc.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcutil-jdk18on</artifactId>
+      <version>${bc.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-jdk18on</artifactId>
+      <version>${bc.version}</version>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xipki</groupId>
-      <artifactId>audit-extra</artifactId>
-      <version>6.0.0-SNAPSHOT</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xipki</groupId>
-      <artifactId>security-extra</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.tinylog</groupId>
-      <artifactId>slf4j-tinylog</artifactId>
-      <version>${tinylog.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.tinylog</groupId>
-      <artifactId>tinylog-impl</artifactId>
-      <version>${tinylog.version}</version>
-      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

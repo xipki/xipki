@@ -37,7 +37,10 @@ import org.xipki.qa.ca.extn.QaExtensionValue;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.*;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
+import org.xipki.util.Validity;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.io.ByteArrayInputStream;

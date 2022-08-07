@@ -10,13 +10,7 @@
 	"dbSchemas": {
 		"KEYPAIR_ENC_KEY":"00112233445566778899AABBCCDDEEFF"
 	},
-	"signers":[{
-		"name":"responder1",
-		"type":"pkcs12",
-		"conf":{
-			"value":"password=1234,keystore=file:${keycerts.dir}/tlskeys/server/tls-server.p12,algo=REPLACEME-CMP_SIGALGO"
-		}
-	}],
+	"signers":[],
 	"keypairGens":[{
 		"name":"pkcs11",
 		"type":"pkcs11",
@@ -36,17 +30,6 @@
 		"binaryConf":{
 			"file":"${keycerts.dir}/tlskeys/client/tls-client-cert.der"
 		}
-	},{
-		"name":"requestor-mac1",
-		"type":"pbm",
-		"conf":{
-			"value":"123456"
-		}
-	}],
-	"users":[{
-		"name":"user1",
-		"active":true,
-		"password":"password1"
 	}],
 	"publishers":[{
 		"name":"ocsp-publisher",
@@ -253,24 +236,12 @@
 					"http://localhost:8080/ocsp/responder1"
 				]
 			},
-			"cmpControl":{
-				"send.ca":true,
-				"send.certchain":false,
-				"messagetime.bias":300,
-				"rr.aki.required":true,
-				"group.enroll":true,
-				"protection.sigalgo":"REPLACEME-CMP_SIGALGO"
-			},
-			"popControl":{
-				"value":"sigalgo=REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2"
-			},
 			"crlControl":{
 				"interval.hours": 24,
 				"fullcrl.intervals":90,
 				"overlap":"90d",
 				"interval.time":"01:00"
 			},
-			"cmpResponderName":"responder1",
 			"keypairGenNames": ["software"],
 			"expirationPeriod":365,
 			"genSelfIssued":{
@@ -283,7 +254,6 @@
 			"maxValidity":"10y",
 			"nextCrlNo":2,
 			"permissions":["all"],
-			"protocolSupport":["cmp","rest"],
 			"saveRequest":true,
 			"saveKeypair": true,
 			"signerType":"${token.type}",
@@ -304,17 +274,7 @@
 			"ocsp-publisher"
 		],
 		"requestors":[{
-			"ra":true,
 			"requestorName":"requestor1",
-			"permissions":[
-				"all"
-			],
-			"profiles":[
-				"all"
-			]
-		},{
-			"ra":true,
-			"requestorName":"requestor-mac1",
 			"permissions":[
 				"all"
 			],

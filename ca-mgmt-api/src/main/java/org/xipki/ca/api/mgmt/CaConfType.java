@@ -19,10 +19,13 @@ package org.xipki.ca.api.mgmt;
 
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.FileOrValue;
-import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
+import org.xipki.util.exception.InvalidConfException;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * CA configuration types.

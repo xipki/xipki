@@ -25,8 +25,8 @@ import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.math.BigInteger;
 import java.util.LinkedList;

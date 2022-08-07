@@ -27,12 +27,10 @@ import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Base64;
-import org.xipki.util.*;
+import org.xipki.util.StringUtil;
 import org.xipki.util.exception.InvalidConfException;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.CertificateException;
@@ -68,62 +66,72 @@ public class PopControl {
 
     // Diffie-Hellman based POP
     KeystoreConf dh = conf.getDh();
+    if (dh == null) {
+      dhCerts = null;
+      return;
+    }
+
     String type = dh.getType();
     String passwordStr = dh.getPassword();
     String keystoreStr = dh.getKeystore();
     if (StringUtil.isBlank(type) && StringUtil.isBlank(passwordStr)
         && StringUtil.isBlank(keystoreStr)) {
       dhCerts = null;
+      return;
+    }
+
+    if (StringUtil.isBlank(type)) {
+      throw new InvalidConfException("type is not defined in conf");
+    }
+
+    if (StringUtil.isBlank(keystoreStr)) {
+      throw new InvalidConfException("keystore is not defined in conf");
+    }
+
+    if (StringUtil.isBlank(passwordStr)) {
+      throw new InvalidConfException("password is not defined in conf");
+    }
+
+    InputStream is;
+    if (keystoreStr.startsWith("base64:")) {
+      byte[] bytes = Base64.decode(keystoreStr.substring("base64:".length()));
+      is = new ByteArrayInputStream(bytes);
     } else {
-      if (StringUtil.isBlank(type)) {
-        throw new InvalidConfException("type is not defined in conf");
-      }
-
-      if (StringUtil.isBlank(keystoreStr)) {
-        throw new InvalidConfException("keystore is not defined in conf");
-      }
-
-      if (StringUtil.isBlank(passwordStr)) {
-        throw new InvalidConfException("password is not defined in conf");
-      }
-
-      InputStream is;
-      if (keystoreStr.startsWith("base64:")) {
-        byte[] bytes = Base64.decode(keystoreStr.substring("base64:".length()));
-        is = new ByteArrayInputStream(bytes);
-      } else {
-        throw new InvalidConfException("keystore not start with 'base64:'");
-      }
-
       try {
-        char[] password = passwordStr.toCharArray();
-        KeyStore ks = KeyUtil.getKeyStore(type);
-        ks.load(is, password);
+        is = new FileInputStream(keystoreStr);
+      } catch (FileNotFoundException e) {
+        throw new InvalidConfException(e);
+      }
+    }
 
-        Enumeration<String> aliases = ks.aliases();
-        List<X509Cert> certs = new LinkedList<>();
-        while (aliases.hasMoreElements()) {
-          String alias = aliases.nextElement();
-          if (!ks.isKeyEntry(alias)) {
-            continue;
-          }
+    try {
+      char[] password = passwordStr.toCharArray();
+      KeyStore ks = KeyUtil.getKeyStore(type);
+      ks.load(is, password);
 
-          PrivateKey key = (PrivateKey) ks.getKey(alias, password);
-          if (!(key instanceof XDHKey)) {
-            // we consider only XDH key
-            continue;
-          }
-          X509Cert cert = new X509Cert((X509Certificate) ks.getCertificate(alias));
-
-          dhKeyAndCerts.add(new DHSigStaticKeyCertPair(key, cert));
-          certs.add(cert);
+      Enumeration<String> aliases = ks.aliases();
+      List<X509Cert> certs = new LinkedList<>();
+      while (aliases.hasMoreElements()) {
+        String alias = aliases.nextElement();
+        if (!ks.isKeyEntry(alias)) {
+          continue;
         }
 
-        this.dhCerts = certs.toArray(new X509Cert[0]);
-      } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException
-          | UnrecoverableKeyException | ClassCastException ex) {
-        throw new InvalidConfException("invalid dhStatic pop configuration", ex);
+        PrivateKey key = (PrivateKey) ks.getKey(alias, password);
+        if (!(key instanceof XDHKey)) {
+          // we consider only XDH key
+          continue;
+        }
+        X509Cert cert = new X509Cert((X509Certificate) ks.getCertificate(alias));
+
+        dhKeyAndCerts.add(new DHSigStaticKeyCertPair(key, cert));
+        certs.add(cert);
       }
+
+      this.dhCerts = certs.toArray(new X509Cert[0]);
+    } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException
+             | UnrecoverableKeyException | ClassCastException ex) {
+      throw new InvalidConfException("invalid dhStatic pop configuration", ex);
     }
   } // constructor
 

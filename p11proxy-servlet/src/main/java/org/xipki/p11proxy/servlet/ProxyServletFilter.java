@@ -22,10 +22,10 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.Securities;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11TokenException;
-import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.XipkiBaseDir;
+import org.xipki.util.exception.InvalidConfException;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;

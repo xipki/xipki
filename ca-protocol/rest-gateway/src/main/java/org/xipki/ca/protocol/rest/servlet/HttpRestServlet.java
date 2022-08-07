@@ -20,12 +20,13 @@ package org.xipki.ca.protocol.rest.servlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
+import org.xipki.ca.protocol.RestResponse;
 import org.xipki.ca.protocol.rest.RestResponder;
 import org.xipki.ca.protocol.servlet.HttpRequestMetadataRetrieverImpl;
+import org.xipki.ca.protocol.servlet.ServletHelper;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,7 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * REST API exception.
@@ -76,40 +76,15 @@ public class HttpRestServlet extends HttpServlet {
     AuditEvent event = new AuditEvent(new Date());
     try {
       String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
-      byte[] requestBytes = IoUtil.read(req.getInputStream());
+      byte[] requestBytes = viaPost ? IoUtil.read(req.getInputStream()) : null;
 
-      RestResponder.RestResponse response = responder.service(path, event, requestBytes,
+      RestResponse restResp = responder.service(path, event, requestBytes,
           new HttpRequestMetadataRetrieverImpl(req));
+      restResp.fillResponse(resp);
 
-      resp.setStatus(response.getStatusCode());
-      if (response.getContentType() != null) {
-        resp.setContentType(response.getContentType());
-      }
+      ServletHelper.logReqResp("REST Gateway", LOG, logReqResp, true, req,
+          requestBytes, restResp.getBody());
 
-      Map<String, String> headers = response.getHeaders();
-      if (headers != null) {
-        for (String headerName : response.getHeaders().keySet()) {
-          resp.setHeader(headerName, response.getHeaders().get(headerName));
-        }
-      }
-
-      byte[] respBody = response.getBody();
-      if (logReqResp && LOG.isDebugEnabled()) {
-        if (viaPost) {
-          LOG.debug("HTTP POST CA REST path: {}\nRequest:\n{}\nResponse:\n{}", req.getRequestURI(),
-              LogUtil.base64Encode(requestBytes), LogUtil.base64Encode(respBody));
-        } else {
-          LOG.debug("HTTP GET CA REST path: {}\nResponse:\n{}", req.getRequestURI(),
-              LogUtil.base64Encode(respBody));
-        }
-      }
-
-      if (respBody == null) {
-        resp.setContentLength(0);
-      } else {
-        resp.setContentLength(respBody.length);
-        resp.getOutputStream().write(respBody);
-      }
       if (event.getStatus() == null) {
         event.setStatus(AuditStatus.SUCCESSFUL);
       }

@@ -5,7 +5,7 @@
     <session-timeout>60</session-timeout>
   </session-config>
   <filter>
-    <filter-name>ca-filter</filter-name>
+    <filter-name>protocol-filter</filter-name>
     <filter-class>org.xipki.ca.protocol.cmp.servlet.ProtocolServletFilter</filter-class>
   </filter>
   <filter-mapping>

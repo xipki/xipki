@@ -41,6 +41,7 @@ import java.io.IOException;
  * Class to build the protocol proxy from the configuration.
  *
  * @author Lijun Liao
+ * @since 6.0.0
  */
 public class ProtocolProxyConfWrapper {
 

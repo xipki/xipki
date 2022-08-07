@@ -17,8 +17,8 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.util.LinkedList;
 import java.util.List;

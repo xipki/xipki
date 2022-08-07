@@ -79,7 +79,8 @@ slf4j-*.jar,\
 sunpkcs11-wrapper-*.jar,\
 *-tinylog.jar,\
 tinylog*.jar,\
-util-*.jar
+util-*.jar,\
+gateway-common-*.jar
 ```
 - Start tomcat
 

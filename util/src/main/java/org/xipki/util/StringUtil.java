@@ -294,4 +294,12 @@ public class StringUtil {
     return new BigInteger(tmpStr, defaultHex ? 16 : 10);
   }
 
+  public static String getVersion(Class clazz) {
+    try {
+      return toUtf8String(IoUtil.read(clazz.getResourceAsStream("/version"))).trim();
+    } catch (Exception ex) {
+      return "UNKNOWN";
+    }
+  }
+
 }

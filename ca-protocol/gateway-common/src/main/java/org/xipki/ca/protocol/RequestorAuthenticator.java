@@ -2,6 +2,12 @@ package org.xipki.ca.protocol;
 
 import org.xipki.security.X509Cert;
 
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public interface RequestorAuthenticator {
 
   Requestor getPasswordRequestorByKeyId(byte[] keyId);

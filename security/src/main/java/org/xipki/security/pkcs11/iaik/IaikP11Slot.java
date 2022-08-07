@@ -59,11 +59,11 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static iaik.pkcs.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.security.pkcs11.iaik.IaikP11SlotUtil.*;
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.Args.positive;
 import static org.xipki.util.CollectionUtil.isEmpty;
-import static iaik.pkcs.pkcs11.wrapper.PKCS11Constants.*;
 
 /**
  * {@link P11Slot} based on the IAIK PKCS#11 wrapper.

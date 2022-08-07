@@ -17,8 +17,8 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
+import org.xipki.util.exception.InvalidConfException;
 
 /**
  * CA configuration entry with database table id.

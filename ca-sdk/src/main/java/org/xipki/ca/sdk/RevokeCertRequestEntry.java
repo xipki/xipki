@@ -4,6 +4,12 @@ import org.xipki.security.CrlReason;
 
 import java.math.BigInteger;
 
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public class RevokeCertRequestEntry {
 
   /*

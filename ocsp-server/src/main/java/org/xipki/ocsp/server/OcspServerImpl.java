@@ -184,15 +184,7 @@ public class OcspServerImpl implements OcspServer {
     extension_pkix_ocsp_extendedRevoke = new WritableOnlyExtension(encoded);
 
     encodedAcceptableResponses_Basic = Hex.decode("300B06092B0601050507300101");
-
-    String ver;
-    try {
-      ver = StringUtil.toUtf8String(
-              IoUtil.read(OcspServerImpl.class.getResourceAsStream("/version"))).trim();
-    } catch (Exception ex) {
-      ver = "UNKNOWN";
-    }
-    version = ver;
+    version = StringUtil.getVersion(OcspServerImpl.class);
   } // method static
 
   public OcspServerImpl(OcspLicense license) {

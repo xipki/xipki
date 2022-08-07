@@ -8,6 +8,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ *
+ * @author Lijun Liao
+ * @since 6.0.0
+ */
+
 public class DummyPasswordRequestor implements Requestor {
 
   private String user;

@@ -17,7 +17,6 @@
 
 package org.xipki.ca.server.db;
 
-import org.xipki.util.exception.OperationException.ErrorCode;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
@@ -29,6 +28,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Hex;
 import org.xipki.util.exception.OperationException;
+import org.xipki.util.exception.OperationException.ErrorCode;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -44,9 +44,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static org.xipki.util.SqlUtil.buildInsertSql;
 import static org.xipki.util.exception.OperationException.ErrorCode.DATABASE_FAILURE;
 import static org.xipki.util.exception.OperationException.ErrorCode.SYSTEM_FAILURE;
-import static org.xipki.util.SqlUtil.buildInsertSql;
 
 /**
  * Base class to exec the database queries to manage CA system.

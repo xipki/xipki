@@ -4,6 +4,11 @@ import org.xipki.util.FileOrBinary;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
 
+/**
+ * Configuration of SSL.
+ *
+ * @author Lijun Liao
+ */
 public class SslConf extends ValidatableConf {
 
   private String name;

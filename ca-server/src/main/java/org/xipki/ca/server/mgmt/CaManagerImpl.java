@@ -26,7 +26,6 @@ import org.xipki.audit.AuditStatus;
 import org.xipki.audit.Audits;
 import org.xipki.audit.PciAuditEvent;
 import org.xipki.ca.api.NameId;
-import org.xipki.util.exception.OperationException;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.ca.api.profile.CertprofileFactoryRegister;
@@ -44,6 +43,7 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.security.*;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.util.*;
+import org.xipki.util.exception.OperationException;
 
 import java.io.Closeable;
 import java.io.File;
@@ -58,7 +58,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.xipki.util.Args.*;
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.toNonBlankLower;
 import static org.xipki.util.StringUtil.concat;
 
 /**
@@ -252,14 +253,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   private final KeypairGenManager keypairGenManager;
 
   static {
-    String ver;
-    try {
-      ver = StringUtil.toUtf8String(
-              IoUtil.read(CaManagerImpl.class.getResourceAsStream("/version"))).trim();
-    } catch (Exception ex) {
-      ver = "UNKNOWN";
-    }
-    version = ver;
+    version = StringUtil.getVersion(CaManagerImpl.class);
   }
 
   public CaManagerImpl(CmLicense license) {

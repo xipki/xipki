@@ -16,8 +16,8 @@
     <module>gateway-common</module>
     <module>cmp-gateway</module>
     <module>cmp-client</module>
-    <module>scep-gateway</module>
-    <module>scep-client</module>
     <module>rest-gateway</module>
+    <module>scep-client</module>
+    <module>scep-gateway</module>
   </modules>
 </project>

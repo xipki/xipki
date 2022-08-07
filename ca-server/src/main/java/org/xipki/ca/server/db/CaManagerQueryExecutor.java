@@ -21,8 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
-import org.xipki.util.exception.ObjectCreationException;
-import org.xipki.util.exception.OperationException;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
@@ -36,6 +34,8 @@ import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.*;
+import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.util.exception.OperationException;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
