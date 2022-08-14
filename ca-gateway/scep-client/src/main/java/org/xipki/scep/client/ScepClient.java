@@ -54,7 +54,7 @@ public class ScepClient extends Client {
     } catch (XiHttpClientException ex) {
       throw new ScepClientException(ex);
     }
-    return new ScepHttpResponse(resp.getContentType(), resp.getContent());
+    return parseResp(resp);
   } // method httpGet
 
   @Override
@@ -66,7 +66,20 @@ public class ScepClient extends Client {
     } catch (IOException ex) {
       throw new ScepClientException(ex);
     }
-    return new ScepHttpResponse(resp.getContentType(), resp.getContent());
+    return parseResp(resp);
   } // method httpPost
+
+  private static ScepHttpResponse parseResp(HttpRespContent resp) throws ScepClientException {
+    byte[] content = resp.getContent();
+    if (!resp.isOK()) {
+      String msg = "server returned status code " + resp.getStatusCode();
+      if (content != null && content.length != 0) {
+        msg += ", message: " + new String(content);
+      }
+      throw new ScepClientException(msg);
+    }
+
+    return new ScepHttpResponse(resp.getContentType(), content);
+  }
 
 }

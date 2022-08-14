@@ -32,21 +32,19 @@
 		"caInfo":{
 			"caUris":{
 				"crlUris":[
-					"http://localhost:8080/crl/?type=crl&name=tls-ca"
+					"http://localhost:8081/crl/?type=crl&name=tls-ca"
 				],
 				"ocspUris":[
-					"http://localhost:8080/ocsp/responder1"
+					"http://localhost:8081/ocsp/responder1"
 				]
 			},
-            "popControl":{
-                "value":"sigalgo=SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2:ED25519:ED448:DHPOP-X25519"
-            },
 			"crlControl":{
 				"interval.hours": 24,
 				"fullcrl.intervals":7,
 				"overlap":"3d",
 				"interval.time":"02:00"
 			},
+			"keypairGenNames":["software"],
 			"expirationPeriod":365,
 			"genSelfIssued":{
 				"certOutform":"der",
@@ -58,7 +56,6 @@
 			"maxValidity":"30y",
 			"nextCrlNo":2,
 			"permissions":["all"],
-			"protocolSupport":["cmp"],
 			"saveRequest":false,
 			"signerType":"${token.type}",
 			"signerConf":{

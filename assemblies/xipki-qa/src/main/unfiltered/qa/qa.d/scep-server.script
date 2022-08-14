@@ -1,17 +1,32 @@
-## Add SCEP support to subcawith
+# Please adapt me
+SUBJECT="CN=SCEP Responder 1,O=myorg,C=DE"
 
-xi:csr-p12 --hash $STDHASH --p12 output/scep1.p12 --password 1234 \
-  --subject "CN=scep responder1,O=myorg,C=DE" --out output/scep1.csr
+KEYCERTS_DIR = output/camgmt
+CACERT_FILE = output/subcawithcrl1.crt
 
-ca:enroll-cert --ca subcawithcrl1 --csr output/scep1.csr \
-  --outform $OUTFORM \
-  --out output/scep1.crt \
-  --profile scep
+echo "#################################################################"
+echo "#                 Generate Key, CSR and Certificate             #"
+echo "#################################################################"
 
-xi:update-cert-p12 --p12 output/scep1.p12 --password 1234 \
-  --cert output/scep1.crt
+echo "# Generate PKCS#12 key and certificate for SCEP Responder"
 
-ca:signer-add --name scep-responder1 --type pkcs12 \
-  --conf password=1234,keystore=file:output/scep1.p12,algo=SHA256withRSA
+xi:rsa-p12 --key-size 2048 --password 1234 \
+  --out ${KEYCERTS_DIR}/scep-subcawithcrl.p12
 
-ca:ca-up --name subcawithcrl1 --scep-responder scep-responder1
+xi:csr-p12 --password 1234 \
+  --p12 ${KEYCERTS_DIR}/scep-subcawithcrl.p12 \
+  --out ${KEYCERTS_DIR}/scep-subcawithcrl.csr \
+  --subject "${SUBJECT}"
+
+ca:enroll-cert --ca subcawithcrl1 --profile scep \
+  --csr ${KEYCERTS_DIR}/scep-subcawithcrl.csr \
+  --out ${KEYCERTS_DIR}/scep-subcawithcrl.der
+
+echo "# Update the certificate in the PKCS#12 file"
+xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/scep-subcawithcrl.p12 --password 1234 \
+  --cert ${KEYCERTS_DIR}/scep-subcawithcrl.der --ca-cert ${CACERT_FILE}
+
+xi:copy-file -f ${KEYCERTS_DIR}/scep-subcawithcrl.p12 \
+  ${GATEWAY_XIPKI_DIR}/keycerts/scep-subcawithcrl.p12
+
+xi:confirm "PLEASE RESTART TOMCAT ${GATEWAY_TOMCAT_DIR}!"

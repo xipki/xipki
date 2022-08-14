@@ -7,7 +7,9 @@ each ($list) {
   CN = cmp-crmf-ca-genkey-${profilename}-${CUR_TIME}
 
   xi:cmp-enroll-cagenkey \
+    --ca subca --profile ${profilename} \
     --p12-out output/${CN}.p12 --password 1234 \
     --cert-outform pem --cert-out output/${CN}.crt \
-    --profile ${profilename} --subject "CN=${CN}.myorg.org,O=myorg,C=DE"
+    --subject "CN=${CN}.myorg.org,O=myorg,C=DE" \
+    --signer-password 1234 --signer-p12 keycerts/tlskeys/client/tls-client.p12
 }

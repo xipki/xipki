@@ -48,7 +48,7 @@ public class PermissionConstants {
 
   public static final int ALL =
       ENROLL_CERT | REVOKE_CERT | UNSUSPEND_CERT | REMOVE_CERT | KEY_UPDATE
-          | GEN_CRL | ENROLL_CROSS | GEN_KEYPAIR | GET_CERT;
+          | GEN_CRL | GET_CRL | ENROLL_CROSS | GEN_KEYPAIR | GET_CERT;
 
   static {
     codeTextMap.put(ENROLL_CERT, "enroll_cert");
@@ -60,6 +60,7 @@ public class PermissionConstants {
     codeTextMap.put(GET_CRL, "get_crl");
     codeTextMap.put(ENROLL_CROSS, "enroll_cross");
     codeTextMap.put(GEN_KEYPAIR, "gen_keypair");
+    codeTextMap.put(GET_CERT, "get_cert");
 
     for (Entry<Integer, String> entry : codeTextMap.entrySet()) {
       textCodeMap.put(entry.getValue(), entry.getKey());

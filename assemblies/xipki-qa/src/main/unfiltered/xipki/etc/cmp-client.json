@@ -1,6 +1,7 @@
 {
+	"sendRequestorCert": true,
 	"responder":{
-		"url":"https://localhost:8445/cmp/",
+		"url":"http://localhost:8082/cmp/",
 		"pbmMac": {
 			"macAlgos":["HMAC-SHA256"],
 			"owfAlgos":["SHA256"]
@@ -15,11 +16,6 @@
 	"ssl":{
 		"name":"ssl1",
 		"hostnameVerifier":"default",
-		"storeType":"pkcs12",
-		"keystore":{
-			"file":"xipki/keycerts/tlskeys/client/tls-client.p12"
-		},
-		"keystorePassword":"1234",
 		"trustanchors":[{
 			"file":"xipki/keycerts/tlskeys/server/tls-server-cert.der"
 		}]

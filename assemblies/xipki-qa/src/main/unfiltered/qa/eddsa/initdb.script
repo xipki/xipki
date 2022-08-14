@@ -11,7 +11,7 @@ OS_NAME = $(osinfo --name)
 
 ## CA Database
 
-DB_CONF = "${XIPKI_DIR}/etc/ca/database/ca-db.properties"
+DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties"
 DB_SCHEMA = xipki/sql/ca-init.xml
 
 if { "${OS_NAME}" equals "windows" } then {
@@ -22,7 +22,7 @@ if { "${OS_NAME}" equals "windows" } then {
 
 ## OCSP Database
 
-DB_CONF = "${XIPKI_DIR}/etc/ca/database/ocsp-db.properties"
+DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties"
 DB_SCHEMA = xipki/sql/ocsp-init.xml
 
 if { "${OS_NAME}" equals "windows" } then {

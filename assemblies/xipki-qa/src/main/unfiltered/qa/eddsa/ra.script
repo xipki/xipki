@@ -2,17 +2,6 @@ echo "#################################################################"
 echo "#              Manage certificate with CMP Client               #"
 echo "#################################################################"
 
-xi:cmp-init
-
-echo "Sleeping 1 second"
-sleep 1
-
-## Check the healthy status
-
-xi:cmp-health --ca rootca1
-
-xi:cmp-health --ca subca1
-
 list = [ "2" "3" "4" ]
 each ($list) {
   xi:ec-p12 --curve ed25519 --password 1234 --out output/ed25519-${it}.p12
@@ -27,10 +16,12 @@ list = [ ed25519 ed448 x25519 x448 ]
 each ($list) {
   type = $it
 
-  xi:cmp-enroll-cagenkey \
+  xi:cmp-enroll-cagenkey --ca subca \
     --p12-out output/${type}-1.p12 --password 1234 \
     --cert-out output/${type}-1.crt --profile ${type} \
-    --subject "CN=${type}-1.myorg.org,C=DE"
+    --subject "CN=${type}-1.myorg.org,C=DE" \
+    --signer-password 1234 --signer-p12 keycerts/tlskeys/client/tls-client.p12
+
 
   xi:update-cert-p12 --p12 output/${type}-1.p12 --password 1234 \
     --cert output/${type}-1.crt \
@@ -44,10 +35,11 @@ list = [ ed25519 ed448 x25519 x448 ]
 each ($list) {
   type = $it
 
-  xi:cmp-enroll-p12 \
+  xi:cmp-enroll-p12 --ca subca \
     --p12 output/${type}-2.p12 --password 1234 \
     --out output/${type}-2.crt --profile ${type} \
-    --subject "CN=${type}-2.myorg.org,C=DE"
+    --subject "CN=${type}-2.myorg.org,C=DE" \
+    --signer-password 1234 --signer-p12 keycerts/tlskeys/client/tls-client.p12
 
   xi:update-cert-p12 --p12 output/${type}-2.p12 --password 1234 \
     --cert output/${type}-2.crt \
@@ -82,8 +74,9 @@ list = [ ed25519 ed448 x25519 x448 ]
 each ($list) {
   type = $it
 
-  xi:cmp-csr-enroll --csr output/${type}-3.csr \
-    --out output/${type}-3.crt --profile ${type}
+  xi:cmp-csr-enroll --ca subca --csr output/${type}-3.csr \
+    --out output/${type}-3.crt --profile ${type} \
+    --signer-password 1234 --signer-p12 keycerts/tlskeys/client/tls-client.p12
 
   xi:update-cert-p12 --p12 output/${type}-3.p12 --password 1234 \
     --cert output/${type}-3.crt \

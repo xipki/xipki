@@ -15,7 +15,7 @@
 					"http://myorg.org/subca1.der"
 				],
 				"crlUris":[
-					"http://localhost:8080/crl/?type=crl&name=subca1"
+					"http://localhost:8081/crl/?type=crl&name=subca1"
 				],
 				"ocspUris":[
 					"http://localhost:8080/ocsp/responder1"

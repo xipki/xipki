@@ -89,8 +89,10 @@ if { $printUsage equals "true" } then {
 
   source file:./qa/eddsa/ra.script
 
-  cmp-enroll-cagenkey --subject "CN=ocsp99,O=example org,C=DE" --profile ocsp \
-    --p12-out output/ocsp99.p12 --cert-out output/ocsp99.crt --password 1234
+  cmp-enroll-cagenkey --ca subca \
+    --subject "CN=ocsp99,O=example org,C=DE" --profile ocsp \
+    --p12-out output/ocsp99.p12 --cert-out output/ocsp99.crt --password 1234 \
+    --signer-password 1234 --signer-p12 keycerts/tlskeys/client/tls-client.p12
 
   ## Copy the configuration of OCSP responder
   #xi:copy-file -f \

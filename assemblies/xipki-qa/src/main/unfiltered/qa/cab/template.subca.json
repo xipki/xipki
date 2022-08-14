@@ -15,7 +15,7 @@
 					"http://myorg.org/subca1.der"
 				],
 				"crlUris":[
-					"http://localhost:8080/crl/?type=crl&name=subca1"
+					"http://localhost:8081/crl/?type=crl&name=subca1"
 				],
 				"ocspUris":[
 					"http://localhost:8080/ocsp/responder1"
@@ -27,7 +27,7 @@
 			"kceypairGenNames":["software"],
 			"ctlogControl":{
 				"enabled":true,
-				"servers":"https://localhost:8443/ctlog/ctlogrsa;https://localhost:8443/ctlog/ctlogec",
+				"servers":"https://localhost:8444/ctlog/ctlogrsa;https://localhost:8444/ctlog/ctlogec",
 				"sslcontext.name":"localhost"
 			},
 			"expirationPeriod":365,

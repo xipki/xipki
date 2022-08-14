@@ -149,20 +149,10 @@
       <directory>${project.build.directory}/xipki-ocsp-${project.version}/</directory>
       <outputDirectory>xipki-ocsp</outputDirectory>
     </fileSet>
-    <!-- Copy xipki-cmp-gateway -->
+    <!-- Copy xipki-gateway -->
     <fileSet>
-      <directory>${project.build.directory}/xipki-cmp-gateway-${project.version}/</directory>
-      <outputDirectory>xipki-cmp-gateway</outputDirectory>
-    </fileSet>
-    <!-- Copy xipki-scep-gateway -->
-    <fileSet>
-      <directory>${project.build.directory}/xipki-scep-gateway-${project.version}/</directory>
-      <outputDirectory>xipki-scep-gateway</outputDirectory>
-    </fileSet>
-    <!-- Copy xipki-rest-gateway -->
-    <fileSet>
-      <directory>${project.build.directory}/xipki-rest-gateway-${project.version}/</directory>
-      <outputDirectory>xipki-rest-gateway</outputDirectory>
+      <directory>${project.build.directory}/xipki-gateway-${project.version}/</directory>
+      <outputDirectory>xipki-gateway</outputDirectory>
     </fileSet>
   </fileSets>
   <files>

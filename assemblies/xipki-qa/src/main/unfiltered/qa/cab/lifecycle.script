@@ -74,13 +74,6 @@ if { $printUsage equals "true" } then {
   STDHASH = $HASH
   source file:./qa/qa.d/prepare-keys.script
 
-  ## CA client configuration
-  xi:copy-file -f qa/cab/template.cmpclient.json \
-    xipki/cmpclient/cmpclient.json
-
-  xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
-    xipki/cmpclient/cmpclient.json
-
   xi:copy-file -f qa/cab/template.ca-load.script \
     qa/cab/ca-load.script
 

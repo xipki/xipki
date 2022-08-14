@@ -2,8 +2,6 @@ source qa/setenv.script
 
 xi:rm -r -f output
 
-xi:copy-file -f qa/tools/cmpclient.json xipki/cmpclient/cmpclient.json
-
 echo "#################################################################"
 CA_TYPE=DSA
 echo "#                             ${CA_TYPE}"

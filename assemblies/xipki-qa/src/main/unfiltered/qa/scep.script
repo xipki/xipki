@@ -1,4 +1,4 @@
-SCEP_URL = http://localhost:8080/ca/scep/subcawithcrl/ocsp/pkiclient.exe
+SCEP_URL = http://localhost:8082/scep/subcawithcrl/ocsp/pkiclient.exe
 
 echo "#################################################################"
 echo "#               Enroll Certificate via SCEP                     #"
@@ -108,4 +108,3 @@ xi:update-cert-p12 \
   --cert output/scep-ocsp2.crt \
   --ca-cert output/subcawithcrl1.crt \
   --ca-cert output/rootca1.crt
-

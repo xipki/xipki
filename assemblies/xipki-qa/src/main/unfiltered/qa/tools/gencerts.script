@@ -2,7 +2,7 @@ sleep 1
 
 OS_NAME = $(osinfo --name)
 
-DB_CONF = "${XIPKI_DIR}/etc/ca/database/ca-db.properties"
+DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties"
 DB_SCHEMA = xipki/sql/ca-init.xml
 
 if { "${OS_NAME}" equals "windows" } then {
@@ -26,22 +26,23 @@ ca:load-conf --conf-file qa/tools/ca-conf.json --out-dir ${OUT_DIR}/ca
 xi:move-file -f ${OUT_DIR}/ca/ca-tls-ca.crt ${OUT_DIR}/ca/tls-ca-cert.der
 
 ############## RA ###################
-xi:cmp-init
-
 ## Server
 
-xi:cmp-enroll-cagenkey --password 1234 --profile tls \
+xi:cmp-enroll-cagenkey --ca tls-ca --password 1234 --profile tls \
   --p12-out ${OUT_DIR}/server/tls-server.p12 \
   --cert-out ${OUT_DIR}/server/tls-server-cert.der \
-  --subject "CN=localhost,OU=${CA_TYPE},O=myorg demo,C=DE"
+  --subject "CN=localhost,OU=${CA_TYPE},O=myorg demo,C=DE" \
+  --signer-password 1234 --signer-p12 keycerts/tlskeys/client/tls-client.p12
 
 list = [client client2 client3]
 each ($list) {
   name = $it
-  xi:cmp-enroll-cagenkey --password 1234 --profile tls \
+  xi:cmp-enroll-cagenkey --ca tls-ca --password 1234 --profile tls \
     --p12-out ${OUT_DIR}/${name}/tls-${name}.p12 \
     --cert-out ${OUT_DIR}/${name}/tls-${name}-cert.der \
-    --subject "CN=${name},OU=${CA_TYPE},O=myorg demo,C=DE"
+    --subject "CN=${name},OU=${CA_TYPE},O=myorg demo,C=DE" \
+    --signer-password 1234 --signer-p12 keycerts/tlskeys/client/tls-client.p12
+
 }
 
 ############# Export other files ##########

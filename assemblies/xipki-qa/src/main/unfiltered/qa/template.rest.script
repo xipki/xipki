@@ -1,4 +1,4 @@
-BASE_URL = https://localhost:8443/ca/rest/subcawithcrl
+BASE_URL = https://localhost:8445/rest/subcawithcrl
 
 echo "#################################################################"
 echo "#             Manage certificate via REST interface             #"
@@ -39,17 +39,13 @@ echo "REST revoke (suspend) "
 
 xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
 
-echo "REST revoke (unsuspend)"
+echo "REST unsuspend"
 
-xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
+xi:curl "$BASE_URL/unsuspend-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}"
 
 echo "REST revoke (revoke)"
 
 xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
-
-echo "REST new-crl"
-
-xi:curl --out output/rest/new-crl.crl $BASE_URL/new-crl
 
 echo "REST crl"
 xi:curl --out output/rest/crl.crl $BASE_URL/crl

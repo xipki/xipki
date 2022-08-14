@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Please adapt the URL
-BASE_URL="https://localhost:8443/ca/rest/subcawithcrl"
+BASE_URL="https://localhost:8445/rest/subcawithcrl"
 CACERT="output/subcawithcrl1.der"
 
 echo "base url: ${BASE_URL}"
@@ -69,7 +69,7 @@ curl ${OPTS} \
 echo "unsuspend certificate"
 
 curl ${OPTS} \
-    "${BASE_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
+    "${BASE_URL}/unsuspend-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}"
 
 echo "revoke certificate"
 

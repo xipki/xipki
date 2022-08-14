@@ -1,5 +1,5 @@
 # CRL distribution point (HTTP)
-crldp=http://localhost:8080/crl/?type=crl&name=rootca1
+crldp=http://localhost:8081/crl/?type=crl&name=rootca1
 
 # If an alternative URL instead crldp is used to download the CRL.
 #download.url=http://ca.intern-myorg.org/crl/myca1
@@ -7,7 +7,7 @@ crldp=http://localhost:8080/crl/?type=crl&name=rootca1
 # URL to retrieve the hash value for the CRL: <hash algo> <URL>. Optional
 # If present, first download the hash value, and only it differs from the
 # the previous one, the CRL will be downloaded.
-download.fp.url=SHA1 http://localhost:8080/crl/?hashalgo=sha1&type=crl&name=rootca1
+download.fp.url=SHA1 http://localhost:8081/crl/?hashalgo=sha1&type=crl&name=rootca1
 
 # Comma separated list of duration (with unit m for minutes, h for hours,
 # d for day, w for week, y for year) before the nextUpdate of current CRL.
