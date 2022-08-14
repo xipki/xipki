@@ -47,6 +47,18 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
+      <source>${project.build.directory}/webapps/cmp-gateway.war</source>
+      <outputDirectory>webapps</outputDirectory>
+      <destName>cmp.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>${project.build.directory}/webapps/rest-gateway.war</source>
+      <outputDirectory>webapps</outputDirectory>
+      <destName>rest.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>${project.build.directory}/webapps/scep-gateway.war</source>
       <outputDirectory>webapps</outputDirectory>
       <destName>scep.war</destName>

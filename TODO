@@ -1,6 +1,2 @@
-1. CMP:
-   cmp-gateway: use different cmp responder for different CA
-   cmp-client: configure only the CA certificate of the responder.
-      If unknown, the responder send just empty Subject (check the standard how to handle if responder is unknown)
-2. SCEP:
-   as CMP
+1. Audit events: revoke, unsuspend, ...
+2. Exclude the hikaricp from the standard log level

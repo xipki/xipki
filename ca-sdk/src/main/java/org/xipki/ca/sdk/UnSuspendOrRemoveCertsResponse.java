@@ -11,7 +11,7 @@ import java.util.List;
  * @since 6.0.0
  */
 
-public class UnrevokeOrRemoveCertsResponse extends SdkResponse {
+public class UnSuspendOrRemoveCertsResponse extends SdkResponse {
 
   private List<SingleCertSerialEntry> entries;
 
@@ -23,8 +23,8 @@ public class UnrevokeOrRemoveCertsResponse extends SdkResponse {
     this.entries = entries;
   }
 
-  public static UnrevokeOrRemoveCertsResponse decode(byte[] encoded) {
-    return JSON.parseObject(encoded, UnrevokeOrRemoveCertsResponse.class);
+  public static UnSuspendOrRemoveCertsResponse decode(byte[] encoded) {
+    return JSON.parseObject(encoded, UnSuspendOrRemoveCertsResponse.class);
   }
 
 }

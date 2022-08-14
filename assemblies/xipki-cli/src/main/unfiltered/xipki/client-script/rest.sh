@@ -14,7 +14,7 @@ elif [[ "$1" == "ocsp" ]] ; then
 fi
 
 # Please adapt the URL
-CA_URL="https://localhost:8443/ca/rest/myca"
+CA_URL="https://localhost:8445/rest/myca"
 echo "CA URL: ${CA_URL}"
 
 OCSP_URL="http://localhost:8080/ocsp/"
@@ -139,7 +139,7 @@ fi
 echo "unsuspend certificate"
 
 curl ${OPTS} \
-    "${CA_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
+    "${CA_URL}/unsuspend-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}"
 
 if [[ $ocsp -eq 1 ]]; then
 	echo "Current OCSP status"
@@ -160,24 +160,9 @@ if [[ $ocsp -eq 1 ]]; then
   		-issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
 fi
 
-echo "generate new CRL"
-
-curl ${OPTS} \
-    --output ${OUT_DIR}/new-crl.crl \
-    "${CA_URL}/new-crl"
-
 echo "get current CRL"
 
 curl ${OPTS} \
     --output ${OUT_DIR}/crl.crl \
     "${CA_URL}/crl"
 
-echo "get CRL for given CRL number"
-
-CRLNUMBER=`openssl crl -inform der -in ${OUT_DIR}/crl.crl -crlnumber -noout | cut -d '=' -f 2`
-
-curl ${OPTS} \
-    --output ${OUT_DIR}/crl-0x${CRLNUMBER}.crl \
-    "${CA_URL}/crl?crl-number=0x${CRLNUMBER}"
-    
-END

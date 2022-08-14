@@ -76,15 +76,13 @@ public class RestAPIConstants {
 
   public static final String CMD_revoke_cert = "revoke-cert";
 
-  public static final String CMD_delete_cert = "delete-cert";
+  public static final String CMD_unsuspend_cert = "unsuspend-cert";
 
   public static final String CMD_enroll_cert = "enroll-cert";
 
   public static final String CMD_enroll_cert_cagenkeypair = "enroll-cert-cagenkeypair";
 
   public static final String CMD_crl = "crl";
-
-  public static final String CMD_new_crl = "new-crl";
 
   public static final String PARAM_profile = "profile";
 

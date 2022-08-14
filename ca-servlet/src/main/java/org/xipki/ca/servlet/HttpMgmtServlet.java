@@ -582,9 +582,9 @@ public class HttpMgmtServlet extends HttpServlet {
           resp = null;
           break;
         }
-        case unrevokeCertificate: {
-          MgmtRequest.UnrevokeCertificate req = parse(in, MgmtRequest.UnrevokeCertificate.class);
-          caManager.unrevokeCertificate(req.getCaName(), req.getSerialNumber());
+        case unsuspendCertificate: {
+          MgmtRequest.UnsuspendCertificate req = parse(in, MgmtRequest.UnsuspendCertificate.class);
+          caManager.unsuspendCertificate(req.getCaName(), req.getSerialNumber());
           resp = null;
           break;
         }

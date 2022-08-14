@@ -8,7 +8,7 @@
     <artifactId>assemblies</artifactId>
     <version>6.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xipki-rest-gateway</artifactId>
+  <artifactId>xipki-gateway</artifactId>
   <packaging>pom</packaging>
   <name>XiPKI :: assembly :: ${project.artifactId}</name>
   <properties>
@@ -17,8 +17,20 @@
   <dependencies>
     <dependency>
       <groupId>org.xipki.gateway</groupId>
+      <artifactId>cmp-gateway</artifactId>
+      <version>6.0.0-SNAPSHOT</version>
+      <type>war</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.gateway</groupId>
+      <artifactId>scep-gateway</artifactId>
+      <version>6.0.0-SNAPSHOT</version>
+      <type>war</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.gateway</groupId>
       <artifactId>rest-gateway</artifactId>
-      <version>${project.version}</version>
+      <version>6.0.0-SNAPSHOT</version>
       <type>war</type>
     </dependency>
   </dependencies>
@@ -80,7 +92,19 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki.gateway</groupId>
+                  <artifactId>cmp-gateway</artifactId>
+                  <version>${project.version}</version>
+                  <type>war</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.gateway</groupId>
                   <artifactId>rest-gateway</artifactId>
+                  <version>${project.version}</version>
+                  <type>war</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.gateway</groupId>
+                  <artifactId>scep-gateway</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>

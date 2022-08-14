@@ -72,14 +72,10 @@ public class XiHttpClient {
     }
   } // method httpGet
 
-  public byte[] httpPost(String url, String requestContentType, byte[] request,
+  public HttpRespContent httpPost(String url, String requestContentType, byte[] request,
                          String expectedRespContentType)
       throws IOException {
     HttpRespContent resp = httpPost(url, requestContentType, request);
-    byte[] body = resp.getContent();
-    if (body == null) {
-      return null;
-    }
 
     String responseContentType = resp.getContentType();
     boolean isValidContentType = false;
@@ -93,7 +89,7 @@ public class XiHttpClient {
       throw new IOException("bad response: mime type " + responseContentType + " not supported!");
     }
 
-    return body;
+    return resp;
   }
 
   public HttpRespContent httpPost(String url, String requestContentType, byte[] request)
@@ -127,17 +123,22 @@ public class XiHttpClient {
     Args.notNull(conn, "conn");
 
     try {
-      InputStream inputstream = conn.getInputStream();
-      if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-        inputstream.close();
-        throw new XiHttpClientException("bad response: " + conn.getResponseCode() + "    "
-                + conn.getResponseMessage());
+      InputStream inputstream;
+      int respCode = conn.getResponseCode();
+      if (respCode == HttpURLConnection.HTTP_OK) {
+        inputstream = conn.getInputStream();
+      } else {
+        inputstream = conn.getErrorStream();
       }
 
-      HttpRespContent respContent = new HttpRespContent();
-      respContent.setContent(IoUtil.read(inputstream));
-      respContent.setContentType(conn.getContentType());
-      return respContent;
+      byte[] content = inputstream == null ? new byte[0] : IoUtil.read(inputstream);
+      String ct = conn.getContentType();
+
+      if (respCode == HttpURLConnection.HTTP_OK) {
+        return HttpRespContent.ofOk(ct, content);
+      } else {
+        return HttpRespContent.ofError(respCode, ct, content);
+      }
     } catch (IOException ex) {
       throw new XiHttpClientException(ex);
     }

@@ -28,7 +28,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Hex;
 import org.xipki.util.exception.OperationException;
-import org.xipki.util.exception.OperationException.ErrorCode;
+import org.xipki.util.exception.ErrorCode;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -45,8 +45,8 @@ import java.util.Date;
 import java.util.List;
 
 import static org.xipki.util.SqlUtil.buildInsertSql;
-import static org.xipki.util.exception.OperationException.ErrorCode.DATABASE_FAILURE;
-import static org.xipki.util.exception.OperationException.ErrorCode.SYSTEM_FAILURE;
+import static org.xipki.util.exception.ErrorCode.DATABASE_FAILURE;
+import static org.xipki.util.exception.ErrorCode.SYSTEM_FAILURE;
 
 /**
  * Base class to exec the database queries to manage CA system.
@@ -199,15 +199,6 @@ public class CertStoreBase extends QueryExecutor {
       throws OperationException {
     try {
       return execUpdatePrepStmt(sql, params);
-    } catch (DataAccessException ex) {
-      throw new OperationException(ErrorCode.DATABASE_FAILURE, ex);
-    }
-  }
-
-  protected List<ResultRow> execQueryStmt0(String sql)
-      throws OperationException {
-    try {
-      return execQueryStmt(sql);
     } catch (DataAccessException ex) {
       throw new OperationException(ErrorCode.DATABASE_FAILURE, ex);
     }

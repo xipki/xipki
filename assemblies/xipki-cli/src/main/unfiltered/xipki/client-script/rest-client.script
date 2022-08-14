@@ -17,7 +17,7 @@ if { $printUsage equals "true" } then {
   echo "    ocsp:      Also test the OCSP status"
 } else {
 HASH = SHA256
-BASE_URL = https://localhost:8446/rest/myca
+BASE_URL = https://localhost:8445/rest/myca
 
 echo "#################################################################"
 echo "#               Manage certificate via REST API                 #"
@@ -96,7 +96,7 @@ if { "$ocsp" equals "true" } then {
 
 echo "=====REST: Unsuspend====="
 
-xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
+xi:curl "$BASE_URL/unsuspend-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}"
 
 if { "$ocsp" equals "true" } then {
   echo "Current OCSP status"
@@ -112,9 +112,7 @@ if { "$ocsp" equals "true" } then {
   xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
 }
 
-echo "=====CMP: Generate CRL====="
-
-xi:curl --out ${OUT_DIR}/rest-myca-gen.crl $BASE_URL/new-crl
+echo "=====REST: Get CRL====="
 
 xi:curl --out ${OUT_DIR}/rest-myca-get.crl $BASE_URL/crl
 }

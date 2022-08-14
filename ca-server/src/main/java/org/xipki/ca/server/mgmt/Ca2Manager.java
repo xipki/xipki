@@ -49,7 +49,7 @@ import org.xipki.util.StringUtil;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.exception.OperationException;
-import org.xipki.util.exception.OperationException.ErrorCode;
+import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.http.SslContextConf;
 
 import java.math.BigInteger;
@@ -544,9 +544,8 @@ class Ca2Manager {
       return null;
     }
 
-    int expirationPeriod = caEntry.getExpirationPeriod();
-    if (expirationPeriod < 0) {
-      System.err.println("invalid expirationPeriod: " + expirationPeriod);
+    if (caEntry.getExpirationPeriod() < 0) {
+      System.err.println("invalid expirationPeriod: " + caEntry.getExpirationPeriod());
       return null;
     }
 
@@ -603,23 +602,9 @@ class Ca2Manager {
       }
     }
 
-    String name = caEntry.getIdent().getName();
-    long nextCrlNumber = caEntry.getNextCrlNumber();
-
-    CaEntry entry = new CaEntry(new NameId(null, name), caEntry.getSerialNoLen(),
-        nextCrlNumber, signerType, signerConf, caEntry.getCaUris(), numCrls, expirationPeriod);
+    CaEntry entry = caEntry.clone();
+    entry.setSignerConf(signerConf);
     entry.setCert(caCert);
-    entry.setCrlControl(caEntry.getCrlControl());
-    entry.setCrlSignerName(caEntry.getCrlSignerName());
-    entry.setExtraControl(caEntry.getExtraControl());
-    entry.setKeepExpiredCertInDays(caEntry.getKeepExpiredCertInDays());
-    entry.setMaxValidity(caEntry.getMaxValidity());
-    entry.setPermission(caEntry.getPermission());
-    entry.setSaveCert(caEntry.isSaveCert());
-    entry.setSaveRequest(caEntry.isSaveRequest());
-    entry.setSaveKeypair(caEntry.isSaveKeypair());
-    entry.setStatus(caEntry.getStatus());
-    entry.setValidityMode(caEntry.getValidityMode());
 
     addCa(entry);
     return caCert;
@@ -702,7 +687,7 @@ class Ca2Manager {
     }
   } // method revokeCertificate
 
-  void unrevokeCertificate(String caName, BigInteger serialNumber) throws CaMgmtException {
+  void unsuspendCertificate(String caName, BigInteger serialNumber) throws CaMgmtException {
     assertMasterModeAndSetuped();
 
     caName = toNonBlankLower(caName, "caName");
@@ -710,8 +695,8 @@ class Ca2Manager {
 
     X509Ca ca = getX509Ca(caName);
     try {
-      if (ca.unrevokeCert(serialNumber, MSGID_ca_mgmt) == null) {
-        throw new CaMgmtException("could not unrevoke non-existing certificate");
+      if (ca.unsuspendCert(serialNumber, MSGID_ca_mgmt) == null) {
+        throw new CaMgmtException("could not unsuspend non-existing certificate");
       }
     } catch (OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);

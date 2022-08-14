@@ -65,7 +65,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import static org.xipki.util.Args.notEmpty;
 import static org.xipki.util.Args.notNull;
-import static org.xipki.util.exception.OperationException.ErrorCode.*;
+import static org.xipki.util.exception.ErrorCode.*;
 
 /**
  * X509CA.
@@ -119,7 +119,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     private final int index;
 
     public OperationExceptionWithIndex(int index, OperationException underlying) {
-      super(underlying.getErrorCode(), underlying.getMessage());
+      super(underlying.getErrorCode(), underlying.getErrorMessage());
       this.index = index;
     }
 
@@ -216,28 +216,16 @@ public class X509Ca extends X509CaModule implements Closeable {
   }
 
   /**
-   * Returns the certificates satisfying the given search criteria.
+   * Returns the certificate satisfying the given search criteria.
    * @param subjectName Subject of the certificate.
-   * @param transactionId <code>null</code> for all transactionIds.
-   * @return the certificates satisfying the given search criteria
+   * @param transactionId transactionId.
+   * @return the certificate satisfying the given search criteria
    * @throws OperationException
    *         if error occurs.
    */
-  public List<X509Cert> getCert(X500Name subjectName, byte[] transactionId)
+  public X509Cert getCert(X500Name subjectName, String transactionId)
       throws OperationException {
     return certstore.getCert(subjectName, transactionId);
-  }
-
-  public KnowCertResult knowsCert(X509Cert cert)
-      throws OperationException {
-    notNull(cert, "cert");
-
-    X500Name issuerX500 = cert.getIssuer();
-    if (!caInfo.getSubject().equals(X509Util.getRfc4519Name(issuerX500))) {
-      return KnowCertResult.UNKNOWN;
-    }
-
-    return certstore.knowsCertForSerial(caIdent, cert.getSerialNumber());
   }
 
   public CertWithRevocationInfo getCertWithRevocationInfo(BigInteger serialNumber)
@@ -262,14 +250,6 @@ public class X509Ca extends X509CaModule implements Closeable {
   public X509CRLHolder getCrl(BigInteger crlNumber, String msgId) throws OperationException {
     return crlModule.getCrl(crlNumber, msgId);
   } // method getCrl
-
-  public CertificateList getBcCurrentCrl(String msgId) throws OperationException {
-    return crlModule.getBcCurrentCrl(msgId);
-  }
-
-  public CertificateList getBcCrl(BigInteger crlNumber, String msgId) throws OperationException {
-    return crlModule.getBcCrl(crlNumber, msgId);
-  }
 
   public X509CRLHolder generateCrlOnDemand(String msgId) throws OperationException {
     return crlModule.generateCrlOnDemand(msgId);
@@ -304,9 +284,9 @@ public class X509Ca extends X509CaModule implements Closeable {
     return revokerModule.revokeCert(serialNumber, reason, invalidityTime, msgId);
   }
 
-  public CertWithDbId unrevokeCert(BigInteger serialNumber, String msgId)
+  public CertWithDbId unsuspendCert(BigInteger serialNumber, String msgId)
       throws OperationException {
-    return revokerModule.unrevokeCert(serialNumber, msgId);
+    return revokerModule.unsuspendCert(serialNumber, msgId);
   }
 
   public CertWithDbId removeCert(BigInteger serialNumber, String msgId) throws OperationException {
@@ -354,6 +334,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     List<KeypairGenerator> keypairGenerators = null;
     List<String> keypairGenNames = caInfo.getKeypairGenNames();
     if (CollectionUtil.isNotEmpty(keypairGenNames)) {
+      //TODO: only when keypair gen is required, execute this
       keypairGenerators = new ArrayList<>(keypairGenNames.size());
       for (String name : keypairGenNames) {
         KeypairGenerator keypairGen = caManager.getKeypairGenerator(name);
@@ -678,31 +659,6 @@ public class X509Ca extends X509CaModule implements Closeable {
         ? null : caManager.getIdentifiedCertprofile(certprofileName);
   } // method getX509Certprofile
 
-  public RequestorInfo.CertRequestorInfo getRequestor(X500Name requestorSender) {
-    Set<CaHasRequestorEntry> requestorEntries = caManager.getRequestorsForCa(caIdent.getName());
-    if (CollectionUtil.isEmpty(requestorEntries)) {
-      return null;
-    }
-
-    for (CaHasRequestorEntry m : requestorEntries) {
-      RequestorEntryWrapper entry = caManager.getRequestorWrapper(m.getRequestorIdent().getName());
-
-      if (entry.getDbEntry().isFaulty()) {
-        continue;
-      }
-
-      if (!RequestorEntry.TYPE_CERT.equals(entry.getDbEntry().getType())) {
-        continue;
-      }
-
-      if (entry.getCert().getCert().getSubject().equals(requestorSender)) {
-        return new RequestorInfo.CertRequestorInfo(m, entry.getCert());
-      }
-    }
-
-    return null;
-  } // method getRequestor
-
   public RequestorInfo.CertRequestorInfo getRequestor(X509Cert requestorCert) {
     Set<CaHasRequestorEntry> requestorEntries = caManager.getRequestorsForCa(caIdent.getName());
     if (CollectionUtil.isEmpty(requestorEntries)) {
@@ -721,10 +677,6 @@ public class X509Ca extends X509CaModule implements Closeable {
     }
 
     return null;
-  }
-
-  public CaManagerImpl getCaManager() {
-    return caManager;
   }
 
   public boolean healthy() {

@@ -19,6 +19,8 @@ package org.xipki.ca.gateway;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.sdk.*;
+import org.xipki.util.exception.ErrorCode;
+import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.XiHttpClient;
 
 import javax.net.ssl.HostnameVerifier;
@@ -27,6 +29,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import static org.xipki.ca.sdk.SdkConstants.*;
 
@@ -39,7 +42,7 @@ import static org.xipki.ca.sdk.SdkConstants.*;
 
 public class SdkClient {
 
-  private static String CONTENT_TYPE_JSON = "application/json";
+  private static final String CONTENT_TYPE_JSON = "application/json";
 
   private final String serverUrl;
 
@@ -52,36 +55,49 @@ public class SdkClient {
   }
 
   private byte[] send(String ca, String command, SdkRequest request)
-      throws IOException {
+      throws IOException, SdkErrorResponseException {
     String ct = request == null ? null : CONTENT_TYPE_JSON;
-    return client.httpPost(serverUrl + ca + "/" + command, ct,
+    HttpRespContent resp = client.httpPost(serverUrl + ca + "/" + command, ct,
         request == null ? null : request.encode(),
         CONTENT_TYPE_JSON);
+    if (resp.isOK()) {
+      return resp.getContent();
+    }
+
+    byte[] errorContent = resp.getContent();
+    if (errorContent == null) {
+      throw new SdkErrorResponseException(ErrorCode.SYSTEM_FAILURE, null);
+    } else {
+      throw new SdkErrorResponseException(ErrorResponse.decode(errorContent));
+    }
   } // method send
 
   public boolean healthy(String ca) {
     try {
       send(ca, CMD_health, null);
       return true;
-    } catch (IOException e) {
+    } catch (Exception e) {
       return false;
     }
   }
 
-  public byte[] cacert(String ca) throws IOException {
+  public byte[] cacert(String ca)
+      throws IOException, SdkErrorResponseException {
     byte[] respBytes = send(ca, CMD_cacert, null);
     CertChainResponse resp = CertChainResponse.decode(respBytes);
     byte[][] certs = resp.getCertificates();
     return certs == null || certs.length == 0 ? null : certs[0];
   }
 
-  public byte[][] cacertchain(String ca) throws IOException {
+  public byte[][] cacertchain(String ca)
+      throws IOException, SdkErrorResponseException {
     byte[] respBytes = send(ca, CMD_cacert, null);
     CertChainResponse resp = CertChainResponse.decode(respBytes);
     return resp.getCertificates();
   }
 
-  public byte[] generateCrl(String ca, String crldp) throws IOException {
+  public byte[] generateCrl(String ca, String crldp)
+      throws IOException, SdkErrorResponseException {
     GenCRLRequest req = new GenCRLRequest();
     req.setCrlDp(crldp);
     byte[] respBytes = send(ca, CMD_gen_crl, req);
@@ -89,12 +105,13 @@ public class SdkClient {
     return resp.getCrl();
   }
 
-  public byte[] currentCrl(String ca) throws IOException {
+  public byte[] currentCrl(String ca)
+      throws IOException, SdkErrorResponseException {
     return currentCrl(ca, null, null, null);
   }
 
   public byte[] currentCrl(String ca, BigInteger crlNumber, Date thisUpdate, String crlDp)
-      throws IOException {
+      throws IOException, SdkErrorResponseException {
     GetCRLRequest req = new GetCRLRequest();
     req.setCrlNumber(crlNumber);
     req.setCrlDp(crlDp);
@@ -106,7 +123,7 @@ public class SdkClient {
 
   private byte[] enrollCert0(
       String func, String cmd, String ca, EnrollCertRequestEntry reqEntry)
-      throws IOException, SdkClientException {
+      throws IOException, SdkErrorResponseException {
     EnrollCertsRequest req = new EnrollCertsRequest();
     req.setCaCertMode(CertsMode.NONE);
     req.setEntries(Collections.singletonList(reqEntry));
@@ -116,16 +133,15 @@ public class SdkClient {
     EnrollOrPullCertResponseEntry rEntry = resp.getEntries().get(0);
     byte[] cert = rEntry.getCert();
     if (cert == null) {
-      String msg = "error " + func;
-      logError(msg, rEntry.getError());
-      throw new SdkClientException(msg);
+      throw new SdkErrorResponseException(
+          ErrorCode.SYSTEM_FAILURE, "error " + func);
     }
     return cert;
   }
 
   private KeyCertPair enrollCertCaGenKeypair0(
       String func, String cmd, String ca, EnrollCertRequestEntry reqEntry)
-      throws IOException, SdkClientException {
+      throws IOException, SdkErrorResponseException {
     EnrollCertsRequest req = new EnrollCertsRequest();
     req.setCaCertMode(CertsMode.NONE);
     req.setEntries(Collections.singletonList(reqEntry));
@@ -134,15 +150,14 @@ public class SdkClient {
     EnrollOrPollCertsResponse resp = EnrollOrPollCertsResponse.decode(respBytes);
     EnrollOrPullCertResponseEntry rEntry = resp.getEntries().get(0);
     if (rEntry.getCert() == null || rEntry.getPrivateKey() == null) {
-      String msg = "error " + func;
-      logError(msg, rEntry.getError());
-      throw new SdkClientException(msg);
+      throw new SdkErrorResponseException(
+          ErrorCode.SYSTEM_FAILURE, "error " + func);
     }
     return new KeyCertPair(rEntry.getPrivateKey(), rEntry.getCert());
   }
 
   public byte[] enrollCert(String ca, String certprofile, byte[] p10Req)
-      throws IOException, SdkClientException {
+      throws IOException, SdkErrorResponseException {
     EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry();
     reqEntry.setP10req(p10Req);
     reqEntry.setCertprofile(certprofile);
@@ -151,7 +166,7 @@ public class SdkClient {
 
   public KeyCertPair enrollCertCaGenKeypair(
       String ca, String certprofile, String subject)
-      throws IOException, SdkClientException {
+      throws IOException, SdkErrorResponseException {
     EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry();
     reqEntry.setSubject(new X500NameType(subject));
     reqEntry.setCertprofile(certprofile);
@@ -161,7 +176,7 @@ public class SdkClient {
   public byte[] enrollKupCert(
       String ca, String certprofile, byte[] p10Req,
       X500Name oldCertIssuer, BigInteger oldCertSerialNumber)
-      throws SdkClientException, IOException {
+      throws IOException, SdkErrorResponseException {
     EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry();
     reqEntry.setCertprofile(certprofile);
     reqEntry.setP10req(p10Req);
@@ -176,7 +191,7 @@ public class SdkClient {
   public KeyCertPair enrollKupCertCaGenKeypair(
       String ca, String certprofile, X500Name subject,
       String oldCertIssuer, BigInteger oldCertSerialNumber)
-      throws SdkClientException, IOException {
+      throws IOException, SdkErrorResponseException {
     EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry();
     reqEntry.setCertprofile(certprofile);
     reqEntry.setSubject(new X500NameType(subject));
@@ -190,65 +205,75 @@ public class SdkClient {
   }
 
   public EnrollOrPollCertsResponse enrollCerts(String ca, EnrollCertsRequest req)
-      throws IOException {
+      throws IOException, SdkErrorResponseException {
     byte[] respBytes = send(ca, CMD_enroll, req);
-    return EnrollOrPollCertsResponse.decode(respBytes);
+    return checkEnrollResp(respBytes, req);
   }
 
   public EnrollOrPollCertsResponse enrollKupCerts(String ca, EnrollCertsRequest req)
-      throws IOException {
+      throws IOException, SdkErrorResponseException {
     byte[] respBytes = send(ca, CMD_enroll_kup, req);
-    return EnrollOrPollCertsResponse.decode(respBytes);
+    return checkEnrollResp(respBytes, req);
+  }
+
+  private EnrollOrPollCertsResponse checkEnrollResp(byte[] respBytes, EnrollCertsRequest req)
+      throws IOException {
+    EnrollOrPollCertsResponse resp = EnrollOrPollCertsResponse.decode(respBytes);
+    List<EnrollOrPullCertResponseEntry> entries = resp.getEntries();
+    int expectedSize = req.getEntries().size();
+    int size = entries == null ? 0 : entries.size();
+    if (expectedSize != size) {
+      throw new IOException("expected " + expectedSize + " entries, but received " + size);
+    }
+    return resp;
   }
 
   public void confirmCerts(String ca, ConfirmCertsRequest req)
-      throws IOException {
+      throws IOException, SdkErrorResponseException {
     send(ca, CMD_confirm_enroll, req);
   }
 
   public void revokePendingCerts(String ca, String tid)
-      throws IOException {
+      throws IOException, SdkErrorResponseException {
     TransactionIdRequest req = new TransactionIdRequest();
     req.setTid(tid);
     send(ca, CMD_revoke_pending_cert, req);
   }
 
   public EnrollOrPollCertsResponse pollCerts(String ca, PollCertRequest req)
-      throws IOException {
+      throws IOException, SdkErrorResponseException {
     byte[] respBytes = send(ca, CMD_poll_cert, req);
     return EnrollOrPollCertsResponse.decode(respBytes);
   }
 
   public RevokeCertsResponse revokeCerts(String ca, RevokeCertsRequest req)
-      throws IOException {
+      throws IOException, SdkErrorResponseException {
     byte[] respBytes = send(ca, CMD_revoke_cert, req);
     return RevokeCertsResponse.decode(respBytes);
   }
 
-  public UnrevokeOrRemoveCertsResponse unrevokeCerts(
-      String ca, UnrevokeOrRemoveCertsRequest req)
-      throws IOException {
-    byte[] respBytes = send(ca, CMD_unrevoke_cert, req);
-    return UnrevokeOrRemoveCertsResponse.decode(respBytes);
+  public UnSuspendOrRemoveCertsResponse unsuspendCerts(
+      String ca, UnsuspendOrRemoveRequest req)
+      throws IOException, SdkErrorResponseException {
+    byte[] respBytes = send(ca, CMD_unsuspend_cert, req);
+    return UnSuspendOrRemoveCertsResponse.decode(respBytes);
   }
 
-  public UnrevokeOrRemoveCertsResponse removeCerts(
-      String ca, UnrevokeOrRemoveCertsRequest req)
-      throws IOException {
+  public UnSuspendOrRemoveCertsResponse removeCerts(
+      String ca, UnsuspendOrRemoveRequest req)
+      throws IOException, SdkErrorResponseException {
     byte[] respBytes = send(ca, CMD_remove_cert, req);
-    return UnrevokeOrRemoveCertsResponse.decode(respBytes);
+    return UnSuspendOrRemoveCertsResponse.decode(respBytes);
   }
 
   public byte[] getCert(String caName, X500Name issuer, BigInteger serialNumber)
-      throws IOException {
+      throws IOException, SdkErrorResponseException {
     GetCertRequest req = new GetCertRequest();
     req.setIssuer(new X500NameType(issuer));
     req.setSerialNumber(serialNumber);
-    return send(caName, CMD_get_cert, req);
-  }
-
-  private void logError(String message, ErrorEntry err) {
-    // TODO
+    byte[] respBytes = send(caName, CMD_get_cert, req);
+    PayloadResponse resp = PayloadResponse.decode(respBytes);
+    return resp.getPayload();
   }
 
 }

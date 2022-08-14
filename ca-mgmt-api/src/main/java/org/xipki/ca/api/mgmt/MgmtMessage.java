@@ -123,7 +123,7 @@ public abstract class MgmtMessage {
     tokenInfoP11,
     unlockCa,
     unrevokeCa,
-    unrevokeCertificate;
+    unsuspendCertificate;
 
     public static MgmtAction ofName(String str) {
       for (MgmtAction action : MgmtAction.values()) {

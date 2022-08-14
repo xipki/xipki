@@ -115,7 +115,7 @@ public class Actions {
   @Service
   public static class CopyFile extends XiAction {
 
-    @Argument(index = 0, name = "source file", required = true, description = "file to be copied")
+    @Argument(index = 0, name = "source-file", required = true, description = "file to be copied")
     @Completion(FileCompleter.class)
     private String source;
 
@@ -386,7 +386,7 @@ public class Actions {
   @Service
   public static class MoveFile extends XiAction {
 
-    @Argument(index = 0, name = "source file", required = true, description = "file to be moved")
+    @Argument(index = 0, name = "source-file", required = true, description = "file to be moved")
     @Completion(FileCompleter.class)
     private String source;
 

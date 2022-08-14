@@ -19,6 +19,9 @@ public class X500NameType {
 
   private byte[] encoded;
 
+  public X500NameType() {
+  }
+
   public X500NameType(String text) {
     this.text = text;
   }

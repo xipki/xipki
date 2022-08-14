@@ -212,6 +212,7 @@ class ConfLoader {
     // CA
     for (String caName : conf.getCaNames()) {
       CaConf.SingleCa scc = conf.getCa(caName);
+
       CaConf.GenSelfIssued genSelfIssued = scc.getGenSelfIssued();
       CaEntry caEntry = scc.getCaEntry();
       if (caEntry != null) {

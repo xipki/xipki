@@ -39,7 +39,7 @@ import org.xipki.util.Base64;
 import org.xipki.util.*;
 import org.xipki.util.PemEncoder.PemLabel;
 import org.xipki.util.exception.OperationException;
-import org.xipki.util.exception.OperationException.ErrorCode;
+import org.xipki.util.exception.ErrorCode;
 
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
@@ -48,7 +48,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 import static org.xipki.util.Args.notNull;
-import static org.xipki.util.exception.OperationException.ErrorCode.*;
+import static org.xipki.util.exception.ErrorCode.*;
 
 /**
  * REST API responder.
@@ -406,9 +406,13 @@ public class RestResponder {
 
           break;
         }
-        case RestAPIConstants.CMD_revoke_cert: {
-          if (requestor.isPermitted(PermissionConstants.REVOKE_CERT)) {
-            throw new OperationException(NOT_PERMITTED, "REVOKE_CERT is not allowed");
+        case RestAPIConstants.CMD_revoke_cert:
+        case RestAPIConstants.CMD_unsuspend_cert: {
+          boolean revoke = command.equals(RestAPIConstants.CMD_revoke_cert);
+          int permission = revoke ? PermissionConstants.REVOKE_CERT
+              : PermissionConstants.UNSUSPEND_CERT;
+          if (!requestor.isPermitted(permission)) {
+            throw new OperationException(NOT_PERMITTED, command + " is not allowed");
           }
 
           String strCaSha1 = httpRetriever.getParameter(RestAPIConstants.PARAM_ca_sha1);
@@ -434,16 +438,20 @@ public class RestResponder {
             throw new OperationException(ErrorCode.BAD_REQUEST, ex.getMessage());
           }
 
-          String strReason = httpRetriever.getParameter(RestAPIConstants.PARAM_reason);
-          CrlReason reason = (strReason == null) ? CrlReason.UNSPECIFIED
-              : CrlReason.forNameOrText(strReason);
-
-          if (reason == CrlReason.REMOVE_FROM_CRL) {
-            UnrevokeOrRemoveCertsRequest sdkReq = new UnrevokeOrRemoveCertsRequest();
-            sdkReq.setIssuerFp(caSha1);
+          if (!revoke) {
+            UnsuspendOrRemoveRequest sdkReq = new UnsuspendOrRemoveRequest();
+            sdkReq.setIssuerCertSha1Fp(caSha1);
             sdkReq.setEntries(Collections.singletonList(serialNumber));
-            sdk.unrevokeCerts(caName, sdkReq);
+            sdk.unsuspendCerts(caName, sdkReq);
           } else {
+            String strReason = httpRetriever.getParameter(RestAPIConstants.PARAM_reason);
+            CrlReason reason = (strReason == null) ? CrlReason.UNSPECIFIED
+                : CrlReason.forNameOrText(strReason);
+            if (reason == CrlReason.REMOVE_FROM_CRL) {
+              throw new OperationException(ErrorCode.BAD_REQUEST,
+                  "reason " + CrlReason.REMOVE_FROM_CRL.getDescription() + " is not allowed!");
+            }
+
             Date invalidityTime = null;
             String strInvalidityTime = httpRetriever.getParameter(
                 RestAPIConstants.PARAM_invalidity_time);
@@ -459,7 +467,7 @@ public class RestResponder {
             entry.setReason(reason);
 
             RevokeCertsRequest sdkReq = new RevokeCertsRequest();
-            sdkReq.setIssuerFp(caSha1);
+            sdkReq.setIssuerCertSha1Fp(caSha1);
             sdkReq.setEntries(Collections.singletonList(entry));
             sdk.revokeCerts(caName, sdkReq);
           }
@@ -492,15 +500,6 @@ public class RestResponder {
                 AuditLevel.INFO, AuditStatus.FAILED);
           }
 
-          respCt = RestAPIConstants.CT_pkix_crl;
-          break;
-        }
-        case RestAPIConstants.CMD_new_crl: {
-          if (!requestor.isPermitted(PermissionConstants.GEN_CRL)) {
-            throw new OperationException(NOT_PERMITTED, "GEN_CRL is not allowed");
-          }
-
-          respBytes = sdk.generateCrl(caName, null);
           respCt = RestAPIConstants.CT_pkix_crl;
           break;
         }
@@ -564,15 +563,11 @@ public class RestResponder {
       event.setStatus(AuditStatus.FAILED);
       event.addEventData(CaAuditConstants.NAME_message, code.name());
 
-      switch (code) {
-        case DATABASE_FAILURE:
-        case SYSTEM_FAILURE:
-          auditMessage = code.name();
-          break;
-        default:
-          auditMessage = code.name() + ": " + ex.getErrorMessage();
-          break;
-      } // end switch code
+      if (code == DATABASE_FAILURE || code == SYSTEM_FAILURE) {
+        auditMessage = code.name();
+      } else {
+        auditMessage = code.name() + ": " + ex.getErrorMessage();
+      }
 
       Map<String, String> headers = new HashMap<>();
       headers.put(RestAPIConstants.HEADER_PKISTATUS, RestAPIConstants.PKISTATUS_rejection);

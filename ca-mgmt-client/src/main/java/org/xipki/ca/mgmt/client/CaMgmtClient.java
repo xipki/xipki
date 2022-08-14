@@ -600,13 +600,13 @@ public class CaMgmtClient implements CaManager {
   } // method revokeCertificate
 
   @Override
-  public void unrevokeCertificate(String caName, BigInteger serialNumber)
+  public void unsuspendCertificate(String caName, BigInteger serialNumber)
       throws CaMgmtException {
-    MgmtRequest.UnrevokeCertificate req = new MgmtRequest.UnrevokeCertificate();
+    MgmtRequest.UnsuspendCertificate req = new MgmtRequest.UnsuspendCertificate();
     req.setCaName(caName);
     req.setSerialNumber(serialNumber);
-    voidTransmit(MgmtAction.unrevokeCertificate, req);
-  } // method unrevokeCertificate
+    voidTransmit(MgmtAction.unsuspendCertificate, req);
+  } // method unsuspendCertificate
 
   @Override
   public void removeCertificate(String caName, BigInteger serialNumber)

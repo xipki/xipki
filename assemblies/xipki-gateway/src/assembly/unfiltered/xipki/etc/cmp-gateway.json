@@ -1,10 +1,25 @@
 {
-	"scep": {
-		"includeCaCert": true,
-		"includeCertChain": false,
-		"includeSignerCert": true,
-		"supportGetCrl": true,
-		"maxSigningTimeBiasInMs": 300
+	"cmp": {
+		"confirmCert": false,
+		"sendCaCert": false,
+		"sendCertChain": false,
+		"messageTimeRequired": true,
+		"sendResponderCert": true,
+		"messageTimeBias": 300,
+		"confirmWaitTime": 300,
+		"requestSigAlgos": [
+			"SHA256withRSA",
+			"SHA256withECDSA"
+		],
+		"requestPbmMacs": [
+			"HMAC-SHA256"
+		],
+		"requestPbmOwfs": [
+			"SHA256"
+		],
+		"responsePbmMac": "HMAC-SHA256",
+		"responsePbmOwf": "SHA256",
+		"responsePbmIterationCount": 10240
 	},
 	// If set to true, please set writer.level to debug in the file META-INF/classes/tinylog.properties.
 	"logReqResp": false,
@@ -31,9 +46,11 @@
 	"audit": {
 		"type": "embed"
 	},
-	"signer": {
-		"type": "pkcs12",
-		"conf": "password=1234,keystore=file:keycerts/scep-signer.p12,algo=SHA256withRSA"
+	"signers": {
+		"default": {
+			"type": "pkcs12",
+			"conf": "password=1234,keystore=file:keycerts/tlskeys/server/tls-server.p12,algo=SHA256withECDSA"
+		}
 	},
 	"security":{
 		"keyStrongrandomEnabled":false,

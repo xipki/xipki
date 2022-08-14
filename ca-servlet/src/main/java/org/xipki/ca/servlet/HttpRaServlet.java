@@ -27,8 +27,7 @@ import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.exception.OperationException;
+import org.xipki.util.exception.ErrorCode;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -85,7 +84,7 @@ public class HttpRaServlet extends HttpServlet {
       byte[] respBody = response == null ? null : response.encode();
       int httpStatus = HttpServletResponse.SC_OK;
       if (response instanceof ErrorResponse) {
-        OperationException.ErrorCode errCode = ((ErrorResponse) response).getCode();
+        ErrorCode errCode = ((ErrorResponse) response).getCode();
         switch (errCode) {
           case UNAUTHORIZED:
           case NOT_PERMITTED:
@@ -121,10 +120,10 @@ public class HttpRaServlet extends HttpServlet {
       if (logReqResp && LOG.isDebugEnabled()) {
         if (viaPost) {
           LOG.debug("HTTP POST CA REST path: {}\nRequest:\n{}\nResponse:\n{}", req.getRequestURI(),
-              LogUtil.base64Encode(requestBytes), LogUtil.base64Encode(respBody));
+              new String(requestBytes), new String(respBody));
         } else {
           LOG.debug("HTTP GET CA REST path: {}\nResponse:\n{}", req.getRequestURI(),
-              LogUtil.base64Encode(respBody));
+              new String(respBody));
         }
       }
 

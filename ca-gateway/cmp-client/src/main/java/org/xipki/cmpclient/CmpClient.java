@@ -168,7 +168,7 @@ public interface CmpClient extends Closeable {
       throws CmpClientException, PkiErrorException;
 
   /**
-   * Unrevokes a certificate.
+   * Unsuspends a certificate.
    * @param caName
    *          CA name. Must not be {@code null}.
    * @param issuerCert
@@ -177,19 +177,19 @@ public interface CmpClient extends Closeable {
    *          Serial number of the certificate. Must not be {@code null}.
    * @param debug
    *          Request/response debug control. Could be {@code null}.
-   * @return result of the unrevocation.
+   * @return result of action.
    * @throws PkiErrorException
    *          if the response returns none-success status.
    * @throws CmpClientException
    *          if client error occurs.
    */
-  CertIdOrError unrevokeCert(
+  CertIdOrError unsuspendCert(
       String caName, Requestor requestor, X509Cert issuerCert,
       BigInteger serial, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
-   * Unrevokes certificates.
+   * Unsuspends certificates.
    *
    * @param caName
    *          CA name. Must not be {@code null}.
@@ -205,13 +205,13 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  CertIdOrError unrevokeCert(
+  CertIdOrError unsuspendCert(
       String caName, Requestor requestor, X509Cert issuerCert,
       X509Cert cert, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
-   * Unrevokes certificates.
+   * Unsuspends certificates.
    *
    * @param caName
    *          CA name. Must not be {@code null}.
@@ -225,7 +225,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  Map<String, CertIdOrError> unrevokeCerts(
+  Map<String, CertIdOrError> unsuspendCerts(
       String caName, Requestor requestor, UnrevokeCertRequest request,
       ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;

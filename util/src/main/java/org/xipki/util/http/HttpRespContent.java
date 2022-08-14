@@ -25,23 +25,39 @@ package org.xipki.util.http;
 
 public class HttpRespContent {
 
-  private String contentType;
+  private final String contentType;
 
-  private byte[] content;
+  private final byte[] content;
+
+  private final int statusCode;
+
+  private HttpRespContent(int statusCode, String contentType, byte[] content) {
+    this.contentType = contentType;
+    this.content = content;
+    this.statusCode = statusCode;
+  }
+
+  public static HttpRespContent ofOk(String contentType, byte[] content) {
+    return new HttpRespContent(200, contentType, content);
+  }
+
+  public static HttpRespContent ofError(int statusCode, String contentType, byte[] content) {
+    return new HttpRespContent(statusCode, contentType, content);
+  }
+
+  public boolean isOK() {
+    return statusCode == 200;
+  }
+
+  public int getStatusCode() {
+    return statusCode;
+  }
 
   public String getContentType() {
     return contentType;
   }
 
-  public void setContentType(String contentType) {
-    this.contentType = contentType;
-  }
-
   public byte[] getContent() {
     return content;
-  }
-
-  public void setContent(byte[] content) {
-    this.content = content;
   }
 }

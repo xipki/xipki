@@ -51,7 +51,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.xipki.ca.sdk.CaAuditConstants.*;
 import static org.xipki.util.Args.notNull;
-import static org.xipki.util.exception.OperationException.ErrorCode.*;
+import static org.xipki.util.exception.ErrorCode.*;
 
 /**
  * X509CA CRL module.

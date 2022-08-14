@@ -14,9 +14,14 @@ public class PollCertRequest extends SdkRequest {
 
   private String transactionId;
 
-  public X500NameType issuer;
+  /**
+   * SHA-1 fingerprint of the DER-encoded issuer's certificate
+   */
+  private byte[] issuerCertSha1Fp;
 
-  public byte[] subjectKeyIdentifier;
+  private X500NameType issuer;
+
+  private byte[] authorityKeyIdentifier;
 
   private List<PollCertRequestEntry> entries;
 
@@ -28,14 +33,6 @@ public class PollCertRequest extends SdkRequest {
     this.transactionId = transactionId;
   }
 
-  public List<PollCertRequestEntry> getEntries() {
-    return entries;
-  }
-
-  public void setEntries(List<PollCertRequestEntry> entries) {
-    this.entries = entries;
-  }
-
   public X500NameType getIssuer() {
     return issuer;
   }
@@ -44,12 +41,28 @@ public class PollCertRequest extends SdkRequest {
     this.issuer = issuer;
   }
 
-  public byte[] getSubjectKeyIdentifier() {
-    return subjectKeyIdentifier;
+  public byte[] getAuthorityKeyIdentifier() {
+    return authorityKeyIdentifier;
   }
 
-  public void setSubjectKeyIdentifier(byte[] subjectKeyIdentifier) {
-    this.subjectKeyIdentifier = subjectKeyIdentifier;
+  public void setAuthorityKeyIdentifier(byte[] authorityKeyIdentifier) {
+    this.authorityKeyIdentifier = authorityKeyIdentifier;
+  }
+
+  public byte[] getIssuerCertSha1Fp() {
+    return issuerCertSha1Fp;
+  }
+
+  public void setIssuerCertSha1Fp(byte[] issuerCertSha1Fp) {
+    this.issuerCertSha1Fp = issuerCertSha1Fp;
+  }
+
+  public List<PollCertRequestEntry> getEntries() {
+    return entries;
+  }
+
+  public void setEntries(List<PollCertRequestEntry> entries) {
+    this.entries = entries;
   }
 
   public static PollCertRequest decode(byte[] encoded) {

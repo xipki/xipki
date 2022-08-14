@@ -44,8 +44,8 @@ import java.util.concurrent.TimeUnit;
 
 import static org.xipki.ca.sdk.CaAuditConstants.*;
 import static org.xipki.util.Args.notNull;
-import static org.xipki.util.exception.OperationException.ErrorCode.NOT_PERMITTED;
-import static org.xipki.util.exception.OperationException.ErrorCode.SYSTEM_FAILURE;
+import static org.xipki.util.exception.ErrorCode.NOT_PERMITTED;
+import static org.xipki.util.exception.ErrorCode.SYSTEM_FAILURE;
 
 /**
  * X509CA revoker module.
@@ -160,23 +160,23 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     }
   } // method revokeCertificate
 
-  public CertWithDbId unrevokeCert(BigInteger serialNumber, String msgId)
+  public CertWithDbId unsuspendCert(BigInteger serialNumber, String msgId)
       throws OperationException {
     if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
       throw new OperationException(NOT_PERMITTED,
-          "insufficient permission to unrevoke CA certificate");
+          "insufficient permission to unsuspend CA certificate");
     }
 
-    AuditEvent event = newPerfAuditEvent(TYPE_unrevoke_cert, msgId);
+    AuditEvent event = newPerfAuditEvent(TYPE_unsuspend_cert, msgId);
     boolean successful = false;
     try {
-      CertWithDbId ret = unrevokeCert0(serialNumber, false, event);
+      CertWithDbId ret = unsuspendCert0(serialNumber, false, event);
       successful = true;
       return ret;
     } finally {
       finish(event, successful);
     }
-  } // method unrevokeCertificate
+  } // method unsuspendCert
 
   private CertWithRevocationInfo revokeCertificate0(BigInteger serialNumber, CrlReason reason,
       Date invalidityTime, boolean force, AuditEvent event) throws OperationException {
@@ -252,22 +252,22 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     return revokedCert;
   } // method revokeSuspendedCert0
 
-  private CertWithDbId unrevokeCert0(BigInteger serialNumber, boolean force, AuditEvent event)
+  private CertWithDbId unsuspendCert0(BigInteger serialNumber, boolean force, AuditEvent event)
       throws OperationException {
     String hexSerial = LogUtil.formatCsn(serialNumber);
     event.addEventData(NAME_serial, hexSerial);
 
-    LOG.info("     START unrevokeCertificate: ca={}, serialNumber={}", caIdent.getName(),
+    LOG.info("     START unsuspendertificate: ca={}, serialNumber={}", caIdent.getName(),
         hexSerial);
 
-    CertWithDbId unrevokedCert = certstore.unrevokeCert(caIdent, serialNumber, force, caIdNameMap);
+    CertWithDbId unrevokedCert = certstore.unsuspendCert(caIdent, serialNumber, force, caIdNameMap);
     if (unrevokedCert == null) {
       return null;
     }
 
     publisherModule.publishCertUnrevoked(unrevokedCert);
 
-    LOG.info("SUCCESSFUL unrevokeCertificate: ca={}, serialNumber={}, revocationResult=UNREVOKED",
+    LOG.info("SUCCESSFUL unsuspendCertificate: ca={}, serialNumber={}",
         caIdent.getName(), hexSerial);
 
     return unrevokedCert;
@@ -299,10 +299,10 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
   public void unrevokeCa(String msgId) throws OperationException {
     caInfo.setRevocationInfo(null);
     if (caInfo.isSelfSigned()) {
-      AuditEvent event = newPerfAuditEvent(TYPE_unrevoke_cert, msgId);
+      AuditEvent event = newPerfAuditEvent(TYPE_unsuspend_cert, msgId);
       boolean successful = false;
       try {
-        unrevokeCert0(caInfo.getSerialNumber(), true, event);
+        unsuspendCert0(caInfo.getSerialNumber(), true, event);
         successful = true;
       } finally {
         finish(event, successful);

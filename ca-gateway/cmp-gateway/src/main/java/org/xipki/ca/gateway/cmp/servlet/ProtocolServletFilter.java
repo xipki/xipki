@@ -69,7 +69,7 @@ public class ProtocolServletFilter implements Filter {
       conf = new ProtocolProxyConfWrapper(conf0);
 
       CmpResponder responder = new CmpResponder(cmpControl, conf.getSdkClient(),
-          conf.getSecurities().getSecurityFactory(), conf.getSigner(),
+          conf.getSecurities().getSecurityFactory(), conf.getSigners(),
           conf.getAuthenticator(), conf.getPopControl());
 
       servlet = new HttpCmpServlet();

@@ -58,7 +58,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import static org.xipki.util.exception.OperationException.ErrorCode.*;
+import static org.xipki.util.exception.ErrorCode.*;
 
 /**
  * X509CA GrandCertTemplate builder.

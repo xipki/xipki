@@ -50,7 +50,7 @@ if { $printUsage equals "true" } then {
 
   xi:csr-p11 --slot ${SLOT} --label ${P11_LABEL} --out ${KEYCERTS_DIR}/${P11_LABEL}.csr --subject "${SUBJECT}"
 
-  xi:cmp-csr-enroll --csr ${KEYCERTS_DIR}/${P11_LABEL}.csr --out ${KEYCERTS_DIR}/${P11_LABEL}.der --profile ocsp
+  ca:enroll-cert --ca myca1 --csr ${KEYCERTS_DIR}/${P11_LABEL}.csr --out ${KEYCERTS_DIR}/${P11_LABEL}.der --profile ocsp
 
   echo "# Update the certificate in the device"
   xi:update-cert-p11 --slot ${SLOT} --label ${P11_LABEL} --cert ${KEYCERTS_DIR}/${P11_LABEL}.der

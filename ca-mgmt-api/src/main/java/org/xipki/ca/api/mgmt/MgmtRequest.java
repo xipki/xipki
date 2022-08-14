@@ -692,7 +692,7 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class RevokeCertificate
 
-  public static class UnrevokeCertificate extends CaNameRequest {
+  public static class UnsuspendCertificate extends CaNameRequest {
 
     private BigInteger serialNumber;
 

@@ -1,12 +1,61 @@
+# Please adapt me
+SUBJECT="CN=OCSP Responder 1,O=myorg,C=DE"
+
 KEYCERTS_DIR = xipki/ocsp-setup/keycerts
+CACERT_FILE = xipki/ca-setup/keycerts/myca1.der
 
-echo "# Generate PKCS#12 key and certificate for OCSP Responder"
+printUsage = "false"
+argsValid = "false"
+keytype = ""
 
-xi:cmp-enroll-cagenkey \
-  --p12-out ${KEYCERTS_DIR}/ocsp1.p12 --password 1234 \
-  --cert-out ${KEYCERTS_DIR}/ocsp1.der --profile ocsp \
-  --subject "CN=OCSP Responder 1,O=myorg,C=DE"
+if { "$1" equals "" } then {
+  printUsage = "true"
+  argsValid = "true"
+} elif { "$1" equals "help" } then {
+  printUsage = "true"
+  argsValid = "true"
+} else {
+  list = [rsa dsa ec sm2]; each ($list) {
+    if { "$1" equals $it } then {
+      argsValid = "true"
+      keytype = "$1"
+      break
+    }
+  }
+}
 
-echo "Please"
-echo "  1. Copy ${KEYCERTS_DIR}/ocsp1.p12 to replace the <tomcat.dir>/xipki/keycerts/ocsp1.p12"
-echo "  2. Restart tomcat."
+if { $printUsage equals "true" } then {
+  echo "Usage: "
+  echo ""
+  echo "source file:./xipki/ocsp/setup-ocsp-p12.script <key type>"
+  echo "    key type:  rsa, ec, dsa, sm2"
+} else {
+  echo "#################################################################"
+  echo "#                 Generate Key, CSR and Certificate             #"
+  echo "#################################################################"
+
+  echo "# Generate PKCS#12 key and certificate for OCSP Responder"
+
+  if { "$keytype" equals "dsa" } then {
+    xi:dsa-p12 --plen 2048 --password 1234 --out ${KEYCERTS_DIR}/ocsp1.p12
+  } elif { "$keytype" equals "ec" } then {
+    xi:ec-p12 --curve secp256r1 --password 1234 --out ${KEYCERTS_DIR}/ocsp1.p12
+  } elif { "$keytype" equals "rsa" } then {
+    xi:rsa-p12 --key-size 2048 --password 1234 --out ${KEYCERTS_DIR}/ocsp1.p12
+  } elif { "$keytype" equals "sm2" } then {
+    xi:sm2-p12 --password 1234 --out ${KEYCERTS_DIR}/ocsp1.p12
+  }
+
+  xi:csr-p12 --password 1234 --p12 ${KEYCERTS_DIR}/ocsp1.p12 --out ${KEYCERTS_DIR}/ocsp1.csr \
+    --subject "${SUBJECT}"
+
+  ca:enroll-cert --ca myca1 --csr ${KEYCERTS_DIR}/ocsp1.csr --out ${KEYCERTS_DIR}/ocsp1.der --profile ocsp
+
+  echo "# Update the certificate in the PKCS#12 file"
+  xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/ocsp1.p12 --password 1234 \
+    --cert ${KEYCERTS_DIR}/ocsp1.der --ca-cert ${CACERT_FILE}
+
+  echo "Please"
+  echo "  1. Copy ${KEYCERTS_DIR}/ocsp1.p12 to replace the <tomcat.dir>/xipki/keycerts/ocsp1.p12"
+  echo "  2. Restart tomcat."
+}

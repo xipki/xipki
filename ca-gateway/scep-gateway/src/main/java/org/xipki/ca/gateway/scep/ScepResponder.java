@@ -47,6 +47,7 @@ import org.xipki.security.*;
 import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
 
 import javax.servlet.http.HttpServletResponse;
@@ -54,16 +55,13 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import static org.xipki.util.Args.notNull;
-import static org.xipki.util.exception.OperationException.ErrorCode.*;
+import static org.xipki.util.exception.ErrorCode.*;
 
 /**
  * SCEP responder.
@@ -112,8 +110,6 @@ public class ScepResponder {
 
   private static final Logger LOG = LoggerFactory.getLogger(ScepResponder.class);
 
-  private static final long DFLT_MAX_SIGNINGTIME_BIAS = 5L * 60 * 1000; // 5 minutes
-
   private static final String CGI_PROGRAM = "/pkiclient.exe";
 
   private static final int CGI_PROGRAM_LEN = CGI_PROGRAM.length();
@@ -132,17 +128,12 @@ public class ScepResponder {
 
   private final RequestorAuthenticator authenticator;
 
-  private PrivateKey responderKey;
+  private final CaNameScepSigners signers;
 
-  private X509Cert responderCert;
-
-  private EnvelopedDataDecryptor envelopedDataDecryptor;
-
-  //private long maxSigningTimeBiasInMs = DFLT_MAX_SIGNINGTIME_BIAS;
-
-  public ScepResponder(ScepControl control, SdkClient sdk, SecurityFactory securityFactory,
-                       ConcurrentContentSigner signer, RequestorAuthenticator authenticator,
-                       PopControl popControl) {
+  public ScepResponder(
+      ScepControl control, SdkClient sdk, SecurityFactory securityFactory,
+      CaNameScepSigners signers, RequestorAuthenticator authenticator,
+      PopControl popControl) {
     this.control = notNull(control, "control");
     this.sdk = notNull(sdk, "sdk");
     this.securityFactory = notNull(securityFactory, "securityFactory");
@@ -155,22 +146,7 @@ public class ScepResponder {
         CaCapability.AES, CaCapability.DES3, CaCapability.POSTPKIOperation,
         CaCapability.Renewal, CaCapability.SHA1, CaCapability.SHA256, CaCapability.SHA512);
     this.caCaps = caps;
-
-    Key signingKey = signer.getSigningKey();
-    if (!(signingKey instanceof PrivateKey)) {
-      throw new IllegalArgumentException(
-          "Unsupported signer type: the signing key is not a PrivateKey");
-    }
-
-    if (!(signer.getCertificate().getPublicKey() instanceof RSAPublicKey)) {
-      throw new IllegalArgumentException("The SCEP responder key is not RSA key");
-    }
-
-    this.responderKey = (PrivateKey) signingKey;
-    this.responderCert = signer.getCertificate();
-    this.envelopedDataDecryptor =
-        new EnvelopedDataDecryptor(
-            new EnvelopedDataDecryptor.EnvelopedDataDecryptorInstance(responderCert, responderKey));
+    this.signers = signers;
   } // constructor
 
   private CaCaps getCaCaps() {
@@ -185,15 +161,14 @@ public class ScepResponder {
     return authenticator.getCertRequestor(cert);
   }
 
-  public RestResponse service(String path, byte[] request,
-                              HttpRequestMetadataRetriever metadataRetriever) {
+  public RestResponse service(
+      String path, byte[] request, HttpRequestMetadataRetriever metadataRetriever) {
     String caName = null;
     String certprofileName = null;
     if (path.length() > 1) {
-      String scepPath = path;
-      if (scepPath.endsWith(CGI_PROGRAM)) {
+      if (path.endsWith(CGI_PROGRAM)) {
         // skip also the first char (which is always '/')
-        String tpath = scepPath.substring(1, scepPath.length() - CGI_PROGRAM_LEN);
+        String tpath = path.substring(1, path.length() - CGI_PROGRAM_LEN);
         String[] tokens = tpath.split("/");
         if (tokens.length == 2) {
           caName = tokens[0];
@@ -241,17 +216,34 @@ public class ScepResponder {
           return new RestResponse(HttpServletResponse.SC_BAD_REQUEST);
         }
 
+        ScepSigner signer = signers.getSigner(caName);
+        if (signer == null) {
+          final String msg = "found no signer";
+          LOG.error(msg + " for CA {}", caName);
+          auditMessage = msg;
+          auditStatus = AuditStatus.FAILED;
+          return new RestResponse(HttpServletResponse.SC_BAD_REQUEST);
+        }
+
         ContentInfo ci;
         try {
-          ci = servicePkiOperation(caName, reqMessage, certprofileName, msgId, event);
+          ci = servicePkiOperation(signer, caName, reqMessage, certprofileName, msgId, event);
         } catch (MessageDecodingException ex) {
           final String msg = "could not decrypt and/or verify the request";
           LogUtil.error(LOG, ex, msg);
           auditMessage = msg;
           auditStatus = AuditStatus.FAILED;
           return new RestResponse(HttpServletResponse.SC_BAD_REQUEST);
-        } catch (OperationException ex) {
-          OperationException.ErrorCode code = ex.getErrorCode();
+        } catch (OperationException | SdkErrorResponseException ex) {
+          ErrorCode code;
+          if (ex instanceof OperationException) {
+            auditMessage = ex.getMessage();
+            code = ((OperationException) ex).getErrorCode();
+          } else {
+            ErrorResponse err = ((SdkErrorResponseException) ex).getErrorResponse();
+            auditMessage = err.getMessage();
+            code = err.getCode();
+          }
 
           int httpCode;
           switch (code) {
@@ -282,7 +274,6 @@ public class ScepResponder {
               break;
           }
 
-          auditMessage = ex.getMessage();
           LogUtil.error(LOG, ex, auditMessage);
           auditStatus = AuditStatus.FAILED;
           return new RestResponse(httpCode);
@@ -352,8 +343,13 @@ public class ScepResponder {
   } // method audit
 
   private byte[] getCaCertResp(String caName)
-      throws OperationException {
+      throws OperationException, SdkErrorResponseException {
     try {
+      ScepSigner signer = signers.getSigner(caName);
+      if (signer == null) {
+        throw new OperationException(PATH_NOT_FOUND, "found na signer for CA " + caName);
+      }
+
       byte[] cacert = sdk.cacert(caName);
       if (cacert == null) {
         throw new OperationException(PATH_NOT_FOUND, "unknown CA " + caName);
@@ -362,7 +358,7 @@ public class ScepResponder {
       CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
       try {
         cmsSignedDataGen.addCertificate(new X509CertificateHolder(Certificate.getInstance(cacert)));
-        cmsSignedDataGen.addCertificate(responderCert.toBcCert());
+        cmsSignedDataGen.addCertificate(signer.getCert().toBcCert());
         CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
         return degenerateSignedData.getEncoded();
       } catch (IOException ex) {
@@ -374,11 +370,11 @@ public class ScepResponder {
   }
 
   private ContentInfo servicePkiOperation(
-      String caName, CMSSignedData requestContent, String certprofileName,
-      String msgId, AuditEvent event)
-      throws MessageDecodingException, OperationException {
+      ScepSigner signer, String caName, CMSSignedData requestContent,
+      String certprofileName, String msgId, AuditEvent event)
+      throws MessageDecodingException, OperationException, SdkErrorResponseException {
     DecodedPkiMessage req = DecodedPkiMessage.decode(
-        requestContent, envelopedDataDecryptor, null);
+        requestContent, signer.getDecryptor(), null);
 
     PkiMessage rep = servicePkiOperation0(caName, requestContent, req,
                         certprofileName, msgId, event);
@@ -389,13 +385,13 @@ public class ScepResponder {
     if (rep.getFailInfo() != null) {
       audit(event, NAME_fail_info, rep.getFailInfo().toString());
     }
-    return encodeResponse(rep, req);
+    return encodeResponse(signer, rep, req);
   } // method servicePkiOperation
 
   private PkiMessage servicePkiOperation0(
       String caName, CMSSignedData requestContent,
       DecodedPkiMessage req, String certprofileName, String msgId, AuditEvent event)
-      throws OperationException {
+      throws OperationException, SdkErrorResponseException {
     notNull(requestContent, "requestContent");
 
     String tid = notNull(req, "req").getTransactionId().getId();
@@ -685,11 +681,11 @@ public class ScepResponder {
   } // method servicePkiOperation0
 
   private SignedData getCert(String caName, X500Name issuer, BigInteger serialNumber)
-      throws FailInfoException, OperationException {
+      throws FailInfoException, OperationException, SdkErrorResponseException {
     byte[] encodedCert;
     try {
       encodedCert = sdk.getCert(caName, issuer, serialNumber);
-    } catch (Exception ex) {
+    } catch (IOException ex) {
       final String message = "could not get certificate for CA '" + caName
           + "' and serialNumber=" + LogUtil.formatCsn(serialNumber) + ")";
       LogUtil.error(LOG, ex, message);
@@ -714,7 +710,7 @@ public class ScepResponder {
     byte[] cert = entry.getCert();
     if (cert == null) {
       throw new OperationException(
-          OperationException.ErrorCode.ofCode(entry.getError().getCode()),
+          ErrorCode.ofCode(entry.getError().getCode()),
           "expected 1 cert, but received none");
     }
 
@@ -740,7 +736,7 @@ public class ScepResponder {
   } // method buildSignedData
 
   private SignedData getCrl(String caName, X500Name issuer, BigInteger serialNumber)
-      throws FailInfoException, OperationException {
+      throws FailInfoException, OperationException, SdkErrorResponseException {
     if (!control.isSupportGetCrl()) {
       throw FailInfoException.BAD_REQUEST;
     }
@@ -769,12 +765,13 @@ public class ScepResponder {
     return SignedData.getInstance(signedData.toASN1Structure().getContent());
   } // method getCrl
 
-  private ContentInfo encodeResponse(PkiMessage response, DecodedPkiMessage request)
+  private ContentInfo encodeResponse(
+      ScepSigner signer, PkiMessage response, DecodedPkiMessage request)
       throws OperationException {
     notNull(response, "response");
     notNull(request, "request");
 
-    String algorithm = responderKey.getAlgorithm();
+    String algorithm = signer.getKey().getAlgorithm();
 
     if (!"RSA".equalsIgnoreCase(algorithm)) {
       throw new UnsupportedOperationException(
@@ -787,9 +784,9 @@ public class ScepResponder {
     try {
       SignAlgo signatureAlgorithm = SignAlgo.getInstance(hashAlgo.getJceName() + "withRSA");
       X509Cert[] cmsCertSet = control.isIncludeSignerCert()
-          ? new X509Cert[]{responderCert} : null;
+          ? new X509Cert[]{signer.getCert()} : null;
 
-      ci = response.encode(responderKey, signatureAlgorithm, responderCert, cmsCertSet,
+      ci = response.encode(signer.getKey(), signatureAlgorithm, signer.getCert(), cmsCertSet,
           request.getSignatureCert(), request.getContentEncryptionAlgorithm());
     } catch (MessageEncodingException | NoSuchAlgorithmException ex) {
       LogUtil.error(LOG, ex, "could not encode response");

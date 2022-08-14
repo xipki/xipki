@@ -26,6 +26,7 @@ import org.bouncycastle.asn1.cms.GCMParameters;
 import org.bouncycastle.asn1.crmf.*;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.*;
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.X509CRLHolder;
@@ -62,6 +63,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.DateUtil;
 import org.xipki.util.*;
 import org.xipki.util.ReqRespDebug.ReqRespPair;
+import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.XiHttpClient;
 
 import javax.crypto.*;
@@ -160,7 +162,7 @@ class CmpAgent {
     }
   }
 
-  private byte[] send(String caName, byte[] request)
+  private HttpRespContent send(String caName, byte[] request)
       throws IOException {
     notNull(request, "request");
     return httpClient.httpPost(serverUrl + caName, CMP_REQUEST_MIMETYPE,
@@ -248,23 +250,30 @@ class CmpAgent {
       }
     }
 
-    byte[] encodedResponse;
+    HttpRespContent resp;
     try {
-      encodedResponse = send(caName, encodedRequest);
+      resp = send(caName, encodedRequest);
     } catch (IOException ex) {
       LogUtil.error(LOG, ex, "could not send the PKI request to server");
       throw new CmpClientException("TRANSPORT_ERROR", ex);
     }
 
-    if (reqResp != null && debug.saveResponse()) {
-      reqResp.setResponse(encodedResponse);
+    byte[] encodedResp = resp.getContent();
+    if (reqResp != null && debug.saveResponse() && resp.getContent() != null) {
+      reqResp.setResponse(encodedResp);
+    }
+
+    if (!resp.isOK()) {
+      String msg = "received HTTP status code " + resp.getStatusCode();
+      LOG.warn(msg);
+      throw new CmpClientException("Received HTTP status code");
     }
 
     GeneralPKIMessage response;
     try {
-      response = new GeneralPKIMessage(encodedResponse);
+      response = new GeneralPKIMessage(encodedResp);
     } catch (IOException ex) {
-      LOG.error("could not decode the received PKI message: {}", Hex.encode(encodedResponse));
+      LOG.error("could not decode the received PKI message: {}", Hex.encode(encodedResp));
       throw new CmpClientException(ex.getMessage(), ex);
     }
 
@@ -275,7 +284,7 @@ class CmpAgent {
     ASN1OctetString respTid = respHeader.getTransactionID();
     if (!tid.equals(respTid)) {
       LOG.warn("Response contains different tid ({}) than requested {}", respTid, tid);
-      throw new CmpClientException("Response contains differnt tid than the request");
+      throw new CmpClientException("Response contains different tid than the request");
     }
 
     ASN1OctetString senderNonce = reqHeader.getSenderNonce();
@@ -317,9 +326,9 @@ class CmpAgent {
     }
 
     GeneralName sender = requestor != null ? requestor.getName()
-        : new GeneralName(new X500Name(""));
+        : new GeneralName(new X500Name(new RDN[0]));
     GeneralName recipient = responder != null ? responder.getName()
-        : new GeneralName(new X500Name(""));
+        : new GeneralName(new X500Name(new RDN[0]));
 
     PKIHeaderBuilder hdrBuilder = new PKIHeaderBuilder(PKIHeader.CMP_2000, sender, recipient);
     hdrBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));

@@ -21,9 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.Audits;
 import org.xipki.audit.Audits.AuditConf;
-import org.xipki.ca.gateway.conf.ProtocolProxyConf;
-import org.xipki.ca.gateway.conf.SdkClientConf;
-import org.xipki.ca.gateway.conf.SignerConf;
+import org.xipki.ca.gateway.conf.*;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.Securities;
 import org.xipki.security.X509Cert;
@@ -36,6 +34,8 @@ import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.SslContextConf;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Class to build the protocol proxy from the configuration.
@@ -53,7 +53,7 @@ public class ProtocolProxyConfWrapper {
 
   private final SdkClient sdkClient;
 
-  private final ConcurrentContentSigner signer;
+  private final CaNameSigners signers;
 
   private final RequestorAuthenticator authenticator;
 
@@ -102,12 +102,31 @@ public class ProtocolProxyConfWrapper {
     sdkClient = new SdkClient(sdkConf.getServerUrl(),
         sdkSslConf.getSslSocketFactory(), sdkSslConf.buildHostnameVerifier());
 
-    SignerConf signerConf = conf.getSigner();
-    signer = (signerConf == null) ? null
-            : securities.getSecurityFactory().createSigner(signerConf.getType(),
-                new org.xipki.security.SignerConf(signerConf.getConf()),
-                X509Util.parseCerts(signerConf.getCerts()).toArray(new X509Cert[0]));
+    CaNameSignersConf signersConf = conf.getSigners();
+    if (signersConf == null) {
+      signers = null;
+    } else {
+      ConcurrentContentSigner defaultSigner = buildSigner(signersConf.getDefault());
+      CaNameSignerConf[] signerConfs = signersConf.getSigners();
+      Map<String, ConcurrentContentSigner> signerMap = null;
+      if (signerConfs != null && signerConfs.length > 0) {
+        signerMap = new HashMap<>();
+        for (CaNameSignerConf m : signerConfs) {
+          signerMap.put(m.getName(), buildSigner(m.getSigner()));
+        }
+      }
+
+      signers = new CaNameSigners(defaultSigner, signerMap);
+    }
   } // method init
+
+  private ConcurrentContentSigner buildSigner(SignerConf signerConf)
+      throws InvalidConfException, ObjectCreationException {
+    return (signerConf == null) ? null
+        : securities.getSecurityFactory().createSigner(signerConf.getType(),
+        new org.xipki.security.SignerConf(signerConf.getConf()),
+        X509Util.parseCerts(signerConf.getCerts()).toArray(new X509Cert[0]));
+  }
 
   public Securities getSecurities() {
     return securities;
@@ -121,8 +140,8 @@ public class ProtocolProxyConfWrapper {
     return sdkClient;
   }
 
-  public ConcurrentContentSigner getSigner() {
-    return signer;
+  public CaNameSigners getSigners() {
+    return signers;
   }
 
   public RequestorAuthenticator getAuthenticator() {

@@ -23,7 +23,7 @@ import org.xipki.ca.mgmt.shell.*;
 import org.xipki.ca.mgmt.shell.CertActions.EnrollCert;
 import org.xipki.ca.mgmt.shell.CertActions.RevokeCert;
 import org.xipki.ca.mgmt.shell.CertActions.RmCert;
-import org.xipki.ca.mgmt.shell.CertActions.UnrevokeCert;
+import org.xipki.ca.mgmt.shell.CertActions.UnsuspendCert;
 import org.xipki.shell.CmdFailure;
 
 /**
@@ -674,7 +674,7 @@ public class QaCaNegActions {
   @Command(scope = "caqa", name = "neg-unrevoke-cert",
       description = "unrevoke certificate (negative, QA)")
   @Service
-  public static class NegUnrevokeCert extends UnrevokeCert {
+  public static class NegUnrevokeCert extends UnsuspendCert {
 
     @Override
     protected Object execute0()

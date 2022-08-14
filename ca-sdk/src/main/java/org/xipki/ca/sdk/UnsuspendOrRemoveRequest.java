@@ -11,7 +11,7 @@ import java.util.List;
  * @since 6.0.0
  */
 
-public class UnrevokeOrRemoveCertsRequest extends ChangeCertStatusRequest {
+public class UnsuspendOrRemoveRequest extends ChangeCertStatusRequest {
 
   private List<BigInteger> entries;
 
@@ -23,8 +23,8 @@ public class UnrevokeOrRemoveCertsRequest extends ChangeCertStatusRequest {
     this.entries = entries;
   }
 
-  public static UnrevokeOrRemoveCertsRequest decode(byte[] encoded) {
-    return JSON.parseObject(encoded, UnrevokeOrRemoveCertsRequest.class);
+  public static UnsuspendOrRemoveRequest decode(byte[] encoded) {
+    return JSON.parseObject(encoded, UnsuspendOrRemoveRequest.class);
   }
 
 }

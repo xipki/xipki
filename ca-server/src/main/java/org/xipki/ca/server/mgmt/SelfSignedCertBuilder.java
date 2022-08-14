@@ -44,7 +44,7 @@ import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.exception.OperationException;
-import org.xipki.util.exception.OperationException.ErrorCode;
+import org.xipki.util.exception.ErrorCode;
 
 import java.io.IOException;
 import java.math.BigInteger;

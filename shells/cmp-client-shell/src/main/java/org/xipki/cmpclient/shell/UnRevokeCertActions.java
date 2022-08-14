@@ -107,9 +107,9 @@ public class UnRevokeCertActions {
 
   } // class CmpRevoke
 
-  @Command(scope = "xi", name = "cmp-unrevoke", description = "unrevoke certificate")
+  @Command(scope = "xi", name = "cmp-unsuspend", description = "unsuspend certificate")
   @Service
-  public static class CmpUnrevoke extends UnRevokeCertAction {
+  public static class CmpUnsuspend extends UnRevokeCertAction {
 
     @Override
     protected Object execute0()
@@ -126,9 +126,9 @@ public class UnRevokeCertActions {
 
         if (certFile != null) {
           X509Cert cert = X509Util.parseCert(new File(certFile));
-          certIdOrError = client.unrevokeCert(caName, requestor, caCert, cert, debug);
+          certIdOrError = client.unsuspendCert(caName, requestor, caCert, cert, debug);
         } else {
-          certIdOrError = client.unrevokeCert(caName, requestor, caCert, getSerialNumber(), debug);
+          certIdOrError = client.unsuspendCert(caName, requestor, caCert, getSerialNumber(), debug);
         }
       } finally {
         saveRequestResponse(debug);
@@ -138,12 +138,12 @@ public class UnRevokeCertActions {
         PkiStatusInfo error = certIdOrError.getError();
         throw new CmdFailure("releasing revocation failed: " + error);
       } else {
-        println("unrevoked certificate");
+        println("unsuspended certificate");
       }
       return null;
     } // method execute0
 
-  } // class CmpUnrevoke
+  } // class CmpUnsuspend
 
   public abstract static class UnRevokeCertAction extends Actions.AuthClientAction {
 

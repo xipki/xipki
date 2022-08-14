@@ -1,5 +1,7 @@
 package org.xipki.ca.sdk;
 
+import java.math.BigInteger;
+
 /**
  *
  * @author Lijun Liao
@@ -11,15 +13,15 @@ public class PollCertRequestEntry {
   /*
    * In SCEP: this field is null.
    */
-  private Integer id;
+  private BigInteger id;
 
   private X500NameType subject;
 
-  public Integer getId() {
+  public BigInteger getId() {
     return id;
   }
 
-  public void setId(Integer id) {
+  public void setId(BigInteger id) {
     this.id = id;
   }
 

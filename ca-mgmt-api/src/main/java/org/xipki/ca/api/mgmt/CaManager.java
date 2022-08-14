@@ -631,7 +631,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void unrevokeCertificate(String caName, BigInteger serialNumber)
+  void unsuspendCertificate(String caName, BigInteger serialNumber)
       throws CaMgmtException;
 
   /**

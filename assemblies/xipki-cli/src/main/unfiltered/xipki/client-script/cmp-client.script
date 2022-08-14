@@ -17,12 +17,9 @@ if { $printUsage equals "true" } then {
   echo "    help:      Print this usage"
   echo "    ocsp:      Also test the OCSP status"
 } else {
-echo "#################################################################"
-echo "# Reset CMP client (only required if CA changed the             #"
-echo "# configuration since last reset / initialization)              #"
-echo "#################################################################"
-
 HASH = SHA256
+SIGNER_P12 = xipki/keycerts/tlskeys/client/tls-client.p12
+SIGNER_PASSWORD = 1234
 
 echo "#################################################################"
 echo "#                 Manage certificate via CMP                    #"
@@ -36,10 +33,10 @@ CACERT = ${OUT_DIR}/cacert.der
 
 echo "# Get CA certificate"
 
-xi:cmp-cacert -ca ${CA} \
+xi:cmp-cacert --ca ${CA} \
   --out ${CACERT}
 
-xi:cmp-cacertchain -ca ${CA} \
+xi:cmp-cacertchain --ca ${CA} \
   --out ${OUT_DIR}/cacertchain.pem
 
 ## Enroll certificates (profile smime)
@@ -51,12 +48,13 @@ CN = cmp-crmf-smime
 xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" \
   --subject "CN=${CN}-${CUR_TIME}"
 
-xi:cmp-enroll-p12 -ca ${CA} \
+xi:cmp-enroll-p12 --ca ${CA} \
   --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --out ${OUT_DIR}/${CN}.der --profile smime \
-  --subject "CN=${CN}-${CUR_TIME},E=info@myorg.com,O=myorg,C=DE"
+  --subject "CN=${CN}-${CUR_TIME},E=info@myorg.com,O=myorg,C=DE" \
+  --signer-p12 ${SIGNER_P12} --signer-password ${SIGNER_PASSWORD}
 
-xi:update-cert-p12 -ca ${CA} \
+xi:update-cert-p12 \
   --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert ${OUT_DIR}/${CN}.der
 
@@ -64,10 +62,11 @@ echo "=====CMP: Enroll (CA generate key pair) via CRMF====="
 
 CN = cmp-crmf-ca-genkey-smime
 
-xi:cmp-enroll-cagenkey \
+xi:cmp-enroll-cagenkey --ca ${CA} \
   --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert-out ${OUT_DIR}/${CN}.der --profile smime \
-  --subject "CN=${CN}-${CUR_TIME},E=info@myorg.com,O=myorg,C=DE"
+  --subject "CN=${CN}-${CUR_TIME},E=info@myorg.com,O=myorg,C=DE" \
+  --signer-p12 ${SIGNER_P12} --signer-password ${SIGNER_PASSWORD}
 
 echo "=====CMP: Enroll via CSR====="
 
@@ -80,7 +79,9 @@ xi:csr-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --out ${OUT_DIR}/${CN}.csr \
   --subject "CN=${CN}-${CUR_TIME},E=info@myorg.com,O=myorg,C=DE"
 
-xi:cmp-csr-enroll --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der --profile smime
+xi:cmp-csr-enroll --ca ${CA} \
+  --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der --profile smime \
+  --signer-p12 ${SIGNER_P12} --signer-password ${SIGNER_PASSWORD}
 
 xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert ${OUT_DIR}/${CN}.der
@@ -94,9 +95,11 @@ CN = cmp-crmf-tls
 xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" \
   --subject "CN=${CN}-${CUR_TIME}"
 
-xi:cmp-enroll-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+xi:cmp-enroll-p12 --ca ${CA} \
+  --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --out ${OUT_DIR}/${CN}.der --profile tls \
-  --subject "CN=${CN}-${CUR_TIME}.myorg.org,O=myorg,C=DE"
+  --subject "CN=${CN}-${CUR_TIME}.myorg.org,O=myorg,C=DE" \
+  --signer-p12 ${SIGNER_P12} --signer-password ${SIGNER_PASSWORD}
 
 xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert ${OUT_DIR}/${CN}.der
@@ -105,10 +108,11 @@ echo "=====CMP: Enroll (CA generate key pair) via CRMF====="
 
 CN = cmp-crmf-ca-genkey-tls
 
-xi:cmp-enroll-cagenkey \
+xi:cmp-enroll-cagenkey --ca ${CA} \
   --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert-out ${OUT_DIR}/${CN}.der --profile tls \
-  --subject "CN=${CN}-${CUR_TIME}.myorg.org,O=myorg,C=DE"
+  --subject "CN=${CN}-${CUR_TIME}.myorg.org,O=myorg,C=DE" \
+  --signer-p12 ${SIGNER_P12} --signer-password ${SIGNER_PASSWORD}
 
 echo "=====CMP: Enroll via CSR====="
 
@@ -121,7 +125,9 @@ xi:csr-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --out ${OUT_DIR}/${CN}.csr \
   --subject "CN=${CN}-${CUR_TIME}.myorg.org,O=myorg,C=DE"
 
-xi:cmp-csr-enroll --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der --profile tls
+xi:cmp-csr-enroll --ca ${CA} \
+  --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der --profile tls \
+  --signer-p12 ${SIGNER_P12} --signer-password ${SIGNER_PASSWORD}
 
 xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert ${OUT_DIR}/${CN}.der
@@ -133,7 +139,9 @@ if { "$ocsp" equals "true" } then {
 
 echo "=====CMP: Suspend certificate====="
 
-xi:cmp-revoke --ca myca --cert ${OUT_DIR}/${CN}.der --reason certificateHold
+xi:cmp-revoke --ca myca \
+  --ca-cert ${CACERT} --cert ${OUT_DIR}/${CN}.der --reason certificateHold \
+  --signer-p12 ${SIGNER_P12} --signer-password ${SIGNER_PASSWORD}
 
 if { "$ocsp" equals "true" } then {
   echo "Current OCSP Status"
@@ -142,7 +150,9 @@ if { "$ocsp" equals "true" } then {
 
 echo "=====CMP: Unsuspend certificate====="
 
-xi:cmp-unrevoke --ca myca --cert ${OUT_DIR}/${CN}.der
+xi:cmp-unsuspend --ca myca \
+  --ca-cert ${CACERT} --cert ${OUT_DIR}/${CN}.der \
+  --signer-p12 ${SIGNER_P12} --signer-password ${SIGNER_PASSWORD}
 
 if { "$ocsp" equals "true" } then {
   echo "Current OCSP Status"
@@ -151,16 +161,14 @@ if { "$ocsp" equals "true" } then {
 
 echo "=====CMP: Revocate certificate====="
 
-xi:cmp-revoke --ca myca --cert ${OUT_DIR}/${CN}.der --reason affiliationChanged
+xi:cmp-revoke --ca myca \
+  --ca-cert ${CACERT} --cert ${OUT_DIR}/${CN}.der --reason affiliationChanged \
+  --signer-p12 ${SIGNER_P12} --signer-password ${SIGNER_PASSWORD}
 
 if { "$ocsp" equals "true" } then {
   echo "Current OCSP Status"
   xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
 }
-
-echo "=====CMP: Generate CRL====="
-
-xi:cmp-gen-crl --ca myca --out ${OUT_DIR}/cmp-myca-gen.crl
 
 echo "=====CMP: Get CRL===="
 xi:cmp-get-crl --ca myca --out ${OUT_DIR}/cmp-myca-get.crl

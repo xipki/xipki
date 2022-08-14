@@ -62,7 +62,7 @@ public class CertActions {
   @Command(scope = "ca", name = "cert-status",
       description = "show certificate status and save the certificate")
   @Service
-  public static class CertStatus extends UnRevRmCertAction {
+  public static class CertStatus extends UnsuspendRmCertAction {
 
     @Option(name = "--outform", description = "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
@@ -333,7 +333,7 @@ public class CertActions {
   @Command(scope = "ca", name = "get-request",
       description = "get the request to enroll certificate")
   @Service
-  public static class GetRequest extends UnRevRmCertAction {
+  public static class GetRequest extends UnsuspendRmCertAction {
 
     @Option(name = "--out", aliases = "-o", required = true,
         description = "where to save the request")
@@ -450,7 +450,7 @@ public class CertActions {
 
   @Command(scope = "ca", name = "rm-cert", description = "remove certificate")
   @Service
-  public static class RmCert extends UnRevRmCertAction {
+  public static class RmCert extends UnsuspendRmCertAction {
 
     @Option(name = "--force", aliases = "-f", description = "without prompt")
     private Boolean force = Boolean.FALSE;
@@ -475,7 +475,7 @@ public class CertActions {
 
   @Command(scope = "ca", name = "revoke-cert", description = "revoke certificate")
   @Service
-  public static class RevokeCert extends UnRevRmCertAction {
+  public static class RevokeCert extends UnsuspendRmCertAction {
 
     @Option(name = "--reason", aliases = "-r", required = true, description = "CRL reason")
     @Completion(Completers.ClientCrlReasonCompleter.class)
@@ -511,9 +511,9 @@ public class CertActions {
 
   } // class RevokeCert
 
-  @Command(scope = "ca", name = "unrevoke-cert", description = "unrevoke certificate")
+  @Command(scope = "ca", name = "unsuspend-cert", description = "unsuspend certificate")
   @Service
-  public static class UnrevokeCert extends UnRevRmCertAction {
+  public static class UnsuspendCert extends UnsuspendRmCertAction {
 
     @Override
     protected Object execute0()
@@ -521,17 +521,17 @@ public class CertActions {
       BigInteger serialNo = getSerialNumber();
       String msg = "certificate (serial number = 0x" + serialNo.toString(16) + ")";
       try {
-        caManager.unrevokeCertificate(caName, serialNo);
-        println("unrevoked " + msg);
+        caManager.unsuspendCertificate(caName, serialNo);
+        println("unsuspended " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not unrevoke " + msg + ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not unsuspend " + msg + ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 
   } // class UnrevokeCert
 
-  public abstract static class UnRevRmCertAction extends CaAction {
+  public abstract static class UnsuspendRmCertAction extends CaAction {
 
     @Option(name = "--ca", required = true, description = "CA name")
     @Completion(CaCompleters.CaNameCompleter.class)

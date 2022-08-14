@@ -473,9 +473,9 @@ CA Management Commands
 
      update requestor
 
-   * `ca:revoke-cert`
+   * `ca:unsuspend-cert`
 
-     revoke certificate
+     unsuspend certificate
 
    * `ca:rm-cert`
 
@@ -501,9 +501,9 @@ CA Management Commands
 
      list objects in PKCS#11 device of the CA
 
-   * `ca:unrevoke-cert`
+   * `ca:unsuspend-cert`
 
-     unrevoke certificate
+     unsuspend certificate
 
    * `ca:user-add`
 
@@ -572,9 +572,9 @@ CMP Client Commands
 
      revoke certificate
 
-   * `xi:cmp-unrevoke`
+   * `xi:cmp-unsuspend`
 
-     unrevoke certificate
+     unsuspend certificate
 
    * `xi:cmp-update-cagenkey`
 

@@ -38,7 +38,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static org.xipki.util.Args.notNull;
-import static org.xipki.util.exception.OperationException.ErrorCode.NOT_PERMITTED;
+import static org.xipki.util.exception.ErrorCode.NOT_PERMITTED;
 
 /**
  * X509CA revoker module.

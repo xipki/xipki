@@ -9,14 +9,9 @@ package org.xipki.ca.sdk;
 public class ChangeCertStatusRequest extends SdkRequest {
 
   /**
-   * Hash algorithm to compute {@link #issuerFp}. Optional.
+   * SHA-1 fingerprint of the DER-encoded issuer's certificate
    */
-  private String issuerFpAlgo;
-
-  /**
-   * Fingerprint of the DER-encoded issuer's certificate
-   */
-  private byte[] issuerFp;
+  private byte[] issuerCertSha1Fp;
 
   private X500NameType issuer;
 
@@ -38,20 +33,11 @@ public class ChangeCertStatusRequest extends SdkRequest {
     this.authorityKeyIdentifier = authorityKeyIdentifier;
   }
 
-  public String getIssuerFpAlgo() {
-    return issuerFpAlgo;
+  public byte[] getIssuerCertSha1Fp() {
+    return issuerCertSha1Fp;
   }
 
-  public void setIssuerFpAlgo(String issuerFpAlgo) {
-    this.issuerFpAlgo = issuerFpAlgo;
+  public void setIssuerCertSha1Fp(byte[] issuerCertSha1Fp) {
+    this.issuerCertSha1Fp = issuerCertSha1Fp;
   }
-
-  public byte[] getIssuerFp() {
-    return issuerFp;
-  }
-
-  public void setIssuerFp(byte[] issuerFp) {
-    this.issuerFp = issuerFp;
-  }
-
 }

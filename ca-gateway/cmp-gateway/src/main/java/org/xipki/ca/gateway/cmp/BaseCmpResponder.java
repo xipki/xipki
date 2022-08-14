@@ -46,10 +46,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
-import org.xipki.ca.gateway.PopControl;
-import org.xipki.ca.gateway.Requestor;
-import org.xipki.ca.gateway.RequestorAuthenticator;
-import org.xipki.ca.gateway.SdkClient;
+import org.xipki.ca.gateway.*;
+import org.xipki.ca.sdk.ErrorResponse;
 import org.xipki.security.*;
 import org.xipki.security.cmp.CmpUtil;
 import org.xipki.security.cmp.ProtectionResult;
@@ -59,7 +57,7 @@ import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
 import org.xipki.util.exception.InsufficientPermissionException;
 import org.xipki.util.exception.OperationException;
-import org.xipki.util.exception.OperationException.ErrorCode;
+import org.xipki.util.exception.ErrorCode;
 
 import javax.crypto.*;
 import javax.crypto.spec.GCMParameterSpec;
@@ -148,7 +146,7 @@ abstract class BaseCmpResponder {
 
   private final RequestorAuthenticator authenticator;
 
-  private final ConcurrentContentSigner signer;
+  private final CaNameSigners signers;
 
   private final KeyGenerator aesKeyGen;
 
@@ -209,7 +207,7 @@ abstract class BaseCmpResponder {
 
   protected BaseCmpResponder(
       CmpControl cmpControl, SdkClient sdk, SecurityFactory securityFactory,
-      ConcurrentContentSigner signer, RequestorAuthenticator authenticator,
+      CaNameSigners signers, RequestorAuthenticator authenticator,
       PopControl popControl)
       throws NoSuchAlgorithmException {
     this.sdk = sdk;
@@ -217,7 +215,7 @@ abstract class BaseCmpResponder {
     this.authenticator = authenticator;
     this.cmpControl = cmpControl;
     this.popControl = popControl;
-    this.signer = signer;
+    this.signers = signers;
     this.aesKeyGen = KeyGenerator.getInstance("AES");
   }
 
@@ -226,17 +224,18 @@ abstract class BaseCmpResponder {
       PKIMessage request, PKIHeaderBuilder respHeader,
       PKIHeader reqHeader, PKIBody reqBody, Requestor requestor,
       ASN1OctetString tid, String msgId, AuditEvent event)
-      throws InsufficientPermissionException;
+      throws InsufficientPermissionException, SdkErrorResponseException;
 
   protected abstract PKIBody cmpUnRevokeCertificates(
       String caName, PKIMessage request, PKIHeaderBuilder respHeader, PKIHeader reqHeader,
-      PKIBody reqBody, Requestor requestor, String msgId, AuditEvent event);
+      PKIBody reqBody, Requestor requestor, String msgId, AuditEvent event)
+      throws SdkErrorResponseException;
 
   protected abstract PKIBody confirmCertificates(String caName, ASN1OctetString transactionId,
-      CertConfirmContent certConf, String msgId);
+      CertConfirmContent certConf, String msgId) throws SdkErrorResponseException;
 
   protected abstract PKIBody revokePendingCertificates(
-      String caName, ASN1OctetString transactionId);
+      String caName, ASN1OctetString transactionId) throws SdkErrorResponseException;
 
   private Requestor getCertRequestor(
       X500Name requestorSender, byte[] senderKID, CMPCertificate[] extraCerts) {
@@ -372,6 +371,11 @@ abstract class BaseCmpResponder {
               new PKIFailureInfo(PKIFailureInfo.notAuthorized)));
 
       respBody = new PKIBody(PKIBody.TYPE_ERROR, emc);
+    } catch (SdkErrorResponseException ex) {
+      LogUtil.error(LOG, ex);
+      ErrorResponse errResp = ex.getErrorResponse();
+      respBody = new PKIBody(PKIBody.TYPE_ERROR,
+          new ErrorMsgContent(buildPKIStatusInfo(errResp.getCode(), errResp.getMessage())));
     }
 
     if (respBody.getType() == PKIBody.TYPE_ERROR) {
@@ -432,6 +436,8 @@ abstract class BaseCmpResponder {
         LogUtil.error(LOG, ex, "tid=" + tidStr + ": could not parse messageTime");
       }
     }
+
+    ConcurrentContentSigner signer = signers.getSigner(caName);
 
     GeneralName recipient = reqHeader.getRecipient();
     X500Name x500Name = getX500Name(recipient);
@@ -549,7 +555,7 @@ abstract class BaseCmpResponder {
         caName, pkiMessage, requestor, tid, message, msgId, parameters, event);
 
     if (isProtected) {
-      resp = addProtection(resp, event, requestor);
+      resp = addProtection(signer, resp, event, requestor);
     }
     // otherwise protected by TLS connection
 
@@ -654,7 +660,8 @@ abstract class BaseCmpResponder {
   } // method verifyProtection
 
   private PKIMessage addProtection(
-      PKIMessage pkiMessage, AuditEvent event, Requestor requestor) {
+      ConcurrentContentSigner signer, PKIMessage pkiMessage, AuditEvent event,
+      Requestor requestor) {
     GeneralName respSender = pkiMessage.getHeader().getSender();
     try {
       if (requestor.getCert() != null) {
@@ -976,7 +983,7 @@ abstract class BaseCmpResponder {
   }
 
   protected PKIBody cmpGeneralMsg(String caName, PKIBody reqBody, AuditEvent event)
-      throws InsufficientPermissionException {
+      throws InsufficientPermissionException, SdkErrorResponseException {
     GenMsgContent genMsgBody = GenMsgContent.getInstance(reqBody.getContent());
     InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
 
@@ -1033,5 +1040,60 @@ abstract class BaseCmpResponder {
     GenRepContent genRepContent = new GenRepContent(itvResp);
     return new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
   } // method cmpGeneralMsg
+
+  static PKIStatusInfo buildPKIStatusInfo(int errorCode, String message) {
+    ErrorCode code;
+    try {
+      code = ErrorCode.ofCode(errorCode);
+    } catch (Exception ex) {
+      LOG.warn("unknown error code {}, map it to {}",
+          errorCode, ErrorCode.SYSTEM_FAILURE);
+      code = ErrorCode.SYSTEM_FAILURE;
+    }
+    return buildPKIStatusInfo(code, message);
+  }
+
+  static PKIStatusInfo buildPKIStatusInfo(ErrorCode errorCode, String message) {
+    PKIFreeText freeText = message == null ? null : new PKIFreeText(message);
+
+    int failureInfo;
+    switch (errorCode) {
+      case ALREADY_ISSUED:
+        failureInfo = PKIFailureInfo.duplicateCertReq;
+        break;
+      case BAD_CERT_TEMPLATE:
+      case INVALID_EXTENSION:
+        failureInfo = PKIFailureInfo.badCertTemplate;
+        break;
+      case BAD_REQUEST:
+      case CERT_UNREVOKED:
+      case UNKNOWN_CERT:
+      case UNKNOWN_CERT_PROFILE:
+        failureInfo = PKIFailureInfo.badRequest;
+        break;
+      case BAD_POP:
+        failureInfo = PKIFailureInfo.badPOP;
+        break;
+      case CERT_REVOKED:
+        failureInfo = PKIFailureInfo.certRevoked;
+        break;
+      case NOT_PERMITTED:
+      case UNAUTHORIZED:
+        failureInfo = PKIFailureInfo.notAuthorized;
+        break;
+      case SYSTEM_UNAVAILABLE:
+        failureInfo = PKIFailureInfo.systemUnavail;
+        break;
+      case CRL_FAILURE:
+      case DATABASE_FAILURE:
+      case SYSTEM_FAILURE:
+      case PATH_NOT_FOUND:
+      default:
+        failureInfo = systemFailure;
+        break;
+    }
+
+    return new PKIStatusInfo(PKIStatus.rejection, freeText, new PKIFailureInfo(failureInfo));
+  }
 
 }

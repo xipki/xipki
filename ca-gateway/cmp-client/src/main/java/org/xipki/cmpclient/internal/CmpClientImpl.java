@@ -191,7 +191,6 @@ public final class CmpClientImpl implements CmpClient {
     caName = notBlank(caName, "caName").toLowerCase(Locale.ROOT);
 
     final String id = "cert-1";
-    CmpAgent agent = null;
     CsrEnrollCertRequest request = new CsrEnrollCertRequest(id, profile, csr);
     EnrollCertResponse result = agent.requestCertificate(caName,
         requestor, request, notBefore, notAfter, debug);
@@ -325,17 +324,17 @@ public final class CmpClientImpl implements CmpClient {
   } // method verify
 
   @Override
-  public CertIdOrError unrevokeCert(
+  public CertIdOrError unsuspendCert(
       String caName, Requestor requestor, X509Cert issuerCert,
       X509Cert cert, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     notNull(cert, "cert");
     assertIssuedByCa(cert, issuerCert);
-    return unrevokeCert(caName, requestor, issuerCert, cert.getSerialNumber(), debug);
+    return unsuspendCert(caName, requestor, issuerCert, cert.getSerialNumber(), debug);
   } // method unrevokeCert
 
   @Override
-  public CertIdOrError unrevokeCert(
+  public CertIdOrError unsuspendCert(
       String caName, Requestor requestor, X509Cert issuerCert,
       BigInteger serial, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
@@ -353,12 +352,12 @@ public final class CmpClientImpl implements CmpClient {
     entry2.setAuthorityKeyIdentifier(entry.getAuthorityKeyIdentifier());
     request.addRequestEntry(entry2);
     Map<String, CertIdOrError> result =
-        unrevokeCerts(caName, requestor, request, debug);
+        unsuspendCerts(caName, requestor, request, debug);
     return (result == null) ? null : result.get(id);
   } // method unrevokeCert
 
   @Override
-  public Map<String, CertIdOrError> unrevokeCerts(
+  public Map<String, CertIdOrError> unsuspendCerts(
       String caName, Requestor requestor, UnrevokeCertRequest request,
       ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
@@ -503,7 +502,8 @@ public final class CmpClientImpl implements CmpClient {
 
   @Override
   public List<X509Cert> getDhPopPeerCertificates() {
-    return Collections.unmodifiableList(dhpopCerts);
+    return dhpopCerts == null ? Collections.emptyList()
+        : Collections.unmodifiableList(dhpopCerts);
   }
 
 }

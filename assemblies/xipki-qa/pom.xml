@@ -287,11 +287,7 @@
                    dest="${project.build.directory}"/>
                 <unzip src="../xipki-ocsp/target/xipki-ocsp-${project.version}.zip"
                    dest="${project.build.directory}"/>
-                <unzip src="../xipki-cmp-gateway/target/xipki-cmp-gateway-${project.version}.zip"
-                       dest="${project.build.directory}"/>
-                <unzip src="../xipki-scep-gateway/target/xipki-scep-gateway-${project.version}.zip"
-                       dest="${project.build.directory}"/>
-                <unzip src="../xipki-rest-gateway/target/xipki-rest-gateway-${project.version}.zip"
+                <unzip src="../xipki-gateway/target/xipki-gateway-${project.version}.zip"
                        dest="${project.build.directory}"/>
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
                   <arg value="--file"/>

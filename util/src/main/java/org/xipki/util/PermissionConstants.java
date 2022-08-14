@@ -35,9 +35,10 @@ public class PermissionConstants {
 
   public static final int ENROLL_CERT = 1;
   public static final int REVOKE_CERT = 2;
-  public static final int UNREVOKE_CERT = 4;
+  public static final int UNSUSPEND_CERT = 4;
   public static final int REMOVE_CERT = 8;
   public static final int KEY_UPDATE = 16;
+  @Deprecated
   public static final int GEN_CRL = 32;
   public static final int GET_CRL = 64;
   public static final int ENROLL_CROSS = 128;
@@ -45,13 +46,14 @@ public class PermissionConstants {
 
   public static final int GET_CERT = 256;
 
-  public static final int ALL = GEN_KEYPAIR | ENROLL_CERT | REVOKE_CERT | UNREVOKE_CERT
-      | REMOVE_CERT | KEY_UPDATE | GEN_CRL | GET_CRL | ENROLL_CROSS;
+  public static final int ALL =
+      ENROLL_CERT | REVOKE_CERT | UNSUSPEND_CERT | REMOVE_CERT | KEY_UPDATE
+          | GEN_CRL | ENROLL_CROSS | GEN_KEYPAIR | GET_CERT;
 
   static {
     codeTextMap.put(ENROLL_CERT, "enroll_cert");
     codeTextMap.put(REVOKE_CERT, "revoke_cert");
-    codeTextMap.put(UNREVOKE_CERT, "unrevoke_cert");
+    codeTextMap.put(UNSUSPEND_CERT, "unsuspend_cert");
     codeTextMap.put(REMOVE_CERT, "remove_cert");
     codeTextMap.put(KEY_UPDATE, "key_update");
     codeTextMap.put(GEN_CRL, "gen_crl");

@@ -1164,8 +1164,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void unrevokeCertificate(String caName, BigInteger serialNumber) throws CaMgmtException {
-    ca2Manager.unrevokeCertificate(caName, serialNumber);
+  public void unsuspendCertificate(String caName, BigInteger serialNumber) throws CaMgmtException {
+    ca2Manager.unsuspendCertificate(caName, serialNumber);
   }
 
   @Override

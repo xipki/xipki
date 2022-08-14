@@ -41,7 +41,7 @@ public class ScepProxyConf extends ProtocolProxyConf {
   @Override
   public void validate() throws InvalidConfException {
     super.validate();
-    notNull(signer, "signer");
+    notNull(signers, "signers");
     notNull(scep, "scep");
   }
 }

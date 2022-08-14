@@ -64,7 +64,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.xipki.util.Args.*;
-import static org.xipki.util.exception.OperationException.ErrorCode.*;
+import static org.xipki.util.exception.ErrorCode.*;
 
 /**
  * CA database store.
@@ -504,7 +504,7 @@ public class CertStore extends CertStoreBase {
     return certWithRevInfo;
   } // method revokeSuspendedCert
 
-  public CertWithDbId unrevokeCert(NameId ca, BigInteger serialNumber, boolean force,
+  public CertWithDbId unsuspendCert(NameId ca, BigInteger serialNumber, boolean force,
       CaIdNameMap idNamMap) throws OperationException {
     notNulls(ca, "ca", serialNumber, "serialNumber");
 
@@ -526,7 +526,7 @@ public class CertStore extends CertStoreBase {
     CrlReason currentReason = currentRevInfo.getReason();
     if (!force) {
       if (currentReason != CrlReason.CERTIFICATE_HOLD) {
-        throw new OperationException(NOT_PERMITTED, "could not unrevoke certificate revoked with "
+        throw new OperationException(NOT_PERMITTED, "could not unsuspend certificate revoked with "
             + "reason " + currentReason.getDescription());
       }
     }
@@ -545,17 +545,7 @@ public class CertStore extends CertStoreBase {
     }
 
     return certWithRevInfo.getCert();
-  } // method unrevokeCert
-
-  public void removeCert(NameId ca, BigInteger serialNumber) throws OperationException {
-    notNulls(ca, "ca", serialNumber, "serialNumber");
-    long id = getCertId(ca, serialNumber);
-    if (id == 0) {
-      return;
-    }
-
-    removeCert(id);
-  } // method removeCert
+  } // method unsuspendCert
 
   public void removeCert(long id) throws OperationException {
     execUpdatePrepStmt0(SQL_REMOVE_CERT_FOR_ID, col2Long(id));
@@ -825,37 +815,28 @@ public class CertStore extends CertStoreBase {
   } // method getCertInfo
 
   /**
-   * Get certificates for given subject and transactionId.
+   * Get certificate for given subject and transactionId.
    *
    * @param subjectName Subject of Certificate or requested Subject.
-   * @param transactionId will only be considered if there are more than one certificate
-   *     matches the subject.
-   * @return certificates for given subject and transactionId.
+   * @param transactionId the transactionId
+   * @return certificate for given subject and transactionId.
    * @throws OperationException
    *           If error occurs.
    */
-  public List<X509Cert> getCert(X500Name subjectName, byte[] transactionId)
+  public X509Cert getCert(X500Name subjectName, String transactionId)
       throws OperationException {
-    final String sql = (transactionId != null)
-        ? "SELECT CERT FROM CERT WHERE TID=? AND (FP_S=? OR FP_RS=?)"
-        : "SELECT CERT FROM CERT WHERE FP_S=? OR FP_RS=?";
+    final String sql = buildSelectFirstSql("CERT FROM CERT WHERE TID=? AND (FP_S=? OR FP_RS=?)");
 
     long fpSubject = X509Util.fpCanonicalizedName(subjectName);
-    List<X509Cert> certs = new LinkedList<>();
 
-    SqlColumn2[] params = new SqlColumn2[transactionId == null ? 2 : 3];
-    int idx = 0;
-    if (transactionId != null) {
-      params[idx++] = col2Str(Base64.encodeToString(transactionId));
-    }
-    params[idx++] = col2Long(fpSubject);
-    params[idx] = col2Long(fpSubject);
+    SqlColumn2[] params = new SqlColumn2[3];
+    params[0] = col2Str(transactionId);
+    params[1] = col2Long(fpSubject);
+    params[2] = col2Long(fpSubject);
 
     List<ResultRow> rows = execQueryPrepStmt0(sql, params);
-    for (ResultRow rs : rows) {
-      certs.add(parseCert(Base64.decodeFast(rs.getString("CERT"))));
-    }
-    return certs;
+    return rows == null || rows.isEmpty() ? null
+        : parseCert(Base64.decodeFast(rows.get(0).getString("CERT")));
   } // method getCert
 
   public byte[] getCertRequest(NameId ca, BigInteger serialNumber) throws OperationException {
@@ -945,14 +926,6 @@ public class CertStore extends CertStoreBase {
     }
     return ret;
   } // method listCerts
-
-  public KnowCertResult knowsCertForSerial(NameId ca, BigInteger serial) throws OperationException {
-    notNull(serial, "serial");
-
-    ResultRow rs = execQuery1PrepStmt0(sqlKnowsCertForSerial,
-                    col2Str(serial.toString(16)), col2Int(ca.getId()));
-    return rs == null ? KnowCertResult.UNKNOWN : new KnowCertResult(true);
-  } // method knowsCertForSerial
 
   public List<CertRevInfoWithSerial> getRevokedCerts(NameId ca, Date notExpiredAt, long startId,
       int numEntries) throws OperationException {

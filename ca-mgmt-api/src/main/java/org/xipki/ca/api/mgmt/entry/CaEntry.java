@@ -137,6 +137,40 @@ public class CaEntry extends MgmtEntry {
     this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
   } // constructor Ca
 
+  @Override
+  public CaEntry clone() {
+    CaEntry ret = new CaEntry();
+    ret.ident = ident;
+    ret.serialNoLen = serialNoLen;
+    ret.nextCrlNumber = nextCrlNumber;
+    ret.signerType = signerType;
+    ret.signerConf = signerConf;
+    ret.caUris = caUris;
+    ret.numCrls = numCrls;
+    ret.expirationPeriod = expirationPeriod;
+    ret.status = status;
+    ret.maxValidity = maxValidity;
+    ret.crlControl = crlControl;
+    ret.crlSignerName = crlSignerName;
+    ret.ctlogControl = ctlogControl;
+    ret.revokeSuspendedControl = revokeSuspendedControl;
+    ret.keypairGenNames = keypairGenNames;
+    ret.saveRequest = saveRequest;
+    ret.saveKeypair = saveKeypair;
+    ret.saveCert = saveCert;
+    ret.validityMode = validityMode;
+    ret.permission = permission;
+    ret.keepExpiredCertInDays = keepExpiredCertInDays;
+    ret.extraControl = extraControl;
+    ret.pathLenConstraint = pathLenConstraint;
+    ret.revocationInfo = revocationInfo;
+    ret.cert = cert;
+    ret.certchain = certchain;
+    ret.subject = subject;
+    ret.hexSha1OfCert = hexSha1OfCert;
+    return ret;
+  }
+
   public static List<CaSignerConf> splitCaSignerConfs(String conf)
       throws XiSecurityException {
     ConfPairs pairs = new ConfPairs(conf);

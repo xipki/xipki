@@ -20,6 +20,7 @@ package org.xipki.ca.gateway.scep.servlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.gateway.ProtocolProxyConfWrapper;
+import org.xipki.ca.gateway.scep.CaNameScepSigners;
 import org.xipki.ca.gateway.scep.ScepControl;
 import org.xipki.ca.gateway.scep.ScepProxyConf;
 import org.xipki.ca.gateway.scep.ScepResponder;
@@ -69,8 +70,10 @@ public class ProtocolServletFilter implements Filter {
       conf = new ProtocolProxyConfWrapper(conf0);
       ScepControl scepControl = conf0.getScep();
 
+      CaNameScepSigners signers = new CaNameScepSigners(conf.getSigners());
+
       ScepResponder responder = new ScepResponder(scepControl, conf.getSdkClient(),
-          conf.getSecurities().getSecurityFactory(),  conf.getSigner(),
+          conf.getSecurities().getSecurityFactory(),  signers,
           conf.getAuthenticator(), conf.getPopControl());
 
       servlet = new HttpScepServlet();

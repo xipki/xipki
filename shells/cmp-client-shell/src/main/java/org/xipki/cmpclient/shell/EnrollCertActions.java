@@ -112,17 +112,20 @@ public class EnrollCertActions {
         saveRequestResponse(debug);
       }
 
-      X509Cert cert = null;
+      CertifiedKeyPairOrError certOrError = null;
       if (result != null) {
         String id = result.getAllIds().iterator().next();
-        cert = result.getCertOrError(id).getCertificate();
+        certOrError = result.getCertOrError(id);
       }
 
-      if (cert == null) {
-        throw new CmdFailure("no certificate received from the server");
+      if (certOrError == null) {
+        throw new CmdFailure("error, received neither certificate nor error");
+      } else if (certOrError.getError() != null) {
+        throw new CmdFailure(certOrError.getError().toString());
       }
 
-      saveVerbose("certificate saved to file", outputFile, encodeCert(cert.getEncoded(), outform));
+      saveVerbose("certificate saved to file", outputFile,
+          encodeCert(certOrError.getCertificate().getEncoded(), outform));
       return null;
     } // method execute0
 
@@ -174,14 +177,20 @@ public class EnrollCertActions {
         throws Exception {
       EnrollCertResult result = enroll();
 
-      X509Cert cert = null;
-      PrivateKeyInfo privateKeyInfo = null;
+      CertifiedKeyPairOrError certOrError = null;
       if (result != null) {
         String id = result.getAllIds().iterator().next();
-        CertifiedKeyPairOrError certOrError = result.getCertOrError(id);
-        cert = certOrError.getCertificate();
-        privateKeyInfo = certOrError.getPrivateKeyInfo();
+        certOrError = result.getCertOrError(id);
       }
+
+      if (certOrError == null) {
+        throw new CmdFailure("error, received neither certificate nor error");
+      } else if (certOrError.getError() != null) {
+        throw new CmdFailure(certOrError.getError().toString());
+      }
+
+      X509Cert cert = certOrError.getCertificate();
+      PrivateKeyInfo privateKeyInfo = certOrError.getPrivateKeyInfo();
 
       if (cert == null) {
         throw new CmdFailure("no certificate received from the server");
@@ -752,17 +761,21 @@ public class EnrollCertActions {
         throws Exception {
       EnrollCertResult result = enroll();
 
-      X509Cert cert = null;
+      CertifiedKeyPairOrError certOrError = null;
+
       if (result != null) {
         String id = result.getAllIds().iterator().next();
-        cert = result.getCertOrError(id).getCertificate();
+        certOrError = result.getCertOrError(id);
       }
 
-      if (cert == null) {
-        throw new CmdFailure("no certificate received from the server");
+      if (certOrError == null) {
+        throw new CmdFailure("error, received neither certificate nor error");
+      } else if (certOrError.getError() != null) {
+        throw new CmdFailure(certOrError.getError().toString());
       }
 
-      saveVerbose("saved certificate to file", outputFile, encodeCert(cert.getEncoded(), outform));
+      saveVerbose("saved certificate to file", outputFile,
+          encodeCert(certOrError.getCertificate().getEncoded(), outform));
 
       return null;
     } // method execute0

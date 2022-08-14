@@ -25,9 +25,9 @@ public abstract class ProtocolProxyConf {
   protected Securities.SecurityConf security;
 
   /**
-   * The signer. If only signed with PMAC; this may be {@code null}.
+   * The signers. If only signed with PMAC; this may be {@code null}.
    */
-  protected SignerConf signer;
+  protected CaNameSignersConf signers;
 
   public boolean isLogReqResp() {
     return logReqResp;
@@ -77,12 +77,12 @@ public abstract class ProtocolProxyConf {
     this.security = security;
   }
 
-  public SignerConf getSigner() {
-    return signer;
+  public CaNameSignersConf getSigners() {
+    return signers;
   }
 
-  public void setSigner(SignerConf signer) {
-    this.signer = signer;
+  public void setSigners(CaNameSignersConf signers) {
+    this.signers = signers;
   }
 
   public void validate() throws InvalidConfException {

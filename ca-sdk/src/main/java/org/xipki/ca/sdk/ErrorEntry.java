@@ -1,6 +1,6 @@
 package org.xipki.ca.sdk;
 
-import org.xipki.util.exception.OperationException;
+import org.xipki.util.exception.ErrorCode;
 
 /**
  *
@@ -17,7 +17,7 @@ public class ErrorEntry {
   private ErrorEntry() {
   }
 
-  public ErrorEntry(OperationException.ErrorCode code, String message) {
+  public ErrorEntry(ErrorCode code, String message) {
     this.code = code.getCode();
     this.message = message;
   }
