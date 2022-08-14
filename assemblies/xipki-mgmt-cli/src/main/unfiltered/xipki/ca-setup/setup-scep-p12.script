@@ -1,0 +1,26 @@
+# Please adapt me
+SUBJECT="CN=SCEP Responder 1,O=myorg,C=DE"
+
+KEYCERTS_DIR = xipki/scep-setup/keycerts
+CACERT_FILE = xipki/ca-setup/keycerts/myca1.der
+
+echo "#################################################################"
+echo "#                 Generate Key, CSR and Certificate             #"
+echo "#################################################################"
+
+echo "# Generate PKCS#12 key and certificate for SCEP Responder"
+
+xi:rsa-p12 --key-size 2048 --password 1234 --out ${KEYCERTS_DIR}/scep1.p12
+
+xi:csr-p12 --password 1234 --p12 ${KEYCERTS_DIR}/scep1.p12 --out ${KEYCERTS_DIR}/scep1.csr \
+  --subject "${SUBJECT}"
+
+ca:enroll-cert --ca myca1 --csr ${KEYCERTS_DIR}/scep1.csr --out ${KEYCERTS_DIR}/scep1.der --profile scep
+
+echo "# Update the certificate in the PKCS#12 file"
+xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/scep1.p12 --password 1234 \
+  --cert ${KEYCERTS_DIR}/scep1.der --ca-cert ${CACERT_FILE}
+
+echo "Please"
+echo "  1. Copy ${KEYCERTS_DIR}/scep1.p12 to replace the <tomcat.dir>/xipki/keycerts/scep1.p12"
+echo "  2. Restart tomcat."
