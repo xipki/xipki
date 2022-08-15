@@ -1280,7 +1280,7 @@ class CmpAgent {
 
       if (certId == null) {
         LOG.warn("certId is not present in response for (issuer='{}', serialNumber={})",
-            X509Util.getRfc4519Name(re.getIssuer()), LogUtil.formatCsn(re.getSerialNumber()));
+            X509Util.x500NameText(re.getIssuer()), LogUtil.formatCsn(re.getSerialNumber()));
         certId = new CertId(new GeneralName(re.getIssuer()), re.getSerialNumber());
       }
 

@@ -127,9 +127,9 @@ public class SignerEntry extends MgmtEntry {
     sb.append("certificate: ").append("\n");
     if (certificate != null || base64Cert != null) {
       if (certificate != null) {
-        sb.append("\tissuer: ").append(certificate.getIssuerRfc4519Text()).append('\n');
+        sb.append("\tissuer: ").append(certificate.getIssuerText()).append('\n');
         sb.append("\tserialNumber: ").append(certificate.getSerialNumberHex()).append('\n');
-        sb.append("\tsubject: ").append(certificate.getSubjectRfc4519Text());
+        sb.append("\tsubject: ").append(certificate.getSubjectText());
       }
       if (verbose) {
         sb.append("\n\tencoded: ");

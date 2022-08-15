@@ -123,9 +123,9 @@ public class RequestorEntry extends MgmtEntry {
       try {
         X509Cert cert = X509Util.parseCert(StringUtil.toUtf8Bytes(conf));
         sb.append("cert:");
-        sb.append("\n\tissuer: ").append(cert.getIssuerRfc4519Text());
+        sb.append("\n\tissuer: ").append(cert.getIssuerText());
         sb.append("\n\tserialNumber: ").append(cert.getSerialNumberHex());
-        sb.append("\n\tsubject: ").append(cert.getSubjectRfc4519Text()).append('\n');
+        sb.append("\n\tsubject: ").append(cert.getSubjectText()).append('\n');
       } catch (CertificateException ex) {
         sb.append("cert: ERROR(").append(ex.getMessage()).append(")\n");
       }

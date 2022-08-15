@@ -616,7 +616,7 @@ public class OcspServerImpl implements OcspServer {
               continue;
             }
 
-            String issuerSubject = caCert.getSubjectRfc4519Text();
+            String issuerSubject = caCert.getSubjectText();
             boolean granted = license.grant(issuerSubject);
             if (!granted) {
               LOG.error("Not granted for CA {}, need new license", issuerSubject);
@@ -766,8 +766,7 @@ public class OcspServerImpl implements OcspServer {
           OcspRespWithCacheInfo cachedResp = responseCacher.getOcspResponse(
               cacheDbIssuer.getId(), cacheDbSerialNumber, cacheDbSigAlg);
           if (cachedResp != null) {
-            boolean granted = license.grant(cacheDbIssuer.getCert().getSubjectRfc4519Text());
-            if (granted) {
+            if (license.grant(cacheDbIssuer.getCert().getSubjectText())) {
               return cachedResp;
             } else {
               LOG.error("Not granted, new license needed");

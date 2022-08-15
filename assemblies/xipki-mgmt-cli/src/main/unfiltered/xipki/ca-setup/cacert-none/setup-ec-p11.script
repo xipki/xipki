@@ -1,5 +1,5 @@
 # Please adapt me
-CA_SUBJECT="CN=myca1,O=myorg,C=DE"
+CA_SUBJECT="C=DE,O=myorg,CN=myca1"
 
 # Please adapt me
 HASH = SHA256

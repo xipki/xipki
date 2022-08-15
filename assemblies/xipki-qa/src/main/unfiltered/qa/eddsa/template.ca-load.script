@@ -19,7 +19,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 
 xi:copy-file -f qa/eddsa/template.rootca.json qa/eddsa/rootca.json
 
-xi:replace --old "REPLACEME-SUBJECT" --new "CN=rootca1,O=myorg,C=DE" \
+xi:replace --old "REPLACEME-SUBJECT" --new "C=DE,O=myorg,CN=rootca1" \
   qa/eddsa/rootca.json
 
 xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
@@ -49,12 +49,12 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:csr-p11 \
     --slot $SLOT --label subca1 \
     --out output/subca1.csr \
-    --subject "CN=subca1,O=myorg,C=DE"
+    --subject "C=DE,O=myorg,CN=subca1"
 } else {
   xi:csr-p12 \
     --p12 output/subca1.p12 --password 1234 \
     --out output/subca1.csr \
-    --subject "CN=subca1,O=myorg,C=DE"
+    --subject "C=DE,O=myorg,CN=subca1"
 }
 
 ca:enroll-cert --ca rootca1 --csr output/subca1.csr \

@@ -640,7 +640,7 @@ public abstract class P11Slot implements Closeable {
       for (P11ObjectIdentifier objectId : ids) {
         X509Cert entity = certificates.get(objectId);
         sb.append("\t").append(objectId);
-        sb.append(", subject='").append(entity.getSubjectRfc4519Text()).append("'\n");
+        sb.append(", subject='").append(entity.getSubjectText()).append("'\n");
       }
 
       ids = getSortedObjectIds(identities.keySet());
@@ -654,7 +654,7 @@ public abstract class P11Slot implements Closeable {
           String algo = getAlgorithmDesc(publicKey);
           sb.append(", algo=").append(algo);
           if (identity.getCertificate() != null) {
-            String subject = identity.getCertificate().getSubjectRfc4519Text();
+            String subject = identity.getCertificate().getSubjectText();
             sb.append(", subject='").append(subject).append("'");
           }
         } else {
@@ -1526,7 +1526,7 @@ public abstract class P11Slot implements Closeable {
 
   private static void formatString(Integer index, boolean verbose, StringBuilder sb,
       X509Cert cert) {
-    String subject = cert.getSubjectRfc4519Text();
+    String subject = cert.getSubjectText();
     sb.append("\t\tCertificate");
     if (index != null) {
       sb.append("[").append(index).append("]");
@@ -1540,7 +1540,7 @@ public abstract class P11Slot implements Closeable {
 
     sb.append("\n\t\t\tSubject: ").append(subject);
 
-    sb.append("\n\t\t\tIssuer: ").append(cert.getIssuerRfc4519Text());
+    sb.append("\n\t\t\tIssuer: ").append(cert.getIssuerText());
     sb.append("\n\t\t\tSerial: ").append(cert.getSerialNumberHex());
     sb.append("\n\t\t\tStart time: ").append(cert.getNotBefore());
     sb.append("\n\t\t\tEnd time: ").append(cert.getNotAfter());

@@ -516,7 +516,7 @@ public class ScepResponder {
           CertificationRequest csr = CertificationRequest.getInstance(req.getMessageData());
           X500Name reqSubject = csr.getCertificationRequestInfo().getSubject();
           if (LOG.isInfoEnabled()) {
-            LOG.info("tid={}, subject={}", tid, X509Util.getRfc4519Name(reqSubject));
+            LOG.info("tid={}, subject={}", tid, X509Util.x500NameText(reqSubject));
           }
 
           if (SdkClient.verifyCsr(csr, securityFactory, popControl)) {
@@ -628,8 +628,8 @@ public class ScepResponder {
         }
         case CertPoll: {
           IssuerAndSubject is = IssuerAndSubject.getInstance(req.getMessageData());
-          audit(event, CaAuditConstants.NAME_issuer, X509Util.getRfc4519Name(is.getIssuer()));
-          audit(event, CaAuditConstants.NAME_subject, X509Util.getRfc4519Name(is.getSubject()));
+          audit(event, CaAuditConstants.NAME_issuer, X509Util.x500NameText(is.getIssuer()));
+          audit(event, CaAuditConstants.NAME_subject, X509Util.x500NameText(is.getSubject()));
           PollCertRequestEntry template = new PollCertRequestEntry();
           template.setSubject(new X500NameType(is.getSubject()));
 
@@ -652,14 +652,14 @@ public class ScepResponder {
         case GetCert:
           IssuerAndSerialNumber isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
           BigInteger serial = isn.getSerialNumber().getPositiveValue();
-          audit(event, CaAuditConstants.NAME_issuer, X509Util.getRfc4519Name(isn.getName()));
+          audit(event, CaAuditConstants.NAME_issuer, X509Util.x500NameText(isn.getName()));
           audit(event, CaAuditConstants.NAME_serial, LogUtil.formatCsn(serial));
           signedData = getCert(caName, isn.getName(), serial);
           break;
         case GetCRL:
           isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
           serial = isn.getSerialNumber().getPositiveValue();
-          audit(event, CaAuditConstants.NAME_issuer, X509Util.getRfc4519Name(isn.getName()));
+          audit(event, CaAuditConstants.NAME_issuer, X509Util.x500NameText(isn.getName()));
           audit(event, CaAuditConstants.NAME_serial, LogUtil.formatCsn(serial));
           signedData = getCrl(caName, isn.getName(), serial);
           break;

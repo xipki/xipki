@@ -530,7 +530,7 @@ abstract class BaseCmpResponder {
         errorStatus = null;
       } else {
         LOG.warn("tid={}: not authorized requestor (TLS client '{}')", tid,
-            tlsClientCert.getSubjectRfc4519Text());
+            tlsClientCert.getSubjectText());
         errorStatus = "requestor (TLS client certificate) is not authorized";
       }
     } else {

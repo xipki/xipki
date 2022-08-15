@@ -1,5 +1,5 @@
 # Please adapt me
-SUBJECT="CN=SCEP Responder 1,O=myorg,C=DE"
+SUBJECT="C=DE,O=myorg,CN=SCEP Responder 1"
 
 KEYCERTS_DIR = xipki/scep-setup/keycerts
 CACERT_FILE = xipki/ca-setup/keycerts/myca1.der

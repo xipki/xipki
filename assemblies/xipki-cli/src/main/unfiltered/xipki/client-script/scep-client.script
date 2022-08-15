@@ -25,7 +25,7 @@ CN = scep-smime-${CUR_TIME}
 
 # Must use the same CN as in the CSR
 xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" \
-  --subject "CN=${CN},E=info@myorg.com,O=myorg,C=DE"
+  --subject "C=DE,O=myorg,E=info@myorg.com,CN=${CN}"
 
 xi:csr-p12  --hash ${HASH} --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --challenge-password user1:password1 \
@@ -48,11 +48,11 @@ CN = scep-tls-${CUR_TIME}
 
 # Must use the same CN as in the CSR
 xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" \
-  --subject "CN=${CN}.myorg.org,O=myorg,C=DE"
+  --subject "C=DE,O=myorg,CN=${CN}.myorg.org"
 
 xi:csr-p12  --hash ${HASH} --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --challenge-password user1:password1 \
-  --subject "CN=${CN}.myorg.org,O=myorg,C=DE" --out ${OUT_DIR}/${CN}.csr
+  --subject "C=DE,O=myorg,CN=${CN}.myorg.org" --out ${OUT_DIR}/${CN}.csr
 
 echo "# Enroll certificate via PKCSReq"
 xi:scep-enroll --method pkcs --url ${URL} --ca-cert ${CACERT} \
@@ -84,7 +84,7 @@ echo "# Renewal"
 xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}-2.p12" --subject "CN=dummy"
 
 xi:csr-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-2.p12 --password 1234 \
-  --subject "CN=${CN}-2.myorg.org,O=myorg,C=DE" --out ${OUT_DIR}/${CN}-2.csr
+  --subject "C=DE,O=myorg,CN=${CN}-2.myorg.org" --out ${OUT_DIR}/${CN}-2.csr
 
 echo "# Enroll certificate via Renewal, hence signed by the old key ${CN}.p12"
 xi:scep-enroll --method renewal --url ${URL} --ca-cert ${CACERT} \
@@ -99,7 +99,7 @@ echo "# Renewal with different CommonName"
 xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}-3.p12" --subject "CN=dummy"
 
 xi:csr-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-3.p12 --password 1234 \
-  --subject "CN=${CN}-3.myorg.org,O=myorg,C=DE" --out ${OUT_DIR}/${CN}-3.csr
+  --subject "C=DE,O=myorg,CN=${CN}-3.myorg.org" --out ${OUT_DIR}/${CN}-3.csr
 
 echo "# Enroll certificate via Renewal, hence signed by the old key ${CN}.p12"
 xi:scep-enroll --method renewal --url ${URL} --ca-cert ${CACERT} --p12 ${OUT_DIR}/${CN}.p12 \

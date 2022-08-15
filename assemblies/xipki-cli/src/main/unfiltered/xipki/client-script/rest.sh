@@ -68,7 +68,7 @@ echo "generate CSR"
 
 openssl req -new -sha256 -key ${OUT_DIR}/${CN}-key.pem -outform der \
     -out ${OUT_DIR}/${CN}.csr \
-    -subj "/CN=${CN}/emailAddress=info@example.com/O=myorg/C=DE"
+    -subj "/C=DE/O=myorg/CN=${CN}/emailAddress=info@example.com"
 
 echo "enroll certificate"
 
@@ -85,7 +85,7 @@ echo "enroll certificate (CA generate keypair)"
 
 curl ${OPTS} \
     --header "Content-Type: text/plain; encoding=utf-8" \
-    --data-ascii "subject=CN=${CN}.example.org,O=example,C=DE" \
+    --data-ascii "subject=C=DE,O=example,CN=${CN}.example.org" \
     --output ${OUT_DIR}/${CN}.pem \
     "${CA_URL}/enroll-cert-cagenkeypair?profile=tls"
 
@@ -100,7 +100,7 @@ echo "generate CSR"
 
 openssl req -new -sha256 -key ${OUT_DIR}/${CN}-key.pem -outform der \
     -out ${OUT_DIR}/${CN}.csr \
-    -subj "/CN=${CN}.example.org/O=myorg/C=DE"
+    -subj "/C=DE/O=myorg/CN=${CN}.example.org"
 
 echo "enroll certificate"
 

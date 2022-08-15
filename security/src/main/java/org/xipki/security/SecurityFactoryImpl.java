@@ -266,8 +266,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         sb.append("conf='").append(signerConf.getConf());
         X509Cert cert = signer.getCertificate();
         if (cert != null) {
-          String subject = cert.getSubjectRfc4519Text();
-          sb.append("', certificate subject='").append(subject).append("'");
+          sb.append("', certificate subject='").append(cert.getSubjectText())
+              .append("'");
         }
 
         throw new ObjectCreationException(sb.toString());

@@ -303,8 +303,8 @@ class X509PublisherModule extends X509CaModule {
       X509Cert cert = certToRemove.getCert();
       if (LOG.isErrorEnabled()) {
         LOG.error("removing certificate issuer='{}', serial={}, subject='{}' from publisher"
-            + " {} failed.", cert.getIssuerRfc4519Text(), cert.getSerialNumberHex(),
-            cert.getSubjectRfc4519Text(), publisher.getIdent());
+            + " {} failed.", cert.getIssuerText(), cert.getSerialNumberHex(),
+            cert.getSubjectText(), publisher.getIdent());
       }
     } // end for
 

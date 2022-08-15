@@ -33,8 +33,8 @@ public interface OcspLicense {
   boolean grantAllCAs();
 
   /**
-   * The CA subject RFC4519 style.
-   * Output of org.bouncycastle.asn1.x500.style.RFC4519Style.INSTANCE.toString(X500Name name)
+   * The CA subject BCStyle style.
+   * Output of org.bouncycastle.asn1.x500.style.BCStyle.INSTANCE.toString(X500Name name)
    * @param caSubject the CA's subject
    * @return whether OCSP service for the given CA is allowed.
    */

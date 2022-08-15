@@ -1,5 +1,5 @@
 # Please adapt me
-SUBJECT="CN=OCSP Responder 1,O=myorg,C=DE"
+SUBJECT="C=DE,O=myorg,CN=OCSP Responder 1"
 
 KEYCERTS_DIR = xipki/ocsp-setup/keycerts
 CACERT_FILE = xipki/ca-setup/keycerts/myca1.der

@@ -1,5 +1,5 @@
 # Please adapt me
-SUBJECT="CN=OCSP Responder 1,O=myorg,C=DE"
+SUBJECT="C=DE,O=myorg,CN=OCSP Responder 1"
 
 # Please adapt me
 P11_LABEL = ocsp1

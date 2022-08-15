@@ -108,7 +108,7 @@ public class X509Ca extends X509CaModule implements Closeable {
 
     void setGrantedSubject(X500Name subject) {
       this.grantedSubject = subject;
-      this.grantedSubjectText = X509Util.getRfc4519Name(subject);
+      this.grantedSubjectText = X509Util.x500NameText(subject);
     }
   }
 
@@ -380,7 +380,7 @@ public class X509Ca extends X509CaModule implements Closeable {
       try {
         //-----begin license-----
         // check CA
-        String caSubject = caInfo.getCert().getSubjectRfc4519Text();
+        String caSubject = caInfo.getCert().getSubjectText();
         if (!(license.grantAllCAs() || license.grant(caSubject))) {
           LOG.error("Not granted for CA {}, need new license", caSubject);
           throw new OperationException(SYSTEM_FAILURE, "new license needed");
@@ -410,7 +410,7 @@ public class X509Ca extends X509CaModule implements Closeable {
           CertWithDbId cert = certInfo.getCert();
           LOG.info("{} generateCertificate: CA={}, profile={}, subject='{}', serialNumber={}",
               prefix, caIdent.getName(), certprofilIdent.getName(),
-              cert.getCert().getSubjectRfc4519Text(), cert.getCert().getSerialNumberHex());
+              cert.getCert().getSubjectText(), cert.getCert().getSerialNumberHex());
         }
       } catch (OperationException ex) {
         exception = new OperationExceptionWithIndex(i, ex);
@@ -470,7 +470,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     notNull(gct, "gct");
 
     event.addEventData(CaAuditConstants.NAME_req_subject,
-        X509Util.getRfc4519Name(gct.requestedSubject));
+        X509Util.x500NameText(gct.requestedSubject));
     event.addEventData(CaAuditConstants.NAME_certprofile, gct.certprofile.getIdent().getName());
     event.addEventData(CaAuditConstants.NAME_not_before,
         DateUtil.toUtcTimeyyyyMMddhhmmss(gct.grantedNotBefore));

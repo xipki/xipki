@@ -565,7 +565,7 @@ public class Actions {
         } // end if(validOn)
 
         if (verbose) {
-          println("responder is " + X509Util.getRfc4519Name(responderCerts[0].getSubject()));
+          println("responder is " + X509Util.x500NameText(responderCerts[0].getSubject()));
         }
       } // end if
 

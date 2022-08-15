@@ -603,7 +603,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     String base64Cert = null;
     if (encodedCert != null) {
       try {
-        subject = X509Util.parseCert(encodedCert).getIssuerRfc4519Text();
+        subject = X509Util.parseCert(encodedCert).getIssuerText();
         base64Cert = Base64.encodeToString(encodedCert);
       } catch (CertificateException ex) {
         throw new CaMgmtException("could not parse the certificate", ex);

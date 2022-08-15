@@ -250,7 +250,7 @@ public class CertStore extends CertStoreBase {
                 + Base64.encodeToString(nonce) + ":" + Base64.encodeToString(encrypted);
       }
 
-      String subjectText = X509Util.cutText(cert.getCert().getSubjectRfc4519Text(), maxX500nameLen);
+      String subjectText = X509Util.cutText(cert.getCert().getSubjectText(), maxX500nameLen);
       long fpSubject = X509Util.fpCanonicalizedName(cert.getCert().getSubject());
 
       String reqSubjectText = null;
@@ -881,7 +881,7 @@ public class CertStore extends CertStoreBase {
       RDN[] rdns = subjectPattern.getRDNs();
       for (RDN rdn : rdns) {
         X500Name rdnName = new X500Name(new RDN[]{rdn});
-        String rdnStr = X509Util.getRfc4519Name(rdnName);
+        String rdnStr = X509Util.x500NameText(rdnName);
         if (rdnStr.indexOf('%') != -1) {
           throw new OperationException(BAD_REQUEST,
                   "the character '%' is not allowed in subjectPattern");

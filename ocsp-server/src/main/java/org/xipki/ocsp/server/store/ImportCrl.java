@@ -714,7 +714,7 @@ class ImportCrl {
         sql = "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT,REV_INFO)"
             + " VALUES(?,?,?,?,?,?,?)";
         ps = datasource.prepareStatement(conn, sql);
-        String subject = X509Util.getRfc4519Name(caCert.subject);
+        String subject = X509Util.x500NameText(caCert.subject);
 
         ps.setInt(offset++, issuerId);
         ps.setString(offset++, subject);

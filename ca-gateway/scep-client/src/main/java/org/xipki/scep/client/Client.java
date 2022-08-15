@@ -614,7 +614,7 @@ public abstract class Client {
 
     if (!caValidator.isTrusted(caCert)) {
       throw new ScepClientException(
-          "CA certificate '" + caCert.getSubjectRfc4519Text() + "' is not trusted");
+          "CA certificate '" + caCert.getSubjectText() + "' is not trusted");
     }
 
     if (raCerts.isEmpty()) {
@@ -628,11 +628,11 @@ public abstract class Client {
     try {
       if (!X509Util.issues(caCert, raEncCert)) {
         throw new ScepClientException("RA certificate '"
-            + raEncCert.getSubjectRfc4519Text() + " is not issued by the CA");
+            + raEncCert.getSubjectText() + " is not issued by the CA");
       }
       if (raSignCert != raEncCert && X509Util.issues(caCert, raSignCert)) {
         throw new ScepClientException("RA certificate '"
-            + raSignCert.getSubjectRfc4519Text() + " is not issued by the CA");
+            + raSignCert.getSubjectText() + " is not issued by the CA");
       }
     } catch (CertificateException ex) {
       throw new ScepClientException("invalid certificate: " + ex.getMessage(), ex);

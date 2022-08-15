@@ -185,7 +185,7 @@ class RefDigestReader implements Closeable {
     this.caCert = Args.notNull(caCert, "caCert");
     this.stopMe = Args.notNull(stopMe, "stopMe");
     this.totalAccount = totalAccount;
-    this.caSubjectName = caCert.getSubjectRfc4519Text();
+    this.caSubjectName = caCert.getSubjectText();
     this.lastProcessedId = minId - 1;
     this.outQueue = new ArrayBlockingQueue<>(numBlocksToRead);
   } // constructor

@@ -20,7 +20,6 @@ package org.xipki.security;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -68,9 +67,9 @@ public class X509Cert {
 
   private final Date notAfter;
 
-  private String issuerRfc4519Text;
+  private String issuerText;
 
-  private String subjectRfc4519Text;
+  private String subjectText;
 
   private byte[] subjectKeyId;
 
@@ -272,24 +271,24 @@ public class X509Cert {
     return authorityKeyId;
   }
 
-  public String getSubjectRfc4519Text() {
-    if (subjectRfc4519Text == null) {
+  public String getSubjectText() {
+    if (subjectText == null) {
       synchronized (sync) {
-        subjectRfc4519Text = RFC4519Style.INSTANCE.toString(subject);
+        subjectText = X509Util.x500NameText(subject);
       }
     }
 
-    return subjectRfc4519Text;
+    return subjectText;
   }
 
-  public String getIssuerRfc4519Text() {
-    if (issuerRfc4519Text == null) {
+  public String getIssuerText() {
+    if (issuerText == null) {
       synchronized (sync) {
-        issuerRfc4519Text = RFC4519Style.INSTANCE.toString(subject);
+        issuerText = X509Util.x500NameText(subject);
       }
     }
 
-    return issuerRfc4519Text;
+    return issuerText;
   }
 
   public SubjectPublicKeyInfo getSubjectPublicKeyInfo() {

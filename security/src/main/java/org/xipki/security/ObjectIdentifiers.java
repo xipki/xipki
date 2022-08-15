@@ -20,7 +20,7 @@ package org.xipki.security;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x500.style.RFC4519Style;
+import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.xipki.util.StringUtil;
@@ -799,7 +799,7 @@ public class ObjectIdentifiers {
 
     if (StringUtil.isBlank(name)) {
       try {
-        name = RFC4519Style.INSTANCE.oidToDisplayName(type);
+        name = BCStyle.INSTANCE.oidToDisplayName(type);
       } catch (IllegalArgumentException ex) {
       }
     }
@@ -815,7 +815,7 @@ public class ObjectIdentifiers {
     }
 
     try {
-      return RFC4519Style.INSTANCE.attrNameToOID(name);
+      return BCStyle.INSTANCE.attrNameToOID(name);
     } catch (IllegalArgumentException ex) {
       return null;
     }

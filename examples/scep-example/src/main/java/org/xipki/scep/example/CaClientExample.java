@@ -181,9 +181,9 @@ public class CaClientExample {
   protected static void printCert(String prefix, X509Cert cert) {
     System.out.println(prefix);
     System.out.print("Subject: ");
-    System.out.println(cert.getSubjectRfc4519Text());
+    System.out.println(cert.getSubjectText());
     System.out.print(" Issuer: ");
-    System.out.println(cert.getIssuerRfc4519Text());
+    System.out.println(cert.getIssuerText());
     System.out.print(" Serial: " + cert.getSerialNumberHex());
     System.out.println("NotBefore: " + cert.getNotBefore());
     System.out.println(" NotAfter: " + cert.getNotAfter());

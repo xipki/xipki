@@ -494,7 +494,7 @@ public class CaEntry extends MgmtEntry {
       if (this.pathLenConstraint < 0) {
         throw new CaMgmtException("given certificate is not a CA certificate");
       }
-      this.subject = cert.getSubjectRfc4519Text();
+      this.subject = cert.getSubjectText();
       byte[] encodedCert = cert.getEncoded();
       this.hexSha1OfCert = HashAlgo.SHA1.hexHash(encodedCert);
     }

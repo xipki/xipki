@@ -228,7 +228,7 @@ class OcspStoreQueryExecutor {
     X509Cert cert = certificate.getCert();
     long notBeforeSeconds = cert.getNotBefore().getTime() / 1000;
     long notAfterSeconds = cert.getNotAfter().getTime() / 1000;
-    String cuttedSubject = X509Util.cutText(certificate.getCert().getSubjectRfc4519Text(),
+    String cuttedSubject = X509Util.cutText(certificate.getCert().getSubjectText(),
                             maxX500nameLen);
 
     PreparedStatement ps = datasource.prepareStatement(sql);
@@ -465,7 +465,7 @@ class OcspStoreQueryExecutor {
 
     try {
       String b64Cert = Base64.encodeToString(encodedCert);
-      String subject = issuerCert.getSubjectRfc4519Text();
+      String subject = issuerCert.getSubjectText();
       int idx = 1;
       ps.setInt(idx++, id);
       ps.setString(idx++, subject);

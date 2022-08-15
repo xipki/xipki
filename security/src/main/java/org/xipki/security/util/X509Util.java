@@ -18,8 +18,6 @@
 package org.xipki.security.util;
 
 import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
-import org.bouncycastle.asn1.crmf.DhSigStatic;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
@@ -30,7 +28,6 @@ import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
-import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
@@ -310,9 +307,9 @@ public class X509Util {
     }
   }
 
-  public static String getRfc4519Name(X500Name name) {
+  public static String x500NameText(X500Name name) {
     notNull(name, "name");
-    return RFC4519Style.INSTANCE.toString(name);
+    return BCStyle.INSTANCE.toString(name);
   }
 
   public static long fpCanonicalizedName(X500Name name) {
@@ -696,8 +693,7 @@ public class X509Util {
   }
 
   public static String cutX500Name(X500Name name, int maxLen) {
-    String text = getRfc4519Name(name);
-    return cutText(text, maxLen);
+    return cutText(x500NameText(name), maxLen);
   }
 
   public static Extension createExtnSubjectAltName(List<String> taggedValues, boolean critical)
@@ -876,10 +872,10 @@ public class X509Util {
 
     StringBuilder sb = new StringBuilder(verbose ? 1000 : 100);
     sb.append("  issuer:  ")
-      .append(X509Util.getRfc4519Name(cert.getIssuer())).append('\n');
+      .append(x500NameText(cert.getIssuer())).append('\n');
     sb.append("  serialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber())).append('\n');
     sb.append("  subject: ")
-      .append(X509Util.getRfc4519Name(cert.getSubject())).append('\n');
+      .append(x500NameText(cert.getSubject())).append('\n');
     sb.append("  notBefore: ").append(cert.getNotBefore()).append("\n");
     sb.append("  notAfter:  ").append(cert.getNotAfter());
 
@@ -913,7 +909,7 @@ public class X509Util {
 
     for (FileOrBinary m : certsConf) {
       try {
-        X509Cert cert = X509Util.parseCert(m.readContent());
+        X509Cert cert = parseCert(m.readContent());
         certs.add(cert);
       } catch (CertificateException | IOException ex) {
         String msg = "could not parse the certificate";
