@@ -29,11 +29,12 @@
 		}
 	},
 	"audit":{
-		"type":"embed"
+		"type":"embed",
+		"conf": "file=logs/scep-audit.log"
 	},
 	"signers":{
 		"signers":[{
-			"name":"myca",
+			"names":["myca"],
 			"signer":{
 				"type":"pkcs12",
 				"conf":"password=1234,keystore=file:keycerts/scep1.p12,algo=SHA256withRSA"

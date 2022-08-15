@@ -19,7 +19,6 @@ package org.xipki.audit;
 
 import org.xipki.audit.services.EmbedAuditService;
 import org.xipki.audit.services.FileMacAuditService;
-import org.xipki.audit.services.Slf4jAuditService;
 import org.xipki.password.PasswordResolver;
 
 import java.lang.reflect.InvocationTargetException;
@@ -87,8 +86,6 @@ public class Audits {
       AuditService service;
       if ("embed".equalsIgnoreCase(auditType)) {
         service = new EmbedAuditService();
-      } else if ("slf4j".equals(auditType)) {
-        service = new Slf4jAuditService();
       } else if ("file-mac".equals(auditType)) {
         service = new FileMacAuditService();
       } else {

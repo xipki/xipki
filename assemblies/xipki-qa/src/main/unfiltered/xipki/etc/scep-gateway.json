@@ -33,7 +33,7 @@
 	},
 	"signers":{
 		"signers":[{
-			"name":"subcawithcrl",
+			"names":["subcawithcrl"],
 			"signer":{
 				"type":"pkcs12",
 				"conf":"password=1234,keystore=file:keycerts/scep-subcawithcrl.p12,algo=SHA256withRSA"

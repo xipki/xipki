@@ -519,7 +519,7 @@ public class ScepResponder {
             LOG.info("tid={}, subject={}", tid, X509Util.x500NameText(reqSubject));
           }
 
-          if (SdkClient.verifyCsr(csr, securityFactory, popControl)) {
+          if (!SdkClient.verifyCsr(csr, securityFactory, popControl)) {
             LOG.warn("tid={} POP verification failed", tid);
             throw FailInfoException.BAD_MESSAGE_CHECK;
           }

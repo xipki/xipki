@@ -112,7 +112,10 @@ public class ProtocolProxyConfWrapper {
       if (signerConfs != null && signerConfs.length > 0) {
         signerMap = new HashMap<>();
         for (CaNameSignerConf m : signerConfs) {
-          signerMap.put(m.getName(), buildSigner(m.getSigner()));
+          ConcurrentContentSigner signer = buildSigner(m.getSigner());
+          for (String name : m.getNames()) {
+            signerMap.put(name, signer);
+          }
         }
       }
 

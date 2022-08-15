@@ -1,5 +1,7 @@
 package org.xipki.ca.gateway.conf;
 
+import java.util.List;
+
 /**
  *
  * @author Lijun Liao
@@ -8,16 +10,16 @@ package org.xipki.ca.gateway.conf;
 
 public class CaNameSignerConf {
 
-  private String name;
+  private List<String> names;
 
   private SignerConf signer;
 
-  public String getName() {
-    return name;
+  public List<String> getNames() {
+    return names;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setNames(List<String> names) {
+    this.names = names;
   }
 
   public SignerConf getSigner() {

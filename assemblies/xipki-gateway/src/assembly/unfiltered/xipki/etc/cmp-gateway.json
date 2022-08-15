@@ -44,7 +44,8 @@
 		}
 	},
 	"audit":{
-		"type":"embed"
+		"type":"embed",
+		"conf": "file=logs/cmp-audit.log"
 	},
 	"signers":{
 		"default":{
