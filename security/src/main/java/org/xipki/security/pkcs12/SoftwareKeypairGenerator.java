@@ -42,7 +42,7 @@ import java.util.Locale;
 /**
  * Software-based keypair generator.
  * @author Lijun Liao
- * @since 5.4.0
+ * @since 6.0.0
  */
 public class SoftwareKeypairGenerator extends KeypairGenerator {
 

@@ -27,7 +27,8 @@
 		}
 	},
 	"audit":{
-		"type":"embed"
+		"type":"embed",
+		"conf": "file=logs/rest-audit.log"
 	},
 	"security":{
 		"keyStrongrandomEnabled":false,

@@ -139,13 +139,10 @@ public class RestResponder {
     return authenticator.getCertRequestor(cert);
   }
 
-  public RestResponse service(String path, AuditEvent event, byte[] request,
-                              HttpRequestMetadataRetriever httpRetriever) {
+  public RestResponse service(String path, byte[] request,
+          HttpRequestMetadataRetriever httpRetriever, AuditEvent event) {
     event.setApplicationName(CaAuditConstants.APPNAME);
     event.setName(CaAuditConstants.NAME_perf);
-
-    String msgId = RandomUtil.nextHexLong();
-    event.addEventData(CaAuditConstants.NAME_mid, msgId);
 
     AuditLevel auditLevel = AuditLevel.INFO;
     AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
@@ -286,8 +283,8 @@ public class RestResponder {
           Extensions extensions;
           SubjectPublicKeyInfo subjectPublicKeyInfo;
 
+          String ct = httpRetriever.getHeader("Content-Type");
           if (RestAPIConstants.CMD_enroll_cert_cagenkeypair.equals(command)) {
-            String ct = httpRetriever.getHeader("Content-Type");
             subjectPublicKeyInfo = null;
 
             if (ct.startsWith("text/plain")) {
@@ -320,7 +317,6 @@ public class RestResponder {
                   AuditLevel.INFO, AuditStatus.FAILED);
             }
           } else {
-            String ct = httpRetriever.getHeader("Content-Type");
             if (!RestAPIConstants.CT_pkcs10.equalsIgnoreCase(ct)) {
               String message = "unsupported media type " + ct;
               throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message,
@@ -344,6 +340,10 @@ public class RestResponder {
           template.setSubject(new X500NameType(subject));
           template.notBefore(notBefore);
           template.notAfter(notAfter);
+
+          event.addEventData(CaAuditConstants.NAME_certprofile, profile);
+          event.addEventData(CaAuditConstants.NAME_req_subject,
+              "\"" + X509Util.x500NameText(subject) + "\"");
 
           try {
             template.extensions(extensions);
@@ -407,7 +407,8 @@ public class RestResponder {
           break;
         }
         case RestAPIConstants.CMD_revoke_cert:
-        case RestAPIConstants.CMD_unsuspend_cert: {
+        case RestAPIConstants.CMD_unsuspend_cert:
+        case RestAPIConstants.CMD_unrevoke_cert: {
           boolean revoke = command.equals(RestAPIConstants.CMD_revoke_cert);
           int permission = revoke ? PermissionConstants.REVOKE_CERT
               : PermissionConstants.UNSUSPEND_CERT;
@@ -438,6 +439,8 @@ public class RestResponder {
             throw new OperationException(ErrorCode.BAD_REQUEST, ex.getMessage());
           }
 
+          event.addEventData(CaAuditConstants.NAME_serial, LogUtil.formatCsn(serialNumber));
+
           if (!revoke) {
             UnsuspendOrRemoveRequest sdkReq = new UnsuspendOrRemoveRequest();
             sdkReq.setIssuerCertSha1Fp(caSha1);
@@ -451,6 +454,7 @@ public class RestResponder {
               throw new OperationException(ErrorCode.BAD_REQUEST,
                   "reason " + CrlReason.REMOVE_FROM_CRL.getDescription() + " is not allowed!");
             }
+            event.addEventData(CaAuditConstants.NAME_reason, reason);
 
             Date invalidityTime = null;
             String strInvalidityTime = httpRetriever.getParameter(

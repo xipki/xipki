@@ -223,16 +223,16 @@ abstract class BaseCmpResponder {
       String caName, String dfltCertprofileName, boolean groupEnroll,
       PKIMessage request, PKIHeaderBuilder respHeader,
       PKIHeader reqHeader, PKIBody reqBody, Requestor requestor,
-      ASN1OctetString tid, String msgId, AuditEvent event)
+      ASN1OctetString tid, AuditEvent event)
       throws InsufficientPermissionException, SdkErrorResponseException;
 
   protected abstract PKIBody cmpUnRevokeCertificates(
       String caName, PKIMessage request, PKIHeaderBuilder respHeader, PKIHeader reqHeader,
-      PKIBody reqBody, Requestor requestor, String msgId, AuditEvent event)
+      PKIBody reqBody, Requestor requestor, AuditEvent event)
       throws SdkErrorResponseException;
 
   protected abstract PKIBody confirmCertificates(String caName, ASN1OctetString transactionId,
-      CertConfirmContent certConf, String msgId) throws SdkErrorResponseException;
+      CertConfirmContent certConf) throws SdkErrorResponseException;
 
   protected abstract PKIBody revokePendingCertificates(
       String caName, ASN1OctetString transactionId) throws SdkErrorResponseException;
@@ -285,8 +285,6 @@ abstract class BaseCmpResponder {
    *          Transaction id. Must not be {@code null}.
    * @param message
    *          PKI message. Must not be {@code null}.
-   * @param msgId
-   *          Message id. Must not be {@code null}.
    * @param parameters
    *          Additional parameters.
    * @param event
@@ -294,9 +292,8 @@ abstract class BaseCmpResponder {
    * @return the response
    */
   private PKIMessage processPkiMessage0(
-      String caName, PKIMessage request, Requestor requestor,
-      ASN1OctetString tid, GeneralPKIMessage message, String msgId,
-      Map<String, String> parameters, AuditEvent event) {
+      String caName, PKIMessage request, Requestor requestor, ASN1OctetString tid,
+      GeneralPKIMessage message, Map<String, String> parameters, AuditEvent event) {
     event.addEventData(NAME_requestor, requestor == null ? "null" : requestor.getName());
 
     PKIHeader reqHeader = message.getHeader();
@@ -344,14 +341,14 @@ abstract class BaseCmpResponder {
         }
 
         respBody = cmpEnrollCert(caName, dfltCertprofileName, groupEnroll, request, respHeader,
-            reqHeader, reqBody, requestor, tid, msgId, event);
+            reqHeader, reqBody, requestor, tid, event);
       } else if (type == PKIBody.TYPE_CERT_CONFIRM) {
         event.addEventType(TYPE_certConf);
         CertConfirmContent certConf = (CertConfirmContent) reqBody.getContent();
-        respBody = confirmCertificates(caName, tid, certConf, msgId);
+        respBody = confirmCertificates(caName, tid, certConf);
       } else if (type == PKIBody.TYPE_REVOCATION_REQ) {
         respBody = cmpUnRevokeCertificates(caName, request, respHeader, reqHeader,
-            reqBody, requestor, msgId, event);
+            reqBody, requestor, event);
       } else if (type == PKIBody.TYPE_CONFIRM) {
         event.addEventType(TYPE_pkiconf);
         respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
@@ -411,9 +408,6 @@ abstract class BaseCmpResponder {
     }
     String tidStr = Base64.encodeToString(tid.getOctets());
     event.addEventData(NAME_tid, tidStr);
-
-    String msgId = RandomUtil.nextHexLong();
-    event.addEventData(NAME_mid, msgId);
 
     final GeneralName respSender = reqHeader.getRecipient();
 
@@ -552,7 +546,7 @@ abstract class BaseCmpResponder {
     }
 
     PKIMessage resp = processPkiMessage0(
-        caName, pkiMessage, requestor, tid, message, msgId, parameters, event);
+        caName, pkiMessage, requestor, tid, message, parameters, event);
 
     if (isProtected) {
       resp = addProtection(signer, resp, event, requestor);

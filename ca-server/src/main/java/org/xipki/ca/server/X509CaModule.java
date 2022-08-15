@@ -81,26 +81,28 @@ public abstract class X509CaModule {
     return Audits.getAuditService();
   }
 
-  protected AuditEvent newPerfAuditEvent(String eventType, String msgId) {
-    return newAuditEvent(eventType, msgId);
+  protected AuditEvent newPerfAuditEvent(String eventType) {
+    return newAuditEvent(eventType);
   }
 
-  protected AuditEvent newAuditEvent(String eventType, String msgId) {
+  protected AuditEvent newAuditEvent(String eventType) {
     notNull(eventType, "eventType");
-    notNull(msgId, "msgId");
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName(CaAuditConstants.APPNAME);
     event.setName(CaAuditConstants.NAME_perf);
     event.addEventData(CaAuditConstants.NAME_ca, caIdent.getName());
     event.addEventType(eventType);
-    event.addEventData(CaAuditConstants.NAME_mid, msgId);
     return event;
   }
 
-  protected void finish(AuditEvent event, boolean successful) {
-    event.finish();
+  protected void setEventStatus(AuditEvent event, boolean successful) {
     event.setLevel(successful ? AuditLevel.INFO : AuditLevel.ERROR);
     event.setStatus(successful ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED);
+  }
+
+  protected void finish(AuditEvent event, boolean successful) {
+    setEventStatus(event, successful);
+    event.finish();
     auditService().logEvent(event);
   }
 

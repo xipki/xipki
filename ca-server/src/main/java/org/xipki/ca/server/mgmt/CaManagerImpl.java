@@ -1056,10 +1056,6 @@ public class CaManagerImpl implements CaManager, Closeable {
     publisherManager.changePublisher(name, type, conf);
   }
 
-  public CaServerConf getCaServerConf() {
-    return caServerConf;
-  }
-
   public void setCaServerConf(CaServerConf caServerConf) {
     this.caServerConf = notNull(caServerConf, "caServerConf");
   }
@@ -1087,14 +1083,6 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public Set<String> getCaAliasNames() {
     return caAliases.keySet();
-  }
-
-  public X509Cert getCaCert(String caName) {
-    return ca2Manager.getCaCert(caName);
-  }
-
-  public List<X509Cert> getCaCertchain(String caName) {
-    return ca2Manager.getCaCertchain(caName);
   }
 
   @Override
@@ -1181,10 +1169,6 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   public X509Ca getX509Ca(String name) throws CaMgmtException {
     return ca2Manager.getX509Ca(name);
-  }
-
-  public X509Ca getX509Ca(NameId ident) throws CaMgmtException {
-    return ca2Manager.getX509Ca(ident);
   }
 
   public KeypairGenerator getKeypairGenerator(String keypairGenName) {

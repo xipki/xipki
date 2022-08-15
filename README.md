@@ -32,68 +32,6 @@ JRE/JDK, and the steps to reproduce the bug.
 * [Utimaco Se](https://hsm.utimaco.com/products-hardware-security-modules/general-purpose-hsm/)
 * [Sansec HSM](https://en.sansec.com.cn/product/HSM-52.html) / [三未信安服务器密码机](http://www.sansec.com.cn/product/4.html): tested SM2, ECDSA and RSA.
 
-## Performance
-
-### Test Settings
-- OS: Ubuntu 20.04, X86_64
-- CPU: Intel Core i3-7100U CPU @ 2.40GHz, 4 Core
-- Disk: SanDisk SD8SN8U (SSD)
-- Memory: 8GB
-- Cryptograhic Token: PKCS#12 keystore
-- Database: PostgreSQL 9.5
-- Database, CA server, OCSP server and test clients on the same machine.
-- Server: Apache Tomcat/8.5.34
-- Server JDK: 11.0.11+9-Ubuntu-0ubuntu2.20.04
-- Test Client: XiPKI QA, tested with 5 threads for 60 seconds.
-
-### CA
-
-- PostgreSQL is tuned by setting shared_buffers = 2GB and commit_delay = 1000.
-- Certificate Enrollment
-
-| Key type      | Key size / Curve | Certificates per second |
-|:-------------:|-------------:|-------------:|
-| RSA           | 2048          | 630   |
-|               | 3072          | 300   |
-|               | 4096          | 150   |
-| DSA           | 2048          | 580   |
-|               | 3072          | 330   |
-| EC            | NIST P-256    | 880   |
-|               | NIST P-384    | 700   |
-|               | NIST P-521    | 530   |
-|            | Brainpool P256R1 | 560   |
-|            | Brainpool P384R1 | 350   |
-|            | Brainpool P512R1 | 210   |
-| SM2           | SM2P256V1     | 800   |
-| EdDSA         | Ed25519       | 1,200 |
-|               | Ed448         | 900   |
-
-### OCSP
-
-- Default PostgreSQL configuration
-- OCSP Cache Disabled
-
-| Key type      | Key size / Curve | Responses per second |
-|:-------------:|:-------------:|-------------:|
-| RSA           | 2048          | 880   |
-|               | 3072          | 350   |
-|               | 4096          | 160   |
-| DSA           | 2048          | 2,000 |
-|               | 3072          | 1,000 |
-| EC            | NIST P-256    | 3,600 |
-|               | NIST P-384    | 2,400 |
-|               | NIST P-521    | 1,400 |
-|            | Brainpool P256R1 | 1,500 |
-|            | Brainpool P384R1 | 850   |
-|            | Brainpool P512R1 | 500   |
-| SM2           | SM2P256V1     | 4,000 |
-| EdDSA         | Ed25519       | 5,000 |
-|               | Ed448         | 3,300 |
-
-- OCSP Cache enabled
-  - If the OCSP requests contain nonce: same as without cache (see above).
-  - Otherwise, (much) better than without cache.
-
 ## Get Started
 
 ### JAVA_HOME
@@ -102,7 +40,9 @@ JRE/JDK, and the steps to reproduce the bug.
 
 ### Binaries
 
-Download the binaries `xipki-ca-<version>.zip`, `xipki-ocsp-<version>.zip` and
+Download the binaries `xipki-ca-<version>.zip`, `xipki-ocsp-<version>.zip`, 
+`xipki-gateway-<version>.zip`, `xipki-mgmt-cli-<version>.tar.gz` 
+(or `xipki-mgmt-cli-jdk8-<version>.tar.gz` for JDK 8),
 `xipki-cli-<version>.tar.gz` (or `xipki-cli-jdk8-<version>.tar.gz` for JDK 8) from
 [releases](https://github.com/xipki/xipki/releases).
 
@@ -124,7 +64,9 @@ follows.
    - DB Tool: `assemblies/xipki-dbtool/target/xipki-dbtool-<version>.zip`
    - CA: `assemblies/xipki-ca/target/xipki-ca-<version>.zip`
    - OCSP: `assemblies/xipki-ocsp/target/xipki-ocsp-<version>.zip`
-   - CLI (Command Line Interface): `assemblies/xipki-cli/target/xipki-cli-<version>.tar.gz` (or `xipki-cli-jdk8-<version>.tar.gz` for JDK 8)
+   - Protocol Gateway (CMP, SCEP, REST): `assemblies/xipki-gateway/target/xipki-gateway-<version>.zip`
+   - Management CLI: `assemblies/xipki-mgmt-cli/target/xipki-mgmt-cli-<version>.tar.gz` (or `xipki-mgmt-cli-jdk8-<version>.tar.gz` for JDK 8)
+   - CLI: `assemblies/xipki-cli/target/xipki-cli-<version>.tar.gz` (or `xipki-cli-jdk8-<version>.tar.gz` for JDK 8)
 
 ## Install DB Tool
 
@@ -134,26 +76,35 @@ follows.
  
 ## Install CA Server
 
-1. Unpack the binary `xipki-ca-<version>.zip` and install CA as described in the
+1. Unpack tomcat to a new folder
+2. Unpack the binary `xipki-ca-<version>.zip` and install CA as described in the
    unpacked README file.
 
 ## Install OCSP Responder
 
-Note that CA and OCSP can be installed in the same servlet container.
-
-1. Unpack the binary `xipki-ocsp-<version>.zip` and install OCSP responder as described in the
+1. Unpack tomcat to a new folder
+2. Unpack the binary `xipki-ocsp-<version>.zip` and install OCSP responder as described in the
    unpacked README file.
+
+## Install Protocol Gateway
+
+1. Unpack tomcat to a new folder
+2. Unpack the binary `xipki-gate-<version>.zip` and install protocol gateway as described in the
+   unpacked README file.
+
+## Install Management Command Line Interface
+
+1. Unpack the binary `xipki-mgmt-cli-<version>.tar.gz` (or `xipki-mgmt-cli-jdk8-<version>.tar.gz` for JDK 8)
+3. If you get "java.lang.ClassNotFoundException: &lt;jdbc class&gt;", please copy the missing JDBC driver jar to the directory `lib/boot`.
 
 ## Install Command Line Interface
 
 1. Unpack the binary `xipki-cli-<version>.tar.gz` (or `xipki-cli-jdk8-<version>.tar.gz` for JDK 8)
-2. Adapt the CMP client configuration `xipki/cmpclient/cmpclient.json`
-3. If you get "java.lang.ClassNotFoundException: &lt;jdbc class&gt;", please copy the missing JDBC driver jar to the directory `lib/boot`.
 
 ## Configure PKCS#11 device (optional)
 
    This step is only required if the real PKCS#11 device instead of the emulator
-   is used. **Note that this step should be applied to both tomcat and xipki-cli**.
+   is used. **Note that this step should be applied to all components tomcat, xipki-mgmt-cli, and xipki-cli**.
 
   * Copy `xipki/security/example/pkcs11-hsm.json` to `xipki/security/pkcs11.json`, and adapt the PKCS#11 configuration.
 
@@ -198,12 +149,12 @@ PKCS#11 sessions. In this case, the servlet container should be started as follo
 preload <start script>
 ```
 
-2. Setup CA in CLI
+2. Setup CA in Management CLI (xipki-mgmt-cli)
     * _(If error like "Identity or Certificate with label=mylabel already exists" occurs,
       you need to comment the line which generate the key (e.g. dsa-p11 ec-p11, rsa-p11, sm2-p12)
       or delete the existing key using command `delete-key-p11`)_.
 
-   * Start CLI.
+   * Start Management CLI.
 
      `bin/karaf`
 
@@ -231,14 +182,6 @@ preload <start script>
    * Verify the installation, execute the command in CLI:  
      `ca-info myca1`
 
-## Enroll/Revoke Certificate and Get CRL via Shell (optional)
-
-- The following shell script demonstrates how to enroll and revoke certificates, and how to get
-  the current CRL:    
-  `<CLI_ROOT>/xipki/client-script/rest.sh` (use argument 'help' to print the usage)
-
-  Note that this script tells CA to generate real certificates. DO NOT use it in the production environment.
-
 ## Enroll/Revoke Certificate
 
 * SCEP  
@@ -248,8 +191,8 @@ preload <start script>
   It can be executed in the CLI as follows:  
   - `source xipki/client-script/scep-client.script`
 
-* XiPKI CLI
-  XiPKI CLI provides commands to enroll and revoke certificates via CMP.
+* CMP
+  Using any CMP client. XiPKI provides also a CMP client.
 
   The binary `xipki-cli-<version>`.tar.gz (or `xipki-cli-jdk8-<version>.tar.gz` for JDK 8) contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:  
@@ -262,6 +205,10 @@ preload <start script>
   The binary `xipki-cli-<version>`.tar.gz (or `xipki-cli-jdk8-<version>.tar.gz` for JDK 8) contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:  
   - `source xipki/client-script/rest-client.script` (use argument 'help' to print the usage)
+
+Management CLI Commands
+-----
+Please refer to [commands.md](commands.md) for more details.
  
 CLI Commands
 -----
@@ -273,20 +220,23 @@ See discussion in [discussion #205](https://github.com/xipki/xipki/discussions/2
 
 Features
 -----
+- CA Protocol Gateway
+  - SCEP (RFC 8894)
+  - CMP (RFC 4210 and RFC 4211)
+  - RESTful API
+
 - CA (Certification Authority)
   - X.509 Certificate v3 (RFC 5280)
   - X.509 CRL v2 (RFC 5280)
   - EdDSA Certificates (RFC 8410, RFC 8032)
   - SHAKE Certificates (RFC 8692)
   - Diffie-Hellman Proof-of-Possession Algorithms (RFC 6955)
-  - SCEP (RFC 8894)
   - EN 319 411 (eIDAS)
   - EN 319 412 (eIDAS)
   - Supported databases: DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
   - Direct and indirect CRL
   - FullCRL and DeltaCRL
   - Customized extension to embed certificates in CRL
-  - CMP (RFC 4210 and RFC 4211)
   - API to specify customized certificate profiles
   - Support of JSON-based certificate profile
   - API to specify customized publisher, e.g. for LDAP and OCSP responder
@@ -312,8 +262,8 @@ Features
     - SHA*withPlainECDSA: where * is 1, 224, 256, 384 and 512
     - SHA*withDSA: where * is 1, 224, 256, 384 and 512
     - SM3withSM2
- - Native support of X.509 extensions (other extensions can be supported by
-   configuring it as blob)
+  - Native support of X.509 extensions (other extensions can be supported by
+    configuring it as blob)
     - AdditionalInformation (German national standard CommonPKI)
     - Admission (German national standard CommonPKI)
     - AuthorityInformationAccess (RFC 5280)
@@ -347,15 +297,14 @@ Features
     - SubjectKeyIdentifier (RFC 5280)
     - TLSFeature (RFC 7633)
     - ValidityModel (German national standard CommonPKI)
-
- - Management of multiple CAs in one software instance
- - Support of database cluster
- - Multiple software instances (all can be in active mode) for the same CA
- - Native support of management of CA via embedded OSGi commands
- - API to manage CA. This allows one to implement proprietary CLI, e.g. Website, to manage CA.
- - Database tool (export and import CA database) simplifies the switch of
-   databases, upgrade of XiPKi and switch from other CA system to XiPKI CA
- - All configuration of CA except those of databases is saved in database
+  - Management of multiple CAs in one software instance
+    - Support of database cluster
+    - Multiple software instances (all can be in active mode) for the same CA
+    - Native support of management of CA via embedded OSGi commands
+    - API to manage CA. This allows one to implement proprietary CLI, e.g. Website, to manage CA.
+    - Database tool (export and import CA database) simplifies the switch of
+      databases, upgrade of XiPKi and switch from other CA system to XiPKI CA
+    - All configuration of CA except those of databases is saved in database
 
 - OCSP Responder
   - OCSP Responder (RFC 2560 and RFC 6960)
@@ -376,10 +325,6 @@ Features
   - High performance
   - Support of health check
 
-- SCEP
-  - Supported SCEP versions
-    - RFC 8894
-
 - CLI
   - Configurating CA
   - Client to enroll, revoke, unrevoke and remove certificates, to generate and download CRLs
@@ -392,7 +337,7 @@ Features
   - High performance
   - Support of health check
 
-- For CA, OCSP Responder, and CLI
+- For CA, OCSP Responder, Protocol Gateway and CLI
   - Support of PKCS#12 and JCEKS keystore
   - Support of PKCS#11 devices, e.g. HSM
   - API to use customized key types, e.g. smartcard

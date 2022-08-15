@@ -78,6 +78,9 @@ public class RestAPIConstants {
 
   public static final String CMD_unsuspend_cert = "unsuspend-cert";
 
+  @Deprecated
+  public static final String CMD_unrevoke_cert = "unrevoke-cert";
+
   public static final String CMD_enroll_cert = "enroll-cert";
 
   public static final String CMD_enroll_cert_cagenkeypair = "enroll-cert-cagenkeypair";

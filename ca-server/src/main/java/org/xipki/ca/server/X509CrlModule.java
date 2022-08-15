@@ -148,7 +148,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       nextUpdate = control.getOverlap().add(nextUpdate);
 
       try {
-        generateCrl(createDeltaCrlNow, now, nextUpdate, MSGID_ca_routine);
+        generateCrl(createDeltaCrlNow, now, nextUpdate);
       } catch (Throwable th) {
         LogUtil.error(LOG, th);
       }
@@ -212,18 +212,16 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     }
   }
 
-  public X509CRLHolder getCurrentCrl(String msgId) throws OperationException {
-    return getCrl(null, msgId);
+  public X509CRLHolder getCurrentCrl(AuditEvent event) throws OperationException {
+    return getCrl(null, event);
   }
 
-  public X509CRLHolder getCrl(BigInteger crlNumber, String msgId) throws OperationException {
+  public X509CRLHolder getCrl(BigInteger crlNumber, AuditEvent event) throws OperationException {
     LOG.info("     START getCrl: ca={}, crlNumber={}", caIdent.getName(), crlNumber);
     boolean successful = false;
 
-    AuditEvent event0 = newPerfAuditEvent(
-            crlNumber == null ? TYPE_download_crl : TYPE_downlaod_crl4number, msgId);
     if (crlNumber != null) {
-      event0.addEventData(NAME_crl_number, crlNumber);
+      event.addEventData(NAME_crl_number, crlNumber);
     }
 
     try {
@@ -247,20 +245,20 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       if (!successful) {
         LOG.info("    FAILED getCrl: ca={}", caIdent.getName());
       }
-      finish(event0, successful);
+      setEventStatus(event, successful);
     }
   } // method getCrl
 
-  public CertificateList getBcCurrentCrl(String msgId) throws OperationException {
-    return getBcCrl(null, msgId);
+  public CertificateList getBcCurrentCrl() throws OperationException {
+    return getBcCrl(null);
   }
 
-  public CertificateList getBcCrl(BigInteger crlNumber, String msgId) throws OperationException {
+  public CertificateList getBcCrl(BigInteger crlNumber) throws OperationException {
     LOG.info("     START getCrl: ca={}, crlNumber={}", caIdent.getName(), crlNumber);
     boolean successful = false;
 
     AuditEvent event0 = newPerfAuditEvent(
-            crlNumber == null ? TYPE_download_crl : TYPE_downlaod_crl4number, msgId);
+            crlNumber == null ? TYPE_download_crl : TYPE_downlaod_crl4number);
     if (crlNumber != null) {
       event0.addEventData(NAME_crl_number, crlNumber);
     }
@@ -290,13 +288,13 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     }
   } // method getCrl
 
-  private void cleanupCrlsWithoutException(String msgId) {
+  private void cleanupCrlsWithoutException() {
     try {
       int numCrls = caInfo.getNumCrls();
       LOG.info("     START cleanupCrls: ca={}, numCrls={}", caIdent.getName(), numCrls);
 
       boolean succ = false;
-      AuditEvent event0 = newPerfAuditEvent(TYPE_cleanup_crl, msgId);
+      AuditEvent event0 = newPerfAuditEvent(TYPE_cleanup_crl);
 
       try {
         int num = (numCrls <= 0) ? 0 : certstore.cleanupCrls(caIdent, caInfo.getNumCrls());
@@ -316,7 +314,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     }
   }
 
-  public X509CRLHolder generateCrlOnDemand(String msgId) throws OperationException {
+  public X509CRLHolder generateCrlOnDemand() throws OperationException {
     CrlControl control = caInfo.getCrlControl();
     if (control == null) {
       throw new OperationException(NOT_PERMITTED, "CA could not generate CRL");
@@ -343,18 +341,19 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       // add overlap
       nextUpdate = control.getOverlap().add(nextUpdate);
 
-      return generateCrl(false, thisUpdate, nextUpdate, msgId);
+      return generateCrl(false, thisUpdate, nextUpdate);
     } finally {
       crlGenInProcess.set(false);
     }
   } // method generateCrlOnDemand
 
-  private X509CRLHolder generateCrl(boolean deltaCrl, Date thisUpdate, Date nextUpdate,
-      String msgId) throws OperationException {
+  private X509CRLHolder generateCrl(
+      boolean deltaCrl, Date thisUpdate, Date nextUpdate)
+      throws OperationException {
     boolean successful = false;
-    AuditEvent event = newPerfAuditEvent(TYPE_gen_crl, msgId);
+    AuditEvent event = newPerfAuditEvent(TYPE_gen_crl);
     try {
-      X509CRLHolder crl = generateCrl0(deltaCrl, thisUpdate, nextUpdate, event, msgId);
+      X509CRLHolder crl = generateCrl0(deltaCrl, thisUpdate, nextUpdate, event);
       successful = true;
       return crl;
     } finally {
@@ -363,7 +362,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
   }
 
   private X509CRLHolder generateCrl0(boolean deltaCrl, Date thisUpdate, Date nextUpdate,
-      AuditEvent event, String msgId) throws OperationException {
+      AuditEvent event) throws OperationException {
     CrlControl control = caInfo.getCrlControl();
     if (control == null) {
       throw new OperationException(NOT_PERMITTED, "CRL generation is not allowed");
@@ -593,7 +592,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
 
       if (!deltaCrl) {
         // clean up the CRL
-        cleanupCrlsWithoutException(msgId);
+        cleanupCrlsWithoutException();
       }
       return crl;
     } finally {

@@ -37,7 +37,7 @@ import static org.xipki.util.StringUtil.concat;
  * Manages the keypair generation.
  *
  * @author Lijun Liao
- * @since  5.4.0
+ * @since  6.0.0
  */
 
 class KeypairGenManager {

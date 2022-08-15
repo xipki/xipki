@@ -15,7 +15,7 @@ import org.xipki.shell.XiAction;
 /**
  * Shell to fill the keypool with keypairs.
  *
- * @since 5.4.0
+ * @since 6.0.0
  * @author Lijun Liao
  */
 

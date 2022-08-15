@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  * An implementation of {@link KeypairGeneratorFactoryRegister}.
  *
  * @author Lijun Liao
- * @since 5.4.0
+ * @since 6.0.0
  */
 
 public class KeypairGeneratorFactoryRegisterImpl implements KeypairGeneratorFactoryRegister {

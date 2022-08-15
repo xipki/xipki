@@ -38,7 +38,7 @@ import static org.xipki.util.Args.notNull;
  * XiPKI Keypool database query executor.
  *
  * @author Lijun Liao
- * @since 5.4.0
+ * @since 6.0.0
  */
 
 class KeypoolQueryExecutor {

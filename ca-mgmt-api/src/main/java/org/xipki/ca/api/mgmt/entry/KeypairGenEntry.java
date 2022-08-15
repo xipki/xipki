@@ -24,7 +24,7 @@ import org.xipki.util.ConfPairs;
 /**
  * Keypair generation entry.
  * @author Lijun Liao
- * @since 5.4.0
+ * @since 6.0.0
  */
 
 public class KeypairGenEntry extends MgmtEntry {

@@ -51,7 +51,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * The Mac protected audit service.
  *
  * @author Lijun Liao
- * @since 5.4.0
+ * @since 6.0.0
  */
 
 public abstract class MacAuditService implements AuditService {

@@ -25,7 +25,7 @@ import java.security.KeyStore;
  * Keystore wrapper (containing the keystore object and its encoded form).
  *
  * @author Lijun Liao
- * @since 5.4.0
+ * @since 6.0.0
  */
 
 public class KeyStoreWrapper {

@@ -187,9 +187,6 @@ public class ScepResponder {
     event.setName(CaAuditConstants.NAME_perf);
     event.addEventData("name", caName + "/" + certprofileName);
 
-    String msgId = RandomUtil.nextHexLong();
-    event.addEventData(CaAuditConstants.NAME_mid, msgId);
-
     AuditLevel auditLevel = AuditLevel.INFO;
     AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
     String auditMessage = null;
@@ -227,7 +224,7 @@ public class ScepResponder {
 
         ContentInfo ci;
         try {
-          ci = servicePkiOperation(signer, caName, reqMessage, certprofileName, msgId, event);
+          ci = servicePkiOperation(signer, caName, reqMessage, certprofileName, event);
         } catch (MessageDecodingException ex) {
           final String msg = "could not decrypt and/or verify the request";
           LogUtil.error(LOG, ex, msg);
@@ -371,13 +368,13 @@ public class ScepResponder {
 
   private ContentInfo servicePkiOperation(
       ScepSigner signer, String caName, CMSSignedData requestContent,
-      String certprofileName, String msgId, AuditEvent event)
+      String certprofileName, AuditEvent event)
       throws MessageDecodingException, OperationException, SdkErrorResponseException {
     DecodedPkiMessage req = DecodedPkiMessage.decode(
         requestContent, signer.getDecryptor(), null);
 
     PkiMessage rep = servicePkiOperation0(caName, requestContent, req,
-                        certprofileName, msgId, event);
+                        certprofileName, event);
     audit(event, NAME_pki_status, rep.getPkiStatus().toString());
     if (rep.getPkiStatus() == PkiStatus.FAILURE) {
       event.setStatus(AuditStatus.FAILED);
@@ -390,7 +387,7 @@ public class ScepResponder {
 
   private PkiMessage servicePkiOperation0(
       String caName, CMSSignedData requestContent,
-      DecodedPkiMessage req, String certprofileName, String msgId, AuditEvent event)
+      DecodedPkiMessage req, String certprofileName, AuditEvent event)
       throws OperationException, SdkErrorResponseException {
     notNull(requestContent, "requestContent");
 
@@ -519,6 +516,10 @@ public class ScepResponder {
             LOG.info("tid={}, subject={}", tid, X509Util.x500NameText(reqSubject));
           }
 
+          event.addEventData(CaAuditConstants.NAME_certprofile, certprofileName);
+          event.addEventData(CaAuditConstants.NAME_req_subject,
+              "\"" + X509Util.x500NameText(reqSubject) + "\"");
+
           if (!SdkClient.verifyCsr(csr, securityFactory, popControl)) {
             LOG.warn("tid={} POP verification failed", tid);
             throw FailInfoException.BAD_MESSAGE_CHECK;
@@ -628,8 +629,10 @@ public class ScepResponder {
         }
         case CertPoll: {
           IssuerAndSubject is = IssuerAndSubject.getInstance(req.getMessageData());
-          audit(event, CaAuditConstants.NAME_issuer, X509Util.x500NameText(is.getIssuer()));
-          audit(event, CaAuditConstants.NAME_subject, X509Util.x500NameText(is.getSubject()));
+          audit(event, CaAuditConstants.NAME_issuer,
+              "\"" + X509Util.x500NameText(is.getIssuer()) + "\"");
+          audit(event, CaAuditConstants.NAME_subject,
+              "\"" + X509Util.x500NameText(is.getSubject()) + "\"");
           PollCertRequestEntry template = new PollCertRequestEntry();
           template.setSubject(new X500NameType(is.getSubject()));
 
@@ -652,14 +655,16 @@ public class ScepResponder {
         case GetCert:
           IssuerAndSerialNumber isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
           BigInteger serial = isn.getSerialNumber().getPositiveValue();
-          audit(event, CaAuditConstants.NAME_issuer, X509Util.x500NameText(isn.getName()));
+          audit(event, CaAuditConstants.NAME_issuer,
+              "\"" + X509Util.x500NameText(isn.getName()) + "\"");
           audit(event, CaAuditConstants.NAME_serial, LogUtil.formatCsn(serial));
           signedData = getCert(caName, isn.getName(), serial);
           break;
         case GetCRL:
           isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
           serial = isn.getSerialNumber().getPositiveValue();
-          audit(event, CaAuditConstants.NAME_issuer, X509Util.x500NameText(isn.getName()));
+          audit(event, CaAuditConstants.NAME_issuer,
+              "\"" + X509Util.x500NameText(isn.getName()) + "\"");
           audit(event, CaAuditConstants.NAME_serial, LogUtil.formatCsn(serial));
           signedData = getCrl(caName, isn.getName(), serial);
           break;

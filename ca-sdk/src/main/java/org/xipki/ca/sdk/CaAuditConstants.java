@@ -28,10 +28,6 @@ public class CaAuditConstants {
 
   public static final String APPNAME = "ca";
 
-  public static final String MSGID_ca_routine = "ca_routine";
-
-  public static final String MSGID_ca_mgmt = "ca_mgmt";
-
   public static final String NAME_ca = "ca";
 
   public static final String NAME_certprofile = "certprofile";
@@ -49,8 +45,6 @@ public class CaAuditConstants {
   public static final String NAME_issuer = "issuer";
 
   public static final String NAME_message = "message";
-
-  public static final String NAME_mid = "mid";
 
   public static final String NAME_next_update = "next_update";
 

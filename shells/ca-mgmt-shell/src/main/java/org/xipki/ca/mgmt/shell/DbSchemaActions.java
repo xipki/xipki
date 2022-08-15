@@ -28,7 +28,7 @@ import java.util.Map;
  * Actions to operate on databases directly.
  *
  * @author Lijun Liao
- * @since  5.4.0
+ * @since  6.0.0
  */
 public class DbSchemaActions {
 

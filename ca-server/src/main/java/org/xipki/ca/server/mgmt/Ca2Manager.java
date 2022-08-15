@@ -158,10 +158,6 @@ class Ca2Manager {
     return true;
   } // method startCa
 
-  Set<String> getCaNames() {
-    return manager.caInfos.keySet();
-  }
-
   Set<String> getSuccessfulCaNames() {
     Set<String> ret = new HashSet<>();
     for (String name : manager.x509cas.keySet()) {
@@ -322,11 +318,6 @@ class Ca2Manager {
     }
   } // method addCa
 
-  CaEntry getCa(String name) {
-    CaInfo caInfo = manager.caInfos.get(toNonBlankLower(name, "name"));
-    return (caInfo == null) ? null : caInfo.getCaEntry();
-  } // method getCa
-
   void changeCa(ChangeCaEntry entry) throws CaMgmtException {
     assertMasterMode();
 
@@ -476,7 +467,7 @@ class Ca2Manager {
     manager.queryExecutor.revokeCa(caName, revocationInfo);
 
     try {
-      ca.revokeCa(revocationInfo, MSGID_ca_mgmt);
+      ca.revokeCa(revocationInfo);
     } catch (OperationException ex) {
       throw new CaMgmtException(concat("could not revoke CA ", ex.getMessage()), ex);
     }
@@ -499,7 +490,7 @@ class Ca2Manager {
 
     X509Ca ca = manager.x509cas.get(caName);
     try {
-      ca.unrevokeCa(MSGID_ca_mgmt);
+      ca.unrevokeCa();
     } catch (OperationException ex) {
       throw new CaMgmtException(
           concat("could not unrevoke CA " + caName + ": ", ex.getMessage()), ex);
@@ -650,7 +641,7 @@ class Ca2Manager {
 
     CertificateInfo certInfo;
     try {
-      certInfo = ca.generateCert(certTemplateData, manager.byCaRequestor,null, MSGID_ca_mgmt);
+      certInfo = ca.generateCert(certTemplateData, manager.byCaRequestor,null, event);
     } catch (OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
@@ -676,8 +667,7 @@ class Ca2Manager {
 
     X509Ca ca = getX509Ca(caName);
     try {
-      if (ca.revokeCert(serialNumber, reason, invalidityTime,
-          MSGID_ca_mgmt) == null) {
+      if (ca.revokeCert(serialNumber, reason, invalidityTime) == null) {
         throw new CaMgmtException("could not revoke non-existing certificate");
       }
     } catch (OperationException ex) {
@@ -693,7 +683,7 @@ class Ca2Manager {
 
     X509Ca ca = getX509Ca(caName);
     try {
-      if (ca.unsuspendCert(serialNumber, MSGID_ca_mgmt) == null) {
+      if (ca.unsuspendCert(serialNumber) == null) {
         throw new CaMgmtException("could not unsuspend non-existing certificate");
       }
     } catch (OperationException ex) {
@@ -709,7 +699,7 @@ class Ca2Manager {
     X509Ca ca = getX509Ca(caName);
 
     try {
-      if (ca.removeCert(serialNumber, MSGID_ca_mgmt) == null) {
+      if (ca.removeCert(serialNumber) == null) {
         throw new CaMgmtException("could not remove certificate");
       }
     } catch (OperationException ex) {
@@ -724,7 +714,7 @@ class Ca2Manager {
 
     X509Ca ca = getX509Ca(caName);
     try {
-      return ca.generateCrlOnDemand(MSGID_ca_mgmt);
+      return ca.generateCrlOnDemand();
     } catch (OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
@@ -735,7 +725,7 @@ class Ca2Manager {
     notNull(crlNumber, "crlNumber");
     X509Ca ca = getX509Ca(caName);
     try {
-      X509CRLHolder crl = ca.getCrl(crlNumber, MSGID_ca_mgmt);
+      X509CRLHolder crl = ca.getCrl(crlNumber);
       if (crl == null) {
         LOG.warn("found no CRL for CA {} and crlNumber {}", caName, crlNumber);
       }
@@ -749,7 +739,7 @@ class Ca2Manager {
     caName = toNonBlankLower(caName, "caName");
     X509Ca ca = getX509Ca(caName);
     try {
-      X509CRLHolder crl = ca.getCurrentCrl(MSGID_ca_mgmt);
+      X509CRLHolder crl = ca.getCurrentCrl();
       if (crl == null) {
         LOG.warn("found no CRL for CA {}", caName);
       }

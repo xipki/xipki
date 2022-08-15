@@ -120,7 +120,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
   } // constructor
 
   public CertWithRevocationInfo revokeCert(BigInteger serialNumber, CrlReason reason,
-      Date invalidityTime, String msgId) throws OperationException {
+      Date invalidityTime, AuditEvent event) throws OperationException {
     if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
       throw new OperationException(NOT_PERMITTED,
           "insufficient permission to revoke CA certificate");
@@ -148,7 +148,6 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
         throw new IllegalStateException("unknown CRL reason " + reason);
     } // switch (reason)
 
-    AuditEvent event = newPerfAuditEvent(TYPE_revoke_cert, msgId);
     boolean successful = true;
     try {
       CertWithRevocationInfo ret = revokeCertificate0(serialNumber, reason,
@@ -156,25 +155,24 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
       successful = (ret != null);
       return ret;
     } finally {
-      finish(event, successful);
+      setEventStatus(event, successful);
     }
   } // method revokeCertificate
 
-  public CertWithDbId unsuspendCert(BigInteger serialNumber, String msgId)
+  public CertWithDbId unsuspendCert(BigInteger serialNumber, AuditEvent event)
       throws OperationException {
     if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
       throw new OperationException(NOT_PERMITTED,
           "insufficient permission to unsuspend CA certificate");
     }
 
-    AuditEvent event = newPerfAuditEvent(TYPE_unsuspend_cert, msgId);
     boolean successful = false;
     try {
       CertWithDbId ret = unsuspendCert0(serialNumber, false, event);
       successful = true;
       return ret;
     } finally {
-      finish(event, successful);
+      setEventStatus(event, successful);
     }
   } // method unsuspendCert
 
@@ -210,11 +208,11 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     return revokedCert;
   } // method revokeCertificate0
 
-  private CertWithRevocationInfo revokeSuspendedCert(SerialWithId serialNumber, CrlReason reason)
+  private CertWithRevocationInfo revokeSuspendedCert(
+      SerialWithId serialNumber, CrlReason reason)
           throws OperationException {
-    AuditEvent event = newPerfAuditEvent(TYPE_revoke_suspendedCert, MSGID_ca_routine);
-
     boolean successful = false;
+    AuditEvent event = newAuditEvent(TYPE_revoke_suspendedCert);
     try {
       CertWithRevocationInfo ret = revokeSuspendedCert0(serialNumber, reason, event);
       successful = (ret != null);
@@ -273,12 +271,13 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     return unrevokedCert;
   } // doUnrevokeCertificate
 
-  public void revokeCa(CertRevocationInfo revocationInfo, String msgId) throws OperationException {
+  public void revokeCa(CertRevocationInfo revocationInfo)
+      throws OperationException {
     notNull(revocationInfo, "revocationInfo");
     caInfo.setRevocationInfo(revocationInfo);
 
     if (caInfo.isSelfSigned()) {
-      AuditEvent event = newPerfAuditEvent(TYPE_revoke_cert, msgId);
+      AuditEvent event = newPerfAuditEvent(TYPE_revoke_cert);
       boolean successful = true;
       try {
         CertWithRevocationInfo ret = revokeCertificate0(caInfo.getSerialNumber(),
@@ -296,10 +295,10 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     }
   } // method revokeCa
 
-  public void unrevokeCa(String msgId) throws OperationException {
+  public void unrevokeCa() throws OperationException {
     caInfo.setRevocationInfo(null);
     if (caInfo.isSelfSigned()) {
-      AuditEvent event = newPerfAuditEvent(TYPE_unsuspend_cert, msgId);
+      AuditEvent event = newPerfAuditEvent(TYPE_unsuspend_cert);
       boolean successful = false;
       try {
         unsuspendCert0(caInfo.getSerialNumber(), true, event);
@@ -319,7 +318,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
 
   private int revokeSuspendedCerts() throws OperationException {
     LOG.debug("revoking suspended certificates");
-    AuditEvent event = newPerfAuditEvent(TYPE_revoke_suspendedCert, MSGID_ca_routine);
+    AuditEvent event = newPerfAuditEvent(TYPE_revoke_suspendedCert);
     boolean successful = false;
     try {
       int num = revokeSuspendedCerts0();

@@ -40,7 +40,7 @@ import static org.xipki.util.Args.notNull;
  * PKCS#11 {@link P11KeypairGenerator}.
  *
  * @author Lijun Liao
- * @since 5.4.0
+ * @since 6.0.0
  *
  */
 public class P11KeypairGenerator extends KeypairGenerator {

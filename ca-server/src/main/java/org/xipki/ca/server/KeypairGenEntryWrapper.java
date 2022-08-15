@@ -33,7 +33,7 @@ import static org.xipki.util.Args.notNull;
  * Wrapper of keypair generation database entry.
  *
  * @author Lijun Liao
- * @since 5.4.0
+ * @since 6.0.0
  */
 public class KeypairGenEntryWrapper {
 

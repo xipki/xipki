@@ -67,13 +67,11 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
       final Date expiredAt = new Date(System.currentTimeMillis() - MS_PER_DAY * (keepDays + 1));
 
       try {
-        String msgId = CaAuditConstants.MSGID_ca_routine;
-
         LOG.debug("revoking expired certificates");
-        AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_remove_expired_certs, msgId);
+        AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_remove_expired_certs);
         boolean successful = false;
         try {
-          int num = removeExpiredCerts0(expiredAt, event, msgId);
+          int num = removeExpiredCerts0(expiredAt, event);
           LOG.info("removed {} certificates expired at {} of CA {}", num, expiredAt, caIdent);
           successful = true;
         } finally {
@@ -119,22 +117,22 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
         minutesOfDay + random.nextInt(60), minutesOfDay, TimeUnit.MINUTES);
   } // constructor
 
-  public CertWithDbId removeCert(SerialWithId serialNumber, String msgId)
+  public CertWithDbId removeCert(SerialWithId serialNumber, AuditEvent event)
       throws OperationException {
-    return removeCert0(serialNumber.getId(), serialNumber.getSerial(), msgId);
+    return removeCert0(serialNumber.getId(), serialNumber.getSerial(), event);
   }
 
-  public CertWithDbId removeCert(BigInteger serialNumber, String msgId) throws OperationException {
-    return removeCert0(0, serialNumber, msgId);
+  public CertWithDbId removeCert(BigInteger serialNumber, AuditEvent event)
+      throws OperationException {
+    return removeCert0(0, serialNumber, event);
   }
 
-  private CertWithDbId removeCert0(long certId, BigInteger serialNumber, String msgId)
+  private CertWithDbId removeCert0(long certId, BigInteger serialNumber, AuditEvent event)
       throws OperationException {
     if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
       throw new OperationException(NOT_PERMITTED, "could not remove CA certificate");
     }
 
-    AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_remove_cert, msgId);
     boolean successful = true;
     try {
       event.addEventData(CaAuditConstants.NAME_serial, LogUtil.formatCsn(serialNumber));
@@ -156,11 +154,11 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
       successful = (certToRemove != null);
       return certToRemove;
     } finally {
-      finish(event, successful);
+      setEventStatus(event, successful);
     }
   } // method removeCertificate
 
-  private int removeExpiredCerts0(Date expiredAtTime, AuditEvent event, String msgId)
+  private int removeExpiredCerts0(Date expiredAtTime, AuditEvent event)
       throws OperationException {
     notNull(expiredAtTime, "expiredtime");
     if (!masterMode) {
@@ -188,7 +186,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
         }
 
         try {
-          if (removeCert(serial, msgId) != null) {
+          if (removeCert(serial, event) != null) {
             sum++;
           }
         } catch (OperationException ex) {

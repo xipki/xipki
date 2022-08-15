@@ -35,6 +35,7 @@ import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.cmp.CmpUtf8Pairs;
 import org.xipki.security.cmp.CmpUtil;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.DateUtil;
 import org.xipki.util.*;
 import org.xipki.util.exception.InsufficientPermissionException;
@@ -246,7 +247,7 @@ public class CmpResponder extends BaseCmpResponder {
       return new CertRepMessage(null, certResps);
     }
 
-    return enrollCerts(caName, groupEnroll, kup, requestor, tid, certTemplateDatas);
+    return enrollCerts(caName, groupEnroll, kup, requestor, tid, certTemplateDatas, event);
   } // method processCertReqMessages
 
   /**
@@ -321,7 +322,7 @@ public class CmpResponder extends BaseCmpResponder {
 
           try {
             certResp = enrollCerts(caName, false, false, requestor, tid,
-                Collections.singletonList(certTemplate));
+                Collections.singletonList(certTemplate), event);
           } catch (IOException e) {
             LogUtil.error(LOG, e);
             return buildErrorMsgPkiBody(rejection, systemFailure, null);
@@ -348,7 +349,7 @@ public class CmpResponder extends BaseCmpResponder {
 
   private CertRepMessage enrollCerts(
       String caName, boolean groupEnroll, boolean kup, Requestor requestor,
-      ASN1OctetString tid, List<EnrollCertRequestEntry> templates)
+      ASN1OctetString tid, List<EnrollCertRequestEntry> templates, AuditEvent event)
       throws IOException, SdkErrorResponseException {
     EnrollCertsRequest sdkReq = new EnrollCertsRequest();
     sdkReq.setExplicitConfirm(cmpControl.isConfirmCert());
@@ -357,6 +358,19 @@ public class CmpResponder extends BaseCmpResponder {
     sdkReq.setCaCertMode(cmpControl.getCaCertsMode());
     sdkReq.setTransactionId(Hex.encode(tid.getOctets()));
     sdkReq.setEntries(templates);
+
+    for (EnrollCertRequestEntry m : templates) {
+      event.addEventData(CaAuditConstants.NAME_certprofile, m.getCertprofile());
+      X500Name subject;
+      if (m.getSubject() != null) {
+        subject = m.getSubject().toX500Name();
+      } else {
+        CertificationRequest csr = CertificationRequest.getInstance(m.getP10req());
+        subject = csr.getCertificationRequestInfo().getSubject();
+      }
+      event.addEventData(CaAuditConstants.NAME_req_subject,
+          "\"" + X509Util.x500NameText(subject) + "\"");
+    }
 
     EnrollOrPollCertsResponse resp = kup
         ? sdk.enrollKupCerts(caName, sdkReq)
@@ -481,6 +495,7 @@ public class CmpResponder extends BaseCmpResponder {
         if (reason == null) {
           reason = CrlReason.UNSPECIFIED;
         }
+        event.addEventData(CaAuditConstants.NAME_reason, reason);
 
         RevokeCertRequestEntry entry = new RevokeCertRequestEntry();
         entry.setSerialNumber(serialNumber);
@@ -492,6 +507,7 @@ public class CmpResponder extends BaseCmpResponder {
       } else {
         unrevokeEntries.add(serialNumber);
       }
+      event.addEventData(CaAuditConstants.NAME_serial, LogUtil.formatCsn(serialNumber));
     }
 
     List<SingleCertSerialEntry> respEntries;
@@ -533,7 +549,7 @@ public class CmpResponder extends BaseCmpResponder {
 
   @Override
   protected PKIBody confirmCertificates(
-      String caName, ASN1OctetString transactionId, CertConfirmContent certConf, String msgId)
+      String caName, ASN1OctetString transactionId, CertConfirmContent certConf)
       throws SdkErrorResponseException {
     CertStatus[] certStatuses = certConf.toCertStatusArray();
 
@@ -589,7 +605,7 @@ public class CmpResponder extends BaseCmpResponder {
   protected PKIBody cmpEnrollCert(
       String caName, String dfltCertprofileName, boolean groupEnroll,
       PKIMessage request, PKIHeaderBuilder respHeader, PKIHeader reqHeader, PKIBody reqBody,
-      Requestor requestor, ASN1OctetString tid, String msgId, AuditEvent event)
+      Requestor requestor, ASN1OctetString tid, AuditEvent event)
       throws InsufficientPermissionException, SdkErrorResponseException {
     if (dfltCertprofileName != null) {
       dfltCertprofileName = dfltCertprofileName.toLowerCase(Locale.ROOT);
@@ -660,7 +676,7 @@ public class CmpResponder extends BaseCmpResponder {
   @Override
   protected PKIBody cmpUnRevokeCertificates(
       String caName, PKIMessage request, PKIHeaderBuilder respHeader, PKIHeader reqHeader,
-      PKIBody reqBody, Requestor requestor, String msgId, AuditEvent event)
+      PKIBody reqBody, Requestor requestor, AuditEvent event)
       throws SdkErrorResponseException {
     Integer requiredPermission = null;
     boolean allRevdetailsOfSameType = true;
@@ -692,7 +708,7 @@ public class CmpResponder extends BaseCmpResponder {
         privilegeWithdrawn      (9),
         aACompromise           (10)
        */
-      if (reasonCode < 0 || reasonCode > 10) {
+      if (reasonCode < 0 || reasonCode > 10 || reasonCode == 7) {
         return buildErrorMsgPkiBody(rejection, badRequest, "invalid CRLReason " + reasonCode);
       }
 

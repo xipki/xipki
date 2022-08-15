@@ -31,7 +31,7 @@ import java.util.Set;
  * {@link KeypairGeneratorFactory} for the type software.
  *
  * @author Lijun Liao
- * @since 5.4.0
+ * @since 6.0.0
  */
 
 public class DfltKeypairGeneratorFactory implements KeypairGeneratorFactory {

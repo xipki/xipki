@@ -29,7 +29,8 @@
 		}
 	},
 	"audit":{
-		"type":"embed"
+		"type":"embed",
+		"conf": "file=logs/scep-audit.log"
 	},
 	"signers":{
 		"signers":[{

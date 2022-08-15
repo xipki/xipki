@@ -32,7 +32,7 @@ import java.util.*;
  * Concurrent keypair generator.
  *
  * @author Lijun Liao
- * @since 5.4.0
+ * @since 6.0.0
  */
 
 public abstract class KeypairGenerator implements Closeable {

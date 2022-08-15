@@ -33,7 +33,7 @@ import java.util.Set;
 /**
  * Keypool based keypair generator.
  *
- * @since 5.4.0
+ * @since 6.0.0
  * @author Lijun Liao
  */
 

@@ -40,7 +40,7 @@ import java.util.Set;
  * Actions to manage Keypair generation entries.
  *
  * @author Lijun Liao
- * @since 5.4.0
+ * @since 6.0.0
  */
 public class KeypairGenActions {
 
