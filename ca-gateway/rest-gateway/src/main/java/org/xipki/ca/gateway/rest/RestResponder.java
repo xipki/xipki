@@ -328,7 +328,7 @@ public class RestResponder {
             }
 
             CertificationRequest csr = CertificationRequest.getInstance(request);
-            if (!securityFactory.verifyPop(csr, popControl.getPopAlgoValidator())) {
+            if (!SdkClient.verifyCsr(csr, securityFactory, popControl)) {
               throw new OperationException(BAD_POP);
             }
 

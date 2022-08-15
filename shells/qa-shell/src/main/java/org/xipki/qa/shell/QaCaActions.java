@@ -650,12 +650,8 @@ public class QaCaActions {
         throw new CmdFailure("certificate profile named '" + name + "' is not configured");
       }
 
-      if (cp.getType() != null) {
-        assertTypeEquals("type", type, cp.getType());
-      }
-
+      assertTypeEquals("type", type == null ? "xijson" : type, cp.getType());
       assertEquals("conf", conf, cp.getConf());
-
       println(" checked profile " + name);
       return null;
     }

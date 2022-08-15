@@ -17,8 +17,13 @@
 
 package org.xipki.ca.gateway;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
+import org.bouncycastle.asn1.crmf.DhSigStatic;
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.sdk.*;
+import org.xipki.security.*;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.XiHttpClient;
@@ -32,6 +37,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.xipki.ca.sdk.SdkConstants.*;
+import static org.xipki.util.Args.notNull;
 
 /**
  * API client.
@@ -275,5 +281,33 @@ public class SdkClient {
     PayloadResponse resp = PayloadResponse.decode(respBytes);
     return resp.getPayload();
   }
+
+  public static boolean verifyCsr(CertificationRequest csr, SecurityFactory securityFactory,
+                                  PopControl popControl) {
+    notNull(csr, "csr");
+    notNull(popControl, "popControl");
+
+    ASN1ObjectIdentifier algOid = csr.getSignatureAlgorithm().getAlgorithm();
+
+    DHSigStaticKeyCertPair kaKeyAndCert = null;
+    if (ObjectIdentifiers.Xipki.id_alg_dhPop_x25519.equals(algOid)
+        || ObjectIdentifiers.Xipki.id_alg_dhPop_x448.equals(algOid)) {
+      DhSigStatic dhSigStatic = DhSigStatic.getInstance(csr.getSignature().getBytes());
+      IssuerAndSerialNumber isn = dhSigStatic.getIssuerAndSerial();
+
+      ASN1ObjectIdentifier keyOid = csr.getCertificationRequestInfo().getSubjectPublicKeyInfo()
+          .getAlgorithm().getAlgorithm();
+      kaKeyAndCert = popControl.getDhKeyCertPair(isn.getName(), isn.getSerialNumber().getValue(),
+          EdECConstants.getName(keyOid));
+
+      if (kaKeyAndCert == null) {
+        return false;
+      }
+    }
+
+    AlgorithmValidator popValidator = popControl.getPopAlgoValidator();
+
+    return securityFactory.verifyPop(csr, popValidator, kaKeyAndCert);
+  } // method verifyCsr
 
 }

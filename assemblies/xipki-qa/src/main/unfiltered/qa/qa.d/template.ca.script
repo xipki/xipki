@@ -400,5 +400,3 @@ ca:careq-add \
   --permission all \
   --profile all \
   --ca subcawithcrl1
-
-source file:./qa/qa.d/scep-server.script

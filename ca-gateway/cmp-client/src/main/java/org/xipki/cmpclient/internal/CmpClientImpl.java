@@ -36,6 +36,7 @@ import org.xipki.util.http.SslContextConf;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -144,12 +145,7 @@ public final class CmpClientImpl implements CmpClient {
     }
 
     if (responderConf.getDhPopCerts() != null) {
-      List<X509Cert> certs = new LinkedList<>();
-      for (FileOrBinary m : responderConf.getDhPopCerts()) {
-        X509Cert cert = X509Util.parseCert(m.readContent());
-        certs.add(cert);
-      }
-      this.dhpopCerts = certs;
+      this.dhpopCerts = X509Util.parseCerts(responderConf.getDhPopCerts().readContent());
     }
 
     this.agent = new CmpAgent(signatureResponder, pbmMacResponder, serverUrl, securityFactory,

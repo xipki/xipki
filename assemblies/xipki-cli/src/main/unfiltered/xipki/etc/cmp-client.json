@@ -1,5 +1,5 @@
 {
-	"sendRequestorCert": true,
+	"sendRequestorCert":true,
 	"responder":{
 		"url":"http://localhost:8082/cmp/",
 		"pbmMac": {

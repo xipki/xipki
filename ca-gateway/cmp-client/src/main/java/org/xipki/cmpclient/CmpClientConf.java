@@ -41,7 +41,7 @@ public class CmpClientConf extends ValidatableConf {
 
     private Responder.Signature signature;
 
-    private List<FileOrBinary> dhPopCerts;
+    private FileOrBinary dhPopCerts;
 
     public String getUrl() {
       return url;
@@ -67,11 +67,11 @@ public class CmpClientConf extends ValidatableConf {
       this.signature = value;
     }
 
-    public List<FileOrBinary> getDhPopCerts() {
+    public FileOrBinary getDhPopCerts() {
       return dhPopCerts;
     }
 
-    public void setDhPopCerts(List<FileOrBinary> dhPopCerts) {
+    public void setDhPopCerts(FileOrBinary dhPopCerts) {
       this.dhPopCerts = dhPopCerts;
     }
 

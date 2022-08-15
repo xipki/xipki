@@ -1,8 +1,8 @@
 {
-	"sendRequestorCert": true,
+	"sendRequestorCert":true,
 	"responder":{
 		"url":"http://localhost:8082/cmp/",
-		"pbmMac": {
+		"pbmMac":{
 			"macAlgos":["HMAC-SHA256"],
 			"owfAlgos":["SHA256"]
 		},
@@ -11,6 +11,9 @@
 			"cert":{
 				"file":"xipki/keycerts/tlskeys/server/tls-server-cert.der"
 			}
+		},
+		"dhPopCerts":{
+			"file":"qa/keys/dhpop-certs.pem"
 		}
 	},
 	"ssl":{

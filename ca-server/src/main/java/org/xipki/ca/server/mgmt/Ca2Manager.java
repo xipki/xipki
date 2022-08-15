@@ -286,8 +286,7 @@ class Ca2Manager {
 
     SecurityFactory securityFactory = manager.securityFactory;
     String origSignerConf = caEntry.getSignerConf();
-    String newSignerConf = canonicalizeSignerConf(caEntry.getSignerType(),
-        origSignerConf, null, securityFactory);
+    String newSignerConf = canonicalizeSignerConf(origSignerConf);
     if (!origSignerConf.equals(newSignerConf)) {
       caEntry.setSignerConf(newSignerConf);
     }
@@ -595,8 +594,7 @@ class Ca2Manager {
 
     if ("PKCS12".equalsIgnoreCase(signerType) || "JCEKS".equalsIgnoreCase(signerType)) {
       try {
-        signerConf = canonicalizeSignerConf(signerType, signerConf,
-            new X509Cert[]{caCert}, manager.securityFactory);
+        signerConf = canonicalizeSignerConf(signerConf);
       } catch (Exception ex) {
         throw new CaMgmtException(concat(ex.getClass().getName(), ": ", ex.getMessage()), ex);
       }

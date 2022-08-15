@@ -584,8 +584,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         if (signerConf == null) {
           signerConf = rs.getString("SIGNER_CONF");
         } else {
-          signerConf = CaUtil.canonicalizeSignerConf(
-              signerType, signerConf, null, securityFactory);
+          signerConf = CaUtil.canonicalizeSignerConf(signerConf);
         }
 
         try {
@@ -862,7 +861,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     SignerEntry dbEntry = createSigner(name);
     String tmpType = (type == null ? dbEntry.getType() : type);
     if (conf != null) {
-      conf = CaUtil.canonicalizeSignerConf(tmpType, conf, null, securityFactory);
+      conf = CaUtil.canonicalizeSignerConf(conf);
     }
 
     SignerEntry newDbEntry = new SignerEntry(name, tmpType,

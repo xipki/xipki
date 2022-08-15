@@ -18,6 +18,8 @@
 package org.xipki.security.util;
 
 import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
+import org.bouncycastle.asn1.crmf.DhSigStatic;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
@@ -26,6 +28,7 @@ import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.Extension;
@@ -126,6 +129,28 @@ public class X509Util {
     try (InputStream in = Files.newInputStream(expandFilepath(file).toPath())) {
       return parseCert(in);
     }
+  }
+
+  public static List<X509Cert> parseCerts(byte[] certsBytes)
+      throws IOException, CertificateException {
+    return parseCerts(new ByteArrayInputStream(certsBytes));
+  }
+
+  public static List<X509Cert> parseCerts(InputStream certsStream)
+      throws IOException, CertificateException {
+    List<X509Cert> certs = new LinkedList<>();
+    try (PemReader pemReader = new PemReader(
+        new InputStreamReader(certsStream, StandardCharsets.UTF_8))) {
+      PemObject pemObj;
+      while ((pemObj = pemReader.readPemObject()) != null) {
+        if (!"CERTIFICATE".equals(pemObj.getType())) {
+          continue;
+        }
+
+        certs.add(parseCert(pemObj.getContent()));
+      }
+    }
+    return certs;
   }
 
   public static X509Cert parseCert(InputStream certStream)

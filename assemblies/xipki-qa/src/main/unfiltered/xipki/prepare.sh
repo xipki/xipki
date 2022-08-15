@@ -70,4 +70,5 @@ rm -rf ${TOMCAT_DIR}/webapps/* ${TOMCAT_DIR}/logs/* ${TOMCAT_DIR}/xipki -rf ${TO
 
 cp -r xipki-gateway/* ${TOMCAT_DIR}/
 cp -r ${DIR}/tomcat/gateway/* ${TOMCAT_DIR}/
-cp ${DIR}/etc/scep-gateway.json ${XIPKI_DIR}/etc
+cp ${DIR}/etc/*-gateway.json ${XIPKI_DIR}/etc
+cp ${DIR}/../qa/keys/dhpop.p12 ${XIPKI_DIR}/keycerts

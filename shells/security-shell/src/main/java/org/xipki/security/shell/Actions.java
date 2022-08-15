@@ -410,19 +410,7 @@ public class Actions {
     protected List<X509Cert> getPeerCertificates()
             throws CertificateException, IOException {
       if (StringUtil.isNotBlank(peerCertsFile)) {
-        try (PemReader pemReader = new PemReader(
-            new InputStreamReader(new FileInputStream(peerCertsFile), StandardCharsets.UTF_8))) {
-          List<X509Cert> certs = new LinkedList<>();
-          PemObject pemObj;
-          while ((pemObj = pemReader.readPemObject()) != null) {
-            if (!"CERTIFICATE".equals(pemObj.getType())) {
-              continue;
-            }
-
-            certs.add(X509Util.parseCert(pemObj.getContent()));
-          }
-          return certs.isEmpty() ? null : certs;
-        }
+        return X509Util.parseCerts(new FileInputStream(peerCertsFile));
       } else if (StringUtil.isNotBlank(peerCertFile)) {
         X509Cert cert = X509Util.parseCert(Paths.get(peerCertFile).toFile());
         return Collections.singletonList(cert);

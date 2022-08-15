@@ -1,28 +1,28 @@
 {
-	"cmp": {
-		"confirmCert": false,
-		"sendCaCert": false,
-		"sendCertChain": false,
-		"messageTimeRequired": true,
-		"sendResponderCert": true,
-		"messageTimeBias": 300,
-		"confirmWaitTime": 300,
-		"requestSigAlgos": [
+	"cmp":{
+		"confirmCert":false,
+		"sendCaCert":false,
+		"sendCertChain":false,
+		"messageTimeRequired":true,
+		"sendResponderCert":true,
+		"messageTimeBias":300,
+		"confirmWaitTime":300,
+		"requestSigAlgos":[
 			"SHA256withRSA",
 			"SHA256withECDSA"
 		],
-		"requestPbmMacs": [
+		"requestPbmMacs":[
 			"HMAC-SHA256"
 		],
-		"requestPbmOwfs": [
+		"requestPbmOwfs":[
 			"SHA256"
 		],
-		"responsePbmMac": "HMAC-SHA256",
-		"responsePbmOwf": "SHA256",
-		"responsePbmIterationCount": 10240
+		"responsePbmMac":"HMAC-SHA256",
+		"responsePbmOwf":"SHA256",
+		"responsePbmIterationCount":10240
 	},
 	// If set to true, please set writer.level to debug in the file META-INF/classes/tinylog.properties.
-	"logReqResp": false,
+	"logReqResp":false,
 	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
 	"pop":{
 		"sigAlgos":[
@@ -30,7 +30,7 @@
 			"SM3withSM2", "ED25519", "ED448", "DHPOP-X25519", "DHPOP-X448"
 		]
 	},
-	"sdkClient": {
+	"sdkClient":{
 		"serverUrl":"https://localhost:8444/ca/ra/",
 		"ssl":{
 			"storeType":"pkcs12",
@@ -38,18 +38,18 @@
 			"keystore":{
 				"file":"keycerts/tlskeys/client/tls-client.p12"
 			},
-			"trustanchors": [{
-				"file": "keycerts/tlskeys/ca/tls-ca-cert.pem"
+			"trustanchors":[{
+				"file":"keycerts/tlskeys/ca/tls-ca-cert.pem"
 			}]
 		}
 	},
-	"audit": {
-		"type": "embed"
+	"audit":{
+		"type":"embed"
 	},
-	"signers": {
-		"default": {
-			"type": "pkcs12",
-			"conf": "password=1234,keystore=file:keycerts/tlskeys/server/tls-server.p12,algo=SHA256withECDSA"
+	"signers":{
+		"default":{
+			"type":"pkcs12",
+			"conf":"password=1234,keystore=file:keycerts/tlskeys/server/tls-server.p12,algo=SHA256withECDSA"
 		}
 	},
 	"security":{
@@ -62,7 +62,6 @@
 		"password":{
 			"masterPasswordCallback":"FILE file=security/masterpassword.secret"
 		},
-		"signerFactories": []
+		"signerFactories":[]
 	}
 }
-

@@ -74,10 +74,6 @@ if { $printUsage equals "true" } then {
   xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
     xipki/etc/ocsp/ocsp-responder.json
 
-  ## CA client configuration
-  xi:copy-file -f qa/eddsa/cmpclient.json \
-    xipki/cmpclient/cmpclient.json
-
   xi:copy-file -f qa/eddsa/template.ca-load.script \
     qa/eddsa/ca-load.script
 

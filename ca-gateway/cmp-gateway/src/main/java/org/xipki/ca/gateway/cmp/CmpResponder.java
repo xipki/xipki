@@ -31,6 +31,7 @@ import org.xipki.audit.AuditStatus;
 import org.xipki.ca.gateway.*;
 import org.xipki.ca.sdk.*;
 import org.xipki.security.CrlReason;
+import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.cmp.CmpUtf8Pairs;
 import org.xipki.security.cmp.CmpUtil;
@@ -262,7 +263,7 @@ public class CmpResponder extends BaseCmpResponder {
     CertRepMessage certResp;
     ASN1Integer certReqId = new ASN1Integer(-1);
 
-    if (!securityFactory.verifyPop(p10cr, popControl.getPopAlgoValidator())) {
+    if (!SdkClient.verifyCsr(p10cr, securityFactory, popControl)) {
       LOG.warn("could not validate POP for the pkcs#10 requst");
       certResp = buildErrCertResp(certReqId, badPOP, "invalid POP");
     } else {

@@ -145,9 +145,6 @@ if { $printUsage equals "true" } then {
   xi:copy-file -f qa/qa.d/template.ca.script \
     qa/qa.d/ca.script
 
-  xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
-    qa/qa.d/ca.script
-
   dsaPlain = ""
 
   gm = ""
@@ -180,8 +177,6 @@ if { $printUsage equals "true" } then {
 
   xi:replace --old "REPLACEME-GM" --new "${gm}" \
     qa/qa.d/ca.script
-
-  CMP_CONTROL = "send.ca=true,send.certchain=false,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=${$CMP_SIGALGO}"
 
   if { "$1" equals "-l" } then {
     source file:./qa/qa.d/ca-load.script
@@ -226,32 +221,29 @@ if { $printUsage equals "true" } then {
   echo "#################################################################"
   echo "#                            Signer                             #"
   echo "#################################################################"
-  caqa:signer-check --name responder1 --type pkcs12 \
-    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA256WITHRSA
-
   ca:signer-add --name qa-responder1 --type pkcs12 \
-    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA1withRSA
+    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA1withECDSA
 
   # name already exists
   caqa:neg-signer-add --name qa-responder1 --type pkcs12 \
-    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA1withRSA
+    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA1withECDSA
 
   # password incorrect
   caqa:neg-signer-add --name qa-responder2 --type pkcs12 \
-    --conf password=123456,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA1withRSA
+    --conf password=123456,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA1withECDSA
 
   # invalid algo
   caqa:neg-signer-add --name qa-responder2 --type pkcs12 \
     --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=INVALIDALGO
 
   caqa:signer-check --name qa-responder1 --type pkcs12 \
-    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA1WITHRSA
+    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA1withECDSA
 
   ca:signer-up --name qa-responder1 \
-    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA256withRSA
+    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA256withECDSA
 
   caqa:signer-check --name qa-responder1 --type pkcs12 \
-    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA256WITHRSA
+    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA256withECDSA
 
   ca:signer-rm -f qa-responder1
 
@@ -261,7 +253,7 @@ if { $printUsage equals "true" } then {
   echo "#################################################################"
   echo "#                    Add certificate profile                    #"
   echo "#################################################################"
-  caqa:profile-check --name subca \
+  caqa:profile-check --name subca --type xijson \
     --conf-file qa/certprofile/certprofile-subca.json
 
   ca:profile-add --name qa-subca \
@@ -284,7 +276,7 @@ if { $printUsage equals "true" } then {
   # invalid conf
   caqa:neg-profile-up --name qa-subca --conf invalid-profile-conf
 
-  caqa:profile-check --name qa-subca \
+  caqa:profile-check --name qa-subca --type xijson \
     --conf-file qa/certprofile/certprofile-subca-complex.json
 
   ca:profile-rm -f qa-subca
@@ -303,8 +295,6 @@ if { $printUsage equals "true" } then {
     --signer-type $TOKEN_TYPE \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://myorg.org/subca1.der \
-    --cmp-control $CMP_CONTROL \
-    --cmp-responder responder1 \
     --certchain output/rootca1.crt
 
   caqa:ca-check --name rootca1 \
@@ -315,8 +305,6 @@ if { $printUsage equals "true" } then {
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://myorg.org/rootca1.der \
-    --cmp-control $CMP_CONTROL \
-    --cmp-responder responder1 \
     --validity-mode cutoff \
     --certchain NULL
 
@@ -333,9 +321,6 @@ if { $printUsage equals "true" } then {
     --cert output/subca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://myorg.org/subca1.der \
-    --cmp-control $CMP_CONTROL \
-    --cmp-responder responder1 \
-    --support-cmp yes --support-rest yes \
     --save-req no \
     --revoke-suspended-control enabled=true,targetReason=cessationOfOperation,unchangedSince=15d \
     --certchain output/rootca1.crt \
@@ -358,8 +343,6 @@ if { $printUsage equals "true" } then {
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
     --ca-cert-uri http://myorg.org/rootca1-2.der \
-    --cmp-control $CMP_CONTROL \
-    --cmp-responder responder1 \
     --validity-mode strict
 
   # for commands neg-gen-rootca
@@ -389,8 +372,6 @@ if { $printUsage equals "true" } then {
     --signer-conf $CA_SIGNER_CONF_RCA \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://myorg.org/rootca1.der \
-    --cmp-control $CMP_CONTROL \
-    --cmp-responder responder1 \
     --validity-mode cutoff
 
   ca:profile-rm -f rootca
@@ -408,8 +389,6 @@ if { $printUsage equals "true" } then {
     --cert output/subca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://myorg.org/rootca1.der \
-    --cmp-control $CMP_CONTROL \
-    --cmp-responder responder1 \
     --validity-mode cutoff
 
   echo "neg-ca-add: certchain does not match"
@@ -425,8 +404,6 @@ if { $printUsage equals "true" } then {
     --cert output/subca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://myorg.org/rootca1.der \
-    --cmp-control $CMP_CONTROL \
-    --cmp-responder responder1 \
     --validity-mode cutoff \
     --certchain output/subcawithcrl1.crt
 
@@ -443,23 +420,6 @@ if { $printUsage equals "true" } then {
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://myorg.org/rootca1.der \
-    --cmp-responder responder1 \
-    --validity-mode cutoff
-
-  echo "neg-ca-add: CMP control name does not exist"
-
-  caqa:neg-ca-add \
-    --name rootca2 \
-    --permission all \
-    --sn-len 20  \
-    --next-crl-no 2 \
-    --max-validity 10y \
-    --signer-type $TOKEN_TYPE \
-    --signer-conf $CA_SIGNER_CONF_RCA \
-    --cert output/rootca1.crt \
-    --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://myorg.org/rootca1.der \
-    --cmp-responder responder1 \
     --validity-mode cutoff
 
   echo "neg-ca-add: CRL signer name does not exist"
@@ -476,25 +436,6 @@ if { $printUsage equals "true" } then {
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://myorg.org/rootca1.der \
     --crl-signer crlsigner2 \
-    --cmp-control $CMP_CONTROL \
-    --cmp-responder responder1 \
-    --validity-mode cutoff
-
-  echo "neg-ca-add: signer name does not exist"
-
-  caqa:neg-ca-add \
-    --name rootca2 \
-    --permission all \
-    --sn-len 20  \
-    --next-crl-no 2 \
-    --max-validity 10y \
-    --signer-type $TOKEN_TYPE \
-    --signer-conf $CA_SIGNER_CONF_RCA \
-    --cert output/rootca1.crt \
-    --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://myorg.org/rootca1.der \
-    --cmp-control $CMP_CONTROL \
-    --cmp-responder responder2 \
     --validity-mode cutoff
 
   echo "#################################################################"
@@ -670,14 +611,14 @@ if { $printUsage equals "true" } then {
   ##### signer #####
 
   ca:signer-add --name responder2 --type pkcs12 \
-    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA256withRSA
+    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA256withECDSA
 
   ca:signer-info
 
   ca:signer-info responder2
 
  ca:signer-up --name responder2 \
-    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA1withRSA
+    --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA1withECDSA
 
   ca:signer-rm -f responder2
 

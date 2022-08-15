@@ -1,6 +1,6 @@
 {
 	// If set to true, please set writer.level to debug in the file META-INF/classes/tinylog.properties.
-	"logReqResp": false,
+	"logReqResp":false,
 	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
 	"pop":{
 		"sigAlgos":[
@@ -8,7 +8,7 @@
 			"SM3withSM2", "ED25519", "ED448", "DHPOP-X25519", "DHPOP-X448"
 		]
 	},
-	"sdkClient": {
+	"sdkClient":{
 		"serverUrl":"https://localhost:8444/ca/ra/",
 		"ssl":{
 			"storeType":"pkcs12",
@@ -17,12 +17,12 @@
 				"file":"keycerts/tlskeys/client/tls-client.p12"
 			},
 			"trustanchors": [{
-				"file": "keycerts/tlskeys/ca/tls-ca-cert.pem"
+				"file":"keycerts/tlskeys/ca/tls-ca-cert.pem"
 			}]
 		}
 	},
-	"audit": {
-		"type": "embed"
+	"audit":{
+		"type":"embed"
 	},
 	"security":{
 		"keyStrongrandomEnabled":false,
@@ -34,7 +34,6 @@
 		"password":{
 			"masterPasswordCallback":"FILE file=security/masterpassword.secret"
 		},
-		"signerFactories": []
+		"signerFactories":[]
 	}
 }
-

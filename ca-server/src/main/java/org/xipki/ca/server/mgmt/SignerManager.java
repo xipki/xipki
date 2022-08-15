@@ -92,8 +92,7 @@ class SignerManager {
 
     String conf = signerEntry.getConf();
     if (conf != null) {
-      String newConf = canonicalizeSignerConf(signerEntry.getType(), conf, null,
-          manager.securityFactory);
+      String newConf = canonicalizeSignerConf(conf);
       if (!conf.equals(newConf)) {
         signerEntry.setConf(newConf);
       }

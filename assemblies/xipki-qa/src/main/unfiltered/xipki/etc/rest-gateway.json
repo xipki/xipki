@@ -1,11 +1,4 @@
 {
-	"scep":{
-		"includeCaCert":true,
-		"includeCertChain":false,
-		"includeSignerCert":true,
-		"supportGetCrl":true,
-		"maxSigningTimeBiasInMs":300
-	},
 	// If set to true, please set writer.level to debug in the file META-INF/classes/tinylog.properties.
 	"logReqResp":false,
 	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
@@ -13,7 +6,12 @@
 		"sigAlgos":[
 			"SHA256withRSA", "SHA256withECDSA", "SHA256withDSA",
 			"SM3withSM2", "ED25519", "ED448", "DHPOP-X25519", "DHPOP-X448"
-		]
+		],
+		"dh":{
+			"type":"pkcs12",
+			"password":"1234",
+			"keystore":"xipki/keycerts/dhpop.p12"
+		}
 	},
 	"sdkClient":{
 		"serverUrl":"https://localhost:8444/ca/ra/",
@@ -23,22 +21,13 @@
 			"keystore":{
 				"file":"keycerts/tlskeys/client/tls-client.p12"
 			},
-			"trustanchors": [{
+			"trustanchors":[{
 				"file":"keycerts/tlskeys/ca/tls-ca-cert.pem"
 			}]
 		}
 	},
 	"audit":{
 		"type":"embed"
-	},
-	"signers":{
-		"signers":[{
-			"name":"subcawithcrl",
-			"signer":{
-				"type":"pkcs12",
-				"conf":"password=1234,keystore=file:keycerts/scep-subcawithcrl.p12,algo=SHA256withRSA"
-			}
-		}]
 	},
 	"security":{
 		"keyStrongrandomEnabled":false,

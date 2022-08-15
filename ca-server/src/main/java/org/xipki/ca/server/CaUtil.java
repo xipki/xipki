@@ -19,18 +19,13 @@ package org.xipki.ca.server;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
-import org.bouncycastle.asn1.crmf.DhSigStatic;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.PopControl;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.security.*;
-import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 
@@ -161,34 +156,6 @@ public class CaUtil {
     return new X500Name(rdns.toArray(new RDN[0]));
   } // method sortX509Name
 
-  public static boolean verifyCsr(CertificationRequest csr, SecurityFactory securityFactory,
-      PopControl popControl) {
-    notNull(csr, "csr");
-    notNull(popControl, "popControl");
-
-    ASN1ObjectIdentifier algOid = csr.getSignatureAlgorithm().getAlgorithm();
-
-    DHSigStaticKeyCertPair kaKeyAndCert = null;
-    if (Xipki.id_alg_dhPop_x25519.equals(algOid)
-            || Xipki.id_alg_dhPop_x448.equals(algOid)) {
-      DhSigStatic dhSigStatic = DhSigStatic.getInstance(csr.getSignature().getBytes());
-      IssuerAndSerialNumber isn = dhSigStatic.getIssuerAndSerial();
-
-      ASN1ObjectIdentifier keyOid = csr.getCertificationRequestInfo().getSubjectPublicKeyInfo()
-          .getAlgorithm().getAlgorithm();
-      kaKeyAndCert = popControl.getDhKeyCertPair(isn.getName(), isn.getSerialNumber().getValue(),
-          EdECConstants.getName(keyOid));
-
-      if (kaKeyAndCert == null) {
-        return false;
-      }
-    }
-
-    AlgorithmValidator popValidator = popControl.getPopAlgoValidator();
-
-    return securityFactory.verifyPop(csr, popValidator, kaKeyAndCert);
-  } // method verifyCsr
-
   private static RDN[] getRdns(RDN[] rdns, ASN1ObjectIdentifier type) {
     notNull(rdns, "rdns");
     notNull(type, "type");
@@ -202,8 +169,7 @@ public class CaUtil {
     return CollectionUtil.isEmpty(ret) ? null : ret.toArray(new RDN[0]);
   } // method getRdns
 
-  public static String canonicalizeSignerConf(String keystoreType, String signerConf,
-      X509Cert[] certChain, SecurityFactory securityFactory)
+  public static String canonicalizeSignerConf(String signerConf)
           throws CaMgmtException {
     if (!signerConf.contains("file:") && !signerConf.contains("base64:")) {
       return signerConf;

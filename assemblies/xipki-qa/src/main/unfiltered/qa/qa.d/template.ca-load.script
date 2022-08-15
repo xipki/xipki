@@ -230,5 +230,3 @@ xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
   qa/qa.d/subcawithcrl.json
 
 ca:load-conf --conf-file qa/qa.d/subcawithcrl.json
-
-source file:./qa/qa.d/scep-server.script
