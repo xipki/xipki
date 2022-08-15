@@ -1,4 +1,2 @@
 1. Audit events: revoke, unsuspend, ...
-2. Exclude the hikaricp from the standard log level
 3. OCSP start: too many duplicated log entries
-5. Rfc4519.can...(X500Name), also in data, is in reversed order.

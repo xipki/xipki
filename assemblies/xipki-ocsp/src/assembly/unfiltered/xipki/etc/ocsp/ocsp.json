@@ -1,6 +1,6 @@
 {
 	// If set to true, please set writer.level to debug in the file META-INF/classes/tinylog.properties.
-	"logReqResp": false,
+	"logReqResp":false,
 	"serverConf":"etc/ocsp/ocsp-responder.json",
 	"security":{
 		"keyStrongrandomEnabled":false,
