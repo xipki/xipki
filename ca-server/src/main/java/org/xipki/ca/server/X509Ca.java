@@ -246,7 +246,7 @@ public class X509Ca extends X509CaModule implements Closeable {
   }
 
   public X509CRLHolder getCurrentCrl() throws OperationException {
-    return crlModule.getCurrentCrl(null);
+    return getCrl(null);
   }
 
   public X509CRLHolder getCrl(BigInteger crlNumber) throws OperationException {
