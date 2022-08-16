@@ -183,6 +183,12 @@
 			"file":"${profiles.dir}/certprofile-tls-sm2.json"
 		}
 	},{
+		"name":"tls-sm2-enc",
+		"type":"xijson",
+		"conf":{
+			"file":"${profiles.dir}/certprofile-tls-sm2-enc.json"
+		}
+	},{
 		"name":"tlsa",
 		"type":"xijson",
 		"conf":{

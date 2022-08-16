@@ -55,7 +55,7 @@ xi:curl --out ${OUT_DIR}/${CN}.der --data-file ${OUT_DIR}/${CN}.csr \
 
 ## Enroll certificate (profile tls)
 
-echo "=====REST: Enroll (CA generate keypair)====="
+echo "=====REST: Enroll (CA generates keypair)====="
 
 CN = rest-tls-cagenkey-${CUR_TIME}
 
@@ -115,4 +115,28 @@ if { "$ocsp" equals "true" } then {
 echo "=====REST: Get CRL====="
 
 xi:curl --out ${OUT_DIR}/rest-myca-get.crl $BASE_URL/crl
+
+echo "=====REST: Enroll Chinese SM2 Twin TLS Certificates (CA generates all keypairs)====="
+
+CN = rest-sm2-tls-twin-cagenkey-${CUR_TIME}
+
+xi:curl --out ${OUT_DIR}/${CN}.pem \
+  --data "subject=C=CN,O=myorg,CN=${CN}.myorg.org" \
+  --header "Content-Type: text/plain; encoding=utf-8" \
+  "$BASE_URL/enroll-cert-cagenkeypair-twin?profile=tls-sm2"
+
+echo "=====REST: Enroll Chinese SM2 Twin TLS Certificates (CA generates only keypair for the encryption)====="
+
+CN = rest-sm2-tls-twin-${CUR_TIME}
+
+xi:sm2-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
+
+xi:csr-p12 --hash SM3 --gm --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --subject "C=CN,O=myorg,CN=${CN}.myorg.org" \
+  --out ${OUT_DIR}/${CN}.csr
+
+xi:curl --out ${OUT_DIR}/${CN}.pem --data-file ${OUT_DIR}/${CN}.csr \
+  --header "Content-Type: application/pkcs10" \
+  "$BASE_URL/enroll-cert-twin?profile=tls-sm2"
+
 }

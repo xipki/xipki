@@ -56,3 +56,27 @@ CRLNUMBER = $(xi:crl-info --crlnumber --in output/rest/crl.crl)
 
 xi:curl --out output/rest/crl-number-${CRLNUMBER}.crl \
   "$BASE_URL/crl?crl-nubmer=${CRLNUMBER}"
+
+echo "=====REST: Enroll Chinese SM2 Twin TLS Certificates (CA generates all keypairs)====="
+
+CN = rest-sm2-tls-twin-cagenkey
+
+xi:curl --out output/rest/sm2-twin/${CN}.pem \
+  --data "subject=C=CN,O=myorg,CN=${CN}.myorg.org" \
+  --header "Content-Type: text/plain; encoding=utf-8" \
+  "$BASE_URL/enroll-cert-cagenkeypair-twin?profile=tls-sm2"
+
+echo "=====REST: Enroll Chinese SM2 Twin TLS Certificates (CA generates only keypair for the encryption)====="
+
+CN = rest-sm2-tls-twin
+
+xi:sm2-p12 --password 1234 --out output/rest/sm2-twin/${CN}.p12 --subject "CN=${CN}"
+
+xi:csr-p12 --hash SM3 --gm --p12 output/rest/sm2-twin/${CN}.p12 --password 1234 \
+  --subject "C=CN,O=myorg,CN=${CN}.myorg.org" \
+  --out output/rest/sm2-twin/${CN}.csr
+
+xi:curl --out output/rest/sm2-twin/${CN}.pem --data-file output/rest/sm2-twin/${CN}.csr \
+  --header "Content-Type: application/pkcs10" \
+  "$BASE_URL/enroll-cert-twin?profile=tls-sm2"
+

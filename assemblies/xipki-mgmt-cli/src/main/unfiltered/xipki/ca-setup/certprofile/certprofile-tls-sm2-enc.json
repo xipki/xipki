@@ -1,6 +1,6 @@
 {
 	"metadata":{
-		"details":"certprofile SM2 tls sign",
+		"details":"certprofile SM2 tls encryption",
 		"category":"A"
 	},
 	"version":"v3",
@@ -164,7 +164,7 @@
 		"keyUsage":{
 			"usages":[{
 				"required":true,
-				"value":"digitalSignature"
+				"value":"dataEncipherment"
 			}]
 		}
 	},{

@@ -383,7 +383,10 @@ public class RestResponder {
       String command, String caName, Requestor requestor, byte[] request,
       HttpRequestMetadataRetriever httpRetriever, AuditEvent event)
       throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
-    boolean caGenKeyPair = RestAPIConstants.CMD_enroll_cert_cagenkeypair.equals(command);
+    boolean twin = RestAPIConstants.CMD_enroll_cert_twin.equals(command)
+        || RestAPIConstants.CMD_enroll_cert_cagenkeypair_twin.equals(command);
+    boolean caGenKeyPair = RestAPIConstants.CMD_enroll_cert_cagenkeypair.equals(command)
+        || RestAPIConstants.CMD_enroll_cert_cagenkeypair_twin.equals(command);
 
     String profile = httpRetriever.getParameter(RestAPIConstants.PARAM_profile);
     if (StringUtil.isBlank(profile)) {
@@ -393,6 +396,8 @@ public class RestResponder {
     }
     profile = profile.toLowerCase();
 
+    String profileEnc = twin ? profile + "-enc" : null;
+
     if (!requestor.isPermitted(PermissionConstants.ENROLL_CERT)) {
       throw new OperationException(NOT_PERMITTED, "ENROLL_CERT is not allowed");
     }
@@ -400,6 +405,11 @@ public class RestResponder {
     if (!requestor.isCertprofilePermitted(profile)) {
       throw new OperationException(NOT_PERMITTED,
           "certprofile " + profile + " is not allowed");
+    }
+
+    if (profileEnc != null && !requestor.isCertprofilePermitted(profileEnc)) {
+      throw new OperationException(NOT_PERMITTED,
+          "certprofile " + profileEnc + " is not allowed");
     }
 
     String strNotBefore = httpRetriever.getParameter(RestAPIConstants.PARAM_not_before);
@@ -467,6 +477,7 @@ public class RestResponder {
     }
 
     BigInteger certId = BigInteger.ONE;
+    BigInteger certIdEnc = twin ? BigInteger.valueOf(2) : null;
 
     EnrollCertRequestEntry template = new EnrollCertRequestEntry();
     template.setCertReqId(certId);
@@ -495,13 +506,37 @@ public class RestResponder {
           AuditLevel.INFO, AuditStatus.FAILED);
     }
 
-    List<EnrollCertRequestEntry> templates = new ArrayList<>(1);
+    List<EnrollCertRequestEntry> templates = new ArrayList<>(twin ? 2 : 1);
     templates.add(template);
+
+    if (twin) {
+      template = new EnrollCertRequestEntry();
+      template.setCertReqId(certIdEnc);
+      template.setCertprofile(profileEnc);
+      template.setSubject(new X500NameType(subject));
+      template.notBefore(notBefore);
+      template.notAfter(notAfter);
+
+      event.addEventData(CaAuditConstants.NAME_certprofile, profileEnc);
+      event.addEventData(CaAuditConstants.NAME_req_subject,
+          "\"" + X509Util.x500NameText(subject) + "\"");
+
+      try {
+        template.extensions(extensions);
+      } catch (IOException e) {
+        String message  ="could not encode extensions";
+        throw new HttpRespAuditException(BAD_REQUEST, message,
+            AuditLevel.INFO, AuditStatus.FAILED);
+      }
+
+      templates.add(template);
+    }
+
 
     EnrollCertsRequest sdkReq = new EnrollCertsRequest();
     sdkReq.setEntries(templates);
     sdkReq.setExplicitConfirm(false);
-    sdkReq.setGroupEnroll(false);
+    sdkReq.setGroupEnroll(twin);
     sdkReq.setCaCertMode(CertsMode.NONE);
 
     EnrollOrPollCertsResponse sdkResp = sdk.enrollCerts(caName, sdkReq);
@@ -515,7 +550,7 @@ public class RestResponder {
 
 
     EnrollOrPullCertResponseEntry entry = getEntry(entries, certId);
-    if (!(caGenKeyPair)) {
+    if (!(caGenKeyPair || twin)) {
       return HttpRespContent.ofOk(RestAPIConstants.CT_pkix_cert, entry.getCert());
     }
 
@@ -528,6 +563,14 @@ public class RestResponder {
       bo.write(NEWLINE);
     }
 
+    if (twin) {
+      entry = getEntry(entries, certIdEnc);
+      bo.write(PemEncoder.encode(entry.getCert(), PemLabel.CERTIFICATE));
+      bo.write(NEWLINE);
+
+      bo.write(PemEncoder.encode(entry.getCert(), PemLabel.PRIVATE_KEY));
+      bo.write(NEWLINE);
+    }
     bo.flush();
 
     return HttpRespContent.ofOk(RestAPIConstants.CT_pem_file, bo.toByteArray());

@@ -57,7 +57,8 @@
 			"max-time",
 			"tlsa",
 			"apple-wwdr",
-			"gmt0015"
+			"gmt0015",
+			"tls-sm2", "tls-sm2-enc"
 		],
 		"requestors":[{
 			"requestorName":"requestor1",

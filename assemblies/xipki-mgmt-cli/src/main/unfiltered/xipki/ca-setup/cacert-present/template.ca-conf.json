@@ -53,6 +53,18 @@
 		"conf":{
 			"file":"${profiles.dir}/certprofile-tls-c.json"
 		}
+	},{
+		"name":"sm2-tls",
+		"type":"xijson",
+		"conf":{
+			"file":"${profiles.dir}/certprofile-sm2-tls.json"
+		}
+	},{
+		"name":"sm2-tls-enc",
+		"type":"xijson",
+		"conf":{
+			"file":"${profiles.dir}/certprofile-sm2-tls-enc.json"
+		}
 	}],
 	"cas":[{
 		"name":"myca1",
@@ -99,7 +111,9 @@
 			"scep",
 			"smime",
 			"tls",
-			"tls-c"
+			"tls-c",
+			"sm2-tls",
+			"sm2-tls-enc"
 		],
 		"publishers":[
 //	        "ocsp-publisher"

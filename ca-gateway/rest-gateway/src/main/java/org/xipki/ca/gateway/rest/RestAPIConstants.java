@@ -40,10 +40,6 @@ public class RestAPIConstants {
 
   public static final String PKISTATUS_rejection = "rejection";
 
-  public static final String PKISTATUS_waiting = "waiting";
-
-  public static final String HEADER_STATUS_String = "X-xipki-status-string";
-
   public static final String HEADER_failInfo = "X-xipki-fail-info";
 
   public static final String FAILINFO_badAlg = "badAlg";
@@ -72,8 +68,6 @@ public class RestAPIConstants {
 
   public static final String CMD_cacertchain = "cacertchain";
 
-  public static final String CMD_pop_dh_certs = "dh-pop-certs";
-
   public static final String CMD_revoke_cert = "revoke-cert";
 
   public static final String CMD_unsuspend_cert = "unsuspend-cert";
@@ -84,6 +78,10 @@ public class RestAPIConstants {
   public static final String CMD_enroll_cert = "enroll-cert";
 
   public static final String CMD_enroll_cert_cagenkeypair = "enroll-cert-cagenkeypair";
+
+  public static final String CMD_enroll_cert_twin = "enroll-cert-twin";
+
+  public static final String CMD_enroll_cert_cagenkeypair_twin = "enroll-cert-cagenkeypair-twin";
 
   public static final String CMD_crl = "crl";
 
