@@ -403,7 +403,6 @@ public class CmpResponder extends BaseCmpResponder {
     return new CertRepMessage(caPubs, certResponses);
   }
 
-  // TODO: audit me
   private PKIBody unRevokeCertificates(String caName, RevReqContent rr,
       boolean revoke, AuditEvent event) throws IOException, SdkErrorResponseException {
     RevDetails[] revContent = rr.toRevDetailsArray();

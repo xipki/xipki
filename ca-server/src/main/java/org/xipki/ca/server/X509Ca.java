@@ -389,14 +389,24 @@ public class X509Ca extends X509CaModule implements Closeable {
     List<GrantedCertTemplate> gcts = new ArrayList<>(n);
 
     List<KeypairGenerator> keypairGenerators = null;
-    List<String> keypairGenNames = caInfo.getKeypairGenNames();
-    if (CollectionUtil.isNotEmpty(keypairGenNames)) {
-      //TODO: only when keypair gen is required, execute this
-      keypairGenerators = new ArrayList<>(keypairGenNames.size());
-      for (String name : keypairGenNames) {
-        KeypairGenerator keypairGen = caManager.getKeypairGenerator(name);
-        if (keypairGen != null) {
-          keypairGenerators.add(keypairGen);
+    boolean caGenKeypair = false;
+    for (int i = 0; i < n; i++) {
+      CertTemplateData certTemplate = certTemplates.get(i);
+      if (certTemplate.isCaGenerateKeypair()) {
+        caGenKeypair = true;
+        break;
+      }
+    }
+
+    if (caGenKeypair) {
+      List<String> keypairGenNames = caInfo.getKeypairGenNames();
+      if (CollectionUtil.isNotEmpty(keypairGenNames)) {
+        keypairGenerators = new ArrayList<>(keypairGenNames.size());
+        for (String name : keypairGenNames) {
+          KeypairGenerator keypairGen = caManager.getKeypairGenerator(name);
+          if (keypairGen != null) {
+            keypairGenerators.add(keypairGen);
+          }
         }
       }
     }

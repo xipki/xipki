@@ -121,8 +121,8 @@
 			"smime",
 			"tls",
 			"tls-c",
-			"sm2-tls",
-			"sm2-tls-enc"
+			"tls-sm2",
+			"tls-sm2-enc"
 		],
 		"publishers":[
 //	        "ocsp-publisher"
