@@ -293,7 +293,7 @@ class IaikP11Slot extends P11Slot {
           } else if (keyType == KeyType.EC) {
             template = new ECPrivateKey();
           } else if (keyType == KeyType.VENDOR_SM2) {
-            template = new ECPrivateKey(KeyType.VENDOR_SM2);
+            template = ECPrivateKey.newSM2PrivateKey(slot.getModule());
           } else if (keyType == KeyType.EC_EDWARDS) {
             template = new ECPrivateKey(KeyType.EC_EDWARDS);
           } else if (keyType == KeyType.EC_MONTGOMERY) {
@@ -1159,26 +1159,34 @@ class IaikP11Slot extends P11Slot {
   @Override
   protected PrivateKeyInfo generateECKeypairOtf0(ASN1ObjectIdentifier curveId)
       throws P11TokenException {
-    return generateECKeypairOtf0(KeyType.EC, CKM_EC_KEY_PAIR_GEN,
-        curveId);
+    return generateECKeypairOtf0(KeyType.EC, CKM_EC_KEY_PAIR_GEN, curveId);
   }
 
   private PrivateKeyInfo generateECKeypairOtf0(
       long keyType, long mech, ASN1ObjectIdentifier curveId)
       throws P11TokenException {
-    ECPrivateKey privateKeyTemplate = new ECPrivateKey(keyType);
-    ECPublicKey publicKeyTemplate = new ECPublicKey(keyType);
-    setPrivateKeyAttrsOtf(privateKeyTemplate);
+    ECPrivateKey privateKeyTemplate;
+    ECPublicKey publicKeyTemplate;
 
-    if (!GMObjectIdentifiers.sm2p256v1.equals(curveId)) {
-      byte[] encodedCurveId;
+    if (keyType == KeyType.VENDOR_SM2) {
+      if (!GMObjectIdentifiers.sm2p256v1.equals(curveId)) {
+        throw new P11TokenException("keyType and curveId do not match.");
+      }
+
+      privateKeyTemplate = ECPrivateKey.newSM2PrivateKey(slot.getModule());
+      publicKeyTemplate  = ECPublicKey.newSM2PublicKey(slot.getModule());
+    } else {
+      privateKeyTemplate = new ECPrivateKey(keyType);
+      publicKeyTemplate  = new ECPublicKey(keyType);
+
       try {
-        encodedCurveId = curveId.getEncoded();
+        publicKeyTemplate.getEcdsaParams().setByteArrayValue(curveId.getEncoded());
       } catch (IOException ex) {
         throw new P11TokenException(ex.getMessage(), ex);
       }
-      publicKeyTemplate.getEcdsaParams().setByteArrayValue(encodedCurveId);
     }
+
+    setPrivateKeyAttrsOtf(privateKeyTemplate);
 
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
@@ -1196,11 +1204,8 @@ class IaikP11Slot extends P11Slot {
           byte[] encodedPublicPoint =
               ASN1OctetString.getInstance(pk.getEcPoint().getByteArrayValue()).getOctets();
           byte[] privValue = sk.getValue().getByteArrayValue();
-          IoUtil.save("logs/ed25519-prikey.bin", privValue);
-          PrivateKeyInfo pki = new PrivateKeyInfo(algId, new DEROctetString(privValue),
+          return new PrivateKeyInfo(algId, new DEROctetString(privValue),
               null, encodedPublicPoint);
-          IoUtil.save("logs/ed25519.der", pki.getEncoded());
-          return pki;
         } else {
           AlgorithmIdentifier algId =
               new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveId);
@@ -1239,8 +1244,8 @@ class IaikP11Slot extends P11Slot {
       throws P11TokenException {
     long ckm = CKM_VENDOR_SM2_KEY_PAIR_GEN;
     if (supportsMechanism(ckm)) {
-      ECPrivateKey privateKey = new ECPrivateKey(KeyType.VENDOR_SM2);
-      ECPublicKey publicKey = new ECPublicKey(KeyType.VENDOR_SM2);
+      ECPrivateKey privateKey = ECPrivateKey.newSM2PrivateKey(slot.getModule());
+      ECPublicKey publicKey = ECPublicKey.newSM2PublicKey(slot.getModule());
       setKeyAttributes(control, publicKey, privateKey, newObjectConf);
 
       return generateKeyPair(ckm, control.getId(), privateKey, publicKey);
