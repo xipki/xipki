@@ -53,6 +53,9 @@ public class ObjectIdentifiers {
 
   private static final ASN1ObjectIdentifier id_microsoft = id_pen.branch("311");
 
+  // CCC: Car Connectivity Consortium
+  private static final ASN1ObjectIdentifier id_ccc = id_pen.branch("41577");
+
   public static final class CMP {
     public static final ASN1ObjectIdentifier id_it_certProfile =
             new ASN1ObjectIdentifier("1.3.6.1.5.5.7.4.21");
@@ -524,7 +527,6 @@ public class ObjectIdentifiers {
     // Certificate Transparency (RFC 6962)
     public static final ASN1ObjectIdentifier id_kp_certificateTransparency =
         new ASN1ObjectIdentifier("1.3.6.1.4.1.11129.2.4.4");
-
   }
 
   public static final class Extn {
@@ -614,6 +616,19 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier id_SCTs = new ASN1ObjectIdentifier(
         "1.3.6.1.4.1.11129.2.4.2");
 
+    // CCC: Car Connectivity Consortium
+    public static final ASN1ObjectIdentifier id_ccc_extn = id_ccc.branch("5");
+    public static final ASN1ObjectIdentifier id_ccc_Vehicle_Cert_K = id_ccc_extn.branch("1");
+    public static final ASN1ObjectIdentifier id_ccc_External_CA_Cert_F = id_ccc_extn.branch("2");
+    public static final ASN1ObjectIdentifier id_ccc_Internal_CA_Cert_E = id_ccc_extn.branch("3");
+    public static final ASN1ObjectIdentifier id_ccc_Endpoint_Cert_H = id_ccc_extn.branch("4");
+    public static final ASN1ObjectIdentifier id_ccc_VehicleOEM_Enc_Cert = id_ccc_extn.branch("5");
+    public static final ASN1ObjectIdentifier id_ccc_VehicleOEM_Sig_Cert = id_ccc_extn.branch("6");
+    public static final ASN1ObjectIdentifier id_ccc_Device_Enc_Cert = id_ccc_extn.branch("7");
+    public static final ASN1ObjectIdentifier id_ccc_Vehicle_Intermediate_Cert =
+        id_ccc_extn.branch("8");
+    public static final ASN1ObjectIdentifier id_ccc_VehicleOEM_CA_Cert_J = id_ccc_extn.branch("9");
+    public static final ASN1ObjectIdentifier id_ccc_VehicleOEM_CA_Cert_M = id_ccc_extn.branch("10");
   }
 
   /*
@@ -696,6 +711,17 @@ public class ObjectIdentifiers {
       oidNameMap.put(Extn.id_GMT_0015_TaxationNumber, "GMT 0015 TaxationNumber");
       oidNameMap.put(Extn.id_precertificate, "CT Precertificate Indication");
       oidNameMap.put(Extn.id_SCTs, "CT Precertificate SCTs");
+      // CCC
+      oidNameMap.put(Extn.id_ccc_Vehicle_Cert_K, "CCC Vehicle Certificate [K]");
+      oidNameMap.put(Extn.id_ccc_External_CA_Cert_F, "CCC External CA Certificate [F]");
+      oidNameMap.put(Extn.id_ccc_Internal_CA_Cert_E, "CCC External CA Certificate [E]");
+      oidNameMap.put(Extn.id_ccc_Endpoint_Cert_H, "Endpoint Certificate [H]");
+      oidNameMap.put(Extn.id_ccc_VehicleOEM_Enc_Cert, "CCC VehicleOEM.Enc.Cert");
+      oidNameMap.put(Extn.id_ccc_VehicleOEM_Sig_Cert, "CCC VehicleOEM.Sig.Cert");
+      oidNameMap.put(Extn.id_ccc_Device_Enc_Cert, "CCC Device.Enc.Cert");
+      oidNameMap.put(Extn.id_ccc_Vehicle_Intermediate_Cert, "CCC Vehicle Intermediate Certificate");
+      oidNameMap.put(Extn.id_ccc_VehicleOEM_CA_Cert_J, "CCC Vehicle OEM CA Certificate [J]");
+      oidNameMap.put(Extn.id_ccc_VehicleOEM_CA_Cert_M, "CCC Vehicle OEM CA Certificate [M]");
 
       oidNameMap.put(Extension.auditIdentity, "auditIdentity");
       oidNameMap.put(Extension.authorityInfoAccess, "authorityInfoAccess");

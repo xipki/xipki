@@ -28,6 +28,7 @@ import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
 import org.xipki.ca.api.profile.CertprofileException;
+import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.certprofile.xijson.DirectoryStringType;
 import org.xipki.ca.certprofile.xijson.ExtensionSyntaxChecker;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
@@ -81,6 +82,10 @@ public class ExtensionsChecker {
   private TlsFeature tlsFeature;
 
   private QaExtensionValue smimeCapabilities;
+
+  private ASN1ObjectIdentifier cccExtensionSchemaType;
+
+  private byte[] cccExtensionSchemaValue;
 
   private Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
 
@@ -198,6 +203,9 @@ public class ExtensionsChecker {
       }
     }
 
+    // CCC
+    initCCCExtensionSchemas(extensions);
+
     // constant extensions
     this.constantExtensions = buildConstantExtesions(extensions);
 
@@ -209,6 +217,59 @@ public class ExtensionsChecker {
     this.o2tChecker = new O2tChecker(this);
     this.u2zChecker = new U2zChecker(this);
   } // constructor
+
+  private void initCCCExtensionSchemas(Map<String, ExtensionType> extensions)
+      throws CertprofileException {
+    Set<String> extnIds = extensions.keySet();
+    ASN1ObjectIdentifier type = null;
+    for (String m : extnIds) {
+      ASN1ObjectIdentifier mOid = new ASN1ObjectIdentifier(m);
+      if (mOid.on(Extn.id_ccc_extn)) {
+        if (type != null) {
+          throw new CertprofileException(
+              "Maximal one CCC Extension is allowed, but configured at least 2.");
+        }
+        type = mOid;
+      }
+    }
+
+    if (type == null) {
+      return;
+    }
+
+    ExtensionType ex = extensions.get(type.getId());
+    if (!ex.isCritical()) {
+      throw new CertprofileException(
+          "CCC Extension must be set to critical, but configured non-critical.");
+    }
+
+    List<ASN1ObjectIdentifier> simpleSchemaTypes = Arrays.asList(
+        Extn.id_ccc_Vehicle_Cert_K,
+        Extn.id_ccc_External_CA_Cert_F,
+        Extn.id_ccc_VehicleOEM_Enc_Cert,
+        Extn.id_ccc_VehicleOEM_Sig_Cert,
+        Extn.id_ccc_Device_Enc_Cert,
+        Extn.id_ccc_Vehicle_Intermediate_Cert,
+        Extn.id_ccc_VehicleOEM_CA_Cert_J,
+        Extn.id_ccc_VehicleOEM_CA_Cert_M);
+
+    if (!simpleSchemaTypes.contains(type)) {
+      return;
+    }
+
+    CCCSimpleExtensionSchema schema = ex.getCccExtensionSchema();
+    if (schema == null) {
+      throw new CertprofileException("ccExtensionSchema is not set for " + type);
+    }
+
+    ASN1Sequence seq = new DERSequence(new ASN1Integer(schema.getVersion()));
+    this.cccExtensionSchemaType = type;
+    try {
+      this.cccExtensionSchemaValue = seq.getEncoded();
+    } catch (IOException e) {
+      throw new CertprofileException("error encoding CCC extensionSchemaValue");
+    }
+  }
 
   CertificatePolicies getCertificatePolicies() {
     return certificatePolicies;
@@ -419,6 +480,12 @@ public class ExtensionsChecker {
             || Extn.id_GMT_0015_IdentityCode.equals(oid)) {
           a2gChecker.checkExtnGmt0015(failureMsg, extnValue, requestedExtns, extnControl,
               oid, requestedSubject);
+        } else if (oid.equals(cccExtensionSchemaType)) {
+          byte[] expected = cccExtensionSchemaValue;
+          if (!Arrays.equals(cccExtensionSchemaValue, extnValue)) {
+            addViolation(failureMsg, "extension value", hex(extnValue),
+                (expected == null) ? "not present" : hex(expected));
+          }
         } else {
           byte[] expected = getExpectedExtValue(oid, requestedExtns, extnControl);
           if (!Arrays.equals(expected, extnValue)) {

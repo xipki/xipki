@@ -928,6 +928,12 @@ public class XijsonCertprofile extends BaseCertprofile {
       }
     }
 
+    // CCC
+    type = extensions.getCccExtensionSchemaType();
+    if (occurences.contains(type)) {
+      values.addExtension(type, extensions.getCccExtensionSchemaValue());
+    }
+
     // GMT 0015
     // InsuranceNumber ::= PrintableString
     // ICRegistrationNumber ::= PrintableString

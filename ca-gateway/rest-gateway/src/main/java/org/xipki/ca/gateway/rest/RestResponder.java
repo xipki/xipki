@@ -280,7 +280,8 @@ public class RestResponder {
       if (respContent == null) {
         return new RestResponse(OK, null, headers, null);
       } else {
-        return new RestResponse(OK, respContent.getContentType(), headers, respContent.getContent());
+        return new RestResponse(OK, respContent.getContentType(), headers,
+            respContent.getContent());
       }
     } catch (OperationException ex) {
       ErrorCode code = ex.getErrorCode();
@@ -532,7 +533,6 @@ public class RestResponder {
       templates.add(template);
     }
 
-
     EnrollCertsRequest sdkReq = new EnrollCertsRequest();
     sdkReq.setEntries(templates);
     sdkReq.setExplicitConfirm(false);
@@ -547,7 +547,6 @@ public class RestResponder {
           "expected " + templates.size() + " cert, but received " + n,
           AuditLevel.INFO, AuditStatus.FAILED);
     }
-
 
     EnrollOrPullCertResponseEntry entry = getEntry(entries, certId);
     if (!(caGenKeyPair || twin)) {

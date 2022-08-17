@@ -122,6 +122,10 @@ public class XijsonExtensions {
 
   private SubjectDirectoryAttributesControl subjectDirAttrsControl;
 
+  private ASN1ObjectIdentifier cccExtensionSchemaType;
+
+  private ExtensionValue cccExtensionSchemaValue;
+
   XijsonExtensions(X509ProfileType conf, SubjectControl subjectControl)
       throws CertprofileException {
     notNull(conf, "conf");
@@ -214,6 +218,9 @@ public class XijsonExtensions {
 
     // Extensions defined in Chinese Standard GMT 0015
     initGmt0015Extensions(extnIds);
+
+    // CCC
+    initCCCExtensionSchemas(extnIds, extensions);
 
     // constant extensions
     this.constantExtensions = conf.buildConstantExtesions();
@@ -840,6 +847,55 @@ public class XijsonExtensions {
     extnIds.remove(Extn.id_GMT_0015_TaxationNumber);
   } // method initGmt0015Extensions
 
+  private void initCCCExtensionSchemas(
+      Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
+      throws CertprofileException {
+    ASN1ObjectIdentifier type = null;
+    for (ASN1ObjectIdentifier m : extnIds) {
+      if (m.on(Extn.id_ccc_extn)) {
+        if (type != null) {
+          throw new CertprofileException(
+              "Maximal one CCC Extension is allowed, but configured at least 2.");
+        }
+        type = m;
+      }
+    }
+
+    if (type == null) {
+      return;
+    }
+
+    extnIds.remove(type);
+    ExtensionType ex = extensions.get(type.getId());
+    if (!ex.isCritical()) {
+      throw new CertprofileException(
+          "CCC Extension must be set to critical, but configured non-critical.");
+    }
+
+    List<ASN1ObjectIdentifier> simpleSchemaTypes = Arrays.asList(
+        Extn.id_ccc_Vehicle_Cert_K,
+        Extn.id_ccc_External_CA_Cert_F,
+        Extn.id_ccc_VehicleOEM_Enc_Cert,
+        Extn.id_ccc_VehicleOEM_Sig_Cert,
+        Extn.id_ccc_Device_Enc_Cert,
+        Extn.id_ccc_Vehicle_Intermediate_Cert,
+        Extn.id_ccc_VehicleOEM_CA_Cert_J,
+        Extn.id_ccc_VehicleOEM_CA_Cert_M);
+
+    if (!simpleSchemaTypes.contains(type)) {
+      return;
+    }
+
+    CCCSimpleExtensionSchema schema = ex.getCccExtensionSchema();
+    if (schema == null) {
+      throw new CertprofileException("ccExtensionSchema is not set for " + type);
+    }
+
+    ASN1Sequence seq = new DERSequence(new ASN1Integer(schema.getVersion()));
+    this.cccExtensionSchemaType = type;
+    this.cccExtensionSchemaValue = new ExtensionValue(ex.isCritical(), seq);
+  }
+
   private static List<ASN1ObjectIdentifier> toOidList(List<DescribableOid> oidWithDescTypes) {
     if (CollectionUtil.isEmpty(oidWithDescTypes)) {
       return null;
@@ -1051,8 +1107,16 @@ public class XijsonExtensions {
     return subjectDirAttrsControl;
   }
 
+  public ASN1ObjectIdentifier getCccExtensionSchemaType() {
+    return cccExtensionSchemaType;
+  }
+
+  public ExtensionValue getCccExtensionSchemaValue() {
+    return cccExtensionSchemaValue;
+  }
+
   private static ExtensionType getExtension(ASN1ObjectIdentifier type,
-      Map<String, ExtensionType> extensions) {
+                                            Map<String, ExtensionType> extensions) {
     ExtensionType extension = extensions.get(type.getId());
     if (extension == null) {
       throw new IllegalStateException("should not reach here: undefined extension "

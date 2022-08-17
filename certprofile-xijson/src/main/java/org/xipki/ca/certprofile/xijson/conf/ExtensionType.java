@@ -137,6 +137,9 @@ public class ExtensionType extends ValidatableConf {
   private ValidityModel validityModel;
 
   @JSONField(ordinal = 5)
+  private CCCSimpleExtensionSchema cccExtensionSchema;
+
+  @JSONField(ordinal = 5)
   private Object custom;
 
   /**
@@ -385,6 +388,14 @@ public class ExtensionType extends ValidatableConf {
     this.validityModel = validityModel;
   }
 
+  public CCCSimpleExtensionSchema getCccExtensionSchema() {
+    return cccExtensionSchema;
+  }
+
+  public void setCccExtensionSchema(CCCSimpleExtensionSchema cccExtensionSchema) {
+    this.cccExtensionSchema = cccExtensionSchema;
+  }
+
   public Object getCustom() {
     return custom;
   }
@@ -430,6 +441,7 @@ public class ExtensionType extends ValidatableConf {
     validate(subjectKeyIdentifier);
     validate(tlsFeature);
     validate(validityModel);
+    validate(cccExtensionSchema);
     validate(syntax);
   } // method validate
 

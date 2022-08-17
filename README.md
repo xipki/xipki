@@ -297,6 +297,7 @@ Features
     - SubjectKeyIdentifier (RFC 5280)
     - TLSFeature (RFC 7633)
     - ValidityModel (German national standard CommonPKI)
+    - ExtensionSchema (Car Connectivity Consortium)
   - Management of multiple CAs in one software instance
     - Support of database cluster
     - Multiple software instances (all can be in active mode) for the same CA
