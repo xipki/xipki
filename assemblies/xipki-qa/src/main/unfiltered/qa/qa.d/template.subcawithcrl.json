@@ -36,7 +36,7 @@
 			"keypairGenNames":["software"],
 			"expirationPeriod":365,
 			"keepExpiredCertDays":-1,
-			"maxValidity":"8000y",
+			"maxValidity":"5y",
 			"nextCrlNo":2,
 			"permissions":["all"],
 			"saveRequest":true,

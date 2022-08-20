@@ -41,6 +41,8 @@ public class SdkConstants {
 
   public static final String CMD_enroll = "enroll";
 
+  public static final String CMD_enroll_cross = "enroll_cross";
+
   public static final String CMD_enroll_kup = "enroll_kup";
 
   public static final String CMD_confirm_enroll = "confirm_enroll";

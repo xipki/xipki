@@ -80,6 +80,7 @@ public class X509ProfileType extends ValidatableConf {
    *   <li>365d: 365 days</li>
    *   <li>120h: 120 hours</li>
    *   <li>100m: 100 minutes</li>
+   *   <li>99991231235959Z: certificate has this UNDEFINED notAfter</li>
    * </ul>
    */
   @JSONField(ordinal = 6)

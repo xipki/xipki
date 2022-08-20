@@ -216,6 +216,12 @@ public class SdkClient {
     return checkEnrollResp(respBytes, req);
   }
 
+  public EnrollOrPollCertsResponse enrollCrossCerts(String ca, EnrollCertsRequest req)
+      throws IOException, SdkErrorResponseException {
+    byte[] respBytes = send(ca, CMD_enroll_cross, req);
+    return checkEnrollResp(respBytes, req);
+  }
+
   public EnrollOrPollCertsResponse enrollKupCerts(String ca, EnrollCertsRequest req)
       throws IOException, SdkErrorResponseException {
     byte[] respBytes = send(ca, CMD_enroll_kup, req);

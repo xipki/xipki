@@ -224,8 +224,17 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case generateCertificate: {
           MgmtRequest.GenerateCertificate req = parse(in, MgmtRequest.GenerateCertificate.class);
-          X509Cert cert = caManager.generateCertificate(req.getCaName(),
-              req.getProfileName(), req.getEncodedCsr(), req.getNotBefore(), req.getNotAfter());
+          X509Cert cert = caManager.generateCertificate(req.getCaName(), req.getProfileName(),
+              req.getEncodedCsr(), req.getNotBefore(), req.getNotAfter());
+          resp = toByteArray(cert);
+          break;
+        }
+        case generateCrossCertificate: {
+          MgmtRequest.GenerateCrossCertificate req =
+              parse(in, MgmtRequest.GenerateCrossCertificate.class);
+          X509Cert cert = caManager.generateCrossCertificate(req.getCaName(),
+              req.getProfileName(), req.getEncodedCsr(), req.getEncodedTargetCert(),
+              req.getNotBefore(), req.getNotAfter());
           resp = toByteArray(cert);
           break;
         }
@@ -248,7 +257,8 @@ public class HttpMgmtServlet extends HttpServlet {
           }
 
           X509Cert cert = caManager.generateRootCa(caEntry,
-              req.getCertprofileName(), req.getSubject(), req.getSerialNumber());
+              req.getCertprofileName(), req.getSubject(), req.getSerialNumber(),
+              req.getNotBefore(), req.getNotAfter());
           resp = toByteArray(cert);
           break;
         }

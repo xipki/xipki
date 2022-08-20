@@ -260,11 +260,15 @@ public class SdkResponder {
         }
         case CMD_enroll: {
           assertPermitted(requestor, ENROLL_CERT);
-          return enroll(ca, request, requestor, false, event);
+          return enroll(ca, request, requestor, false, false, event);
         }
         case CMD_enroll_kup: {
           assertPermitted(requestor, KEY_UPDATE);
-          return enroll(ca, request, requestor, true, event);
+          return enroll(ca, request, requestor, true, false, event);
+        }
+        case CMD_enroll_cross: {
+          assertPermitted(requestor, ENROLL_CROSS);
+          return enroll(ca, request, requestor, false, true, event);
         }
         case CMD_poll_cert: {
           if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(KEY_UPDATE))) {
@@ -319,7 +323,7 @@ public class SdkResponder {
 
   private SdkResponse enroll(
       X509Ca ca, byte[] request, RequestorInfo requestor,
-      boolean keyUpdate, final AuditEvent event)
+      boolean keyUpdate, boolean crossCert, final AuditEvent event)
       throws OperationException {
     EnrollCertsRequest req = EnrollCertsRequest.decode(request);
     for (EnrollCertRequestEntry entry : req.getEntries()) {
@@ -445,6 +449,7 @@ public class SdkResponder {
       boolean caGenerateKeypair = publicKeyInfo == null;
       CertTemplateData certTemplate = new CertTemplateData(subject, publicKeyInfo,
           notBefore, notAfter, extensions, profile, entry.getCertReqId(), caGenerateKeypair);
+      certTemplate.setForCrossCert(crossCert);
       certTemplates.add(certTemplate);
     }
 

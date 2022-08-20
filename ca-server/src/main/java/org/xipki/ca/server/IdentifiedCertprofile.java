@@ -94,6 +94,10 @@ public class IdentifiedCertprofile implements Closeable {
     return certprofile.getValidity();
   }
 
+  public boolean hasNoWellDefinedExpirationDate() {
+    return certprofile.hasNoWellDefinedExpirationDate();
+  }
+
   public NotAfterMode getNotAfterMode() {
     return certprofile.getNotAfterMode();
   }

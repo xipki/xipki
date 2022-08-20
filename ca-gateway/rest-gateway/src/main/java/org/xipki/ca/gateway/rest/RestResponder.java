@@ -20,9 +20,12 @@ package org.xipki.ca.gateway.rest;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.util.Arrays;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
@@ -33,6 +36,7 @@ import org.xipki.ca.sdk.*;
 import org.xipki.security.CrlReason;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
+import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
@@ -42,10 +46,7 @@ import org.xipki.util.exception.OperationException;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.http.HttpRespContent;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -250,6 +251,10 @@ public class RestResponder {
               StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certsBytes)));
           break;
         }
+        case RestAPIConstants.CMD_enroll_cross_cert: {
+          respContent = enrollCrossCert(caName, requestor, request, httpRetriever, event);
+          break;
+        }
         case RestAPIConstants.CMD_enroll_cert:
         case RestAPIConstants.CMD_enroll_cert_cagenkeypair:
         case RestAPIConstants.CMD_enroll_cert_twin:
@@ -384,30 +389,18 @@ public class RestResponder {
       String command, String caName, Requestor requestor, byte[] request,
       HttpRequestMetadataRetriever httpRetriever, AuditEvent event)
       throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
+    if (!requestor.isPermitted(PermissionConstants.ENROLL_CERT)) {
+      throw new OperationException(NOT_PERMITTED, "ENROLL_CERT is not allowed");
+    }
+
     boolean twin = RestAPIConstants.CMD_enroll_cert_twin.equals(command)
         || RestAPIConstants.CMD_enroll_cert_cagenkeypair_twin.equals(command);
     boolean caGenKeyPair = RestAPIConstants.CMD_enroll_cert_cagenkeypair.equals(command)
         || RestAPIConstants.CMD_enroll_cert_cagenkeypair_twin.equals(command);
 
-    String profile = httpRetriever.getParameter(RestAPIConstants.PARAM_profile);
-    if (StringUtil.isBlank(profile)) {
-      throw new HttpRespAuditException(BAD_REQUEST,
-          "required parameter " + RestAPIConstants.PARAM_profile + " not specified",
-          AuditLevel.INFO, AuditStatus.FAILED);
-    }
-    profile = profile.toLowerCase();
+    String profile = checkProfile(requestor, httpRetriever);
 
     String profileEnc = twin ? profile + "-enc" : null;
-
-    if (!requestor.isPermitted(PermissionConstants.ENROLL_CERT)) {
-      throw new OperationException(NOT_PERMITTED, "ENROLL_CERT is not allowed");
-    }
-
-    if (!requestor.isCertprofilePermitted(profile)) {
-      throw new OperationException(NOT_PERMITTED,
-          "certprofile " + profile + " is not allowed");
-    }
-
     if (profileEnc != null && !requestor.isCertprofilePermitted(profileEnc)) {
       throw new OperationException(NOT_PERMITTED,
           "certprofile " + profileEnc + " is not allowed");
@@ -573,6 +566,156 @@ public class RestResponder {
     bo.flush();
 
     return HttpRespContent.ofOk(RestAPIConstants.CT_pem_file, bo.toByteArray());
+  }
+
+  private HttpRespContent enrollCrossCert(
+      String caName, Requestor requestor, byte[] request,
+      HttpRequestMetadataRetriever httpRetriever, AuditEvent event)
+      throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
+    if (!requestor.isPermitted(PermissionConstants.ENROLL_CROSS)) {
+      throw new OperationException(NOT_PERMITTED, "ENROLL_CROSS is not allowed");
+    }
+
+    String profile = checkProfile(requestor, httpRetriever);
+
+    String ct = httpRetriever.getHeader("Content-Type");
+    if (!RestAPIConstants.CT_pem_file.equalsIgnoreCase(ct)) {
+      String message = "unsupported media type " + ct;
+      throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message,
+          AuditLevel.INFO, AuditStatus.FAILED);
+    }
+
+    String strNotBefore = httpRetriever.getParameter(RestAPIConstants.PARAM_not_before);
+    Date notBefore = (strNotBefore == null) ? null
+        : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotBefore);
+
+    String strNotAfter = httpRetriever.getParameter(RestAPIConstants.PARAM_not_after);
+    Date notAfter = (strNotAfter == null) ? null
+        : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotAfter);
+
+    byte[] csrBytes = null;
+    byte[] targetCertBytes = null;
+
+    PemReader pemReader = new PemReader(new InputStreamReader(new ByteArrayInputStream(request)));
+    while (true) {
+      PemObject pemObject = pemReader.readPemObject();
+      if (pemObject == null) {
+        break;
+      }
+
+      String type = pemObject.getType();
+      if (PemLabel.CERTIFICATE_REQUEST.equals(type)) {
+        if (csrBytes != null) {
+          throw new HttpRespAuditException(BAD_REQUEST, "duplicated PEM CSRs",
+              AuditLevel.INFO, AuditStatus.FAILED);
+        }
+        csrBytes = pemObject.getContent();
+      } else if (PemLabel.CERTIFICATE.equals(type)) {
+        if (targetCertBytes != null) {
+          throw new HttpRespAuditException(BAD_REQUEST, "duplicated PEM CERTIFICATEs",
+              AuditLevel.INFO, AuditStatus.FAILED);
+        }
+        targetCertBytes = pemObject.getContent();
+      } else {
+        throw new HttpRespAuditException(BAD_REQUEST, "unknown PEM object type " + type,
+            AuditLevel.INFO, AuditStatus.FAILED);
+      }
+    }
+
+    if (csrBytes == null) {
+      throw new HttpRespAuditException(BAD_REQUEST, "PEM CSR is not specified",
+          AuditLevel.INFO, AuditStatus.FAILED);
+    }
+
+    if (targetCertBytes == null) {
+      throw new HttpRespAuditException(BAD_REQUEST, "PEM CERTIFICATE is not specified",
+          AuditLevel.INFO, AuditStatus.FAILED);
+    }
+
+    CertificationRequest csr = CertificationRequest.getInstance(csrBytes);
+    if (!SdkClient.verifyCsr(csr, securityFactory, popControl)) {
+      throw new OperationException(BAD_POP);
+    }
+
+    Certificate targetCert = Certificate.getInstance(targetCertBytes);
+    try {
+      X509Util.assertCsrAndCertMatch(csr, targetCert, true);
+    } catch (XiSecurityException ex) {
+      throw new HttpRespAuditException(BAD_REQUEST, ex.getMessage(),
+          AuditLevel.INFO, AuditStatus.FAILED);
+    }
+
+    SubjectPublicKeyInfo subjectPublicKeyInfo = targetCert.getSubjectPublicKeyInfo();
+    Extensions extensions = targetCert.getTBSCertificate().getExtensions();
+    X500Name subject = targetCert.getSubject();
+    BigInteger certId = BigInteger.ONE;
+    if (notAfter == null || notAfter.after(targetCert.getEndDate().getDate())) {
+      notAfter = targetCert.getEndDate().getDate();
+    }
+
+    EnrollCertRequestEntry template = new EnrollCertRequestEntry();
+    template.setCertReqId(certId);
+    template.setCertprofile(profile);
+    template.setSubject(new X500NameType(subject));
+    template.notBefore(notBefore);
+    template.notAfter(notAfter);
+
+    event.addEventData(CaAuditConstants.NAME_certprofile, profile);
+    event.addEventData(CaAuditConstants.NAME_req_subject,
+        "\"" + X509Util.x500NameText(subject) + "\"");
+
+    try {
+      template.extensions(extensions);
+    } catch (IOException e) {
+      String message  ="could not encode extensions";
+      throw new HttpRespAuditException(BAD_REQUEST, message,
+          AuditLevel.INFO, AuditStatus.FAILED);
+    }
+
+    try {
+      template.subjectPublicKey(subjectPublicKeyInfo);
+    } catch (IOException e) {
+      String message  ="could not encode SubjectPublicKeyInfo";
+      throw new HttpRespAuditException(BAD_REQUEST, message,
+          AuditLevel.INFO, AuditStatus.FAILED);
+    }
+
+    List<EnrollCertRequestEntry> templates = Collections.singletonList(template);
+
+    EnrollCertsRequest sdkReq = new EnrollCertsRequest();
+    sdkReq.setEntries(templates);
+    sdkReq.setExplicitConfirm(false);
+    sdkReq.setGroupEnroll(false);
+    sdkReq.setCaCertMode(CertsMode.NONE);
+
+    EnrollOrPollCertsResponse sdkResp = sdk.enrollCrossCerts(caName, sdkReq);
+    List<EnrollOrPullCertResponseEntry> entries = sdkResp.getEntries();
+    int n = entries == null ? 0 : entries.size();
+    if (n != templates.size()) {
+      throw new HttpRespAuditException(INTERNAL_SERVER_ERROR,
+          "expected " + templates.size() + " cert, but received " + n,
+          AuditLevel.INFO, AuditStatus.FAILED);
+    }
+
+    EnrollOrPullCertResponseEntry entry = getEntry(entries, certId);
+    return HttpRespContent.ofOk(RestAPIConstants.CT_pkix_cert, entry.getCert());
+  }
+
+  private static String checkProfile(
+      Requestor requestor, HttpRequestMetadataRetriever httpRetriever) throws HttpRespAuditException, OperationException {
+    String profile = httpRetriever.getParameter(RestAPIConstants.PARAM_profile);
+    if (StringUtil.isBlank(profile)) {
+      throw new HttpRespAuditException(BAD_REQUEST,
+          "required parameter " + RestAPIConstants.PARAM_profile + " not specified",
+          AuditLevel.INFO, AuditStatus.FAILED);
+    }
+    profile = profile.toLowerCase();
+
+    if (!requestor.isCertprofilePermitted(profile)) {
+      throw new OperationException(NOT_PERMITTED,
+          "certprofile " + profile + " is not allowed");
+    }
+    return profile;
   }
 
   private static EnrollOrPullCertResponseEntry getEntry(

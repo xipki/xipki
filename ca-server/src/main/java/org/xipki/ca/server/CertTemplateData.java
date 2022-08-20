@@ -50,6 +50,8 @@ public class CertTemplateData {
 
   private final BigInteger certReqId;
 
+  private boolean forCrossCert;
+
   public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Date notBefore,
       Date notAfter, Extensions extensions, String certprofileName) {
     this(subject, publicKeyInfo, notBefore, notAfter, extensions, certprofileName, null, false);
@@ -67,6 +69,14 @@ public class CertTemplateData {
     this.notAfter = notAfter;
     this.certReqId = certReqId;
     this.caGenerateKeypair = caGenerateKeypair;
+  }
+
+  public boolean isForCrossCert() {
+    return forCrossCert;
+  }
+
+  public void setForCrossCert(boolean forCrossCert) {
+    this.forCrossCert = forCrossCert;
   }
 
   public X500Name getSubject() {

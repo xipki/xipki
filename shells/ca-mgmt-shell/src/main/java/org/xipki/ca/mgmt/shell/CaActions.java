@@ -429,6 +429,12 @@ public class CaActions {
     @Option(name = "--serial", description = "serial number of the Root CA")
     private String serialS;
 
+    @Option(name = "--not-before", description = "notBefore, UTC time of format yyyyMMddHHmmss")
+    private String notBeforeS;
+
+    @Option(name = "--not-after", description = "notAfter, UTC time of format yyyyMMddHHmmss")
+    private String notAfterS;
+
     @Option(name = "--outform", description = "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
@@ -442,7 +448,12 @@ public class CaActions {
     protected Object execute0()
         throws Exception {
       CaEntry caEntry = getCaEntry();
-      X509Cert rootcaCert = caManager.generateRootCa(caEntry, rootcaProfile, subject, serialS);
+      Date notBefore = StringUtil.isNotBlank(notBeforeS)
+          ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
+      Date notAfter = StringUtil.isNotBlank(notAfterS)
+          ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
+      X509Cert rootcaCert = caManager.generateRootCa(caEntry, rootcaProfile,
+          subject, serialS, notBefore, notAfter);
       if (rootcaCertOutFile != null) {
         saveVerbose("saved root certificate to file", rootcaCertOutFile,
             encodeCert(rootcaCert.getEncoded(), outform));

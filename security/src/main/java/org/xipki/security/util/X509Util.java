@@ -28,11 +28,13 @@ import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.slf4j.Logger;
@@ -921,6 +923,36 @@ public class X509Util {
     }
 
     return certs;
+  }
+
+  public static void assertCsrAndCertMatch(
+      CertificationRequest csr, Certificate targetCert, boolean caCertRequired)
+      throws XiSecurityException {
+    CertificationRequestInfo cri = csr.getCertificationRequestInfo();
+
+    try {
+      if (!Arrays.equals(cri.getSubject().getEncoded(), targetCert.getSubject().getEncoded())) {
+        throw new XiSecurityException("CSR and certificate do not have the same subject");
+      }
+
+      if (!Arrays.equals(cri.getSubjectPublicKeyInfo().getEncoded(),
+          targetCert.getSubjectPublicKeyInfo().getEncoded())) {
+        throw new XiSecurityException(
+            "CSR and certificate do not have the same SubjectPublicKeyInfo");
+      }
+
+      if (caCertRequired) {
+        Extension extn = targetCert.getTBSCertificate().getExtensions()
+            .getExtension(Extension.basicConstraints);
+        BasicConstraints bc = extn == null
+            ? null : BasicConstraints.getInstance(extn.getParsedValue());
+        if (bc == null || !bc.isCA()) {
+          throw new XiSecurityException("targetCert is not a CA certificate");
+        }
+      }
+    } catch (IOException | RuntimeException ex) {
+      throw new XiSecurityException("error while encoding Subject or SubjectPublicKeyInfo");
+    }
   }
 
 }

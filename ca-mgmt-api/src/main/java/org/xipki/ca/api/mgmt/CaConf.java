@@ -59,10 +59,17 @@ public class CaConf {
 
     private final String serialNumber;
 
-    public GenSelfIssued(String profile, String subject, String serialNumber) {
+    private final Date notBefore;
+
+    private final Date notAfter;
+
+    public GenSelfIssued(String profile, String subject, String serialNumber,
+                         Date notBefore, Date notAfter) {
       this.profile = Args.notBlank(profile, "profile");
       this.subject = Args.notBlank(subject, "subject");
       this.serialNumber = serialNumber;
+      this.notBefore = notBefore;
+      this.notAfter = notAfter;
     }
 
     public String getProfile() {
@@ -77,6 +84,13 @@ public class CaConf {
       return serialNumber;
     }
 
+    public Date getNotBefore() {
+      return notBefore;
+    }
+
+    public Date getNotAfter() {
+      return notAfter;
+    }
   } // class GenSelfIssued
 
   public static class SingleCa {
@@ -286,15 +300,18 @@ public class CaConf {
 
         if (m.getCaInfo() != null) {
           CaConfType.CaInfo ci = m.getCaInfo();
-          if (ci.getGenSelfIssued() != null) {
+          CaConfType.GenSelfIssued gsi = ci.getGenSelfIssued();
+          if (gsi != null) {
             if (ci.getCert() != null) {
               throw new InvalidConfException("cert.file of CA " + name + " may not be set");
             }
-            String subject = ci.getGenSelfIssued().getSubject();
-            String serialNumber = ci.getGenSelfIssued().getSerialNumber();
 
-            genSelfIssued = new GenSelfIssued(ci.getGenSelfIssued().getProfile(),
-                subject, serialNumber);
+            Date notBefore = gsi.getNotBefore() == null ? null
+                : DateUtil.parseUtcTimeyyyyMMdd(gsi.getNotBefore());
+            Date notAfter = gsi.getNotBefore() == null ? null
+                : DateUtil.parseUtcTimeyyyyMMdd(gsi.getNotAfter());
+            genSelfIssued = new GenSelfIssued(gsi.getProfile(),
+                gsi.getSubject(), gsi.getSerialNumber(), notBefore, notAfter);
           }
 
           CaUris caUris;

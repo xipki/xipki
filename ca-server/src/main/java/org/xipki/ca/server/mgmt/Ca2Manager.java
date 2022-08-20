@@ -23,6 +23,7 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CRLHolder;
@@ -52,6 +53,7 @@ import org.xipki.util.exception.OperationException;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.http.SslContextConf;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
 import java.util.*;
@@ -519,7 +521,7 @@ class Ca2Manager {
   } // method getX509Ca
 
   X509Cert generateRootCa(CaEntry caEntry, String profileName, String subject,
-      String serialNumber) throws CaMgmtException {
+      String serialNumber, Date notBefore, Date notAfter) throws CaMgmtException {
     assertMasterModeAndSetuped();
 
     notNull(caEntry, "caEntry");
@@ -575,7 +577,7 @@ class Ca2Manager {
     try {
       result = SelfSignedCertBuilder.generateSelfSigned(manager.securityFactory, signerType,
           caEntry.getSignerConf(), certprofile, subject, serialOfThisCert, caEntry.getCaUris(),
-          caEntry.getExtraControl());
+          caEntry.getExtraControl(), notBefore, notAfter);
     } catch (OperationException | InvalidConfException ex) {
       throw new CaMgmtException(concat(ex.getClass().getName(), ": ", ex.getMessage()), ex);
     }
@@ -599,16 +601,19 @@ class Ca2Manager {
     return caCert;
   } // method generateRootCa
 
-  X509Cert generateCertificate(String caName, String profileName, byte[] encodedCsr,
-      Date notBefore, Date notAfter) throws CaMgmtException {
+  X509Cert generateCrossCertificate(
+      String caName, String profileName, byte[] encodedCsr, byte[] encodedTargetCert,
+      Date notBefore, Date notAfter)
+      throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     profileName = toNonBlankLower(profileName, "profileName");
     notNull(encodedCsr, "encodedCsr");
+    notNull(encodedTargetCert, "encodedTargetCert");
 
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName(APPNAME);
     event.setName(NAME_perf);
-    event.addEventType("CAMGMT_CRL_GEN_ONDEMAND");
+    event.addEventType("CAMGMT_GEN_CROSS_CERT");
 
     X509Ca ca = getX509Ca(caName);
     CertificationRequest csr;
@@ -618,14 +623,89 @@ class Ca2Manager {
       throw new CaMgmtException(concat("invalid CSR request. ERROR: ", ex.getMessage()));
     }
 
-    boolean popValid = manager.getSecurityFactory().verifyPop(csr, null, null);
-    if (!popValid) {
+    Certificate targetCert = Certificate.getInstance(encodedTargetCert);
+    try {
+      X509Util.assertCsrAndCertMatch(csr, targetCert, true);
+    } catch (XiSecurityException ex) {
+      throw new CaMgmtException(ex.getMessage());
+    }
+
+    if (!manager.getSecurityFactory().verifyPop(csr, null, null)) {
       throw new CaMgmtException("could not validate POP for the CSR");
     }
 
-    CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
+    Extensions extensions = targetCert.getTBSCertificate().getExtensions();
+    X500Name subject = targetCert.getSubject();
+    SubjectPublicKeyInfo publicKeyInfo = targetCert.getSubjectPublicKeyInfo();
+
+    if (notBefore != null) {
+      Date now = new Date();
+      if (notBefore.before(now)) {
+        notBefore = now;
+      }
+      if (notBefore.before(targetCert.getStartDate().getDate())) {
+        notBefore = targetCert.getStartDate().getDate();
+      }
+    }
+
+    Date targetCertNotAfter = targetCert.getEndDate().getDate();
+    if (notAfter == null) {
+      notAfter = targetCertNotAfter;
+    } else {
+      if (notAfter.after(targetCertNotAfter)) {
+        notAfter = targetCertNotAfter;
+      }
+    }
+
+    CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
+        notBefore, notAfter, extensions, profileName);
+    certTemplateData.setForCrossCert(true);
+
+    CertificateInfo certInfo;
+    try {
+      certInfo = ca.generateCert(certTemplateData, manager.byCaRequestor,null, event);
+    } catch (OperationException ex) {
+      throw new CaMgmtException(ex.getMessage(), ex);
+    }
+
+    if (ca.getCaInfo().isSaveRequest()) {
+      try {
+        long dbId = ca.addRequest(encodedCsr);
+        ca.addRequestCert(dbId, certInfo.getCert().getCertId());
+      } catch (OperationException ex) {
+        LogUtil.warn(LOG, ex, "could not save request");
+      }
+    }
+
+    return certInfo.getCert().getCert();
+  }
+
+  X509Cert generateCertificate(String caName, String profileName, byte[] encodedCsr,
+      Date notBefore, Date notAfter) throws CaMgmtException {
+    caName = toNonBlankLower(caName, "caName");
+    profileName = toNonBlankLower(profileName, "profileName");
+    notNull(encodedCsr, "encodedCsr");
+
+    AuditEvent event = new AuditEvent(new Date());
+    event.setApplicationName(APPNAME);
+    event.setName(NAME_perf);
+    event.addEventType("CAMGMT_GEN_CERT");
+
+    X509Ca ca = getX509Ca(caName);
+    CertificationRequest csr;
+    try {
+      csr = X509Util.parseCsr(encodedCsr);
+    } catch (Exception ex) {
+      throw new CaMgmtException(concat("invalid CSR request. ERROR: ", ex.getMessage()));
+    }
+
+    CertificationRequestInfo cri = csr.getCertificationRequestInfo();
+    if (!manager.getSecurityFactory().verifyPop(csr, null, null)) {
+      throw new CaMgmtException("could not validate POP for the CSR");
+    }
+
     Extensions extensions = null;
-    ASN1Set attrs = certTemp.getAttributes();
+    ASN1Set attrs = cri.getAttributes();
     for (int i = 0; i < attrs.size(); i++) {
       Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
       if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {
@@ -633,8 +713,8 @@ class Ca2Manager {
       }
     }
 
-    X500Name subject = certTemp.getSubject();
-    SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
+    X500Name subject = cri.getSubject();
+    SubjectPublicKeyInfo publicKeyInfo = cri.getSubjectPublicKeyInfo();
 
     CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
         notBefore, notAfter, extensions, profileName);

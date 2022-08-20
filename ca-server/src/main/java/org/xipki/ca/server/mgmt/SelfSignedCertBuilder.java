@@ -54,8 +54,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.List;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.*;
 
 /**
  * Self-signed certificate builder.
@@ -92,9 +91,11 @@ class SelfSignedCertBuilder {
   private SelfSignedCertBuilder() {
   }
 
-  public static GenerateSelfSignedResult generateSelfSigned(SecurityFactory securityFactory,
+  public static GenerateSelfSignedResult generateSelfSigned(
+      SecurityFactory securityFactory,
       String signerType, String signerConf, IdentifiedCertprofile certprofile,
-      String subject, BigInteger serialNumber, CaUris caUris, ConfPairs extraControl)
+      String subject, BigInteger serialNumber, CaUris caUris, ConfPairs extraControl,
+      Date notBefore, Date notAfter)
           throws OperationException, InvalidConfException {
     notNull(securityFactory, "securityFactory");
     notBlank(signerType, "signerType");
@@ -156,14 +157,14 @@ class SelfSignedCertBuilder {
     }
 
     X509Cert newCert = generateCertificate(signer, certprofile, subject, serialNumber,
-        caUris, extraControl);
+        caUris, extraControl, notBefore, notAfter);
 
     return new GenerateSelfSignedResult(signerConf, newCert);
   } // method generateSelfSigned
 
   private static X509Cert generateCertificate(ConcurrentContentSigner signer,
       IdentifiedCertprofile certprofile, String subject, BigInteger serialNumber,
-      CaUris caUris, ConfPairs extraControl)
+      CaUris caUris, ConfPairs extraControl, Date notBefore, Date notAfter)
       throws OperationException {
     SubjectPublicKeyInfo publicKeyInfo;
     try {
@@ -218,18 +219,29 @@ class SelfSignedCertBuilder {
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
     }
 
-    Date notBefore = certprofile.getNotBefore(null);
+    notBefore = certprofile.getNotBefore(notBefore);
     if (notBefore == null) {
       notBefore = new Date();
     }
 
-    Validity validity = certprofile.getValidity();
-    if (validity == null) {
-      throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
-          "no validity specified in the profile " + certprofile.getIdent());
-    }
+    if (certprofile.hasNoWellDefinedExpirationDate()) {
+      if (notAfter == null) {
+        notAfter = new Date(253402300799982L); //9999-12-31-23-59-59
+      }
+    } else {
+      Validity validity = certprofile.getValidity();
+      if (validity == null) {
+        throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+            "no validity specified in the profile " + certprofile.getIdent());
+      }
 
-    Date notAfter = validity.add(notBefore);
+      Date maxNotAfter = validity.add(notBefore);
+      if (notAfter == null) {
+        notAfter = maxNotAfter;
+      } else if (notAfter.after(maxNotAfter)) {
+        notAfter = maxNotAfter;
+      }
+    }
 
     X500Name grantedSubject = subjectInfo.getGrantedSubject();
 

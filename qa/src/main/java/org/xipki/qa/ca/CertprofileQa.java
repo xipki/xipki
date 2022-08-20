@@ -67,7 +67,7 @@ public class CertprofileQa {
 
   private static final long SECOND = 1000L;
 
-  private static final long MAX_CERT_TIME_MS = 253402300799982L; //9999-12-31-23-59-59
+  private static final long MAX_CERT_TIME_MS = 253402300799000L; //9999-12-31-23-59-59.000
 
   private static final long EPOCHTIME_2050010100 = 2524608000L;
 
@@ -223,19 +223,25 @@ public class CertprofileQa {
     } else if (cert.getNotBefore().before(issuerInfo.getCaNotBefore())) {
       issue.setFailureMessage("notBefore may not be before CA's notBefore");
     } else {
-      Validity validity = certprofile.getValidity();
-      Date expectedNotAfter = validity.add(cert.getNotBefore());
-      if (expectedNotAfter.getTime() > MAX_CERT_TIME_MS) {
-        expectedNotAfter = new Date(MAX_CERT_TIME_MS);
-      }
+      if (certprofile.hasNoWellDefinedExpirationDate()) {
+        if (MAX_CERT_TIME_MS != cert.getNotAfter().getTime()) {
+          issue.setFailureMessage("cert notAfter != 99991231235959Z");
+        }
+      } else {
+        Validity validity = certprofile.getValidity();
+        Date expectedNotAfter = validity.add(cert.getNotBefore());
+        if (expectedNotAfter.getTime() > MAX_CERT_TIME_MS) {
+          expectedNotAfter = new Date(MAX_CERT_TIME_MS);
+        }
 
-      if (issuerInfo.isCutoffNotAfter()
-          && expectedNotAfter.after(issuerInfo.getCaNotAfter())) {
-        expectedNotAfter = issuerInfo.getCaNotAfter();
-      }
+        if (issuerInfo.isCutoffNotAfter()
+            && expectedNotAfter.after(issuerInfo.getCaNotAfter())) {
+          expectedNotAfter = issuerInfo.getCaNotAfter();
+        }
 
-      if (Math.abs(expectedNotAfter.getTime() - cert.getNotAfter().getTime()) > 60 * SECOND) {
-        issue.setFailureMessage("cert validity is not within " + validity.toString());
+        if (Math.abs(expectedNotAfter.getTime() - cert.getNotAfter().getTime()) > 60 * SECOND) {
+          issue.setFailureMessage("cert validity is not within " + validity.toString());
+        }
       }
     }
 

@@ -144,11 +144,11 @@ public class CertActions {
 
     @Option(name = "--ca", required = true, description = "CA name")
     @Completion(CaCompleters.CaNameCompleter.class)
-    private String caName;
+    protected String caName;
 
     @Option(name = "--csr", required = true, description = "CSR file")
     @Completion(FileCompleter.class)
-    private String csrFile;
+    protected String csrFile;
 
     @Option(name = "--outform", description = "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
@@ -157,17 +157,17 @@ public class CertActions {
     @Option(name = "--out", aliases = "-o", required = true,
         description = "where to save the certificate")
     @Completion(FileCompleter.class)
-    private String outFile;
+    protected String outFile;
 
     @Option(name = "--profile", aliases = "-p", required = true, description = "profile name")
     @Completion(CaCompleters.ProfileNameCompleter.class)
-    private String profileName;
+    protected String profileName;
 
     @Option(name = "--not-before", description = "notBefore, UTC time of format yyyyMMddHHmmss")
-    private String notBeforeS;
+    protected String notBeforeS;
 
     @Option(name = "--not-after", description = "notAfter, UTC time of format yyyyMMddHHmmss")
-    private String notAfterS;
+    protected String notAfterS;
 
     @Override
     protected Object execute0()
@@ -193,6 +193,43 @@ public class CertActions {
     } // method execute0
 
   } // class EnrollCert
+
+  @Command(scope = "ca", name = "enroll-cross-cert", description = "enroll cross certificate")
+  @Service
+  public static class EnrollCrossCert extends EnrollCert {
+
+    @Option(name = "--target-cert", required = true, description =
+        " certificate file, for which the cross certificate will be generated. " +
+            "There shall be not different in subject and public key between " +
+            "certFile and csrFile.")
+    @Completion(FileCompleter.class)
+    private String targetCertFile;
+
+    @Override
+    protected Object execute0()
+        throws Exception {
+      CaEntry ca = caManager.getCa(caName);
+      if (ca == null) {
+        throw new CmdFailure("CA " + caName + " not available");
+      }
+
+      Date notBefore = StringUtil.isNotBlank(notBeforeS)
+          ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
+
+      Date notAfter = StringUtil.isNotBlank(notAfterS)
+          ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
+
+      byte[] encodedCsr = IoUtil.read(csrFile);
+      byte[] encodedTargetCert = IoUtil.read(targetCertFile);
+
+      X509Cert cert = caManager.generateCrossCertificate(caName, profileName,
+          encodedCsr, encodedTargetCert, notBefore, notAfter);
+      saveVerbose("saved certificate to file", outFile, encodeCert(cert.getEncoded(), outform));
+
+      return null;
+    } // method execute0
+
+  } // class EnrollCrossCert
 
   @Command(scope = "ca", name = "gen-crl", description = "generate CRL")
   @Service

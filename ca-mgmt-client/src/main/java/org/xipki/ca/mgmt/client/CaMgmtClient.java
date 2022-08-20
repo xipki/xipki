@@ -618,6 +618,24 @@ public class CaMgmtClient implements CaManager {
   } // method removeCertificate
 
   @Override
+  public X509Cert generateCrossCertificate(
+      String caName, String profileName, byte[] encodedCsr, byte[] encodedTargetCert,
+      Date notBefore, Date notAfter)
+      throws CaMgmtException {
+    MgmtRequest.GenerateCrossCertificate req = new MgmtRequest.GenerateCrossCertificate();
+    req.setCaName(caName);
+    req.setProfileName(profileName);
+    req.setEncodedCsr(encodedCsr);
+    req.setEncodedTargetCert(encodedTargetCert);
+    req.setNotBefore(notBefore);
+    req.setNotAfter(notAfter);
+
+    byte[] respBytes = transmit(MgmtAction.generateCrossCertificate, req);
+    MgmtResponse.ByteArray resp = parse(respBytes, MgmtResponse.ByteArray.class);
+    return parseCert(resp.getResult());
+  } // method generateCertificate
+
+  @Override
   public X509Cert generateCertificate(String caName, String profileName,
       byte[] encodedCsr, Date notBefore, Date notAfter)
           throws CaMgmtException {
@@ -635,13 +653,15 @@ public class CaMgmtClient implements CaManager {
 
   @Override
   public X509Cert generateRootCa(CaEntry caEntry, String certprofileName,
-      String subject, String serialNumber)
+      String subject, String serialNumber, Date notBefore, Date notAfter)
           throws CaMgmtException {
     MgmtRequest.GenerateRootCa req = new MgmtRequest.GenerateRootCa();
     req.setCaEntry(new CaEntryWrapper(caEntry));
     req.setCertprofileName(certprofileName);
     req.setSubject(subject);
     req.setSerialNumber(serialNumber);
+    req.setNotBefore(notBefore);
+    req.setNotAfter(notAfter);
 
     byte[] respBytes = transmit(MgmtAction.generateRootCa, req);
     MgmtResponse.ByteArray resp = parse(respBytes, MgmtResponse.ByteArray.class);

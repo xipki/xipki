@@ -70,7 +70,7 @@ class GrandCertTemplateBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(GrandCertTemplateBuilder.class);
 
-  private static final long MAX_CERT_TIME_MS = 253402300799982L; //9999-12-31-23-59-59
+  private static final long MAX_CERT_TIME_MS = 253402300799000L; //9999-12-31-23-59-59.000
 
   private static final Date MAX_CERT_TIME = new Date(MAX_CERT_TIME_MS);
 
@@ -134,13 +134,21 @@ class GrandCertTemplateBuilder {
       default:
     }
 
-    X500Name requestedSubject = CaUtil.removeEmptyRdns(certTemplate.getSubject());
+    boolean forCrossCert = certTemplate.isForCrossCert();
+    ;
+    X500Name requestedSubject;
 
-    if (!certprofile.isSerialNumberInReqPermitted()) {
-      RDN[] rdns = requestedSubject.getRDNs(ObjectIdentifiers.DN.SN);
-      if (rdns != null && rdns.length > 0) {
-        throw new OperationException(BAD_CERT_TEMPLATE,
-            "subjectDN SerialNumber in request is not permitted");
+    if (forCrossCert) {
+      requestedSubject = certTemplate.getSubject();
+    } else {
+      requestedSubject = CaUtil.removeEmptyRdns(certTemplate.getSubject());
+
+      if (!certprofile.isSerialNumberInReqPermitted()) {
+        RDN[] rdns = requestedSubject.getRDNs(ObjectIdentifiers.DN.SN);
+        if (rdns != null && rdns.length > 0) {
+          throw new OperationException(BAD_CERT_TEMPLATE,
+              "subjectDN SerialNumber in request is not permitted");
+        }
       }
     }
 
@@ -283,7 +291,7 @@ class GrandCertTemplateBuilder {
       }
 
       grantedPublicKeyInfo = new SubjectPublicKeyInfo(privateKey.getPrivateKeyAlgorithm(),
-                              publicKeyData);
+          publicKeyData);
       try {
         grantedPublicKeyInfo = X509Util.toRfc3279Style(grantedPublicKeyInfo);
       } catch (InvalidKeySpecException ex) {
@@ -303,17 +311,35 @@ class GrandCertTemplateBuilder {
       throw new OperationException(BAD_CERT_TEMPLATE, ex);
     }
 
-    // subject
+    StringBuilder msgBuilder = new StringBuilder();
+
     Certprofile.SubjectInfo subjectInfo;
     try {
       subjectInfo = certprofile.getSubject(requestedSubject, grantedPublicKeyInfo);
     } catch (CertprofileException ex) {
-      throw new OperationException(SYSTEM_FAILURE, "exception in cert profile " + certprofileIdent);
+      throw new OperationException(SYSTEM_FAILURE,
+          "exception in cert profile " + certprofileIdent);
     } catch (BadCertTemplateException ex) {
       throw new OperationException(BAD_CERT_TEMPLATE, ex);
     }
 
-    X500Name grantedSubject = subjectInfo.getGrantedSubject();
+    // subject
+    X500Name grantedSubject;
+    if (forCrossCert) {
+      // For cross certificate, the original requested certificate must be used.
+      if (!X509Util.canonicalizName(subjectInfo.getGrantedSubject())
+          .equals(X509Util.canonicalizName(requestedSubject))) {
+        throw new OperationException(BAD_CERT_TEMPLATE,
+            "subject did not match the certificate profile");
+      }
+      grantedSubject = requestedSubject;
+    } else {
+      grantedSubject = subjectInfo.getGrantedSubject();
+
+      if (subjectInfo.getWarning() != null) {
+        msgBuilder.append(", ").append(subjectInfo.getWarning());
+      }
+    }
 
     // make sure that empty subject is not permitted
     ASN1ObjectIdentifier[] attrTypes = grantedSubject.getAttributeTypes();
@@ -338,64 +364,65 @@ class GrandCertTemplateBuilder {
       }
     } // end if(update)
 
-    StringBuilder msgBuilder = new StringBuilder();
+    Date grantedNotAfter;
 
-    if (subjectInfo.getWarning() != null) {
-      msgBuilder.append(", ").append(subjectInfo.getWarning());
-    }
-
-    Validity validity = certprofile.getValidity();
-
-    if (validity == null) {
-      validity = caInfo.getMaxValidity();
-    } else if (validity.compareTo(caInfo.getMaxValidity()) > 0) {
-      validity = caInfo.getMaxValidity();
-    }
-
-    Date maxNotAfter = validity.add(grantedNotBefore);
-    // maxNotAfter not after 99991231-235959
-    if (maxNotAfter.getTime() > MAX_CERT_TIME_MS) {
-      maxNotAfter = MAX_CERT_TIME;
-    }
-
-    Date grantedNotAfter = certTemplate.getNotAfter();
-    if (grantedNotAfter != null) {
-      if (grantedNotAfter.after(maxNotAfter)) {
-        grantedNotAfter = maxNotAfter;
-        msgBuilder.append(", notAfter modified");
-      }
+    if (certprofile.hasNoWellDefinedExpirationDate()) {
+      grantedNotAfter = MAX_CERT_TIME;
     } else {
-      grantedNotAfter = maxNotAfter;
-    }
+      Validity validity = certprofile.getValidity();
 
-    if (grantedNotAfter.after(caInfo.getNotAfter())) {
-      ValidityMode caMode = caInfo.getValidityMode();
-      NotAfterMode profileMode = certprofile.getNotAfterMode();
-      if (profileMode == null) {
-        profileMode = NotAfterMode.BY_CA;
+      if (validity == null) {
+        validity = caInfo.getMaxValidity();
+      } else if (validity.compareTo(caInfo.getMaxValidity()) > 0) {
+        validity = caInfo.getMaxValidity();
       }
 
-      if (profileMode == NotAfterMode.STRICT) {
-        throw new OperationException(NOT_PERMITTED,
-                "notAfter outside of CA's validity is not permitted by the CertProfile");
+      Date maxNotAfter = validity.add(grantedNotBefore);
+      // maxNotAfter not after 99991231-235959.000
+      if (maxNotAfter.getTime() > MAX_CERT_TIME_MS) {
+        maxNotAfter = MAX_CERT_TIME;
       }
 
-      if (caMode == ValidityMode.STRICT) {
-        throw new OperationException(NOT_PERMITTED,
-                "notAfter outside of CA's validity is not permitted by the CA");
-      }
+      grantedNotAfter = certTemplate.getNotAfter();
 
-      if (caMode == ValidityMode.CUTOFF) {
-        grantedNotAfter = caInfo.getNotAfter();
-      } else if (caMode == ValidityMode.LAX) {
-        if (profileMode == NotAfterMode.CUTOFF) {
-          grantedNotAfter = caInfo.getNotAfter();
+      if (grantedNotAfter != null) {
+        if (grantedNotAfter.after(maxNotAfter)) {
+          grantedNotAfter = maxNotAfter;
+          msgBuilder.append(", notAfter modified");
         }
       } else {
-        throw new IllegalStateException("should not reach here, CA ValidityMode " + caMode
-                + " CertProfile NotAfterMode " + profileMode);
-      } // end if (mode)
-    } // end if (notAfter)
+        grantedNotAfter = maxNotAfter;
+      }
+
+      if (grantedNotAfter.after(caInfo.getNotAfter())) {
+        ValidityMode caMode = caInfo.getValidityMode();
+        NotAfterMode profileMode = certprofile.getNotAfterMode();
+        if (profileMode == null) {
+          profileMode = NotAfterMode.BY_CA;
+        }
+
+        if (profileMode == NotAfterMode.STRICT) {
+          throw new OperationException(NOT_PERMITTED,
+              "notAfter outside of CA's validity is not permitted by the CertProfile");
+        }
+
+        if (caMode == ValidityMode.STRICT) {
+          throw new OperationException(NOT_PERMITTED,
+              "notAfter outside of CA's validity is not permitted by the CA");
+        }
+
+        if (caMode == ValidityMode.CUTOFF) {
+          grantedNotAfter = caInfo.getNotAfter();
+        } else if (caMode == ValidityMode.LAX) {
+          if (profileMode == NotAfterMode.CUTOFF) {
+            grantedNotAfter = caInfo.getNotAfter();
+          }
+        } else {
+          throw new IllegalStateException("should not reach here, CA ValidityMode " + caMode
+              + " CertProfile NotAfterMode " + profileMode);
+        } // end if (caMode)
+      } // end if (grantedNotAfter)
+    }
 
     String warning = null;
     if (msgBuilder.length() > 2) {

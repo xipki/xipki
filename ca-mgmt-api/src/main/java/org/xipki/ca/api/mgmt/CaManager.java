@@ -665,9 +665,35 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  X509Cert generateCertificate(String caName, String profileName, byte[] encodedCsr,
-      Date notBefore, Date notAfter)
+  X509Cert generateCertificate(String caName, String profileName,
+          byte[] encodedCsr, Date notBefore, Date notAfter)
           throws CaMgmtException;
+
+  /**
+   * CA {@code caName} issues a new certificate.
+   *
+   * @param caName
+   *          CA name. Must not be {@code null}.
+   * @param profileName
+   *          Name of the certificate profile. Must not be {@code null}.
+   * @param encodedCsr
+   *          CSR. Must not be {@code null}.
+   * @param encodedTargetCert
+   *          certificate file, for which the cross certificate will be
+   *          generated. There shall be not different in subject and public
+   *          key between #encodedCsr and #encodedCert.
+   * @param notBefore
+   *          NotBefore.
+   * @param notAfter
+   *          NotAfter
+   * @return the issued certificate
+   * @throws CaMgmtException
+   *          if error occurs.
+   */
+  X509Cert generateCrossCertificate(
+      String caName, String profileName, byte[] encodedCsr, byte[] encodedTargetCert,
+      Date notBefore, Date notAfter)
+      throws CaMgmtException;
 
   /**
    * Generates a self-signed CA certificate.
@@ -681,12 +707,16 @@ public interface CaManager {
    *          Serial number. {@code null}: lets CA choose the serial number;
    *          fixed serialnumber: decimal or heximal (beginning with 0x) number;
    *          RANDOM:&lt;size in bytes&gt; random number with given length.
+   * @param notBefore
+   *          NotBefore.
+   * @param notAfter
+   *          NotAfter
    * @return the generated certificate
    * @throws CaMgmtException
    *          if error occurs.
    */
   X509Cert generateRootCa(CaEntry caEntry, String certprofileName,
-      String subject, String serialNumber)
+      String subject, String serialNumber, Date notBefore, Date notAfter)
           throws CaMgmtException;
 
   /**

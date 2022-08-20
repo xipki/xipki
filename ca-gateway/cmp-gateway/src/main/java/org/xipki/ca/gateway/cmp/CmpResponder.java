@@ -247,7 +247,8 @@ public class CmpResponder extends BaseCmpResponder {
       return new CertRepMessage(null, certResps);
     }
 
-    return enrollCerts(caName, groupEnroll, kup, requestor, tid, certTemplateDatas, event);
+    boolean cross = request.getBody().getType() == PKIBody.TYPE_CROSS_CERT_REQ;
+    return enrollCerts(caName, groupEnroll, kup, cross, requestor, tid, certTemplateDatas, event);
   } // method processCertReqMessages
 
   /**
@@ -321,7 +322,7 @@ public class CmpResponder extends BaseCmpResponder {
           }
 
           try {
-            certResp = enrollCerts(caName, false, false, requestor, tid,
+            certResp = enrollCerts(caName, false, false, false, requestor, tid,
                 Collections.singletonList(certTemplate), event);
           } catch (IOException e) {
             LogUtil.error(LOG, e);
@@ -348,7 +349,7 @@ public class CmpResponder extends BaseCmpResponder {
   } // method processP10cr
 
   private CertRepMessage enrollCerts(
-      String caName, boolean groupEnroll, boolean kup, Requestor requestor,
+      String caName, boolean groupEnroll, boolean kup, boolean cross, Requestor requestor,
       ASN1OctetString tid, List<EnrollCertRequestEntry> templates, AuditEvent event)
       throws IOException, SdkErrorResponseException {
     EnrollCertsRequest sdkReq = new EnrollCertsRequest();
@@ -372,9 +373,12 @@ public class CmpResponder extends BaseCmpResponder {
           "\"" + X509Util.x500NameText(subject) + "\"");
     }
 
-    EnrollOrPollCertsResponse resp = kup
-        ? sdk.enrollKupCerts(caName, sdkReq)
-        : sdk.enrollCerts(caName, sdkReq);
+    EnrollOrPollCertsResponse resp;
+    if (cross) {
+      resp = sdk.enrollCrossCerts(caName, sdkReq);
+    } else {
+      resp = kup ? sdk.enrollKupCerts(caName, sdkReq) :sdk.enrollCerts(caName, sdkReq);
+    }
 
     List<EnrollOrPullCertResponseEntry> rentries = resp.getEntries();
     CertResponse[] certResponses = new CertResponse[rentries.size()];

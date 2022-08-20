@@ -65,6 +65,7 @@ public abstract class MgmtMessage {
     clearPublishQueue,
     exportConf,
     generateCertificate,
+    generateCrossCertificate,
     generateCrlOnDemand,
     generateRootCa,
     getAliasesForCa,

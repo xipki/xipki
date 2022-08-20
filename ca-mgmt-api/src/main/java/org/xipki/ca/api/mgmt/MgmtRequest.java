@@ -381,6 +381,60 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class GenerateCertificate
 
+  public static class GenerateCrossCertificate extends CaNameRequest {
+
+    private String profileName;
+
+    private byte[] encodedCsr;
+
+    private byte[] encodedTargetCert;
+
+    private Date notBefore;
+
+    private Date notAfter;
+
+    public String getProfileName() {
+      return profileName;
+    }
+
+    public void setProfileName(String profileName) {
+      this.profileName = profileName;
+    }
+
+    public byte[] getEncodedCsr() {
+      return encodedCsr;
+    }
+
+    public void setEncodedCsr(byte[] encodedCsr) {
+      this.encodedCsr = encodedCsr;
+    }
+
+    public byte[] getEncodedTargetCert() {
+      return encodedTargetCert;
+    }
+
+    public void setEncodedTargetCert(byte[] encodedTargetCert) {
+      this.encodedTargetCert = encodedTargetCert;
+    }
+
+    public Date getNotBefore() {
+      return notBefore;
+    }
+
+    public void setNotBefore(Date notBefore) {
+      this.notBefore = notBefore;
+    }
+
+    public Date getNotAfter() {
+      return notAfter;
+    }
+
+    public void setNotAfter(Date notAfter) {
+      this.notAfter = notAfter;
+    }
+
+  } // class GenerateCrossCertificate
+
   public static class GenerateRootCa extends MgmtRequest {
 
     private CaEntryWrapper caEntry;
@@ -390,6 +444,10 @@ public abstract class MgmtRequest extends MgmtMessage {
     private String subject;
 
     private String serialNumber;
+
+    private Date notBefore;
+
+    private Date notAfter;
 
     public CaEntryWrapper getCaEntry() {
       return caEntry;
@@ -423,6 +481,21 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.serialNumber = serialNumber;
     }
 
+    public Date getNotBefore() {
+      return notBefore;
+    }
+
+    public void setNotBefore(Date notBefore) {
+      this.notBefore = notBefore;
+    }
+
+    public Date getNotAfter() {
+      return notAfter;
+    }
+
+    public void setNotAfter(Date notAfter) {
+      this.notAfter = notAfter;
+    }
   } // class GenerateRootCa
 
   public static class GetCert extends MgmtRequest {

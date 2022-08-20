@@ -671,6 +671,20 @@ public abstract class Certprofile implements Closeable {
   public abstract Validity getValidity();
 
   /**
+   * As in RFC5280:
+   *
+   *    To indicate that a certificate has no well-defined expiration date,
+   *    the notAfter SHOULD be assigned the GeneralizedTime value of
+   *    99991231235959Z.
+   *
+   * @return true to use the fixed value 99991231235959Z in notAfter, false
+   *   as in defined in {@link #getValidity()}.
+   */
+  public boolean hasNoWellDefinedExpirationDate() {
+    return false;
+  }
+
+  /**
    * Checks the public key. If the check passes, returns the canonicalized public key.
    *
    * @param publicKey

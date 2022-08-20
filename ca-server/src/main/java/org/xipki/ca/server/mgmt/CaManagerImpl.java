@@ -1163,8 +1163,18 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public X509Cert generateCertificate(String caName, String profileName,
-      byte[] encodedCsr, Date notBefore, Date notAfter) throws CaMgmtException {
-    return ca2Manager.generateCertificate(caName, profileName, encodedCsr, notBefore, notAfter);
+      byte[] encodedCsr, Date notBefore, Date notAfter)
+      throws CaMgmtException {
+    return ca2Manager.generateCertificate(caName, profileName,
+        encodedCsr, notBefore, notAfter);
+  }
+
+  @Override
+  public X509Cert generateCrossCertificate(String caName, String profileName,
+       byte[] encodedCsr, byte[] encodedTargetCert, Date notBefore, Date notAfter)
+      throws CaMgmtException {
+    return ca2Manager.generateCrossCertificate(caName, profileName, encodedCsr,
+        encodedTargetCert, notBefore, notAfter);
   }
 
   public X509Ca getX509Ca(String name) throws CaMgmtException {
@@ -1188,8 +1198,9 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public X509Cert generateRootCa(CaEntry caEntry, String profileName, String subject,
-      String serialNumber) throws CaMgmtException {
-    return ca2Manager.generateRootCa(caEntry, profileName, subject, serialNumber);
+      String serialNumber, Date notBefore, Date notAfter) throws CaMgmtException {
+    return ca2Manager.generateRootCa(caEntry, profileName, subject, serialNumber,
+        notBefore, notAfter);
   }
 
   void assertMasterMode() throws CaMgmtException {

@@ -84,6 +84,8 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private Validity validity;
 
+  private boolean hasNoWellDefinedExpirationDate;
+
   private NotAfterMode notAfterMode;
 
   private X509CertVersion version;
@@ -103,6 +105,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     notBeforeOption = null;
     subjectControl = null;
     validity = null;
+    hasNoWellDefinedExpirationDate = false;
     notAfterMode = null;
     version = null;
     extensions = null;
@@ -174,7 +177,13 @@ public class XijsonCertprofile extends BaseCertprofile {
     this.raOnly = conf.getRaOnly() != null && conf.getRaOnly();
     this.maxSize = conf.getMaxSize();
 
-    this.validity = Validity.getInstance(conf.getValidity());
+    if ("99991231235959Z".equalsIgnoreCase(conf.getValidity())) {
+      this.hasNoWellDefinedExpirationDate = true;
+      this.validity = null;
+    } else {
+      this.hasNoWellDefinedExpirationDate = false;
+      this.validity = Validity.getInstance(conf.getValidity());
+    }
     this.notAfterMode = conf.getNotAfterMode();
     this.certLevel = conf.getCertLevel();
     if (this.certLevel == null) {
@@ -327,6 +336,11 @@ public class XijsonCertprofile extends BaseCertprofile {
   protected boolean initExtraExtension(ExtensionType extn)
       throws CertprofileException {
     return false;
+  }
+
+  @Override
+  public boolean hasNoWellDefinedExpirationDate() {
+    return this.hasNoWellDefinedExpirationDate;
   }
 
   @Override
