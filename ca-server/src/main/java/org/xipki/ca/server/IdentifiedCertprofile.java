@@ -337,7 +337,15 @@ public class IdentifiedCertprofile implements Closeable {
     ASN1ObjectIdentifier extType = Extension.subjectKeyIdentifier;
     ExtensionControl extControl = controls.remove(extType);
     if (extControl != null) {
-      SubjectKeyIdentifier value = certprofile.getSubjectKeyIdentifier(publicKeyInfo);
+      // If specified by the request, use it
+      Extension reqExtn = requestedExtns.get(extType);
+      SubjectKeyIdentifier value;
+      if (reqExtn == null) {
+        value = certprofile.getSubjectKeyIdentifier(publicKeyInfo);
+      } else {
+        value = new SubjectKeyIdentifier(
+            SubjectKeyIdentifier.getInstance(reqExtn.getParsedValue()).getKeyIdentifier());
+      }
       addExtension(values, extType, value, extControl);
     }
 

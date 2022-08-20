@@ -288,32 +288,4 @@ public class SdkClient {
     return resp.getPayload();
   }
 
-  public static boolean verifyCsr(CertificationRequest csr, SecurityFactory securityFactory,
-                                  PopControl popControl) {
-    notNull(csr, "csr");
-    notNull(popControl, "popControl");
-
-    ASN1ObjectIdentifier algOid = csr.getSignatureAlgorithm().getAlgorithm();
-
-    DHSigStaticKeyCertPair kaKeyAndCert = null;
-    if (ObjectIdentifiers.Xipki.id_alg_dhPop_x25519.equals(algOid)
-        || ObjectIdentifiers.Xipki.id_alg_dhPop_x448.equals(algOid)) {
-      DhSigStatic dhSigStatic = DhSigStatic.getInstance(csr.getSignature().getBytes());
-      IssuerAndSerialNumber isn = dhSigStatic.getIssuerAndSerial();
-
-      ASN1ObjectIdentifier keyOid = csr.getCertificationRequestInfo().getSubjectPublicKeyInfo()
-          .getAlgorithm().getAlgorithm();
-      kaKeyAndCert = popControl.getDhKeyCertPair(isn.getName(), isn.getSerialNumber().getValue(),
-          EdECConstants.getName(keyOid));
-
-      if (kaKeyAndCert == null) {
-        return false;
-      }
-    }
-
-    AlgorithmValidator popValidator = popControl.getPopAlgoValidator();
-
-    return securityFactory.verifyPop(csr, popValidator, kaKeyAndCert);
-  } // method verifyCsr
-
 }

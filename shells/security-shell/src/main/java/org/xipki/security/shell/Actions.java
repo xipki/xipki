@@ -345,6 +345,11 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String peerCertsFile;
 
+    @Option(name = "--cert",
+        description = "Certificate file, from which subject and extensions will be extracted.")
+    @Completion(FileCompleter.class)
+    private String certFile;
+
     @Option(name = "--subject", aliases = "-s", description = "subject in the CSR, "
             + "if not set, use the subject in the signer's certificate ")
     private String subject;
@@ -422,13 +427,61 @@ public class Actions {
     @Override
     protected Object execute0()
             throws Exception {
+      ConcurrentContentSigner signer = getSigner();
+
+      SubjectPublicKeyInfo subjectPublicKeyInfo;
+      if (signer.getCertificate() != null) {
+        Certificate cert = Certificate.getInstance(signer.getCertificate().getEncoded());
+        subjectPublicKeyInfo = cert.getSubjectPublicKeyInfo();
+      } else {
+        subjectPublicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(signer.getPublicKey());
+      }
+
+      if (certFile != null) {
+        Certificate cert = Certificate.getInstance(X509Util.toDerEncoded(IoUtil.read(certFile)));
+        if (!Arrays.equals(subjectPublicKeyInfo.getEncoded(),
+            cert.getSubjectPublicKeyInfo().getEncoded())) {
+          throw new IllegalCmdParamException(
+              "PublicKey extracted from signer is different than in the certificate");
+        }
+
+        X500Name subjectDn = cert.getSubject();
+        List<Extension> extensions = new LinkedList<>();
+        Extensions certExtns = cert.getTBSCertificate().getExtensions();
+
+        List<ASN1ObjectIdentifier> excludeOids = Arrays.asList(
+            Extension.authorityKeyIdentifier,
+            Extension.authorityInfoAccess,
+            Extension.certificateIssuer,
+            Extension.certificatePolicies,
+            Extension.cRLDistributionPoints,
+            Extension.freshestCRL,
+            Extension.nameConstraints,
+            Extension.policyMappings,
+            Extension.policyConstraints,
+            Extension.certificatePolicies,
+            Extension.subjectInfoAccess,
+            Extension.subjectDirectoryAttributes);
+
+        for (ASN1ObjectIdentifier certExtnOid : certExtns.getExtensionOIDs()) {
+          if (!excludeOids.contains(certExtnOid)) {
+            extensions.add(certExtns.getExtension(certExtnOid));
+          }
+        }
+
+        PKCS10CertificationRequest csr = generateRequest(signer, subjectPublicKeyInfo, subjectDn,
+            challengePassword, extensions);
+        saveVerbose("saved CSR to file", outputFilename, encodeCsr(csr.getEncoded(), outform));
+        return null;
+      }
+
       if (extkeyusages != null) {
         List<String> list = new ArrayList<>(extkeyusages.size());
         for (String m : extkeyusages) {
           String id = Completers.ExtKeyusageCompleter.getIdForUsageName(m);
           if (id == null) {
             try {
-              id = new ASN1ObjectIdentifier(m).getId();
+              new ASN1ObjectIdentifier(m);
             } catch (Exception ex) {
               throw new IllegalCmdParamException("invalid extended key usage " + m);
             }
@@ -563,27 +616,6 @@ public class Actions {
 
       extensions.addAll(getAdditionalExtensions());
 
-      ConcurrentContentSigner signer = getSigner();
-
-      Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
-      if (CollectionUtil.isNotEmpty(extensions)) {
-        attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest,
-                new Extensions(extensions.toArray(new Extension[0])));
-      }
-
-      if (StringUtil.isNotBlank(challengePassword)) {
-        attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword,
-                new DERPrintableString(challengePassword));
-      }
-
-      SubjectPublicKeyInfo subjectPublicKeyInfo;
-      if (signer.getCertificate() != null) {
-        Certificate cert = Certificate.getInstance(signer.getCertificate().getEncoded());
-        subjectPublicKeyInfo = cert.getSubjectPublicKeyInfo();
-      } else {
-        subjectPublicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(signer.getPublicKey());
-      }
-
       X500Name subjectDn;
       if (subject == null) {
         if (StringUtil.isNotBlank(dateOfBirth)) {
@@ -644,8 +676,7 @@ public class Actions {
       }
 
       PKCS10CertificationRequest csr = generateRequest(signer, subjectPublicKeyInfo, subjectDn,
-              attributes);
-
+              challengePassword, extensions);
       saveVerbose("saved CSR to file", outputFilename, encodeCsr(csr.getEncoded(), outform));
       return null;
     } // method execute0
@@ -687,13 +718,24 @@ public class Actions {
     } // method textToAsn1ObjectIdentifers
 
     private PKCS10CertificationRequest generateRequest(
-            ConcurrentContentSigner signer,
-            SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
-            Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
+            ConcurrentContentSigner signer, SubjectPublicKeyInfo subjectPublicKeyInfo,
+            X500Name subjectDn, String challengePassword, List<Extension> extensions)
             throws XiSecurityException {
       Args.notNull(signer, "signer");
       Args.notNull(subjectPublicKeyInfo, "subjectPublicKeyInfo");
       Args.notNull(subjectDn, "subjectDn");
+
+      Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
+      if (CollectionUtil.isNotEmpty(extensions)) {
+        attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest,
+            new Extensions(extensions.toArray(new Extension[0])));
+      }
+
+      if (StringUtil.isNotBlank(challengePassword)) {
+        attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword,
+            new DERPrintableString(challengePassword));
+      }
+
       PKCS10CertificationRequestBuilder csrBuilder =
               new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
       if (CollectionUtil.isNotEmpty(attributes)) {

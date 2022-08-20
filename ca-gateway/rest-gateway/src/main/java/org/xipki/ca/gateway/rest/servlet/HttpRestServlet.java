@@ -20,6 +20,7 @@ package org.xipki.ca.gateway.rest.servlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
+import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.RestResponse;
 import org.xipki.ca.gateway.rest.RestResponder;
 import org.xipki.ca.gateway.servlet.HttpRequestMetadataRetrieverImpl;
@@ -95,6 +96,7 @@ public class HttpRestServlet extends HttpServlet {
     } finally {
       event.finish();
       auditService.logEvent(event);
+      GatewayUtil.logAuditEvent(LOG, event);
     }
   } // method service0
 

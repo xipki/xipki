@@ -21,6 +21,7 @@ import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
+import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.cmp.CmpResponder;
 import org.xipki.ca.gateway.servlet.HttpRespAuditException;
 import org.xipki.ca.gateway.servlet.ServletHelper;
@@ -161,6 +162,7 @@ public class HttpCmpServlet extends HttpServlet {
       resp.flushBuffer();
       event.finish();
       auditService.logEvent(event);
+      GatewayUtil.logAuditEvent(LOG, event);
     }
   } // method doPost
 

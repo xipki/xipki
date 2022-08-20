@@ -337,6 +337,8 @@ public class ScepResponder {
 
     event.finish();
     auditService.logEvent(event);
+
+    GatewayUtil.logAuditEvent(LOG, event);
   } // method audit
 
   private byte[] getCaCertResp(String caName)
@@ -520,7 +522,7 @@ public class ScepResponder {
           event.addEventData(CaAuditConstants.NAME_req_subject,
               "\"" + X509Util.x500NameText(reqSubject) + "\"");
 
-          if (!SdkClient.verifyCsr(csr, securityFactory, popControl)) {
+          if (!GatewayUtil.verifyCsr(csr, securityFactory, popControl)) {
             LOG.warn("tid={} POP verification failed", tid);
             throw FailInfoException.BAD_MESSAGE_CHECK;
           }

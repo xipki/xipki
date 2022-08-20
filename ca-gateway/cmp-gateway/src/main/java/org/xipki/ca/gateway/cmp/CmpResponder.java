@@ -265,7 +265,7 @@ public class CmpResponder extends BaseCmpResponder {
     CertRepMessage certResp;
     ASN1Integer certReqId = new ASN1Integer(-1);
 
-    if (!SdkClient.verifyCsr(p10cr, securityFactory, popControl)) {
+    if (!GatewayUtil.verifyCsr(p10cr, securityFactory, popControl)) {
       LOG.warn("could not validate POP for the pkcs#10 requst");
       certResp = buildErrCertResp(certReqId, badPOP, "invalid POP");
     } else {

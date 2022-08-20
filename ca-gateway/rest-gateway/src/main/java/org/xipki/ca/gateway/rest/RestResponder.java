@@ -459,7 +459,7 @@ public class RestResponder {
       }
 
       CertificationRequest csr = CertificationRequest.getInstance(request);
-      if (!SdkClient.verifyCsr(csr, securityFactory, popControl)) {
+      if (!GatewayUtil.verifyCsr(csr, securityFactory, popControl)) {
         throw new OperationException(BAD_POP);
       }
 
@@ -605,15 +605,15 @@ public class RestResponder {
         }
 
         String type = pemObject.getType();
-        if (PemLabel.CERTIFICATE_REQUEST.equals(type)) {
+        if (PemLabel.CERTIFICATE_REQUEST.getType().equals(type)) {
           if (csrBytes != null) {
             throw new HttpRespAuditException(BAD_REQUEST, "duplicated PEM CSRs",
                 AuditLevel.INFO, AuditStatus.FAILED);
           }
           csrBytes = pemObject.getContent();
-        } else if (PemLabel.CERTIFICATE.equals(type)) {
+        } else if (PemLabel.CERTIFICATE.getType().equals(type)) {
           if (targetCertBytes != null) {
-            throw new HttpRespAuditException(BAD_REQUEST, "duplicated PEM CERTIFICATEs",
+            throw new HttpRespAuditException(BAD_REQUEST, "duplicated PEM certificates",
                 AuditLevel.INFO, AuditStatus.FAILED);
           }
           targetCertBytes = pemObject.getContent();
@@ -637,7 +637,7 @@ public class RestResponder {
     }
 
     CertificationRequest csr = CertificationRequest.getInstance(csrBytes);
-    if (!SdkClient.verifyCsr(csr, securityFactory, popControl)) {
+    if (!GatewayUtil.verifyCsr(csr, securityFactory, popControl)) {
       throw new OperationException(BAD_POP);
     }
 
