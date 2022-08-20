@@ -35,9 +35,6 @@ xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
 xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
   qa/qa.d/rootca.json
 
-xi:replace --old "REPLACEME-OUTFORM" --new "$OUTFORM" \
-  qa/qa.d/rootca.json
-
 if { $TOKEN_TYPE equals "pkcs11" } then {
   ca:refresh-token --type pkcs11
 }

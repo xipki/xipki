@@ -307,9 +307,9 @@ public class CaConf {
             }
 
             Date notBefore = gsi.getNotBefore() == null ? null
-                : DateUtil.parseUtcTimeyyyyMMdd(gsi.getNotBefore());
-            Date notAfter = gsi.getNotBefore() == null ? null
-                : DateUtil.parseUtcTimeyyyyMMdd(gsi.getNotAfter());
+                : DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.getNotBefore());
+            Date notAfter = gsi.getNotAfter() == null ? null
+                : DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.getNotAfter());
             genSelfIssued = new GenSelfIssued(gsi.getProfile(),
                 gsi.getSubject(), gsi.getSerialNumber(), notBefore, notAfter);
           }

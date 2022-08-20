@@ -95,7 +95,6 @@
 			},
 			"expirationPeriod":365,
 			"genSelfIssued":{
-				"certOutform":"der",
 				"subject":"REPLACEME-SUBJECT",
 				"profile":"rootca",
 				"serialNumber":"1"
