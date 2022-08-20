@@ -385,69 +385,6 @@ class IaikP11SlotUtil {
   } // method removeObjects
 
   static void setKeyAttributes(P11NewKeyControl control,
-      PublicKey publicKey, PrivateKey privateKey, P11NewObjectConf newObjectConf) {
-    if (privateKey != null) {
-      privateKey.getToken().setBooleanValue(true);
-      if (newObjectConf.isIgnoreLabel()) {
-        if (control.getLabel() != null) {
-          LOG.warn("label is set, but ignored: '{}'", control.getLabel());
-        }
-      } else {
-        privateKey.getLabel().setCharArrayValue(control.getLabel().toCharArray());
-      }
-      privateKey.getPrivate().setBooleanValue(true);
-
-      if (control.getExtractable() != null) {
-        privateKey.getExtractable().setBooleanValue(control.getExtractable());
-      }
-
-      if (control.getSensitive() != null) {
-        privateKey.getSensitive().setBooleanValue(control.getSensitive());
-      }
-
-      Set<P11KeyUsage> usages = control.getUsages();
-      final Boolean TRUE = Boolean.TRUE;
-      if (isNotEmpty(usages)) {
-        for (P11KeyUsage usage : usages) {
-          if (usage == P11KeyUsage.DECRYPT) {
-            privateKey.getDecrypt().setBooleanValue(TRUE);
-          } else if (usage == P11KeyUsage.DERIVE) {
-            privateKey.getDerive().setBooleanValue(TRUE);
-          } else if (usage == P11KeyUsage.SIGN) {
-            privateKey.getSign().setBooleanValue(TRUE);
-          } else if (usage == P11KeyUsage.SIGN_RECOVER) {
-            privateKey.getSignRecover().setBooleanValue(TRUE);
-          } else if (usage == P11KeyUsage.UNWRAP) {
-            privateKey.getUnwrap().setBooleanValue(TRUE);
-          }
-        }
-      } else {
-        long keyType = privateKey.getKeyType().getLongValue();
-        // if not set
-        if (keyType == PKCS11Constants.CKK_EC
-            || keyType == PKCS11Constants.CKK_RSA
-            || keyType == PKCS11Constants.CKK_DSA
-            || keyType == PKCS11Constants.CKK_VENDOR_SM2) {
-          privateKey.getSign().setBooleanValue(TRUE);
-        }
-
-        if (keyType == PKCS11Constants.CKK_RSA) {
-          privateKey.getUnwrap().setBooleanValue(TRUE);
-          privateKey.getDecrypt().setBooleanValue(TRUE);
-        }
-      }
-    }
-
-    if (publicKey != null) {
-      publicKey.getToken().setBooleanValue(true);
-      if (!newObjectConf.isIgnoreLabel()) {
-        publicKey.getLabel().setCharArrayValue(control.getLabel().toCharArray());
-      }
-      publicKey.getVerify().setBooleanValue(true);
-    }
-  } // method setKeyAttributes
-
-  static void setKeyAttributes(P11NewKeyControl control,
       SecretKey template, char[] label) {
     template.getToken().setBooleanValue(true);
     if (label != null) {
