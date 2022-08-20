@@ -597,29 +597,33 @@ public class RestResponder {
     byte[] targetCertBytes = null;
 
     PemReader pemReader = new PemReader(new InputStreamReader(new ByteArrayInputStream(request)));
-    while (true) {
-      PemObject pemObject = pemReader.readPemObject();
-      if (pemObject == null) {
-        break;
-      }
+    try {
+      while (true) {
+        PemObject pemObject = pemReader.readPemObject();
+        if (pemObject == null) {
+          break;
+        }
 
-      String type = pemObject.getType();
-      if (PemLabel.CERTIFICATE_REQUEST.equals(type)) {
-        if (csrBytes != null) {
-          throw new HttpRespAuditException(BAD_REQUEST, "duplicated PEM CSRs",
+        String type = pemObject.getType();
+        if (PemLabel.CERTIFICATE_REQUEST.equals(type)) {
+          if (csrBytes != null) {
+            throw new HttpRespAuditException(BAD_REQUEST, "duplicated PEM CSRs",
+                AuditLevel.INFO, AuditStatus.FAILED);
+          }
+          csrBytes = pemObject.getContent();
+        } else if (PemLabel.CERTIFICATE.equals(type)) {
+          if (targetCertBytes != null) {
+            throw new HttpRespAuditException(BAD_REQUEST, "duplicated PEM CERTIFICATEs",
+                AuditLevel.INFO, AuditStatus.FAILED);
+          }
+          targetCertBytes = pemObject.getContent();
+        } else {
+          throw new HttpRespAuditException(BAD_REQUEST, "unknown PEM object type " + type,
               AuditLevel.INFO, AuditStatus.FAILED);
         }
-        csrBytes = pemObject.getContent();
-      } else if (PemLabel.CERTIFICATE.equals(type)) {
-        if (targetCertBytes != null) {
-          throw new HttpRespAuditException(BAD_REQUEST, "duplicated PEM CERTIFICATEs",
-              AuditLevel.INFO, AuditStatus.FAILED);
-        }
-        targetCertBytes = pemObject.getContent();
-      } else {
-        throw new HttpRespAuditException(BAD_REQUEST, "unknown PEM object type " + type,
-            AuditLevel.INFO, AuditStatus.FAILED);
       }
+    } finally {
+      pemReader.close();
     }
 
     if (csrBytes == null) {
