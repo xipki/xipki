@@ -49,13 +49,10 @@ public abstract class DbWorker implements Runnable {
 
   private Exception exception;
 
-  public DbWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
-                  String dbConfFile)
+  public DbWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String dbConfFile)
           throws PasswordResolverException, IOException {
-    Properties props = DbPorter.getDbConfProperties(
-        Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile))));
-    this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
-        passwordResolver);
+    Properties props = DbPorter.getDbConfProperties(Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile))));
+    this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props, passwordResolver);
   }
 
   public final Exception exception() {

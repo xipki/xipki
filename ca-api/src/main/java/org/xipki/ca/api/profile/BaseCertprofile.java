@@ -55,8 +55,7 @@ public abstract class BaseCertprofile extends Certprofile {
 
   private static final Logger LOG = LoggerFactory.getLogger(BaseCertprofile.class);
 
-  private static final LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes
-          = new LruCache<>(100);
+  private static final LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
 
   protected BaseCertprofile() {
   }
@@ -152,8 +151,7 @@ public abstract class BaseCertprofile extends Certprofile {
         if (cvalue != null) {
           String lcvalue = cvalue.toLowerCase();
           if (lcvalue.startsWith(":") && lcvalue.endsWith("(subjectpublickeyinfo)")) {
-            String hashAlgName = lcvalue.substring(1,
-                    lcvalue.length() - "(subjectpublickeyinfo)".length());
+            String hashAlgName = lcvalue.substring(1, lcvalue.length() - "(subjectpublickeyinfo)".length());
             HashAlgo ha;
             try {
               ha = HashAlgo.getInstance(hashAlgName);
@@ -187,8 +185,7 @@ public abstract class BaseCertprofile extends Certprofile {
           }
         } else if (ObjectIdentifiers.DN.postalAddress.equals(type)) {
           for (int i = 0; i < len; i++) {
-            RDN rdn = createPostalAddressRdn(type, thisRdns[i].getFirst().getValue(),
-                control);
+            RDN rdn = createPostalAddressRdn(type, thisRdns[i].getFirst().getValue(), control);
             rdns.add(rdn);
           }
         } else {
@@ -295,8 +292,7 @@ public abstract class BaseCertprofile extends Certprofile {
         }
         byte pointEncoding = keyData[0];
         if (!ecOption.getPointEncodings().contains(pointEncoding)) {
-          throw new BadCertTemplateException(String.format(
-              "not accepted EC point encoding '%s'", pointEncoding));
+          throw new BadCertTemplateException(String.format("not accepted EC point encoding '%s'", pointEncoding));
         }
       }
 
@@ -307,8 +303,7 @@ public abstract class BaseCertprofile extends Certprofile {
         throw ex;
       } catch (Exception ex) {
         LogUtil.warn(LOG, ex, "checkEcSubjectPublicKeyInfo");
-        throw new BadCertTemplateException(String.format(
-            "invalid public key: %s", ex.getMessage()));
+        throw new BadCertTemplateException(String.format("invalid public key: %s", ex.getMessage()));
       }
       return publicKey;
     } else if (keyParamsOption instanceof RSAParametersOption) {
@@ -355,8 +350,7 @@ public abstract class BaseCertprofile extends Certprofile {
         return publicKey;
       }
     } else {
-      throw new IllegalStateException(String.format(
-          "should not reach here, unknown KeyParametersOption %s", keyParamsOption));
+      throw new IllegalStateException("should not reach here, unknown KeyParametersOption " + keyParamsOption);
     }
 
     throw new BadCertTemplateException("the given publicKey is not permitted");
@@ -488,8 +482,7 @@ public abstract class BaseCertprofile extends Certprofile {
     }
 
     if (!TextVadidator.DATE_OF_BIRTH.isValid(text)) {
-      throw new BadCertTemplateException(
-          "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
+      throw new BadCertTemplateException("Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
     }
 
     if (newRdnValue == null) {
@@ -499,8 +492,7 @@ public abstract class BaseCertprofile extends Certprofile {
     return new RDN(type, newRdnValue);
   } // method createDateOfBirthRdn
 
-  private static RDN createPostalAddressRdn(ASN1ObjectIdentifier type, ASN1Encodable rdnValue,
-                                            RdnControl control)
+  private static RDN createPostalAddressRdn(ASN1ObjectIdentifier type, ASN1Encodable rdnValue, RdnControl control)
           throws BadCertTemplateException {
     Args.notNull(type, "type");
 
@@ -511,8 +503,7 @@ public abstract class BaseCertprofile extends Certprofile {
     ASN1Sequence seq = (ASN1Sequence) rdnValue;
     final int size = seq.size();
     if (size < 1 || size > 6) {
-      throw new BadCertTemplateException(
-          "Sequence size of RDN postalAddress is not within [1, 6]: " + size);
+      throw new BadCertTemplateException("Sequence size of RDN postalAddress is not within [1, 6]: " + size);
     }
 
     ASN1EncodableVector vec = new ASN1EncodableVector();
@@ -522,8 +513,7 @@ public abstract class BaseCertprofile extends Certprofile {
       if (line instanceof ASN1String && !(line instanceof DERUniversalString)) {
         text = ((ASN1String) line).getString();
       } else {
-        throw new BadCertTemplateException(
-          String.format("postalAddress[%d] has incorrect syntax", i));
+        throw new BadCertTemplateException(String.format("postalAddress[%d] has incorrect syntax", i));
       }
 
       ASN1Encodable asn1Line = createRdnValue(text, type, control);
@@ -547,8 +537,7 @@ public abstract class BaseCertprofile extends Certprofile {
     return CollectionUtil.isEmpty(ret) ? null : ret.toArray(new RDN[0]);
   } // method getRdns
 
-  private static ASN1Encodable createRdnValue(String text, ASN1ObjectIdentifier type,
-      RdnControl option)
+  private static ASN1Encodable createRdnValue(String text, ASN1ObjectIdentifier type, RdnControl option)
           throws BadCertTemplateException {
     String tmpText = text.trim();
 
@@ -578,8 +567,7 @@ public abstract class BaseCertprofile extends Certprofile {
               ObjectIdentifiers.oidToDisplayName(type), tmpText, pattern.pattern()));
       }
 
-      tmpText = StringUtil.concat((prefix != null ? prefix : ""), tmpText,
-          (suffix != null ? suffix : ""));
+      tmpText = StringUtil.concat((prefix != null ? prefix : ""), tmpText, (suffix != null ? suffix : ""));
 
       int len = tmpText.length();
       Range range = option.getStringLengthRange();
@@ -605,11 +593,7 @@ public abstract class BaseCertprofile extends Certprofile {
     Boolean isPrintableString = null;
     if (stringType == null) {
       isPrintableString = isPrintableString(tmpText);
-      if (isPrintableString) {
-        stringType = StringType.printableString;
-      } else {
-        stringType = StringType.utf8String;
-      }
+      stringType = isPrintableString ? StringType.printableString : StringType.utf8String;
     } else if (stringType == StringType.printableString) {
       isPrintableString = isPrintableString(tmpText);
     }
@@ -669,8 +653,7 @@ public abstract class BaseCertprofile extends Certprofile {
         }
         break;
       default:
-        throw new BadCertTemplateException(
-            String.format("invalid point encoding 0x%02x", encoded[0]));
+        throw new BadCertTemplateException(String.format("invalid point encoding 0x%02x", encoded[0]));
     }
   } // method checkEcSubjectPublicKeyInfo
 

@@ -148,10 +148,8 @@ public class OcspRequest {
 
       Header hdrExtension = readHeader(request, hdrExtensions.readerIndex);
       while (true) {
-        int extensionLen =
-            hdrExtension.readerIndex - hdrExtension.tagIndex + hdrExtension.len;
-        ExtendedExtension extn = ExtendedExtension.getInstance(
-            request, hdrExtension.tagIndex, extensionLen);
+        int extensionLen = hdrExtension.readerIndex - hdrExtension.tagIndex + hdrExtension.len;
+        ExtendedExtension extn = ExtendedExtension.getInstance(request, hdrExtension.tagIndex, extensionLen);
         if (extn != null) {
           extensions.add(extn);
         }

@@ -35,8 +35,7 @@ import java.util.Set;
 public class CertprofileFactoryImpl implements CertprofileFactory {
 
   private static final String TYPE = "xijson";
-  private static final Set<String> types = Collections.unmodifiableSet(
-      new HashSet<>(Collections.singletonList(TYPE)));
+  private static final Set<String> types = Collections.unmodifiableSet(new HashSet<>(Collections.singletonList(TYPE)));
 
   @Override
   public Set<String> getSupportedTypes() {

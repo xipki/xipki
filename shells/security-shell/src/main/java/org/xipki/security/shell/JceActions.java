@@ -42,8 +42,7 @@ public class JceActions {
     @Option(name = "--type", required = true, description = "JCE signer type")
     private String type;
 
-    @Option(name = "--alias", required = true,
-        description = "alias of the key in the JCE device")
+    @Option(name = "--alias", required = true, description = "alias of the key in the JCE device")
     private String alias;
 
     @Option(name = "--algo", required = true, description = "signature algorithm")

@@ -144,16 +144,14 @@ public class P11ProxyResponder {
 
     if (reqLen < 14) {
       LOG.error("response too short");
-      return getResp(VERSION_V1_0, transactionId,
-          RC_BAD_REQUEST, action);
+      return getResp(VERSION_V1_0, transactionId, RC_BAD_REQUEST, action);
     }
 
     // Version
     short version = IoUtil.parseShort(request, 0);
     if (!versions.contains(version)) {
       LOG.error("unsupported version {}", version);
-      return getResp(VERSION_V1_0, transactionId,
-          RC_UNSUPPORTED_VERSION, action);
+      return getResp(VERSION_V1_0, transactionId, RC_UNSUPPORTED_VERSION, action);
     }
 
     // Length
@@ -210,8 +208,7 @@ public class P11ProxyResponder {
         case ACTION_GEN_KEYPAIR_DSA: {
           GenDSAKeypairParams asn1 = GenDSAKeypairParams.getInstance(content);
           P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
-          P11IdentityId identityId = slot.generateDSAKeypair(
-              asn1.getP(), asn1.getQ(), asn1.getG(), asn1.getControl());
+          P11IdentityId identityId = slot.generateDSAKeypair(asn1.getP(), asn1.getQ(), asn1.getG(), asn1.getControl());
           ASN1Object obj = new IdentityId(identityId);
           return getSuccessResp(version, transactionId, action, obj);
         }
@@ -220,8 +217,7 @@ public class P11ProxyResponder {
         case ACTION_GEN_KEYPAIR_EC_MONTGOMERY: {
           GenECKeypairParams asn1 = GenECKeypairParams.getInstance(content);
           P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
-          P11IdentityId identityId = slot.generateECKeypair(
-              asn1.getCurveId(), asn1.getControl());
+          P11IdentityId identityId = slot.generateECKeypair(asn1.getCurveId(), asn1.getControl());
           ASN1Object obj = new IdentityId(identityId);
           return getSuccessResp(version, transactionId, action, obj);
         }
@@ -243,8 +239,7 @@ public class P11ProxyResponder {
         case ACTION_GEN_KEYPAIR_DSA_OTF: {
           GenDSAKeypairParams asn1 = GenDSAKeypairParams.getInstance(content);
           P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
-          PrivateKeyInfo ki = slot.generateDSAKeypairOtf(
-              asn1.getP(), asn1.getQ(), asn1.getG());
+          PrivateKeyInfo ki = slot.generateDSAKeypairOtf(asn1.getP(), asn1.getQ(), asn1.getG());
           return getSuccessResp(version, transactionId, action, ki.getEncoded());
         }
         case ACTION_GEN_KEYPAIR_EC_OTF:
@@ -258,8 +253,7 @@ public class P11ProxyResponder {
         case ACTION_GEN_KEYPAIR_RSA_OTF: {
           GenRSAKeypairParams asn1 = GenRSAKeypairParams.getInstance(content);
           P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
-          PrivateKeyInfo ki = slot.generateRSAKeypairOtf(
-              asn1.getKeysize(), asn1.getPublicExponent());
+          PrivateKeyInfo ki = slot.generateRSAKeypairOtf(asn1.getKeysize(), asn1.getPublicExponent());
           return getSuccessResp(version, transactionId, action, ki.getEncoded());
         }
         case ACTION_GEN_KEYPAIR_SM2_OTF: {
@@ -271,8 +265,7 @@ public class P11ProxyResponder {
         case ACTION_GEN_SECRET_KEY: {
           GenSecretKeyParams asn1 = GenSecretKeyParams.getInstance(content);
           P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
-          P11IdentityId identityId =
-              slot.generateSecretKey(asn1.getKeyType(), asn1.getKeysize(), asn1.getControl());
+          P11IdentityId identityId = slot.generateSecretKey(asn1.getKeyType(), asn1.getKeysize(), asn1.getControl());
           ASN1Object obj = new IdentityId(identityId);
           return getSuccessResp(version, transactionId, action, obj);
         }
@@ -363,8 +356,7 @@ public class P11ProxyResponder {
         case ACTION_IMPORT_SECRET_KEY: {
           ImportSecretKeyParams asn1 = ImportSecretKeyParams.getInstance(content);
           P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
-          P11ObjectIdentifier keyId = slot.importSecretKey(asn1.getKeyType(),
-              asn1.getKeyValue(), asn1.getControl());
+          P11ObjectIdentifier keyId = slot.importSecretKey(asn1.getKeyType(), asn1.getKeyValue(), asn1.getControl());
           P11IdentityId identityId = new P11IdentityId(asn1.getSlotId(), keyId, null, null);
           ASN1Object obj = new IdentityId(identityId);
           return getSuccessResp(version, transactionId, action, obj);
@@ -391,8 +383,7 @@ public class P11ProxyResponder {
         case ACTION_SIGN: {
           SignTemplate signTemplate = SignTemplate.getInstance(content);
           long mechanism = signTemplate.getMechanism().getMechanism();
-          org.xipki.security.pkcs11.proxy.asn1.P11Params asn1Params =
-              signTemplate.getMechanism().getParams();
+          org.xipki.security.pkcs11.proxy.asn1.P11Params asn1Params = signTemplate.getMechanism().getParams();
 
           P11Params params = null;
 
@@ -402,15 +393,13 @@ public class P11ProxyResponder {
                 params = RSAPkcsPssParams.getInstance(asn1Params).getPkcsPssParams();
                 break;
               case org.xipki.security.pkcs11.proxy.asn1.P11Params.TAG_OPAQUE:
-                params = new P11ByteArrayParams(
-                    ASN1OctetString.getInstance(asn1Params).getOctets());
+                params = new P11ByteArrayParams(ASN1OctetString.getInstance(asn1Params).getOctets());
                 break;
               case org.xipki.security.pkcs11.proxy.asn1.P11Params.TAG_IV:
                 params = new P11IVParams(ASN1OctetString.getInstance(asn1Params).getOctets());
                 break;
               default:
-                throw new BadAsn1ObjectException(
-                    "unknown SignTemplate.params: unknown tag " + asn1Params.getTagNo());
+                throw new BadAsn1ObjectException("unknown SignTemplate.params: unknown tag " + asn1Params.getTagNo());
             }
           }
 
@@ -428,8 +417,7 @@ public class P11ProxyResponder {
         case ACTION_UPDATE_CERT: {
           ObjectIdAndCert asn1 = ObjectIdAndCert.getInstance(content);
           P11Slot slot = getSlot(p11CryptService, asn1.getSlotId().getValue());
-          slot.updateCertificate(asn1.getObjectId().getValue(),
-              new X509Cert(asn1.getCertificate()));
+          slot.updateCertificate(asn1.getObjectId().getValue(), new X509Cert(asn1.getCertificate()));
           return getSuccessResp(version, transactionId, action, (byte[])null);
         }
         default: {
@@ -438,8 +426,7 @@ public class P11ProxyResponder {
         }
       }
     } catch (BadAsn1ObjectException ex) {
-      LogUtil.error(LOG, ex, "could not process decode requested content (tid="
-          + Hex.encode(transactionId) + ")");
+      LogUtil.error(LOG, ex, "could not process decode requested content (tid=" + Hex.encode(transactionId) + ")");
       return getResp(version, transactionId, RC_BAD_REQUEST, action);
     } catch (P11TokenException ex) {
       LogUtil.error(LOG, ex, buildErrorMsg(action, transactionId));
@@ -462,8 +449,7 @@ public class P11ProxyResponder {
   } // method processRequest
 
   private static String buildErrorMsg(short action, byte[] transactionId) {
-    return "could not process action " + getActionName(action)
-        + " (tid=" + Hex.encode(transactionId) + ")";
+    return "could not process action " + getActionName(action) + " (tid=" + Hex.encode(transactionId) + ")";
   }
 
   private P11Slot getSlot(P11CryptService p11Service, P11SlotIdentifier slotId)
@@ -485,8 +471,7 @@ public class P11ProxyResponder {
     return resp;
   } // method getResp
 
-  private static byte[] getSuccessResp(short version, byte[] transactionId, short action,
-      ASN1Object respContent) {
+  private static byte[] getSuccessResp(short version, byte[] transactionId, short action, ASN1Object respContent) {
     byte[] encoded;
     try {
       encoded = respContent.getEncoded();
@@ -497,8 +482,7 @@ public class P11ProxyResponder {
     return getSuccessResp(version, transactionId, action, encoded);
   } // method getSuccessResp
 
-  private static byte[] getSuccessResp(short version, byte[] transactionId, short action,
-      byte[] respContent) {
+  private static byte[] getSuccessResp(short version, byte[] transactionId, short action, byte[] respContent) {
     int bodyLen = 4;
     if (respContent != null) {
       bodyLen += respContent.length;

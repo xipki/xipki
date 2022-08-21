@@ -30,10 +30,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Base64;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.Validity;
+import org.xipki.util.*;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
 
@@ -70,18 +67,16 @@ public class ResponseCacher implements Closeable {
 
   private static final long SEC_NEXT_UPDATE_BUFFER = 600;
 
-  private static final String SQL_ADD_ISSUER = "INSERT INTO ISSUER (ID,S1C,CERT) VALUES (?,?,?)";
+  private static final String SQL_ADD_ISSUER = SqlUtil.buildInsertSql("ISSUER", "ID,S1C,CERT");
 
   private static final String SQL_SELECT_ISSUER_ID = "SELECT ID FROM ISSUER";
 
-  private static final String SQL_DELETE_EXPIRED_RESP
-      = "DELETE FROM OCSP WHERE GENERATED_AT<? OR NEXT_UPDATE<?";
+  private static final String SQL_DELETE_EXPIRED_RESP = "DELETE FROM OCSP WHERE GENERATED_AT<? OR NEXT_UPDATE<?";
 
-  private static final String SQL_ADD_RESP = "INSERT INTO OCSP (ID,IID,IDENT,"
-      + "GENERATED_AT,NEXT_UPDATE,RESP) VALUES (?,?,?,?,?,?)";
+  private static final String SQL_ADD_RESP =
+      SqlUtil.buildInsertSql("OCSP", "ID,IID,IDENT,GENERATED_AT,NEXT_UPDATE,RESP");
 
-  private static final String SQL_UPDATE_RESP = "UPDATE OCSP SET GENERATED_AT=?,"
-      + "NEXT_UPDATE=?,RESP=? WHERE ID=?";
+  private static final String SQL_UPDATE_RESP = "UPDATE OCSP SET GENERATED_AT=?,NEXT_UPDATE=?,RESP=? WHERE ID=?";
 
   private final ConcurrentBag<ConcurrentBagEntry<Digest>> idDigesters;
 
@@ -275,9 +270,8 @@ public class ResponseCacher implements Closeable {
     }
   } // method storeIssuer
 
-  public OcspRespWithCacheInfo getOcspResponse(int issuerId, BigInteger serialNumber,
-      SignAlgo sigAlgo)
-          throws DataAccessException {
+  public OcspRespWithCacheInfo getOcspResponse(int issuerId, BigInteger serialNumber, SignAlgo sigAlgo)
+      throws DataAccessException {
     final String sql = sqlSelectOcsp;
     byte[] identBytes = buildIdent(serialNumber, sigAlgo);
     long id = deriveId(issuerId, identBytes);
@@ -327,8 +321,8 @@ public class ResponseCacher implements Closeable {
     }
   } // method getOcspResponse
 
-  public void storeOcspResponse(int issuerId, BigInteger serialNumber, long generatedAt,
-      Long nextUpdate, SignAlgo sigAlgo, byte[] response) {
+  public void storeOcspResponse(
+      int issuerId, BigInteger serialNumber, long generatedAt, Long nextUpdate, SignAlgo sigAlgo, byte[] response) {
     long nowInSec = System.currentTimeMillis() / 1000;
     if (nextUpdate == null) {
       nextUpdate = nowInSec + SEC_DFLT_NEXT_UPDATE_DURATION;
@@ -445,8 +439,7 @@ public class ResponseCacher implements Closeable {
           ids.add(rs.getInt("ID"));
         }
       } catch (SQLException ex) {
-        LogUtil.error(LOG, datasource.translate(SQL_SELECT_ISSUER_ID, ex),
-            "could not executing updateCacheStore()");
+        LogUtil.error(LOG, datasource.translate(SQL_SELECT_ISSUER_ID, ex), "could not executing updateCacheStore()");
         return false;
       } catch (Exception ex) {
         LogUtil.error(LOG, ex, "could not executing updateCacheStore()");

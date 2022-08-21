@@ -82,8 +82,7 @@ public class CertprofileQa {
   public CertprofileQa(String data)
       throws CertprofileException {
     this(
-        StringUtil.toUtf8Bytes(
-            notNull(data, "data")));
+        StringUtil.toUtf8Bytes(notNull(data, "data")));
   }
 
   public CertprofileQa(byte[] dataBytes)
@@ -100,14 +99,13 @@ public class CertprofileQa {
       this.extensionsChecker = new ExtensionsChecker(conf, certprofile);
     } catch (RuntimeException ex) {
       LogUtil.error(LOG, ex);
-      throw new CertprofileException(
-          "RuntimeException thrown while initializing certprofile: " + ex.getMessage());
+      throw new CertprofileException("RuntimeException thrown while initializing certprofile: " + ex.getMessage());
     }
   } // constructor
 
-  public ValidationResult checkCert(byte[] certBytes, IssuerInfo issuerInfo,
-      X500Name requestedSubject, SubjectPublicKeyInfo requestedPublicKey,
-      Extensions requestedExtensions) {
+  public ValidationResult checkCert(
+      byte[] certBytes, IssuerInfo issuerInfo, X500Name requestedSubject,
+      SubjectPublicKeyInfo requestedPublicKey, Extensions requestedExtensions) {
     notNull(certBytes, "certBytes");
     notNull(issuerInfo, "issuerInfo");
     notNull(requestedSubject, "requestedSubject");
@@ -125,8 +123,7 @@ public class CertprofileQa {
     if (maxSize != 0) {
       int size = certBytes.length;
       if (size > maxSize) {
-        issue.setFailureMessage(String.format(
-            "certificate exceeds the maximal allowed size: %d > %d", size, maxSize));
+        issue.setFailureMessage(String.format("certificate exceeds the maximal allowed size: %d > %d", size, maxSize));
       }
     }
 
@@ -144,8 +141,7 @@ public class CertprofileQa {
 
     X509CertVersion expVersion = certprofile.getVersion();
     if (versionNumber != expVersion.getVersionNumber()) {
-      issue.setFailureMessage("is '" + versionNumber
-          + "' but expected '" + expVersion.getVersionNumber() + "'");
+      issue.setFailureMessage("is '" + versionNumber + "' but expected '" + expVersion.getVersionNumber() + "'");
     }
 
     // serialNumber
@@ -169,8 +165,7 @@ public class CertprofileQa {
       AlgorithmIdentifier sigAlgId = bcCert.getSignatureAlgorithm();
       AlgorithmIdentifier tbsSigAlgId = tbsCert.getSignature();
       if (!tbsSigAlgId.equals(sigAlgId)) {
-        issue.setFailureMessage(
-            "Certificate.tbsCertificate.signature != Certificate.signatureAlgorithm");
+        issue.setFailureMessage("Certificate.tbsCertificate.signature != Certificate.signatureAlgorithm");
       }
 
       try {
@@ -188,8 +183,7 @@ public class CertprofileQa {
           }
         }
       } catch (NoSuchAlgorithmException ex) {
-        issue.setFailureMessage("unsupported signature algorithm "
-            + sigAlgId.getAlgorithm().getId());
+        issue.setFailureMessage("unsupported signature algorithm " + sigAlgId.getAlgorithm().getId());
       }
     }
 
@@ -246,8 +240,7 @@ public class CertprofileQa {
     }
 
     // subjectPublicKeyInfo
-    resultIssues.addAll(publicKeyChecker.checkPublicKey(bcCert.getSubjectPublicKeyInfo(),
-        requestedPublicKey));
+    resultIssues.addAll(publicKeyChecker.checkPublicKey(bcCert.getSubjectPublicKeyInfo(), requestedPublicKey));
 
     // Signature
     issue = new ValidationIssue("X509.SIG", "whether certificate is signed by CA");
@@ -292,15 +285,14 @@ public class CertprofileQa {
     issue = new ValidationIssue("X509.GrantedSubject", "grantedSubject");
     resultIssues.add(issue);
 
-    resultIssues.addAll(extensionsChecker.checkExtensions(bcCert, issuerInfo, requestedExtensions,
-        requestedSubject));
+    resultIssues.addAll(extensionsChecker.checkExtensions(bcCert, issuerInfo, requestedExtensions, requestedSubject));
 
     return new ValidationResult(resultIssues);
   } // method checkCert
 
   public static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(
       Map<String, ExtensionType> extensionsType)
-          throws CertprofileException {
+      throws CertprofileException {
     if (extensionsType == null) {
       return null;
     }
@@ -324,8 +316,7 @@ public class CertprofileQa {
       try {
         encodedValue = extn.getConstant().toASN1Encodable().toASN1Primitive().getEncoded();
       } catch (IOException | InvalidConfException ex) {
-        throw new CertprofileException(
-            "could not parse the constant extension value of type" + type, ex);
+        throw new CertprofileException("could not parse the constant extension value of type" + type, ex);
       }
 
       QaExtensionValue extension = new QaExtensionValue(extn.isCritical(), encodedValue);

@@ -116,16 +116,14 @@ public class DecodedNextCaMessage {
   }
 
   @SuppressWarnings("unchecked")
-  public static DecodedNextCaMessage decode(CMSSignedData pkiMessage,
-      CollectionStore<X509CertificateHolder> certStore)
+  public static DecodedNextCaMessage decode(CMSSignedData pkiMessage, CollectionStore<X509CertificateHolder> certStore)
       throws MessageDecodingException {
     Args.notNull(pkiMessage, "pkiMessage");
 
     SignerInformationStore signerStore = pkiMessage.getSignerInfos();
     Collection<SignerInformation> signerInfos = signerStore.getSigners();
     if (signerInfos.size() != 1) {
-      throw new MessageDecodingException(
-          "number of signerInfos is not 1, but " + signerInfos.size());
+      throw new MessageDecodingException("number of signerInfos is not 1, but " + signerInfos.size());
     }
 
     SignerInformation signerInfo = signerInfos.iterator().next();
@@ -142,8 +140,7 @@ public class DecodedNextCaMessage {
     }
 
     if (signedDataCerts == null || signedDataCerts.size() != 1) {
-      throw new MessageDecodingException(
-          "could not find embedded certificate to verify the signature");
+      throw new MessageDecodingException("could not find embedded certificate to verify the signature");
     }
 
     AttributeTable signedAttrs = signerInfo.getSignedAttributes();
@@ -169,12 +166,10 @@ public class DecodedNextCaMessage {
 
       String sigAlgOid = signerInfo.getEncryptionAlgOID();
       if (!PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOid)) {
-        SignAlgo signAlgo = SignAlgo.getInstance(
-            signerInfo.toASN1Structure().getDigestEncryptionAlgorithm());
+        SignAlgo signAlgo = SignAlgo.getInstance(signerInfo.toASN1Structure().getDigestEncryptionAlgorithm());
 
         if (digestAlgo != signAlgo.getHashAlgo()) {
-          ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use"
-              + " the same digestAlgorithm");
+          ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use the same digestAlgorithm");
           return ret;
         }
       } // end if
@@ -223,8 +218,7 @@ public class DecodedNextCaMessage {
     if (!CMSObjectIdentifiers.signedData.equals(signedContentType)) {
       // fall back: some SCEP client use id-data
       if (!CMSObjectIdentifiers.data.equals(signedContentType)) {
-        ret.setFailureMessage("either id-signedData or id-data is excepted, but not '"
-            + signedContentType.getId());
+        ret.setFailureMessage("either id-signedData or id-data is excepted, but not '" + signedContentType.getId());
         return ret;
       }
     }

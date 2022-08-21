@@ -47,7 +47,8 @@ public class IssuerInfo {
 
   private final boolean cutoffNotAfter;
 
-  public IssuerInfo(List<String> caIssuerUrls, List<String> ocspUrls, List<String> crlUrls,
+  public IssuerInfo(
+      List<String> caIssuerUrls, List<String> ocspUrls, List<String> crlUrls,
       List<String> deltaCrlUrls, byte[] certBytes, boolean cutoffNotAfter)
       throws CertificateException {
     notNull(certBytes, "certBytes");
@@ -72,8 +73,7 @@ public class IssuerInfo {
       this.crlUrls = Collections.unmodifiableSet(new HashSet<>(crlUrls));
     }
 
-    this.deltaCrlUrls = isEmpty(deltaCrlUrls) ? null
-            : Collections.unmodifiableSet(new HashSet<>(deltaCrlUrls));
+    this.deltaCrlUrls = isEmpty(deltaCrlUrls) ? null : Collections.unmodifiableSet(new HashSet<>(deltaCrlUrls));
 
     this.cert = X509Util.parseCert(certBytes);
   } // constructor

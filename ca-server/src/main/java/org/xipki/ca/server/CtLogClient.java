@@ -64,9 +64,8 @@ public class CtLogClient {
   } // constructor
 
   public SignedCertificateTimestampList getCtLogScts(
-      X509CertificateHolder precert, X509Cert caCert, List<X509Cert> certchain,
-      CtLogPublicKeyFinder publicKeyFinder)
-          throws OperationException {
+      X509CertificateHolder precert, X509Cert caCert, List<X509Cert> certchain, CtLogPublicKeyFinder publicKeyFinder)
+      throws OperationException {
     AddPreChainRequest request = new AddPreChainRequest();
     List<byte[]> chain = new LinkedList<>();
     request.setChain(chain);
@@ -113,8 +112,7 @@ public class CtLogClient {
       try {
         res = curl.curlPost(url, false, headers, null, content);
       } catch (Exception ex) {
-        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-            "error while calling " + url + ": " + ex.getMessage());
+        throw new OperationException(ErrorCode.SYSTEM_FAILURE, "error while calling " + url + ": " + ex.getMessage());
       }
 
       byte[] respContent = res.getContent();
@@ -149,8 +147,7 @@ public class CtLogClient {
           sig.initVerify(verifyKey);
           CtLog.update(sig, sctVersion, timestamp, extensions, issuerKeyHash, preCertTbsCert);
           sigValid = sig.verify(ds.getSignature());
-        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException
-            | SignatureException ex) {
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException | SignatureException ex) {
           throw new OperationException(ErrorCode.SYSTEM_FAILURE, "error verifying SCT signature");
         }
 
@@ -161,8 +158,7 @@ public class CtLogClient {
         }
       }
 
-      SignedCertificateTimestamp sct = new SignedCertificateTimestamp(sctVersion,
-          logId, timestamp, extensions, ds);
+      SignedCertificateTimestamp sct = new SignedCertificateTimestamp(sctVersion, logId, timestamp, extensions, ds);
       scts.add(sct);
     }
 
@@ -186,8 +182,7 @@ public class CtLogClient {
         hashName = "SHA512";
         break;
       default:
-        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-            "unsupported hash algorithm " + algorithm.getHash());
+        throw new OperationException(ErrorCode.SYSTEM_FAILURE, "unsupported hash algorithm " + algorithm.getHash());
     }
 
     String encAlgo;

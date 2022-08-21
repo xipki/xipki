@@ -84,9 +84,8 @@ public class UpdateCertActions {
     }
 
     @Override
-    protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(String id, String profile,
-        CertRequest certRequest)
-            throws Exception {
+    protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(String id, String profile, CertRequest certRequest)
+        throws Exception {
       final boolean caGenKeypair = true;
       final boolean kup = true;
       return new EnrollCertRequest.Entry("id-1", profile, certRequest, null, caGenKeypair, kup);
@@ -115,8 +114,7 @@ public class UpdateCertActions {
       }
 
       if (StringUtil.isNotBlank(certOutputFile)) {
-        saveVerbose("saved certificate to file", certOutputFile,
-            encodeCert(cert.getEncoded(), certOutform));
+        saveVerbose("saved certificate to file", certOutputFile, encodeCert(cert.getEncoded(), certOutform));
       }
 
       PrivateKey privateKey = BouncyCastleProvider.getPrivateKey(privateKeyInfo);
@@ -150,13 +148,11 @@ public class UpdateCertActions {
     @Option(name = "--slot", required = true, description = "slot index")
     private Integer slotIndex;
 
-    @Option(name = "--key-id",
-        description = "id of the private key in the PKCS#11 device\n"
+    @Option(name = "--key-id", description = "id of the private key in the PKCS#11 device\n"
             + "either keyId or keyLabel must be specified")
     private String keyId;
 
-    @Option(name = "--key-label",
-        description = "label of the private key in the PKCS#11 device\n"
+    @Option(name = "--key-label", description = "label of the private key in the PKCS#11 device\n"
             + "either keyId or keyLabel must be specified")
     private String keyLabel;
 
@@ -181,9 +177,9 @@ public class UpdateCertActions {
       return signer;
     } // method getSigner
 
-    public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
-        String keyLabel, byte[] keyId, HashAlgo hashAlgo,
-        SignatureAlgoControl signatureAlgoControl) {
+    public static SignerConf getPkcs11SignerConf(
+        String pkcs11ModuleName, Integer slotIndex, String keyLabel, byte[] keyId,
+        HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl) {
       Args.notNull(hashAlgo, "hashAlgo");
       Args.notNull(slotIndex, "slotIndex");
 
@@ -215,8 +211,7 @@ public class UpdateCertActions {
 
   } // class CmpUpdateP11
 
-  @Command(scope = "xi", name = "cmp-update-p12",
-      description = "update certificate (PKCS#12 keystore)")
+  @Command(scope = "xi", name = "cmp-update-p12", description = "update certificate (PKCS#12 keystore)")
   @Service
   public static class CmpUpdateP12 extends UpdateCertAction {
 
@@ -244,8 +239,7 @@ public class UpdateCertActions {
         ConfPairs conf = new ConfPairs("password", password);
         conf.putPair("parallelism", Integer.toString(1));
         conf.putPair("keystore", "file:" + p12File);
-        SignerConf signerConf = new SignerConf(conf.getEncoded(),
-            getHashAlgo(hashAlgo), getSignatureAlgoControl());
+        SignerConf signerConf = new SignerConf(conf.getEncoded(), getHashAlgo(hashAlgo), getSignatureAlgoControl());
         signer = securityFactory.createSigner("PKCS12", signerConf, (X509Cert[]) null);
       }
       return signer;
@@ -258,8 +252,7 @@ public class UpdateCertActions {
     @Reference
     protected SecurityFactory securityFactory;
 
-    @Option(name = "--subject", aliases = "-s",
-        description = "subject to be requested")
+    @Option(name = "--subject", aliases = "-s", description = "subject to be requested")
     private String subject;
 
     @Option(name = "--not-before", description = "notBefore, UTC time of format yyyyMMddHHmmss")
@@ -277,7 +270,7 @@ public class UpdateCertActions {
 
     protected abstract EnrollCertRequest.Entry buildEnrollCertRequestEntry(
         String id, String profile, CertRequest certRequest)
-            throws Exception;
+        throws Exception;
 
     protected EnrollCertResult enroll()
         throws Exception {
@@ -309,12 +302,8 @@ public class UpdateCertActions {
       }
 
       X509Cert oldCert = X509Util.parseCert(new File(oldCertFile));
-      CertId oldCertId = new CertId(new GeneralName(oldCert.getIssuer()),
-                            oldCert.getSerialNumber());
-
-      Controls controls = new Controls(
-          new AttributeTypeAndValue(CMPObjectIdentifiers.regCtrl_oldCertID, oldCertId));
-
+      CertId oldCertId = new CertId(new GeneralName(oldCert.getIssuer()), oldCert.getSerialNumber());
+      Controls controls = new Controls(new AttributeTypeAndValue(CMPObjectIdentifiers.regCtrl_oldCertID, oldCertId));
       CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(), controls);
 
       EnrollCertRequest.Entry reqEntry = buildEnrollCertRequestEntry("id-1", null, certReq);
@@ -343,28 +332,23 @@ public class UpdateCertActions {
     @Completion(Completers.DerPemCompleter.class)
     private String outform = "der";
 
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "where to save the certificate")
+    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the certificate")
     @Completion(FileCompleter.class)
     private String outputFile;
 
-    @Option(name = "--rsa-pss",
-        description = "whether to use the RSAPSS for the POP computation\n"
+    @Option(name = "--rsa-pss", description = "whether to use the RSAPSS for the POP computation\n"
             + "(only applied to RSA key)")
     private Boolean rsaPss = Boolean.FALSE;
 
-    @Option(name = "--dsa-plain",
-        description = "whether to use the Plain DSA for the POP computation\n"
+    @Option(name = "--dsa-plain", description = "whether to use the Plain DSA for the POP computation\n"
             + "(only applied to DSA and ECDSA key)")
     private Boolean dsaPlain = Boolean.FALSE;
 
-    @Option(name = "--gm",
-        description = "whether to use the chinese GM algorithm for the POP computation\n"
+    @Option(name = "--gm", description = "whether to use the chinese GM algorithm for the POP computation\n"
             + "(only applied to EC key with GM curves)")
     private Boolean gm = Boolean.FALSE;
 
-    @Option(name = "--embeds-publickey",
-        description = "whether to embed the public key in the request")
+    @Option(name = "--embeds-publickey", description = "whether to embed the public key in the request")
     private Boolean embedsPulibcKey = Boolean.FALSE;
 
     protected SignatureAlgoControl getSignatureAlgoControl() {
@@ -386,13 +370,11 @@ public class UpdateCertActions {
     } // method getPublicKey
 
     @Override
-    protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(String id, String profile,
-        CertRequest certRequest)
-            throws Exception {
+    protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(String id, String profile, CertRequest certRequest)
+        throws Exception {
       ConcurrentContentSigner signer = getSigner();
 
-      ProofOfPossessionSigningKeyBuilder popBuilder =
-          new ProofOfPossessionSigningKeyBuilder(certRequest);
+      ProofOfPossessionSigningKeyBuilder popBuilder = new ProofOfPossessionSigningKeyBuilder(certRequest);
       ConcurrentBagEntrySigner signer0 = signer.borrowSigner();
       POPOSigningKey popSk;
       try {

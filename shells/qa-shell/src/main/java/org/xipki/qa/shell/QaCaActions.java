@@ -96,8 +96,7 @@ public class QaCaActions {
     @Completion(FileCompleter.class)
     private String certFile;
 
-    @Option(name = "--issuer",
-        description = "issuer name\n(required if multiple issuers are configured)")
+    @Option(name = "--issuer", description = "issuer name\n(required if multiple issuers are configured)")
     @Completion(QaCompleters.IssuerNameCompleter.class)
     private String issuerName;
 
@@ -105,8 +104,7 @@ public class QaCaActions {
     @Completion(FileCompleter.class)
     private String csrFile;
 
-    @Option(name = "--profile", aliases = "-p", required = true,
-        description = "certificate profile")
+    @Option(name = "--profile", aliases = "-p", required = true, description = "certificate profile")
     @Completion(QaCompleters.CertprofileNameCompleter.class)
     private String profileName;
 
@@ -141,8 +139,7 @@ public class QaCaActions {
 
       CertprofileQa qa = qaSystemManager.getCertprofile(profileName);
       if (qa == null) {
-        throw new IllegalCmdParamException("found no certificate profile named '"
-            + profileName + "'");
+        throw new IllegalCmdParamException("found no certificate profile named '" + profileName + "'");
       }
 
       CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
@@ -234,8 +231,8 @@ public class QaCaActions {
     protected String subjectTemplate;
 
     @Option(name = "--random-dn", description = "DN name to be incremented")
-    @Completion(value = StringsCompleter.class, values = {"GIVENNAME", "SURNAME", "STREET",
-            "POSTALCODE", "O", "OU", "CN"})
+    @Completion(value = StringsCompleter.class,
+        values = {"GIVENNAME", "SURNAME", "STREET", "POSTALCODE", "O", "OU", "CN"})
     protected String randomDnStr = "O";
 
     @Option(name = "--duration", description = "duration")
@@ -250,13 +247,11 @@ public class QaCaActions {
     @Option(name = "--max-num", description = "maximal number of requests\n0 for unlimited")
     protected Integer maxRequests = 0;
 
-    @Option(name = "--queue-size",
-            description = "Number of maximal HTTP requests in the sending queue")
+    @Option(name = "--queue-size", description = "Number of maximal HTTP requests in the sending queue")
     protected Integer queueSize = 50;
   }
 
-  @Command(scope = "xiqa", name = "cmp-benchmark-cagen-enroll",
-          description = "CA client enroll (benchmark)")
+  @Command(scope = "xiqa", name = "cmp-benchmark-cagen-enroll", description = "CA client enroll (benchmark)")
   @Service
   public static class CmpBenchmarkCaGenEnroll extends AbstractCmpBenchmarkEnroll {
     @Override
@@ -277,10 +272,8 @@ public class QaCaActions {
         }
       }
 
-      CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(certprofile, null,
-              subjectTemplate, randomDn);
-      CaEnrollBenchmark benchmark = new CaEnrollBenchmark(benchmarkEntry, maxRequests, num,
-              queueSize, description);
+      CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(certprofile, null, subjectTemplate, randomDn);
+      CaEnrollBenchmark benchmark = new CaEnrollBenchmark(benchmarkEntry, maxRequests, num, queueSize, description);
 
       benchmark.setDuration(duration);
       benchmark.setThreads(numThreads);
@@ -343,10 +336,8 @@ public class QaCaActions {
         throw new IllegalCmdParamException("invalid keyType " + keyType);
       }
 
-      CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(certprofile, keyEntry,
-          subjectTemplate, randomDn);
-      CaEnrollBenchmark benchmark = new CaEnrollBenchmark(benchmarkEntry, maxRequests, num,
-          queueSize, description);
+      CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(certprofile, keyEntry, subjectTemplate, randomDn);
+      CaEnrollBenchmark benchmark = new CaEnrollBenchmark(benchmarkEntry, maxRequests, num, queueSize, description);
 
       benchmark.setDuration(duration);
       benchmark.setThreads(numThreads);
@@ -395,8 +386,7 @@ public class QaCaActions {
 
         if (eySize != isSize) {
           if (CollectionUtil.isNotEmpty(ca.getCertchain())) {
-            throw new CmdFailure("Length of CA certchain " + isSize
-                + " is not as expected " + eySize);
+            throw new CmdFailure("Length of CA certchain " + isSize + " is not as expected " + eySize);
           }
         } else if (eySize != 0) {
           for (int i = 0; i < eySize; i++) {
@@ -419,8 +409,7 @@ public class QaCaActions {
 
       // CRL signer name
       if (ey.getCrlSignerName() != null) {
-        assertEquals(
-            "CRL signer name", ey.getCrlSignerName(), ca.getCrlSignerName());
+        assertEquals("CRL signer name", ey.getCrlSignerName(), ca.getCrlSignerName());
       }
 
       // Expiration period
@@ -440,8 +429,7 @@ public class QaCaActions {
 
       // Keep expired certificate
       if (ey.getKeepExpiredCertInDays() != null) {
-        assertObjEquals("keepExiredCertInDays",
-            ey.getKeepExpiredCertInDays(), ca.getKeepExpiredCertInDays());
+        assertObjEquals("keepExiredCertInDays", ey.getKeepExpiredCertInDays(), ca.getKeepExpiredCertInDays());
       }
 
       // Num CRLs
@@ -516,8 +504,7 @@ public class QaCaActions {
 
   } // class CaprofileCheck
 
-  @Command(scope = "caqa", name = "capub-check",
-      description = "check information of publishers in given CA (QA)")
+  @Command(scope = "caqa", name = "capub-check", description = "check information of publishers in given CA (QA)")
   @Service
   public static class CapubCheck extends CaAction {
 
@@ -553,8 +540,7 @@ public class QaCaActions {
 
   } // class CapubCheck
 
-  @Command(scope = "caqa", name = "careq-check",
-      description = "check information of requestors in CA (QA)")
+  @Command(scope = "caqa", name = "careq-check", description = "check information of requestors in CA (QA)")
   @Service
   public static class CaReqCheck extends CaAction {
 
@@ -602,8 +588,7 @@ public class QaCaActions {
         int intPermission = ShellUtil.getPermission(permissions);
 
         if (intPermission != entry.getPermission()) {
-          throw new CmdFailure("permissions: is '" + entry.getPermission()
-              + "', but expected '" + intPermission + "'");
+          throw new CmdFailure("permissions: is '" + entry.getPermission() + "', but expected '" + intPermission + "'");
         }
       }
 
@@ -615,8 +600,7 @@ public class QaCaActions {
         }
 
         if (!profiles.equals(entry.getProfiles())) {
-          throw new CmdFailure("profiles: is '" + entry.getProfiles()
-              + "', but expected '" + profiles + "'");
+          throw new CmdFailure("profiles: is '" + entry.getProfiles() + "', but expected '" + profiles + "'");
         }
       }
 
@@ -626,8 +610,7 @@ public class QaCaActions {
 
   } // class CaReqCheck
 
-  @Command(scope = "caqa", name = "profile-check",
-      description = "check information of profiles (QA)")
+  @Command(scope = "caqa", name = "profile-check", description = "check information of profiles (QA)")
   @Service
   public static class ProfileCheck extends ProfileCaActions.ProfileUp {
 
@@ -658,8 +641,7 @@ public class QaCaActions {
 
   } // class ProfileCheck
 
-  @Command(scope = "caqa", name = "publisher-check",
-      description = "check information of publishers (QA)")
+  @Command(scope = "caqa", name = "publisher-check", description = "check information of publishers (QA)")
   @Service
   public static class PublisherCheck extends PublisherCaActions.PublisherUp {
 
@@ -687,8 +669,7 @@ public class QaCaActions {
 
   } // class PublisherCheck
 
-  @Command(scope = "caqa", name = "requestor-check",
-      description = "check information of requestors (QA)")
+  @Command(scope = "caqa", name = "requestor-check", description = "check information of requestors (QA)")
   @Service
   public static class RequestorCheck extends RequestorCaActions.RequestorUp {
 

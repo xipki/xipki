@@ -69,15 +69,13 @@ public class SubjectDnSpec {
   private static final Range RANGE_NAME = new Range(1, 256);
 
   // stringTypes
-  private static final Set<StringType> DIRECTORY_STRINGS = new HashSet<>(
-      Arrays.asList(StringType.bmpString, StringType.printableString,
-          StringType.teletexString, StringType.utf8String));
+  private static final Set<StringType> DIRECTORY_STRINGS = new HashSet<>(Arrays.asList(
+      StringType.bmpString, StringType.printableString, StringType.teletexString, StringType.utf8String));
 
-  private static final Set<StringType> PRINTABLE_STRING_ONLY = new HashSet<>(
-          Collections.singletonList(StringType.printableString));
+  private static final Set<StringType> PRINTABLE_STRING_ONLY =
+      new HashSet<>(Collections.singletonList(StringType.printableString));
 
-  private static final Set<StringType> IA5_STRING_ONLY = new HashSet<>(
-          Collections.singletonList(StringType.ia5String));
+  private static final Set<StringType> IA5_STRING_ONLY = new HashSet<>(Collections.singletonList(StringType.ia5String));
 
   private static final Map<ASN1ObjectIdentifier, StringType> DFLT_STRING_TYPES = new HashMap<>();
 
@@ -87,8 +85,7 @@ public class SubjectDnSpec {
 
   private static final Map<ASN1ObjectIdentifier, RdnControl> CONTROLS = new HashMap<>();
 
-  private static final Map<ASN1ObjectIdentifier, Set<StringType>> STRING_TYPE_SET =
-      new HashMap<>();
+  private static final Map<ASN1ObjectIdentifier, Set<StringType>> STRING_TYPE_SET = new HashMap<>();
 
   private static final List<ASN1ObjectIdentifier> FORWARD_DNS;
 
@@ -110,8 +107,7 @@ public class SubjectDnSpec {
         tmpForwardDNs.add(oid);
       }
     } catch (Exception ex) {
-      throw new ExceptionInInitializerError(new Exception(
-          "could not load RDN order: " + ex.getMessage(), ex));
+      throw new ExceptionInInitializerError(new Exception("could not load RDN order: " + ex.getMessage(), ex));
     } finally {
       try {
         reader.close();
@@ -169,8 +165,7 @@ public class SubjectDnSpec {
         LOG.info("area/country codes: {}", list);
       }
     } catch (Exception ex) {
-      throw new ExceptionInInitializerError(new Exception(
-          "could not load area code: " + ex.getMessage(), ex));
+      throw new ExceptionInInitializerError(new Exception("could not load area code: " + ex.getMessage(), ex));
     } finally {
       try {
         reader.close();
@@ -224,9 +219,7 @@ public class SubjectDnSpec {
     conf(ids, DN.userid, null, DIRECTORY_STRINGS);
 
     // localityName, jurisdictionOfIncorporationLocalityName
-    idList = new ASN1ObjectIdentifier[] {
-        DN.localityName,
-        DN.jurisdictionOfIncorporationLocalityName};
+    idList = new ASN1ObjectIdentifier[] {DN.localityName, DN.jurisdictionOfIncorporationLocalityName};
     for (ASN1ObjectIdentifier m : idList) {
       conf(ids, m, RANGE_128, DIRECTORY_STRINGS);
     }
@@ -271,8 +264,7 @@ public class SubjectDnSpec {
     conf(ids, DN.serialNumber, RANGE_64, PRINTABLE_STRING_ONLY);
 
     // stateOrProvinceName, jurisdictionOfIncorporationStateOrProvinceName
-    idList = new ASN1ObjectIdentifier[] {
-        DN.ST, DN.jurisdictionOfIncorporationStateOrProvinceName};
+    idList = new ASN1ObjectIdentifier[] {DN.ST, DN.jurisdictionOfIncorporationStateOrProvinceName};
     for (ASN1ObjectIdentifier m : idList) {
       conf(ids, m, RANGE_128, DIRECTORY_STRINGS);
     }
@@ -300,10 +292,7 @@ public class SubjectDnSpec {
 
     for (ASN1ObjectIdentifier type : ids) {
       StringType stringType = DFLT_STRING_TYPES.get(type);
-      RdnControl control = new RdnControl(type,
-          0, // minOccurs
-          9 //maxOccurs
-          );
+      RdnControl control = new RdnControl(type, 0, 9);
       control.setStringType(stringType);
       control.setStringLengthRange(RANGES.get(type));
       TextVadidator pattern = PATTERNS.get(type);
@@ -317,8 +306,8 @@ public class SubjectDnSpec {
   private SubjectDnSpec() {
   }
 
-  private static void conf(Set<ASN1ObjectIdentifier> types, ASN1ObjectIdentifier type,
-      Range range, Set<StringType> stringTypes) {
+  private static void conf(
+      Set<ASN1ObjectIdentifier> types, ASN1ObjectIdentifier type, Range range, Set<StringType> stringTypes) {
     types.add(type);
     if (range != null) {
       RANGES.put(type, range);
@@ -361,8 +350,7 @@ public class SubjectDnSpec {
     StringType stringType = control.getStringType();
     if (stringType != null) {
       if (STRING_TYPE_SET.containsKey(type) && !STRING_TYPE_SET.get(type).contains(stringType)) {
-        throw new CertprofileException(
-          String.format("%s is not allowed %s", stringType.name(), type.getId()));
+        throw new CertprofileException(String.format("%s is not allowed %s", stringType.name(), type.getId()));
       }
     } else {
       StringType specStrType = DFLT_STRING_TYPES.get(type);
@@ -434,8 +422,7 @@ public class SubjectDnSpec {
     } else {
       InputStream confStream = SubjectDnSpec.class.getResourceAsStream(fallbackResource);
       if (confStream == null) {
-        throw new IllegalStateException(
-            "could not access non-existing resource " + fallbackResource);
+        throw new IllegalStateException("could not access non-existing resource " + fallbackResource);
       }
       LOG.info("read from resource " + fallbackResource);
       return new BufferedReader(new InputStreamReader(confStream, StandardCharsets.UTF_8));

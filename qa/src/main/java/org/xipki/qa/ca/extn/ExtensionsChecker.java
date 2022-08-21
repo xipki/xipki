@@ -108,8 +108,7 @@ public class ExtensionsChecker {
     Map<String, ExtensionType> extensions = conf.buildExtensions();
 
     // Extension controls
-    Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls =
-        certprofile.getExtensionControls();
+    Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls = certprofile.getExtensionControls();
 
     // Certificate Policies
     ASN1ObjectIdentifier type = Extension.certificatePolicies;
@@ -174,8 +173,7 @@ public class ExtensionsChecker {
     // SMIMECapabilities
     type = Extn.id_smimeCapabilities;
     if (extensionControls.containsKey(type)) {
-      List<SmimeCapability> list =
-          extensions.get(type.getId()).getSmimeCapabilities().getCapabilities();
+      List<SmimeCapability> list = extensions.get(type.getId()).getSmimeCapabilities().getCapabilities();
 
       ASN1EncodableVector vec = new ASN1EncodableVector();
       for (SmimeCapability m : list) {
@@ -189,15 +187,13 @@ public class ExtensionsChecker {
             params = readAsn1Encodable(capParam.getBinary().getValue());
           }
         }
-        org.bouncycastle.asn1.smime.SMIMECapability cap =
-            new org.bouncycastle.asn1.smime.SMIMECapability(oid, params);
+        org.bouncycastle.asn1.smime.SMIMECapability cap = new org.bouncycastle.asn1.smime.SMIMECapability(oid, params);
         vec.add(cap);
       }
 
       DERSequence extValue = new DERSequence(vec);
       try {
-        smimeCapabilities = new QaExtensionValue(
-            extensionControls.get(type).isCritical(), extValue.getEncoded());
+        smimeCapabilities = new QaExtensionValue(extensionControls.get(type).isCritical(), extValue.getEncoded());
       } catch (IOException ex) {
         throw new CertprofileException("Cannot encode SMIMECapabilities: " + ex.getMessage());
       }
@@ -226,8 +222,7 @@ public class ExtensionsChecker {
       ASN1ObjectIdentifier mOid = new ASN1ObjectIdentifier(m);
       if (mOid.on(Extn.id_ccc_extn)) {
         if (type != null) {
-          throw new CertprofileException(
-              "Maximal one CCC Extension is allowed, but configured at least 2.");
+          throw new CertprofileException("Maximal one CCC Extension is allowed, but configured at least 2.");
         }
         type = mOid;
       }
@@ -239,8 +234,7 @@ public class ExtensionsChecker {
 
     ExtensionType ex = extensions.get(type.getId());
     if (!ex.isCritical()) {
-      throw new CertprofileException(
-          "CCC Extension must be set to critical, but configured non-critical.");
+      throw new CertprofileException("CCC Extension must be set to critical, but configured non-critical.");
     }
 
     List<ASN1ObjectIdentifier> simpleSchemaTypes = Arrays.asList(
@@ -323,8 +317,8 @@ public class ExtensionsChecker {
     return certprofile;
   }
 
-  public List<ValidationIssue> checkExtensions(Certificate cert, IssuerInfo issuerInfo,
-      Extensions requestedExtns, X500Name requestedSubject) {
+  public List<ValidationIssue> checkExtensions(
+      Certificate cert, IssuerInfo issuerInfo, Extensions requestedExtns, X500Name requestedSubject) {
     notNull(cert, "cert");
     notNull(issuerInfo, "issuerInfo");
 
@@ -333,8 +327,7 @@ public class ExtensionsChecker {
     List<ValidationIssue> result = new LinkedList<>();
 
     // detect the list of extension types in certificate
-    Set<ASN1ObjectIdentifier> presentExtenionTypes =
-        getExensionTypes(cert, issuerInfo, requestedExtns);
+    Set<ASN1ObjectIdentifier> presentExtenionTypes = getExensionTypes(cert, issuerInfo, requestedExtns);
 
     Extensions extensions = cert.getTBSCertificate().getExtensions();
     ASN1ObjectIdentifier[] oids = extensions.getExtensionOIDs();
@@ -356,8 +349,7 @@ public class ExtensionsChecker {
       }
     }
 
-    Map<ASN1ObjectIdentifier, ExtensionControl> extnControls =
-        certprofile.getExtensionControls();
+    Map<ASN1ObjectIdentifier, ExtensionControl> extnControls = certprofile.getExtensionControls();
     for (ASN1ObjectIdentifier oid : certExtTypes) {
       ValidationIssue issue = createExtensionIssue(oid);
       result.add(issue);
@@ -379,8 +371,7 @@ public class ExtensionsChecker {
         if (extensionSyntaxes != null && extensionSyntaxes.containsKey(oid)) {
           Extension requestedExtn = requestedExtns.getExtension(oid);
           if (!Arrays.equals(requestedExtn.getExtnValue().getOctets(), extnValue)) {
-            failureMsg.append(
-                "extension in certificate does not equal the one contained in the request");
+            failureMsg.append("extension in certificate does not equal the one contained in the request");
           } else {
             ExtnSyntax syntax = extensionSyntaxes.get(oid);
             String extnName = "extension " + ObjectIdentifiers.oidToDisplayName(oid);
@@ -394,83 +385,58 @@ public class ExtensionsChecker {
           a2gChecker.checkExtnAuthorityKeyId(failureMsg, extnValue, issuerInfo);
         } else if (Extension.subjectKeyIdentifier.equals(oid)) {
           // SubjectKeyIdentifier
-          o2tChecker.checkExtnSubjectKeyIdentifier(
-                      failureMsg, extnValue, cert.getSubjectPublicKeyInfo());
+          o2tChecker.checkExtnSubjectKeyIdentifier(failureMsg, extnValue, cert.getSubjectPublicKeyInfo());
         } else if (Extension.keyUsage.equals(oid)) {
-          h2nChecker.checkExtnKeyUsage(
-                      failureMsg, jceCert.getKeyUsage(), requestedExtns, extnControl);
+          h2nChecker.checkExtnKeyUsage(failureMsg, jceCert.getKeyUsage(), requestedExtns, extnControl);
         } else if (Extension.certificatePolicies.equals(oid)) {
-          a2gChecker.checkExtnCertificatePolicies(
-                      failureMsg, extnValue, requestedExtns, extnControl);
+          a2gChecker.checkExtnCertificatePolicies(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extension.policyMappings.equals(oid)) {
-          o2tChecker.checkExtnPolicyMappings(
-                      failureMsg, extnValue, requestedExtns, extnControl);
+          o2tChecker.checkExtnPolicyMappings(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extension.subjectAlternativeName.equals(oid)) {
-          o2tChecker.checkExtnSubjectAltNames(
-                      failureMsg, extnValue, requestedExtns, extnControl, requestedSubject);
+          o2tChecker.checkExtnSubjectAltNames(failureMsg, extnValue, requestedExtns, extnControl, requestedSubject);
         } else if (Extension.subjectDirectoryAttributes.equals(oid)) {
-          o2tChecker.checkExtnSubjectDirAttrs(
-                      failureMsg, extnValue, requestedExtns, extnControl);
+          o2tChecker.checkExtnSubjectDirAttrs(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extension.issuerAlternativeName.equals(oid)) {
-          h2nChecker.checkExtnIssuerAltNames(
-                      failureMsg, extnValue, issuerInfo);
+          h2nChecker.checkExtnIssuerAltNames(failureMsg, extnValue, issuerInfo);
         } else if (Extension.basicConstraints.equals(oid)) {
-          a2gChecker.checkExtnBasicConstraints(
-                      failureMsg, extnValue);
+          a2gChecker.checkExtnBasicConstraints(failureMsg, extnValue);
         } else if (Extension.nameConstraints.equals(oid)) {
-          h2nChecker.checkExtnNameConstraints(
-                      failureMsg, extnValue, requestedExtns, extnControl);
+          h2nChecker.checkExtnNameConstraints(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extension.policyConstraints.equals(oid)) {
-          o2tChecker.checkExtnPolicyConstraints(
-                      failureMsg, extnValue, requestedExtns, extnControl);
+          o2tChecker.checkExtnPolicyConstraints(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extension.extendedKeyUsage.equals(oid)) {
-          a2gChecker.checkExtnExtendedKeyUsage(
-                      failureMsg, extnValue, requestedExtns, extnControl);
+          a2gChecker.checkExtnExtendedKeyUsage(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extension.cRLDistributionPoints.equals(oid)) {
-          a2gChecker.checkExtnCrlDistributionPoints(
-                      failureMsg, extnValue, issuerInfo);
+          a2gChecker.checkExtnCrlDistributionPoints(failureMsg, extnValue, issuerInfo);
         } else if (Extension.inhibitAnyPolicy.equals(oid)) {
-          h2nChecker.checkExtnInhibitAnyPolicy(
-                      failureMsg, extnValue, extensions, extnControl);
+          h2nChecker.checkExtnInhibitAnyPolicy(failureMsg, extnValue, extensions, extnControl);
         } else if (Extension.freshestCRL.equals(oid)) {
-          a2gChecker.checkExtnDeltaCrlDistributionPoints(
-                      failureMsg, extnValue, issuerInfo);
+          a2gChecker.checkExtnDeltaCrlDistributionPoints(failureMsg, extnValue, issuerInfo);
         } else if (Extension.authorityInfoAccess.equals(oid)) {
-          a2gChecker.checkExtnAuthorityInfoAccess(
-                      failureMsg, extnValue, issuerInfo);
+          a2gChecker.checkExtnAuthorityInfoAccess(failureMsg, extnValue, issuerInfo);
         } else if (Extension.subjectInfoAccess.equals(oid)) {
-          o2tChecker.checkExtnSubjectInfoAccess(
-                      failureMsg, extnValue, requestedExtns, extnControl);
+          o2tChecker.checkExtnSubjectInfoAccess(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extn.id_extension_admission.equals(oid)) {
-          a2gChecker.checkExtnAdmission(
-                      failureMsg, extnValue, requestedExtns, requestedSubject, extnControl);
+          a2gChecker.checkExtnAdmission(failureMsg, extnValue, requestedExtns, requestedSubject, extnControl);
         } else if (Extn.id_extension_pkix_ocsp_nocheck.equals(oid)) {
-          o2tChecker.checkExtnOcspNocheck(
-                      failureMsg, extnValue);
+          o2tChecker.checkExtnOcspNocheck(failureMsg, extnValue);
         } else if (Extn.id_extension_restriction.equals(oid)) {
-          o2tChecker.checkExtnRestriction(
-                      failureMsg, extnValue, requestedExtns, extnControl);
+          o2tChecker.checkExtnRestriction(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extn.id_extension_additionalInformation.equals(oid)) {
-          a2gChecker.checkExtnAdditionalInformation(
-                      failureMsg, extnValue, requestedExtns, extnControl);
+          a2gChecker.checkExtnAdditionalInformation(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extn.id_extension_validityModel.equals(oid)) {
-          u2zChecker.checkExtnValidityModel(
-                      failureMsg, extnValue, requestedExtns, extnControl);
+          u2zChecker.checkExtnValidityModel(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extension.privateKeyUsagePeriod.equals(oid)) {
           o2tChecker.checkExtnPrivateKeyUsagePeriod(
-                      failureMsg, extnValue, jceCert.getNotBefore(), jceCert.getNotAfter());
+              failureMsg, extnValue, jceCert.getNotBefore(), jceCert.getNotAfter());
         } else if (Extension.qCStatements.equals(oid)) {
-          o2tChecker.checkExtnQcStatements(
-                      failureMsg, extnValue, requestedExtns, extnControl);
+          o2tChecker.checkExtnQcStatements(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extension.biometricInfo.equals(oid)) {
-          a2gChecker.checkExtnBiometricInfo(
-                      failureMsg, extnValue, requestedExtns);
+          a2gChecker.checkExtnBiometricInfo(failureMsg, extnValue, requestedExtns);
         } else if (Extn.id_pe_tlsfeature.equals(oid)) {
-          o2tChecker.checkExtnTlsFeature(
-                      failureMsg, extnValue, requestedExtns, extnControl);
+          o2tChecker.checkExtnTlsFeature(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extn.id_smimeCapabilities.equals(oid)) {
-          o2tChecker.checkSmimeCapabilities(
-                      failureMsg, extnValue, extnControl);
+          o2tChecker.checkSmimeCapabilities(failureMsg, extnValue, extnControl);
         } else if (Extn.id_SCTs.equals(oid)) {
           o2tChecker.checkScts(failureMsg, extnValue, extnControl);
         } else if (Extn.id_GMT_0015_ICRegistrationNumber.equals(oid)
@@ -478,8 +444,7 @@ public class ExtensionsChecker {
             || Extn.id_GMT_0015_OrganizationCode.equals(oid)
             || Extn.id_GMT_0015_TaxationNumber.equals(oid)
             || Extn.id_GMT_0015_IdentityCode.equals(oid)) {
-          a2gChecker.checkExtnGmt0015(failureMsg, extnValue, requestedExtns, extnControl,
-              oid, requestedSubject);
+          a2gChecker.checkExtnGmt0015(failureMsg, extnValue, requestedExtns, extnControl, oid, requestedSubject);
         } else if (oid.equals(cccExtensionSchemaType)) {
           byte[] expected = cccExtensionSchemaValue;
           if (!Arrays.equals(cccExtensionSchemaValue, extnValue)) {
@@ -498,8 +463,7 @@ public class ExtensionsChecker {
           issue.setFailureMessage(failureMsg.toString());
         }
 
-      } catch (IllegalArgumentException | ClassCastException | IOException
-          | ArrayIndexOutOfBoundsException ex) {
+      } catch (IllegalArgumentException | ClassCastException | IOException | ArrayIndexOutOfBoundsException ex) {
         LOG.debug("extension value does not have correct syntax", ex);
         issue.setFailureMessage("extension value does not have correct syntax");
       }
@@ -508,8 +472,8 @@ public class ExtensionsChecker {
     return result;
   } // method checkExtensions
 
-  private byte[] getExpectedExtValue(ASN1ObjectIdentifier type, Extensions requestedExtns,
-      ExtensionControl extControl) {
+  private byte[] getExpectedExtValue(
+      ASN1ObjectIdentifier type, Extensions requestedExtns, ExtensionControl extControl) {
     if (constantExtensions != null && constantExtensions.containsKey(type)) {
       return constantExtensions.get(type).getValue();
     } else if (requestedExtns != null && extControl.isRequest()) {
@@ -522,12 +486,11 @@ public class ExtensionsChecker {
     return null;
   } // getExpectedExtValue
 
-  private Set<ASN1ObjectIdentifier> getExensionTypes(Certificate cert,
-      IssuerInfo issuerInfo, Extensions requestedExtns) {
+  private Set<ASN1ObjectIdentifier> getExensionTypes(
+      Certificate cert, IssuerInfo issuerInfo, Extensions requestedExtns) {
     Set<ASN1ObjectIdentifier> types = new HashSet<>();
     // profile required extension types
-    Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls =
-        certprofile.getExtensionControls();
+    Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls = certprofile.getExtensionControls();
 
     for (Entry<ASN1ObjectIdentifier, ExtensionControl> entry : extensionControls.entrySet()) {
       ASN1ObjectIdentifier oid = entry.getKey();
@@ -598,8 +561,7 @@ public class ExtensionsChecker {
     // IssuerAltName
     type = Extension.issuerAlternativeName;
     if (extensionControls.containsKey(type)) {
-      if (cert.getTBSCertificate().getExtensions().getExtension(Extension.subjectAlternativeName)
-          != null) {
+      if (cert.getTBSCertificate().getExtensions().getExtension(Extension.subjectAlternativeName) != null) {
         addIfNotIn(types, type);
       }
     }
@@ -723,10 +685,9 @@ public class ExtensionsChecker {
     }
   } // method createExtensionIssue
 
-  void checkDirectoryString(ASN1ObjectIdentifier extnType,
-      DirectoryStringType type, String text,
-      StringBuilder failureMsg, byte[] extensionValue, Extensions requestedExtns,
-      ExtensionControl extControl) {
+  void checkDirectoryString(
+      ASN1ObjectIdentifier extnType, DirectoryStringType type, String text, StringBuilder failureMsg,
+      byte[] extensionValue, Extensions requestedExtns, ExtensionControl extControl) {
     if (type == null) {
       checkConstantExtnValue(extnType, failureMsg, extensionValue, requestedExtns, extControl);
       return;
@@ -756,13 +717,11 @@ public class ExtensionsChecker {
         correctStringType = (asn1 instanceof DERUTF8String);
         break;
       default:
-        throw new IllegalStateException("should not reach here, unknown DirectoryStringType "
-            + type);
+        throw new IllegalStateException("should not reach here, unknown DirectoryStringType " + type);
     } // end switch
 
     if (!correctStringType) {
-      failureMsg.append("extension value is not of type DirectoryString.")
-        .append(text).append("; ");
+      failureMsg.append("extension value is not of type DirectoryString.").append(text).append("; ");
       return;
     }
 
@@ -790,9 +749,9 @@ public class ExtensionsChecker {
     return (constantExtensions == null) ? null : constantExtensions.get(type).getValue();
   }
 
-  void checkConstantExtnValue(ASN1ObjectIdentifier extnType,
-      StringBuilder failureMsg, byte[] extensionValue, Extensions requestedExtns,
-      ExtensionControl extControl) {
+  void checkConstantExtnValue(
+      ASN1ObjectIdentifier extnType, StringBuilder failureMsg, byte[] extensionValue,
+      Extensions requestedExtns, ExtensionControl extControl) {
     byte[] expected = getExpectedExtValue(extnType, requestedExtns, extControl);
     if (!Arrays.equals(expected, extensionValue)) {
       addViolation(failureMsg, "extension values", hex(extensionValue),

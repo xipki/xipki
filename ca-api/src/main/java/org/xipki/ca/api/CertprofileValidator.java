@@ -97,8 +97,7 @@ public class CertprofileValidator {
     }
 
     if (CollectionUtil.isNotEmpty(set)) {
-      msg.append("critical only extensions are marked as non-critical ")
-        .append(toString(set)).append(", ");
+      msg.append("critical only extensions are marked as non-critical ").append(toString(set)).append(", ");
     }
 
     // make sure that non-critical only extensions are not marked as critical.
@@ -136,9 +135,7 @@ public class CertprofileValidator {
 
     if (certLevel == CertLevel.SubCA || certLevel == CertLevel.RootCA) {
       // make sure the CA certificate contains usage keyCertSign and cRLSign
-      KeyUsage[] requiredUsages = new KeyUsage[] {
-          KeyUsage.keyCertSign,
-          KeyUsage.cRLSign};
+      KeyUsage[] requiredUsages = new KeyUsage[] {KeyUsage.keyCertSign, KeyUsage.cRLSign};
       for (KeyUsage usage : requiredUsages) {
         if (!containsKeyusage(usages, usage)) {
           msg.append("CA profile does not contain keyUsage ").append(usage).append(", ");
@@ -156,8 +153,7 @@ public class CertprofileValidator {
       }
 
       if (CollectionUtil.isNotEmpty(setUsages)) {
-        msg.append("EndEntity profile must not contain CA-only keyUsage ").append(setUsages)
-          .append(", ");
+        msg.append("EndEntity profile must not contain CA-only keyUsage ").append(setUsages).append(", ");
       }
     }
 
@@ -201,14 +197,12 @@ public class CertprofileValidator {
           msg.append("required KeyUsage KeyAgreement is not marked as 'required', ");
         }
 
-        allowedUsages = Arrays.asList(KeyUsage.keyAgreement, KeyUsage.encipherOnly,
-                          KeyUsage.decipherOnly);
+        allowedUsages = Arrays.asList(KeyUsage.keyAgreement, KeyUsage.encipherOnly, KeyUsage.decipherOnly);
       } else {
         if (certLevel == CertLevel.EndEntity) {
           if (! (requiredUsages.contains(KeyUsage.digitalSignature)
                 || requiredUsages.contains(KeyUsage.contentCommitment))) {
-            msg.append("required KeyUsage digitalSignature or contentCommitment is not marked "
-                + "as 'required', ");
+            msg.append("required KeyUsage digitalSignature or contentCommitment is not marked as 'required', ");
           }
 
           allowedUsages = Arrays.asList(KeyUsage.digitalSignature, KeyUsage.contentCommitment);
@@ -222,13 +216,11 @@ public class CertprofileValidator {
       optionalUsages.removeAll(allowedUsages);
 
       if (!requiredUsages.isEmpty()) {
-        msg.append("Required KeyUsage items ").append(requiredUsages)
-          .append(" are not permitted, ");
+        msg.append("Required KeyUsage items ").append(requiredUsages).append(" are not permitted, ");
       }
 
       if (!optionalUsages.isEmpty()) {
-        msg.append("Optional KeyUsage items ").append(requiredUsages)
-        .append(" are not permitted, ");
+        msg.append("Optional KeyUsage items ").append(requiredUsages).append(" are not permitted, ");
       }
     }
 
@@ -298,8 +290,7 @@ public class CertprofileValidator {
           }
         } else if (m.equals(X9ObjectIdentifiers.id_ecPublicKey)) {
           if (opt instanceof ECParamatersOption) {
-            Set<ASN1ObjectIdentifier> curveOids =
-                new HashSet<>(((ECParamatersOption) opt).getCurveOids());
+            Set<ASN1ObjectIdentifier> curveOids = new HashSet<>(((ECParamatersOption) opt).getCurveOids());
             curveOids.remove(SECObjectIdentifiers.secp256r1);
             curveOids.remove(SECObjectIdentifiers.secp384r1);
             curveOids.remove(SECObjectIdentifiers.secp521r1);
@@ -382,13 +373,11 @@ public class CertprofileValidator {
     Set<KeyUsageControl> usages = certprofile.getKeyUsage();
     if (certLevel == CertLevel.RootCA || certLevel == CertLevel.SubCA) {
       if (!containsKeyusage(usages, KeyUsage.cRLSign)) {
-        msg.append("RootCA profile does contain keyUsage ")
-          .append(KeyUsage.cRLSign).append(", ");
+        msg.append("RootCA profile does contain keyUsage ").append(KeyUsage.cRLSign).append(", ");
       }
     } else if (certLevel == CertLevel.EndEntity) {
       if (containsKeyusage(usages, KeyUsage.cRLSign)) {
-        msg.append("EndEntity profile must not contain keyUsage ")
-          .append(KeyUsage.cRLSign).append(", ");
+        msg.append("EndEntity profile must not contain keyUsage ").append(KeyUsage.cRLSign).append(", ");
       }
     }
 

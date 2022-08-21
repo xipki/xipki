@@ -103,11 +103,9 @@ public abstract class AbstractCaTest {
     if (scepServerContainer == null) {
       CaCaps caCaps = getExpectedCaCaps();
 
-      ScepControl control = new ScepControl(isSendCaCert(), isPendingCert(), sendSignerCert(),
-          secret);
+      ScepControl control = new ScepControl(isSendCaCert(), isPendingCert(), sendSignerCert(), secret);
 
-      this.scepServer = new ScepServer("scep", caCaps, isWithRa(), isWithNextCa(), isGenerateCrl(),
-          control);
+      this.scepServer = new ScepServer("scep", caCaps, isWithRa(), isWithNextCa(), isGenerateCrl(), control);
       this.scepServerContainer = new ScepServerContainer(port, scepServer);
     }
 
@@ -134,8 +132,7 @@ public abstract class AbstractCaTest {
   private void doTest(KeyPair keypair)
       throws Exception {
     CaIdentifier caId = new CaIdentifier("http://localhost:" + port + "/scep/pkiclient.exe", null);
-    CaCertValidator caCertValidator = new CaCertValidator.PreprovisionedCaCertValidator(
-            scepServer.getCaCert());
+    CaCertValidator caCertValidator = new CaCertValidator.PreprovisionedCaCertValidator(scepServer.getCaCert());
     ScepClient client = new ScepClient(caId, caCertValidator);
 
     client.refresh();
@@ -197,8 +194,7 @@ public abstract class AbstractCaTest {
     CertificationRequest csr;
     {
       privKey = keypair.getPrivate();
-      SubjectPublicKeyInfo subjectPublicKeyInfo = MyUtil.createSubjectPublicKeyInfo(
-              keypair.getPublic());
+      SubjectPublicKeyInfo subjectPublicKeyInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
       X500Name subject = new X500Name("CN=EE1, OU=emulator, O=myorg.org, C=DE");
 
       // first try without secret
@@ -224,8 +220,7 @@ public abstract class AbstractCaTest {
       p10Req = MyUtil.generateRequest(privKey, subjectPublicKeyInfo, subject, secret, null);
 
       selfSignedCert = MyUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
-      EnrolmentResponse enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(),
-          privKey, selfSignedCert);
+      EnrolmentResponse enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
 
       List<X509Cert> certs = enrolResp.getCertificates();
       Assert.assertTrue("number of received certificates", certs.size() > 0);
@@ -259,8 +254,7 @@ public abstract class AbstractCaTest {
     Assert.assertNotNull("received certificate", cert);
 
     // getCRL
-    X509CRLHolder crl = client.scepGetCrl(privKey, enroledCert, issuerName,
-        enroledCert.getSerialNumber());
+    X509CRLHolder crl = client.scepGetCrl(privKey, enroledCert, issuerName, enroledCert.getSerialNumber());
     Assert.assertNotNull("received CRL", crl);
 
     // getNextCA

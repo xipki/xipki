@@ -88,8 +88,7 @@ public class ScepResponder {
 
     public static final FailInfoException BAD_CERTID = new FailInfoException(FailInfo.badCertId);
 
-    public static final FailInfoException BAD_MESSAGE_CHECK
-        = new FailInfoException(FailInfo.badMessageCheck);
+    public static final FailInfoException BAD_MESSAGE_CHECK = new FailInfoException(FailInfo.badMessageCheck);
 
     public static final FailInfoException BAD_REQUEST = new FailInfoException(FailInfo.badRequest);
 
@@ -132,8 +131,7 @@ public class ScepResponder {
 
   public ScepResponder(
       ScepControl control, SdkClient sdk, SecurityFactory securityFactory,
-      CaNameScepSigners signers, RequestorAuthenticator authenticator,
-      PopControl popControl) {
+      CaNameScepSigners signers, RequestorAuthenticator authenticator, PopControl popControl) {
     this.control = notNull(control, "control");
     this.sdk = notNull(sdk, "sdk");
     this.securityFactory = notNull(securityFactory, "securityFactory");
@@ -142,8 +140,7 @@ public class ScepResponder {
 
     // CACaps
     CaCaps caps = new CaCaps();
-    caps.addCapabilities(CaCapability.SCEPStandard,
-        CaCapability.AES, CaCapability.DES3, CaCapability.POSTPKIOperation,
+    caps.addCapabilities(CaCapability.SCEPStandard, CaCapability.AES, CaCapability.DES3, CaCapability.POSTPKIOperation,
         CaCapability.Renewal, CaCapability.SHA1, CaCapability.SHA256, CaCapability.SHA512);
     this.caCaps = caps;
     this.signers = signers;
@@ -161,8 +158,7 @@ public class ScepResponder {
     return authenticator.getCertRequestor(cert);
   }
 
-  public RestResponse service(
-      String path, byte[] request, HttpRequestMetadataRetriever metadataRetriever) {
+  public RestResponse service(String path, byte[] request, HttpRequestMetadataRetriever metadataRetriever) {
     String caName = null;
     String certprofileName = null;
     if (path.length() > 1) {
@@ -369,14 +365,10 @@ public class ScepResponder {
   }
 
   private ContentInfo servicePkiOperation(
-      ScepSigner signer, String caName, CMSSignedData requestContent,
-      String certprofileName, AuditEvent event)
+      ScepSigner signer, String caName, CMSSignedData requestContent, String certprofileName, AuditEvent event)
       throws MessageDecodingException, OperationException, SdkErrorResponseException {
-    DecodedPkiMessage req = DecodedPkiMessage.decode(
-        requestContent, signer.getDecryptor(), null);
-
-    PkiMessage rep = servicePkiOperation0(caName, requestContent, req,
-                        certprofileName, event);
+    DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, signer.getDecryptor(), null);
+    PkiMessage rep = servicePkiOperation0(caName, requestContent, req, certprofileName, event);
     audit(event, NAME_pki_status, rep.getPkiStatus().toString());
     if (rep.getPkiStatus() == PkiStatus.FAILURE) {
       event.setStatus(AuditStatus.FAILED);
@@ -388,8 +380,7 @@ public class ScepResponder {
   } // method servicePkiOperation
 
   private PkiMessage servicePkiOperation0(
-      String caName, CMSSignedData requestContent,
-      DecodedPkiMessage req, String certprofileName, AuditEvent event)
+      String caName, CMSSignedData requestContent, DecodedPkiMessage req, String certprofileName, AuditEvent event)
       throws OperationException, SdkErrorResponseException {
     notNull(requestContent, "requestContent");
 
@@ -408,8 +399,7 @@ public class ScepResponder {
       audit(event, NAME_decryption, "failed");
     }
 
-    PkiMessage rep = new PkiMessage(req.getTransactionId(), MessageType.CertRep,
-                        Nonce.randomNonce());
+    PkiMessage rep = new PkiMessage(req.getTransactionId(), MessageType.CertRep, Nonce.randomNonce());
     rep.setRecipientNonce(req.getSenderNonce());
 
     if (req.getFailureMessage() != null) {
@@ -519,8 +509,7 @@ public class ScepResponder {
           }
 
           event.addEventData(CaAuditConstants.NAME_certprofile, certprofileName);
-          event.addEventData(CaAuditConstants.NAME_req_subject,
-              "\"" + X509Util.x500NameText(reqSubject) + "\"");
+          event.addEventData(CaAuditConstants.NAME_req_subject, "\"" + X509Util.x500NameText(reqSubject) + "\"");
 
           if (!GatewayUtil.verifyCsr(csr, securityFactory, popControl)) {
             LOG.warn("tid={} POP verification failed", tid);
@@ -541,8 +530,7 @@ public class ScepResponder {
           }
 
           if (X509Util.getCommonName(csrReqInfo.getSubject()) == null) {
-            throw new OperationException(BAD_CERT_TEMPLATE,
-                "tid=" + tid + ": no CommonName in requested subject");
+            throw new OperationException(BAD_CERT_TEMPLATE, "tid=" + tid + ": no CommonName in requested subject");
           }
 
           String challengePwd = getChallengePassword(csrReqInfo);
@@ -556,8 +544,7 @@ public class ScepResponder {
             String user = strs[0];
             String password = strs[1];
             requestor = getRequestor(user);
-            boolean authorized = requestor != null
-                && requestor.authenticate(password.getBytes(StandardCharsets.UTF_8));
+            boolean authorized = requestor != null && requestor.authenticate(password.getBytes(StandardCharsets.UTF_8));
             if (!authorized) {
               LOG.warn("tid={}: could not authenticate user {}", tid, user);
               throw FailInfoException.BAD_REQUEST;
@@ -566,8 +553,7 @@ public class ScepResponder {
 
           if (selfSigned) {
             if (MessageType.PKCSReq != mt) {
-              LOG.warn("tid={}: self-signed certificate is not permitted for"
-                  + " messageType {}", tid, mt);
+              LOG.warn("tid={}: self-signed certificate is not permitted for messageType {}", tid, mt);
               throw FailInfoException.BAD_REQUEST;
             }
             if (requestor == null) {
@@ -631,10 +617,8 @@ public class ScepResponder {
         }
         case CertPoll: {
           IssuerAndSubject is = IssuerAndSubject.getInstance(req.getMessageData());
-          audit(event, CaAuditConstants.NAME_issuer,
-              "\"" + X509Util.x500NameText(is.getIssuer()) + "\"");
-          audit(event, CaAuditConstants.NAME_subject,
-              "\"" + X509Util.x500NameText(is.getSubject()) + "\"");
+          audit(event, CaAuditConstants.NAME_issuer, "\"" + X509Util.x500NameText(is.getIssuer()) + "\"");
+          audit(event, CaAuditConstants.NAME_subject, "\"" + X509Util.x500NameText(is.getSubject()) + "\"");
           PollCertRequestEntry template = new PollCertRequestEntry();
           template.setSubject(new X500NameType(is.getSubject()));
 
@@ -657,16 +641,14 @@ public class ScepResponder {
         case GetCert:
           IssuerAndSerialNumber isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
           BigInteger serial = isn.getSerialNumber().getPositiveValue();
-          audit(event, CaAuditConstants.NAME_issuer,
-              "\"" + X509Util.x500NameText(isn.getName()) + "\"");
+          audit(event, CaAuditConstants.NAME_issuer, "\"" + X509Util.x500NameText(isn.getName()) + "\"");
           audit(event, CaAuditConstants.NAME_serial, LogUtil.formatCsn(serial));
           signedData = getCert(caName, isn.getName(), serial);
           break;
         case GetCRL:
           isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
           serial = isn.getSerialNumber().getPositiveValue();
-          audit(event, CaAuditConstants.NAME_issuer,
-              "\"" + X509Util.x500NameText(isn.getName()) + "\"");
+          audit(event, CaAuditConstants.NAME_issuer, "\"" + X509Util.x500NameText(isn.getName()) + "\"");
           audit(event, CaAuditConstants.NAME_serial, LogUtil.formatCsn(serial));
           signedData = getCrl(caName, isn.getName(), serial);
           break;
@@ -716,9 +698,7 @@ public class ScepResponder {
     EnrollOrPullCertResponseEntry entry = entries.get(0);
     byte[] cert = entry.getCert();
     if (cert == null) {
-      throw new OperationException(
-          ErrorCode.ofCode(entry.getError().getCode()),
-          "expected 1 cert, but received none");
+      throw new OperationException(ErrorCode.ofCode(entry.getError().getCode()), "expected 1 cert, but received none");
     }
 
     return buildSignedData(cert, sdkResp.getExtraCerts());
@@ -781,8 +761,7 @@ public class ScepResponder {
     String algorithm = signer.getKey().getAlgorithm();
 
     if (!"RSA".equalsIgnoreCase(algorithm)) {
-      throw new UnsupportedOperationException(
-          "getSignatureAlgorithm() for non-RSA is not supported yet.");
+      throw new UnsupportedOperationException("getSignatureAlgorithm() for non-RSA is not supported yet.");
     }
 
     HashAlgo hashAlgo = request.getDigestAlgorithm();
@@ -790,8 +769,7 @@ public class ScepResponder {
     ContentInfo ci;
     try {
       SignAlgo signatureAlgorithm = SignAlgo.getInstance(hashAlgo.getJceName() + "withRSA");
-      X509Cert[] cmsCertSet = control.isIncludeSignerCert()
-          ? new X509Cert[]{signer.getCert()} : null;
+      X509Cert[] cmsCertSet = control.isIncludeSignerCert() ? new X509Cert[]{signer.getCert()} : null;
 
       ci = response.encode(signer.getKey(), signatureAlgorithm, signer.getCert(), cmsCertSet,
           request.getSignatureCert(), request.getContentEncryptionAlgorithm());
@@ -808,14 +786,12 @@ public class ScepResponder {
     int permission = PermissionConstants.ENROLL_CERT;
     if (!requestor.isPermitted(permission)) {
       throw new OperationException(NOT_PERMITTED,
-          PermissionConstants.getTextForCode(permission) + " is not permitted for user "
-          + requestor.getName());
+          PermissionConstants.getTextForCode(permission) + " is not permitted for user " + requestor.getName());
     }
 
     if (!requestor.isCertprofilePermitted(certprofile)) {
       throw new OperationException(NOT_PERMITTED,
-          "Certificate profile " + certprofile + " is not permitted for user "
-          + requestor.getName());
+          "Certificate profile " + certprofile + " is not permitted for user " + requestor.getName());
     }
   } // method checkUserPermission
 

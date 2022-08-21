@@ -59,16 +59,14 @@ public class ProtocolServletFilter implements Filter {
     try {
       conf0 = RestProxyConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CFG, true));
     } catch (IOException | InvalidConfException ex) {
-      throw new IllegalArgumentException(
-          "could not parse configuration file " + DFLT_CFG, ex);
+      throw new IllegalArgumentException("could not parse configuration file " + DFLT_CFG, ex);
     }
 
     try {
       conf = new ProtocolProxyConfWrapper(conf0);
 
-      RestResponder responder = new RestResponder(conf.getSdkClient(),
-          conf.getSecurities().getSecurityFactory(), conf.getAuthenticator(),
-          conf.getPopControl());
+      RestResponder responder = new RestResponder(conf.getSdkClient(), conf.getSecurities().getSecurityFactory(),
+          conf.getAuthenticator(), conf.getPopControl());
 
       servlet = new HttpRestServlet();
       servlet.setLogReqResp(conf.isLogReqResp());

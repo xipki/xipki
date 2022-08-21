@@ -49,8 +49,7 @@ public class RemoveObjectsParams extends ProxyMessage {
   public RemoveObjectsParams(P11SlotIdentifier slotId, byte[] objectId, String objectLabel) {
     Args.notNull(slotId, "slotId");
     if ((objectId == null || objectId.length == 0) && StringUtil.isBlank(objectLabel)) {
-      throw new IllegalArgumentException(
-          "at least one of objectId and objectLabel must not be null");
+      throw new IllegalArgumentException("at least one of objectId and objectLabel must not be null");
     }
 
     this.objectId = objectId;

@@ -55,7 +55,8 @@ class IaikP11Identity extends P11Identity {
     this.expectedSignatureLen = 0;
   }
 
-  IaikP11Identity(IaikP11Slot slot, P11IdentityId identityId, PrivateKey privateKey,
+  IaikP11Identity(
+      IaikP11Slot slot, P11IdentityId identityId, PrivateKey privateKey,
       PublicKey publicKey, X509Cert[] certificateChain) {
     super(slot, identityId, publicKey, certificateChain);
     this.signingKey = notNull(privateKey, "privateKey");
@@ -81,9 +82,8 @@ class IaikP11Identity extends P11Identity {
       expectedSignatureLen = 0;
     } else {
       throw new IllegalArgumentException(
-          "currently only RSA, DSA, EC, EdDSA and XDH public key are supported,"
-          + " but not " + this.publicKey.getAlgorithm()
-          + " (class: " + publicKey.getClass().getName() + ")");
+          "currently only RSA, DSA, EC, EdDSA and XDH public key are supported, but not "
+          + this.publicKey.getAlgorithm() + " (class: " + publicKey.getClass().getName() + ")");
     }
   } // constructor
 

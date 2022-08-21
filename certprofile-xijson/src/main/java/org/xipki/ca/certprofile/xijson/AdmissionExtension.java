@@ -89,8 +89,8 @@ public class AdmissionExtension {
 
     private final ExtensionValue extensionValue;
 
-    public AdmissionSyntaxOption(boolean critical, GeneralName admissionAuthority,
-        List<AdmissionsOption> admissionsList) {
+    public AdmissionSyntaxOption(
+        boolean critical, GeneralName admissionAuthority, List<AdmissionsOption> admissionsList) {
       this.critical = critical;
       this.admissionAuthority = admissionAuthority;
       this.admissionsList = Args.notEmpty(admissionsList, "admissionsList");
@@ -98,8 +98,7 @@ public class AdmissionExtension {
       boolean bo = false;
       for (AdmissionsOption ao : admissionsList) {
         for (ProfessionInfoOption pio : ao.getProfessionInfos()) {
-          if (pio.getRegistrationNumberOption() != null
-              && pio.getRegistrationNumberOption().getRegex() != null) {
+          if (pio.getRegistrationNumberOption() != null && pio.getRegistrationNumberOption().getRegex() != null) {
             bo = true;
             break;
           }
@@ -137,15 +136,14 @@ public class AdmissionExtension {
             registrationNumber = pio.getRegistrationNumberOption().getConstant();
           }
           pis[i] = new ProfessionInfo(pio.getNamingAuthority(), professionItems,
-              pio.getProfessionOids().toArray(new ASN1ObjectIdentifier[0]), registrationNumber,
-              addProfessionInfo);
+              pio.getProfessionOids().toArray(new ASN1ObjectIdentifier[0]),
+              registrationNumber, addProfessionInfo);
         }
 
         vec.add(new Admissions(ao.getAdmissionAuthority(), ao.getNamingAuthority(), pis));
       }
 
-      extensionValue = new ExtensionValue(critical,
-          new AdmissionSyntax(admissionAuthority, new DERSequence(vec)));
+      extensionValue = new ExtensionValue(critical, new AdmissionSyntax(admissionAuthority, new DERSequence(vec)));
     }
 
     public GeneralName getAdmissionAuthority() {
@@ -199,8 +197,7 @@ public class AdmissionExtension {
           Pattern regex = option.getRegex();
           String regNum = registrationNumbers.get(j);
           if (regNum == null || !regex.matcher(regNum).matches()) {
-            throw new BadCertTemplateException("invalid registrationNumber[" + i + "][" + j
-                + "]: '" + regNum + "'");
+            throw new BadCertTemplateException("invalid registrationNumber[" + i + "][" + j + "]: '" + regNum + "'");
           }
           newRegNumbers.add(regNum);
         }
@@ -236,15 +233,13 @@ public class AdmissionExtension {
           }
 
           pis[i] = new ProfessionInfo(pio.getNamingAuthority(), professionItems,
-              pio.getProfessionOids().toArray(new ASN1ObjectIdentifier[0]),
-              registrationNumber, addProfessionInfo);
+              pio.getProfessionOids().toArray(new ASN1ObjectIdentifier[0]), registrationNumber, addProfessionInfo);
         }
 
         vec.add(new Admissions(ao.getAdmissionAuthority(), ao.getNamingAuthority(), pis));
       }
 
-      return new ExtensionValue(critical,
-          new AdmissionSyntax(admissionAuthority, new DERSequence(vec)));
+      return new ExtensionValue(critical, new AdmissionSyntax(admissionAuthority, new DERSequence(vec)));
     } // method getExtensionValue
 
   } // class AdmissionSyntaxOption
@@ -265,8 +260,8 @@ public class AdmissionExtension {
 
     private byte[] addProfessionalInfo;
 
-    public ProfessionInfoOption(NamingAuthority namingAuthority, List<String> professionItems,
-        List<ASN1ObjectIdentifier> professionOids,
+    public ProfessionInfoOption(
+        NamingAuthority namingAuthority, List<String> professionItems, List<ASN1ObjectIdentifier> professionOids,
         RegistrationNumberOption registrationNumberOption, byte[] addProfessionalInfo) {
       this.namingAuthority = namingAuthority;
       this.professionItems = Args.notEmpty(professionItems, "professionItems");

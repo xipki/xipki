@@ -104,27 +104,26 @@ public class P12KeyGenerator {
   public P12KeyGenerator() {
   }
 
-  public KeyStoreWrapper generateRSAKeypair(int keysize, BigInteger publicExponent,
-      KeystoreGenerationParameters params, String selfSignedCertSubject)
-          throws Exception {
+  public KeyStoreWrapper generateRSAKeypair(
+      int keysize, BigInteger publicExponent, KeystoreGenerationParameters params, String selfSignedCertSubject)
+      throws Exception {
     KeyPairWithSubjectPublicKeyInfo kp = genRSAKeypair(keysize, publicExponent, params.getRandom());
     return generateIdentity(kp, params, selfSignedCertSubject);
   }
 
-  public KeyStoreWrapper generateDSAKeypair(int plength, int qlength,
-      KeystoreGenerationParameters params, String selfSignedCertSubject)
-          throws Exception {
+  public KeyStoreWrapper generateDSAKeypair(
+      int plength, int qlength, KeystoreGenerationParameters params, String selfSignedCertSubject)
+      throws Exception {
     KeyPairWithSubjectPublicKeyInfo kp = genDSAKeypair(plength, qlength, params.getRandom());
     return generateIdentity(kp, params, selfSignedCertSubject);
   }
 
-  public KeyStoreWrapper generateECKeypair(ASN1ObjectIdentifier curveOid,
-      KeystoreGenerationParameters params, String selfSignedCertSubject)
-          throws Exception {
+  public KeyStoreWrapper generateECKeypair(
+      ASN1ObjectIdentifier curveOid, KeystoreGenerationParameters params, String selfSignedCertSubject)
+      throws Exception {
     notNull(curveOid, "curveOid");
     KeyPair keypair = KeyUtil.generateECKeypair(curveOid, params.getRandom());
-    AlgorithmIdentifier algId = new AlgorithmIdentifier(
-        X9ObjectIdentifiers.id_ecPublicKey, curveOid);
+    AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveOid);
 
     ECPublicKey pub = (ECPublicKey) keypair.getPublic();
     int orderBitLength = pub.getParams().getOrder().bitLength();
@@ -135,24 +134,22 @@ public class P12KeyGenerator {
         params, selfSignedCertSubject);
   } // method generateECKeypair
 
-  public KeyStoreWrapper generateEdECKeypair(ASN1ObjectIdentifier curveOid,
-      KeystoreGenerationParameters params, String selfSignedCertSubject)
-          throws Exception {
+  public KeyStoreWrapper generateEdECKeypair(
+      ASN1ObjectIdentifier curveOid, KeystoreGenerationParameters params, String selfSignedCertSubject)
+      throws Exception {
     notNull(curveOid, "curveOid");
     if (!EdECConstants.isEdwardsOrMontgomeryCurve(curveOid)) {
       throw new IllegalArgumentException("invalid EdDSA curve  " + curveOid.getId());
     }
     KeyPair keypair = KeyUtil.generateEdECKeypair(curveOid, params.getRandom());
-    SubjectPublicKeyInfo subjectPublicKeyInfo =
-        KeyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
+    SubjectPublicKeyInfo subjectPublicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
 
     return generateIdentity(new KeyPairWithSubjectPublicKeyInfo(keypair, subjectPublicKeyInfo),
         params, selfSignedCertSubject);
   } // method generateEdECKeypair
 
-  public KeyStoreWrapper generateSecretKey(String algorithm, int keyBitLen,
-      KeystoreGenerationParameters params)
-          throws Exception {
+  public KeyStoreWrapper generateSecretKey(String algorithm, int keyBitLen, KeystoreGenerationParameters params)
+      throws Exception {
     if (keyBitLen % 8 != 0) {
       throw new IllegalArgumentException("keyBitLen (" + keyBitLen + ") must be multiple of 8");
     }
@@ -185,12 +182,10 @@ public class P12KeyGenerator {
     return result;
   } // method generateSecretKey
 
-  private KeyPairWithSubjectPublicKeyInfo genRSAKeypair(int keysize,
-      BigInteger publicExponent, SecureRandom random)
-          throws Exception {
+  private KeyPairWithSubjectPublicKeyInfo genRSAKeypair(int keysize, BigInteger publicExponent, SecureRandom random)
+      throws Exception {
     KeyPair kp = KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
-    java.security.interfaces.RSAPublicKey rsaPubKey =
-        (java.security.interfaces.RSAPublicKey) kp.getPublic();
+    java.security.interfaces.RSAPublicKey rsaPubKey = (java.security.interfaces.RSAPublicKey) kp.getPublic();
 
     SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo(
         new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE),
@@ -198,17 +193,16 @@ public class P12KeyGenerator {
     return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
   } // method genRSAKeypair
 
-  private KeyPairWithSubjectPublicKeyInfo genDSAKeypair(int plength, int qlength,
-      SecureRandom random)
-          throws Exception {
+  private KeyPairWithSubjectPublicKeyInfo genDSAKeypair(int plength, int qlength, SecureRandom random)
+      throws Exception {
     KeyPair kp = KeyUtil.generateDSAKeypair(plength, qlength, random);
     SubjectPublicKeyInfo spki = KeyUtil.createSubjectPublicKeyInfo(kp.getPublic());
     return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
   }
 
-  private static KeyStoreWrapper generateIdentity(KeyPairWithSubjectPublicKeyInfo kp,
-      KeystoreGenerationParameters params, String selfSignedCertSubject)
-          throws Exception {
+  private static KeyStoreWrapper generateIdentity(
+      KeyPairWithSubjectPublicKeyInfo kp, KeystoreGenerationParameters params, String selfSignedCertSubject)
+      throws Exception {
     Date now = new Date();
     Date notBefore = new Date(now.getTime() - 10 * MIN); // 10 minutes past
     Date notAfter = new Date(notBefore.getTime() + 3650 * DAY);
@@ -216,8 +210,7 @@ public class P12KeyGenerator {
     String dnStr = (selfSignedCertSubject == null) ? "CN=DUMMY" : selfSignedCertSubject;
     X500Name subjectDn = new X500Name(dnStr);
     SubjectPublicKeyInfo subjectPublicKeyInfo = kp.getSubjectPublicKeyInfo();
-    ContentSigner contentSigner = getContentSigner(
-        kp.getKeypair().getPrivate(), kp.getKeypair().getPublic());
+    ContentSigner contentSigner = getContentSigner(kp.getKeypair().getPrivate(), kp.getKeypair().getPublic());
 
     // Generate keystore
     X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(subjectDn,
@@ -225,18 +218,15 @@ public class P12KeyGenerator {
 
     byte[] encodedSpki = kp.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
     byte[] skiValue = HashAlgo.SHA1.hash(encodedSpki);
-    certGenerator.addExtension(Extension.subjectKeyIdentifier, false,
-        new SubjectKeyIdentifier(skiValue));
+    certGenerator.addExtension(Extension.subjectKeyIdentifier, false, new SubjectKeyIdentifier(skiValue));
 
     KeyAndCertPair identity = new KeyAndCertPair(
-        new X509Cert(certGenerator.build(contentSigner)),
-        kp.getKeypair().getPrivate());
+        new X509Cert(certGenerator.build(contentSigner)), kp.getKeypair().getPrivate());
 
     KeyStore ks = KeyUtil.getKeyStore("PKCS12");
     ks.load(null, params.getPassword());
 
-    ks.setKeyEntry("main", identity.key, params.getPassword(),
-        new Certificate[]{identity.cert.toJceCert()});
+    ks.setKeyEntry("main", identity.key, params.getPassword(), new Certificate[]{identity.cert.toJceCert()});
 
     ByteArrayOutputStream ksStream = new ByteArrayOutputStream();
     try {

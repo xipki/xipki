@@ -93,8 +93,7 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
       try {
         certBytes = issuer.getCert().readContent();
       } catch (IOException ex) {
-        LogUtil.error(LOG, ex,
-            "could not read the certificate bytes of issuer " + issuer.getName());
+        LogUtil.error(LOG, ex, "could not read the certificate bytes of issuer " + issuer.getName());
         continue;
       }
 

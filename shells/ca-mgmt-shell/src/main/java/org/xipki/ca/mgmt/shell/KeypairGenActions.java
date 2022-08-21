@@ -48,8 +48,7 @@ public class KeypairGenActions {
   @Service
   public static class KeypairGenAdd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "keypair generation name")
+    @Option(name = "--name", aliases = "-n", required = true, description = "keypair generation name")
     @Completion(CaCompleters.KeypairGenNameCompleter.class)
     private String name;
 
@@ -84,8 +83,7 @@ public class KeypairGenActions {
 
   } // class KeypairGenActions
 
-  @Command(scope = "ca", name = "keypairgen-info",
-          description = "show information of keypair generation")
+  @Command(scope = "ca", name = "keypairgen-info", description = "show information of keypair generation")
   @Service
   public static class KeypairGenInfo extends CaAction {
 

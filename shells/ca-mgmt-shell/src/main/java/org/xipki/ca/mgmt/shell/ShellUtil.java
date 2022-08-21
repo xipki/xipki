@@ -36,8 +36,7 @@ public class ShellUtil {
   private ShellUtil() {
   }
 
-  public static String canonicalizeSignerConf(String keystoreType, String signerConf,
-      PasswordResolver passwordResolver, SecurityFactory securityFactory)
+  public static String canonicalizeSignerConf(String keystoreType, String signerConf, SecurityFactory securityFactory)
           throws Exception {
     Args.notBlank(keystoreType, "keystoreType");
     Args.notBlank(signerConf, "signerConf");

@@ -109,8 +109,7 @@ class ResponseSigner {
 
       Certificate bcCertificate = Certificate.getInstance(encodedCert);
       this.responderIdByName = new ResponderID(bcCertificate.getSubject());
-      byte[] keySha1 = HashAlgo.SHA1.hash(
-          bcCertificate.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
+      byte[] keySha1 = HashAlgo.SHA1.hash(bcCertificate.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
       this.responderIdByKey = new ResponderID(keySha1);
     }
 
@@ -129,8 +128,7 @@ class ResponseSigner {
     return signers.get(0);
   }
 
-  public ConcurrentContentSigner getSignerForPreferredSigAlgs(
-      List<AlgorithmIdentifier> prefSigAlgs) {
+  public ConcurrentContentSigner getSignerForPreferredSigAlgs(List<AlgorithmIdentifier> prefSigAlgs) {
     if (prefSigAlgs == null) {
       return signers.get(0);
     }

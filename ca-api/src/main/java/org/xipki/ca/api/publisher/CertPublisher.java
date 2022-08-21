@@ -53,9 +53,9 @@ public abstract class CertPublisher implements Closeable {
    * @throws CertPublisherException
    *         If error during the initialization occurs.
    */
-  public abstract void initialize(String conf, PasswordResolver passwordResolver,
-      Map<String, FileOrValue> datasourceConfs)
-          throws CertPublisherException;
+  public abstract void initialize(
+      String conf, PasswordResolver passwordResolver, Map<String, FileOrValue> datasourceConfs)
+      throws CertPublisherException;
 
   @Override
   public void close() {
@@ -102,8 +102,8 @@ public abstract class CertPublisher implements Closeable {
    *          Revocation information. Must not be {@code null}.
    * @return whether the revocation is published.
    */
-  public abstract boolean certificateRevoked(X509Cert caCert, CertWithDbId cert,
-      String certprofile, CertRevocationInfo revInfo);
+  public abstract boolean certificateRevoked(
+      X509Cert caCert, CertWithDbId cert, String certprofile, CertRevocationInfo revInfo);
 
   /**
    * Publishes the unrevocation of a certificate.

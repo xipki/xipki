@@ -39,8 +39,7 @@ class MonetaryValueOption {
 
   private final Range2Type exponentRange;
 
-  public MonetaryValueOption(Iso4217CurrencyCode currency, Range2Type amountRange,
-      Range2Type exponentRange) {
+  public MonetaryValueOption(Iso4217CurrencyCode currency, Range2Type amountRange, Range2Type exponentRange) {
     this.currency = notNull(currency, "currency");
     this.amountRange = notNull(amountRange, "amountRange");
     this.exponentRange = notNull(exponentRange, "exponentRange");

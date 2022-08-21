@@ -50,15 +50,13 @@ public class AddCertParams extends ProxyMessage {
 
   private final Certificate certificate;
 
-  public AddCertParams(P11SlotIdentifier slotId, P11NewObjectControl control,
-      Certificate certificate) {
+  public AddCertParams(P11SlotIdentifier slotId, P11NewObjectControl control, Certificate certificate) {
     this.slotId = Args.notNull(slotId, "slotId");
     this.control = Args.notNull(control, "control");
     this.certificate = Args.notNull(certificate, "certificate");
   }
 
-  public AddCertParams(P11SlotIdentifier slotId, P11NewObjectControl control,
-      X509Cert certificate) {
+  public AddCertParams(P11SlotIdentifier slotId, P11NewObjectControl control, X509Cert certificate) {
     this.slotId = Args.notNull(slotId, "slotId");
     this.control = Args.notNull(control, "control");
     Args.notNull(certificate, "certificate");

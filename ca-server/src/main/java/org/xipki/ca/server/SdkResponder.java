@@ -128,8 +128,7 @@ public class SdkResponder {
   }
 
   public SdkResponse service(
-      String path, AuditEvent event, byte[] request,
-      HttpRequestMetadataRetriever httpRetriever) {
+      String path, AuditEvent event, byte[] request, HttpRequestMetadataRetriever httpRetriever) {
     AuditLevel auditLevel = AuditLevel.INFO;
     AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
     String auditMessage = null;
@@ -158,15 +157,13 @@ public class SdkResponder {
   }
 
   private SdkResponse service0(
-      String path, AuditEvent event, byte[] request,
-      HttpRequestMetadataRetriever httpRetriever) {
+      String path, AuditEvent event, byte[] request, HttpRequestMetadataRetriever httpRetriever) {
     event.setApplicationName(APPNAME);
     event.setName(NAME_perf);
 
     try {
       if (caManager == null) {
-        return new ErrorResponse(null, SYSTEM_FAILURE,
-            "responderManager in servlet not configured");
+        return new ErrorResponse(null, SYSTEM_FAILURE, "responderManager in servlet not configured");
       }
 
       String caName = null;
@@ -193,19 +190,16 @@ public class SdkResponder {
         try {
           ca = caManager.getX509Ca(caName);
         } catch (CaMgmtException e) {
-          return new ErrorResponse(null, PATH_NOT_FOUND,
-              "CA unknown");
+          return new ErrorResponse(null, PATH_NOT_FOUND, "CA unknown");
         }
       }
 
       if (StringUtil.isBlank(command)) {
-        return new ErrorResponse(null, PATH_NOT_FOUND,
-            "command is not specified");
+        return new ErrorResponse(null, PATH_NOT_FOUND, "command is not specified");
       }
 
       if (ca == null || ca.getCaInfo().getStatus() != CaStatus.ACTIVE) {
-        String message = (ca == null) ? "unknown CA '" + caName + "'"
-            : "CA '" + caName + "' is out of service";
+        String message = (ca == null) ? "unknown CA '" + caName + "'" : "CA '" + caName + "' is out of service";
         return new ErrorResponse(null, PATH_NOT_FOUND, message);
       }
 
@@ -233,8 +227,7 @@ public class SdkResponder {
       switch (command) {
         case CMD_health: {
           boolean healthy = ca.healthy();
-          return healthy ? null : new ErrorResponse(null, SYSTEM_UNAVAILABLE,
-                              "CA is not healthy");
+          return healthy ? null : new ErrorResponse(null, SYSTEM_UNAVAILABLE, "CA is not healthy");
         }
         case CMD_cacert: {
           byte[][] certs = new byte[1][];
@@ -322,15 +315,13 @@ public class SdkResponder {
   } // method service
 
   private SdkResponse enroll(
-      X509Ca ca, byte[] request, RequestorInfo requestor,
-      boolean keyUpdate, boolean crossCert, final AuditEvent event)
+      X509Ca ca, byte[] request, RequestorInfo requestor, boolean keyUpdate, boolean crossCert, final AuditEvent event)
       throws OperationException {
     EnrollCertsRequest req = EnrollCertsRequest.decode(request);
     for (EnrollCertRequestEntry entry : req.getEntries()) {
       String profile = entry.getCertprofile();
       if (!requestor.isCertprofilePermitted(profile)) {
-        throw new OperationException(NOT_PERMITTED,
-            "certprofile " + profile + " is not allowed");
+        throw new OperationException(NOT_PERMITTED, "certprofile " + profile + " is not allowed");
       }
     }
 
@@ -382,8 +373,7 @@ public class SdkResponder {
         if (keyUpdate) {
           OldCertInfo oc = entry.getOldCert();
           if (oc == null) {
-            throw new OperationException(BAD_CERT_TEMPLATE,
-                "oldCert is not specified in enroll_kup command");
+            throw new OperationException(BAD_CERT_TEMPLATE, "oldCert is not specified in enroll_kup command");
           }
 
           X500Name issuer = X500Name.getInstance(oc.getIssuer());
@@ -394,20 +384,18 @@ public class SdkResponder {
           } catch (CaMgmtException ex) {
             // TODO: LOG me
             throw new OperationException(SYSTEM_FAILURE,
-                "error while finding certificate with "
-                    + "the issuer " + issuer + "and serial number " + serialNumber);
+                "error while finding certificate with the issuer " + issuer + "and serial number " + serialNumber);
           }
 
           if (oldCert == null) {
             throw new OperationException(UNKNOWN_CERT,
-                "found no certificate with the issuer "
-                    + issuer + "and serial number " + serialNumber);
+                "found no certificate with the issuer " + issuer + "and serial number " + serialNumber);
           }
 
           if (oldCert.isRevoked()) {
             throw new OperationException(CERT_REVOKED,
-                "could not update a revoked certificate "
-                    + "with the issuer " + issuer + "and serial number " + serialNumber);
+                "could not update a revoked certificate with the issuer " + issuer
+                    + "and serial number " + serialNumber);
           }
 
           if (profile == null) {
@@ -495,8 +483,7 @@ public class SdkResponder {
   private SdkResponse poll(X509Ca ca, byte[] request)
       throws OperationException {
     PollCertRequest req = PollCertRequest.decode(request);
-    assertIssuerMatch(ca, req.getIssuer(), req.getAuthorityKeyIdentifier(),
-        req.getIssuerCertSha1Fp());
+    assertIssuerMatch(ca, req.getIssuer(), req.getAuthorityKeyIdentifier(), req.getIssuerCertSha1Fp());
 
     String tid = req.getTransactionId();
 
@@ -593,12 +580,10 @@ public class SdkResponder {
 
   private void assertIssuerMatch(X509Ca ca, ChangeCertStatusRequest req)
       throws OperationException {
-    assertIssuerMatch(ca, req.getIssuer(), req.getAuthorityKeyIdentifier(),
-        req.getIssuerCertSha1Fp());
+    assertIssuerMatch(ca, req.getIssuer(), req.getAuthorityKeyIdentifier(), req.getIssuerCertSha1Fp());
   }
 
-  private void assertIssuerMatch(X509Ca ca, X500NameType issuer, byte[] authorityKeyId,
-                                 byte[] issuerCertSha1Fp)
+  private void assertIssuerMatch(X509Ca ca, X500NameType issuer, byte[] authorityKeyId, byte[] issuerCertSha1Fp)
       throws OperationException {
     if (issuer == null && authorityKeyId == null && issuerCertSha1Fp == null) {
       throw new OperationException(BAD_REQUEST, "no issuer's identifier is specified");
@@ -625,15 +610,13 @@ public class SdkResponder {
 
       byte[] caSki = ca.getCaCert().getSubjectKeyId();
       if (!Arrays.equals(caSki, authorityKeyId)) {
-        throw new OperationException(BAD_CERT_TEMPLATE,
-            "AuthorityKeyIdentifier does not target at the CA");
+        throw new OperationException(BAD_CERT_TEMPLATE, "AuthorityKeyIdentifier does not target at the CA");
       }
     }
 
     if (issuerCertSha1Fp != null) {
       if (!Hex.encode(issuerCertSha1Fp).equalsIgnoreCase(ca.getHexSha1OfCert())) {
-        throw new OperationException(BAD_CERT_TEMPLATE,
-            "IssuerCertSha256Fp does not target at the CA");
+        throw new OperationException(BAD_CERT_TEMPLATE, "IssuerCertSha256Fp does not target at the CA");
       }
     }
   }
@@ -710,9 +693,8 @@ public class SdkResponder {
   }
 
   private List<EnrollOrPullCertResponseEntry> generateCertificates(
-      X509Ca ca, List<CertTemplateData> certTemplates,
-      RequestorInfo requestor, boolean kup, EnrollCertsRequest req,
-      byte[] request, long waitForConfirmUtil, AuditEvent event) {
+      X509Ca ca, List<CertTemplateData> certTemplates, RequestorInfo requestor, boolean kup,
+      EnrollCertsRequest req, byte[] request, long waitForConfirmUtil, AuditEvent event) {
     String caName = ca.getCaInfo().getIdent().getName();
     final int n = certTemplates.size();
     String tid = req.getTransactionId();
@@ -822,8 +804,7 @@ public class SdkResponder {
     return ret;
   } // method generateCertificates
 
-  private static void fillResponseEntry(
-      EnrollOrPullCertResponseEntry rentry, CertificateInfo certInfo) {
+  private static void fillResponseEntry(EnrollOrPullCertResponseEntry rentry, CertificateInfo certInfo) {
     if (certInfo.getPrivateKey() != null) {
       try {
         rentry.setPrivateKey(certInfo.getPrivateKey().getEncoded());

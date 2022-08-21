@@ -82,8 +82,7 @@ public class CaEmulator {
   private static final DefaultDigestAlgorithmIdentifierFinder DFLT_DIGESTALG_IDENTIFIER_FINDER =
       new DefaultDigestAlgorithmIdentifierFinder();
 
-  private static final Map<String, BcContentVerifierProviderBuilder> VERIFIER_PROVIDER_BUILDER =
-      new HashMap<>();
+  private static final Map<String, BcContentVerifierProviderBuilder> VERIFIER_PROVIDER_BUILDER = new HashMap<>();
 
   private final PrivateKey caKey;
 
@@ -138,13 +137,11 @@ public class CaEmulator {
 
   public X509Cert generateCert(SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn)
       throws Exception {
-    return generateCert(pubKeyInfo, subjectDn,
-        new Date(System.currentTimeMillis() - 10 * CaEmulator.MIN_IN_MS));
+    return generateCert(pubKeyInfo, subjectDn, new Date(System.currentTimeMillis() - 10 * CaEmulator.MIN_IN_MS));
   }
 
-  public X509Cert generateCert(SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn,
-      Date notBefore)
-          throws Exception {
+  public X509Cert generateCert(SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn, Date notBefore)
+      throws Exception {
     Args.notNull(pubKeyInfo, "pubKeyInfo");
     Args.notNull(subjectDn, "subjectDn");
     Args.notNull(notBefore, "notBefore");
@@ -253,8 +250,7 @@ public class CaEmulator {
     try {
       return builder.build(keyParam);
     } catch (OperatorCreationException ex) {
-      throw new InvalidKeyException("could not build ContentVerifierProvider: " + ex.getMessage(),
-          ex);
+      throw new InvalidKeyException("could not build ContentVerifierProvider: " + ex.getMessage(), ex);
     }
   } // method getContentVerifierProvider
 
@@ -285,8 +281,7 @@ public class CaEmulator {
     try {
       kf = KeyFactory.getInstance(algorithm);
     } catch (NoSuchAlgorithmException ex) {
-      throw new InvalidKeySpecException("could not find KeyFactory for " + algorithm
-          + ": " + ex.getMessage());
+      throw new InvalidKeySpecException("could not find KeyFactory for " + algorithm + ": " + ex.getMessage());
     }
 
     return kf.generatePublic(keyspec);

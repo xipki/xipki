@@ -148,8 +148,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment},
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment},
         null));
 
     // Extensions - extenedKeyUsage
@@ -212,8 +211,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     return ret;
   } // method createRdn
 
-  protected static RdnType createRdn(ASN1ObjectIdentifier type,
-      String regex, String group, ValueType value) {
+  protected static RdnType createRdn(ASN1ObjectIdentifier type, String regex, String group, ValueType value) {
     RdnType ret = new RdnType();
     ret.setType(createOidType(type));
     ret.setMinOccurs(1);
@@ -231,13 +229,12 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     return ret;
   } // method createRdn
 
-  protected static X509ProfileType getBaseCabProfile(String description, CertLevel certLevel,
-      String validity) {
+  protected static X509ProfileType getBaseCabProfile(String description, CertLevel certLevel, String validity) {
     return getBaseCabProfile(description, certLevel, validity, false);
   }
 
-  protected static X509ProfileType getBaseCabProfile(String description, CertLevel certLevel,
-      String validity, boolean useMidnightNotBefore) {
+  protected static X509ProfileType getBaseCabProfile(
+      String description, CertLevel certLevel, String validity, boolean useMidnightNotBefore) {
     X509ProfileType profile = new X509ProfileType();
 
     profile.setMetadata(createDescription(description));
@@ -280,18 +277,18 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     return profile;
   } // method getBaseCabProfile
 
-  protected static X509ProfileType getBaseProfile(String description, CertLevel certLevel,
-                                                   String validity) {
+  protected static X509ProfileType getBaseProfile(
+      String description, CertLevel certLevel, String validity) {
     return  getBaseProfile(description, certLevel, validity, true);
   }
 
-  protected static X509ProfileType getBaseProfile(String description, CertLevel certLevel,
-      String validity, boolean withEddsa) {
+  protected static X509ProfileType getBaseProfile(
+      String description, CertLevel certLevel, String validity, boolean withEddsa) {
     return getBaseProfile(description, certLevel, validity, false, withEddsa);
   }
 
-  protected static X509ProfileType getBaseProfile(String description, CertLevel certLevel,
-      String validity, boolean useMidnightNotBefore, boolean withEddsa) {
+  protected static X509ProfileType getBaseProfile(
+      String description, CertLevel certLevel, String validity, boolean useMidnightNotBefore, boolean withEddsa) {
     X509ProfileType profile = new X509ProfileType();
 
     profile.setMetadata(createDescription(description));

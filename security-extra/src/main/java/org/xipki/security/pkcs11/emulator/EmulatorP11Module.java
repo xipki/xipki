@@ -41,8 +41,7 @@ public class EmulatorP11Module extends P11Module {
 
   public static final String TYPE = "emulator";
 
-  public static final String DFLT_BASEDIR =
-      System.getProperty("java.io.tmpdir") + File.separator + "pkcs11-emulator";
+  public static final String DFLT_BASEDIR = System.getProperty("java.io.tmpdir") + File.separator + "pkcs11-emulator";
 
   private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Module.class);
 
@@ -75,8 +74,7 @@ public class EmulatorP11Module extends P11Module {
       try {
         createExampleRepository(baseDir, 2);
       } catch (IOException ex) {
-        throw new P11TokenException(
-            "could not initialize the base direcotry: " + baseDir.getPath(), ex);
+        throw new P11TokenException("could not initialize the base direcotry: " + baseDir.getPath(), ex);
       }
 
       LOG.info("create and initialize the base directory: " + baseDir.getPath());
@@ -100,8 +98,7 @@ public class EmulatorP11Module extends P11Module {
 
     for (File child : children) {
       if ((child.isDirectory() && child.canRead() && !child.exists())) {
-        LOG.warn("ignore path {}, it does not point to a readable existing directory",
-            child.getPath());
+        LOG.warn("ignore path {}, it does not point to a readable existing directory", child.getPath());
         continue;
       }
 
@@ -167,7 +164,7 @@ public class EmulatorP11Module extends P11Module {
       KeyCryptor privateKeyCryptor = new KeyCryptor(firstPwd);
 
       P11Slot slot = new EmulatorP11Slot(moduleConf.getName(), slotDir, slotId,
-          moduleConf.isReadOnly(), firstPwd, privateKeyCryptor, moduleConf.getP11MechanismFilter(),
+          moduleConf.isReadOnly(), privateKeyCryptor, moduleConf.getP11MechanismFilter(),
           moduleConf.getP11NewObjectConf(), moduleConf.getNumSessions(),
           moduleConf.getSecretKeyTypes(), moduleConf.getKeyPairTypes());
       slots.add(slot);

@@ -57,8 +57,7 @@ public class CrlServletFilter implements Filter {
           throws ServletException {
     XipkiBaseDir.init();
     try {
-      this.dataSource = new DataSourceFactory().createDataSourceForFile(
-              "ca", DFLT_CA_SERVER_CFG, null);
+      this.dataSource = new DataSourceFactory().createDataSourceForFile("ca", DFLT_CA_SERVER_CFG, null);
       this.hasSha1Column = dataSource.tableHasColumn(null, "CRL", "SHA1");
     } catch (PasswordResolverException | IOException | DataAccessException ex) {
       LOG.error("error initializing datasource", ex);

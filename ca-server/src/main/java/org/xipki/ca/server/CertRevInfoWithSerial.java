@@ -44,8 +44,7 @@ public class CertRevInfoWithSerial implements Comparable<CertRevInfoWithSerial> 
 
   private Date invalidityTime;
 
-  public CertRevInfoWithSerial(long id, BigInteger serial, CrlReason reason,
-      Date revocationTime, Date invalidityTime) {
+  public CertRevInfoWithSerial(long id, BigInteger serial, CrlReason reason, Date revocationTime, Date invalidityTime) {
     this.reason = notNull(reason, "reason");
     this.revocationTime = notNull(revocationTime, "revocationTime");
     this.invalidityTime = invalidityTime;
@@ -53,8 +52,7 @@ public class CertRevInfoWithSerial implements Comparable<CertRevInfoWithSerial> 
     this.serial = Args.notNull(serial, "serial");
   } // method constructor
 
-  public CertRevInfoWithSerial(long id, BigInteger serial, int reasonCode,
-      Date revocationTime, Date invalidityTime) {
+  public CertRevInfoWithSerial(long id, BigInteger serial, int reasonCode, Date revocationTime, Date invalidityTime) {
     this(id, serial, CrlReason.forReasonCode(reasonCode), revocationTime, invalidityTime);
   } // method constructor
 

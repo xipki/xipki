@@ -92,8 +92,8 @@ public class SansecSignerFactory implements SignerFactory {
       if (!sansecDir.exists()) {
         LOG.info("found no SANSEC configuration directory " + sansecDir);
       } else {
-        File[] files = sansecDir.listFiles((dir, name) -> name.equals("swsds.ini")
-            || (name.startsWith("swsds-") && name.endsWith(".ini")));
+        File[] files = sansecDir.listFiles((dir, name) ->
+            name.equals("swsds.ini") || (name.startsWith("swsds-") && name.endsWith(".ini")));
         if (files == null) {
           LOG.info("found no SANSEC configuration file");
         } else {
@@ -103,8 +103,7 @@ public class SansecSignerFactory implements SignerFactory {
             if ("swsds.ini".equals(fn)) {
               type = "sansec";
           } else {
-            type = "sansec-" + fn.substring("swsds-".length(),
-                fn.length() - ".ini".length()).toLowerCase(Locale.ROOT);
+            type = "sansec-" + fn.substring("swsds-".length(), fn.length() - ".ini".length()).toLowerCase(Locale.ROOT);
           }
             String path = file.getCanonicalPath();
             confFileMap.put(type, path);
@@ -149,8 +148,7 @@ public class SansecSignerFactory implements SignerFactory {
         if (cause != null) {
           // exception message: SWR_CARD_OPERATION_DENY:1021002
           if (t.getCause().getMessage().contains("1021002")) {
-            msg += ", details: no permission to access to SANSEC HSM, " +
-                "please login, and restart this system.";
+            msg += ", details: no permission to access to SANSEC HSM, please login, and restart this system.";
           }
         }
         initStatus.details = msg;
@@ -180,13 +178,12 @@ public class SansecSignerFactory implements SignerFactory {
    * </ul>
    */
   @Override
-  public ConcurrentContentSigner newSigner(
-      String type, SignerConf conf, X509Cert[] certificateChain)
+  public ConcurrentContentSigner newSigner(String type, SignerConf conf, X509Cert[] certificateChain)
       throws ObjectCreationException {
     type = type.toLowerCase(Locale.ROOT);
     if (!types.contains(type)) {
       throw new ObjectCreationException("unknown signer type " + type);
-  }
+    }
 
     String str = conf.getConfValue("parallelism");
     int parallelism = 20;

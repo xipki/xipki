@@ -52,8 +52,7 @@ public class EmbedAuditService implements AuditService {
 
   private static Logger LOG = LoggerFactory.getLogger(EmbedAuditService.class);
 
-  private static final DateTimeFormatter DTF =
-          DateTimeFormatter.ofPattern("yyyy.MM.dd-HH:mm:ss.SSS");
+  private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy.MM.dd-HH:mm:ss.SSS");
 
   private final ZoneId timeZone = ZoneId.systemDefault();
 
@@ -165,13 +164,13 @@ public class EmbedAuditService implements AuditService {
     int year = yyyyMMdd / 10000;
     int month = yyyyMMdd % 10000 / 100;
     int day = yyyyMMdd % 100;
-    String dateStr = year + "." + (month < 10 ? "0" + month : month)
-            + "." + (day < 10 ? "0" + day : day);
+    String dateStr = year + "." + (month < 10 ? "0" + month : month) + "." + (day < 10 ? "0" + day : day);
     return logFileNamePrefix + dateStr + logFileNameSuffix;
   }
 
   @Override
-  public void close() throws Exception {
+  public void close()
+      throws Exception {
     writer.flush();
     writer.close();
   }

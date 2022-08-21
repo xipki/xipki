@@ -39,8 +39,7 @@ public class P11ModuleFactoryRegisterImpl implements P11ModuleFactoryRegister {
 
   private static final Map<String, P11Module> modules = new HashMap<>();
 
-  private final ConcurrentLinkedDeque<P11ModuleFactory> factories =
-          new ConcurrentLinkedDeque<>();
+  private final ConcurrentLinkedDeque<P11ModuleFactory> factories = new ConcurrentLinkedDeque<>();
 
   public void registFactory(P11ModuleFactory factory) {
     //might be null if dependency is optional
@@ -89,8 +88,7 @@ public class P11ModuleFactoryRegisterImpl implements P11ModuleFactoryRegister {
       }
 
       if (p11Module == null) {
-        throw new P11TokenException(
-            "could not find Factory to create PKCS#11 module of type '" + type + "'");
+        throw new P11TokenException("could not find Factory to create PKCS#11 module of type '" + type + "'");
       }
       modules.put(key, p11Module);
     }

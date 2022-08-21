@@ -524,8 +524,7 @@ public class QaSecurityActions {
 
   } // class SpeedEcGenP11
 
-  @Command(scope = "xi", name = "speed-ec-sign-p11",
-      description = "performance test of PKCS#11 EC signature creation")
+  @Command(scope = "xi", name = "speed-ec-sign-p11", description = "performance test of PKCS#11 EC signature creation")
   @Service
   public static class SpeedEcSignP11 extends SpeedP11SignAction {
 
@@ -610,8 +609,7 @@ public class QaSecurityActions {
 
   } // class SpeedHmacSignP11
 
-  @Command(scope = "xi", name = "speed-rsa-gen-p11",
-      description = "performance test of PKCS#11 RSA key generation")
+  @Command(scope = "xi", name = "speed-rsa-gen-p11", description = "performance test of PKCS#11 RSA key generation")
   @Service
   public static class SpeedRsaGenP11 extends SpeedP11Action {
 
@@ -668,8 +666,7 @@ public class QaSecurityActions {
 
   } // class SpeedP11SignAction
 
-  @Command(scope = "xi", name = "speed-sm2-gen-p11",
-      description = "performance test of PKCS#11 SM2 key generation")
+  @Command(scope = "xi", name = "speed-sm2-gen-p11", description = "performance test of PKCS#11 SM2 key generation")
   @Service
   public static class SpeedSm2GenP11 extends SpeedP11Action {
 
@@ -694,8 +691,7 @@ public class QaSecurityActions {
     @Override
     protected BenchmarkExecutor getTester()
         throws Exception {
-      return new P11SignSpeed.SM2(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
-          getNumThreads());
+      return new P11SignSpeed.SM2(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel, getNumThreads());
     }
 
   } // class SpeedSm2SignP11
@@ -718,8 +714,7 @@ public class QaSecurityActions {
     protected BenchmarkExecutor nextTester()
         throws Exception {
       KeyControl.DSA control = queue.poll();
-      return (control == null) ? null
-          : new P12KeyGenSpeed.DSA(control.plen(), control.qlen(), securityFactory);
+      return (control == null) ? null : new P12KeyGenSpeed.DSA(control.plen(), control.qlen(), securityFactory);
     }
 
   } // class BspeedDsaGenP12
@@ -749,8 +744,7 @@ public class QaSecurityActions {
         signAlgo = "SHA1withDSA";
       }
 
-      return new P12SignSpeed.DSA(securityFactory, signAlgo, getNumThreads(),
-          control.plen(), control.qlen());
+      return new P12SignSpeed.DSA(securityFactory, signAlgo, getNumThreads(), control.plen(), control.qlen());
     }
 
   } // class BspeedDsaSignP12
@@ -796,8 +790,7 @@ public class QaSecurityActions {
         throws Exception {
       KeyControl.EC control = queue.poll();
       return (control == null) ? null
-          : new P12SignSpeed.EC(securityFactory, signAlgo, getNumThreads(),
-                  getCurveOid(control.curveName()));
+          : new P12SignSpeed.EC(securityFactory, signAlgo, getNumThreads(), getCurveOid(control.curveName()));
     }
 
   } // class BspeedEcSignP12
@@ -846,7 +839,7 @@ public class QaSecurityActions {
       KeyControl.RSA control = queue.poll();
       return (control == null) ? null
         : new P12SignSpeed.RSA(securityFactory, signAlgo, getNumThreads(),
-            control.modulusLen(), toBigInt("0x10001"));
+          control.modulusLen(), toBigInt("0x10001"));
     }
   } // class BspeedRsaSignP12
 
@@ -925,8 +918,7 @@ public class QaSecurityActions {
 
   } // class SpeedDsaSignP12
 
-  @Command(scope = "xi", name = "speed-ec-gen-p12",
-      description = "performance test of PKCS#12 EC key generation")
+  @Command(scope = "xi", name = "speed-ec-gen-p12", description = "performance test of PKCS#12 EC key generation")
   @Service
   public static class SpeedEcGenP12 extends SingleSpeedAction {
 
@@ -942,8 +934,7 @@ public class QaSecurityActions {
 
   } // class SpeedEcGenP12
 
-  @Command(scope = "xi", name = "speed-ec-sign-p12",
-      description = "performance test of PKCS#12 EC signature creation")
+  @Command(scope = "xi", name = "speed-ec-sign-p12", description = "performance test of PKCS#12 EC signature creation")
   @Service
   public static class SpeedEcSignP12 extends SpeedP12SignAction {
 
@@ -958,8 +949,7 @@ public class QaSecurityActions {
     @Override
     protected BenchmarkExecutor getTester()
         throws Exception {
-      return new P12SignSpeed.EC(securityFactory, signAlgo, getNumThreads(),
-          getCurveOid(curveName));
+      return new P12SignSpeed.EC(securityFactory, signAlgo, getNumThreads(), getCurveOid(curveName));
     }
 
   } // class SpeedEcSignP12
@@ -1016,8 +1006,7 @@ public class QaSecurityActions {
 
   } // class SpeedHmacSignP12
 
-  @Command(scope = "xi", name = "speed-rsa-gen-p12",
-      description = "performance test of PKCS#12 RSA key generation")
+  @Command(scope = "xi", name = "speed-rsa-gen-p12", description = "performance test of PKCS#12 RSA key generation")
   @Service
   public static class SpeedRsaGenP12 extends SingleSpeedAction {
 
@@ -1053,8 +1042,7 @@ public class QaSecurityActions {
     @Override
     protected BenchmarkExecutor getTester()
         throws Exception {
-      return new P12SignSpeed.RSA(securityFactory, signAlgo, getNumThreads(), keysize,
-          toBigInt(publicExponent));
+      return new P12SignSpeed.RSA(securityFactory, signAlgo, getNumThreads(), keysize, toBigInt(publicExponent));
     }
 
   } // class SpeedRsaSignP12
@@ -1063,8 +1051,7 @@ public class QaSecurityActions {
 
   } // class SpeedP12SignAction
 
-  @Command(scope = "xi", name = "speed-sm2-gen-p12",
-      description = "performance test of PKCS#12 SM2 key generation")
+  @Command(scope = "xi", name = "speed-sm2-gen-p12", description = "performance test of PKCS#12 SM2 key generation")
   @Service
   public static class SpeedSm2GenP12 extends SingleSpeedAction {
 
@@ -1089,16 +1076,14 @@ public class QaSecurityActions {
 
   } // class SpeedSm2SignP12
 
-  @Command(scope = "xi", name = "speed-sign-jce",
-          description = "performance test of JCE signature creation")
+  @Command(scope = "xi", name = "speed-sign-jce", description = "performance test of JCE signature creation")
   @Service
   public static class SpeedSignJce extends SingleSpeedAction {
 
     @Option(name = "--type", required = true, description = "JCE signer type")
     private String type;
 
-    @Option(name = "--alias", required = true,
-            description = "alias of the key in the JCE device")
+    @Option(name = "--alias", required = true, description = "alias of the key in the JCE device")
     private String alias;
 
     @Option(name = "--algo", required = true, description = "signature algorithm")

@@ -45,8 +45,7 @@ public class GenECKeypairParams extends ProxyMessage {
 
   private final ASN1ObjectIdentifier curveId;
 
-  public GenECKeypairParams(P11SlotIdentifier slotId,
-      P11NewKeyControl control, ASN1ObjectIdentifier curveId) {
+  public GenECKeypairParams(P11SlotIdentifier slotId, P11NewKeyControl control, ASN1ObjectIdentifier curveId) {
     this.slotId = Args.notNull(slotId, "slotId");
     this.control = control;
     this.curveId = Args.notNull(curveId, "curveId");

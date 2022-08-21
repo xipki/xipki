@@ -184,17 +184,13 @@ public class KeyParametersType extends ValidatableConf {
       }
       return option;
     } else if (rsa != null) {
-      KeyParametersOption.RSAParametersOption option =
-          new KeyParametersOption.RSAParametersOption();
+      KeyParametersOption.RSAParametersOption option = new KeyParametersOption.RSAParametersOption();
       option.setModulusLengths(buildParametersMap(rsa.getModulusLengths()));
       return option;
     } else if (dsa != null) {
-      KeyParametersOption.DSAParametersOption option =
-          new KeyParametersOption.DSAParametersOption();
-
+      KeyParametersOption.DSAParametersOption option = new KeyParametersOption.DSAParametersOption();
       option.setPlengths(buildParametersMap(dsa.getPlengths()));
       option.setQlengths(buildParametersMap(dsa.getQlengths()));
-
       return option;
     } else {
       return KeyParametersOption.ALLOW_ALL;

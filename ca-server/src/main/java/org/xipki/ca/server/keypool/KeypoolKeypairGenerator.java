@@ -133,8 +133,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
 
       int[] keyLengths = {128, 192, 256};
       for (int keyLength : keyLengths) {
-        KeySpec spec = new PBEKeySpec(passwordChars, "ENC".getBytes(StandardCharsets.UTF_8),
-            10000, keyLength);
+        KeySpec spec = new PBEKeySpec(passwordChars, "ENC".getBytes(StandardCharsets.UTF_8), 10000, keyLength);
         SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
         if (keyLength == 128) {
           aes128key = key;
@@ -191,7 +190,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
       cipher.init(Cipher.DECRYPT_MODE, key, spec);
       plain = cipher.doFinal(cd.cipherText);
     } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException
-        | InvalidAlgorithmParameterException ex) {
+             | InvalidAlgorithmParameterException ex) {
       throw new XiSecurityException("error decrypting ciphertext", ex);
     }
     return PrivateKeyInfo.getInstance(plain);
@@ -220,11 +219,9 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
 
       LOG.info("loaded datasource.{}", datasourceName);
       return datasource;
-    } catch (DataAccessException | PasswordResolverException | IOException
-        | RuntimeException ex) {
+    } catch (DataAccessException | PasswordResolverException | IOException | RuntimeException ex) {
       throw new XiSecurityException(
-          ex.getClass().getName() + " while parsing datasource " + datasourceName + ": "
-              + ex.getMessage(), ex);
+          ex.getClass().getName() + " while parsing datasource " + datasourceName + ": " + ex.getMessage(), ex);
     }
   } // method loadDatasource
 

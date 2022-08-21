@@ -93,8 +93,7 @@ class IssuerStore {
   }
 
   public void setCrlInfos(Map<Integer, CrlInfo> crlInfos) {
-    this.crlInfos = crlInfos == null
-        ? Collections.emptyMap() : new HashMap<>(crlInfos);
+    this.crlInfos = crlInfos == null ? Collections.emptyMap() : new HashMap<>(crlInfos);
   }
 
   public CrlInfo getCrlInfo(int crlInfoId) {

@@ -59,8 +59,7 @@ import java.util.List;
  */
 public class CertActions {
 
-  @Command(scope = "ca", name = "cert-status",
-      description = "show certificate status and save the certificate")
+  @Command(scope = "ca", name = "cert-status", description = "show certificate status and save the certificate")
   @Service
   public static class CertStatus extends UnsuspendRmCertAction {
 
@@ -83,8 +82,7 @@ public class CertActions {
       }
 
       String msg = StringUtil.concat("certificate profile: ", certInfo.getCertprofile(),
-          "\nstatus: ",
-          (certInfo.getRevInfo() == null ? "good" : "revoked with " + certInfo.getRevInfo()));
+          "\nstatus: ", (certInfo.getRevInfo() == null ? "good" : "revoked with " + certInfo.getRevInfo()));
       println(msg);
       if (outputFile != null) {
         saveVerbose("saved certificate to file", outputFile,
@@ -154,8 +152,7 @@ public class CertActions {
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "where to save the certificate")
+    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the certificate")
     @Completion(FileCompleter.class)
     protected String outFile;
 
@@ -177,16 +174,11 @@ public class CertActions {
         throw new CmdFailure("CA " + caName + " not available");
       }
 
-      Date notBefore = StringUtil.isNotBlank(notBeforeS)
-          ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
-
-      Date notAfter = StringUtil.isNotBlank(notAfterS)
-          ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
-
+      Date notBefore = StringUtil.isNotBlank(notBeforeS) ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
+      Date notAfter = StringUtil.isNotBlank(notAfterS) ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
       byte[] encodedCsr = X509Util.toDerEncoded(IoUtil.read(csrFile));
 
-      X509Cert cert = caManager.generateCertificate(caName, profileName, encodedCsr,
-          notBefore, notAfter);
+      X509Cert cert = caManager.generateCertificate(caName, profileName, encodedCsr, notBefore, notAfter);
       saveVerbose("saved certificate to file", outFile, encodeCert(cert.getEncoded(), outform));
 
       return null;
@@ -199,9 +191,8 @@ public class CertActions {
   public static class EnrollCrossCert extends EnrollCert {
 
     @Option(name = "--target-cert", required = true, description =
-        " certificate file, for which the cross certificate will be generated. " +
-            "There shall be not different in subject and public key between " +
-            "certFile and csrFile.")
+            " certificate file, for which the cross certificate will be generated. There shall "
+            + "be no difference in subject and public key between certFile and csrFile.")
     @Completion(FileCompleter.class)
     private String targetCertFile;
 
@@ -213,11 +204,8 @@ public class CertActions {
         throw new CmdFailure("CA " + caName + " not available");
       }
 
-      Date notBefore = StringUtil.isNotBlank(notBeforeS)
-          ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
-
-      Date notAfter = StringUtil.isNotBlank(notAfterS)
-          ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
+      Date notBefore = StringUtil.isNotBlank(notBeforeS) ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
+      Date notAfter = StringUtil.isNotBlank(notAfterS) ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
 
       byte[] encodedCsr = X509Util.toDerEncoded(IoUtil.read(csrFile));
       byte[] encodedTargetCert = X509Util.toDerEncoded(IoUtil.read(targetCertFile));
@@ -267,8 +255,7 @@ public class CertActions {
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "where to save the certificate")
+    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the certificate")
     @Completion(FileCompleter.class)
     private String outputFile;
 
@@ -293,12 +280,10 @@ public class CertActions {
   @Service
   public static class GetCrl extends CrlAction {
 
-    @Option(name = "--with-basecrl",
-        description = "whether to retrieve the baseCRL if the current CRL is a delta CRL")
+    @Option(name = "--with-basecrl", description = "whether to retrieve the baseCRL if the current CRL is a delta CRL")
     private Boolean withBaseCrl = Boolean.FALSE;
 
-    @Option(name = "--basecrl-out",
-        description = "where to save the baseCRL\n(defaults to <out>-baseCRL)")
+    @Option(name = "--basecrl-out", description = "where to save the baseCRL\n(defaults to <out>-baseCRL)")
     @Completion(FileCompleter.class)
     private String baseCrlOut;
 
@@ -367,13 +352,11 @@ public class CertActions {
 
   } // class GetCrl
 
-  @Command(scope = "ca", name = "get-request",
-      description = "get the request to enroll certificate")
+  @Command(scope = "ca", name = "get-request", description = "get the request to enroll certificate")
   @Service
   public static class GetRequest extends UnsuspendRmCertAction {
 
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "where to save the request")
+    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the request")
     @Completion(FileCompleter.class)
     private String outputFile;
 
@@ -404,13 +387,11 @@ public class CertActions {
     protected String subjectPatternS;
 
     @Option(name = "--valid-from",
-        description = "start UTC time when the certificate is still valid, in form of"
-            + "yyyyMMdd or yyyyMMddHHmmss")
+        description = "start UTC time when the certificate is still valid, in form of yyyyMMdd or yyyyMMddHHmmss")
     private String validFromS;
 
     @Option(name = "--valid-to",
-        description = "end UTC time when the certificate is still valid, in form of"
-            + "yyyMMdd or yyyyMMddHHmmss")
+        description = "end UTC time when the certificate is still valid, in form of yyyMMdd or yyyyMMddHHmmss")
     private String validToS;
 
     @Option(name = "-n", description = "maximal number of entries (between 1 and 1000)")
@@ -438,8 +419,8 @@ public class CertActions {
         }
       }
 
-      List<CertListInfo> certInfos = caManager.listCertificates(caName, subjectPattern, validFrom,
-          validTo, orderBy, num);
+      List<CertListInfo> certInfos =
+          caManager.listCertificates(caName, subjectPattern, validFrom, validTo, orderBy, num);
       final int n = certInfos.size();
       if (n == 0) {
         println("found no certificate");
@@ -575,18 +556,15 @@ public class CertActions {
     protected String caName;
 
     @Option(name = "--cert", aliases = "-c",
-        description = "certificate file\n"
-            + "(either cert or serial must be specified)")
+        description = "certificate file\n(either cert or serial must be specified)")
     @Completion(FileCompleter.class)
     protected String certFile;
 
-    @Option(name = "--serial", aliases = "-s",
-        description = "serial number\n(either cert or serial must be specified)")
+    @Option(name = "--serial", aliases = "-s", description = "serial number\n(either cert or serial must be specified)")
     private String serialNumberS;
 
     protected BigInteger getSerialNumber()
-        throws CmdFailure, IllegalCmdParamException, CertificateException, IOException,
-          CaMgmtException  {
+        throws CmdFailure, IllegalCmdParamException, CertificateException, IOException, CaMgmtException  {
       CaEntry ca = caManager.getCa(caName);
       if (ca == null) {
         throw new CmdFailure("CA " + caName + " not available");

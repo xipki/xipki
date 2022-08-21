@@ -86,9 +86,9 @@ public class PbmMacCmpCaClient extends CmpCaClient {
 
   private AlgorithmIdentifier requestMac;
 
-  public PbmMacCmpCaClient(String caUri, X509Certificate caCert, X500Name requestorSubject,
-      X500Name responderSubject, String hashAlgo)
-          throws Exception {
+  public PbmMacCmpCaClient(
+      String caUri, X509Certificate caCert, X500Name requestorSubject, X500Name responderSubject, String hashAlgo)
+      throws Exception {
     super(caUri, caCert, requestorSubject, responderSubject, hashAlgo);
   }
 
@@ -154,13 +154,11 @@ public class PbmMacCmpCaClient extends CmpCaClient {
     ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
     if (!protectedMsg.hasPasswordBasedMacProtection()) {
-      LOG.warn("NOT_MAC_BASED: {}",
-          pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
+      LOG.warn("NOT_MAC_BASED: {}", pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
       return false;
     }
 
-    PBMParameter parameter =
-        PBMParameter.getInstance(pkiMessage.getHeader().getProtectionAlg().getParameters());
+    PBMParameter parameter = PBMParameter.getInstance(pkiMessage.getHeader().getProtectionAlg().getParameters());
     ASN1ObjectIdentifier algOid = parameter.getOwf().getAlgorithm();
     if (!trustedOwfOids.contains(algOid)) {
       LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.owf: {})", algOid);
@@ -224,13 +222,11 @@ public class PbmMacCmpCaClient extends CmpCaClient {
       throw new Exception("unsupported encryption scheme " + encSchemaAlgOid.getId());
     }
 
-    SecretKeyFactory keyFact =
-        SecretKeyFactory.getInstance(alg.getKeyDerivationFunc().getAlgorithm().getId());
+    SecretKeyFactory keyFact = SecretKeyFactory.getInstance(alg.getKeyDerivationFunc().getAlgorithm().getId());
     SecretKey key;
 
     int iterations = func.getIterationCount().intValue();
-    key = keyFact.generateSecret(new PBKDF2KeySpec(password, func.getSalt(), iterations,
-            keysizeInBit, func.getPrf()));
+    key = keyFact.generateSecret(new PBKDF2KeySpec(password, func.getSalt(), iterations, keysizeInBit, func.getPrf()));
     key = new SecretKeySpec(key.getEncoded(), "AES");
 
     String cipherAlgOid = alg.getEncryptionScheme().getAlgorithm().getId();
@@ -238,8 +234,7 @@ public class PbmMacCmpCaClient extends CmpCaClient {
 
     ASN1Encodable encParams = alg.getEncryptionScheme().getParameters();
     GCMParameters gcmParameters = GCMParameters.getInstance(encParams);
-    GCMParameterSpec gcmParamSpec =
-        new GCMParameterSpec(gcmParameters.getIcvLen() * 8, gcmParameters.getNonce());
+    GCMParameterSpec gcmParamSpec = new GCMParameterSpec(gcmParameters.getIcvLen() * 8, gcmParameters.getNonce());
     cipher.init(Cipher.DECRYPT_MODE, key, gcmParamSpec);
 
     return cipher.doFinal(ev.getEncValue().getOctets());
@@ -251,8 +246,7 @@ public class PbmMacCmpCaClient extends CmpCaClient {
     builder.setSenderKID(kid);
     byte[] salt = new byte[64];
     random.nextBytes(salt);
-    PBMParameter pbmParameter = new PBMParameter(salt, requestOwf,
-        requestInterationCount, requestMac);
+    PBMParameter pbmParameter = new PBMParameter(salt, requestOwf, requestInterationCount, requestMac);
 
     try {
       PKMACBuilder pkMacBuilder = new PKMACBuilder(new JcePKMACValuesCalculator());

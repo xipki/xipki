@@ -65,8 +65,7 @@ public class RestCaClient implements Closeable {
   public RestCaClient(String caUrl, String user, String password)
       throws Exception {
     this.caUrl = new URL(SdkUtil.requireNonBlank("caUrl", caUrl)).toString();
-    this.authorization = Base64.getEncoder().encodeToString(
-                            (user + ":" + password).getBytes(StandardCharsets.UTF_8));
+    this.authorization = Base64.getEncoder().encodeToString((user + ":" + password).getBytes(StandardCharsets.UTF_8));
   }
 
   public void init()
@@ -96,8 +95,7 @@ public class RestCaClient implements Closeable {
     // Get CA certificate chain
     byte[] bytes = httpGet(caUrl + "/cacertchain", CT_PEM_FILE);
     try (PemReader pemReader =
-        new PemReader(new InputStreamReader(
-            new ByteArrayInputStream(bytes), StandardCharsets.UTF_8))) {
+        new PemReader(new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8))) {
       PemObject pemObject;
       while ((pemObject = pemReader.readPemObject()) != null) {
         if ("CERTIFICATE".contentEquals(pemObject.getType())) {
@@ -190,8 +188,7 @@ public class RestCaClient implements Closeable {
     InputStream inputStream = conn.getInputStream();
     if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
       inputStream.close();
-      throw new IOException("bad response: " + conn.getResponseCode() + "    "
-          + conn.getResponseMessage());
+      throw new IOException("bad response: " + conn.getResponseCode() + "    " + conn.getResponseMessage());
     }
 
     String responseContentType = conn.getContentType();

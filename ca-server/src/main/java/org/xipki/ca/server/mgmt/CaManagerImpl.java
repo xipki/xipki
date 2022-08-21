@@ -194,8 +194,6 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   RequestorInfo byCaRequestor;
 
-  NameId byUserRequestorId;
-
   boolean masterMode;
 
   int shardId;
@@ -334,13 +332,11 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose)
-          throws CaMgmtException {
+  public String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose) throws CaMgmtException {
     return signerManager.getTokenInfoP11(moduleName, slotIndex, verbose);
   }
 
-  private void init()
-      throws CaMgmtException {
+  private void init() throws CaMgmtException {
     if (securityFactory == null) {
       throw new IllegalStateException("securityFactory is not set");
     }
@@ -486,8 +482,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     return queryExecutor.getDbSchemaVersion();
   }
 
-  private DataSourceWrapper loadDatasource(String datasourceName, FileOrValue datasourceConf)
-      throws CaMgmtException {
+  private DataSourceWrapper loadDatasource(String datasourceName, FileOrValue datasourceConf) throws CaMgmtException {
     try {
       DataSourceWrapper datasource = datasourceFactory.createDataSource(
           datasourceName, datasourceConf, securityFactory.getPasswordResolver());
@@ -498,10 +493,9 @@ public class CaManagerImpl implements CaManager, Closeable {
 
       LOG.info("loaded datasource.{}", datasourceName);
       return datasource;
-    } catch (DataAccessException | PasswordResolverException | IOException
-        | RuntimeException ex) {
+    } catch (DataAccessException | PasswordResolverException | IOException | RuntimeException ex) {
       throw new CaMgmtException(concat(ex.getClass().getName(),
-        " while parsing datasource ", datasourceName, ": ", ex.getMessage()), ex);
+          " while parsing datasource ", datasourceName, ": ", ex.getMessage()), ex);
     }
   } // method loadDatasource
 
@@ -538,8 +532,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
 
-    SystemEvent newLockInfo = new SystemEvent(EVENT_LOCK, lockInstanceId,
-        System.currentTimeMillis() / 1000L);
+    SystemEvent newLockInfo = new SystemEvent(EVENT_LOCK, lockInstanceId, System.currentTimeMillis() / 1000L);
     queryExecutor.changeSystemEvent(newLockInfo);
     caLockedByMe = true;
   } // method lockCa
@@ -593,8 +586,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void notifyCaChange() throws CaMgmtException {
     try {
-      SystemEvent systemEvent = new SystemEvent(EVENT_CACHAGNE, lockInstanceId,
-          System.currentTimeMillis() / 1000L);
+      SystemEvent systemEvent = new SystemEvent(EVENT_CACHAGNE, lockInstanceId, System.currentTimeMillis() / 1000L);
       queryExecutor.changeSystemEvent(systemEvent);
       LOG.info("notified the change of CA system");
     } catch (CaMgmtException ex) {
@@ -772,8 +764,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       if (!masterMode && persistentScheduledThreadPoolExecutor == null) {
         persistentScheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
         persistentScheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
-        persistentScheduledThreadPoolExecutor.scheduleAtFixedRate(new CaRestarter(),
-            300, 300, SECONDS);
+        persistentScheduledThreadPoolExecutor.scheduleAtFixedRate(new CaRestarter(), 300, 300, SECONDS);
       }
     }
 
@@ -983,26 +974,22 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public KeypairGenEntry getKeypairGen(String name)
-          throws CaMgmtException {
+  public KeypairGenEntry getKeypairGen(String name) throws CaMgmtException {
     return keypairGenDbEntries.get(name);
   }
 
   @Override
-  public void removeKeypairGen(String name)
-          throws CaMgmtException {
+  public void removeKeypairGen(String name) throws CaMgmtException {
     keypairGenManager.removeKeypairGen(name);
   }
 
   @Override
-  public void changeKeypairGen(String name, String type, String conf)
-          throws CaMgmtException {
+  public void changeKeypairGen(String name, String type, String conf) throws CaMgmtException {
     keypairGenManager.changeKeypairGen(name, type, conf);
   }
 
   @Override
-  public void addKeypairGen(KeypairGenEntry keypairGenEntry)
-          throws CaMgmtException {
+  public void addKeypairGen(KeypairGenEntry keypairGenEntry) throws CaMgmtException {
     keypairGenManager.addKeypairGen(keypairGenEntry);
   }
 
@@ -1017,8 +1004,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void changeSigner(String name, String type, String conf, String base64Cert)
-      throws CaMgmtException {
+  public void changeSigner(String name, String type, String conf, String base64Cert) throws CaMgmtException {
     signerManager.changeSigner(name, type, conf, base64Cert);
   }
 
@@ -1146,8 +1132,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method shutdownScheduledThreadPoolExecutor
 
   @Override
-  public void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason,
-      Date invalidityTime) throws CaMgmtException {
+  public void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason, Date invalidityTime)
+      throws CaMgmtException {
     ca2Manager.revokeCertificate(caName, serialNumber, reason, invalidityTime);
   }
 
@@ -1162,19 +1148,17 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public X509Cert generateCertificate(String caName, String profileName,
-      byte[] encodedCsr, Date notBefore, Date notAfter)
+  public X509Cert generateCertificate(
+      String caName, String profileName, byte[] encodedCsr, Date notBefore, Date notAfter)
       throws CaMgmtException {
-    return ca2Manager.generateCertificate(caName, profileName,
-        encodedCsr, notBefore, notAfter);
+    return ca2Manager.generateCertificate(caName, profileName, encodedCsr, notBefore, notAfter);
   }
 
   @Override
-  public X509Cert generateCrossCertificate(String caName, String profileName,
-       byte[] encodedCsr, byte[] encodedTargetCert, Date notBefore, Date notAfter)
+  public X509Cert generateCrossCertificate(
+      String caName, String profileName, byte[] encodedCsr, byte[] encodedTargetCert, Date notBefore, Date notAfter)
       throws CaMgmtException {
-    return ca2Manager.generateCrossCertificate(caName, profileName, encodedCsr,
-        encodedTargetCert, notBefore, notAfter);
+    return ca2Manager.generateCrossCertificate(caName, profileName, encodedCsr, encodedTargetCert, notBefore, notAfter);
   }
 
   public X509Ca getX509Ca(String name) throws CaMgmtException {
@@ -1197,10 +1181,10 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public X509Cert generateRootCa(CaEntry caEntry, String profileName, String subject,
-      String serialNumber, Date notBefore, Date notAfter) throws CaMgmtException {
-    return ca2Manager.generateRootCa(caEntry, profileName, subject, serialNumber,
-        notBefore, notAfter);
+  public X509Cert generateRootCa(
+      CaEntry caEntry, String profileName, String subject, String serialNumber, Date notBefore, Date notAfter)
+      throws CaMgmtException {
+    return ca2Manager.generateRootCa(caEntry, profileName, subject, serialNumber, notBefore, notAfter);
   }
 
   void assertMasterMode() throws CaMgmtException {
@@ -1228,8 +1212,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     return publisherManager.createPublisher(entry);
   }
 
-  public KeypairGenEntryWrapper createKeypairGenerator(KeypairGenEntry entry)
-      throws CaMgmtException {
+  public KeypairGenEntryWrapper createKeypairGenerator(KeypairGenEntry entry) throws CaMgmtException {
     return keypairGenManager.createKeypairGen(entry);
   }
 
@@ -1238,8 +1221,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public X509CRLHolder generateCrlOnDemand(String caName)
-      throws CaMgmtException {
+  public X509CRLHolder generateCrlOnDemand(String caName) throws CaMgmtException {
     return ca2Manager.generateCrlOnDemand(caName);
   }
 
@@ -1254,14 +1236,12 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public CertWithRevocationInfo getCert(String caName, BigInteger serialNumber)
-      throws CaMgmtException {
+  public CertWithRevocationInfo getCert(String caName, BigInteger serialNumber) throws CaMgmtException {
     return ca2Manager.getCert(caName, serialNumber);
   }
 
   @Override
-  public CertWithRevocationInfo getCert(X500Name issuer, BigInteger serialNumber)
-      throws CaMgmtException {
+  public CertWithRevocationInfo getCert(X500Name issuer, BigInteger serialNumber) throws CaMgmtException {
     return ca2Manager.getCert(issuer, serialNumber);
   }
 
@@ -1271,20 +1251,18 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public List<CertListInfo> listCertificates(String caName, X500Name subjectPattern, Date validFrom,
-      Date validTo, CertListOrderBy orderBy, int numEntries) throws CaMgmtException {
-    return ca2Manager.listCertificates(caName, subjectPattern, validFrom, validTo, orderBy,
-        numEntries);
+  public List<CertListInfo> listCertificates(
+      String caName, X500Name subjectPattern, Date validFrom, Date validTo, CertListOrderBy orderBy, int numEntries)
+      throws CaMgmtException {
+    return ca2Manager.listCertificates(caName, subjectPattern, validFrom, validTo, orderBy, numEntries);
   }
 
   @Override
-  public void refreshTokenForSignerType(String signerType)
-      throws CaMgmtException {
+  public void refreshTokenForSignerType(String signerType) throws CaMgmtException {
     try {
       securityFactory.refreshTokenForSignerType(signerType);
     } catch (XiSecurityException ex) {
-      throw new CaMgmtException("could not refresh token for signer type " + signerType
-          + ": " + ex.getMessage(), ex);
+      throw new CaMgmtException("could not refresh token for signer type " + signerType + ": " + ex.getMessage(), ex);
     }
   }
 

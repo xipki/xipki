@@ -67,8 +67,7 @@ public class LiquibaseMain implements Closeable {
 
     private final String schema;
 
-    public DatabaseConf(String driver, String username, String password,
-        String url, String schema) {
+    public DatabaseConf(String driver, String username, String password, String url, String schema) {
       this.driver = driver;
       this.username = notNull(username, "username");
       this.password = password;
@@ -143,8 +142,7 @@ public class LiquibaseMain implements Closeable {
         String dataSourceUrl = dbProps.getProperty("dataSource.url");
         String prefix = "jdbc:h2:";
         if (dataSourceUrl.startsWith(prefix + "~")) {
-          urlBuilder.append(prefix)
-            .append(IoUtil.expandFilepath(dataSourceUrl.substring(prefix.length())));
+          urlBuilder.append(prefix).append(IoUtil.expandFilepath(dataSourceUrl.substring(prefix.length())));
         } else {
           urlBuilder.append(dataSourceUrl);
         }
@@ -210,8 +208,7 @@ public class LiquibaseMain implements Closeable {
         String dataSourceUrl = dbProps.getProperty("dataSource.url");
         String prefix = "jdbc:hsqldb:file:";
         if (dataSourceUrl.startsWith(prefix + "~")) {
-          urlBuilder.append(prefix)
-            .append(IoUtil.expandFilepath(dataSourceUrl.substring(prefix.length())));
+          urlBuilder.append(prefix).append(IoUtil.expandFilepath(dataSourceUrl.substring(prefix.length())));
         } else {
           urlBuilder.append(dataSourceUrl);
         }
@@ -350,9 +347,5 @@ public class LiquibaseMain implements Closeable {
       liquibase = null;
     }
   } // method close
-
-  public static boolean loglevelIsSevereOrOff(String logLevel) {
-    return "off".equalsIgnoreCase(logLevel) || "severe".equalsIgnoreCase(logLevel);
-  }
 
 }

@@ -58,8 +58,7 @@ public class ExtendedKeyUsage extends ValidatableConf {
     Set<ExtKeyUsageControl> controls = new HashSet<>();
 
     for (Usage m : usages) {
-      controls.add(new ExtKeyUsageControl(
-                    new ASN1ObjectIdentifier(m.getOid()), m.isRequired()));
+      controls.add(new ExtKeyUsageControl(new ASN1ObjectIdentifier(m.getOid()), m.isRequired()));
     }
 
     return Collections.unmodifiableSet(controls);

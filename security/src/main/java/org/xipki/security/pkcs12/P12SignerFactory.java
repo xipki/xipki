@@ -68,9 +68,8 @@ public class P12SignerFactory implements SignerFactory {
   }
 
   @Override
-  public ConcurrentContentSigner newSigner(String type, SignerConf conf,
-      X509Cert[] certificateChain)
-          throws ObjectCreationException {
+  public ConcurrentContentSigner newSigner(String type, SignerConf conf, X509Cert[] certificateChain)
+      throws ObjectCreationException {
     if (!canCreateSigner(type)) {
       throw new ObjectCreationException("unknown signer type " + type);
     }
@@ -101,8 +100,7 @@ public class P12SignerFactory implements SignerFactory {
         try {
           password = passwordResolver.resolvePassword(passwordHint);
         } catch (PasswordResolverException ex) {
-          throw new ObjectCreationException(
-              "could not resolve password. Message: " + ex.getMessage());
+          throw new ObjectCreationException("could not resolve password. Message: " + ex.getMessage());
         }
       }
     }
@@ -147,8 +145,7 @@ public class P12SignerFactory implements SignerFactory {
                 "could not find peer certificate for algorithm " + publicKeyAlg);
           }
 
-          P12XdhMacContentSignerBuilder signerBuilder =
-              new P12XdhMacContentSignerBuilder(keypairWithCert, peerCert);
+          P12XdhMacContentSignerBuilder signerBuilder = new P12XdhMacContentSignerBuilder(keypairWithCert, peerCert);
           return signerBuilder.createSigner(parallelism);
         } else {
           P12ContentSignerBuilder signerBuilder = new P12ContentSignerBuilder(keypairWithCert);
@@ -158,13 +155,11 @@ public class P12SignerFactory implements SignerFactory {
             sigAlgo = SignAlgo.getInstance(pubKey, conf);
           }
 
-          return signerBuilder.createSigner(sigAlgo, parallelism,
-              securityFactory.getRandom4Sign());
+          return signerBuilder.createSigner(sigAlgo, parallelism, securityFactory.getRandom4Sign());
         }
       }
     } catch (NoSuchAlgorithmException | NoSuchPaddingException | XiSecurityException ex) {
-      throw new ObjectCreationException(String.format("%s: %s", ex.getClass().getName(),
-          ex.getMessage()));
+      throw new ObjectCreationException(String.format("%s: %s", ex.getClass().getName(), ex.getMessage()));
     }
   } // method newSigner
 

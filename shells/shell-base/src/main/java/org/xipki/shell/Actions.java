@@ -65,18 +65,15 @@ public class Actions {
 
   } // class Confirm
 
-  @Command(scope = "xi", name = "copy-dir",
-      description = "copy content of the directory to destination")
+  @Command(scope = "xi", name = "copy-dir", description = "copy content of the directory to destination")
   @Service
   public static class CopyDir extends XiAction {
 
-    @Argument(index = 0, name = "source", required = true,
-        description = "content of this directory will be copied")
+    @Argument(index = 0, name = "source", required = true, description = "content of this directory will be copied")
     @Completion(Completers.DirCompleter.class)
     private String source;
 
-    @Argument(index = 1, name = "destination", required = true,
-        description = "destination directory")
+    @Argument(index = 1, name = "destination", required = true, description = "destination directory")
     @Completion(Completers.DirCompleter.class)
     private String dest;
 
@@ -196,8 +193,7 @@ public class Actions {
     @Option(name = "--data-charset", aliases = "-c", description = "charset of data")
     private String postDataCharSet = "UTF-8";
 
-    @Option(name = "--data-file",
-        description = "file contains the data to be sent in a POST request")
+    @Option(name = "--data-file", description = "file contains the data to be sent in a POST request")
     @Completion(FileCompleter.class)
     private String postDataFile;
 
@@ -205,12 +201,10 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String outFile;
 
-    @Option(name = "--header", aliases = "-h", multiValued = true,
-        description = "header in request")
+    @Option(name = "--header", aliases = "-h", multiValued = true, description = "header in request")
     private List<String> headers;
 
-    @Option(name = "--user", aliases = "-u",
-        description = "User and password of the form user:password")
+    @Option(name = "--user", aliases = "-u", description = "User and password of the form user:password")
     private String userPassword;
 
     @Reference
@@ -261,8 +255,7 @@ public class Actions {
         if (result.getContent() != null) {
           saveVerbose("saved response to file", outFile, result.getContent());
         } else {
-          saveVerbose("saved (error) response to file",
-              "error-" + outFile, result.getErrorContent());
+          saveVerbose("saved (error) response to file", "error-" + outFile, result.getErrorContent());
         }
       } else {
         String ct = result.getContentType();
@@ -312,8 +305,7 @@ public class Actions {
   @Service
   public static class Mkdir extends XiAction {
 
-    @Argument(index = 0, name = "directory", required = true,
-        description = "directory to be created")
+    @Argument(index = 0, name = "directory", required = true, description = "directory to be created")
     @Completion(Completers.DirCompleter.class)
     private String dirName;
 
@@ -335,18 +327,15 @@ public class Actions {
 
   } // class Mkdir
 
-  @Command(scope = "xi", name = "move-dir",
-      description = "move content of the directory to destination")
+  @Command(scope = "xi", name = "move-dir", description = "move content of the directory to destination")
   @Service
   public static class MoveDir extends XiAction {
 
-    @Argument(index = 0, name = "source", required = true,
-        description = "content of this directory will be copied")
+    @Argument(index = 0, name = "source", required = true, description = "content of this directory will be copied")
     @Completion(Completers.DirCompleter.class)
     private String source;
 
-    @Argument(index = 1, name = "destination", required = true,
-        description = "destination directory")
+    @Argument(index = 1, name = "destination", required = true, description = "destination directory")
     @Completion(Completers.DirCompleter.class)
     private String dest;
 
@@ -503,13 +492,11 @@ public class Actions {
   @Service
   public static class Rm extends XiAction {
 
-    @Argument(index = 0, name = "file", required = true,
-        description = "file or directory to be deleted")
+    @Argument(index = 0, name = "file", required = true, description = "file or directory to be deleted")
     @Completion(FileCompleter.class)
     private String targetPath;
 
-    @Option(name = "--recursive", aliases = "-r",
-        description = "remove directories and their contents recursively")
+    @Option(name = "--recursive", aliases = "-r", description = "remove directories and their contents recursively")
     private Boolean recursive = Boolean.FALSE;
 
     @Option(name = "--force", aliases = "-f", description = "remove files without prompt")

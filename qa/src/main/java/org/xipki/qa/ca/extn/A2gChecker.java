@@ -61,16 +61,17 @@ class A2gChecker extends ExtensionChecker {
     super(parent);
   }
 
-  void checkExtnAdditionalInformation(StringBuilder failureMsg,
-      byte[] extensionValue, Extensions requestedExtns, ExtensionControl extControl) {
+  void checkExtnAdditionalInformation(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns, ExtensionControl extControl) {
     AdditionalInformation additionalInformation = caller.getAdditionalInformation();
     caller.checkDirectoryString(Extn.id_extension_additionalInformation,
         additionalInformation.getType(), additionalInformation.getText(),
-        failureMsg, extensionValue, requestedExtns, extControl);
+        failureMsg, extnValue, requestedExtns, extControl);
   }
 
-  void checkExtnAdmission(StringBuilder failureMsg, byte[] extnValue,
-      Extensions requestedExtns, X500Name requestedSubject, ExtensionControl extnControl) {
+  void checkExtnAdmission(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns, X500Name requestedSubject,
+      ExtensionControl extnControl) {
     AdmissionExtension.AdmissionSyntaxOption conf = getCertprofile().extensions().getAdmission();
 
     ASN1ObjectIdentifier type = Extn.id_extension_admission;
@@ -101,8 +102,7 @@ class A2gChecker extends ExtensionChecker {
     }
 
     try {
-      byte[] expected =
-          conf.getExtensionValue(reqRegNumsList).getValue().toASN1Primitive().getEncoded();
+      byte[] expected = conf.getExtensionValue(reqRegNumsList).getValue().toASN1Primitive().getEncoded();
       if (!Arrays.equals(expected, extnValue)) {
         addViolation(failureMsg, "extension valus", hex(extnValue), hex(expected));
       }
@@ -115,8 +115,7 @@ class A2gChecker extends ExtensionChecker {
     }
   } // method checkExtnAdmission
 
-  void checkExtnAuthorityInfoAccess(StringBuilder failureMsg, byte[] extnValue,
-      IssuerInfo issuerInfo) {
+  void checkExtnAuthorityInfoAccess(StringBuilder failureMsg, byte[] extnValue, IssuerInfo issuerInfo) {
     AuthorityInfoAccessControl aiaControl = getCertprofile().getAiaControl();
     Set<String> expCaIssuerUris = (aiaControl == null || aiaControl.isIncludesCaIssuers())
         ? issuerInfo.getCaIssuerUrls() : Collections.emptySet();
@@ -152,8 +151,7 @@ class A2gChecker extends ExtensionChecker {
           }
 
           if (x500GenName != null) {
-            failureMsg.append("authorityCertIssuer contains at least two directoryName "
-                + "but expected one; ");
+            failureMsg.append("authorityCertIssuer contains at least two directoryName but expected one; ");
             break;
           } else {
             x500GenName = (X500Name) genName.getName();
@@ -161,8 +159,7 @@ class A2gChecker extends ExtensionChecker {
         }
 
         if (x500GenName == null) {
-          failureMsg.append(
-              "authorityCertIssuer does not contain directoryName but expected one; ");
+          failureMsg.append("authorityCertIssuer does not contain directoryName but expected one; ");
         } else {
           X500Name caIssuer = issuerInfo.getCert().getIssuer();
           if (!caIssuer.equals(x500GenName)) {
@@ -176,8 +173,7 @@ class A2gChecker extends ExtensionChecker {
       } else {
         BigInteger issuerSn = issuerInfo.getCert().getSerialNumber();
         if (!issuerSn.equals(authorityCertSerialNumber)) {
-          addViolation(failureMsg, "authorityCertSerialNumber",
-              authorityCertSerialNumber, issuerSn);
+          addViolation(failureMsg, "authorityCertSerialNumber", authorityCertSerialNumber, issuerSn);
         }
       }
 
@@ -190,8 +186,7 @@ class A2gChecker extends ExtensionChecker {
         failureMsg.append("keyIdentifier is 'absent', but expected 'present'; ");
       } else {
         if (!Arrays.equals(issuerInfo.getSubjectKeyIdentifier(), keyIdentifier)) {
-          addViolation(failureMsg, "keyIdentifier", hex(keyIdentifier),
-              hex(issuerInfo.getSubjectKeyIdentifier()));
+          addViolation(failureMsg, "keyIdentifier", hex(keyIdentifier), hex(issuerInfo.getSubjectKeyIdentifier()));
         }
       }
 
@@ -234,8 +229,7 @@ class A2gChecker extends ExtensionChecker {
     }
   } // method checkExtnBasicConstraints
 
-  void checkExtnBiometricInfo(StringBuilder failureMsg, byte[] extnValue,
-      Extensions requestedExtns) {
+  void checkExtnBiometricInfo(StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns) {
     BiometricInfoOption conf = getCertprofile().extensions().getBiometricInfo();
 
     if (conf == null) {
@@ -286,7 +280,7 @@ class A2gChecker extends ExtensionChecker {
       } catch (NoSuchAlgorithmException e) {
         hashAlgo = null;
         failureMsg.append("biometricData[").append(i)
-                .append("].biometricDataHash of the request has incorrect syntax; ");
+            .append("].biometricDataHash of the request has incorrect syntax; ");
       }
 
       if (hashAlgo != null) {
@@ -296,8 +290,7 @@ class A2gChecker extends ExtensionChecker {
                     Hex.encode(isData.getHashAlgorithm().getEncoded()),
                     Hex.encode(hashAlgo.getAlgorithmIdentifier().getEncoded()));
           } catch (Exception ex) {
-            failureMsg.append("biometricData[").append(i)
-                    .append("].biometricDataHash: could not encode; ");
+            failureMsg.append("biometricData[").append(i).append("].biometricDataHash: could not encode; ");
           }
         }
       }
@@ -305,8 +298,7 @@ class A2gChecker extends ExtensionChecker {
       byte[] isBytes = isData.getBiometricDataHash().getOctets();
       byte[] expBytes = expData.getBiometricDataHash().getOctets();
       if (!Arrays.equals(isBytes, expBytes)) {
-        addViolation(failureMsg, "biometricData[" + i + "].biometricDataHash",
-            hex(isBytes), hex(expBytes));
+        addViolation(failureMsg, "biometricData[" + i + "].biometricDataHash", hex(isBytes), hex(expBytes));
       }
 
       DERIA5String str = isData.getSourceDataUri();
@@ -327,25 +319,22 @@ class A2gChecker extends ExtensionChecker {
           failureMsg.append("biometricData[").append(i).append("].sourceDataUri is 'absent'");
           failureMsg.append(" but expected 'present'; ");
         } else if (!isSourceDataUri.equals(expSourceDataUri)) {
-          addViolation(failureMsg, "biometricData[" + i + "].sourceDataUri",
-              isSourceDataUri, expSourceDataUri);
+          addViolation(failureMsg, "biometricData[" + i + "].sourceDataUri", isSourceDataUri, expSourceDataUri);
         }
       }
     }
   } // method checkExtnBiometricInfo
 
-  void checkExtnCertificatePolicies(StringBuilder failureMsg, byte[] extnValue,
-      Extensions requestedExtns, ExtensionControl extnControl) {
+  void checkExtnCertificatePolicies(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns, ExtensionControl extnControl) {
     CertificatePolicies certificatePolicies = caller.getCertificatePolicies();
     if (certificatePolicies == null) {
-      caller.checkConstantExtnValue(Extension.certificatePolicies,
-          failureMsg, extnValue, requestedExtns, extnControl);
+      caller.checkConstantExtnValue(Extension.certificatePolicies, failureMsg, extnValue, requestedExtns, extnControl);
       return;
     }
 
     Map<String, CertificatePolicyInformationType> expPoliciesMap = new HashMap<>();
-    for (CertificatePolicyInformationType cp :
-        caller.getCertificatePolicies().getCertificatePolicyInformations()) {
+    for (CertificatePolicyInformationType cp : caller.getCertificatePolicies().getCertificatePolicyInformations()) {
       expPoliciesMap.put(cp.getPolicyIdentifier().getOid(), cp);
     }
     Set<String> expPolicyIds = new HashSet<>(expPoliciesMap.keySet());
@@ -374,8 +363,7 @@ class A2gChecker extends ExtensionChecker {
 
       int size = isPolicyQualifiers.size();
       for (int i = 0; i < size; i++) {
-        PolicyQualifierInfo isPolicyQualifierInfo =
-            PolicyQualifierInfo.getInstance(isPolicyQualifiers.getObjectAt(i));
+        PolicyQualifierInfo isPolicyQualifierInfo = PolicyQualifierInfo.getInstance(isPolicyQualifiers.getObjectAt(i));
         ASN1ObjectIdentifier isPolicyQualifierId = isPolicyQualifierInfo.getPolicyQualifierId();
         ASN1Encodable isQualifier = isPolicyQualifierInfo.getQualifier();
         if (PolicyQualifierId.id_qt_cps.equals(isPolicyQualifierId)) {
@@ -399,8 +387,7 @@ class A2gChecker extends ExtensionChecker {
             continue;
           case userNotice:
             if (!isUserNotices.contains(value)) {
-              failureMsg.append("userNotice '").append(value)
-                .append("' is absent but is required; ");
+              failureMsg.append("userNotice '").append(value).append("' is absent but is required; ");
             }
             continue;
           default:
@@ -410,23 +397,20 @@ class A2gChecker extends ExtensionChecker {
     }
 
     for (String policyId : expPolicyIds) {
-      failureMsg.append("certificate policy '").append(policyId)
-        .append("' is absent but is required; ");
+      failureMsg.append("certificate policy '").append(policyId).append("' is absent but is required; ");
     }
   } // method checkExtnCertificatePolicies
 
-  void checkExtnDeltaCrlDistributionPoints(StringBuilder failureMsg,
-      byte[] extnValue, IssuerInfo issuerInfo) {
+  void checkExtnDeltaCrlDistributionPoints(StringBuilder failureMsg, byte[] extnValue, IssuerInfo issuerInfo) {
     checkExtnCrlDistributionPoints(true, failureMsg, extnValue, issuerInfo);
   }
 
-  void checkExtnCrlDistributionPoints(StringBuilder failureMsg,
-      byte[] extnValue, IssuerInfo issuerInfo) {
+  void checkExtnCrlDistributionPoints(StringBuilder failureMsg, byte[] extnValue, IssuerInfo issuerInfo) {
     checkExtnCrlDistributionPoints(false, failureMsg, extnValue, issuerInfo);
   }
 
-  private void checkExtnCrlDistributionPoints(boolean deltaCrl, StringBuilder failureMsg,
-      byte[] extnValue, IssuerInfo issuerInfo) {
+  private void checkExtnCrlDistributionPoints(
+      boolean deltaCrl, StringBuilder failureMsg, byte[] extnValue, IssuerInfo issuerInfo) {
     CRLDistPoint isCrlDistPoints = CRLDistPoint.getInstance(extnValue);
     DistributionPoint[] isDistributionPoints = isCrlDistPoints.getDistributionPoints();
 
@@ -452,39 +436,34 @@ class A2gChecker extends ExtensionChecker {
         continue;
       }
 
-      GeneralNames isDistributionPointNames =
-          GeneralNames.getInstance(entry.getDistributionPoint().getName());
+      GeneralNames isDistributionPointNames = GeneralNames.getInstance(entry.getDistributionPoint().getName());
       GeneralName[] names = isDistributionPointNames.getNames();
 
       for (int i = 0; i < names.length; i++) {
         GeneralName name = names[i];
         if (name.getTagNo() != GeneralName.uniformResourceIdentifier) {
-          addViolation(failureMsg, "tag of URL of " + type, name.getTagNo(),
-              GeneralName.uniformResourceIdentifier);
+          addViolation(failureMsg, "tag of URL of " + type, name.getTagNo(), GeneralName.uniformResourceIdentifier);
         } else {
           String uri = ((ASN1String) name.getName()).getString();
           isCrlUrls.add(uri);
         }
       }
 
-      Set<String> expCrlUrls = deltaCrl
-          ? issuerInfo.getDeltaCrlUrls() : issuerInfo.getCrlUrls();
+      Set<String> expCrlUrls = deltaCrl ? issuerInfo.getDeltaCrlUrls() : issuerInfo.getCrlUrls();
       Set<String> diffs = strInBnotInA(expCrlUrls, isCrlUrls);
       if (isNotEmpty(diffs)) {
-        failureMsg.append("URLs of ").append(type).append(" ")
-            .append(diffs).append(" are present but not expected; ");
+        failureMsg.append("URLs of ").append(type).append(" ").append(diffs).append(" are present but not expected; ");
       }
 
       diffs = strInBnotInA(isCrlUrls, expCrlUrls);
       if (isNotEmpty(diffs)) {
-        failureMsg.append("URLs of ").append(type).append(" ")
-            .append(diffs).append(" are absent but are required; ");
+        failureMsg.append("URLs of ").append(type).append(" ").append(diffs).append(" are absent but are required; ");
       }
     }
   } // method checkExtnCrlDistributionPoints
 
-  void checkExtnExtendedKeyUsage(StringBuilder failureMsg,
-      byte[] extnValue, Extensions requestedExtns, ExtensionControl extnControl) {
+  void checkExtnExtendedKeyUsage(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns, ExtensionControl extnControl) {
     Set<String> isUsages = new HashSet<>();
     org.bouncycastle.asn1.x509.ExtendedKeyUsage keyusage =
         org.bouncycastle.asn1.x509.ExtendedKeyUsage.getInstance(extnValue);
@@ -504,8 +483,7 @@ class A2gChecker extends ExtensionChecker {
     }
 
     Set<ExtKeyUsageControl> optionalExtKeyusage = caller.getExtKeyusage(false);
-    if (requestedExtns != null && extnControl.isRequest()
-        && isNotEmpty(optionalExtKeyusage)) {
+    if (requestedExtns != null && extnControl.isRequest() && isNotEmpty(optionalExtKeyusage)) {
       Extension extension = requestedExtns.getExtension(Extension.extendedKeyUsage);
       if (extension != null) {
         org.bouncycastle.asn1.x509.ExtendedKeyUsage reqKeyUsage =
@@ -536,9 +514,10 @@ class A2gChecker extends ExtensionChecker {
     }
   } // method checkExtnExtendedKeyUsage
 
-  void checkExtnGmt0015(StringBuilder failureMsg,
-      byte[] extnValue, Extensions requestedExtns, ExtensionControl extnControl,
-      ASN1ObjectIdentifier oid, X500Name requestedSubject) throws IOException {
+  void checkExtnGmt0015(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns,
+      ExtensionControl extnControl, ASN1ObjectIdentifier oid, X500Name requestedSubject)
+      throws IOException {
     if (Extn.id_GMT_0015_ICRegistrationNumber.equals(oid)
         || Extn.id_GMT_0015_InsuranceNumber.equals(oid)
         || Extn.id_GMT_0015_OrganizationCode.equals(oid)
@@ -613,11 +592,9 @@ class A2gChecker extends ExtensionChecker {
       if (StringUtil.isNotBlank(extnStr)) {
         final boolean explicit = true;
         if (tag == 0 || tag == 2) {
-          expected =
-              new DERTaggedObject(explicit, tag, new DERPrintableString(extnStr)).getEncoded();
+          expected = new DERTaggedObject(explicit, tag, new DERPrintableString(extnStr)).getEncoded();
         } else if (tag == 1) {
-          expected =
-              new DERTaggedObject(explicit, tag, new DERUTF8String(extnStr)).getEncoded();
+          expected = new DERTaggedObject(explicit, tag, new DERUTF8String(extnStr)).getEncoded();
         }
       }
 

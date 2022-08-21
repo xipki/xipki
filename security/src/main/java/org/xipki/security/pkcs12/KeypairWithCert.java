@@ -63,17 +63,18 @@ public class KeypairWithCert {
     this.publicKey = certificateChain[0].getPublicKey();
   }
 
-  public static KeypairWithCert fromKeystore(String keystoreType, InputStream keystoreStream,
-      char[] keystorePassword, String keyname, char[] keyPassword, X509Cert cert)
-          throws XiSecurityException {
+  public static KeypairWithCert fromKeystore(
+      String keystoreType, InputStream keystoreStream, char[] keystorePassword,
+      String keyname, char[] keyPassword, X509Cert cert)
+      throws XiSecurityException {
     return fromKeystore(keystoreType, keystoreStream, keystorePassword, keyname, keyPassword,
         cert == null ? null : new X509Cert[] {cert});
   }
 
-  public static KeypairWithCert fromKeystore(String keystoreType, InputStream keystoreStream,
-      char[] keystorePassword, String keyname, char[] keyPassword,
-      X509Cert[] certchain)
-          throws XiSecurityException {
+  public static KeypairWithCert fromKeystore(
+      String keystoreType, InputStream keystoreStream, char[] keystorePassword,
+      String keyname, char[] keyPassword, X509Cert[] certchain)
+      throws XiSecurityException {
     if (!("PKCS12".equalsIgnoreCase(keystoreType) || "JCEKS".equalsIgnoreCase(keystoreType))) {
       throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
     }
@@ -92,8 +93,7 @@ public class KeypairWithCert {
     try {
       keystore.load(keystoreStream, keystorePassword);
       return fromKeystore(keystore, keyname, keyPassword, certchain);
-    } catch (NoSuchAlgorithmException | ClassCastException | CertificateException
-        | IOException ex) {
+    } catch (NoSuchAlgorithmException | ClassCastException | CertificateException | IOException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     } finally {
       try {
@@ -103,9 +103,9 @@ public class KeypairWithCert {
     }
   }
 
-  public static KeypairWithCert fromKeystore(KeyStore keystore,
-      String keyname, char[] keyPassword, X509Cert[] certchain)
-          throws XiSecurityException {
+  public static KeypairWithCert fromKeystore(
+      KeyStore keystore, String keyname, char[] keyPassword, X509Cert[] certchain)
+      throws XiSecurityException {
     notNull(keyPassword, "keyPassword");
 
     try {
@@ -129,8 +129,7 @@ public class KeypairWithCert {
       PrivateKey key = (PrivateKey) keystore.getKey(tmpKeyname, keyPassword);
 
       if (!(key instanceof RSAPrivateKey || key instanceof DSAPrivateKey
-          || key instanceof ECPrivateKey
-          || key instanceof EdDSAKey || key instanceof XDHKey)) {
+          || key instanceof ECPrivateKey || key instanceof EdDSAKey || key instanceof XDHKey)) {
         throw new XiSecurityException("unsupported key " + key.getClass().getName());
       }
 
@@ -157,8 +156,8 @@ public class KeypairWithCert {
       X509Cert[] certificateChain = X509Util.buildCertPath(cert, caCerts);
 
       return new KeypairWithCert(key, certificateChain);
-    } catch (KeyStoreException | NoSuchAlgorithmException
-        | UnrecoverableKeyException | ClassCastException | CertPathBuilderException ex) {
+    } catch (KeyStoreException | NoSuchAlgorithmException  | UnrecoverableKeyException
+             | ClassCastException | CertPathBuilderException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
   } // method fromKeystore

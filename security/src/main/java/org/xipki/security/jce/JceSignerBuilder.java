@@ -49,28 +49,19 @@ public class JceSignerBuilder {
 
   private final X509Cert[] certificateChain;
 
-  public JceSignerBuilder(
-          PrivateKey privateKey, PublicKey publicKey,
-          X509Cert[] certificateChain,
-          String providerName)
+  public JceSignerBuilder(PrivateKey privateKey, PublicKey publicKey, X509Cert[] certificateChain, String providerName)
       throws XiSecurityException {
     this(privateKey, publicKey, certificateChain, providerName, null);
   }
 
-  public JceSignerBuilder(
-          PrivateKey privateKey, PublicKey publicKey,
-          X509Cert[] certificateChain,
-          Provider provider)
-          throws XiSecurityException {
+  public JceSignerBuilder(PrivateKey privateKey, PublicKey publicKey, X509Cert[] certificateChain, Provider provider)
+      throws XiSecurityException {
     this(privateKey, publicKey, certificateChain, null, provider);
   }
 
-  private JceSignerBuilder(
-          PrivateKey privateKey, PublicKey publicKey,
-          X509Cert[] certificateChain,
-          String providerName,
-          Provider provider)
-          throws XiSecurityException {
+  private JceSignerBuilder(PrivateKey privateKey, PublicKey publicKey, X509Cert[] certificateChain,
+                           String providerName, Provider provider)
+      throws XiSecurityException {
     this.privateKey = notNull(privateKey, "privateKey");
     this.publicKey = notNull(publicKey, "publicKey");
     this.providerName = providerName;
@@ -96,9 +87,8 @@ public class JceSignerBuilder {
     this.certificateChain = chain;
   } // constructor
 
-  public ConcurrentContentSigner createSigner(SignAlgo signAlgo,
-      int parallelism)
-          throws XiSecurityException {
+  public ConcurrentContentSigner createSigner(SignAlgo signAlgo, int parallelism)
+      throws XiSecurityException {
     positive(parallelism, "parallelism");
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);

@@ -53,9 +53,9 @@ public class CmpUtil {
   private CmpUtil() {
   }
 
-  public static PKIMessage addProtection(PKIMessage pkiMessage, ConcurrentContentSigner signer,
-      GeneralName signerName, boolean addSignerCert)
-          throws CMPException, NoIdleSignerException {
+  public static PKIMessage addProtection(
+      PKIMessage pkiMessage, ConcurrentContentSigner signer, GeneralName signerName, boolean addSignerCert)
+      throws CMPException, NoIdleSignerException {
     notNull(pkiMessage, "pkiMessage");
     notNull(signer, "signer");
 
@@ -70,8 +70,7 @@ public class CmpUtil {
       tmpSignerName = new GeneralName(x500Name);
     }
 
-    ProtectedPKIMessageBuilder builder =
-        newProtectedPKIMessageBuilder(pkiMessage, tmpSignerName, null);
+    ProtectedPKIMessageBuilder builder = newProtectedPKIMessageBuilder(pkiMessage, tmpSignerName, null);
     if (addSignerCert) {
       X509CertificateHolder signerCert = signer.getCertificate().toBcCert();
       builder.addCMPCertificate(signerCert);
@@ -87,11 +86,10 @@ public class CmpUtil {
     return signedMessage.toASN1Structure();
   } // method addProtection
 
-  public static PKIMessage addProtection(PKIMessage pkiMessage, char[] password,
-      PBMParameter pbmParameter, GeneralName signerName, byte[] senderKid)
+  public static PKIMessage addProtection(
+      PKIMessage pkiMessage, char[] password, PBMParameter pbmParameter, GeneralName signerName, byte[] senderKid)
       throws CMPException {
-    ProtectedPKIMessageBuilder builder =
-        newProtectedPKIMessageBuilder(pkiMessage, signerName, senderKid);
+    ProtectedPKIMessageBuilder builder = newProtectedPKIMessageBuilder(pkiMessage, signerName, senderKid);
     ProtectedPKIMessage signedMessage;
     try {
       PKMACBuilder pkMacBuilder = new PKMACBuilder(new JcePKMACValuesCalculator());
@@ -106,8 +104,7 @@ public class CmpUtil {
   private static ProtectedPKIMessageBuilder newProtectedPKIMessageBuilder(PKIMessage pkiMessage,
       GeneralName sender, byte[] senderKid) {
     PKIHeader header = pkiMessage.getHeader();
-    ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
-        sender, header.getRecipient());
+    ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(sender, header.getRecipient());
     PKIFreeText freeText = header.getFreeText();
     if (freeText != null) {
       builder.setFreeText(freeText);
@@ -222,8 +219,7 @@ public class CmpUtil {
 
   public static AttributeTypeAndValue buildAttributeTypeAndValue(CmpUtf8Pairs utf8Pairs) {
     notNull(utf8Pairs, "utf8Pairs");
-    return new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
-        new DERUTF8String(utf8Pairs.encoded()));
+    return new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs, new DERUTF8String(utf8Pairs.encoded()));
   }
 
 }

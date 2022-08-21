@@ -92,18 +92,15 @@ class GrandCertTemplateBuilder {
   }
 
   GrantedCertTemplate create(
-      IdentifiedCertprofile certprofile,
-      CertTemplateData certTemplate,
-      List<KeypairGenerator> keypairGenerators,
-      boolean update)
+      IdentifiedCertprofile certprofile, CertTemplateData certTemplate,
+      List<KeypairGenerator> keypairGenerators, boolean update)
       throws OperationException {
     if (caInfo.getRevocationInfo() != null) {
       throw new OperationException(NOT_PERMITTED, "CA is revoked");
     }
 
     if (certprofile == null) {
-      throw new OperationException(UNKNOWN_CERT_PROFILE,
-          "unknown cert profile " + certTemplate.getCertprofileName());
+      throw new OperationException(UNKNOWN_CERT_PROFILE, "unknown cert profile " + certTemplate.getCertprofileName());
     }
 
     ConcurrentContentSigner signer = caInfo.getSigner(certprofile.getSignatureAlgorithms());
@@ -114,14 +111,12 @@ class GrandCertTemplateBuilder {
 
     final NameId certprofileIdent = certprofile.getIdent();
     if (certprofile.getVersion() != Certprofile.X509CertVersion.v3) {
-      throw new OperationException(SYSTEM_FAILURE,
-          "unknown cert version " + certprofile.getVersion());
+      throw new OperationException(SYSTEM_FAILURE, "unknown cert version " + certprofile.getVersion());
     }
 
     switch (certprofile.getCertLevel()) {
       case RootCA:
-        throw new OperationException(NOT_PERMITTED,
-            "CA is not allowed to generate Root CA certificate");
+        throw new OperationException(NOT_PERMITTED, "CA is not allowed to generate Root CA certificate");
       case SubCA:
         Integer reqPathlen = certprofile.getPathLenBasicConstraint();
         int caPathLen = caInfo.getPathLenConstraint();
@@ -146,8 +141,7 @@ class GrandCertTemplateBuilder {
       if (!certprofile.isSerialNumberInReqPermitted()) {
         RDN[] rdns = requestedSubject.getRDNs(ObjectIdentifiers.DN.SN);
         if (rdns != null && rdns.length > 0) {
-          throw new OperationException(BAD_CERT_TEMPLATE,
-              "subjectDN SerialNumber in request is not permitted");
+          throw new OperationException(BAD_CERT_TEMPLATE, "subjectDN SerialNumber in request is not permitted");
         }
       }
     }
@@ -164,8 +158,7 @@ class GrandCertTemplateBuilder {
 
     long time = caInfo.getNoNewCertificateAfter();
     if (grantedNotBefore.getTime() > time) {
-      throw new OperationException(NOT_PERMITTED,
-          "CA is not permitted to issue certificate after " + new Date(time));
+      throw new OperationException(NOT_PERMITTED, "CA is not permitted to issue certificate after " + new Date(time));
     }
 
     if (grantedNotBefore.before(caInfo.getNotBefore())) {
@@ -188,8 +181,7 @@ class GrandCertTemplateBuilder {
       if (grantedPublicKeyInfo.getAlgorithm().getAlgorithm().equals(
           PKCSObjectIdentifiers.rsaEncryption)) {
         try {
-          ASN1Sequence seq = ASN1Sequence.getInstance(
-              grantedPublicKeyInfo.getPublicKeyData().getOctets());
+          ASN1Sequence seq = ASN1Sequence.getInstance(grantedPublicKeyInfo.getPublicKeyData().getOctets());
           if (seq.size() != 2) {
             throw new OperationException(BAD_CERT_TEMPLATE, "invalid format of RSA public key");
           }
@@ -231,8 +223,7 @@ class GrandCertTemplateBuilder {
       }
 
       if (keypairGenerator == null) {
-        throw new OperationException(SYSTEM_FAILURE,
-            "found no keypair generator for keyspec " + keyspec);
+        throw new OperationException(SYSTEM_FAILURE, "found no keypair generator for keyspec " + keyspec);
       }
 
       String name = keypairGenerator.getName();
@@ -250,8 +241,7 @@ class GrandCertTemplateBuilder {
         ASN1BitString asn1PublicKeyData = privateKey.getPublicKeyData();
         try {
           privateKey = new PrivateKeyInfo(
-              new AlgorithmIdentifier(keyAlgOid,
-                  privateKey.getPrivateKeyAlgorithm().getParameters()),
+              new AlgorithmIdentifier(keyAlgOid, privateKey.getPrivateKeyAlgorithm().getParameters()),
               privateKey.getPrivateKey().toASN1Primitive(),
               privateKey.getAttributes(),
               asn1PublicKeyData == null ? null : asn1PublicKeyData.getOctets());
@@ -290,8 +280,7 @@ class GrandCertTemplateBuilder {
           throw new IllegalStateException("unknown key type " + keyType);
       }
 
-      grantedPublicKeyInfo = new SubjectPublicKeyInfo(privateKey.getPrivateKeyAlgorithm(),
-          publicKeyData);
+      grantedPublicKeyInfo = new SubjectPublicKeyInfo(privateKey.getPrivateKeyAlgorithm(), publicKeyData);
       try {
         grantedPublicKeyInfo = X509Util.toRfc3279Style(grantedPublicKeyInfo);
       } catch (InvalidKeySpecException ex) {
@@ -317,8 +306,7 @@ class GrandCertTemplateBuilder {
     try {
       subjectInfo = certprofile.getSubject(requestedSubject, grantedPublicKeyInfo);
     } catch (CertprofileException ex) {
-      throw new OperationException(SYSTEM_FAILURE,
-          "exception in cert profile " + certprofileIdent);
+      throw new OperationException(SYSTEM_FAILURE, "exception in cert profile " + certprofileIdent);
     } catch (BadCertTemplateException ex) {
       throw new OperationException(BAD_CERT_TEMPLATE, ex);
     }
@@ -329,8 +317,7 @@ class GrandCertTemplateBuilder {
       // For cross certificate, the original requested certificate must be used.
       if (!X509Util.canonicalizName(subjectInfo.getGrantedSubject())
           .equals(X509Util.canonicalizName(requestedSubject))) {
-        throw new OperationException(BAD_CERT_TEMPLATE,
-            "subject did not match the certificate profile");
+        throw new OperationException(BAD_CERT_TEMPLATE, "subject did not match the certificate profile");
       }
       grantedSubject = requestedSubject;
     } else {
@@ -350,13 +337,11 @@ class GrandCertTemplateBuilder {
     // make sure that the grantedSubject does not equal the CA's subject
     if (X509Util.canonicalizName(grantedSubject).equals(
         caInfo.getPublicCaInfo().getC14nSubject())) {
-      throw new OperationException(ALREADY_ISSUED,
-          "certificate with the same subject as CA is not allowed");
+      throw new OperationException(ALREADY_ISSUED, "certificate with the same subject as CA is not allowed");
     }
 
     if (update) {
-      CertStore.CertStatus certStatus =
-          certstore.getCertStatusForSubject(caInfo.getIdent(), grantedSubject);
+      CertStore.CertStatus certStatus = certstore.getCertStatusForSubject(caInfo.getIdent(), grantedSubject);
       if (certStatus == CertStore.CertStatus.REVOKED) {
         throw new OperationException(CERT_REVOKED);
       } else if (certStatus == CertStore.CertStatus.UNKNOWN) {
@@ -429,8 +414,7 @@ class GrandCertTemplateBuilder {
       warning = msgBuilder.substring(2);
     }
     GrantedCertTemplate gct = new GrantedCertTemplate(certTemplate.getExtensions(), certprofile,
-        grantedNotBefore, grantedNotAfter, requestedSubject, grantedPublicKeyInfo,
-        privateKey, signer, warning);
+        grantedNotBefore, grantedNotAfter, requestedSubject, grantedPublicKeyInfo, privateKey, signer, warning);
     gct.setGrantedSubject(grantedSubject);
     return gct;
 

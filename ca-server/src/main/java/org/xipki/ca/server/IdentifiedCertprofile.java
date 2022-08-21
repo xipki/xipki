@@ -131,8 +131,7 @@ public class IdentifiedCertprofile implements Closeable {
               && !containsRdn(subject, DN.givenName)
               && !containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:street is prohibited if the "
-                + "subject:organizationName field, subject:givenName, and subject:surname field "
-                + "are absent.");
+                + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
           }
         }
 
@@ -142,8 +141,7 @@ public class IdentifiedCertprofile implements Closeable {
               && !containsRdn(subject, DN.givenName)
               && !containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:localityName is prohibited if the "
-                + "subject:organizationName field, subject:givenName, and subject:surname field "
-                + "are absent.");
+                + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
           }
         } else {
           if (!containsRdn(subject, DN.ST)
@@ -162,8 +160,7 @@ public class IdentifiedCertprofile implements Closeable {
               && !containsRdn(subject, DN.givenName)
               && !containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:stateOrProvinceName is prohibited if the "
-                + "subject:organizationName field, subject:givenName, and subject:surname field "
-                + "are absent.");
+                + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
           }
         } else {
           if (!containsRdn(subject, DN.localityName)
@@ -182,8 +179,7 @@ public class IdentifiedCertprofile implements Closeable {
               && !containsRdn(subject, DN.givenName)
               && !containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:postalCode is prohibited if the "
-                + "subject:organizationName field, subject:givenName, and subject:surname field "
-                + "are absent.");
+                + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
           }
         }
 
@@ -193,8 +189,7 @@ public class IdentifiedCertprofile implements Closeable {
               || containsRdn(subject, DN.givenName)
               || containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:countryCode is required if the "
-                + "subject:organizationName field, subject:givenName, and subject:surname field "
-                + "are present");
+                + "subject:organizationName field, subject:givenName, and subject:surname field are present");
           }
         }
 
@@ -208,8 +203,7 @@ public class IdentifiedCertprofile implements Closeable {
             }
           }
         } else if (BaseRequirements.id_organization_validated.equals(policyId)) {
-          ASN1ObjectIdentifier[] includeSubjectFields = new ASN1ObjectIdentifier[] {
-              DN.O, DN.C};
+          ASN1ObjectIdentifier[] includeSubjectFields = new ASN1ObjectIdentifier[] {DN.O, DN.C};
           for (ASN1ObjectIdentifier m : includeSubjectFields) {
             if (!containsRdn(subject, m)) {
               throw new BadCertTemplateException("subject " + ObjectIdentifiers.getName(m)
@@ -222,8 +216,7 @@ public class IdentifiedCertprofile implements Closeable {
                 + "subject:stateOrProvinceName is required in organization validated certificate");
           }
         } else if (BaseRequirements.id_individual_validated.equals(policyId)) {
-          ASN1ObjectIdentifier[] includeSubjectFields = new ASN1ObjectIdentifier[] {
-              DN.C};
+          ASN1ObjectIdentifier[] includeSubjectFields = new ASN1ObjectIdentifier[] {DN.C};
           for (ASN1ObjectIdentifier m : includeSubjectFields) {
             if (!containsRdn(subject, m)) {
               throw new BadCertTemplateException("subject " + ObjectIdentifiers.getName(m)
@@ -234,8 +227,7 @@ public class IdentifiedCertprofile implements Closeable {
           if (!(containsRdn(subject, DN.O)
               || (containsRdn(subject, DN.givenName) && containsRdn(subject, DN.surname)))) {
             throw new BadCertTemplateException("at least one of subject:organizationName and "
-                + "(subject:givenName, subject:surName) is required in individual validated "
-                + "certificate");
+                + "(subject:givenName, subject:surName) is required in individual validated certificate");
           }
 
           if (!(containsRdn(subject, DN.localityName) || containsRdn(subject, DN.ST))) {
@@ -244,12 +236,10 @@ public class IdentifiedCertprofile implements Closeable {
           }
         }
       } else {
-        ASN1ObjectIdentifier[] requiredTypes = new ASN1ObjectIdentifier[] {
-            DN.CN, DN.O, DN.C};
+        ASN1ObjectIdentifier[] requiredTypes = new ASN1ObjectIdentifier[] {DN.CN, DN.O, DN.C};
         for (ASN1ObjectIdentifier m : requiredTypes) {
           if (!containsRdn(subject, DN.CN)) {
-            throw new BadCertTemplateException("missing " + ObjectIdentifiers.getName(m)
-              + " in subject");
+            throw new BadCertTemplateException("missing " + ObjectIdentifiers.getName(m) + " in subject");
           }
         }
       }
@@ -308,15 +298,15 @@ public class IdentifiedCertprofile implements Closeable {
    *          NotAfter. Must not be {@code null}.
    * @return the extensions of the certificate to be issued.
    */
-  public ExtensionValues getExtensions(X500Name requestedSubject, X500Name grantedSubject,
-      Extensions requestedExtensions, SubjectPublicKeyInfo publicKeyInfo, PublicCaInfo publicCaInfo,
-      X509Cert crlSignerCert, Date notBefore, Date notAfter)
+  public ExtensionValues getExtensions(
+      X500Name requestedSubject, X500Name grantedSubject, Extensions requestedExtensions,
+      SubjectPublicKeyInfo publicKeyInfo, PublicCaInfo publicCaInfo, X509Cert crlSignerCert,
+      Date notBefore, Date notAfter)
       throws CertprofileException, BadCertTemplateException {
     notNull(publicKeyInfo, "publicKeyInfo");
     ExtensionValues values = new ExtensionValues();
 
-    Map<ASN1ObjectIdentifier, ExtensionControl> controls
-        = new HashMap<>(certprofile.getExtensionControls());
+    Map<ASN1ObjectIdentifier, ExtensionControl> controls = new HashMap<>(certprofile.getExtensionControls());
 
     // CTLog extension will be processed by the CA
     controls.remove(Extn.id_SCTs);
@@ -343,8 +333,7 @@ public class IdentifiedCertprofile implements Closeable {
       if (reqExtn == null) {
         value = certprofile.getSubjectKeyIdentifier(publicKeyInfo);
       } else {
-        value = new SubjectKeyIdentifier(
-            SubjectKeyIdentifier.getInstance(reqExtn.getParsedValue()).getKeyIdentifier());
+        value = new SubjectKeyIdentifier(SubjectKeyIdentifier.getInstance(reqExtn.getParsedValue()).getKeyIdentifier());
       }
       addExtension(values, extType, value, extControl);
     }
@@ -355,8 +344,7 @@ public class IdentifiedCertprofile implements Closeable {
     if (extControl != null) {
       AuthorityKeyIdentifier value = null;
       if (certprofile.useIssuerAndSerialInAki()) {
-        GeneralNames x509CaIssuer = new GeneralNames(
-            new GeneralName(publicCaInfo.getIssuer()));
+        GeneralNames x509CaIssuer = new GeneralNames(new GeneralName(publicCaInfo.getIssuer()));
         value = new AuthorityKeyIdentifier(x509CaIssuer, publicCaInfo.getSerialNumber());
       } else {
         byte[] ikiValue = publicCaInfo.getSubjectKeyIdentifer();
@@ -398,8 +386,7 @@ public class IdentifiedCertprofile implements Closeable {
 
       AuthorityInformationAccess value = null;
       if (CollectionUtil.isNotEmpty(caIssuers) || CollectionUtil.isNotEmpty(ocspUris)) {
-        value = CaUtil.createAuthorityInformationAccess(
-            caIssuers, ocspUris);
+        value = CaUtil.createAuthorityInformationAccess(caIssuers, ocspUris);
       }
       addExtension(values, extType, value, extControl);
     }
@@ -419,8 +406,7 @@ public class IdentifiedCertprofile implements Closeable {
           CrlDistributionPointsControl control = certprofile.getCrlDpControl();
           Set<String> protocols = control == null ? null : control.getProtocols();
           assertAllUrisHasProtocol(uris, protocols);
-          value = CaUtil.createCrlDistributionPoints(uris,
-              x500CaPrincipal, crlSignerSubject);
+          value = CaUtil.createCrlDistributionPoints(uris, x500CaPrincipal, crlSignerSubject);
         }
         addExtension(values, extType, value, extControl);
       }
@@ -435,8 +421,7 @@ public class IdentifiedCertprofile implements Closeable {
           CrlDistributionPointsControl control = certprofile.getFreshestCrlControl();
           Set<String> protocols = control == null ? null : control.getProtocols();
           assertAllUrisHasProtocol(uris, protocols);
-          value = CaUtil.createCrlDistributionPoints(caUris.getDeltaCrlUris(),
-              x500CaPrincipal, crlSignerSubject);
+          value = CaUtil.createCrlDistributionPoints(caUris.getDeltaCrlUris(), x500CaPrincipal, crlSignerSubject);
         }
         addExtension(values, extType, value, extControl);
       }
@@ -446,8 +431,8 @@ public class IdentifiedCertprofile implements Closeable {
     extType = Extension.basicConstraints;
     extControl = controls.remove(extType);
     if (extControl != null) {
-      BasicConstraints value = CaUtil.createBasicConstraints(certprofile.getCertLevel(),
-          certprofile.getPathLenBasicConstraint());
+      BasicConstraints value = CaUtil.createBasicConstraints(
+          certprofile.getCertLevel(), certprofile.getPathLenBasicConstraint());
       addExtension(values, extType, value, extControl);
     }
 
@@ -487,8 +472,7 @@ public class IdentifiedCertprofile implements Closeable {
 
       if (extControl.isCritical()
           && usages.contains(ObjectIdentifiers.XKU.id_kp_anyExtendedKeyUsage)) {
-        extControl = new ExtensionControl(false, extControl.isRequired(),
-            extControl.isRequest());
+        extControl = new ExtensionControl(false, extControl.isRequired(), extControl.isRequest());
       }
 
       if (!extControl.isCritical() && usages.contains(ObjectIdentifiers.XKU.id_kp_timeStamping)) {
@@ -511,8 +495,7 @@ public class IdentifiedCertprofile implements Closeable {
     extType = Extension.subjectInfoAccess;
     extControl = controls.remove(extType);
     if (extControl != null) {
-      ASN1Sequence value = createSubjectInfoAccess(requestedExtns,
-            certprofile.getSubjectInfoAccessModes());
+      ASN1Sequence value = createSubjectInfoAccess(requestedExtns, certprofile.getSubjectInfoAccessModes());
       addExtension(values, extType, value, extControl);
     }
 
@@ -553,8 +536,7 @@ public class IdentifiedCertprofile implements Closeable {
 
     if (CollectionUtil.isNotEmpty(unprocessedExtTypes)) {
       throw new CertprofileException(
-          "could not add required extensions "
-          + CertprofileUtil.toString(unprocessedExtTypes));
+          "could not add required extensions " + CertprofileUtil.toString(unprocessedExtTypes));
     }
 
     // Check the SubjectAltNames
@@ -623,13 +605,10 @@ public class IdentifiedCertprofile implements Closeable {
                   if (blen == 1 | blen == 2) {
                     commonNameBytes[i * 2 + 1] = (byte) Integer.parseInt(block, 16);
                   } else if (blen == 3 | blen == 4) {
-                    commonNameBytes[i * 2] =
-                        (byte) Integer.parseInt(block.substring(0, blen - 2), 16);
-                    commonNameBytes[i * 2 + 1] =
-                        (byte) Integer.parseInt(block.substring(blen - 2), 16);
+                    commonNameBytes[i * 2] = (byte) Integer.parseInt(block.substring(0, blen - 2), 16);
+                    commonNameBytes[i * 2 + 1] = (byte) Integer.parseInt(block.substring(blen - 2), 16);
                   } else if(blen != 0) {
-                    throw new BadCertTemplateException(
-                        "invalid IP address in commonName " + commonName);
+                    throw new BadCertTemplateException("invalid IP address in commonName " + commonName);
                   }
                 }
 
@@ -639,8 +618,7 @@ public class IdentifiedCertprofile implements Closeable {
               }
             }
           } else {
-            throw new BadCertTemplateException(
-                "invalid IP address " + Hex.toHexString(octets));
+            throw new BadCertTemplateException("invalid IP address " + Hex.toHexString(octets));
           }
         }
       }
@@ -655,7 +633,7 @@ public class IdentifiedCertprofile implements Closeable {
   } // method getExtensions
 
   private static void assertAllUrisHasProtocol(List<String> uris, Set<String> protocols)
-          throws CertprofileException {
+      throws CertprofileException {
     if (protocols == null || uris == null) {
       return;
     }
@@ -670,8 +648,7 @@ public class IdentifiedCertprofile implements Closeable {
       }
 
       if (!validUri) {
-        throw new CertprofileException(
-                "URL '" + uri + "' does not have any of protocols " + protocols);
+        throw new CertprofileException("URL '" + uri + "' does not have any of protocols " + protocols);
       }
     }
   }
@@ -689,14 +666,10 @@ public class IdentifiedCertprofile implements Closeable {
   }
 
   public BigInteger generateSerialNumber(
-          X500Name caSubject,
-          SubjectPublicKeyInfo caPublicKeyInfo,
-          X500Name requestSubject,
-          SubjectPublicKeyInfo publicKeyInfo,
-          ConfPairs caExtraControl)
-          throws CertprofileException {
-    return certprofile.generateSerialNumber(caSubject, caPublicKeyInfo,
-            requestSubject, publicKeyInfo, caExtraControl);
+          X500Name caSubject, SubjectPublicKeyInfo caPublicKeyInfo, X500Name requestSubject,
+          SubjectPublicKeyInfo publicKeyInfo, ConfPairs caExtraControl)
+      throws CertprofileException {
+    return certprofile.generateSerialNumber(caSubject, caPublicKeyInfo, requestSubject, publicKeyInfo, caExtraControl);
   }
 
   public SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)

@@ -66,12 +66,11 @@ class H2nChecker extends ExtensionChecker {
     super(parent);
   }
 
-  void checkExtnInhibitAnyPolicy(StringBuilder failureMsg, byte[] extensionValue,
-      Extensions requestedExtns, ExtensionControl extControl) {
+  void checkExtnInhibitAnyPolicy(
+      StringBuilder failureMsg, byte[] extensionValue, Extensions requestedExtns, ExtensionControl extControl) {
     InhibitAnyPolicy conf = caller.getInhibitAnyPolicy();
     if (conf == null) {
-      caller.checkConstantExtnValue(Extension.inhibitAnyPolicy, failureMsg, extensionValue,
-          requestedExtns, extControl);
+      caller.checkConstantExtnValue(Extension.inhibitAnyPolicy, failureMsg, extensionValue, requestedExtns, extControl);
       return;
     }
 
@@ -82,8 +81,7 @@ class H2nChecker extends ExtensionChecker {
     }
   } // method checkExtnInhibitAnyPolicy
 
-  void checkExtnIssuerAltNames(StringBuilder failureMsg, byte[] extensionValue,
-      IssuerInfo issuerInfo) {
+  void checkExtnIssuerAltNames(StringBuilder failureMsg, byte[] extensionValue, IssuerInfo issuerInfo) {
     byte[] caSubjectAltExtensionValue = issuerInfo.getCert().getExtensionCoreValue(
         Extension.subjectAlternativeName);
     if (caSubjectAltExtensionValue == null) {
@@ -92,13 +90,12 @@ class H2nChecker extends ExtensionChecker {
     }
 
     if (!Arrays.equals(caSubjectAltExtensionValue, extensionValue)) {
-      addViolation(failureMsg, "issuerAltNames", hex(extensionValue),
-          hex(caSubjectAltExtensionValue));
+      addViolation(failureMsg, "issuerAltNames", hex(extensionValue), hex(caSubjectAltExtensionValue));
     }
   } // method checkExtnIssuerAltNames
 
-  void checkExtnKeyUsage(StringBuilder failureMsg,
-      boolean[] usages, Extensions requestedExtns, ExtensionControl extnControl) {
+  void checkExtnKeyUsage(
+      StringBuilder failureMsg, boolean[] usages, Extensions requestedExtns, ExtensionControl extnControl) {
     int len = usages.length;
 
     if (len > 9) {
@@ -166,13 +163,12 @@ class H2nChecker extends ExtensionChecker {
     return ret;
   } // method getKeyusage
 
-  void checkExtnNameConstraints(StringBuilder failureMsg, byte[] extnValue,
-      Extensions requestedExtns, ExtensionControl extnControl) {
+  void checkExtnNameConstraints(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns, ExtensionControl extnControl) {
     NameConstraints nameConstraints = caller.getNameConstraints();
 
     if (nameConstraints == null) {
-      caller.checkConstantExtnValue(Extension.nameConstraints,
-          failureMsg, extnValue, requestedExtns, extnControl);
+      caller.checkConstantExtnValue(Extension.nameConstraints, failureMsg, extnValue, requestedExtns, extnControl);
       return;
     }
 
@@ -185,8 +181,9 @@ class H2nChecker extends ExtensionChecker {
         tmpNameConstraints.getExcludedSubtrees(), nameConstraints.getExcludedSubtrees());
   } // method checkExtnNameConstraints
 
-  private void checkExtnNameConstraintsSubtrees(StringBuilder failureMsg, String description,
-      GeneralSubtree[] subtrees, List<GeneralSubtreeType> expectedSubtrees) {
+  private void checkExtnNameConstraintsSubtrees(
+      StringBuilder failureMsg, String description, GeneralSubtree[] subtrees,
+      List<GeneralSubtreeType> expectedSubtrees) {
     int isSize = (subtrees == null) ? 0 : subtrees.length;
     int expSize = (expectedSubtrees == null) ? 0 : expectedSubtrees.size();
     if (isSize != expSize) {
@@ -223,9 +220,7 @@ class H2nChecker extends ExtensionChecker {
 
       GeneralName expBase;
       if (expSubtree.getBase().getDirectoryName() != null) {
-        expBase = new GeneralName(
-            X509Util.reverse(
-                new X500Name(expBase0.getDirectoryName())));
+        expBase = new GeneralName(X509Util.reverse(new X500Name(expBase0.getDirectoryName())));
       } else if (expBase0.getDnsName() != null) {
         expBase = new GeneralName(GeneralName.dNSName, expBase0.getDnsName());
       } else if (expBase0.getIpAddress() != null) {

@@ -79,7 +79,8 @@ public class ExtendedExtension extends Extension {
     arraycopy(extnValue, encoded, offset);
   }
 
-  private ExtendedExtension(OID extnType, byte[] encoded, int from, boolean critical,
+  private ExtendedExtension(
+      OID extnType, byte[] encoded, int from, boolean critical,
       int encodedLength, int extnValueFrom, int extnValueLength) {
     super();
     this.extnType = extnType;
@@ -176,8 +177,7 @@ public class ExtendedExtension extends Extension {
   }
 
   public ExtendedExtension revertCritical() {
-    byte[] extnValue = Arrays.copyOfRange(encoded,
-                        extnValueFrom, extnValueFrom + extnValueLength);
+    byte[] extnValue = Arrays.copyOfRange(encoded, extnValueFrom, extnValueFrom + extnValueLength);
     return new ExtendedExtension(extnType, !critical, extnValue);
   }
 

@@ -50,8 +50,7 @@ class ProxyP11Identity extends P11Identity {
     this.asn1KeyId = new ObjectIdentifier(identityId.getKeyId());
   }
 
-  ProxyP11Identity(ProxyP11Slot slot, P11IdentityId identityId, PublicKey publicKey,
-      X509Cert[] certificateChain) {
+  ProxyP11Identity(ProxyP11Slot slot, P11IdentityId identityId, PublicKey publicKey, X509Cert[] certificateChain) {
     super(slot, identityId, publicKey, certificateChain);
     this.asn1KeyId = new ObjectIdentifier(identityId.getKeyId());
   }
@@ -81,8 +80,7 @@ class ProxyP11Identity extends P11Identity {
 
     SignTemplate signTemplate = new SignTemplate(
         ((ProxyP11Slot) slot).getAsn1SlotId(), asn1KeyId, mechanism, p11Param, content);
-    byte[] result = ((ProxyP11Slot) slot).getModule().send(P11ProxyConstants.ACTION_SIGN,
-        signTemplate);
+    byte[] result = ((ProxyP11Slot) slot).getModule().send(P11ProxyConstants.ACTION_SIGN, signTemplate);
 
     ASN1OctetString octetString;
     try {
@@ -98,10 +96,8 @@ class ProxyP11Identity extends P11Identity {
   protected byte[] digestSecretKey0(long mechanism)
       throws P11TokenException {
     DigestSecretKeyTemplate template =
-        new DigestSecretKeyTemplate(
-            ((ProxyP11Slot) slot).getAsn1SlotId(), asn1KeyId, mechanism);
-    byte[] result = ((ProxyP11Slot) slot).getModule().send(
-        P11ProxyConstants.ACTION_DIGEST_SECRETKEY, template);
+        new DigestSecretKeyTemplate(((ProxyP11Slot) slot).getAsn1SlotId(), asn1KeyId, mechanism);
+    byte[] result = ((ProxyP11Slot) slot).getModule().send(P11ProxyConstants.ACTION_DIGEST_SECRETKEY, template);
 
     ASN1OctetString octetString;
     try {

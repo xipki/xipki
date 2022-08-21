@@ -72,8 +72,7 @@ public class CaUtil {
   public static BasicConstraints createBasicConstraints(CertLevel level, Integer pathLen) {
     BasicConstraints basicConstraints;
     if (level == CertLevel.RootCA || level == CertLevel.SubCA) {
-      basicConstraints = (pathLen != null)  ? new BasicConstraints(pathLen)
-          : new BasicConstraints(true);
+      basicConstraints = (pathLen != null)  ? new BasicConstraints(pathLen) : new BasicConstraints(true);
     } else if (level == CertLevel.EndEntity) {
       basicConstraints = new BasicConstraints(false);
     } else {
@@ -93,8 +92,7 @@ public class CaUtil {
     if (CollectionUtil.isNotEmpty(caIssuerUris)) {
       for (String uri : caIssuerUris) {
         GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
-        accessDescriptions.add(
-            new AccessDescription(X509ObjectIdentifiers.id_ad_caIssuers, gn));
+        accessDescriptions.add(new AccessDescription(X509ObjectIdentifiers.id_ad_caIssuers, gn));
       }
     }
 
@@ -170,7 +168,7 @@ public class CaUtil {
   } // method getRdns
 
   public static String canonicalizeSignerConf(String signerConf)
-          throws CaMgmtException {
+      throws CaMgmtException {
     if (!signerConf.contains("file:") && !signerConf.contains("base64:")) {
       return signerConf;
     }
@@ -207,9 +205,8 @@ public class CaUtil {
     return pairs.getEncoded();
   } // method canonicalizeSignerConf
 
-  public static FileOrValue createFileOrValue(ZipOutputStream zipStream,
-      String content, String fileName)
-          throws IOException {
+  public static FileOrValue createFileOrValue(ZipOutputStream zipStream, String content, String fileName)
+      throws IOException {
     if (StringUtil.isBlank(content)) {
       return null;
     }
@@ -230,9 +227,8 @@ public class CaUtil {
     return ret;
   } // method createFileOrValue
 
-  public static FileOrBinary createFileOrBase64Value(ZipOutputStream zipStream,
-      String b64Content, String fileName)
-          throws IOException {
+  public static FileOrBinary createFileOrBase64Value(ZipOutputStream zipStream, String b64Content, String fileName)
+      throws IOException {
     if (StringUtil.isBlank(b64Content)) {
       return null;
     }
@@ -240,9 +236,8 @@ public class CaUtil {
     return createFileOrBinary(zipStream, Base64.decode(b64Content), fileName);
   } // method createFileOrBase64Value
 
-  public static FileOrBinary createFileOrBinary(ZipOutputStream zipStream,
-      byte[] content, String fileName)
-          throws IOException {
+  public static FileOrBinary createFileOrBinary(ZipOutputStream zipStream, byte[] content, String fileName)
+      throws IOException {
     if (content == null || content.length == 0) {
       return null;
     }
@@ -287,9 +282,8 @@ public class CaUtil {
     }
   } // method encodeCertchain
 
-  public static List<X509Cert> buildCertChain(X509Cert targetCert,
-      List<X509Cert> certs)
-          throws CaMgmtException {
+  public static List<X509Cert> buildCertChain(X509Cert targetCert, List<X509Cert> certs)
+      throws CaMgmtException {
     X509Cert[] certchain;
     try {
       certchain = X509Util.buildCertPath(targetCert, certs, false);

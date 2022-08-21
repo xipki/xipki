@@ -61,13 +61,11 @@ public class FillKeytool {
 
   private final PasswordResolver passwordResolver;
 
-  public FillKeytool(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
-                     String dbConfFile)
+  public FillKeytool(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String dbConfFile)
       throws PasswordResolverException, IOException {
     this.passwordResolver = passwordResolver;
     try (InputStream dbConfStream = new FileInputStream(IoUtil.expandFilepath(dbConfFile))) {
-      this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, dbConfStream,
-          passwordResolver);
+      this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, dbConfStream, passwordResolver);
     }
   }
 
@@ -90,8 +88,7 @@ public class FillKeytool {
       throw new IllegalArgumentException("invalid encAlg " + encAlg);
     }
 
-    KeySpec spec = new PBEKeySpec(password, "ENC".getBytes(StandardCharsets.UTF_8),
-        10000, keyLength);
+    KeySpec spec = new PBEKeySpec(password, "ENC".getBytes(StandardCharsets.UTF_8), 10000, keyLength);
     SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
     SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
     Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");

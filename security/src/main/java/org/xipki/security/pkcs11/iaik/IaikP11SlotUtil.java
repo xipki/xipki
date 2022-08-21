@@ -88,8 +88,7 @@ class IaikP11SlotUtil {
         LOG.info("user already logged in");
       } else {
         LOG.info("login failed as user " + userTypeText);
-        throw new P11TokenException(
-            "login failed as user " + userTypeText + ": " + ex.getMessage(), ex);
+        throw new P11TokenException("login failed as user " + userTypeText + ": " + ex.getMessage(), ex);
       }
     }
   } // method singleLogin
@@ -140,9 +139,8 @@ class IaikP11SlotUtil {
     return ret;
   } // method getMechanism
 
-  static X509PublicKeyCertificate getCertificateObject(Session session, byte[] keyId,
-      char[] keyLabel)
-          throws P11TokenException {
+  static X509PublicKeyCertificate getCertificateObject(Session session, byte[] keyId, char[] keyLabel)
+      throws P11TokenException {
     X509PublicKeyCertificate[] certs = getCertificateObjects(session, keyId, keyLabel);
 
     if (isEmpty(certs)) {
@@ -152,8 +150,7 @@ class IaikP11SlotUtil {
 
     int size = certs.length;
     if (size > 1) {
-      LOG.warn("found {} public key identified by {}, use the first one", size,
-          getDescription(keyId, keyLabel));
+      LOG.warn("found {} public key identified by {}, use the first one", size, getDescription(keyId, keyLabel));
     }
 
     return certs[0];
@@ -184,8 +181,7 @@ class IaikP11SlotUtil {
     if (userType == PKCS11Constants.CKU_SO) {
       sessionLoggedIn = state.equals(State.RW_SO_FUNCTIONS);
     } else {
-      sessionLoggedIn = state.equals(State.RW_USER_FUNCTIONS)
-          || state.equals(State.RO_USER_FUNCTIONS);
+      sessionLoggedIn = state.equals(State.RW_USER_FUNCTIONS) || state.equals(State.RO_USER_FUNCTIONS);
     }
 
     LOG.debug("sessionLoggedIn: {}", sessionLoggedIn);
@@ -286,8 +282,7 @@ class IaikP11SlotUtil {
       ASN1ObjectIdentifier curveOid = ASN1ObjectIdentifier.getInstance(ecParameters);
 
       // some HSM does not return the standard conform ECPoint
-      if (keyType == KeyType.VENDOR_SM2
-        || keyType == KeyType.EC) {
+      if (keyType == KeyType.VENDOR_SM2 || keyType == KeyType.EC) {
         int coordSize;
         if (GMObjectIdentifiers.sm2p256v1.equals(curveOid)
                 || SECObjectIdentifiers.secp256r1.equals(curveOid)
@@ -328,8 +323,7 @@ class IaikP11SlotUtil {
             throw new XiSecurityException("unknown Montgomery curve OID " + curveOid);
           }
         }
-        SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(new AlgorithmIdentifier(curveOid),
-            encodedPoint);
+        SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(new AlgorithmIdentifier(curveOid), encodedPoint);
         try {
           return KeyUtil.generatePublicKey(pkInfo);
         } catch (InvalidKeySpecException ex) {
@@ -384,8 +378,7 @@ class IaikP11SlotUtil {
     }
   } // method removeObjects
 
-  static void setKeyAttributes(P11NewKeyControl control,
-      SecretKey template, char[] label) {
+  static void setKeyAttributes(P11NewKeyControl control, SecretKey template, char[] label) {
     template.getToken().setBooleanValue(true);
     if (label != null) {
       template.getLabel().setCharArrayValue(label);
@@ -416,9 +409,8 @@ class IaikP11SlotUtil {
     }
   }
 
-  static X509PublicKeyCertificate[] getCertificateObjects(Session session, byte[] keyId,
-      char[] keyLabel)
-          throws P11TokenException {
+  static X509PublicKeyCertificate[] getCertificateObjects(Session session, byte[] keyId, char[] keyLabel)
+      throws P11TokenException {
     X509PublicKeyCertificate template = new X509PublicKeyCertificate();
     if (keyId != null) {
       template.getId().setByteArrayValue(keyId);

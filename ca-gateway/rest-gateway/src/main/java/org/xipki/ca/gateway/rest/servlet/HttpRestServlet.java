@@ -78,12 +78,10 @@ public class HttpRestServlet extends HttpServlet {
       String path = req.getServletPath();
       byte[] requestBytes = viaPost ? IoUtil.read(req.getInputStream()) : null;
 
-      RestResponse restResp = responder.service(path, requestBytes,
-          new HttpRequestMetadataRetrieverImpl(req), event);
+      RestResponse restResp = responder.service(path, requestBytes, new HttpRequestMetadataRetrieverImpl(req), event);
       restResp.fillResponse(resp);
 
-      ServletHelper.logReqResp("REST Gateway", LOG, logReqResp, true, req,
-          requestBytes, restResp.getBody());
+      ServletHelper.logReqResp("REST Gateway", LOG, logReqResp, true, req, requestBytes, restResp.getBody());
 
       if (event.getStatus() == null) {
         event.setStatus(AuditStatus.SUCCESSFUL);

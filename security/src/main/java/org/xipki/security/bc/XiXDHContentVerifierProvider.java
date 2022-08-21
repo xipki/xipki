@@ -156,8 +156,7 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
       keyAgreement.init(ownerKeyAndCert.getPrivateKey());
       keyAgreement.doPhase(verifyKey, true);
       zz = keyAgreement.generateSecret();
-    } catch (NoSuchAlgorithmException | NoSuchProviderException
-        | InvalidKeyException | IllegalStateException ex) {
+    } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException | IllegalStateException ex) {
       throw new InvalidKeyException("KeyChange error", ex);
     }
 
@@ -186,8 +185,7 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
       throws OperatorCreationException {
     ASN1ObjectIdentifier oid = verifierAlgorithmIdentifier.getAlgorithm();
     if (!this.sigAlgOid.equals(oid)) {
-      throw new OperatorCreationException(
-          "given public key is not suitable for the alogithm " + oid.getId());
+      throw new OperatorCreationException("given public key is not suitable for the alogithm " + oid.getId());
     }
 
     Mac hmac;

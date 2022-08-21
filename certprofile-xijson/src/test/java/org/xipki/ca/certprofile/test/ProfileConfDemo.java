@@ -96,8 +96,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign},
-        null));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign},  null));
 
     marshall(profile, destFilename, true);
   } // method certprofileRootCa
@@ -133,8 +132,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(
-            new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null));
 
     marshall(profile, destFilename, true);
   } // method certprofileCross
@@ -173,15 +171,13 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign},
-        null));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null));
 
     marshall(profile, destFilename, true);
   } // method certprofileSubCa
 
   private static void certprofileOcsp(String destFilename) {
-    X509ProfileType profile = getBaseProfile("certprofile ocsp", CertLevel.EndEntity, "5y",
-        true);
+    X509ProfileType profile = getBaseProfile("certprofile ocsp", CertLevel.EndEntity, "5y", true);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -200,8 +196,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
     list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
     list.add(createExtension(Extension.freshestCRL, false, false, null));
-    list.add(createExtension(
-              Extn.id_extension_pkix_ocsp_nocheck, false, false, null));
+    list.add(createExtension(Extn.id_extension_pkix_ocsp_nocheck, false, false, null));
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, true));
@@ -215,8 +210,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.contentCommitment},
-        null));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.contentCommitment}, null));
 
     // Extensions - extendedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
@@ -315,8 +309,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment},
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment},
         null));
 
     // Extensions - extendedKeyUsage
@@ -391,8 +384,8 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileTlsEdwardsOrMontgomery
 
-  private static void certprofileTls(String destFilename,
-                                     KeypairGenerationType.KeyType kpgKeyType, boolean sm2) {
+  private static void certprofileTls(
+      String destFilename, KeypairGenerationType.KeyType kpgKeyType, boolean sm2) {
     String desc = "certprofile tls";
     X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", true, false);
 
@@ -483,8 +476,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment},
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment},
         null));
 
     // Extensions - extendedKeyUsage
@@ -529,8 +521,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment},
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment},
         null));
 
     // Extensions - extendedKeyUsage
@@ -576,8 +567,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment},
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment},
         null));
 
     marshall(profile, destFilename, true);
@@ -621,8 +611,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment},
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment},
         null));
 
     // Extensions - extendedKeyUsage

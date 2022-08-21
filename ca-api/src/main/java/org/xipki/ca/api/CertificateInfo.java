@@ -54,7 +54,8 @@ public class CertificateInfo {
 
   private boolean alreadyIssued;
 
-  public CertificateInfo(CertWithDbId cert, PrivateKeyInfo privateKey, NameId issuer,
+  public CertificateInfo(
+      CertWithDbId cert, PrivateKeyInfo privateKey, NameId issuer,
       X509Cert issuerCert, NameId profile, NameId requestor) {
     this.profile = Args.notNull(profile, "profile");
     this.cert = Args.notNull(cert, "cert");

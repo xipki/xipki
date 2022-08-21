@@ -140,7 +140,7 @@ public class CertRevocationInfo {
   @Override
   public int hashCode() {
     return reason.hashCode() + 31 * revocationTime.hashCode()
-            + (invalidityTime == null ? 0 : 31 * 31 * invalidityTime.hashCode());
+        + (invalidityTime == null ? 0 : 31 * 31 * invalidityTime.hashCode());
   }
 
   @Override

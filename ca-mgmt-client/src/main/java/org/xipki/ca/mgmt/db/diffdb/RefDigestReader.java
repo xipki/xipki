@@ -204,16 +204,14 @@ class RefDigestReader implements Closeable {
             null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'");
         if (certhashAlgo != HashAlgo.getInstance(certHashAlgoInDb)) {
           throw new IllegalArgumentException(
-              "certHashAlgo in parameter (" + certhashAlgo + ") != in DB ("
-                  + certHashAlgoInDb + ")");
+              "certHashAlgo in parameter (" + certhashAlgo + ") != in DB (" + certHashAlgoInDb + ")");
         }
 
         coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=",
             Integer.toString(caId), " AND ID>=?");
         break;
       default:
-        coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,",
-            (certhashAlgo == HashAlgo.SHA1 ? "SHA1" : "CERT"),
+        coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,", (certhashAlgo == HashAlgo.SHA1 ? "SHA1" : "CERT"),
             " FROM CERT WHERE CA_ID=", Integer.toString(caId), " AND ID>=?");
         break;
     }
@@ -237,8 +235,9 @@ class RefDigestReader implements Closeable {
     return caId;
   }
 
-  public static RefDigestReader getInstance(DataSourceWrapper datasource, DbType dbType,
-      HashAlgo certhashAlgo, int caId, int numBlocksToRead, int numPerSelect, AtomicBoolean stopMe)
+  public static RefDigestReader getInstance(
+      DataSourceWrapper datasource, DbType dbType, HashAlgo certhashAlgo, int caId,
+      int numBlocksToRead, int numPerSelect, AtomicBoolean stopMe)
       throws Exception {
     Args.notNull(datasource, "datasource");
 
@@ -272,8 +271,7 @@ class RefDigestReader implements Closeable {
         throw new IllegalArgumentException("no CA with id '" + caId + "' is available");
       }
 
-      caCert = X509Util.parseCert(
-          StringUtil.toUtf8Bytes(rs.getString("CERT")));
+      caCert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
       rs.close();
 
       sql = "SELECT COUNT(*) FROM CERT WHERE " + colCaId + "=" + caId;
@@ -286,8 +284,7 @@ class RefDigestReader implements Closeable {
       rs = stmt.executeQuery(sql);
       minId = rs.next() ? rs.getLong(1) : 1;
 
-      RefDigestReader reader = new RefDigestReader(datasource, caCert,
-          totalAccount, minId, numBlocksToRead, stopMe);
+      RefDigestReader reader = new RefDigestReader(datasource, caCert, totalAccount, minId, numBlocksToRead, stopMe);
       reader.init(dbType, certhashAlgo, caId, numPerSelect);
       return reader;
     } catch (SQLException ex) {

@@ -68,8 +68,7 @@ public class P11MacContentSignerBuilder {
     }
 
     try {
-      byte[] sha1HashOfKey = cryptService.getIdentity(identityId).digestSecretKey(
-          PKCS11Constants.CKM_SHA_1);
+      byte[] sha1HashOfKey = cryptService.getIdentity(identityId).digestSecretKey(PKCS11Constants.CKM_SHA_1);
       concurrentSigner.setSha1DigestOfMacKey(sha1HashOfKey);
     } catch (P11TokenException | XiSecurityException ex) {
       LogUtil.warn(LOG, ex, "could not compute the digest of secret key " + identityId);

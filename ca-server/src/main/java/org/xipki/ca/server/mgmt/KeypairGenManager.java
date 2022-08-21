@@ -152,8 +152,7 @@ class KeypairGenManager {
       type = type.toLowerCase();
     }
 
-    KeypairGenEntryWrapper newKeypairGen = manager.queryExecutor.changeKeypairGen(
-        name, type, conf, manager);
+    KeypairGenEntryWrapper newKeypairGen = manager.queryExecutor.changeKeypairGen(name, type, conf, manager);
 
     manager.keypairGens.remove(name);
     manager.keypairGenDbEntries.remove(name);

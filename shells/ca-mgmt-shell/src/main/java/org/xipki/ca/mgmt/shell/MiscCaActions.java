@@ -130,8 +130,7 @@ public class MiscCaActions {
   @Service
   public static class LoadConf extends CaAction {
 
-    @Option(name = "--conf-file", required = true,
-            description = "CA system configuration file (JSON or zip file)")
+    @Option(name = "--conf-file", required = true, description = "CA system configuration file (JSON or zip file)")
     @Completion(FileCompleter.class)
     private String confFile;
 
@@ -164,8 +163,7 @@ public class MiscCaActions {
             String caname = entry.getKey();
             String filename = "ca-" + caname + ".crt";
             saveVerbose("saved certificate of root CA " + caname + " to",
-                new File(outDir, filename),
-                encodeCert(entry.getValue().getEncoded(), outform));
+                new File(outDir, filename), encodeCert(entry.getValue().getEncoded(), outform));
           }
         }
         return null;
@@ -352,8 +350,7 @@ public class MiscCaActions {
 
   } // class Unlock
 
-  @Command(scope = "ca", name = "ca-token-info-p11",
-          description = "list objects in PKCS#11 device of the CA")
+  @Command(scope = "ca", name = "ca-token-info-p11", description = "list objects in PKCS#11 device of the CA")
   @Service
   public static class CaTokenInfoP11 extends CaAction {
 

@@ -48,15 +48,13 @@ public class ObjectIdAndCert extends ProxyMessage {
 
   private final Certificate certificate;
 
-  public ObjectIdAndCert(SlotIdentifier slotId, ObjectIdentifier objectId,
-      Certificate certificate) {
+  public ObjectIdAndCert(SlotIdentifier slotId, ObjectIdentifier objectId, Certificate certificate) {
     this.slotId = Args.notNull(slotId, "slotId");
     this.objectId = Args.notNull(objectId, "objectId");
     this.certificate = Args.notNull(certificate, "certificate");
   }
 
-  public ObjectIdAndCert(SlotIdentifier slotId, ObjectIdentifier objectId,
-      X509Cert certificate) {
+  public ObjectIdAndCert(SlotIdentifier slotId, ObjectIdentifier objectId, X509Cert certificate) {
     this.slotId = Args.notNull(slotId, "slotId");
     this.objectId = Args.notNull(objectId, "objectId");
     Args.notNull(certificate, "certificate");

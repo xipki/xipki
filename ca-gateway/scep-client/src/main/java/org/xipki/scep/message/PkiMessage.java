@@ -147,8 +147,7 @@ public class PkiMessage {
 
   public ASN1Encodable addSignendAttribute(ASN1ObjectIdentifier type, ASN1Encodable value) {
     if (SCEP_ATTR_TYPES.contains(type)) {
-      throw new IllegalArgumentException(
-          "Adding SCEP attribute via addSignedAttribute() method is not permitted");
+      throw new IllegalArgumentException("Adding SCEP attribute via addSignedAttribute() method is not permitted");
     }
     return signedAttributes.put(type, value);
   }
@@ -229,7 +228,8 @@ public class PkiMessage {
     return new AttributeTable(vec);
   }
 
-  public ContentInfo encode(PrivateKey signerKey, SignAlgo signatureAlgorithm, X509Cert signerCert,
+  public ContentInfo encode(
+      PrivateKey signerKey, SignAlgo signatureAlgorithm, X509Cert signerCert,
       X509Cert[] signerCertSet, X509Cert recipientCert, ASN1ObjectIdentifier encAlgId)
       throws MessageEncodingException {
     Args.notNull(signerKey, "signerKey");
@@ -242,9 +242,10 @@ public class PkiMessage {
     return encode(signer, signerCert, signerCertSet, recipientCert, encAlgId);
   } // method encode
 
-  public ContentInfo encode(ContentSigner signer, X509Cert signerCert,
-      X509Cert[] cmsCertSet, X509Cert recipientCert, ASN1ObjectIdentifier encAlgId)
-          throws MessageEncodingException {
+  public ContentInfo encode(
+      ContentSigner signer, X509Cert signerCert, X509Cert[] cmsCertSet,
+      X509Cert recipientCert, ASN1ObjectIdentifier encAlgId)
+      throws MessageEncodingException {
     Args.notNull(signer, "signer");
     Args.notNull(signerCert, "signerCert");
     if (messageData != null) {
@@ -270,16 +271,14 @@ public class PkiMessage {
       CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
 
       // signerInfo
-      JcaSignerInfoGeneratorBuilder signerInfoBuilder = new JcaSignerInfoGeneratorBuilder(
-          new BcDigestCalculatorProvider());
+      JcaSignerInfoGeneratorBuilder signerInfoBuilder =
+          new JcaSignerInfoGeneratorBuilder(new BcDigestCalculatorProvider());
 
-      signerInfoBuilder.setSignedAttributeGenerator(
-          new DefaultSignedAttributeTableGenerator(getSignedAttributes()));
+      signerInfoBuilder.setSignedAttributeGenerator(new DefaultSignedAttributeTableGenerator(getSignedAttributes()));
 
       AttributeTable attrTable = getUnsignedAttributes();
       if (attrTable != null) {
-        signerInfoBuilder.setUnsignedAttributeGenerator(
-            new SimpleAttributeTableGenerator(attrTable));
+        signerInfoBuilder.setUnsignedAttributeGenerator(new SimpleAttributeTableGenerator(attrTable));
       }
 
       // certificateSet
@@ -330,8 +329,7 @@ public class PkiMessage {
     }
   } // method encrypt
 
-  private static void addAttribute(ASN1EncodableVector vector,
-      ASN1ObjectIdentifier attrType, ASN1Encodable attrValue) {
+  private static void addAttribute(ASN1EncodableVector vector, ASN1ObjectIdentifier attrType, ASN1Encodable attrValue) {
     vector.add(new Attribute(attrType, new DERSet(attrValue)));
   }
 

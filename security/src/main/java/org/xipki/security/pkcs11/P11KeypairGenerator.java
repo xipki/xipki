@@ -67,8 +67,7 @@ public class P11KeypairGenerator extends KeypairGenerator {
 
     if ((slotIndex == null && slotId == null)
         || (slotIndex != null && slotId != null)) {
-      throw new XiSecurityException(
-          "exactly one of slot (index) and slot-id must be specified");
+      throw new XiSecurityException("exactly one of slot (index) and slot-id must be specified");
     }
 
     try {

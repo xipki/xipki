@@ -79,8 +79,7 @@ public class RequestOptions {
     return preferredSignatureAlgorithms;
   }
 
-  public void setPreferredSignatureAlgorithms(
-      SignAlgo[] preferredSignatureAlgorithms) {
+  public void setPreferredSignatureAlgorithms(SignAlgo[] preferredSignatureAlgorithms) {
     this.preferredSignatureAlgorithms = Arrays.asList(preferredSignatureAlgorithms);
   }
 

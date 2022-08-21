@@ -48,8 +48,7 @@ public class CaCaps {
   }
 
   public CaCaps(Set<CaCapability> capabilities) {
-    this.capabilities = CollectionUtil.isEmpty(capabilities)
-        ? new HashSet<>() : new HashSet<>(capabilities);
+    this.capabilities = CollectionUtil.isEmpty(capabilities) ? new HashSet<>() : new HashSet<>(capabilities);
     refresh();
   }
 
@@ -134,8 +133,7 @@ public class CaCaps {
   }
 
   public boolean supportsPost() {
-    return containsCapability(POSTPKIOperation)
-        || containsCapability(SCEPStandard);
+    return containsCapability(POSTPKIOperation) || containsCapability(SCEPStandard);
   }
 
   public HashAlgo mostSecureHashAlgo() {

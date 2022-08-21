@@ -62,9 +62,10 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
   private final int numCertsPerCommit;
 
-  OcspCertStoreFromCaDbImporter(DataSourceWrapper datasource,  String srcDir, String publisherName,
+  OcspCertStoreFromCaDbImporter(
+      DataSourceWrapper datasource,  String srcDir, String publisherName,
       int numCertsPerCommit, boolean resume, AtomicBoolean stopMe)
-          throws Exception {
+      throws Exception {
     super(datasource, srcDir, stopMe);
 
     this.publisherName = Args.toNonBlankLower(publisherName, "publisherName");
@@ -93,8 +94,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     certstore.validate();
 
     if (certstore.getVersion() > VERSION_V2) {
-      throw new Exception("could not import CertStore greater than " + VERSION_V2 + ": "
-          + certstore.getVersion());
+      throw new Exception("could not import CertStore greater than " + VERSION_V2 + ": " + certstore.getVersion());
     }
 
     CaCertstore.Caconf caconf;
@@ -246,9 +246,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     }
   } // method importIssuer0
 
-  private void importCert(CaCertstore certstore, boolean revokedOnly, List<Integer> caIds,
-      File processLogFile)
-          throws Exception {
+  private void importCert(CaCertstore certstore, boolean revokedOnly, List<Integer> caIds, File processLogFile)
+      throws Exception {
     HashAlgo certhashAlgo = getCertHashAlgo();
 
     int numProcessedBefore = 0;
@@ -323,10 +322,11 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
         + importLog.numProcessed() + " certificates");
   } // method importCert
 
-  private long importCert0(HashAlgo certhashAlgo, PreparedStatement psCert, String certsZipFile,
+  private long importCert0(
+      HashAlgo certhashAlgo, PreparedStatement psCert, String certsZipFile,
       boolean revokedOnly, List<Integer> caIds, long minId, File processLogFile,
       ProcessLog processLog, int numProcessedInLastProcess, ProcessLog importLog)
-          throws Exception {
+      throws Exception {
     ZipFile zipFile = new ZipFile(new File(certsZipFile));
     ZipEntry certsEntry = zipFile.getEntry("overview.json");
 
@@ -444,8 +444,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
           importLog.addNumProcessed(numImportedEntriesInBatch);
           numProcessedEntriesInBatch = 0;
           numImportedEntriesInBatch = 0;
-          String filename = (numProcessedInLastProcess + processLog.numProcessed())
-              + ":" + lastSuccessfulCertId;
+          String filename = (numProcessedInLastProcess + processLog.numProcessed()) + ":" + lastSuccessfulCertId;
           echoToFile(filename, processLogFile);
           processLog.printStatus();
         } else if (isLastBlock) {
@@ -454,8 +453,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
           importLog.addNumProcessed(numImportedEntriesInBatch);
           numProcessedEntriesInBatch = 0;
           numImportedEntriesInBatch = 0;
-          String filename = (numProcessedInLastProcess + processLog.numProcessed())
-              + ":" + lastSuccessfulCertId;
+          String filename = (numProcessedInLastProcess + processLog.numProcessed()) + ":" + lastSuccessfulCertId;
           echoToFile(filename, processLogFile);
           processLog.printStatus();
         }
@@ -473,8 +471,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
       throws DataAccessException {
     String certHashAlgoStr = dbSchemaInfo.getVariableValue("CERTHASH_ALGO");
     if (certHashAlgoStr == null) {
-      throw new DataAccessException(
-          "Column with NAME='CERTHASH_ALGO' is not defined in table DBSCHEMA");
+      throw new DataAccessException("Column with NAME='CERTHASH_ALGO' is not defined in table DBSCHEMA");
     }
 
     try {

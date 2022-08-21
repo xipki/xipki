@@ -57,8 +57,7 @@ public class PublicKeyChecker {
 
   private static final Logger LOG = LoggerFactory.getLogger(PublicKeyChecker.class);
 
-  private static final LruCache<ASN1ObjectIdentifier, Integer> EC_CURVEFIELD_SIZES
-      = new LruCache<>(100);
+  private static final LruCache<ASN1ObjectIdentifier, Integer> EC_CURVEFIELD_SIZES = new LruCache<>(100);
 
   private final Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
 
@@ -83,8 +82,7 @@ public class PublicKeyChecker {
       }
     }
 
-    ValidationIssue issue = new ValidationIssue("X509.PUBKEY.REQ",
-        "whether public key matches the request one");
+    ValidationIssue issue = new ValidationIssue("X509.PUBKEY.REQ", "whether public key matches the request one");
     resultIssues.add(issue);
     SubjectPublicKeyInfo c14nRequestedPublicKey;
     try {
@@ -227,8 +225,7 @@ public class PublicKeyChecker {
         }
         break;
       default:
-        throw new BadCertTemplateException(
-            "invalid point encoding 0x" + Integer.toString(encoded[0], 16));
+        throw new BadCertTemplateException("invalid point encoding 0x" + Integer.toString(encoded[0], 16));
     } // end switch
   } // method checkECSubjectPublicKeyInfo
 

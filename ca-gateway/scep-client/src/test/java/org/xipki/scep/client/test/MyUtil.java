@@ -68,10 +68,10 @@ public class MyUtil {
   private static final AlgorithmIdentifier ALGID_RSA =
       new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
 
-  public static X509Cert issueSubCaCert(PrivateKey rcaKey, X500Name issuer,
-      SubjectPublicKeyInfo pubKeyInfo, X500Name subject, BigInteger serialNumber,
-      Date startTime)
-          throws OperatorCreationException {
+  public static X509Cert issueSubCaCert(
+      PrivateKey rcaKey, X500Name issuer, SubjectPublicKeyInfo pubKeyInfo, X500Name subject,
+      BigInteger serialNumber, Date startTime)
+      throws OperatorCreationException {
     Date notAfter = new Date(startTime.getTime() + CaEmulator.DAY_IN_MS * 3650);
     X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(issuer, serialNumber,
         startTime, notAfter, subject, pubKeyInfo);
@@ -88,8 +88,8 @@ public class MyUtil {
     }
   } // method issueSubCaCert
 
-  public static PKCS10CertificationRequest generateRequest(PrivateKey privatekey,
-      SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
+  public static PKCS10CertificationRequest generateRequest(
+      PrivateKey privatekey, SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
       String challengePassword, List<Extension> extensions)
       throws OperatorCreationException {
     Args.notNull(privatekey, "privatekey");
@@ -122,22 +122,20 @@ public class MyUtil {
       throw new OperatorCreationException(ex.getMessage(), ex);
     }
 
-    ContentSigner contentSigner = new JcaContentSignerBuilder(sigAlgName)
-        .setProvider("BC").build(privatekey);
+    ContentSigner contentSigner = new JcaContentSignerBuilder(sigAlgName).setProvider("BC").build(privatekey);
     return csrBuilder.build(contentSigner);
   } // method generateRequest
 
-  public static X509Cert generateSelfsignedCert(CertificationRequest csr,
-      PrivateKey identityKey)
-          throws CertificateException {
+  public static X509Cert generateSelfsignedCert(CertificationRequest csr, PrivateKey identityKey)
+      throws CertificateException {
     Args.notNull(csr, "csr");
     return generateSelfsignedCert(csr.getCertificationRequestInfo().getSubject(),
         csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(), identityKey);
   }
 
-  public static X509Cert generateSelfsignedCert(X500Name subjectDn,
-      SubjectPublicKeyInfo pubKeyInfo, PrivateKey identityKey)
-          throws CertificateException {
+  public static X509Cert generateSelfsignedCert(
+      X500Name subjectDn, SubjectPublicKeyInfo pubKeyInfo, PrivateKey identityKey)
+      throws CertificateException {
     Args.notNull(subjectDn, "subjectDn");
     Args.notNull(pubKeyInfo, "pubKeyInfo");
     Args.notNull(identityKey, "identityKey");
@@ -153,15 +151,13 @@ public class MyUtil {
     try {
       certGenerator.addExtension(Extension.keyUsage, true, ku);
     } catch (CertIOException ex) {
-      throw new CertificateException(
-          "could not generate self-signed certificate: " + ex.getMessage(), ex);
+      throw new CertificateException("could not generate self-signed certificate: " + ex.getMessage(), ex);
     }
 
     ContentSigner contentSigner;
     try {
       String sigAlgorithm = ScepUtil.getSignatureAlgName(identityKey, HashAlgo.SHA1);
-      contentSigner = new JcaContentSignerBuilder(sigAlgorithm)
-          .setProvider("BC").build(identityKey);
+      contentSigner = new JcaContentSignerBuilder(sigAlgorithm).setProvider("BC").build(identityKey);
     } catch (OperatorCreationException | NoSuchAlgorithmException ex) {
       throw new CertificateException("error while creating signer", ex);
     }

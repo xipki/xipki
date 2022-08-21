@@ -113,7 +113,7 @@ public abstract class DataSourceWrapper implements Closeable {
 
     @Override
     protected String getSqlToDropForeignKeyConstraint(String constraintName, String baseTable)
-            throws DataAccessException {
+        throws DataAccessException {
       return concat("ALTER TABLE ", baseTable, " DROP FOREIGN KEY ", constraintName);
     }
 
@@ -263,8 +263,7 @@ public abstract class DataSourceWrapper implements Closeable {
 
     @Override
     protected String getSqlToDropUniqueConstraint(String contraintName, String table) {
-      return concat("ALTER TABLE ", table, " DROP CONSTRAINT ", contraintName,
-          " DROP INDEX");
+      return concat("ALTER TABLE ", table, " DROP CONSTRAINT ", contraintName, " DROP INDEX");
     }
 
     @Override
@@ -335,8 +334,7 @@ public abstract class DataSourceWrapper implements Closeable {
     @Override
     public String buildSelectFirstSql(int rows, String orderBy, String coreSql) {
       return concat("SELECT ", coreSql,
-          (isBlank(orderBy) ? "" : " ORDER BY " + orderBy), " LIMIT ",
-          Integer.toString(rows));
+          (isBlank(orderBy) ? "" : " ORDER BY " + orderBy), " LIMIT ", Integer.toString(rows));
     }
 
     @Override
@@ -413,8 +411,7 @@ public abstract class DataSourceWrapper implements Closeable {
       if (ex instanceof SQLException) {
         throw translate(null, (SQLException) ex);
       } else {
-        throw new DataAccessException(
-            "error occured while getting Connection: " + ex.getMessage(), ex);
+        throw new DataAccessException("error occured while getting Connection: " + ex.getMessage(), ex);
       }
     }
   } // method getConnection
@@ -555,7 +552,7 @@ public abstract class DataSourceWrapper implements Closeable {
   public abstract String buildSelectFirstSql(int rows, String orderBy, String coreSql);
 
   public String getFirstStringValue(Connection conn, String table, String column, String criteria)
-          throws DataAccessException {
+      throws DataAccessException {
     final String sql = "SELECT " + column + " FROM " + table + " WHERE " + criteria;
     Statement stmt = null;
     ResultSet rs = null;
@@ -581,7 +578,7 @@ public abstract class DataSourceWrapper implements Closeable {
   }
 
   public Long getFirstLongValue(Connection conn, String table, String column, String criteria)
-          throws DataAccessException {
+      throws DataAccessException {
     final String sql = "SELECT " + column + " FROM " + table + " WHERE " + criteria;
     Statement stmt = null;
     ResultSet rs = null;
@@ -686,9 +683,8 @@ public abstract class DataSourceWrapper implements Closeable {
     }
   } // method deleteFromTable
 
-  public void deleteFromTableWithException(Connection conn, String table, String idColumn,
-      long id)
-          throws SQLException, DataAccessException {
+  public void deleteFromTableWithException(Connection conn, String table, String idColumn, long id)
+      throws SQLException, DataAccessException {
     notBlank(table, "table");
     notBlank(idColumn, "idColumn");
     final String sql = concat("DELETE FROM ", table, " WHERE ", idColumn,
@@ -926,9 +922,9 @@ public abstract class DataSourceWrapper implements Closeable {
     executeUpdate(conn, getSqlToDropForeignKeyConstraint(constraintName, baseTable));
   }
 
-  protected String getSqlToAddForeignKeyConstraint(String constraintName, String baseTable,
-      String baseColumn, String referencedTable, String referencedColumn, String onDeleteAction,
-      String onUpdateAction) {
+  protected String getSqlToAddForeignKeyConstraint(
+      String constraintName, String baseTable, String baseColumn, String referencedTable,
+      String referencedColumn, String onDeleteAction, String onUpdateAction) {
     notBlank(constraintName, "constraintName");
     notBlank(baseTable, "baseTable");
     notBlank(baseColumn, "baseColumn");
@@ -945,7 +941,7 @@ public abstract class DataSourceWrapper implements Closeable {
   public void addForeignKeyConstraint(Connection conn, String constraintName, String baseTable,
       String baseColumn, String referencedTable, String referencedColumn, String onDeleteAction,
       String onUpdateAction)
-          throws DataAccessException {
+      throws DataAccessException {
     final String sql = getSqlToAddForeignKeyConstraint(constraintName, baseTable, baseColumn,
         referencedTable, referencedColumn, onDeleteAction, onUpdateAction);
     executeUpdate(conn, sql);
@@ -997,8 +993,7 @@ public abstract class DataSourceWrapper implements Closeable {
     executeUpdate(conn, getSqlToDropUniqueConstraint(constraintName, table));
   }
 
-  protected String getSqlToAddUniqueConstrain(String constraintName, String table,
-      String... columns) {
+  protected String getSqlToAddUniqueConstrain(String constraintName, String table, String... columns) {
     notBlank(constraintName, "constraintName");
     notBlank(table, "table");
 
@@ -1015,9 +1010,8 @@ public abstract class DataSourceWrapper implements Closeable {
     return sb.append(")").toString();
   } // method getSqlToAddUniqueConstrain
 
-  public void addUniqueConstrain(Connection conn, String constraintName,
-      String table, String... columns)
-          throws DataAccessException {
+  public void addUniqueConstrain(Connection conn, String constraintName, String table, String... columns)
+      throws DataAccessException {
     executeUpdate(conn, getSqlToAddUniqueConstrain(constraintName, table, columns));
   }
 
@@ -1062,38 +1056,31 @@ public abstract class DataSourceWrapper implements Closeable {
         return new DataAccessException(Reason.BadSqlGrammar, buildMessage(sql, sqlEx), sqlEx);
       } else if (sqlErrorCodes.invalidResultSetAccessCodes.contains(errorCode)) {
         logTranslation(sql, sqlEx);
-        return new DataAccessException(Reason.InvalidResultSetAccess,
-            buildMessage(sql, sqlEx), sqlEx);
+        return new DataAccessException(Reason.InvalidResultSetAccess, buildMessage(sql, sqlEx), sqlEx);
       } else if (sqlErrorCodes.duplicateKeyCodes.contains(errorCode)) {
         logTranslation(sql, sqlEx);
         return new DataAccessException(Reason.DuplicateKey, buildMessage(sql, sqlEx), sqlEx);
       } else if (sqlErrorCodes.dataIntegrityViolationCodes.contains(errorCode)) {
         logTranslation(sql, sqlEx);
-        return new DataAccessException(Reason.DataIntegrityViolation,
-            buildMessage(sql, sqlEx), sqlEx);
+        return new DataAccessException(Reason.DataIntegrityViolation, buildMessage(sql, sqlEx), sqlEx);
       } else if (sqlErrorCodes.permissionDeniedCodes.contains(errorCode)) {
         logTranslation(sql, sqlEx);
-        return new DataAccessException(Reason.PermissionDeniedDataAccess,
-            buildMessage(sql, sqlEx), sqlEx);
+        return new DataAccessException(Reason.PermissionDeniedDataAccess, buildMessage(sql, sqlEx), sqlEx);
       } else if (sqlErrorCodes.dataAccessResourceFailureCodes.contains(errorCode)) {
         logTranslation(sql, sqlEx);
-        return new DataAccessException(Reason.DataAccessResourceFailure,
-            buildMessage(sql, sqlEx), sqlEx);
+        return new DataAccessException(Reason.DataAccessResourceFailure, buildMessage(sql, sqlEx), sqlEx);
       } else if (sqlErrorCodes.transientDataAccessResourceCodes.contains(errorCode)) {
         logTranslation(sql, sqlEx);
-        return new DataAccessException(Reason.TransientDataAccessResource,
-            buildMessage(sql, sqlEx), sqlEx);
+        return new DataAccessException(Reason.TransientDataAccessResource, buildMessage(sql, sqlEx), sqlEx);
       } else if (sqlErrorCodes.cannotAcquireLockCodes.contains(errorCode)) {
         logTranslation(sql, sqlEx);
         return new DataAccessException(Reason.CannotAcquireLock, buildMessage(sql, sqlEx), sqlEx);
       } else if (sqlErrorCodes.deadlockLoserCodes.contains(errorCode)) {
         logTranslation(sql, sqlEx);
-        return new DataAccessException(Reason.DeadlockLoserDataAccess,
-            buildMessage(sql, sqlEx), sqlEx);
+        return new DataAccessException(Reason.DeadlockLoserDataAccess, buildMessage(sql, sqlEx), sqlEx);
       } else if (sqlErrorCodes.cannotSerializeTransactionCodes.contains(errorCode)) {
         logTranslation(sql, sqlEx);
-        return new DataAccessException(Reason.CannotSerializeTransaction,
-            buildMessage(sql, sqlEx), sqlEx);
+        return new DataAccessException(Reason.CannotSerializeTransaction, buildMessage(sql, sqlEx), sqlEx);
       }
     } // end if (errorCode)
 
@@ -1107,8 +1094,7 @@ public abstract class DataSourceWrapper implements Closeable {
       } else if (sqlStateCodes.dataAccessResourceFailureCodes.contains(classCode)) {
         return new DataAccessException(Reason.DataAccessResourceFailure, buildMessage(sql, ex), ex);
       } else if (sqlStateCodes.transientDataAccessResourceCodes.contains(classCode)) {
-        return new DataAccessException(Reason.TransientDataAccessResource,
-            buildMessage(sql, ex), ex);
+        return new DataAccessException(Reason.TransientDataAccessResource, buildMessage(sql, ex), ex);
       } else if (sqlStateCodes.concurrencyFailureCodes.contains(classCode)) {
         return new DataAccessException(Reason.ConcurrencyFailure, buildMessage(sql, ex), ex);
       }
@@ -1140,8 +1126,8 @@ public abstract class DataSourceWrapper implements Closeable {
       return;
     }
 
-    LOG.debug("Translating SQLException: SQL state '{}', error code '{}', message [{}]; SQL "
-        + "was [{}]", sqlEx.getSQLState(), sqlEx.getErrorCode(), sqlEx.getMessage(), sql);
+    LOG.debug("Translating SQLException: SQL state '{}', error code '{}', message [{}]; SQL was [{}]",
+        sqlEx.getSQLState(), sqlEx.getErrorCode(), sqlEx.getMessage(), sql);
   }
 
   private String buildMessage(String sql, SQLException ex) {
@@ -1162,8 +1148,7 @@ public abstract class DataSourceWrapper implements Closeable {
     }
   } // method executeUpdate
 
-  static DataSourceWrapper createDataSource(String name, Properties props,
-      DatabaseType databaseType) {
+  static DataSourceWrapper createDataSource(String name, Properties props, DatabaseType databaseType) {
     notNull(props, "props");
     notNull(databaseType, "databaseType");
 

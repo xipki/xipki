@@ -79,15 +79,13 @@ public class Range {
       throw new IllegalArgumentException("min and max may not be both null");
     }
     if (min != null && max != null && min > max) {
-      throw new IllegalArgumentException(String.format(
-          "min may not be greater than max: %d > %d", min, max));
+      throw new IllegalArgumentException(String.format("min may not be greater than max: %d > %d", min, max));
     }
   }
 
   @Override
   public String toString() {
-    return StringUtil.concatObjects("[", (min == null ? "" : min), ",",
-        (max == null ? "" : max), "]");
+    return StringUtil.concatObjects("[", (min == null ? "" : min), ",", (max == null ? "" : max), "]");
   }
 
 }

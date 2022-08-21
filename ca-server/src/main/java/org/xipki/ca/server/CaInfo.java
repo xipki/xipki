@@ -125,8 +125,7 @@ public class CaInfo {
     ASN1ObjectIdentifier caKeyAlgOid = caKeyAlgId.getAlgorithm();
 
     if (caKeyAlgOid.equals(PKCSObjectIdentifiers.rsaEncryption)) {
-      java.security.interfaces.RSAPublicKey pubKey =
-          (java.security.interfaces.RSAPublicKey) cert.getPublicKey();
+      java.security.interfaces.RSAPublicKey pubKey = (java.security.interfaces.RSAPublicKey) cert.getPublicKey();
       caKeyspec = "RSA/" + pubKey.getModulus().bitLength();
     } else if (caKeyAlgOid.equals(X9ObjectIdentifiers.id_ecPublicKey)) {
       ASN1ObjectIdentifier curveOid = ASN1ObjectIdentifier.getInstance(caKeyAlgId.getParameters());
@@ -367,15 +366,13 @@ public class CaInfo {
       SignerConf signerConf = new SignerConf(m.getConf());
       ConcurrentContentSigner signer;
       try {
-        signer = securityFactory.createSigner(caEntry.getSignerType(), signerConf,
-            caEntry.getCert());
+        signer = securityFactory.createSigner(caEntry.getSignerType(), signerConf, caEntry.getCert());
         if (dfltSigner == null) {
           dfltSigner = signer;
         }
         tmpSigners.put(m.getAlgo(), signer);
       } catch (Throwable th) {
-        LogUtil.error(LOG, th,
-                "could not initialize the CA signer for CA " + caEntry.getIdent().getName());
+        LogUtil.error(LOG, th, "could not initialize the CA signer for CA " + caEntry.getIdent().getName());
         for (ConcurrentContentSigner ccs : tmpSigners.values()) {
           try {
             ccs.close();

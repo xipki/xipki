@@ -116,9 +116,8 @@ public class SubjectChecker {
     return result;
   } // method checkSubject
 
-  private ValidationIssue checkSubjectAttribute(ASN1ObjectIdentifier type, X500Name subject,
-      X500Name requestedSubject)
-          throws BadCertTemplateException {
+  private ValidationIssue checkSubjectAttribute(ASN1ObjectIdentifier type, X500Name subject, X500Name requestedSubject)
+      throws BadCertTemplateException {
     boolean multiValuedRdn = subjectControl.getGroup(type) != null;
     if (multiValuedRdn) {
       return checkSubjectAttributeMultiValued(type, subject, requestedSubject);
@@ -127,9 +126,9 @@ public class SubjectChecker {
     }
   } // method checkSubjectAttribute
 
-  private ValidationIssue checkSubjectAttributeNotMultiValued(ASN1ObjectIdentifier type,
-      X500Name subject, X500Name requestedSubject)
-          throws BadCertTemplateException {
+  private ValidationIssue checkSubjectAttributeNotMultiValued(
+      ASN1ObjectIdentifier type, X500Name subject, X500Name requestedSubject)
+      throws BadCertTemplateException {
     ValidationIssue issue = createSubjectIssue(type);
 
     // control
@@ -141,8 +140,7 @@ public class SubjectChecker {
     int rdnsSize = (rdns == null) ? 0 : rdns.length;
 
     if (rdnsSize < minOccurs || rdnsSize > maxOccurs) {
-      issue.setFailureMessage("number of RDNs '" + rdnsSize
-          + "' is not within [" + minOccurs + ", " + maxOccurs + "]");
+      issue.setFailureMessage("number of RDNs '" + rdnsSize + "' is not within [" + minOccurs + ", " + maxOccurs + "]");
       return issue;
     }
 
@@ -182,8 +180,7 @@ public class SubjectChecker {
       RDN rdn = rdns[i];
       AttributeTypeAndValue[] atvs = rdn.getTypesAndValues();
       if (atvs.length > 1) {
-        failureMsg.append("size of RDN[").append(i).append("] is '")
-                .append(atvs.length).append("' but expected '1'");
+        failureMsg.append("size of RDN[").append(i).append("] is '").append(atvs.length).append("' but expected '1'");
         failureMsg.append("; ");
         continue;
       }
@@ -206,9 +203,9 @@ public class SubjectChecker {
     return issue;
   } // method checkSubjectAttributeNotMultiValued
 
-  private ValidationIssue checkSubjectAttributeMultiValued(ASN1ObjectIdentifier type,
-      X500Name subject, X500Name requestedSubject)
-          throws BadCertTemplateException {
+  private ValidationIssue checkSubjectAttributeMultiValued(
+      ASN1ObjectIdentifier type, X500Name subject, X500Name requestedSubject)
+      throws BadCertTemplateException {
     ValidationIssue issue = createSubjectIssue(type);
 
     RDN[] rdns = subject.getRDNs(type);
@@ -267,8 +264,7 @@ public class SubjectChecker {
 
     for (int i = 0; i < atvsSize; i++) {
       AttributeTypeAndValue atv = atvs.get(i);
-      String atvTextValue = getAtvValueString("AttributeTypeAndValue[" + i + "]", atv,
-          stringType, failureMsg);
+      String atvTextValue = getAtvValueString("AttributeTypeAndValue[" + i + "]", atv, stringType, failureMsg);
       if (atvTextValue == null) {
         continue;
       }
@@ -286,18 +282,17 @@ public class SubjectChecker {
     return issue;
   } // method checkSubjectAttributeMultiValued
 
-  private void checkAttributeTypeAndValue(String name, ASN1ObjectIdentifier type,
-      String atvTextValue, RdnControl rdnControl, List<String> requestedCoreAtvTextValues,
-      int index, StringBuilder failureMsg)
-          throws BadCertTemplateException {
+  private void checkAttributeTypeAndValue(
+      String name, ASN1ObjectIdentifier type, String atvTextValue, RdnControl rdnControl,
+      List<String> requestedCoreAtvTextValues, int index, StringBuilder failureMsg)
+      throws BadCertTemplateException {
     if (atvTextValue != null && ObjectIdentifiers.DN.emailAddress.equals(type)) {
       atvTextValue = atvTextValue.toLowerCase();
     }
 
     if (ObjectIdentifiers.DN.dateOfBirth.equals(type)) {
       if (!TextVadidator.DATE_OF_BIRTH.isValid(atvTextValue)) {
-        throw new BadCertTemplateException(
-            "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
+        throw new BadCertTemplateException("Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
       }
     } else if (rdnControl != null) {
       String prefix = rdnControl.getPrefix();
@@ -318,8 +313,7 @@ public class SubjectChecker {
             .append("' does not end with suffix '").append(suffix).append("'; ");
           return;
         } else {
-          atvTextValue = atvTextValue.substring(0,
-              atvTextValue.length() - suffix.length());
+          atvTextValue = atvTextValue.substring(0, atvTextValue.length() - suffix.length());
         }
       }
 
@@ -417,8 +411,7 @@ public class SubjectChecker {
     String attrName = ObjectIdentifiers.getName(subjectAttrType);
     if (attrName == null) {
       attrName = subjectAttrType.getId().replace('.', '_');
-      issue = new ValidationIssue("X509.SUBJECT." + attrName, "attribute "
-          + subjectAttrType.getId());
+      issue = new ValidationIssue("X509.SUBJECT." + attrName, "attribute " + subjectAttrType.getId());
     } else {
       issue = new ValidationIssue("X509.SUBJECT." + attrName, "attribute " + attrName
           + " (" + subjectAttrType.getId() + ")");
@@ -426,8 +419,8 @@ public class SubjectChecker {
     return issue;
   } // method createSubjectIssue
 
-  private static String getAtvValueString(String name, AttributeTypeAndValue atv,
-      StringType stringType, StringBuilder failureMsg) {
+  private static String getAtvValueString
+      (String name, AttributeTypeAndValue atv, StringType stringType, StringBuilder failureMsg) {
     ASN1ObjectIdentifier type = atv.getType();
     ASN1Encodable atvValue = atv.getValue();
 
@@ -452,7 +445,7 @@ public class SubjectChecker {
         ASN1Encodable obj = seq.getObjectAt(i);
         if (!matchStringType(obj, stringType)) {
           failureMsg.append(name).append(".[").append(i).append("] is not of type ")
-            .append(stringType.name()).append("; ");
+              .append(stringType.name()).append("; ");
           validEncoding = false;
           break;
         }

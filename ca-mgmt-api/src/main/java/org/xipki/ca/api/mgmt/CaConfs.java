@@ -305,10 +305,8 @@ public class CaConfs {
     return file.isAbsolute() ? filePath : new File(baseDir, filePath).getPath();
   } // method resolveFilePath
 
-  private static String convertSignerConf(FileOrValue confFv, Map<String, String> properties,
-      String baseDir)
-          throws IOException {
-
+  private static String convertSignerConf(FileOrValue confFv, Map<String, String> properties, String baseDir)
+      throws IOException {
     String conf;
     if (confFv.getValue() != null) {
       conf = confFv.getValue();

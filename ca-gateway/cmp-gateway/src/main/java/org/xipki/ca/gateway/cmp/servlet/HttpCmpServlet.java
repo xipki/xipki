@@ -121,11 +121,9 @@ public class HttpCmpServlet extends HttpServlet {
         parameters.put(entry.getKey(), entry.getValue()[0]);
       }
 
-      PKIMessage pkiResp = responder.processPkiMessage(
-                              caName, pkiReq, clientCert, parameters, event);
+      PKIMessage pkiResp = responder.processPkiMessage(caName, pkiReq, clientCert, parameters, event);
       byte[] encodedPkiResp = pkiResp.getEncoded();
-      ServletHelper.logReqResp("CMP Gateway", LOG, logReqResp, true, req,
-          requestBytes, encodedPkiResp);
+      ServletHelper.logReqResp("CMP Gateway", LOG, logReqResp, true, req, requestBytes, encodedPkiResp);
 
       resp.setContentType(CT_RESPONSE);
       resp.setContentLength(encodedPkiResp.length);

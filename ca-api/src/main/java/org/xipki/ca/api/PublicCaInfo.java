@@ -77,15 +77,13 @@ public class PublicCaInfo {
       try {
         subjectAltName = GeneralNames.getInstance(encodedSubjectAltName);
       } catch (RuntimeException ex) {
-        throw new OperationException(ErrorCode.INVALID_EXTENSION,
-            "invalid SubjectAltName extension in CA certificate");
+        throw new OperationException(ErrorCode.INVALID_EXTENSION, "invalid SubjectAltName extension in CA certificate");
       }
     }
   } // constructor
 
-  public PublicCaInfo(X500Name subject, X500Name issuer, BigInteger serialNumber,
-      GeneralNames subjectAltName, byte[] subjectKeyIdentifier,
-      CaUris caUris, ConfPairs extraControl) {
+  public PublicCaInfo(X500Name subject, X500Name issuer, BigInteger serialNumber, GeneralNames subjectAltName,
+                      byte[] subjectKeyIdentifier, CaUris caUris, ConfPairs extraControl) {
     this.subject = Args.notNull(subject, "subject");
     this.issuer = Args.notNull(issuer, "issuer");
     this.serialNumber = Args.notNull(serialNumber, "serialNumber");
@@ -134,8 +132,7 @@ public class PublicCaInfo {
   }
 
   public byte[] getSubjectKeyIdentifer() {
-    return (subjectKeyIdentifier == null) ? null
-        : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
+    return (subjectKeyIdentifier == null) ? null : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
   }
 
   public BigInteger getSerialNumber() {

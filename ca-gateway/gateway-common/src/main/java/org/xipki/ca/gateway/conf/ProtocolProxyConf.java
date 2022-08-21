@@ -85,7 +85,8 @@ public abstract class ProtocolProxyConf {
     this.signers = signers;
   }
 
-  public void validate() throws InvalidConfException {
+  public void validate()
+      throws InvalidConfException {
     notNull(audit, "audit");
     notNull(authenticator, "authenticator");
     notNull(pop, "pop");
@@ -93,7 +94,8 @@ public abstract class ProtocolProxyConf {
     notNull(security, "security");
   }
 
-  protected void notNull(Object obj, String name) throws InvalidConfException {
+  protected void notNull(Object obj, String name)
+      throws InvalidConfException {
     if (obj == null) {
       throw new InvalidConfException(name + " must not be null.");
     }

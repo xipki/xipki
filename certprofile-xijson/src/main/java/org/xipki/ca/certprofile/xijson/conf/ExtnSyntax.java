@@ -130,8 +130,7 @@ public class ExtnSyntax extends Describable {
         Set<String> set = new HashSet<>();
         for (SubFieldSyntax m : subFields) {
           if (m.isRequired()) {
-            throw new InvalidConfException(
-                "SubField within SEQUECE_OF or SET OF must not be required");
+            throw new InvalidConfException("SubField within SEQUECE_OF or SET OF must not be required");
           }
 
           int tag = (m.getTag() != null) ? m.getTag().getValue() : -1;

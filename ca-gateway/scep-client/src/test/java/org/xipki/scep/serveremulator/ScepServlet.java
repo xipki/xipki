@@ -103,8 +103,7 @@ public class ScepServlet extends HttpServlet {
         CMSSignedData reqMessage;
         // parse the request
         try {
-          byte[] content = post ? IoUtil.read(req.getInputStream())
-              : Base64.decode(req.getParameter("message"));
+          byte[] content = post ? IoUtil.read(req.getInputStream()) : Base64.decode(req.getParameter("message"));
 
           reqMessage = new CMSSignedData(content);
         } catch (Exception ex) {
@@ -146,13 +145,10 @@ public class ScepServlet extends HttpServlet {
           ct = ScepConstants.CT_X509_CA_RA_CERT;
           CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
           try {
-            cmsSignedDataGen.addCertificate(
-                responder.getCaEmulator().getCaCert().toBcCert());
+            cmsSignedDataGen.addCertificate(responder.getCaEmulator().getCaCert().toBcCert());
             ct = ScepConstants.CT_X509_CA_RA_CERT;
-            cmsSignedDataGen.addCertificate(
-                responder.getRaEmulator().getRaCert().toBcCert());
-            CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(
-                new CMSAbsentContent());
+            cmsSignedDataGen.addCertificate(responder.getRaEmulator().getRaCert().toBcCert());
+            CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
             respBytes = degenerateSignedData.getEncoded();
           } catch (CMSException ex) {
             ex.printStackTrace();

@@ -61,8 +61,7 @@ class CaconfDbImporter extends DbPorter {
     caconf.validate();
 
     if (caconf.getVersion() > VERSION_V2) {
-      throw new Exception("could not import CA configuration greater than "
-          + VERSION_V2 + ": " + caconf.getVersion());
+      throw new Exception("could not import CA configuration greater than " + VERSION_V2 + ": " + caconf.getVersion());
     }
 
     System.out.println("importing CA configuration to database");
@@ -79,8 +78,7 @@ class CaconfDbImporter extends DbPorter {
       importCaHasCertprofile(caconf.getCaHasProfiles());
       importKeypairGen(caconf.getKeypairGens());
     } catch (Exception ex) {
-      System.err.println("could not import CA configuration to database. message: "
-          + ex.getMessage());
+      System.err.println("could not import CA configuration to database. message: " + ex.getMessage());
       throw ex;
     }
     System.out.println(" imported CA configuration to database");
@@ -139,8 +137,7 @@ class CaconfDbImporter extends DbPorter {
       ps = prepareStatement(sql);
 
       for (CaCertstore.Signer signer : signers) {
-        String b64Cert = (signer.getCert() == null) ? null
-            : Base64.encodeToString(readContent(signer.getCert()));
+        String b64Cert = (signer.getCert() == null) ? null : Base64.encodeToString(readContent(signer.getCert()));
         try {
           int idx = 1;
           ps.setString(idx++, signer.getName());
@@ -246,7 +243,7 @@ class CaconfDbImporter extends DbPorter {
   } // method importProfile
 
   private void importKeypairGen(List<CaCertstore.NameTypeConf> keypairGens)
-          throws DataAccessException, IOException {
+      throws DataAccessException, IOException {
     System.out.println("importing table KEYPAIR_GEN");
     if (keypairGens == null) {
       System.out.println(" imported table KEYPAIR_GEN: nothing to import");
@@ -301,8 +298,7 @@ class CaconfDbImporter extends DbPorter {
     System.out.println("importing table CA");
 
     final String sql = buildInsertSql("CA",
-        "ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME," +
-        "SUBJECT,REV_INFO,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN,CONF");
+        "ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,SUBJECT,REV_INFO,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN,CONF");
 
     PreparedStatement ps = null;
     try {

@@ -50,8 +50,7 @@ public class VerifiedPkiMessage {
     return protectionVerificationResult;
   }
 
-  public void setProtectionVerificationResult(
-      ProtectionVerificationResult protectionVerificationResult) {
+  public void setProtectionVerificationResult(ProtectionVerificationResult protectionVerificationResult) {
     this.protectionVerificationResult = protectionVerificationResult;
   }
 

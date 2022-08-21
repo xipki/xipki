@@ -169,8 +169,7 @@ public class OcspMgmtClient implements OcspManager {
         try {
           String responseContentType = httpUrlConnection.getContentType();
           if (!RESPONSE_CT.equals(responseContentType)) {
-            throw new OcspMgmtException(
-                "bad response: mime type " + responseContentType + " not supported!");
+            throw new OcspMgmtException("bad response: mime type " + responseContentType + " not supported!");
           }
 
           if (voidReturn) {
@@ -199,8 +198,7 @@ public class OcspMgmtClient implements OcspManager {
         }
       }
     } catch (IOException ex) {
-      throw new OcspMgmtException(
-          "IOException while sending message to the server: " + ex.getMessage(), ex);
+      throw new OcspMgmtException("IOException while sending message to the server: " + ex.getMessage(), ex);
     }
   } // method transmit
 

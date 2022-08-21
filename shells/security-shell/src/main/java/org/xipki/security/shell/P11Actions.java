@@ -91,13 +91,11 @@ public class P11Actions {
 
   } // class AddCertP11
 
-  @Command(scope = "xi", name = "delete-cert-p11",
-      description = "remove certificate from PKCS#11 device")
+  @Command(scope = "xi", name = "delete-cert-p11", description = "remove certificate from PKCS#11 device")
   @Service
   public static class DeleteCertP11 extends P11SecurityAction {
 
-    @Option(name = "--id", required = true,
-        description = "id (hex) of the certificate in the PKCS#11 device")
+    @Option(name = "--id", required = true, description = "id (hex) of the certificate in the PKCS#11 device")
     private String id;
 
     @Option(name = "--force", aliases = "-f", description = "without prompt")
@@ -122,18 +120,15 @@ public class P11Actions {
 
   } // class DeleteCertP11
 
-  @Command(scope = "xi", name = "export-cert-p11",
-      description = "export certificate from PKCS#11 device")
+  @Command(scope = "xi", name = "export-cert-p11", description = "export certificate from PKCS#11 device")
   @Service
   public static class ExportCertP11 extends P11SecurityAction {
 
-    @Option(name = "--id",
-        description = "id (hex) of the private key in the PKCS#11 device\n"
+    @Option(name = "--id", description = "id (hex) of the private key in the PKCS#11 device\n"
             + "either keyId or keyLabel must be specified")
     protected String id;
 
-    @Option(name = "--label",
-        description = "label of the private key in the PKCS#11 device\n"
+    @Option(name = "--label", description = "label of the private key in the PKCS#11 device\n"
             + "either keyId or keyLabel must be specified")
     protected String label;
 
@@ -141,8 +136,7 @@ public class P11Actions {
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "where to save the certificate")
+    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the certificate")
     @Completion(FileCompleter.class)
     private String outFile;
 
@@ -161,18 +155,15 @@ public class P11Actions {
 
   } // class ExportCertP11
 
-  @Command(scope = "xi", name = "update-cert-p11",
-      description = "update certificate in PKCS#11 device")
+  @Command(scope = "xi", name = "update-cert-p11", description = "update certificate in PKCS#11 device")
   @Service
   public static class UpdateCertP11 extends P11SecurityAction {
 
-    @Option(name = "--id",
-        description = "id (hex) of the private key in the PKCS#11 device\n"
+    @Option(name = "--id", description = "id (hex) of the private key in the PKCS#11 device\n"
             + "either keyId or keyLabel must be specified")
     protected String id;
 
-    @Option(name = "--label",
-        description = "label of the private key in the PKCS#11 device\n"
+    @Option(name = "--label", description = "label of the private key in the PKCS#11 device\n"
             + "either keyId or keyLabel must be specified")
     protected String label;
 
@@ -200,18 +191,15 @@ public class P11Actions {
     @Option(name = "--slot", description = "slot index")
     private int slotIndex = 0;
 
-    @Option(name = "--id",
-        description = "id (hex) of the private key in the PKCS#11 device\n"
+    @Option(name = "--id", description = "id (hex) of the private key in the PKCS#11 device\n"
             + "either keyId or keyLabel must be specified")
     private String id;
 
-    @Option(name = "--label",
-        description = "label of the private key in the PKCS#11 device\n"
+    @Option(name = "--label", description = "label of the private key in the PKCS#11 device\n"
             + "either keyId or keyLabel must be specified")
     private String label;
 
-    @Option(name = "--module",
-        description = "name of the PKCS#11 module")
+    @Option(name = "--module", description = "name of the PKCS#11 module")
     @Completion(SecurityCompleters.P11ModuleNameCompleter.class)
     private String moduleName = "default";
 
@@ -230,9 +218,9 @@ public class P11Actions {
       return securityFactory.createSigner("PKCS11", conf, (X509Cert[]) null);
     }
 
-    public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, int slotIndex,
-        String keyLabel, byte[] keyId, int parallelism, HashAlgo hashAlgo,
-        SignatureAlgoControl signatureAlgoControl) {
+    public static SignerConf getPkcs11SignerConf(
+        String pkcs11ModuleName, int slotIndex, String keyLabel, byte[] keyId, int parallelism,
+        HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl) {
       Args.positive(parallelism, "parallelism");
       Args.notNull(hashAlgo, "hashAlgo");
 
@@ -329,18 +317,15 @@ public class P11Actions {
 
   } // class EcP11
 
-  @Command(scope = "xi", name = "delete-key-p11",
-      description = "delete key and cert in PKCS#11 device")
+  @Command(scope = "xi", name = "delete-key-p11", description = "delete key and cert in PKCS#11 device")
   @Service
   public static class DeleteKeyP11 extends P11SecurityAction {
 
-    @Option(name = "--id",
-        description = "id (hex) of the private key in the PKCS#11 device\n"
+    @Option(name = "--id", description = "id (hex) of the private key in the PKCS#11 device\n"
             + "either keyId or keyLabel must be specified")
     protected String id;
 
-    @Option(name = "--label",
-        description = "label of the private key in the PKCS#11 device\n"
+    @Option(name = "--label", description = "label of the private key in the PKCS#11 device\n"
             + "either keyId or keyLabel must be specified")
     protected String label;
 
@@ -366,18 +351,15 @@ public class P11Actions {
 
   } // class DeleteKeyP11
 
-  @Command(scope = "xi", name = "key-exists-p11",
-          description = "return whether key and certs exist in PKCS#11 device")
+  @Command(scope = "xi", name = "key-exists-p11", description = "return whether key and certs exist in PKCS#11 device")
   @Service
   public static class KeyExistsP11 extends P11SecurityAction {
 
-    @Option(name = "--id",
-            description = "id (hex) of the private key in the PKCS#11 device\n"
+    @Option(name = "--id", description = "id (hex) of the private key in the PKCS#11 device\n"
                     + "either keyId or keyLabel must be specified")
     protected String id;
 
-    @Option(name = "--label",
-            description = "label of the private key in the PKCS#11 device\n"
+    @Option(name = "--label", description = "label of the private key in the PKCS#11 device\n"
                     + "either keyId or keyLabel must be specified")
     protected String label;
 
@@ -402,12 +384,10 @@ public class P11Actions {
         description = "whether the key is extractable, valid values are yes|no|true|false")
     private String extractable;
 
-    @Option(name = "--sensitive",
-        description = "whether the key is sensitive, valid values are yes|no|true|false")
+    @Option(name = "--sensitive", description = "whether the key is sensitive, valid values are yes|no|true|false")
     private String sensitive;
 
-    @Option(name = "--key-usage", multiValued = true,
-        description = "key usage of the private key")
+    @Option(name = "--key-usage", multiValued = true, description = "key usage of the private key")
     @Completion(SecurityCompleters.P11KeyUsageCompleter.class)
     private List<String> keyusages;
 
@@ -435,18 +415,15 @@ public class P11Actions {
 
   } // class P11KeyGenAction
 
-  @Command(scope = "xi", name = "delete-objects-p11",
-      description = "delete objects in PKCS#11 device")
+  @Command(scope = "xi", name = "delete-objects-p11", description = "delete objects in PKCS#11 device")
   @Service
   public static class DeleteObjectsP11 extends P11SecurityAction {
 
-    @Option(name = "--id",
-        description = "id (hex) of the objects in the PKCS#11 device\n"
+    @Option(name = "--id", description = "id (hex) of the objects in the PKCS#11 device\n"
             + "at least one of id and label must be specified")
     private String id;
 
-    @Option(name = "--label",
-        description = "label of the objects in the PKCS#11 device\n"
+    @Option(name = "--label", description = "label of the objects in the PKCS#11 device\n"
             + "at least one of id and label must be specified")
     private String label;
 
@@ -514,16 +491,14 @@ public class P11Actions {
       }
 
       P11Slot slot = getSlot();
-      P11IdentityId identityId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent),
-          getControl());
+      P11IdentityId identityId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent), getControl());
       finalize("RSA", identityId);
       return null;
     }
 
   } // class RsaP11
 
-  @Command(scope = "xi", name = "secretkey-p11",
-      description = "generate secret key in PKCS#11 device")
+  @Command(scope = "xi", name = "secretkey-p11", description = "generate secret key in PKCS#11 device")
   @Service
   public static class SecretkeyP11 extends P11KeyGenAction {
 
@@ -616,8 +591,7 @@ public class P11Actions {
     @Completion(SecurityCompleters.SecretKeyTypeCompleter.class)
     private String keyType;
 
-    @Option(name = "--keystore", required = true,
-        description = "JCEKS keystore from which the key is imported")
+    @Option(name = "--keystore", required = true, description = "JCEKS keystore from which the key is imported")
     @Completion(FileCompleter.class)
     private String keyOutFile;
 
@@ -686,8 +660,7 @@ public class P11Actions {
 
   public abstract static class P11SecurityAction extends SecurityAction {
 
-    protected static final String DEFAULT_P11MODULE_NAME =
-        P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
+    protected static final String DEFAULT_P11MODULE_NAME = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
     @Option(name = "--slot", description = "slot index")
     protected int slotIndex = 0;
@@ -732,8 +705,7 @@ public class P11Actions {
 
   } // class P11SecurityAction
 
-  @Command(scope = "xi", name = "sm2-p11",
-      description = "generate SM2 (curve sm2p256v1) keypair in PKCS#11 device")
+  @Command(scope = "xi", name = "sm2-p11", description = "generate SM2 (curve sm2p256v1) keypair in PKCS#11 device")
   @Service
   public static class Sm2P11 extends P11KeyGenAction {
 

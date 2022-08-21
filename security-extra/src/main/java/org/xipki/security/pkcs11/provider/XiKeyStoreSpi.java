@@ -150,14 +150,10 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
 
         P11PrivateKey key = new P11PrivateKey(p11Service, identity.getId());
         KeyCertEntry keyCertEntry = new KeyCertEntry(key, chain);
-        keyCerts.put(moduleName + "#slotid-" + slotId.getId() + "#keyid-"
-            + objId.getIdHex(), keyCertEntry);
-        keyCerts.put(moduleName + "#slotid-" + slotId.getId() + "#keylabel-"
-            + objId.getLabel(), keyCertEntry);
-        keyCerts.put(moduleName + "#slotindex-" + slotId.getIndex() + "#keyid-"
-            + objId.getIdHex(), keyCertEntry);
-        keyCerts.put(moduleName + "#slotindex-" + slotId.getIndex() + "#keylabel-"
-            + objId.getLabel(), keyCertEntry);
+        keyCerts.put(moduleName + "#slotid-" + slotId.getId() + "#keyid-" + objId.getIdHex(), keyCertEntry);
+        keyCerts.put(moduleName + "#slotid-" + slotId.getId() + "#keylabel-" + objId.getLabel(), keyCertEntry);
+        keyCerts.put(moduleName + "#slotindex-" + slotId.getIndex() + "#keyid-" + objId.getIdHex(), keyCertEntry);
+        keyCerts.put(moduleName + "#slotindex-" + slotId.getIndex() + "#keylabel-" + objId.getLabel(), keyCertEntry);
       }
     }
   } // method engineLoad

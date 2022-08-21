@@ -199,9 +199,8 @@ public class P12ContentSignerBuilder {
     }
   } // method createContentSigner
 
-  public ConcurrentContentSigner createSigner(SignAlgo signAlgo, int parallelism,
-      SecureRandom random)
-          throws XiSecurityException, NoSuchPaddingException {
+  public ConcurrentContentSigner createSigner(SignAlgo signAlgo, int parallelism, SecureRandom random)
+      throws XiSecurityException, NoSuchPaddingException {
     notNull(signAlgo, "signAlgo");
     positive(parallelism, "parallelism");
 
@@ -269,8 +268,7 @@ public class P12ContentSignerBuilder {
   }
 
   private Signature createSignature(SignAlgo signAlgo, String provName, boolean test)
-      throws NoSuchAlgorithmException, NoSuchProviderException,
-      InvalidKeyException, SignatureException {
+      throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
     Signature signature = Signature.getInstance(signAlgo.getJceName(), provName);
     signature.initSign(key);
     if (test) {
@@ -287,15 +285,15 @@ public class P12ContentSignerBuilder {
     try {
       if (key instanceof RSAPrivateKey) {
         if (!(signAlgo.isRSAPSSSigAlgo() || signAlgo.isRSAPkcs1SigAlgo())) {
-          throw new NoSuchAlgorithmException("the given algorithm is not a valid RSA signature "
-              + "algorithm '" + signAlgo + "'");
+          throw new NoSuchAlgorithmException(
+              "the given algorithm is not a valid RSA signature algorithm '" + signAlgo + "'");
         }
         keyparam = SignerUtil.generateRSAPrivateKeyParameter((RSAPrivateKey) key);
         signerBuilder = new RSAContentSignerBuilder(signAlgo);
       } else if (key instanceof DSAPrivateKey) {
         if (!signAlgo.isDSASigAlgo()) {
-          throw new NoSuchAlgorithmException("the given algorithm is not a valid DSA signature "
-              + "algirthm " + signAlgo);
+          throw new NoSuchAlgorithmException(
+              "the given algorithm is not a valid DSA signature algirthm " + signAlgo);
         }
         keyparam = DSAUtil.generatePrivateKeyParameter(key);
         signerBuilder = new DSAContentSignerBuilder(signAlgo);
@@ -304,14 +302,14 @@ public class P12ContentSignerBuilder {
         EllipticCurve curve = ((ECPrivateKey) key).getParams().getCurve();
         if (GMUtil.isSm2primev2Curve(curve)) {
           if (!signAlgo.isSM2SigAlgo()) {
-            throw new NoSuchAlgorithmException("the given algorithm is not a valid SM2 signature "
-                + "algirthm " + signAlgo);
+            throw new NoSuchAlgorithmException(
+                "the given algorithm is not a valid SM2 signature algirthm " + signAlgo);
           }
           signerBuilder = new SM2ContentSignerBuilder(signAlgo);
         } else {
           if (!signAlgo.isECDSASigAlgo()) {
-            throw new NoSuchAlgorithmException("the given algorithm is not a valid ECDSA signature "
-                + "algirthm " + signAlgo);
+            throw new NoSuchAlgorithmException(
+                "the given algorithm is not a valid ECDSA signature algirthm " + signAlgo);
           }
           signerBuilder = new ECDSAContentSignerBuilder(signAlgo);
         }

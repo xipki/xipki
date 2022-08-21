@@ -68,8 +68,7 @@ public class HealthCheckServlet extends HttpServlet {
       }
 
       boolean healthy = server.healthCheck(responderAndPath.getResponder());
-      int status = healthy
-          ? HttpServletResponse.SC_OK : HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+      int status = healthy ? HttpServletResponse.SC_OK : HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
       resp.setStatus(status);
     } catch (Throwable th) {

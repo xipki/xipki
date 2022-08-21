@@ -103,16 +103,15 @@ public class CrlStreamParser extends Asn1StreamParser {
 
     private final X500Name certificateIssuer;
 
-    private RevokedCert(BigInteger serialNumber, Date revocationDate, int reason,
-        Date invalidityDate, X500Name certificateIssuer) {
+    private RevokedCert(
+        BigInteger serialNumber, Date revocationDate, int reason, Date invalidityDate, X500Name certificateIssuer) {
       this.serialNumber = serialNumber;
       this.revocationDate = revocationDate.getTime() / 1000;
       this.reason = reason;
       if (invalidityDate == null) {
         this.invalidityDate = 0;
       } else {
-        this.invalidityDate =
-            revocationDate.equals(invalidityDate) ? 0 : invalidityDate.getTime() / 1000;
+        this.invalidityDate = revocationDate.equals(invalidityDate) ? 0 : invalidityDate.getTime() / 1000;
       }
 
       this.certificateIssuer = certificateIssuer;
@@ -205,8 +204,7 @@ public class CrlStreamParser extends Asn1StreamParser {
         Extensions extns = Extensions.getInstance(revCert.getObjectAt(2));
         byte[] coreExtValue = X509Util.getCoreExtValue(extns, Extension.certificateIssuer);
         if (coreExtValue != null) {
-          certificateIssuer = X500Name.getInstance(
-                                GeneralNames.getInstance(coreExtValue).getNames()[0].getName());
+          certificateIssuer = X500Name.getInstance(GeneralNames.getInstance(coreExtValue).getNames()[0].getName());
         }
 
         coreExtValue = X509Util.getCoreExtValue(extns, Extension.invalidityDate);
@@ -233,8 +231,7 @@ public class CrlStreamParser extends Asn1StreamParser {
         }
       }
 
-      next = new RevokedCert(serialNumber, revocationDate, reason, invalidityDate,
-                  certificateIssuer);
+      next = new RevokedCert(serialNumber, revocationDate, reason, invalidityDate, certificateIssuer);
     } // method next0
 
     @Override

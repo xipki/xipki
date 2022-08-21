@@ -97,8 +97,7 @@ class ConfLoader {
           LOG.info("ignore existed keypairGen {}", name);
           continue;
         } else {
-          throw logAndCreateException(
-                  concat("keypairGen ", name, " existed, could not re-added it"));
+          throw logAndCreateException(concat("keypairGen ", name, " existed, could not re-added it"));
         }
       }
 
@@ -121,8 +120,7 @@ class ConfLoader {
           LOG.info("ignore existed signer {}", name);
           continue;
         } else {
-          throw logAndCreateException(
-              concat("signer ", name, " existed, could not re-added it"));
+          throw logAndCreateException(concat("signer ", name, " existed, could not re-added it"));
         }
       }
 
@@ -146,8 +144,7 @@ class ConfLoader {
           LOG.info("ignore existed cert-based requestor {}", name);
           continue;
         } else {
-          throw logAndCreateException(
-              concat("cert-based requestor ", name, " existed, could not re-added it"));
+          throw logAndCreateException(concat("cert-based requestor ", name, " existed, could not re-added it"));
         }
       }
 
@@ -170,8 +167,7 @@ class ConfLoader {
           LOG.info("ignore existed publisher {}", name);
           continue;
         } else {
-          throw logAndCreateException(
-              concat("publisher ", name, " existed, could not re-added it"));
+          throw logAndCreateException(concat("publisher ", name, " existed, could not re-added it"));
         }
       }
 
@@ -194,8 +190,7 @@ class ConfLoader {
           LOG.info("ignore existed certprofile {}", name);
           continue;
         } else {
-          throw logAndCreateException(
-              concat("certprofile ", name, " existed, could not re-added it"));
+          throw logAndCreateException(concat("certprofile ", name, " existed, could not re-added it"));
         }
       }
 
@@ -222,8 +217,7 @@ class ConfLoader {
             SignerConf signerConf = new SignerConf(caEntry.getSignerConf());
             ConcurrentContentSigner signer;
             try {
-              signer = securityFactory.createSigner(caEntry.getSignerType(), signerConf,
-                  (X509Cert) null);
+              signer = securityFactory.createSigner(caEntry.getSignerType(), signerConf, (X509Cert) null);
             } catch (ObjectCreationException ex) {
               throw new CaMgmtException(concat("could not create signer for CA ", caName), ex);
             }
@@ -237,9 +231,8 @@ class ConfLoader {
           }
         } else {
           if (genSelfIssued != null) {
-            X509Cert cert = manager.generateRootCa(caEntry, genSelfIssued.getProfile(),
-                genSelfIssued.getSubject(), genSelfIssued.getSerialNumber(),
-                genSelfIssued.getNotBefore(), genSelfIssued.getNotAfter());
+            X509Cert cert = manager.generateRootCa(caEntry, genSelfIssued.getProfile(), genSelfIssued.getSubject(),
+                genSelfIssued.getSerialNumber(), genSelfIssued.getNotBefore(), genSelfIssued.getNotAfter());
             LOG.info("generated root CA {}", caName);
             generatedRootCerts.put(caName, cert);
           } else {
@@ -435,8 +428,7 @@ class ConfLoader {
 
           // Certificate
           byte[] certBytes = entry.getCert().getEncoded();
-          caInfoType.setCert(createFileOrBinary(zipStream, certBytes,
-              concat("files/ca-", name, "-cert.der")));
+          caInfoType.setCert(createFileOrBinary(zipStream, certBytes, concat("files/ca-", name, "-cert.der")));
 
           // certchain
           List<X509Cert> certchain = entry.getCertchain();
@@ -452,8 +444,7 @@ class ConfLoader {
           }
 
           if (entry.getCrlControl() != null) {
-            caInfoType.setCrlControl(
-                new HashMap<>(new ConfPairs(entry.getCrlControl().getConf()).asMap()));
+            caInfoType.setCrlControl(new HashMap<>(new ConfPairs(entry.getCrlControl().getConf()).asMap()));
           }
 
           if (entry.getCrlSignerName() != null) {
@@ -461,8 +452,7 @@ class ConfLoader {
           }
 
           if (entry.getCtlogControl() != null) {
-            caInfoType.setCtlogControl(
-                new HashMap<>(new ConfPairs(entry.getCtlogControl().getConf()).asMap()));
+            caInfoType.setCtlogControl(new HashMap<>(new ConfPairs(entry.getCtlogControl().getConf()).asMap()));
           }
 
           caInfoType.setExpirationPeriod(entry.getExpirationPeriod());
@@ -520,8 +510,7 @@ class ConfLoader {
                 Base64.decode(entry.getConf()), concat("files/requestor-", name, ".der"));
             type.setBinaryConf(fob);
           } else {
-            FileOrValue fov = createFileOrValue(zipStream,
-                entry.getConf(), concat("files/requestor-", name, ".conf"));
+            FileOrValue fov = createFileOrValue(zipStream,  entry.getConf(), concat("files/requestor-", name, ".conf"));
             type.setConf(fov);
           }
 
@@ -542,8 +531,7 @@ class ConfLoader {
           NameTypeConf conf = new NameTypeConf();
           conf.setName(name);
           conf.setType(entry.getType());
-          conf.setConf(createFileOrValue(zipStream, entry.getConf(),
-              concat("files/publisher-", name, ".conf")));
+          conf.setConf(createFileOrValue(zipStream, entry.getConf(), concat("files/publisher-", name, ".conf")));
           list.add(conf);
         }
 
@@ -560,8 +548,7 @@ class ConfLoader {
           NameTypeConf conf = new NameTypeConf();
           conf.setName(name);
           conf.setType(entry.getType());
-          conf.setConf(createFileOrValue(zipStream, entry.getConf(),
-              concat("files/certprofile-", name, ".conf")));
+          conf.setConf(createFileOrValue(zipStream, entry.getConf(), concat("files/certprofile-", name, ".conf")));
           list.add(conf);
         }
 
@@ -579,8 +566,7 @@ class ConfLoader {
           CaConfType.Signer conf = new CaConfType.Signer();
           conf.setName(name);
           conf.setType(entry.getType());
-          conf.setConf(createFileOrValue(zipStream, entry.getConf(),
-              concat("files/signer-", name, ".conf")));
+          conf.setConf(createFileOrValue(zipStream, entry.getConf(), concat("files/signer-", name, ".conf")));
           conf.setCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(),
               concat("files/signer-", name, ".der")));
 

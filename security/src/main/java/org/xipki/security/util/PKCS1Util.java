@@ -56,9 +56,8 @@ public class PKCS1Util {
         digestPkcsPrefix.put(algo, Hex.decode(prefix));
     }
 
-    public static byte[] EMSA_PKCS1_v1_5_encoding(byte[] hashValue, int modulusBigLength,
-                                                  HashAlgo hashAlgo)
-            throws XiSecurityException {
+    public static byte[] EMSA_PKCS1_v1_5_encoding(byte[] hashValue, int modulusBigLength, HashAlgo hashAlgo)
+        throws XiSecurityException {
         notNull(hashValue, "hashValue");
         notNull(hashAlgo, "hashAlgo");
 
@@ -70,7 +69,7 @@ public class PKCS1Util {
 
         if (prefix.length + hashLen + 3 > blockSize) {
             throw new XiSecurityException("data too long (maximal " + (blockSize - 3)
-                    + " allowed): " + (prefix.length + hashLen));
+                + " allowed): " + (prefix.length + hashLen));
         }
 
         byte[] block = new byte[blockSize];
@@ -100,8 +99,7 @@ public class PKCS1Util {
         int blockSize = (modulusBigLength + 7) / 8;
 
         if (msgLen + 3 > blockSize) {
-            throw new XiSecurityException("data too long (maximal " + (blockSize - 3)
-                    + " allowed): " + msgLen);
+            throw new XiSecurityException("data too long (maximal " + (blockSize - 3) + " allowed): " + msgLen);
         }
 
         byte[] block = new byte[blockSize];
@@ -122,9 +120,9 @@ public class PKCS1Util {
     } // method EMSA_PKCS1_v1_5_encoding
 
     public static byte[] EMSA_PSS_ENCODE(
-            HashAlgo contentDigest, byte[] hashValue, HashAlgo mgfDigest,
-            int saltLen, int modulusBitLength, SecureRandom random)
-            throws XiSecurityException {
+        HashAlgo contentDigest, byte[] hashValue, HashAlgo mgfDigest,
+        int saltLen, int modulusBitLength, SecureRandom random)
+        throws XiSecurityException {
         switch (contentDigest) {
             case SHAKE128:
             case SHAKE256:
@@ -134,7 +132,7 @@ public class PKCS1Util {
 
                 if (saltLen != contentDigest.getLength()) {
                     throw new XiSecurityException(
-                            "saltLen != " + contentDigest.getLength() + ": " + saltLen);
+                        "saltLen != " + contentDigest.getLength() + ": " + saltLen);
                 }
                 break;
             default:
@@ -147,8 +145,7 @@ public class PKCS1Util {
         final byte trailer = (byte)0xBC;
 
         if (hashValue.length != hLen) {
-            throw new XiSecurityException("hashValue.length is incorrect: "
-                    + hashValue.length + " != " + hLen);
+            throw new XiSecurityException("hashValue.length is incorrect: " + hashValue.length + " != " + hLen);
         }
 
         int emBits = modulusBitLength - 1;
@@ -198,8 +195,7 @@ public class PKCS1Util {
         return (bytes == null) ? null : Arrays.copyOf(bytes, bytes.length);
     }
 
-    public static byte[] RSAES_OAEP_ENCODE(byte[] M, int modulusBigLength, HashAlgo hashAlgo,
-                                           SecureRandom random) {
+    public static byte[] RSAES_OAEP_ENCODE(byte[] M, int modulusBigLength, HashAlgo hashAlgo, SecureRandom random) {
         int k = (modulusBigLength + 7) / 8;
         int mLen = M.length;
         int hLen = hashAlgo.getLength();

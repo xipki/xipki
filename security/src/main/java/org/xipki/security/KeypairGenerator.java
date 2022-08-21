@@ -83,8 +83,7 @@ public abstract class KeypairGenerator implements Closeable {
     }
 
     if (tokens == null) {
-      tokens = new HashSet<>(
-          Arrays.asList("RSA", "EC", "DSA", "ED25519", "ED448", "X25519", "X448"));
+      tokens = new HashSet<>(Arrays.asList("RSA", "EC", "DSA", "ED25519", "ED448", "X25519", "X448"));
     }
 
     for (String token : tokens) {
@@ -108,8 +107,7 @@ public abstract class KeypairGenerator implements Closeable {
         case "EC":
           List<String> curveNames = AlgorithmUtil.getECCurveNames();
           for (String curveName : curveNames) {
-            ASN1ObjectIdentifier curveId =
-                AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
+            ASN1ObjectIdentifier curveId = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
             if (curveId != null) {
               String keyspec = "EC/" + curveId.getId();
               keyspecs.add(keyspec);

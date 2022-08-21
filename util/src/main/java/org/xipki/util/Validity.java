@@ -158,8 +158,7 @@ public class Validity implements Comparable<Validity> {
       case MINUTE:
         return new Date(referenceDate.getTime() + validity * MINUTE);
       default:
-        throw new IllegalStateException(String.format(
-            "should not reach here, unknown Validity.Unit %s", unit));
+        throw new IllegalStateException(String.format("should not reach here, unknown Validity.Unit %s", unit));
     }
   } // method add
 
@@ -176,8 +175,7 @@ public class Validity implements Comparable<Validity> {
       case MINUTE:
         return validity;
       default:
-        throw new IllegalStateException(String.format(
-            "should not reach here, unknown Validity.Unit %s", unit));
+        throw new IllegalStateException(String.format("should not reach here, unknown Validity.Unit %s", unit));
     }
   }
 
@@ -232,8 +230,7 @@ public class Validity implements Comparable<Validity> {
       case MINUTE:
         return validity + "m";
       default:
-        throw new IllegalStateException(String.format(
-            "should not reach here, unknown Validity.Unit %s", unit));
+        throw new IllegalStateException(String.format("should not reach here, unknown Validity.Unit %s", unit));
     }
   }
 

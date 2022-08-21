@@ -56,7 +56,8 @@ public class P11ContentSignerBuilder {
 
   private final P11IdentityId identityId;
 
-  public P11ContentSignerBuilder(P11CryptService cryptService, SecurityFactory securityFactory,
+  public P11ContentSignerBuilder(
+      P11CryptService cryptService, SecurityFactory securityFactory,
       P11IdentityId identityId, X509Cert[] certificateChain)
       throws XiSecurityException, P11TokenException {
     this.cryptService = notNull(cryptService, "cryptService");
@@ -65,8 +66,7 @@ public class P11ContentSignerBuilder {
 
     P11Identity identity = cryptService.getIdentity(identityId);
     X509Cert signerCertInP11 = identity.getCertificate();
-    PublicKey publicKeyInP11 = (signerCertInP11 != null) ? signerCertInP11.getPublicKey()
-        : identity.getPublicKey();
+    PublicKey publicKeyInP11 = (signerCertInP11 != null) ? signerCertInP11.getPublicKey() : identity.getPublicKey();
 
     if (publicKeyInP11 == null) {
       throw new XiSecurityException("public key with " + identityId + " does not exist");
@@ -103,9 +103,8 @@ public class P11ContentSignerBuilder {
     }
   } // constructor
 
-  public ConcurrentContentSigner createSigner(SignAlgo signAlgo,
-      int parallelism)
-          throws XiSecurityException, P11TokenException {
+  public ConcurrentContentSigner createSigner(SignAlgo signAlgo, int parallelism)
+      throws XiSecurityException, P11TokenException {
     positive(parallelism, "parallelism");
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);
@@ -124,8 +123,7 @@ public class P11ContentSignerBuilder {
 
         if (isSm2p256v1) {
           java.security.spec.ECPoint w = ecKey.getW();
-          signer = createSM2ContentSigner(signAlgo, GMObjectIdentifiers.sm2p256v1,
-              w.getAffineX(), w.getAffineY());
+          signer = createSM2ContentSigner(signAlgo, GMObjectIdentifiers.sm2p256v1, w.getAffineX(), w.getAffineY());
         } else {
           signer = createECContentSigner(signAlgo);
         }
@@ -160,8 +158,7 @@ public class P11ContentSignerBuilder {
   private XiContentSigner createRSAContentSigner(SignAlgo signAlgo)
       throws XiSecurityException, P11TokenException {
     if (signAlgo.isRSAPSSSigAlgo()) {
-      return new P11ContentSigner.RSAPSS(cryptService, identityId, signAlgo,
-          securityFactory.getRandom4Sign());
+      return new P11ContentSigner.RSAPSS(cryptService, identityId, signAlgo, securityFactory.getRandom4Sign());
     } else {
       return new P11ContentSigner.RSA(cryptService, identityId, signAlgo);
     }
@@ -172,11 +169,10 @@ public class P11ContentSignerBuilder {
     return new P11ContentSigner.ECDSA(cryptService, identityId, signAlgo);
   }
 
-  private XiContentSigner createSM2ContentSigner(SignAlgo signAlgo,
-      ASN1ObjectIdentifier curveOid, BigInteger pubPointX, BigInteger pubPointy)
+  private XiContentSigner createSM2ContentSigner(
+      SignAlgo signAlgo, ASN1ObjectIdentifier curveOid, BigInteger pubPointX, BigInteger pubPointy)
       throws XiSecurityException, P11TokenException {
-    return new P11ContentSigner.SM2(cryptService, identityId, signAlgo,
-        curveOid, pubPointX, pubPointy);
+    return new P11ContentSigner.SM2(cryptService, identityId, signAlgo, curveOid, pubPointX, pubPointy);
   }
 
   private XiContentSigner createDSAContentSigner(SignAlgo signAlgo)

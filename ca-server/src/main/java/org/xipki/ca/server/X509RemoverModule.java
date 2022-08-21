@@ -97,7 +97,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
   private ScheduledFuture<?> expiredCertsRemover;
 
   public X509RemoverModule(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore,
-      X509PublisherModule publisherModule) {
+                           X509PublisherModule publisherModule) {
     super(caInfo);
 
     this.caIdNameMap = caManager.idNameMap();
@@ -162,8 +162,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
       throws OperationException {
     notNull(expiredAtTime, "expiredtime");
     if (!masterMode) {
-      throw new OperationException(NOT_PERMITTED,
-          "CA could not remove expired certificates in slave mode");
+      throw new OperationException(NOT_PERMITTED, "CA could not remove expired certificates in slave mode");
     }
 
     event.addEventData(CaAuditConstants.NAME_expired_at, expiredAtTime);
@@ -173,8 +172,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
 
     int sum = 0;
     while (true) {
-      List<SerialWithId> serials = certstore.getExpiredUnrevokedSerialNumbers(
-            caIdent, expiredAt, numEntries);
+      List<SerialWithId> serials = certstore.getExpiredUnrevokedSerialNumbers(caIdent, expiredAt, numEntries);
       if (CollectionUtil.isEmpty(serials)) {
         return sum;
       }
@@ -191,8 +189,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
           }
         } catch (OperationException ex) {
           LOG.info("removed {} expired certificates of CA {}", sum, caIdent.getName());
-          LogUtil.error(LOG, ex, "could not remove expired certificate with serial"
-              + serial.getSerial());
+          LogUtil.error(LOG, ex, "could not remove expired certificate with serial" + serial.getSerial());
           throw ex;
         }
       } // end for

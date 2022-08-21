@@ -172,8 +172,7 @@ public class RequestOption {
       trustanchors = new HashSet<>(tmpCerts.size());
       trustanchors.addAll(tmpCerts);
     } catch (Exception ex) {
-      throw new InvalidConfException(
-          "could not initialize the trustanchors: " + ex.getMessage(), ex);
+      throw new InvalidConfException("could not initialize the trustanchors: " + ex.getMessage(), ex);
     }
 
     OcspServerConf.CertCollection certsType = certpathConf.getCerts();
@@ -241,7 +240,7 @@ public class RequestOption {
   }
 
   private static Set<X509Cert> getCerts(OcspServerConf.CertCollection conf)
-      throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+      throws CertificateException, IOException {
     notNull(conf, "conf");
     Set<X509Cert> tmpCerts = new HashSet<>();
 

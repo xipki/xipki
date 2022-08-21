@@ -75,8 +75,7 @@ public class ProfileCaActions {
 
   } // class CaprofileAdd
 
-  @Command(scope = "ca", name = "caprofile-info",
-      description = "show information of certificate profile in given CA")
+  @Command(scope = "ca", name = "caprofile-info", description = "show information of certificate profile in given CA")
   @Service
   public static class CaprofileInfo extends CaAction {
 
@@ -117,8 +116,7 @@ public class ProfileCaActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--profile", required = true, multiValued = true,
-        description = "certificate profile name")
+    @Option(name = "--profile", required = true, multiValued = true, description = "certificate profile name")
     @Completion(CaCompleters.ProfileNameCompleter.class)
     private List<String> profileNames;
 
@@ -183,8 +181,7 @@ public class ProfileCaActions {
 
   } // class ProfileAdd
 
-  @Command(scope = "ca", name = "profile-export",
-      description = "export certificate profile configuration")
+  @Command(scope = "ca", name = "profile-export", description = "export certificate profile configuration")
   @Service
   public static class ProfileExport extends CaAction {
 
@@ -192,8 +189,7 @@ public class ProfileCaActions {
     @Completion(CaCompleters.ProfileNameCompleter.class)
     private String name;
 
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "where to save the profile configuration")
+    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the profile configuration")
     @Completion(FileCompleter.class)
     private String confFile;
 
@@ -216,8 +212,7 @@ public class ProfileCaActions {
 
   } // class ProfileExport
 
-  @Command(scope = "ca", name = "profile-info",
-      description = "show information of certificate profile")
+  @Command(scope = "ca", name = "profile-info", description = "show information of certificate profile")
   @Service
   public static class ProfileInfo extends CaAction {
 
@@ -225,8 +220,7 @@ public class ProfileCaActions {
     @Completion(CaCompleters.ProfileNameCompleter.class)
     private String name;
 
-    @Option(name = "--verbose", aliases = "-v",
-        description = "show certificate profile information verbosely")
+    @Option(name = "--verbose", aliases = "-v", description = "show certificate profile information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Override

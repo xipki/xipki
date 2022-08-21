@@ -85,8 +85,6 @@ public class SoftwareKeypairGenerator extends KeypairGenerator {
         }
 
         KeyPair kp = KeyUtil.generateRSAKeypair(keysize, rsaE, random);
-        java.security.interfaces.RSAPublicKey rsaPubKey =
-            (java.security.interfaces.RSAPublicKey) kp.getPublic();
         return KeyUtil.toPrivateKeyInfo((RSAPrivateCrtKey) kp.getPrivate());
       }
       case "EC": {

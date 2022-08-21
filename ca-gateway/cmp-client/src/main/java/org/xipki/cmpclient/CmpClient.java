@@ -184,8 +184,7 @@ public interface CmpClient extends Closeable {
    *          if client error occurs.
    */
   CertIdOrError unsuspendCert(
-      String caName, Requestor requestor, X509Cert issuerCert,
-      BigInteger serial, ReqRespDebug debug)
+      String caName, Requestor requestor, X509Cert issuerCert, BigInteger serial, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -206,8 +205,7 @@ public interface CmpClient extends Closeable {
    *          if client error occurs.
    */
   CertIdOrError unsuspendCert(
-      String caName, Requestor requestor, X509Cert issuerCert,
-      X509Cert cert, ReqRespDebug debug)
+      String caName, Requestor requestor, X509Cert issuerCert, X509Cert cert, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -226,8 +224,7 @@ public interface CmpClient extends Closeable {
    *          if client error occurs.
    */
   Map<String, CertIdOrError> unsuspendCerts(
-      String caName, Requestor requestor, UnrevokeCertRequest request,
-      ReqRespDebug debug)
+      String caName, Requestor requestor, UnrevokeCertRequest request, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**

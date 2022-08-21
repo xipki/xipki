@@ -49,8 +49,8 @@ public class GenRSAKeypairParams extends ProxyMessage {
 
   private final BigInteger publicExponent;
 
-  public GenRSAKeypairParams(P11SlotIdentifier slotId,
-      P11NewKeyControl control, int keysize, BigInteger publicExponent) {
+  public GenRSAKeypairParams(
+      P11SlotIdentifier slotId, P11NewKeyControl control, int keysize, BigInteger publicExponent) {
     this.slotId = Args.notNull(slotId, "slotId");
     this.control = control;
     this.keysize = Args.min(keysize, "keysize", 1);

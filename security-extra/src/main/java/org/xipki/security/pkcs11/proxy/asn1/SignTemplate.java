@@ -57,7 +57,7 @@ public class SignTemplate extends ProxyMessage {
   }
 
   public SignTemplate(SlotIdentifier slotId, ObjectIdentifier objectId,
-      long mechanism, P11Params parameter, byte[] message) {
+                      long mechanism, P11Params parameter, byte[] message) {
     this.slotId = Args.notNull(slotId, "slotId");
     this.objectId = Args.notNull(objectId, "objectId");
     this.message = Args.notNull(message, "message");
@@ -79,8 +79,7 @@ public class SignTemplate extends ProxyMessage {
         throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
       }
     } catch (IOException | IllegalArgumentException ex) {
-      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
-          ex);
+      throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(), ex);
     }
   }
 

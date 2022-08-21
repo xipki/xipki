@@ -72,9 +72,7 @@ public class EnrollCertResult {
 
   private final Map<String, CertifiedKeyPairOrError> certsOrErrors;
 
-  public EnrollCertResult(
-          X509Cert[] caCertChain, Map<String,
-          CertifiedKeyPairOrError> certsOrErrors) {
+  public EnrollCertResult(X509Cert[] caCertChain, Map<String, CertifiedKeyPairOrError> certsOrErrors) {
     this.certsOrErrors = Args.notEmpty(certsOrErrors, "certsOrErrors");
     this.caCertChain = caCertChain;
   }

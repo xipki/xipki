@@ -68,8 +68,7 @@ public class ScriptRunner {
     /**
      * Default constructor
      */
-    public ScriptRunner(Connection connection, boolean autoCommit,
-                        boolean stopOnError) {
+    public ScriptRunner(Connection connection, boolean autoCommit, boolean stopOnError) {
         this.connection = connection;
         this.autoCommit = autoCommit;
         this.stopOnError = stopOnError;
@@ -93,8 +92,7 @@ public class ScriptRunner {
         } catch(IOException e){
             System.err.println("Unable to access or create the db_create error log");
         }
-        String timeStamp = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss")
-                            .format(new java.util.Date());
+        String timeStamp = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss").format(new java.util.Date());
         println("\n-------\n" + timeStamp + "\n-------\n");
         printlnError("\n-------\n" + timeStamp + "\n-------\n");
     }
@@ -165,7 +163,7 @@ public class ScriptRunner {
      * @throws IOException if there is an error reading from the Reader
      */
     private void runScript(Connection conn, Reader reader) throws IOException,
-            SQLException {
+        SQLException {
         StringBuffer command = null;
         try {
             LineNumberReader lineReader = new LineNumberReader(reader);
@@ -176,22 +174,17 @@ public class ScriptRunner {
                 }
                 String trimmedLine = line.trim();
                 final Matcher delimMatch = delimP.matcher(trimmedLine);
-                if (trimmedLine.length() < 1
-                        || trimmedLine.startsWith("//")) {
+                if (trimmedLine.length() < 1 || trimmedLine.startsWith("//")) {
                     // Do nothing
                 } else if (delimMatch.matches()) {
                     setDelimiter(delimMatch.group(2), false);
                 } else if (trimmedLine.startsWith("--")) {
                     println(trimmedLine);
-                } else if (trimmedLine.length() < 1
-                        || trimmedLine.startsWith("--")) {
+                } else if (trimmedLine.length() < 1 || trimmedLine.startsWith("--")) {
                     // Do nothing
-                } else if (!fullLineDelimiter
-                        && trimmedLine.endsWith(getDelimiter())
-                        || fullLineDelimiter
-                        && trimmedLine.equals(getDelimiter())) {
-                    command.append(line.substring(0, line
-                            .lastIndexOf(getDelimiter())));
+                } else if (!fullLineDelimiter && trimmedLine.endsWith(getDelimiter())
+                        ||  fullLineDelimiter && trimmedLine.equals(getDelimiter())) {
+                    command.append(line.substring(0, line.lastIndexOf(getDelimiter())));
                     command.append(" ");
                     this.execCommand(conn, command, lineReader);
                     command = null;
@@ -208,17 +201,15 @@ public class ScriptRunner {
             }
         }
         catch (IOException e) {
-            throw new IOException(String.format("Error executing '%s': %s",
-                        command, e.getMessage()), e);
+            throw new IOException(String.format("Error executing '%s': %s", command, e.getMessage()), e);
         } finally {
             conn.rollback();
             flush();
         }
     }
 
-    private void execCommand(Connection conn, StringBuffer command,
-                             LineNumberReader lineReader) throws IOException, SQLException {
-
+    private void execCommand(Connection conn, StringBuffer command, LineNumberReader lineReader)
+        throws IOException, SQLException {
         if (command.length() == 0) {
             return;
         }
@@ -237,9 +228,8 @@ public class ScriptRunner {
         this.runScript(conn, new BufferedReader(new FileReader(file)));
     }
 
-    private void execSqlCommand(Connection conn, StringBuffer command,
-                             LineNumberReader lineReader) throws SQLException {
-
+    private void execSqlCommand(Connection conn, StringBuffer command, LineNumberReader lineReader)
+        throws SQLException {
         Statement statement = conn.createStatement();
 
         println(command);

@@ -44,7 +44,7 @@ public class ResponseData extends ASN1Type {
   private final int encodedLength;
 
   public ResponseData(int version, ResponderID responderId, Date producedAt,
-      List<SingleResponse> responses, Extensions extensions) {
+                      List<SingleResponse> responses, Extensions extensions) {
     if (version < 0 || version > 127) {
       throw new IllegalArgumentException("invalid version: " + version);
     }

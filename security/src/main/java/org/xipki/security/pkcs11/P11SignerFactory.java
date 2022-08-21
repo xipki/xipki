@@ -43,8 +43,7 @@ public class P11SignerFactory implements SignerFactory {
 
   private static final String TYPE = "pkcs11";
 
-  private static final Set<String> types = Collections.unmodifiableSet(
-      new HashSet<>(Collections.singletonList(TYPE)));
+  private static final Set<String> types = Collections.unmodifiableSet(new HashSet<>(Collections.singletonList(TYPE)));
 
   private P11CryptServiceFactory p11CryptServiceFactory;
 
@@ -69,9 +68,8 @@ public class P11SignerFactory implements SignerFactory {
   }
 
   @Override
-  public ConcurrentContentSigner newSigner(String type, SignerConf conf,
-      X509Cert[] certificateChain)
-          throws ObjectCreationException {
+  public ConcurrentContentSigner newSigner(String type, SignerConf conf, X509Cert[] certificateChain)
+      throws ObjectCreationException {
     if (!TYPE.equalsIgnoreCase(type)) {
       throw new ObjectCreationException("unknown signer type " + type);
     }
@@ -107,8 +105,7 @@ public class P11SignerFactory implements SignerFactory {
 
     if ((slotIndex == null && slotId == null)
         || (slotIndex != null && slotId != null)) {
-      throw new ObjectCreationException(
-          "exactly one of slot (index) and slot-id must be specified");
+      throw new ObjectCreationException("exactly one of slot (index) and slot-id must be specified");
     }
 
     String keyLabel = conf.getConfValue("key-label");
@@ -152,8 +149,7 @@ public class P11SignerFactory implements SignerFactory {
       }
 
       if (algo != null && algo.isMac()) {
-        P11MacContentSignerBuilder signerBuilder = new P11MacContentSignerBuilder(
-            p11Service, identityId);
+        P11MacContentSignerBuilder signerBuilder = new P11MacContentSignerBuilder(p11Service, identityId);
         return signerBuilder.createSigner(algo, parallelism);
       } else {
         if (algo == null) {

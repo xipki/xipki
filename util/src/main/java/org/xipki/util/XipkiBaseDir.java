@@ -54,8 +54,7 @@ public class XipkiBaseDir {
 
     if (StringUtil.isBlank(str)) {
       basedir = new File("xipki").getAbsolutePath();
-      LOG.info("use default basedir '{}', can be specified via the property '{}'",
-          basedir, PROP_XIPKI_BASE);
+      LOG.info("use default basedir '{}', can be specified via the property '{}'", basedir, PROP_XIPKI_BASE);
     } else {
       if (str.startsWith("~")) {
         str = IoUtil.USER_HOME + str.substring(1);

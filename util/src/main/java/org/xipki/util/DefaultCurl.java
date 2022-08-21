@@ -69,8 +69,7 @@ public class DefaultCurl implements Curl {
         sslSocketFactory = sslContextConf.getSslSocketFactory();
         hostnameVerifier = sslContextConf.buildHostnameVerifier();
       } catch (ObjectCreationException ex) {
-        initException = new ObjectCreationException(
-            "could not initialize DefaultCurl: " + ex.getMessage(), ex);
+        initException = new ObjectCreationException("could not initialize DefaultCurl: " + ex.getMessage(), ex);
         throw initException;
       }
     }
@@ -83,37 +82,39 @@ public class DefaultCurl implements Curl {
   }
 
   @Override
-  public CurlResult curlGet(String url, boolean verbose, Map<String, String> headers,
-      String userPassword)
-          throws Exception {
+  public CurlResult curlGet(String url, boolean verbose, Map<String, String> headers, String userPassword)
+      throws Exception {
     checkUserPassword(userPassword);
 
     return curlGet(url, null, verbose, headers, userPassword);
   }
 
   @Override
-  public CurlResult curlGet(String url, OutputStream respContentStream,
-      boolean verbose, Map<String, String> headers, String userPassword) throws Exception {
+  public CurlResult curlGet(
+      String url, OutputStream respContentStream, boolean verbose, Map<String, String> headers, String userPassword)
+      throws Exception {
     return curl(false, url, respContentStream, verbose, headers, userPassword, null);
   }
 
   @Override
-  public CurlResult curlPost(String url, boolean verbose, Map<String, String> headers,
-      String userPassword, byte[] content)
-          throws Exception {
+  public CurlResult curlPost(
+      String url, boolean verbose, Map<String, String> headers, String userPassword, byte[] content)
+      throws Exception {
     return curlPost(url, null, verbose, headers, userPassword, content);
   }
 
   @Override
-  public CurlResult curlPost(String url, OutputStream respContentStream,
-      boolean verbose, Map<String, String> headers, String userPassword, byte[] content)
-          throws Exception {
+  public CurlResult curlPost(
+      String url, OutputStream respContentStream, boolean verbose,
+      Map<String, String> headers, String userPassword, byte[] content)
+      throws Exception {
     return curl(true, url, respContentStream, verbose, headers, userPassword, content);
   }
 
-  private CurlResult curl(boolean post, String url, OutputStream respContentStream,
-      boolean verbose, Map<String, String> headers, String userPassword, byte[] content)
-          throws Exception {
+  private CurlResult curl(
+      boolean post, String url, OutputStream respContentStream, boolean verbose,
+      Map<String, String> headers, String userPassword, byte[] content)
+      throws Exception {
     if (!post && content != null) {
       throw new IllegalArgumentException("method GET cannot be used to transfer non-empty content");
     }
@@ -193,8 +194,7 @@ public class DefaultCurl implements Curl {
         println("=====response content=====");
       } else {
         if (respCode != HttpURLConnection.HTTP_OK) {
-          println("ERROR: bad response: " + httpConn.getResponseCode() + "    "
-              + httpConn.getResponseMessage());
+          println("ERROR: bad response: " + httpConn.getResponseCode() + "    " + httpConn.getResponseMessage());
         }
       }
 

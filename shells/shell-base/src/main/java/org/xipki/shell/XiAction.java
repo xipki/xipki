@@ -208,8 +208,7 @@ public abstract class XiAction implements Action {
   }
 
   private static boolean isEnabled(String enabledS, String optionName) {
-    if ("yes".equalsIgnoreCase(enabledS) || "enabled".equalsIgnoreCase(enabledS)
-        || "true".equalsIgnoreCase(enabledS)) {
+    if ("yes".equalsIgnoreCase(enabledS) || "enabled".equalsIgnoreCase(enabledS) || "true".equalsIgnoreCase(enabledS)) {
       return true;
     } else if ("no".equalsIgnoreCase(enabledS) || "disabled".equalsIgnoreCase(enabledS)
         || "false".equalsIgnoreCase(enabledS)) {

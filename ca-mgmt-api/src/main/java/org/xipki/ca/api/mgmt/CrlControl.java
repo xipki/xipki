@@ -177,10 +177,8 @@ public class CrlControl {
     }
 
     int hours = getInteger(props, KEY_INTERVAL_HOURS, 24);
-    if (!(hours >= 1 && hours <= 24
-            && (24 - 24 / hours * hours == 0))) {
-      throw new InvalidConfException(
-              KEY_INTERVAL_HOURS + " " + hours + " not in [1,2,3,4,6,8,12,24]");
+    if (!(hours >= 1 && hours <= 24 && (24 - 24 / hours * hours == 0))) {
+      throw new InvalidConfException(KEY_INTERVAL_HOURS + " " + hours + " not in [1,2,3,4,6,8,12,24]");
     }
     this.intervalHours = hours;
     this.intervalMillis = hours * 60L * 60 * 1000;
@@ -193,8 +191,7 @@ public class CrlControl {
     } else {
       List<String> tokens = StringUtil.split(str.trim(), ":");
       if (tokens.size() != 2) {
-        throw new InvalidConfException(
-            "invalid " + KEY_INTERVAL_TIME + ": '" + str + "'");
+        throw new InvalidConfException("invalid " + KEY_INTERVAL_TIME + ": '" + str + "'");
       }
 
       try {
@@ -215,8 +212,7 @@ public class CrlControl {
       i++;
     }
 
-    this.intervalDayTime = i == 0 ? hm
-            : new HourMinute(hm.getHour() - i * intervalHours, hm.getMinute());
+    this.intervalDayTime = i == 0 ? hm : new HourMinute(hm.getHour() - i * intervalHours, hm.getMinute());
 
     validate();
   } // constructor
@@ -302,18 +298,15 @@ public class CrlControl {
       throws InvalidConfException {
     if (fullCrlIntervals < deltaCrlIntervals) {
       throw new InvalidConfException(
-          "fullCRLIntervals may not be less than deltaCRLIntervals "
-          + fullCrlIntervals + " < " + deltaCrlIntervals);
+          "fullCRLIntervals may not be less than deltaCRLIntervals " + fullCrlIntervals + " < " + deltaCrlIntervals);
     }
 
     if (fullCrlIntervals < 1) {
-      throw new InvalidConfException(
-          "fullCRLIntervals may not be less than 1: " + fullCrlIntervals);
+      throw new InvalidConfException("fullCRLIntervals may not be less than 1: " + fullCrlIntervals);
     }
 
     if (deltaCrlIntervals < 0) {
-      throw new InvalidConfException(
-          "deltaCRLIntervals may not be less than 0: " + deltaCrlIntervals);
+      throw new InvalidConfException("deltaCRLIntervals may not be less than 0: " + deltaCrlIntervals);
     }
 
   } // method validate

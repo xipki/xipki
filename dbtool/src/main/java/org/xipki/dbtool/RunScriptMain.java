@@ -95,8 +95,7 @@ public class RunScriptMain {
   private static void exec(String dbConfFile, String scriptFile, boolean force)
       throws Exception {
     Properties props = new Properties();
-    try (InputStream is = Files.newInputStream(
-                            Paths.get(IoUtil.expandFilepath(dbConfFile)))) {
+    try (InputStream is = Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile)))) {
       props.load(is);
     }
 
@@ -170,7 +169,7 @@ public class RunScriptMain {
     sb.append("\t--force, -f\n");
     sb.append("\t\tNever prompt for confirmation");
 
-    System.out.println(sb.toString());
+    System.out.println(sb);
   } // method printUsage
 
 }

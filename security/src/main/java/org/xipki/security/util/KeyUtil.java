@@ -86,10 +86,8 @@ public class KeyUtil {
     }
   }
 
-  public static KeyPair generateRSAKeypair(int keysize, BigInteger publicExponent,
-      SecureRandom random)
-          throws NoSuchAlgorithmException, NoSuchProviderException,
-      InvalidAlgorithmParameterException {
+  public static KeyPair generateRSAKeypair(int keysize, BigInteger publicExponent, SecureRandom random)
+      throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
     BigInteger tmpPublicExponent = publicExponent;
     if (tmpPublicExponent == null) {
       tmpPublicExponent = RSAKeyGenParameterSpec.F4;
@@ -134,8 +132,7 @@ public class KeyUtil {
 
   public static KeyPair generateDSAKeypair(int plength, int qlength, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-    DSAParameterSpec dsaParamSpec = DSAParameterCache.getDSAParameterSpec(plength, qlength,
-        random);
+    DSAParameterSpec dsaParamSpec = DSAParameterCache.getDSAParameterSpec(plength, qlength, random);
     KeyPairGenerator kpGen = getKeyPairGenerator("DSA");
     synchronized (kpGen) {
       kpGen.initialize(dsaParamSpec, random);
@@ -145,8 +142,7 @@ public class KeyUtil {
 
   public static KeyPair generateDSAKeypair(DSAParameters dsaParams, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-    DSAParameterSpec dsaParamSpec = new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(),
-        dsaParams.getG());
+    DSAParameterSpec dsaParamSpec = new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(), dsaParams.getG());
     return generateDSAKeypair(dsaParamSpec, random);
   }
 
@@ -215,16 +211,13 @@ public class KeyUtil {
       try {
         PrivateKeyInfo edPki;
         if (xdhAlgo.equalsIgnoreCase(EdECConstants.X25519)) {
-          edPki = new PrivateKeyInfo(
-              new AlgorithmIdentifier(EdECConstants.id_ED25519), xdhPki.parsePrivateKey());
+          edPki = new PrivateKeyInfo(new AlgorithmIdentifier(EdECConstants.id_ED25519), xdhPki.parsePrivateKey());
         } else if (xdhAlgo.equalsIgnoreCase(EdECConstants.X448)) {
           byte[] x448Octets = ASN1OctetString.getInstance(xdhPki.parsePrivateKey()).getOctets();
           byte[] ed448Octets = new byte[57];
           System.arraycopy(x448Octets, 0, ed448Octets, 0, 56);
 
-          edPki = new PrivateKeyInfo(
-              new AlgorithmIdentifier(EdECConstants.id_ED448),
-              new DEROctetString(ed448Octets));
+          edPki = new PrivateKeyInfo(new AlgorithmIdentifier(EdECConstants.id_ED448), new DEROctetString(ed448Octets));
         } else {
           throw new IllegalArgumentException("unknown key algorithm " + xdhAlgo);
         }
@@ -254,8 +247,7 @@ public class KeyUtil {
       try {
         kf = KeyFactory.getInstance(alg, "BC");
       } catch (NoSuchAlgorithmException | NoSuchProviderException ex) {
-        throw new InvalidKeySpecException("could not find KeyFactory for " + alg
-            + ": " + ex.getMessage());
+        throw new InvalidKeySpecException("could not find KeyFactory for " + alg + ": " + ex.getMessage());
       }
       KEY_FACTORIES.put(alg, kf);
       return kf;
@@ -406,8 +398,7 @@ public class KeyUtil {
       try {
         return new SubjectPublicKeyInfo(
             new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE),
-            new org.bouncycastle.asn1.pkcs.RSAPublicKey(rsaPubKey.getModulus(),
-                rsaPubKey.getPublicExponent()));
+            new org.bouncycastle.asn1.pkcs.RSAPublicKey(rsaPubKey.getModulus(), rsaPubKey.getPublicExponent()));
       } catch (IOException ex) {
         throw new InvalidKeyException(ex.getMessage(), ex);
       }
@@ -439,8 +430,7 @@ public class KeyUtil {
       System.arraycopy(wxBytes, 0, pubKey, 1, keysize);
       System.arraycopy(wyBytes, 0, pubKey, 1 + keysize, keysize);
 
-      AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey,
-          curveOid);
+      AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveOid);
       return new SubjectPublicKeyInfo(algId, pubKey);
     } else if (publicKey instanceof XDHKey || publicKey instanceof EdDSAKey) {
       String algorithm = publicKey.getAlgorithm().toUpperCase();
@@ -490,9 +480,8 @@ public class KeyUtil {
     }
   } // method createSubjectPublicKeyInfo
 
-  public static ECPublicKey createECPublicKey(byte[] encodedAlgorithmIdParameters,
-      byte[] encodedPoint)
-          throws InvalidKeySpecException {
+  public static ECPublicKey createECPublicKey(byte[] encodedAlgorithmIdParameters, byte[] encodedPoint)
+      throws InvalidKeySpecException {
     notNull(encodedAlgorithmIdParameters, "encodedAlgorithmIdParameters");
     notNull(encodedPoint, "encodedPoint");
 
@@ -502,8 +491,7 @@ public class KeyUtil {
     } else {
       algParams = X962Parameters.getInstance(encodedAlgorithmIdParameters);
     }
-    AlgorithmIdentifier algId = new AlgorithmIdentifier(
-        X9ObjectIdentifiers.id_ecPublicKey, algParams);
+    AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, algParams);
 
     SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo(algId, encodedPoint);
     X509EncodedKeySpec keySpec;
@@ -543,8 +531,7 @@ public class KeyUtil {
    * @param value value to be converted.
    * @param destPos destination
    */
-  private static void unsignedByteArrayCopy(byte[] dest, int destPos,
-      int length, BigInteger value) {
+  private static void unsignedByteArrayCopy(byte[] dest, int destPos, int length, BigInteger value) {
     byte[] bytes = value.toByteArray();
     if (bytes.length == length) {
       System.arraycopy(bytes, 0, dest, destPos, length);

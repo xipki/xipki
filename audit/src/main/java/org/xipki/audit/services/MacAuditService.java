@@ -80,8 +80,7 @@ public abstract class MacAuditService implements AuditService {
 
   private static final Logger LOG = LoggerFactory.getLogger(MacAuditService.class);
 
-  private static final DateTimeFormatter DTF =
-          DateTimeFormatter.ofPattern("yyyy.MM.dd-HH:mm:ss.SSS");
+  private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy.MM.dd-HH:mm:ss.SSS");
 
   private final ZoneId timeZone = ZoneId.systemDefault();
 
@@ -180,8 +179,7 @@ public abstract class MacAuditService implements AuditService {
       try {
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
         char[] passwordChars = password.toCharArray();
-        KeySpec spec = new PBEKeySpec(passwordChars, "ENC".getBytes(StandardCharsets.UTF_8),
-                      10000, 256);
+        KeySpec spec = new PBEKeySpec(passwordChars, "ENC".getBytes(StandardCharsets.UTF_8), 10000, 256);
         decryptionKey = factory.generateSecret(spec);
       } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
         throw new IllegalStateException("error deriving key", ex);
@@ -208,8 +206,7 @@ public abstract class MacAuditService implements AuditService {
     String thisTag = tokenizer.nextToken();
     if (integrityShardId != this.shardId) {
       throw new IllegalStateException(String.format(
-              "shardId in integrityText (%d) != configured shardId (%d)",
-              integrityShardId, this.shardId));
+              "shardId in integrityText (%d) != configured shardId (%d)", integrityShardId, this.shardId));
     }
 
     if (integrityId == id) {
@@ -218,8 +215,7 @@ public abstract class MacAuditService implements AuditService {
       }
     } else if (integrityId > id) {
       throw new IllegalStateException(String.format(
-              "audit entries deleted unexpectedly, id in the latest entry is %d, but expected %d",
-              id, integrityId));
+              "audit entries deleted unexpectedly, id in the latest entry is %d, but expected %d", id, integrityId));
     } else if (integrityId < id) {
       LOG.warn("id in the last entry is{}, but in the integrityText is {}", id, integrityId);
     }
@@ -273,8 +269,7 @@ public abstract class MacAuditService implements AuditService {
     try {
       SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
       char[] passwordChars = password.toCharArray();
-      KeySpec spec = new PBEKeySpec(passwordChars, "MAC".getBytes(StandardCharsets.UTF_8),
-                    10000, 256);
+      KeySpec spec = new PBEKeySpec(passwordChars, "MAC".getBytes(StandardCharsets.UTF_8), 10000, 256);
       macKey = factory.generateSecret(spec);
 
       spec = new PBEKeySpec(passwordChars, "ENC".getBytes(StandardCharsets.UTF_8), 10000, 256);
@@ -308,8 +303,7 @@ public abstract class MacAuditService implements AuditService {
     long thisId = id.incrementAndGet();
     String levelText = level.getText();
 
-    String payload = buildMacPayload(
-                      date, thisId, eventType, levelText, previousId, previousTag, message);
+    String payload = buildMacPayload(date, thisId, eventType, levelText, previousId, previousTag, message);
 
     mac.reset();
     mac.update(tagPrefixBytes);
@@ -326,9 +320,7 @@ public abstract class MacAuditService implements AuditService {
   }
 
   private String buildIntegrityText() {
-    byte[] plaintext =
-            (VERSION_V1 + DELIM + shardId + DELIM + id.get() + DELIM + previousTag)
-            .getBytes(StandardCharsets.UTF_8);
+    byte[] plaintext = StringUtil.toUtf8Bytes(VERSION_V1 + DELIM + shardId + DELIM + id.get() + DELIM + previousTag);
 
     byte[] iv = new byte[12];
     rnd.nextBytes(iv);
@@ -340,8 +332,7 @@ public abstract class MacAuditService implements AuditService {
     } catch (Exception e) {
       throw new IllegalStateException("error encrypting thisId", e);
     }
-    return VERSION_V1 + DELIM + keyId + DELIM + Base64.encodeToString(iv)
-            + DELIM + Base64.encodeToString(cipherText);
+    return VERSION_V1 + DELIM + keyId + DELIM + Base64.encodeToString(iv) + DELIM + Base64.encodeToString(cipherText);
   }
 
   @Override

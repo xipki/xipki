@@ -71,8 +71,7 @@ public class NameConstraints extends ValidatableConf {
   public void validate()
       throws InvalidConfException {
     if (CollectionUtil.isEmpty(permittedSubtrees) && CollectionUtil.isEmpty(excludedSubtrees)) {
-      throw new InvalidConfException(
-          "permittedSubtrees and excludedSubtrees may not be both null");
+      throw new InvalidConfException("permittedSubtrees and excludedSubtrees may not be both null");
     }
     validate(permittedSubtrees);
     validate(excludedSubtrees);
@@ -117,8 +116,7 @@ public class NameConstraints extends ValidatableConf {
     } else if (baseType.getUri() != null) {
       base = new GeneralName(GeneralName.uniformResourceIdentifier, baseType.getUri());
     } else {
-      throw new IllegalStateException(
-          "should not reach here, unknown child of GeneralSubtreeType");
+      throw new IllegalStateException("should not reach here, unknown child of GeneralSubtreeType");
     }
 
     Integer min = type.getMinimum();

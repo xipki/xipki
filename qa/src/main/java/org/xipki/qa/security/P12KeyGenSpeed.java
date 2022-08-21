@@ -45,8 +45,7 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
 
     public DSA(int plength, int qlength, SecurityFactory securityFactory)
         throws Exception {
-      super("PKCS#12 DSA key generation\nplength: " + plength + "\nqlength: " + qlength,
-          securityFactory);
+      super("PKCS#12 DSA key generation\nplength: " + plength + "\nqlength: " + qlength, securityFactory);
 
       this.plength = plength;
       this.qlength = qlength;

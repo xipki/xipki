@@ -296,8 +296,7 @@ public class AdmissionSyntax extends ValidatableConf {
 
         RegistrationNumber rnType = pi.getRegistrationNumber();
         AdmissionExtension.RegistrationNumberOption rno = (rnType == null) ? null
-            : new AdmissionExtension.RegistrationNumberOption(
-                    rnType.getRegex(), rnType.getConstant());
+            : new AdmissionExtension.RegistrationNumberOption(rnType.getRegex(), rnType.getConstant());
 
         AdmissionExtension.ProfessionInfoOption pio =
             new AdmissionExtension.ProfessionInfoOption(namingAuthorityL3,
@@ -308,8 +307,7 @@ public class AdmissionSyntax extends ValidatableConf {
 
       GeneralName admissionAuthority = null;
       if (at.getNamingAuthority() != null) {
-        admissionAuthority = GeneralName.getInstance(
-            asn1PrimitivefromByteArray(at.getAdmissionAuthority()));
+        admissionAuthority = GeneralName.getInstance(asn1PrimitivefromByteArray(at.getAdmissionAuthority()));
       }
 
       NamingAuthority namingAuthority = null;
@@ -318,8 +316,7 @@ public class AdmissionSyntax extends ValidatableConf {
       }
 
       AdmissionExtension.AdmissionsOption admissionsOption =
-          new AdmissionExtension.AdmissionsOption(
-              admissionAuthority, namingAuthority, professionInfos);
+          new AdmissionExtension.AdmissionsOption(admissionAuthority, namingAuthority, professionInfos);
       admissionsList.add(admissionsOption);
     }
 
@@ -328,8 +325,7 @@ public class AdmissionSyntax extends ValidatableConf {
       tmpAdmissionAuthority = GeneralName.getInstance(admissionAuthority);
     }
 
-    return new AdmissionExtension.AdmissionSyntaxOption(
-                critical, tmpAdmissionAuthority, admissionsList);
+    return new AdmissionExtension.AdmissionSyntaxOption(critical, tmpAdmissionAuthority, admissionsList);
   } // method toXiAdmissionSyntax
 
   private static ASN1Primitive asn1PrimitivefromByteArray(byte[] encoded)
@@ -342,11 +338,9 @@ public class AdmissionSyntax extends ValidatableConf {
   }
 
   private static NamingAuthority buildNamingAuthority(NamingAuthorityType value) {
-    ASN1ObjectIdentifier oid = (value.getOid() == null) ? null
-        : new ASN1ObjectIdentifier(value.getOid().getOid());
+    ASN1ObjectIdentifier oid = (value.getOid() == null) ? null : new ASN1ObjectIdentifier(value.getOid().getOid());
     String url = StringUtil.isBlank(value.getUrl()) ? null : value.getUrl();
-    DirectoryString text = StringUtil.isBlank(value.getText()) ? null
-        : new DirectoryString(value.getText());
+    DirectoryString text = StringUtil.isBlank(value.getText()) ? null : new DirectoryString(value.getText());
     return new NamingAuthority(oid, url, text);
   } // method buildNamingAuthority
 

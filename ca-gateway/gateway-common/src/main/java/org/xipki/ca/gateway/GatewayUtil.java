@@ -34,8 +34,7 @@ public class GatewayUtil {
     }
   }
 
-  public static boolean verifyCsr(CertificationRequest csr, SecurityFactory securityFactory,
-                                  PopControl popControl) {
+  public static boolean verifyCsr(CertificationRequest csr, SecurityFactory securityFactory, PopControl popControl) {
     notNull(csr, "csr");
     notNull(popControl, "popControl");
 

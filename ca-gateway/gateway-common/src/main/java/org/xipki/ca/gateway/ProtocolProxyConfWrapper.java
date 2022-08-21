@@ -87,8 +87,7 @@ public class ProtocolProxyConfWrapper {
 
     String clazz = conf.getAuthenticator();
     try {
-      authenticator = (RequestorAuthenticator)
-          Class.forName(clazz).getConstructor().newInstance();
+      authenticator = (RequestorAuthenticator) Class.forName(clazz).getConstructor().newInstance();
     } catch (Exception e) {
       String msg = "could not load RequestorAuthenticator " + clazz;
       LOG.error(msg, e);
@@ -125,8 +124,7 @@ public class ProtocolProxyConfWrapper {
 
   private ConcurrentContentSigner buildSigner(SignerConf signerConf)
       throws InvalidConfException, ObjectCreationException {
-    return (signerConf == null) ? null
-        : securities.getSecurityFactory().createSigner(signerConf.getType(),
+    return (signerConf == null) ? null : securities.getSecurityFactory().createSigner(signerConf.getType(),
         new org.xipki.security.SignerConf(signerConf.getConf()),
         X509Util.parseCerts(signerConf.getCerts()).toArray(new X509Cert[0]));
   }

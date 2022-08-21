@@ -98,8 +98,7 @@ public abstract class CaEnrollBenchKeyEntry {
         throw new IllegalArgumentException("invalid RSA keysize " + keysize);
       }
 
-      AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(
-          PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
+      AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
 
       String modulusStr;
       if (keysize == 1024 || keysize == 2048 || keysize == 3072 || keysize == 4096) {
@@ -120,8 +119,7 @@ public abstract class CaEnrollBenchKeyEntry {
         kp.initialize(keysize);
         RSAPublicKey publicKey = (RSAPublicKey) kp.generateKeyPair().getPublic();
         this.spki = new SubjectPublicKeyInfo(keyAlgId,
-            new org.bouncycastle.asn1.pkcs.RSAPublicKey(
-                publicKey.getModulus(), publicKey.getPublicExponent()));
+            new org.bouncycastle.asn1.pkcs.RSAPublicKey(publicKey.getModulus(), publicKey.getPublicExponent()));
       }
     } // constructor
 
@@ -282,8 +280,7 @@ public static final class ECKeyEntry extends CaEnrollBenchKeyEntry {
           curveName = curveOid.getId();
         }
 
-        AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey,
-            curveOid);
+        AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveOid);
 
         KeyPairGenerator kpgen = KeyPairGenerator.getInstance("ECDSA", "BC");
         ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveName);

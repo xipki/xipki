@@ -52,8 +52,7 @@ public class NotBeforeOption {
   Date getNotBefore(Date requestedNotBefore) {
     long now = System.currentTimeMillis();
     if (requestedNotBefore != null) {
-      long notOlderThan = (offsetMillis != null && offsetMillis < 0)
-          ? now + offsetMillis : now;
+      long notOlderThan = (offsetMillis != null && offsetMillis < 0) ? now + offsetMillis : now;
 
       long notBefore = Math.max(requestedNotBefore.getTime(), notOlderThan);
 

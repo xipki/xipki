@@ -86,8 +86,7 @@ class X509PublisherModule extends X509CaModule {
         successful = publisher.certificateAdded(certInfo);
       } catch (RuntimeException ex) {
         successful = false;
-        LogUtil.warn(LOG, ex, "could not publish certificate to the publisher "
-                + publisher.getIdent());
+        LogUtil.warn(LOG, ex, "could not publish certificate to the publisher " + publisher.getIdent());
       }
 
       if (successful) {
@@ -169,8 +168,7 @@ class X509PublisherModule extends X509CaModule {
         for (IdentifiedCertPublisher publisher : publishers) {
           boolean successful = publisher.caRevoked(caCert, caInfo.getRevocationInfo());
           if (!successful) {
-            LOG.error("republishing CA revocation to publisher {} failed",
-                publisher.getIdent().getName());
+            LOG.error("republishing CA revocation to publisher {} failed", publisher.getIdent().getName());
             return false;
           }
         }
@@ -189,8 +187,7 @@ class X509PublisherModule extends X509CaModule {
       try {
         certstore.clearPublishQueue(caIdent, null);
       } catch (OperationException ex) {
-        throw new CaMgmtException(
-            "could not clear publish queue of CA " + caIdent + ": " + ex.getMessage(), ex);
+        throw new CaMgmtException("could not clear publish queue of CA " + caIdent + ": " + ex.getMessage(), ex);
       }
 
       return;
@@ -201,8 +198,7 @@ class X509PublisherModule extends X509CaModule {
       try {
         certstore.clearPublishQueue(caIdent, publisherIdent);
       } catch (OperationException ex) {
-        throw new CaMgmtException(
-            "could not clear publish queue of CA " + caIdent + ": " + ex.getMessage()
+        throw new CaMgmtException("could not clear publish queue of CA " + caIdent + ": " + ex.getMessage()
             + " for publisher " + publisherName, ex);
       }
     }
@@ -291,8 +287,7 @@ class X509PublisherModule extends X509CaModule {
         singleSuccessful = publisher.certificateRemoved(caCert, certToRemove);
       } catch (RuntimeException ex) {
         singleSuccessful = false;
-        LogUtil.warn(LOG, ex,
-            "could not remove certificate from the publisher " + publisher.getIdent());
+        LogUtil.warn(LOG, ex, "could not remove certificate from the publisher " + publisher.getIdent());
       }
 
       if (singleSuccessful) {
@@ -320,7 +315,7 @@ class X509PublisherModule extends X509CaModule {
       } catch (RuntimeException ex) {
         successful = false;
         LogUtil.error(LOG, ex, "could not publish revocation of certificate to the publisher "
-                + publisher.getIdent());
+            + publisher.getIdent());
       }
 
       if (successful) {
@@ -366,12 +361,10 @@ class X509PublisherModule extends X509CaModule {
       NameId ident = publisher.getIdent();
       boolean successful = publisher.caRevoked(caCert, revocationInfo);
       if (successful) {
-        LOG.info("published event caUnrevoked of CA {} to publisher {}",
-            caIdent.getName(), ident.getName());
+        LOG.info("published event caUnrevoked of CA {} to publisher {}", caIdent.getName(), ident.getName());
       } else {
         succ = false;
-        LOG.error("could not publish event caUnrevoked of CA {} to publisher {}",
-            caIdent.getName(), ident.getName());
+        LOG.error("could not publish event caUnrevoked of CA {} to publisher {}", caIdent.getName(), ident.getName());
       }
     }
 
@@ -384,12 +377,10 @@ class X509PublisherModule extends X509CaModule {
       NameId ident = publisher.getIdent();
       boolean successful = publisher.caUnrevoked(caCert);
       if (successful) {
-        LOG.info("published event caUnrevoked of CA {} to publisher {}",
-            caIdent.getName(), ident.getName());
+        LOG.info("published event caUnrevoked of CA {} to publisher {}", caIdent.getName(), ident.getName());
       } else {
         succ = false;
-        LOG.error("could not publish event caUnrevoked of CA {} to publisher {}",
-            caIdent.getName(), ident.getName());
+        LOG.error("could not publish event caUnrevoked of CA {} to publisher {}", caIdent.getName(), ident.getName());
       }
     }
 

@@ -221,8 +221,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     Object objVal = sourceConf.get(confName);
     if (objVal == null) {
       if (mandatory) {
-        throw new IllegalArgumentException(
-            "mandatory " + confName + " is not specified in sourceConf");
+        throw new IllegalArgumentException("mandatory " + confName + " is not specified in sourceConf");
       } else {
         return null;
       }
@@ -404,8 +403,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     }
 
     if (StringUtil.isBlank(downloadUrl)) {
-      LOG.error("Neither download.url nor crldp in {} is specified, skip it",
-              crlDownloadFile.getPath());
+      LOG.error("Neither download.url nor crldp in {} is specified, skip it", crlDownloadFile.getPath());
       return;
     }
 
@@ -475,16 +473,14 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     String contentType = downResult.getContentType();
 
     if (!CT_PKIX_CRL.equals(contentType)) {
-      LOG.error("Downloading CRL failed, expected content type {}, but received {}",
-              CT_PKIX_CRL, contentType);
+      LOG.error("Downloading CRL failed, expected content type {}, but received {}", CT_PKIX_CRL, contentType);
       return;
     }
 
     if (downResult.getContentLength() < 10) {
       byte[] errorContent = downResult.getErrorContent();
       if (errorContent == null) {
-        LOG.error("Downloading CRL failed, CRL too short (len={}): ",
-                downResult.getContentLength());
+        LOG.error("Downloading CRL failed, CRL too short (len={}): ", downResult.getContentLength());
       } else {
         LOG.error("Downloading CRL failed with error: {}", new String(errorContent));
       }
@@ -498,8 +494,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     boolean useNewCrl = crlNumber == null || newCrlNumber.compareTo(crlNumber) > 0;
     if (useNewCrl) {
       String hashProp = hashAlgo + " " + Hex.encode(crlStream.getHashValue());
-      IoUtil.save(new File(generatedDir, "new-ca.crl.fp"),
-              hashProp.getBytes(StandardCharsets.UTF_8));
+      IoUtil.save(new File(generatedDir, "new-ca.crl.fp"), hashProp.getBytes(StandardCharsets.UTF_8));
       tmpCrlFile.renameTo(new File(generatedDir, "new-ca.crl"));
       if (crlNumber == null) {
         LOG.info("Downloaded CRL at first time");

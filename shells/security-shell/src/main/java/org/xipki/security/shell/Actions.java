@@ -240,12 +240,10 @@ public class Actions {
     @Override
     protected Object execute0()
         throws Exception {
-      CertificateList crl = CertificateList.getInstance(
-          X509Util.toDerEncoded(IoUtil.read(inFile)));
+      CertificateList crl = CertificateList.getInstance(X509Util.toDerEncoded(IoUtil.read(inFile)));
 
       if (crlNumber != null && crlNumber) {
-        ASN1Encodable asn1 = crl.getTBSCertList().getExtensions().getExtensionParsedValue(
-            Extension.cRLNumber);
+        ASN1Encodable asn1 = crl.getTBSCertList().getExtensions().getExtensionParsedValue(Extension.cRLNumber);
         if (asn1 == null) {
           return "null";
         }
@@ -290,17 +288,14 @@ public class Actions {
     @Completion(Completers.HashAlgCompleter.class)
     protected String hashAlgo = "SHA256";
 
-    @Option(name = "--rsa-pss",
-            description = "whether to use the RSAPSS for the POP computation\n"
+    @Option(name = "--rsa-pss", description = "whether to use the RSAPSS for the POP computation\n"
                     + "(only applied to RSA key)")
     private Boolean rsaPss = Boolean.FALSE;
 
-    @Option(name = "--dsa-plain",
-            description = "whether to use the Plain DSA for the POP computation")
+    @Option(name = "--dsa-plain", description = "whether to use the Plain DSA for the POP computation")
     private Boolean dsaPlain = Boolean.FALSE;
 
-    @Option(name = "--gm",
-            description = "whether to use the chinese GM algorithm for the POP computation\n"
+    @Option(name = "--gm", description = "whether to use the chinese GM algorithm for the POP computation\n"
                     + "(only applied to EC key with GM curves)")
     private Boolean gm = Boolean.FALSE;
 
@@ -331,12 +326,10 @@ public class Actions {
                     + " '8'/'rid'/OID")
     protected List<String> subjectAltNames;
 
-    @Option(name = "--subject-info-access", aliases = "--sia", multiValued = true,
-            description = "subjectInfoAccess")
+    @Option(name = "--subject-info-access", aliases = "--sia", multiValued = true, description = "subjectInfoAccess")
     protected List<String> subjectInfoAccesses;
 
-    @Option(name = "--peer-cert",
-            description = "Peer certificate file, only for the Diffie-Hellman keys")
+    @Option(name = "--peer-cert", description = "Peer certificate file, only for the Diffie-Hellman keys")
     @Completion(FileCompleter.class)
     private String peerCertFile;
 
@@ -345,8 +338,7 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String peerCertsFile;
 
-    @Option(name = "--cert",
-        description = "Certificate file, from which subject and extensions will be extracted.")
+    @Option(name = "--cert", description = "Certificate file, from which subject and extensions will be extracted.")
     @Completion(FileCompleter.class)
     private String certFile;
 
@@ -375,13 +367,12 @@ public class Actions {
     @Completion(Completers.KeyusageCompleter.class)
     private List<String> keyusages;
 
-    @Option(name = "--ext-keyusage", multiValued = true,
-            description = "extended keyusage (name or OID)")
+    @Option(name = "--ext-keyusage", multiValued = true, description = "extended keyusage (name or OID)")
     @Completion(Completers.ExtKeyusageCompleter.class)
     private List<String> extkeyusages;
 
     @Option(name = "--qc-eu-limit", multiValued = true,
-            description = "QC EuLimitValue of format <currency>:<amount>:<exponent>")
+        description = "QC EuLimitValue of format <currency>:<amount>:<exponent>")
     private List<String> qcEuLimits;
 
     @Option(name = "--biometric-type", description = "Biometric type")
@@ -398,8 +389,7 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String biometricUri;
 
-    @Option(name = "--extra-extensions-file",
-            description = "Configuration file for extral extensions")
+    @Option(name = "--extra-extensions-file", description = "Configuration file for extral extensions")
     @Completion(FileCompleter.class)
     private String extraExtensionsFile;
 
@@ -439,10 +429,8 @@ public class Actions {
 
       if (certFile != null) {
         Certificate cert = Certificate.getInstance(X509Util.toDerEncoded(IoUtil.read(certFile)));
-        if (!Arrays.equals(subjectPublicKeyInfo.getEncoded(),
-            cert.getSubjectPublicKeyInfo().getEncoded())) {
-          throw new IllegalCmdParamException(
-              "PublicKey extracted from signer is different than in the certificate");
+        if (!Arrays.equals(subjectPublicKeyInfo.getEncoded(), cert.getSubjectPublicKeyInfo().getEncoded())) {
+          throw new IllegalCmdParamException("PublicKey extracted from signer is different than in the certificate");
         }
 
         X500Name subjectDn = cert.getSubject();
@@ -523,8 +511,7 @@ public class Actions {
 
       // ExtendedKeyusage
       if (isNotEmpty(extkeyusages)) {
-        ExtendedKeyUsage extValue = X509Util.createExtendedUsage(
-                textToAsn1ObjectIdentifers(extkeyusages));
+        ExtendedKeyUsage extValue = X509Util.createExtendedUsage(textToAsn1ObjectIdentifers(extkeyusages));
         ASN1ObjectIdentifier extType = Extension.extendedKeyUsage;
         extensions.add(new Extension(extType, false, extValue.getEncoded()));
       }
@@ -551,8 +538,7 @@ public class Actions {
             int exponent = Integer.parseInt(exponentS);
 
             MonetaryValue monterayValue = new MonetaryValue(currency, amount, exponent);
-            QCStatement statment = new QCStatement(
-                    ObjectIdentifiers.Extn.id_etsi_qcs_QcLimitValue, monterayValue);
+            QCStatement statment = new QCStatement(ObjectIdentifiers.Extn.id_etsi_qcs_QcLimitValue, monterayValue);
             vec.add(statment);
           } catch (Exception ex) {
             throw new Exception("invalid qc-eu-limit '" + m + "'");
@@ -606,10 +592,9 @@ public class Actions {
         List<X509ExtensionType> extnConfs = extraExtensions.getExtensions();
         if (CollectionUtil.isNotEmpty(extnConfs)) {
           for (X509ExtensionType m : extnConfs) {
-            byte[] encodedExtnValue = m.getConstant().toASN1Encodable().toASN1Primitive()
-                            .getEncoded(ASN1Encoding.DER);
+            byte[] encodedExtnValue = m.getConstant().toASN1Encodable().toASN1Primitive().getEncoded(ASN1Encoding.DER);
             extensions.add(new Extension(
-                    new ASN1ObjectIdentifier(m.getType().getOid()), false, encodedExtnValue));
+                new ASN1ObjectIdentifier(m.getType().getOid()), false, encodedExtnValue));
           }
         }
       }
@@ -643,8 +628,7 @@ public class Actions {
           if (rdns == null || rdns.length == 0) {
             Date date = DateUtil.parseUtcTimeyyyyMMdd(dateOfBirth);
             date = new Date(date.getTime() + _12_HOURS_MS);
-            ASN1Encodable atvValue = new DERGeneralizedTime(
-                    DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z");
+            ASN1Encodable atvValue = new DERGeneralizedTime(DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z");
             RDN rdn = new RDN(id, atvValue);
             list.add(rdn);
           }
@@ -737,7 +721,7 @@ public class Actions {
       }
 
       PKCS10CertificationRequestBuilder csrBuilder =
-              new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
+          new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
       if (CollectionUtil.isNotEmpty(attributes)) {
         for (Entry<ASN1ObjectIdentifier, ASN1Encodable> entry : attributes.entrySet()) {
           csrBuilder.addAttribute(entry.getKey(), entry.getValue());
@@ -787,8 +771,7 @@ public class Actions {
       ASN1ObjectIdentifier algOid = csr.getSignatureAlgorithm().getAlgorithm();
 
       DHSigStaticKeyCertPair peerKeyAndCert = null;
-      if (Xipki.id_alg_dhPop_x25519.equals(algOid)
-              || Xipki.id_alg_dhPop_x448.equals(algOid)) {
+      if (Xipki.id_alg_dhPop_x25519.equals(algOid) || Xipki.id_alg_dhPop_x448.equals(algOid)) {
         if (peerKeystoreFile == null || keystorePassword == null) {
           System.err.println("could not verify CSR, please specify the peer's keystore");
           return null;
@@ -855,8 +838,7 @@ public class Actions {
     @Option(name = "--password", description = "password of the keystore")
     private String ksPwd;
 
-    @Option(name = "--cert", aliases = "-c", required = true, multiValued = true,
-        description = "certificate files")
+    @Option(name = "--cert", aliases = "-c", required = true, multiValued = true, description = "certificate files")
     @Completion(FileCompleter.class)
     private List<String> certFiles;
 

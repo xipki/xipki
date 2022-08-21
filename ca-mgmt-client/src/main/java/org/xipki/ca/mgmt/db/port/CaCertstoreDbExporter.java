@@ -66,9 +66,10 @@ class CaCertstoreDbExporter extends DbPorter {
 
   private final boolean resume;
 
-  CaCertstoreDbExporter(DataSourceWrapper datasource, String baseDir, int numCertsInBundle,
+  CaCertstoreDbExporter(
+      DataSourceWrapper datasource, String baseDir, int numCertsInBundle,
       int numCertsPerSelect, boolean resume, AtomicBoolean stopMe)
-          throws DataAccessException {
+      throws DataAccessException {
     super(datasource, baseDir, stopMe);
 
     this.numCertsInBundle = Args.positive(numCertsInBundle, "numCertsInBundle");
@@ -117,8 +118,7 @@ class CaCertstoreDbExporter extends DbPorter {
       }
 
       if (CaDbEntryType.CRL == typeProcessedInLastProcess || typeProcessedInLastProcess == null) {
-        exception = exportEntries(CaDbEntryType.CRL, certstore, processLogFile,
-            idProcessedInLastProcess);
+        exception = exportEntries(CaDbEntryType.CRL, certstore, processLogFile, idProcessedInLastProcess);
         typeProcessedInLastProcess = null;
         idProcessedInLastProcess = null;
       }
@@ -126,8 +126,7 @@ class CaCertstoreDbExporter extends DbPorter {
       CaDbEntryType[] types = {CaDbEntryType.CERT, CaDbEntryType.REQUEST, CaDbEntryType.REQCERT};
 
       for (CaDbEntryType type : types) {
-        if (exception == null
-            && (type == typeProcessedInLastProcess || typeProcessedInLastProcess == null)) {
+        if (exception == null && (type == typeProcessedInLastProcess || typeProcessedInLastProcess == null)) {
           exception = exportEntries(type, certstore, processLogFile, idProcessedInLastProcess);
           typeProcessedInLastProcess = null;
           idProcessedInLastProcess = null;
@@ -150,8 +149,8 @@ class CaCertstoreDbExporter extends DbPorter {
     }
   } // method export
 
-  private Exception exportEntries(CaDbEntryType type, CaCertstore certstore,
-      File processLogFile, Long idProcessedInLastProcess) {
+  private Exception exportEntries(
+      CaDbEntryType type, CaCertstore certstore, File processLogFile, Long idProcessedInLastProcess) {
     String tablesText = "table " + type.getTableName();
 
     File dir = new File(baseDir, type.getDirName());
@@ -176,9 +175,10 @@ class CaCertstoreDbExporter extends DbPorter {
     }
   } // method exportEntries
 
-  private void exportEntries(CaDbEntryType type, CaCertstore certstore, File processLogFile,
+  private void exportEntries(
+      CaDbEntryType type, CaCertstore certstore, File processLogFile,
       OutputStream filenameListOs, Long idProcessedInLastProcess)
-          throws Exception {
+      throws Exception {
     int numEntriesPerSelect = Math.max(1, Math.round(type.getSqlBatchFactor() * numCertsPerSelect));
     int numEntriesPerZip = Math.max(1, Math.round(type.getSqlBatchFactor() * numCertsInBundle));
     File entriesDir = new File(baseDir, type.getDirName());
@@ -213,8 +213,7 @@ class CaCertstoreDbExporter extends DbPorter {
         throw new IllegalStateException("unknown CaDbEntryType " + type);
     }
 
-    long minId = (idProcessedInLastProcess != null) ? idProcessedInLastProcess + 1
-        : min(tableName, "ID");
+    long minId = (idProcessedInLastProcess != null) ? idProcessedInLastProcess + 1 : min(tableName, "ID");
 
     String tablesText = "table " + type.getTableName();
     System.out.println("exporting " + tablesText + " from ID " + minId);

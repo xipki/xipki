@@ -60,8 +60,7 @@ public class ProtocolServletFilter implements Filter {
     try {
       conf0 = CmpProxyConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CFG, true));
     } catch (IOException | InvalidConfException ex) {
-      throw new IllegalArgumentException(
-          "could not parse configuration file " + DFLT_CFG, ex);
+      throw new IllegalArgumentException("could not parse configuration file " + DFLT_CFG, ex);
     }
 
     try {
@@ -69,8 +68,7 @@ public class ProtocolServletFilter implements Filter {
       conf = new ProtocolProxyConfWrapper(conf0);
 
       CmpResponder responder = new CmpResponder(cmpControl, conf.getSdkClient(),
-          conf.getSecurities().getSecurityFactory(), conf.getSigners(),
-          conf.getAuthenticator(), conf.getPopControl());
+          conf.getSecurities().getSecurityFactory(), conf.getSigners(), conf.getAuthenticator(), conf.getPopControl());
 
       servlet = new HttpCmpServlet();
       servlet.setLogReqResp(conf.isLogReqResp());

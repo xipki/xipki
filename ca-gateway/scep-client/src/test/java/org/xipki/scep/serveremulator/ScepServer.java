@@ -65,7 +65,7 @@ public class ScepServer {
   private X509Cert nextRaCert;
 
   public ScepServer(String name, CaCaps caCaps, boolean withRa, boolean withNextCa,
-      boolean generateCrl, ScepControl control) {
+                    boolean generateCrl, ScepControl control) {
     this.name = Args.notBlank(name, "name");
     this.caCaps = Args.notNull(caCaps, "caCaps");
     this.control = Args.notNull(control, "control");
@@ -128,8 +128,7 @@ public class ScepServer {
       subject = new X500Name("CN=CA2, OU=emulator, O=myorg.org, C=DE");
 
       Date startTime = new Date(System.currentTimeMillis() + 365 * CaEmulator.DAY_IN_MS);
-      this.nextCaCert = MyUtil.issueSubCaCert(rcaKey, rcaSubject, pkInfo, subject,
-              BigInteger.valueOf(2), startTime);
+      this.nextCaCert = MyUtil.issueSubCaCert(rcaKey, rcaSubject, pkInfo, subject, BigInteger.valueOf(2), startTime);
       CaEmulator tmpCa = new CaEmulator(keypair.getPrivate(), this.nextCaCert, generateCrl);
 
       if (withRa) {

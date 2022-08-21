@@ -230,9 +230,8 @@ public class ProxyP11Module extends P11Module {
         continue;
       }
 
-      P11Slot slot = new ProxyP11Slot(this, slotId, conf.isReadOnly(),
-          conf.getP11MechanismFilter(), conf.getNumSessions(),
-          conf.getSecretKeyTypes(), conf.getKeyPairTypes());
+      P11Slot slot = new ProxyP11Slot(this, slotId, conf.isReadOnly(), conf.getP11MechanismFilter(),
+          conf.getNumSessions(), conf.getSecretKeyTypes(), conf.getKeyPairTypes());
       slots.add(slot);
     }
     setSlots(slots);
@@ -322,8 +321,7 @@ public class ProxyP11Module extends P11Module {
         }
       }
       if (!isValidContentType) {
-        throw new IOException("bad response: mime type " + responseContentType
-            + " is not supported!");
+        throw new IOException("bad response: mime type " + responseContentType + " is not supported!");
       }
 
       byte[] buf = new byte[4096];

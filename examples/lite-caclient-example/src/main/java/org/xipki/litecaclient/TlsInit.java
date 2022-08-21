@@ -84,15 +84,13 @@ public class TlsInit {
     HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
     oldHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
-    LOG.info("Register me as DefaultHostnameVerifier, and backup the old one {}",
-        oldHostnameVerifier);
+    LOG.info("Register me as DefaultHostnameVerifier, and backup the old one {}", oldHostnameVerifier);
     HttpsURLConnection.setDefaultHostnameVerifier(SdkHostnameVerifier.INSTANCE);
   } // method init
 
   public static void close() {
     if (HttpsURLConnection.getDefaultHostnameVerifier() == SdkHostnameVerifier.INSTANCE) {
-      LOG.info("Unregister me as DefaultHostnameVerifier, and reuse the old one {}",
-          oldHostnameVerifier);
+      LOG.info("Unregister me as DefaultHostnameVerifier, and reuse the old one {}", oldHostnameVerifier);
       HttpsURLConnection.setDefaultHostnameVerifier(oldHostnameVerifier);
     }
   } // method close

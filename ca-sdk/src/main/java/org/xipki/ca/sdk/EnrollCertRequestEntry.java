@@ -83,7 +83,8 @@ public class EnrollCertRequestEntry {
     this.subjectPublicKey = subjectPublicKey;
   }
 
-  public void subjectPublicKey(SubjectPublicKeyInfo subjectPublicKey) throws IOException {
+  public void subjectPublicKey(SubjectPublicKeyInfo subjectPublicKey)
+      throws IOException {
     this.subjectPublicKey = subjectPublicKey == null ? null : subjectPublicKey.getEncoded();
   }
 

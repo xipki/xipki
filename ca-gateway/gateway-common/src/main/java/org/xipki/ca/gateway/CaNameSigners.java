@@ -19,8 +19,7 @@ public class CaNameSigners {
 
   private Map<String, ConcurrentContentSigner> signers;
 
-  public CaNameSigners(ConcurrentContentSigner defaultSigner,
-                       Map<String, ConcurrentContentSigner> signers)
+  public CaNameSigners(ConcurrentContentSigner defaultSigner, Map<String, ConcurrentContentSigner> signers)
       throws InvalidConfException {
     if (defaultSigner == null && CollectionUtil.isEmpty(signers)) {
       throw new InvalidConfException("At least one of defaultSigner and signers must be set");

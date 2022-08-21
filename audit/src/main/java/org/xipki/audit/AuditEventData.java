@@ -36,11 +36,7 @@ public class AuditEventData {
     Args.notBlank(name, "name");
     Args.notNull(value, "value");
     this.name = name;
-    if (value instanceof String) {
-      this.value = (String) value;
-    } else {
-      this.value = value.toString();
-    }
+    this.value = (value instanceof String) ? (String) value : value.toString();
   } // constructor
 
   public void addValue(Object additionalValue) {

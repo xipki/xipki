@@ -39,8 +39,8 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
 
   private final int keysize;
 
-  private P11RSAKeyParameter(P11CryptService p11CryptService, P11IdentityId identityId,
-      BigInteger modulus, BigInteger publicExponent) {
+  private P11RSAKeyParameter(
+      P11CryptService p11CryptService, P11IdentityId identityId, BigInteger modulus, BigInteger publicExponent) {
     super(true, modulus, publicExponent);
 
     notNull(modulus,"modulus");
@@ -62,9 +62,8 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
     return identityId;
   }
 
-  public static P11RSAKeyParameter getInstance(P11CryptService p11CryptService,
-      P11IdentityId identityId)
-          throws InvalidKeyException {
+  public static P11RSAKeyParameter getInstance(P11CryptService p11CryptService, P11IdentityId identityId)
+      throws InvalidKeyException {
     notNull(p11CryptService, "p11CryptService");
     notNull(identityId, "identityId");
 

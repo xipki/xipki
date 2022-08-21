@@ -147,18 +147,15 @@ public class UnRevokeCertActions {
 
   public abstract static class UnRevokeCertAction extends Actions.AuthClientAction {
 
-    @Option(name = "--ca-cert", required = true,
-        description = "certificate file")
+    @Option(name = "--ca-cert", required = true, description = "certificate file")
     @Completion(FileCompleter.class)
     private String caCertFile;
 
-    @Option(name = "--cert", aliases = "-c",
-        description = "certificate file (either cert or serial must be specified)")
+    @Option(name = "--cert", aliases = "-c", description = "certificate file (either cert or serial must be specified)")
     @Completion(FileCompleter.class)
     protected String certFile;
 
-    @Option(name = "--serial", aliases = "-s",
-        description = "serial number (either cert or serial must be specified)")
+    @Option(name = "--serial", aliases = "-s", description = "serial number (either cert or serial must be specified)")
     private String serialNumberS;
 
     private BigInteger serialNumber;

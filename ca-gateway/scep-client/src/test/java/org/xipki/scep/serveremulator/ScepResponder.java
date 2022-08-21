@@ -70,7 +70,7 @@ public class ScepResponder {
   private long maxSigningTimeBiasInMs = DFLT_MAX_SIGNINGTIME_BIAS;
 
   public ScepResponder(CaCaps caCaps, CaEmulator caEmulator, RaEmulator raEmulator,
-      NextCaAndRa nextCaAndRa, ScepControl control) {
+                       NextCaAndRa nextCaAndRa, ScepControl control) {
     this.caCaps = Args.notNull(caCaps, "caCaps");
     this.caEmulator = Args.notNull(caEmulator, "caEmulator");
     this.control = Args.notNull(control, "control");
@@ -98,11 +98,9 @@ public class ScepResponder {
       throws MessageDecodingException, CaException, NoSuchAlgorithmException {
     Args.notNull(requestContent, "requestContent");
     PrivateKey recipientKey = (raEmulator != null) ? raEmulator.getRaKey() : caEmulator.getCaKey();
-    X509Cert recipientCert =
-        (raEmulator != null) ? raEmulator.getRaCert() : caEmulator.getCaCert();
+    X509Cert recipientCert = (raEmulator != null) ? raEmulator.getRaCert() : caEmulator.getCaCert();
 
-    EnvelopedDataDecryptorInstance decInstance =
-        new EnvelopedDataDecryptorInstance(recipientCert, recipientKey);
+    EnvelopedDataDecryptorInstance decInstance = new EnvelopedDataDecryptorInstance(recipientCert, recipientKey);
     EnvelopedDataDecryptor recipient = new EnvelopedDataDecryptor(decInstance);
 
     DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, recipient, null);
@@ -117,13 +115,11 @@ public class ScepResponder {
       event.putEventData(AuditEvent.NAME_failInfo, rep.getFailInfo());
     }
 
-    SignAlgo signatureAlgorithm = SignAlgo.getInstance(getSigningKey(),
-        req.getDigestAlgorithm(), null);
+    SignAlgo signatureAlgorithm = SignAlgo.getInstance(getSigningKey(), req.getDigestAlgorithm(), null);
 
     try {
       X509Cert jceSignerCert = getSigningCert();
-      X509Cert[] certs = control.isSendSignerCert()
-          ? new X509Cert[]{jceSignerCert} : null;
+      X509Cert[] certs = control.isSendSignerCert() ? new X509Cert[]{jceSignerCert} : null;
 
       return rep.encode(getSigningKey(), signatureAlgorithm, jceSignerCert, certs,
           req.getSignatureCert(), req.getContentEncryptionAlgorithm());
@@ -137,8 +133,7 @@ public class ScepResponder {
     Args.notNull(nextCaMsg, "nextCaMsg");
     try {
       X509Cert jceSignerCert = getSigningCert();
-      X509Cert[] certs = control.isSendSignerCert()
-          ? new X509Cert[]{jceSignerCert} : null;
+      X509Cert[] certs = control.isSendSignerCert() ? new X509Cert[]{jceSignerCert} : null;
       return nextCaMsg.encode(getSigningKey(), jceSignerCert, certs);
     } catch (Exception ex) {
       throw new CaException(ex);
@@ -280,8 +275,7 @@ public class ScepResponder {
         break;
       case GetCert:
         IssuerAndSerialNumber isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
-        cert = caEmulator.getCert(isn.getName(),
-                isn.getSerialNumber().getValue());
+        cert = caEmulator.getCert(isn.getName(), isn.getSerialNumber().getValue());
         if (cert != null) {
           rep.setMessageData(createSignedData(cert));
         } else {
@@ -399,8 +393,7 @@ public class ScepResponder {
     return null;
   } // method getChallengePassword
 
-  private static PkiMessage buildPkiMessage(PkiMessage message, PkiStatus status,
-      FailInfo failInfo) {
+  private static PkiMessage buildPkiMessage(PkiMessage message, PkiStatus status, FailInfo failInfo) {
     message.setPkiStatus(status);
     message.setFailInfo(failInfo);
     return message;

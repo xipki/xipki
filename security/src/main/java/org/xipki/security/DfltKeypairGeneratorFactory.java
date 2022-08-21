@@ -66,9 +66,8 @@ public class DfltKeypairGeneratorFactory implements KeypairGeneratorFactory {
   }
 
   @Override
-  public KeypairGenerator newKeypairGenerator(String type, String conf,
-                                              SecurityFactory securityFactory)
-          throws ObjectCreationException {
+  public KeypairGenerator newKeypairGenerator(String type, String conf, SecurityFactory securityFactory)
+      throws ObjectCreationException {
     if (!canCreateKeypairGenerator(type)) {
       throw new ObjectCreationException("unknown keypair generator type " + type);
     }

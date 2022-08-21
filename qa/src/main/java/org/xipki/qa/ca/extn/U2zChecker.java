@@ -36,8 +36,8 @@ class U2zChecker extends ExtensionChecker {
     super(parent);
   }
 
-  void checkExtnValidityModel(StringBuilder failureMsg, byte[] extensionValue,
-      Extensions requestedExtns, ExtensionControl extControl) {
+  void checkExtnValidityModel(
+      StringBuilder failureMsg, byte[] extensionValue, Extensions requestedExtns, ExtensionControl extControl) {
     ASN1ObjectIdentifier conf = caller.getValidityModelId();
     if (conf == null) {
       caller.checkConstantExtnValue(Extn.id_extension_validityModel,

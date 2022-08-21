@@ -106,12 +106,10 @@ class IaikP11Slot extends P11Slot {
   private boolean omitDateAttrsInCertObject;
 
   IaikP11Slot(
-          String moduleName, P11SlotIdentifier slotId, Slot slot, boolean readOnly,
-          long userType, List<char[]> password, int maxMessageSize,
-          P11MechanismFilter mechanismFilter,
-          P11NewObjectConf newObjectConf, Integer numSessions,
-          List<Long> secretKeyTypes, List<Long> keyPairTypes)
-          throws P11TokenException {
+      String moduleName, P11SlotIdentifier slotId, Slot slot, boolean readOnly, long userType,
+      List<char[]> password, int maxMessageSize, P11MechanismFilter mechanismFilter, P11NewObjectConf newObjectConf,
+      Integer numSessions, List<Long> secretKeyTypes, List<Long> keyPairTypes)
+      throws P11TokenException {
     super(moduleName, slotId, readOnly, mechanismFilter, numSessions, secretKeyTypes, keyPairTypes);
 
     this.newObjectConf = notNull(newObjectConf, "newObjectConf");
@@ -319,8 +317,7 @@ class IaikP11Slot extends P11Slot {
         try {
           analyseSingleKey(session, privKey, ret);
         } catch (XiSecurityException ex) {
-          LogUtil.error(LOG, ex, "XiSecurityException while initializing private key "
-              + "with id " + hex(keyId));
+          LogUtil.error(LOG, ex, "XiSecurityException while initializing private key with id " + hex(keyId));
         } catch (Throwable th) {
           String label = "";
           if (privKey.getLabel() != null) {
@@ -372,9 +369,8 @@ class IaikP11Slot extends P11Slot {
     refreshResult.addIdentity(identity);
   } // method analyseSingleKey
 
-  private void analyseSingleKey(Session session, PrivateKey privKey,
-      P11SlotRefreshResult refreshResult)
-          throws P11TokenException, XiSecurityException {
+  private void analyseSingleKey(Session session, PrivateKey privKey, P11SlotRefreshResult refreshResult)
+      throws P11TokenException, XiSecurityException {
     byte[] id = value(privKey.getId());
     String label = valueStr(privKey.getLabel());
     if (id == null || label == null) {
@@ -382,8 +378,7 @@ class IaikP11Slot extends P11Slot {
     }
 
     String pubKeyLabel = null;
-    PublicKey p11PublicKey =
-        (PublicKey) getKeyObject(session, new PublicKey(), id, null);
+    PublicKey p11PublicKey = (PublicKey) getKeyObject(session, new PublicKey(), id, null);
     if (p11PublicKey != null) {
       pubKeyLabel = valueStr(p11PublicKey.getLabel());
     }
@@ -511,9 +506,8 @@ class IaikP11Slot extends P11Slot {
     }
   } // method sign
 
-  private byte[] sign0(Session session, int expectedSignatureLen, Mechanism mechanism,
-      byte[] content, Key signingKey)
-          throws TokenException {
+  private byte[] sign0(Session session, int expectedSignatureLen, Mechanism mechanism, byte[] content, Key signingKey)
+      throws TokenException {
     long keytype = signingKey.getKeyType().getLongValue();
     boolean weierstrausKey = false;
     if (KeyType.EC == keytype || KeyType.VENDOR_SM2 == keytype) {
@@ -545,12 +539,10 @@ class IaikP11Slot extends P11Slot {
         try {
           sigvalue = SignerUtil.dsaSigX962ToPlain(sigvalue, expectedSignatureLen * 4);
         } catch (XiSecurityException e) {
-          LOG.error(String.format("ERROR: sigvalue (%d): %s", sigvalue.length,
-                  Hex.toHexString(sigvalue)), e);
+          LOG.error(String.format("ERROR: sigvalue (%d): %s", sigvalue.length, Hex.toHexString(sigvalue)), e);
           throw new TokenException(e);
         } catch (RuntimeException e) {
-          LOG.error(String.format("ERROR: sigvalue (%d): %s", sigvalue.length,
-                  Hex.toHexString(sigvalue)), e);
+          LOG.error(String.format("ERROR: sigvalue (%d): %s", sigvalue.length, Hex.toHexString(sigvalue)), e);
           throw e;
         }
       }
@@ -559,9 +551,8 @@ class IaikP11Slot extends P11Slot {
     return sigvalue;
   } // method sign0
 
-  private byte[] singleSign(Session session, Mechanism mechanism, byte[] content,
-      Key signingKey)
-          throws TokenException {
+  private byte[] singleSign(Session session, Mechanism mechanism, byte[] content, Key signingKey)
+      throws TokenException {
     LOG.debug("single sign");
     session.signInit(mechanism, signingKey);
     return session.sign(content);
@@ -589,8 +580,7 @@ class IaikP11Slot extends P11Slot {
         Throwable cause = ex.getCause();
         if (cause instanceof PKCS11Exception) {
           long ckr = ((PKCS11Exception) cause).getErrorCode();
-          if (ckr == CKR_SESSION_HANDLE_INVALID
-              || ckr == CKR_SESSION_CLOSED) {
+          if (ckr == CKR_SESSION_HANDLE_INVALID || ckr == CKR_SESSION_CLOSED) {
             continue;
           }
         }
@@ -634,8 +624,7 @@ class IaikP11Slot extends P11Slot {
   private void firstLogin(Session session, List<char[]> password)
       throws P11TokenException {
     try {
-      boolean isProtectedAuthenticationPath =
-          session.getToken().getTokenInfo().isProtectedAuthenticationPath();
+      boolean isProtectedAuthenticationPath = session.getToken().getTokenInfo().isProtectedAuthenticationPath();
 
       if (isProtectedAuthenticationPath || isEmpty(password)) {
         LOG.info("verify on PKCS11Module with PROTECTED_AUTHENTICATION_PATH");
@@ -714,8 +703,7 @@ class IaikP11Slot extends P11Slot {
     }
     int size = tmpObjects.size();
     if (size > 1) {
-      LOG.warn("found {} public key identified by {}, use the first one", size,
-          getDescription(keyId, keyLabel));
+      LOG.warn("found {} public key identified by {}, use the first one", size, getDescription(keyId, keyLabel));
     }
 
     return (Key) tmpObjects.get(0);
@@ -847,8 +835,7 @@ class IaikP11Slot extends P11Slot {
         || CKK_SHA3_512_HMAC == keyType) {
       mech = CKM_GENERIC_SECRET_KEY_GEN;
     } else {
-      throw new IllegalArgumentException(
-          "unsupported key type 0x" + Functions.toFullHex((int)keyType));
+      throw new IllegalArgumentException("unsupported key type 0x" + Functions.toFullHex((int)keyType));
     }
 
     assertMechanismSupported(mech);
@@ -875,8 +862,7 @@ class IaikP11Slot extends P11Slot {
     try {
       Session session = bagEntry.value();
       if (labelChars != null && labelExists(session, labelChars)) {
-        throw new IllegalArgumentException(
-            "label " + control.getLabel() + " exists, please specify another one");
+        throw new IllegalArgumentException("label " + control.getLabel() + " exists, please specify another one");
       }
 
       if (id == null) {
@@ -888,8 +874,7 @@ class IaikP11Slot extends P11Slot {
       try {
         key = (SecretKey) session.generateKey(mechanism, template);
       } catch (TokenException ex) {
-        throw new P11TokenException("could not generate generic secret key using "
-            + mechanism.getName(), ex);
+        throw new P11TokenException("could not generate generic secret key using " + mechanism.getName(), ex);
       }
 
       P11ObjectIdentifier objId = new P11ObjectIdentifier(id, valueStr(key.getLabel()));
@@ -923,8 +908,7 @@ class IaikP11Slot extends P11Slot {
     try {
       Session session = bagEntry.value();
       if (labelChars != null && labelExists(session, labelChars)) {
-        throw new IllegalArgumentException(
-            "label " + control.getLabel() + " exists, please specify another one");
+        throw new IllegalArgumentException("label " + control.getLabel() + " exists, please specify another one");
       }
 
       byte[] id = control.getId();
@@ -950,9 +934,8 @@ class IaikP11Slot extends P11Slot {
   } // method importSecretKey0
 
   @Override
-  protected P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent,
-      P11NewKeyControl control)
-          throws P11TokenException {
+  protected P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent, P11NewKeyControl control)
+      throws P11TokenException {
     RSAPrivateKey privateKey = new RSAPrivateKey();
     RSAPublicKey publicKey = new RSAPublicKey();
     setKeyAttributes(control, publicKey, privateKey, newObjectConf);
@@ -962,8 +945,7 @@ class IaikP11Slot extends P11Slot {
       publicKey.getPublicExponent().setByteArrayValue(publicExponent.toByteArray());
     }
 
-    return generateKeyPair(CKM_RSA_PKCS_KEY_PAIR_GEN,
-        control.getId(), privateKey, publicKey);
+    return generateKeyPair(CKM_RSA_PKCS_KEY_PAIR_GEN, control.getId(), privateKey, publicKey);
   } // method generateRSAKeypair0
 
   @Override
@@ -985,8 +967,7 @@ class IaikP11Slot extends P11Slot {
 
       KeyPair keypair = null;
       try {
-        keypair = session.generateKeyPair(Mechanism.get(mech),
-            publicKeyTemplate, privateKeyTemplate);
+        keypair = session.generateKeyPair(Mechanism.get(mech), publicKeyTemplate, privateKeyTemplate);
         RSAPrivateKey sk = (RSAPrivateKey) keypair.getPrivateKey();
 
         return new PrivateKeyInfo(ALGID_RSA,
@@ -1015,9 +996,8 @@ class IaikP11Slot extends P11Slot {
   } // method generateRSAKeypairOtf0
 
   @Override
-  protected P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
-      P11NewKeyControl control)
-          throws P11TokenException {
+  protected P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g, P11NewKeyControl control)
+      throws P11TokenException {
     DSAPrivateKey privateKey = new DSAPrivateKey();
     DSAPublicKey publicKey = new DSAPublicKey();
     setKeyAttributes(control, publicKey, privateKey, newObjectConf);
@@ -1026,8 +1006,7 @@ class IaikP11Slot extends P11Slot {
     publicKey.getSubprime().setByteArrayValue(Util.unsignedBigIntergerToByteArray(q));
     publicKey.getBase().setByteArrayValue(Util.unsignedBigIntergerToByteArray(g));
 
-    return generateKeyPair(CKM_DSA_KEY_PAIR_GEN,
-        control.getId(), privateKey, publicKey);
+    return generateKeyPair(CKM_DSA_KEY_PAIR_GEN, control.getId(), privateKey, publicKey);
   } // method generateDSAKeypair0
 
   @Override
@@ -1059,12 +1038,9 @@ class IaikP11Slot extends P11Slot {
         BigInteger value = toBigInt(pk.getValue()); // y
         byte[] publicKey = new ASN1Integer(value).getEncoded();
 
-        return new PrivateKeyInfo(algId,
-            new ASN1Integer(toBigInt(sk.getValue())), // x
-            null, publicKey);
+        return new PrivateKeyInfo(algId, new ASN1Integer(toBigInt(sk.getValue())), null, publicKey);
       } catch (TokenException | IOException ex) {
-        throw new P11TokenException("could not generate keypair "
-            + Functions.mechanismCodeToString(mech), ex);
+        throw new P11TokenException("could not generate keypair " + Functions.mechanismCodeToString(mech), ex);
       } finally {
         if (keypair != null) {
           destroyObject(session, keypair.getPrivateKey());
@@ -1077,9 +1053,8 @@ class IaikP11Slot extends P11Slot {
   } // method generateDSAKeypairOtf0
 
   @Override
-  protected P11Identity generateECEdwardsKeypair0(ASN1ObjectIdentifier curveId,
-      P11NewKeyControl control)
-          throws P11TokenException {
+  protected P11Identity generateECEdwardsKeypair0(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
+      throws P11TokenException {
     ECPrivateKey privateKey = new ECPrivateKey(KeyType.EC_EDWARDS);
     ECPublicKey publicKey = new ECPublicKey(KeyType.EC_EDWARDS);
     setKeyAttributes(control, publicKey, privateKey, newObjectConf);
@@ -1090,21 +1065,18 @@ class IaikP11Slot extends P11Slot {
       throw new P11TokenException(ex.getMessage(), ex);
     }
     publicKey.getEcdsaParams().setByteArrayValue(encodedCurveId);
-    return generateKeyPair(CKM_EC_EDWARDS_KEY_PAIR_GEN,
-        control.getId(), privateKey, publicKey);
+    return generateKeyPair(CKM_EC_EDWARDS_KEY_PAIR_GEN, control.getId(), privateKey, publicKey);
   } // method generateECEdwardsKeypair0
 
   @Override
   protected PrivateKeyInfo generateECEdwardsKeypairOtf0(ASN1ObjectIdentifier curveId)
       throws P11TokenException {
-    return generateECKeypairOtf0(KeyType.EC_EDWARDS, CKM_EC_EDWARDS_KEY_PAIR_GEN,
-        curveId);
+    return generateECKeypairOtf0(KeyType.EC_EDWARDS, CKM_EC_EDWARDS_KEY_PAIR_GEN, curveId);
   }
 
   @Override
-  protected P11Identity generateECMontgomeryKeypair0(ASN1ObjectIdentifier curveId,
-      P11NewKeyControl control)
-          throws P11TokenException {
+  protected P11Identity generateECMontgomeryKeypair0(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
+      throws P11TokenException {
     ECPrivateKey privateKey = new ECPrivateKey(KeyType.EC_MONTGOMERY);
     ECPublicKey publicKey = new ECPublicKey(KeyType.EC_MONTGOMERY);
     setKeyAttributes(control, publicKey, privateKey, newObjectConf);
@@ -1114,15 +1086,13 @@ class IaikP11Slot extends P11Slot {
       throw new P11TokenException(ex.getMessage(), ex);
     }
 
-    return generateKeyPair(CKM_EC_MONTGOMERY_KEY_PAIR_GEN,
-        control.getId(), privateKey, publicKey);
+    return generateKeyPair(CKM_EC_MONTGOMERY_KEY_PAIR_GEN, control.getId(), privateKey, publicKey);
   } // method generateECMontgomeryKeypair0
 
   @Override
   protected PrivateKeyInfo generateECMontgomeryKeypairOtf0(ASN1ObjectIdentifier curveId)
       throws P11TokenException {
-    return generateECKeypairOtf0(KeyType.EC_MONTGOMERY,
-        CKM_EC_MONTGOMERY_KEY_PAIR_GEN, curveId);
+    return generateECKeypairOtf0(KeyType.EC_MONTGOMERY, CKM_EC_MONTGOMERY_KEY_PAIR_GEN, curveId);
   }
 
   @Override
@@ -1163,8 +1133,7 @@ class IaikP11Slot extends P11Slot {
     return generateECKeypairOtf0(KeyType.EC, CKM_EC_KEY_PAIR_GEN, curveId);
   }
 
-  private PrivateKeyInfo generateECKeypairOtf0(
-      long keyType, long mech, ASN1ObjectIdentifier curveId)
+  private PrivateKeyInfo generateECKeypairOtf0(long keyType, long mech, ASN1ObjectIdentifier curveId)
       throws P11TokenException {
     ECPrivateKey privateKeyTemplate;
     ECPublicKey publicKeyTemplate;
@@ -1195,21 +1164,17 @@ class IaikP11Slot extends P11Slot {
 
       KeyPair keypair = null;
       try {
-        keypair = session.generateKeyPair(Mechanism.get(mech),
-            publicKeyTemplate, privateKeyTemplate);
+        keypair = session.generateKeyPair(Mechanism.get(mech), publicKeyTemplate, privateKeyTemplate);
         ECPrivateKey sk = (ECPrivateKey) keypair.getPrivateKey();
         ECPublicKey pk = (ECPublicKey) keypair.getPublicKey();
 
         if (KeyType.EC_EDWARDS == keyType || KeyType.EC_MONTGOMERY == keyType) {
           AlgorithmIdentifier algId = new AlgorithmIdentifier(curveId);
-          byte[] encodedPublicPoint =
-              ASN1OctetString.getInstance(pk.getEcPoint().getByteArrayValue()).getOctets();
+          byte[] encodedPublicPoint = ASN1OctetString.getInstance(pk.getEcPoint().getByteArrayValue()).getOctets();
           byte[] privValue = sk.getValue().getByteArrayValue();
-          return new PrivateKeyInfo(algId, new DEROctetString(privValue),
-              null, encodedPublicPoint);
+          return new PrivateKeyInfo(algId, new DEROctetString(privValue), null, encodedPublicPoint);
         } else {
-          AlgorithmIdentifier algId =
-              new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveId);
+          AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveId);
 
           byte[] encodedPublicPoint =
               ASN1OctetString.getInstance(pk.getEcPoint().getByteArrayValue()).getOctets();
@@ -1219,15 +1184,12 @@ class IaikP11Slot extends P11Slot {
 
           int orderBigLen = (encodedPublicPoint.length - 1) / 2 * 8;
           return new PrivateKeyInfo(algId,
-              new org.bouncycastle.asn1.sec.ECPrivateKey(
-                  orderBigLen,
+              new org.bouncycastle.asn1.sec.ECPrivateKey(orderBigLen,
                   new BigInteger(1, sk.getValue().getByteArrayValue()),
-                  new DERBitString(encodedPublicPoint),
-                  null));
+                  new DERBitString(encodedPublicPoint), null));
         }
       } catch (TokenException | IOException ex) {
-        throw new P11TokenException("could not generate keypair "
-            + Functions.mechanismCodeToString(mech), ex);
+        throw new P11TokenException("could not generate keypair " + Functions.mechanismCodeToString(mech), ex);
       } finally {
         if (keypair != null) {
           destroyObject(session, keypair.getPrivateKey());
@@ -1260,16 +1222,14 @@ class IaikP11Slot extends P11Slot {
       throws P11TokenException {
     long ckm = CKM_VENDOR_SM2_KEY_PAIR_GEN;
     if (supportsMechanism(ckm)) {
-      return generateECKeypairOtf0(KeyType.VENDOR_SM2,
-          ckm, GMObjectIdentifiers.sm2p256v1);
+      return generateECKeypairOtf0(KeyType.VENDOR_SM2, ckm, GMObjectIdentifiers.sm2p256v1);
     } else {
       return generateECKeypairOtf0(GMObjectIdentifiers.sm2p256v1);
     }
   }
 
-  private P11Identity generateKeyPair(long mech, byte[] id, PrivateKey privateKeyTemplate,
-      PublicKey publicKeyTemplate)
-          throws P11TokenException {
+  private P11Identity generateKeyPair(long mech, byte[] id, PrivateKey privateKeyTemplate, PublicKey publicKeyTemplate)
+      throws P11TokenException {
     char[] labelChars = value(privateKeyTemplate.getLabel());
 
     boolean succ = false;
@@ -1280,8 +1240,7 @@ class IaikP11Slot extends P11Slot {
       try {
         Session session = bagEntry.value();
         if (labelChars != null && labelExists(session, labelChars)) {
-          throw new IllegalArgumentException(
-              "label " + new String(labelChars) + " exists, please specify another one");
+          throw new IllegalArgumentException("label " + new String(labelChars) + " exists, please specify another one");
         }
 
         if (id == null) {
@@ -1292,13 +1251,10 @@ class IaikP11Slot extends P11Slot {
         publicKeyTemplate.getId().setByteArrayValue(id);
 
         try {
-          keypair = session.generateKeyPair(Mechanism.get(mech),
-              publicKeyTemplate, privateKeyTemplate);
-
+          keypair = session.generateKeyPair(Mechanism.get(mech), publicKeyTemplate, privateKeyTemplate);
           labelChars = value(keypair.getPrivateKey().getLabel());
         } catch (TokenException ex) {
-          throw new P11TokenException("could not generate keypair "
-              + Functions.mechanismCodeToString(mech), ex);
+          throw new P11TokenException("could not generate keypair " + Functions.mechanismCodeToString(mech), ex);
         }
 
         if (labelChars == null) {
@@ -1352,9 +1308,9 @@ class IaikP11Slot extends P11Slot {
     }
   } // method generateKeyPair
 
-  private X509PublicKeyCertificate createPkcs11Template(Session session, X509Cert cert,
-      P11NewObjectControl control, boolean omitDateAttrs)
-          throws P11TokenException {
+  private X509PublicKeyCertificate createPkcs11Template(
+      Session session, X509Cert cert, P11NewObjectControl control, boolean omitDateAttrs)
+      throws P11TokenException {
     X509PublicKeyCertificate newCertTemp = new X509PublicKeyCertificate();
     byte[] id = control.getId();
     if (id == null) {
@@ -1433,8 +1389,7 @@ class IaikP11Slot extends P11Slot {
       P11ObjectIdentifier keyId = identityId.getKeyId();
       byte[] id = keyId.getId();
       char[] label = keyId.getLabelChars();
-      SecretKey secretKey =
-          (SecretKey) getKeyObject(session, new SecretKey(), id, label);
+      SecretKey secretKey = (SecretKey) getKeyObject(session, new SecretKey(), id, label);
       if (secretKey != null) {
         try {
           session.destroyObject(secretKey);
@@ -1445,8 +1400,7 @@ class IaikP11Slot extends P11Slot {
         }
       }
 
-      PrivateKey privKey =
-          (PrivateKey) getKeyObject(session, new PrivateKey(), id, label);
+      PrivateKey privKey = (PrivateKey) getKeyObject(session, new PrivateKey(), id, label);
 
       if (privKey != null) {
         try {
@@ -1461,8 +1415,7 @@ class IaikP11Slot extends P11Slot {
       P11ObjectIdentifier pubKeyId = identityId.getPublicKeyId();
       if (pubKeyId != null) {
         PublicKey pubKey =
-            (PublicKey) getKeyObject(session, new PublicKey(),
-                pubKeyId.getId(), pubKeyId.getLabelChars());
+            (PublicKey) getKeyObject(session, new PublicKey(), pubKeyId.getId(), pubKeyId.getLabelChars());
         if (pubKey != null) {
           try {
             session.destroyObject(pubKey);
@@ -1476,8 +1429,7 @@ class IaikP11Slot extends P11Slot {
 
       P11ObjectIdentifier certId = identityId.getCertId();
       if (certId != null) {
-        X509PublicKeyCertificate[] certs =
-            getCertificateObjects(session, certId.getId(), certId.getLabelChars());
+        X509PublicKeyCertificate[] certs = getCertificateObjects(session, certId.getId(), certId.getLabelChars());
         if (certs != null && certs.length > 0) {
           for (X509PublicKeyCertificate cert : certs) {
             try {
@@ -1544,8 +1496,7 @@ class IaikP11Slot extends P11Slot {
   } // method labelExists
 
   void setKeyAttributes(
-      P11NewKeyControl control, PublicKey publicKey, PrivateKey privateKey,
-      P11NewObjectConf newObjectConf) {
+      P11NewKeyControl control, PublicKey publicKey, PrivateKey privateKey, P11NewObjectConf newObjectConf) {
     if (privateKey != null) {
       privateKey.getToken().setBooleanValue(true);
       if (newObjectConf.isIgnoreLabel()) {
@@ -1591,8 +1542,7 @@ class IaikP11Slot extends P11Slot {
         }
 
         if (slot.getModule().getVendorCodeConverter() != null) {
-          if (keyType == slot.getModule().getVendorCodeConverter()
-              .genericToVendorCKK(CKK_VENDOR_SM2)) {
+          if (keyType == slot.getModule().getVendorCodeConverter().genericToVendorCKK(CKK_VENDOR_SM2)) {
             privateKey.getSign().setBooleanValue(TRUE);
           }
         }

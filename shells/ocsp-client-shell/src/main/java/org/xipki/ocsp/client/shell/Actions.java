@@ -77,8 +77,7 @@ public class Actions {
 
       BigIntegerRange(BigInteger from, BigInteger to) {
         if (from.compareTo(to) > 0) {
-          throw new IllegalArgumentException(
-              "from (" + from + ") may not be larger than to (" + to + ")");
+          throw new IllegalArgumentException("from (" + from + ") may not be larger than to (" + to + ")");
         }
         this.from = from;
         this.to = to;
@@ -91,8 +90,7 @@ public class Actions {
 
     } // class BigIntegerRange
 
-    protected static final Map<ASN1ObjectIdentifier, String> EXTENSION_OIDNAME_MAP
-        = new HashMap<>();
+    protected static final Map<ASN1ObjectIdentifier, String> EXTENSION_OIDNAME_MAP = new HashMap<>();
 
     @Option(name = "--verbose", aliases = "-v", description = "show status verbosely")
     protected Boolean verbose = Boolean.FALSE;
@@ -120,8 +118,7 @@ public class Actions {
             + "(at least one of serial and cert must be specified)")
     private String serialNumberList;
 
-    @Option(name = "--cert", aliases = "-c", multiValued = true,
-        description = "certificate files")
+    @Option(name = "--cert", aliases = "-c", multiValued = true, description = "certificate files")
     @Completion(FileCompleter.class)
     private List<String> certFiles;
 
@@ -136,8 +133,7 @@ public class Actions {
       EXTENSION_OIDNAME_MAP.put(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff, "ArchiveCutoff");
       EXTENSION_OIDNAME_MAP.put(OCSPObjectIdentifiers.id_pkix_ocsp_crl, "CrlID");
       EXTENSION_OIDNAME_MAP.put(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, "Nonce");
-      EXTENSION_OIDNAME_MAP.put(ObjectIdentifiers.Extn.id_pkix_ocsp_extendedRevoke,
-          "ExtendedRevoke");
+      EXTENSION_OIDNAME_MAP.put(ObjectIdentifiers.Extn.id_pkix_ocsp_extendedRevoke, "ExtendedRevoke");
     }
 
     /**
@@ -152,9 +148,9 @@ public class Actions {
      * @throws Exception
      *           if checking failed.
      */
-    protected abstract void checkParameters(X509Cert respIssuer,
-        List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
-            throws Exception;
+    protected abstract void checkParameters(
+        X509Cert respIssuer, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+        throws Exception;
 
     /**
      * Check whether the response has the expected issuer, certificate serial numbers and
@@ -173,8 +169,9 @@ public class Actions {
      * @throws Exception
      *           if processing response failed.
      */
-    protected abstract void processResponse(OCSPResp response, X509Cert respIssuer,
-        IssuerHash issuerHash, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+    protected abstract void processResponse(
+        OCSPResp response, X509Cert respIssuer, IssuerHash issuerHash,
+        List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
         throws Exception;
 
     @Override
@@ -205,15 +202,13 @@ public class Actions {
               issuerX500Name = issuerCert.getSubject();
             }
 
-            X509AttributeCertificateHolder cert =
-                new X509AttributeCertificateHolder(IoUtil.read(certFile));
+            X509AttributeCertificateHolder cert = new X509AttributeCertificateHolder(IoUtil.read(certFile));
             // no signature validation
             AttributeCertificateIssuer reqIssuer = cert.getIssuer();
             if (reqIssuer != null && issuerX500Name != null) {
               X500Name reqIssuerName = reqIssuer.getNames()[0];
               if (!issuerX500Name.equals(reqIssuerName)) {
-                throw new IllegalCmdParamException("certificate " + certFile
-                    + " is not issued by the given issuer");
+                throw new IllegalCmdParamException("certificate " + certFile + " is not issued by the given issuer");
               }
             }
 
@@ -222,8 +217,7 @@ public class Actions {
           } else {
             X509Cert cert = X509Util.parseCert(new File(certFile));
             if (!X509Util.issues(issuerCert, cert)) {
-              throw new IllegalCmdParamException(
-                  "certificate " + certFile + " is not issued by the given issuer");
+              throw new IllegalCmdParamException("certificate " + certFile + " is not issued by the given issuer");
             }
             ocspUrls = extractOcspUrls(cert);
             sn = cert.getSerialNumber();
@@ -235,8 +229,8 @@ public class Actions {
             } else {
               String url = ocspUrls.get(0);
               if (ocspUrl != null && !ocspUrl.equals(url)) {
-                throw new IllegalCmdParamException("given certificates have different"
-                    + " OCSP responder URL in certificate");
+                throw new IllegalCmdParamException(
+                    "given certificates have different OCSP responder URL in certificate");
               } else {
                 ocspUrl = url;
               }
@@ -298,8 +292,7 @@ public class Actions {
       IssuerHash issuerHash = new IssuerHash(options.getHashAlgorithm(), issuerCert);
       OCSPResp response;
       try {
-        response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrlObj,
-            options, debug);
+        response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrlObj, options, debug);
       } finally {
         if (debug != null && debug.size() > 0) {
           ReqRespPair reqResp = debug.get(0);
@@ -336,8 +329,7 @@ public class Actions {
 
     public static List<String> extractOcspUrls(X509AttributeCertificateHolder cert)
         throws CertificateEncodingException {
-      byte[] extValue = X509Util.getCoreExtValue(cert.getExtensions(),
-          Extension.authorityInfoAccess);
+      byte[] extValue = X509Util.getCoreExtValue(cert.getExtensions(), Extension.authorityInfoAccess);
       if (extValue == null) {
         return Collections.emptyList();
       }
@@ -371,8 +363,7 @@ public class Actions {
 
   public abstract static class CommonOcspStatusAction extends XiAction {
 
-    @Option(name = "--issuer", aliases = "-i", required = true,
-        description = "issuer certificate file")
+    @Option(name = "--issuer", aliases = "-i", required = true, description = "issuer certificate file")
     @Completion(FileCompleter.class)
     protected String issuerCertFile;
 
@@ -390,8 +381,7 @@ public class Actions {
     @Completion(Completers.HashAlgCompleter.class)
     protected String hashAlgo = "SHA256";
 
-    @Option(name = "--sig-alg", multiValued = true,
-        description = "comma-separated preferred signature algorithms")
+    @Option(name = "--sig-alg", multiValued = true, description = "comma-separated preferred signature algorithms")
     @Completion(Completers.SigAlgCompleter.class)
     protected List<String> prefSigAlgs;
 
@@ -437,17 +427,17 @@ public class Actions {
     protected Boolean quiet = Boolean.FALSE;
 
     @Override
-    protected void checkParameters(X509Cert respIssuer, List<BigInteger> serialNumbers,
-        Map<BigInteger, byte[]> encodedCerts)
-            throws Exception {
+    protected void checkParameters(
+        X509Cert respIssuer, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+        throws Exception {
       Args.notEmpty(serialNumbers, "serialNunmbers");
     }
 
     @Override
-    protected void processResponse(OCSPResp response, X509Cert respIssuer,
-        IssuerHash issuerHash, List<BigInteger> serialNumbers,
-        Map<BigInteger, byte[]> encodedCerts)
-            throws Exception {
+    protected void processResponse(
+        OCSPResp response, X509Cert respIssuer, IssuerHash issuerHash,
+        List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+        throws Exception {
       Args.notNull(response, "response");
       Args.notNull(issuerHash, "issuerHash");
       Args.notNull(serialNumbers, "serialNumbers");
@@ -469,8 +459,7 @@ public class Actions {
         throw new OcspResponseException.InvalidResponse(ex.getMessage(), ex);
       }
 
-      boolean extendedRevoke = basicResp.getExtension(
-          ObjectIdentifiers.Extn.id_pkix_ocsp_extendedRevoke) != null;
+      boolean extendedRevoke = basicResp.getExtension(ObjectIdentifiers.Extn.id_pkix_ocsp_extendedRevoke) != null;
 
       SingleResp[] singleResponses = basicResp.getResponses();
 
@@ -509,8 +498,7 @@ public class Actions {
               respSigner = cert;
             }
           } else {
-            byte[] spkiSha1 = HashAlgo.SHA1.hash(
-                cert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
+            byte[] spkiSha1 = HashAlgo.SHA1.hash(cert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
             if (Arrays.equals(respIdByKey, spkiSha1)) {
               respSigner = cert;
             }
@@ -534,8 +522,7 @@ public class Actions {
         }
 
         if (validOn) {
-          PublicKey responderPubKey =
-              KeyUtil.generatePublicKey(respSigner.getSubjectPublicKeyInfo());
+          PublicKey responderPubKey = KeyUtil.generatePublicKey(respSigner.getSubjectPublicKeyInfo());
           ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(responderPubKey);
           boolean sigValid = basicResp.isSignatureValid(cvp);
 
@@ -556,8 +543,7 @@ public class Actions {
             }
 
             if (!certValid) {
-              throw new CmdFailure("response is equipped with valid signature but the"
-                  + " OCSP signer is not trusted");
+              throw new CmdFailure("response is equipped with valid signature but the OCSP signer is not trusted");
             }
           } else {
             println("response is equipped with valid signature");
@@ -592,8 +578,7 @@ public class Actions {
 
           if (revStatus.hasRevocationReason()) {
             int reason = revStatus.getRevocationReason();
-            if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.getCode()
-                && revTime.getTime() == 0) {
+            if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.getCode() && revTime.getTime() == 0) {
               status = "unknown (RFC6960)";
             } else {
               status = StringUtil.concatObjects("revoked, reason = ",
@@ -613,8 +598,7 @@ public class Actions {
 
         CertificateID certId = singleResp.getCertID();
         HashAlgo hashAlgo = HashAlgo.getInstance(certId.getHashAlgOID());
-        boolean issuerMatch = issuerHash.match(hashAlgo, certId.getIssuerNameHash(),
-            certId.getIssuerKeyHash());
+        boolean issuerMatch = issuerHash.match(hashAlgo, certId.getIssuerNameHash(), certId.getIssuerKeyHash());
         BigInteger serialNumber = certId.getSerialNumber();
 
         msg.append("issuer matched: ").append(issuerMatch);
@@ -625,8 +609,7 @@ public class Actions {
           msg.append("\nthisUpdate: ").append(singleResp.getThisUpdate());
           msg.append("\nnextUpdate: ").append(singleResp.getNextUpdate());
 
-          Extension extension = singleResp.getExtension(
-              ISISMTTObjectIdentifiers.id_isismtt_at_certHash);
+          Extension extension = singleResp.getExtension(ISISMTTObjectIdentifiers.id_isismtt_at_certHash);
           if (extension != null) {
             msg.append("\nCertHash is provided:\n");
             ASN1Encodable extensionValue = extension.getParsedValue();
@@ -649,8 +632,7 @@ public class Actions {
             }
           } // end if (extension != null)
 
-          extension = singleResp.getExtension(
-              OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff);
+          extension = singleResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff);
           if (extension != null) {
             ASN1Encodable extensionValue = extension.getParsedValue();
             ASN1GeneralizedTime time = ASN1GeneralizedTime.getInstance(extensionValue);
@@ -680,8 +662,7 @@ public class Actions {
           } else {
             int size = extensionOids.size();
             for (int j = 0; j < size; j++) {
-              ASN1ObjectIdentifier extensionOid =
-                  (ASN1ObjectIdentifier) extensionOids.get(j);
+              ASN1ObjectIdentifier extensionOid = (ASN1ObjectIdentifier) extensionOids.get(j);
               String name = EXTENSION_OIDNAME_MAP.get(extensionOid);
               if (name == null) {
                 msg.append(extensionOid.getId());

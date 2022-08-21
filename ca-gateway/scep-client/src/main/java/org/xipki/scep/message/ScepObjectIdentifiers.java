@@ -26,8 +26,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
 public class ScepObjectIdentifiers {
 
-  private static final ASN1ObjectIdentifier ID_VERISIGN =
-      new ASN1ObjectIdentifier("2.16.840.1.113733");
+  private static final ASN1ObjectIdentifier ID_VERISIGN = new ASN1ObjectIdentifier("2.16.840.1.113733");
 
   public static final ASN1ObjectIdentifier ID_PKI = ID_VERISIGN.branch("1");
 

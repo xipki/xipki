@@ -167,7 +167,7 @@ public class P11ModuleConf {
       }
 
       public List<char[]> getPasswords(PasswordResolver passwordResolver)
-              throws PasswordResolverException {
+          throws PasswordResolverException {
         if (passwords == null) {
           return null;
         }
@@ -273,8 +273,7 @@ public class P11ModuleConf {
     }
 
     public void setSetCertObjectAttributes(Set<Long> setCertObjectAttributes) {
-      this.setCertObjectAttributes =
-          notNull(setCertObjectAttributes, "setCertObjectAttributes");
+      this.setCertObjectAttributes = notNull(setCertObjectAttributes, "setCertObjectAttributes");
     }
 
   } // class P11NewObjectConf
@@ -311,9 +310,9 @@ public class P11ModuleConf {
 
   private final VendorCodeConverter vendorCodeConverter;
 
-  public P11ModuleConf(Pkcs11conf.Module moduleType, List<Pkcs11conf.MechanismSet> mechanismSets,
-      PasswordResolver passwordResolver)
-          throws InvalidConfException {
+  public P11ModuleConf(
+      Pkcs11conf.Module moduleType, List<Pkcs11conf.MechanismSet> mechanismSets, PasswordResolver passwordResolver)
+      throws InvalidConfException {
     notNull(moduleType, "moduleType");
     notEmpty(mechanismSets, "mechanismSets");
     this.name = moduleType.getName();
@@ -440,8 +439,7 @@ public class P11ModuleConf {
         String mechanismSetName = filterType.getMechanismSet();
 
         if (!mechanismSetsMap.containsKey(mechanismSetName)) {
-          throw new InvalidConfException("MechanismSet '" +  mechanismSetName
-              + "' is not defined");
+          throw new InvalidConfException("MechanismSet '" +  mechanismSetName + "' is not defined");
         }
 
         Set<Long> mechanisms = mechanismSetsMap.get(mechanismSetName);
@@ -496,8 +494,7 @@ public class P11ModuleConf {
         : new P11NewObjectConf(moduleType.getNewObjectConf());
 
     Map<String, String> vendorCodes = moduleType.getVendorCodes();
-    this.vendorCodeConverter = (vendorCodes == null)
-            ? null : MapVendorCodeConverter.getInstance(vendorCodes);
+    this.vendorCodeConverter = (vendorCodes == null) ? null : MapVendorCodeConverter.getInstance(vendorCodes);
   } // constructor
 
   public String getName() {

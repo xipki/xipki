@@ -110,9 +110,9 @@ public class SignatureCmpCaClientExample extends CaClientExample {
       printCert("===== CA Certificate =====", client.getCaCert());
 
       // Enroll certificate via CRMF - (CA generate keypair)
-      KeyAndCert[] keyAndCerts =
-          client.enrollCertsViaCrmfCaGenKeypair(new String[] {CERT_PROFILE, CERT_PROFILE},
-          new String[]{getSubject(), getSubject()});
+      KeyAndCert[] keyAndCerts = client.enrollCertsViaCrmfCaGenKeypair(
+          new String[] {CERT_PROFILE, CERT_PROFILE},
+          new String[] {getSubject(), getSubject()});
       for (int i = 0; i < keyAndCerts.length; i++) {
         printKeyAndCert("===== Enroll via CRMF (CMP, CA generate keypair) =====", keyAndCerts[i]);
       }
@@ -151,17 +151,19 @@ public class SignatureCmpCaClientExample extends CaClientExample {
       // Enroll certificate via CRMF - EC
       kp = generateEcKeypair();
       MyKeypair kp2 = generateEcKeypair();
-      X509Certificate[] certs = client.enrollCertsViaCrmf(new String[] {CERT_PROFILE, CERT_PROFILE},
+      X509Certificate[] certs = client.enrollCertsViaCrmf(
+          new String[] {CERT_PROFILE, CERT_PROFILE},
           new PrivateKey[] {kp.getPrivate(), kp2.getPrivate()},
           new SubjectPublicKeyInfo[] {kp.getPublic(), kp2.getPublic()},
-          new String[]{getSubject(), getSubject()});
+          new String[] {getSubject(), getSubject()});
       for (int i = 0; i < certs.length; i++) {
         printCert("===== Enroll EC via CRMF (CMP) =====", certs[i]);
       }
 
       // Update certificate via CRMF - EC
-      certs = client.updateCertsViaCrmf(new PrivateKey[] {kp.getPrivate(), kp2.getPrivate()},
-          issuer, new BigInteger[] {certs[0].getSerialNumber(), certs[1].getSerialNumber()});
+      certs = client.updateCertsViaCrmf(
+                new PrivateKey[] {kp.getPrivate(), kp2.getPrivate()}, issuer,
+                new BigInteger[] {certs[0].getSerialNumber(), certs[1].getSerialNumber()});
       for (int i = 0; i < certs.length; i++) {
         printCert("===== Update EC via CRMF (CMP) =====", certs[i]);
       }

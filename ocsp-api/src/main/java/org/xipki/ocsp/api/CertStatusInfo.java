@@ -77,8 +77,7 @@ public class CertStatusInfo {
 
   private Date archiveCutOff;
 
-  private CertStatusInfo(CertStatus certStatus, Date thisUpdate, Date nextUpdate,
-      String certprofile) {
+  private CertStatusInfo(CertStatus certStatus, Date thisUpdate, Date nextUpdate, String certprofile) {
     this.certStatus = notNull(certStatus, "certStatus");
     this.thisUpdate = notNull(thisUpdate, "thisUpdate");
     this.nextUpdate = nextUpdate;
@@ -161,8 +160,8 @@ public class CertStatusInfo {
     return new CertStatusInfo(CertStatus.ISSUER_UNKNOWN, thisUpdate, nextUpdate, null);
   }
 
-  public static CertStatusInfo getGoodCertStatusInfo(HashAlgo certHashAlgo, byte[] certHash,
-      Date thisUpdate, Date nextUpdate, String certprofile) {
+  public static CertStatusInfo getGoodCertStatusInfo(
+      HashAlgo certHashAlgo, byte[] certHash, Date thisUpdate, Date nextUpdate, String certprofile) {
     CertStatusInfo ret = new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate, certprofile);
     ret.certHashAlgo = certHashAlgo;
     ret.certHash = certHash;
@@ -173,20 +172,19 @@ public class CertStatusInfo {
     return new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate, null);
   }
 
-  public static CertStatusInfo getRevokedCertStatusInfo(CertRevocationInfo revocationInfo,
-      HashAlgo certHashAlgo, byte[] certHash, Date thisUpdate, Date nextUpdate,
-      String certprofile) {
+  public static CertStatusInfo getRevokedCertStatusInfo(
+      CertRevocationInfo revocationInfo, HashAlgo certHashAlgo, byte[] certHash,
+      Date thisUpdate, Date nextUpdate, String certprofile) {
     notNull(revocationInfo, "revocationInfo");
-    CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate,
-        certprofile);
+    CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate, certprofile);
     ret.revocationInfo = revocationInfo;
     ret.certHashAlgo = certHashAlgo;
     ret.certHash = certHash;
     return ret;
   } // method getRevokedCertStatusInfo
 
-  public static CertStatusInfo getRevokedCertStatusInfo(CertRevocationInfo revocationInfo,
-      Date thisUpdate, Date nextUpdate) {
+  public static CertStatusInfo getRevokedCertStatusInfo(
+      CertRevocationInfo revocationInfo, Date thisUpdate, Date nextUpdate) {
     notNull(revocationInfo, "revocationInfo");
     CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate, null);
     ret.revocationInfo = revocationInfo;

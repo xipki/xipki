@@ -9,8 +9,7 @@ import java.util.Arrays;
  * implementation of Mikael Grev.
  */
 public class Base64Url {
-  private static final String CA_TEXT =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+  private static final String CA_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
   private static final char[] CA = CA_TEXT.toCharArray();
 
   private static final byte[] BASE64URL_BYTES = StringUtil.toUtf8Bytes(CA_TEXT + "=");

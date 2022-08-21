@@ -51,9 +51,8 @@ public class CheckerUtil {
     }
   }
 
-  static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(
-      Map<String, ExtensionType> extensions)
-          throws CertprofileException {
+  static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(Map<String, ExtensionType> extensions)
+      throws CertprofileException {
     if (extensions == null) {
       return null;
     }
@@ -78,8 +77,7 @@ public class CheckerUtil {
       try {
         encodedValue = extn.getConstant().toASN1Encodable().toASN1Primitive().getEncoded();
       } catch (IOException | InvalidConfException ex) {
-        throw new CertprofileException(
-            "could not parse the constant extension value of type" + type, ex);
+        throw new CertprofileException("could not parse the constant extension value of type" + type, ex);
       }
 
       QaExtensionValue extension = new QaExtensionValue(extn.isCritical(), encodedValue);
@@ -93,9 +91,8 @@ public class CheckerUtil {
     return Collections.unmodifiableMap(map);
   } // method buildConstantExtesions
 
-  static Map<ASN1ObjectIdentifier, ExtnSyntax> buildExtesionSyntaxes(
-      Map<String, ExtensionType> extensions)
-          throws CertprofileException {
+  static Map<ASN1ObjectIdentifier, ExtnSyntax> buildExtesionSyntaxes(Map<String, ExtensionType> extensions)
+      throws CertprofileException {
     if (extensions == null) {
       return null;
     }
@@ -130,8 +127,7 @@ public class CheckerUtil {
     return Hex.encode(bytes);
   }
 
-  static Set<String> strInBnotInA(Collection<String> collectionA,
-      Collection<String> collectionB) {
+  static Set<String> strInBnotInA(Collection<String> collectionA, Collection<String> collectionB) {
     if (collectionB == null) {
       return Collections.emptySet();
     }
@@ -219,8 +215,7 @@ public class CheckerUtil {
 
   static Set<String> getKeyUsage(byte[] extensionValue) {
     Set<String> usages = new HashSet<>();
-    org.bouncycastle.asn1.x509.KeyUsage reqKeyUsage =
-        org.bouncycastle.asn1.x509.KeyUsage.getInstance(extensionValue);
+    org.bouncycastle.asn1.x509.KeyUsage reqKeyUsage = org.bouncycastle.asn1.x509.KeyUsage.getInstance(extensionValue);
     for (KeyUsage k : KeyUsage.values()) {
       if (reqKeyUsage.hasUsages(k.getBcUsage())) {
         usages.add(k.getName());
@@ -289,10 +284,8 @@ public class CheckerUtil {
     }
   } // method checkAia
 
-  static void addViolation(StringBuilder failureMsg, String field,
-      Object is, Object expected) {
-    failureMsg.append(field).append(" is '").append(is)
-      .append("' but expected '").append(expected).append("';");
+  static void addViolation(StringBuilder failureMsg, String field, Object is, Object expected) {
+    failureMsg.append(field).append(" is '").append(is).append("' but expected '").append(expected).append("';");
   } // method addViolation
 
 }

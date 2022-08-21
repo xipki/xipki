@@ -45,7 +45,8 @@ public class ResponderImpl implements Responder {
 
   private final List<OcspStore> stores;
 
-  ResponderImpl(ResponderOption responderOption, RequestOption requestOption,
+  ResponderImpl(
+      ResponderOption responderOption, RequestOption requestOption,
       ResponseOption responseOption, ResponseSigner signer, List<OcspStore> stores) {
     this.responderOption = notNull(responderOption, "responderOption");
     this.requestOption = notNull(requestOption, "requestOption");

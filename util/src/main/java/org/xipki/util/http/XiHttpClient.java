@@ -54,8 +54,7 @@ public class XiHttpClient {
     this.hostnameVerifier = sslContextConf.buildHostnameVerifier();
   }
 
-  public XiHttpClient(SSLSocketFactory sslSocketFactory,
-                      HostnameVerifier hostnameVerifier) {
+  public XiHttpClient(SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
     this.sslSocketFactory = sslSocketFactory;
     this.hostnameVerifier = hostnameVerifier;
   }
@@ -72,8 +71,8 @@ public class XiHttpClient {
     }
   } // method httpGet
 
-  public HttpRespContent httpPost(String url, String requestContentType, byte[] request,
-                         String expectedRespContentType)
+  public HttpRespContent httpPost(
+      String url, String requestContentType, byte[] request, String expectedRespContentType)
       throws IOException {
     HttpRespContent resp = httpPost(url, requestContentType, request);
 

@@ -59,8 +59,7 @@ public class CmsEnveloperTest {
 
   @Test
   public void testPassword() throws Exception {
-    passwordTest(CMSEnvelopedDataGenerator.AES256_CBC,
-        PasswordRecipient.PRF.HMacSHA256, "my password".toCharArray());
+    passwordTest(CMSEnvelopedDataGenerator.AES256_CBC, PasswordRecipient.PRF.HMacSHA256, "my password".toCharArray());
   }
 
   @Test
@@ -94,8 +93,7 @@ public class CmsEnveloperTest {
     RecipientId rid = new JceKeyAgreeRecipientId(reciCert);
 
     RecipientInformation recipient = recipients.get(rid);
-    byte[] recData = recipient.getContent(
-        new JceKeyAgreeEnvelopedRecipient(reciPrivKey).setProvider(bc));
+    byte[] recData = recipient.getContent(new JceKeyAgreeEnvelopedRecipient(reciPrivKey).setProvider(bc));
     Assert.assertArrayEquals(recData, data);
   }
 
@@ -108,8 +106,7 @@ public class CmsEnveloperTest {
 
     byte[] kekId = new byte[]{1, 2, 3, 4, 5};
 
-    edGen.addRecipientInfoGenerator(
-        new JceKEKRecipientInfoGenerator(kekId, kek).setProvider("BC"));
+    edGen.addRecipientInfoGenerator(new JceKEKRecipientInfoGenerator(kekId, kek).setProvider("BC"));
 
     CMSEnvelopedData ed = edGen.generate(
         new CMSProcessableByteArray(data),
@@ -148,8 +145,7 @@ public class CmsEnveloperTest {
     CMSEnvelopedDataGenerator edGen = new CMSEnvelopedDataGenerator();
 
     final String bc = "BC";
-    edGen.addRecipientInfoGenerator(
-        new JceKeyTransRecipientInfoGenerator(reciCert, oaepAlgId).setProvider(bc));
+    edGen.addRecipientInfoGenerator(new JceKeyTransRecipientInfoGenerator(reciCert, oaepAlgId).setProvider(bc));
 
     CMSEnvelopedData ed = edGen.generate(
         new CMSProcessableByteArray(data),
@@ -159,8 +155,7 @@ public class CmsEnveloperTest {
     Iterator<RecipientInformation> it = recipients.getRecipients().iterator();
     RecipientInformation recipient = it.next();
 
-    byte[] recData = recipient.getContent(
-        new JceKeyTransEnvelopedRecipient(reciKey).setProvider(bc));
+    byte[] recData = recipient.getContent(new JceKeyTransEnvelopedRecipient(reciKey).setProvider(bc));
     Assert.assertArrayEquals(recData, data);
   }
 
@@ -173,8 +168,7 @@ public class CmsEnveloperTest {
     CMSEnvelopedDataGenerator edGen = new CMSEnvelopedDataGenerator();
 
     edGen.addRecipientInfoGenerator(
-        new BcPasswordRecipientInfoGenerator(
-            new ASN1ObjectIdentifier(algorithm), password)
+        new BcPasswordRecipientInfoGenerator(new ASN1ObjectIdentifier(algorithm), password)
             .setPRF(prf).setSaltAndIterationCount(salt, iterationCOunt));
 
     CMSEnvelopedData ed0 = edGen.generate(

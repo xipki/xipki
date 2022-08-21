@@ -46,8 +46,7 @@ public enum DirectoryStringType {
     } else if (bmpString == this) {
       return new DERBMPString(text);
     } else {
-      throw new IllegalStateException(
-          "should not reach here, unknown DirectoryStringType " + this.name());
+      throw new IllegalStateException("should not reach here, unknown DirectoryStringType " + this.name());
     }
   } // method createDirectoryString
 

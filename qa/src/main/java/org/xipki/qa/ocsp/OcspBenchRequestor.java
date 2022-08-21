@@ -91,15 +91,14 @@ class OcspBenchRequestor {
   private BenchmarkHttpClient httpClient;
 
   public void init(ResponseHandler responseHandler, String responderUrl, X509Cert issuerCert,
-      RequestOptions requestOptions, int queueSize)
-          throws OcspRequestorException, IOException, URISyntaxException {
+                   RequestOptions requestOptions, int queueSize)
+      throws OcspRequestorException, IOException, URISyntaxException {
     notNull(issuerCert, "issuerCert");
     notNull(responseHandler, "responseHandler");
     this.requestOptions = notNull(requestOptions, "requestOptions");
 
     this.issuerhashAlg = requestOptions.getHashAlgorithm();
-    this.issuerNameHash = new DEROctetString(
-        issuerhashAlg.hash(issuerCert.getSubject().getEncoded()));
+    this.issuerNameHash = new DEROctetString(issuerhashAlg.hash(issuerCert.getSubject().getEncoded()));
     this.issuerKeyHash = new DEROctetString(
         issuerhashAlg.hash(issuerCert.getSubjectPublicKeyInfo().getPublicKeyData().getOctets()));
 
@@ -116,8 +115,7 @@ class OcspBenchRequestor {
       ASN1Sequence extnValue = new DERSequence(vec);
       Extension extn;
       try {
-        extn = new Extension(ObjectIdentifiers.Extn.id_pkix_ocsp_prefSigAlgs, false,
-            new DEROctetString(extnValue));
+        extn = new Extension(ObjectIdentifiers.Extn.id_pkix_ocsp_prefSigAlgs, false, new DEROctetString(extnValue));
       } catch (IOException ex) {
         throw new OcspRequestorException(ex.getMessage(), ex);
       }
@@ -145,8 +143,7 @@ class OcspBenchRequestor {
       }
     }
 
-    this.httpClient = new BenchmarkHttpClient(uri.getHost(), port, null,
-        responseHandler, queueSize);
+    this.httpClient = new BenchmarkHttpClient(uri.getHost(), port, null, responseHandler, queueSize);
     this.httpClient.start();
   } // method init
 
@@ -170,12 +167,10 @@ class OcspBenchRequestor {
         throw new OcspRequestorException(ex.getMessage());
       }
       String newRawpath = StringUtil.concat(responderRawPathGet, urlEncodedReq);
-      request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
-          HttpMethod.GET, newRawpath);
+      request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, newRawpath);
     } else {
       ByteBuf content = Unpooled.wrappedBuffer(ocspReq);
-      request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
-          HttpMethod.POST, responderRawPathPost, content);
+      request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, responderRawPathPost, content);
       request.headers().addInt("Content-Length", content.readableBytes());
     }
     request.headers().add("Content-Type", "application/ocsp-request");

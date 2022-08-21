@@ -62,12 +62,10 @@ public class RevokeSuspendedControl {
 
     this.enabled = getBoolean(conf, KEY_ENABLED, false);
     String str = conf.value(KEY_REVOCATION_REASON);
-    this.targetReason = (str == null)
-        ? CrlReason.CESSATION_OF_OPERATION : CrlReason.forNameOrText(str);
+    this.targetReason = (str == null) ? CrlReason.CESSATION_OF_OPERATION : CrlReason.forNameOrText(str);
 
     str = conf.value(KEY_UNCHANGED_SINCE);
-    this.unchangedSince = (str == null)
-        ? new Validity(15, Unit.DAY) : Validity.getInstance(str);
+    this.unchangedSince = (str == null) ? new Validity(15, Unit.DAY) : Validity.getInstance(str);
   } // constructor
 
   public RevokeSuspendedControl(boolean enabled) {

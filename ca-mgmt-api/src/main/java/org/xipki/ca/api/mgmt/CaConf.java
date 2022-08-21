@@ -63,8 +63,7 @@ public class CaConf {
 
     private final Date notAfter;
 
-    public GenSelfIssued(String profile, String subject, String serialNumber,
-                         Date notBefore, Date notAfter) {
+    public GenSelfIssued(String profile, String subject, String serialNumber, Date notBefore, Date notAfter) {
       this.profile = Args.notBlank(profile, "profile");
       this.subject = Args.notBlank(subject, "subject");
       this.serialNumber = serialNumber;
@@ -109,19 +108,17 @@ public class CaConf {
 
     private final List<String> publisherNames;
 
-    public SingleCa(String name, GenSelfIssued genSelfIssued, CaEntry caEntry,
-        List<String> aliases, List<String> profileNames, List<CaHasRequestorEntry> requestors,
-        List<String> publisherNames) {
+    public SingleCa(
+        String name, GenSelfIssued genSelfIssued, CaEntry caEntry, List<String> aliases,
+        List<String> profileNames, List<CaHasRequestorEntry> requestors, List<String> publisherNames) {
       this.name = Args.notBlank(name, "name");
       if (genSelfIssued != null) {
         if (caEntry == null) {
-          throw new IllegalArgumentException(
-              "caEntry may not be null if genSelfIssued is non-null");
+          throw new IllegalArgumentException("caEntry may not be null if genSelfIssued is non-null");
         }
 
         if ((caEntry).getCert() != null) {
-          throw new IllegalArgumentException(
-                  "caEntry.cert may not be null if genSelfIssued is non-null");
+          throw new IllegalArgumentException("caEntry.cert may not be null if genSelfIssued is non-null");
         }
       }
 
@@ -209,8 +206,7 @@ public class CaConf {
         zipEntries.put(zipEntry.getName(), zipEntryBytes);
       }
 
-      CaConfType.CaSystem root =
-          JSON.parseObject(zipEntries.get("caconf.json"), CaConfType.CaSystem.class);
+      CaConfType.CaSystem root = JSON.parseObject(zipEntries.get("caconf.json"), CaConfType.CaSystem.class);
       root.validate();
       init0(root, zipEntries, securityFactory);
     } finally {
@@ -228,8 +224,7 @@ public class CaConf {
     }
   } // method init
 
-  private void init0(CaConfType.CaSystem root, Map<String, byte[]> zipEntries,
-      SecurityFactory securityFactory)
+  private void init0(CaConfType.CaSystem root, Map<String, byte[]> zipEntries, SecurityFactory securityFactory)
       throws IOException, InvalidConfException, CaMgmtException {
     if (root.getProperties() != null) {
       properties.putAll(root.getProperties());
@@ -258,8 +253,7 @@ public class CaConf {
           conf = getBase64Binary(m.getBinaryConf(), zipEntries);
         }
 
-        RequestorEntry en =
-            new RequestorEntry(new NameId(null, m.getName()), m.getType(), conf);
+        RequestorEntry en = new RequestorEntry(new NameId(null, m.getName()), m.getType(), conf);
         addRequestor(en);
       }
     }
@@ -285,8 +279,7 @@ public class CaConf {
     // KeypairGens
     if (root.getKeypairGens() != null) {
       for (CaConfType.NameTypeConf m : root.getKeypairGens()) {
-        KeypairGenEntry en = new KeypairGenEntry(m.getName(), m.getType(),
-                getValue(m.getConf(), zipEntries));
+        KeypairGenEntry en = new KeypairGenEntry(m.getName(), m.getType(), getValue(m.getConf(), zipEntries));
         addKeypairGen(en);
       }
     }
@@ -310,8 +303,8 @@ public class CaConf {
                 : DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.getNotBefore());
             Date notAfter = gsi.getNotAfter() == null ? null
                 : DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.getNotAfter());
-            genSelfIssued = new GenSelfIssued(gsi.getProfile(),
-                gsi.getSubject(), gsi.getSerialNumber(), notBefore, notAfter);
+            genSelfIssued = new GenSelfIssued(gsi.getProfile(), gsi.getSubject(), gsi.getSerialNumber(),
+                notBefore, notAfter);
           }
 
           CaUris caUris;
@@ -319,12 +312,10 @@ public class CaConf {
             caUris = CaUris.EMPTY_INSTANCE;
           } else {
             CaConfType.CaUris uris = ci.getCaUris();
-            caUris = new CaUris(uris.getCacertUris(), uris.getOcspUris(),
-                uris.getCrlUris(), uris.getDeltacrlUris());
+            caUris = new CaUris(uris.getCacertUris(), uris.getOcspUris(), uris.getCrlUris(), uris.getDeltacrlUris());
           }
 
-          int exprirationPeriod = (ci.getExpirationPeriod() == null) ? 365
-              : ci.getExpirationPeriod();
+          int exprirationPeriod = (ci.getExpirationPeriod() == null) ? 365 : ci.getExpirationPeriod();
 
           int numCrls = (ci.getNumCrls() == null) ? 30 : ci.getNumCrls();
 
@@ -333,13 +324,11 @@ public class CaConf {
               numCrls, exprirationPeriod);
 
           if (ci.getCrlControl() != null) {
-            caEntry.setCrlControl(new CrlControl(
-                new ConfPairs(ci.getCrlControl()).getEncoded()));
+            caEntry.setCrlControl(new CrlControl(new ConfPairs(ci.getCrlControl()).getEncoded()));
           }
 
           if (ci.getCtlogControl() != null) {
-            caEntry.setCtlogControl(new CtlogControl(
-                new ConfPairs(ci.getCtlogControl()).getEncoded()));
+            caEntry.setCtlogControl(new CtlogControl(new ConfPairs(ci.getCtlogControl()).getEncoded()));
           }
 
           caEntry.setCrlSignerName(ci.getCrlSignerName());
@@ -349,8 +338,7 @@ public class CaConf {
             caEntry.setExtraControl(new ConfPairs(ci.getExtraControl()).unmodifiable());
           }
 
-          int keepExpiredCertDays = (ci.getKeepExpiredCertDays() == null) ? -1
-              : ci.getKeepExpiredCertDays();
+          int keepExpiredCertDays = (ci.getKeepExpiredCertDays() == null) ? -1 : ci.getKeepExpiredCertDays();
           caEntry.setKeepExpiredCertInDays(keepExpiredCertDays);
 
           caEntry.setMaxValidity(Validity.getInstance(ci.getMaxValidity()));
@@ -358,8 +346,7 @@ public class CaConf {
 
           if (ci.getRevokeSuspendedControl() != null) {
             caEntry.setRevokeSuspendedControl(
-                new RevokeSuspendedControl(
-                    new ConfPairs(ci.getRevokeSuspendedControl())));
+                new RevokeSuspendedControl(new ConfPairs(ci.getRevokeSuspendedControl())));
           }
 
           caEntry.setSaveRequest(ci.isSaveRequest());
@@ -385,12 +372,10 @@ public class CaConf {
               // extract from the signer configuration
               ConcurrentContentSigner signer;
               try {
-                List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(
-                    getValue(ci.getSignerConf(), zipEntries));
+                List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(getValue(ci.getSignerConf(), zipEntries));
                 SignerConf signerConf = new SignerConf(signerConfs.get(0).getConf());
 
-                signer = securityFactory.createSigner(expandConf(ci.getSignerType()), signerConf,
-                    (X509Cert) null);
+                signer = securityFactory.createSigner(expandConf(ci.getSignerType()), signerConf, (X509Cert) null);
               } catch (ObjectCreationException | XiSecurityException ex) {
                 throw new InvalidConfException("could not create CA signer for CA " + name, ex);
               }
@@ -420,8 +405,7 @@ public class CaConf {
         if (m.getRequestors() != null) {
           caHasRequestors = new LinkedList<>();
           for (CaConfType.CaHasRequestor req : m.getRequestors()) {
-            CaHasRequestorEntry en =
-                new CaHasRequestorEntry(new NameId(null, req.getRequestorName()));
+            CaHasRequestorEntry en = new CaHasRequestorEntry(new NameId(null, req.getRequestorName()));
 
             if (req.getProfiles() != null && !req.getProfiles().isEmpty()) {
               en.setProfiles(new HashSet<>(req.getProfiles()));

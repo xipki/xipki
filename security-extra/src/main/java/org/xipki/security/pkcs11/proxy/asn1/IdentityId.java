@@ -50,10 +50,8 @@ public class IdentityId extends ProxyMessage {
   private IdentityId(ASN1Sequence seq)
       throws BadAsn1ObjectException {
     requireRange(seq, 2, 4);
-    P11SlotIdentifier slotId =
-        SlotIdentifier.getInstance(seq.getObjectAt(0)).getValue();
-    P11ObjectIdentifier keyId =
-        ObjectIdentifier.getInstance(seq.getObjectAt(1)).getValue();
+    P11SlotIdentifier slotId = SlotIdentifier.getInstance(seq.getObjectAt(0)).getValue();
+    P11ObjectIdentifier keyId = ObjectIdentifier.getInstance(seq.getObjectAt(1)).getValue();
     String publicKeyLabel = null;
     String certLabel = null;
 

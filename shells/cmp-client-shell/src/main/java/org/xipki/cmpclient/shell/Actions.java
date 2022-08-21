@@ -72,8 +72,7 @@ public class Actions {
     protected Requestor getRequestor()
         throws IllegalCmdParamException, ObjectCreationException, IOException {
       if (!(signerP12File == null ^ signerKeyId == null)) {
-        throw new IllegalCmdParamException(
-            "Exactly one of signer-p12 and signer-keyid must be specified");
+        throw new IllegalCmdParamException("Exactly one of signer-p12 and signer-keyid must be specified");
       }
 
       if (signerP12File != null) {
@@ -211,8 +210,7 @@ public class Actions {
     @Completion(Completers.DerPemCompleter.class)
     private String outform = "der";
 
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "where to save the CA certificate")
+    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the CA certificate")
     @Completion(FileCompleter.class)
     private String outFile;
 
@@ -230,8 +228,7 @@ public class Actions {
         throw new CmdFailure("received no CA certificate");
       }
 
-      saveVerbose(
-          "saved CA certificate to file", outFile, encodeCert(caCert.getEncoded(), outform));
+      saveVerbose("saved CA certificate to file", outFile, encodeCert(caCert.getEncoded(), outform));
       return null;
     } // method execute0
 
@@ -241,8 +238,7 @@ public class Actions {
   @Service
   public static class CmpCacertchain extends ClientAction {
 
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "where to save the CA certificate chain")
+    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the CA certificate chain")
     @Completion(FileCompleter.class)
     private String outFile;
 

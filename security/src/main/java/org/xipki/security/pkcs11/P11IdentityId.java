@@ -50,8 +50,7 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
    * @param certLabel
    *          Label of the certificate
    */
-  public P11IdentityId(P11SlotIdentifier slotId, P11ObjectIdentifier keyId,
-      String publicKeyLabel, String certLabel) {
+  public P11IdentityId(P11SlotIdentifier slotId, P11ObjectIdentifier keyId, String publicKeyLabel, String certLabel) {
     this.slotId = notNull(slotId, "slotId");
     this.keyId = notNull(keyId, "keyId");
     if (publicKeyLabel != null) {
@@ -62,8 +61,7 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
     }
 
     if (certLabel != null) {
-      this.certId = certLabel.equals(keyId.getLabel())
-        ? keyId : new P11ObjectIdentifier(keyId.getId(), certLabel);
+      this.certId = certLabel.equals(keyId.getLabel()) ? keyId : new P11ObjectIdentifier(keyId.getId(), certLabel);
     } else {
       this.certId = null;
     }
@@ -83,8 +81,7 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
 
   public void setCertLabel(String certLabel) {
     if (certLabel != null) {
-      this.certId = certLabel.equals(keyId.getLabel())
-        ? keyId : new P11ObjectIdentifier(keyId.getId(), certLabel);
+      this.certId = certLabel.equals(keyId.getLabel()) ? keyId : new P11ObjectIdentifier(keyId.getId(), certLabel);
     } else {
       this.certId = null;
     }

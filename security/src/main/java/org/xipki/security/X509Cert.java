@@ -300,8 +300,7 @@ public class X509Cert {
           try {
             subjectPublicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(jceInstance.getPublicKey());
           } catch (InvalidKeyException ex) {
-            throw new IllegalStateException("error creating SubjectPublicKeyInfo from PublicKey",
-                ex);
+            throw new IllegalStateException("error creating SubjectPublicKeyInfo from PublicKey", ex);
           }
         }
       }

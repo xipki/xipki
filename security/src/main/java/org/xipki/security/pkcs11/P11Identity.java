@@ -63,8 +63,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     this.signatureKeyBitLength = signatureBitLen;
   } // constructor
 
-  protected P11Identity(P11Slot slot, P11IdentityId id, PublicKey publicKey,
-      X509Cert[] certificateChain) {
+  protected P11Identity(P11Slot slot, P11IdentityId id, PublicKey publicKey, X509Cert[] certificateChain) {
     this.slot = notNull(slot, "slot");
     this.id = notNull(id, "id");
 
@@ -81,8 +80,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     if (this.publicKey instanceof RSAPublicKey) {
       signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();
     } else if (this.publicKey instanceof ECPublicKey) {
-      signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getOrder()
-          .bitLength();
+      signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getOrder().bitLength();
     } else if (this.publicKey instanceof DSAPublicKey) {
       signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getQ().bitLength();
     } else if (this.publicKey instanceof EdDSAKey) {
@@ -92,9 +90,8 @@ public abstract class P11Identity implements Comparable<P11Identity> {
       // no signature is supported
       signatureKeyBitLength = 0;
     } else {
-      throw new IllegalArgumentException("currently only RSA, DSA, EC and Edwards public key are "
-          + "supported, but not " + this.publicKey.getAlgorithm() + " (class: "
-          + this.publicKey.getClass().getName() + ")");
+      throw new IllegalArgumentException("currently only RSA, DSA, EC and Edwards public key are supported, but not "
+          + this.publicKey.getAlgorithm() + " (class: " + this.publicKey.getClass().getName() + ")");
     }
   } // constructor
 
@@ -152,8 +149,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
   }
 
   public X509Cert[] certificateChain() {
-    return (certificateChain == null) ? null
-        : Arrays.copyOf(certificateChain, certificateChain.length);
+    return (certificateChain == null) ? null : Arrays.copyOf(certificateChain, certificateChain.length);
   }
 
   public PublicKey getPublicKey() {

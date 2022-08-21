@@ -149,10 +149,9 @@ public class FileMacAuditService extends MacAuditService {
         }
 
         int startOffset = logFileNamePrefix.length();
-        String dateStr = f.getName().substring(startOffset, startOffset + 10);
+        String ds = f.getName().substring(startOffset, startOffset + 10);
         try {
-          int yyyyMMdd = Integer.parseInt(
-                  dateStr.substring(0, 4) + dateStr.substring(5, 7) + dateStr.substring(8, 10));
+          int yyyyMMdd = Integer.parseInt(ds.substring(0, 4) + ds.substring(5, 7) + ds.substring(8, 10));
           if (yyyyMMdd > latestYyyyMMdd) {
             latestYyyyMMdd = yyyyMMdd;
           }
@@ -168,14 +167,12 @@ public class FileMacAuditService extends MacAuditService {
     }
 
     this.integrityFilePath = new File(logDir,
-            this.logFileNamePrefix.substring(0, this.logFileNamePrefix.length() - 1)
-                    + ".integrity").toPath();
+            this.logFileNamePrefix.substring(0, this.logFileNamePrefix.length() - 1) + ".integrity").toPath();
 
     File integrityFile = integrityFilePath.toFile();
     String integrityText;
     try {
-      integrityText = integrityFile.exists()
-              ? IoUtil.readLastNonBlankLine(integrityFile) : null;
+      integrityText = integrityFile.exists() ? IoUtil.readLastNonBlankLine(integrityFile) : null;
     } catch (IOException ex) {
       throw new IllegalStateException("error reading " + integrityFile.getPath(), ex);
     }
@@ -225,13 +222,13 @@ public class FileMacAuditService extends MacAuditService {
     int year = yyyyMMdd / 10000;
     int month = yyyyMMdd % 10000 / 100;
     int day = yyyyMMdd % 100;
-    String dateStr = year + "." + (month < 10 ? "0" + month : month)
-                      + "." + (day < 10 ? "0" + day : day);
+    String dateStr = year + "." + (month < 10 ? "0" + month : month) + "." + (day < 10 ? "0" + day : day);
     return logFileNamePrefix + dateStr + logFileNameSuffix;
   }
 
   @Override
-  public void doClose() throws Exception {
+  public void doClose()
+      throws Exception {
     writer.flush();
     writer.close();
   }

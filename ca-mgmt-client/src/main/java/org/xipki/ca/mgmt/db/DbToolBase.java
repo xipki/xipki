@@ -102,8 +102,7 @@ public class DbToolBase implements Closeable {
     try {
       stmt.execute(sql);
     } catch (Throwable th) {
-      String msg = String.format("could not delete columns from table %s with %s > %s",
-          table, idColumn, id);
+      String msg = String.format("could not delete columns from table %s with %s > %s", table, idColumn, id);
       LogUtil.error(log, th, msg);
       return false;
     } finally {

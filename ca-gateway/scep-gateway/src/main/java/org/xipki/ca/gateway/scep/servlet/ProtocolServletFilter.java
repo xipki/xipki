@@ -62,8 +62,7 @@ public class ProtocolServletFilter implements Filter {
     try {
       conf0 = ScepProxyConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CFG, true));
     } catch (IOException | InvalidConfException ex) {
-      throw new IllegalArgumentException(
-          "could not parse configuration file " + DFLT_CFG, ex);
+      throw new IllegalArgumentException("could not parse configuration file " + DFLT_CFG, ex);
     }
 
     try {
@@ -73,8 +72,7 @@ public class ProtocolServletFilter implements Filter {
       CaNameScepSigners signers = new CaNameScepSigners(conf.getSigners());
 
       ScepResponder responder = new ScepResponder(scepControl, conf.getSdkClient(),
-          conf.getSecurities().getSecurityFactory(),  signers,
-          conf.getAuthenticator(), conf.getPopControl());
+          conf.getSecurities().getSecurityFactory(),  signers, conf.getAuthenticator(), conf.getPopControl());
 
       servlet = new HttpScepServlet();
       servlet.setLogReqResp(conf.isLogReqResp());

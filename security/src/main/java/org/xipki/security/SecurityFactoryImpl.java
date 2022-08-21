@@ -90,12 +90,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   }
 
   @Override
-  public ConcurrentContentSigner createSigner(String type, SignerConf conf,
-      X509Cert[] certificateChain)
-          throws ObjectCreationException {
-    ConcurrentContentSigner signer = signerFactoryRegister.newSigner(this, type, conf,
-        certificateChain);
-
+  public ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Cert[] certificateChain)
+      throws ObjectCreationException {
+    ConcurrentContentSigner signer = signerFactoryRegister.newSigner(this, type, conf, certificateChain);
     if (!signer.isMac()) {
       validateSigner(signer, type, conf);
     }
@@ -114,9 +111,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   }
 
   @Override
-  public ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey,
-      DHSigStaticKeyCertPair ownerKeyAndCert)
-          throws InvalidKeyException {
+  public ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey, DHSigStaticKeyCertPair ownerKeyAndCert)
+      throws InvalidKeyException {
     return SignerUtil.getContentVerifierProvider(publicKey, ownerKeyAndCert);
   }
 
@@ -132,7 +128,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
   @Override
   public boolean verifyPop(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator,
-      DHSigStaticKeyCertPair ownerKeyAndCert) {
+                           DHSigStaticKeyCertPair ownerKeyAndCert) {
     if (algoValidator == null) {
       algoValidator = CollectionAlgorithmValidator.INSTANCE;
     }
@@ -169,16 +165,14 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   }
 
   public void setDefaultSignerParallelism(int defaultSignerParallelism) {
-    this.defaultSignerParallelism = positive(
-        defaultSignerParallelism, "defaultSignerParallelism");
+    this.defaultSignerParallelism = positive(defaultSignerParallelism, "defaultSignerParallelism");
   }
 
   public void setSignerFactoryRegister(SignerFactoryRegister signerFactoryRegister) {
     this.signerFactoryRegister = signerFactoryRegister;
   }
 
-  public void setKeypairGeneratorFactoryRegister(
-      KeypairGeneratorFactoryRegister keypairGeneratorFactoryRegister) {
+  public void setKeypairGeneratorFactoryRegister(KeypairGeneratorFactoryRegister keypairGeneratorFactoryRegister) {
     this.keypairGeneratorFactoryRegister = keypairGeneratorFactoryRegister;
   }
 
@@ -192,8 +186,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   }
 
   @Override
-  public KeyCertPair createPrivateKeyAndCert(String type, SignerConf conf,
-      X509Cert cert)
+  public KeyCertPair createPrivateKeyAndCert(String type, SignerConf conf, X509Cert cert)
       throws ObjectCreationException {
     conf.putConfEntry("parallelism", Integer.toString(1));
 
@@ -225,14 +218,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     try {
       return SecureRandom.getInstanceStrong();
     } catch (NoSuchAlgorithmException ex) {
-      throw new RuntimeCryptoException(
-          "could not get strong SecureRandom: " + ex.getMessage());
+      throw new RuntimeCryptoException("could not get strong SecureRandom: " + ex.getMessage());
     }
   } // method getSecureRandom
 
-  private static void validateSigner(ConcurrentContentSigner signer, String signerType,
-      SignerConf signerConf)
-          throws ObjectCreationException {
+  private static void validateSigner(ConcurrentContentSigner signer, String signerType, SignerConf signerConf)
+      throws ObjectCreationException {
     if (signer.getPublicKey() == null) {
       return;
     }
@@ -266,14 +257,13 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         sb.append("conf='").append(signerConf.getConf());
         X509Cert cert = signer.getCertificate();
         if (cert != null) {
-          sb.append("', certificate subject='").append(cert.getSubjectText())
-              .append("'");
+          sb.append("', certificate subject='").append(cert.getSubjectText()).append("'");
         }
 
         throw new ObjectCreationException(sb.toString());
       }
-    } catch (NoSuchAlgorithmException | InvalidKeyException
-        | SignatureException | NoSuchProviderException | NoIdleSignerException ex) {
+    } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException | NoSuchProviderException
+             | NoIdleSignerException ex) {
       throw new ObjectCreationException(ex.getMessage(), ex);
     }
   } // method validateSigner

@@ -52,8 +52,7 @@ public class IdentifiedCertPublisher implements Closeable {
     this.certPublisher = notNull(certPublisher, "certPublisher");
   }
 
-  public void initialize(PasswordResolver passwordResolver,
-      Map<String, FileOrValue> datasourceConfs)
+  public void initialize(PasswordResolver passwordResolver, Map<String, FileOrValue> datasourceConfs)
       throws CertPublisherException {
     certPublisher.initialize(entry.getConf(), passwordResolver, datasourceConfs);
   }

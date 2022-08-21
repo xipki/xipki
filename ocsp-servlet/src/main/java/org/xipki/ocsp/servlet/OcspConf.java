@@ -79,8 +79,7 @@ public class OcspConf extends ValidatableConf {
   public static OcspConf readConfFromFile(String fileName)
       throws IOException, InvalidConfException {
     notBlank(fileName, "fileName");
-    try (InputStream is = Files.newInputStream(
-                            Paths.get(IoUtil.expandFilepath(fileName, true)))) {
+    try (InputStream is = Files.newInputStream(Paths.get(IoUtil.expandFilepath(fileName, true)))) {
       OcspConf conf = JSON.parseObject(is, OcspConf.class);
       conf.validate();
 

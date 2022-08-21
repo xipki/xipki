@@ -71,8 +71,7 @@ public class P11SM3WithSM2SignatureSpi extends SignatureSpi {
   protected void engineInitSign(PrivateKey privateKey)
       throws InvalidKeyException {
     if (!(privateKey instanceof P11PrivateKey)) {
-      throw new InvalidKeyException("privateKey is not instanceof "
-          + P11PrivateKey.class.getName());
+      throw new InvalidKeyException("privateKey is not instanceof " + P11PrivateKey.class.getName());
     }
 
     this.signingKey = (P11PrivateKey) privateKey;
@@ -90,8 +89,7 @@ public class P11SM3WithSM2SignatureSpi extends SignatureSpi {
       throw new InvalidKeyException("privateKey is not an EC private key: " + algo);
     }
 
-    byte[] userId = (paramSpec == null)
-        ? StringUtil.toUtf8Bytes("1234567812345678") : paramSpec.getId();
+    byte[] userId = (paramSpec == null) ? StringUtil.toUtf8Bytes("1234567812345678") : paramSpec.getId();
 
     if (signingKey.supportsMechanism(PKCS11Constants.CKM_VENDOR_SM2)) {
       mechanism = PKCS11Constants.CKM_VENDOR_SM2;

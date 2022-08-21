@@ -31,17 +31,14 @@ public class ObjectIdentifiers {
 
   public static final ASN1ObjectIdentifier id_aes128_cbc_in_ecies = id_secg_scheme.branch("20.0");
 
-  public static final ASN1ObjectIdentifier id_ecies_specifiedParameters =
-      id_secg_scheme.branch("8");
+  public static final ASN1ObjectIdentifier id_ecies_specifiedParameters = id_secg_scheme.branch("8");
 
   public static final ASN1ObjectIdentifier id_hmac_full_ecies = id_secg_scheme.branch("22");
 
-  public static final ASN1ObjectIdentifier id_iso18033_kdf2 =
-      new ASN1ObjectIdentifier("1.0.18033.2.5.2");
+  public static final ASN1ObjectIdentifier id_iso18033_kdf2 = new ASN1ObjectIdentifier("1.0.18033.2.5.2");
 
   public static final ASN1ObjectIdentifier id_sha1 = new ASN1ObjectIdentifier("1.3.14.3.2.26");
 
-  public static final ASN1ObjectIdentifier id_it_certProfile =
-          new ASN1ObjectIdentifier("1.3.6.1.5.5.7.4.21");
+  public static final ASN1ObjectIdentifier id_it_certProfile = new ASN1ObjectIdentifier("1.3.6.1.5.5.7.4.21");
 
 }

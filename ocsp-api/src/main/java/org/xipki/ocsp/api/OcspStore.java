@@ -108,10 +108,10 @@ public abstract class OcspStore implements Closeable {
    * @throws OcspStoreException
    *           If OCSP store failed to retrieve the status.
    */
-  public final CertStatusInfo getCertStatus(Date time, RequestIssuer reqIssuer,
-      BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
-      boolean inheritCaRevocation)
-          throws OcspStoreException {
+  public final CertStatusInfo getCertStatus(
+      Date time, RequestIssuer reqIssuer, BigInteger serialNumber, boolean includeCertHash,
+      boolean includeRit, boolean inheritCaRevocation)
+      throws OcspStoreException {
     CertStatusInfo info = getCertStatus0(time, reqIssuer, serialNumber,
         includeCertHash, includeRit, inheritCaRevocation);
 
@@ -157,10 +157,10 @@ public abstract class OcspStore implements Closeable {
    * @throws OcspStoreException
    *           If OCSP store failed to retrieve the status.
    */
-  protected abstract CertStatusInfo getCertStatus0(Date time, RequestIssuer reqIssuer,
-      BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
-      boolean inheritCaRevocation)
-          throws OcspStoreException;
+  protected abstract CertStatusInfo getCertStatus0(
+      Date time, RequestIssuer reqIssuer, BigInteger serialNumber,
+      boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
+      throws OcspStoreException;
 
   /**
    * Initialize the OCSP store.
@@ -237,12 +237,11 @@ public abstract class OcspStore implements Closeable {
     return minNextUpdatePeriod;
   }
 
-  public void setNextUpdatePeriodLimit(
-          Validity minNextUpdatePeriod, Validity maxNextUpdatePeriod) {
+  public void setNextUpdatePeriodLimit(Validity minNextUpdatePeriod, Validity maxNextUpdatePeriod) {
     if (minNextUpdatePeriod != null && maxNextUpdatePeriod != null) {
       if (minNextUpdatePeriod.compareTo(maxNextUpdatePeriod) > 0) {
-        throw new IllegalArgumentException(String.format(
-                "minNextUpdatePeriod (%s) > maxNextUpdatePeriod (%s) is not allowed",
+        throw new IllegalArgumentException(
+            String.format("minNextUpdatePeriod (%s) > maxNextUpdatePeriod (%s) is not allowed",
                 minNextUpdatePeriod, maxNextUpdatePeriod));
       }
     }

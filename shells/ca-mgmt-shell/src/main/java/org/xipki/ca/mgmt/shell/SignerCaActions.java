@@ -82,7 +82,7 @@ public class SignerCaActions {
       }
 
       if ("PKCS12".equalsIgnoreCase(type) || "JCEKS".equalsIgnoreCase(type)) {
-        conf = ShellUtil.canonicalizeSignerConf(type, conf, passwordResolver, securityFactory);
+        conf = ShellUtil.canonicalizeSignerConf(type, conf, securityFactory);
       }
       SignerEntry entry = new SignerEntry(name, type, conf, base64Cert);
 
@@ -209,7 +209,7 @@ public class SignerCaActions {
         tmpType = entry.getType();
       }
 
-      return ShellUtil.canonicalizeSignerConf(tmpType, conf, passwordResolver, securityFactory);
+      return ShellUtil.canonicalizeSignerConf(tmpType, conf, securityFactory);
     } // method getSigenrConf
 
     @Override

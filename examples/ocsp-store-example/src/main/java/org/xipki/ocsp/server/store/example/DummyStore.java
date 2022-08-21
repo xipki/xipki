@@ -104,10 +104,10 @@ public class DummyStore extends OcspStore {
   }
 
   @Override
-  protected CertStatusInfo getCertStatus0(Date time, RequestIssuer reqIssuer,
-      BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
-      boolean inheritCaRevocation)
-          throws OcspStoreException {
+  protected CertStatusInfo getCertStatus0(
+      Date time, RequestIssuer reqIssuer, BigInteger serialNumber,
+      boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
+      throws OcspStoreException {
     if (!knowsIssuer(reqIssuer)) {
       return null;
     }

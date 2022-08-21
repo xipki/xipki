@@ -47,8 +47,7 @@ public class ScepHttpResponse {
   }
 
   public ScepHttpResponse(String contentType, byte[] contentBytes) {
-    this(contentType, Args.notNull(contentBytes, "contentBytes").length,
-        new ByteArrayInputStream(contentBytes));
+    this(contentType, Args.notNull(contentBytes, "contentBytes").length, new ByteArrayInputStream(contentBytes));
   }
 
   public String getContentType() {

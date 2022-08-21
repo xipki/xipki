@@ -144,8 +144,7 @@ public class P11RSADigestSignatureSpi extends SignatureSpi {
   protected void engineInitSign(PrivateKey privateKey)
       throws InvalidKeyException {
     if (!(privateKey instanceof P11PrivateKey)) {
-      throw new InvalidKeyException("privateKey is not instanceof "
-          + P11PrivateKey.class.getName());
+      throw new InvalidKeyException("privateKey is not instanceof " + P11PrivateKey.class.getName());
     }
 
     String algo = privateKey.getAlgorithm();

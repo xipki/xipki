@@ -35,8 +35,7 @@ abstract class AbstractOcspCertstoreDbImporter extends DbPorter {
 
   protected static final String MSG_CERTS_FINISHED = "certs.finished";
 
-  protected static final String SQL_ADD_CRLINFO = SqlUtil.buildInsertSql("CRL_INFO",
-      "ID,NAME,INFO");
+  protected static final String SQL_ADD_CRLINFO = SqlUtil.buildInsertSql("CRL_INFO", "ID,NAME,INFO");
 
   protected static final String SQL_ADD_ISSUER = SqlUtil.buildInsertSql("ISSUER",
       "ID,SUBJECT,NBEFORE,NAFTER,S1C,REV_INFO,CERT,CRL_ID");

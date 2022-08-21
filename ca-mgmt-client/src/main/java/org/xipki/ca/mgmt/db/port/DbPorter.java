@@ -286,8 +286,7 @@ public class DbPorter extends DbToolBase {
 
   public static void echoToFile(String content, File file)
       throws IOException {
-    Files.write(Args.notNull(file, "file").toPath(),
-        StringUtil.toUtf8Bytes(Args.notNull(content, "content")));
+    Files.write(Args.notNull(file, "file").toPath(), StringUtil.toUtf8Bytes(Args.notNull(content, "content")));
   }
 
 }

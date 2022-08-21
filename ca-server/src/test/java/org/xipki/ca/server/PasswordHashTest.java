@@ -47,8 +47,7 @@ public class PasswordHashTest {
     Set<String> passwordHashes = new HashSet<>(20);
     for (int i = 0; i < 10; i++) {
       String passwordHash = PasswordHash.createHash("p\r\nassw0Rd!");
-      Assert.assertFalse("PasswordHash duplication occurs",
-          passwordHashes.contains(passwordHash));
+      Assert.assertFalse("PasswordHash duplication occurs", passwordHashes.contains(passwordHash));
       passwordHashes.add(passwordHash);
     }
   }

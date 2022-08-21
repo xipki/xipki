@@ -146,9 +146,8 @@ public class ExtensionSyntaxChecker {
     checkContentTextOrSubFields(name, syntax, extnValue);
   } // method checkField
 
-  private static void checkSequenceSyntax(String name, ASN1Sequence seq,
-      List<SubFieldSyntax> subFields)
-          throws BadCertTemplateException {
+  private static void checkSequenceSyntax(String name, ASN1Sequence seq, List<SubFieldSyntax> subFields)
+      throws BadCertTemplateException {
     final int subFieldsSize = subFields.size();
     int subFieldsIndex = 0;
 
@@ -259,9 +258,8 @@ public class ExtensionSyntaxChecker {
     }
   } // method checkSetSyntax
 
-  private static SubFieldSyntax getSyntax(String name, ASN1ObjectHolder objHolder,
-      List<SubFieldSyntax> subFields)
-          throws BadCertTemplateException {
+  private static SubFieldSyntax getSyntax(String name, ASN1ObjectHolder objHolder, List<SubFieldSyntax> subFields)
+      throws BadCertTemplateException {
     // find the matched SubField
     ASN1Encodable obj = objHolder.object;
 
@@ -331,9 +329,9 @@ public class ExtensionSyntaxChecker {
     return syntax;
   } // method getSyntax
 
-  private static void checkSequenceOfOrSetOfSyntax(String name, ASN1Sequence seq,
-      ASN1Set set, List<SubFieldSyntax> subFields)
-          throws BadCertTemplateException {
+  private static void checkSequenceOfOrSetOfSyntax(
+      String name, ASN1Sequence seq, ASN1Set set, List<SubFieldSyntax> subFields)
+      throws BadCertTemplateException {
     final int size = (seq != null) ? seq.size() : set.size();
 
     for (int i = 0; i < size; i++) {
@@ -398,14 +396,12 @@ public class ExtensionSyntaxChecker {
   private static void assertMatch(String name, String pattern, String text)
       throws BadCertTemplateException {
     if (!TextVadidator.compile(pattern).isValid(text)) {
-      throw new BadCertTemplateException(
-          String.format("invalid %s '%s' against regex '%s'", name, text, pattern));
+      throw new BadCertTemplateException(String.format("invalid %s '%s' against regex '%s'", name, text, pattern));
     }
   } // method assertMatch
 
-  private static ASN1Encodable getParsedImplicitValue(String name, ASN1TaggedObject taggedObject,
-      FieldType fieldType)
-          throws BadCertTemplateException {
+  private static ASN1Encodable getParsedImplicitValue(String name, ASN1TaggedObject taggedObject, FieldType fieldType)
+      throws BadCertTemplateException {
     try {
       switch (fieldType) {
         case BIT_STRING:
@@ -458,9 +454,8 @@ public class ExtensionSyntaxChecker {
     }
   } // method getParsedImplicitValue
 
-  private static void checkContentTextOrSubFields(String name, ExtnSyntax subField,
-      ASN1Encodable obj)
-          throws BadCertTemplateException {
+  private static void checkContentTextOrSubFields(String name, ExtnSyntax subField, ASN1Encodable obj)
+      throws BadCertTemplateException {
     if (obj instanceof ASN1String) {
       if (subField.getStringRegex() != null) {
         assertMatch(name, subField.getStringRegex(), ((ASN1String) obj).getString());

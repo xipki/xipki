@@ -128,8 +128,7 @@ public class OcspServletFilter implements Filter {
         try {
           certs = X509Util.parseCerts(remoteMgmt.getCerts());
         } catch (InvalidConfException ex) {
-          LogUtil.error(LOG, ex,
-              "could not parse client certificates, disable the remote management");
+          LogUtil.error(LOG, ex, "could not parse client certificates, disable the remote management");
         }
 
         if (CollectionUtil.isEmpty(certs)) {

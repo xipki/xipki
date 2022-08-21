@@ -35,8 +35,7 @@ class SqlErrorCodes {
   private static class DB2 extends SqlErrorCodes {
 
     DB2() {
-      badSqlGrammarCodes = toSet(-7, -29, -97, -104, -109, -115, -128, -199, -204, -206, -301,
-          -408, -441, -491);
+      badSqlGrammarCodes = toSet(-7, -29, -97, -104, -109, -115, -128, -199, -204, -206, -301, -408, -441, -491);
       duplicateKeyCodes = toSet(-803);
       dataIntegrityViolationCodes = toSet(-407, -530, -531, -532, -543, -544, -545, -603, -667);
       dataAccessResourceFailureCodes = toSet(-904, -971);
@@ -75,8 +74,7 @@ class SqlErrorCodes {
     MySQL() {
       badSqlGrammarCodes = toSet(1054, 1064, 1146);
       duplicateKeyCodes = toSet(1062);
-      dataIntegrityViolationCodes = toSet(630, 839, 840, 893, 1169, 1215, 1216, 1217, 1364,
-          1451, 1452, 1557);
+      dataIntegrityViolationCodes = toSet(630, 839, 840, 893, 1169, 1215, 1216, 1217, 1364, 1451, 1452, 1557);
       dataAccessResourceFailureCodes = toSet(1);
       cannotAcquireLockCodes = toSet(1205);
       deadlockLoserCodes = toSet(1213);

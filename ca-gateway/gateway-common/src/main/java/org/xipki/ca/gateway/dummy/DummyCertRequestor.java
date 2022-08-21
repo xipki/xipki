@@ -14,8 +14,7 @@ public class DummyCertRequestor implements Requestor {
   private X509Cert cert;
 
   static {
-    System.err.println("DO NOT USE " + DummyCertRequestor.class.getName()
-        + " IN THE PRODUCT ENVIRONMENT");
+    System.err.println("DO NOT USE " + DummyCertRequestor.class.getName() + " IN THE PRODUCT ENVIRONMENT");
   }
 
   public DummyCertRequestor(X509Cert cert) {

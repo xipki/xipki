@@ -147,14 +147,12 @@ abstract class CrmfKeyWrapper {
         // symmetricCiphertext OCTET STRING
         int symmetricCiphertextLen = bcResult.length - ephemeralPublicKeyLen - macLen;
         byte[] symmetricCiphertext = new byte[symmetricCiphertextLen];
-        System.arraycopy(bcResult, ephemeralPublicKeyLen,
-            symmetricCiphertext, 0, symmetricCiphertextLen);
+        System.arraycopy(bcResult, ephemeralPublicKeyLen, symmetricCiphertext, 0, symmetricCiphertextLen);
         array[1] = new DEROctetString(symmetricCiphertext);
 
         // macTag OCTET STRING
         byte[] macTag = new byte[macLen];
-        System.arraycopy(bcResult, ephemeralPublicKeyLen + symmetricCiphertextLen,
-            macTag, 0, macLen);
+        System.arraycopy(bcResult, ephemeralPublicKeyLen + symmetricCiphertextLen, macTag, 0, macLen);
         array[2] = new DEROctetString(macTag);
         return new DERSequence(array).getEncoded();
       } catch (Exception ex) {
@@ -219,8 +217,7 @@ abstract class CrmfKeyWrapper {
       vec.add(new DERTaggedObject(true, 0, keyDerivationFunction));
 
       // SymmetricEncryption
-      AlgorithmIdentifier symmetricEncryption = new AlgorithmIdentifier(
-          ObjectIdentifiers.Secg.id_aes128_cbc_in_ecies);
+      AlgorithmIdentifier symmetricEncryption = new AlgorithmIdentifier(ObjectIdentifiers.Secg.id_aes128_cbc_in_ecies);
       vec.add(new DERTaggedObject(true, 1, symmetricEncryption));
 
       // MessageAuthenticationCode

@@ -229,8 +229,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
   protected void engineInitSign(PrivateKey privateKey, SecureRandom random)
       throws InvalidKeyException {
     if (!(privateKey instanceof P11PrivateKey)) {
-      throw new InvalidKeyException("privateKey is not instanceof "
-          + P11PrivateKey.class.getName());
+      throw new InvalidKeyException("privateKey is not instanceof " + P11PrivateKey.class.getName());
     }
 
     String algo = privateKey.getAlgorithm();
@@ -240,8 +239,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
 
     this.signingKey = (P11PrivateKey) privateKey;
 
-    pss = new org.bouncycastle.crypto.signers.PSSSigner(signer, contentDigest, mgfDigest,
-        saltLength, trailer);
+    pss = new org.bouncycastle.crypto.signers.PSSSigner(signer, contentDigest, mgfDigest, saltLength, trailer);
 
     P11RSAKeyParameter p11KeyParam = P11RSAKeyParameter.getInstance(
         signingKey.getP11CryptService(), signingKey.getIdentityId());
@@ -293,10 +291,8 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
       PSSParameterSpec newParamSpec = (PSSParameterSpec) params;
 
       if (originalSpec != null) {
-        if (!DigestFactory.isSameDigest(originalSpec.getDigestAlgorithm(),
-            newParamSpec.getDigestAlgorithm())) {
-          throw new InvalidParameterException("parameter must be using "
-              + originalSpec.getDigestAlgorithm());
+        if (!DigestFactory.isSameDigest(originalSpec.getDigestAlgorithm(), newParamSpec.getDigestAlgorithm())) {
+          throw new InvalidParameterException("parameter must be using " + originalSpec.getDigestAlgorithm());
         }
       }
       if (!newParamSpec.getMGFAlgorithm().equalsIgnoreCase("MGF1")
@@ -310,17 +306,14 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
 
       MGF1ParameterSpec mgfParams = (MGF1ParameterSpec) newParamSpec.getMGFParameters();
 
-      if (!DigestFactory.isSameDigest(mgfParams.getDigestAlgorithm(),
-          newParamSpec.getDigestAlgorithm())) {
-        throw new InvalidParameterException(
-            "digest algorithm for MGF should be the same as for PSS parameters.");
+      if (!DigestFactory.isSameDigest(mgfParams.getDigestAlgorithm(), newParamSpec.getDigestAlgorithm())) {
+        throw new InvalidParameterException("digest algorithm for MGF should be the same as for PSS parameters.");
       }
 
       Digest newDigest = DigestFactory.getDigest(mgfParams.getDigestAlgorithm());
 
       if (newDigest == null) {
-        throw new InvalidParameterException(
-            "no match on MGF digest algorithm: " + mgfParams.getDigestAlgorithm());
+        throw new InvalidParameterException("no match on MGF digest algorithm: " + mgfParams.getDigestAlgorithm());
       }
 
       this.engineParams = null;

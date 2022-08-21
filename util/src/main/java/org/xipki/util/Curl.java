@@ -85,14 +85,13 @@ public interface Curl {
 
   CurlResult curlGet(String url, OutputStream respContentStream, boolean verbose,
                      Map<String, String> headers, String userPassword)
-          throws Exception;
+      throws Exception;
 
-  CurlResult curlPost(String url, boolean verbose, Map<String, String> headers, String userPassword,
-      byte[] content)
-          throws Exception;
+  CurlResult curlPost(String url, boolean verbose, Map<String, String> headers, String userPassword, byte[] content)
+      throws Exception;
 
   CurlResult curlPost(String url, OutputStream respContentStream, boolean verbose,
                       Map<String, String> headers, String userPassword, byte[] content)
-          throws Exception;
+      throws Exception;
 
 }

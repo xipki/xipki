@@ -71,8 +71,7 @@ public class AuthorityCertStore {
           encryptionCert = cert;
         }
 
-        if (cert.hasKeyusage(KeyUsage.digitalSignature)
-            || cert.hasKeyusage(KeyUsage.contentCommitment)) {
+        if (cert.hasKeyusage(KeyUsage.digitalSignature) || cert.hasKeyusage(KeyUsage.contentCommitment)) {
           if (signatureCert != null) {
             throw new IllegalArgumentException("Could not determine RA certificate for signature");
           }

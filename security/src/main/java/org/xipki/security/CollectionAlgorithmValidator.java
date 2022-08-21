@@ -54,8 +54,7 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
     INSTANCE = new CollectionAlgorithmValidator(secureAlgos);
   }
 
-  public static CollectionAlgorithmValidator buildAlgorithmValidator(
-      Collection<String> algoNames)
+  public static CollectionAlgorithmValidator buildAlgorithmValidator(Collection<String> algoNames)
       throws NoSuchAlgorithmException {
     Set<SignAlgo> algos = new HashSet<>();
     for (String algoName : algoNames) {
@@ -71,8 +70,7 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
     }
 
     if (algos.isEmpty()) {
-      throw new NoSuchAlgorithmException("none of the signature algorithms "
-          + algoNames + " are supported");
+      throw new NoSuchAlgorithmException("none of the signature algorithms " + algoNames + " are supported");
     }
 
     return new CollectionAlgorithmValidator(algos);

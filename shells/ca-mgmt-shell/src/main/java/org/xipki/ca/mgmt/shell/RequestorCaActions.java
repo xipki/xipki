@@ -63,16 +63,14 @@ public class RequestorCaActions {
     @Completion(CaCompleters.PermissionCompleter.class)
     private Set<String> permissions;
 
-    @Option(name = "--profile", multiValued = true,
-        description = "profile name or 'all' for all profiles")
+    @Option(name = "--profile", multiValued = true, description = "profile name or 'all' for all profiles")
     @Completion(CaCompleters.ProfileNameAndAllCompleter.class)
     private Set<String> profiles;
 
     @Override
     protected Object execute0()
         throws Exception {
-      CaHasRequestorEntry entry =
-          new CaHasRequestorEntry(new NameId(null, requestorName));
+      CaHasRequestorEntry entry = new CaHasRequestorEntry(new NameId(null, requestorName));
       entry.setProfiles(profiles);
       int intPermission = ShellUtil.getPermission(permissions);
       entry.setPermission(intPermission);
@@ -129,8 +127,7 @@ public class RequestorCaActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--requestor", required = true, multiValued = true,
-        description = "requestor name")
+    @Option(name = "--requestor", required = true, multiValued = true, description = "requestor name")
     @Completion(CaCompleters.RequestorNameCompleter.class)
     private List<String> requestorNames;
 
@@ -197,8 +194,7 @@ public class RequestorCaActions {
     @Completion(CaCompleters.RequestorNameCompleter.class)
     private String name;
 
-    @Option(name = "--verbose", aliases = "-v",
-        description = "show requestor information verbosely")
+    @Option(name = "--verbose", aliases = "-v", description = "show requestor information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Override

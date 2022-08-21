@@ -139,8 +139,7 @@ class SignerManager {
       type = type.toLowerCase();
     }
 
-    SignerEntryWrapper newResponder = manager.queryExecutor.changeSigner(name, type, conf,
-        base64Cert, manager, manager.securityFactory);
+    SignerEntryWrapper newResponder = manager.queryExecutor.changeSigner(name, type, conf, base64Cert, manager);
 
     manager.signers.remove(name);
     manager.signerDbEntries.remove(name);

@@ -51,8 +51,7 @@ class EnrollCertResponse {
 
     if (!(resultEntry instanceof ResultEntry.EnrollCert
         || resultEntry instanceof ResultEntry.Error)) {
-      throw new IllegalArgumentException(
-          "Unaccepted parameter of class " + resultEntry.getClass().getName());
+      throw new IllegalArgumentException("Unaccepted parameter of class " + resultEntry.getClass().getName());
     }
 
     if (resultEntries == null) {

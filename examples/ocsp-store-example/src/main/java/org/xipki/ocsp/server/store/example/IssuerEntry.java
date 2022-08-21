@@ -72,8 +72,7 @@ public class IssuerEntry {
       return false;
     }
 
-    return CompareUtil.areEqual(issuerHash, 0, reqIssuer.getData(),
-        reqIssuer.getNameHashFrom(), issuerHash.length);
+    return CompareUtil.areEqual(issuerHash, 0, reqIssuer.getData(), reqIssuer.getNameHashFrom(), issuerHash.length);
   }
 
   public X509Cert getCert() {

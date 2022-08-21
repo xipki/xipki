@@ -57,9 +57,9 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
   private final int numCertsPerCommit;
 
-  OcspCertstoreDbImporter(DataSourceWrapper datasource, String srcDir, int numCertsPerCommit,
-      boolean resume, AtomicBoolean stopMe)
-          throws Exception {
+  OcspCertstoreDbImporter(
+      DataSourceWrapper datasource, String srcDir, int numCertsPerCommit, boolean resume, AtomicBoolean stopMe)
+      throws Exception {
     super(datasource, srcDir, stopMe);
 
     this.numCertsPerCommit = Args.positive(numCertsPerCommit, "numCertsPerCommit");
@@ -86,8 +86,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     certstore.validate();
 
     if (certstore.getVersion() > VERSION_V2) {
-      throw new Exception("could not import Certstore greater than " + VERSION_V2 + ": "
-          + certstore.getVersion());
+      throw new Exception("could not import Certstore greater than " + VERSION_V2 + ": " + certstore.getVersion());
     }
 
     File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
@@ -239,8 +238,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     try (DbPortFileNameIterator certsFileIterator = new DbPortFileNameIterator(
             baseDir + File.separator + type.getDirName() + ".mf")) {
       while (certsFileIterator.hasNext()) {
-        String certsFile = baseDir + File.separator + type.getDirName() + File.separator
-                + certsFileIterator.next();
+        String certsFile = baseDir + File.separator + type.getDirName() + File.separator + certsFileIterator.next();
 
         // extract the toId from the filename
         int fromIdx = certsFile.indexOf('-');
@@ -260,8 +258,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
         }
 
         try {
-          long lastId = importCert0(psCert, certsFile, minId, processLogFile, processLog,
-                  numProcessedBefore);
+          long lastId = importCert0(psCert, certsFile, minId, processLogFile, processLog, numProcessedBefore);
           minId = lastId + 1;
         } catch (Exception ex) {
           System.err.println("\ncould not import certificates from file " + certsFile
@@ -279,7 +276,8 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     System.out.println(" imported " + processLog.numProcessed() + " certificates");
   } // method importCert
 
-  private long importCert0(PreparedStatement psCert, String certsZipFile, long minId,
+  private long importCert0(
+      PreparedStatement psCert, String certsZipFile, long minId,
       File processLogFile, ProcessLog processLog, int numProcessedInLastProcess)
       throws Exception {
     ZipFile zipFile = new ZipFile(new File(certsZipFile));
@@ -287,8 +285,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
     OcspCertstore.Certs certs;
     try {
-      certs = JSON.parseObject(zipFile.getInputStream(certsEntry), StandardCharsets.UTF_8,
-                OcspCertstore.Certs.class);
+      certs = JSON.parseObject(zipFile.getInputStream(certsEntry), StandardCharsets.UTF_8, OcspCertstore.Certs.class);
     } catch (Exception ex) {
       try {
         zipFile.close();

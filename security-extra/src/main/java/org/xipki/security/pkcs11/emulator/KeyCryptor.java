@@ -116,22 +116,20 @@ class KeyCryptor {
       KeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyInfo.getEncoded());
       KeyFactory keyFactory = KeyFactory.getInstance(algoName, "BC");
       return keyFactory.generatePrivate(keySpec);
-    } catch (IOException | NoSuchAlgorithmException | NoSuchProviderException
-        | InvalidKeySpecException ex) {
+    } catch (IOException | NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException ex) {
       throw new P11TokenException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
     }
   } // method decryptPrivateKey
 
   byte[] decrypt(byte[] cipherBlob)
-          throws P11TokenException {
+      throws P11TokenException {
     notNull(cipherBlob, "cipherBlob");
 
     if (cipherBlob[0] != ALG_SCRYPT1_AESGCMNopadding_128) {
       throw new P11TokenException("unknown encryption algorithm");
     }
 
-    GCMParameterSpec spec = new GCMParameterSpec(AES_GCM_TAG_BIT_SIZE,
-            cipherBlob, 1, AES_GCM_NONCE_BYTE_SIZE);
+    GCMParameterSpec spec = new GCMParameterSpec(AES_GCM_TAG_BIT_SIZE, cipherBlob, 1, AES_GCM_NONCE_BYTE_SIZE);
 
     try {
       Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding", "BC");
@@ -141,8 +139,7 @@ class KeyCryptor {
       final int cipherLen = cipherBlob.length - cipherValueOffset;
       int plainLen = cipher.getOutputSize(cipherLen);
       byte[] plain = new byte[plainLen];
-      int realPlainLen = cipher.doFinal(cipherBlob, cipherValueOffset, cipherLen,
-              plain, 0);
+      int realPlainLen = cipher.doFinal(cipherBlob, cipherValueOffset, cipherLen, plain, 0);
       if (plainLen > realPlainLen) {
         plain = Arrays.copyOf(plain, realPlainLen);
       }
@@ -154,18 +151,18 @@ class KeyCryptor {
   } // method decrypt
 
   byte[] encrypt(PrivateKey privateKey)
-          throws P11TokenException {
+      throws P11TokenException {
     notNull(privateKey, "privateKey");
     return encrypt(privateKey.getEncoded());
   }
 
   byte[] encrypt(SecretKey secretKey)
-          throws P11TokenException {
+      throws P11TokenException {
     return encrypt(secretKey.getEncoded());
   }
 
   byte[] encrypt(byte[] data)
-          throws P11TokenException {
+      throws P11TokenException {
     byte[] nonce = new byte[AES_GCM_NONCE_BYTE_SIZE];
     rnd.nextBytes(nonce);
     GCMParameterSpec spec = new GCMParameterSpec(AES_GCM_TAG_BIT_SIZE, nonce);

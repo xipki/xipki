@@ -130,8 +130,7 @@ class CaconfDbExporter extends DbPorter {
         requestor.setId(rs.getInt("ID"));
         requestor.setName(name);
         requestor.setType(rs.getString("TYPE"));
-        requestor.setConf(buildFileOrValue(
-            rs.getString("CONF"), "ca-conf/cert-requestor-" + name + ".conf"));
+        requestor.setConf(buildFileOrValue(rs.getString("CONF"), "ca-conf/cert-requestor-" + name + ".conf"));
 
         requestor.validate();
         requestors.add(requestor);
@@ -194,8 +193,7 @@ class CaconfDbExporter extends DbPorter {
         signer.setName(name);
         signer.setType(rs.getString("TYPE"));
         signer.setConf(buildFileOrValue(rs.getString("CONF"), "ca-conf/conf-signer-" + name));
-        signer.setCert(buildFileOrBase64Binary(
-            rs.getString("CERT"), "ca-conf/cert-signer-" + name + ".der"));
+        signer.setCert(buildFileOrBase64Binary(rs.getString("CERT"), "ca-conf/cert-signer-" + name + ".der"));
 
         signer.validate();
         signers.add(signer);
@@ -211,7 +209,7 @@ class CaconfDbExporter extends DbPorter {
   } // method exportSigner
 
   private void exportKeypairGen(CaCertstore.Caconf caconf)
-          throws DataAccessException, IOException, InvalidConfException {
+      throws DataAccessException, IOException, InvalidConfException {
     System.out.println("exporting table KEYPAIR_GEN");
     List<CaCertstore.NameTypeConf> keypairGens = new LinkedList<>();
     final String sql = "SELECT NAME,TYPE,CONF FROM KEYPAIR_GEN";
@@ -326,8 +324,7 @@ class CaconfDbExporter extends DbPorter {
       columns += ",CONF";
     } else {
       columns += ",SN_SIZE,CA_URIS,MAX_VALIDITY,SAVE_REQ,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,"
-          + "VALIDITY_MODE,CRL_CONTROL,CTLOG_CONTROL,"
-          + "REVOKE_SUSPENDED_CONTROL,KEEP_EXPIRED_CERT_DAYS,EXTRA_CONTROL";
+          + "VALIDITY_MODE,CRL_CONTROL,CTLOG_CONTROL,REVOKE_SUSPENDED_CONTROL,KEEP_EXPIRED_CERT_DAYS,EXTRA_CONTROL";
     }
 
     final String sql = columns + " FROM CA";
@@ -345,13 +342,10 @@ class CaconfDbExporter extends DbPorter {
         ca.setName(name);
         ca.setNextCrlNo(rs.getLong("NEXT_CRLNO"));
         ca.setStatus(rs.getString("STATUS"));
-        ca.setCert(buildFileOrBase64Binary(
-            rs.getString("CERT"), "ca-conf/cert-ca-" + name + ".der"));
-        ca.setCertchain(buildFileOrValue(
-            rs.getString("CERTCHAIN"), "ca-conf/certchain-ca-" + name + ".pem"));
+        ca.setCert(buildFileOrBase64Binary(rs.getString("CERT"), "ca-conf/cert-ca-" + name + ".der"));
+        ca.setCertchain(buildFileOrValue(rs.getString("CERTCHAIN"), "ca-conf/certchain-ca-" + name + ".pem"));
         ca.setSignerType(rs.getString("SIGNER_TYPE"));
-        ca.setSignerConf(buildFileOrValue(
-            rs.getString("SIGNER_CONF"), "ca-conf/signerconf-ca-" + name));
+        ca.setSignerConf(buildFileOrValue(rs.getString("SIGNER_CONF"), "ca-conf/signerconf-ca-" + name));
         ca.setRevInfo(rs.getString("REV_INFO"));
         ca.setCrlSignerName(rs.getString("CRL_SIGNER_NAME"));
 
@@ -411,8 +405,7 @@ class CaconfDbExporter extends DbPorter {
 
         ca.validate();
 
-        ca.setConfColumn(buildFileOrValue(
-            confColumn, "ca-conf/" + name + ".conf"));
+        ca.setConfColumn(buildFileOrValue(confColumn, "ca-conf/" + name + ".conf"));
 
         cas.add(ca);
       }

@@ -52,8 +52,7 @@ public class EnrollCertRequest {
 
     private final ProofOfPossession pop;
 
-    public Entry(String id, String certprofile, CertRequest certReq,
-        ProofOfPossession pop) {
+    public Entry(String id, String certprofile, CertRequest certReq, ProofOfPossession pop) {
       super(id);
 
       this.certprofile = Args.notBlank(certprofile, "certprofile");
@@ -61,7 +60,8 @@ public class EnrollCertRequest {
       this.pop = Args.notNull(pop, "pop");
     }
 
-    public Entry(String id, String certprofile, CertRequest certReq,
+    public Entry(
+        String id, String certprofile, CertRequest certReq,
         ProofOfPossession pop, boolean caGenerateKeypair, boolean kup) {
       super(id);
 

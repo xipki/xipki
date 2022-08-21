@@ -59,8 +59,7 @@ public class CtLog {
     public static DigitallySigned getInstance(byte[] encoded, AtomicInteger offsetObj) {
       int offset = offsetObj.get();
 
-      SignatureAndHashAlgorithm algorithm =
-          SignatureAndHashAlgorithm.getInstance(copyOf(encoded, offset, 2));
+      SignatureAndHashAlgorithm algorithm = SignatureAndHashAlgorithm.getInstance(copyOf(encoded, offset, 2));
       offset += 2;
 
       int signatureLen = readInt(encoded, offset, 2);
@@ -135,8 +134,7 @@ public class CtLog {
       AtomicInteger offsetObj = new AtomicInteger(2);
       while (offsetObj.get() < encoded.length) {
         int sctLen = readInt(encoded, offsetObj.getAndAdd(2), 2);
-        SignedCertificateTimestamp sct = SignedCertificateTimestamp.getInstance(
-            encoded, offsetObj, sctLen);
+        SignedCertificateTimestamp sct = SignedCertificateTimestamp.getInstance(encoded, offsetObj, sctLen);
         scts.add(sct);
       }
 
@@ -265,9 +263,7 @@ public class CtLog {
     private final SignatureAlgorithm signature;
 
     public static SignatureAndHashAlgorithm getInstance(byte[] encoded) {
-      return new SignatureAndHashAlgorithm(
-          HashAlgorithm.ofCode(encoded[0]),
-          SignatureAlgorithm.ofCode(encoded[1]));
+      return new SignatureAndHashAlgorithm(HashAlgorithm.ofCode(encoded[0]), SignatureAlgorithm.ofCode(encoded[1]));
     }
 
     public SignatureAndHashAlgorithm(HashAlgorithm hash, SignatureAlgorithm signature) {
@@ -342,8 +338,7 @@ public class CtLog {
 
     private final DigitallySigned digitallySigned;
 
-    public static SignedCertificateTimestamp getInstance(byte[] encoded, AtomicInteger offsetObj,
-        int len) {
+    public static SignedCertificateTimestamp getInstance(byte[] encoded, AtomicInteger offsetObj, int len) {
       int startOffset = offsetObj.get();
       int offset = startOffset;
       byte version = encoded[offset++];
@@ -374,8 +369,8 @@ public class CtLog {
       return new SignedCertificateTimestamp(version, logID, timestamp, extensions, digitallySigned);
     } // constructor
 
-    public SignedCertificateTimestamp(byte version, byte[] logId, long timestamp, byte[] extensions,
-        DigitallySigned digitallySigned) {
+    public SignedCertificateTimestamp(
+        byte version, byte[] logId, long timestamp, byte[] extensions, DigitallySigned digitallySigned) {
       this.version = version;
       notNull(logId, "logId");
       Args.equals(logId.length, "logID.length", 32);
@@ -526,9 +521,9 @@ public class CtLog {
     return Arrays.copyOfRange(original, from, from + len);
   }
 
-  public static void update(Signature sig, byte version, long timestamp, byte[] sctExtensions,
-      byte[] issuerKeyHash, byte[] preCertTbsCert)
-          throws SignatureException {
+  public static void update(
+      Signature sig, byte version, long timestamp, byte[] sctExtensions, byte[] issuerKeyHash, byte[] preCertTbsCert)
+      throws SignatureException {
     sig.update(version);
     sig.update((byte) 0); // signature_type = certificate_timestamp
     byte[] timestampBytes = Pack.longToBigEndian(timestamp);

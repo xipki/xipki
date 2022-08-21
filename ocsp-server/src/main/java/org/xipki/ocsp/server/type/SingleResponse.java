@@ -42,8 +42,7 @@ public class SingleResponse extends ASN1Type {
 
   private final int encodedLength;
 
-  public SingleResponse(CertID certId, byte[] certStatus, Date thisUpdate, Date nextUpdate,
-      Extensions extensions) {
+  public SingleResponse(CertID certId, byte[] certStatus, Date thisUpdate, Date nextUpdate, Extensions extensions) {
     this.certId = certId;
     this.certStatus = certStatus;
     this.thisUpdate = thisUpdate;

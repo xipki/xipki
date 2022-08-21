@@ -78,20 +78,16 @@ public class PbmMacCmpCaClientExample extends CaClientExample {
       X509Certificate responderCert = SdkUtil.parseCert(new File(expandPath(RESPONDER_CERT_FILE)));
 
       X500Name requestorSubject = new X500Name("CN=PBMMAC");
-      X500Name responderSubject = X500Name.getInstance(
-          responderCert.getSubjectX500Principal().getEncoded());
+      X500Name responderSubject = X500Name.getInstance(responderCert.getSubjectX500Principal().getEncoded());
 
-      PbmMacCmpCaClient client = new PbmMacCmpCaClient(CMP_URL, null, requestorSubject,
-          responderSubject, HASH_ALGO);
+      PbmMacCmpCaClient client = new PbmMacCmpCaClient(CMP_URL, null, requestorSubject, responderSubject, HASH_ALGO);
 
       // SHA1("requestor-mac1".getBytes("UTF-8"))
       client.setKid(Hex.decode("466827c7757a70af71ca0338c01361aab2019dcf"));
       client.setPassword("123456".toCharArray());
       client.setRequestInterationCount(10240);
-      client.setRequestMac(
-          new AlgorithmIdentifier(PKCSObjectIdentifiers.id_hmacWithSHA256, DERNull.INSTANCE));
-      client.setRequestOwf(
-          new AlgorithmIdentifier(NISTObjectIdentifiers.id_sha256, DERNull.INSTANCE));
+      client.setRequestMac(new AlgorithmIdentifier(PKCSObjectIdentifiers.id_hmacWithSHA256, DERNull.INSTANCE));
+      client.setRequestOwf(new AlgorithmIdentifier(NISTObjectIdentifiers.id_sha256, DERNull.INSTANCE));
 
       Set<ASN1ObjectIdentifier> owfOids = new HashSet<>();
       owfOids.add(NISTObjectIdentifiers.id_sha256);
@@ -109,26 +105,22 @@ public class PbmMacCmpCaClientExample extends CaClientExample {
       printCert("===== CA Certificate =====", client.getCaCert());
 
       // Enroll certificate via CRMF - (CA generate keypair)
-      KeyAndCert[] keyAndCerts =
-          client.enrollCertsViaCrmfCaGenKeypair(new String[] {CERT_PROFILE, CERT_PROFILE},
-          new String[]{getSubject(), getSubject()});
+      KeyAndCert[] keyAndCerts = client.enrollCertsViaCrmfCaGenKeypair(
+          new String[] {CERT_PROFILE, CERT_PROFILE}, new String[]{getSubject(), getSubject()});
       for (KeyAndCert kc : keyAndCerts) {
         printKeyAndCert("===== Enroll via CRMF (CMP, CA generate keypair) =====", kc);
       }
 
       // Enroll certificate via CSR - RSA
-      X509Certificate cert = client.enrollCertViaCsr(CERT_PROFILE,
-          genCsr(generateRsaKeypair(), getSubject()));
+      X509Certificate cert = client.enrollCertViaCsr(CERT_PROFILE, genCsr(generateRsaKeypair(), getSubject()));
       printCert("===== Enroll RSA via CSR (CMP) =====", cert);
 
       // Enroll certificate via CSR - EC
-      cert = client.enrollCertViaCsr(CERT_PROFILE,
-          genCsr(generateEcKeypair(), getSubject()));
+      cert = client.enrollCertViaCsr(CERT_PROFILE, genCsr(generateEcKeypair(), getSubject()));
       printCert("===== Enroll EC via CSR (CMP) =====", cert);
 
       // Enroll certificate via CSR - DSA
-      cert = client.enrollCertViaCsr(CERT_PROFILE,
-          genCsr(generateDsaKeypair(), getSubject()));
+      cert = client.enrollCertViaCsr(CERT_PROFILE, genCsr(generateDsaKeypair(), getSubject()));
       printCert("===== Enroll DSA via CSR (CMP) =====", cert);
 
       // Enroll certificate via CRMF - RSA
@@ -147,7 +139,8 @@ public class PbmMacCmpCaClientExample extends CaClientExample {
       // Enroll certificate via CRMF - EC
       kp = generateEcKeypair();
       MyKeypair kp2 = generateEcKeypair();
-      X509Certificate[] certs = client.enrollCertsViaCrmf(new String[] {CERT_PROFILE, CERT_PROFILE},
+      X509Certificate[] certs = client.enrollCertsViaCrmf(
+          new String[] {CERT_PROFILE, CERT_PROFILE},
           new PrivateKey[] {kp.getPrivate(), kp2.getPrivate()},
           new SubjectPublicKeyInfo[] {kp.getPublic(), kp2.getPublic()},
           new String[]{getSubject(), getSubject()});
@@ -156,8 +149,9 @@ public class PbmMacCmpCaClientExample extends CaClientExample {
       }
 
       // Update certificate via CRMF - EC
-      certs = client.updateCertsViaCrmf(new PrivateKey[] {kp.getPrivate(), kp2.getPrivate()},
-          issuer, new BigInteger[] {certs[0].getSerialNumber(), certs[1].getSerialNumber()});
+      certs = client.updateCertsViaCrmf(
+                new PrivateKey[] {kp.getPrivate(), kp2.getPrivate()}, issuer,
+                new BigInteger[] {certs[0].getSerialNumber(), certs[1].getSerialNumber()});
       for (X509Certificate c : certs) {
         printCert("===== Update EC via CRMF (CMP) =====", c);
       }

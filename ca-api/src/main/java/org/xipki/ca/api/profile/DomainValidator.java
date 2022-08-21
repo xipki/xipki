@@ -41,7 +41,7 @@ class DomainValidator {
      * sensitive</i>, otherwise matching is <i>case in-sensitive</i>
      */
     public RegexValidator(String regex, boolean caseSensitive) {
-      if (regex == null || regex.length() == 0) {
+      if (regex == null || regex.isEmpty()) {
         throw new IllegalArgumentException("Regular expression is missing");
       }
       int flags =  (caseSensitive ? 0 : Pattern.CASE_INSENSITIVE);
@@ -79,8 +79,7 @@ class DomainValidator {
   // Regular expression strings for hostnames (derived from RFC2396 and RFC 1123)
   private static final String DOMAIN_LABEL_REGEX = "\\p{Alnum}(?>[\\p{Alnum}-]*\\p{Alnum})*";
   private static final String TOP_LABEL_REGEX = "\\p{Alpha}{2,}";
-  private static final String DOMAIN_NAME_REGEX =
-      "^(?:" + DOMAIN_LABEL_REGEX + "\\.)+" + "(" + TOP_LABEL_REGEX + ")$";
+  private static final String DOMAIN_NAME_REGEX = "^(?:" + DOMAIN_LABEL_REGEX + "\\.)+" + "(" + TOP_LABEL_REGEX + ")$";
 
   /**
    * Singleton instance of this validator.

@@ -140,8 +140,7 @@ public class EjbcaCertStatusStore extends OcspStore {
               continue;
             }
 
-            RequestIssuer reqIssuer =
-                new RequestIssuer(HashAlgo.SHA1, issuerEntry.getEncodedHash(HashAlgo.SHA1));
+            RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1, issuerEntry.getEncodedHash(HashAlgo.SHA1));
             for (EjbcaIssuerEntry m : newIssuers.values()) {
               if (m.matchHash(reqIssuer)) {
                 throw new Exception("found at least two issuers with the same subject and key");
@@ -154,8 +153,7 @@ public class EjbcaCertStatusStore extends OcspStore {
               // CA is revoked
               str = extractTextFromCaData(caData, "revokationdate", "long");
 
-              Date revTime = (str == null || "-1".contentEquals(str))
-                  ? new Date() : new Date(Long.parseLong(str));
+              Date revTime = (str == null || "-1".contentEquals(str)) ? new Date() : new Date(Long.parseLong(str));
               issuerEntry.setRevocationInfo(revTime);
             }
 
@@ -216,10 +214,10 @@ public class EjbcaCertStatusStore extends OcspStore {
   } // method updateIssuerStore
 
   @Override
-  protected CertStatusInfo getCertStatus0(Date time, RequestIssuer reqIssuer,
-      BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
-      boolean inheritCaRevocation)
-          throws OcspStoreException {
+  protected CertStatusInfo getCertStatus0(
+      Date time, RequestIssuer reqIssuer, BigInteger serialNumber,
+      boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
+      throws OcspStoreException {
     if (includeRit) {
       throw new OcspStoreException("EJBCA store does not support includeRit");
     }
@@ -309,8 +307,7 @@ public class EjbcaCertStatusStore extends OcspStore {
       } else {
         byte[] certHash = (hexCertHash == null) ? null : Hex.decode(hexCertHash);
         if (revoked) {
-          CertRevocationInfo revInfo = new CertRevocationInfo(reason,
-              new Date(revTime * 1000), null);
+          CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(revTime * 1000), null);
           certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
               certHashAlgo, certHash, thisUpdate, nextUpdate, null);
         } else {
@@ -327,8 +324,7 @@ public class EjbcaCertStatusStore extends OcspStore {
             date = issuer.getNotBefore();
           } else {
             long nowInMs = System.currentTimeMillis();
-            long dateInMs = Math.max(issuer.getNotBefore().getTime(),
-                nowInMs - DAY * retentionInterval);
+            long dateInMs = Math.max(issuer.getNotBefore().getTime(), nowInMs - DAY * retentionInterval);
             date = new Date(dateInMs);
           }
 
@@ -350,8 +346,7 @@ public class EjbcaCertStatusStore extends OcspStore {
           replaced = true;
         }
       } else if (certStatus == CertStatus.REVOKED) {
-        if (certStatusInfo.getRevocationInfo().getRevocationTime().after(
-              caRevInfo.getRevocationTime())) {
+        if (certStatusInfo.getRevocationInfo().getRevocationTime().after(caRevInfo.getRevocationTime())) {
           replaced = true;
         }
       }
@@ -362,7 +357,7 @@ public class EjbcaCertStatusStore extends OcspStore {
           newRevInfo = caRevInfo;
         } else {
           newRevInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
-              caRevInfo.getRevocationTime(), caRevInfo.getInvalidityTime());
+                        caRevInfo.getRevocationTime(), caRevInfo.getInvalidityTime());
         }
         certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
             certStatusInfo.getCertHashAlgo(), certStatusInfo.getCertHash(),
@@ -485,8 +480,7 @@ public class EjbcaCertStatusStore extends OcspStore {
         long intervalSeconds = updateInterval.approxMinutes() * 60;
         for (Runnable service : scheduledServices) {
           this.scheduledThreadPoolExecutor.scheduleAtFixedRate(service,
-              intervalSeconds + RandomUtil.nextInt(60), intervalSeconds,
-              TimeUnit.SECONDS);
+              intervalSeconds + RandomUtil.nextInt(60), intervalSeconds, TimeUnit.SECONDS);
         }
       }
     }

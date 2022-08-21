@@ -53,8 +53,7 @@ class QueryExecutor {
       this(type, name, value, false, false);
     }
 
-    public SqlColumn(ColumnType type, String name, Object value, boolean sensitive,
-        boolean signerConf) {
+    public SqlColumn(ColumnType type, String name, Object value, boolean sensitive, boolean signerConf) {
       this.type = notNull(type, "type");
       this.name = notNull(name, "name");
       this.value = value;
@@ -174,8 +173,7 @@ class QueryExecutor {
     return new SqlColumn(ColumnType.STRING, name, value);
   }
 
-  protected static SqlColumn colStr(String name, String value, boolean sensitive,
-      boolean signerConf) {
+  protected static SqlColumn colStr(String name, String value, boolean sensitive, boolean signerConf) {
     return new SqlColumn(ColumnType.STRING, name, value, sensitive, signerConf);
   }
 

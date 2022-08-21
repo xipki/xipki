@@ -48,8 +48,7 @@ public class GenSecretKeyParams extends ProxyMessage {
 
   private final int keysize;
 
-  public GenSecretKeyParams(P11SlotIdentifier slotId, P11NewKeyControl control, long keyType,
-      int keysize) {
+  public GenSecretKeyParams(P11SlotIdentifier slotId, P11NewKeyControl control, long keyType, int keysize) {
     this.slotId = Args.notNull(slotId, "slotId");
     this.control = Args.notNull(control, "control");
     this.keyType = keyType;

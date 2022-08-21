@@ -122,8 +122,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign},
-        null));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null));
 
     // Certificate Policies
     list.add(createExtension(Extension.certificatePolicies, true, false));
@@ -137,11 +136,9 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     list.add(createExtension(Extension.policyMappings, true, true));
     last(list).setPolicyMappings(new PolicyMappings());
     last(list).getPolicyMappings().getMappings().add(
-        createPolicyIdMapping(new ASN1ObjectIdentifier("1.1.1.1.1"),
-            new ASN1ObjectIdentifier("2.1.1.1.1")));
+        createPolicyIdMapping(new ASN1ObjectIdentifier("1.1.1.1.1"), new ASN1ObjectIdentifier("2.1.1.1.1")));
     last(list).getPolicyMappings().getMappings().add(
-        createPolicyIdMapping(new ASN1ObjectIdentifier("1.1.1.1.2"),
-            new ASN1ObjectIdentifier("2.1.1.1.2")));
+        createPolicyIdMapping(new ASN1ObjectIdentifier("1.1.1.1.2"), new ASN1ObjectIdentifier("2.1.1.1.2")));
 
     // Policy Constraints
     list.add(createExtension(Extension.policyConstraints, true, true));
@@ -175,8 +172,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     GeneralNameType accessLocation = new GeneralNameType();
     access.setAccessLocation(accessLocation);
-    accessLocation.addTags(GeneralNameTag.directoryName,
-        GeneralNameTag.uniformResourceIdentifier);
+    accessLocation.addTags(GeneralNameTag.directoryName, GeneralNameTag.uniformResourceIdentifier);
 
     marshall(profile, destFilename, true);
   } // method certprofileSubCaComplex
@@ -215,9 +211,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.contentCommitment},
-        null));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.contentCommitment}, null));
 
     marshall(profile, destFilename, true);
   } // method certprofileMultipleOus
@@ -259,9 +253,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.contentCommitment},
-        null));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.contentCommitment}, null));
 
     marshall(profile, destFilename, true);
   } // method certprofileMultipleValuedRdn
@@ -302,9 +294,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.contentCommitment},
-        null));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.contentCommitment}, null));
 
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, true));
@@ -367,8 +357,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment},
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment},
         null));
 
     // Extensions - extenedKeyUsage
@@ -391,8 +380,8 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - tlsFeature
     list.add(createExtension(Extn.id_pe_tlsfeature, true, true));
-    last(list).setTlsFeature(createTlsFeature(
-        TlsExtensionType.STATUS_REQUEST, TlsExtensionType.CLIENT_CERTIFICATE_URL));
+    last(list).setTlsFeature(
+        createTlsFeature(TlsExtensionType.STATUS_REQUEST, TlsExtensionType.CLIENT_CERTIFICATE_URL));
 
     // Extension - Admission
     list.add(createExtension(Extn.id_extension_admission, true, false));
@@ -432,20 +421,17 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     // restriction
     list.add(createExtension(Extn.id_extension_restriction, true, false));
-    last(list).setRestriction(
-        createRestriction(DirectoryStringType.utf8String, "demo restriction"));
+    last(list).setRestriction(createRestriction(DirectoryStringType.utf8String, "demo restriction"));
 
     // additionalInformation
-    list.add(createExtension(
-              Extn.id_extension_additionalInformation, true, false));
+    list.add(createExtension(Extn.id_extension_additionalInformation, true, false));
     last(list).setAdditionalInformation(createAdditionalInformation(DirectoryStringType.utf8String,
         "demo additional information"));
 
     // validationModel
     list.add(createExtension(Extn.id_extension_validityModel, true, false));
     last(list).setValidityModel(
-        createValidityModel(
-            createOidType(new ASN1ObjectIdentifier("1.3.6.1.4.1.8301.3.5.1"), "chain")));
+        createValidityModel(createOidType(new ASN1ObjectIdentifier("1.3.6.1.4.1.8301.3.5.1"), "chain")));
 
     // privateKeyUsagePeriod
     list.add(createExtension(Extension.privateKeyUsagePeriod, true, false));
@@ -516,9 +502,8 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.1"), null);
   }
 
-  private static void certprofileConstantExt(String destFilename, ASN1ObjectIdentifier oidPrefix,
-      Tag tag)
-          throws Exception {
+  private static void certprofileConstantExt(String destFilename, ASN1ObjectIdentifier oidPrefix, Tag tag)
+      throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile constant-extension", CertLevel.EndEntity,
         "5y", true, false);
 
@@ -554,8 +539,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
         new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment},
-        null));
+            KeyUsage.keyEncipherment}, null));
 
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
@@ -581,8 +565,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     certprofileSyntaxExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.1"), null);
   }
 
-  private static void certprofileSyntaxExt(String destFilename,
-      ASN1ObjectIdentifier oidPrefix, Tag tag) {
+  private static void certprofileSyntaxExt(String destFilename, ASN1ObjectIdentifier oidPrefix, Tag tag) {
     X509ProfileType profile = getBaseProfile("certprofile syntax-extension", CertLevel.EndEntity,
         "5y", true, false);
 
@@ -677,8 +660,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
         new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment},
-        null));
+            KeyUsage.keyEncipherment}, null));
 
     marshall(profile, destFilename, true);
   } // method certprofileFixedPartialSubject
@@ -718,8 +700,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     List<CertificatePolicyInformationType> pis = extValue.getCertificatePolicyInformations();
     CertificatePolicyInformationType single = new CertificatePolicyInformationType();
     pis.add(single);
-    single.setPolicyIdentifier(createOidType(
-        new ASN1ObjectIdentifier("1.2.840.113635.100.5.1")));
+    single.setPolicyIdentifier(createOidType(new ASN1ObjectIdentifier("1.2.840.113635.100.5.1")));
     List<PolicyQualifier> qualifiers = new ArrayList<>(1);
     single.setPolicyQualifiers(qualifiers);
 
@@ -727,8 +708,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     qualifiers.add(qualifier);
     qualifier.setType(PolicyQualfierType.userNotice);
     qualifier.setValue("Reliance on this certificate by any party assumes acceptance of the then "
-        + "applicable standard terms and conditions of use, certificate policy and certification "
-        + "practice statements.");
+        + "applicable standard terms and conditions of use, certificate policy and certification practice statements.");
 
     qualifier = new PolicyQualifier();
     qualifiers.add(qualifier);
@@ -738,14 +718,12 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature},
-        null));
+        new KeyUsage[]{KeyUsage.digitalSignature}, null));
 
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth},
-        null));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}, null));
 
     // apple custom extension 1.2.840.113635.100.6.3.1
     list.add(createConstantExtension(new ASN1ObjectIdentifier("1.2.840.113635.100.6.3.1"),
@@ -872,9 +850,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment},
-        null));
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment}, null));
 
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
@@ -884,9 +860,8 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - tlsFeature
     list.add(createExtension(Extn.id_pe_tlsfeature, true, true));
-    last(list).setTlsFeature(
-        createTlsFeature(TlsExtensionType.STATUS_REQUEST,
-                TlsExtensionType.CLIENT_CERTIFICATE_URL));
+    last(list).setTlsFeature(createTlsFeature(
+        TlsExtensionType.STATUS_REQUEST, TlsExtensionType.CLIENT_CERTIFICATE_URL));
 
     // Extensions - SMIMECapabilities
     list.add(createExtension(Extn.id_smimeCapabilities, true, false));
@@ -897,8 +872,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
         createExtension(new ASN1ObjectIdentifier("1.2.3.4.1"), true, false, "demo_without_conf"));
 
     // Extensions - 1.2.3.4.2 (demo_with_conf)
-    list.add(
-        createExtension(new ASN1ObjectIdentifier("1.2.3.4.2"), true, false, "demo_with_conf"));
+    list.add(createExtension(new ASN1ObjectIdentifier("1.2.3.4.2"), true, false, "demo_with_conf"));
     ExtnDemoWithConf demoWithConf = new ExtnDemoWithConf();
     demoWithConf.setTexts(Arrays.asList("text1", "text2"));
     last(list).setCustom(demoWithConf);

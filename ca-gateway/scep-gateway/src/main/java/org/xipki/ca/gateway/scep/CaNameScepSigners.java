@@ -31,8 +31,7 @@ public class CaNameScepSigners {
     }
   }
 
-  public CaNameScepSigners(ScepSigner defaultSigner,
-                           Map<String, ScepSigner> signers)
+  public CaNameScepSigners(ScepSigner defaultSigner, Map<String, ScepSigner> signers)
       throws InvalidConfException {
     if (defaultSigner == null && CollectionUtil.isEmpty(signers)) {
       throw new InvalidConfException("At least one of defaultSigner and signers must be set");

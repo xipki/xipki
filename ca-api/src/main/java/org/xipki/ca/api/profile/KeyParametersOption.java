@@ -44,8 +44,7 @@ public class KeyParametersOption {
     }
 
     public void setModulusLengths(Set<Range> modulusLengths) {
-      this.modulusLengths = (CollectionUtil.isEmpty(modulusLengths)) ? null
-          : new HashSet<>(modulusLengths);
+      this.modulusLengths = (CollectionUtil.isEmpty(modulusLengths)) ? null : new HashSet<>(modulusLengths);
     }
 
     public boolean allowsModulusLength(int modulusLength) {

@@ -124,8 +124,7 @@ public interface CaCertValidator {
       final int hLen = hashAlgo.getLength();
       for (byte[] m : hashValues) {
         if (m.length != hLen) {
-          throw new IllegalArgumentException("invalid the length of hashValue: "
-              + m.length + " != " + hLen);
+          throw new IllegalArgumentException("invalid the length of hashValue: " + m.length + " != " + hLen);
         }
       }
 

@@ -28,6 +28,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
+import org.xipki.util.SqlUtil;
 import org.xipki.util.exception.OperationException;
 import org.xipki.util.exception.ErrorCode;
 
@@ -85,8 +86,7 @@ class OcspStoreQueryExecutor {
       notNull(entry, "entry");
       for (IssuerEntry existingEntry : entries) {
         if (existingEntry.getId() == entry.getId()) {
-          throw new IllegalArgumentException(
-              "issuer with the same id " + entry.getId() + " already available");
+          throw new IllegalArgumentException("issuer with the same id " + entry.getId() + " already available");
         }
       }
 
@@ -107,12 +107,10 @@ class OcspStoreQueryExecutor {
   } // class IssuerStore
 
   private static final String SQL_ADD_REVOKED_CERT =
-      "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,HASH,SUBJECT,RT,RIT,RR)"
-      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+      SqlUtil.buildInsertSql("CERT", "ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,HASH,SUBJECT,RT,RIT,RR");
 
   private static final String SQL_ADD_CERT =
-      "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,HASH,SUBJECT) "
-      + "VALUES (?,?,?,?,?,?,?,?,?)";
+      SqlUtil.buildInsertSql("CERT", "ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,HASH,SUBJECT");
 
   private static final Logger LOG = LoggerFactory.getLogger(OcspStoreQueryExecutor.class);
 
@@ -199,9 +197,8 @@ class OcspStoreQueryExecutor {
     addOrUpdateCert(issuer, certificate, revInfo);
   }
 
-  private void addOrUpdateCert(X509Cert issuer, CertWithDbId certificate,
-      CertRevocationInfo revInfo)
-          throws DataAccessException, OperationException {
+  private void addOrUpdateCert(X509Cert issuer, CertWithDbId certificate, CertRevocationInfo revInfo)
+      throws DataAccessException, OperationException {
     notNull(issuer, "issuer");
 
     boolean revoked = (revInfo != null);
@@ -458,8 +455,7 @@ class OcspStoreQueryExecutor {
     long notBeforeSeconds = issuerCert.getNotBefore().getTime() / 1000;
     long notAfterSeconds = issuerCert.getNotAfter().getTime() / 1000;
 
-    final String sql =
-        "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT) VALUES (?,?,?,?,?,?)";
+    final String sql = "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT) VALUES (?,?,?,?,?,?)";
 
     PreparedStatement ps = datasource.prepareStatement(sql);
 

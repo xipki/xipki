@@ -26,10 +26,7 @@ import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.*;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -51,11 +48,9 @@ public class DatabaseMacAuditService extends MacAuditService {
   public static final String KEY_DATASOURCE = "datasource";
 
   private static final String SQL_ADD_AUDIT =
-          "INSERT INTO AUDIT (SHARD_ID,ID,TIME,LEVEL,EVENT_TYPE,PREVIOUS_ID,MESSAGE,TAG) " +
-                  "VALUES (?,?,?,?,?,?,?,?)";
+      SqlUtil.buildInsertSql("AUDIT", "SHARD_ID,ID,TIME,LEVEL,EVENT_TYPE,PREVIOUS_ID,MESSAGE,TAG");
 
-  private static final String SQL_UPDATE_INTEGRITY =
-          "UPDATE INTEGRITY SET TEXT=? WHERE ID=1";
+  private static final String SQL_UPDATE_INTEGRITY = "UPDATE INTEGRITY SET TEXT=? WHERE ID=1";
 
   private DataSourceWrapper datasource;
 
@@ -70,8 +65,7 @@ public class DatabaseMacAuditService extends MacAuditService {
       ps.setString(1, integrityText);
       ps.executeUpdate();
     } catch (SQLException ex) {
-      throw new IllegalStateException(
-              datasource.translate(SQL_UPDATE_INTEGRITY, ex));
+      throw new IllegalStateException(datasource.translate(SQL_UPDATE_INTEGRITY, ex));
     } catch (DataAccessException ex) {
       throw new IllegalStateException(ex);
     } finally {
@@ -149,8 +143,7 @@ public class DatabaseMacAuditService extends MacAuditService {
         }
       }
 
-      String integrityText = datasource.getFirstStringValue(
-                              conn, "INTEGRITY", "TEXT", "ID=1");
+      String integrityText = datasource.getFirstStringValue(conn, "INTEGRITY", "TEXT", "ID=1");
       if (integrityText == null) {
         String sql = "INSERT INTO INTEGRITY (ID,TEXT) VALUES(1,'')";
         try {

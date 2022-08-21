@@ -210,8 +210,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
         throw new CaMgmtException("could not update table " + tableName);
       }
 
-      LOG.info("updated table {} WHERE {}={}: {}", tableName,
-          whereColumn.name(), whereColumn.value(), changedColumns);
+      LOG.info("updated table {} WHERE {}={}: {}", tableName, whereColumn.name(), whereColumn.value(), changedColumns);
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource.translate(sql, ex));
     } finally {
@@ -219,8 +218,9 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     }
   } // method changeIfNotNull
 
-  private void setColumn(Map<String, String> changedColumns, PreparedStatement ps, int index,
-      SqlColumn column) throws SQLException {
+  private void setColumn(
+      Map<String, String> changedColumns, PreparedStatement ps, int index, SqlColumn column)
+      throws SQLException {
     String name = column.name();
     ColumnType type = column.type();
     Object value = column.value();

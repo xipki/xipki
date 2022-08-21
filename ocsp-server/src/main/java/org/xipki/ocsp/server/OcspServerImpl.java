@@ -177,8 +177,7 @@ public class OcspServerImpl implements OcspServer {
       unsuccesfulOCSPRespMap.put(status, new OcspRespWithCacheInfo(encoded, null));
     }
 
-    ExtendedExtension ext = new ExtendedExtension(OID.ID_PKIX_OCSP_EXTENDEDREVOKE,
-        false, DERNullBytes);
+    ExtendedExtension ext = new ExtendedExtension(OID.ID_PKIX_OCSP_EXTENDEDREVOKE, false, DERNullBytes);
     byte[] encoded = new byte[ext.getEncodedLength()];
     ext.write(encoded, 0);
     extension_pkix_ocsp_extendedRevoke = new WritableOnlyExtension(encoded);
@@ -239,8 +238,7 @@ public class OcspServerImpl implements OcspServer {
       init0();
       initialized.set(true);
       LOG.info("started OCSPResponder server");
-    } catch (InvalidConfException | PasswordResolverException
-            | Error | RuntimeException  ex) {
+    } catch (InvalidConfException | PasswordResolverException | Error | RuntimeException  ex) {
       LOG.error("could not start OCSP responder", ex);
       throw ex;
     } catch (Throwable th) {
@@ -319,8 +317,7 @@ public class OcspServerImpl implements OcspServer {
     for (OcspServerConf.Signer m : conf.getSigners()) {
       String name = m.getName();
       if (set.contains(name)) {
-        throw new InvalidConfException(
-            "duplicated definition of signer option named '" + name + "'");
+        throw new InvalidConfException("duplicated definition of signer option named '" + name + "'");
       }
       set.add(name);
     }
@@ -330,8 +327,7 @@ public class OcspServerImpl implements OcspServer {
     for (OcspServerConf.RequestOption m : conf.getRequestOptions()) {
       String name = m.getName();
       if (set.contains(name)) {
-        throw new InvalidConfException(
-            "duplicated definition of request option named '" + name + "'");
+        throw new InvalidConfException("duplicated definition of request option named '" + name + "'");
       }
       set.add(name);
     }
@@ -341,8 +337,7 @@ public class OcspServerImpl implements OcspServer {
     for (OcspServerConf.ResponseOption m : conf.getResponseOptions()) {
       String name = m.getName();
       if (set.contains(name)) {
-        throw new InvalidConfException(
-            "duplicated definition of response option named '" + name + "'");
+        throw new InvalidConfException("duplicated definition of response option named '" + name + "'");
       }
       set.add(name);
     }
@@ -363,8 +358,7 @@ public class OcspServerImpl implements OcspServer {
       for (DataSourceConf m : conf.getDatasources()) {
         String name = m.getName();
         if (set.contains(name)) {
-          throw new InvalidConfException(
-              "duplicated definition of datasource named '" + name + "'");
+          throw new InvalidConfException("duplicated definition of datasource named '" + name + "'");
         }
         set.add(name);
       }
@@ -389,8 +383,7 @@ public class OcspServerImpl implements OcspServer {
         }
 
         if (crlsDirs.contains(canonicalPath)) {
-          throw new InvalidConfException(
-              "duplicated use of dir '" + canonicalPath + "' in store " + m.getName());
+          throw new InvalidConfException("duplicated use of dir '" + canonicalPath + "' in store " + m.getName());
         } else {
           crlsDirs.add(canonicalPath);
         }
@@ -449,8 +442,7 @@ public class OcspServerImpl implements OcspServer {
         InputStream dsStream = null;
         try {
           dsStream = getInputStream(m.getConf());
-          datasource = datasourceFactory.createDataSource(name,
-                  dsStream, securityFactory.getPasswordResolver());
+          datasource = datasourceFactory.createDataSource(name, dsStream, securityFactory.getPasswordResolver());
         } catch (IOException ex) {
           throw new InvalidConfException(ex.getMessage(), ex);
         } finally {
@@ -500,24 +492,21 @@ public class OcspServerImpl implements OcspServer {
         statusStores.add(stores.get(storeName));
       }
 
-      OcspServerConf.ResponseOption responseOption =
-          responseOptions.get(option.getResponseOptionName());
+      OcspServerConf.ResponseOption responseOption = responseOptions.get(option.getResponseOptionName());
       ResponseSigner signer = signers.get(option.getSignerName());
       if (signer.isMacSigner()) {
         if (responseOption.isResponderIdByName()) {
-          throw new InvalidConfException(
-              "could not use ResponderIdByName for signer " + option.getSignerName());
+          throw new InvalidConfException("could not use ResponderIdByName for signer " + option.getSignerName());
         }
 
         if (EmbedCertsMode.NONE != responseOption.getEmbedCertsMode()) {
-          throw new InvalidConfException(
-              "could not embed certifcate in response for signer " + option.getSignerName());
+          throw new InvalidConfException("could not embed certifcate in response for signer " + option.getSignerName());
         }
       }
 
-      ResponderImpl responder = new ResponderImpl(option,
-          requestOptions.get(option.getRequestOptionName()),
-          responseOption, signer, statusStores);
+      ResponderImpl responder =
+          new ResponderImpl(option, requestOptions.get(option.getRequestOptionName()),
+              responseOption, signer, statusStores);
       responders.put(name, responder);
     } // end for
 
@@ -800,8 +789,7 @@ public class OcspServerImpl implements OcspServer {
       AtomicBoolean unknownAsRevoked0 = new AtomicBoolean(false);
       for (CertID certID : requestList) {
         OcspRespWithCacheInfo failureOcspResp = processCertReq(
-                unknownAsRevoked0, certID,
-                builder, responder, reqOpt, repOpt, repControl);
+                unknownAsRevoked0, certID, builder, responder, reqOpt, repOpt, repControl);
 
         if (failureOcspResp != null) {
           return failureOcspResp;
@@ -866,10 +854,9 @@ public class OcspServerImpl implements OcspServer {
     }
   } // method ask
 
-  private OcspRespWithCacheInfo processCertReq(AtomicBoolean unknownAsRevoked,
-      CertID certId, OCSPRespBuilder builder,
-      ResponderImpl responder, RequestOption reqOpt, OcspServerConf.ResponseOption repOpt,
-      OcspRespControl repControl) {
+  private OcspRespWithCacheInfo processCertReq(
+      AtomicBoolean unknownAsRevoked, CertID certId, OCSPRespBuilder builder, ResponderImpl responder,
+      RequestOption reqOpt, OcspServerConf.ResponseOption repOpt, OcspRespControl repControl) {
     HashAlgo reqHashAlgo = certId.getIssuer().hashAlgorithm();
     if (!reqOpt.allows(reqHashAlgo)) {
       LOG.warn("CertID.hashAlgorithm {} not allowed", reqHashAlgo);
@@ -992,8 +979,7 @@ public class OcspServerImpl implements OcspServer {
         }
         break;
       default:
-        throw new IllegalStateException(
-            "unknown CertificateStatus:" + certStatusInfo.getCertStatus());
+        throw new IllegalStateException("unknown CertificateStatus:" + certStatusInfo.getCertStatus());
     } // end switch
 
     if (responder.getResponderOption().getMode() != OcspMode.RFC2560) {
@@ -1041,8 +1027,7 @@ public class OcspServerImpl implements OcspServer {
     }
 
     if (nextUpdate != null) {
-      repControl.cacheNextUpdate =
-          Math.min(repControl.cacheNextUpdate, nextUpdate.getTime() / 1000);
+      repControl.cacheNextUpdate = Math.min(repControl.cacheNextUpdate, nextUpdate.getTime() / 1000);
     }
 
     return null;
@@ -1072,7 +1057,7 @@ public class OcspServerImpl implements OcspServer {
   }
 
   private Object checkSignature(byte[] request, RequestOption requestOption)
-          throws OCSPException {
+      throws OCSPException {
     OCSPRequest req;
     try {
       if (!requestOption.isValidateSignature()) {
@@ -1114,8 +1099,7 @@ public class OcspServerImpl implements OcspServer {
       cvp = securityFactory.getContentVerifierProvider(certs[0]);
     } catch (InvalidKeyException ex) {
       String message = ex.getMessage();
-      LOG.warn("securityFactory.getContentVerifierProvider, InvalidKeyException: {}",
-          message);
+      LOG.warn("securityFactory.getContentVerifierProvider, InvalidKeyException: {}", message);
       return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
     }
 

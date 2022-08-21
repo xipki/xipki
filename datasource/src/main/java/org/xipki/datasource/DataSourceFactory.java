@@ -46,9 +46,8 @@ public class DataSourceFactory {
 
   private static final Logger LOG = LoggerFactory.getLogger(DataSourceFactory.class);
 
-  public DataSourceWrapper createDataSource(String name, FileOrValue conf,
-      PasswordResolver passwordResolver)
-          throws PasswordResolverException, IOException {
+  public DataSourceWrapper createDataSource(String name, FileOrValue conf, PasswordResolver passwordResolver)
+      throws PasswordResolverException, IOException {
     Args.notNull(conf, "conf");
 
     Properties props = new Properties();
@@ -59,9 +58,8 @@ public class DataSourceFactory {
     return createDataSource(name, props, passwordResolver);
   } // method createDataSource
 
-  public DataSourceWrapper createDataSource(String name, InputStream conf,
-      PasswordResolver passwordResolver)
-          throws PasswordResolverException, IOException {
+  public DataSourceWrapper createDataSource(String name, InputStream conf, PasswordResolver passwordResolver)
+      throws PasswordResolverException, IOException {
     Args.notNull(conf, "conf");
     Properties config = new Properties();
     try {
@@ -77,9 +75,8 @@ public class DataSourceFactory {
     return createDataSource(name, config, passwordResolver);
   } // method createDataSource
 
-  public DataSourceWrapper createDataSource(String name, Properties conf,
-      PasswordResolver passwordResolver)
-          throws PasswordResolverException {
+  public DataSourceWrapper createDataSource(String name, Properties conf, PasswordResolver passwordResolver)
+      throws PasswordResolverException {
     Args.notNull(conf, "conf");
     DatabaseType databaseType;
     String className = conf.getProperty("dataSourceClassName");
@@ -129,11 +126,9 @@ public class DataSourceFactory {
       final String hsqldb_prefix = "jdbc:hsqldb:file:";
 
       if (dataSourceUrl.startsWith(h2_prefix + "~")) {
-        newUrl = h2_prefix + IoUtil.expandFilepath(
-                    dataSourceUrl.substring(h2_prefix.length()));
+        newUrl = h2_prefix + IoUtil.expandFilepath(dataSourceUrl.substring(h2_prefix.length()));
       } else if (dataSourceUrl.startsWith(hsqldb_prefix + "~")) {
-        newUrl = hsqldb_prefix + IoUtil.expandFilepath(
-                    dataSourceUrl.substring(hsqldb_prefix.length()));
+        newUrl = hsqldb_prefix + IoUtil.expandFilepath(dataSourceUrl.substring(hsqldb_prefix.length()));
       }
       if (newUrl != null) {
         conf.setProperty("dataSource.url", newUrl);
@@ -150,9 +145,8 @@ public class DataSourceFactory {
     return DataSourceWrapper.createDataSource(name, conf, databaseType);
   } // method createDataSource
 
-  public DataSourceWrapper createDataSourceForFile(String name, String confFile,
-      PasswordResolver passwordResolver)
-          throws PasswordResolverException, IOException {
+  public DataSourceWrapper createDataSourceForFile(String name, String confFile, PasswordResolver passwordResolver)
+      throws PasswordResolverException, IOException {
     Args.notBlank(confFile, "confFile");
     InputStream fileIn = Files.newInputStream(Paths.get(IoUtil.expandFilepath(confFile)));
     return createDataSource(name, fileIn, passwordResolver);

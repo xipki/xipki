@@ -141,8 +141,7 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
   protected void engineInitSign(PrivateKey privateKey)
       throws InvalidKeyException {
     if (!(privateKey instanceof P11PrivateKey)) {
-      throw new InvalidKeyException("privateKey is not instanceof "
-          + P11PrivateKey.class.getName());
+      throw new InvalidKeyException("privateKey is not instanceof " + P11PrivateKey.class.getName());
     }
     String algo = privateKey.getAlgorithm();
     if (!"DSA".equals(algo)) {
@@ -158,32 +157,23 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
         outputStream = new DigestOutputStream(hashAlgo.createDigest());
       }
     } else {
-      if (hashAlgo == HashAlgo.SHA1
-          && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA1)) {
+      if (hashAlgo == HashAlgo.SHA1 && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA1)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA1;
-      } else if (hashAlgo == HashAlgo.SHA224
-          && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA224)) {
+      } else if (hashAlgo == HashAlgo.SHA224 && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA224)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA224;
-      } else if (hashAlgo == HashAlgo.SHA256
-          && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA256)) {
+      } else if (hashAlgo == HashAlgo.SHA256 && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA256)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA256;
-      } else if (hashAlgo == HashAlgo.SHA384
-          && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA384)) {
+      } else if (hashAlgo == HashAlgo.SHA384 && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA384)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA384;
-      } else if (hashAlgo == HashAlgo.SHA512
-          && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA512)) {
+      } else if (hashAlgo == HashAlgo.SHA512 && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA512)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA512;
-      } else if (hashAlgo == HashAlgo.SHA3_224
-          && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA3_224)) {
+      } else if (hashAlgo == HashAlgo.SHA3_224 && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA3_224)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA3_224;
-      } else if (hashAlgo == HashAlgo.SHA3_256
-          && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA3_256)) {
+      } else if (hashAlgo == HashAlgo.SHA3_256 && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA3_256)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA3_256;
-      } else if (hashAlgo == HashAlgo.SHA3_384
-          && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA3_384)) {
+      } else if (hashAlgo == HashAlgo.SHA3_384 && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA3_384)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA3_384;
-      } else if (hashAlgo == HashAlgo.SHA3_512
-          && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA3_512)) {
+      } else if (hashAlgo == HashAlgo.SHA3_512 && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA3_512)) {
         mechanism = PKCS11Constants.CKM_DSA_SHA3_512;
       } else {
         throw new InvalidKeyException("privateKey and algorithm does not match");

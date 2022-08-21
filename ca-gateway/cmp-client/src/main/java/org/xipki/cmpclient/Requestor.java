@@ -64,8 +64,7 @@ public abstract class Requestor {
 
     private final SignAlgo mac;
 
-    public PbmMacCmpRequestor(char[] password,
-        byte[] senderKID, HashAlgo owf, int iterationCount, SignAlgo mac) {
+    public PbmMacCmpRequestor(char[] password, byte[] senderKID, HashAlgo owf, int iterationCount, SignAlgo mac) {
       super(NULL_GENERALNAME);
       this.password = password;
       this.senderKID = senderKID;

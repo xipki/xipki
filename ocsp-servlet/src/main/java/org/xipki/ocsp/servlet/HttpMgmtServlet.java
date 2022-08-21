@@ -106,8 +106,7 @@ public class HttpMgmtServlet extends HttpServlet {
       String actionStr = path.substring(1);
       MgmtAction action = MgmtAction.ofName(actionStr);
       if (action == null) {
-        throw new MyException(HttpServletResponse.SC_NOT_FOUND,
-            "unknown action '" + actionStr + "'");
+        throw new MyException(HttpServletResponse.SC_NOT_FOUND, "unknown action '" + actionStr + "'");
       }
 
       InputStream in = request.getInputStream();
@@ -128,14 +127,12 @@ public class HttpMgmtServlet extends HttpServlet {
           try {
             ocspServer.refreshTokenForSignerType(type);
           } catch (XiSecurityException ex) {
-            throw new OcspMgmtException("could not refresh token for signer type " + type
-                + ": " + ex.getMessage(), ex);
+            throw new OcspMgmtException("could not refresh token for signer type " + type + ": " + ex.getMessage(), ex);
           }
           break;
         }
         default: {
-          throw new MyException(HttpServletResponse.SC_NOT_FOUND,
-              "unsupported action " + action);
+          throw new MyException(HttpServletResponse.SC_NOT_FOUND, "unsupported action " + action);
         }
       }
 

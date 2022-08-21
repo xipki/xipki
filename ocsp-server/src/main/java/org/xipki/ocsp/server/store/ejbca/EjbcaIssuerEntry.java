@@ -108,14 +108,12 @@ class EjbcaIssuerEntry {
       return false;
     }
 
-    return CompareUtil.areEqual(issuerHash, 0, reqIssuer.getData(),
-        reqIssuer.getNameHashFrom(), issuerHash.length);
+    return CompareUtil.areEqual(issuerHash, 0, reqIssuer.getData(), reqIssuer.getNameHashFrom(), issuerHash.length);
   }
 
   public void setRevocationInfo(Date revocationTime) {
     notNull(revocationTime, "revocationTime");
-    this.revocationInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
-        revocationTime, null);
+    this.revocationInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE, revocationTime, null);
   }
 
   public CertRevocationInfo getRevocationInfo() {
@@ -146,8 +144,7 @@ class EjbcaIssuerEntry {
     }
 
     EjbcaIssuerEntry other = (EjbcaIssuerEntry) obj;
-    return id.equals(other.id)
-        && CompareUtil.equalsObject(revocationInfo, other.revocationInfo);
+    return id.equals(other.id) && CompareUtil.equalsObject(revocationInfo, other.revocationInfo);
     // The comparison of id implies the comparison of issuerHashMap, notBefore and cert.
   } // method equals
 

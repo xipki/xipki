@@ -97,8 +97,7 @@ public class CtLogServlet extends HttpServlet {
       throw new IllegalStateException(msg);
     }
 
-    this.signatureAndHashAlgorithm = new SignatureAndHashAlgorithm(
-        HashAlgorithm.sha256, signatureAlgorithm);
+    this.signatureAndHashAlgorithm = new SignatureAndHashAlgorithm(HashAlgorithm.sha256, signatureAlgorithm);
 
     try {
       KeyFactory kf = KeyFactory.getInstance(keyType);

@@ -96,8 +96,7 @@ public class ServletHelper {
   public static X509Cert getTlsClientCert(HttpServletRequest request)
       throws IOException {
     if (reverseProxyMode == null) {
-      X509Certificate[] certs = (X509Certificate[]) request.getAttribute(
-          "javax.servlet.request.X509Certificate");
+      X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
       if (certs == null || certs.length < 1) {
         return null;
       }
@@ -151,7 +150,8 @@ public class ServletHelper {
 
   } // method getTlsClientCert
 
-  public static void logReqResp(String prefix, Logger log, boolean logReqResp, boolean viaPost,
+  public static void logReqResp(
+      String prefix, Logger log, boolean logReqResp, boolean viaPost,
       HttpServletRequest req, byte[] requestBytes, byte[] respBody) {
     if (logReqResp && log.isDebugEnabled()) {
       String requestURI = req.getRequestURI();
@@ -160,8 +160,7 @@ public class ServletHelper {
         log.debug("{} HTTP POST path: {}\nRequest:\n{}\nResponse:\n{}",
             prefix, requestURI, LogUtil.base64Encode(requestBytes), LogUtil.base64Encode(respBody));
       } else {
-        log.debug("{} HTTP GET path: {}\nResponse:\n{}", prefix, requestURI,
-            LogUtil.base64Encode(respBody));
+        log.debug("{} HTTP GET path: {}\nResponse:\n{}", prefix, requestURI, LogUtil.base64Encode(respBody));
       }
     }
   }

@@ -86,8 +86,7 @@ public abstract class TextVadidator {
   public static TextVadidator compile(String regex) {
     if (":COUNTRY".equalsIgnoreCase(regex) || "COUNTRY".equalsIgnoreCase(regex)) {
       return COUNTRY;
-    } else if (":DATE_OF_BIRTH".equalsIgnoreCase(regex)
-        || "DATE_OF_BIRTH".equalsIgnoreCase(regex)) {
+    } else if (":DATE_OF_BIRTH".equalsIgnoreCase(regex) || "DATE_OF_BIRTH".equalsIgnoreCase(regex)) {
       return DATE_OF_BIRTH;
     } else if (":FQDN".equalsIgnoreCase(regex) || "FQDN".equalsIgnoreCase(regex)) {
       return FQDN;

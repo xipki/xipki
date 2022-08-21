@@ -80,8 +80,7 @@ public class CaServletFilter implements Filter {
     try {
       conf = CaServerConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CA_SERVER_CFG, true));
     } catch (IOException | InvalidConfException ex) {
-      throw new IllegalArgumentException(
-          "could not parse CA configuration file " + DFLT_CA_SERVER_CFG, ex);
+      throw new IllegalArgumentException("could not parse CA configuration file " + DFLT_CA_SERVER_CFG, ex);
     }
 
     logReqResp = conf.isLogReqResp();
@@ -126,8 +125,7 @@ public class CaServletFilter implements Filter {
     caManager.setP11CryptServiceFactory(securities.getP11CryptServiceFactory());
 
     // Certprofiles
-    caManager.setCertprofileFactoryRegister(
-        initCertprofileFactoryRegister(conf.getCertprofileFactories()));
+    caManager.setCertprofileFactoryRegister(initCertprofileFactoryRegister(conf.getCertprofileFactories()));
 
     // Publisher
     CertPublisherFactoryRegister publiserFactoryRegister = new CertPublisherFactoryRegister();

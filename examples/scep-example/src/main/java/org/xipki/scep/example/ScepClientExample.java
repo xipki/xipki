@@ -57,8 +57,7 @@ public class ScepClientExample extends CaClientExample {
     //System.setProperty("javax.net.debug", "all");
 
     try {
-      X509Cert caCert = X509Util.parseCert(
-          IoUtil.read(new FileInputStream(expandPath(CA_CERT_FILE))));
+      X509Cert caCert = X509Util.parseCert(IoUtil.read(new FileInputStream(expandPath(CA_CERT_FILE))));
       CaIdentifier tmpCaId = new CaIdentifier(CA_URL, null);
       CaCertValidator caCertValidator = new CaCertValidator.PreprovisionedCaCertValidator(caCert);
       ScepClient client = new ScepClient(tmpCaId, caCertValidator);
@@ -73,15 +72,12 @@ public class ScepClientExample extends CaClientExample {
       X500Name subjectDn = csr.getCertificationRequestInfo().getSubject();
       X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
           subjectDn, BigInteger.valueOf(1), new Date(),
-          new Date(System.currentTimeMillis() + 24 * 3600 * 1000),
-          subjectDn, keypair.getPublic());
-      ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA")
-          .build(keypair.getPrivate());
+          new Date(System.currentTimeMillis() + 24 * 3600 * 1000), subjectDn, keypair.getPublic());
+      ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA").build(keypair.getPrivate());
       X509Cert selfSignedCert = new X509Cert(certGenerator.build(signer));
 
       // Enroll certificate - RSA
-      EnrolmentResponse resp = client.scepEnrol(csr, keypair.getPrivate(),
-          selfSignedCert);
+      EnrolmentResponse resp = client.scepEnrol(csr, keypair.getPrivate(), selfSignedCert);
       if (resp.isFailure()) {
         throw new Exception("server returned 'failure'");
       }

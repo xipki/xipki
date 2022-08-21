@@ -286,9 +286,8 @@ public class ExtensionConfBuilder {
     return subFields;
   } // method createSyntaxSequenceOfOrSetOf
 
-  public static List<ExtensionType> createConstantExtensions(
-      ASN1ObjectIdentifier oidPrefix, Tag tag)
-          throws IOException {
+  public static List<ExtensionType> createConstantExtensions(ASN1ObjectIdentifier oidPrefix, Tag tag)
+      throws IOException {
     List<ExtensionType> list = new LinkedList<>();
 
     // Custom Constant Extension Value
@@ -346,8 +345,7 @@ public class ExtensionConfBuilder {
     return list;
   } // method createConstantExtensions
 
-  public static List<ExtensionType> createSyntaxExtensions(ASN1ObjectIdentifier oidPrefix,
-      Tag tag) {
+  public static List<ExtensionType> createSyntaxExtensions(ASN1ObjectIdentifier oidPrefix, Tag tag) {
     List<ExtensionType> list = new LinkedList<>();
     // Custom extension with syntax
     list.add(createSyntaxExtension(oidPrefix.branch("1"), true, false, tag,
@@ -402,13 +400,12 @@ public class ExtensionConfBuilder {
     return list;
   } // method createSyntaxExtensions
 
-  public static ExtensionType createExtension(ASN1ObjectIdentifier type, boolean required,
-      boolean critical) {
+  public static ExtensionType createExtension(ASN1ObjectIdentifier type, boolean required, boolean critical) {
     return createExtension(type, required, critical, null);
   }
 
-  public static ExtensionType createExtension(ASN1ObjectIdentifier type, boolean required,
-      boolean critical, String description) {
+  public static ExtensionType createExtension(
+      ASN1ObjectIdentifier type, boolean required, boolean critical, String description) {
     ExtensionType ret = new ExtensionType();
     // attributes
     ret.setRequired(required);
@@ -419,8 +416,8 @@ public class ExtensionConfBuilder {
     return ret;
   }
 
-  public static ExtensionType createConstantExtension(ASN1ObjectIdentifier type, boolean required,
-      boolean critical, Tag tag, FieldType fieldType, String value) {
+  public static ExtensionType createConstantExtension(
+      ASN1ObjectIdentifier type, boolean required, boolean critical, Tag tag, FieldType fieldType, String value) {
     ExtensionType ret = new ExtensionType();
     // attributes
     ret.setRequired(required);
@@ -446,8 +443,8 @@ public class ExtensionConfBuilder {
     return ret;
   } // method createConstantExtension
 
-  public static ExtensionType createSyntaxExtension(ASN1ObjectIdentifier type, boolean required,
-      boolean critical, Tag tag, FieldType fieldType) {
+  public static ExtensionType createSyntaxExtension(
+      ASN1ObjectIdentifier type, boolean required, boolean critical, Tag tag, FieldType fieldType) {
     ExtensionType ret = new ExtensionType();
     // attributes
     ret.setRequired(required);
@@ -470,8 +467,8 @@ public class ExtensionConfBuilder {
     return ret;
   } // method createSyntaxExtension
 
-  public static KeyUsage createKeyUsage(org.xipki.security.KeyUsage[] requiredUsages,
-      org.xipki.security.KeyUsage[] optionalUsages) {
+  public static KeyUsage createKeyUsage(
+      org.xipki.security.KeyUsage[] requiredUsages, org.xipki.security.KeyUsage[] optionalUsages) {
     KeyUsage extValue = new KeyUsage();
     if (requiredUsages != null) {
       for (org.xipki.security.KeyUsage m : requiredUsages) {
@@ -542,8 +539,7 @@ public class ExtensionConfBuilder {
     return extValue;
   } // method createExtendedKeyUsage
 
-  public static ExtendedKeyUsage.Usage createSingleExtKeyUsage(
-      ASN1ObjectIdentifier usage, boolean required) {
+  public static ExtendedKeyUsage.Usage createSingleExtKeyUsage(ASN1ObjectIdentifier usage, boolean required) {
     ExtendedKeyUsage.Usage type = new ExtendedKeyUsage.Usage();
     type.setOid(usage.getId());
     type.setRequired(required);
@@ -561,8 +557,7 @@ public class ExtensionConfBuilder {
     return extValue;
   } // method createRestriction
 
-  public static AdditionalInformation createAdditionalInformation(DirectoryStringType type,
-      String text) {
+  public static AdditionalInformation createAdditionalInformation(DirectoryStringType type, String text) {
     AdditionalInformation extValue = new AdditionalInformation();
     extValue.setType(type);
     extValue.setText(text);
@@ -698,8 +693,7 @@ public class ExtensionConfBuilder {
     return extValue;
   } // method createValidityModel
 
-  public static CertificatePolicies createCertificatePolicies(
-      Map<ASN1ObjectIdentifier, String> policies) {
+  public static CertificatePolicies createCertificatePolicies(Map<ASN1ObjectIdentifier, String> policies) {
     if (policies == null || policies.isEmpty()) {
       return null;
     }
@@ -738,8 +732,7 @@ public class ExtensionConfBuilder {
     return ret;
   } // method createPolicyIdMapping
 
-  public static PolicyConstraints createPolicyConstraints(Integer inhibitPolicyMapping,
-      Integer requireExplicitPolicy) {
+  public static PolicyConstraints createPolicyConstraints(Integer inhibitPolicyMapping, Integer requireExplicitPolicy) {
     PolicyConstraints ret = new PolicyConstraints();
     if (inhibitPolicyMapping != null) {
       ret.setInhibitPolicyMapping(inhibitPolicyMapping);

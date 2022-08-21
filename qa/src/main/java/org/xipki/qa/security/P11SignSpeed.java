@@ -52,29 +52,26 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
     public DSA(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
         String signatureAlgorithm, int threads, int plength, int qlength)
-            throws Exception {
-      this(false, securityFactory, slot, keyId, null, signatureAlgorithm, threads,
-          plength, qlength);
+        throws Exception {
+      this(false, securityFactory, slot, keyId, null, signatureAlgorithm, threads, plength, qlength);
     }
 
     public DSA(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,
-        byte[] keyId, String keyLabel, String signatureAlgorithm, int threads,
-        int plength, int qlength)
-            throws Exception {
+        byte[] keyId, String keyLabel, String signatureAlgorithm, int threads, int plength, int qlength)
+        throws Exception {
       super(securityFactory, slot, signatureAlgorithm, !keyPresent,
           generateKey(keyPresent, slot, keyId, keyLabel, plength, qlength),
           "PKCS#11 DSA signature creation\npLength: " + plength + "\nqLength: " + qlength, threads);
     }
 
-    private static P11ObjectIdentifier generateKey(boolean keyPresent, P11Slot slot, byte[] keyId,
-        String keyLabel, int plength, int qlength)
-            throws Exception {
+    private static P11ObjectIdentifier generateKey(
+        boolean keyPresent, P11Slot slot, byte[] keyId, String keyLabel, int plength, int qlength)
+        throws Exception {
       if (keyPresent) {
         return getNonNullKeyId(slot, keyId, keyLabel);
       }
 
-      return slot.generateDSAKeypair(plength, qlength, getNewKeyControl(keyId, keyLabel))
-                .getKeyId();
+      return slot.generateDSAKeypair(plength, qlength, getNewKeyControl(keyId, keyLabel)).getKeyId();
     }
 
   } // class DSA
@@ -83,22 +80,21 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
     public EC(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
         String signatureAlgorithm, int threads, ASN1ObjectIdentifier curveOid)
-            throws Exception {
+        throws Exception {
       this(false, securityFactory, slot, keyId, null, signatureAlgorithm, threads, curveOid);
     }
 
     public EC(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,
-        byte[] keyId, String keyLabel, String signatureAlgorithm, int threads,
-        ASN1ObjectIdentifier curveOid)
-            throws Exception {
+        byte[] keyId, String keyLabel, String signatureAlgorithm, int threads, ASN1ObjectIdentifier curveOid)
+        throws Exception {
       super(securityFactory, slot, signatureAlgorithm, !keyPresent,
           generateKey(keyPresent, slot, keyId, keyLabel, curveOid),
           "PKCS#11 EC signature creation\ncurve: " + AlgorithmUtil.getCurveName(curveOid), threads);
     }
 
-    private static P11ObjectIdentifier generateKey(boolean keyPresent, P11Slot slot, byte[] keyId,
-        String keyLabel, ASN1ObjectIdentifier curveOid)
-            throws Exception {
+    private static P11ObjectIdentifier generateKey(
+        boolean keyPresent, P11Slot slot, byte[] keyId, String keyLabel, ASN1ObjectIdentifier curveOid)
+        throws Exception {
       if (keyPresent) {
         return getNonNullKeyId(slot, keyId, keyLabel);
       }
@@ -110,31 +106,29 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
   public static class HMAC extends P11SignSpeed {
 
-    public HMAC(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
-        String signatureAlgorithm, int threads)
-            throws Exception {
+    public HMAC(SecurityFactory securityFactory, P11Slot slot, byte[] keyId, String signatureAlgorithm, int threads)
+        throws Exception {
       this(!false, securityFactory, slot, keyId, null, signatureAlgorithm, threads);
     }
 
     public HMAC(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,
         byte[] keyId, String keyLabel, String signatureAlgorithm, int threads)
-            throws Exception {
+        throws Exception {
       super(securityFactory, slot, signatureAlgorithm, !keyPresent,
           generateKey(keyPresent, slot, keyId, keyLabel, signatureAlgorithm),
           "PKCS#11 HMAC signature creation", threads);
     }
 
-    private static P11ObjectIdentifier generateKey(boolean keyPresent, P11Slot slot,
-        byte[] keyId, String keyLabel, String signatureAlgorithm)
-            throws Exception {
+    private static P11ObjectIdentifier generateKey(
+        boolean keyPresent, P11Slot slot, byte[] keyId, String keyLabel, String signatureAlgorithm)
+        throws Exception {
       if (keyPresent) {
         return getNonNullKeyId(slot, keyId, keyLabel);
       }
 
       int keysize = getKeysize(signatureAlgorithm);
       byte[] keyBytes = RandomUtil.nextBytes(keysize / 8);
-      return slot.importSecretKey(PKCS11Constants.CKK_GENERIC_SECRET, keyBytes,
-          getNewKeyControl(keyId, keyLabel));
+      return slot.importSecretKey(PKCS11Constants.CKK_GENERIC_SECRET, keyBytes, getNewKeyControl(keyId, keyLabel));
     }
 
     private static int getKeysize(String hmacAlgorithm) {
@@ -166,30 +160,28 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
     public RSA(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
         String signatureAlgorithm, int threads, int keysize, BigInteger publicExponent)
-            throws Exception {
+        throws Exception {
       this(false, securityFactory, slot, keyId, null, signatureAlgorithm, threads,
           keysize, publicExponent);
     }
 
-    public RSA(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,
-        byte[] keyId, String keyLabel, String signatureAlgorithm, int threads, int keysize,
-        BigInteger publicExponent)
-            throws Exception {
+    public RSA(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
+               String keyLabel, String signatureAlgorithm, int threads, int keysize, BigInteger publicExponent)
+        throws Exception {
       super(securityFactory, slot, signatureAlgorithm, !keyPresent,
           generateKey(keyPresent, slot, keyId, keysize, publicExponent, keyLabel),
           "PKCS#11 RSA signature creation\n" + "keysize: " + keysize + "\n"
               + "public exponent: " + publicExponent, threads);
     }
 
-    private static P11ObjectIdentifier generateKey(boolean keyPresent, P11Slot slot, byte[] keyId,
-        int keysize, BigInteger publicExponent, String keyLabel)
-            throws Exception {
+    private static P11ObjectIdentifier generateKey(
+        boolean keyPresent, P11Slot slot, byte[] keyId, int keysize, BigInteger publicExponent, String keyLabel)
+        throws Exception {
       if (keyPresent) {
         return getNonNullKeyId(slot, keyId, keyLabel);
       }
 
-      return slot.generateRSAKeypair(keysize, publicExponent, getNewKeyControl(keyId, keyLabel))
-              .getKeyId();
+      return slot.generateRSAKeypair(keysize, publicExponent, getNewKeyControl(keyId, keyLabel)).getKeyId();
     }
 
   } // class RSA
@@ -202,16 +194,15 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
     }
 
     public SM2(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,
-        byte[] keyId, String keyLabel, int threads)
-            throws Exception {
+               byte[] keyId, String keyLabel, int threads)
+        throws Exception {
       super(securityFactory, slot, "SM3WITHSM2", !keyPresent,
-          generateKey(keyPresent, slot, keyId, keyLabel), "PKCS#11 SM2 signature creation",
-              threads);
+          generateKey(keyPresent, slot, keyId, keyLabel), "PKCS#11 SM2 signature creation", threads);
     }
 
-    private static P11ObjectIdentifier generateKey(boolean keyPresent, P11Slot slot,
-        byte[] keyId, String keyLabel)
-            throws Exception {
+    private static P11ObjectIdentifier generateKey(
+        boolean keyPresent, P11Slot slot, byte[] keyId, String keyLabel)
+        throws Exception {
       if (keyPresent) {
         return getNonNullKeyId(slot, keyId, keyLabel);
       }
@@ -260,7 +251,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
   public P11SignSpeed(SecurityFactory securityFactory, P11Slot slot, String signatureAlgorithm,
       boolean deleteKeyAfterTest, P11ObjectIdentifier objectId, String description, int threads)
-          throws ObjectCreationException {
+      throws ObjectCreationException {
     super(description + "\nsignature algorithm: " + signatureAlgorithm);
 
     notNull(securityFactory, "securityFactory");
@@ -301,8 +292,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
     return new P11NewKeyControl(id, label);
   }
 
-  protected static P11ObjectIdentifier getNonNullKeyId(P11Slot slot,
-      byte[] keyId, String keyLabel) {
+  protected static P11ObjectIdentifier getNonNullKeyId(P11Slot slot, byte[] keyId, String keyLabel) {
     P11IdentityId p11Id = slot.getIdentityId(keyId, keyLabel);
     if (p11Id == null) {
       throw new IllegalArgumentException("unknown key");
@@ -316,8 +306,8 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
     return new Testor();
   }
 
-  private static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Long slotId, byte[] keyId,
-      String signatureAlgorithm, int parallelism) {
+  private static SignerConf getPkcs11SignerConf(
+      String pkcs11ModuleName, Long slotId, byte[] keyId, String signatureAlgorithm, int parallelism) {
     ConfPairs conf = new ConfPairs("algo", signatureAlgorithm);
     conf.putPair("parallelism", Integer.toString(parallelism));
 

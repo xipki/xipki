@@ -57,22 +57,17 @@ public class CertStoreBase extends QueryExecutor {
 
   protected final String SQL_ADD_CERT;
 
-  protected static final String SQL_REVOKE_CERT =
-      "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
+  protected static final String SQL_REVOKE_CERT = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
 
-  protected static final String SQL_REVOKE_SUSPENDED_CERT =
-      "UPDATE CERT SET LUPDATE=?,RR=? WHERE ID=?";
+  protected static final String SQL_REVOKE_SUSPENDED_CERT = "UPDATE CERT SET LUPDATE=?,RR=? WHERE ID=?";
 
-  protected static final String SQL_INSERT_PUBLISHQUEUE =
-      buildInsertSql("PUBLISHQUEUE", "PID,CA_ID,CID");
+  protected static final String SQL_INSERT_PUBLISHQUEUE = buildInsertSql("PUBLISHQUEUE", "PID,CA_ID,CID");
 
-  protected static final String SQL_REMOVE_PUBLISHQUEUE =
-      "DELETE FROM PUBLISHQUEUE WHERE PID=? AND CID=?";
+  protected static final String SQL_REMOVE_PUBLISHQUEUE = "DELETE FROM PUBLISHQUEUE WHERE PID=? AND CID=?";
 
   protected static final String SQL_MAX_CRLNO = "SELECT MAX(CRL_NO) FROM CRL WHERE CA_ID=?";
 
-  protected static final String SQL_MAX_FULL_CRLNO =
-      "SELECT MAX(CRL_NO) FROM CRL WHERE CA_ID=? AND DELTACRL = 0";
+  protected static final String SQL_MAX_FULL_CRLNO = "SELECT MAX(CRL_NO) FROM CRL WHERE CA_ID=? AND DELTACRL = 0";
 
   protected static final String SQL_MAX_THISUPDAATE_CRL =
       "SELECT MAX(THISUPDATE) FROM CRL WHERE CA_ID=? AND DELTACRL=?";
@@ -84,11 +79,9 @@ public class CertStoreBase extends QueryExecutor {
   protected static final String SQL_DELETE_UNREFERENCED_REQUEST =
       "DELETE FROM REQUEST WHERE ID NOT IN (SELECT req.RID FROM REQCERT req)";
 
-  protected static final String SQL_ADD_REQUEST =
-      buildInsertSql("REQUEST", "ID,LUPDATE,DATA");
+  protected static final String SQL_ADD_REQUEST = buildInsertSql("REQUEST", "ID,LUPDATE,DATA");
 
-  protected static final String SQL_ADD_REQCERT =
-      buildInsertSql("REQCERT", "ID,RID,CID");
+  protected static final String SQL_ADD_REQCERT = buildInsertSql("REQCERT", "ID,RID,CID");
 
   protected final int dbSchemaVersion;
 
@@ -131,7 +124,7 @@ public class CertStoreBase extends QueryExecutor {
   } // constructor
 
   public void updateDbInfo(PasswordResolver passwordResolver)
-          throws DataAccessException, CaMgmtException {
+      throws DataAccessException, CaMgmtException {
     DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
 
     // Save keypair control
@@ -186,8 +179,7 @@ public class CertStoreBase extends QueryExecutor {
     }
   }
 
-  protected int execUpdateStmt0(String sql)
-      throws OperationException {
+  protected int execUpdateStmt0(String sql) throws OperationException {
     try {
       return execUpdateStmt(sql);
     } catch (DataAccessException ex) {

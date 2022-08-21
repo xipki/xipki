@@ -32,6 +32,7 @@ import java.util.*;
  */
 
 public class CanonicalizeCode {
+  private static final int MAX_COUNT_IN_LINE = 120;
 
   private static final List<byte[]> headerLines = new ArrayList<>(20);
 
@@ -231,8 +232,7 @@ public class CanonicalizeCode {
 
     for (File file : files) {
       if (file.isDirectory()) {
-        if (!file.getName().equals("target")
-            && !file.getName().equals("tbd")) {
+        if (!file.getName().equals("target") && !file.getName().equals("tbd")) {
           checkWarningsInDir(file, false);
         }
       } else {
@@ -273,7 +273,7 @@ public class CanonicalizeCode {
           authorsLineAvailable = true;
         }
 
-        if (line.length() > 100 && !line.contains("http")) {
+        if (line.length() > MAX_COUNT_IN_LINE && !line.contains("http")) {
           lineNumbers.add(lineNumber);
         }
       } // end while
@@ -287,8 +287,7 @@ public class CanonicalizeCode {
     }
 
     if (!authorsLineAvailable) {
-      System.out.println("Please check file " + file.getPath().substring(baseDirLen)
-          + ": no authors line");
+      System.out.println("Please check file " + file.getPath().substring(baseDirLen) + ": no authors line");
     }
   } // method checkWarningsInFile
 

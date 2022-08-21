@@ -45,8 +45,7 @@ public final class EnvelopedDataDecryptor {
       Args.notNull(privKey, "privKey");
 
       this.recipientId = new KeyTransRecipientId(
-          recipientCert.getIssuer(), recipientCert.getSerialNumber(),
-          recipientCert.getSubjectKeyId());
+          recipientCert.getIssuer(), recipientCert.getSerialNumber(), recipientCert.getSubjectKeyId());
       this.recipient = new JceKeyTransEnvelopedRecipient(privKey);
     }
 

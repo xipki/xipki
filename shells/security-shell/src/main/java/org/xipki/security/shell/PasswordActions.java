@@ -43,8 +43,7 @@ public class PasswordActions {
   @Service
   public static class Deobfuscate extends SecurityAction {
 
-    @Option(name = "--password",
-        description = "obfuscated password, starts with OBF:\n"
+    @Option(name = "--password", description = "obfuscated password, starts with OBF:\n"
             + "exactly one of password and password-file must be specified")
     private String passwordHint;
 
@@ -60,8 +59,7 @@ public class PasswordActions {
     protected Object execute0()
         throws Exception {
       if ((passwordHint == null) == (passwordFile == null)) {
-        throw new IllegalCmdParamException(
-            "exactly one of password and password-file must be specified");
+        throw new IllegalCmdParamException("exactly one of password and password-file must be specified");
       }
 
       if (passwordHint == null) {
@@ -69,8 +67,7 @@ public class PasswordActions {
       }
 
       if (!StringUtil.startsWithIgnoreCase(passwordHint, "OBF:")) {
-        throw new IllegalCmdParamException("encrypted password '" + passwordHint
-            + "' does not start with OBF:");
+        throw new IllegalCmdParamException("encrypted password '" + passwordHint + "' does not start with OBF:");
       }
 
       String password = OBFPasswordService.deobfuscate(passwordHint);
@@ -113,8 +110,7 @@ public class PasswordActions {
 
       String passwordHint = OBFPasswordService.obfuscate(new String(password));
       if (outFile != null) {
-        saveVerbose("saved the obfuscated password to file", outFile,
-            StringUtil.toUtf8Bytes(passwordHint));
+        saveVerbose("saved the obfuscated password to file", outFile, StringUtil.toUtf8Bytes(passwordHint));
       } else {
         println("the obfuscated password is: '" + passwordHint + "'");
       }
@@ -127,8 +123,7 @@ public class PasswordActions {
   @Service
   public static class PbeDec extends SecurityAction {
 
-    @Option(name = "--password",
-        description = "encrypted password, starts with PBE:\n"
+    @Option(name = "--password", description = "encrypted password, starts with PBE:\n"
             + "exactly one of password and password-file must be specified")
     private String passwordHint;
 
@@ -136,8 +131,7 @@ public class PasswordActions {
     @Completion(FileCompleter.class)
     private String passwordFile;
 
-    @Option(name = "--mpassword-file",
-        description = "file containing the (obfuscated) master password")
+    @Option(name = "--mpassword-file", description = "file containing the (obfuscated) master password")
     @Completion(FileCompleter.class)
     private String masterPasswordFile;
 
@@ -153,8 +147,7 @@ public class PasswordActions {
         throws Exception {
       Args.range(mquorum, "mk", 1, 10);
       if ((passwordHint == null) == (passwordFile == null)) {
-        throw new IllegalCmdParamException(
-            "exactly one of password and password-file must be specified");
+        throw new IllegalCmdParamException("exactly one of password and password-file must be specified");
       }
 
       if (passwordHint == null) {
@@ -162,8 +155,7 @@ public class PasswordActions {
       }
 
       if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:")) {
-        throw new IllegalCmdParamException("encrypted password '" + passwordHint
-            + "' does not start with PBE:");
+        throw new IllegalCmdParamException("encrypted password '" + passwordHint + "' does not start with PBE:");
       }
 
       char[] masterPassword;
@@ -187,8 +179,7 @@ public class PasswordActions {
       char[] password = PBEPasswordService.decryptPassword(masterPassword, passwordHint);
 
       if (outFile != null) {
-        saveVerbose("saved the password to file", outFile,
-            StringUtil.toUtf8Bytes(new String(password)));
+        saveVerbose("saved the password to file", outFile, StringUtil.toUtf8Bytes(new String(password)));
       } else {
         println("the password is: '" + new String(password) + "'");
       }
@@ -201,8 +192,7 @@ public class PasswordActions {
   @Service
   public static class PbeEnc extends SecurityAction {
 
-    @Option(name = "--iteration-count", aliases = "-n",
-        description = "iteration count, between 1 and 65535")
+    @Option(name = "--iteration-count", aliases = "-n", description = "iteration count, between 1 and 65535")
     private int iterationCount = 2000;
 
     @Option(name = "--out", description = "where to save the encrypted password")
@@ -212,8 +202,7 @@ public class PasswordActions {
     @Option(name = "-k", description = "quorum of the password parts")
     private Integer quorum = 1;
 
-    @Option(name = "--mpassword-file",
-        description = "file containing the (obfuscated) master password")
+    @Option(name = "--mpassword-file", description = "file containing the (obfuscated) master password")
     @Completion(FileCompleter.class)
     private String masterPasswordFile;
 
@@ -260,8 +249,7 @@ public class PasswordActions {
       String passwordHint = PBEPasswordService.encryptPassword(PBEAlgo.PBEWithHmacSHA256AndAES_256,
           iterationCount, masterPassword, password);
       if (outFile != null) {
-        saveVerbose("saved the encrypted password to file", outFile,
-            StringUtil.toUtf8Bytes(passwordHint));
+        saveVerbose("saved the encrypted password to file", outFile, StringUtil.toUtf8Bytes(passwordHint));
       } else {
         println("the encrypted password is: '" + passwordHint + "'");
       }

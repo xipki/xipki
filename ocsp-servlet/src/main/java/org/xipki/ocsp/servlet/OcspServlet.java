@@ -181,8 +181,7 @@ public class OcspServlet extends HttpServlet {
 
       byte[] encodedOcspResp = ocspRespWithCacheInfo.getResponse();
       if (logReqResp && LOG.isDebugEnabled()) {
-        LOG.debug("HTTP GET OCSP path: {}\nResponse:\n{}", req.getRequestURI(),
-            LogUtil.base64Encode(encodedOcspResp));
+        LOG.debug("HTTP GET OCSP path: {}\nResponse:\n{}", req.getRequestURI(), LogUtil.base64Encode(encodedOcspResp));
       }
 
       OcspRespWithCacheInfo.ResponseCacheInfo cacheInfo = ocspRespWithCacheInfo.getCacheInfo();
@@ -208,8 +207,7 @@ public class OcspServlet extends HttpServlet {
         }
         // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the ASCII
         // HEX representation of the SHA1 hash of the OCSPResponse structure.
-        resp.addHeader("ETag",
-            StringUtil.concat("\"", HashAlgo.SHA1.hexHash(encodedOcspResp), "\""));
+        resp.addHeader("ETag", StringUtil.concat("\"", HashAlgo.SHA1.hexHash(encodedOcspResp), "\""));
 
         // Max age must be in seconds in the cache-control header
         long maxAge;
@@ -220,13 +218,11 @@ public class OcspServlet extends HttpServlet {
         }
 
         if (nextUpdate != null) {
-          maxAge = Math.min(maxAge,
-              (nextUpdate - cacheInfo.getGeneratedAt()) / 1000);
+          maxAge = Math.min(maxAge, (nextUpdate - cacheInfo.getGeneratedAt()) / 1000);
         }
 
         resp.addHeader("Cache-Control",
-            StringUtil.concat("max-age=", Long.toString(maxAge),
-              ",public,no-transform,must-revalidate"));
+            StringUtil.concat("max-age=", Long.toString(maxAge), ",public,no-transform,must-revalidate"));
       } // end if (ocspRespWithCacheInfo)
 
       resp.setContentLength(encodedOcspResp.length);

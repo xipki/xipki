@@ -59,11 +59,9 @@ public class DemoCertprofile extends XijsonCertprofile {
 
   }
 
-  public static final ASN1ObjectIdentifier id_demo_without_conf =
-      new ASN1ObjectIdentifier("1.2.3.4.1");
+  public static final ASN1ObjectIdentifier id_demo_without_conf = new ASN1ObjectIdentifier("1.2.3.4.1");
 
-  public static final ASN1ObjectIdentifier id_demo_with_conf =
-      new ASN1ObjectIdentifier("1.2.3.4.2");
+  public static final ASN1ObjectIdentifier id_demo_with_conf = new ASN1ObjectIdentifier("1.2.3.4.2");
 
   private boolean addExtraWithoutConf;
 
@@ -138,8 +136,7 @@ public class DemoCertprofile extends XijsonCertprofile {
           value = "UNDEF";
         }
 
-        ExtensionValue extnValue = new ExtensionValue(extnControl.isCritical(),
-            new DERUTF8String(name + ": " + value));
+        ExtensionValue extnValue = new ExtensionValue(extnControl.isCritical(), new DERUTF8String(name + ": " + value));
         extnValues.addExtension(type, extnValue);
       }
     }

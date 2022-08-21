@@ -55,8 +55,7 @@ public class HostnameVerifiers {
    */
   public static HostnameVerifier createHostnameVerifier(String hostnameVerifierType)
       throws ObjectCreationException {
-    if (StringUtil.isBlank(hostnameVerifierType)
-        || "default".equalsIgnoreCase(hostnameVerifierType)) {
+    if (StringUtil.isBlank(hostnameVerifierType) || "default".equalsIgnoreCase(hostnameVerifierType)) {
       return null; // not need to specify explicitly.
       // return HttpsURLConnection.getDefaultHostnameVerifier();
     } else if ("no_op".equalsIgnoreCase(hostnameVerifierType)) {
@@ -66,8 +65,7 @@ public class HostnameVerifiers {
       try {
         Class<?> clazz = Class.forName(className, true, HostnameVerifiers.class.getClassLoader());
         return (HostnameVerifier) clazz.newInstance();
-      } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-          | ClassCastException ex) {
+      } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException ex) {
         throw new ObjectCreationException("create not create HostnameVerifier from "
             + className + ": " + ex.getMessage(), ex);
       }

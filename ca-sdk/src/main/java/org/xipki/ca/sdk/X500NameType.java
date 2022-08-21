@@ -64,8 +64,7 @@ public class X500NameType {
       name = (encoded != null) ? X500Name.getInstance(encoded) : new X500Name(text);
       return name;
     } catch (Exception e) {
-      throw new IOException("error parsing X500Name " +
-          (text != null ? text : "0x" + Hex.encode(encoded)));
+      throw new IOException("error parsing X500Name " + (text != null ? text : "0x" + Hex.encode(encoded)));
     }
   }
 

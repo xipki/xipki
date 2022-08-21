@@ -66,9 +66,8 @@ public class OcspCertPublisher extends CertPublisher {
   }
 
   @Override
-  public void initialize(String conf, PasswordResolver passwordResolver,
-      Map<String, FileOrValue> datasourceConfs)
-          throws CertPublisherException {
+  public void initialize(String conf, PasswordResolver passwordResolver, Map<String, FileOrValue> datasourceConfs)
+      throws CertPublisherException {
     Args.notNull(conf, "conf");
 
     ConfPairs pairs = new ConfPairs(conf);
@@ -96,9 +95,9 @@ public class OcspCertPublisher extends CertPublisher {
     }
   } // method initialize
 
-  private DataSourceWrapper loadDatasource(String datasourceName, FileOrValue datasourceConf,
-      PasswordResolver passwordResolver)
-          throws CertPublisherException {
+  private DataSourceWrapper loadDatasource(
+      String datasourceName, FileOrValue datasourceConf, PasswordResolver passwordResolver)
+      throws CertPublisherException {
     try {
       DataSourceWrapper datasource = new DataSourceFactory().createDataSource(
           datasourceName, datasourceConf, passwordResolver);
@@ -112,9 +111,7 @@ public class OcspCertPublisher extends CertPublisher {
     } catch (DataAccessException | PasswordResolverException | IOException
         | RuntimeException ex) {
       throw new CertPublisherException(
-          ex.getClass().getName() + " while parsing datasource " + datasourceName + ": "
-              + ex.getMessage(),
-          ex);
+          ex.getClass().getName() + " while parsing datasource " + datasourceName + ": " + ex.getMessage(), ex);
     }
   } // method loadDatasource
 
@@ -138,8 +135,7 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.addCert(caCert, cert, certInfo.getRevocationInfo());
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.getSubjectText(), cert.getCert(), cert.getCertId(), ex,
-          "could not save certificate");
+      logAndAudit(caCert.getSubjectText(), cert.getCert(), cert.getCertId(), ex, "could not save certificate");
       return false;
     }
   } // method certificateAdded
@@ -169,8 +165,7 @@ public class OcspCertPublisher extends CertPublisher {
     }
   } // method certificateUnrevoked
 
-  private void logAndAudit(String issuer, X509Cert cert, Long certId, Exception ex,
-      String messagePrefix) {
+  private void logAndAudit(String issuer, X509Cert cert, Long certId, Exception ex, String messagePrefix) {
     String subjectText = cert.getSubjectText();
     String serialText = cert.getSerialNumberHex();
 
@@ -209,8 +204,7 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.revokeCa(caCert, revInfo);
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.getIssuerText(), caCert, null, ex,
-          "could not publish revocation of CA");
+      logAndAudit(caCert.getIssuerText(), caCert, null, ex, "could not publish revocation of CA");
       return false;
     }
   } // method caRevoked
@@ -221,8 +215,7 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.unrevokeCa(caCert);
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.getIssuerText(), caCert, null, ex,
-          "could not publish unrevocation of CA");
+      logAndAudit(caCert.getIssuerText(), caCert, null, ex, "could not publish unrevocation of CA");
       return false;
     }
   } // method caUnrevoked

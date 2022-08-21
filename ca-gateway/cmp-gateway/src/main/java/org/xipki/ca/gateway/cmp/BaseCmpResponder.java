@@ -207,8 +207,7 @@ abstract class BaseCmpResponder {
 
   protected BaseCmpResponder(
       CmpControl cmpControl, SdkClient sdk, SecurityFactory securityFactory,
-      CaNameSigners signers, RequestorAuthenticator authenticator,
-      PopControl popControl)
+      CaNameSigners signers, RequestorAuthenticator authenticator, PopControl popControl)
       throws NoSuchAlgorithmException {
     this.sdk = sdk;
     this.securityFactory = securityFactory;
@@ -221,9 +220,8 @@ abstract class BaseCmpResponder {
 
   protected abstract PKIBody cmpEnrollCert(
       String caName, String dfltCertprofileName, boolean groupEnroll,
-      PKIMessage request, PKIHeaderBuilder respHeader,
-      PKIHeader reqHeader, PKIBody reqBody, Requestor requestor,
-      ASN1OctetString tid, AuditEvent event)
+      PKIMessage request, PKIHeaderBuilder respHeader, PKIHeader reqHeader, PKIBody reqBody,
+      Requestor requestor, ASN1OctetString tid, AuditEvent event)
       throws InsufficientPermissionException, SdkErrorResponseException;
 
   protected abstract PKIBody cmpUnRevokeCertificates(
@@ -231,11 +229,12 @@ abstract class BaseCmpResponder {
       PKIBody reqBody, Requestor requestor, AuditEvent event)
       throws SdkErrorResponseException;
 
-  protected abstract PKIBody confirmCertificates(String caName, ASN1OctetString transactionId,
-      CertConfirmContent certConf) throws SdkErrorResponseException;
+  protected abstract PKIBody confirmCertificates(
+      String caName, ASN1OctetString transactionId, CertConfirmContent certConf)
+      throws SdkErrorResponseException;
 
-  protected abstract PKIBody revokePendingCertificates(
-      String caName, ASN1OctetString transactionId) throws SdkErrorResponseException;
+  protected abstract PKIBody revokePendingCertificates(String caName, ASN1OctetString transactionId)
+      throws SdkErrorResponseException;
 
   private Requestor getCertRequestor(
       X500Name requestorSender, byte[] senderKID, CMPCertificate[] extraCerts) {
@@ -347,8 +346,7 @@ abstract class BaseCmpResponder {
         CertConfirmContent certConf = (CertConfirmContent) reqBody.getContent();
         respBody = confirmCertificates(caName, tid, certConf);
       } else if (type == PKIBody.TYPE_REVOCATION_REQ) {
-        respBody = cmpUnRevokeCertificates(caName, request, respHeader, reqHeader,
-            reqBody, requestor, event);
+        respBody = cmpUnRevokeCertificates(caName, request, respHeader, reqHeader, reqBody, requestor, event);
       } else if (type == PKIBody.TYPE_CONFIRM) {
         event.addEventType(TYPE_pkiconf);
         respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
@@ -359,13 +357,11 @@ abstract class BaseCmpResponder {
         respBody = revokePendingCertificates(caName, tid);
       } else {
         event.addEventType("PKIBody." + type);
-        respBody = buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
-            "unsupported type " + type);
+        respBody = buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest, "unsupported type " + type);
       }
     } catch (InsufficientPermissionException ex) {
-      ErrorMsgContent emc = new ErrorMsgContent(
-          new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(ex.getMessage()),
-              new PKIFailureInfo(PKIFailureInfo.notAuthorized)));
+      ErrorMsgContent emc = new ErrorMsgContent( new PKIStatusInfo(
+          PKIStatus.rejection, new PKIFreeText(ex.getMessage()), new PKIFailureInfo(PKIFailureInfo.notAuthorized)));
 
       respBody = new PKIBody(PKIBody.TYPE_ERROR, emc);
     } catch (SdkErrorResponseException ex) {
@@ -394,8 +390,7 @@ abstract class BaseCmpResponder {
   } // method processPKIMessage0
 
   public PKIMessage processPkiMessage(
-      String caName, PKIMessage pkiMessage, X509Cert tlsClientCert,
-      Map<String, String> parameters, AuditEvent event) {
+      String caName, PKIMessage pkiMessage, X509Cert tlsClientCert, Map<String, String> parameters, AuditEvent event) {
     notNull(pkiMessage, "pkiMessage");
     notNull(event, "event");
     GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
@@ -415,8 +410,7 @@ abstract class BaseCmpResponder {
     if (reqPvno < PVNO_CMP2000) {
       event.update(AuditLevel.INFO, AuditStatus.FAILED);
       event.addEventData(NAME_message, "unsupported version " + reqPvno);
-      return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.unsupportedVersion,
-          null, respSender);
+      return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.unsupportedVersion, null, respSender);
     }
 
     Integer failureCode = null;
@@ -440,8 +434,7 @@ abstract class BaseCmpResponder {
       // consider the empty DN
       if ((rdns != null && rdns.length > 0) // Not an empty DN
           && !signer.getCertificate().getSubject().equals(x500Name)) {
-        LOG.warn("tid={}: I am not the intended recipient, but '{}'",
-            tid, reqHeader.getRecipient());
+        LOG.warn("tid={}: I am not the intended recipient, but '{}'", tid, reqHeader.getRecipient());
         failureCode = PKIFailureInfo.badRequest;
         statusText = "I am not the intended recipient";
       }
@@ -506,8 +499,7 @@ abstract class BaseCmpResponder {
             errorStatus = "request is protected by MAC but the algorithm is forbidden";
             break;
           default:
-            throw new IllegalStateException(
-                "should not reach here, unknown ProtectionResult " + pr);
+            throw new IllegalStateException("should not reach here, unknown ProtectionResult " + pr);
         }
 
         requestor = (Requestor) verificationResult.getRequestor();
@@ -523,8 +515,7 @@ abstract class BaseCmpResponder {
       if (requestor != null) {
         errorStatus = null;
       } else {
-        LOG.warn("tid={}: not authorized requestor (TLS client '{}')", tid,
-            tlsClientCert.getSubjectText());
+        LOG.warn("tid={}: not authorized requestor (TLS client '{}')", tid, tlsClientCert.getSubjectText());
         errorStatus = "requestor (TLS client certificate) is not authorized";
       }
     } else {
@@ -541,12 +532,10 @@ abstract class BaseCmpResponder {
     if (errorStatus != null) {
       event.update(AuditLevel.INFO, AuditStatus.FAILED);
       event.addEventData(NAME_message, errorStatus);
-      return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck,
-          errorStatus, respSender);
+      return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck, errorStatus, respSender);
     }
 
-    PKIMessage resp = processPkiMessage0(
-        caName, pkiMessage, requestor, tid, message, parameters, event);
+    PKIMessage resp = processPkiMessage0(caName, pkiMessage, requestor, tid, message, parameters, event);
 
     if (isProtected) {
       resp = addProtection(signer, resp, event, requestor);
@@ -570,8 +559,7 @@ abstract class BaseCmpResponder {
     return bytes;
   } // method randomBytes
 
-  private ProtectionVerificationResult verifyProtection(
-      String tid, GeneralPKIMessage pkiMessage)
+  private ProtectionVerificationResult verifyProtection(String tid, GeneralPKIMessage pkiMessage)
       throws CMPException, InvalidKeyException {
     ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
@@ -580,8 +568,7 @@ abstract class BaseCmpResponder {
     AlgorithmIdentifier protectionAlg = header.getProtectionAlg();
 
     if (protectedMsg.hasPasswordBasedMacProtection()) {
-      PBMParameter parameter = PBMParameter.getInstance(
-          pkiMessage.getHeader().getProtectionAlg().getParameters());
+      PBMParameter parameter = PBMParameter.getInstance(pkiMessage.getHeader().getProtectionAlg().getParameters());
       HashAlgo owfAlg;
       try {
         owfAlg = HashAlgo.getInstance(parameter.getOwf());
@@ -626,8 +613,7 @@ abstract class BaseCmpResponder {
           macValid ? ProtectionResult.MAC_VALID : ProtectionResult.MAC_INVALID);
     } else {
       if (!cmpControl.getSigAlgoValidator().isAlgorithmPermitted(protectionAlg)) {
-        LOG.warn("SIG_ALGO_FORBIDDEN: {}",
-            pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
+        LOG.warn("SIG_ALGO_FORBIDDEN: {}", pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
         return new ProtectionVerificationResult(null, ProtectionResult.SIGNATURE_ALGO_FORBIDDEN);
       }
 
@@ -639,12 +625,10 @@ abstract class BaseCmpResponder {
         return new ProtectionVerificationResult(null, ProtectionResult.SENDER_NOT_AUTHORIZED);
       }
 
-      ContentVerifierProvider verifierProvider = securityFactory.getContentVerifierProvider(
-          requestor.getCert());
+      ContentVerifierProvider verifierProvider = securityFactory.getContentVerifierProvider(requestor.getCert());
       if (verifierProvider == null) {
         LOG.warn("tid={}: not authorized requestor '{}'", tid, header.getSender());
-        return new ProtectionVerificationResult(requestor,
-            ProtectionResult.SENDER_NOT_AUTHORIZED);
+        return new ProtectionVerificationResult(requestor, ProtectionResult.SENDER_NOT_AUTHORIZED);
       }
 
       boolean signatureValid = protectedMsg.verify(verifierProvider);
@@ -654,20 +638,16 @@ abstract class BaseCmpResponder {
   } // method verifyProtection
 
   private PKIMessage addProtection(
-      ConcurrentContentSigner signer, PKIMessage pkiMessage, AuditEvent event,
-      Requestor requestor) {
+      ConcurrentContentSigner signer, PKIMessage pkiMessage, AuditEvent event, Requestor requestor) {
     GeneralName respSender = pkiMessage.getHeader().getSender();
     try {
       if (requestor.getCert() != null) {
-        return CmpUtil.addProtection(pkiMessage, signer, respSender,
-                cmpControl.isSendResponderCert());
+        return CmpUtil.addProtection(pkiMessage, signer, respSender, cmpControl.isSendResponderCert());
       } else {
-        PBMParameter parameter = new PBMParameter(randomSalt(),
-            cmpControl.getResponsePbmOwf().getAlgorithmIdentifier(),
-            cmpControl.getResponsePbmIterationCount(),
-            cmpControl.getResponsePbmMac().getAlgorithmIdentifier());
-        return CmpUtil.addProtection(pkiMessage, requestor.getPassword(), parameter,
-            respSender, requestor.getKeyId());
+        PBMParameter parameter = new PBMParameter(
+            randomSalt(), cmpControl.getResponsePbmOwf().getAlgorithmIdentifier(),
+            cmpControl.getResponsePbmIterationCount(), cmpControl.getResponsePbmMac().getAlgorithmIdentifier());
+        return CmpUtil.addProtection(pkiMessage, requestor.getPassword(), parameter, respSender, requestor.getKeyId());
       }
     } catch (Exception ex) {
       LogUtil.error(LOG, ex, "could not add protection to the PKI message");
@@ -682,8 +662,7 @@ abstract class BaseCmpResponder {
   } // method addProtection
 
   private PKIMessage buildErrorPkiMessage(
-      ASN1OctetString tid, PKIHeader requestHeader,
-      int failureCode, String statusText, GeneralName respSender) {
+      ASN1OctetString tid, PKIHeader requestHeader, int failureCode, String statusText, GeneralName respSender) {
     GeneralName respRecipient = requestHeader.getSender();
 
     PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
@@ -709,8 +688,7 @@ abstract class BaseCmpResponder {
     return generateRejectionStatus(PKIStatus.rejection, info, errorMessage);
   } // method generateCmpRejectionStatus
 
-  protected static PKIStatusInfo generateRejectionStatus(PKIStatus status, Integer info,
-      String errorMessage) {
+  protected static PKIStatusInfo generateRejectionStatus(PKIStatus status, Integer info, String errorMessage) {
     PKIFreeText statusMessage = (errorMessage == null) ? null : new PKIFreeText(errorMessage);
     PKIFailureInfo failureInfo = (info == null) ? null : new PKIFailureInfo(info);
     return new PKIStatusInfo(status, statusMessage, failureInfo);
@@ -724,8 +702,8 @@ abstract class BaseCmpResponder {
   protected void checkPermission(Requestor requestor, int requiredPermission)
       throws InsufficientPermissionException {
     if (!requestor.isPermitted(requiredPermission)) {
-      throw new InsufficientPermissionException("Permission "
-          + PermissionConstants.getTextForCode(requiredPermission) + "is not permitted");
+      throw new InsufficientPermissionException(
+          "Permission " + PermissionConstants.getTextForCode(requiredPermission) + "is not permitted");
     }
   } // method checkPermission
 
@@ -740,14 +718,12 @@ abstract class BaseCmpResponder {
   protected static CertRepMessage buildErrCertResp(ASN1Integer certReqId, int pkiFailureInfo,
       String pkiStatusText) {
     return new CertRepMessage(null,
-        new CertResponse[]{new CertResponse(certReqId,
-            generateRejectionStatus(pkiFailureInfo, pkiStatusText))});
+        new CertResponse[]{new CertResponse(certReqId, generateRejectionStatus(pkiFailureInfo, pkiStatusText))});
   }
 
-  protected static void addErrCertResp(Map<Integer, CertResponse> resps, int index,
-      ASN1Integer certReqId, int pkiFailureInfo, String pkiStatusText) {
-    resps.put(index, new CertResponse(certReqId,
-        generateRejectionStatus(pkiFailureInfo, pkiStatusText)));
+  protected static void addErrCertResp(
+      Map<Integer, CertResponse> resps, int index, ASN1Integer certReqId, int pkiFailureInfo, String pkiStatusText) {
+    resps.put(index, new CertResponse(certReqId, generateRejectionStatus(pkiFailureInfo, pkiStatusText)));
   }
 
   protected boolean verifyPop(CertificateRequestMessage certRequest, SubjectPublicKeyInfo spki) {
@@ -795,8 +771,7 @@ abstract class BaseCmpResponder {
         }
       }
 
-      ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(
-          publicKey, kaKeyAndCert);
+      ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(publicKey, kaKeyAndCert);
       return certRequest.isValidSigningKeyPOP(cvp);
     } catch (InvalidKeyException | IllegalStateException | CRMFException ex) {
       LogUtil.error(LOG, ex);
@@ -806,8 +781,7 @@ abstract class BaseCmpResponder {
 
   protected static CertResponse postProcessException(ASN1Integer certReqId, OperationException ex) {
     ErrorCode code = ex.getErrorCode();
-    LOG.warn("generate certificate, OperationException: code={}, message={}",
-        code.name(), ex.getErrorMessage());
+    LOG.warn("generate certificate, OperationException: code={}, message={}", code.name(), ex.getErrorMessage());
 
     String errorMessage;
     if (code == ErrorCode.DATABASE_FAILURE || code == ErrorCode.SYSTEM_FAILURE) {
@@ -823,8 +797,7 @@ abstract class BaseCmpResponder {
   protected CertResponse postProcessCertInfo(
       ASN1Integer certReqId, Requestor requestor, byte[] cert, byte[] privateKeyinfo) {
     PKIStatusInfo statusInfo = new PKIStatusInfo(PKIStatus.granted);
-    CertOrEncCert cec = new CertOrEncCert(
-        new CMPCertificate(org.bouncycastle.asn1.x509.Certificate.getInstance(cert)));
+    CertOrEncCert cec = new CertOrEncCert(new CMPCertificate(org.bouncycastle.asn1.x509.Certificate.getInstance(cert)));
     if (privateKeyinfo == null) {
       // no private key will be returned.
       return new CertResponse(certReqId, statusInfo, new CertifiedKeyPair(cec), null);
@@ -851,8 +824,7 @@ abstract class BaseCmpResponder {
         } else {
           String msg = "Requestors's private key can not be used for encryption";
           LOG.error(msg);
-          return new CertResponse(certReqId,
-              new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(msg)));
+          return new CertResponse(certReqId, new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(msg)));
         }
 
         byte[] symmKeyBytes;
@@ -877,8 +849,7 @@ abstract class BaseCmpResponder {
           }
         }
 
-        Cipher dataCipher = (cipher0 != null)
-            ? cipher0.value() : Cipher.getInstance(symmAlgOid.getId());
+        Cipher dataCipher = (cipher0 != null) ? cipher0.value() : Cipher.getInstance(symmAlgOid.getId());
 
         byte[] encValue;
         try {
@@ -944,8 +915,7 @@ abstract class BaseCmpResponder {
           }
         }
 
-        Cipher dataCipher = (cipher0 != null)
-            ? cipher0.value() : Cipher.getInstance(encAlgOid.getId());
+        Cipher dataCipher = (cipher0 != null) ? cipher0.value() : Cipher.getInstance(encAlgOid.getId());
 
         byte[] encValue;
         try {
@@ -969,8 +939,7 @@ abstract class BaseCmpResponder {
     } catch (Throwable th) {
       String msg = "error while encrypting the private key";
       LOG.error(msg);
-      return new CertResponse(certReqId,
-          new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(msg)));
+      return new CertResponse(certReqId, new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(msg)));
     }
 
     return new CertResponse(certReqId, statusInfo, new CertifiedKeyPair(cec, encKey, null), null);
@@ -994,8 +963,7 @@ abstract class BaseCmpResponder {
     }
 
     if (itv == null) {
-      String statusMessage = "PKIBody type " + PKIBody.TYPE_GEN_MSG
-          + " with given sub-type is not supported";
+      String statusMessage = "PKIBody type " + PKIBody.TYPE_GEN_MSG + " with given sub-type is not supported";
       return buildErrorMsgPkiBody(rejection, badRequest, statusMessage);
     }
 
@@ -1027,8 +995,7 @@ abstract class BaseCmpResponder {
       }
     } catch (IOException e) {
       LogUtil.error(LOG, e);
-      return new PKIBody(PKIBody.TYPE_ERROR,
-          buildErrorMsgPkiBody(rejection, systemFailure, null));
+      return new PKIBody(PKIBody.TYPE_ERROR, buildErrorMsgPkiBody(rejection, systemFailure, null));
     }
 
     GenRepContent genRepContent = new GenRepContent(itvResp);
@@ -1040,8 +1007,7 @@ abstract class BaseCmpResponder {
     try {
       code = ErrorCode.ofCode(errorCode);
     } catch (Exception ex) {
-      LOG.warn("unknown error code {}, map it to {}",
-          errorCode, ErrorCode.SYSTEM_FAILURE);
+      LOG.warn("unknown error code {}, map it to {}", errorCode, ErrorCode.SYSTEM_FAILURE);
       code = ErrorCode.SYSTEM_FAILURE;
     }
     return buildPKIStatusInfo(code, message);

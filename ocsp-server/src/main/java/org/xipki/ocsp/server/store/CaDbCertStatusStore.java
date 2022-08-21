@@ -183,8 +183,7 @@ public class CaDbCertStatusStore extends OcspStore {
             X509Cert cert = X509Util.parseCert(certBytes);
 
             IssuerEntry caInfoEntry = new IssuerEntry(rs.getInt("ID"), cert);
-            RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1,
-                caInfoEntry.getEncodedHash(HashAlgo.SHA1));
+            RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1, caInfoEntry.getEncodedHash(HashAlgo.SHA1));
             for (IssuerEntry existingIssuer : caInfos) {
               if (existingIssuer.matchHash(reqIssuer)) {
                 throw new Exception("found at least two issuers with the same subject and key");
@@ -225,10 +224,10 @@ public class CaDbCertStatusStore extends OcspStore {
   } // method updateIssuerStore
 
   @Override
-  protected CertStatusInfo getCertStatus0(Date time, RequestIssuer reqIssuer,
-      BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
-      boolean inheritCaRevocation)
-          throws OcspStoreException {
+  protected CertStatusInfo getCertStatus0(
+      Date time, RequestIssuer reqIssuer, BigInteger serialNumber,
+      boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
+      throws OcspStoreException {
     if (serialNumber.signum() != 1) { // non-positive serial number
       return CertStatusInfo.getUnknownCertStatusInfo(new Date(), null);
     }
@@ -319,15 +318,12 @@ public class CaDbCertStatusStore extends OcspStore {
       } else {
         byte[] certHash = (b64CertHash == null) ? null : Base64.decodeFast(b64CertHash);
         if (revoked) {
-          Date invTime = (invalTime == 0 || invalTime == revTime)
-              ? null : new Date(invalTime * 1000);
-          CertRevocationInfo revInfo = new CertRevocationInfo(reason,
-              new Date(revTime * 1000), invTime);
+          Date invTime = (invalTime == 0 || invalTime == revTime) ? null : new Date(invalTime * 1000);
+          CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(revTime * 1000), invTime);
           certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
               certHashAlgo, certHash, thisUpdate, nextUpdate, null);
         } else {
-          certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo,
-              certHash, thisUpdate, nextUpdate, null);
+          certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, certHash, thisUpdate, nextUpdate, null);
         }
       }
 
@@ -339,8 +335,7 @@ public class CaDbCertStatusStore extends OcspStore {
             date = issuer.getNotBefore();
           } else {
             long nowInMs = System.currentTimeMillis();
-            long dateInMs = Math.max(issuer.getNotBefore().getTime(),
-                nowInMs - DAY * retentionInterval);
+            long dateInMs = Math.max(issuer.getNotBefore().getTime(), nowInMs - DAY * retentionInterval);
             date = new Date(dateInMs);
           }
 
@@ -362,8 +357,7 @@ public class CaDbCertStatusStore extends OcspStore {
           replaced = true;
         }
       } else if (certStatus == CertStatus.REVOKED) {
-        if (certStatusInfo.getRevocationInfo().getRevocationTime().after(
-              caRevInfo.getRevocationTime())) {
+        if (certStatusInfo.getRevocationInfo().getRevocationTime().after(caRevInfo.getRevocationTime())) {
           replaced = true;
         }
       }
@@ -450,10 +444,8 @@ public class CaDbCertStatusStore extends OcspStore {
 
     this.datasource = notNull(datasource, "datasource");
 
-    sqlCs = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,RIT FROM CERT WHERE CA_ID=? AND SN=?");
-    sqlCsNoRit = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT FROM CERT WHERE CA_ID=? AND SN=?");
+    sqlCs = datasource.buildSelectFirstSql(1, "NBEFORE,NAFTER,REV,RR,RT,RIT FROM CERT WHERE CA_ID=? AND SN=?");
+    sqlCsNoRit = datasource.buildSelectFirstSql(1, "NBEFORE,NAFTER,REV,RR,RT FROM CERT WHERE CA_ID=? AND SN=?");
 
     sqlCsWithCertHash = datasource.buildSelectFirstSql(1,
         "NBEFORE,NAFTER,REV,RR,RT,RIT,SHA1 FROM CERT WHERE CA_ID=? AND SN=?");
@@ -495,8 +487,7 @@ public class CaDbCertStatusStore extends OcspStore {
         long intervalSeconds = updateInterval.approxMinutes() * 60;
         for (Runnable service : scheduledServices) {
           this.scheduledThreadPoolExecutor.scheduleAtFixedRate(service,
-              intervalSeconds + RandomUtil.nextInt(60), intervalSeconds,
-              TimeUnit.SECONDS);
+              intervalSeconds + RandomUtil.nextInt(60), intervalSeconds, TimeUnit.SECONDS);
         }
       }
     }

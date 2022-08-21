@@ -281,8 +281,7 @@ public class Securities implements Closeable {
           Class<?> clazz = Class.forName(className);
           SignerFactory factory = (SignerFactory) clazz.newInstance();
           signerFactoryRegister.registFactory(factory);
-        } catch (ClassCastException | ClassNotFoundException | IllegalAccessException
-            | InstantiationException ex) {
+        } catch (ClassCastException | ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
           throw new InvalidConfException("error caught while initializing SignerFactory "
               + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
@@ -296,8 +295,7 @@ public class Securities implements Closeable {
           Class<?> clazz = Class.forName(className);
           KeypairGeneratorFactory factory = (KeypairGeneratorFactory) clazz.newInstance();
           keypairFactoryRegister.registFactory(factory);
-        } catch (ClassCastException | ClassNotFoundException | IllegalAccessException
-            | InstantiationException ex) {
+        } catch (ClassCastException | ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
           throw new InvalidConfException("error caught while initializing KeypairGeneratorFactory "
               + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
@@ -306,10 +304,8 @@ public class Securities implements Closeable {
   } // method initSecurityFactory
 
   private void initSecurityPkcs11(
-      FileOrValue pkcs11Conf,
-      SignerFactoryRegisterImpl signerFactoryRegister,
-      DfltKeypairGeneratorFactory dfltKeypairGeneratorFactory,
-      PasswordResolver passwordResolver)
+      FileOrValue pkcs11Conf, SignerFactoryRegisterImpl signerFactoryRegister,
+      DfltKeypairGeneratorFactory dfltKeypairGeneratorFactory, PasswordResolver passwordResolver)
       throws InvalidConfException {
     p11ModuleFactoryRegister = new P11ModuleFactoryRegisterImpl();
     for (P11ModuleFactory m : p11ModuleFactories) {

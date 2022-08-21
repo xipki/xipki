@@ -183,8 +183,7 @@ public class CertificatePolicies extends ValidatableConf {
     return new org.bouncycastle.asn1.x509.CertificatePolicies(infos);
   } // method toXiCertificatePolicies
 
-  private  static ASN1Sequence createPolicyQualifiers(
-      List<CertificatePolicyQualifier> qualifiers) {
+  private  static ASN1Sequence createPolicyQualifiers(List<CertificatePolicyQualifier> qualifiers) {
     Args.notNull(qualifiers, "qualifiers");
     List<PolicyQualifierInfo> qualifierInfos = new ArrayList<>(qualifiers.size());
     for (CertificatePolicyQualifier qualifier : qualifiers) {

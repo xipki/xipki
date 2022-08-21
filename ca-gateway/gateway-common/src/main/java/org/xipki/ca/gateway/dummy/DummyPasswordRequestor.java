@@ -25,9 +25,7 @@ public class DummyPasswordRequestor implements Requestor {
   private static Map<String, char[]> passwordMap = new HashMap<>();
 
   static {
-    System.err.println("DO NOT USE "
-        + DummyPasswordRequestor.class.getName()
-        + " IN THE PRODUCT ENVIRONMENT");
+    System.err.println("DO NOT USE " + DummyPasswordRequestor.class.getName() + " IN THE PRODUCT ENVIRONMENT");
     passwordMap.put("user1", "password1".toCharArray());
     passwordMap.put("user2", "password2".toCharArray());
   }
@@ -82,8 +80,7 @@ public class DummyPasswordRequestor implements Requestor {
 
   @Override
   public boolean authenticate(byte[] password) {
-    char[] charPassword = password == null ? null
-        : new String(password, StandardCharsets.UTF_8).toCharArray();
+    char[] charPassword = password == null ? null : new String(password, StandardCharsets.UTF_8).toCharArray();
     return authenticate(charPassword);
   }
 

@@ -90,8 +90,7 @@ public class QaP11Actions {
 
   } // class P11provSm2Test
 
-  @Command(scope = "qa", name = "p11prov-test",
-      description = "test the Xipki PKCS#11 JCA/JCE provider")
+  @Command(scope = "qa", name = "p11prov-test", description = "test the Xipki PKCS#11 JCA/JCE provider")
   @Service
   public static class P11provTest extends P11SecurityAction {
 
@@ -99,18 +98,15 @@ public class QaP11Actions {
     @Completion(Completers.HashAlgCompleter.class)
     protected String hashAlgo = "SHA256";
 
-    @Option(name = "--rsa-pss",
-        description = "whether to use the RSAPSS for the POP computation\n"
+    @Option(name = "--rsa-pss", description = "whether to use the RSAPSS for the POP computation\n"
             + "(only applied to RSA key)")
     private Boolean rsaPss = Boolean.FALSE;
 
-    @Option(name = "--dsa-plain",
-        description = "whether to use the Plain DSA for the POP computation\n"
+    @Option(name = "--dsa-plain", description = "whether to use the Plain DSA for the POP computation\n"
             + "(only applied to ECDSA key)")
     private Boolean dsaPlain = Boolean.FALSE;
 
-    @Option(name = "--gm",
-        description = "whether to use the chinese GM algorithm for the POP computation\n"
+    @Option(name = "--gm", description = "whether to use the chinese GM algorithm for the POP computation\n"
             + "(only applied to EC key with GM curves)")
     private Boolean gm = Boolean.FALSE;
 
@@ -158,18 +154,15 @@ public class QaP11Actions {
     @Option(name = "--slot", description = "slot index")
     protected int slotIndex = 0;
 
-    @Option(name = "--id",
-        description = "id of the private key in the PKCS#11 device\n"
+    @Option(name = "--id", description = "id of the private key in the PKCS#11 device\n"
             + "either keyId or keyLabel must be specified")
     protected String id;
 
-    @Option(name = "--label",
-        description = "label of the private key in the PKCS#11 device\n"
+    @Option(name = "--label", description = "label of the private key in the PKCS#11 device\n"
             + "either keyId or keyLabel must be specified")
     protected String label;
 
-    @Option(name = "--verbose", aliases = "-v",
-        description = "show object information verbosely")
+    @Option(name = "--verbose", aliases = "-v", description = "show object information verbosely")
     protected Boolean verbose = Boolean.FALSE;
 
     @Reference (optional = true)
@@ -181,14 +174,12 @@ public class QaP11Actions {
     protected String getAlias()
         throws IllegalCmdParamException {
       if (label != null && id == null) {
-        return StringUtil.concat(moduleName, "#slotindex-", Integer.toString(slotIndex),
-            "#keylabel-", label);
+        return StringUtil.concat(moduleName, "#slotindex-", Integer.toString(slotIndex), "#keylabel-", label);
       } else if (label == null && id != null) {
         return StringUtil.concat(moduleName, "#slotindex-", Integer.toString(slotIndex),
             "#keyid-", id.toLowerCase());
       } else {
-        throw new IllegalCmdParamException(
-            "exactly one of id or label should be specified");
+        throw new IllegalCmdParamException("exactly one of id or label should be specified");
       }
     }
 

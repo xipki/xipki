@@ -43,8 +43,7 @@ public class RevokeCertRequest {
 
     private byte[] authorityKeyIdentifier;
 
-    public Entry(String id, X500Name issuer, BigInteger serialNumber, int reason,
-        Date invalidityDate) {
+    public Entry(String id, X500Name issuer, BigInteger serialNumber, int reason, Date invalidityDate) {
       super(id, issuer, serialNumber);
 
       if (!(reason >= 0 && reason <= 10 && reason != 7)) {

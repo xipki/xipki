@@ -251,19 +251,15 @@ public class XijsonExtensions {
     if (subjectControl.getControl(ObjectIdentifiers.DN.emailAddress) != null) {
       ASN1ObjectIdentifier type = ObjectIdentifiers.DN.emailAddress;
 
-      if (subjectToSubjectAltNameModes == null
-          || subjectToSubjectAltNameModes.get(type) == null) {
-        throw new CertprofileException("subjectToSubjectAltNames for "
-            + ObjectIdentifiers.oidToDisplayName(type)
+      if (subjectToSubjectAltNameModes == null || subjectToSubjectAltNameModes.get(type) == null) {
+        throw new CertprofileException("subjectToSubjectAltNames for " + ObjectIdentifiers.oidToDisplayName(type)
             + " must be configured if subject RDN emailAddress is permitted");
       }
 
       GeneralNameTag nameTag = subjectToSubjectAltNameModes.get(type);
       if (nameTag != GeneralNameTag.rfc822Name) {
-        throw new CertprofileException("For the RDN "
-            + ObjectIdentifiers.DN.emailAddress.getId()
-            + ", only target SubjectAltName type rfc822Name is permitted, but not "
-            + nameTag);
+        throw new CertprofileException("For the RDN " + ObjectIdentifiers.DN.emailAddress.getId()
+            + ", only target SubjectAltName type rfc822Name is permitted, but not " + nameTag);
       }
     }
 
@@ -288,8 +284,7 @@ public class XijsonExtensions {
           }
 
           if (!allowed) {
-            throw new CertprofileException("target SubjectAltName type " + nameTag
-                + " is not allowed");
+            throw new CertprofileException("target SubjectAltName type " + nameTag + " is not allowed");
           }
         }
       }
@@ -357,23 +352,20 @@ public class XijsonExtensions {
     }
   } // method initSubjectToSubjectAltNames
 
-  private void initAdditionalInformation(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) {
+  private void initAdditionalInformation(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
     ASN1ObjectIdentifier type = Extn.id_extension_additionalInformation;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       AdditionalInformation extConf = getExtension(type, extensions).getAdditionalInformation();
       if (extConf != null) {
         ASN1Encodable extValue = extConf.getType().createDirectoryString(extConf.getText());
-        additionalInformation =
-            new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+        additionalInformation = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
       }
     }
   } // method initAdditionalInformation
 
-  private void initAdmission(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions)
-          throws CertprofileException {
+  private void initAdmission(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
+      throws CertprofileException {
     ASN1ObjectIdentifier type = Extn.id_extension_admission;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -390,8 +382,7 @@ public class XijsonExtensions {
     }
   } // method initAdmission
 
-  private void initAuthorityInfoAccess(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) {
+  private void initAuthorityInfoAccess(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
     ASN1ObjectIdentifier type = Extension.authorityInfoAccess;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -405,8 +396,7 @@ public class XijsonExtensions {
     }
   } // method initAuthorityInfoAccess
 
-  private void initAuthorityKeyIdentifier(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) {
+  private void initAuthorityKeyIdentifier(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
     ASN1ObjectIdentifier type = Extension.authorityKeyIdentifier;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -415,8 +405,7 @@ public class XijsonExtensions {
     }
   } // method initAuthorityKeyIdentifier
 
-  private void initSubjectKeyIdentifier(Set<ASN1ObjectIdentifier> extnIds,
-                                          Map<String, ExtensionType> extensions) {
+  private void initSubjectKeyIdentifier(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
     ASN1ObjectIdentifier type = Extension.subjectKeyIdentifier;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -424,8 +413,7 @@ public class XijsonExtensions {
     }
   } // method initSubjectKeyIdentifier
 
-  private void initBasicConstraints(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) {
+  private void initBasicConstraints(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
     ASN1ObjectIdentifier type = Extension.basicConstraints;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -436,9 +424,8 @@ public class XijsonExtensions {
     }
   } // method initBasicConstraints
 
-  private void initBiometricInfo(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions)
-          throws CertprofileException {
+  private void initBiometricInfo(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
+      throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.biometricInfo;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -453,8 +440,7 @@ public class XijsonExtensions {
     }
   } // method initBiometricInfo
 
-  private void initCertificatePolicies(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) {
+  private void initCertificatePolicies(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
     ASN1ObjectIdentifier type = Extension.certificatePolicies;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -465,19 +451,16 @@ public class XijsonExtensions {
     }
   } // method initCertificatePolicies
 
-  private void initCrlDistributionPoints(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) {
+  private void initCrlDistributionPoints(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
     ASN1ObjectIdentifier type = Extension.cRLDistributionPoints;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       CrlDistributionPoints extConf = getExtension(type, extensions).getCrlDistributionPoints();
-      crlDpControl = new CrlDistributionPointsControl(
-                      extConf == null ? null : extConf.getProtocols());
+      crlDpControl = new CrlDistributionPointsControl(extConf == null ? null : extConf.getProtocols());
     }
   } // method initCrlDistributionPoints
 
-  private void initExtendedKeyUsage(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) {
+  private void initExtendedKeyUsage(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
     ASN1ObjectIdentifier type = Extension.extendedKeyUsage;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -488,20 +471,17 @@ public class XijsonExtensions {
     }
   } // method initExtendedKeyUsage
 
-  private void initFreshestCrl(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) {
+  private void initFreshestCrl(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
     ASN1ObjectIdentifier type = Extension.freshestCRL;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       CrlDistributionPoints extConf = getExtension(type, extensions).getFreshestCrl();
-      freshestCrlControl = new CrlDistributionPointsControl(
-                            extConf == null ? null : extConf.getProtocols());
+      freshestCrlControl = new CrlDistributionPointsControl(extConf == null ? null : extConf.getProtocols());
     }
   } // method initFreshestCrl
 
-  private void initInhibitAnyPolicy(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions)
-          throws CertprofileException {
+  private void initInhibitAnyPolicy(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
+      throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.inhibitAnyPolicy;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -509,8 +489,7 @@ public class XijsonExtensions {
       if (extConf != null) {
         int skipCerts = extConf.getSkipCerts();
         if (skipCerts < 0) {
-          throw new CertprofileException(
-              "negative inhibitAnyPolicy.skipCerts is not allowed: " + skipCerts);
+          throw new CertprofileException("negative inhibitAnyPolicy.skipCerts is not allowed: " + skipCerts);
         }
         ASN1Integer value = new ASN1Integer(BigInteger.valueOf(skipCerts));
         this.inhibitAnyPolicy = new ExtensionValue(extensionControls.get(type).isCritical(), value);
@@ -518,8 +497,7 @@ public class XijsonExtensions {
     }
   } // method initInhibitAnyPolicy
 
-  private void initKeyUsage(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) {
+  private void initKeyUsage(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
     ASN1ObjectIdentifier type = Extension.keyUsage;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -530,9 +508,8 @@ public class XijsonExtensions {
     }
   } // method initKeyUsage
 
-  private void initNameConstraints(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions)
-          throws CertprofileException {
+  private void initNameConstraints(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
+      throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.nameConstraints;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -544,8 +521,7 @@ public class XijsonExtensions {
     }
   } // method initNameConstraints
 
-  private void initPrivateKeyUsagePeriod(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) {
+  private void initPrivateKeyUsagePeriod(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
     ASN1ObjectIdentifier type = Extension.privateKeyUsagePeriod;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -556,23 +532,20 @@ public class XijsonExtensions {
     }
   } // method initPrivateKeyUsagePeriod
 
-  private void initPolicyConstraints(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions)
-          throws CertprofileException {
+  private void initPolicyConstraints(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
+      throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.policyConstraints;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       PolicyConstraints extConf = getExtension(type, extensions).getPolicyConstraints();
       if (extConf != null) {
         ASN1Sequence value = extConf.toXiPolicyConstrains();
-        this.policyConstraints =
-            new ExtensionValue(extensionControls.get(type).isCritical(), value);
+        this.policyConstraints = new ExtensionValue(extensionControls.get(type).isCritical(), value);
       }
     }
   } // method initPolicyConstraints
 
-  private void initPolicyMappings(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) {
+  private void initPolicyMappings(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
     ASN1ObjectIdentifier type = Extension.policyMappings;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -584,9 +557,8 @@ public class XijsonExtensions {
     }
   } // method initPolicyMappings
 
-  private void initQcStatements(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions)
-          throws CertprofileException {
+  private void initQcStatements(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
+      throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.qCStatements;
     if (!extensionControls.containsKey(type)) {
       return;
@@ -604,8 +576,7 @@ public class XijsonExtensions {
     boolean requireInfoFromReq = false;
 
     for (QcStatementType m : qcStatementTypes) {
-      ASN1ObjectIdentifier qcStatementId = new ASN1ObjectIdentifier(
-          m.getStatementId().getOid());
+      ASN1ObjectIdentifier qcStatementId = new ASN1ObjectIdentifier(m.getStatementId().getOid());
       QcStatementOption qcStatementOption;
 
       QcStatementValueType statementValue = m.getStatementValue();
@@ -613,14 +584,12 @@ public class XijsonExtensions {
         QCStatement qcStatment = new QCStatement(qcStatementId);
         qcStatementOption = new QcStatementOption(qcStatment);
       } else if (statementValue.getQcRetentionPeriod() != null) {
-        QCStatement qcStatment = new QCStatement(qcStatementId,
-            new ASN1Integer(statementValue.getQcRetentionPeriod()));
+        QCStatement qcStatment = new QCStatement(qcStatementId, new ASN1Integer(statementValue.getQcRetentionPeriod()));
         qcStatementOption = new QcStatementOption(qcStatment);
       } else if (statementValue.getConstant() != null) {
         ASN1Encodable constantStatementValue;
         try {
-          constantStatementValue = new ASN1StreamParser(
-              statementValue.getConstant().getValue()).readObject();
+          constantStatementValue = new ASN1StreamParser(statementValue.getConstant().getValue()).readObject();
         } catch (IOException ex) {
           throw new CertprofileException("can not parse the constant value of QcStatement");
         }
@@ -688,8 +657,7 @@ public class XijsonExtensions {
     qcStatementsOption = null;
   } // method initQcStatements
 
-  private void initRestriction(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) {
+  private void initRestriction(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
     ASN1ObjectIdentifier type = Extn.id_extension_restriction;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -701,9 +669,8 @@ public class XijsonExtensions {
     }
   } // method initRestriction
 
-  private void initSmimeCapabilities(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions)
-          throws CertprofileException {
+  private void initSmimeCapabilities(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
+      throws CertprofileException {
     ASN1ObjectIdentifier type = Extn.id_smimeCapabilities;
     if (!extensionControls.containsKey(type)) {
       return;
@@ -729,8 +696,7 @@ public class XijsonExtensions {
           params = readAsn1Encodable(capParams.getBinary().getValue());
         }
       }
-      org.bouncycastle.asn1.smime.SMIMECapability cap =
-          new org.bouncycastle.asn1.smime.SMIMECapability(oid, params);
+      org.bouncycastle.asn1.smime.SMIMECapability cap = new org.bouncycastle.asn1.smime.SMIMECapability(oid, params);
       vec.add(cap);
     }
 
@@ -738,9 +704,8 @@ public class XijsonExtensions {
     smimeCapabilities = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
   } // method initSmimeCapabilities
 
-  private void initSubjectAlternativeName(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions)
-          throws CertprofileException {
+  private void initSubjectAlternativeName(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
+      throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.subjectAlternativeName;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -751,9 +716,8 @@ public class XijsonExtensions {
     }
   } // method initSubjectAlternativeName
 
-  private void initSubjectInfoAccess(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions)
-          throws CertprofileException {
+  private void initSubjectInfoAccess(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
+      throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.subjectInfoAccess;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -770,9 +734,8 @@ public class XijsonExtensions {
     }
   } // method initSubjectInfoAccess
 
-  private void initTlsFeature(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions)
-          throws CertprofileException {
+  private void initTlsFeature(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
+      throws CertprofileException {
     ASN1ObjectIdentifier type = Extn.id_pe_tlsfeature;
     if (!extensionControls.containsKey(type)) {
       return;
@@ -811,8 +774,7 @@ public class XijsonExtensions {
    *  }
    * </pre>
    */
-  private void initValidityModel(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) {
+  private void initValidityModel(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
     ASN1ObjectIdentifier type = Extn.id_extension_validityModel;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -825,8 +787,7 @@ public class XijsonExtensions {
     }
   } // method initValidityModel
 
-  private void initSubjectDirAttrs(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) {
+  private void initSubjectDirAttrs(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
     ASN1ObjectIdentifier type = Extension.subjectDirectoryAttributes;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -847,15 +808,13 @@ public class XijsonExtensions {
     extnIds.remove(Extn.id_GMT_0015_TaxationNumber);
   } // method initGmt0015Extensions
 
-  private void initCCCExtensionSchemas(
-      Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
+  private void initCCCExtensionSchemas(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
       throws CertprofileException {
     ASN1ObjectIdentifier type = null;
     for (ASN1ObjectIdentifier m : extnIds) {
       if (m.on(Extn.id_ccc_extn)) {
         if (type != null) {
-          throw new CertprofileException(
-              "Maximal one CCC Extension is allowed, but configured at least 2.");
+          throw new CertprofileException("Maximal one CCC Extension is allowed, but configured at least 2.");
         }
         type = m;
       }
@@ -868,8 +827,7 @@ public class XijsonExtensions {
     extnIds.remove(type);
     ExtensionType ex = extensions.get(type.getId());
     if (!ex.isCritical()) {
-      throw new CertprofileException(
-          "CCC Extension must be set to critical, but configured non-critical.");
+      throw new CertprofileException("CCC Extension must be set to critical, but configured non-critical.");
     }
 
     List<ASN1ObjectIdentifier> simpleSchemaTypes = Arrays.asList(
@@ -908,11 +866,10 @@ public class XijsonExtensions {
     return Collections.unmodifiableList(oids);
   } // method toOidList
 
-  GeneralNames createRequestedSubjectAltNames(X500Name requestedSubject,
-      X500Name grantedSubject, Map<ASN1ObjectIdentifier, Extension> requestedExtensions)
+  GeneralNames createRequestedSubjectAltNames(
+      X500Name requestedSubject, X500Name grantedSubject, Map<ASN1ObjectIdentifier, Extension> requestedExtensions)
       throws BadCertTemplateException {
-    Extension extn = (requestedExtensions == null) ? null
-        : requestedExtensions.get(Extension.subjectAlternativeName);
+    Extension extn = (requestedExtensions == null) ? null : requestedExtensions.get(Extension.subjectAlternativeName);
 
     ASN1Encodable extValue = (extn == null) ? null : extn.getParsedValue();
 
@@ -928,8 +885,7 @@ public class XijsonExtensions {
     List<GeneralName> grantedNames = new LinkedList<>();
     // copy the required attributes of Subject
     if (subjectToSubjectAltNameModes != null) {
-      for (Entry<ASN1ObjectIdentifier, GeneralNameTag> entry
-          : subjectToSubjectAltNameModes.entrySet()) {
+      for (Entry<ASN1ObjectIdentifier, GeneralNameTag> entry : subjectToSubjectAltNameModes.entrySet()) {
         ASN1ObjectIdentifier attrType = entry.getKey();
         GeneralNameTag tag = entry.getValue();
 
@@ -1115,8 +1071,8 @@ public class XijsonExtensions {
     return cccExtensionSchemaValue;
   }
 
-  private static ExtensionType getExtension(ASN1ObjectIdentifier type,
-                                            Map<String, ExtensionType> extensions) {
+  private static ExtensionType getExtension(
+      ASN1ObjectIdentifier type, Map<String, ExtensionType> extensions) {
     ExtensionType extension = extensions.get(type.getId());
     if (extension == null) {
       throw new IllegalStateException("should not reach here: undefined extension "

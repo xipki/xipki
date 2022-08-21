@@ -45,7 +45,7 @@ class SimpleIssuerEntry {
     }
 
     return issuer.getRevocationInfo() != null
-            && revocationTimeMs == issuer.getRevocationInfo().getRevocationTime().getTime();
+        && revocationTimeMs == issuer.getRevocationInfo().getRevocationTime().getTime();
   }
 
 } // class SimpleIssuerEntry

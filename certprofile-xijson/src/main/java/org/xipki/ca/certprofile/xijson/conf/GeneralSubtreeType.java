@@ -111,8 +111,8 @@ public class GeneralSubtreeType extends ValidatableConf {
       }
 
       if (occurs != 1) {
-        throw new InvalidConfException("exact one of directoryName, dnsName, ipAddress, rfc822Name,"
-            + " and uri must be set");
+        throw new InvalidConfException(
+            "exact one of directoryName, dnsName, ipAddress, rfc822Name, and uri must be set");
       }
     } // method validate
   } // class Base

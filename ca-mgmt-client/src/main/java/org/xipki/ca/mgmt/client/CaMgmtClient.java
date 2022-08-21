@@ -98,8 +98,7 @@ public class CaMgmtClient implements CaManager {
         sslSocketFactory = sslContextConf.getSslSocketFactory();
         hostnameVerifier = sslContextConf.buildHostnameVerifier();
       } catch (ObjectCreationException ex) {
-        initException = new CaMgmtException(
-            "could not initialize CaMgmtClient: " + ex.getMessage(), ex);
+        initException = new CaMgmtException("could not initialize CaMgmtClient: " + ex.getMessage(), ex);
         throw initException;
       }
     }
@@ -163,8 +162,7 @@ public class CaMgmtClient implements CaManager {
   public Map<String, String> getDbSchemas()
           throws CaMgmtException {
     byte[] respBytes = transmit(MgmtAction.getDbSchemas, null);
-    MgmtResponse.GetDbSchemas resp =
-            parse(respBytes, MgmtResponse.GetDbSchemas.class);
+    MgmtResponse.GetDbSchemas resp = parse(respBytes, MgmtResponse.GetDbSchemas.class);
     return resp.getResult();
   }
 
@@ -588,9 +586,8 @@ public class CaMgmtClient implements CaManager {
   } // method unrevokeCa
 
   @Override
-  public void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason,
-      Date invalidityTime)
-          throws CaMgmtException {
+  public void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason, Date invalidityTime)
+      throws CaMgmtException {
     MgmtRequest.RevokeCertificate req = new MgmtRequest.RevokeCertificate();
     req.setCaName(caName);
     req.setSerialNumber(serialNumber);
@@ -619,8 +616,7 @@ public class CaMgmtClient implements CaManager {
 
   @Override
   public X509Cert generateCrossCertificate(
-      String caName, String profileName, byte[] encodedCsr, byte[] encodedTargetCert,
-      Date notBefore, Date notAfter)
+      String caName, String profileName, byte[] encodedCsr, byte[] encodedTargetCert, Date notBefore, Date notAfter)
       throws CaMgmtException {
     MgmtRequest.GenerateCrossCertificate req = new MgmtRequest.GenerateCrossCertificate();
     req.setCaName(caName);
@@ -636,9 +632,9 @@ public class CaMgmtClient implements CaManager {
   } // method generateCertificate
 
   @Override
-  public X509Cert generateCertificate(String caName, String profileName,
-      byte[] encodedCsr, Date notBefore, Date notAfter)
-          throws CaMgmtException {
+  public X509Cert generateCertificate(
+      String caName, String profileName, byte[] encodedCsr, Date notBefore, Date notAfter)
+      throws CaMgmtException {
     MgmtRequest.GenerateCertificate req = new MgmtRequest.GenerateCertificate();
     req.setCaName(caName);
     req.setProfileName(profileName);
@@ -652,9 +648,9 @@ public class CaMgmtClient implements CaManager {
   } // method generateCertificate
 
   @Override
-  public X509Cert generateRootCa(CaEntry caEntry, String certprofileName,
-      String subject, String serialNumber, Date notBefore, Date notAfter)
-          throws CaMgmtException {
+  public X509Cert generateRootCa(
+      CaEntry caEntry, String certprofileName, String subject, String serialNumber, Date notBefore, Date notAfter)
+      throws CaMgmtException {
     MgmtRequest.GenerateRootCa req = new MgmtRequest.GenerateRootCa();
     req.setCaEntry(new CaEntryWrapper(caEntry));
     req.setCertprofileName(certprofileName);
@@ -760,9 +756,9 @@ public class CaMgmtClient implements CaManager {
   } // method exportConf
 
   @Override
-  public List<CertListInfo> listCertificates(String caName, X500Name subjectPattern, Date validFrom,
-      Date validTo, CertListOrderBy orderBy, int numEntries)
-          throws CaMgmtException {
+  public List<CertListInfo> listCertificates(
+      String caName, X500Name subjectPattern, Date validFrom, Date validTo, CertListOrderBy orderBy, int numEntries)
+      throws CaMgmtException {
     MgmtRequest.ListCertificates req = new MgmtRequest.ListCertificates();
     req.setCaName(caName);
     if (subjectPattern != null) {
@@ -820,7 +816,7 @@ public class CaMgmtClient implements CaManager {
 
   @Override
   public String getTokenInfoP11(String module, Integer slotIndex, boolean verbose)
-          throws CaMgmtException {
+      throws CaMgmtException {
     MgmtRequest.TokenInfoP11 req = new MgmtRequest.TokenInfoP11(module, slotIndex, verbose);
     byte[] respBytes = transmit(MgmtAction.tokenInfoP11, req);
     MgmtResponse.StringResponse resp = parse(respBytes, MgmtResponse.StringResponse.class);
@@ -910,8 +906,7 @@ public class CaMgmtClient implements CaManager {
         try {
           String responseContentType = httpUrlConnection.getContentType();
           if (!RESPONSE_CT.equals(responseContentType)) {
-            throw new CaMgmtException(
-                "bad response: mime type " + responseContentType + " not supported!");
+            throw new CaMgmtException("bad response: mime type " + responseContentType + " not supported!");
           }
 
           if (voidReturn) {
@@ -940,8 +935,7 @@ public class CaMgmtClient implements CaManager {
         }
       }
     } catch (IOException ex) {
-      throw new CaMgmtException(
-          "IOException while sending message to the server: " + ex.getMessage(), ex);
+      throw new CaMgmtException("IOException while sending message to the server: " + ex.getMessage(), ex);
     }
   } // method transmit
 

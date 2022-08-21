@@ -93,7 +93,8 @@ public class SignatureCmpCaClient extends CmpCaClient {
 
   private final X509Certificate responderCert;
 
-  public SignatureCmpCaClient(String caUri, X509Certificate caCert, PrivateKey requestorKey,
+  public SignatureCmpCaClient(
+      String caUri, X509Certificate caCert, PrivateKey requestorKey,
       X509Certificate requestorCert, X509Certificate responderCert, String hashAlgo)
       throws Exception {
     super(caUri, caCert,
@@ -123,8 +124,8 @@ public class SignatureCmpCaClient extends CmpCaClient {
     ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
     if (protectedMsg.hasPasswordBasedMacProtection()) {
-      LOG.warn("protection is not signature based: "
-          + pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
+      LOG.warn("protection is not signature based: {}",
+          pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
       return false;
     }
 
@@ -140,8 +141,7 @@ public class SignatureCmpCaClient extends CmpCaClient {
       return false;
     }
 
-    ContentVerifierProvider verifierProvider = getContentVerifierProvider(
-        responderCert.getPublicKey());
+    ContentVerifierProvider verifierProvider = getContentVerifierProvider(responderCert.getPublicKey());
     if (verifierProvider == null) {
       LOG.warn("not authorized responder '{}'", header.getSender());
       return false;
@@ -188,8 +188,7 @@ public class SignatureCmpCaClient extends CmpCaClient {
     try {
       return builder.build(keyParam);
     } catch (OperatorCreationException ex) {
-      throw new InvalidKeyException("could not build ContentVerifierProvider: "
-          + ex.getMessage(), ex);
+      throw new InvalidKeyException("could not build ContentVerifierProvider: " + ex.getMessage(), ex);
     }
   } // method getContentVerifierProvider
 
@@ -245,20 +244,17 @@ public class SignatureCmpCaClient extends CmpCaClient {
             RSAESOAEPparams params = RSAESOAEPparams.getInstance(keyAlg.getParameters());
             ASN1ObjectIdentifier oid = params.getHashAlgorithm().getAlgorithm();
             if (!oid.equals(RSAESOAEPparams.DEFAULT_HASH_ALGORITHM.getAlgorithm())) {
-              throw new Exception(
-                  "unsupported RSAESOAEPparams.HashAlgorithm " + oid.getId());
+              throw new Exception("unsupported RSAESOAEPparams.HashAlgorithm " + oid.getId());
             }
 
             oid = params.getMaskGenAlgorithm().getAlgorithm();
             if (!oid.equals(RSAESOAEPparams.DEFAULT_MASK_GEN_FUNCTION.getAlgorithm())) {
-              throw new Exception(
-                  "unsupported RSAESOAEPparams.MaskGenAlgorithm " + oid.getId());
+              throw new Exception("unsupported RSAESOAEPparams.MaskGenAlgorithm " + oid.getId());
             }
 
             oid = params.getPSourceAlgorithm().getAlgorithm();
             if (!params.getPSourceAlgorithm().equals(RSAESOAEPparams.DEFAULT_P_SOURCE_ALGORITHM)) {
-              throw new Exception(
-                  "unsupported RSAESOAEPparams.PSourceAlgorithm " + oid.getId());
+              throw new Exception("unsupported RSAESOAEPparams.PSourceAlgorithm " + oid.getId());
             }
           }
 
@@ -284,21 +280,18 @@ public class SignatureCmpCaClient extends CmpCaClient {
           if (tag == 0) { // KDF
             AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
             if (ObjectIdentifiers.id_iso18033_kdf2.equals(algId.getAlgorithm())) {
-              AlgorithmIdentifier hashAlgorithm =
-                  AlgorithmIdentifier.getInstance(algId.getParameters());
+              AlgorithmIdentifier hashAlgorithm = AlgorithmIdentifier.getInstance(algId.getParameters());
               if (!hashAlgorithm.getAlgorithm().equals(ObjectIdentifiers.id_sha1)) {
                 throw new Exception("unsupported KeyDerivationFunction.HashAlgorithm "
                     + hashAlgorithm.getAlgorithm().getId());
               }
             } else {
-              throw new Exception(
-                  "unsupported KeyDerivationFunction " + algId.getAlgorithm().getId());
+              throw new Exception("unsupported KeyDerivationFunction " + algId.getAlgorithm().getId());
             }
           } else if (tag == 1) { // SymmetricEncryption
             AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
             if (!ObjectIdentifiers.id_aes128_cbc_in_ecies.equals(algId.getAlgorithm())) {
-              throw new Exception("unsupported SymmetricEncryption "
-                  + algId.getAlgorithm().getId());
+              throw new Exception("unsupported SymmetricEncryption " + algId.getAlgorithm().getId());
             }
           } else if (tag == 2) { // MessageAuthenticationCode
             AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
@@ -310,8 +303,7 @@ public class SignatureCmpCaClient extends CmpCaClient {
                     + hashAlgorithm.getAlgorithm().getId());
               }
             } else {
-              throw new Exception("unsupported MessageAuthenticationCode "
-                  + algId.getAlgorithm().getId());
+              throw new Exception("unsupported MessageAuthenticationCode " + algId.getAlgorithm().getId());
             }
           }
         }
@@ -348,8 +340,7 @@ public class SignatureCmpCaClient extends CmpCaClient {
         byte[] symmetricCiphertext = DEROctetString.getInstance(seq.getObjectAt(1)).getOctets();
         byte[] macTag = DEROctetString.getInstance(seq.getObjectAt(2)).getOctets();
 
-        byte[] bcInput = new byte[ephemeralPublicKey.length + symmetricCiphertext.length
-                                  + macTag.length];
+        byte[] bcInput = new byte[ephemeralPublicKey.length + symmetricCiphertext.length + macTag.length];
         System.arraycopy(ephemeralPublicKey, 0, bcInput, 0, ephemeralPublicKey.length);
         int offset = ephemeralPublicKey.length;
         System.arraycopy(symmetricCiphertext, 0, bcInput, offset, symmetricCiphertext.length);

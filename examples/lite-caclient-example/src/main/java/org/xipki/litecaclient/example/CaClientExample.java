@@ -109,8 +109,7 @@ public class CaClientExample {
 
     SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo(
         new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE),
-        new org.bouncycastle.asn1.pkcs.RSAPublicKey(pubKey.getModulus(),
-            pubKey.getPublicExponent()));
+        new org.bouncycastle.asn1.pkcs.RSAPublicKey(pubKey.getModulus(), pubKey.getPublicExponent()));
     return new MyKeypair(kp.getPrivate(), subjectPublicKeyInfo);
   } // method generateRsaKeypair
 
@@ -160,9 +159,8 @@ public class CaClientExample {
     return genCsr(keypair, subject, null);
   }
 
-  protected static CertificationRequest genCsr(MyKeypair keypair, String subject,
-      String challengePassword)
-          throws GeneralSecurityException, OperatorCreationException {
+  protected static CertificationRequest genCsr(MyKeypair keypair, String subject, String challengePassword)
+      throws GeneralSecurityException, OperatorCreationException {
     X500Name subjectDn = new X500Name(subject);
 
     PKCS10CertificationRequestBuilder csrBuilder = new PKCS10CertificationRequestBuilder(

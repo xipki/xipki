@@ -36,11 +36,9 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class KeypairGeneratorFactoryRegisterImpl implements KeypairGeneratorFactoryRegister {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(KeypairGeneratorFactoryRegisterImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(KeypairGeneratorFactoryRegisterImpl.class);
 
-  private final ConcurrentLinkedDeque<KeypairGeneratorFactory> factories =
-      new ConcurrentLinkedDeque<>();
+  private final ConcurrentLinkedDeque<KeypairGeneratorFactory> factories = new ConcurrentLinkedDeque<>();
 
   public KeypairGeneratorFactoryRegisterImpl() {
   }
@@ -83,8 +81,7 @@ public class KeypairGeneratorFactoryRegisterImpl implements KeypairGeneratorFact
   }
 
   @Override
-  public KeypairGenerator newKeypairGenerator(
-      SecurityFactory securityFactory, String type, String conf)
+  public KeypairGenerator newKeypairGenerator(SecurityFactory securityFactory, String type, String conf)
       throws ObjectCreationException {
     Args.notBlank(type, "type");
 
@@ -94,8 +91,7 @@ public class KeypairGeneratorFactoryRegisterImpl implements KeypairGeneratorFact
       }
     }
 
-    throw new ObjectCreationException(
-        "could not find Factory to create keypair generator of type " + type);
+    throw new ObjectCreationException("could not find Factory to create keypair generator of type " + type);
   }
 
 }

@@ -42,13 +42,12 @@ public class HttpRespAuditException extends Exception {
 
   private final AuditStatus auditStatus;
 
-  public HttpRespAuditException(int httpStatus, String auditMessage,
-      AuditLevel auditLevel, AuditStatus auditStatus) {
+  public HttpRespAuditException(int httpStatus, String auditMessage, AuditLevel auditLevel, AuditStatus auditStatus) {
     this(httpStatus, null, auditMessage, auditLevel, auditStatus);
   }
 
-  public HttpRespAuditException(int httpStatus, String httpErrorMessage,
-      String auditMessage, AuditLevel auditLevel, AuditStatus auditStatus) {
+  public HttpRespAuditException(
+      int httpStatus, String httpErrorMessage, String auditMessage, AuditLevel auditLevel, AuditStatus auditStatus) {
     this.httpStatus = httpStatus;
     this.httpErrorMessage = httpErrorMessage;
     this.auditMessage = Args.notBlank(auditMessage, "auditMessage");

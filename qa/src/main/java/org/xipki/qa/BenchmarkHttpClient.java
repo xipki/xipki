@@ -354,8 +354,7 @@ public class BenchmarkHttpClient {
         channelClass = (Class<? extends SocketChannel>)
                 Class.forName("io.netty.channel.kqueue.KQueueSocketChannel", false, loader);
 
-        Class<?> clazz = Class.forName("io.netty.channel.kqueue.KQueueEventLoopGroup",
-                    true, loader);
+        Class<?> clazz = Class.forName("io.netty.channel.kqueue.KQueueEventLoopGroup", true, loader);
         Constructor<?> constructor = clazz.getConstructor(int.class);
         this.workerGroup = (EventLoopGroup) constructor.newInstance(numThreads);
         LOG.info("Use KQueue Transport");

@@ -51,9 +51,8 @@ public class P12XdhMacContentSignerBuilder {
 
     private final int hashLen;
 
-    private XdhMacContentSigner(SignAlgo signAlgo,
-        SecretKey signingKey, IssuerAndSerialNumber peerIssuerAndSerial)
-            throws XiSecurityException {
+    private XdhMacContentSigner(SignAlgo signAlgo, SecretKey signingKey, IssuerAndSerialNumber peerIssuerAndSerial)
+        throws XiSecurityException {
       super(signAlgo, signingKey);
       this.hashLen = signAlgo.getHashAlgo().getLength();
 
@@ -68,8 +67,7 @@ public class P12XdhMacContentSignerBuilder {
       try {
         encodedSig = new DERSequence(vec).getEncoded();
       } catch (IOException ex) {
-        throw new XiSecurityException(
-            "exception initializing ContentSigner: " + ex.getMessage(), ex);
+        throw new XiSecurityException("exception initializing ContentSigner: " + ex.getMessage(), ex);
       }
       this.prefix = Arrays.copyOfRange(encodedSig, 0, encodedSig.length - hashLen);
     }
@@ -89,8 +87,7 @@ public class P12XdhMacContentSignerBuilder {
     public byte[] getSignature() {
       byte[] hashValue = super.getSignature();
       if (hashValue.length != hashLen) {
-        throw new RuntimeOperatorException(
-            "exception obtaining signature: invalid signature length");
+        throw new RuntimeOperatorException("exception obtaining signature: invalid signature length");
       }
       byte[] sigValue = new byte[prefix.length + hashLen];
       System.arraycopy(prefix, 0, sigValue, 0, prefix.length);
@@ -110,9 +107,8 @@ public class P12XdhMacContentSignerBuilder {
 
   private final X509Cert[] certificateChain;
 
-  public P12XdhMacContentSignerBuilder(X509Cert peerCert,
-      PrivateKey privateKey, PublicKey publicKey)
-          throws XiSecurityException {
+  public P12XdhMacContentSignerBuilder(X509Cert peerCert, PrivateKey privateKey, PublicKey publicKey)
+      throws XiSecurityException {
     notNull(privateKey, "privateKey");
     notNull(peerCert, "peerCert");
     this.publicKey = notNull(publicKey, "publicKey");
@@ -120,8 +116,7 @@ public class P12XdhMacContentSignerBuilder {
     init(privateKey, peerCert);
   }
 
-  public P12XdhMacContentSignerBuilder(KeypairWithCert keypairWithCert,
-      X509Cert peerCert)
+  public P12XdhMacContentSignerBuilder(KeypairWithCert keypairWithCert, X509Cert peerCert)
       throws XiSecurityException {
     notNull(keypairWithCert, "keypairWithCert");
     notNull(peerCert, "peerCert");
@@ -154,8 +149,7 @@ public class P12XdhMacContentSignerBuilder {
       keyAgreement.init(privateKey);
       keyAgreement.doPhase(peerPubKey, true);
       zz = keyAgreement.generateSecret();
-    } catch (NoSuchAlgorithmException | NoSuchProviderException
-        | InvalidKeyException | IllegalStateException ex) {
+    } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException | IllegalStateException ex) {
       throw new XiSecurityException("KeyChange error", ex);
     }
 
@@ -171,8 +165,8 @@ public class P12XdhMacContentSignerBuilder {
       trailingInfo = peerCert.getIssuer().getEncoded();
     } catch (IOException ex) {
       throw new XiSecurityException("error encoding certificate", ex);
-
     }
+
     byte[] k = this.algo.getHashAlgo().hash(leadingInfo, zz, trailingInfo);
     this.key = new SecretKeySpec(k, algo.getJceName());
     this.peerIssuerAndSerial = new IssuerAndSerialNumber(

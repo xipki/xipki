@@ -42,8 +42,7 @@ class QcStatementOption {
     this.monetaryValueOption = null;
   }
 
-  public QcStatementOption(ASN1ObjectIdentifier statementId,
-      MonetaryValueOption monetaryValueOption) {
+  public QcStatementOption(ASN1ObjectIdentifier statementId, MonetaryValueOption monetaryValueOption) {
     this.statement = null;
     this.statementId = Args.notNull(statementId, "statementId");
     this.monetaryValueOption = Args.notNull(monetaryValueOption, "monetaryValueOption");

@@ -183,8 +183,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
         throws HttpClientException, IOException {
       byte[] encoded = certReq.getEncoded();
       ByteBuf content = Unpooled.wrappedBuffer(encoded);
-      FullHttpRequest httpReq = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
-          HttpMethod.POST, conf.caUrl, content);
+      FullHttpRequest httpReq = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, conf.caUrl, content);
       httpReq.headers().addInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes())
         .add(HttpHeaderNames.CONTENT_TYPE, REQUEST_MIMETYPE);
       httpClient.send(httpReq);
@@ -230,12 +229,8 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
   private final boolean caGenKeyPair;
 
   public CaEnrollBenchmark(
-          CaEnrollBenchEntry benchmarkEntry,
-          int maxRequests,
-          int num,
-          int queueSize,
-          String description)
-          throws IOException, InvalidConfException {
+      CaEnrollBenchEntry benchmarkEntry, int maxRequests, int num, int queueSize, String description)
+      throws IOException, InvalidConfException {
     super(description);
     this.maxRequests = maxRequests;
     this.num = positive(num, "num");
@@ -300,8 +295,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       certTempBuilder.setSubject(benchmarkEntry.getX500Name(thisIndex));
 
       if (!caGenKeyPair) {
-        SubjectPublicKeyInfo spki = benchmarkEntry.getSubjectPublicKeyInfo();
-        certTempBuilder.setPublicKey(spki);
+        certTempBuilder.setPublicKey(benchmarkEntry.getSubjectPublicKeyInfo());
       }
 
       CertTemplate certTemplate = certTempBuilder.build();
@@ -309,8 +303,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       certReqMsgs[i] = new CertReqMsg(certRequest, RA_VERIFIED, null);
     }
 
-    PKIHeaderBuilder builder = new PKIHeaderBuilder(
-        PKIHeader.CMP_2000, conf.requestor(), conf.responder());
+    PKIHeaderBuilder builder = new PKIHeaderBuilder(PKIHeader.CMP_2000, conf.requestor(), conf.responder());
     builder.setMessageTime(new ASN1GeneralizedTime(new Date()));
     builder.setTransactionID(randomBytes(8));
     builder.setSenderNonce(randomBytes(8));
@@ -320,7 +313,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       vec.add(new DERUTF8String(benchmarkEntry.getCertprofile()));
     }
     InfoTypeAndValue certprofileInfo =
-            new InfoTypeAndValue(ObjectIdentifiers.CMP.id_it_certProfile, new DERSequence(vec));
+        new InfoTypeAndValue(ObjectIdentifiers.CMP.id_it_certProfile, new DERSequence(vec));
     builder.setGeneralInfo(new InfoTypeAndValue[]{IMPLICIT_CONFIRM, certprofileInfo});
 
     PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsgs));
@@ -400,8 +393,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
     CertResponse[] certResponses = certRep.getResponse();
 
     if (certResponses.length != numCerts) {
-      throw new Exception("expected " + numCerts + " CertResponse, but returned "
-          + certResponses.length);
+      throw new Exception("expected " + numCerts + " CertResponse, but returned " + certResponses.length);
     }
 
     for (int i = 0; i < numCerts; i++) {
@@ -411,8 +403,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       BigInteger certReqId = certResp.getCertReqId().getValue();
 
       if (status != PKIStatus.GRANTED && status != PKIStatus.GRANTED_WITH_MODS) {
-        throw new Exception("CertReqId " + certReqId
-            + ": server returned PKIStatus: " + buildText(statusInfo));
+        throw new Exception("CertReqId " + certReqId + ": server returned PKIStatus: " + buildText(statusInfo));
       }
     }
   } // method parseEnrollCertResult

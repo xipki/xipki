@@ -122,8 +122,7 @@ public class HttpRaServlet extends HttpServlet {
           LOG.debug("HTTP POST CA REST path: {}\nRequest:\n{}\nResponse:\n{}", req.getRequestURI(),
               new String(requestBytes), new String(respBody));
         } else {
-          LOG.debug("HTTP GET CA REST path: {}\nResponse:\n{}", req.getRequestURI(),
-              new String(respBody));
+          LOG.debug("HTTP GET CA REST path: {}\nResponse:\n{}", req.getRequestURI(), new String(respBody));
         }
       }
 

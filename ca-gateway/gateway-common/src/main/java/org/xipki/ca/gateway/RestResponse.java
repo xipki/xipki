@@ -26,8 +26,7 @@ public class RestResponse {
     this(statusCode, null, null, null);
   }
 
-  public RestResponse(int statusCode, String contentType, Map<String, String> headers,
-                      byte[] body) {
+  public RestResponse(int statusCode, String contentType, Map<String, String> headers, byte[] body) {
     this.statusCode = statusCode;
     this.contentType = contentType;
     this.headers = headers;
@@ -50,7 +49,8 @@ public class RestResponse {
     return body;
   }
 
-  public void fillResponse(HttpServletResponse resp) throws IOException {
+  public void fillResponse(HttpServletResponse resp)
+      throws IOException {
     resp.setStatus(statusCode);
     if (contentType != null) {
       resp.setContentType(contentType);

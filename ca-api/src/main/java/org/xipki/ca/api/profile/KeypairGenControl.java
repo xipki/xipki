@@ -74,9 +74,8 @@ public abstract class KeypairGenControl {
       }
 
       this.keysize = keysize;
-      this.keyAlgorithm = new AlgorithmIdentifier(
-          (keyAlgorithmOid != null) ? keyAlgorithmOid : PKCSObjectIdentifiers.rsaEncryption,
-          DERNull.INSTANCE);
+      this.keyAlgorithm = new AlgorithmIdentifier((keyAlgorithmOid != null)
+          ? keyAlgorithmOid : PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
 
       this.keyspec = "RSA/" + keysize;
     } // constructor
@@ -108,9 +107,8 @@ public abstract class KeypairGenControl {
     public ECKeypairGenControl(ASN1ObjectIdentifier curveOid,
         ASN1ObjectIdentifier keyAlgorithmOid) {
       this.curveOid = Args.notNull(curveOid, "curveOid");
-      this.keyAlgorithm = new AlgorithmIdentifier(
-          (keyAlgorithmOid != null) ? keyAlgorithmOid : X9ObjectIdentifiers.id_ecPublicKey,
-           curveOid);
+      this.keyAlgorithm = new AlgorithmIdentifier((keyAlgorithmOid != null)
+          ? keyAlgorithmOid : X9ObjectIdentifiers.id_ecPublicKey, curveOid);
       keyspec = "EC/" + curveOid.getId();
     }
 
@@ -147,19 +145,12 @@ public abstract class KeypairGenControl {
       }
 
       if (qLength == 0) {
-        if (pLength < 2048) {
-          qLength = 160;
-        } else if (pLength < 3072) {
-          qLength = 224;
-        } else {
-          qLength = 256;
-        }
+        qLength = pLength < 2048 ? 160 : pLength < 3072 ? 224 : 256;
       }
 
       this.plength = pLength;
       this.qlength = qLength;
-      this.keyAlgorithmOid = (keyAlgorithmOid != null)
-              ? keyAlgorithmOid : X9ObjectIdentifiers.id_dsa;
+      this.keyAlgorithmOid = (keyAlgorithmOid != null) ? keyAlgorithmOid : X9ObjectIdentifiers.id_dsa;
       keyspec = "DSA/" + pLength + "/" + qLength;
     }
 
@@ -186,8 +177,7 @@ public abstract class KeypairGenControl {
       this.keyAlgorithm = new AlgorithmIdentifier(Args.notNull(keyAlgorithmOid, "keyAlgorithmOid"));
       this.keyspec = EdECConstants.getName(keyAlgorithmOid);
       if (this.keyspec == null) {
-        throw new IllegalArgumentException(
-            "invalid EdDSA keyAlgorithmOid " + keyAlgorithmOid.getId());
+        throw new IllegalArgumentException("invalid EdDSA keyAlgorithmOid " + keyAlgorithmOid.getId());
       }
     }
 

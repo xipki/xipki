@@ -40,7 +40,7 @@ public class ScepClient extends Client {
   }
 
   public ScepClient(CaIdentifier caId, CaCertValidator caCertValidator,
-      SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
+                    SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
     super(caId, caCertValidator);
     this.httpClient = new XiHttpClient(sslSocketFactory, hostnameVerifier);
   }

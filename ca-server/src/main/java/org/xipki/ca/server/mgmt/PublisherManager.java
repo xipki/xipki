@@ -232,8 +232,7 @@ class PublisherManager {
       type = type.toLowerCase();
     }
 
-    IdentifiedCertPublisher publisher =
-        manager.queryExecutor.changePublisher(name, type, conf, manager);
+    IdentifiedCertPublisher publisher = manager.queryExecutor.changePublisher(name, type, conf, manager);
 
     IdentifiedCertPublisher oldPublisher = manager.publishers.remove(name);
     shutdownPublisher(oldPublisher);
@@ -326,8 +325,7 @@ class PublisherManager {
       }
 
       ret = new IdentifiedCertPublisher(entry, publisher);
-      ret.initialize(manager.securityFactory.getPasswordResolver(),
-          manager.datasourceNameConfFileMap);
+      ret.initialize(manager.securityFactory.getPasswordResolver(), manager.datasourceNameConfFileMap);
       return ret;
     } catch (ObjectCreationException | CertPublisherException | RuntimeException ex) {
       String msg = "invalid configuration for the publisher " + entry.getIdent();

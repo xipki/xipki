@@ -107,8 +107,7 @@ public abstract class ExtensionSpec {
   } // method isValidPublicIPv4Address
 
   public static ExtensionSpec getExtensionSpec(CertDomain domain, CertLevel certLevel) {
-    return domain == CertDomain.CABForumBR
-        ? browserForumInstances.get(certLevel) : rfc5280Instances.get(certLevel);
+    return domain == CertDomain.CABForumBR ? browserForumInstances.get(certLevel) : rfc5280Instances.get(certLevel);
   } // method getExtensionSpec
 
   private static class Rfc5280 extends ExtensionSpec {
@@ -190,11 +189,10 @@ public abstract class ExtensionSpec {
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             Extension.certificatePolicies,
             Extension.extendedKeyUsage,
-            Extension.authorityKeyIdentifier  /* not required in RFC5280, forbidden by several
+            Extension.authorityKeyIdentifier)));  /* not required in RFC5280, forbidden by several
                                                  national standards e.g. chinese GM/T 0015
                                                  and German Gematik.
                                                */
-            )));
 
     private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSIONS =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
@@ -250,16 +248,14 @@ public abstract class ExtensionSpec {
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             Extension.basicConstraints, // BR
             Extension.keyUsage, // BR
-            Extension.nameConstraints // BR
-            )));
+            Extension.nameConstraints))); // BR
 
     private static final Set<ASN1ObjectIdentifier> NON_CRITICAL_ONLY_EXTENSIONS =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             Extension.certificatePolicies, // BR
             Extension.cRLDistributionPoints, // BR
             Extension.authorityInfoAccess, // BR
-            Extension.extendedKeyUsage // BR
-            )));
+            Extension.extendedKeyUsage))); // BR
 
     private final Set<ASN1ObjectIdentifier> requiredExtensions;
 
@@ -303,8 +299,7 @@ public abstract class ExtensionSpec {
             Extension.policyMappings,
             Extension.nameConstraints,
             Extension.policyConstraints,
-            Extension.inhibitAnyPolicy
-            )));
+            Extension.inhibitAnyPolicy)));
 
     private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSIONS =
         Collections.emptySet();
@@ -346,8 +341,7 @@ public abstract class ExtensionSpec {
             Extension.cRLDistributionPoints, // BR
             Extension.authorityInfoAccess, // BR
             Extension.basicConstraints, // BR
-            Extension.keyUsage // BR
-            )));
+            Extension.keyUsage))); // BR
 
     private static final Set<ASN1ObjectIdentifier> NON_PERMITTED_EXTENSIONS =
         Collections.emptySet();
@@ -356,16 +350,14 @@ public abstract class ExtensionSpec {
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             Extension.basicConstraints, // BR
             Extension.keyUsage, // BR
-            Extension.nameConstraints // BR
-            )));
+            Extension.nameConstraints))); // BR
 
     private static final Set<ASN1ObjectIdentifier> NON_CRITICAL_ONLY_EXTENSIONS =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             Extension.certificatePolicies, // BR
             Extension.cRLDistributionPoints, // BR
             Extension.authorityInfoAccess, // BR
-            Extension.extendedKeyUsage // BR
-            )));
+            Extension.extendedKeyUsage))); // BR
 
     private final Set<ASN1ObjectIdentifier> requiredExtensions;
 
@@ -405,8 +397,7 @@ public abstract class ExtensionSpec {
             Extension.certificatePolicies, // BR
             Extension.authorityInfoAccess, // BR
             Extension.extendedKeyUsage, // BR
-            Extension.subjectAlternativeName // BR
-            )));
+            Extension.subjectAlternativeName))); // BR
 
     private static final Set<ASN1ObjectIdentifier> NON_PERMITTED_EXTENSIONS =
         Collections.emptySet();
@@ -418,8 +409,7 @@ public abstract class ExtensionSpec {
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             Extension.certificatePolicies, // BR
             Extension.cRLDistributionPoints, // BR
-            Extension.authorityInfoAccess // BR
-            )));
+            Extension.authorityInfoAccess))); // BR
 
     private final Set<ASN1ObjectIdentifier> requiredExtensions;
 

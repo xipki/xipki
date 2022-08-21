@@ -76,8 +76,7 @@ public class PublisherCaActions {
 
   } // class CapubAdd
 
-  @Command(scope = "ca", name = "capub-info",
-      description = "show information of publisher in given CA")
+  @Command(scope = "ca", name = "capub-info", description = "show information of publisher in given CA")
   @Service
   public static class CapubInfo extends CaAction {
 
@@ -117,8 +116,7 @@ public class PublisherCaActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--publisher", required = true, multiValued = true,
-        description = "publisher name")
+    @Option(name = "--publisher", required = true, multiValued = true, description = "publisher name")
     @Completion(CaCompleters.PublisherNameCompleter.class)
     private List<String> publisherNames;
 
@@ -191,8 +189,7 @@ public class PublisherCaActions {
     @Completion(CaCompleters.PublisherNameCompleter.class)
     private String name;
 
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "where to save the publisher configuration")
+    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the publisher configuration")
     @Completion(FileCompleter.class)
     private String confFile;
 
@@ -207,8 +204,7 @@ public class PublisherCaActions {
       if (StringUtil.isBlank(entry.getConf())) {
         println("publisher does not have conf");
       } else {
-        saveVerbose("saved publisher configuration to", confFile,
-            StringUtil.toUtf8Bytes(entry.getConf()));
+        saveVerbose("saved publisher configuration to", confFile, StringUtil.toUtf8Bytes(entry.getConf()));
       }
       return null;
     } // method execute0

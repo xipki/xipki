@@ -65,8 +65,8 @@ public class OCSPRespBuilder {
    * @param certStatus status of the certificate - null if okay
    * @param singleExtensions optional extensions
    */
-  public void addResponse(CertID certId, byte[] certStatus, Date thisUpdate, Date nextUpdate,
-      Extensions singleExtensions) {
+  public void addResponse(
+      CertID certId, byte[] certStatus, Date thisUpdate, Date nextUpdate, Extensions singleExtensions) {
     list.add(new SingleResponse(certId, certStatus, thisUpdate, nextUpdate, singleExtensions));
   }
 
@@ -79,11 +79,10 @@ public class OCSPRespBuilder {
     this.responseExtensions = responseExtensions;
   }
 
-  public byte[] buildOCSPResponse(ConcurrentContentSigner signer,
-      TaggedCertSequence taggedCertSequence, Date producedAt)
+  public byte[] buildOCSPResponse(
+      ConcurrentContentSigner signer, TaggedCertSequence taggedCertSequence, Date producedAt)
       throws OCSPException, NoIdleSignerException {
-    ResponseData responseData = new ResponseData(0,
-        responderId, producedAt, list, responseExtensions);
+    ResponseData responseData = new ResponseData(0, responderId, producedAt, list, responseExtensions);
 
     byte[] tbs = new byte[responseData.getEncodedLength()];
     responseData.write(tbs, 0);

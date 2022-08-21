@@ -52,15 +52,15 @@ public class CertTemplateData {
 
   private boolean forCrossCert;
 
-  public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Date notBefore,
+  public CertTemplateData(
+      X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Date notBefore,
       Date notAfter, Extensions extensions, String certprofileName) {
     this(subject, publicKeyInfo, notBefore, notAfter, extensions, certprofileName, null, false);
   }
 
   public CertTemplateData(
-      X500Name subject, SubjectPublicKeyInfo publicKeyInfo,
-      Date notBefore, Date notAfter, Extensions extensions, String certprofileName,
-      BigInteger certReqId, boolean caGenerateKeypair) {
+      X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Date notBefore, Date notAfter, Extensions extensions,
+      String certprofileName, BigInteger certReqId, boolean caGenerateKeypair) {
     this.publicKeyInfo = publicKeyInfo;
     this.subject = Args.notNull(subject, "subject");
     this.certprofileName = Args.toNonBlankLower(certprofileName, "certprofileName");

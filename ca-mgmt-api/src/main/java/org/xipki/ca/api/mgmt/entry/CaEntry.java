@@ -276,8 +276,7 @@ public class CaEntry extends MgmtEntry {
   }
 
   public void setKeypairGenNames(List<String> keypairGenNames) {
-    this.keypairGenNames = (keypairGenNames == null)
-            ? null : CollectionUtil.toLowerCaseList(keypairGenNames);
+    this.keypairGenNames = (keypairGenNames == null) ? null : CollectionUtil.toLowerCaseList(keypairGenNames);
   }
 
   public boolean isSaveRequest() {

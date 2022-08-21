@@ -117,8 +117,7 @@ public class OcspServerUtil {
     if (singleSigners.isEmpty()) {
       throw new InvalidConfException("could not create any signer for OCSP responder " + name);
     } else {
-      LOG.info("Create signers of sign algorithms {} for the OCSP responder {}",
-          succSigAlgos, name);
+      LOG.info("Create signers of sign algorithms {} for the OCSP responder {}", succSigAlgos, name);
     }
 
     if (!failSigAlgos.isEmpty()) {
@@ -157,17 +156,15 @@ public class OcspServerUtil {
         try {
           Class<?> clazz = Class.forName(className, false, OcspServerUtil.class.getClassLoader());
           store = (OcspStore) clazz.newInstance();
-        } catch (ClassNotFoundException | ClassCastException | InstantiationException
-                | IllegalAccessException ex) {
-          throw new InvalidConfException("ObjectCreationException of store " + conf.getName()
-              + ":" + ex.getMessage(), ex);
+        } catch (ClassNotFoundException | ClassCastException | InstantiationException | IllegalAccessException ex) {
+          throw new InvalidConfException("ObjectCreationException of store " + conf.getName() + ":" + ex.getMessage(),
+              ex);
         }
       } else {
         throw new ObjectCreationException("unknown OCSP store type " + type);
       }
     } catch (ObjectCreationException ex) {
-      throw new InvalidConfException("ObjectCreationException of store " + conf.getName()
-          + ":" + ex.getMessage(), ex);
+      throw new InvalidConfException("ObjectCreationException of store " + conf.getName() + ":" + ex.getMessage(), ex);
     }
 
     store.setName(conf.getName());
@@ -208,15 +205,13 @@ public class OcspServerUtil {
       Map<String, ?> sourceConf = conf.getSource().getConf();
       store.init(sourceConf, datasource);
     } catch (OcspStoreException ex) {
-      throw new InvalidConfException("CertStatusStoreException of store " + conf.getName()
-          + ":" + ex.getMessage(), ex);
+      throw new InvalidConfException("CertStatusStoreException of store " + conf.getName() + ":" + ex.getMessage(), ex);
     }
 
     return store;
   } // method newStore
 
-  static boolean canBuildCertpath(X509Cert[] certsInReq,
-      RequestOption requestOption, Date referenceTime) {
+  static boolean canBuildCertpath(X509Cert[] certsInReq, RequestOption requestOption, Date referenceTime) {
     X509Cert target = certsInReq[0];
 
     Set<X509Cert> trustanchors = requestOption.getTrustanchors();
@@ -239,8 +234,7 @@ public class OcspServerUtil {
 
     if (model == null || model == CertpathValidationModel.PKIX) {
       for (X509Cert m : certpath) {
-        if (m.getNotBefore().after(referenceTime)
-                || m.getNotAfter().before(referenceTime)) {
+        if (m.getNotBefore().after(referenceTime) || m.getNotAfter().before(referenceTime)) {
           return false;
         }
       }
@@ -321,8 +315,7 @@ public class OcspServerUtil {
     }
   } // method parseConf
 
-  static ExtendedExtension removeExtension(List<ExtendedExtension> extensions,
-      OID extnType) {
+  static ExtendedExtension removeExtension(List<ExtendedExtension> extensions, OID extnType) {
     ExtendedExtension extn = null;
     for (ExtendedExtension m : extensions) {
       if (extnType == m.getExtnType()) {

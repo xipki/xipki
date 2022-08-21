@@ -101,8 +101,7 @@ public final class DSAParameterCache {
   private DSAParameterCache() {
   }
 
-  private static void addDSAParamSpec(
-      int plen, int qlen, BigInteger p, BigInteger q, BigInteger g) {
+  private static void addDSAParamSpec(int plen, int qlen, BigInteger p, BigInteger q, BigInteger g) {
     DSAParameterSpec spec = new DSAParameterSpec(p, q, g);
 
     boolean match = true;
@@ -121,8 +120,7 @@ public final class DSAParameterCache {
     }
   }
 
-  public static DSAParameterSpec getDSAParameterSpec(int plength, int qlength,
-      SecureRandom random) {
+  public static DSAParameterSpec getDSAParameterSpec(int plength, int qlength, SecureRandom random) {
     DSAParameterSpec spec = cache.get(plength + "-" + qlength);
     if (spec != null) {
       return new DSAParameterSpec(spec.getP(), spec.getQ(), spec.getG());
@@ -131,8 +129,7 @@ public final class DSAParameterCache {
     return getNewDSAParameterSpec(plength, qlength, random);
   }
 
-  public static DSAParameterSpec getNewDSAParameterSpec(int plength, int qlength,
-      SecureRandom random) {
+  public static DSAParameterSpec getNewDSAParameterSpec(int plength, int qlength, SecureRandom random) {
     final int certainty = 80;
     SecureRandom tmpRandom = (random == null) ? new SecureRandom() : random;
     DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());

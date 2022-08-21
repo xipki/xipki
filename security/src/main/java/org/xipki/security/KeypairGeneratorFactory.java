@@ -58,8 +58,7 @@ public interface KeypairGeneratorFactory {
    * @throws ObjectCreationException
    *         if signer could not be created.
    */
-  KeypairGenerator newKeypairGenerator(
-      String type, String conf, SecurityFactory securityFactory)
+  KeypairGenerator newKeypairGenerator(String type, String conf, SecurityFactory securityFactory)
       throws ObjectCreationException;
 
 }

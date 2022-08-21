@@ -74,8 +74,7 @@ public class SignerEntryWrapper {
 
     X509Cert responderCert = dbEntry.getCertificate();
     dbEntry.setConfFaulty(true);
-    signer = securityFactory.createSigner(dbEntry.getType(), new SignerConf(dbEntry.getConf()),
-        responderCert);
+    signer = securityFactory.createSigner(dbEntry.getType(), new SignerConf(dbEntry.getConf()), responderCert);
     if (signer.getCertificate() == null) {
       throw new ObjectCreationException("signer without certificate is not allowed");
     }

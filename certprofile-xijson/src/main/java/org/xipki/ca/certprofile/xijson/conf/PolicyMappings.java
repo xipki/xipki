@@ -100,8 +100,7 @@ public class PolicyMappings extends ValidatableConf {
 
     for (int i = 0; i < n; i++) {
       PolicyIdMappingType mapping = mappings.get(i);
-      ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(
-          mapping.getIssuerDomainPolicy().getOid());
+      ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(mapping.getIssuerDomainPolicy().getOid());
       issuerDomainPolicy[i] = CertPolicyId.getInstance(oid);
 
       oid = new ASN1ObjectIdentifier(mapping.getSubjectDomainPolicy().getOid());

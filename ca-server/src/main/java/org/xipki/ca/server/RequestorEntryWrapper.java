@@ -45,14 +45,10 @@ public class RequestorEntryWrapper {
 
   private CertWithDbId cert;
 
-  private byte[] keyId;
-
-  private char[] password;
-
   public RequestorEntryWrapper() {
   }
 
-  public void setDbEntry(RequestorEntry dbEntry, PasswordResolver passwordResolver) {
+  public void setDbEntry(RequestorEntry dbEntry) {
     this.dbEntry = Args.notNull(dbEntry, "dbEntry");
     String type = dbEntry.getType();
     String conf = dbEntry.getConf();
@@ -75,14 +71,6 @@ public class RequestorEntryWrapper {
 
   public RequestorEntry getDbEntry() {
     return dbEntry;
-  }
-
-  public boolean matchKeyId(byte[] keyId) {
-    return Arrays.equals(keyId, this.keyId);
-  }
-
-  public char[] getPassword() {
-    return password;
   }
 
 }

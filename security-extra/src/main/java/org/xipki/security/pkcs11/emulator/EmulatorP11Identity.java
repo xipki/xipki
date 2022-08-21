@@ -71,11 +71,9 @@ public class EmulatorP11Identity extends P11Identity {
 
   private final ConcurrentBag<ConcurrentBagEntry<Cipher>> rsaCiphers = new ConcurrentBag<>();
 
-  private final ConcurrentBag<ConcurrentBagEntry<Signature>> dsaSignatures =
-      new ConcurrentBag<>();
+  private final ConcurrentBag<ConcurrentBagEntry<Signature>> dsaSignatures = new ConcurrentBag<>();
 
-  private final ConcurrentBag<ConcurrentBagEntry<Signature>> eddsaSignatures =
-      new ConcurrentBag<>();
+  private final ConcurrentBag<ConcurrentBagEntry<Signature>> eddsaSignatures = new ConcurrentBag<>();
 
   private final ConcurrentBag<ConcurrentBagEntry<SM2Signer>> sm2Signers = new ConcurrentBag<>();
 
@@ -168,17 +166,17 @@ public class EmulatorP11Identity extends P11Identity {
     mechHashMap.put(PKCS11Constants.CKM_SHA3_512_HMAC, HashAlgo.SHA512);
   }
 
-  public EmulatorP11Identity(P11Slot slot, P11IdentityId identityId,
-      SecretKey signingKey, int maxSessions, SecureRandom random) {
+  public EmulatorP11Identity(
+      P11Slot slot, P11IdentityId identityId, SecretKey signingKey, int maxSessions, SecureRandom random) {
     super(slot, identityId, 0);
     this.signingKey = notNull(signingKey, "signingKey");
     this.random = notNull(random, "random");
     this.maxSessions = maxSessions;
   } // constructor
 
-  public EmulatorP11Identity(P11Slot slot, P11IdentityId identityId, PrivateKey privateKey,
-      PublicKey publicKey, X509Cert[] certificateChain, int maxSessions,
-      SecureRandom random)
+  public EmulatorP11Identity(
+      P11Slot slot, P11IdentityId identityId, PrivateKey privateKey, PublicKey publicKey,
+      X509Cert[] certificateChain, int maxSessions, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
     super(slot, identityId, publicKey, certificateChain);
     this.signingKey = notNull(privateKey, "privateKey");
@@ -219,8 +217,7 @@ public class EmulatorP11Identity extends P11Identity {
       } else {
         String algorithm;
         if (this.publicKey instanceof ECPublicKey) {
-          boolean sm2curve = GMUtil.isSm2primev2Curve(
-                  ((ECPublicKey) this.publicKey).getParams().getCurve());
+          boolean sm2curve = GMUtil.isSm2primev2Curve(((ECPublicKey) this.publicKey).getParams().getCurve());
           algorithm = sm2curve ? null : "NONEwithECDSA";
         } else if (this.publicKey instanceof DSAPublicKey) {
           algorithm = "NONEwithDSA";
@@ -251,8 +248,7 @@ public class EmulatorP11Identity extends P11Identity {
           // do nothing. not suitable for sign.
         } else {
           for (int i = 0; i < maxSessions; i++) {
-            SM2Signer sm2signer = new SM2Signer(
-                    ECUtil.generatePrivateKeyParameter((PrivateKey) signingKey));
+            SM2Signer sm2signer = new SM2Signer(ECUtil.generatePrivateKeyParameter((PrivateKey) signingKey));
             sm2Signers.add(new ConcurrentBagEntry<>(sm2signer));
           }
         }
@@ -383,8 +379,7 @@ public class EmulatorP11Identity extends P11Identity {
     }
 
     GMac gmac = new GMac(new GCMBlockCipher(new AESEngine()));
-    ParametersWithIV paramsWithIv =
-        new ParametersWithIV(new KeyParameter(signingKey.getEncoded()), iv);
+    ParametersWithIV paramsWithIv = new ParametersWithIV(new KeyParameter(signingKey.getEncoded()), iv);
     gmac.init(paramsWithIv);
     gmac.update(contentToSign, 0, contentToSign.length);
     byte[] signature = new byte[gmac.getMacSize()];
@@ -395,8 +390,7 @@ public class EmulatorP11Identity extends P11Identity {
   private byte[] rsaPkcsPssSign(P11Params parameters, byte[] contentToSign, HashAlgo hashAlgo)
       throws P11TokenException {
     if (!(parameters instanceof P11Params.P11RSAPkcsPssParams)) {
-      throw new P11TokenException("the parameters is not of "
-          + P11Params.P11RSAPkcsPssParams.class.getName());
+      throw new P11TokenException("the parameters is not of " + P11Params.P11RSAPkcsPssParams.class.getName());
     }
 
     P11Params.P11RSAPkcsPssParams pssParam = (P11Params.P11RSAPkcsPssParams) parameters;
@@ -409,8 +403,7 @@ public class EmulatorP11Identity extends P11Identity {
 
     HashAlgo mgfHash =  mgfMechHashMap.get(pssParam.getMaskGenerationFunction());
     if (mgfHash == null) {
-      throw new P11TokenException(
-          "unsupported MaskGenerationFunction " + pssParam.getHashAlgorithm());
+      throw new P11TokenException("unsupported MaskGenerationFunction " + pssParam.getHashAlgorithm());
     }
 
     byte[] hashValue = (hashAlgo == null) ? contentToSign : hashAlgo.hash(contentToSign);

@@ -56,8 +56,7 @@ class RequestorManager {
     requestorsInitialized = false;
   }
 
-  void initRequestors()
-      throws CaMgmtException {
+  void initRequestors() throws CaMgmtException {
     if (requestorsInitialized) {
       return;
     }
@@ -77,7 +76,7 @@ class RequestorManager {
         manager.idNameMap.addRequestor(requestorDbEntry.getIdent());
         manager.requestorDbEntries.put(name, requestorDbEntry);
         RequestorEntryWrapper requestor = new RequestorEntryWrapper();
-        requestor.setDbEntry(requestorDbEntry, manager.securityFactory.getPasswordResolver());
+        requestor.setDbEntry(requestorDbEntry);
         manager.requestors.put(name, requestor);
       }
 
@@ -95,9 +94,8 @@ class RequestorManager {
       throw new CaMgmtException(concat("Requestor named ", name, " exists"));
     }
 
-    PasswordResolver pwdResolver = manager.securityFactory.getPasswordResolver();
     RequestorEntryWrapper requestor = new RequestorEntryWrapper();
-    requestor.setDbEntry(requestorEntry, pwdResolver);
+    requestor.setDbEntry(requestorEntry);
 
     manager.queryExecutor.addRequestor(requestorEntry);
     manager.idNameMap.addRequestor(requestorEntry.getIdent());

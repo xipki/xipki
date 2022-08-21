@@ -52,8 +52,8 @@ public class GenDSAKeypairParams extends ProxyMessage {
 
   private final BigInteger g;
 
-  public GenDSAKeypairParams(P11SlotIdentifier slotId, P11NewKeyControl control,
-      BigInteger p, BigInteger q, BigInteger g) {
+  public GenDSAKeypairParams(
+      P11SlotIdentifier slotId, P11NewKeyControl control, BigInteger p, BigInteger q, BigInteger g) {
     this.slotId = Args.notNull(slotId, "slotId");
     this.control = control;
     this.p = Args.notNull(p, "p");

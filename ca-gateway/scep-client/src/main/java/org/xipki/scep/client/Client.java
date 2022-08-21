@@ -103,9 +103,8 @@ public abstract class Client {
    * @throws ScepClientException
    *          If error happens
    */
-  protected abstract ScepHttpResponse httpPost(String url, String requestContentType,
-      byte[] request)
-          throws ScepClientException;
+  protected abstract ScepHttpResponse httpPost(String url, String requestContentType, byte[] request)
+      throws ScepClientException;
 
   /**
    * Send request via HTTP GET.
@@ -150,8 +149,7 @@ public abstract class Client {
       }
     }
 
-    if (Operation.GetCACaps == operation || Operation.GetCACert == operation
-        || Operation.GetNextCACert == operation) {
+    if (Operation.GetCACaps == operation || Operation.GetCACert == operation || Operation.GetNextCACert == operation) {
       String url = caId.buildGetUrl(operation, caId.getProfile());
       return httpGet(url);
     } else {
@@ -159,8 +157,7 @@ public abstract class Client {
         String url = caId.buildPostUrl(operation);
         return httpPost(url, REQ_CONTENT_TYPE, request);
       } else {
-        String url = caId.buildGetUrl(operation,
-            (request == null) ? null : Base64.encodeToString(request));
+        String url = caId.buildGetUrl(operation, (request == null) ? null : Base64.encodeToString(request));
         return httpGet(url);
       }
     } // end if
@@ -180,8 +177,7 @@ public abstract class Client {
       throws ScepClientException {
     // getCACaps
     ScepHttpResponse getCaCapsResp = httpSend(Operation.GetCACaps);
-    this.caCaps = CaCaps.getInstance(
-                    StringUtil.toUtf8String(getCaCapsResp.getContentBytes()));
+    this.caCaps = CaCaps.getInstance(StringUtil.toUtf8String(getCaCapsResp.getContentBytes()));
 
     // getCACert
     ScepHttpResponse getCaCertResp = httpSend(Operation.GetCACert);
@@ -189,13 +185,11 @@ public abstract class Client {
 
     X509CertificateHolder certHolder;
     try {
-      certHolder =
-          new X509CertificateHolder(this.authorityCertStore.getSignatureCert().getEncoded());
+      certHolder = new X509CertificateHolder(this.authorityCertStore.getSignatureCert().getEncoded());
     } catch (IOException ex) {
       throw new ScepClientException(ex);
     }
-    this.responseSignerCerts = new CollectionStore<>(
-            Collections.singletonList(certHolder));
+    this.responseSignerCerts = new CollectionStore<>(Collections.singletonList(certHolder));
   } // method refresh
 
   public CaCaps getCaCaps()
@@ -226,9 +220,9 @@ public abstract class Client {
     return authorityCertStore;
   }
 
-  public X509CRLHolder scepGetCrl(PrivateKey identityKey, X509Cert identityCert,
-      X500Name issuer, BigInteger serialNumber)
-          throws ScepClientException {
+  public X509CRLHolder scepGetCrl(
+      PrivateKey identityKey, X509Cert identityCert, X500Name issuer, BigInteger serialNumber)
+      throws ScepClientException {
     Args.notNull(identityKey, "identityKey");
     Args.notNull(identityCert, "identityCert");
     Args.notNull(issuer, "issuer");
@@ -256,9 +250,9 @@ public abstract class Client {
     }
   } // method scepGetCrl
 
-  public List<X509Cert> scepGetCert(PrivateKey identityKey, X509Cert identityCert,
-      X500Name issuer, BigInteger serialNumber)
-          throws ScepClientException {
+  public List<X509Cert> scepGetCert(
+      PrivateKey identityKey, X509Cert identityCert, X500Name issuer, BigInteger serialNumber)
+      throws ScepClientException {
     Args.notNull(identityKey, "identityKey");
     Args.notNull(identityCert, "identityCert");
     Args.notNull(issuer, "issuer");
@@ -287,26 +281,24 @@ public abstract class Client {
     }
   } // method scepGetCert
 
-  public EnrolmentResponse scepCertPoll(PrivateKey identityKey, X509Cert identityCert,
-      CertificationRequest csr, X500Name issuer)
-          throws ScepClientException {
+  public EnrolmentResponse scepCertPoll(
+      PrivateKey identityKey, X509Cert identityCert, CertificationRequest csr, X500Name issuer)
+      throws ScepClientException {
     Args.notNull(csr, "csr");
 
     TransactionId tid;
     try {
-      tid = TransactionId.sha1TransactionId(
-          csr.getCertificationRequestInfo().getSubjectPublicKeyInfo());
+      tid = TransactionId.sha1TransactionId(csr.getCertificationRequestInfo().getSubjectPublicKeyInfo());
     } catch (InvalidKeySpecException ex) {
       throw new ScepClientException(ex.getMessage(), ex);
     }
 
-    return scepCertPoll(identityKey, identityCert, tid, issuer,
-        csr.getCertificationRequestInfo().getSubject());
+    return scepCertPoll(identityKey, identityCert, tid, issuer, csr.getCertificationRequestInfo().getSubject());
   } // method scepCertPoll
 
-  public EnrolmentResponse scepCertPoll(PrivateKey identityKey, X509Cert identityCert,
-      TransactionId transactionId, X500Name issuer, X500Name subject)
-          throws ScepClientException {
+  public EnrolmentResponse scepCertPoll(
+      PrivateKey identityKey, X509Cert identityCert, TransactionId transactionId, X500Name issuer, X500Name subject)
+      throws ScepClientException {
     Args.notNull(identityKey, "identityKey");
     Args.notNull(identityCert, "identityCert");
     Args.notNull(issuer, "issuer");
@@ -326,9 +318,9 @@ public abstract class Client {
     return new EnrolmentResponse(response);
   } // method scepCertPoll
 
-  public EnrolmentResponse scepEnrol(CertificationRequest csr, PrivateKey identityKey,
-      X509Cert identityCert)
-          throws ScepClientException {
+  public EnrolmentResponse scepEnrol(
+      CertificationRequest csr, PrivateKey identityKey, X509Cert identityCert)
+      throws ScepClientException {
     Args.notNull(csr, "csr");
     Args.notNull(identityKey, "identityKey");
     Args.notNull(identityCert, "identityCert");
@@ -344,9 +336,8 @@ public abstract class Client {
     return scepPkcsReq(csr, identityKey, identityCert);
   } // method scepEnrol
 
-  public EnrolmentResponse scepPkcsReq(CertificationRequest csr, PrivateKey identityKey,
-      X509Cert identityCert)
-          throws ScepClientException {
+  public EnrolmentResponse scepPkcsReq(CertificationRequest csr, PrivateKey identityKey, X509Cert identityCert)
+      throws ScepClientException {
     Args.notNull(csr, "csr");
     Args.notNull(identityKey, "identityKey");
     Args.notNull(identityCert, "identityCert");
@@ -360,14 +351,12 @@ public abstract class Client {
     return enroll(MessageType.PKCSReq, csr, identityKey, identityCert);
   } // method scepPkcsReq
 
-  public EnrolmentResponse scepRenewalReq(CertificationRequest csr, PrivateKey identityKey,
-      X509Cert identityCert)
-          throws ScepClientException {
+  public EnrolmentResponse scepRenewalReq(CertificationRequest csr, PrivateKey identityKey, X509Cert identityCert)
+      throws ScepClientException {
     initIfNotInited();
 
     if (!caCaps.supportsRenewal()) {
-      throw new OperationNotSupportedException(
-          "unsupported messageType '" + MessageType.RenewalReq + "'");
+      throw new OperationNotSupportedException("unsupported messageType '" + MessageType.RenewalReq + "'");
     }
 
     if (identityCert.isSelfSigned()) {
@@ -377,13 +366,12 @@ public abstract class Client {
     return enroll(MessageType.RenewalReq, csr, identityKey, identityCert);
   } // method scepRenewalReq
 
-  private EnrolmentResponse enroll(MessageType messageType, CertificationRequest csr,
-      PrivateKey identityKey, X509Cert identityCert)
-          throws ScepClientException {
+  private EnrolmentResponse enroll(
+      MessageType messageType, CertificationRequest csr, PrivateKey identityKey, X509Cert identityCert)
+      throws ScepClientException {
     TransactionId tid;
     try {
-      tid = TransactionId.sha1TransactionId(
-          csr.getCertificationRequestInfo().getSubjectPublicKeyInfo());
+      tid = TransactionId.sha1TransactionId(csr.getCertificationRequestInfo().getSubjectPublicKeyInfo());
     } catch (InvalidKeySpecException ex) {
       throw new ScepClientException(ex.getMessage(), ex);
     }
@@ -404,17 +392,15 @@ public abstract class Client {
     initIfNotInited();
 
     if (!this.caCaps.supportsGetNextCACert()) {
-      throw new OperationNotSupportedException(
-              "unsupported operation '" + Operation.GetNextCACert.getCode() + "'");
+      throw new OperationNotSupportedException("unsupported operation '" + Operation.GetNextCACert.getCode() + "'");
     }
 
     ScepHttpResponse resp = httpSend(Operation.GetNextCACert);
     return retrieveNextCaAuthorityCertStore(resp);
   } // method scepNextCaCert
 
-  private ContentInfo encryptThenSign(PkiMessage request, PrivateKey identityKey,
-      X509Cert identityCert)
-          throws ScepClientException {
+  private ContentInfo encryptThenSign(PkiMessage request, PrivateKey identityKey, X509Cert identityCert)
+      throws ScepClientException {
     HashAlgo hashAlgo = caCaps.mostSecureHashAlgo();
     ASN1ObjectIdentifier encAlgId;
     if (caCaps.supportsAES()) {
@@ -500,9 +486,8 @@ public abstract class Client {
     }
   }
 
-  private DecodedPkiMessage decode(CMSSignedData pkiMessage, PrivateKey recipientKey,
-      X509Cert recipientCert)
-          throws ScepClientException {
+  private DecodedPkiMessage decode(CMSSignedData pkiMessage, PrivateKey recipientKey, X509Cert recipientCert)
+      throws ScepClientException {
     DecodedPkiMessage resp;
     try {
       resp = DecodedPkiMessage.decode(pkiMessage, recipientKey, recipientCert, responseSignerCerts);
@@ -556,9 +541,8 @@ public abstract class Client {
     }
   }
 
-  private static AuthorityCertStore retrieveCaCertStore(ScepHttpResponse resp,
-      CaCertValidator caValidator)
-          throws ScepClientException {
+  private static AuthorityCertStore retrieveCaCertStore(ScepHttpResponse resp, CaCertValidator caValidator)
+      throws ScepClientException {
     String ct = resp.getContentType();
 
     X509Cert caCert = null;
@@ -589,15 +573,13 @@ public abstract class Client {
 
       final int n = certs.size();
       if (n < 2) {
-        throw new ScepClientException(
-            "at least 2 certificates are expected, but only " + n + " is available");
+        throw new ScepClientException("at least 2 certificates are expected, but only " + n + " is available");
       }
 
       for (X509Cert cert : certs) {
         if (cert.getBasicConstraints() > -1) {
           if (caCert != null) {
-            throw new ScepClientException(
-                    "multiple CA certificates is returned, but exactly 1 is expected");
+            throw new ScepClientException("multiple CA certificates is returned, but exactly 1 is expected");
           }
           caCert = cert;
         } else {
@@ -613,26 +595,22 @@ public abstract class Client {
     }
 
     if (!caValidator.isTrusted(caCert)) {
-      throw new ScepClientException(
-          "CA certificate '" + caCert.getSubjectText() + "' is not trusted");
+      throw new ScepClientException("CA certificate '" + caCert.getSubjectText() + "' is not trusted");
     }
 
     if (raCerts.isEmpty()) {
       return AuthorityCertStore.getInstance(caCert);
     }
 
-    AuthorityCertStore cs = AuthorityCertStore.getInstance(caCert,
-        raCerts.toArray(new X509Cert[0]));
+    AuthorityCertStore cs = AuthorityCertStore.getInstance(caCert, raCerts.toArray(new X509Cert[0]));
     X509Cert raEncCert = cs.getEncryptionCert();
     X509Cert raSignCert = cs.getSignatureCert();
     try {
       if (!X509Util.issues(caCert, raEncCert)) {
-        throw new ScepClientException("RA certificate '"
-            + raEncCert.getSubjectText() + " is not issued by the CA");
+        throw new ScepClientException("RA certificate '" + raEncCert.getSubjectText() + " is not issued by the CA");
       }
       if (raSignCert != raEncCert && X509Util.issues(caCert, raSignCert)) {
-        throw new ScepClientException("RA certificate '"
-            + raSignCert.getSubjectText() + " is not issued by the CA");
+        throw new ScepClientException("RA certificate '" + raSignCert.getSubjectText() + " is not issued by the CA");
       }
     } catch (CertificateException ex) {
       throw new ScepClientException("invalid certificate: " + ex.getMessage(), ex);

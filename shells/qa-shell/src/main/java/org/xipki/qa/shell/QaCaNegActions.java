@@ -94,8 +94,7 @@ public class QaCaNegActions {
 
   } // class NegCaaliasRm
 
-  @Command(scope = "caqa", name = "neg-caprofile-add",
-      description = "add certificate profiles to CA (negative, QA)")
+  @Command(scope = "caqa", name = "neg-caprofile-add", description = "add certificate profiles to CA (negative, QA)")
   @Service
   public static class NegCaprofileAdd extends ProfileCaActions.CaprofileAdd {
 
@@ -115,8 +114,7 @@ public class QaCaNegActions {
 
   } // class NegCaprofileAdd
 
-  @Command(scope = "caqa", name = "neg-caprofile-rm",
-      description = "remove certificate profile from CA (negative, QA)")
+  @Command(scope = "caqa", name = "neg-caprofile-rm", description = "remove certificate profile from CA (negative, QA)")
   @Service
   public static class NegCaprofileRm extends ProfileCaActions.CaprofileRm {
 
@@ -136,8 +134,7 @@ public class QaCaNegActions {
 
   } // class NegCaprofileRm
 
-  @Command(scope = "caqa", name = "neg-capub-add",
-      description = "add publishers to CA (negative, QA)")
+  @Command(scope = "caqa", name = "neg-capub-add", description = "add publishers to CA (negative, QA)")
   @Service
   public static class NegCaPubAdd extends PublisherCaActions.CapubAdd {
 
@@ -157,8 +154,7 @@ public class QaCaNegActions {
 
   } // class NegCaPubAdd
 
-  @Command(scope = "caqa", name = "neg-capub-rm",
-      description = "remove publisher from CA (negative, QA)")
+  @Command(scope = "caqa", name = "neg-capub-rm", description = "remove publisher from CA (negative, QA)")
   @Service
   public static class NegCapubRm extends PublisherCaActions.CapubRm {
 
@@ -198,8 +194,7 @@ public class QaCaNegActions {
 
   } // class NegCaRm
 
-  @Command(scope = "caqa", name = "neg-careq-add",
-      description = "add requestor to CA (negative, QA)")
+  @Command(scope = "caqa", name = "neg-careq-add", description = "add requestor to CA (negative, QA)")
   @Service
   public static class NegCaReqAdd extends RequestorCaActions.CareqAdd {
 
@@ -219,8 +214,7 @@ public class QaCaNegActions {
 
   } // class NegCaReqAdd
 
-  @Command(scope = "caqa", name = "neg-careq-rm",
-      description = "remove requestor in CA (negative, QA)")
+  @Command(scope = "caqa", name = "neg-careq-rm", description = "remove requestor in CA (negative, QA)")
   @Service
   public static class NegCareqRm extends RequestorCaActions.CareqRm {
 
@@ -300,8 +294,7 @@ public class QaCaNegActions {
 
   } // class NegCaUp
 
-  @Command(scope = "caqa", name = "neg-clear-publishqueue",
-      description = "clear publish queue (negative, QA)")
+  @Command(scope = "caqa", name = "neg-clear-publishqueue", description = "clear publish queue (negative, QA)")
   @Service
   public static class NegClearPublishQueue extends MiscCaActions.ClearPublishqueue {
 
@@ -321,8 +314,7 @@ public class QaCaNegActions {
 
   } // class NegClearPublishQueue
 
-  @Command(scope = "caqa", name = "neg-enroll-cert",
-      description = "enroll certificate (negative, QA)")
+  @Command(scope = "caqa", name = "neg-enroll-cert", description = "enroll certificate (negative, QA)")
   @Service
   public static class NegEnrollCert extends EnrollCert {
 
@@ -342,8 +334,7 @@ public class QaCaNegActions {
 
   } // class NegEnrollCert
 
-  @Command(scope = "caqa", name = "neg-gen-rootca",
-      description = "generate selfsigned CA (negative, QA)")
+  @Command(scope = "caqa", name = "neg-gen-rootca", description = "generate selfsigned CA (negative, QA)")
   @Service
   public static class NegGenRootCa extends CaActions.GenRootca {
 
@@ -363,8 +354,7 @@ public class QaCaNegActions {
 
   } // class NegGenRootCa
 
-  @Command(scope = "caqa", name = "neg-profile-add",
-      description = "add certificate profile (negative, QA)")
+  @Command(scope = "caqa", name = "neg-profile-add", description = "add certificate profile (negative, QA)")
   @Service
   public static class NegProfileAdd extends ProfileCaActions.ProfileAdd {
 
@@ -404,8 +394,7 @@ public class QaCaNegActions {
 
   } // class NegProfileRm
 
-  @Command(scope = "caqa", name = "neg-profile-up",
-      description = "update certificate profile (negative, QA)")
+  @Command(scope = "caqa", name = "neg-profile-up", description = "update certificate profile (negative, QA)")
   @Service
   public static class NegProfileUp extends ProfileCaActions.ProfileUp {
 
@@ -445,8 +434,7 @@ public class QaCaNegActions {
 
   } // class NegPublisherAdd
 
-  @Command(scope = "caqa", name = "neg-publisher-rm",
-      description = "remove publisher (negative, QA)")
+  @Command(scope = "caqa", name = "neg-publisher-rm", description = "remove publisher (negative, QA)")
   @Service
   public static class NegPublisherRm extends PublisherCaActions.PublisherRm {
 
@@ -466,8 +454,7 @@ public class QaCaNegActions {
 
   } // class NegPublisherRm
 
-  @Command(scope = "caqa", name = "neg-publisher-up",
-      description = "update publisher (negative, QA)")
+  @Command(scope = "caqa", name = "neg-publisher-up", description = "update publisher (negative, QA)")
   @Service
   public static class NegPublisherUp extends PublisherCaActions.PublisherUp {
 
@@ -487,8 +474,7 @@ public class QaCaNegActions {
 
   } // class NegPublisherUp
 
-  @Command(scope = "caqa", name = "neg-republish",
-      description = "republish certificates (negative, QA)")
+  @Command(scope = "caqa", name = "neg-republish", description = "republish certificates (negative, QA)")
   @Service
   public static class NegRepublish extends MiscCaActions.Republish {
 
@@ -528,8 +514,7 @@ public class QaCaNegActions {
 
   } // class NegRequestorAdd
 
-  @Command(scope = "caqa", name = "neg-requestor-rm",
-      description = "remove requestor (negative, QA)")
+  @Command(scope = "caqa", name = "neg-requestor-rm", description = "remove requestor (negative, QA)")
   @Service
   public static class NegRequestorRm extends RequestorCaActions.RequestorRm {
 
@@ -549,8 +534,7 @@ public class QaCaNegActions {
 
   } // class NegRequestorRm
 
-  @Command(scope = "caqa", name = "neg-requestor-up",
-      description = "update requestor (negative, QA)")
+  @Command(scope = "caqa", name = "neg-requestor-up", description = "update requestor (negative, QA)")
   @Service
   public static class NegRequestorUp extends RequestorCaActions.RequestorUp {
 
@@ -590,8 +574,7 @@ public class QaCaNegActions {
 
   } // class NegRmCert
 
-  @Command(scope = "caqa", name = "neg-revoke-cert",
-      description = "revoke certificate (negative, QA)")
+  @Command(scope = "caqa", name = "neg-revoke-cert", description = "revoke certificate (negative, QA)")
   @Service
   public static class NegRevokeCert extends RevokeCert {
 
@@ -671,8 +654,7 @@ public class QaCaNegActions {
 
   } // class NegSignerUp
 
-  @Command(scope = "caqa", name = "neg-unrevoke-cert",
-      description = "unrevoke certificate (negative, QA)")
+  @Command(scope = "caqa", name = "neg-unrevoke-cert", description = "unrevoke certificate (negative, QA)")
   @Service
   public static class NegUnrevokeCert extends UnsuspendCert {
 

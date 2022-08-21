@@ -51,8 +51,7 @@ public class Passwords {
     private List<String> singlePasswordResolvers;
 
     public String getMasterPasswordCallback() {
-      return StringUtil.isBlank(masterPasswordCallback)
-          ? dflt_masterPasswordCallback : masterPasswordCallback;
+      return StringUtil.isBlank(masterPasswordCallback) ? dflt_masterPasswordCallback : masterPasswordCallback;
     }
 
     public void setMasterPasswordCallback(String masterPasswordCallback) {
@@ -99,8 +98,7 @@ public class Passwords {
           Class<?> clazz = Class.forName(className);
           SinglePasswordResolver resolver = (SinglePasswordResolver) clazz.newInstance();
           passwordResolver.registResolver(resolver);
-        } catch (ClassCastException | ClassNotFoundException | IllegalAccessException
-            | InstantiationException ex) {
+        } catch (ClassCastException | ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
           throw new InvalidConfException("error caught while initializing SinglePasswordResolver "
               + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }

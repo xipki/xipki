@@ -57,8 +57,7 @@ public class GMUtil {
   private GMUtil() {
   }
 
-  public static byte[] getSM2Z(ASN1ObjectIdentifier curveOid, BigInteger pubPointX,
-      BigInteger pubPointY) {
+  public static byte[] getSM2Z(ASN1ObjectIdentifier curveOid, BigInteger pubPointX, BigInteger pubPointY) {
     return getSM2Z(defaultIDA, curveOid, pubPointX, pubPointY);
   }
 
@@ -66,8 +65,8 @@ public class GMUtil {
     return defaultIDA.clone();
   }
 
-  public static byte[] getSM2Z(byte[] userID, ASN1ObjectIdentifier curveOid,
-      BigInteger pubPointX, BigInteger pubPointY) {
+  public static byte[] getSM2Z(
+      byte[] userID, ASN1ObjectIdentifier curveOid, BigInteger pubPointX, BigInteger pubPointY) {
     SM3Digest digest = new SM3Digest();
 
     addUserId(digest, userID);

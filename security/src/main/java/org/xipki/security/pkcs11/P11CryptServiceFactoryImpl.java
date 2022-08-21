@@ -92,8 +92,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
       }
 
       if (!confs.containsKey(P11CryptServiceFactory.DEFAULT_P11MODULE_NAME)) {
-        throw new InvalidConfException("module '"
-            + P11CryptServiceFactory.DEFAULT_P11MODULE_NAME + "' is not defined");
+        throw new InvalidConfException("module '" + P11CryptServiceFactory.DEFAULT_P11MODULE_NAME + "' is not defined");
       }
       this.moduleConfs = Collections.unmodifiableMap(confs);
       this.moduleNames = Collections.unmodifiableSet(new HashSet<>(confs.keySet()));
@@ -107,8 +106,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
     try {
       init();
     } catch (InvalidConfException ex) {
-      throw new IllegalStateException(
-          "could not initialize P11CryptServiceFactory: " + ex.getMessage(), ex);
+      throw new IllegalStateException("could not initialize P11CryptServiceFactory: " + ex.getMessage(), ex);
     }
 
     if (moduleConfs == null) {
@@ -168,8 +166,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
     try {
       init();
     } catch (InvalidConfException ex) {
-      throw new IllegalStateException(
-          "could not initialize P11CryptServiceFactory: " + ex.getMessage(), ex);
+      throw new IllegalStateException("could not initialize P11CryptServiceFactory: " + ex.getMessage(), ex);
     }
     return moduleNames;
   }

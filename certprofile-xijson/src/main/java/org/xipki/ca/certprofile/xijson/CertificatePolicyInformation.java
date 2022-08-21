@@ -35,8 +35,7 @@ public class CertificatePolicyInformation {
 
   private final List<CertificatePolicyQualifier> qualifiers;
 
-  public CertificatePolicyInformation(String certPolicyId,
-      List<CertificatePolicyQualifier> qualifiers) {
+  public CertificatePolicyInformation(String certPolicyId, List<CertificatePolicyQualifier> qualifiers) {
     this.certPolicyId = Args.notBlank(certPolicyId, "certPolicyId");
     this.qualifiers = CollectionUtil.unmodifiableList(qualifiers);
   }

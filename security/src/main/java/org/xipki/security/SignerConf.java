@@ -52,8 +52,7 @@ public class SignerConf {
     }
   }
 
-  public SignerConf(String confWithoutAlgo, HashAlgo hashAlgo,
-      SignatureAlgoControl signatureAlgoControl) {
+  public SignerConf(String confWithoutAlgo, HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl) {
     this.hashAlgo = notNull(hashAlgo, "hashAlgo");
     this.signatureAlgoControl = signatureAlgoControl;
     this.confPairs = new ConfPairs(notBlank(confWithoutAlgo, "confWithoutAlgo"));

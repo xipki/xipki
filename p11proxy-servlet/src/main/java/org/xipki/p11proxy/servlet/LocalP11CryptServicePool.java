@@ -81,8 +81,7 @@ public class LocalP11CryptServicePool {
               + " already used, use another module name");
         }
         p11CryptServices.put(moduleId, p11Service);
-        LOG.info("map module name '{}' to ID {}({}), access path: "
-            + "'url=https://<host>:<port>/p11proxy,module={}'",
+        LOG.info("map module name '{}' to ID {}({}), access path: url=https://<host>:<port>/p11proxy,module={}'",
             moduleName, moduleId, hexModuleId, hexModuleId);
       }
     }

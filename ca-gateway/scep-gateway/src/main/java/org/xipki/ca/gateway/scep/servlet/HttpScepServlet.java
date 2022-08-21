@@ -78,12 +78,10 @@ public class HttpScepServlet extends HttpServlet {
         ? IoUtil.read(req.getInputStream())
         : Base64.decode(req.getParameter("message"));
 
-    RestResponse restResp = responder.service(path, requestBytes,
-        new HttpRequestMetadataRetrieverImpl(req));
+    RestResponse restResp = responder.service(path, requestBytes, new HttpRequestMetadataRetrieverImpl(req));
     restResp.fillResponse(resp);
 
-    ServletHelper.logReqResp("SCEP Gateway", LOG, logReqResp, true, req,
-        requestBytes, restResp.getBody());
+    ServletHelper.logReqResp("SCEP Gateway", LOG, logReqResp, true, req, requestBytes, restResp.getBody());
   }
 
 }

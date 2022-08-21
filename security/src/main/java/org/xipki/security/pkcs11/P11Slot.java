@@ -214,11 +214,9 @@ public abstract class P11Slot implements Closeable {
 
   private final SecureRandom random = new SecureRandom();
 
-  private final ConcurrentHashMap<P11ObjectIdentifier, P11Identity> identities =
-      new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<P11ObjectIdentifier, P11Identity> identities = new ConcurrentHashMap<>();
 
-  private final ConcurrentHashMap<P11ObjectIdentifier, X509Cert> certificates =
-      new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<P11ObjectIdentifier, X509Cert> certificates = new ConcurrentHashMap<>();
 
   private final Set<Long> mechanisms = new HashSet<>();
 
@@ -229,10 +227,9 @@ public abstract class P11Slot implements Closeable {
   protected final List<Long> keyPairTypes;
 
   protected P11Slot(
-          String moduleName, P11SlotIdentifier slotId, boolean readOnly,
-          P11MechanismFilter mechanismFilter, Integer numSessions,
-          List<Long> secretKeyTypes, List<Long> keyPairTypes)
-          throws P11TokenException {
+      String moduleName, P11SlotIdentifier slotId, boolean readOnly, P11MechanismFilter mechanismFilter,
+      Integer numSessions, List<Long> secretKeyTypes, List<Long> keyPairTypes)
+      throws P11TokenException {
     this.mechanismFilter = notNull(mechanismFilter, "mechanismFilter");
     this.moduleName = notBlank(moduleName, "moduleName");
     this.slotId = notNull(slotId, "slotId");
@@ -330,9 +327,8 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  protected abstract P11Identity generateSecretKey0(long keyType, int keysize,
-      P11NewKeyControl control)
-          throws P11TokenException;
+  protected abstract P11Identity generateSecretKey0(long keyType, int keysize, P11NewKeyControl control)
+      throws P11TokenException;
 
   /**
    * Imports secret key object in the PKCS#11 token. The key itself will not be generated
@@ -348,9 +344,8 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  protected abstract P11Identity importSecretKey0(long keyType, byte[] keyValue,
-      P11NewKeyControl control)
-          throws P11TokenException;
+  protected abstract P11Identity importSecretKey0(long keyType, byte[] keyValue, P11NewKeyControl control)
+      throws P11TokenException;
 
   /**
    * Generates a DSA keypair on-the-fly.
@@ -367,9 +362,8 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  protected abstract P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
-      P11NewKeyControl control)
-          throws P11TokenException;
+  protected abstract P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g, P11NewKeyControl control)
+      throws P11TokenException;
 
   /**
    * Generates an EC Edwards keypair.
@@ -382,9 +376,8 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  protected abstract P11Identity generateECEdwardsKeypair0(ASN1ObjectIdentifier curveId,
-      P11NewKeyControl control)
-          throws P11TokenException;
+  protected abstract P11Identity generateECEdwardsKeypair0(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
+      throws P11TokenException;
 
   /**
    * Generates an EC Edwards keypair on-the-fly.
@@ -409,9 +402,8 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  protected abstract P11Identity generateECMontgomeryKeypair0(ASN1ObjectIdentifier curveId,
-      P11NewKeyControl control)
-          throws P11TokenException;
+  protected abstract P11Identity generateECMontgomeryKeypair0(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
+      throws P11TokenException;
 
   /**
    * Generates an EC Montgomery keypair on-the-fly.
@@ -436,9 +428,8 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  protected abstract P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId,
-      P11NewKeyControl control)
-          throws P11TokenException;
+  protected abstract P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
+      throws P11TokenException;
 
   /**
    * Generates an EC keypair over-the-air.
@@ -487,9 +478,8 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  protected abstract P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent,
-      P11NewKeyControl control)
-          throws P11TokenException;
+  protected abstract P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent, P11NewKeyControl control)
+      throws P11TokenException;
 
   protected abstract P11SlotRefreshResult refresh0()
       throws P11TokenException;
@@ -1046,9 +1036,8 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public P11ObjectIdentifier importSecretKey(long keyType, byte[] keyValue,
-      P11NewKeyControl control)
-          throws P11TokenException {
+  public P11ObjectIdentifier importSecretKey(long keyType, byte[] keyValue, P11NewKeyControl control)
+      throws P11TokenException {
     notNull(control, "control");
     assertWritable("createSecretKey");
     assertNoIdentityAndCert(control.getId(), control.getLabel());
@@ -1062,7 +1051,8 @@ public abstract class P11Slot implements Closeable {
     return objId;
   } // method importSecretKey
 
-  private void assertSecretKeyAllowed(long keyType) throws P11TokenException {
+  private void assertSecretKeyAllowed(long keyType)
+      throws P11TokenException {
     if (secretKeyTypes == null) {
       return;
     }
@@ -1110,9 +1100,8 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public P11IdentityId generateRSAKeypair(int keysize, BigInteger publicExponent,
-      P11NewKeyControl control)
-          throws P11TokenException {
+  public P11IdentityId generateRSAKeypair(int keysize, BigInteger publicExponent, P11NewKeyControl control)
+      throws P11TokenException {
     min(keysize, "keysize", 1024);
     if (keysize % 1024 != 0) {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + keysize);
@@ -1152,8 +1141,7 @@ public abstract class P11Slot implements Closeable {
     return generateDSAKeypairOtf0(p, q, g);
   } // method generateDSAKeypairOtf
 
-  protected abstract PrivateKeyInfo generateDSAKeypairOtf0(
-      BigInteger p, BigInteger q, BigInteger g)
+  protected abstract PrivateKeyInfo generateDSAKeypairOtf0(BigInteger p, BigInteger q, BigInteger g)
       throws P11TokenException;
 
   /**
@@ -1194,9 +1182,8 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public P11IdentityId generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g,
-      P11NewKeyControl control)
-          throws P11TokenException {
+  public P11IdentityId generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g, P11NewKeyControl control)
+      throws P11TokenException {
     notNull(p, "p");
     notNull(q, "q");
     notNull(g, "g");

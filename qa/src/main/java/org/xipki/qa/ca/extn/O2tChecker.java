@@ -77,8 +77,7 @@ class O2tChecker extends ExtensionChecker {
       Extensions requestedExtns, ExtensionControl extnControl) {
     PolicyConstraints conf = caller.getPolicyConstraints();
     if (conf == null) {
-      caller.checkConstantExtnValue(Extension.policyConstraints, failureMsg, extnValue,
-          requestedExtns, extnControl);
+      caller.checkConstantExtnValue(Extension.policyConstraints, failureMsg, extnValue, requestedExtns, extnControl);
       return;
     }
 
@@ -98,8 +97,7 @@ class O2tChecker extends ExtensionChecker {
     }
 
     if (!match) {
-      addViolation(failureMsg, "requireExplicitPolicy", isRequireExplicitPolicy,
-          expRequireExplicitPolicy);
+      addViolation(failureMsg, "requireExplicitPolicy", isRequireExplicitPolicy, expRequireExplicitPolicy);
     }
 
     Integer expInhibitPolicyMapping = conf.getInhibitPolicyMapping();
@@ -116,17 +114,15 @@ class O2tChecker extends ExtensionChecker {
     }
 
     if (!match) {
-      addViolation(failureMsg, "inhibitPolicyMapping", isInhibitPolicyMapping,
-          expInhibitPolicyMapping);
+      addViolation(failureMsg, "inhibitPolicyMapping", isInhibitPolicyMapping, expInhibitPolicyMapping);
     }
   } // method checkExtnPolicyConstraints
 
-  void checkExtnPolicyMappings(StringBuilder failureMsg, byte[] extnValue,
-      Extensions requestedExtns, ExtensionControl extnControl) {
+  void checkExtnPolicyMappings(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns, ExtensionControl extnControl) {
     PolicyMappings conf = caller.getPolicyMappings();
     if (conf == null) {
-      caller.checkConstantExtnValue(Extension.policyMappings, failureMsg, extnValue,
-          requestedExtns, extnControl);
+      caller.checkConstantExtnValue(Extension.policyMappings, failureMsg, extnValue, requestedExtns, extnControl);
       return;
     }
 
@@ -146,8 +142,7 @@ class O2tChecker extends ExtensionChecker {
 
       String isSubjectDomainPolicy = isMap.remove(expIssuerDomainPolicy);
       if (isSubjectDomainPolicy == null) {
-        failureMsg.append("issuerDomainPolicy '").append(expIssuerDomainPolicy)
-          .append("' is absent but is required; ");
+        failureMsg.append("issuerDomainPolicy '").append(expIssuerDomainPolicy).append("' is absent but is required; ");
       } else if (!isSubjectDomainPolicy.equals(expSubjectDomainPolicy)) {
         addViolation(failureMsg, "subjectDomainPolicy for issuerDomainPolicy",
             isSubjectDomainPolicy, expSubjectDomainPolicy);
@@ -155,13 +150,12 @@ class O2tChecker extends ExtensionChecker {
     }
 
     if (isNotEmpty(isMap)) {
-      failureMsg.append("issuerDomainPolicies '").append(isMap.keySet())
-        .append("' are present but not expected; ");
+      failureMsg.append("issuerDomainPolicies '").append(isMap.keySet()).append("' are present but not expected; ");
     }
   } // method checkExtnMappings
 
-  void checkExtnPrivateKeyUsagePeriod(StringBuilder failureMsg,
-      byte[] extnValue, Date certNotBefore, Date certNotAfter) {
+  void checkExtnPrivateKeyUsagePeriod(
+      StringBuilder failureMsg, byte[] extnValue, Date certNotBefore, Date certNotAfter) {
     ASN1GeneralizedTime notBefore = new ASN1GeneralizedTime(certNotBefore);
     Date dateNotAfter;
     Validity privateKeyUsagePeriod = getCertprofile().extensions().getPrivateKeyUsagePeriod();
@@ -193,12 +187,11 @@ class O2tChecker extends ExtensionChecker {
     }
   } // method checkExtnPrivateKeyUsagePeriod
 
-  void checkExtnQcStatements(StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns,
-      ExtensionControl extnControl) {
+  void checkExtnQcStatements(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns, ExtensionControl extnControl) {
     QcStatements qcStatements = caller.getQcStatements();
     if (qcStatements == null) {
-      caller.checkConstantExtnValue(Extension.qCStatements,
-          failureMsg, extnValue, requestedExtns, extnControl);
+      caller.checkConstantExtnValue(Extension.qCStatements, failureMsg, extnValue, requestedExtns, extnControl);
       return;
     }
 
@@ -212,8 +205,7 @@ class O2tChecker extends ExtensionChecker {
 
     // extract the euLimit and pdsLocations data from request
     Map<String, int[]> reqQcEuLimits = new HashMap<>();
-    Extension reqExtension = (requestedExtns == null) ? null
-        : requestedExtns.getExtension(Extension.qCStatements);
+    Extension reqExtension = (requestedExtns == null) ? null : requestedExtns.getExtension(Extension.qCStatements);
     if (reqExtension != null) {
       ASN1Sequence seq = ASN1Sequence.getInstance(reqExtension.getParsedValue());
 
@@ -310,8 +302,7 @@ class O2tChecker extends ExtensionChecker {
           } else if (expAmountExp != null) {
             value = expAmountExp[0];
           } else {
-            failureMsg.append("found no QcEuLimit for currency '").append(expCurrency)
-              .append("'; ");
+            failureMsg.append("found no QcEuLimit for currency '").append(expCurrency).append("'; ");
             return;
           }
           String expAmount = Integer.toString(value);
@@ -322,8 +313,7 @@ class O2tChecker extends ExtensionChecker {
           } else if (expAmountExp != null) {
             value = expAmountExp[1];
           } else {
-            failureMsg.append("found no QcEuLimit for currency '").append(expCurrency)
-            .append("'; ");
+            failureMsg.append("found no QcEuLimit for currency '").append(expCurrency).append("'; ");
             return;
           }
           String expExponent = Integer.toString(value);
@@ -335,16 +325,13 @@ class O2tChecker extends ExtensionChecker {
           String isAmount = monterayValue.getAmount().toString();
           String isExponent = monterayValue.getExponent().toString();
           if (!isCurrency.equals(expCurrency)) {
-            addViolation(failureMsg, "statementInfo[" + i + "].qcEuLimit.currency",
-                isCurrency, expCurrency);
+            addViolation(failureMsg, "statementInfo[" + i + "].qcEuLimit.currency", isCurrency, expCurrency);
           }
           if (!isAmount.equals(expAmount)) {
-            addViolation(failureMsg, "statementInfo[" + i + "].qcEuLimit.amount",
-                isAmount, expAmount);
+            addViolation(failureMsg, "statementInfo[" + i + "].qcEuLimit.amount", isAmount, expAmount);
           }
           if (!isExponent.equals(expExponent)) {
-            addViolation(failureMsg, "statementInfo[" + i + "].qcEuLimit.exponent",
-                isExponent, expExponent);
+            addViolation(failureMsg, "statementInfo[" + i + "].qcEuLimit.exponent", isExponent, expExponent);
           }
         } else {
           throw new IllegalStateException("statementInfo[" + i + "]should not reach here");
@@ -355,29 +342,25 @@ class O2tChecker extends ExtensionChecker {
     }
   } // method checkExtnQcStatements
 
-  void checkExtnRestriction(StringBuilder failureMsg, byte[] extnValue,
-      Extensions requestedExtns, ExtensionControl extnControl) {
+  void checkExtnRestriction(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns, ExtensionControl extnControl) {
     Restriction restriction = caller.getRestriction();
     caller.checkDirectoryString(Extn.id_extension_restriction,
-        restriction.getType(), restriction.getText(),
-        failureMsg, extnValue, requestedExtns, extnControl);
+        restriction.getType(), restriction.getText(), failureMsg, extnValue, requestedExtns, extnControl);
   } // method checkExtnRestriction
 
-  void checkSmimeCapabilities(StringBuilder failureMsg, byte[] extnValue,
-      ExtensionControl extnControl) {
+  void checkSmimeCapabilities(StringBuilder failureMsg, byte[] extnValue, ExtensionControl extnControl) {
     byte[] expected = caller.getSmimeCapabilities().getValue();
     if (!Arrays.equals(expected, extnValue)) {
       addViolation(failureMsg, "extension valus", hex(extnValue), hex(expected));
     }
   } // method checkSmimeCapabilities
 
-  void checkScts(StringBuilder failureMsg,
-      byte[] extensionValue, ExtensionControl extControl) {
+  void checkScts(StringBuilder failureMsg, byte[] extensionValue, ExtensionControl extControl) {
     // just check the syntax
     try {
       ASN1OctetString octet = DEROctetString.getInstance(extensionValue);
-      SignedCertificateTimestampList sctList =
-          SignedCertificateTimestampList.getInstance(octet.getOctets());
+      SignedCertificateTimestampList sctList = SignedCertificateTimestampList.getInstance(octet.getOctets());
       int size = sctList.getSctList().size();
       for (int i = 0; i < size; i++) {
         sctList.getSctList().get(i).getDigitallySigned().getSignatureObject();
@@ -387,8 +370,9 @@ class O2tChecker extends ExtensionChecker {
     }
   } // method checkScts
 
-  void checkExtnSubjectAltNames(StringBuilder failureMsg, byte[] extnValue,
-      Extensions requestedExtns, ExtensionControl extnControl, X500Name requestedSubject) {
+  void checkExtnSubjectAltNames(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns,
+      ExtensionControl extnControl, X500Name requestedSubject) {
     XijsonCertprofile certprofile = getCertprofile();
     Set<GeneralNameMode> conf = certprofile.getSubjectAltNameModes();
 
@@ -414,8 +398,7 @@ class O2tChecker extends ExtensionChecker {
       try {
         expected[i] = createGeneralName(is[i], conf);
       } catch (BadCertTemplateException ex) {
-        failureMsg.append("could not process ").append(i + 1).append("-th name: ")
-          .append(ex.getMessage()).append("; ");
+        failureMsg.append("could not process ").append(i + 1).append("-th name: ").append(ex.getMessage()).append("; ");
         return;
       }
     }
@@ -434,7 +417,7 @@ class O2tChecker extends ExtensionChecker {
 
   private GeneralName[] getRequestedSubjectAltNames(
       XijsonCertprofile certprofile, X500Name requestedSubject, Extensions requestedExtns)
-          throws CertprofileException, BadCertTemplateException {
+      throws CertprofileException, BadCertTemplateException {
     ASN1Encodable extValue = (requestedExtns == null) ? null
         : requestedExtns.getExtensionParsedValue(Extension.subjectAlternativeName);
 
@@ -456,8 +439,7 @@ class O2tChecker extends ExtensionChecker {
     if (subjectToSubjectAltNameModes != null) {
       X500Name grantedSubject = certprofile.getSubject(requestedSubject).getGrantedSubject();
 
-      for (Entry<ASN1ObjectIdentifier, GeneralNameTag> entry
-          : subjectToSubjectAltNameModes.entrySet()) {
+      for (Entry<ASN1ObjectIdentifier, GeneralNameTag> entry : subjectToSubjectAltNameModes.entrySet()) {
         ASN1ObjectIdentifier attrType = entry.getKey();
         GeneralNameTag tag = entry.getValue();
 
@@ -484,8 +466,7 @@ class O2tChecker extends ExtensionChecker {
               grantedNames.add(new GeneralName(tag.getTag(), rdnValue));
               break;
             default:
-              throw new IllegalStateException(
-                  "should not reach here, unknown GeneralName tag " + tag);
+              throw new IllegalStateException("should not reach here, unknown GeneralName tag " + tag);
           } // end switch (tag)
         }
       }
@@ -502,10 +483,9 @@ class O2tChecker extends ExtensionChecker {
     return grantedNames.isEmpty() ? null : grantedNames.toArray(new GeneralName[0]);
   } // method getRequestedSubjectAltNames
 
-  void checkExtnSubjectDirAttrs(StringBuilder failureMsg, byte[] extnValue,
-      Extensions requestedExtns, ExtensionControl extnControl) {
-    SubjectDirectoryAttributesControl conf =
-        getCertprofile().extensions().getSubjectDirAttrsControl();
+  void checkExtnSubjectDirAttrs(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns, ExtensionControl extnControl) {
+    SubjectDirectoryAttributesControl conf = getCertprofile().extensions().getSubjectDirAttrsControl();
     if (conf == null) {
       failureMsg.append("extension is present but not expected; ");
       return;
@@ -513,8 +493,7 @@ class O2tChecker extends ExtensionChecker {
 
     ASN1Encodable extInRequest = null;
     if (requestedExtns != null) {
-      extInRequest = requestedExtns.getExtensionParsedValue(
-          Extension.subjectDirectoryAttributes);
+      extInRequest = requestedExtns.getExtensionParsedValue(Extension.subjectDirectoryAttributes);
     }
 
     if (extInRequest == null) {
@@ -574,8 +553,7 @@ class O2tChecker extends ExtensionChecker {
       Attribute attr = Attribute.getInstance(subDirAttrs.get(i));
       ASN1ObjectIdentifier attrType = attr.getAttrType();
       if (!attrTypes.contains(attrType)) {
-        failureMsg.append("attribute of type " + attrType.getId())
-          .append(" is present but not expected; ");
+        failureMsg.append("attribute of type " + attrType.getId()).append(" is present but not expected; ");
         continue;
       }
 
@@ -637,8 +615,7 @@ class O2tChecker extends ExtensionChecker {
       for (ASN1ObjectIdentifier oid : attrTypes) {
         attrTypeTexts.add(oid.getId());
       }
-      failureMsg.append("required attributes of types ").append(attrTypeTexts)
-        .append(" are not present; ");
+      failureMsg.append("required attributes of types ").append(attrTypeTexts).append(" are not present; ");
     }
 
     if (dateOfBirth != null) {
@@ -671,28 +648,24 @@ class O2tChecker extends ExtensionChecker {
     if (!countryOfCitizenshipList.isEmpty()) {
       Set<String> diffs = strInBnotInA(expCountryOfCitizenshipList, countryOfCitizenshipList);
       if (isNotEmpty(diffs)) {
-        failureMsg.append("countryOfCitizenship ").append(diffs)
-          .append(" are present but not expected; ");
+        failureMsg.append("countryOfCitizenship ").append(diffs).append(" are present but not expected; ");
       }
 
       diffs = strInBnotInA(countryOfCitizenshipList, expCountryOfCitizenshipList);
       if (isNotEmpty(diffs)) {
-        failureMsg.append("countryOfCitizenship ").append(diffs)
-          .append(" are absent but are required; ");
+        failureMsg.append("countryOfCitizenship ").append(diffs).append(" are absent but are required; ");
       }
     }
 
     if (!countryOfResidenceList.isEmpty()) {
       Set<String> diffs = strInBnotInA(expCountryOfResidenceList, countryOfResidenceList);
       if (isNotEmpty(diffs)) {
-        failureMsg.append("countryOfResidence ").append(diffs)
-          .append(" are present but not expected; ");
+        failureMsg.append("countryOfResidence ").append(diffs).append(" are present but not expected; ");
       }
 
       diffs = strInBnotInA(countryOfResidenceList, expCountryOfResidenceList);
       if (isNotEmpty(diffs)) {
-        failureMsg.append("countryOfResidence ").append(diffs)
-          .append(" are absent but are required; ");
+        failureMsg.append("countryOfResidence ").append(diffs).append(" are absent but are required; ");
       }
     }
 
@@ -701,25 +674,22 @@ class O2tChecker extends ExtensionChecker {
         ASN1ObjectIdentifier attrType = entry.getKey();
         Set<ASN1Encodable> expAttrValues = entry.getValue();
         if (expAttrValues == null) {
-          failureMsg.append("attribute of type ").append(attrType.getId())
-              .append(" is present but not requested; ");
+          failureMsg.append("attribute of type ").append(attrType.getId()).append(" is present but not requested; ");
           continue;
         }
 
         Set<ASN1Encodable> attrValues = otherAttrs.get(attrType);
         if (!attrValues.equals(expAttrValues)) {
-          failureMsg.append("attribute of type ").append(attrType.getId())
-            .append(" differs from the requested one; ");
+          failureMsg.append("attribute of type ").append(attrType.getId()).append(" differs from the requested one; ");
           continue;
         }
       }
     }
   } // method checkExtnSubjectDirAttrs
 
-  void checkExtnSubjectInfoAccess(StringBuilder failureMsg, byte[] extnValue,
-      Extensions requestedExtns, ExtensionControl extnControl) {
-    Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> conf =
-        getCertprofile().getSubjectInfoAccessModes();
+  void checkExtnSubjectInfoAccess(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns, ExtensionControl extnControl) {
+    Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> conf = getCertprofile().getSubjectInfoAccessModes();
     if (conf == null) {
       failureMsg.append("extension is present but not expected; ");
       return;
@@ -755,12 +725,10 @@ class O2tChecker extends ExtensionChecker {
         continue;
       }
 
-      AccessDescription certAccessDesc = AccessDescription.getInstance(
-          certSeq.getObjectAt(i));
+      AccessDescription certAccessDesc = AccessDescription.getInstance(certSeq.getObjectAt(i));
       ASN1ObjectIdentifier certAccessMethod = certAccessDesc.getAccessMethod();
 
-      boolean bo = (accessMethod == null) ? (certAccessMethod == null)
-          : accessMethod.equals(certAccessMethod);
+      boolean bo = Objects.equals(accessMethod, certAccessMethod);
 
       if (!bo) {
         addViolation(failureMsg, "accessMethod",
@@ -784,16 +752,15 @@ class O2tChecker extends ExtensionChecker {
     }
   } // method checkExtnSUbjectInfoAccess
 
-  void checkExtnSubjectKeyIdentifier(StringBuilder failureMsg,
-      byte[] extnValue, SubjectPublicKeyInfo subjectPublicKeyInfo) {
+  void checkExtnSubjectKeyIdentifier(
+      StringBuilder failureMsg, byte[] extnValue, SubjectPublicKeyInfo subjectPublicKeyInfo) {
     // subjectKeyIdentifier
     SubjectKeyIdentifier asn1 = SubjectKeyIdentifier.getInstance(extnValue);
     byte[] ski = asn1.getKeyIdentifier();
 
     byte[] expectedSki;
     try {
-      expectedSki = getCertprofile().getSubjectKeyIdentifier(subjectPublicKeyInfo)
-                      .getKeyIdentifier();
+      expectedSki = getCertprofile().getSubjectKeyIdentifier(subjectPublicKeyInfo).getKeyIdentifier();
     } catch (CertprofileException e) {
       failureMsg.append("error computing expected SubjectKeyIdentifier");
       return;
@@ -804,12 +771,11 @@ class O2tChecker extends ExtensionChecker {
     }
   } // method checkExtnSubjectKeyIdentifier
 
-  void checkExtnTlsFeature(StringBuilder failureMsg, byte[] extnValue,
-      Extensions requestedExtns, ExtensionControl extnControl) {
+  void checkExtnTlsFeature(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns, ExtensionControl extnControl) {
     TlsFeature tlsFeature = caller.getTlsFeature();
     if (tlsFeature == null) {
-      caller.checkConstantExtnValue(Extn.id_pe_tlsfeature, failureMsg, extnValue,
-          requestedExtns, extnControl);
+      caller.checkConstantExtnValue(Extn.id_pe_tlsfeature, failureMsg, extnValue, requestedExtns, extnControl);
       return;
     }
 

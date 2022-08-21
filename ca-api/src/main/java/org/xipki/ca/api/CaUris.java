@@ -54,8 +54,7 @@ public class CaUris {
   private CaUris() {
   }
 
-  public CaUris(List<String> cacertUris, List<String> ocspUris, List<String> crlUris,
-      List<String> deltaCrlUris) {
+  public CaUris(List<String> cacertUris, List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris) {
     this.cacertUris = (cacertUris == null) ? null : Collections.unmodifiableList(cacertUris);
     this.ocspUris = (ocspUris == null) ? null : Collections.unmodifiableList(ocspUris);
     this.crlUris = (crlUris == null) ? null : Collections.unmodifiableList(crlUris);

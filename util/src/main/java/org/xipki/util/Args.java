@@ -33,88 +33,77 @@ public class Args {
 
   public static int positive(int argument, String name) {
     if (argument < 1) {
-      throw new IllegalArgumentException(String.format(
-          "%s may not be non-positive: %d", name, argument));
+      throw new IllegalArgumentException(String.format("%s may not be non-positive: %d", name, argument));
     }
     return argument;
   }
 
   public static long positive(long argument, String name) {
     if (argument < 1) {
-      throw new IllegalArgumentException(String.format(
-          "%s may not be non-positive: %d", name, argument));
+      throw new IllegalArgumentException(String.format("%s may not be non-positive: %d", name, argument));
     }
     return argument;
   }
 
   public static int notNegative(int argument, String name) {
     if (argument < 0) {
-      throw new IllegalArgumentException(String.format(
-          "%s may not be negative: %d", name, argument));
+      throw new IllegalArgumentException(String.format("%s may not be negative: %d", name, argument));
     }
     return argument;
   }
 
   public static long notNegative(long argument, String name) {
     if (argument < 0) {
-      throw new IllegalArgumentException(String.format(
-          "%s may not be negative: %d", name, argument));
+      throw new IllegalArgumentException(String.format("%s may not be negative: %d", name, argument));
     }
     return argument;
   }
 
   public static byte equals(byte argument, String name, byte value) {
     if (argument != value) {
-      throw new IllegalArgumentException(String.format(
-          "%s may not be other than %d: %d", name, value, argument));
+      throw new IllegalArgumentException(String.format("%s may not be other than %d: %d", name, value, argument));
     }
     return argument;
   }
 
   public static int equals(int argument, String name, int value) {
     if (argument != value) {
-      throw new IllegalArgumentException(String.format(
-          "%s may not be other than %d: %d", name, value, argument));
+      throw new IllegalArgumentException(String.format("%s may not be other than %d: %d", name, value, argument));
     }
     return argument;
   }
 
   public static long equals(long argument, String name, long value) {
     if (argument != value) {
-      throw new IllegalArgumentException(String.format(
-          "%s may not be other than %d: %d", name, value, argument));
+      throw new IllegalArgumentException(String.format("%s may not be other than %d: %d", name, value, argument));
     }
     return argument;
   }
 
   public static int min(int argument, String name, int min) {
     if (argument < min) {
-      throw new IllegalArgumentException(String.format(
-          "%s may not be less than %d: %d", name, min, argument));
+      throw new IllegalArgumentException(String.format("%s may not be less than %d: %d", name, min, argument));
     }
     return argument;
   }
 
   public static long min(long argument, String name, long min) {
     if (argument < min) {
-      throw new IllegalArgumentException(String.format(
-          "%s may not be less than %d: %d", name, min, argument));
+      throw new IllegalArgumentException(String.format("%s may not be less than %d: %d", name, min, argument));
     }
     return argument;
   }
 
   public static int max(int argument, String name, int max) {
     if (argument > max) {
-      throw new IllegalArgumentException(String.format(
-          "%s may not be greater than %d: %d", name, max, argument));
+      throw new IllegalArgumentException(String.format("%s may not be greater than %d: %d", name, max, argument));
     }
     return argument;
   }
 
   public static long max(long argument, String name, long max) {
     if (argument > max) {
-      throw new IllegalArgumentException(String.format(
-          "%s may not be greater than %d: %d", name, max, argument));
+      throw new IllegalArgumentException(String.format("%s may not be greater than %d: %d", name, max, argument));
     }
     return argument;
   }

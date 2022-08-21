@@ -57,8 +57,7 @@ public class PopControl {
       this.popAlgoValidator = CollectionAlgorithmValidator.INSTANCE;
     } else {
       try {
-        this.popAlgoValidator = CollectionAlgorithmValidator.buildAlgorithmValidator(
-            conf.getSigAlgos());
+        this.popAlgoValidator = CollectionAlgorithmValidator.buildAlgorithmValidator(conf.getSigAlgos());
       } catch (NoSuchAlgorithmException ex) {
         throw new InvalidConfException("invalid signature algorithm", ex);
       }
@@ -74,8 +73,7 @@ public class PopControl {
     String type = dh.getType();
     String passwordStr = dh.getPassword();
     String keystoreStr = dh.getKeystore();
-    if (StringUtil.isBlank(type) && StringUtil.isBlank(passwordStr)
-        && StringUtil.isBlank(keystoreStr)) {
+    if (StringUtil.isBlank(type) && StringUtil.isBlank(passwordStr) && StringUtil.isBlank(keystoreStr)) {
       dhCerts = null;
       return;
     }
@@ -136,11 +134,7 @@ public class PopControl {
   } // constructor
 
   public X509Cert[] getDhCertificates() {
-    if (dhCerts == null || dhCerts.length == 0) {
-      return null;
-    } else {
-      return Arrays.copyOf(dhCerts, dhCerts.length);
-    }
+    return (dhCerts == null || dhCerts.length == 0) ? null : Arrays.copyOf(dhCerts, dhCerts.length);
   } // method getCertificates
 
   public DHSigStaticKeyCertPair getDhKeyCertPair(X500Name issuer, BigInteger serial,
@@ -150,8 +144,7 @@ public class PopControl {
     }
 
     for (DHSigStaticKeyCertPair m : dhKeyAndCerts) {
-      if (m.getIssuer().equals(issuer)
-          && m.getSerialNumber().equals(serial)
+      if (m.getIssuer().equals(issuer) && m.getSerialNumber().equals(serial)
           && m.getPrivateKey().getAlgorithm().equalsIgnoreCase(keyAlgorithm)) {
         return m;
       }

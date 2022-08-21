@@ -99,8 +99,7 @@ public class InitDbMain {
   private static void exec(String dbConfFile, String dbSchemaFile, boolean force)
       throws Exception {
     Properties props = new Properties();
-    try (InputStream is = Files.newInputStream(
-                            Paths.get(IoUtil.expandFilepath(dbConfFile)))) {
+    try (InputStream is = Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile)))) {
       props.load(is);
     }
 
@@ -180,8 +179,7 @@ public class InitDbMain {
 
     try {
       try {
-        conn = DriverManager.getConnection(dbConf.getUrl(),
-            dbConf.getUsername(), dbConf.getPassword());
+        conn = DriverManager.getConnection(dbConf.getUrl(), dbConf.getUsername(), dbConf.getPassword());
         if (dbConf.getSchema() != null) {
           conn.setSchema(dbConf.getSchema());
         }

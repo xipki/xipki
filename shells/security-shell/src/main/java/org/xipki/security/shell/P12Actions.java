@@ -66,8 +66,7 @@ import java.util.Set;
 
 public class P12Actions {
 
-  @Command(scope = "xi", name = "secretkey-p12",
-      description = "generate secret key in JCEKS (not PKCS#12) keystore")
+  @Command(scope = "xi", name = "secretkey-p12", description = "generate secret key in JCEKS (not PKCS#12) keystore")
   @Service
   public static class SecretkeyP12 extends P12KeyGenAction {
 
@@ -83,7 +82,7 @@ public class P12Actions {
     protected Object execute0()
         throws Exception {
       if (!("AES".equalsIgnoreCase(keyType) || "DES3".equalsIgnoreCase(keyType)
-            || "GENERIC".equalsIgnoreCase(keyType))) {
+          || "GENERIC".equalsIgnoreCase(keyType))) {
         throw new IllegalCmdParamException("invalid keyType " + keyType);
       }
 
@@ -96,8 +95,7 @@ public class P12Actions {
 
   } // class SecretkeyP12
 
-  @Command(scope = "xi", name = "export-cert-p12",
-      description = "export certificate from PKCS#12 keystore")
+  @Command(scope = "xi", name = "export-cert-p12", description = "export certificate from PKCS#12 keystore")
   @Service
   public static class ExportCertP12 extends P12SecurityAction {
 
@@ -105,8 +103,7 @@ public class P12Actions {
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "where to save the certificate")
+    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the certificate")
     @Completion(FileCompleter.class)
     private String outFile;
 
@@ -137,8 +134,7 @@ public class P12Actions {
 
   } // class ExportCertP12
 
-  @Command(scope = "xi", name = "update-cert-p12",
-      description = "update certificate in PKCS#12 keystore")
+  @Command(scope = "xi", name = "update-cert-p12", description = "update certificate in PKCS#12 keystore")
   @Service
   public static class UpdateCertP12 extends P12SecurityAction {
 
@@ -189,8 +185,7 @@ public class P12Actions {
 
       ks.setKeyEntry(keyname, key, pwd, jceCertChain);
 
-      try (OutputStream out = Files.newOutputStream(
-          Paths.get(expandFilepath(p12File)))) {
+      try (OutputStream out = Files.newOutputStream(Paths.get(expandFilepath(p12File)))) {
         ks.store(out, pwd);
         println("updated certificate");
         return null;
@@ -220,8 +215,7 @@ public class P12Actions {
         SignatureAlgoControl algoControl = null;
         AlgorithmIdentifier algId = cert.getSubjectPublicKeyInfo().getAlgorithm();
         if (X9ObjectIdentifiers.id_ecPublicKey.equals(algId.getAlgorithm())) {
-          if (ASN1ObjectIdentifier.getInstance(algId.getParameters())
-                  .equals(GMObjectIdentifiers.sm2p256v1)) {
+          if (ASN1ObjectIdentifier.getInstance(algId.getParameters()).equals(GMObjectIdentifiers.sm2p256v1)) {
             hashAlgo = HashAlgo.SM3;
             algoControl = new SignatureAlgoControl(false, false, true);
           }
@@ -327,8 +321,7 @@ public class P12Actions {
         }
       }
 
-      KeyStoreWrapper keypair = new P12KeyGenerator().generateDSAKeypair(plen,
-          qlen, getKeyGenParameters(), subject);
+      KeyStoreWrapper keypair = new P12KeyGenerator().generateDSAKeypair(plen, qlen, getKeyGenParameters(), subject);
       saveKey(keypair);
 
       return null;
@@ -340,8 +333,7 @@ public class P12Actions {
   @Service
   public static class EcP12 extends P12KeyGenAction {
 
-    @Option(name = "--subject", aliases = "-s",
-        description = "subject of the self-signed certificate")
+    @Option(name = "--subject", aliases = "-s", description = "subject of the self-signed certificate")
     protected String subject;
 
     @Option(name = "--curve", description = "EC curve name or OID")
@@ -411,8 +403,7 @@ public class P12Actions {
   @Service
   public static class RsaP12 extends P12KeyGenAction {
 
-    @Option(name = "--subject", aliases = "-s",
-        description = "subject of the self-signed certificate")
+    @Option(name = "--subject", aliases = "-s", description = "subject of the self-signed certificate")
     private String subject;
 
     @Option(name = "--key-size", description = "keysize in bit")
@@ -456,8 +447,7 @@ public class P12Actions {
     }
 
     protected KeyStore getKeyStore()
-        throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException,
-          NoSuchProviderException {
+        throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
       KeyStore ks;
       try (InputStream in = Files.newInputStream(Paths.get(expandFilepath(p12File)))) {
         ks = KeyUtil.getKeyStore("PKCS12");
@@ -468,13 +458,11 @@ public class P12Actions {
 
   } // class P12SecurityAction
 
-  @Command(scope = "xi", name = "sm2-p12",
-      description = "generate SM2 (curve sm2p256v1) keypair in PKCS#12 keystore")
+  @Command(scope = "xi", name = "sm2-p12", description = "generate SM2 (curve sm2p256v1) keypair in PKCS#12 keystore")
   @Service
   public static class Sm2P12 extends P12KeyGenAction {
 
-    @Option(name = "--subject", aliases = "-s",
-        description = "subject of the self-signed certificate")
+    @Option(name = "--subject", aliases = "-s", description = "subject of the self-signed certificate")
     protected String subject;
 
     @Override
@@ -489,8 +477,7 @@ public class P12Actions {
 
   } // class Sm2P12
 
-  @Command(scope = "xi", name = "pkcs12",
-      description = "export PKCS#12 key store, like the 'openssl pkcs12' command")
+  @Command(scope = "xi", name = "pkcs12", description = "export PKCS#12 key store, like the 'openssl pkcs12' command")
   @Service
   public static class Pkcs12 extends P12SecurityAction {
 
@@ -510,8 +497,7 @@ public class P12Actions {
         KeypairWithCert kp = KeypairWithCert.fromKeystore("PKCS12",
                               keystoreStream, password, null, password, (X509Cert) null);
         byte[] encodedKey = PemEncoder.encode(kp.getKey().getEncoded(), PemLabel.PRIVATE_KEY);
-        byte[] encodedCert = PemEncoder.encode(kp.getCertificateChain()[0].getEncoded(),
-                              PemLabel.CERTIFICATE);
+        byte[] encodedCert = PemEncoder.encode(kp.getCertificateChain()[0].getEncoded(), PemLabel.CERTIFICATE);
         IoUtil.save(keyOutFile, encodedKey);
         IoUtil.save(certOutFile, encodedCert);
       }

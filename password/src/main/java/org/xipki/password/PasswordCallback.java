@@ -119,8 +119,7 @@ public interface PasswordCallback {
       ConfPairs pairs = new ConfPairs(conf);
       passwordFile = pairs.value("file");
       if (StringUtil.isBlank(passwordFile)) {
-        throw new PasswordResolverException("invalid configuration " + conf
-            + ", no file is specified");
+        throw new PasswordResolverException("invalid configuration " + conf + ", no file is specified");
       }
       passwordFile = IoUtil.expandFilepath(passwordFile);
     }

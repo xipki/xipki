@@ -160,8 +160,7 @@ public class IaikP11Module extends P11Module {
     try {
       module = iaik.pkcs.pkcs11.Module.getInstance(path);
     } catch (IOException ex) {
-      final String msg = "could not load the PKCS#11 module "
-              + moduleConf.getName() + ": " + path;
+      final String msg = "could not load the PKCS#11 module " + moduleConf.getName() + ": " + path;
       LogUtil.error(LOG, ex, msg);
       throw new P11TokenException(msg, ex);
     }

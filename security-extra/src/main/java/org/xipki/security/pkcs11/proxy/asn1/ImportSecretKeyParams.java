@@ -49,8 +49,7 @@ public class ImportSecretKeyParams extends ProxyMessage {
 
   private final byte[] keyValue;
 
-  public ImportSecretKeyParams(P11SlotIdentifier slotId,
-      P11NewKeyControl control, long keyType, byte[] keyValue) {
+  public ImportSecretKeyParams(P11SlotIdentifier slotId, P11NewKeyControl control, long keyType, byte[] keyValue) {
     this.slotId = Args.notNull(slotId, "slotId");
     this.control = Args.notNull(control, "control");
     this.keyType = keyType;

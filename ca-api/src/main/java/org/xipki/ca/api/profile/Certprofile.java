@@ -55,8 +55,8 @@ public abstract class Certprofile implements Closeable {
 
     private final Set<String> caIssuersProtocols;
 
-    public AuthorityInfoAccessControl(boolean includesCaIssuers, boolean includesOcsp,
-        Set<String> caIssuersProtocols, Set<String> ocspProtocols) {
+    public AuthorityInfoAccessControl(
+        boolean includesCaIssuers, boolean includesOcsp, Set<String> caIssuersProtocols, Set<String> ocspProtocols) {
       this.includesCaIssuers = includesCaIssuers;
       this.includesOcsp = includesOcsp;
       this.ocspProtocols = ocspProtocols == null
@@ -88,8 +88,7 @@ public abstract class Certprofile implements Closeable {
     private final Set<String> protocols;
 
     public CrlDistributionPointsControl(Set<String> protocols) {
-      this.protocols = protocols == null
-         ? null : Collections.unmodifiableSet(new HashSet<>(protocols));
+      this.protocols = protocols == null ? null : Collections.unmodifiableSet(new HashSet<>(protocols));
     }
 
     public Set<String> getProtocols() {
@@ -280,8 +279,7 @@ public abstract class Certprofile implements Closeable {
 
     public RdnControl(ASN1ObjectIdentifier type, int minOccurs, int maxOccurs) {
       if (minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs) {
-        throw new IllegalArgumentException(
-            String.format("illegal minOccurs=%s, maxOccurs=%s", minOccurs, maxOccurs));
+        throw new IllegalArgumentException(String.format("illegal minOccurs=%s, maxOccurs=%s", minOccurs, maxOccurs));
       }
 
       this.type = Args.notNull(type, "type");
@@ -587,29 +585,6 @@ public abstract class Certprofile implements Closeable {
   public abstract Set<GeneralNameMode> getSubjectAltNameModes();
 
   /**
-   * Increments the SerialNumber attribute in the subject.
-   * @param currentSerialNumber
-   *          Current serial number. Could be {@code null}.
-   * @return the incremented serial number
-   * @throws BadFormatException
-   *         If the currentSerialNumber is not a non-negative decimal long.
-   */
-  public String incSerialNumber(String currentSerialNumber)
-      throws BadFormatException {
-    try {
-      long currentSn = (currentSerialNumber == null) ? 0
-          : Long.parseLong(currentSerialNumber.trim());
-      if (currentSn < 0) {
-        throw new BadFormatException("invalid currentSerialNumber " + currentSerialNumber);
-      }
-      return Long.toString(currentSn + 1);
-    } catch (NumberFormatException ex) {
-      throw new BadFormatException(String.format(
-          "invalid serialNumber attribute %s", currentSerialNumber));
-    }
-  }
-
-  /**
    * Whether the subject attribute serialNumber in request is permitted.
    *
    * @return whether the serialNumber is permitted in request.
@@ -769,8 +744,8 @@ public abstract class Certprofile implements Closeable {
     return 0;
   }
 
-  public SubjectKeyIdentifier getSubjectKeyIdentifier(
-          SubjectPublicKeyInfo subjectPublicKeyInfo) throws CertprofileException {
+  public SubjectKeyIdentifier getSubjectKeyIdentifier(SubjectPublicKeyInfo subjectPublicKeyInfo)
+      throws CertprofileException {
     SubjectKeyIdentifierControl control = getSubjectKeyIdentifierControl();
     SubjectKeyIdentifierControl.SubjectKeyIdentifierMethod method = null;
     String hashAlgo = null;
@@ -792,8 +767,7 @@ public abstract class Certprofile implements Closeable {
 
     byte[] encodedSpki = subjectPublicKeyInfo.getPublicKeyData().getBytes();
     byte[] skiValue = hash.hash(encodedSpki);
-    if (method == null
-            || method == SubjectKeyIdentifierControl.SubjectKeyIdentifierMethod.METHOD_1) {
+    if (method == null || method == SubjectKeyIdentifierControl.SubjectKeyIdentifierMethod.METHOD_1) {
       // do nothing
     } else if (method == SubjectKeyIdentifierControl.SubjectKeyIdentifierMethod.METHOD_2) {
       byte[] bytes = Arrays.copyOfRange(skiValue, skiValue.length - 8, skiValue.length);
@@ -823,11 +797,8 @@ public abstract class Certprofile implements Closeable {
       }
 
       if (size < skiValue.length) {
-        if (leftmost) {
-          skiValue = Arrays.copyOf(skiValue, size);
-        } else {
-          skiValue = Arrays.copyOfRange(skiValue, skiValue.length - size, skiValue.length);
-        }
+        skiValue = leftmost ? Arrays.copyOf(skiValue, size)
+            : Arrays.copyOfRange(skiValue, skiValue.length - size, skiValue.length);
       }
     }
 
@@ -862,11 +833,8 @@ public abstract class Certprofile implements Closeable {
    * @throws CertprofileException if Certprofile Exception occurred.
    */
   public BigInteger generateSerialNumber(
-          X500Name caSubject,
-          SubjectPublicKeyInfo caPublicKeyInfo,
-          X500Name requestSubject,
-          SubjectPublicKeyInfo publicKeyInfo,
-          ConfPairs caExtraControl)
+          X500Name caSubject, SubjectPublicKeyInfo caPublicKeyInfo, X500Name requestSubject,
+          SubjectPublicKeyInfo publicKeyInfo, ConfPairs caExtraControl)
           throws CertprofileException {
     throw new UnsupportedOperationException("generateSerialNumber unsupported");
   }

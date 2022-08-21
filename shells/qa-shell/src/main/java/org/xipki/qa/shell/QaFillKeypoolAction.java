@@ -23,22 +23,18 @@ import org.xipki.shell.XiAction;
 @Service
 public class QaFillKeypoolAction extends XiAction {
 
-  @Option(name = "--db-conf", required = true,
-      description = "database configuration file of the keypool")
+  @Option(name = "--db-conf", required = true, description = "database configuration file of the keypool")
   @Completion(FileCompleter.class)
   private String dbconfFile;
 
-  @Option(name = "--num",
-      description = "number of keypairs for each keyspec")
+  @Option(name = "--num", description = "number of keypairs for each keyspec")
   private int num = 10;
 
-  @Option(name = "--enc-algo",
-      description = "algorithm to encrypt the generated keypair." +
+  @Option(name = "--enc-algo", description = "algorithm to encrypt the generated keypair." +
           "Valid values are AES128/GCM, AES192/GCM and AES256/GCM")
   private String encAlg = "AES128/GCM";
 
-  @Option(name = "--password",
-      description = "password to encrypt the generated keypair")
+  @Option(name = "--password", description = "password to encrypt the generated keypair")
   private String password;
 
   private DataSourceFactory datasourceFactory;

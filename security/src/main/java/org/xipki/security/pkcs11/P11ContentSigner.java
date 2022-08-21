@@ -65,8 +65,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
   protected final byte[] encodedAlgorithmIdentifier;
 
-  P11ContentSigner(P11CryptService cryptService, P11IdentityId identityId,
-      SignAlgo signAlgo)
+  P11ContentSigner(P11CryptService cryptService, P11IdentityId identityId, SignAlgo signAlgo)
       throws XiSecurityException {
     this.identityId = notNull(identityId, "identityId");
     this.cryptService = notNull(cryptService, "cryptService");
@@ -274,8 +273,7 @@ abstract class P11ContentSigner implements XiContentSigner {
     public byte[] getSignature() {
       try {
         byte[] plainSignature = getPlainSignature();
-        return signAlgo.isPlainECDSASigAlgo() ? plainSignature
-            : SignerUtil.dsaSigPlainToX962(plainSignature);
+        return signAlgo.isPlainECDSASigAlgo() ? plainSignature : SignerUtil.dsaSigPlainToX962(plainSignature);
       } catch (XiSecurityException ex) {
         LogUtil.warn(LOG, ex);
         throw new RuntimeCryptoException("XiSecurityException: " + ex.getMessage());
@@ -363,8 +361,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       hashMechMap.put(SHA3_512, PKCS11Constants.CKM_SHA3_512_HMAC);
     } // method static
 
-    Mac(P11CryptService cryptService, P11IdentityId identityId,
-        SignAlgo signAlgo)
+    Mac(P11CryptService cryptService, P11IdentityId identityId, SignAlgo signAlgo)
             throws XiSecurityException, P11TokenException {
       super(cryptService, identityId, signAlgo);
 
@@ -430,9 +427,8 @@ abstract class P11ContentSigner implements XiContentSigner {
       hashMechMap.put(SHA3_512, PKCS11Constants.CKM_SHA3_512_RSA_PKCS);
     } // method static
 
-    RSA(P11CryptService cryptService, P11IdentityId identityId,
-        SignAlgo signAlgo)
-            throws XiSecurityException, P11TokenException {
+    RSA(P11CryptService cryptService, P11IdentityId identityId, SignAlgo signAlgo)
+        throws XiSecurityException, P11TokenException {
       super(cryptService, identityId, signAlgo);
 
       if (!signAlgo.isRSAPkcs1SigAlgo()) {
@@ -454,8 +450,7 @@ abstract class P11ContentSigner implements XiContentSigner {
         throw new XiSecurityException("unsupported signature algorithm " + signAlgo);
       }
 
-      if (mechanism == PKCS11Constants.CKM_RSA_PKCS
-          || mechanism == PKCS11Constants.CKM_RSA_X_509) {
+      if (mechanism == PKCS11Constants.CKM_RSA_PKCS || mechanism == PKCS11Constants.CKM_RSA_X_509) {
         this.digestPkcsPrefix = PKCS1Util.getDigestPkcsPrefix(hashAlgo);
         this.outputStream = new DigestOutputStream(hashAlgo.createDigest());
       } else {
@@ -527,8 +522,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
     private final OutputStream outputStream;
 
-    RSAPSS(P11CryptService cryptService, P11IdentityId identityId,
-        SignAlgo signAlgo, SecureRandom random)
+    RSAPSS(P11CryptService cryptService, P11IdentityId identityId, SignAlgo signAlgo, SecureRandom random)
         throws XiSecurityException, P11TokenException {
       super(cryptService, identityId, signAlgo);
       if (!signAlgo.isRSAPSSSigAlgo()) {
@@ -545,8 +539,7 @@ abstract class P11ContentSigner implements XiContentSigner {
         this.mechanism = mech;
         this.parameters = new P11Params.P11RSAPkcsPssParams(hashAlgo);
         this.outputStream = new ByteArrayOutputStream();
-      } else if (!signAlgo.getHashAlgo().isShake()
-          && slot.supportsMechanism(PKCS11Constants.CKM_RSA_PKCS_PSS)) {
+      } else if (!signAlgo.getHashAlgo().isShake() && slot.supportsMechanism(PKCS11Constants.CKM_RSA_PKCS_PSS)) {
         this.mechanism = PKCS11Constants.CKM_RSA_PKCS_PSS;
         this.parameters = new P11Params.P11RSAPkcsPssParams(hashAlgo);
         this.outputStream = new DigestOutputStream(hashAlgo.createDigest());
@@ -624,10 +617,9 @@ abstract class P11ContentSigner implements XiContentSigner {
       hashMechMap.put(SM3, PKCS11Constants.CKM_VENDOR_SM2_SM3);
     }
 
-    SM2(P11CryptService cryptService, P11IdentityId identityId,
-        SignAlgo signAlgo, ASN1ObjectIdentifier curveOid, BigInteger pubPointX,
-        BigInteger pubPointY)
-            throws XiSecurityException, P11TokenException {
+    SM2(P11CryptService cryptService, P11IdentityId identityId, SignAlgo signAlgo,
+        ASN1ObjectIdentifier curveOid, BigInteger pubPointX, BigInteger pubPointY)
+        throws XiSecurityException, P11TokenException {
       super(cryptService, identityId, signAlgo);
       if (!signAlgo.isSM2SigAlgo()) {
         throw new XiSecurityException("not an SM2 algorithm: " + signAlgo);

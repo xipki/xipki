@@ -139,8 +139,7 @@ class Ca2Manager {
       } else {
         ctxConf = manager.caServerConf.getSslContextConf(name);
         if (ctxConf == null) {
-          LOG.error(concat("getSslContextConf (ca=", caName,
-              "): found no SslContext named " + name));
+          LOG.error(concat("getSslContextConf (ca=", caName, "): found no SslContext named " + name));
           return false;
         }
       }
@@ -173,8 +172,7 @@ class Ca2Manager {
   Set<String> getFailedCaNames() {
     Set<String> ret = new HashSet<>();
     for (String name : manager.caInfos.keySet()) {
-      if (CaStatus.ACTIVE == manager.caInfos.get(name).getStatus()
-          && !manager.x509cas.containsKey(name)) {
+      if (CaStatus.ACTIVE == manager.caInfos.get(name).getStatus() && !manager.x509cas.containsKey(name)) {
         ret.add(name);
       }
     }
@@ -294,8 +292,7 @@ class Ca2Manager {
       ConcurrentContentSigner signer;
       for (CaSignerConf m : signerConfs) {
         SignerConf signerConf = new SignerConf(m.getConf());
-        signer = securityFactory.createSigner(caEntry.getSignerType(), signerConf,
-            caEntry.getCert());
+        signer = securityFactory.createSigner(caEntry.getSignerType(), signerConf, caEntry.getCert());
         if (caEntry.getCert() == null) {
           if (signer.getCertificate() == null) {
             throw new CaMgmtException("CA signer without certificate is not allowed");
@@ -334,8 +331,7 @@ class Ca2Manager {
     entry.getIdent().setId(ident.getId());
 
     CaInfo caInfo0 = manager.caInfos.get(name);
-    manager.queryExecutor.changeCa(entry, caInfo0.getCaEntry(), caInfo0.getCaConfColumn(),
-        manager.securityFactory);
+    manager.queryExecutor.changeCa(entry, caInfo0.getCaEntry(), caInfo0.getCaConfColumn(), manager.securityFactory);
 
     if (createCa(name)) {
       CaInfo caInfo = manager.caInfos.get(name);
@@ -461,8 +457,7 @@ class Ca2Manager {
     if (currentRevInfo != null) {
       CrlReason currentReason = currentRevInfo.getReason();
       if (currentReason != CrlReason.CERTIFICATE_HOLD) {
-        throw new CaMgmtException(concat("CA ", caName, " has been revoked with reason ",
-            currentReason.name()));
+        throw new CaMgmtException(concat("CA ", caName, " has been revoked with reason ", currentReason.name()));
       }
     }
 
@@ -494,8 +489,7 @@ class Ca2Manager {
     try {
       ca.unrevokeCa();
     } catch (OperationException ex) {
-      throw new CaMgmtException(
-          concat("could not unrevoke CA " + caName + ": ", ex.getMessage()), ex);
+      throw new CaMgmtException(concat("could not unrevoke CA " + caName + ": ", ex.getMessage()), ex);
     }
     LOG.info("unrevoked CA '{}'", caName);
 
@@ -558,8 +552,7 @@ class Ca2Manager {
       }
 
       if (numBytes < 1 || numBytes > 20) {
-        throw new CaMgmtException(concat("invalid SerialNumber for SelfSigned " + serialNumber,
-                profileName));
+        throw new CaMgmtException(concat("invalid SerialNumber for SelfSigned " + serialNumber, profileName));
       }
       byte[] bytes = RandomUtil.nextBytes(numBytes);
       // clear the highest bit
@@ -602,8 +595,7 @@ class Ca2Manager {
   } // method generateRootCa
 
   X509Cert generateCrossCertificate(
-      String caName, String profileName, byte[] encodedCsr, byte[] encodedTargetCert,
-      Date notBefore, Date notAfter)
+      String caName, String profileName, byte[] encodedCsr, byte[] encodedTargetCert, Date notBefore, Date notAfter)
       throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     profileName = toNonBlankLower(profileName, "profileName");
@@ -680,8 +672,9 @@ class Ca2Manager {
     return certInfo.getCert().getCert();
   }
 
-  X509Cert generateCertificate(String caName, String profileName, byte[] encodedCsr,
-      Date notBefore, Date notAfter) throws CaMgmtException {
+  X509Cert generateCertificate(
+      String caName, String profileName, byte[] encodedCsr, Date notBefore, Date notAfter)
+      throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     profileName = toNonBlankLower(profileName, "profileName");
     notNull(encodedCsr, "encodedCsr");
@@ -738,8 +731,8 @@ class Ca2Manager {
     return certInfo.getCert().getCert();
   } // method generateCertificate
 
-  void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason,
-      Date invalidityTime) throws CaMgmtException {
+  void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason, Date invalidityTime)
+      throws CaMgmtException {
     assertMasterModeAndSetuped();
 
     caName = toNonBlankLower(caName, "caName");
@@ -860,8 +853,7 @@ class Ca2Manager {
     }
 
     try {
-      return manager.certstore.getCertWithRevocationInfo(caId.getId(), serialNumber,
-                manager.idNameMap);
+      return manager.certstore.getCertWithRevocationInfo(caId.getId(), serialNumber, manager.idNameMap);
     } catch (OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
@@ -878,8 +870,9 @@ class Ca2Manager {
     }
   } // method getCertRequest
 
-  List<CertListInfo> listCertificates(String caName, X500Name subjectPattern, Date validFrom,
-      Date validTo, CertListOrderBy orderBy, int numEntries) throws CaMgmtException {
+  List<CertListInfo> listCertificates(
+      String caName, X500Name subjectPattern, Date validFrom, Date validTo, CertListOrderBy orderBy, int numEntries)
+      throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     range(numEntries, "numEntries", 1, 1000);
     X509Ca ca = getX509Ca(caName);

@@ -50,9 +50,9 @@ public class P12MacContentSignerBuilder {
     this.key = notNull(key, "key");
   }
 
-  public P12MacContentSignerBuilder(String keystoreType, InputStream keystoreStream,
-      char[] keystorePassword, String keyname, char[] keyPassword)
-          throws XiSecurityException {
+  public P12MacContentSignerBuilder(
+      String keystoreType, InputStream keystoreStream, char[] keystorePassword, String keyname, char[] keyPassword)
+      throws XiSecurityException {
     if (!"JCEKS".equalsIgnoreCase(keystoreType)) {
       throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
     }
@@ -81,15 +81,14 @@ public class P12MacContentSignerBuilder {
       }
 
       this.key = (SecretKey) ks.getKey(tmpKeyname, keyPassword);
-    } catch (KeyStoreException | NoSuchAlgorithmException
-        | CertificateException | IOException | UnrecoverableKeyException | ClassCastException ex) {
+    } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException
+             | UnrecoverableKeyException | ClassCastException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
   } // constructor
 
-  public ConcurrentContentSigner createSigner(SignAlgo sigAlgo,
-      int parallelism)
-          throws XiSecurityException {
+  public ConcurrentContentSigner createSigner(SignAlgo sigAlgo, int parallelism)
+      throws XiSecurityException {
     notNull(sigAlgo, "sigAlgo");
     positive(parallelism, "parallelism");
 

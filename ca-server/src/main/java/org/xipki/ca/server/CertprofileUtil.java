@@ -73,8 +73,7 @@ public class CertprofileUtil {
               && !containsRdn(subject, DN.givenName)
               && !containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:street is prohibited if the "
-                + "subject:organizationName field, subject:givenName, and subject:surname field "
-                + "are absent.");
+                + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
           }
         }
 
@@ -84,8 +83,7 @@ public class CertprofileUtil {
               && !containsRdn(subject, DN.givenName)
               && !containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:localityName is prohibited if the "
-                + "subject:organizationName field, subject:givenName, and subject:surname field "
-                + "are absent.");
+                + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
           }
         } else {
           if (!containsRdn(subject, DN.ST)
@@ -104,8 +102,7 @@ public class CertprofileUtil {
               && !containsRdn(subject, DN.givenName)
               && !containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:stateOrProvinceName is prohibited if the "
-                + "subject:organizationName field, subject:givenName, and subject:surname field "
-                + "are absent.");
+                + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
           }
         } else {
           if (!containsRdn(subject, DN.localityName)
@@ -124,8 +121,7 @@ public class CertprofileUtil {
               && !containsRdn(subject, DN.givenName)
               && !containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:postalCode is prohibited if the "
-                + "subject:organizationName field, subject:givenName, and subject:surname field "
-                + "are absent.");
+                + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
           }
         }
 
@@ -135,8 +131,7 @@ public class CertprofileUtil {
               || containsRdn(subject, DN.givenName)
               || containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:countryCode is required if the "
-                + "subject:organizationName field, subject:givenName, and subject:surname field "
-                + "are present");
+                + "subject:organizationName field, subject:givenName, and subject:surname field are present");
           }
         }
 
@@ -150,8 +145,7 @@ public class CertprofileUtil {
             }
           }
         } else if (BaseRequirements.id_organization_validated.equals(policyId)) {
-          ASN1ObjectIdentifier[] includeSubjectFields = new ASN1ObjectIdentifier[] {
-              DN.O, DN.C};
+          ASN1ObjectIdentifier[] includeSubjectFields = new ASN1ObjectIdentifier[] {DN.O, DN.C};
           for (ASN1ObjectIdentifier m : includeSubjectFields) {
             if (!containsRdn(subject, m)) {
               throw new BadCertTemplateException("subject " + ObjectIdentifiers.getName(m)
@@ -164,8 +158,7 @@ public class CertprofileUtil {
                 + "subject:stateOrProvinceName is required in organization validated certificate");
           }
         } else if (BaseRequirements.id_individual_validated.equals(policyId)) {
-          ASN1ObjectIdentifier[] includeSubjectFields = new ASN1ObjectIdentifier[] {
-              DN.C};
+          ASN1ObjectIdentifier[] includeSubjectFields = new ASN1ObjectIdentifier[] {DN.C};
           for (ASN1ObjectIdentifier m : includeSubjectFields) {
             if (!containsRdn(subject, m)) {
               throw new BadCertTemplateException("subject " + ObjectIdentifiers.getName(m)
@@ -176,8 +169,7 @@ public class CertprofileUtil {
           if (!(containsRdn(subject, DN.O)
               || (containsRdn(subject, DN.givenName) && containsRdn(subject, DN.surname)))) {
             throw new BadCertTemplateException("at least one of subject:organizationName and "
-                + "(subject:givenName, subject:surName) is required in individual validated "
-                + "certificate");
+                + "(subject:givenName, subject:surName) is required in individual validated certificate");
           }
 
           if (!(containsRdn(subject, DN.localityName) || containsRdn(subject, DN.ST))) {
@@ -186,12 +178,10 @@ public class CertprofileUtil {
           }
         }
       } else {
-        ASN1ObjectIdentifier[] requiredTypes = new ASN1ObjectIdentifier[] {
-            DN.CN, DN.O, DN.C};
+        ASN1ObjectIdentifier[] requiredTypes = new ASN1ObjectIdentifier[] {DN.CN, DN.O, DN.C};
         for (ASN1ObjectIdentifier m : requiredTypes) {
           if (!containsRdn(subject, DN.CN)) {
-            throw new BadCertTemplateException("missing " + ObjectIdentifiers.getName(m)
-              + " in subject");
+            throw new BadCertTemplateException("missing " + ObjectIdentifiers.getName(m) + " in subject");
           }
         }
       }
@@ -199,10 +189,8 @@ public class CertprofileUtil {
 
     // check the country
     ASN1ObjectIdentifier[] countryOids = new ASN1ObjectIdentifier[] {
-        ObjectIdentifiers.DN.C,
-        ObjectIdentifiers.DN.countryOfCitizenship,
-        ObjectIdentifiers.DN.countryOfResidence,
-        ObjectIdentifiers.DN.jurisdictionOfIncorporationCountryName};
+        ObjectIdentifiers.DN.C, ObjectIdentifiers.DN.countryOfCitizenship,
+        ObjectIdentifiers.DN.countryOfResidence, ObjectIdentifiers.DN.jurisdictionOfIncorporationCountryName};
 
     for (ASN1ObjectIdentifier oid : countryOids) {
       RDN[] countryRdns = subjectInfo.getGrantedSubject().getRDNs(oid);
@@ -270,9 +258,8 @@ public class CertprofileUtil {
   } // method addRequestedExtKeyusage
 
   static ASN1Sequence createSubjectInfoAccess(
-      Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
-      Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> modes)
-          throws BadCertTemplateException {
+      Map<ASN1ObjectIdentifier, Extension> requestedExtensions, Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> modes)
+      throws BadCertTemplateException {
     if (modes == null) {
       return null;
     }
@@ -297,21 +284,20 @@ public class CertprofileUtil {
       Set<GeneralNameMode> generalNameModes = modes.get(accessMethod);
 
       if (generalNameModes == null) {
-        throw new BadCertTemplateException("subjectInfoAccess.accessMethod "
-            + accessMethod.getId() + " is not allowed");
+        throw new BadCertTemplateException(
+            "subjectInfoAccess.accessMethod " + accessMethod.getId() + " is not allowed");
       }
 
-      GeneralName accessLocation = BaseCertprofile.createGeneralName(
-          ad.getAccessLocation(), generalNameModes);
+      GeneralName accessLocation = BaseCertprofile.createGeneralName(ad.getAccessLocation(), generalNameModes);
       vec.add(new AccessDescription(accessMethod, accessLocation));
     } // end for
 
     return vec.size() > 0 ? new DERSequence(vec) : null;
   } // method createSubjectInfoAccess
 
-  static void addExtension(ExtensionValues values, ASN1ObjectIdentifier extType,
-      ExtensionValue extValue, ExtensionControl extControl)
-          throws CertprofileException {
+  static void addExtension(
+      ExtensionValues values, ASN1ObjectIdentifier extType, ExtensionValue extValue, ExtensionControl extControl)
+      throws CertprofileException {
     if (extValue != null) {
       values.addExtension(extType, extValue);
     } else if (extControl.isRequired()) {
@@ -323,9 +309,9 @@ public class CertprofileUtil {
     }
   } // method addExtension
 
-  static void addExtension(ExtensionValues values, ASN1ObjectIdentifier extType,
-      ASN1Encodable extValue, ExtensionControl extControl)
-          throws CertprofileException {
+  static void addExtension(
+      ExtensionValues values, ASN1ObjectIdentifier extType, ASN1Encodable extValue, ExtensionControl extControl)
+      throws CertprofileException {
     if (extValue != null) {
       values.addExtension(extType, extControl.isCritical(), extValue);
     } else if (extControl.isRequired()) {

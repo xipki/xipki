@@ -70,8 +70,7 @@ public class SignerUtil {
   private static final DigestAlgorithmIdentifierFinder DIGESTALG_IDENTIFIER_FINDER
       = new DefaultDigestAlgorithmIdentifierFinder();
 
-  private static final Map<String, BcContentVerifierProviderBuilder> VERIFIER_PROVIDER_BUILDER =
-      new HashMap<>();
+  private static final Map<String, BcContentVerifierProviderBuilder> VERIFIER_PROVIDER_BUILDER = new HashMap<>();
 
   private SignerUtil() {
   }
@@ -189,9 +188,9 @@ public class SignerUtil {
     }
   } // method bigIntToBytes
 
-  public static ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey,
-      DHSigStaticKeyCertPair ownerKeyAndCert)
-          throws InvalidKeyException {
+  public static ContentVerifierProvider getContentVerifierProvider(
+      PublicKey publicKey, DHSigStaticKeyCertPair ownerKeyAndCert)
+      throws InvalidKeyException {
     notNull(publicKey, "publicKey");
 
     String keyAlg = publicKey.getAlgorithm().toUpperCase();
@@ -228,8 +227,7 @@ public class SignerUtil {
     try {
       return builder.build(keyParam);
     } catch (OperatorCreationException ex) {
-      throw new InvalidKeyException("could not build ContentVerifierProvider: "
-          + ex.getMessage(), ex);
+      throw new InvalidKeyException("could not build ContentVerifierProvider: " + ex.getMessage(), ex);
     }
   } // method getContentVerifierProvider
 

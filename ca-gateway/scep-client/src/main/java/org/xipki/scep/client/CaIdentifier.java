@@ -45,8 +45,7 @@ public class CaIdentifier {
     final String protocol = tmpUrl.getProtocol();
 
     if (!"http".equalsIgnoreCase(protocol) && !"https".equalsIgnoreCase(protocol)) {
-      throw new IllegalArgumentException(
-          "URL protocol should be HTTP or HTTPS, but not '" + protocol + "'");
+      throw new IllegalArgumentException("URL protocol should be HTTP or HTTPS, but not '" + protocol + "'");
     }
 
     if (tmpUrl.getQuery() != null) {

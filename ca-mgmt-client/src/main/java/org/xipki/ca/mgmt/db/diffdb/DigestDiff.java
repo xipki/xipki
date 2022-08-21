@@ -72,10 +72,10 @@ class DigestDiff {
 
   private final int numTargetThreads;
 
-  public DigestDiff(DataSourceWrapper refDatasource, DataSourceWrapper targetDatasource,
-      String reportDirName, boolean revokedOnly, AtomicBoolean stopMe, int numPerSelect,
-      int numThreads)
-          throws DataAccessException {
+  public DigestDiff(
+      DataSourceWrapper refDatasource, DataSourceWrapper targetDatasource, String reportDirName,
+      boolean revokedOnly, AtomicBoolean stopMe, int numPerSelect, int numThreads)
+      throws DataAccessException {
     this.refDatasource = Args.notNull(refDatasource, "refDatasource");
     this.revokedOnly = revokedOnly;
     this.targetDatasource = Args.notNull(targetDatasource, "targetDatasource");
@@ -105,8 +105,7 @@ class DigestDiff {
     this.numTargetThreads = Math.min(numThreads, targetDatasource.getMaximumPoolSize() - 1);
 
     if (this.numTargetThreads != numThreads) {
-      LOG.info("reduce the numTargetThreads from {} to {}", numTargetThreads,
-          this.numTargetThreads);
+      LOG.info("reduce the numTargetThreads from {} to {}", numTargetThreads, this.numTargetThreads);
     }
   } // constructor
 
@@ -208,13 +207,11 @@ class DigestDiff {
     try {
       reporter.start();
       ProcessLog processLog = new ProcessLog(refReader.getTotalAccount());
-      System.out.println(
-          "Processing certificates of CA \n\t'" + refReader.getCaSubjectName() + "'");
+      System.out.println("Processing certificates of CA \n\t'" + refReader.getCaSubjectName() + "'");
       processLog.printHeader();
 
       target = new TargetDigestReader(revokedOnly, processLog, refReader, reporter,
-          targetDatasource, targetDbType, certhashAlgo, caId, numPerSelect,
-          numTargetThreads, stopMe);
+          targetDatasource, targetDbType, certhashAlgo, caId, numPerSelect, numTargetThreads, stopMe);
 
       target.awaitTerminiation();
       processLog.printTrailer();
@@ -297,8 +294,7 @@ class DigestDiff {
 
   public static HashAlgo detectOcspDbCerthashAlgo(DataSourceWrapper datasource)
       throws DataAccessException {
-    String str = datasource.getFirstStringValue(
-                null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'");
+    String str = datasource.getFirstStringValue(null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'");
     try {
       return HashAlgo.getInstance(str);
     } catch (NoSuchAlgorithmException ex) {

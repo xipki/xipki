@@ -347,8 +347,7 @@ public class CaConfColumn {
   }
 
   private ValidityMode validityMode() {
-    return validityMode == null
-        ? ValidityMode.STRICT : ValidityMode.forName(validityMode);
+    return validityMode == null ? ValidityMode.STRICT : ValidityMode.forName(validityMode);
   }
 
 }

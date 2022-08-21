@@ -126,8 +126,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       conf = X509ProfileType.parse(new ByteArrayInputStream(bytes));
     } catch (RuntimeException ex) {
       LogUtil.error(LOG, ex);
-      throw new CertprofileException(
-          "caught RuntimeException while parsing certprofile: " + ex.getMessage());
+      throw new CertprofileException("caught RuntimeException while parsing certprofile: " + ex.getMessage());
     }
 
     initialize(conf);
@@ -143,8 +142,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       initialize0(conf);
     } catch (RuntimeException ex) {
       LogUtil.error(LOG, ex);
-      throw new CertprofileException(
-          "caught RuntimeException while initializing certprofile: " + ex.getMessage());
+      throw new CertprofileException("caught RuntimeException while initializing certprofile: " + ex.getMessage());
     }
   } // method initialize
 
@@ -210,8 +208,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         int keySize = Integer.parseInt(params.get(KeypairGenerationType.PARAM_keysize));
         this.keypairGenControl = new KeypairGenControl.RSAKeypairGenControl(keySize, keyAlgOid);
       } else if (keyType == KeyType.EC) {
-        ASN1ObjectIdentifier curveOid =
-            new ASN1ObjectIdentifier(params.get(KeypairGenerationType.PARAM_curve));
+        ASN1ObjectIdentifier curveOid = new ASN1ObjectIdentifier(params.get(KeypairGenerationType.PARAM_curve));
         this.keypairGenControl = new KeypairGenControl.ECKeypairGenControl(curveOid, keyAlgOid);
       } else if (keyType == KeyType.DSA) {
         int plen = Integer.parseInt(params.get(KeypairGenerationType.PARAM_plength));
@@ -231,8 +228,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     TimeZone midnightTimeZone = null;
     if (str.startsWith("midnight")) {
       int seperatorIdx = str.indexOf(':');
-      String timezoneId = (seperatorIdx == -1)
-          ? "GMT+0" : str.substring(seperatorIdx + 1).toUpperCase();
+      String timezoneId = (seperatorIdx == -1) ? "GMT+0" : str.substring(seperatorIdx + 1).toUpperCase();
       final List<String> validIds = Arrays.asList(
           "GMT+0", "GMT+1", "GMT+2", "GMT+3", "GMT+4", "GMT+5",
           "GMT+6", "GMT+7", "GMT+8", "GMT+9", "GMT+10", "GMT+11", "GMT+12",
@@ -375,8 +371,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       } else {
         if (!occu.isValueOverridable()) {
           throw new BadCertTemplateException(String.format(
-              "subject DN of type %s is not allowed in the request",
-              ObjectIdentifiers.oidToDisplayName(type)));
+              "subject DN of type %s is not allowed in the request", ObjectIdentifiers.oidToDisplayName(type)));
 
         }
       }
@@ -410,20 +405,16 @@ public class XijsonCertprofile extends BaseCertprofile {
 
       if (!present) {
         throw new BadCertTemplateException(String.format(
-            "required subject DN of type %s is not present",
-            ObjectIdentifiers.oidToDisplayName(occurence.getType())));
+            "required subject DN of type %s is not present", ObjectIdentifiers.oidToDisplayName(occurence.getType())));
       }
     }
   } // method verifySubjectDnOccurence
 
   @Override
   public ExtensionValues getExtensions(
-      Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
-      X500Name requestedSubject, X500Name grantedSubject,
-      Map<ASN1ObjectIdentifier, Extension> requestedExtensions, Date notBefore, Date notAfter,
-      PublicCaInfo caInfo)
-          throws CertprofileException, BadCertTemplateException {
-
+      Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls, X500Name requestedSubject, X500Name grantedSubject,
+      Map<ASN1ObjectIdentifier, Extension> requestedExtensions, Date notBefore, Date notAfter, PublicCaInfo caInfo)
+      throws CertprofileException, BadCertTemplateException {
     ExtensionValues values = new ExtensionValues();
     if (CollectionUtil.isEmpty(extensionControls)) {
       return values;
@@ -463,8 +454,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       GeneralNames genNames = extensions.createRequestedSubjectAltNames(
           requestedSubject, grantedSubject, requestedExtensions);
       if (genNames != null) {
-        ExtensionValue value = new ExtensionValue(extensionControls.get(type).isCritical(),
-            genNames);
+        ExtensionValue value = new ExtensionValue(extensionControls.get(type).isCritical(), genNames);
         values.addExtension(type, value);
         occurences.remove(type);
       }
@@ -477,8 +467,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     type = Extension.subjectDirectoryAttributes;
     Extension extension = (requestedExtensions == null) ? null : requestedExtensions.get(type);
 
-    SubjectDirectoryAttributesControl subjectDirAttrsControl =
-        extensions.getSubjectDirAttrsControl();
+    SubjectDirectoryAttributesControl subjectDirAttrsControl = extensions.getSubjectDirAttrsControl();
     if (occurences.contains(type) && subjectDirAttrsControl != null && extension != null) {
       ASN1GeneralizedTime dateOfBirth = null;
       String placeOfBirth = null;
@@ -487,8 +476,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       List<String> countryOfResidenceList = new LinkedList<>();
       Map<ASN1ObjectIdentifier, List<ASN1Encodable>> otherAttrs = new HashMap<>();
 
-      Vector<?> reqSubDirAttrs = SubjectDirectoryAttributes.getInstance(
-          extension.getParsedValue()).getAttributes();
+      Vector<?> reqSubDirAttrs = SubjectDirectoryAttributes.getInstance(extension.getParsedValue()).getAttributes();
       for (Object reqSubDirAttr : reqSubDirAttrs) {
         Attribute attr = (Attribute) reqSubDirAttr;
         ASN1ObjectIdentifier attrType = attr.getAttrType();
@@ -507,8 +495,7 @@ public class XijsonCertprofile extends BaseCertprofile {
           String country = DERPrintableString.getInstance(attrVal).getString();
           countryOfResidenceList.add(country);
         } else {
-          List<ASN1Encodable> otherAttrVals =
-                  otherAttrs.computeIfAbsent(attrType, k -> new LinkedList<>());
+          List<ASN1Encodable> otherAttrVals = otherAttrs.computeIfAbsent(attrType, k -> new LinkedList<>());
           otherAttrVals.add(attrVal);
         }
       }
@@ -576,8 +563,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       }
 
       SubjectDirectoryAttributes subjDirAttrs = new SubjectDirectoryAttributes(attrs);
-      ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(),
-          subjDirAttrs);
+      ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(), subjDirAttrs);
       values.addExtension(type, extValue);
       occurences.remove(type);
     }
@@ -638,8 +624,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     if (occurences.contains(type) && admission != null) {
       if (admission.isInputFromRequestRequired()) {
         if (admissionRdns == null) {
-          throw new BadCertTemplateException(
-                  "admission required in the request but not present");
+          throw new BadCertTemplateException("admission required in the request but not present");
         }
         List<List<String>> reqRegNumsList = new LinkedList<>();
         for (RDN m : admissionRdns) {
@@ -706,8 +691,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       ASN1EncodableVector vec = new ASN1EncodableVector();
       vec.add(new DERTaggedObject(false, 0, new DERGeneralizedTime(notBefore)));
       vec.add(new DERTaggedObject(false, 1, new DERGeneralizedTime(tmpNotAfter)));
-      ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(),
-          new DERSequence(vec));
+      ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(), new DERSequence(vec));
       values.addExtension(type, extValue);
       occurences.remove(type);
     }
@@ -724,8 +708,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         // extract the data from request
         extension = requestedExtensions.get(type);
         if (extension == null) {
-          throw new BadCertTemplateException(
-              "No QCStatement extension is contained in the request");
+          throw new BadCertTemplateException("No QCStatement extension is contained in the request");
         }
         ASN1Sequence seq = ASN1Sequence.getInstance(extension.getParsedValue());
 
@@ -737,8 +720,7 @@ public class XijsonCertprofile extends BaseCertprofile {
             continue;
           }
 
-          MonetaryValue monetaryValue = MonetaryValue.getInstance(
-              stmt.getStatementInfo());
+          MonetaryValue monetaryValue = MonetaryValue.getInstance(stmt.getStatementInfo());
           int amount = monetaryValue.getAmount().intValue();
           int exponent = monetaryValue.getExponent().intValue();
           Iso4217CurrencyCode currency = monetaryValue.getCurrency();
@@ -758,8 +740,7 @@ public class XijsonCertprofile extends BaseCertprofile {
           String currencyS = monetaryOption.getCurrencyString();
           int[] limit = qcEuLimits.get(currencyS);
           if (limit == null) {
-            throw new BadCertTemplateException(
-                "no EuLimitValue is specified for currency '" + currencyS + "'");
+            throw new BadCertTemplateException("no EuLimitValue is specified for currency '" + currencyS + "'");
           }
 
           int amount = limit[0];
@@ -776,14 +757,12 @@ public class XijsonCertprofile extends BaseCertprofile {
                 + "' is not within [" + range.getMin() + ", " + range.getMax() + "]");
           }
 
-          MonetaryValue monetaryVale = new MonetaryValue(monetaryOption.getCurrency(), amount,
-              exponent);
+          MonetaryValue monetaryVale = new MonetaryValue(monetaryOption.getCurrency(), amount, exponent);
           QCStatement qcStatment = new QCStatement(m.getStatementId(), monetaryVale);
           vec.add(qcStatment);
         }
 
-        ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(),
-            new DERSequence(vec));
+        ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(), new DERSequence(vec));
         values.addExtension(type, extValue);
         occurences.remove(type);
       }
@@ -797,8 +776,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       ASN1Sequence seq = ASN1Sequence.getInstance(extension.getParsedValue());
       final int n = seq.size();
       if (n < 1) {
-        throw new BadCertTemplateException(
-            "biometricInfo extension in request contains empty sequence");
+        throw new BadCertTemplateException("biometricInfo extension in request contains empty sequence");
       }
 
       ASN1EncodableVector vec = new ASN1EncodableVector();
@@ -807,28 +785,24 @@ public class XijsonCertprofile extends BaseCertprofile {
         BiometricData bd = BiometricData.getInstance(seq.getObjectAt(i));
         TypeOfBiometricData bdType = bd.getTypeOfBiometricData();
         if (!biometricInfo.isTypePermitted(bdType)) {
-          throw new BadCertTemplateException(
-              "biometricInfo[" + i + "].typeOfBiometricData is not permitted");
+          throw new BadCertTemplateException("biometricInfo[" + i + "].typeOfBiometricData is not permitted");
         }
 
         HashAlgo hashAlgo;
         try {
           hashAlgo = HashAlgo.getInstance(bd.getHashAlgorithm());
         } catch (NoSuchAlgorithmException ex) {
-          throw new CertprofileException(
-              "biometricInfo[" + i + "].hashAlgorithm: " + ex.getMessage());
+          throw new CertprofileException("biometricInfo[" + i + "].hashAlgorithm: " + ex.getMessage());
         }
 
         if (!biometricInfo.isHashAlgorithmPermitted(hashAlgo)) {
-          throw new BadCertTemplateException(
-              "biometricInfo[" + i + "].hashAlgorithm is not permitted");
+          throw new BadCertTemplateException("biometricInfo[" + i + "].hashAlgorithm is not permitted");
         }
 
         int expHashValueSize = hashAlgo.getLength();
         byte[] hashValue = bd.getBiometricDataHash().getOctets();
         if (hashValue.length != expHashValueSize) {
-          throw new BadCertTemplateException(
-              "biometricInfo[" + i + "].biometricDataHash has incorrect length");
+          throw new BadCertTemplateException("biometricInfo[" + i + "].biometricDataHash has incorrect length");
         }
 
         DERIA5String sourceDataUri = bd.getSourceDataUri();
@@ -854,8 +828,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         vec.add(newBiometricData);
       }
 
-      ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(),
-          new DERSequence(vec));
+      ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(), new DERSequence(vec));
       values.addExtension(type, extValue);
       occurences.remove(type);
     }
@@ -936,8 +909,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
         if (extnValue != null) {
           occurences.remove(type);
-          values.addExtension(type,
-              new ExtensionValue(extensionControls.get(type).isCritical(), extnValue));
+          values.addExtension(type, new ExtensionValue(extensionControls.get(type).isCritical(), extnValue));
         }
       }
     }
@@ -977,15 +949,13 @@ public class XijsonCertprofile extends BaseCertprofile {
         if (StringUtil.isNotBlank(extnStr)) {
           occurences.remove(m);
           ASN1Encodable extnValue = new DERPrintableString(extnStr);
-          values.addExtension(m,
-              new ExtensionValue(extensionControls.get(m).isCritical(), extnValue));
+          values.addExtension(m, new ExtensionValue(extensionControls.get(m).isCritical(), extnValue));
         }
       }
     }
 
     // constant extensions
-    Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions =
-        extensions.getConstantExtensions();
+    Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions = extensions.getConstantExtensions();
     if (constantExtensions != null) {
       for (Entry<ASN1ObjectIdentifier, ExtensionValue> entry : constantExtensions.entrySet()) {
         ASN1ObjectIdentifier m = entry.getKey();
@@ -1001,8 +971,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     }
 
     // extensions with syntax
-    Map<ASN1ObjectIdentifier, ExtnSyntax> extensionsWithSyntax =
-        extensions.getExtensionsWithSyntax();
+    Map<ASN1ObjectIdentifier, ExtnSyntax> extensionsWithSyntax = extensions.getExtensionsWithSyntax();
     if (extensionsWithSyntax != null) {
       for (Entry<ASN1ObjectIdentifier, ExtnSyntax> entry : extensionsWithSyntax.entrySet()) {
         ASN1ObjectIdentifier m = entry.getKey();
@@ -1032,11 +1001,10 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method getExtensions
 
   protected ExtensionValues getExtraExtensions(
-      Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
-      X500Name requestedSubject, X500Name grantedSubject,
-      Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
+      Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences, X500Name requestedSubject,
+      X500Name grantedSubject, Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
       Date notBefore, Date notAfter, PublicCaInfo caInfo)
-          throws CertprofileException, BadCertTemplateException {
+      throws CertprofileException, BadCertTemplateException {
     return null;
   } // method getExtraExtensions
 

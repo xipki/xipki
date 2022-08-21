@@ -64,9 +64,10 @@ class OcspCertstoreDbExporter extends DbPorter {
 
   private final boolean resume;
 
-  OcspCertstoreDbExporter(DataSourceWrapper datasource, String baseDir, int numCertsInBundle,
+  OcspCertstoreDbExporter(
+      DataSourceWrapper datasource, String baseDir, int numCertsInBundle,
       int numCertsPerSelect, boolean resume, AtomicBoolean stopMe)
-          throws Exception {
+      throws Exception {
     super(datasource, baseDir, stopMe);
 
     this.numCertsInBundle = Args.positive(numCertsInBundle, "numCertsInBundle");
@@ -378,8 +379,7 @@ class OcspCertstoreDbExporter extends DbPorter {
             numCertInCurrentFile = 0;
             minCertIdOfCurrentFile = -1;
             maxCertIdOfCurrentFile = -1;
-            currentCertsZipFile = new File(baseDir,
-                "tmp-certs-" + System.currentTimeMillis() + ".zip");
+            currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
             currentCertsZip = getZipOutputStream(currentCertsZipFile);
           } // end if
         } while (rs.next());

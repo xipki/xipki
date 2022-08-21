@@ -142,9 +142,8 @@ public interface SecurityFactory {
    * @throws InvalidKeyException
    *         If the publicKey is invalid or unsupported.
    */
-  ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey,
-      DHSigStaticKeyCertPair ownerKeyAndCert)
-          throws InvalidKeyException;
+  ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey, DHSigStaticKeyCertPair ownerKeyAndCert)
+      throws InvalidKeyException;
 
   /**
    * Gets the ContentVerifierProvider from the certificate.
@@ -210,8 +209,7 @@ public interface SecurityFactory {
    * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
    *         <code>false</code> otherwise.
    */
-  boolean verifyPop(CertificationRequest csr, AlgorithmValidator algoValidator,
-      DHSigStaticKeyCertPair ownerKeyAndCert);
+  boolean verifyPop(CertificationRequest csr, AlgorithmValidator algoValidator, DHSigStaticKeyCertPair ownerKeyAndCert);
 
   /**
    * Create PublicKey from the {@code subjectPublicKeyInfo}.

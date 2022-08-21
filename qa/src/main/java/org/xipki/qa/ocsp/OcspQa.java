@@ -61,10 +61,10 @@ public class OcspQa {
     this.securityFactory = notNull(securityFactory, "securityFactory");
   }
 
-  public ValidationResult checkOcsp(OCSPResp response, IssuerHash issuerHash,
-      BigInteger serialNumber, byte[] encodedCert,
-      OcspCertStatus expectedOcspStatus, OcspResponseOption responseOption,
-      Date exptectedRevTime, boolean noSigVerify) {
+  public ValidationResult checkOcsp(
+      OCSPResp response, IssuerHash issuerHash, BigInteger serialNumber, byte[] encodedCert,
+      OcspCertStatus expectedOcspStatus, OcspResponseOption responseOption, Date exptectedRevTime,
+      boolean noSigVerify) {
     List<BigInteger> serialNumbers = new ArrayList<>(1);
     serialNumbers.add(serialNumber);
 
@@ -109,11 +109,10 @@ public class OcspQa {
     return new ValidationResult(resultIssues);
   } // method checkOcsp
 
-  public ValidationResult checkOcsp(OCSPResp response, IssuerHash issuerHash,
-      List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts,
-      Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
-      Map<BigInteger, Date> expectedRevTimes, OcspResponseOption responseOption,
-      boolean noSigVerify) {
+  public ValidationResult checkOcsp(
+      OCSPResp response, IssuerHash issuerHash, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts,
+      Map<BigInteger, OcspCertStatus> expectedOcspStatuses, Map<BigInteger, Date> expectedRevTimes,
+      OcspResponseOption responseOption, boolean noSigVerify) {
     notNull(response, "response");
     notEmpty(serialNumbers, "serialNumbers");
     notEmpty(expectedOcspStatuses, "expectedOcspStatuses");
@@ -127,8 +126,7 @@ public class OcspQa {
     ValidationIssue issue = new ValidationIssue("OCSP.STATUS", "response.status");
     resultIssues.add(issue);
     if (status != 0) {
-      issue.setFailureMessage("is '" + Unsuccessful.getStatusText(status)
-          + "', but expected 'successful'");
+      issue.setFailureMessage("is '" + Unsuccessful.getStatusText(status) + "', but expected 'successful'");
       return new ValidationResult(resultIssues);
     }
 
@@ -193,21 +191,18 @@ public class OcspQa {
       } // end if (expectedSigalgo != null)
 
       // signer certificate
-      ValidationIssue sigSignerCertIssue = new ValidationIssue("OCSP.SIGNERCERT",
-          "signer certificate");
+      ValidationIssue sigSignerCertIssue = new ValidationIssue("OCSP.SIGNERCERT", "signer certificate");
       resultIssues.add(sigSignerCertIssue);
 
       // signature validation
-      ValidationIssue sigValIssue = new ValidationIssue("OCSP.SIG.VALIDATION",
-          "signature validation");
+      ValidationIssue sigValIssue = new ValidationIssue("OCSP.SIG.VALIDATION", "signature validation");
       resultIssues.add(sigValIssue);
 
       X509CertificateHolder respSigner = null;
 
       X509CertificateHolder[] responderCerts = basicResp.getCerts();
       if (responderCerts == null || responderCerts.length < 1) {
-        sigSignerCertIssue.setFailureMessage(
-            "no responder certificate is contained in the response");
+        sigSignerCertIssue.setFailureMessage("no responder certificate is contained in the response");
         sigValIssue.setFailureMessage("could not find certificate to validate signature");
       } else {
         ResponderID respId = basicResp.getResponderId().toASN1Primitive();
@@ -234,8 +229,7 @@ public class OcspQa {
 
         if (respSigner == null) {
           sigSignerCertIssue.setFailureMessage("no responder certificate match the ResponderId");
-          sigValIssue.setFailureMessage("could not find certificate matching the"
-              + " ResponderId to validate signature");
+          sigValIssue.setFailureMessage("could not find certificate matching the ResponderId to validate signature");
         }
       }
 
@@ -268,8 +262,7 @@ public class OcspQa {
         }
 
         try {
-          PublicKey responderPubKey = KeyUtil.generatePublicKey(
-              respSigner.getSubjectPublicKeyInfo());
+          PublicKey responderPubKey = KeyUtil.generatePublicKey(respSigner.getSubjectPublicKeyInfo());
           ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(responderPubKey);
           boolean sigValid = basicResp.isSignatureValid(cvp);
           if (!sigValid) {
@@ -285,8 +278,7 @@ public class OcspQa {
     Extension nonceExtn = basicResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
     resultIssues.add(checkOccurrence("OCSP.NONCE", nonceExtn, responseOption.getNonceOccurrence()));
 
-    boolean extendedRevoke = basicResp.getExtension(
-        ObjectIdentifiers.Extn.id_pkix_ocsp_extendedRevoke) != null;
+    boolean extendedRevoke = basicResp.getExtension(ObjectIdentifiers.Extn.id_pkix_ocsp_extendedRevoke) != null;
 
     for (int i = 0; i < singleResponses.length; i++) {
       SingleResp singleResp = singleResponses[i];
@@ -315,16 +307,14 @@ public class OcspQa {
       IssuerHash issuerHash, OcspCertStatus expectedStatus, byte[] encodedCert,
       Date expectedRevTime, boolean extendedRevoke, TripleState nextupdateOccurrence,
       TripleState certhashOccurrence, HashAlgo certhashAlg) {
-    if (expectedStatus == OcspCertStatus.unknown
-        || expectedStatus == OcspCertStatus.issuerUnknown) {
+    if (expectedStatus == OcspCertStatus.unknown || expectedStatus == OcspCertStatus.issuerUnknown) {
       certhashOccurrence = TripleState.forbidden;
     }
 
     List<ValidationIssue> issues = new LinkedList<>();
 
     // issuer hash
-    ValidationIssue issue = new ValidationIssue("OCSP.RESPONSE." + index + ".ISSUER",
-        "certificate issuer");
+    ValidationIssue issue = new ValidationIssue("OCSP.RESPONSE." + index + ".ISSUER", "certificate issuer");
     issues.add(issue);
 
     CertificateID certId = singleResp.getCertID();
@@ -390,8 +380,7 @@ public class OcspQa {
               status = OcspCertStatus.cessationOfOperation;
               break;
             default:
-              issue.setFailureMessage(
-                  "should not reach here, unknown CRLReason " + revocationReason);
+              issue.setFailureMessage("should not reach here, unknown CRLReason " + revocationReason);
               break;
           }
         } // end if
@@ -453,8 +442,7 @@ public class OcspQa {
       if (encodedCert != null) {
         encodedCert = X509Util.toDerEncoded(encodedCert);
 
-        issue = new ValidationIssue("OCSP.RESPONSE." + index + ".CHASH.VALIDITY",
-            "certhash validity");
+        issue = new ValidationIssue("OCSP.RESPONSE." + index + ".CHASH.VALIDITY", "certhash validity");
         issues.add(issue);
 
         try {

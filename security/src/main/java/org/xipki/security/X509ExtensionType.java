@@ -275,8 +275,7 @@ public class X509ExtensionType extends ValidatableConf {
             v.add(m.toASN1Encodable());
           }
 
-          rv = (FieldType.SEQUENCE == type || FieldType.SEQUENCE_OF == type)
-                ? new DERSequence(v) : new DERSet(v);
+          rv = (FieldType.SEQUENCE == type || FieldType.SEQUENCE_OF == type) ? new DERSequence(v) : new DERSet(v);
           break;
         default:
           throw new RuntimeException("should not reach here, unknown type " + type);
@@ -311,8 +310,7 @@ public class X509ExtensionType extends ValidatableConf {
           for (ConstantExtnValue m : listValue) {
             if (m.getTag() != null) {
               if (!tags.add(m.getTag().getValue())) {
-                throw new InvalidConfException(
-                    "duplicated definition of tag " + m.getTag().getValue());
+                throw new InvalidConfException("duplicated definition of tag " + m.getTag().getValue());
               }
             }
           }

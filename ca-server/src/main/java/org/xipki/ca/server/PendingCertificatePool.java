@@ -78,8 +78,7 @@ class PendingCertificatePool {
   PendingCertificatePool() {
   }
 
-  void addCertificate(String transactionId, BigInteger certReqId, CertificateInfo certInfo,
-      long waitForConfirmTill) {
+  void addCertificate(String transactionId, BigInteger certReqId, CertificateInfo certInfo, long waitForConfirmTill) {
     notNull(transactionId, "transactionId");
     notNull(certInfo, "certInfo");
     if (certInfo.isAlreadyIssued()) {
@@ -88,8 +87,7 @@ class PendingCertificatePool {
 
     PendingCertificatePool.MyEntry myEntry = new MyEntry(certReqId, waitForConfirmTill, certInfo);
     synchronized (map) {
-      Set<PendingCertificatePool.MyEntry> entries =
-              map.computeIfAbsent(transactionId, k -> new HashSet<>());
+      Set<PendingCertificatePool.MyEntry> entries = map.computeIfAbsent(transactionId, k -> new HashSet<>());
       entries.add(myEntry);
     }
   } // method addCertificate

@@ -190,18 +190,15 @@ public class CertStore extends CertStoreBase {
 
   private long earliestNotBefore;
 
-  public CertStore(DataSourceWrapper datasource, UniqueIdGenerator idGenerator,
-                   PasswordResolver passwordResolver)
+  public CertStore(DataSourceWrapper datasource, UniqueIdGenerator idGenerator, PasswordResolver passwordResolver)
       throws DataAccessException, CaMgmtException {
     super(datasource, passwordResolver);
 
     this.idGenerator = notNull(idGenerator, "idGenerator");
 
     this.sqlCertForId = buildSelectFirstSql("PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE ID=?");
-    this.sqlCertWithRevInfo = buildSelectFirstSql(
-        "ID,REV,RR,RT,RIT,PID,CERT FROM CERT WHERE CA_ID=? AND SN=?");
-    this.sqlCertInfo = buildSelectFirstSql(
-        "PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE CA_ID=? AND SN=?");
+    this.sqlCertWithRevInfo = buildSelectFirstSql("ID,REV,RR,RT,RIT,PID,CERT FROM CERT WHERE CA_ID=? AND SN=?");
+    this.sqlCertInfo = buildSelectFirstSql("PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE CA_ID=? AND SN=?");
     this.sqlKnowsCertForSerial = buildSelectFirstSql("ID FROM CERT WHERE SN=? AND CA_ID=?");
     this.sqlCertStatusForSubjectFp = buildSelectFirstSql("REV FROM CERT WHERE FP_S=? AND CA_ID=?");
     this.sqlReqIdForSerial = buildSelectFirstSql("REQCERT.RID as REQ_ID FROM REQCERT INNER JOIN "
@@ -367,8 +364,7 @@ public class CertStore extends CertStoreBase {
   public long getThisUpdateOfCurrentCrl(NameId ca, boolean deltaCrl) throws OperationException {
     notNull(ca, "ca");
 
-    return execQueryLongPrepStmt(SQL_MAX_THISUPDAATE_CRL,
-        col2Int(ca.getId()), col2Int(deltaCrl ? 1 : 0));
+    return execQueryLongPrepStmt(SQL_MAX_THISUPDAATE_CRL, col2Int(ca.getId()), col2Int(deltaCrl ? 1 : 0));
   } // method getThisUpdateOfCurrentCrl
 
   public void addCrl(NameId ca, X509CRLHolder crl) throws OperationException, CRLException {
@@ -418,8 +414,9 @@ public class CertStore extends CertStoreBase {
     execUpdatePrepStmt0(SQL_ADD_CRL, columns.toArray(new SqlColumn2[0]));
   } // method addCrl
 
-  public CertWithRevocationInfo revokeCert(NameId ca, BigInteger serialNumber,
-      CertRevocationInfo revInfo, boolean force, CaIdNameMap idNameMap) throws OperationException {
+  public CertWithRevocationInfo revokeCert(
+      NameId ca, BigInteger serialNumber, CertRevocationInfo revInfo, boolean force, CaIdNameMap idNameMap)
+      throws OperationException {
     notNulls(ca, "ca", serialNumber, "serialNumber", revInfo, "revInfo");
 
     CertWithRevocationInfo certWithRevInfo =
@@ -467,8 +464,9 @@ public class CertStore extends CertStoreBase {
     return certWithRevInfo;
   } // method revokeCert
 
-  public CertWithRevocationInfo revokeSuspendedCert(NameId ca, SerialWithId serialNumber,
-      CrlReason reason, CaIdNameMap idNameMap) throws OperationException {
+  public CertWithRevocationInfo revokeSuspendedCert(
+      NameId ca, SerialWithId serialNumber, CrlReason reason, CaIdNameMap idNameMap)
+      throws OperationException {
     notNulls(ca, "ca", serialNumber, "serialNumber", reason, "reason");
 
     CertWithRevocationInfo certWithRevInfo =
@@ -504,8 +502,8 @@ public class CertStore extends CertStoreBase {
     return certWithRevInfo;
   } // method revokeSuspendedCert
 
-  public CertWithDbId unsuspendCert(NameId ca, BigInteger serialNumber, boolean force,
-      CaIdNameMap idNamMap) throws OperationException {
+  public CertWithDbId unsuspendCert(NameId ca, BigInteger serialNumber, boolean force, CaIdNameMap idNamMap)
+      throws OperationException {
     notNulls(ca, "ca", serialNumber, "serialNumber");
 
     CertWithRevocationInfo certWithRevInfo =
@@ -556,7 +554,7 @@ public class CertStore extends CertStoreBase {
     String sql = cacheSqlCidFromPublishQueue.get(numEntries);
     if (sql == null) {
       sql = datasource.buildSelectFirstSql(numEntries, "CID ASC",
-              "CID FROM PUBLISHQUEUE WHERE PID=? AND CA_ID=?");
+          "CID FROM PUBLISHQUEUE WHERE PID=? AND CA_ID=?");
       cacheSqlCidFromPublishQueue.put(numEntries, sql);
     }
 
@@ -592,8 +590,8 @@ public class CertStore extends CertStoreBase {
     }
   } // method getCountOfCerts
 
-  public List<SerialWithId> getSerialNumbers(NameId ca,  long startId, int numEntries,
-      boolean onlyRevoked) throws OperationException {
+  public List<SerialWithId> getSerialNumbers(NameId ca,  long startId, int numEntries, boolean onlyRevoked)
+      throws OperationException {
     notNulls(ca, "ca", numEntries, "numEntries");
 
     LruCache<Integer, String> cache = onlyRevoked ? cacheSqlSerialsRevoked : cacheSqlSerials;
@@ -625,31 +623,28 @@ public class CertStore extends CertStoreBase {
     return ret;
   }
 
-  public List<SerialWithId> getExpiredUnrevokedSerialNumbers(
-      NameId ca, long expiredAt, int numEntries)
+  public List<SerialWithId> getExpiredUnrevokedSerialNumbers(NameId ca, long expiredAt, int numEntries)
       throws OperationException {
     notNull(ca, "ca");
     positive(numEntries, "numEntries");
 
     String sql = cacheSqlExpiredSerials.get(numEntries);
     if (sql == null) {
-      sql = datasource.buildSelectFirstSql(numEntries,
-            "ID,SN FROM CERT WHERE CA_ID=? AND NAFTER<? AND REV=0");
+      sql = datasource.buildSelectFirstSql(numEntries, "ID,SN FROM CERT WHERE CA_ID=? AND NAFTER<? AND REV=0");
       cacheSqlExpiredSerials.put(numEntries, sql);
     }
 
     return getSerialNumbers0(sql, numEntries, col2Int(ca.getId()), col2Long(expiredAt));
   } // method getExpiredSerialNumbers
 
-  public List<SerialWithId> getSuspendedCertSerials(NameId ca, long latestLastUpdate,
-      int numEntries) throws OperationException {
+  public List<SerialWithId> getSuspendedCertSerials(NameId ca, long latestLastUpdate, int numEntries)
+      throws OperationException {
     notNull(ca, "ca");
     positive(numEntries, "numEntries");
 
     String sql = cacheSqlSuspendedSerials.get(numEntries);
     if (sql == null) {
-      sql = datasource.buildSelectFirstSql(numEntries,
-          "ID,SN FROM CERT WHERE CA_ID=? AND LUPDATE<? AND RR=?");
+      sql = datasource.buildSelectFirstSql(numEntries, "ID,SN FROM CERT WHERE CA_ID=? AND LUPDATE<? AND RR=?");
       cacheSqlSuspendedSerials.put(numEntries, sql);
     }
 
@@ -696,8 +691,7 @@ public class CertStore extends CertStoreBase {
       return getEncodedCrl(ca);
     }
 
-    ResultRow rs = execQuery1PrepStmt0(sqlCrlWithNo,
-        col2Int(ca.getId()), col2Long(crlNumber.longValue()));
+    ResultRow rs = execQuery1PrepStmt0(sqlCrlWithNo, col2Int(ca.getId()), col2Long(crlNumber.longValue()));
 
     return rs == null ? null : Base64.decodeFast(rs.getString("CRL"));
   } // method getEncodedCrl
@@ -723,14 +717,13 @@ public class CertStore extends CertStoreBase {
     }
 
     long crlNumber = crlNumbers.get(numCrlsToDelete - 1);
-    execUpdatePrepStmt0("DELETE FROM CRL WHERE CA_ID=? AND CRL_NO<?", col2Int(ca.getId()),
-        col2Long(crlNumber + 1));
+    execUpdatePrepStmt0("DELETE FROM CRL WHERE CA_ID=? AND CRL_NO<?", col2Int(ca.getId()), col2Long(crlNumber + 1));
 
     return numCrlsToDelete;
   } // method cleanupCrls
 
-  public CertificateInfo getCertForId(NameId ca, X509Cert caCert, long certId,
-      CaIdNameMap idNameMap) throws OperationException {
+  public CertificateInfo getCertForId(NameId ca, X509Cert caCert, long certId, CaIdNameMap idNameMap)
+      throws OperationException {
     notNulls(ca, "ca", caCert, "caCert", idNameMap, "idNameMap");
 
     ResultRow rs = execQuery1PrepStmt0(sqlCertForId, col2Long(certId));
@@ -756,8 +749,8 @@ public class CertStore extends CertStoreBase {
     return buildCertWithRevInfo(certId, rs, idNameMap);
   }
 
-  public CertWithRevocationInfo getCertWithRevocationInfo(int caId, BigInteger serial,
-      CaIdNameMap idNameMap) throws OperationException {
+  public CertWithRevocationInfo getCertWithRevocationInfo(int caId, BigInteger serial, CaIdNameMap idNameMap)
+      throws OperationException {
     notNulls(serial, "serial", idNameMap, "idNameMap");
 
     ResultRow rs = execQuery1PrepStmt0(sqlCertWithRevInfo,
@@ -769,8 +762,8 @@ public class CertStore extends CertStoreBase {
     return buildCertWithRevInfo(rs.getLong("ID"), rs, idNameMap);
   } // method getCertWithRevocationInfo
 
-  private CertWithRevocationInfo buildCertWithRevInfo(long certId, ResultRow rs,
-      CaIdNameMap idNameMap) throws OperationException {
+  private CertWithRevocationInfo buildCertWithRevInfo(long certId, ResultRow rs, CaIdNameMap idNameMap)
+      throws OperationException {
     X509Cert cert = parseCert(Base64.decodeFast(rs.getString("CERT")));
     CertWithDbId certWithMeta = new CertWithDbId(cert);
     certWithMeta.setCertId(certId);
@@ -793,12 +786,11 @@ public class CertStore extends CertStoreBase {
     return rs.getLong("ID");
   }
 
-  public CertificateInfo getCertInfo(NameId ca, X509Cert caCert, BigInteger serial,
-      CaIdNameMap idNameMap) throws OperationException {
+  public CertificateInfo getCertInfo(NameId ca, X509Cert caCert, BigInteger serial, CaIdNameMap idNameMap)
+      throws OperationException {
     notNulls(ca, "ca", caCert, "caCert", idNameMap, "idNameMap", serial, "serial");
 
-    ResultRow rs = execQuery1PrepStmt0(sqlCertInfo,
-        col2Int(ca.getId()), col2Str(serial.toString(16)));
+    ResultRow rs = execQuery1PrepStmt0(sqlCertInfo, col2Int(ca.getId()), col2Str(serial.toString(16)));
     if (rs == null) {
       return null;
     }
@@ -807,8 +799,7 @@ public class CertStore extends CertStoreBase {
     CertWithDbId certWithMeta = new CertWithDbId(parseCert(encodedCert));
 
     CertificateInfo certInfo = new CertificateInfo(certWithMeta, null, ca, caCert,
-        idNameMap.getCertprofile(rs.getInt("PID")),
-        idNameMap.getRequestor(rs.getInt("RID")));
+        idNameMap.getCertprofile(rs.getInt("PID")), idNameMap.getRequestor(rs.getInt("RID")));
 
     certInfo.setRevocationInfo(buildCertRevInfo(rs));
     return certInfo;
@@ -835,15 +826,13 @@ public class CertStore extends CertStoreBase {
     params[2] = col2Long(fpSubject);
 
     List<ResultRow> rows = execQueryPrepStmt0(sql, params);
-    return rows == null || rows.isEmpty() ? null
-        : parseCert(Base64.decodeFast(rows.get(0).getString("CERT")));
+    return rows == null || rows.isEmpty() ? null : parseCert(Base64.decodeFast(rows.get(0).getString("CERT")));
   } // method getCert
 
   public byte[] getCertRequest(NameId ca, BigInteger serialNumber) throws OperationException {
     notNulls(ca, "ca", serialNumber, "serialNumber");
 
-    ResultRow row = execQuery1PrepStmt0(sqlReqIdForSerial,
-        col2Int(ca.getId()), col2Str(serialNumber.toString(16)));
+    ResultRow row = execQuery1PrepStmt0(sqlReqIdForSerial, col2Int(ca.getId()), col2Str(serialNumber.toString(16)));
 
     if (row == null) {
       return null;
@@ -853,8 +842,9 @@ public class CertStore extends CertStoreBase {
     return (row == null) ? null : Base64.decodeFast(row.getString("DATA"));
   } // method getCertRequest
 
-  public List<CertListInfo> listCerts(NameId ca, X500Name subjectPattern, Date validFrom,
-      Date validTo, CertListOrderBy orderBy, int numEntries) throws OperationException {
+  public List<CertListInfo> listCerts(
+      NameId ca, X500Name subjectPattern, Date validFrom, Date validTo, CertListOrderBy orderBy, int numEntries)
+      throws OperationException {
     notNull(ca, "ca");
     positive(numEntries, "numEntries");
 
@@ -883,8 +873,7 @@ public class CertStore extends CertStoreBase {
         X500Name rdnName = new X500Name(new RDN[]{rdn});
         String rdnStr = X509Util.x500NameText(rdnName);
         if (rdnStr.indexOf('%') != -1) {
-          throw new OperationException(BAD_REQUEST,
-                  "the character '%' is not allowed in subjectPattern");
+          throw new OperationException(BAD_REQUEST, "the character '%' is not allowed in subjectPattern");
         }
         if (rdnStr.indexOf('*') != -1) {
           rdnStr = rdnStr.replace('*', '%');
@@ -927,8 +916,8 @@ public class CertStore extends CertStoreBase {
     return ret;
   } // method listCerts
 
-  public List<CertRevInfoWithSerial> getRevokedCerts(NameId ca, Date notExpiredAt, long startId,
-      int numEntries) throws OperationException {
+  public List<CertRevInfoWithSerial> getRevokedCerts(NameId ca, Date notExpiredAt, long startId, int numEntries)
+      throws OperationException {
     notNulls(ca, "ca", notExpiredAt, "notExpiredAt");
     positive(numEntries, "numEntries");
 
@@ -955,8 +944,8 @@ public class CertStore extends CertStoreBase {
     return ret;
   } // method getRevokedCerts
 
-  public List<CertRevInfoWithSerial> getCertsForDeltaCrl(NameId ca, BigInteger baseCrlNumber,
-      Date notExpiredAt) throws OperationException {
+  public List<CertRevInfoWithSerial> getCertsForDeltaCrl(NameId ca, BigInteger baseCrlNumber, Date notExpiredAt)
+      throws OperationException {
     notNulls(ca, "ca", notExpiredAt, "notExpiredAt", baseCrlNumber, "baseCrlNumber");
 
     // Get the Base FullCRL
@@ -1017,8 +1006,7 @@ public class CertStore extends CertStoreBase {
         }
       }
     } catch (SQLException ex) {
-      throw new OperationException(DATABASE_FAILURE,
-          datasource.translate(sqlSelectUnrevokedSn100, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sqlSelectUnrevokedSn100, ex).getMessage());
     } catch (IOException ex) {
       throw new OperationException(CRL_FAILURE, ex.getMessage());
     } finally {
@@ -1043,8 +1031,7 @@ public class CertStore extends CertStoreBase {
           }
         }
       } catch (SQLException ex) {
-        throw new OperationException(DATABASE_FAILURE,
-            datasource.translate(sqlSelectUnrevokedSn, ex).getMessage());
+        throw new OperationException(DATABASE_FAILURE, datasource.translate(sqlSelectUnrevokedSn, ex).getMessage());
       } finally {
         datasource.releaseResources(ps, null);
       }
@@ -1054,8 +1041,7 @@ public class CertStore extends CertStoreBase {
     // we check all revoked certificates with LUPDATE field (last update) > THISUPDATE - 1.
     final int numEntries = 1000;
 
-    String coreSql =
-        "ID,SN,RR,RT,RIT FROM CERT WHERE ID>? AND CA_ID=? AND REV=1 AND NAFTER>? AND LUPDATE>?";
+    String coreSql = "ID,SN,RR,RT,RIT FROM CERT WHERE ID>? AND CA_ID=? AND REV=1 AND NAFTER>? AND LUPDATE>?";
     String sql = datasource.buildSelectFirstSql(numEntries, "ID ASC", coreSql);
     ps = prepareStatement(sql);
     long startId = 1;
@@ -1089,8 +1075,7 @@ public class CertStore extends CertStoreBase {
             }
 
             long revInvalidityTime = rs.getLong("RIT");
-            Date invalidityTime = (revInvalidityTime == 0)
-                                    ? null : new Date(1000 * revInvalidityTime);
+            Date invalidityTime = (revInvalidityTime == 0) ? null : new Date(1000 * revInvalidityTime);
             CertRevInfoWithSerial revInfo = new CertRevInfoWithSerial(id, sn,
                 rs.getInt("RR"), new Date(1000 * rs.getLong("RT")), invalidityTime);
             ret.add(revInfo);
@@ -1115,10 +1100,8 @@ public class CertStore extends CertStoreBase {
 
   public CertStatus getCertStatusForSubject(NameId ca, X500Name subject) throws OperationException {
     long subjectFp = X509Util.fpCanonicalizedName(subject);
-    ResultRow rs = execQuery1PrepStmt0(sqlCertStatusForSubjectFp,
-                    col2Long(subjectFp), col2Int(ca.getId()));
-    return (rs == null) ? CertStatus.UNKNOWN
-                        : rs.getBoolean("REV") ? CertStatus.REVOKED : CertStatus.GOOD;
+    ResultRow rs = execQuery1PrepStmt0(sqlCertStatusForSubjectFp, col2Long(subjectFp), col2Int(ca.getId()));
+    return (rs == null) ? CertStatus.UNKNOWN : rs.getBoolean("REV") ? CertStatus.REVOKED : CertStatus.GOOD;
   } // method getCertStatusForSubjectFp
 
   public boolean isHealthy() {

@@ -616,9 +616,8 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason,
-      Date invalidityTime)
-          throws CaMgmtException;
+  void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason, Date invalidityTime)
+      throws CaMgmtException;
 
   /**
    * Unrevokes a certificate with the serial number {@code serialNumber}, and
@@ -665,9 +664,8 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  X509Cert generateCertificate(String caName, String profileName,
-          byte[] encodedCsr, Date notBefore, Date notAfter)
-          throws CaMgmtException;
+  X509Cert generateCertificate(String caName, String profileName, byte[] encodedCsr, Date notBefore, Date notAfter)
+      throws CaMgmtException;
 
   /**
    * CA {@code caName} issues a new certificate.
@@ -691,8 +689,7 @@ public interface CaManager {
    *          if error occurs.
    */
   X509Cert generateCrossCertificate(
-      String caName, String profileName, byte[] encodedCsr, byte[] encodedTargetCert,
-      Date notBefore, Date notAfter)
+      String caName, String profileName, byte[] encodedCsr, byte[] encodedTargetCert, Date notBefore, Date notAfter)
       throws CaMgmtException;
 
   /**
@@ -715,9 +712,9 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  X509Cert generateRootCa(CaEntry caEntry, String certprofileName,
-      String subject, String serialNumber, Date notBefore, Date notAfter)
-          throws CaMgmtException;
+  X509Cert generateRootCa(
+      CaEntry caEntry, String certprofileName, String subject, String serialNumber, Date notBefore, Date notAfter)
+      throws CaMgmtException;
 
   /**
    * Generates a new CRL for CA {@code caName}.
@@ -826,9 +823,9 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  List<CertListInfo> listCertificates(String caName, X500Name subjectPattern, Date validFrom,
-      Date validTo, CertListOrderBy orderBy, int numEntries)
-          throws CaMgmtException;
+  List<CertListInfo> listCertificates(
+      String caName, X500Name subjectPattern, Date validFrom, Date validTo, CertListOrderBy orderBy, int numEntries)
+      throws CaMgmtException;
 
   /**
    * Returns the request used to enroll the given certificate.

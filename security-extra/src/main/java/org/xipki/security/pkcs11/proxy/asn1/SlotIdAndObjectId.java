@@ -53,8 +53,7 @@ public class SlotIdAndObjectId extends ProxyMessage {
     this.objectId = new ObjectIdentifier(objectId);
   }
 
-  public SlotIdAndObjectId(SlotIdentifier slotId,
-      ObjectIdentifier objectId) {
+  public SlotIdAndObjectId(SlotIdentifier slotId, ObjectIdentifier objectId) {
     this.slotId = Args.notNull(slotId, "slotId");
     this.objectId = Args.notNull(objectId, "objectId");
   }

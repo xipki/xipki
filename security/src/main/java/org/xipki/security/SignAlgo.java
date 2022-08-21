@@ -208,8 +208,7 @@ public enum SignAlgo {
     }
   }
 
-  SignAlgo(String jceName, int code, ASN1ObjectIdentifier oid,
-           HashAlgo hashAlgo, boolean withNullParams) {
+  SignAlgo(String jceName, int code, ASN1ObjectIdentifier oid, HashAlgo hashAlgo, boolean withNullParams) {
     this.code = (byte) Args.range(code, "code", 0, 255);
     this.jceName = jceName.toUpperCase();
     this.oid = oid;
@@ -459,8 +458,7 @@ public enum SignAlgo {
         throw new NoSuchAlgorithmException("mgf != MGF1");
       }
 
-      AlgorithmIdentifier mgfDigestAlgId = AlgorithmIdentifier.getInstance(
-          mgf.getParameters());
+      AlgorithmIdentifier mgfDigestAlgId = AlgorithmIdentifier.getInstance(mgf.getParameters());
       if (!digestAlgId.equals(mgfDigestAlgId)) {
         throw new NoSuchAlgorithmException("digestAlg != MGF1.digestAlg");
       }
@@ -505,8 +503,7 @@ public enum SignAlgo {
       throws NoSuchAlgorithmException {
     SignAlgo alg = map.get(nameOrOid.toUpperCase().replace("-", ""));
     if (alg == null) {
-      throw new NoSuchAlgorithmException(
-          "Unknown HashAlgo OID/name '" + nameOrOid + "'");
+      throw new NoSuchAlgorithmException("Unknown HashAlgo OID/name '" + nameOrOid + "'");
     }
     return alg;
   }
@@ -543,9 +540,8 @@ public enum SignAlgo {
     }
   } // method getInstance
 
-  public static SignAlgo getInstance(Key key, HashAlgo hashAlgo,
-      SignatureAlgoControl algoControl)
-          throws NoSuchAlgorithmException {
+  public static SignAlgo getInstance(Key key, HashAlgo hashAlgo, SignatureAlgoControl algoControl)
+      throws NoSuchAlgorithmException {
     notNull(hashAlgo, "hashAlgo");
     notNull(key, "key");
 
@@ -634,9 +630,8 @@ public enum SignAlgo {
     }
   } // method getDSASigAlgo
 
-  private static SignAlgo getECSigAlgo(HashAlgo hashAlgo, boolean plainSignature,
-      boolean gm)
-          throws NoSuchAlgorithmException {
+  private static SignAlgo getECSigAlgo(HashAlgo hashAlgo, boolean plainSignature, boolean gm)
+      throws NoSuchAlgorithmException {
     notNull(hashAlgo, "hashAlgo");
     if (gm && plainSignature) {
       throw new IllegalArgumentException("plainSignature and gm cannot be both true");

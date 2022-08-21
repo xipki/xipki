@@ -168,8 +168,7 @@ public class ChangeCaEntry extends MgmtEntry {
   }
 
   public void setKeypairGenNames(List<String> keypairGenNames) {
-    this.keypairGenNames = (keypairGenNames == null)
-            ? null : CollectionUtil.toLowerCaseList(keypairGenNames);
+    this.keypairGenNames = (keypairGenNames == null) ? null : CollectionUtil.toLowerCaseList(keypairGenNames);
   }
 
   public ValidityMode getValidityMode() {
@@ -242,8 +241,7 @@ public class ChangeCaEntry extends MgmtEntry {
 
   public void setSerialNoLen(Integer serialNoLen) {
     if (serialNoLen != null) {
-      Args.range(serialNoLen, "serialNoLen",
-          CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
+      Args.range(serialNoLen, "serialNoLen", CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
     }
     this.serialNoLen = serialNoLen;
   }

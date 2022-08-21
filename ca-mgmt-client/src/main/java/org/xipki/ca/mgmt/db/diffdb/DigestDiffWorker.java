@@ -59,7 +59,8 @@ public class DigestDiffWorker extends DbWorker {
 
   private final int numThreads;
 
-  public DigestDiffWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
+  public DigestDiffWorker(
+      DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
       boolean revokedOnly, String refDbConfFile, String targetDbConfFile, String reportDirName,
       int numCertsPerSelect, int numThreads, Set<byte[]> includeCaCerts)
       throws PasswordResolverException, IOException {
@@ -90,8 +91,7 @@ public class DigestDiffWorker extends DbWorker {
 
     Properties props = DbPorter.getDbConfProperties(
         Files.newInputStream(Paths.get(IoUtil.expandFilepath(targetDbConfFile))));
-    this.targetDatasource = datasourceFactory.createDataSource(
-        "ds-" + targetDbConfFile, props, passwordResolver);
+    this.targetDatasource = datasourceFactory.createDataSource("ds-" + targetDbConfFile, props, passwordResolver);
   } // constructor
 
   @Override

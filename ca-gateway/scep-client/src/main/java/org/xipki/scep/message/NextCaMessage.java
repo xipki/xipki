@@ -66,13 +66,11 @@ public class NextCaMessage {
   }
 
   public void setRaCerts(List<X509Cert> raCerts) {
-    this.raCerts = CollectionUtil.isEmpty(raCerts) ? null
-        : Collections.unmodifiableList(new ArrayList<>(raCerts));
+    this.raCerts = CollectionUtil.isEmpty(raCerts) ? null : Collections.unmodifiableList(new ArrayList<>(raCerts));
   }
 
-  public ContentInfo encode(PrivateKey signingKey, X509Cert signerCert,
-      X509Cert[] cmsCertSet)
-          throws MessageEncodingException {
+  public ContentInfo encode(PrivateKey signingKey, X509Cert signerCert, X509Cert[] cmsCertSet)
+      throws MessageEncodingException {
     Args.notNull(signingKey, "signingKey");
     Args.notNull(signerCert, "signerCert");
 
@@ -85,8 +83,7 @@ public class NextCaMessage {
         }
       }
 
-      byte[] degenratedSignedDataBytes = degenerateSignedData.generate(
-          new CMSAbsentContent()).getEncoded();
+      byte[] degenratedSignedDataBytes = degenerateSignedData.generate(new CMSAbsentContent()).getEncoded();
 
       CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
 
@@ -103,14 +100,12 @@ public class NextCaMessage {
       SignerInfoGenerator signerInfo = signerInfoBuilder.build(signer, signerCert.toBcCert());
       generator.addSignerInfoGenerator(signerInfo);
 
-      CMSTypedData cmsContent = new CMSProcessableByteArray(CMSObjectIdentifiers.signedData,
-          degenratedSignedDataBytes);
+      CMSTypedData cmsContent = new CMSProcessableByteArray(CMSObjectIdentifiers.signedData, degenratedSignedDataBytes);
 
       // certificateSet
       ScepUtil.addCmsCertSet(generator, cmsCertSet);
       return generator.generate(cmsContent, true).toASN1Structure();
-    } catch (CMSException | CertificateEncodingException | IOException
-        | OperatorCreationException ex) {
+    } catch (CMSException | CertificateEncodingException | IOException | OperatorCreationException ex) {
       throw new MessageEncodingException(ex);
     }
   } // method encode
@@ -120,8 +115,7 @@ public class NextCaMessage {
     if ("RSA".equalsIgnoreCase(algorithm)) {
       return hashAlgo.getJceName() + "withRSA";
     } else {
-      throw new UnsupportedOperationException(
-          "getSignatureAlgorithm() for non-RSA is not supported yet.");
+      throw new UnsupportedOperationException("getSignatureAlgorithm() for non-RSA is not supported yet.");
     }
   }
 

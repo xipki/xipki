@@ -77,8 +77,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign},
-        null));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null));
 
       marshall(profile, destFilename, true);
   } // method certprofileCabRootCa
@@ -118,8 +117,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign},
-        null));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null));
 
     // Extensions - CertificatePolicies
     list.add(createExtension(Extension.certificatePolicies, true, false));
@@ -131,8 +129,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
   } // method certprofileCabSubCa
 
   private static void certprofileCabDomainValidatedTls(String destFilename) {
-    X509ProfileType profile = getBaseCabSubscriberProfile(
-        "certprofile TLS (CA/Browser Forum BR, Domain Validated)");
+    X509ProfileType profile = getBaseCabSubscriberProfile("certprofile TLS (CA/Browser Forum BR, Domain Validated)");
 
     // Subject
     Subject subject = profile.getSubject();

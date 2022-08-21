@@ -36,12 +36,10 @@ public class DbSchemaActions {
   @Service
   public static class AddDbSchema extends CaActions.CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-        description = "DBSchema entry name")
+    @Option(name = "--name", aliases = "-n", required = true, description = "DBSchema entry name")
     private String name;
 
-    @Option(name = "--value", aliases = "-v", required = true,
-        description = "DBSchema entry value")
+    @Option(name = "--value", aliases = "-v", required = true, description = "DBSchema entry value")
     private String value;
 
     @Override
@@ -55,12 +53,10 @@ public class DbSchemaActions {
   @Service
   public static class ChangeDbSchema extends CaActions.CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "DBSchema entry name")
+    @Option(name = "--name", aliases = "-n", required = true, description = "DBSchema entry name")
     private String name;
 
-    @Option(name = "--value", aliases = "-v", required = true,
-            description = "DBSchema entry value")
+    @Option(name = "--value", aliases = "-v", required = true, description = "DBSchema entry value")
     private String value;
 
     @Override
@@ -74,8 +70,7 @@ public class DbSchemaActions {
   @Service
   public static class RemoveDbSchema extends CaActions.CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "DBSchema entry name")
+    @Option(name = "--name", aliases = "-n", required = true, description = "DBSchema entry name")
     private String name;
 
     @Override

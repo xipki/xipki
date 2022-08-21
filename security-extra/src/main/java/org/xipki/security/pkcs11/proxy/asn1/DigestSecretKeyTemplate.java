@@ -55,8 +55,7 @@ public class DigestSecretKeyTemplate extends ProxyMessage {
     this.mechanism = Mechanism.getInstance(seq.getObjectAt(idx++));
   }
 
-  public DigestSecretKeyTemplate(SlotIdentifier slotId, ObjectIdentifier objectId,
-      long mechanism) {
+  public DigestSecretKeyTemplate(SlotIdentifier slotId, ObjectIdentifier objectId, long mechanism) {
     this.slotId = Args.notNull(slotId, "slotId");
     this.objectId = Args.notNull(objectId, "objectId");
     this.mechanism = new Mechanism(mechanism, null);

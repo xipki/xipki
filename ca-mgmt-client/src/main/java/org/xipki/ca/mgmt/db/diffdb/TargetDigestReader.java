@@ -201,8 +201,7 @@ class TargetDigestReader implements Closeable {
         singleSql = StringUtil.concat("REV,RR,RT,RIT,HASH FROM CERT WHERE IID=",
             Integer.toString(caId), " AND SN=?");
 
-        arrayBuffer.append("SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=").append(caId)
-          .append(" AND SN IN (?");
+        arrayBuffer.append("SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=").append(caId).append(" AND SN IN (?");
         for (int i = 1; i < numPerSelect; i++) {
           arrayBuffer.append(",?");
         }
@@ -257,9 +256,9 @@ class TargetDigestReader implements Closeable {
     }
   }
 
-  private Map<BigInteger, DigestEntry> getCertsViaSingleSelect(PreparedStatement singleSelectStmt,
-      List<BigInteger> serialNumbers)
-          throws DataAccessException {
+  private Map<BigInteger, DigestEntry> getCertsViaSingleSelect(
+      PreparedStatement singleSelectStmt, List<BigInteger> serialNumbers)
+      throws DataAccessException {
     Map<BigInteger, DigestEntry> ret = new HashMap<>(serialNumbers.size());
 
     for (BigInteger serialNumber : serialNumbers) {
@@ -272,9 +271,9 @@ class TargetDigestReader implements Closeable {
     return ret;
   } // method getCertsViaSingleSelect
 
-  private Map<BigInteger, DigestEntry> getCertsViaInArraySelect(PreparedStatement batchSelectStmt,
-      List<BigInteger> serialNumbers)
-          throws DataAccessException {
+  private Map<BigInteger, DigestEntry> getCertsViaInArraySelect(
+      PreparedStatement batchSelectStmt, List<BigInteger> serialNumbers)
+      throws DataAccessException {
     final int n = serialNumbers.size();
     if (n != numPerSelect) {
       throw new IllegalArgumentException("size of serialNumbers is not '" + numPerSelect
@@ -322,8 +321,7 @@ class TargetDigestReader implements Closeable {
       }
 
       String base64Certhash = getBase64HashValue(rs);
-      DigestEntry certB = new DigestEntry(serialNumber, revoked, revReason, revTime, revInvTime,
-          base64Certhash);
+      DigestEntry certB = new DigestEntry(serialNumber, revoked, revReason, revTime, revInvTime, base64Certhash);
       ret.put(serialNumber, certB);
     }
 
@@ -351,8 +349,7 @@ class TargetDigestReader implements Closeable {
           revInvTime = null;
         }
       }
-      return new DigestEntry(serialNumber, revoked, revReason, revTime, revInvTime,
-          getBase64HashValue(rs));
+      return new DigestEntry(serialNumber, revoked, revReason, revTime, revInvTime, getBase64HashValue(rs));
     } catch (SQLException ex) {
       throw datasource.translate(singleCertSql, ex);
     } finally {

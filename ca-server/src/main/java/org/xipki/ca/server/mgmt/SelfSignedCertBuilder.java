@@ -92,33 +92,28 @@ class SelfSignedCertBuilder {
   }
 
   public static GenerateSelfSignedResult generateSelfSigned(
-      SecurityFactory securityFactory,
-      String signerType, String signerConf, IdentifiedCertprofile certprofile,
-      String subject, BigInteger serialNumber, CaUris caUris, ConfPairs extraControl,
-      Date notBefore, Date notAfter)
-          throws OperationException, InvalidConfException {
+      SecurityFactory securityFactory, String signerType, String signerConf, IdentifiedCertprofile certprofile,
+      String subject, BigInteger serialNumber, CaUris caUris, ConfPairs extraControl, Date notBefore, Date notAfter)
+      throws OperationException, InvalidConfException {
     notNull(securityFactory, "securityFactory");
     notBlank(signerType, "signerType");
     notNull(certprofile, "certprofile");
     notBlank(subject, "subject");
     notNull(serialNumber, "serialNumber");
     if (serialNumber.signum() != 1) {
-      throw new IllegalArgumentException(
-          "serialNumber may not be non-positive: " + serialNumber);
+      throw new IllegalArgumentException("serialNumber may not be non-positive: " + serialNumber);
     }
 
     Certprofile.CertLevel level = certprofile.getCertLevel();
     if (Certprofile.CertLevel.RootCA != level) {
-      throw new IllegalArgumentException(
-          "certprofile is not of level " + Certprofile.CertLevel.RootCA);
+      throw new IllegalArgumentException("certprofile is not of level " + Certprofile.CertLevel.RootCA);
     }
 
     if ("PKCS12".equalsIgnoreCase(signerType) || "JCEKS".equalsIgnoreCase(signerType)) {
       ConfPairs keyValues = new ConfPairs(signerConf);
       String keystoreConf = keyValues.value("keystore");
       if (keystoreConf == null) {
-        throw new InvalidConfException(
-          "required parameter 'keystore' for types PKCS12 and JCEKS, is not specified");
+        throw new InvalidConfException("required parameter 'keystore' for types PKCS12 and JCEKS, is not specified");
       }
     }
 
@@ -162,8 +157,8 @@ class SelfSignedCertBuilder {
     return new GenerateSelfSignedResult(signerConf, newCert);
   } // method generateSelfSigned
 
-  private static X509Cert generateCertificate(ConcurrentContentSigner signer,
-      IdentifiedCertprofile certprofile, String subject, BigInteger serialNumber,
+  private static X509Cert generateCertificate(
+      ConcurrentContentSigner signer, IdentifiedCertprofile certprofile, String subject, BigInteger serialNumber,
       CaUris caUris, ConfPairs extraControl, Date notBefore, Date notAfter)
       throws OperationException {
     SubjectPublicKeyInfo publicKeyInfo;
@@ -191,15 +186,13 @@ class SelfSignedCertBuilder {
     }
 
     if (!signerPublicKey.equals(csrPublicKey)) {
-      throw new OperationException(ErrorCode.BAD_REQUEST,
-          "Public keys of the signer's token and of CSR are different");
+      throw new OperationException(ErrorCode.BAD_REQUEST, "Public keys of the signer's token and of CSR are different");
     }
 
     try {
       certprofile.checkPublicKey(publicKeyInfo);
     } catch (CertprofileException ex) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          "exception in cert profile " + certprofile.getIdent());
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE, "exception in cert profile " + certprofile.getIdent());
     } catch (BadCertTemplateException ex) {
       LOG.warn("certprofile.checkPublicKey", ex);
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
@@ -212,8 +205,7 @@ class SelfSignedCertBuilder {
     try {
       subjectInfo = certprofile.getSubject(requestedSubject, publicKeyInfo);
     } catch (CertprofileException ex) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          "exception in cert profile " + certprofile.getIdent());
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE, "exception in cert profile " + certprofile.getIdent());
     } catch (BadCertTemplateException ex) {
       LOG.warn("certprofile.getSubject", ex);
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
@@ -270,9 +262,9 @@ class SelfSignedCertBuilder {
     }
   } // method generateCertificate
 
-  private static void addExtensions(X509v3CertificateBuilder certBuilder,
-      IdentifiedCertprofile profile, X500Name requestedSubject, X500Name grantedSubject,
-      Extensions extensions, SubjectPublicKeyInfo requestedPublicKeyInfo,
+  private static void addExtensions(
+      X509v3CertificateBuilder certBuilder, IdentifiedCertprofile profile, X500Name requestedSubject,
+      X500Name grantedSubject, Extensions extensions, SubjectPublicKeyInfo requestedPublicKeyInfo,
       PublicCaInfo publicCaInfo, Date notBefore, Date notAfter)
       throws CertprofileException, IOException, BadCertTemplateException {
     ExtensionValues extensionTuples = profile.getExtensions(requestedSubject, grantedSubject,

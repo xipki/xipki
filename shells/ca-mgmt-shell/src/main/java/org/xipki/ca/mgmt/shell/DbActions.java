@@ -119,8 +119,7 @@ public class DbActions {
   @Service
   public static class DiffDigest extends DbAction {
 
-    @Option(name = "--ref-db", required = true,
-        description = "database configuration file of the reference system")
+    @Option(name = "--ref-db", required = true, description = "database configuration file of the reference system")
     @Completion(FileCompleter.class)
     private String refDbConf;
 
@@ -139,12 +138,10 @@ public class DbActions {
     @Option(name = "-k", description = "number of certificates per SELECT")
     private Integer numCertsPerSelect = 1000;
 
-    @Option(name = "--target-threads",
-        description = "number of threads to query the target database")
+    @Option(name = "--target-threads", description = "number of threads to query the target database")
     private Integer numTargetThreads = 40;
 
-    @Option(name = "--ca-cert", multiValued = true,
-        description = "Certificate of CAs to be considered")
+    @Option(name = "--ca-cert", multiValued = true, description = "Certificate of CAs to be considered")
     @Completion(FileCompleter.class)
     private List<String> caCertFiles;
 

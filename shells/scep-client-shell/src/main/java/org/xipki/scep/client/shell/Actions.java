@@ -71,8 +71,7 @@ public class Actions {
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "where to save the certificate")
+    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the certificate")
     @Completion(FileCompleter.class)
     private String outputFile;
 
@@ -85,8 +84,7 @@ public class Actions {
       X509Cert caCert = client.getAuthorityCertStore().getCaCert();
       X500Name caSubject = caCert.getSubject();
 
-      EnrolmentResponse resp = client.scepCertPoll(getIdentityKey(), getIdentityCert(), csr,
-          caSubject);
+      EnrolmentResponse resp = client.scepCertPoll(getIdentityKey(), getIdentityCert(), csr, caSubject);
       if (resp.isFailure()) {
         throw new CmdFailure("server returned 'failure'");
       } else if (resp.isPending()) {
@@ -98,8 +96,7 @@ public class Actions {
         throw new CmdFailure("received no certficate from server");
       }
 
-      saveVerbose("saved certificate to file", outputFile,
-          encodeCert(certs.get(0).getEncoded(), outform));
+      saveVerbose("saved certificate to file", outputFile, encodeCert(certs.get(0).getEncoded(), outform));
       return null;
     }
 
@@ -197,8 +194,7 @@ public class Actions {
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "where to save the certificate")
+    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the certificate")
     @Completion(FileCompleter.class)
     private String outputFile;
 
@@ -235,8 +231,7 @@ public class Actions {
       }
 
       X509Cert cert = resp.getCertificates().get(0);
-      saveVerbose("saved enrolled certificate to file", outputFile,
-          encodeCert(cert.getEncoded(), outform));
+      saveVerbose("saved enrolled certificate to file", outputFile, encodeCert(cert.getEncoded(), outform));
       return null;
     }
 
@@ -308,8 +303,7 @@ public class Actions {
       BigInteger serial = toBigInt(serialNumber);
       X509Cert caCert = client.getAuthorityCertStore().getCaCert();
       X500Name caSubject = caCert.getSubject();
-      List<X509Cert> certs = client.scepGetCert(getIdentityKey(), getIdentityCert(),
-          caSubject, serial);
+      List<X509Cert> certs = client.scepGetCert(getIdentityKey(), getIdentityCert(), caSubject, serial);
       if (certs == null || certs.isEmpty()) {
         throw new CmdFailure("received no certficate from server");
       }
@@ -325,8 +319,7 @@ public class Actions {
   @Service
   public static class ScepGetCrl extends ClientAction {
 
-    @Option(name = "--cert", aliases = "-c", required = true,
-        description = "certificate file")
+    @Option(name = "--cert", aliases = "-c", required = true, description = "certificate file")
     @Completion(FileCompleter.class)
     private String certFile;
 

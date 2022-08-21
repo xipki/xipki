@@ -93,8 +93,7 @@ public class CmpControl {
       throw new InvalidConfException("requestSigAlgos is not set");
     }
     try {
-      this.sigAlgoValidator =
-          CollectionAlgorithmValidator.buildAlgorithmValidator(requestSigAlgos);
+      this.sigAlgoValidator = CollectionAlgorithmValidator.buildAlgorithmValidator(requestSigAlgos);
     } catch (NoSuchAlgorithmException ex) {
       throw new InvalidConfException("invalid signature algorithm", ex);
     }

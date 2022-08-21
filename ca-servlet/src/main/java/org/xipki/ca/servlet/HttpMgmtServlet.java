@@ -110,8 +110,7 @@ public class HttpMgmtServlet extends HttpServlet {
       String actionStr = path.substring(1);
       MgmtAction action = MgmtAction.ofName(actionStr);
       if (action == null) {
-        throw new MyException(HttpServletResponse.SC_NOT_FOUND,
-            "unknown action '" + actionStr + "'");
+        throw new MyException(HttpServletResponse.SC_NOT_FOUND, "unknown action '" + actionStr + "'");
       }
 
       InputStream in = request.getInputStream();
@@ -232,9 +231,8 @@ public class HttpMgmtServlet extends HttpServlet {
         case generateCrossCertificate: {
           MgmtRequest.GenerateCrossCertificate req =
               parse(in, MgmtRequest.GenerateCrossCertificate.class);
-          X509Cert cert = caManager.generateCrossCertificate(req.getCaName(),
-              req.getProfileName(), req.getEncodedCsr(), req.getEncodedTargetCert(),
-              req.getNotBefore(), req.getNotAfter());
+          X509Cert cert = caManager.generateCrossCertificate(req.getCaName(), req.getProfileName(),
+              req.getEncodedCsr(), req.getEncodedTargetCert(), req.getNotBefore(), req.getNotAfter());
           resp = toByteArray(cert);
           break;
         }
@@ -256,9 +254,8 @@ public class HttpMgmtServlet extends HttpServlet {
                 "could not build the CaEntry: " + ex.getMessage());
           }
 
-          X509Cert cert = caManager.generateRootCa(caEntry,
-              req.getCertprofileName(), req.getSubject(), req.getSerialNumber(),
-              req.getNotBefore(), req.getNotAfter());
+          X509Cert cert = caManager.generateRootCa(caEntry, req.getCertprofileName(), req.getSubject(),
+              req.getSerialNumber(), req.getNotBefore(), req.getNotAfter());
           resp = toByteArray(cert);
           break;
         }
@@ -454,8 +451,7 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case loadConf: {
           MgmtRequest.LoadConf req = parse(in, MgmtRequest.LoadConf.class);
-          Map<String, X509Cert> rootcaNameCertMap =
-              caManager.loadConf(new ByteArrayInputStream(req.getConfBytes()));
+          Map<String, X509Cert> rootcaNameCertMap = caManager.loadConf(new ByteArrayInputStream(req.getConfBytes()));
 
           if (rootcaNameCertMap == null || rootcaNameCertMap.isEmpty()) {
             resp = new MgmtResponse.LoadConf(null);
@@ -544,8 +540,7 @@ public class HttpMgmtServlet extends HttpServlet {
         case republishCertificates: {
           MgmtRequest.RepublishCertificates req =
               parse(in, MgmtRequest.RepublishCertificates.class);
-          caManager.republishCertificates(req.getCaName(), req.getPublisherNames(),
-              req.getNumThreads());
+          caManager.republishCertificates(req.getCaName(), req.getPublisherNames(), req.getNumThreads());
           resp = null;
           break;
         }
@@ -569,15 +564,13 @@ public class HttpMgmtServlet extends HttpServlet {
         case revokeCertficate:
         case revokeCertificate: {
           MgmtRequest.RevokeCertificate req = parse(in, MgmtRequest.RevokeCertificate.class);
-          caManager.revokeCertificate(req.getCaName(), req.getSerialNumber(),
-              req.getReason(), req.getInvalidityTime());
+          caManager.revokeCertificate(req.getCaName(), req.getSerialNumber(), req.getReason(), req.getInvalidityTime());
           resp = null;
           break;
         }
         case tokenInfoP11: {
           MgmtRequest.TokenInfoP11 req = parse(in, MgmtRequest.TokenInfoP11.class);
-          String info = caManager.getTokenInfoP11(req.getModuleName(),
-                  req.getSlotIndex(), req.isVerbose());
+          String info = caManager.getTokenInfoP11(req.getModuleName(), req.getSlotIndex(), req.isVerbose());
           resp = new MgmtResponse.StringResponse(info);
           break;
         }
@@ -653,8 +646,7 @@ public class HttpMgmtServlet extends HttpServlet {
           break;
         }
         default: {
-          throw new MyException(HttpServletResponse.SC_NOT_FOUND,
-              "unsupported action " + actionStr);
+          throw new MyException(HttpServletResponse.SC_NOT_FOUND, "unsupported action " + actionStr);
         }
       }
 
@@ -702,8 +694,7 @@ public class HttpMgmtServlet extends HttpServlet {
       encoded = crl.getEncoded();
     } catch (IOException ex) {
       LOG.error(action + ": could not encode the generated CRL", ex);
-      throw new MyException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-          "could not encode the generated CRL");
+      throw new MyException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "could not encode the generated CRL");
     }
 
     return new MgmtResponse.ByteArray(encoded);

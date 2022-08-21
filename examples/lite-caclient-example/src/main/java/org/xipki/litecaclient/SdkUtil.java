@@ -122,8 +122,7 @@ public class SdkUtil {
       parent.mkdirs();
     }
 
-    Files.copy(
-        new ByteArrayInputStream(content), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(new ByteArrayInputStream(content), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
   }
 
   public static HttpURLConnection openHttpConn(URL url)
@@ -148,9 +147,9 @@ public class SdkUtil {
     return obj;
   }
 
-  public static byte[] send(URL url, String httpMethod, byte[] request, String requestContentType,
-      String expectedResponseContentType)
-          throws IOException {
+  public static byte[] send(
+      URL url, String httpMethod, byte[] request, String requestContentType, String expectedResponseContentType)
+      throws IOException {
     HttpURLConnection httpUrlConnection = SdkUtil.openHttpConn(url);
     httpUrlConnection.setDoOutput(true);
     httpUrlConnection.setUseCaches(false);

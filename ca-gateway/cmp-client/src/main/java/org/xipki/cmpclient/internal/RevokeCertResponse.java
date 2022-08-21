@@ -39,10 +39,8 @@ class RevokeCertResponse {
 
   void addResultEntry(ResultEntry resultEntry) {
     Args.notNull(resultEntry, "resultEntry");
-    if (!(resultEntry instanceof ResultEntry.RevokeCert
-        || resultEntry instanceof ResultEntry.Error)) {
-      throw new IllegalArgumentException("unaccepted parameter of class "
-            + resultEntry.getClass().getName());
+    if (!(resultEntry instanceof ResultEntry.RevokeCert || resultEntry instanceof ResultEntry.Error)) {
+      throw new IllegalArgumentException("unaccepted parameter of class " + resultEntry.getClass().getName());
     }
 
     if (resultEntries == null) {

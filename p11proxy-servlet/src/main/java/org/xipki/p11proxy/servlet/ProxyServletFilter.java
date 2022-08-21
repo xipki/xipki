@@ -59,8 +59,7 @@ public class ProxyServletFilter implements Filter {
     try {
       conf = P11ProxyConf.readConfFromFile(IoUtil.expandFilepath(DFLT_SERVER_CFG, true));
     } catch (IOException | InvalidConfException ex) {
-      throw new IllegalArgumentException(
-          "could not parse PKCS#11 Proxy configuration file " + DFLT_SERVER_CFG, ex);
+      throw new IllegalArgumentException("could not parse PKCS#11 Proxy configuration file " + DFLT_SERVER_CFG, ex);
     }
 
     String str = filterConfig.getInitParameter("logReqResp");
@@ -80,8 +79,7 @@ public class ProxyServletFilter implements Filter {
     try {
       pool.init();
     } catch (P11TokenException | XiSecurityException ex) {
-      throw new ServletException(
-          "could not initialize LocalP11CryptServicePool: " + ex.getMessage(), ex);
+      throw new ServletException("could not initialize LocalP11CryptServicePool: " + ex.getMessage(), ex);
     }
 
     servlet = new HttpProxyServlet();

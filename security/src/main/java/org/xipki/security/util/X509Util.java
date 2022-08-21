@@ -281,8 +281,7 @@ public class X509Util {
 
   public static String toPemCert(X509Cert cert) {
     notNull(cert, "cert");
-    return StringUtil.toUtf8String(
-            PemEncoder.encode(cert.getEncoded(), PemLabel.CERTIFICATE));
+    return StringUtil.toUtf8String(PemEncoder.encode(cert.getEncoded(), PemLabel.CERTIFICATE));
   }
 
   public static X509Certificate parseX509Certificate(InputStream crlStream)
@@ -376,8 +375,7 @@ public class X509Util {
       return ((ASN1String) value).getString();
     } else {
       try {
-        return "#" + Hex.encode(
-            value.toASN1Primitive().getEncoded(ASN1Encoding.DER));
+        return "#" + Hex.encode(value.toASN1Primitive().getEncoded(ASN1Encoding.DER));
       } catch (IOException ex) {
         throw new IllegalArgumentException("other value has no encoded form");
       }
@@ -467,15 +465,13 @@ public class X509Util {
    * @throws CertPathBuilderException
    *           If cannot build a valid certificate path.
    */
-  public static X509Cert[] buildCertPath(X509Cert targetCert,
-      Collection<X509Cert> certs, boolean includeTargetCert)
-          throws CertPathBuilderException {
+  public static X509Cert[] buildCertPath(X509Cert targetCert, Collection<X509Cert> certs, boolean includeTargetCert)
+      throws CertPathBuilderException {
     return buildCertPath(targetCert, certs, null, includeTargetCert);
   }
 
-  public static X509Cert[] buildCertPath(X509Cert targetCert,
-      Collection<X509Cert> certs, Collection<X509Cert> trustanchors,
-      boolean includeTargetCert) {
+  public static X509Cert[] buildCertPath(
+      X509Cert targetCert, Collection<X509Cert> certs, Collection<X509Cert> trustanchors, boolean includeTargetCert) {
     notNull(targetCert, "cert");
 
     if (trustanchors == null) {
@@ -678,8 +674,7 @@ public class X509Util {
       if (keyParameters == null) {
         return publicKeyInfo;
       } else {
-        return new SubjectPublicKeyInfo(new AlgorithmIdentifier(algOid),
-            publicKeyInfo.getPublicKeyData().getBytes());
+        return new SubjectPublicKeyInfo(new AlgorithmIdentifier(algOid), publicKeyInfo.getPublicKeyData().getBytes());
       }
     } else {
       return publicKeyInfo;
@@ -712,9 +707,8 @@ public class X509Util {
     }
   } // method createExtnSubjectAltName
 
-  public static Extension createExtnSubjectInfoAccess(List<String> accessMethodAndLocations,
-      boolean critical)
-          throws BadInputException {
+  public static Extension createExtnSubjectInfoAccess(List<String> accessMethodAndLocations, boolean critical)
+      throws BadInputException {
     if (isEmpty(accessMethodAndLocations)) {
       return null;
     }
@@ -873,17 +867,14 @@ public class X509Util {
     }
 
     StringBuilder sb = new StringBuilder(verbose ? 1000 : 100);
-    sb.append("  issuer:  ")
-      .append(x500NameText(cert.getIssuer())).append('\n');
+    sb.append("  issuer:  ").append(x500NameText(cert.getIssuer())).append('\n');
     sb.append("  serialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber())).append('\n');
-    sb.append("  subject: ")
-      .append(x500NameText(cert.getSubject())).append('\n');
+    sb.append("  subject: ").append(x500NameText(cert.getSubject())).append('\n');
     sb.append("  notBefore: ").append(cert.getNotBefore()).append("\n");
     sb.append("  notAfter:  ").append(cert.getNotAfter());
 
     if (verbose) {
-      sb.append("\n  encoded: ");
-      sb.append(Base64.encodeToString(cert.getEncoded()));
+      sb.append("\n  encoded: ").append(Base64.encodeToString(cert.getEncoded()));
     }
 
     return sb.toString();
@@ -925,8 +916,7 @@ public class X509Util {
     return certs;
   }
 
-  public static void assertCsrAndCertMatch(
-      CertificationRequest csr, Certificate targetCert, boolean caCertRequired)
+  public static void assertCsrAndCertMatch(CertificationRequest csr, Certificate targetCert, boolean caCertRequired)
       throws XiSecurityException {
     CertificationRequestInfo cri = csr.getCertificationRequestInfo();
 
@@ -937,15 +927,12 @@ public class X509Util {
 
       if (!Arrays.equals(cri.getSubjectPublicKeyInfo().getEncoded(),
           targetCert.getSubjectPublicKeyInfo().getEncoded())) {
-        throw new XiSecurityException(
-            "CSR and certificate do not have the same SubjectPublicKeyInfo");
+        throw new XiSecurityException("CSR and certificate do not have the same SubjectPublicKeyInfo");
       }
 
       if (caCertRequired) {
-        Extension extn = targetCert.getTBSCertificate().getExtensions()
-            .getExtension(Extension.basicConstraints);
-        BasicConstraints bc = extn == null
-            ? null : BasicConstraints.getInstance(extn.getParsedValue());
+        Extension extn = targetCert.getTBSCertificate().getExtensions().getExtension(Extension.basicConstraints);
+        BasicConstraints bc = extn == null ? null : BasicConstraints.getInstance(extn.getParsedValue());
         if (bc == null || !bc.isCA()) {
           throw new XiSecurityException("targetCert is not a CA certificate");
         }

@@ -87,8 +87,7 @@ public class JceSigner implements XiContentSigner {
 
     } // class SignerOutputStream
 
-    public JceSigner(PrivateKey signKey, SignAlgo signAlgo, String providerName,
-                      Provider provider)
+    public JceSigner(PrivateKey signKey, SignAlgo signAlgo, String providerName, Provider provider)
             throws XiSecurityException {
         this.signKey = signKey;
         this.signAlgo = signAlgo;

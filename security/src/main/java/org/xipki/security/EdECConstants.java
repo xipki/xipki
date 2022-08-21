@@ -26,17 +26,11 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
  */
 public class EdECConstants {
 
-  private static final ASN1ObjectIdentifier id_edwards_curve_algs =
-      new ASN1ObjectIdentifier("1.3.101");
-
-  public static final ASN1ObjectIdentifier id_X25519 =
-      id_edwards_curve_algs.branch("110").intern();
-  public static final ASN1ObjectIdentifier id_X448 =
-      id_edwards_curve_algs.branch("111").intern();
-  public static final ASN1ObjectIdentifier id_ED25519 =
-      id_edwards_curve_algs.branch("112").intern();
-  public static final ASN1ObjectIdentifier id_ED448 =
-      id_edwards_curve_algs.branch("113").intern();
+  private static final ASN1ObjectIdentifier id_edwards_curve_algs = new ASN1ObjectIdentifier("1.3.101");
+  public static final ASN1ObjectIdentifier id_X25519 = id_edwards_curve_algs.branch("110");
+  public static final ASN1ObjectIdentifier id_X448 = id_edwards_curve_algs.branch("111");
+  public static final ASN1ObjectIdentifier id_ED25519 = id_edwards_curve_algs.branch("112");
+  public static final ASN1ObjectIdentifier id_ED448 = id_edwards_curve_algs.branch("113");
 
   public static final String X25519 = "X25519";
 

@@ -88,12 +88,10 @@ class SM2Signer {
     if (userId == null) {
       // use default userId
       z = GMUtil.getSM2Z(GMObjectIdentifiers.sm2p256v1,
-          pubPoint.getAffineXCoord().toBigInteger(),
-          pubPoint.getAffineYCoord().toBigInteger());
+            pubPoint.getAffineXCoord().toBigInteger(), pubPoint.getAffineYCoord().toBigInteger());
     } else {
       z = GMUtil.getSM2Z(userId, GMObjectIdentifiers.sm2p256v1,
-        pubPoint.getAffineXCoord().toBigInteger(),
-        pubPoint.getAffineYCoord().toBigInteger());
+            pubPoint.getAffineXCoord().toBigInteger(), pubPoint.getAffineYCoord().toBigInteger());
     }
     digest.reset();
     digest.update(z, 0, z.length);

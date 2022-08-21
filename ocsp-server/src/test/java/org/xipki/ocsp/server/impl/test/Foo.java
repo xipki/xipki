@@ -137,8 +137,7 @@ public class Foo {
     ASN1EncodableVector vec = new ASN1EncodableVector();
 
     if (control.version != 0) {
-      vec.add(new DERTaggedObject(true, 0,
-          new ASN1Integer(BigInteger.valueOf(control.version))));
+      vec.add(new DERTaggedObject(true, 0, new ASN1Integer(BigInteger.valueOf(control.version))));
     }
 
     if (requestorName != null) {

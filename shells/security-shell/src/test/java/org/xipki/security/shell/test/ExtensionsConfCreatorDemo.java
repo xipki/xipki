@@ -66,8 +66,7 @@ public class ExtensionsConfCreatorDemo {
   public static void main(String[] args) {
     try {
       extensionsEeCompelx("extensions-ee-complex.json");
-      extensionsSyntaxExt("extensions-syntax-ext.json",
-          new ASN1ObjectIdentifier("1.2.3.6.1"), null);
+      extensionsSyntaxExt("extensions-syntax-ext.json", new ASN1ObjectIdentifier("1.2.3.6.1"), null);
       extensionsSyntaxExt("extensions-syntax-ext-implicit-tag.json",
           new ASN1ObjectIdentifier("1.2.3.6.2"), new Tag(1, false));
       extensionsSyntaxExt("extensions-syntax-ext-explicit-tag.json",
@@ -108,8 +107,7 @@ public class ExtensionsConfCreatorDemo {
     List<X509ExtensionType> extnConfs = extraExtensions.getExtensions();
     if (CollectionUtil.isNotEmpty(extnConfs)) {
       for (X509ExtensionType m : extnConfs) {
-        byte[] encodedExtnValue =
-            m.getConstant().toASN1Encodable().toASN1Primitive().getEncoded(ASN1Encoding.DER);
+        byte[] encodedExtnValue = m.getConstant().toASN1Encodable().toASN1Primitive().getEncoded(ASN1Encoding.DER);
         new Extension(new ASN1ObjectIdentifier(m.getType().getOid()), false, encodedExtnValue);
       }
     }
@@ -139,8 +137,7 @@ public class ExtensionsConfCreatorDemo {
     X509ExtensionType sdaExt = new X509ExtensionType();
     list.add(sdaExt);
 
-    sdaExt.setType(
-        createOidType(Extension.subjectDirectoryAttributes, "subjectDirectoryAttributes"));
+    sdaExt.setType(createOidType(Extension.subjectDirectoryAttributes, "subjectDirectoryAttributes"));
 
     ConstantExtnValue sdaSyntax = new ConstantExtnValue(FieldType.SEQUENCE_OF);
     sdaExt.setConstant(sdaSyntax);
@@ -210,9 +207,8 @@ public class ExtensionsConfCreatorDemo {
     marshall(extensions, destFilename);
   } // method extensionsEeCompelx
 
-  private static void extensionsSyntaxExt(String destFilename, ASN1ObjectIdentifier oidPrefix,
-      Tag tag)
-          throws Exception {
+  private static void extensionsSyntaxExt(String destFilename, ASN1ObjectIdentifier oidPrefix, Tag tag)
+      throws Exception {
     ExtensionsType extensions = new ExtensionsType();
     // Extensions
     // Extensions - general
@@ -222,45 +218,31 @@ public class ExtensionsConfCreatorDemo {
     marshall(extensions, destFilename);
   } // method extensionsSyntaxExt
 
-  private static List<X509ExtensionType> createConstantExtensions(ASN1ObjectIdentifier oidPrefix,
-      Tag tag) {
+  private static List<X509ExtensionType> createConstantExtensions(ASN1ObjectIdentifier oidPrefix, Tag tag) {
     List<X509ExtensionType> list = new LinkedList<>();
 
     // Custom Constant Extension Value
     list.add(createConstantExtension(oidPrefix.branch("1"), tag, FieldType.BIT_STRING,
         Base64.encodeToString(new byte[] {1, 2})));
-    list.add(createConstantExtension(oidPrefix.branch("2"), tag, FieldType.BMPString,
-        "A BMP string"));
-    list.add(createConstantExtension(oidPrefix.branch("3"), tag, FieldType.BOOLEAN,
-        Boolean.TRUE.toString()));
-    list.add(createConstantExtension(oidPrefix.branch("4"), tag, FieldType.IA5String,
-        "An IA5 string"));
-    list.add(createConstantExtension(oidPrefix.branch("5"), tag, FieldType.INTEGER,
-        "10"));
-    list.add(createConstantExtension(oidPrefix.branch("6"), tag, FieldType.NULL,
-        null));
+    list.add(createConstantExtension(oidPrefix.branch("2"), tag, FieldType.BMPString, "A BMP string"));
+    list.add(createConstantExtension(oidPrefix.branch("3"), tag, FieldType.BOOLEAN, Boolean.TRUE.toString()));
+    list.add(createConstantExtension(oidPrefix.branch("4"), tag, FieldType.IA5String, "An IA5 string"));
+    list.add(createConstantExtension(oidPrefix.branch("5"), tag, FieldType.INTEGER, "10"));
+    list.add(createConstantExtension(oidPrefix.branch("6"), tag, FieldType.NULL, null));
     list.add(createConstantExtension(oidPrefix.branch("7"), tag, FieldType.OCTET_STRING,
         Base64.encodeToString(new byte[] {3, 4})));
-    list.add(createConstantExtension(oidPrefix.branch("8"), tag, FieldType.OID,
-        "2.3.4.5"));
-    list.add(createConstantExtension(oidPrefix.branch("9"), tag, FieldType.PrintableString,
-        "A printable string"));
+    list.add(createConstantExtension(oidPrefix.branch("8"), tag, FieldType.OID, "2.3.4.5"));
+    list.add(createConstantExtension(oidPrefix.branch("9"), tag, FieldType.PrintableString, "A printable string"));
 
-    list.add(createConstantExtension(oidPrefix.branch("10"), tag, FieldType.NULL,
-        null));
+    list.add(createConstantExtension(oidPrefix.branch("10"), tag, FieldType.NULL, null));
 
-    list.add(createConstantExtension(oidPrefix.branch("11"), tag, FieldType.TeletexString,
-        "A teletax string"));
-    list.add(createConstantExtension(oidPrefix.branch("12"), tag, FieldType.UTF8String,
-        "A UTF8 string"));
-    list.add(createConstantExtension(oidPrefix.branch("13"), tag, FieldType.ENUMERATED,
-        "2"));
+    list.add(createConstantExtension(oidPrefix.branch("11"), tag, FieldType.TeletexString, "A teletax string"));
+    list.add(createConstantExtension(oidPrefix.branch("12"), tag, FieldType.UTF8String, "A UTF8 string"));
+    list.add(createConstantExtension(oidPrefix.branch("13"), tag, FieldType.ENUMERATED, "2"));
     list.add(createConstantExtension(oidPrefix.branch("14"), tag, FieldType.GeneralizedTime,
         new ASN1GeneralizedTime("20180314130102Z").getTimeString()));
-    list.add(createConstantExtension(oidPrefix.branch("15"), tag, FieldType.UTCTime,
-        "190314130102Z"));
-    list.add(createConstantExtension(oidPrefix.branch("16"), tag, FieldType.Name,
-        "CN=abc,C=DE"));
+    list.add(createConstantExtension(oidPrefix.branch("15"), tag, FieldType.UTCTime, "190314130102Z"));
+    list.add(createConstantExtension(oidPrefix.branch("16"), tag, FieldType.Name, "CN=abc,C=DE"));
 
     list.add(createConstantExtension(oidPrefix.branch("17"), tag, FieldType.SEQUENCE, null));
     last(list).getConstant().setListValue(createConstantSequenceOrSet());
@@ -486,8 +468,7 @@ public class ExtensionsConfCreatorDemo {
     list.add(extn);
 
     // children
-    extn.setType(createOidType(new ASN1ObjectIdentifier("1.2.840.113635.100.6.3.6"),
-        "custom apple extension"));
+    extn.setType(createOidType(new ASN1ObjectIdentifier("1.2.840.113635.100.6.3.6"), "custom apple extension"));
     ConstantExtnValue extnValue = new ConstantExtnValue(FieldType.SEQUENCE);
     extnValue.setListValue(subFields);
     extn.setConstant(extnValue);
