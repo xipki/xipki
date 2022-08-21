@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.pkcs11.P11ModuleConf.P11NewObjectConf;
 import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11Slot.P11KeyUsage;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;

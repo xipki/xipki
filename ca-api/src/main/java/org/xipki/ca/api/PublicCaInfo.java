@@ -24,8 +24,8 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.exception.OperationException;
 import org.xipki.util.exception.ErrorCode;
+import org.xipki.util.exception.OperationException;
 
 import java.math.BigInteger;
 import java.util.Arrays;

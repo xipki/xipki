@@ -29,7 +29,6 @@ import org.xipki.security.KeyUsage;
 import org.xipki.security.SignAlgo;
 import org.xipki.util.*;
 import org.xipki.util.exception.BadCertTemplateException;
-import org.xipki.util.exception.BadFormatException;
 
 import java.io.Closeable;
 import java.math.BigInteger;

@@ -25,7 +25,8 @@ import org.bouncycastle.asn1.x509.*;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.SubjectDnSpec;
-import org.xipki.security.*;
+import org.xipki.security.SignAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 

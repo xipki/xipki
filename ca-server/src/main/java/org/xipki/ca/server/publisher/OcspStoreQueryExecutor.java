@@ -29,8 +29,8 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
 import org.xipki.util.SqlUtil;
-import org.xipki.util.exception.OperationException;
 import org.xipki.util.exception.ErrorCode;
+import org.xipki.util.exception.OperationException;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;

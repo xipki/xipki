@@ -26,7 +26,6 @@ import org.xipki.util.exception.InvalidConfException;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.Collection;

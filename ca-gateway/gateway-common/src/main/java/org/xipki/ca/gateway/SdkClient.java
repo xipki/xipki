@@ -17,13 +17,8 @@
 
 package org.xipki.ca.gateway;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
-import org.bouncycastle.asn1.crmf.DhSigStatic;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.sdk.*;
-import org.xipki.security.*;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.XiHttpClient;
@@ -37,7 +32,6 @@ import java.util.Date;
 import java.util.List;
 
 import static org.xipki.ca.sdk.SdkConstants.*;
-import static org.xipki.util.Args.notNull;
 
 /**
  * API client.

@@ -28,7 +28,6 @@ import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.certprofile.xijson.DirectoryStringType;
 import org.xipki.ca.certprofile.xijson.ExtensionSyntaxChecker;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;

@@ -25,7 +25,6 @@ import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.server.RequestorEntryWrapper;
-import org.xipki.password.PasswordResolver;
 
 import java.util.HashSet;
 import java.util.List;

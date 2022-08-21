@@ -40,11 +40,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.Validity;
-import org.xipki.util.exception.BadCertTemplateException;
-import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.exception.ObjectCreationException;
-import org.xipki.util.exception.OperationException;
-import org.xipki.util.exception.ErrorCode;
+import org.xipki.util.exception.*;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -54,7 +50,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.List;
 
-import static org.xipki.util.Args.*;
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
 
 /**
  * Self-signed certificate builder.

@@ -47,19 +47,19 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.RandomUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.exception.OperationException;
-import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.http.SslContextConf;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.Map.Entry;
 
-import static org.xipki.ca.sdk.CaAuditConstants.*;
+import static org.xipki.ca.sdk.CaAuditConstants.APPNAME;
+import static org.xipki.ca.sdk.CaAuditConstants.NAME_perf;
 import static org.xipki.ca.server.CaUtil.canonicalizeSignerConf;
 import static org.xipki.util.Args.*;
 import static org.xipki.util.StringUtil.concat;

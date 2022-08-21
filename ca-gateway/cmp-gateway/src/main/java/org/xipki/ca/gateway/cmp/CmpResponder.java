@@ -31,7 +31,6 @@ import org.xipki.audit.AuditStatus;
 import org.xipki.ca.gateway.*;
 import org.xipki.ca.sdk.*;
 import org.xipki.security.CrlReason;
-import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.cmp.CmpUtf8Pairs;
 import org.xipki.security.cmp.CmpUtil;

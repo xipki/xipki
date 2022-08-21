@@ -24,7 +24,6 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.cmpclient.CmpClient;
-import org.xipki.cmpclient.EnrollCertResult;
 import org.xipki.cmpclient.Requestor;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;

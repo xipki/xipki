@@ -27,7 +27,6 @@ import org.bouncycastle.asn1.cmp.*;
 import org.bouncycastle.asn1.crmf.*;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.qa.BenchmarkHttpClient;

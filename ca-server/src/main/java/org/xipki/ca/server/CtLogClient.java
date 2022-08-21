@@ -29,8 +29,8 @@ import org.xipki.security.ctlog.CtLogMessages.AddPreChainRequest;
 import org.xipki.security.ctlog.CtLogMessages.AddPreChainResponse;
 import org.xipki.util.*;
 import org.xipki.util.Curl.CurlResult;
-import org.xipki.util.exception.OperationException;
 import org.xipki.util.exception.ErrorCode;
+import org.xipki.util.exception.OperationException;
 import org.xipki.util.http.SslContextConf;
 
 import java.io.IOException;

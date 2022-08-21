@@ -19,10 +19,10 @@ package org.xipki.ca.gateway.cmp.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.gateway.ProtocolProxyConfWrapper;
 import org.xipki.ca.gateway.cmp.CmpControl;
 import org.xipki.ca.gateway.cmp.CmpProxyConf;
 import org.xipki.ca.gateway.cmp.CmpResponder;
-import org.xipki.ca.gateway.ProtocolProxyConfWrapper;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.XipkiBaseDir;

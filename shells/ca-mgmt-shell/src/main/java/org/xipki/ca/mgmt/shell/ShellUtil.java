@@ -17,7 +17,6 @@
 
 package org.xipki.ca.mgmt.shell;
 
-import org.xipki.password.PasswordResolver;
 import org.xipki.security.SecurityFactory;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.*;
