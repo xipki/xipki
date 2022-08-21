@@ -14,10 +14,8 @@
   <packaging>pom</packaging>
   <modules>
     <module>certprofile-example</module>
-    <module>lite-caclient-example</module>
     <module>ocsp-store-example</module>
     <module>ocsp-store-example-assembly</module>
-    <module>scep-example</module>
     <module>license-example</module>
     <module>dummy-ctlog-server</module>
     <module>dummy-crl-server</module>
