@@ -44,7 +44,7 @@ public class AuditEventData {
   } // constructor
 
   public void addValue(Object additionalValue) {
-    this.value += ", " + additionalValue;
+    this.value += "," + additionalValue;
   }
 
   public String getName() {
