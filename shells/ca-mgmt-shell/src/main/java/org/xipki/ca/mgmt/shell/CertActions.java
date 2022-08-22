@@ -183,7 +183,7 @@ public class CertActions {
       Date notAfter = StringUtil.isNotBlank(notAfterS)
           ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
 
-      byte[] encodedCsr = IoUtil.read(csrFile);
+      byte[] encodedCsr = X509Util.toDerEncoded(IoUtil.read(csrFile));
 
       X509Cert cert = caManager.generateCertificate(caName, profileName, encodedCsr,
           notBefore, notAfter);

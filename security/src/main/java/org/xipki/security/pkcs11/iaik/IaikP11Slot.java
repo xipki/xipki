@@ -23,6 +23,7 @@ import iaik.pkcs.pkcs11.objects.Certificate.CertificateType;
 import iaik.pkcs.pkcs11.objects.*;
 import iaik.pkcs.pkcs11.objects.Key.KeyType;
 import iaik.pkcs.pkcs11.wrapper.Functions;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
@@ -58,6 +59,7 @@ import static org.xipki.util.Args.notNull;
 import static org.xipki.util.Args.positive;
 import static org.xipki.util.CollectionUtil.isEmpty;
 import static iaik.pkcs.pkcs11.wrapper.PKCS11Constants.*;
+import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**
  * {@link P11Slot} based on the IAIK PKCS#11 wrapper.
@@ -856,7 +858,7 @@ class IaikP11Slot extends P11Slot {
     byte[] id = control.getId();
 
     ValuedSecretKey template = new ValuedSecretKey(keyType);
-    setKeyAttributes(control, template, labelChars);
+    IaikP11SlotUtil.setKeyAttributes(control, template, labelChars);
     template.getValueLen().setLongValue((long) (keysize / 8));
 
     Mechanism mechanism = Mechanism.get(mech);
@@ -905,7 +907,7 @@ class IaikP11Slot extends P11Slot {
       labelChars = control.getLabel().toCharArray();
     }
 
-    setKeyAttributes(control, template, labelChars);
+    IaikP11SlotUtil.setKeyAttributes(control, template, labelChars);
     template.getValue().setByteArrayValue(keyValue);
 
     SecretKey key;
@@ -1328,5 +1330,77 @@ class IaikP11Slot extends P11Slot {
     cert.getLabel().setCharArrayValue(keyLabel);
     return !isEmpty(getObjects(session, cert, 1));
   } // method labelExists
+
+  private void setKeyAttributes(
+      P11NewKeyControl control, PublicKey publicKey, PrivateKey privateKey,
+      P11NewObjectConf newObjectConf) {
+    if (privateKey != null) {
+      privateKey.getToken().setBooleanValue(true);
+      if (newObjectConf.isIgnoreLabel()) {
+        if (control.getLabel() != null) {
+          LOG.warn("label is set, but ignored: '{}'", control.getLabel());
+        }
+      } else {
+        privateKey.getLabel().setCharArrayValue(control.getLabel().toCharArray());
+      }
+      privateKey.getPrivate().setBooleanValue(true);
+
+      if (control.getExtractable() != null) {
+        privateKey.getExtractable().setBooleanValue(control.getExtractable());
+      }
+
+      if (control.getSensitive() != null) {
+        privateKey.getSensitive().setBooleanValue(control.getSensitive());
+      }
+
+      Set<P11KeyUsage> usages = control.getUsages();
+      final Boolean TRUE = Boolean.TRUE;
+      if (isNotEmpty(usages)) {
+        for (P11KeyUsage usage : usages) {
+          if (usage == P11KeyUsage.DECRYPT) {
+            privateKey.getDecrypt().setBooleanValue(TRUE);
+          } else if (usage == P11KeyUsage.DERIVE) {
+            privateKey.getDerive().setBooleanValue(TRUE);
+          } else if (usage == P11KeyUsage.SIGN) {
+            privateKey.getSign().setBooleanValue(TRUE);
+          } else if (usage == P11KeyUsage.SIGN_RECOVER) {
+            privateKey.getSignRecover().setBooleanValue(TRUE);
+          } else if (usage == P11KeyUsage.UNWRAP) {
+            privateKey.getUnwrap().setBooleanValue(TRUE);
+          }
+        }
+      } else {
+        long keyType = privateKey.getKeyType().getLongValue();
+        // if not set
+        if (keyType == PKCS11Constants.CKK_EC
+            || keyType == PKCS11Constants.CKK_RSA
+            || keyType == PKCS11Constants.CKK_DSA) {
+          privateKey.getSign().setBooleanValue(TRUE);
+        } else {
+          if ((keyType & CKK_VENDOR_DEFINED) != 0) {
+            if (slot.getModule().getVendorCodeConverter() != null) {
+              if (slot.getModule().getVendorCodeConverter().vendorToGenericCKK(keyType) == CKK_VENDOR_SM2) {
+                privateKey.getSign().setBooleanValue(TRUE);
+              }
+            }
+          }
+        }
+
+        if (keyType == PKCS11Constants.CKK_RSA) {
+          privateKey.getUnwrap().setBooleanValue(TRUE);
+          privateKey.getDecrypt().setBooleanValue(TRUE);
+        }
+
+      }
+    }
+
+    if (publicKey != null) {
+      publicKey.getToken().setBooleanValue(true);
+      if (!newObjectConf.isIgnoreLabel()) {
+        publicKey.getLabel().setCharArrayValue(control.getLabel().toCharArray());
+      }
+      publicKey.getVerify().setBooleanValue(true);
+    }
+  } // method setKeyAttributes
 
 }

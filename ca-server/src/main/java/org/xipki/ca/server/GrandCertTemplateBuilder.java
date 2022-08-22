@@ -72,7 +72,7 @@ class GrandCertTemplateBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(GrandCertTemplateBuilder.class);
 
-  private static final long MAX_CERT_TIME_MS = 253402300799982L; //9999-12-31-23-59-59
+  private static final long MAX_CERT_TIME_MS = 253402300799000L; //9999-12-31-23-59-59.000
 
   private static final Date MAX_CERT_TIME = new Date(MAX_CERT_TIME_MS);
 
