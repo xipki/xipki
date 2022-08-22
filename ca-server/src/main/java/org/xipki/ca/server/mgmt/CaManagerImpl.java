@@ -196,6 +196,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   boolean masterMode;
 
+  boolean noLock;
+
   int shardId;
 
   Map<String, FileOrValue> datasourceNameConfFileMap;
@@ -214,7 +216,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   CaManagerQueryExecutor queryExecutor;
 
-  private CmLicense license;
+  private final CmLicense license;
 
   private DataSourceWrapper datasource;
 
@@ -356,6 +358,9 @@ public class CaManagerImpl implements CaManager, Closeable {
     masterMode = caServerConf.isMaster();
     LOG.info("ca.masterMode: {}", masterMode);
 
+    noLock = caServerConf.isNoLock();
+    LOG.info("ca.noLock: {}", noLock);
+
     shardId = caServerConf.getShardId();
     LOG.info("ca.shardId: {}", shardId);
 
@@ -394,7 +399,9 @@ public class CaManagerImpl implements CaManager, Closeable {
     this.queryExecutor = new CaManagerQueryExecutor(this.datasource);
 
     if (masterMode) {
-      lockCa(true);
+      if (!noLock) {
+        lockCa();
+      }
 
       List<String> names = queryExecutor.namesFromTable("REQUESTOR");
       final String[] embeddedNames = {RequestorInfo.NAME_BY_CA};
@@ -482,7 +489,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     return queryExecutor.getDbSchemaVersion();
   }
 
-  private DataSourceWrapper loadDatasource(String datasourceName, FileOrValue datasourceConf) throws CaMgmtException {
+  private DataSourceWrapper loadDatasource(String datasourceName, FileOrValue datasourceConf)
+      throws CaMgmtException {
     try {
       DataSourceWrapper datasource = datasourceFactory.createDataSource(
           datasourceName, datasourceConf, securityFactory.getPasswordResolver());
@@ -512,7 +520,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
   } // method getCaSystemStatus
 
-  private void lockCa(boolean forceRelock) throws CaMgmtException {
+  private void lockCa() throws CaMgmtException {
     SystemEvent lockInfo = queryExecutor.getSystemEvent(EVENT_LOCK);
 
     if (lockInfo != null) {
@@ -521,15 +529,13 @@ public class CaManagerImpl implements CaManager, Closeable {
 
       if (!this.lockInstanceId.equals(lockedBy)) {
         String msg = concat("could not lock CA, it has been locked by ", lockedBy, " since ",
-            lockedAt.toString(),  ". In general this indicates that another"
-            + " CA software in active mode is accessing the database or the last shutdown of CA"
-            + " software in active mode is abnormal.");
+            lockedAt.toString(),  ". In general this indicates that another CA software in master mode is "
+                + "accessing the database or the last shutdown of CA software in master mode is abnormal. "
+                + "If you know what you do, you can unlock it executing the ca:unlock command.");
         throw logAndCreateException(msg);
       }
 
-      if (forceRelock) {
-        LOG.info("CA has been locked by me since {}, re-lock it", lockedAt);
-      }
+      LOG.info("CA has been locked by me since {}, re-lock it", lockedAt);
     }
 
     SystemEvent newLockInfo = new SystemEvent(EVENT_LOCK, lockInstanceId, System.currentTimeMillis() / 1000L);
@@ -1121,13 +1127,6 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
 
     scheduledThreadPoolExecutor.shutdown();
-    while (!scheduledThreadPoolExecutor.isTerminated()) {
-      try {
-        Thread.sleep(100);
-      } catch (InterruptedException ex) {
-        LOG.error("interrupted: {}", ex.getMessage());
-      }
-    }
     scheduledThreadPoolExecutor = null;
   } // method shutdownScheduledThreadPoolExecutor
 

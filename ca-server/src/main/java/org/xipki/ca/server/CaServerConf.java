@@ -139,6 +139,8 @@ public class CaServerConf extends ValidatableConf {
    */
   private boolean master = true;
 
+  private boolean noLock = false;
+
   /**
    * shard id, between 0 and 127. CA systems using same database must have
    * different shard ids.
@@ -178,6 +180,14 @@ public class CaServerConf extends ValidatableConf {
 
   public void setMaster(boolean master) {
     this.master = master;
+  }
+
+  public boolean isNoLock() {
+    return noLock;
+  }
+
+  public void setNoLock(boolean noLock) {
+    this.noLock = noLock;
   }
 
   public boolean isLogReqResp() {

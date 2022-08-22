@@ -1,5 +1,7 @@
 {
 	"master":true,
+	// If you have more than one instances in master mode, set it to false.
+	"noLock":true,
 	// If set to true, please set writer.level to debug in the file META-INF/classes/tinylog.properties.
 	"logReqResp": false,
 	// shard id, between 0 and 127. CA systems using same database must have

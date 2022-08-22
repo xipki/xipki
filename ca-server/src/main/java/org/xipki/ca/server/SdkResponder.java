@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
 import java.util.*;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static org.xipki.ca.sdk.CaAuditConstants.*;
@@ -110,6 +111,8 @@ public class SdkResponder {
 
   private final CaManagerImpl caManager;
 
+  private ScheduledThreadPoolExecutor threadPoolExecutor;
+
   static {
     kupCertExtnIds = new HashSet<>();
     kupCertExtnIds.add(Extension.biometricInfo.getId());
@@ -123,8 +126,10 @@ public class SdkResponder {
   public SdkResponder(CaManagerImpl caManager) {
     this.caManager = Args.notNull(caManager, "caManager");
     this.pendingCertPool = new PendingCertificatePool();
-    caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
-        new PendingPoolCleaner(), 10, 10, TimeUnit.MINUTES);
+
+    threadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+    threadPoolExecutor.setRemoveOnCancelPolicy(true);
+    threadPoolExecutor.scheduleAtFixedRate(new PendingPoolCleaner(), 10, 10, TimeUnit.MINUTES);
   }
 
   public SdkResponse service(
@@ -877,5 +882,13 @@ public class SdkResponder {
 
     return successful;
   } // method revokePendingCertificates
+
+  public void close() {
+    if (threadPoolExecutor == null) {
+      return;
+    }
+    threadPoolExecutor.shutdown();
+    threadPoolExecutor = null;
+  }
 
 }
