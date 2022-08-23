@@ -74,8 +74,6 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private boolean raOnly;
 
-  private boolean serialNumberInReqPermitted;
-
   private NotBeforeOption notBeforeOption;
 
   private List<SignAlgo> signatureAlgorithms;
@@ -100,7 +98,6 @@ public class XijsonCertprofile extends BaseCertprofile {
     keyAlgorithms = null;
     maxSize = null;
     raOnly = false;
-    serialNumberInReqPermitted = true;
     signatureAlgorithms = null;
     notBeforeOption = null;
     subjectControl = null;
@@ -277,8 +274,6 @@ public class XijsonCertprofile extends BaseCertprofile {
     } else {
       this.notBeforeOption = NotBeforeOption.getMidNightOption(midnightTimeZone);
     }
-
-    this.serialNumberInReqPermitted = conf.isSerialNumberInReq();
 
     // KeyAlgorithms
     this.keyAlgorithms = conf.toXiKeyAlgorithms();
@@ -1095,11 +1090,6 @@ public class XijsonCertprofile extends BaseCertprofile {
   @Override
   public Date getNotBefore(Date requestedNotBefore) {
     return notBeforeOption.getNotBefore(requestedNotBefore);
-  }
-
-  @Override
-  public boolean isSerialNumberInReqPermitted() {
-    return serialNumberInReqPermitted;
   }
 
   @Override

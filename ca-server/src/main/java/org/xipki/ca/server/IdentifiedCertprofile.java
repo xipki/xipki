@@ -684,10 +684,6 @@ public class IdentifiedCertprofile implements Closeable {
     }
   }
 
-  public boolean isSerialNumberInReqPermitted() {
-    return certprofile.isSerialNumberInReqPermitted();
-  }
-
   public Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls() {
     return certprofile.getExtensionControls();
   }

@@ -9,7 +9,6 @@
 	"maxSize":4500,
 	"validity":"5y",
 	"notBeforeTime":"current",
-	"serialNumberInReq":false,
 	"keypairGeneration":{
 		"inheritCA":false,
 		"forbidden":false,

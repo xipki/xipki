@@ -1,4 +1,4 @@
-package org.xipki.ca.gateway;
+package org.xipki.security;
 
 /**
  *
