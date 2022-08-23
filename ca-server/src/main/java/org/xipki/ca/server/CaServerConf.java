@@ -139,7 +139,16 @@ public class CaServerConf extends ValidatableConf {
    */
   private boolean master = true;
 
+  /**
+   * If set to true, two different CA instances in master mode may modify
+   * CA system or generate CRL at the same time.
+   */
   private boolean noLock = false;
+
+  /**
+   * If set to true, the CA operates
+   */
+  private boolean noRA = false;
 
   /**
    * shard id, between 0 and 127. CA systems using same database must have
@@ -188,6 +197,14 @@ public class CaServerConf extends ValidatableConf {
 
   public void setNoLock(boolean noLock) {
     this.noLock = noLock;
+  }
+
+  public boolean isNoRA() {
+    return noRA;
+  }
+
+  public void setNoRA(boolean noRA) {
+    this.noRA = noRA;
   }
 
   public boolean isLogReqResp() {

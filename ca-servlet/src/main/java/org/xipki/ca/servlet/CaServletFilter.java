@@ -135,10 +135,15 @@ public class CaServletFilter implements Filter {
 
     caManager.startCaSystem();
 
-    SdkResponder responder = new SdkResponder(caManager);
-    this.raServlet = new HttpRaServlet();
-    this.raServlet.setResponder(responder);
-    this.raServlet.setLogReqResp(logReqResp);
+    LOG.info("ca.noRA: {}", conf.isNoRA());
+
+    if (!conf.isNoRA()) {
+      SdkResponder responder = new SdkResponder(caManager);
+      this.raServlet = new HttpRaServlet();
+      this.raServlet.setResponder(responder);
+      this.raServlet.setLogReqResp(logReqResp);
+
+    }
 
     RemoteMgmt remoteMgmt = conf.getRemoteMgmt();
     this.remoteMgmtEnabled = remoteMgmt != null && remoteMgmt.isEnabled();
@@ -210,8 +215,12 @@ public class CaServletFilter implements Filter {
 
     String path = req.getServletPath();
     if (path.startsWith("/ra/")) {
-      req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(3)); // 3 = "/ra".length()
-      raServlet.service(req, res);
+      if (raServlet != null) {
+        req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(3)); // 3 = "/ra".length()
+        raServlet.service(req, res);
+      } else {
+        sendError(res, HttpServletResponse.SC_NOT_FOUND);
+      }
     } else if (path.startsWith("/mgmt/")) {
       if (remoteMgmtEnabled) {
         req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/mgmt".length()

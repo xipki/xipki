@@ -146,6 +146,37 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   } // class CertWithRevocationInfoWrapper
 
+  public static class KeyCertBytes extends MgmtResponse {
+
+    private byte[] key;
+
+    private byte[] cert;
+
+    public KeyCertBytes() {
+    }
+
+    public KeyCertBytes(byte[] key, byte[] cert) {
+      this.key = key;
+      this.cert = cert;
+    }
+
+    public byte[] getKey() {
+      return key;
+    }
+
+    public void setKey(byte[] key) {
+      this.key = key;
+    }
+
+    public byte[] getCert() {
+      return cert;
+    }
+
+    public void setCert(byte[] cert) {
+      this.cert = cert;
+    }
+  } // class ByteArray
+
   public static class ByteArray extends MgmtResponse {
 
     private byte[] result;
@@ -187,27 +218,6 @@ public abstract class MgmtResponse extends MgmtMessage {
     }
 
   } // class Error
-
-  public static class GetAliasesForCa extends MgmtResponse {
-
-    private Set<String> result;
-
-    public GetAliasesForCa() {
-    }
-
-    public GetAliasesForCa(Set<String> result) {
-      this.result = result;
-    }
-
-    public Set<String> getResult() {
-      return result;
-    }
-
-    public void setResult(Set<String> result) {
-      this.result = result;
-    }
-
-  } // class GetAliasesForCa
 
   public static class GetCa extends MgmtResponse {
 

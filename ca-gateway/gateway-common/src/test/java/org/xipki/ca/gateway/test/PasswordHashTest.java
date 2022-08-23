@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server;
+package org.xipki.ca.gateway.test;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xipki.ca.gateway.PasswordHash;
 
 import java.security.Security;
 import java.util.HashSet;

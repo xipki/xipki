@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server;
+package org.xipki.ca.gateway;
 
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;

@@ -20,9 +20,7 @@ package org.xipki.ca.api.mgmt;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.mgmt.entry.*;
-import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.CrlReason;
-import org.xipki.security.X509Cert;
+import org.xipki.security.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -665,6 +663,27 @@ public interface CaManager {
    *          if error occurs.
    */
   X509Cert generateCertificate(String caName, String profileName, byte[] encodedCsr, Date notBefore, Date notAfter)
+      throws CaMgmtException;
+
+  /**
+   * CA {@code caName} issues a new certificate.
+   *
+   * @param caName
+   *          CA name. Must not be {@code null}.
+   * @param profileName
+   *          Name of the certificate profile. Must not be {@code null}.
+   * @param subject
+   *          Subject. Must not be {@code null}.
+   * @param notBefore
+   *          NotBefore. Could be {@code null}.
+   * @param notAfter
+   *          NotAfter. Could be {@code null}.
+   * @return the generated key and issued certificate
+   * @throws CaMgmtException
+   *          if error occurs.
+   */
+  KeyCertBytesPair generateKeyCert(
+      String caName, String profileName, String subject, Date notBefore, Date notAfter)
       throws CaMgmtException;
 
   /**

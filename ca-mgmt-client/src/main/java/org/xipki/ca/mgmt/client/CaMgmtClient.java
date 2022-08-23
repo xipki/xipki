@@ -27,6 +27,7 @@ import org.xipki.ca.api.mgmt.MgmtMessage.SignerEntryWrapper;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
+import org.xipki.security.KeyCertBytesPair;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
@@ -635,7 +636,7 @@ public class CaMgmtClient implements CaManager {
   public X509Cert generateCertificate(
       String caName, String profileName, byte[] encodedCsr, Date notBefore, Date notAfter)
       throws CaMgmtException {
-    MgmtRequest.GenerateCertificate req = new MgmtRequest.GenerateCertificate();
+    MgmtRequest.GenerateCert req = new MgmtRequest.GenerateCert();
     req.setCaName(caName);
     req.setProfileName(profileName);
     req.setEncodedCsr(encodedCsr);
@@ -645,6 +646,22 @@ public class CaMgmtClient implements CaManager {
     byte[] respBytes = transmit(MgmtAction.generateCertificate, req);
     MgmtResponse.ByteArray resp = parse(respBytes, MgmtResponse.ByteArray.class);
     return parseCert(resp.getResult());
+  } // method generateCertificate
+
+  @Override
+  public KeyCertBytesPair generateKeyCert(
+      String caName, String profileName, String subject, Date notBefore, Date notAfter)
+      throws CaMgmtException {
+    MgmtRequest.GenerateKeyCert req = new MgmtRequest.GenerateKeyCert();
+    req.setCaName(caName);
+    req.setProfileName(profileName);
+    req.setSubject(subject);
+    req.setNotBefore(notBefore);
+    req.setNotAfter(notAfter);
+
+    byte[] respBytes = transmit(MgmtAction.generateKeyCert, req);
+    MgmtResponse.KeyCertBytes resp = parse(respBytes, MgmtResponse.KeyCertBytes.class);
+    return new KeyCertBytesPair(resp.getKey(), resp.getCert());
   } // method generateCertificate
 
   @Override

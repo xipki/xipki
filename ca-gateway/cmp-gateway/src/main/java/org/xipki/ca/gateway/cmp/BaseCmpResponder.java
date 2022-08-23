@@ -48,6 +48,8 @@ import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
 import org.xipki.ca.gateway.*;
 import org.xipki.ca.sdk.ErrorResponse;
+import org.xipki.ca.sdk.SdkClient;
+import org.xipki.ca.sdk.SdkErrorResponseException;
 import org.xipki.security.*;
 import org.xipki.security.cmp.CmpUtil;
 import org.xipki.security.cmp.ProtectionResult;

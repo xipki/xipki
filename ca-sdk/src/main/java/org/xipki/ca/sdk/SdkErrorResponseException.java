@@ -1,4 +1,4 @@
-package org.xipki.ca.gateway;
+package org.xipki.ca.sdk;
 
 import org.xipki.ca.sdk.ErrorResponse;
 import org.xipki.util.exception.ErrorCode;

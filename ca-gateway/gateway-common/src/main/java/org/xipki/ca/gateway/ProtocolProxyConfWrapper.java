@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.Audits;
 import org.xipki.audit.Audits.AuditConf;
 import org.xipki.ca.gateway.conf.*;
+import org.xipki.ca.sdk.SdkClient;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.Securities;
 import org.xipki.security.X509Cert;

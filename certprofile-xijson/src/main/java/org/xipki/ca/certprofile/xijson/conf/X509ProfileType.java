@@ -115,9 +115,6 @@ public class X509ProfileType extends ValidatableConf {
   @JSONField(ordinal = 7)
   private String notBeforeTime;
 
-  @JSONField(ordinal = 8)
-  private boolean serialNumberInReq;
-
   /**
    * Control how CA will generate the keypair for the certificate.
    * Defaults to forbidden.
@@ -239,14 +236,6 @@ public class X509ProfileType extends ValidatableConf {
 
   public void setNotBeforeTime(String notBeforeTime) {
     this.notBeforeTime = notBeforeTime;
-  }
-
-  public boolean isSerialNumberInReq() {
-    return serialNumberInReq;
-  }
-
-  public void setSerialNumberInReq(boolean serialNumberInReq) {
-    this.serialNumberInReq = serialNumberInReq;
   }
 
   public KeypairGenerationType getKeypairGeneration() {

@@ -57,12 +57,12 @@ xi:curl --out ${OUT_DIR}/${CN}.der --data-file ${OUT_DIR}/${CN}.csr \
 
 echo "=====REST: Enroll (CA generates keypair)====="
 
-CN = rest-tls-cagenkey-${CUR_TIME}
+CN = rest-tls-genkey-${CUR_TIME}
 
 xi:curl --out ${OUT_DIR}/${CN}.pem \
   --data "subject=C=DE,O=myorg,CN=${CN}.myorg.org" \
   --header "Content-Type: text/plain; encoding=utf-8" \
-  "$BASE_URL/enroll-cert-cagenkeypair?profile=tls"
+  "$BASE_URL/enroll-cert-genkey?profile=tls"
 
 echo "=====REST: Enroll====="
 
@@ -118,12 +118,12 @@ xi:curl --out ${OUT_DIR}/rest-myca-get.crl $BASE_URL/crl
 
 echo "=====REST: Enroll Chinese SM2 Twin TLS Certificates (CA generates all keypairs)====="
 
-CN = rest-sm2-tls-twin-cagenkey-${CUR_TIME}
+CN = rest-sm2-tls-twin-genkey-${CUR_TIME}
 
 xi:curl --out ${OUT_DIR}/${CN}.pem \
   --data "subject=C=CN,O=myorg,CN=${CN}.myorg.org" \
   --header "Content-Type: text/plain; encoding=utf-8" \
-  "$BASE_URL/enroll-cert-cagenkeypair-twin?profile=tls-sm2"
+  "$BASE_URL/enroll-cert-genkey-twin?profile=tls-sm2"
 
 echo "=====REST: Enroll Chinese SM2 Twin TLS Certificates (CA generates only keypair for the encryption)====="
 

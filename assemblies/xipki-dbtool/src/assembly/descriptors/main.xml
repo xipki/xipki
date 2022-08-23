@@ -8,10 +8,12 @@
   </formats>
   <dependencySets>
     <dependencySet>
-      <useProjectArtifact>false</useProjectArtifact>
+      <useProjectArtifact>faxlse</useProjectArtifact>
       <outputDirectory>lib</outputDirectory>
       <excludes>
         <exclude>org.mariadb.jdbc:mariadb-java-client</exclude>
+        <exclude>org.postgresql:postgresql</exclude>
+        <exclude>com.h2database:h2</exclude>
       </excludes>
     </dependencySet>
     <dependencySet>
@@ -19,6 +21,8 @@
       <outputDirectory>lib/jdbc</outputDirectory>
       <includes>
         <include>org.mariadb.jdbc:mariadb-java-client</include>
+        <include>org.postgresql:postgresql</include>
+        <include>com.h2database:h2</include>
       </includes>
     </dependencySet>
   </dependencySets>

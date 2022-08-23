@@ -246,8 +246,6 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     profile.setValidity(validity);
     profile.setNotBeforeTime(useMidnightNotBefore ? "midnight" : "current");
 
-    profile.setSerialNumberInReq(false);
-
     if (certLevel == CertLevel.EndEntity) {
       profile.setKeypairGeneration(new KeypairGenerationType());
       profile.getKeypairGeneration().setInheritCA(true);
@@ -298,8 +296,6 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     profile.setVersion(X509CertVersion.v3);
     profile.setValidity(validity);
     profile.setNotBeforeTime(useMidnightNotBefore ? "midnight" : "current");
-
-    profile.setSerialNumberInReq(false);
 
     if (certLevel == CertLevel.EndEntity) {
       profile.setKeypairGeneration(new KeypairGenerationType());
@@ -368,8 +364,6 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     profile.setVersion(X509CertVersion.v3);
     profile.setValidity(validity);
     profile.setNotBeforeTime("current");
-
-    profile.setSerialNumberInReq(false);
 
     KeypairGenerationType kpGen = new KeypairGenerationType();
     profile.setKeypairGeneration(kpGen);

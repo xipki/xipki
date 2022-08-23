@@ -372,8 +372,7 @@ public class CertStore extends CertStoreBase {
 
     Extensions extns = crl.getExtensions();
     byte[] extnValue = X509Util.getCoreExtValue(extns, Extension.cRLNumber);
-    Long crlNumber = (extnValue == null) ? null
-                      : ASN1Integer.getInstance(extnValue).getPositiveValue().longValue();
+    Long crlNumber = (extnValue == null) ? null : ASN1Integer.getInstance(extnValue).getPositiveValue().longValue();
 
     extnValue = X509Util.getCoreExtValue(extns, Extension.deltaCRLIndicator);
     Long baseCrlNumber = null;

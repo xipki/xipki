@@ -6,22 +6,22 @@ package org.xipki.security;
  * @since 6.0.0
  */
 
-public class KeyCertPair {
+public class KeyCertBytesPair {
 
   private final byte[] key;
 
-  private final byte[] certificate;
+  private final byte[] cert;
 
-  public KeyCertPair(byte[] key, byte[] certificate) {
+  public KeyCertBytesPair(byte[] key, byte[] cert) {
     this.key = key;
-    this.certificate = certificate;
+    this.cert = cert;
   }
 
   public byte[] getKey() {
     return key;
   }
 
-  public byte[] getCertificate() {
-    return certificate;
+  public byte[] getCert() {
+    return cert;
   }
 }

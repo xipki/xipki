@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.gateway;
+package org.xipki.ca.sdk;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.ca.sdk.*;
+import org.xipki.security.KeyCertBytesPair;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.XiHttpClient;
@@ -135,7 +135,7 @@ public class SdkClient {
     return cert;
   }
 
-  private KeyCertPair enrollCertCaGenKeypair0(String func, String cmd, String ca, EnrollCertRequestEntry reqEntry)
+  private KeyCertBytesPair enrollCertCaGenKeypair0(String func, String cmd, String ca, EnrollCertRequestEntry reqEntry)
       throws IOException, SdkErrorResponseException {
     EnrollCertsRequest req = new EnrollCertsRequest();
     req.setCaCertMode(CertsMode.NONE);
@@ -147,7 +147,7 @@ public class SdkClient {
     if (rEntry.getCert() == null || rEntry.getPrivateKey() == null) {
       throw new SdkErrorResponseException(ErrorCode.SYSTEM_FAILURE, "error " + func);
     }
-    return new KeyCertPair(rEntry.getPrivateKey(), rEntry.getCert());
+    return new KeyCertBytesPair(rEntry.getPrivateKey(), rEntry.getCert());
   }
 
   public byte[] enrollCert(String ca, String certprofile, byte[] p10Req)
@@ -158,7 +158,7 @@ public class SdkClient {
     return enrollCert0("enrollCert", CMD_enroll, ca, reqEntry);
   }
 
-  public KeyCertPair enrollCertCaGenKeypair(String ca, String certprofile, String subject)
+  public KeyCertBytesPair enrollCertCaGenKeypair(String ca, String certprofile, String subject)
       throws IOException, SdkErrorResponseException {
     EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry();
     reqEntry.setSubject(new X500NameType(subject));
@@ -180,7 +180,7 @@ public class SdkClient {
     return enrollCert0("enrollKupCert", CMD_enroll_kup, ca, reqEntry);
   }
 
-  public KeyCertPair enrollKupCertCaGenKeypair(
+  public KeyCertBytesPair enrollKupCertCaGenKeypair(
       String ca, String certprofile, X500Name subject, String oldCertIssuer, BigInteger oldCertSerialNumber)
       throws IOException, SdkErrorResponseException {
     EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry();

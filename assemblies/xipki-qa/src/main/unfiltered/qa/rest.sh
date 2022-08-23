@@ -46,9 +46,9 @@ echo "enroll certificate (CA generate keypair)"
 
 curl ${OPTS} \
     --header "Content-Type: text/plain; charset=utf-8" \
-    --data-ascii "subject=CN=${filename}-cagenkeypair.example.org,O=myorg,C=DE" \
-    --output ${filename}-cagenkeypair.pem -v \
-    "${BASE_URL}/enroll-cert-cagenkeypair?profile=tlsa"
+    --data-ascii "subject=CN=${filename}-genkey.example.org,O=myorg,C=DE" \
+    --output ${filename}-genkey.pem -v \
+    "${BASE_URL}/enroll-cert-genkey?profile=tlsa"
 
 echo "enroll certificate"
 

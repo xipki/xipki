@@ -1160,6 +1160,13 @@ public class CaManagerImpl implements CaManager, Closeable {
     return ca2Manager.generateCrossCertificate(caName, profileName, encodedCsr, encodedTargetCert, notBefore, notAfter);
   }
 
+  @Override
+  public KeyCertBytesPair generateKeyCert(
+      String caName, String profileName, String subject, Date notBefore, Date notAfter)
+      throws CaMgmtException {
+    return ca2Manager.generateKeyCert(caName, profileName, subject, notBefore, notAfter);
+  }
+
   public X509Ca getX509Ca(String name) throws CaMgmtException {
     return ca2Manager.getX509Ca(name);
   }

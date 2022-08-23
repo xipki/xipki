@@ -40,8 +40,6 @@ import static org.xipki.util.Args.notNull;
 
 public abstract class X509CaModule {
 
-  protected static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
-
   protected static final long MS_PER_SECOND = 1000L;
 
   protected static final long MS_PER_MINUTE = 60000L;

@@ -79,11 +79,11 @@ public class RestAPIConstants {
 
   public static final String CMD_enroll_cross_cert = "enroll-cross-cert";
 
-  public static final String CMD_enroll_cert_cagenkeypair = "enroll-cert-cagenkeypair";
+  public static final String CMD_enroll_cert_genkey = "enroll-cert-genkey";
 
   public static final String CMD_enroll_cert_twin = "enroll-cert-twin";
 
-  public static final String CMD_enroll_cert_cagenkeypair_twin = "enroll-cert-cagenkeypair-twin";
+  public static final String CMD_enroll_cert_genkey_twin = "enroll-cert-genkey-twin";
 
   public static final String CMD_crl = "crl";
 

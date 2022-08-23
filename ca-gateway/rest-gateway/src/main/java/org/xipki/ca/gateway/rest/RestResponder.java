@@ -253,9 +253,9 @@ public class RestResponder {
           break;
         }
         case RestAPIConstants.CMD_enroll_cert:
-        case RestAPIConstants.CMD_enroll_cert_cagenkeypair:
+        case RestAPIConstants.CMD_enroll_cert_genkey:
         case RestAPIConstants.CMD_enroll_cert_twin:
-        case RestAPIConstants.CMD_enroll_cert_cagenkeypair_twin: {
+        case RestAPIConstants.CMD_enroll_cert_genkey_twin: {
           respContent = enrollCerts(command, caName, requestor, request, httpRetriever, event);
           break;
         }
@@ -390,9 +390,9 @@ public class RestResponder {
     }
 
     boolean twin = RestAPIConstants.CMD_enroll_cert_twin.equals(command)
-        || RestAPIConstants.CMD_enroll_cert_cagenkeypair_twin.equals(command);
-    boolean caGenKeyPair = RestAPIConstants.CMD_enroll_cert_cagenkeypair.equals(command)
-        || RestAPIConstants.CMD_enroll_cert_cagenkeypair_twin.equals(command);
+        || RestAPIConstants.CMD_enroll_cert_genkey_twin.equals(command);
+    boolean caGenKeyPair = RestAPIConstants.CMD_enroll_cert_genkey.equals(command)
+        || RestAPIConstants.CMD_enroll_cert_genkey_twin.equals(command);
 
     String profile = checkProfile(requestor, httpRetriever);
 

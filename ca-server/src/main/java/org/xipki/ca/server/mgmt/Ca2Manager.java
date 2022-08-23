@@ -53,6 +53,7 @@ import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.exception.OperationException;
 import org.xipki.util.http.SslContextConf;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
 import java.util.*;
@@ -670,6 +671,39 @@ class Ca2Manager {
     }
 
     return certInfo.getCert().getCert();
+  }
+
+  KeyCertBytesPair generateKeyCert(
+      String caName, String profileName, String subject, Date notBefore, Date notAfter)
+      throws CaMgmtException {
+    caName = toNonBlankLower(caName, "caName");
+    profileName = toNonBlankLower(profileName, "profileName");
+    notBlank(subject, "subject");
+
+    AuditEvent event = new AuditEvent(new Date());
+    event.setApplicationName(APPNAME);
+    event.setName(NAME_perf);
+    event.addEventType("CAMGMT_GEN_KEYCERT");
+
+    X509Ca ca = getX509Ca(caName);
+
+    X500Name x500Subject = new X500Name(subject);
+
+    CertTemplateData certTemplateData = new CertTemplateData(
+        x500Subject, null, notBefore, notAfter, null, profileName, BigInteger.ONE, true);
+
+    CertificateInfo certInfo;
+    try {
+      certInfo = ca.generateCert(certTemplateData, manager.byCaRequestor,null, event);
+    } catch (OperationException ex) {
+      throw new CaMgmtException(ex.getMessage(), ex);
+    }
+
+    try {
+      return new KeyCertBytesPair(certInfo.getPrivateKey().getEncoded(), certInfo.getCert().getCert().getEncoded());
+    } catch (IOException ex) {
+      throw new CaMgmtException(ex.getMessage(), ex);
+    }
   }
 
   X509Cert generateCertificate(

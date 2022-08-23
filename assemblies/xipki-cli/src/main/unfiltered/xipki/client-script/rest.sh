@@ -79,7 +79,7 @@ curl ${OPTS} \
     "${CA_URL}/enroll-cert?profile=smime"
 
 # enroll certificate tls (CA generate keypair)
-CN=tls-cagenkeypair-${CUR_TIME}
+CN=tls-genkey-${CUR_TIME}
 
 echo "enroll certificate (CA generate keypair)"
 
@@ -87,7 +87,7 @@ curl ${OPTS} \
     --header "Content-Type: text/plain; encoding=utf-8" \
     --data-ascii "subject=C=DE,O=example,CN=${CN}.example.org" \
     --output ${OUT_DIR}/${CN}.pem \
-    "${CA_URL}/enroll-cert-cagenkeypair?profile=tls"
+    "${CA_URL}/enroll-cert-genkey?profile=tls"
 
 # enroll certificate tls
 CN=tls-${CUR_TIME}

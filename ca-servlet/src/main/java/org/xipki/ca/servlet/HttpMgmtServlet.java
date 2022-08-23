@@ -27,6 +27,7 @@ import org.xipki.ca.api.mgmt.MgmtMessage.CaEntryWrapper;
 import org.xipki.ca.api.mgmt.MgmtMessage.MgmtAction;
 import org.xipki.ca.api.mgmt.MgmtMessage.SignerEntryWrapper;
 import org.xipki.ca.api.mgmt.entry.*;
+import org.xipki.security.KeyCertBytesPair;
 import org.xipki.security.X509Cert;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
@@ -222,7 +223,7 @@ public class HttpMgmtServlet extends HttpServlet {
           break;
         }
         case generateCertificate: {
-          MgmtRequest.GenerateCertificate req = parse(in, MgmtRequest.GenerateCertificate.class);
+          MgmtRequest.GenerateCert req = parse(in, MgmtRequest.GenerateCert.class);
           X509Cert cert = caManager.generateCertificate(req.getCaName(), req.getProfileName(),
               req.getEncodedCsr(), req.getNotBefore(), req.getNotAfter());
           resp = toByteArray(cert);
@@ -234,6 +235,13 @@ public class HttpMgmtServlet extends HttpServlet {
           X509Cert cert = caManager.generateCrossCertificate(req.getCaName(), req.getProfileName(),
               req.getEncodedCsr(), req.getEncodedTargetCert(), req.getNotBefore(), req.getNotAfter());
           resp = toByteArray(cert);
+          break;
+        }
+        case generateKeyCert: {
+          MgmtRequest.GenerateKeyCert req = parse(in, MgmtRequest.GenerateKeyCert.class);
+          KeyCertBytesPair keyCertBytesPair = caManager.generateKeyCert(req.getCaName(),
+              req.getProfileName(), req.getSubject(), req.getNotBefore(), req.getNotAfter());
+          resp = new MgmtResponse.KeyCertBytes(keyCertBytesPair.getKey(), keyCertBytesPair.getCert());
           break;
         }
         case generateCrlOnDemand: {

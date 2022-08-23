@@ -583,15 +583,6 @@ public abstract class Certprofile implements Closeable {
 
   public abstract Set<GeneralNameMode> getSubjectAltNameModes();
 
-  /**
-   * Whether the subject attribute serialNumber in request is permitted.
-   *
-   * @return whether the serialNumber is permitted in request.
-   */
-  public boolean isSerialNumberInReqPermitted() {
-    return true;
-  }
-
   public Set<ExtKeyUsageControl> getExtendedKeyUsages() {
     return null;
   }

@@ -61,6 +61,10 @@ public class CaActions {
     @Reference
     protected SecurityFactory securityFactory;
 
+    protected static Date parseDate(String dateStr) {
+      return StringUtil.isBlank(dateStr) ? null : DateUtil.parseUtcTimeyyyyMMddhhmmss(dateStr);
+    }
+
     protected static String toString(Collection<?> col) {
       if (col == null) {
         return "null";
@@ -439,8 +443,8 @@ public class CaActions {
     protected Object execute0()
         throws Exception {
       CaEntry caEntry = getCaEntry();
-      Date notBefore = StringUtil.isNotBlank(notBeforeS) ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
-      Date notAfter = StringUtil.isNotBlank(notAfterS) ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
+      Date notBefore = parseDate(notBeforeS);
+      Date notAfter = parseDate(notAfterS);
       X509Cert rootcaCert = caManager.generateRootCa(caEntry, rootcaProfile, subject, serialS, notBefore, notAfter);
       if (rootcaCertOutFile != null) {
         saveVerbose("saved root certificate to file", rootcaCertOutFile,

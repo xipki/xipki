@@ -337,11 +337,9 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class ExportConf
 
-  public static class GenerateCertificate extends CaNameRequest {
+  private static class AbstractGenerateCert extends CaNameRequest {
 
     private String profileName;
-
-    private byte[] encodedCsr;
 
     private Date notBefore;
 
@@ -353,14 +351,6 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     public void setProfileName(String profileName) {
       this.profileName = profileName;
-    }
-
-    public byte[] getEncodedCsr() {
-      return encodedCsr;
-    }
-
-    public void setEncodedCsr(byte[] encodedCsr) {
-      this.encodedCsr = encodedCsr;
     }
 
     public Date getNotBefore() {
@@ -379,6 +369,33 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.notAfter = notAfter;
     }
 
+  } // class GenerateCertificate
+
+  public static class GenerateCert extends AbstractGenerateCert {
+
+    private byte[] encodedCsr;
+
+    public byte[] getEncodedCsr() {
+      return encodedCsr;
+    }
+
+    public void setEncodedCsr(byte[] encodedCsr) {
+      this.encodedCsr = encodedCsr;
+    }
+
+  } // class GenerateCertificate
+
+  public static class GenerateKeyCert extends AbstractGenerateCert {
+
+    private String subject;
+
+    public String getSubject() {
+      return subject;
+    }
+
+    public void setSubject(String subject) {
+      this.subject = subject;
+    }
   } // class GenerateCertificate
 
   public static class GenerateCrossCertificate extends CaNameRequest {
