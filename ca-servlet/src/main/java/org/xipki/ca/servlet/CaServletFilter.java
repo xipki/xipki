@@ -63,6 +63,8 @@ public class CaServletFilter implements Filter {
 
   private CaManagerImpl caManager;
 
+  private SdkResponder responder;
+
   private HttpRaServlet raServlet;
 
   private boolean remoteMgmtEnabled;
@@ -138,7 +140,7 @@ public class CaServletFilter implements Filter {
     LOG.info("ca.noRA: {}", conf.isNoRA());
 
     if (!conf.isNoRA()) {
-      SdkResponder responder = new SdkResponder(caManager);
+      this.responder = new SdkResponder(caManager);
       this.raServlet = new HttpRaServlet();
       this.raServlet.setResponder(responder);
       this.raServlet.setLogReqResp(logReqResp);
@@ -192,6 +194,10 @@ public class CaServletFilter implements Filter {
 
     if (licenseFactory != null) {
       licenseFactory.close();
+    }
+
+    if (responder != null) {
+      responder.close();
     }
 
     if (Audits.getAuditService() != null) {

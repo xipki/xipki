@@ -150,10 +150,4 @@ public class HttpRaServlet extends HttpServlet {
     }
   } // method service0
 
-  @Override
-  public void destroy() {
-    if (responder != null) {
-        responder.close();
-      }
-    }
 }
