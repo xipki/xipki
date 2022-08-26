@@ -31,8 +31,13 @@ import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x509.qualified.*;
+import org.bouncycastle.openssl.PKCS8Generator;
+import org.bouncycastle.openssl.jcajce.JcaPKCS8Generator;
+import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8EncryptorBuilder;
+import org.bouncycastle.operator.OutputEncryptor;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.bouncycastle.util.io.pem.PemObject;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.*;
 import org.xipki.security.ObjectIdentifiers.Xipki;
@@ -53,6 +58,7 @@ import java.security.Key;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.*;
@@ -164,11 +170,14 @@ public class Actions {
     private String outFile;
 
     @Option(name = "--outtype", required = true, description = "type of the destination keystore")
-    @Completion(SecurityCompleters.KeystoreTypeCompleter.class)
+    @Completion(SecurityCompleters.KeystoreTypeWithPEMCompleter.class)
     private String outType;
 
-    @Option(name = "--outpwd", description = "password of the destination keystore")
+    @Option(name = "--outpwd", description = "password of the destination keystore.\n" +
+        "For PEM, you may use NONE to save the private key unprotected.")
     private String outPwd;
+
+    private static final byte[] CRLF = new byte[]{'\r', '\n'};
 
     @Override
     protected Object execute0()
@@ -181,32 +190,84 @@ public class Actions {
       }
 
       KeyStore inKs = KeyStore.getInstance(inType);
-      KeyStore outKs = KeyStore.getInstance(outType);
-      outKs.load(null);
+      KeyStore outKs;
+      ByteArrayOutputStream outPemKs;
+      if ("PEM".equalsIgnoreCase(outType)) {
+        outPemKs = new ByteArrayOutputStream();
+        outKs = null;
+      } else {
+        outPemKs = null;
+        outKs = KeyStore.getInstance(outType);
+        outKs.load(null);
+      }
 
       char[] inPassword = readPasswordIfNotSet("password of the source keystore", inPwd);
       try (InputStream inStream = Files.newInputStream(realInFile.toPath())) {
         inKs.load(inStream, inPassword);
       }
 
-      char[] outPassword = readPasswordIfNotSet("password of the destination keystore", outPwd);
+      char[] outPassword;
+      if ("PEM".equalsIgnoreCase(outType) && "NONE".equalsIgnoreCase(outPwd)) {
+        outPassword = null;
+      } else {
+        outPassword = readPasswordIfNotSet("password of the destination keystore", outPwd);
+      }
+
+      OutputEncryptor pemOe = null;
+      if ("PEM".equalsIgnoreCase(outType) && outPassword != null) {
+        JceOpenSSLPKCS8EncryptorBuilder eb = new JceOpenSSLPKCS8EncryptorBuilder(PKCS8Generator.PBE_SHA1_3DES);
+        eb.setPassword(outPassword);
+        pemOe = eb.build();
+      }
+
       Enumeration<String> aliases = inKs.aliases();
       while (aliases.hasMoreElements()) {
         String alias = aliases.nextElement();
         if (inKs.isKeyEntry(alias)) {
           java.security.cert.Certificate[] certs = inKs.getCertificateChain(alias);
           Key key = inKs.getKey(alias, inPassword);
-          outKs.setKeyEntry(alias, key, outPassword, certs);
+          if (outKs != null) {
+            outKs.setKeyEntry(alias, key, outPassword, certs);
+          } else {
+            if (outPassword == null) {
+              outPemKs.write(PemEncoder.encode(key.getEncoded(), PemEncoder.PemLabel.PRIVATE_KEY));
+            } else {
+              JcaPKCS8Generator gen = new JcaPKCS8Generator((PrivateKey) key, pemOe);
+              PemObject po = gen.generate();
+              outPemKs.write(PemEncoder.encode(po.getContent(), PemEncoder.PemLabel.ENCRYPTED_PRIVATE_KEY));
+            }
+            outPemKs.write(CRLF);
+
+            for (java.security.cert.Certificate cert : certs) {
+              writePemCert(outPemKs, cert);
+            }
+          }
         } else {
           java.security.cert.Certificate cert = inKs.getCertificate(alias);
-          outKs.setCertificateEntry(alias, cert);
+          if (outKs != null) {
+            outKs.setCertificateEntry(alias, cert);
+          } else {
+            writePemCert(outPemKs, cert);
+          }
         }
       }
 
-      ByteArrayOutputStream bout = new ByteArrayOutputStream(4096);
-      outKs.store(bout, outPassword);
-      saveVerbose("saved destination keystore to file", realOutFile, bout.toByteArray());
+      byte[] outBytes;
+      if (outPemKs == null) {
+        ByteArrayOutputStream bout = new ByteArrayOutputStream(4096);
+        outKs.store(bout, outPassword);
+        outBytes = bout.toByteArray();
+      } else {
+        outBytes = outPemKs.toByteArray();
+      }
+      saveVerbose("saved destination keystore to file", realOutFile, outBytes);
       return null;
+    }
+
+    private static void writePemCert(OutputStream out, java.security.cert.Certificate cert)
+        throws CertificateEncodingException, IOException {
+      out.write(PemEncoder.encode(cert.getEncoded(), PemEncoder.PemLabel.CERTIFICATE));
+      out.write(CRLF);
     }
 
   } // class ConvertKeystore

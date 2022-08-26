@@ -48,6 +48,14 @@ public class SecurityCompleters {
   } // class KeystoreTypeCompleter
 
   @Service
+  public static class KeystoreTypeWithPEMCompleter extends EnumCompleter {
+
+    public KeystoreTypeWithPEMCompleter() {
+      setTokens("PKCS12", "JCEKS", "PEM");
+    }
+  } // class KeystoreTypeCompleter
+
+  @Service
   public static class P11KeyUsageCompleter extends EnumCompleter {
 
     public P11KeyUsageCompleter() {
