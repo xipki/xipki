@@ -18,7 +18,6 @@
 package org.xipki.qa.ca;
 
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1UTCTime;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -28,12 +27,10 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.profile.Certprofile.X509CertVersion;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
 import org.xipki.qa.ca.extn.ExtensionsChecker;
-import org.xipki.qa.ca.extn.QaExtensionValue;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
@@ -41,14 +38,11 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
-import org.xipki.util.exception.InvalidConfException;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.Map.Entry;
 
 import static org.xipki.util.Args.notNull;
 

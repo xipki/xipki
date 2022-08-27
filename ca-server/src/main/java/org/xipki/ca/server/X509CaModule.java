@@ -28,7 +28,6 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import static org.xipki.util.Args.notNull;
 

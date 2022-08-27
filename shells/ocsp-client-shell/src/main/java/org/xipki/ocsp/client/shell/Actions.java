@@ -58,7 +58,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SignatureException;
-import java.security.cert.CertificateEncodingException;
 import java.util.*;
 
 /**

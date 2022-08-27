@@ -24,7 +24,6 @@ import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11Slot.P11KeyUsage;
 import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.EnumCompleter;
-import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.CollectionUtil;
 
 import java.util.Collections;

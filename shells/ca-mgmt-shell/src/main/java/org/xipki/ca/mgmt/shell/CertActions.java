@@ -53,7 +53,10 @@ import org.xipki.util.PemEncoder;
 import org.xipki.util.StringUtil;
 import org.xipki.util.exception.InvalidConfException;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyStore;
 import java.security.PrivateKey;

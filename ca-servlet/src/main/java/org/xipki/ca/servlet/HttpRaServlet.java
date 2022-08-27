@@ -23,7 +23,6 @@ import org.xipki.audit.*;
 import org.xipki.ca.sdk.ErrorResponse;
 import org.xipki.ca.sdk.SdkResponse;
 import org.xipki.ca.server.SdkResponder;
-import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
@@ -36,9 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * REST API exception.

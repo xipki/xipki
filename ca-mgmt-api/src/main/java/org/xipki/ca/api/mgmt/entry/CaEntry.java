@@ -26,7 +26,6 @@ import org.xipki.util.*;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**

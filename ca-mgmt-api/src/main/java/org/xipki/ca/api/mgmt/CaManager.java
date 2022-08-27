@@ -20,7 +20,10 @@ package org.xipki.ca.api.mgmt;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.mgmt.entry.*;
-import org.xipki.security.*;
+import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.CrlReason;
+import org.xipki.security.KeyCertBytesPair;
+import org.xipki.security.X509Cert;
 
 import java.io.IOException;
 import java.io.InputStream;
