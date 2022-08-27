@@ -53,7 +53,7 @@ public class NewObjectControl extends ProxyMessage {
 
     for (int i = 1; i < size; i++) {
       ASN1Encodable obj = seq.getObjectAt(i);
-      if (obj instanceof ASN1TaggedObject) {
+      if (!(obj instanceof ASN1TaggedObject)) {
         continue;
       }
 
