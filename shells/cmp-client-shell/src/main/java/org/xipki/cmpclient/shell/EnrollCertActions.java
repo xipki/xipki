@@ -35,11 +35,11 @@ import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x509.qualified.*;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.xipki.cmpclient.CmpClientException;
-import org.xipki.cmpclient.EnrollCertRequest;
-import org.xipki.cmpclient.EnrollCertRequest.EnrollType;
-import org.xipki.cmpclient.EnrollCertResult;
-import org.xipki.cmpclient.EnrollCertResult.CertifiedKeyPairOrError;
+import org.xipki.cmp.client.CmpClientException;
+import org.xipki.cmp.client.EnrollCertRequest;
+import org.xipki.cmp.client.EnrollCertRequest.EnrollType;
+import org.xipki.cmp.client.EnrollCertResult;
+import org.xipki.cmp.client.EnrollCertResult.CertifiedKeyPairOrError;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.*;
 import org.xipki.security.X509ExtensionType.ExtensionsType;
@@ -439,7 +439,7 @@ public class EnrollCertActions {
           String id = Completers.ExtKeyusageCompleter.getIdForUsageName(m);
           if (id == null) {
             try {
-              id = new ASN1ObjectIdentifier(m).getId();
+              new ASN1ObjectIdentifier(m).getId();
             } catch (Exception ex) {
               throw new IllegalCmdParamException("invalid extended key usage " + m);
             }
@@ -450,7 +450,7 @@ public class EnrollCertActions {
       }
 
       X500Name subjectDn = new X500Name(subject);
-      List<RDN> list = new LinkedList<RDN>();
+      List<RDN> list = new LinkedList<>();
 
       if (StringUtil.isNotBlank(dateOfBirth)) {
         ASN1ObjectIdentifier id = ObjectIdentifiers.DN.dateOfBirth;

@@ -23,8 +23,8 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.cmpclient.CmpClient;
-import org.xipki.cmpclient.Requestor;
+import org.xipki.cmp.client.CmpClient;
+import org.xipki.cmp.client.Requestor;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -70,7 +70,7 @@ public class Actions {
 
     protected Requestor getRequestor()
         throws IllegalCmdParamException, ObjectCreationException, IOException {
-      if (!(signerP12File == null ^ signerKeyId == null)) {
+      if ((signerP12File == null) == (signerKeyId == null)) {
         throw new IllegalCmdParamException("Exactly one of signer-p12 and signer-keyid must be specified");
       }
 

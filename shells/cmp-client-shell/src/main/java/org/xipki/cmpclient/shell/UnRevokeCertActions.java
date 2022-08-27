@@ -22,9 +22,9 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.cmpclient.CertIdOrError;
-import org.xipki.cmpclient.PkiStatusInfo;
-import org.xipki.cmpclient.Requestor;
+import org.xipki.cmp.client.CertIdOrError;
+import org.xipki.cmp.client.Requestor;
+import org.xipki.cmp.PkiStatusInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
@@ -61,7 +61,7 @@ public class UnRevokeCertActions {
 
     @Override
     protected Object execute0() throws Exception {
-      if (!(certFile == null ^ getSerialNumber() == null)) {
+      if ((certFile == null) == (getSerialNumber() == null)) {
         throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
       }
 
@@ -112,7 +112,7 @@ public class UnRevokeCertActions {
 
     @Override
     protected Object execute0() throws Exception {
-      if (!(certFile == null ^ getSerialNumber() == null)) {
+      if ((certFile == null) == (getSerialNumber() == null)) {
         throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
       }
 
