@@ -59,8 +59,7 @@ public class ProfileCaActions {
     private List<String> profileNames;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       for (String profileName : profileNames) {
         String msg = StringUtil.concat("certificate profile ", profileName, " to CA ", caName);
         try {
@@ -84,8 +83,7 @@ public class ProfileCaActions {
     private String caName;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (caManager.getCa(caName) == null) {
         throw new CmdFailure("could not find CA '" + caName + "'");
       }
@@ -124,8 +122,7 @@ public class ProfileCaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       for (String profileName : profileNames) {
         String msg = StringUtil.concat("certificate profile ", profileName, " from CA ", caName);
         if (force || confirm("Do you want to remove " + msg, 3)) {
@@ -162,8 +159,7 @@ public class ProfileCaActions {
     private String confFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (conf == null && confFile != null) {
         conf = StringUtil.toUtf8String(IoUtil.read(confFile));
       }
@@ -194,8 +190,7 @@ public class ProfileCaActions {
     private String confFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CertprofileEntry entry = caManager.getCertprofile(name);
       if (entry == null) {
         throw new IllegalCmdParamException("no certificate profile named " + name + " is defined");
@@ -224,8 +219,7 @@ public class ProfileCaActions {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       StringBuilder sb = new StringBuilder();
 
       if (name == null) {
@@ -272,8 +266,7 @@ public class ProfileCaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       String msg = "certificate profile " + name;
       if (force || confirm("Do you want to remove " + msg, 3)) {
         try {
@@ -308,8 +301,7 @@ public class ProfileCaActions {
     protected String confFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (type == null && conf == null && confFile == null) {
         throw new IllegalCmdParamException("nothing to update");
       }

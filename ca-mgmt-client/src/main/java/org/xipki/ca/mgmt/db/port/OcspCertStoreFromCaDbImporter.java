@@ -85,8 +85,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     this.resume = resume;
   } // constructor
 
-  public void importToDb()
-      throws Exception {
+  public void importToDb() throws Exception {
     CaCertstore certstore;
     try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_CA_CERTSTORE))) {
       certstore = JSON.parseObject(is, CaCertstore.class);

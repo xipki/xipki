@@ -47,8 +47,7 @@ public class SubjectInfoAccess extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notEmpty(accesses, "accesses");
     validate(accesses);
   }
@@ -78,8 +77,7 @@ public class SubjectInfoAccess extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notNull(accessMethod, "accessMethod");
       validate(accessMethod);
       notNull(accessLocation, "accessLocation");

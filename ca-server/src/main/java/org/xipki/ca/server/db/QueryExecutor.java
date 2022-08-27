@@ -106,8 +106,7 @@ class QueryExecutor {
   protected static class DbSchemaInfo {
     private final Map<String, String> variables = new HashMap<>();
 
-    protected DbSchemaInfo(DataSourceWrapper datasource)
-        throws DataAccessException {
+    protected DbSchemaInfo(DataSourceWrapper datasource) throws DataAccessException {
       notNull(datasource, "datasource");
       final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
 
@@ -197,8 +196,7 @@ class QueryExecutor {
     return new SqlColumn2(ColumnType.TIMESTAMP, value);
   }
 
-  protected int execUpdateStmt(String sql)
-      throws DataAccessException {
+  protected int execUpdateStmt(String sql) throws DataAccessException {
     Statement ps = datasource.createStatement();
     try {
       return ps.executeUpdate(sql);

@@ -189,18 +189,16 @@ public abstract class ExtensionSpec {
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             Extension.certificatePolicies,
             Extension.extendedKeyUsage,
-            Extension.authorityKeyIdentifier)));  /* not required in RFC5280, forbidden by several
-                                                 national standards e.g. chinese GM/T 0015
-                                                 and German Gematik.
-                                               */
+            // not required in RFC5280, forbidden by several national standards,
+            // e.g. chinese GM/T 0015 and German Gematik.
+            Extension.authorityKeyIdentifier)));
 
     private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSIONS =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             Extension.basicConstraints,
             Extension.keyUsage)));
 
-    private static final Set<ASN1ObjectIdentifier> NON_CRITICAL_ONLY_EXTENSIONS =
-        Collections.emptySet();
+    private static final Set<ASN1ObjectIdentifier> NON_CRITICAL_ONLY_EXTENSIONS = Collections.emptySet();
 
     private final Set<ASN1ObjectIdentifier> requiredExtensions;
 
@@ -241,8 +239,7 @@ public abstract class ExtensionSpec {
             Extension.subjectKeyIdentifier,
             Extension.keyUsage)));
 
-    private static final Set<ASN1ObjectIdentifier> NON_PERMITTED_EXTENSIONS =
-        Collections.emptySet();
+    private static final Set<ASN1ObjectIdentifier> NON_PERMITTED_EXTENSIONS = Collections.emptySet();
 
     private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSIONS =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
@@ -301,11 +298,9 @@ public abstract class ExtensionSpec {
             Extension.policyConstraints,
             Extension.inhibitAnyPolicy)));
 
-    private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSIONS =
-        Collections.emptySet();
+    private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSIONS = Collections.emptySet();
 
-    private static final Set<ASN1ObjectIdentifier> NON_CRITICAL_ONLY_EXTENSIONS =
-        Collections.emptySet();
+    private static final Set<ASN1ObjectIdentifier> NON_CRITICAL_ONLY_EXTENSIONS = Collections.emptySet();
 
     @Override
     public Set<ASN1ObjectIdentifier> getRequiredExtensions() {

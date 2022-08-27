@@ -61,30 +61,23 @@ public class IoUtil {
     }
   }
 
-  public static byte[] read(String fileName)
-      throws IOException {
+  public static byte[] read(String fileName) throws IOException {
     return read(fileName, false);
   }
 
-  public static byte[] read(String fileName, boolean prependBaseDir)
-      throws IOException {
-    return Files.readAllBytes(
-        Paths.get(expandFilepath(fileName, prependBaseDir)));
+  public static byte[] read(String fileName, boolean prependBaseDir) throws IOException {
+    return Files.readAllBytes(Paths.get(expandFilepath(fileName, prependBaseDir)));
   }
 
-  public static byte[] read(File file)
-      throws IOException {
+  public static byte[] read(File file) throws IOException {
     return read(file, false);
   }
 
-  public static byte[] read(File file, boolean prependBaseDir)
-      throws IOException {
-    return Files.readAllBytes(
-        Paths.get(expandFilepath(file.getPath(), prependBaseDir)));
+  public static byte[] read(File file, boolean prependBaseDir) throws IOException {
+    return Files.readAllBytes(Paths.get(expandFilepath(file.getPath(), prependBaseDir)));
   }
 
-  public static byte[] read(InputStream in)
-      throws IOException {
+  public static byte[] read(InputStream in) throws IOException {
     try {
       ByteArrayOutputStream bout = new ByteArrayOutputStream();
       int readed;
@@ -103,8 +96,7 @@ public class IoUtil {
     }
   }
 
-  public static void save(String fileName, byte[] encoded)
-      throws IOException {
+  public static void save(String fileName, byte[] encoded) throws IOException {
     save(fileName, encoded, false);
   }
 
@@ -113,8 +105,7 @@ public class IoUtil {
     save(new File(fileName), encoded, prependBaseDir);
   }
 
-  public static void save(File file, byte[] content)
-      throws IOException {
+  public static void save(File file, byte[] content) throws IOException {
     save(file, content, false);
   }
 
@@ -123,20 +114,17 @@ public class IoUtil {
     File tmpFile = expandFilepath(file, prependBaseDir);
     mkdirsParent(tmpFile.toPath());
 
-    Files.copy(new ByteArrayInputStream(content), tmpFile.toPath(),
-        StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(new ByteArrayInputStream(content), tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
   }
 
-  public static void mkdirsParent(Path path)
-      throws IOException {
+  public static void mkdirsParent(Path path) throws IOException {
     Path parent = path.getParent();
     if (parent != null) {
       Files.createDirectories(parent);
     }
   }
 
-  public static String getHostAddress()
-      throws SocketException {
+  public static String getHostAddress() throws SocketException {
     List<String> addresses = new LinkedList<>();
 
     Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -306,8 +294,7 @@ public class IoUtil {
     return Base64.encodeToString(data, withLineBreak);
   }
 
-  public static HttpURLConnection openHttpConn(URL url)
-      throws IOException {
+  public static HttpURLConnection openHttpConn(URL url) throws IOException {
     notNull(url, "url");
     URLConnection conn = url.openConnection();
     if (conn instanceof HttpURLConnection) {
@@ -336,8 +323,7 @@ public class IoUtil {
     return console.readLine();
   }
 
-  public static Properties loadProperties(String path)
-      throws IOException {
+  public static Properties loadProperties(String path) throws IOException {
     return loadProperties(path, false);
   }
 

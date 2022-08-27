@@ -171,8 +171,7 @@ public class QaP11Actions {
     protected abstract Object execute1(PrivateKey key, Certificate cert)
         throws Exception;
 
-    protected String getAlias()
-        throws IllegalCmdParamException {
+    protected String getAlias() throws IllegalCmdParamException {
       if (label != null && id == null) {
         return StringUtil.concat(moduleName, "#slotindex-", Integer.toString(slotIndex), "#keylabel-", label);
       } else if (label == null && id != null) {
@@ -184,8 +183,7 @@ public class QaP11Actions {
     }
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       KeyStore ks = KeyStore.getInstance("PKCS11", XiPkcs11Provider.PROVIDER_NAME);
       ks.load(null, null);
       if (verbose) {

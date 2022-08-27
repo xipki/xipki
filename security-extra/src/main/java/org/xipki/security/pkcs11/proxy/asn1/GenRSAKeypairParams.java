@@ -57,8 +57,7 @@ public class GenRSAKeypairParams extends ProxyMessage {
     this.publicExponent = publicExponent;
   }
 
-  private GenRSAKeypairParams(ASN1Sequence seq)
-      throws BadAsn1ObjectException {
+  private GenRSAKeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 2, 4);
     final int size = seq.size();
     int idx = 0;

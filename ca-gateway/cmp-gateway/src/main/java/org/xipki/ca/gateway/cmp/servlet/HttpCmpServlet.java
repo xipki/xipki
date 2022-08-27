@@ -133,8 +133,10 @@ public class HttpCmpServlet extends HttpServlet {
       AuditStatus auditStatus;
       String auditMessage;
 
+      int httpStatus = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
       if (th instanceof HttpRespAuditException) {
         HttpRespAuditException hae = (HttpRespAuditException) th;
+        httpStatus = hae.getHttpStatus();
         auditStatus = hae.getAuditStatus();
         auditLevel = hae.getAuditLevel();
         auditMessage = hae.getAuditMessage();
@@ -155,7 +157,7 @@ public class HttpCmpServlet extends HttpServlet {
         event.addEventData(CaAuditConstants.NAME_message, auditMessage);
       }
 
-      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      resp.sendError(httpStatus);
     } finally {
       resp.flushBuffer();
       event.finish();

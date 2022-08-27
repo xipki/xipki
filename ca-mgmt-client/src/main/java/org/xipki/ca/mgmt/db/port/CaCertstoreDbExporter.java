@@ -77,8 +77,7 @@ class CaCertstoreDbExporter extends DbPorter {
     this.resume = resume;
   } // constructor
 
-  public void export()
-      throws Exception {
+  public void export() throws Exception {
     CaCertstore certstore;
     if (resume) {
       try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_CA_CERTSTORE))) {

@@ -146,8 +146,7 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notBlank(name, "name");
       notBlank(status, "status");
 
@@ -185,8 +184,7 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notBlank(name, "name");
     }
 
@@ -345,8 +343,7 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       validate(signers);
       validate(requestors);
       validate(publishers);
@@ -388,8 +385,7 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
     }
 
   } // class CaHasPublisher
@@ -407,8 +403,7 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
     }
 
   } // class CaHasProfile
@@ -446,70 +441,10 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
     }
 
   } // class CaHasRequestor
-
-  public static class CaHasUser extends CaHasEntry {
-
-    private int id;
-
-    private int userId;
-
-    private int active;
-
-    private int permission;
-
-    private String profiles;
-
-    public int getId() {
-      return id;
-    }
-
-    public void setId(int id) {
-      this.id = id;
-    }
-
-    public int getUserId() {
-      return userId;
-    }
-
-    public void setUserId(int userId) {
-      this.userId = userId;
-    }
-
-    public int getActive() {
-      return active;
-    }
-
-    public void setActive(int active) {
-      this.active = active;
-    }
-
-    public int getPermission() {
-      return permission;
-    }
-
-    public void setPermission(int permission) {
-      this.permission = permission;
-    }
-
-    public String getProfiles() {
-      return profiles;
-    }
-
-    public void setProfiles(String profiles) {
-      this.profiles = profiles;
-    }
-
-    @Override
-    public void validate()
-        throws InvalidConfException {
-    }
-
-  } // class CaHasUser
 
   public static class Cert extends IdentifidDbObject {
 
@@ -704,8 +639,7 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       super.validate();
 
       notNull(caId, "caId");
@@ -795,8 +729,7 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       super.validate();
       notNull(caId, "caId");
       notBlank(crlNo, "crlNo");
@@ -826,8 +759,7 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       validate(crls);
     }
 
@@ -860,36 +792,6 @@ public class CaCertstore extends ValidatableConf {
       notNull(value, "value");
     }
   }
-
-  public static class DeltaCrlCacheEntry extends ValidatableConf {
-
-    private String serial;
-
-    private int caId;
-
-    public String getSerial() {
-      return serial;
-    }
-
-    public void setSerial(String serial) {
-      this.serial = serial;
-    }
-
-    public int getCaId() {
-      return caId;
-    }
-
-    public void setCaId(int caId) {
-      this.caId = caId;
-    }
-
-    @Override
-    public void validate()
-        throws InvalidConfException {
-      notBlank(serial, "serial");
-    }
-
-  } // class DeltaCrlCacheEntry
 
   public static class NameTypeConf extends ValidatableConf {
 
@@ -924,8 +826,7 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-            throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notBlank(name, "name");
       notBlank(type, "type");
       if (conf != null) {
@@ -972,8 +873,7 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       super.validate();
       notNull(rid, "rid");
       notNull(cid, "cid");
@@ -1004,8 +904,7 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       validate(reqCerts);
     }
 
@@ -1034,8 +933,7 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       super.validate();
       notNull(update, "update");
       notBlank(file, "file");
@@ -1066,8 +964,7 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       validate(requests);
     }
 
@@ -1116,8 +1013,7 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notBlank(name, "name");
       notBlank(type, "type");
       notNull(conf, "conf");
@@ -1160,8 +1056,7 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
     }
 
   } // class ToPublish
@@ -1177,8 +1072,6 @@ public class CaCertstore extends ValidatableConf {
   private int countReqCerts;
 
   private List<ToPublish> publishQueue;
-
-  private List<DeltaCrlCacheEntry> deltaCrlCache;
 
   public int getVersion() {
     return version;
@@ -1231,22 +1124,9 @@ public class CaCertstore extends ValidatableConf {
     this.publishQueue = publishQueue;
   }
 
-  public List<DeltaCrlCacheEntry> getDeltaCrlCache() {
-    if (deltaCrlCache == null) {
-      deltaCrlCache = new LinkedList<>();
-    }
-    return deltaCrlCache;
-  }
-
-  public void setDeltaCrlCache(List<DeltaCrlCacheEntry> deltaCrlCache) {
-    this.deltaCrlCache = deltaCrlCache;
-  }
-
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     validate(publishQueue);
-    validate(deltaCrlCache);
   }
 
 }

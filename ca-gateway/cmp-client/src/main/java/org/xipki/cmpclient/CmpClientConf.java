@@ -76,8 +76,7 @@ public class CmpClientConf extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       if (pbmMac == null && signature == null) {
         throw new InvalidConfException("at least one of pbmMac and signature must be specified");
       }
@@ -148,8 +147,7 @@ public class CmpClientConf extends ValidatableConf {
       }
 
       @Override
-      public void validate()
-          throws InvalidConfException {
+      public void validate() throws InvalidConfException {
         notEmpty(signatureAlgos, "signatureAlgos");
       }
 
@@ -188,8 +186,7 @@ public class CmpClientConf extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     validate(responder);
     validate(ssl);
   }

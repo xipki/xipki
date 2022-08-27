@@ -64,8 +64,7 @@ public class KeypairGenActions {
     private String confFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (conf == null && confFile != null) {
         conf = StringUtil.toUtf8String(IoUtil.read(confFile));
       }
@@ -92,8 +91,7 @@ public class KeypairGenActions {
     private String name;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (name == null) {
         Set<String> names = caManager.getKeypairGenNames();
         int size = names.size();
@@ -139,8 +137,7 @@ public class KeypairGenActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       String msg = "keypair generation " + name;
       if (force || confirm("Do you want to remove " + msg, 3)) {
         try {
@@ -159,8 +156,7 @@ public class KeypairGenActions {
   @Service
   public static class KeypairGenUp extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-            description = "keypair generation name")
+    @Option(name = "--name", aliases = "-n", required = true, description = "keypair generation name")
     @Completion(CaCompleters.KeypairGenNameCompleter.class)
     protected String name;
 
@@ -176,8 +172,7 @@ public class KeypairGenActions {
     protected String confFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (type == null && conf == null && confFile == null) {
         throw new IllegalCmdParamException("nothing to update");
       }

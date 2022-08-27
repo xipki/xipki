@@ -126,8 +126,7 @@ public class CaEmulator {
     return generateCrl;
   }
 
-  public X509Cert generateCert(CertificationRequest csr)
-      throws Exception {
+  public X509Cert generateCert(CertificationRequest csr) throws Exception {
     if (!verifyPop(csr)) {
       throw new Exception("CSR invalid");
     }

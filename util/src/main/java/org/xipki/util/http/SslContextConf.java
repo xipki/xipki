@@ -219,8 +219,7 @@ public class SslContextConf {
     }
   }
 
-  public SSLSocketFactory getSslSocketFactory()
-      throws ObjectCreationException {
+  public SSLSocketFactory getSslSocketFactory() throws ObjectCreationException {
     if (!useSslConf) {
       return null;
     }

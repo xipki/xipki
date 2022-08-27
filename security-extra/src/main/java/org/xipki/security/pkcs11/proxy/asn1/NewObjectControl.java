@@ -44,16 +44,15 @@ public class NewObjectControl extends ProxyMessage {
     this.control = Args.notNull(control, "control");
   }
 
-  private NewObjectControl(ASN1Sequence seq)
-      throws BadAsn1ObjectException {
+  private NewObjectControl(ASN1Sequence seq) {
     final int size = seq.size();
     Args.min(size, "seq.size", 1);
-    String label = DERUTF8String.getInstance(seq.getObjectAt(0)).getString();
+    String label = ASN1UTF8String.getInstance(seq.getObjectAt(0)).getString();
     byte[] id = null;
 
     for (int i = 1; i < size; i++) {
       ASN1Encodable obj = seq.getObjectAt(i);
-      if (obj instanceof ASN1TaggedObject) {
+      if (!(obj instanceof ASN1TaggedObject)) {
         continue;
       }
 
@@ -67,8 +66,7 @@ public class NewObjectControl extends ProxyMessage {
     this.control = new P11NewKeyControl(id, label);
   }
 
-  public static NewObjectControl getInstance(Object obj)
-      throws BadAsn1ObjectException {
+  public static NewObjectControl getInstance(Object obj) throws BadAsn1ObjectException {
     if (obj == null || obj instanceof NewObjectControl) {
       return (NewObjectControl) obj;
     }

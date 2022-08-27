@@ -58,8 +58,7 @@ public abstract class Certprofile implements Closeable {
         boolean includesCaIssuers, boolean includesOcsp, Set<String> caIssuersProtocols, Set<String> ocspProtocols) {
       this.includesCaIssuers = includesCaIssuers;
       this.includesOcsp = includesOcsp;
-      this.ocspProtocols = ocspProtocols == null
-          ? null : Collections.unmodifiableSet(new HashSet<>(ocspProtocols));
+      this.ocspProtocols = ocspProtocols == null ? null : Collections.unmodifiableSet(new HashSet<>(ocspProtocols));
       this.caIssuersProtocols = caIssuersProtocols == null
           ? null : Collections.unmodifiableSet(new HashSet<>(caIssuersProtocols));
     }
@@ -531,11 +530,6 @@ public abstract class Certprofile implements Closeable {
 
   } // class SubjectInfo
 
-  @Deprecated
-  public boolean isOnlyForRa() {
-    return false;
-  }
-
   public NotAfterMode getNotAfterMode() {
     return NotAfterMode.BY_CA;
   }
@@ -607,8 +601,7 @@ public abstract class Certprofile implements Closeable {
    * @throws CertprofileException
    *         if error during the initialization occurs.
    */
-  public abstract void initialize(String data)
-      throws CertprofileException;
+  public abstract void initialize(String data) throws CertprofileException;
 
   public abstract CertLevel getCertLevel();
 

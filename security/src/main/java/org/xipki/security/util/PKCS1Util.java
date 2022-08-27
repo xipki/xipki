@@ -131,8 +131,7 @@ public class PKCS1Util {
                 }
 
                 if (saltLen != contentDigest.getLength()) {
-                    throw new XiSecurityException(
-                        "saltLen != " + contentDigest.getLength() + ": " + saltLen);
+                    throw new XiSecurityException("saltLen != " + contentDigest.getLength() + ": " + saltLen);
                 }
                 break;
             default:

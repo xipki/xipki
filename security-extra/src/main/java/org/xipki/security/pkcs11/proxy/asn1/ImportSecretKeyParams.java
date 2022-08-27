@@ -56,8 +56,7 @@ public class ImportSecretKeyParams extends ProxyMessage {
     this.keyValue = Args.notNull(keyValue, "keyValue");
   }
 
-  private ImportSecretKeyParams(ASN1Sequence seq)
-      throws BadAsn1ObjectException {
+  private ImportSecretKeyParams(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 4, 4);
     int idx = 0;
     slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();

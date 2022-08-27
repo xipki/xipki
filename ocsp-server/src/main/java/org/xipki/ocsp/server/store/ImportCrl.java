@@ -188,8 +188,8 @@ class ImportCrl {
   private static final String SQL_UPDATE_CERT_REV
       = "UPDATE CERT SET REV=?,RR=?,RT=?,RIT=?,LUPDATE=?,CRL_ID=? WHERE ID=?";
 
-  private static final String SQL_INSERT_CERT_REV =
-      SqlUtil.buildInsertSql("CERT", "ID,IID,SN,REV,RR,RT,RIT,LUPDATE,CRL_ID");
+  private static final String SQL_INSERT_CERT_REV = SqlUtil.buildInsertSql("CERT",
+      "ID,IID,SN,REV,RR,RT,RIT,LUPDATE,CRL_ID");
 
   private static final String SQL_DELETE_CERT = "DELETE FROM CERT WHERE IID=? AND SN=?";
 
@@ -198,8 +198,8 @@ class ImportCrl {
   private static final String SQL_UPDATE_CERT
       = "UPDATE CERT SET LUPDATE=?,NBEFORE=?,NAFTER=?,CRL_ID=?,HASH=? WHERE ID=?";
 
-  private static final String SQL_INSERT_CERT
-      = SqlUtil.buildInsertSql("CERT", "ID,IID,SN,REV,RR,RT,RIT,LUPDATE,NBEFORE,NAFTER,CRL_ID,HASH");
+  private static final String SQL_INSERT_CERT = SqlUtil.buildInsertSql("CERT",
+      "ID,IID,SN,REV,RR,RT,RIT,LUPDATE,NBEFORE,NAFTER,CRL_ID,HASH");
 
   private static final String CORE_SQL_SELECT_ID_CERT = "ID,REV,RR,RT,RIT,CRL_ID FROM CERT WHERE IID=? AND SN=?";
 

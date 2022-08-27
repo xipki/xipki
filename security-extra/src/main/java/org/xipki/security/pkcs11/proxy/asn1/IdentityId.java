@@ -47,8 +47,7 @@ public class IdentityId extends ProxyMessage {
     this.value = Args.notNull(value, "value");
   }
 
-  private IdentityId(ASN1Sequence seq)
-      throws BadAsn1ObjectException {
+  private IdentityId(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 2, 4);
     P11SlotIdentifier slotId = SlotIdentifier.getInstance(seq.getObjectAt(0)).getValue();
     P11ObjectIdentifier keyId = ObjectIdentifier.getInstance(seq.getObjectAt(1)).getValue();
@@ -73,8 +72,7 @@ public class IdentityId extends ProxyMessage {
     this.value = new P11IdentityId(slotId, keyId, publicKeyLabel, certLabel);
   }
 
-  public static IdentityId getInstance(Object obj)
-      throws BadAsn1ObjectException {
+  public static IdentityId getInstance(Object obj) throws BadAsn1ObjectException {
     if (obj == null || obj instanceof IdentityId) {
       return (IdentityId) obj;
     }

@@ -51,8 +51,7 @@ public class ServerCaps extends ProxyMessage {
     this.versions = Collections.unmodifiableSet(Args.notEmpty(versions, "versions"));
   }
 
-  private ServerCaps(ASN1Sequence seq)
-      throws BadAsn1ObjectException {
+  private ServerCaps(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 2, 2);
     try {
       this.readOnly = ASN1Boolean.getInstance(seq.getObjectAt(0)).isTrue();
@@ -82,8 +81,7 @@ public class ServerCaps extends ProxyMessage {
     this.versions = Collections.unmodifiableSet(tmpVersions);
   }
 
-  public static ServerCaps getInstance(Object obj)
-      throws BadAsn1ObjectException {
+  public static ServerCaps getInstance(Object obj) throws BadAsn1ObjectException {
     if (obj == null || obj instanceof ServerCaps) {
       return (ServerCaps) obj;
     }

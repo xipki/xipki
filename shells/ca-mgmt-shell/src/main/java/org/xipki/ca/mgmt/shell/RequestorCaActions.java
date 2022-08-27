@@ -68,8 +68,7 @@ public class RequestorCaActions {
     private Set<String> profiles;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CaHasRequestorEntry entry = new CaHasRequestorEntry(new NameId(null, requestorName));
       entry.setProfiles(profiles);
       int intPermission = ShellUtil.getPermission(permissions);
@@ -96,8 +95,7 @@ public class RequestorCaActions {
     private String caName;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (caManager.getCa(caName) == null) {
         throw new CmdFailure("could not find CA '" + caName + "'");
       }
@@ -135,8 +133,7 @@ public class RequestorCaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       for (String requestorName : requestorNames) {
         String msg = "requestor " + requestorName + " from CA " + caName;
         if (force || confirm("Do you want to remove " + msg, 3)) {
@@ -167,8 +164,7 @@ public class RequestorCaActions {
     private String certFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       X509Cert cert = X509Util.parseCert(IoUtil.read(certFile));
       RequestorEntry entry = new RequestorEntry(new NameId(null, name), RequestorEntry.TYPE_CERT,
             Base64.encodeToString(cert.getEncoded()));
@@ -198,8 +194,7 @@ public class RequestorCaActions {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       StringBuilder sb = new StringBuilder();
 
       if (name == null) {
@@ -246,8 +241,7 @@ public class RequestorCaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       String msg = "CMP requestor " + name;
       if (force || confirm("Do you want to remove " + msg, 3)) {
         try {
@@ -275,8 +269,7 @@ public class RequestorCaActions {
     protected String certFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       // check if the certificate is valid
       String msg = "CMP requestor " + name;
 

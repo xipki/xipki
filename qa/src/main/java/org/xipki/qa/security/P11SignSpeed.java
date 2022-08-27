@@ -301,8 +301,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
   }
 
   @Override
-  protected Runnable getTestor()
-      throws Exception {
+  protected Runnable getTestor() throws Exception {
     return new Testor();
   }
 

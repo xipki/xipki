@@ -61,8 +61,7 @@ public class PolicyMappings extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notNull(issuerDomainPolicy, "issuerDomainPolicy");
       validate(issuerDomainPolicy);
       notNull(subjectDomainPolicy, "subjectDomainPolicy");
@@ -85,8 +84,7 @@ public class PolicyMappings extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notEmpty(mappings, "mappings");
     validate(mappings);
   }

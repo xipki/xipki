@@ -51,8 +51,7 @@ public class ProxyServletFilter implements Filter {
   private boolean logReqResp;
 
   @Override
-  public void init(FilterConfig filterConfig)
-      throws ServletException {
+  public void init(FilterConfig filterConfig) throws ServletException {
     XipkiBaseDir.init();
 
     P11ProxyConf conf;

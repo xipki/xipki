@@ -66,9 +66,6 @@ public class X509ProfileType extends ValidatableConf {
   @JSONField(ordinal = 3)
   private CertDomain certDomain = CertDomain.RFC5280;
 
-  @JSONField(ordinal = 4)
-  private Boolean raOnly;
-
   @JSONField(ordinal = 5)
   private Integer maxSize;
 
@@ -296,14 +293,6 @@ public class X509ProfileType extends ValidatableConf {
     this.extensions = extensions;
   }
 
-  public Boolean getRaOnly() {
-    return raOnly;
-  }
-
-  public void setRaOnly(Boolean raOnly) {
-    this.raOnly = raOnly;
-  }
-
   public Integer getMaxSize() {
     return maxSize;
   }
@@ -345,8 +334,7 @@ public class X509ProfileType extends ValidatableConf {
   } // method toXiKeyAlgorithms
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notNull(version, "version");
     notNull(certLevel, "certLevel");
     notBlank(validity, "validity");

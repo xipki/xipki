@@ -549,8 +549,7 @@ public class CaConf {
     return (binary == null) ? null : Base64.encodeToString(binary);
   }
 
-  private static byte[] read(InputStream in)
-      throws IOException {
+  private static byte[] read(InputStream in) throws IOException {
     ByteArrayOutputStream bout = new ByteArrayOutputStream();
     int readed;
     byte[] buffer = new byte[2048];

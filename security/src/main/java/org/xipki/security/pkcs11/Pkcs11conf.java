@@ -66,8 +66,7 @@ public class Pkcs11conf extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notBlank(mechanismSet, "mechanismSet");
       validate(slots);
     }
@@ -297,8 +296,7 @@ public class Pkcs11conf extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notBlank(name, "name");
       notBlank(type, "type");
       notEmpty(nativeLibraries, "nativeLibraries");
@@ -339,8 +337,7 @@ public class Pkcs11conf extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notNull(path, "path");
     }
 
@@ -404,8 +401,7 @@ public class Pkcs11conf extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
     }
 
   } // class NewObjectConf
@@ -439,8 +435,7 @@ public class Pkcs11conf extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notEmpty(passwords, "passwords");
     }
 
@@ -471,8 +466,7 @@ public class Pkcs11conf extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       exactOne(index, "index", id, "id");
     }
 
@@ -516,8 +510,7 @@ public class Pkcs11conf extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notEmpty(modules, "modules");
     validate(modules);
     notEmpty(mechanismSets, "mechanismSets");

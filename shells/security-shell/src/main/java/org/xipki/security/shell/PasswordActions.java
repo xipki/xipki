@@ -56,8 +56,7 @@ public class PasswordActions {
     private String outFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if ((passwordHint == null) == (passwordFile == null)) {
         throw new IllegalCmdParamException("exactly one of password and password-file must be specified");
       }
@@ -93,8 +92,7 @@ public class PasswordActions {
     private Integer quorum = 1;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       Args.range(quorum, "k", 1, 10);
 
       char[] password;
@@ -143,8 +141,7 @@ public class PasswordActions {
     private String outFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       Args.range(mquorum, "mk", 1, 10);
       if ((passwordHint == null) == (passwordFile == null)) {
         throw new IllegalCmdParamException("exactly one of password and password-file must be specified");
@@ -210,8 +207,7 @@ public class PasswordActions {
     private Integer mquorum = 1;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       Args.range(iterationCount, "iterationCount", 1, 65535);
       Args.range(quorum, "k", 1, 10);
       Args.range(mquorum, "mk", 1, 10);

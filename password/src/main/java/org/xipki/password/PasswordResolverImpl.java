@@ -90,8 +90,7 @@ public class PasswordResolverImpl implements PasswordResolver {
   } // method unregistResolver
 
   @Override
-  public char[] resolvePassword(String passwordHint)
-      throws PasswordResolverException {
+  public char[] resolvePassword(String passwordHint) throws PasswordResolverException {
     notNull(passwordHint, "passwordHint");
     int index = passwordHint.indexOf(':');
     if (index == -1) {

@@ -45,8 +45,7 @@ public class SignerConf extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notBlank(type, "type");
     notBlank(conf, "conf");
   }

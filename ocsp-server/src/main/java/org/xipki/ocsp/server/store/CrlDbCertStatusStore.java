@@ -216,8 +216,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     executor.shutdown();
   } // method init
 
-  private static String getStrValue(Map<String, ?> sourceConf,
-      String confName, boolean mandatory) {
+  private static String getStrValue(Map<String, ?> sourceConf, String confName, boolean mandatory) {
     Object objVal = sourceConf.get(confName);
     if (objVal == null) {
       if (mandatory) {

@@ -93,8 +93,7 @@ class ProxyP11Identity extends P11Identity {
   } // method sign0
 
   @Override
-  protected byte[] digestSecretKey0(long mechanism)
-      throws P11TokenException {
+  protected byte[] digestSecretKey0(long mechanism) throws P11TokenException {
     DigestSecretKeyTemplate template =
         new DigestSecretKeyTemplate(((ProxyP11Slot) slot).getAsn1SlotId(), asn1KeyId, mechanism);
     byte[] result = ((ProxyP11Slot) slot).getModule().send(P11ProxyConstants.ACTION_DIGEST_SECRETKEY, template);

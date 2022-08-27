@@ -68,8 +68,7 @@ public class NameConstraints extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     if (CollectionUtil.isEmpty(permittedSubtrees) && CollectionUtil.isEmpty(excludedSubtrees)) {
       throw new InvalidConfException("permittedSubtrees and excludedSubtrees may not be both null");
     }

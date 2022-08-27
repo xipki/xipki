@@ -43,8 +43,7 @@ public class CrlActions {
   public static class CmpGetCrl extends CrlAction {
 
     @Override
-    protected X509CRLHolder retrieveCrl()
-        throws CmpClientException, PkiErrorException {
+    protected X509CRLHolder retrieveCrl() throws CmpClientException, PkiErrorException {
       ReqRespDebug debug = getReqRespDebug();
       try {
         return client.downloadCrl(caName, debug);
@@ -54,8 +53,7 @@ public class CrlActions {
     }
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       X509CRLHolder crl;
       try {
         crl = retrieveCrl();
@@ -87,8 +85,7 @@ public class CrlActions {
         throws CmpClientException, PkiErrorException;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       X509CRLHolder crl;
       try {
         crl = retrieveCrl();

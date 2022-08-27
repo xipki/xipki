@@ -63,8 +63,7 @@ public class AddCertParams extends ProxyMessage {
     this.certificate = certificate.toBcCert().toASN1Structure();
   }
 
-  private AddCertParams(ASN1Sequence seq)
-      throws BadAsn1ObjectException {
+  private AddCertParams(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 3, 3);
     int idx = 0;
     slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
@@ -72,8 +71,7 @@ public class AddCertParams extends ProxyMessage {
     this.certificate = getCertificate0(seq.getObjectAt(idx++));
   }
 
-  public static AddCertParams getInstance(Object obj)
-      throws BadAsn1ObjectException {
+  public static AddCertParams getInstance(Object obj) throws BadAsn1ObjectException {
     if (obj == null || obj instanceof AddCertParams) {
       return (AddCertParams) obj;
     }

@@ -41,8 +41,7 @@ public class IssuerEntry {
 
   private final X509Cert cert;
 
-  public IssuerEntry(X509Cert cert)
-      throws IOException, CertificateEncodingException {
+  public IssuerEntry(X509Cert cert) throws IOException, CertificateEncodingException {
     this.cert = Args.notNull(cert, "cert");
     byte[] encodedName = cert.getSubject().getEncoded("DER");
     byte[] encodedKey = cert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();

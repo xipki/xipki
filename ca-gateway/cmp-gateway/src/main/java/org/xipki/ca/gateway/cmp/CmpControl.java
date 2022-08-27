@@ -73,8 +73,7 @@ public class CmpControl {
 
   private final CollectionAlgorithmValidator sigAlgoValidator;
 
-  public CmpControl(CmpControlConf conf)
-      throws InvalidConfException {
+  public CmpControl(CmpControlConf conf) throws InvalidConfException {
     this.confirmCert = getBoolean(conf.getConfirmCert(), false);
     this.sendCaCert = getBoolean(conf.getSendCaCert(), false);
     this.sendCertChain = getBoolean(conf.getSendCertChain(), false);
@@ -196,14 +195,6 @@ public class CmpControl {
 
   public int getConfirmWaitTimeMs() {
     return confirmWaitTimeMs;
-  }
-
-  public boolean isSendCaCert() {
-    return sendCaCert;
-  }
-
-  public boolean isSendCertChain() {
-    return sendCertChain;
   }
 
   public boolean isSendResponderCert() {

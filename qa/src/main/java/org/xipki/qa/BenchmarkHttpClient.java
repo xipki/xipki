@@ -108,12 +108,10 @@ public class BenchmarkHttpClient {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
     }
 
-    public SslContext buildSslContext()
-        throws GeneralSecurityException, IOException {
+    public SslContext buildSslContext() throws GeneralSecurityException, IOException {
       if (sslContext != null) {
         return sslContext;
       }
@@ -381,8 +379,7 @@ public class BenchmarkHttpClient {
     this.channel = bootstrap.connect(host, port).syncUninterruptibly().channel();
   } // method start
 
-  public void send(FullHttpRequest request)
-      throws HttpClientException {
+  public void send(FullHttpRequest request) throws HttpClientException {
     request.headers().add(HttpHeaderNames.HOST, hostHeader);
     if (!channel.isActive()) {
       throw new HttpClientException("channel is not active");

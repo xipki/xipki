@@ -58,8 +58,7 @@ public class LocalP11CryptServicePool {
     return initialized.get();
   }
 
-  public void init()
-      throws P11TokenException, XiSecurityException {
+  public void init() throws P11TokenException, XiSecurityException {
     LOG.info("initializing ...");
     if (initialized.get()) {
       LOG.info("already initialized, skipping ...");

@@ -39,13 +39,11 @@ public class P11CryptService {
 
   private final P11Module module;
 
-  public P11CryptService(P11Module module)
-      throws P11TokenException {
+  public P11CryptService(P11Module module) throws P11TokenException {
     this.module = notNull(module, "module");
   }
 
-  public synchronized void refresh()
-      throws P11TokenException {
+  public synchronized void refresh() throws P11TokenException {
     LOG.info("refreshing PKCS#11 module {}", module.getName());
 
     List<P11SlotIdentifier> slotIds = module.getSlotIds();
@@ -67,13 +65,11 @@ public class P11CryptService {
     LOG.info("refreshed PKCS#11 module {}", module.getName());
   } // method refresh
 
-  public P11Module getModule()
-      throws P11TokenException {
+  public P11Module getModule() {
     return module;
   }
 
-  public P11Slot getSlot(P11SlotIdentifier slotId)
-      throws P11TokenException {
+  public P11Slot getSlot(P11SlotIdentifier slotId) throws P11TokenException {
     return module.getSlot(slotId);
   }
 

@@ -49,12 +49,10 @@ public abstract class XiAction implements Action {
   @Reference
   protected Session session;
 
-  protected abstract Object execute0()
-      throws Exception;
+  protected abstract Object execute0() throws Exception;
 
   @Override
-  public Object execute()
-      throws Exception {
+  public Object execute() throws Exception {
     return execute0();
   }
 
@@ -62,8 +60,7 @@ public abstract class XiAction implements Action {
     return bo != null && bo;
   }
 
-  protected ConfPairs embedFileContent(ConfPairs confPairs)
-      throws IOException {
+  protected ConfPairs embedFileContent(ConfPairs confPairs) throws IOException {
     boolean changed = false;
     for (String name : confPairs.names()) {
       String value = confPairs.value(name);
@@ -175,13 +172,11 @@ public abstract class XiAction implements Action {
     println(tmpPromptPrefix + " " + saveTo.getPath());
   } // method saveVerbose
 
-  protected void save(String file, byte[] encoded)
-      throws IOException {
+  protected void save(String file, byte[] encoded) throws IOException {
     save(new File(file), encoded);
   }
 
-  protected void save(File file, byte[] encoded)
-      throws IOException {
+  protected void save(File file, byte[] encoded) throws IOException {
     File tmpFile = expandFilepath(file);
     File parent = tmpFile.getParentFile();
     if (parent != null) {
@@ -218,8 +213,7 @@ public abstract class XiAction implements Action {
     }
   }
 
-  protected String readPrompt(String prompt)
-      throws IOException {
+  protected String readPrompt(String prompt) throws IOException {
     String tmpPrompt = prompt;
     if (StringUtil.isNotBlank(prompt)) {
       if (!prompt.endsWith(" ")) {
@@ -229,8 +223,7 @@ public abstract class XiAction implements Action {
     return readLine(tmpPrompt, null);
   }
 
-  protected char[] readPasswordIfNotSet(String password)
-      throws IOException {
+  protected char[] readPasswordIfNotSet(String password) throws IOException {
     return readPasswordIfNotSet(null, password);
   }
 
@@ -239,13 +232,11 @@ public abstract class XiAction implements Action {
     return (password != null) ? password.toCharArray() : readPassword(prompt);
   }
 
-  protected char[] readPassword()
-      throws IOException {
+  protected char[] readPassword() throws IOException {
     return readPassword(null);
   }
 
-  protected char[] readPassword(String prompt)
-      throws IOException {
+  protected char[] readPassword(String prompt) throws IOException {
     String tmpPrompt = (prompt == null) ? "Password:" : prompt.trim();
 
     if (!tmpPrompt.endsWith(":")) {
@@ -258,8 +249,7 @@ public abstract class XiAction implements Action {
               : readLine(tmpPrompt, '*').toCharArray();
   }
 
-  private String readLine(String prompt, Character ch)
-      throws IOException {
+  private String readLine(String prompt, Character ch) throws IOException {
     Object oldIgnoreInterrupts = session.get(Session.IGNORE_INTERRUPTS);
     session.put(Session.IGNORE_INTERRUPTS, Boolean.TRUE);
     try {
@@ -333,8 +323,7 @@ public abstract class XiAction implements Action {
     return "pem".equalsIgnoreCase(encodeForm) ? PemEncoder.encode(data, pemLabel) : data;
   }
 
-  protected boolean confirm(String prompt, int maxTries)
-      throws IOException {
+  protected boolean confirm(String prompt, int maxTries) throws IOException {
     String tmpPrompt;
     if (prompt == null || prompt.isEmpty()) {
       tmpPrompt = "(Yes/No)? ";

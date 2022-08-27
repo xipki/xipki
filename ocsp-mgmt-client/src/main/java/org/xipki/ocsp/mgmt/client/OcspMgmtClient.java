@@ -72,8 +72,7 @@ public class OcspMgmtClient implements OcspManager {
     this.sslContextConf = sslContextConf;
   }
 
-  public void setServerUrl(String serverUrl)
-      throws MalformedURLException {
+  public void setServerUrl(String serverUrl) throws MalformedURLException {
     Args.notBlank(serverUrl, "serverUrl");
     this.serverUrl = serverUrl.endsWith("/") ? serverUrl : serverUrl + "/";
 
@@ -82,8 +81,7 @@ public class OcspMgmtClient implements OcspManager {
     }
   }
 
-  public synchronized void initIfNotDone()
-      throws OcspMgmtException {
+  public synchronized void initIfNotDone() throws OcspMgmtException {
     if (initException != null) {
       throw initException;
     }
@@ -97,8 +95,7 @@ public class OcspMgmtClient implements OcspManager {
         sslSocketFactory = sslContextConf.getSslSocketFactory();
         hostnameVerifier = sslContextConf.buildHostnameVerifier();
       } catch (ObjectCreationException ex) {
-        initException = new OcspMgmtException(
-            "could not initialize CaMgmtClient: " + ex.getMessage(), ex);
+        initException = new OcspMgmtException("could not initialize CaMgmtClient: " + ex.getMessage(), ex);
         throw initException;
       }
     }
@@ -107,14 +104,12 @@ public class OcspMgmtClient implements OcspManager {
   } // method initIfNotDone
 
   @Override
-  public void restartOcspServer()
-      throws OcspMgmtException {
+  public void restartOcspServer() throws OcspMgmtException {
     voidTransmit(MgmtAction.restartServer, null);
   }
 
   @Override
-  public void refreshTokenForSignerType(String signerType)
-      throws OcspMgmtException {
+  public void refreshTokenForSignerType(String signerType) throws OcspMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(signerType);
     voidTransmit(MgmtAction.refreshTokenForSignerType, req);
   }

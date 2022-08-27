@@ -70,8 +70,7 @@ public class ScepHttpResponse {
     return content;
   }
 
-  public byte[] getContentBytes()
-      throws ScepClientException {
+  public byte[] getContentBytes() throws ScepClientException {
     if (content == null) {
       return null;
     }

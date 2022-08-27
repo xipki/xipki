@@ -53,8 +53,7 @@ class EjbcaIssuerEntry {
 
   private CertRevocationInfo revocationInfo;
 
-  public EjbcaIssuerEntry(X509Cert cert)
-      throws CertificateEncodingException {
+  public EjbcaIssuerEntry(X509Cert cert) throws CertificateEncodingException {
     this.cert = notNull(cert, "cert");
     this.notBefore = cert.getNotBefore();
     byte[] encodedCert = cert.getEncoded();

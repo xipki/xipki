@@ -78,8 +78,7 @@ public abstract class P11Module {
    * @throws P11TokenException
    *         if PKCS#11 token error occurs
    */
-  public P11Slot getSlot(P11SlotIdentifier slotId)
-      throws P11TokenException {
+  public P11Slot getSlot(P11SlotIdentifier slotId) throws P11TokenException {
     notNull(slotId, "slotId");
     P11Slot slot = slots.get(slotId);
     if (slot == null) {
@@ -105,8 +104,7 @@ public abstract class P11Module {
     return slotIds;
   }
 
-  public P11SlotIdentifier getSlotIdForIndex(int index)
-      throws P11UnknownEntityException {
+  public P11SlotIdentifier getSlotIdForIndex(int index) throws P11UnknownEntityException {
     for (P11SlotIdentifier id : slotIds) {
       if (id.getIndex() == index) {
         return id;
@@ -115,8 +113,7 @@ public abstract class P11Module {
     throw new P11UnknownEntityException("could not find slot with index " + index);
   }
 
-  public P11SlotIdentifier getSlotIdForId(long id)
-      throws P11UnknownEntityException {
+  public P11SlotIdentifier getSlotIdForId(long id) throws P11UnknownEntityException {
     for (P11SlotIdentifier slotId : slotIds) {
       if (slotId.getId() == id) {
         return slotId;

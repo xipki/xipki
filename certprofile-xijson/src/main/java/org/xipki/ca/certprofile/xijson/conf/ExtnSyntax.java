@@ -116,8 +116,7 @@ public class ExtnSyntax extends Describable {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notNull(type, "type");
     if (CollectionUtil.isNotEmpty(subFields)) {
       if (type == FieldType.SEQUENCE || type == FieldType.SET) {
@@ -169,8 +168,7 @@ public class ExtnSyntax extends Describable {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       super.validate();
       if (FieldType.RAW == type()) {
         throw new InvalidConfException("FieldType RAW is not allowed");

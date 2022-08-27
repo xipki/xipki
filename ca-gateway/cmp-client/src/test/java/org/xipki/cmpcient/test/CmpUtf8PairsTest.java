@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package org.xipki.security.cmp.test;
+package org.xipki.cmpcient.test;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.xipki.security.cmp.CmpUtf8Pairs;
+import org.xipki.cmpclient.CmpUtf8Pairs;
 
 import java.util.HashMap;
 import java.util.Map;

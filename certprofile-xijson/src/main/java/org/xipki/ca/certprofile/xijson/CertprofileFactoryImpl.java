@@ -48,8 +48,7 @@ public class CertprofileFactoryImpl implements CertprofileFactory {
   }
 
   @Override
-  public Certprofile newCertprofile(String type)
-      throws ObjectCreationException {
+  public Certprofile newCertprofile(String type) throws ObjectCreationException {
     if (TYPE.equalsIgnoreCase(type)) {
       return new XijsonCertprofile();
     } else {

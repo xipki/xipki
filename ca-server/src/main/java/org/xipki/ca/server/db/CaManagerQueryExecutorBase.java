@@ -54,8 +54,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
 
   protected int dbSchemaVersion;
 
-  CaManagerQueryExecutorBase(DataSourceWrapper datasource)
-      throws CaMgmtException {
+  CaManagerQueryExecutorBase(DataSourceWrapper datasource) throws CaMgmtException {
     super(datasource);
     try {
       DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
@@ -118,8 +117,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     return (sa != null) ? getRealString(sa) : sb;
   }
 
-  protected int execUpdateStmt0(String sql)
-      throws CaMgmtException {
+  protected int execUpdateStmt0(String sql) throws CaMgmtException {
     try {
       return execUpdateStmt(sql);
     } catch (DataAccessException ex) {

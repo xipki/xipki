@@ -65,8 +65,7 @@ public class CertPublisherFactoryRegister {
    * @throws ObjectCreationException
    *           if publisher could not be created.
    */
-  public CertPublisher newPublisher(String type)
-      throws ObjectCreationException {
+  public CertPublisher newPublisher(String type) throws ObjectCreationException {
     Args.notBlank(type, "type");
 
     for (CertPublisherFactory service : factories) {

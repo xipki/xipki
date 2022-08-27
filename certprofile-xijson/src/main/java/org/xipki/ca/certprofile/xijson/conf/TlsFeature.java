@@ -46,8 +46,7 @@ public class TlsFeature extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notEmpty(features, "features");
     validate(features);
   }

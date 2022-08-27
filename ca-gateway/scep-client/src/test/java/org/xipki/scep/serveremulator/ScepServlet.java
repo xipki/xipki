@@ -17,8 +17,6 @@
 
 package org.xipki.scep.serveremulator;
 
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.cms.CMSAbsentContent;
 import org.bouncycastle.cms.CMSException;
@@ -66,8 +64,7 @@ public class ScepServlet extends HttpServlet {
   }
 
   @Override
-  protected void service(HttpServletRequest req, HttpServletResponse resp)
-          throws IOException {
+  protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     boolean post;
 
     String method = req.getMethod();
@@ -217,20 +214,5 @@ public class ScepServlet extends HttpServlet {
     resp.setContentLength(body.length);
     resp.getOutputStream().write(body);
   }
-
-  protected PKIMessage generatePkiMessage(InputStream is)
-      throws IOException {
-    ASN1InputStream asn1Stream = new ASN1InputStream(Args.notNull(is, "is"));
-
-    try {
-      return PKIMessage.getInstance(asn1Stream.readObject());
-    } finally {
-      try {
-        asn1Stream.close();
-      } catch (Exception ex) {
-        LOG.error("could not close stream: {}", ex.getMessage());
-      }
-    }
-  } // method generatePkiMessage
 
 }

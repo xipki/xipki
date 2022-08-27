@@ -78,8 +78,7 @@ public class UpdateCertActions {
     private String password;
 
     @Override
-    protected SubjectPublicKeyInfo getPublicKey()
-        throws Exception {
+    protected SubjectPublicKeyInfo getPublicKey() throws Exception {
       return null;
     }
 
@@ -92,8 +91,7 @@ public class UpdateCertActions {
     }
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       EnrollCertResult result = enroll();
 
       X509Cert cert = null;
@@ -130,8 +128,7 @@ public class UpdateCertActions {
       return null;
     } // method execute0
 
-    private char[] getPassword()
-        throws IOException {
+    private char[] getPassword() throws IOException {
       char[] pwdInChar = readPasswordIfNotSet(password);
       if (pwdInChar != null) {
         password = new String(pwdInChar);
@@ -140,8 +137,7 @@ public class UpdateCertActions {
     }
   } // class CmpUpdateCagenkey
 
-  @Command(scope = "xi", name = "cmp-update-p11",
-      description = "update certificate (PKCS#11 token)")
+  @Command(scope = "xi", name = "cmp-update-p11", description = "update certificate (PKCS#11 token)")
   @Service
   public static class CmpUpdateP11 extends UpdateCertAction {
 
@@ -162,8 +158,7 @@ public class UpdateCertActions {
     private ConcurrentContentSigner signer;
 
     @Override
-    protected ConcurrentContentSigner getSigner()
-        throws ObjectCreationException {
+    protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
       if (signer == null) {
         byte[] keyIdBytes = null;
         if (keyId != null) {
@@ -225,8 +220,7 @@ public class UpdateCertActions {
     private ConcurrentContentSigner signer;
 
     @Override
-    protected ConcurrentContentSigner getSigner()
-        throws ObjectCreationException {
+    protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
       if (signer == null) {
         if (password == null) {
           try {
@@ -265,15 +259,13 @@ public class UpdateCertActions {
     @Completion(FileCompleter.class)
     private String oldCertFile;
 
-    protected abstract SubjectPublicKeyInfo getPublicKey()
-        throws Exception;
+    protected abstract SubjectPublicKeyInfo getPublicKey() throws Exception;
 
     protected abstract EnrollCertRequest.Entry buildEnrollCertRequestEntry(
         String id, String profile, CertRequest certRequest)
         throws Exception;
 
-    protected EnrollCertResult enroll()
-        throws Exception {
+    protected EnrollCertResult enroll() throws Exception {
       CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
 
       if (subject != null && !subject.isEmpty()) {
@@ -361,11 +353,9 @@ public class UpdateCertActions {
      * @throws ObjectCreationException
      *           if no signer can be built.
      */
-    protected abstract ConcurrentContentSigner getSigner()
-        throws ObjectCreationException;
+    protected abstract ConcurrentContentSigner getSigner() throws ObjectCreationException;
 
-    protected SubjectPublicKeyInfo getPublicKey()
-        throws Exception {
+    protected SubjectPublicKeyInfo getPublicKey() throws Exception {
       return embedsPulibcKey ? getSigner().getCertificate().getSubjectPublicKeyInfo() : null;
     } // method getPublicKey
 
@@ -391,8 +381,7 @@ public class UpdateCertActions {
     } // method buildEnrollCertRequestEntry
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       EnrollCertResult result = enroll();
 
       X509Cert cert = null;

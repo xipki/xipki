@@ -86,8 +86,7 @@ public class RequestOption {
 
   private final CertpathValidationModel certpathValidationModel;
 
-  RequestOption(OcspServerConf.RequestOption conf)
-      throws InvalidConfException {
+  RequestOption(OcspServerConf.RequestOption conf) throws InvalidConfException {
     notNull(conf, "conf");
 
     supportsHttpGet = conf.isSupportsHttpGet();

@@ -49,8 +49,7 @@ class EnrollCertResponse {
   void addResultEntry(ResultEntry resultEntry) {
     Args.notNull(resultEntry, "resultEntry");
 
-    if (!(resultEntry instanceof ResultEntry.EnrollCert
-        || resultEntry instanceof ResultEntry.Error)) {
+    if (!(resultEntry instanceof ResultEntry.EnrollCert || resultEntry instanceof ResultEntry.Error)) {
       throw new IllegalArgumentException("Unaccepted parameter of class " + resultEntry.getClass().getName());
     }
 

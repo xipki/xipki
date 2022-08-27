@@ -60,9 +60,8 @@ public class EnrollCertRequest {
       this.pop = Args.notNull(pop, "pop");
     }
 
-    public Entry(
-        String id, String certprofile, CertRequest certReq,
-        ProofOfPossession pop, boolean caGenerateKeypair, boolean kup) {
+    public Entry(String id, String certprofile, CertRequest certReq,
+                 ProofOfPossession pop, boolean caGenerateKeypair, boolean kup) {
       super(id);
 
       this.certprofile = kup ? certprofile : Args.notBlank(certprofile, "certprofile");

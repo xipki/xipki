@@ -156,8 +156,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     return publicKey;
   }
 
-  public void setCertificates(X509Cert[] certificateChain)
-      throws P11TokenException {
+  public void setCertificates(X509Cert[] certificateChain) throws P11TokenException {
     if (CollectionUtil.isEmpty(certificateChain)) {
       this.certificateChain = null;
     } else {

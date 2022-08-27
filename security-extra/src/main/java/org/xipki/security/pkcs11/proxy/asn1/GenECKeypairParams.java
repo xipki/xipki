@@ -51,8 +51,7 @@ public class GenECKeypairParams extends ProxyMessage {
     this.curveId = Args.notNull(curveId, "curveId");
   }
 
-  private GenECKeypairParams(ASN1Sequence seq)
-      throws BadAsn1ObjectException {
+  private GenECKeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 2, 3);
     int idx = 0;
     slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
@@ -73,8 +72,7 @@ public class GenECKeypairParams extends ProxyMessage {
     curveId = oid;
   }
 
-  public static GenECKeypairParams getInstance(Object obj)
-      throws BadAsn1ObjectException {
+  public static GenECKeypairParams getInstance(Object obj) throws BadAsn1ObjectException {
     if (obj == null || obj instanceof GenECKeypairParams) {
       return (GenECKeypairParams) obj;
     }

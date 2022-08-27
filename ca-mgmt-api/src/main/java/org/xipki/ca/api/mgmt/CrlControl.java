@@ -127,13 +127,11 @@ public class CrlControl {
 
   private TripleState invalidityDateMode = TripleState.optional;
 
-  public CrlControl(String conf)
-      throws InvalidConfException {
+  public CrlControl(String conf) throws InvalidConfException {
     this(toConfPairs(conf));
   }
 
-  private static ConfPairs toConfPairs(String conf)
-      throws InvalidConfException {
+  private static ConfPairs toConfPairs(String conf) throws InvalidConfException {
     try {
       return new ConfPairs(conf);
     } catch (RuntimeException ex) {
@@ -141,8 +139,7 @@ public class CrlControl {
     }
   }
 
-  public CrlControl(ConfPairs props)
-      throws InvalidConfException {
+  public CrlControl(ConfPairs props) throws InvalidConfException {
     Args.notNull(props, "props");
 
     String str = props.value(KEY_INVALIDITY_DATE);
@@ -294,8 +291,7 @@ public class CrlControl {
     return intervalMillis;
   }
 
-  public final void validate()
-      throws InvalidConfException {
+  public final void validate() throws InvalidConfException {
     if (fullCrlIntervals < deltaCrlIntervals) {
       throw new InvalidConfException(
           "fullCRLIntervals may not be less than deltaCRLIntervals " + fullCrlIntervals + " < " + deltaCrlIntervals);

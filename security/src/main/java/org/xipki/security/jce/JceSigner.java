@@ -46,8 +46,7 @@ public class JceSigner implements XiContentSigner {
     private class SignerOutputStream extends OutputStream {
 
         @Override
-        public void write(int oneByte)
-                throws IOException {
+        public void write(int oneByte) throws IOException {
             try {
                 signature.update((byte) oneByte);
             } catch (SignatureException e) {
@@ -56,8 +55,7 @@ public class JceSigner implements XiContentSigner {
         }
 
         @Override
-        public void write(byte[] bytes)
-                throws IOException {
+        public void write(byte[] bytes) throws IOException {
             try {
                 signature.update(bytes);
             } catch (SignatureException e) {
@@ -66,8 +64,7 @@ public class JceSigner implements XiContentSigner {
         }
 
         @Override
-        public void write(byte[] bytes, int off, int len)
-                throws IOException {
+        public void write(byte[] bytes, int off, int len) throws IOException {
             try {
                 signature.update(bytes, off, len);
             } catch (SignatureException e) {
@@ -76,13 +73,11 @@ public class JceSigner implements XiContentSigner {
         }
 
         @Override
-        public void flush()
-                throws IOException {
+        public void flush() throws IOException {
         }
 
         @Override
-        public void close()
-                throws IOException {
+        public void close() throws IOException {
         }
 
     } // class SignerOutputStream

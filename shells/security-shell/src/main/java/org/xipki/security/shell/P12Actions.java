@@ -79,8 +79,7 @@ public class P12Actions {
     private Integer keysize;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (!("AES".equalsIgnoreCase(keyType) || "DES3".equalsIgnoreCase(keyType)
           || "GENERIC".equalsIgnoreCase(keyType))) {
         throw new IllegalCmdParamException("invalid keyType " + keyType);
@@ -108,8 +107,7 @@ public class P12Actions {
     private String outFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       KeyStore ks = getKeyStore();
 
       String keyname = null;
@@ -147,8 +145,7 @@ public class P12Actions {
     private Set<String> caCertFiles;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       KeyStore ks = getKeyStore();
 
       char[] pwd = getPassword();
@@ -238,8 +235,7 @@ public class P12Actions {
     @Option(name = "--password", description = "password of the PKCS#12 keystore file")
     private String password;
 
-    private char[] getPassword()
-        throws IOException {
+    private char[] getPassword() throws IOException {
       char[] pwdInChar = readPasswordIfNotSet(password);
       if (pwdInChar != null) {
         password = new String(pwdInChar);
@@ -258,8 +254,7 @@ public class P12Actions {
     }
 
     @Override
-    protected ConcurrentContentSigner getSigner()
-        throws ObjectCreationException {
+    protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
       SignatureAlgoControl signatureAlgoControl = getSignatureAlgoControl();
       char[] pwd;
       try {
@@ -294,8 +289,7 @@ public class P12Actions {
   @Service
   public static class DsaP12 extends P12KeyGenAction {
 
-    @Option(name = "--subject", aliases = "-s",
-        description = "subject of the self-signed certificate")
+    @Option(name = "--subject", aliases = "-s", description = "subject of the self-signed certificate")
     private String subject;
 
     @Option(name = "--plen", description = "bit length of the prime")
@@ -305,8 +299,7 @@ public class P12Actions {
     private Integer qlen;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (plen % 1024 != 0) {
         throw new IllegalCmdParamException("plen is not multiple of 1024: " + plen);
       }
@@ -341,8 +334,7 @@ public class P12Actions {
     private String curveName = "secp256r1";
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       P12KeyGenerator keyGen = new P12KeyGenerator();
       KeystoreGenerationParameters keyGenParams = getKeyGenParameters();
       KeyStoreWrapper keypair;
@@ -370,8 +362,7 @@ public class P12Actions {
     @Option(name = "--password", description = "password of the keystore file")
     protected String password;
 
-    protected void saveKey(KeyStoreWrapper keyGenerationResult)
-        throws IOException {
+    protected void saveKey(KeyStoreWrapper keyGenerationResult) throws IOException {
       Args.notNull(keyGenerationResult, "keyGenerationResult");
       saveVerbose("saved PKCS#12 keystore to file", keyOutFile, keyGenerationResult.keystore());
     }
@@ -388,8 +379,7 @@ public class P12Actions {
       return params;
     }
 
-    private char[] getPassword()
-        throws IOException {
+    private char[] getPassword() throws IOException {
       char[] pwdInChar = readPasswordIfNotSet(password);
       if (pwdInChar != null) {
         password = new String(pwdInChar);
@@ -413,8 +403,7 @@ public class P12Actions {
     private String publicExponent = "0x10001";
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (keysize % 1024 != 0) {
         throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
       }
@@ -437,8 +426,7 @@ public class P12Actions {
     @Option(name = "--password", description = "password of the PKCS#12 file")
     protected String password;
 
-    protected char[] getPassword()
-        throws IOException {
+    protected char[] getPassword() throws IOException {
       char[] pwdInChar = readPasswordIfNotSet(password);
       if (pwdInChar != null) {
         password = new String(pwdInChar);
@@ -466,8 +454,7 @@ public class P12Actions {
     protected String subject;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       KeyStoreWrapper keypair = new P12KeyGenerator().generateECKeypair(
           GMObjectIdentifiers.sm2p256v1, getKeyGenParameters(), subject);
       saveKey(keypair);
@@ -490,8 +477,7 @@ public class P12Actions {
     private String certOutFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       char[] password = getPassword();
       try (InputStream keystoreStream = new FileInputStream(expandFilepath(p12File))) {
         KeypairWithCert kp = KeypairWithCert.fromKeystore("PKCS12",

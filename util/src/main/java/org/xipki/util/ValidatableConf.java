@@ -29,8 +29,7 @@ import java.util.Collection;
 
 public abstract class ValidatableConf {
 
-  protected static void validate(ValidatableConf conf)
-      throws InvalidConfException {
+  protected static void validate(ValidatableConf conf) throws InvalidConfException {
     if (conf != null) {
       conf.validate();
     }

@@ -48,8 +48,7 @@ public class BiometricInfoOption {
 
   private final TripleState sourceDataUriOccurrence;
 
-  public BiometricInfoOption(BiometricInfo value)
-      throws NoSuchAlgorithmException {
+  public BiometricInfoOption(BiometricInfo value) throws NoSuchAlgorithmException {
     notNull(value, "value");
 
     this.sourceDataUriOccurrence = value.getIncludeSourceDataUri();

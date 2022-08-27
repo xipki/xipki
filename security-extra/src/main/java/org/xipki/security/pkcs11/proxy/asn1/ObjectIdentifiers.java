@@ -46,8 +46,7 @@ public class ObjectIdentifiers extends ProxyMessage {
     this.objectIds = Args.notNull(objectIds, "objectIds");
   }
 
-  private ObjectIdentifiers(ASN1Sequence seq)
-      throws BadAsn1ObjectException {
+  private ObjectIdentifiers(ASN1Sequence seq) throws BadAsn1ObjectException {
     this.objectIds = new LinkedList<>();
     final int size = seq.size();
     for (int i = 0; i < size; i++) {
@@ -55,8 +54,7 @@ public class ObjectIdentifiers extends ProxyMessage {
     }
   }
 
-  public static ObjectIdentifiers getInstance(Object obj)
-      throws BadAsn1ObjectException {
+  public static ObjectIdentifiers getInstance(Object obj) throws BadAsn1ObjectException {
     if (obj == null || obj instanceof ObjectIdentifiers) {
       return (ObjectIdentifiers) obj;
     }

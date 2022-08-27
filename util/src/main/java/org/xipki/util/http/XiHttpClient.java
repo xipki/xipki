@@ -48,8 +48,7 @@ public class XiHttpClient {
     this.hostnameVerifier = null;
   }
 
-  public XiHttpClient(SslContextConf sslContextConf)
-      throws ObjectCreationException {
+  public XiHttpClient(SslContextConf sslContextConf) throws ObjectCreationException {
     this.sslSocketFactory = sslContextConf.getSslSocketFactory();
     this.hostnameVerifier = sslContextConf.buildHostnameVerifier();
   }
@@ -59,8 +58,7 @@ public class XiHttpClient {
     this.hostnameVerifier = hostnameVerifier;
   }
 
-  public HttpRespContent httpGet(String url)
-      throws XiHttpClientException {
+  public HttpRespContent httpGet(String url) throws XiHttpClientException {
     Args.notNull(url, "url");
     try {
       HttpURLConnection httpConn = openHttpConn(new URL(url));
@@ -143,8 +141,7 @@ public class XiHttpClient {
     }
   } // method parseResponse
 
-  private HttpURLConnection openHttpConn(URL url)
-      throws IOException {
+  private HttpURLConnection openHttpConn(URL url) throws IOException {
     Args.notNull(url, "url");
     URLConnection conn = url.openConnection();
     if (!(conn instanceof HttpURLConnection)) {

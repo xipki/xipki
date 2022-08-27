@@ -72,8 +72,7 @@ public class KeyUtil {
   private KeyUtil() {
   }
 
-  public static KeyStore getKeyStore(String storeType)
-      throws KeyStoreException {
+  public static KeyStore getKeyStore(String storeType) throws KeyStoreException {
     notBlank(storeType, "storeType");
     if ("JCEKS".equalsIgnoreCase(storeType)) {
       return KeyStore.getInstance(storeType);

@@ -26,7 +26,7 @@ import org.xipki.cmpclient.CertIdOrError;
 import org.xipki.cmpclient.Requestor;
 import org.xipki.security.CrlReason;
 import org.xipki.security.X509Cert;
-import org.xipki.security.cmp.PkiStatusInfo;
+import org.xipki.cmpclient.PkiStatusInfo;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
@@ -60,8 +60,7 @@ public class UnRevokeCertActions {
     private String invalidityDateS;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (!(certFile == null ^ getSerialNumber() == null)) {
         throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
       }
@@ -112,8 +111,7 @@ public class UnRevokeCertActions {
   public static class CmpUnsuspend extends UnRevokeCertAction {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (!(certFile == null ^ getSerialNumber() == null)) {
         throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
       }

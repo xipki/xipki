@@ -35,8 +35,7 @@ public abstract class ProxyMessage extends ASN1Object {
       throws BadAsn1ObjectException {
     int size = seq.size();
     if (size < minSize || size > maxSize) {
-      String msg = String.format("seq.size() must not be out of the range [%d, %d]: %d",
-          minSize, maxSize, size);
+      String msg = String.format("seq.size() must not be out of the range [%d, %d]: %d", minSize, maxSize, size);
       throw new BadAsn1ObjectException(msg);
     }
   }

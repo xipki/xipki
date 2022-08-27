@@ -43,8 +43,7 @@ public class ObjectIdentifier extends ProxyMessage {
     this.value = Args.notNull(value, "value");
   }
 
-  private ObjectIdentifier(ASN1Sequence seq)
-      throws BadAsn1ObjectException {
+  private ObjectIdentifier(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 2, 2);
     int idx = 0;
     byte[] id = getOctetStringBytes(seq.getObjectAt(idx++));
@@ -52,8 +51,7 @@ public class ObjectIdentifier extends ProxyMessage {
     this.value = new P11ObjectIdentifier(id, label);
   }
 
-  public static ObjectIdentifier getInstance(Object obj)
-      throws BadAsn1ObjectException {
+  public static ObjectIdentifier getInstance(Object obj) throws BadAsn1ObjectException {
     if (obj == null || obj instanceof ObjectIdentifier) {
       return (ObjectIdentifier) obj;
     }

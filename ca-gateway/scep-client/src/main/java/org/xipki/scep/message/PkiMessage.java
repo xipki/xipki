@@ -179,12 +179,10 @@ public class PkiMessage {
         new DERPrintableString(Integer.toString(messageType.getCode())));
 
     // senderNonce
-    addAttribute(vec, ScepObjectIdentifiers.ID_SENDER_NONCE,
-        new DEROctetString(senderNonce.getBytes()));
+    addAttribute(vec, ScepObjectIdentifiers.ID_SENDER_NONCE, new DEROctetString(senderNonce.getBytes()));
 
     // transactionID
-    addAttribute(vec, ScepObjectIdentifiers.ID_TRANSACTION_ID,
-        new DERPrintableString(transactionId.getId()));
+    addAttribute(vec, ScepObjectIdentifiers.ID_TRANSACTION_ID, new DERPrintableString(transactionId.getId()));
 
     // failInfo
     if (failInfo != null) {
@@ -194,8 +192,7 @@ public class PkiMessage {
 
     // failInfoText
     if (failInfoText != null && !failInfoText.isEmpty()) {
-      addAttribute(vec, ScepObjectIdentifiers.ID_SCEP_FAILINFOTEXT,
-          new DERUTF8String(failInfoText));
+      addAttribute(vec, ScepObjectIdentifiers.ID_SCEP_FAILINFOTEXT, new DERUTF8String(failInfoText));
     }
 
     // pkiStatus
@@ -206,8 +203,7 @@ public class PkiMessage {
 
     // recipientNonce
     if (recipientNonce != null) {
-      addAttribute(vec, ScepObjectIdentifiers.ID_RECIPIENT_NONCE,
-          new DEROctetString(recipientNonce.getBytes()));
+      addAttribute(vec, ScepObjectIdentifiers.ID_RECIPIENT_NONCE, new DEROctetString(recipientNonce.getBytes()));
     }
 
     for (Entry<ASN1ObjectIdentifier, ASN1Encodable> entry : signedAttributes.entrySet()) {

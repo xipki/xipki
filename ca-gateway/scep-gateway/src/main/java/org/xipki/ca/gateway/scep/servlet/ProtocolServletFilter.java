@@ -52,8 +52,7 @@ public class ProtocolServletFilter implements Filter {
   private ProtocolProxyConfWrapper conf;
 
   @Override
-  public void init(FilterConfig filterConfig)
-      throws ServletException {
+  public void init(FilterConfig filterConfig) throws ServletException {
     LOG.info("XiPKI SCEP Gateway version {}", StringUtil.getVersion(getClass()));
 
     XipkiBaseDir.init();

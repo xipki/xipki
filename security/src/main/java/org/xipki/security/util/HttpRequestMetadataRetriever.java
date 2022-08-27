@@ -34,7 +34,6 @@ public interface HttpRequestMetadataRetriever {
 
   String getParameter(String paramName);
 
-  X509Cert getTlsClientCert()
-      throws IOException;
+  X509Cert getTlsClientCert() throws IOException;
 
 }

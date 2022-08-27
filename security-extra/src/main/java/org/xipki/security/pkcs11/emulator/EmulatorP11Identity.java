@@ -261,8 +261,7 @@ public class EmulatorP11Identity extends P11Identity {
   }
 
   @Override
-  protected byte[] digestSecretKey0(long mechanism)
-      throws P11TokenException {
+  protected byte[] digestSecretKey0(long mechanism) throws P11TokenException {
     if (!(signingKey instanceof SecretKey)) {
       throw new P11TokenException("digestSecretKey could not be applied to non-SecretKey");
     }
@@ -435,8 +434,7 @@ public class EmulatorP11Identity extends P11Identity {
     return rsaX509Sign(paddedHash);
   } // method rsaPkcsSign
 
-  private byte[] rsaX509Sign(byte[] dataToSign)
-      throws P11TokenException {
+  private byte[] rsaX509Sign(byte[] dataToSign) throws P11TokenException {
     ConcurrentBagEntry<Cipher> cipher;
     try {
       cipher = rsaCiphers.borrow(5000, TimeUnit.MILLISECONDS);
@@ -488,8 +486,7 @@ public class EmulatorP11Identity extends P11Identity {
     }
   } // method dsaAndEcdsaSign
 
-  private byte[] eddsaSign(byte[] dataToSign)
-      throws P11TokenException {
+  private byte[] eddsaSign(byte[] dataToSign) throws P11TokenException {
     if (!(signingKey instanceof EdDSAKey)) {
       throw new P11TokenException("given signing key is not suitable for EdDSA sign");
     }
@@ -516,8 +513,7 @@ public class EmulatorP11Identity extends P11Identity {
     }
   } // method eddsaSign
 
-  private byte[] sm2SignHash(byte[] hash)
-      throws P11TokenException {
+  private byte[] sm2SignHash(byte[] hash) throws P11TokenException {
     ConcurrentBagEntry<SM2Signer> sig0;
     try {
       sig0 = sm2Signers.borrow(5000, TimeUnit.MILLISECONDS);
@@ -542,8 +538,7 @@ public class EmulatorP11Identity extends P11Identity {
     }
   } // method sm2SignHash
 
-  private byte[] sm2Sign(P11Params params, byte[] dataToSign)
-      throws P11TokenException {
+  private byte[] sm2Sign(P11Params params, byte[] dataToSign) throws P11TokenException {
     if (params == null) {
       throw new P11TokenException("userId may not be null");
     }

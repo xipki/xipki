@@ -156,8 +156,7 @@ public class CtLogServlet extends HttpServlet {
     }
   } // method doPost
 
-  private static <T> T parse(InputStream in, Class<?> clazz)
-      throws IOException {
+  private static <T> T parse(InputStream in, Class<?> clazz) throws IOException {
     try {
       return JSON.parseObject(in, clazz);
     } catch (RuntimeException | IOException ex) {

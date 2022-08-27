@@ -73,8 +73,7 @@ public class CertificatePolicies extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notNull(type, "type");
       notBlank(value, "value");
     }
@@ -109,8 +108,7 @@ public class CertificatePolicies extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notNull(policyIdentifier, "policyIdentifier");
       validate(policyIdentifier);
       validate(policyQualifiers);
@@ -133,8 +131,7 @@ public class CertificatePolicies extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notEmpty(certificatePolicyInformations, "certificatePolicyInformations");
     validate(certificatePolicyInformations);
   }

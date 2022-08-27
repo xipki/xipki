@@ -485,8 +485,7 @@ public class SdkResponder {
     }
   } // enroll
 
-  private SdkResponse poll(X509Ca ca, byte[] request)
-      throws OperationException {
+  private SdkResponse poll(X509Ca ca, byte[] request) throws OperationException {
     PollCertRequest req = PollCertRequest.decode(request);
     assertIssuerMatch(ca, req.getIssuer(), req.getAuthorityKeyIdentifier(), req.getIssuerCertSha1Fp());
 

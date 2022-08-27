@@ -88,8 +88,7 @@ class IaikP11Identity extends P11Identity {
   } // constructor
 
   @Override
-  protected byte[] digestSecretKey0(long mechanism)
-      throws P11TokenException {
+  protected byte[] digestSecretKey0(long mechanism) throws P11TokenException {
     if (! (signingKey instanceof SecretKey)) {
       throw new P11TokenException("could not digest asymmetric key");
     }

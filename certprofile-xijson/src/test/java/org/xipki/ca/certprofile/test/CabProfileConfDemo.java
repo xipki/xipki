@@ -79,7 +79,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null));
 
-      marshall(profile, destFilename, true);
+    marshall(profile, destFilename, true);
   } // method certprofileCabRootCa
 
   private static void certprofileCabSubCa(String destFilename) {

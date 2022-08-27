@@ -63,8 +63,7 @@ public class MiscCaActions {
     private List<String> publisherNames;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (publisherNames == null) {
         throw new IllegalStateException("should not reach here");
       }
@@ -100,8 +99,7 @@ public class MiscCaActions {
   @Service
   public static class ExportConf extends CaAction {
 
-    @Option(name = "--conf-file", required = true,
-        description = "zip file that saves the exported configuration")
+    @Option(name = "--conf-file", required = true, description = "zip file that saves the exported configuration")
     @Completion(FileCompleter.class)
     private String confFile;
 
@@ -111,8 +109,7 @@ public class MiscCaActions {
     private List<String> caNames;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       String msg = "configuration to file " + confFile;
       try {
         InputStream is = caManager.exportConf(caNames);
@@ -143,8 +140,7 @@ public class MiscCaActions {
     private String outDir = ".";
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       String msg = "configuration " + confFile;
       try {
         InputStream confStream;
@@ -179,8 +175,7 @@ public class MiscCaActions {
   public static class NotifyChange extends CaAction {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       String msg = "the change of CA system";
       try {
         caManager.notifyCaChange();
@@ -202,8 +197,7 @@ public class MiscCaActions {
     protected String type;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       caManager.refreshTokenForSignerType(type);
       println("refreshed token for signer type " + type);
       return null;
@@ -228,8 +222,7 @@ public class MiscCaActions {
     private List<String> publisherNames;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (publisherNames == null) {
         throw new IllegalStateException("should not reach here");
       }
@@ -270,8 +263,7 @@ public class MiscCaActions {
     private String name;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       try {
         caManager.restartCa(name);
         System.out.println("restarted CA " + name);
@@ -288,8 +280,7 @@ public class MiscCaActions {
   public static class Restart extends CaAction {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       try {
         caManager.restartCaSystem();
       } catch (CaMgmtException ex) {
@@ -319,8 +310,7 @@ public class MiscCaActions {
   public static class SystemStatus extends CaAction {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CaSystemStatus status = caManager.getCaSystemStatus();
       if (status != null) {
         println(status.toString());
@@ -364,8 +354,7 @@ public class MiscCaActions {
     private Integer slotIndex;
 
     @Override
-    protected Object execute0()
-            throws Exception {
+    protected Object execute0() throws Exception {
       try {
         String tokenInfo = caManager.getTokenInfoP11(moduleName, slotIndex, verbose);
         println(tokenInfo);

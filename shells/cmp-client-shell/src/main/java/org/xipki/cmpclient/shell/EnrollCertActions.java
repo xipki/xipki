@@ -75,8 +75,7 @@ public class EnrollCertActions {
     @Completion(FileCompleter.class)
     private String csrFile;
 
-    @Option(name = "--profile", aliases = "-p", required = true,
-        description = "certificate profile")
+    @Option(name = "--profile", aliases = "-p", required = true, description = "certificate profile")
     private String profile;
 
     @Option(name = "--not-before", description = "notBefore, UTC time of format yyyyMMddHHmmss")
@@ -94,8 +93,7 @@ public class EnrollCertActions {
     private String outputFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
 
       Date notBefore = StringUtil.isNotBlank(notBeforeS) ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
@@ -153,8 +151,7 @@ public class EnrollCertActions {
     private String password;
 
     @Override
-    protected SubjectPublicKeyInfo getPublicKey()
-        throws Exception {
+    protected SubjectPublicKeyInfo getPublicKey() throws Exception {
       return null;
     }
 
@@ -167,8 +164,7 @@ public class EnrollCertActions {
     }
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       EnrollCertResult result = enroll();
 
       CertifiedKeyPairOrError certOrError = null;
@@ -222,8 +218,7 @@ public class EnrollCertActions {
     } // method execute0
 
     @Override
-    protected EnrollType getCmpReqType()
-        throws Exception {
+    protected EnrollType getCmpReqType() throws Exception {
       if ("cr".equalsIgnoreCase(cmpreqType)) {
         return EnrollCertRequest.EnrollType.CERT_REQ;
       } else if ("ir".equalsIgnoreCase(cmpreqType)) {
@@ -233,8 +228,7 @@ public class EnrollCertActions {
       }
     } // method getCmpReqType
 
-    private char[] getPassword()
-        throws IOException {
+    private char[] getPassword() throws IOException {
       char[] pwdInChar = readPasswordIfNotSet(password);
       if (pwdInChar != null) {
         password = new String(pwdInChar);
@@ -265,8 +259,7 @@ public class EnrollCertActions {
     private ConcurrentContentSigner signer;
 
     @Override
-    protected ConcurrentContentSigner getSigner()
-        throws ObjectCreationException {
+    protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
       if (signer == null) {
         byte[] keyIdBytes = null;
         if (keyId != null) {
@@ -429,18 +422,15 @@ public class EnrollCertActions {
     @Completion(FileCompleter.class)
     private String extraExtensionsFile;
 
-    protected abstract SubjectPublicKeyInfo getPublicKey()
-        throws Exception;
+    protected abstract SubjectPublicKeyInfo getPublicKey() throws Exception;
 
     protected abstract EnrollCertRequest.Entry buildEnrollCertRequestEntry(
         String id, String profile, CertRequest certRequest)
         throws Exception;
 
-    protected abstract EnrollCertRequest.EnrollType getCmpReqType()
-        throws Exception;
+    protected abstract EnrollCertRequest.EnrollType getCmpReqType() throws Exception;
 
-    protected EnrollCertResult enroll()
-        throws Exception {
+    protected EnrollCertResult enroll() throws Exception {
       EnrollCertRequest.EnrollType type = getCmpReqType();
 
       if (extkeyusages != null) {
@@ -706,8 +696,7 @@ public class EnrollCertActions {
         throws ObjectCreationException, CmpClientException;
 
     @Override
-    protected SubjectPublicKeyInfo getPublicKey()
-        throws Exception {
+    protected SubjectPublicKeyInfo getPublicKey() throws Exception {
       return getSigner().getCertificate().getSubjectPublicKeyInfo();
     }
 
@@ -730,8 +719,7 @@ public class EnrollCertActions {
     } // method buildEnrollCertRequestEntry
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       EnrollCertResult result = enroll();
 
       CertifiedKeyPairOrError certOrError = null;
@@ -754,8 +742,7 @@ public class EnrollCertActions {
     } // method execute0
 
     @Override
-    protected EnrollType getCmpReqType()
-        throws Exception {
+    protected EnrollType getCmpReqType() throws Exception {
       if ("cr".equalsIgnoreCase(cmpreqType)) {
         return EnrollCertRequest.EnrollType.CERT_REQ;
       } else if ("ir".equalsIgnoreCase(cmpreqType)) {

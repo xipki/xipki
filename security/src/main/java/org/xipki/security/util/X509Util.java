@@ -121,8 +121,7 @@ public class X509Util {
     return new X500Name(newRdn);
   }
 
-  public static X509Cert parseCert(File file)
-      throws IOException, CertificateException {
+  public static X509Cert parseCert(File file) throws IOException, CertificateException {
     notNull(file, "file");
     try (InputStream in = Files.newInputStream(expandFilepath(file).toPath())) {
       return parseCert(in);
@@ -157,8 +156,7 @@ public class X509Util {
     return parseCert(read(certStream));
   }
 
-  public static X509Cert parseCert(byte[] bytes)
-      throws CertificateEncodingException {
+  public static X509Cert parseCert(byte[] bytes) throws CertificateEncodingException {
     notNull(bytes, "bytes");
 
     byte[] certBytes = null;
@@ -200,8 +198,7 @@ public class X509Util {
     return new X509Cert(certHolder, derBytes);
   }
 
-  public static CertificationRequest parseCsr(File file)
-      throws IOException {
+  public static CertificationRequest parseCsr(File file) throws IOException {
     notNull(file, "file");
     try (InputStream in = Files.newInputStream(expandFilepath(file).toPath())) {
       return parseCsr(in);
@@ -264,8 +261,7 @@ public class X509Util {
     return bytes;
   } // method toDerEncoded
 
-  private static CertificateFactory getCertFactory()
-      throws CertificateException {
+  private static CertificateFactory getCertFactory() throws CertificateException {
     synchronized (certFactLock) {
       if (certFact == null) {
         try {
@@ -295,8 +291,7 @@ public class X509Util {
     return parseCrl(Files.readAllBytes(expandFilepath(file).toPath()));
   }
 
-  public static X509CRLHolder parseCrl(byte[] encodedCrl)
-      throws CRLException {
+  public static X509CRLHolder parseCrl(byte[] encodedCrl) throws CRLException {
     notNull(encodedCrl, "encodedCrl");
 
     byte[] derBytes = toDerEncoded(encodedCrl);

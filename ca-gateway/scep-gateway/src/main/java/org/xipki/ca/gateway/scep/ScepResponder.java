@@ -731,7 +731,7 @@ public class ScepResponder {
       throw FailInfoException.BAD_REQUEST;
     }
 
-    byte[] crl = null;
+    byte[] crl;
     try {
       crl = sdk.currentCrl(caName);
     } catch (IOException e) {
@@ -797,37 +797,6 @@ public class ScepResponder {
           "Certificate profile " + certprofile + " is not permitted for user " + requestor.getName());
     }
   } // method checkUserPermission
-
-  private static byte[] getTransactionIdBytes(String tid)
-      throws OperationException {
-    byte[] bytes = null;
-    final int n = tid.length();
-    if (n % 2 != 0) { // neither hex nor base64 encoded
-      bytes = StringUtil.toUtf8Bytes(tid);
-    } else {
-      try {
-        bytes = Hex.decode(tid);
-      } catch (Exception ex) {
-        if (n % 4 == 0) {
-          try {
-            bytes = Base64.decode(tid);
-          } catch (Exception ex2) {
-            LOG.error("could not decode (hex or base64) '{}': {}", tid, ex2.getMessage());
-          }
-        }
-      }
-    }
-
-    if (bytes == null) {
-      bytes = StringUtil.toUtf8Bytes(tid);
-    }
-
-    if (bytes.length > 20) {
-      throw new OperationException(BAD_REQUEST, "transactionID too long");
-    }
-
-    return bytes;
-  } // method getTransactionIdBytes
 
   private static void audit(AuditEvent audit, String name, String value) {
     audit.addEventData(name, (value == null) ? "null" : value);

@@ -53,8 +53,7 @@ public class CrlServletFilter implements Filter {
   private boolean hasSha1Column;
 
   @Override
-  public void init(FilterConfig filterConfig)
-          throws ServletException {
+  public void init(FilterConfig filterConfig) throws ServletException {
     XipkiBaseDir.init();
     try {
       this.dataSource = new DataSourceFactory().createDataSourceForFile("ca", DFLT_CA_SERVER_CFG, null);

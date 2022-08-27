@@ -44,8 +44,7 @@ public class RSAPkcsPssParams extends ProxyMessage {
     this.pkcsPssParams = Args.notNull(pkcsPssParams, "pkcsPssParams");
   }
 
-  private RSAPkcsPssParams(ASN1Sequence seq)
-      throws BadAsn1ObjectException {
+  private RSAPkcsPssParams(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 3, 3);
     int idx = 0;
     long contentHash = getInteger(seq.getObjectAt(idx++)).longValue();
@@ -54,8 +53,7 @@ public class RSAPkcsPssParams extends ProxyMessage {
     this.pkcsPssParams = new P11RSAPkcsPssParams(contentHash, mgfHash, saltLength);
   } // constructor
 
-  public static RSAPkcsPssParams getInstance(Object obj)
-      throws BadAsn1ObjectException {
+  public static RSAPkcsPssParams getInstance(Object obj) throws BadAsn1ObjectException {
     if (obj == null || obj instanceof RSAPkcsPssParams) {
       return (RSAPkcsPssParams) obj;
     }

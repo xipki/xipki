@@ -40,8 +40,7 @@ public class ValidityModel extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notNull(modelId, "modelId");
     validate(modelId);
   }

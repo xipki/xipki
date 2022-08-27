@@ -73,8 +73,8 @@ public class ResponseCacher implements Closeable {
 
   private static final String SQL_DELETE_EXPIRED_RESP = "DELETE FROM OCSP WHERE GENERATED_AT<? OR NEXT_UPDATE<?";
 
-  private static final String SQL_ADD_RESP =
-      SqlUtil.buildInsertSql("OCSP", "ID,IID,IDENT,GENERATED_AT,NEXT_UPDATE,RESP");
+  private static final String SQL_ADD_RESP = SqlUtil.buildInsertSql("OCSP",
+      "ID,IID,IDENT,GENERATED_AT,NEXT_UPDATE,RESP");
 
   private static final String SQL_UPDATE_RESP = "UPDATE OCSP SET GENERATED_AT=?,NEXT_UPDATE=?,RESP=? WHERE ID=?";
 
@@ -218,8 +218,7 @@ public class ResponseCacher implements Closeable {
   } // method close
 
   public IssuerEntry getIssuer(RequestIssuer reqIssuer) {
-    IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
-    return (issuer == null) ? null : issuer;
+    return issuerStore.getIssuerForFp(reqIssuer);
   }
 
   public synchronized IssuerEntry storeIssuer(X509Cert issuerCert)

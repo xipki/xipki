@@ -58,16 +58,14 @@ public class SlotIdAndObjectId extends ProxyMessage {
     this.objectId = Args.notNull(objectId, "objectId");
   }
 
-  private SlotIdAndObjectId(ASN1Sequence seq)
-      throws BadAsn1ObjectException {
+  private SlotIdAndObjectId(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 2, 2);
     int idx = 0;
     this.slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++));
     this.objectId = ObjectIdentifier.getInstance(seq.getObjectAt(idx++));
   }
 
-  public static SlotIdAndObjectId getInstance(Object obj)
-      throws BadAsn1ObjectException {
+  public static SlotIdAndObjectId getInstance(Object obj) throws BadAsn1ObjectException {
     if (obj == null || obj instanceof SlotIdAndObjectId) {
       return (SlotIdAndObjectId) obj;
     }

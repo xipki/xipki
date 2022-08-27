@@ -23,6 +23,7 @@ import org.xipki.util.StringUtil;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Certificate entry containing the serial number, revocation information and hash value of
@@ -184,7 +185,7 @@ class DigestEntry {
   } // method getIndexes
 
   private static boolean equals(Object obj1, Object obj2) {
-    return (obj1 == null) ? (obj2 == null) : obj1.equals(obj2);
+    return Objects.equals(obj1, obj2);
   }
 
 }

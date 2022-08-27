@@ -75,8 +75,7 @@ public class QaCaActions {
     private CaQaSystemManager qaSystemManager;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       boolean succ = qaSystemManager.init();
       if (succ) {
         println("CA QA system initialized successfully");
@@ -115,8 +114,7 @@ public class QaCaActions {
     private CaQaSystemManager qaSystemManager;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       Set<String> issuerNames = qaSystemManager.getIssuerNames();
       if (isEmpty(issuerNames)) {
         throw new IllegalCmdParamException("no issuer is configured");
@@ -206,8 +204,7 @@ public class QaCaActions {
     private String aliasName;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("checking CA alias='" + aliasName + "', CA='" + caName + "'");
       String tmpCaName = caManager.getCaNameForAlias(aliasName);
       if (tmpCaName == null) {
@@ -255,8 +252,7 @@ public class QaCaActions {
   @Service
   public static class CmpBenchmarkCaGenEnroll extends AbstractCmpBenchmarkEnroll {
     @Override
-    protected Object execute0()
-            throws Exception {
+    protected Object execute0() throws Exception {
       if (numThreads < 1) {
         throw new IllegalCmdParamException("invalid number of threads " + numThreads);
       }
@@ -300,8 +296,7 @@ public class QaCaActions {
     private String curveName;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (numThreads < 1) {
         throw new IllegalCmdParamException("invalid number of threads " + numThreads);
       }
@@ -353,8 +348,7 @@ public class QaCaActions {
   public static class CaCheck extends CaActions.CaUp {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       ChangeCaEntry ey = getChangeCaEntry();
       String caName = ey.getIdent().getName();
       println("checking CA " + caName);
@@ -485,8 +479,7 @@ public class QaCaActions {
     private String profileName;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("checking CA profile CA='" + caName + "', profile='" + profileName + "'");
 
       if (caManager.getCa(caName) == null) {
@@ -517,8 +510,7 @@ public class QaCaActions {
     private String publisherName;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("checking CA publisher CA='" + caName + "', publisher='" + publisherName + "'");
 
       if (caManager.getCa(caName) == null) {
@@ -562,8 +554,7 @@ public class QaCaActions {
     private Set<String> profiles;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("checking CA requestor CA='" + caName + "', requestor='" + requestorName + "'");
 
       if (caManager.getCa(caName) == null) {
@@ -615,8 +606,7 @@ public class QaCaActions {
   public static class ProfileCheck extends ProfileCaActions.ProfileUp {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("checking profile " + name);
 
       if (type == null && conf == null && confFile == null) {
@@ -646,8 +636,7 @@ public class QaCaActions {
   public static class PublisherCheck extends PublisherCaActions.PublisherUp {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("checking publisher " + name);
 
       PublisherEntry cp = caManager.getPublisher(name);
@@ -674,8 +663,7 @@ public class QaCaActions {
   public static class RequestorCheck extends RequestorCaActions.RequestorUp {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("checking requestor " + name);
 
       RequestorEntry cr = caManager.getRequestor(name);
@@ -709,8 +697,7 @@ public class QaCaActions {
   public static class SignerCheck extends SignerCaActions.SignerUp {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("checking signer " + name);
 
       SignerEntry cr = caManager.getSigner(name);

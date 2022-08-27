@@ -57,8 +57,7 @@ public class P12ContentSignerBuilder {
 
     private final SignAlgo signAlgo;
 
-    private RSAContentSignerBuilder(SignAlgo signAlgo)
-        throws NoSuchAlgorithmException {
+    private RSAContentSignerBuilder(SignAlgo signAlgo) throws NoSuchAlgorithmException {
       super(signAlgo.getAlgorithmIdentifier(), signAlgo.getHashAlgo().getAlgorithmIdentifier());
       this.signAlgo = signAlgo;
     }
@@ -84,8 +83,7 @@ public class P12ContentSignerBuilder {
 
     private final SignAlgo signAlgo;
 
-    private DSAContentSignerBuilder(SignAlgo signAlgo)
-        throws NoSuchAlgorithmException {
+    private DSAContentSignerBuilder(SignAlgo signAlgo) throws NoSuchAlgorithmException {
       super(signAlgo.getAlgorithmIdentifier(), signAlgo.getHashAlgo().getAlgorithmIdentifier());
       this.signAlgo = signAlgo;
     }
@@ -103,8 +101,7 @@ public class P12ContentSignerBuilder {
 
     private final SignAlgo signAlgo;
 
-    private ECDSAContentSignerBuilder(SignAlgo signAlgo)
-        throws NoSuchAlgorithmException {
+    private ECDSAContentSignerBuilder(SignAlgo signAlgo) throws NoSuchAlgorithmException {
       super(signAlgo.getAlgorithmIdentifier(), signAlgo.getHashAlgo().getAlgorithmIdentifier());
       this.signAlgo = signAlgo;
     }
@@ -127,8 +124,7 @@ public class P12ContentSignerBuilder {
 
     private final SignAlgo signAlgo;
 
-    private SM2ContentSignerBuilder(SignAlgo signAlgo)
-        throws NoSuchAlgorithmException {
+    private SM2ContentSignerBuilder(SignAlgo signAlgo) throws NoSuchAlgorithmException {
       super(signAlgo.getAlgorithmIdentifier(), signAlgo.getHashAlgo().getAlgorithmIdentifier());
       this.signAlgo = signAlgo;
     }

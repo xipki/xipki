@@ -325,7 +325,7 @@ public abstract class BaseCertprofile extends Certprofile {
       DSAParametersOption dsaOption = (DSAParametersOption) keyParamsOption;
       ASN1Encodable params = publicKey.getAlgorithm().getParameters();
       if (params == null) {
-        throw new BadCertTemplateException("null Dss-Parms is not permitted");
+        throw new BadCertTemplateException("null Dss-Params is not permitted");
       }
 
       int plength;
@@ -338,7 +338,7 @@ public abstract class BaseCertprofile extends Certprofile {
         plength = rsaP.getPositiveValue().bitLength();
         qlength = rsaQ.getPositiveValue().bitLength();
       } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException ex) {
-        throw new BadCertTemplateException("illegal Dss-Parms");
+        throw new BadCertTemplateException("illegal Dss-Params");
       }
 
       boolean match = dsaOption.allowsPlength(plength);
@@ -369,8 +369,7 @@ public abstract class BaseCertprofile extends Certprofile {
     return new RDN(type, rdnValue);
   } // method createSubjectRdn
 
-  protected void fixRdnControl(RdnControl rdnControl)
-      throws CertprofileException {
+  protected void fixRdnControl(RdnControl rdnControl) throws CertprofileException {
     SubjectDnSpec.fixRdnControl(rdnControl);
   }
 
@@ -385,8 +384,7 @@ public abstract class BaseCertprofile extends Certprofile {
    * @throws BadCertTemplateException
    *         If requestedName is invalid or contains entries which are not allowed in the modes.
    */
-  public static GeneralName createGeneralName(GeneralName requestedName,
-      Set<Certprofile.GeneralNameMode> modes)
+  public static GeneralName createGeneralName(GeneralName requestedName, Set<Certprofile.GeneralNameMode> modes)
       throws BadCertTemplateException {
     Args.notNull(requestedName, "requestedName");
 

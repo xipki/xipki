@@ -60,8 +60,7 @@ public class AlgorithmType extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notEmpty(algorithms, "algorithms");
     validate(algorithms);
     validate(parameters);

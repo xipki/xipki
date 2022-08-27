@@ -175,8 +175,7 @@ public class Actions {
         throws Exception;
 
     @Override
-    protected final Object execute0()
-        throws Exception {
+    protected final Object execute0() throws Exception {
       if (StringUtil.isBlank(serialNumberList) && isEmpty(certFiles)) {
         throw new IllegalCmdParamException("Neither serialNumbers nor certFiles is set");
       }
@@ -316,8 +315,7 @@ public class Actions {
       return null;
     } // method execute0
 
-    public static List<String> extractOcspUrls(X509Cert cert)
-        throws CertificateEncodingException {
+    public static List<String> extractOcspUrls(X509Cert cert) {
       byte[] extnValue = cert.getExtensionCoreValue(Extension.authorityInfoAccess);
       if (extnValue == null) {
         return Collections.emptyList();
@@ -327,8 +325,7 @@ public class Actions {
       return extractOcspUrls(aia);
     } // method extractOcspUrls
 
-    public static List<String> extractOcspUrls(X509AttributeCertificateHolder cert)
-        throws CertificateEncodingException {
+    public static List<String> extractOcspUrls(X509AttributeCertificateHolder cert) {
       byte[] extValue = X509Util.getCoreExtValue(cert.getExtensions(), Extension.authorityInfoAccess);
       if (extValue == null) {
         return Collections.emptyList();
@@ -391,8 +388,7 @@ public class Actions {
     @Option(name = "--sign", description = "sign request")
     protected Boolean signRequest = Boolean.FALSE;
 
-    protected RequestOptions getRequestOptions()
-        throws Exception {
+    protected RequestOptions getRequestOptions() throws Exception {
       RequestOptions options = new RequestOptions();
       options.setUseNonce(usenonce);
       if (nonceLen != null) {

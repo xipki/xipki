@@ -106,8 +106,7 @@ public class Actions {
     protected String hashAlgo = "SHA256";
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       X509Cert cert = X509Util.parseCert(IoUtil.read(inFile));
 
       if (serial != null && serial) {
@@ -180,8 +179,7 @@ public class Actions {
     private static final byte[] CRLF = new byte[]{'\r', '\n'};
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       File realInFile = new File(IoUtil.expandFilepath(inFile));
       File realOutFile = new File(IoUtil.expandFilepath(outFile));
 
@@ -296,8 +294,7 @@ public class Actions {
     private Boolean nextUpdate;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CertificateList crl = CertificateList.getInstance(X509Util.toDerEncoded(IoUtil.read(inFile)));
 
       if (crlNumber != null && crlNumber) {
@@ -457,11 +454,10 @@ public class Actions {
      * @throws Exception
      *           If getting signer failed.
      */
-    protected abstract ConcurrentContentSigner getSigner()
-            throws Exception;
+    protected abstract ConcurrentContentSigner getSigner() throws Exception;
 
     protected List<X509Cert> getPeerCertificates()
-            throws CertificateException, IOException {
+        throws CertificateException, IOException {
       if (StringUtil.isNotBlank(peerCertsFile)) {
         return X509Util.parseCerts(new FileInputStream(peerCertsFile));
       } else if (StringUtil.isNotBlank(peerCertFile)) {
@@ -473,8 +469,7 @@ public class Actions {
     } // method getPeerCertificates
 
     @Override
-    protected Object execute0()
-            throws Exception {
+    protected Object execute0() throws Exception {
       ConcurrentContentSigner signer = getSigner();
 
       SubjectPublicKeyInfo subjectPublicKeyInfo;
@@ -822,8 +817,7 @@ public class Actions {
     private String keystorePassword;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CertificationRequest csr = X509Util.parseCsr(IoUtil.read(csrFile));
 
       ASN1ObjectIdentifier algOid = csr.getSignatureAlgorithm().getAlgorithm();
@@ -901,8 +895,7 @@ public class Actions {
     private List<String> certFiles;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       File realKsFile = new File(IoUtil.expandFilepath(ksFile));
       KeyStore ks = KeyStore.getInstance(ksType);
       char[] password = readPasswordIfNotSet(ksPwd);
@@ -993,8 +986,7 @@ public class Actions {
     private String outKeyPass;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       KeyStore srcKs;
       if (StringUtil.isBlank(inProvider)) {
         srcKs = KeyStore.getInstance(inType);

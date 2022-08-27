@@ -53,8 +53,7 @@ public class Actions {
     private String prompt;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       boolean toContinue = confirm(prompt + "\nDo you want to continue", 3);
       if (!toContinue) {
         throw new CmdFailure("User cancelled");
@@ -78,8 +77,7 @@ public class Actions {
     private String dest;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       source = expandFilepath(source);
       dest = expandFilepath(dest);
 
@@ -124,8 +122,7 @@ public class Actions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       source = expandFilepath(source);
       dest = expandFilepath(dest);
 
@@ -167,8 +164,7 @@ public class Actions {
     private String target;
 
     @Override
-    protected Object execute0()
-            throws Exception {
+    protected Object execute0() throws Exception {
       return new File(target).exists();
     }
 
@@ -211,8 +207,7 @@ public class Actions {
     private org.xipki.util.Curl curl;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       byte[] content = null;
       if (postData != null) {
         content = postData.getBytes(postDataCharSet);
@@ -310,8 +305,7 @@ public class Actions {
     private String dirName;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       File target = new File(expandFilepath(dirName));
       if (target.exists()) {
         if (!target.isDirectory()) {
@@ -340,8 +334,7 @@ public class Actions {
     private String dest;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       source = expandFilepath(source);
       dest = expandFilepath(dest);
 
@@ -387,8 +380,7 @@ public class Actions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       source = expandFilepath(source);
       dest = expandFilepath(dest);
 
@@ -437,8 +429,7 @@ public class Actions {
     private String newText;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       File sourceFile = new File(expandFilepath(source));
       if (!sourceFile.exists()) {
         System.err.println(source + " does not exist");
@@ -503,8 +494,7 @@ public class Actions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       targetPath = expandFilepath(targetPath);
 
       File target = new File(targetPath);
@@ -543,8 +533,7 @@ public class Actions {
     private String format = "yyyyMMdd-HHmmss";
 
     @Override
-    protected Object execute0()
-            throws Exception {
+    protected Object execute0() throws Exception {
       SimpleDateFormat sdf = new SimpleDateFormat(format);
       return sdf.format(new Date());
     }
@@ -561,8 +550,7 @@ public class Actions {
     private Boolean printArch;
 
     @Override
-    protected Object execute0()
-            throws Exception {
+    protected Object execute0() throws Exception {
       String name = System.getProperty("os.name").toLowerCase(Locale.ROOT);
       if (name.startsWith("windows")) {
         name = "windows";

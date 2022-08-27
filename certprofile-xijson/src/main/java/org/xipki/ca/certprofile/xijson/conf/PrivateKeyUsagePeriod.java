@@ -39,8 +39,7 @@ public class PrivateKeyUsagePeriod extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notBlank(validity, "validity");
   }
 

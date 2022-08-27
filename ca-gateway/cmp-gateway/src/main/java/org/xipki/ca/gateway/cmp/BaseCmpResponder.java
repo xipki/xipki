@@ -50,10 +50,10 @@ import org.xipki.ca.gateway.*;
 import org.xipki.ca.sdk.ErrorResponse;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.SdkErrorResponseException;
+import org.xipki.cmpclient.CmpUtil;
+import org.xipki.cmpclient.ProtectionResult;
+import org.xipki.cmpclient.ProtectionVerificationResult;
 import org.xipki.security.*;
-import org.xipki.security.cmp.CmpUtil;
-import org.xipki.security.cmp.ProtectionResult;
-import org.xipki.security.cmp.ProtectionVerificationResult;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
 import org.xipki.util.PermissionConstants;
@@ -125,15 +125,13 @@ abstract class BaseCmpResponder {
 
   private static final int PVNO_CMP2000 = 2;
 
-  private static final AlgorithmIdentifier prf_hmacWithSHA256 =
-      SignAlgo.HMAC_SHA256.getAlgorithmIdentifier();
+  private static final AlgorithmIdentifier prf_hmacWithSHA256 = SignAlgo.HMAC_SHA256.getAlgorithmIdentifier();
 
   private static final ConcurrentBag<ConcurrentBagEntry<Cipher>> aesGcm_ciphers;
 
   private static final ConcurrentBag<ConcurrentBagEntry<SecretKeyFactory>> pbkdf2_kdfs;
 
-  private static final Map<ErrorCode, Integer> errorCodeToPkiFailureMap
-      = new HashMap<>(20);
+  private static final Map<ErrorCode, Integer> errorCodeToPkiFailureMap = new HashMap<>(20);
 
   private static final boolean aesGcm_ciphers_initialized;
 
@@ -241,8 +239,7 @@ abstract class BaseCmpResponder {
   protected abstract PKIBody revokePendingCertificates(String caName, ASN1OctetString transactionId)
       throws SdkErrorResponseException;
 
-  private Requestor getCertRequestor(
-      X500Name requestorSender, byte[] senderKID, CMPCertificate[] extraCerts) {
+  private Requestor getCertRequestor(X500Name requestorSender, byte[] senderKID, CMPCertificate[] extraCerts) {
     if (extraCerts == null) {
       return null;
     }
@@ -379,8 +376,8 @@ abstract class BaseCmpResponder {
     if (respBody.getType() == PKIBody.TYPE_ERROR) {
       ErrorMsgContent errorMsgContent = (ErrorMsgContent) respBody.getContent();
 
-      org.xipki.security.cmp.PkiStatusInfo pkiStatus =
-          new org.xipki.security.cmp.PkiStatusInfo(errorMsgContent.getPKIStatusInfo());
+      org.xipki.cmpclient.PkiStatusInfo pkiStatus =
+          new org.xipki.cmpclient.PkiStatusInfo(errorMsgContent.getPKIStatusInfo());
 
       event.setStatus(AuditStatus.FAILED);
       String statusString = pkiStatus.statusMessage();
@@ -712,16 +709,14 @@ abstract class BaseCmpResponder {
     }
   } // method checkPermission
 
-  protected static PKIBody buildErrorMsgPkiBody(PKIStatus pkiStatus, int failureInfo,
-      String statusMessage) {
+  protected static PKIBody buildErrorMsgPkiBody(PKIStatus pkiStatus, int failureInfo, String statusMessage) {
     PKIFreeText pkiStatusMsg = (statusMessage == null) ? null : new PKIFreeText(statusMessage);
     ErrorMsgContent emc = new ErrorMsgContent(
         new PKIStatusInfo(pkiStatus, pkiStatusMsg, new PKIFailureInfo(failureInfo)));
     return new PKIBody(PKIBody.TYPE_ERROR, emc);
   }
 
-  protected static CertRepMessage buildErrCertResp(ASN1Integer certReqId, int pkiFailureInfo,
-      String pkiStatusText) {
+  protected static CertRepMessage buildErrCertResp(ASN1Integer certReqId, int pkiFailureInfo, String pkiStatusText) {
     return new CertRepMessage(null,
         new CertResponse[]{new CertResponse(certReqId, generateRejectionStatus(pkiFailureInfo, pkiStatusText))});
   }

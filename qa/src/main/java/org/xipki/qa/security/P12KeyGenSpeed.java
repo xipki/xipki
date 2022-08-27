@@ -43,8 +43,7 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
     private final int plength;
     private final int qlength;
 
-    public DSA(int plength, int qlength, SecurityFactory securityFactory)
-        throws Exception {
+    public DSA(int plength, int qlength, SecurityFactory securityFactory) {
       super("PKCS#12 DSA key generation\nplength: " + plength + "\nqlength: " + qlength, securityFactory);
 
       this.plength = plength;
@@ -52,8 +51,7 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
     }
 
     @Override
-    protected void generateKeypair(SecureRandom random)
-        throws Exception {
+    protected void generateKeypair(SecureRandom random) throws Exception {
       KeyUtil.generateDSAKeypair(plength, qlength, random);
     }
 
@@ -63,15 +61,13 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
 
     private final ASN1ObjectIdentifier curveOid;
 
-    public EC(ASN1ObjectIdentifier curveOid, SecurityFactory securityFactory)
-        throws Exception {
+    public EC(ASN1ObjectIdentifier curveOid, SecurityFactory securityFactory) {
       super("PKCS#12 EC key generation\ncurve: " + curveOid.getId(), securityFactory);
       this.curveOid = curveOid;
     }
 
     @Override
-    protected void generateKeypair(SecureRandom random)
-        throws Exception {
+    protected void generateKeypair(SecureRandom random) throws Exception {
       if (EdECConstants.isEdwardsOrMontgomeryCurve(curveOid)) {
         KeyUtil.generateEdECKeypair(curveOid, random);
       } else {
@@ -86,8 +82,7 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
     private final int keysize;
     private final BigInteger publicExponent;
 
-    public RSA(int keysize, BigInteger publicExponent, SecurityFactory securityFactory)
-        throws Exception {
+    public RSA(int keysize, BigInteger publicExponent, SecurityFactory securityFactory) {
       super("PKCS#12 RSA key generation\nkeysize: " + keysize
           + "\npublic exponent: " + publicExponent, securityFactory);
 
@@ -133,8 +128,7 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
       throws Exception;
 
   @Override
-  protected Runnable getTestor()
-      throws Exception {
+  protected Runnable getTestor() throws Exception {
     return new Testor();
   }
 

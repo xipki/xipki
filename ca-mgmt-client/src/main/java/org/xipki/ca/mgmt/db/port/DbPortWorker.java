@@ -158,8 +158,7 @@ public abstract class DbPortWorker extends DbWorker {
     }
 
     @Override
-    protected void run0()
-        throws Exception {
+    protected void run0() throws Exception {
       if (password != null) {
         decrypt(srcFolder);
       }
@@ -230,8 +229,7 @@ public abstract class DbPortWorker extends DbWorker {
       checkDestFolder();
     }
 
-    private void checkDestFolder()
-        throws IOException {
+    private void checkDestFolder() throws IOException {
       File file = new File(destFolder);
       if (!file.exists()) {
         file.mkdirs();
@@ -259,8 +257,7 @@ public abstract class DbPortWorker extends DbWorker {
     } // method checkDestFolder
 
     @Override
-    protected void run0()
-        throws Exception {
+    protected void run0() throws Exception {
       long start = System.currentTimeMillis();
       try {
         if (!resume) {
@@ -335,8 +332,7 @@ public abstract class DbPortWorker extends DbWorker {
     } // constructor
 
     @Override
-    protected void run0()
-        throws Exception {
+    protected void run0() throws Exception {
       long start = System.currentTimeMillis();
       try {
         // CertStore
@@ -380,8 +376,7 @@ public abstract class DbPortWorker extends DbWorker {
     }
 
     @Override
-    protected void run0()
-        throws Exception {
+    protected void run0() throws Exception {
       long start = System.currentTimeMillis();
       if (password != null) {
         decrypt(srcFolder);
@@ -429,8 +424,7 @@ public abstract class DbPortWorker extends DbWorker {
     }
 
     @Override
-    protected void run0()
-        throws Exception {
+    protected void run0() throws Exception {
       long start = System.currentTimeMillis();
       if (password != null) {
         decrypt(srcFolder);

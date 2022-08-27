@@ -52,8 +52,7 @@ class CaconfDbImporter extends DbPorter {
     super(datasource, srcDir, stopMe);
   }
 
-  public void importToDb()
-      throws Exception {
+  public void importToDb() throws Exception {
     CaCertstore.Caconf caconf;
     try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_CA_CONFIGURATION))) {
       caconf = JSON.parseObject(is, CaCertstore.Caconf.class);

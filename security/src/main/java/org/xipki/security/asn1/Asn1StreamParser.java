@@ -93,8 +93,7 @@ public class Asn1StreamParser {
     return bytes;
   } // method readValue
 
-  public static int markAndReadTag(InputStream instream)
-      throws IOException {
+  public static int markAndReadTag(InputStream instream) throws IOException {
     instream.mark(10);
     return instream.read();
   }
@@ -160,8 +159,7 @@ public class Asn1StreamParser {
     }
   } // method readTime
 
-  public static void skip(InputStream instream, long count)
-      throws IOException {
+  public static void skip(InputStream instream, long count) throws IOException {
     long remaining = count;
     while (remaining > 0) {
       remaining -= instream.skip(remaining);

@@ -150,8 +150,7 @@ public class HttpMgmtServlet extends HttpServlet {
     }
   } // method doPost
 
-  private static String getNameFromRequest(InputStream in)
-      throws OcspMgmtException {
+  private static String getNameFromRequest(InputStream in) throws OcspMgmtException {
     MgmtRequest.Name req = parse(in, MgmtRequest.Name.class);
     return req.getName();
   }

@@ -53,8 +53,7 @@ public class Restriction extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notNull(type, "type");
     notBlank(text, "text");
   }

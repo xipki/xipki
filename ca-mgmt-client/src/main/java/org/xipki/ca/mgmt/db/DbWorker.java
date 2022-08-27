@@ -73,7 +73,6 @@ public abstract class DbWorker implements Runnable {
     }
   } // method run
 
-  protected abstract void run0()
-      throws Exception;
+  protected abstract void run0() throws Exception;
 
 }

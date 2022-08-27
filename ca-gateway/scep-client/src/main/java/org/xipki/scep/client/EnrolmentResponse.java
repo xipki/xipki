@@ -45,8 +45,7 @@ public final class EnrolmentResponse {
 
   private List<X509Cert> certificates;
 
-  public EnrolmentResponse(PkiMessage pkcsRep)
-      throws ScepClientException {
+  public EnrolmentResponse(PkiMessage pkcsRep) throws ScepClientException {
     Args.notNull(pkcsRep, "pkcsRep");
     MessageType messageType = pkcsRep.getMessageType();
     if (MessageType.CertRep != messageType) {

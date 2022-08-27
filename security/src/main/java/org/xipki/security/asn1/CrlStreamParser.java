@@ -147,8 +147,7 @@ public class CrlStreamParser extends Asn1StreamParser {
 
     private int offset;
 
-    private RevokedCertsIterator()
-        throws IOException {
+    private RevokedCertsIterator() throws IOException {
       this.instream = new BufferedInputStream(new FileInputStream(crlFile));
       skip(this.instream, firstRevokedCertificateOffset);
       this.offset = firstRevokedCertificateOffset;
@@ -235,8 +234,7 @@ public class CrlStreamParser extends Asn1StreamParser {
     } // method next0
 
     @Override
-    public void close()
-        throws IOException {
+    public void close() throws IOException {
       if (instream != null) {
         instream.close();
       }
@@ -277,8 +275,7 @@ public class CrlStreamParser extends Asn1StreamParser {
   // end index (exclusive) of tbsCertList
   private final int tbsCertListEndIndex;
 
-  public CrlStreamParser(File crlFile)
-      throws IOException {
+  public CrlStreamParser(File crlFile) throws IOException {
     this.crlFile = notNull(crlFile, "crlFile");
     // Round 1
     try (BufferedInputStream instream = new BufferedInputStream(
@@ -470,8 +467,7 @@ public class CrlStreamParser extends Asn1StreamParser {
     return crlExtensions;
   }
 
-  public boolean verifySignature(SubjectPublicKeyInfo publicKeyInfo)
-      throws IOException {
+  public boolean verifySignature(SubjectPublicKeyInfo publicKeyInfo) throws IOException {
     PublicKey publicKey;
     try {
       publicKey = KeyUtil.generatePublicKey(publicKeyInfo);
@@ -481,8 +477,7 @@ public class CrlStreamParser extends Asn1StreamParser {
     return verifySignature(publicKey);
   }
 
-  public boolean verifySignature(PublicKey publicKey)
-      throws IOException {
+  public boolean verifySignature(PublicKey publicKey) throws IOException {
     try {
       ContentVerifierProvider cvp = SignerUtil.getContentVerifierProvider(publicKey, null);
       ContentVerifier verifier = cvp.get(algorithmIdentifier);
@@ -526,8 +521,7 @@ public class CrlStreamParser extends Asn1StreamParser {
     }
   } // method verifySignature
 
-  public RevokedCertsIterator revokedCertificates()
-      throws IOException {
+  public RevokedCertsIterator revokedCertificates() throws IOException {
     return new RevokedCertsIterator();
   }
 }

@@ -72,8 +72,6 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private Integer maxSize;
 
-  private boolean raOnly;
-
   private NotBeforeOption notBeforeOption;
 
   private List<SignAlgo> signatureAlgorithms;
@@ -97,7 +95,6 @@ public class XijsonCertprofile extends BaseCertprofile {
     serialNumberMode = null;
     keyAlgorithms = null;
     maxSize = null;
-    raOnly = false;
     signatureAlgorithms = null;
     notBeforeOption = null;
     subjectControl = null;
@@ -113,8 +110,7 @@ public class XijsonCertprofile extends BaseCertprofile {
   }
 
   @Override
-  public void initialize(String data)
-      throws CertprofileException {
+  public void initialize(String data) throws CertprofileException {
     notBlank(data, "data");
 
     X509ProfileType conf;
@@ -130,8 +126,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   } // method initialize
 
-  public void initialize(X509ProfileType conf)
-      throws CertprofileException {
+  public void initialize(X509ProfileType conf) throws CertprofileException {
     notNull(conf, "conf");
 
     reset();
@@ -143,8 +138,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     }
   } // method initialize
 
-  private void initialize0(X509ProfileType conf)
-      throws CertprofileException {
+  private void initialize0(X509ProfileType conf) throws CertprofileException {
     this.version = conf.getVersion();
     if (this.version == null) {
       this.version = X509CertVersion.v3;
@@ -169,7 +163,6 @@ public class XijsonCertprofile extends BaseCertprofile {
       this.signatureAlgorithms = Collections.unmodifiableList(list);
     }
 
-    this.raOnly = conf.getRaOnly() != null && conf.getRaOnly();
     this.maxSize = conf.getMaxSize();
 
     if ("99991231235959Z".equalsIgnoreCase(conf.getValidity())) {
@@ -324,8 +317,7 @@ public class XijsonCertprofile extends BaseCertprofile {
    * @throws CertprofileException
    *           If initialization of the extra extension failed.
    */
-  protected boolean initExtraExtension(ExtensionType extn)
-      throws CertprofileException {
+  protected boolean initExtraExtension(ExtensionType extn) throws CertprofileException {
     return false;
   }
 
@@ -1056,11 +1048,6 @@ public class XijsonCertprofile extends BaseCertprofile {
   @Override
   public Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls() {
     return extensions.getExtensionControls();
-  }
-
-  @Override
-  public boolean isOnlyForRa() {
-    return raOnly;
   }
 
   @Override

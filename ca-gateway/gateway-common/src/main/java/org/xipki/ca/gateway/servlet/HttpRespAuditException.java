@@ -34,8 +34,6 @@ public class HttpRespAuditException extends Exception {
 
   private final int httpStatus;
 
-  private final String httpErrorMessage;
-
   private final String auditMessage;
 
   private final AuditLevel auditLevel;
@@ -43,13 +41,7 @@ public class HttpRespAuditException extends Exception {
   private final AuditStatus auditStatus;
 
   public HttpRespAuditException(int httpStatus, String auditMessage, AuditLevel auditLevel, AuditStatus auditStatus) {
-    this(httpStatus, null, auditMessage, auditLevel, auditStatus);
-  }
-
-  public HttpRespAuditException(
-      int httpStatus, String httpErrorMessage, String auditMessage, AuditLevel auditLevel, AuditStatus auditStatus) {
     this.httpStatus = httpStatus;
-    this.httpErrorMessage = httpErrorMessage;
     this.auditMessage = Args.notBlank(auditMessage, "auditMessage");
     this.auditLevel = Args.notNull(auditLevel, "auditLevel");
     this.auditStatus = Args.notNull(auditStatus, "auditStatus");
@@ -57,10 +49,6 @@ public class HttpRespAuditException extends Exception {
 
   public int getHttpStatus() {
     return httpStatus;
-  }
-
-  public String getHttpErrorMessage() {
-    return httpErrorMessage;
   }
 
   public String getAuditMessage() {

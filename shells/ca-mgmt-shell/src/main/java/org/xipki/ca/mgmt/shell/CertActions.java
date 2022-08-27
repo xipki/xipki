@@ -84,8 +84,7 @@ public class CertActions {
     private String outputFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CertWithRevocationInfo certInfo = caManager.getCert(caName, getSerialNumber());
 
       if (certInfo == null) {
@@ -115,12 +114,10 @@ public class CertActions {
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
-    protected abstract X509CRLHolder retrieveCrl()
-        throws Exception;
+    protected abstract X509CRLHolder retrieveCrl() throws Exception;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CaEntry ca = caManager.getCa(caName);
       if (ca == null) {
         throw new CmdFailure("CA " + caName + " not available");
@@ -191,8 +188,7 @@ public class CertActions {
     protected String notAfterS;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CaEntry ca = caManager.getCa(caName);
       if (ca == null) {
         throw new CmdFailure("CA " + caName + " not available");
@@ -292,8 +288,7 @@ public class CertActions {
     private String targetCertFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CaEntry ca = caManager.getCa(caName);
       if (ca == null) {
         throw new CmdFailure("CA " + caName + " not available");
@@ -323,8 +318,7 @@ public class CertActions {
     protected String outFile;
 
     @Override
-    protected X509CRLHolder retrieveCrl()
-        throws Exception {
+    protected X509CRLHolder retrieveCrl() throws Exception {
       return caManager.generateCrlOnDemand(caName);
     }
 
@@ -355,8 +349,7 @@ public class CertActions {
     private String outputFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CertWithRevocationInfo certInfo = caManager.getCert(caName, toBigInt(serialNumberS));
 
       if (certInfo == null) {
@@ -393,8 +386,7 @@ public class CertActions {
     }
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CaEntry ca = caManager.getCa(caName);
       if (ca == null) {
         throw new CmdFailure("CA " + caName + " not available");
@@ -456,8 +448,7 @@ public class CertActions {
     private String outputFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       byte[] request = caManager.getCertRequest(caName, getSerialNumber());
       if (request == null) {
         System.out.println("unknown request unknown");
@@ -497,8 +488,7 @@ public class CertActions {
     private String orderByS;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       Date validFrom = parseDate(validFromS);
       Date validTo = parseDate(validToS);
       X500Name subjectPattern = null;
@@ -539,26 +529,6 @@ public class CertActions {
           DateUtil.toUtcTimeyyyyMMddhhmmss(info.getNotAfter()), " | ", info.getSubject());
     } // method format
 
-    private Date getDate(String str)
-        throws IllegalCmdParamException {
-      if (str == null) {
-        return null;
-      }
-
-      final int len = str.length();
-      try {
-        if (len == 8) {
-          return DateUtil.parseUtcTimeyyyyMMdd(str);
-        } else if (len == 14) {
-          return DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
-        } else {
-          throw new IllegalCmdParamException("invalid time " + str);
-        }
-      } catch (IllegalArgumentException ex) {
-        throw new IllegalCmdParamException("invalid time " + str + ": " + ex.getMessage(), ex);
-      }
-    } // method getDate
-
   } // class ListCert
 
   @Command(scope = "ca", name = "rm-cert", description = "remove certificate")
@@ -569,8 +539,7 @@ public class CertActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       BigInteger serialNo = getSerialNumber();
       String msg = "certificate (serial number = 0x" + serialNo.toString(16) + ")";
       if (force || confirm("Do you want to remove " + msg, 3)) {
@@ -598,8 +567,7 @@ public class CertActions {
     private String invalidityDateS;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CrlReason crlReason = CrlReason.forNameOrText(reason);
 
       if (!CrlReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
@@ -626,8 +594,7 @@ public class CertActions {
   public static class UnsuspendCert extends UnsuspendRmCertAction {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       BigInteger serialNo = getSerialNumber();
       String msg = "certificate (serial number = 0x" + serialNo.toString(16) + ")";
       try {

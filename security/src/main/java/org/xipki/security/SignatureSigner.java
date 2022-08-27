@@ -41,14 +41,12 @@ public class SignatureSigner implements XiContentSigner {
 
   private class SignatureStream extends OutputStream {
 
-    public byte[] getSignature()
-        throws SignatureException {
+    public byte[] getSignature() throws SignatureException {
       return signer.sign();
     }
 
     @Override
-    public void write(int singleByte)
-        throws IOException {
+    public void write(int singleByte) throws IOException {
       try {
         signer.update((byte) singleByte);
       } catch (SignatureException ex) {
@@ -57,8 +55,7 @@ public class SignatureSigner implements XiContentSigner {
     }
 
     @Override
-    public void write(byte[] bytes)
-        throws IOException {
+    public void write(byte[] bytes) throws IOException {
       try {
         signer.update(bytes);
       } catch (SignatureException ex) {
@@ -67,8 +64,7 @@ public class SignatureSigner implements XiContentSigner {
     }
 
     @Override
-    public void write(byte[] bytes, int off, int len)
-        throws IOException {
+    public void write(byte[] bytes, int off, int len) throws IOException {
       try {
         signer.update(bytes, off, len);
       } catch (SignatureException ex) {

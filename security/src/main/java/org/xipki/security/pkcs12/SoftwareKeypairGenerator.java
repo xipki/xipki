@@ -58,8 +58,7 @@ public class SoftwareKeypairGenerator extends KeypairGenerator {
   }
 
   @Override
-  public PrivateKeyInfo generateKeypair(String keyspec)
-      throws XiSecurityException {
+  public PrivateKeyInfo generateKeypair(String keyspec) throws XiSecurityException {
     if (!supports(keyspec)) {
       throw new XiSecurityException(name + " cannot generate keypair of keyspec " + keyspec);
     }

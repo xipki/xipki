@@ -97,7 +97,6 @@ public class NameId {
   @Override
   public String toString() {
     return StringUtil.concatObjects("(id=", id, ", name=", name, ")");
-
   }
 
 }

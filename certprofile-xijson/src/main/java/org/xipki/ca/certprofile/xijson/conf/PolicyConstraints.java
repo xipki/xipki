@@ -56,8 +56,7 @@ public class PolicyConstraints extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     // Only for CA, at least one of requireExplicitPolicy and inhibitPolicyMapping must be present
     if (requireExplicitPolicy == null && inhibitPolicyMapping == null) {
       throw new InvalidConfException("requireExplicitPolicy and inhibitPolicyMapping may not be both null");

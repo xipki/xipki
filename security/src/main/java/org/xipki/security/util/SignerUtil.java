@@ -88,8 +88,7 @@ public class SignerUtil {
     }
   }
 
-  public static Signer createPSSRSASigner(SignAlgo sigAlgo)
-      throws XiSecurityException {
+  public static Signer createPSSRSASigner(SignAlgo sigAlgo) throws XiSecurityException {
     return createPSSRSASigner(sigAlgo, null);
   }
 
@@ -111,8 +110,7 @@ public class SignerUtil {
         org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT);
   } // method createPSSRSASigner
 
-  public static byte[] dsaSigPlainToX962(byte[] signature)
-      throws XiSecurityException {
+  public static byte[] dsaSigPlainToX962(byte[] signature) throws XiSecurityException {
     notNull(signature, "signature");
     if (signature.length % 2 != 0) {
       throw new XiSecurityException("signature.lenth must be even, but is odd");

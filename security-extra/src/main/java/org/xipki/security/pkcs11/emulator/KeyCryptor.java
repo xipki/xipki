@@ -88,8 +88,7 @@ class KeyCryptor {
     this.rnd = new SecureRandom();
   } // constructor
 
-  PrivateKey decryptPrivateKey(byte[] encryptedPrivateKeyInfo)
-      throws P11TokenException {
+  PrivateKey decryptPrivateKey(byte[] encryptedPrivateKeyInfo) throws P11TokenException {
     notNull(encryptedPrivateKeyInfo, "encryptedPrivateKeyInfo");
     byte[] plain = decrypt(encryptedPrivateKeyInfo);
 
@@ -121,8 +120,7 @@ class KeyCryptor {
     }
   } // method decryptPrivateKey
 
-  byte[] decrypt(byte[] cipherBlob)
-      throws P11TokenException {
+  byte[] decrypt(byte[] cipherBlob) throws P11TokenException {
     notNull(cipherBlob, "cipherBlob");
 
     if (cipherBlob[0] != ALG_SCRYPT1_AESGCMNopadding_128) {
@@ -150,19 +148,16 @@ class KeyCryptor {
     }
   } // method decrypt
 
-  byte[] encrypt(PrivateKey privateKey)
-      throws P11TokenException {
+  byte[] encrypt(PrivateKey privateKey) throws P11TokenException {
     notNull(privateKey, "privateKey");
     return encrypt(privateKey.getEncoded());
   }
 
-  byte[] encrypt(SecretKey secretKey)
-      throws P11TokenException {
+  byte[] encrypt(SecretKey secretKey) throws P11TokenException {
     return encrypt(secretKey.getEncoded());
   }
 
-  byte[] encrypt(byte[] data)
-      throws P11TokenException {
+  byte[] encrypt(byte[] data) throws P11TokenException {
     byte[] nonce = new byte[AES_GCM_NONCE_BYTE_SIZE];
     rnd.nextBytes(nonce);
     GCMParameterSpec spec = new GCMParameterSpec(AES_GCM_TAG_BIT_SIZE, nonce);

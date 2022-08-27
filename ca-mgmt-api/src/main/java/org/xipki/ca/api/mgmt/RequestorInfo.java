@@ -109,8 +109,7 @@ public interface RequestorInfo {
     }
 
     @Override
-    public void assertPermitted(int permission)
-        throws InsufficientPermissionException {
+    public void assertPermitted(int permission) throws InsufficientPermissionException {
       if (!isPermitted(permission)) {
         throw new  InsufficientPermissionException("Permission "
             + PermissionConstants.getTextForCode(permission) + " is not permitted");
@@ -125,7 +124,6 @@ public interface RequestorInfo {
 
   boolean isPermitted(int requiredPermission);
 
-  void assertPermitted(int requiredPermission)
-      throws InsufficientPermissionException;
+  void assertPermitted(int requiredPermission) throws InsufficientPermissionException;
 
 }

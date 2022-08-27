@@ -366,8 +366,7 @@ public class DecodedPkiMessage extends PkiMessage {
       return ret;
     }
 
-    if (MessageType.CertRep == messageType
-            && (pkiStatus == PkiStatus.FAILURE | pkiStatus == PkiStatus.PENDING)) {
+    if (MessageType.CertRep == messageType && (pkiStatus == PkiStatus.FAILURE | pkiStatus == PkiStatus.PENDING)) {
       return ret;
     }
 
@@ -437,9 +436,8 @@ public class DecodedPkiMessage extends PkiMessage {
     return ret;
   } // method decode
 
-  private static String getPrintableStringAttrValue(AttributeTable attrs,
-      ASN1ObjectIdentifier type)
-          throws MessageDecodingException {
+  private static String getPrintableStringAttrValue(AttributeTable attrs, ASN1ObjectIdentifier type)
+      throws MessageDecodingException {
     ASN1Encodable value = ScepUtil.getFirstAttrValue(attrs, type);
     if (value instanceof ASN1PrintableString) {
       return ((ASN1PrintableString) value).getString();
@@ -450,9 +448,8 @@ public class DecodedPkiMessage extends PkiMessage {
     }
   }
 
-  private static Integer getIntegerPrintStringAttrValue(AttributeTable attrs,
-      ASN1ObjectIdentifier type)
-          throws MessageDecodingException {
+  private static Integer getIntegerPrintStringAttrValue(AttributeTable attrs, ASN1ObjectIdentifier type)
+      throws MessageDecodingException {
     String str = getPrintableStringAttrValue(attrs, type);
     if (str == null) {
       return null;

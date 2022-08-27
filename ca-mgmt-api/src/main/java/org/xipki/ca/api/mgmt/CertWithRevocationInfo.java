@@ -66,12 +66,4 @@ public class CertWithRevocationInfo {
     this.certprofile = certprofile;
   }
 
-  public CertWithStatusInfo toCertWithStatusInfo() {
-    CertWithStatusInfo ret = new CertWithStatusInfo();
-    ret.setCert(cert.getCert());
-    ret.setCertprofile(certprofile);
-    ret.setRevocationInfo(revInfo);
-    return ret;
-  }
-
 }

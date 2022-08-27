@@ -60,8 +60,7 @@ public class BiometricInfo extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notNull(oid, "oid");
       notNull(predefined, "predefined");
     }
@@ -108,8 +107,7 @@ public class BiometricInfo extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notEmpty(hashAlgorithms, "hashAlgorithms");
     notEmpty(types, "types");
     notNull(includeSourceDataUri, "includeSourceDataUri");

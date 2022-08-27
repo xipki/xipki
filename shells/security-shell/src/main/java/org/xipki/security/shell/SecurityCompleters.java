@@ -66,8 +66,7 @@ public class SecurityCompleters {
       setTokens(names);
     }
 
-    public static Set<P11KeyUsage> parseUsages(List<String> usageTexts)
-        throws IllegalCmdParamException {
+    public static Set<P11KeyUsage> parseUsages(List<String> usageTexts) {
       Set<P11KeyUsage> usages = new HashSet<>();
       for (String usageText : usageTexts) {
         P11KeyUsage usage = P11KeyUsage.valueOf(usageText.toUpperCase());

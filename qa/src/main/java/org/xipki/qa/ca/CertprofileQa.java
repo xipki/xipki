@@ -79,14 +79,11 @@ public class CertprofileQa {
 
   private final XijsonCertprofile certprofile;
 
-  public CertprofileQa(String data)
-      throws CertprofileException {
-    this(
-        StringUtil.toUtf8Bytes(notNull(data, "data")));
+  public CertprofileQa(String data) throws CertprofileException {
+    this(StringUtil.toUtf8Bytes(notNull(data, "data")));
   }
 
-  public CertprofileQa(byte[] dataBytes)
-      throws CertprofileException {
+  public CertprofileQa(byte[] dataBytes) throws CertprofileException {
     notNull(dataBytes, "dataBytes");
     try {
       X509ProfileType conf = X509ProfileType.parse(new ByteArrayInputStream(dataBytes));
@@ -289,46 +286,6 @@ public class CertprofileQa {
 
     return new ValidationResult(resultIssues);
   } // method checkCert
-
-  public static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(
-      Map<String, ExtensionType> extensionsType)
-      throws CertprofileException {
-    if (extensionsType == null) {
-      return null;
-    }
-
-    Map<ASN1ObjectIdentifier, QaExtensionValue> map = new HashMap<>();
-
-    for (Entry<String, ExtensionType> entry : extensionsType.entrySet()) {
-      String type = entry.getKey();
-      ExtensionType extn = entry.getValue();
-      if (extn.getConstant() == null) {
-        continue;
-      }
-
-      ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(type);
-      if (Extension.subjectAlternativeName.equals(oid) || Extension.subjectInfoAccess.equals(oid)
-          || Extension.biometricInfo.equals(oid)) {
-        continue;
-      }
-
-      byte[] encodedValue;
-      try {
-        encodedValue = extn.getConstant().toASN1Encodable().toASN1Primitive().getEncoded();
-      } catch (IOException | InvalidConfException ex) {
-        throw new CertprofileException("could not parse the constant extension value of type" + type, ex);
-      }
-
-      QaExtensionValue extension = new QaExtensionValue(extn.isCritical(), encodedValue);
-      map.put(oid, extension);
-    }
-
-    if (CollectionUtil.isEmpty(map)) {
-      return null;
-    }
-
-    return Collections.unmodifiableMap(map);
-  } // method buildConstantExtesions
 
   private static void checkTime(Time time, ValidationIssue issue) {
     ASN1Primitive asn1Time = time.toASN1Primitive();

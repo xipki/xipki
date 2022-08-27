@@ -22,7 +22,7 @@ import org.bouncycastle.asn1.crmf.CertId;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.cmpclient.IdentifiedObject;
-import org.xipki.security.cmp.PkiStatusInfo;
+import org.xipki.cmpclient.PkiStatusInfo;
 
 import java.math.BigInteger;
 

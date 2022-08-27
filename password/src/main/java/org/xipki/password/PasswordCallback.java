@@ -46,8 +46,7 @@ public interface PasswordCallback {
    * @throws PasswordResolverException
    *         if error occurs
    */
-  void init(String conf)
-      throws PasswordResolverException;
+  void init(String conf) throws PasswordResolverException;
 
   /**
    * Resolves the password
@@ -59,8 +58,7 @@ public interface PasswordCallback {
    * @throws PasswordResolverException
    *         if error occurs
    */
-  char[] getPassword(String prompt, String testToken)
-      throws PasswordResolverException;
+  char[] getPassword(String prompt, String testToken) throws PasswordResolverException;
 
   class File implements PasswordCallback {
 
@@ -113,8 +111,7 @@ public interface PasswordCallback {
     } // method getPassword
 
     @Override
-    public void init(String conf)
-        throws PasswordResolverException {
+    public void init(String conf) throws PasswordResolverException {
       Args.notBlank(conf, "conf");
       ConfPairs pairs = new ConfPairs(conf);
       passwordFile = pairs.value("file");
@@ -172,8 +169,7 @@ public interface PasswordCallback {
     }
 
     @Override
-    public void init(String conf)
-        throws PasswordResolverException {
+    public void init(String conf) throws PasswordResolverException {
       if (StringUtil.isBlank(conf)) {
         quorum = 1;
         return;
@@ -212,8 +208,7 @@ public interface PasswordCallback {
     }
 
     @Override
-    public void init(String conf)
-        throws PasswordResolverException {
+    public void init(String conf) throws PasswordResolverException {
       Args.notBlank(conf, "conf");
       this.password = OBFPasswordService.deobfuscate(conf).toCharArray();
     }

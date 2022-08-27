@@ -287,8 +287,7 @@ public enum SignAlgo {
     return algId;
   }
 
-  public Signature newSignature()
-      throws NoSuchAlgorithmException {
+  public Signature newSignature() throws NoSuchAlgorithmException {
     return Signature.getInstance(jceName);
   }
 

@@ -18,7 +18,6 @@
 package org.xipki.cmpclient;
 
 import org.bouncycastle.asn1.crmf.CertId;
-import org.xipki.security.cmp.PkiStatusInfo;
 
 import static org.xipki.util.Args.notNull;
 

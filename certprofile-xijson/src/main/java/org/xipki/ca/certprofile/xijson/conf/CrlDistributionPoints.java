@@ -41,8 +41,7 @@ public class CrlDistributionPoints extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
   }
 
 } // class CrlDistributionPoints

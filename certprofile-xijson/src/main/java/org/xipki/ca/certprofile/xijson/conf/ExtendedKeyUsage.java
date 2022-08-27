@@ -47,8 +47,7 @@ public class ExtendedKeyUsage extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notEmpty(usages, "usages");
     validate(usages);
   }

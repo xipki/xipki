@@ -132,22 +132,6 @@ public class CertStore extends CertStoreBase {
 
   } // class SystemEvent
 
-  public static class KnowCertResult {
-
-    public static final KnowCertResult UNKNOWN = new KnowCertResult(false);
-
-    private final boolean known;
-
-    public KnowCertResult(boolean known) {
-      this.known = known;
-    }
-
-    public boolean isKnown() {
-      return known;
-    }
-
-  }
-
   private static final Logger LOG = LoggerFactory.getLogger(CertStore.class);
 
   private final String sqlCertForId;

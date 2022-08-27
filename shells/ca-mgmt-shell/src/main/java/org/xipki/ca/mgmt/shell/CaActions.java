@@ -114,14 +114,12 @@ public class CaActions {
     @Completion(FileCompleter.class)
     private String certFile;
 
-    @Option(name = "--certchain", multiValued = true,
-        description = "certificate chain of CA certificate")
+    @Option(name = "--certchain", multiValued = true, description = "certificate chain of CA certificate")
     @Completion(FileCompleter.class)
     private List<String> issuerCertFiles;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CaEntry caEntry = getCaEntry();
       if (certFile != null) {
         X509Cert caCert = X509Util.parseCert(new File(certFile));
@@ -166,8 +164,7 @@ public class CaActions {
     @Option(name = "--crl-uri", multiValued = true, description = "CRL distribution point")
     private List<String> crlUris;
 
-    @Option(name = "--deltacrl-uri", multiValued = true,
-        description = "Delta CRL distribution point")
+    @Option(name = "--deltacrl-uri", multiValued = true, description = "Delta CRL distribution point")
     private List<String> deltaCrlUris;
 
     @Option(name = "--permission", required = true, multiValued = true, description = "permission")
@@ -240,8 +237,7 @@ public class CaActions {
     @Reference
     private PasswordResolver passwordResolver;
 
-    protected CaEntry getCaEntry()
-        throws Exception {
+    protected CaEntry getCaEntry() throws Exception {
       Args.range(snLen, "snLen", CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
 
       if (nextCrlNumber < 1) {
@@ -324,8 +320,7 @@ public class CaActions {
     private String caAlias;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       String msg = "CA alias " + caAlias + " associated with CA " + caName;
       try {
         caManager.addCaAlias(caAlias, caName);
@@ -347,8 +342,7 @@ public class CaActions {
     private String caAlias;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       Set<String> aliasNames = caManager.getCaAliasNames();
 
       StringBuilder sb = new StringBuilder();
@@ -396,8 +390,7 @@ public class CaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       String msg = "CA alias " + caAlias;
       if (force || confirm("Do you want to remove " + msg, 3)) {
         try {
@@ -440,8 +433,7 @@ public class CaActions {
     private String rootcaCertOutFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CaEntry caEntry = getCaEntry();
       Date notBefore = parseDate(notBeforeS);
       Date notAfter = parseDate(notAfterS);
@@ -468,8 +460,7 @@ public class CaActions {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       StringBuilder sb = new StringBuilder();
       if (name == null) {
         sb.append("successful CAs:\n");
@@ -514,8 +505,7 @@ public class CaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       String msg = "CA " + name;
       if (force || confirm("Do you want to remove " + msg, 3)) {
         try {
@@ -556,8 +546,7 @@ public class CaActions {
     private String invalidityDateS;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CrlReason crlReason = CrlReason.forNameOrText(reason);
 
       if (!PERMITTED_REASONS.contains(crlReason)) {
@@ -598,8 +587,7 @@ public class CaActions {
     private String caName;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (!caManager.getCaNames().contains(caName)) {
         throw new IllegalCmdParamException("invalid CA name " + caName);
       }
@@ -714,8 +702,7 @@ public class CaActions {
     @Reference
     private PasswordResolver passwordResolver;
 
-    protected ChangeCaEntry getChangeCaEntry()
-        throws Exception {
+    protected ChangeCaEntry getChangeCaEntry() throws Exception {
       ChangeCaEntry entry = new ChangeCaEntry(new NameId(null, caName));
 
       if (snLen != null) {
@@ -832,8 +819,7 @@ public class CaActions {
     } // method getChangeCaEntry
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       String msg = "CA " + caName;
       try {
         caManager.changeCa(getChangeCaEntry());

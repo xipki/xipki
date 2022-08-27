@@ -115,8 +115,7 @@ public abstract class Client {
    * @throws ScepClientException
    *           If error occurs.
    */
-  protected abstract ScepHttpResponse httpGet(String url)
-      throws ScepClientException;
+  protected abstract ScepHttpResponse httpGet(String url) throws ScepClientException;
 
   public boolean isHttpGetOnly() {
     return httpGetOnly;
@@ -168,13 +167,11 @@ public abstract class Client {
     return httpSend(operation, null);
   }
 
-  public void init()
-      throws ScepClientException {
+  public void init() throws ScepClientException {
     refresh();
   }
 
-  public void refresh()
-      throws ScepClientException {
+  public void refresh() throws ScepClientException {
     // getCACaps
     ScepHttpResponse getCaCapsResp = httpSend(Operation.GetCACaps);
     this.caCaps = CaCaps.getInstance(StringUtil.toUtf8String(getCaCapsResp.getContentBytes()));
@@ -192,8 +189,7 @@ public abstract class Client {
     this.responseSignerCerts = new CollectionStore<>(Collections.singletonList(certHolder));
   } // method refresh
 
-  public CaCaps getCaCaps()
-      throws ScepClientException {
+  public CaCaps getCaCaps() throws ScepClientException {
     initIfNotInited();
     return caCaps;
   }
@@ -202,20 +198,17 @@ public abstract class Client {
     return authorityCertStore == null ? null : authorityCertStore.getCaCert();
   }
 
-  public CaIdentifier getCaId()
-      throws ScepClientException {
+  public CaIdentifier getCaId() throws ScepClientException {
     initIfNotInited();
     return caId;
   }
 
-  public CaCertValidator getCaCertValidator()
-      throws ScepClientException {
+  public CaCertValidator getCaCertValidator() throws ScepClientException {
     initIfNotInited();
     return caCertValidator;
   }
 
-  public AuthorityCertStore getAuthorityCertStore()
-      throws ScepClientException {
+  public AuthorityCertStore getAuthorityCertStore() throws ScepClientException {
     initIfNotInited();
     return authorityCertStore;
   }
@@ -318,8 +311,7 @@ public abstract class Client {
     return new EnrolmentResponse(response);
   } // method scepCertPoll
 
-  public EnrolmentResponse scepEnrol(
-      CertificationRequest csr, PrivateKey identityKey, X509Cert identityCert)
+  public EnrolmentResponse scepEnrol(CertificationRequest csr, PrivateKey identityKey, X509Cert identityCert)
       throws ScepClientException {
     Args.notNull(csr, "csr");
     Args.notNull(identityKey, "identityKey");
@@ -387,8 +379,7 @@ public abstract class Client {
     return new EnrolmentResponse(response);
   } // method enroll
 
-  public AuthorityCertStore scepNextCaCert()
-      throws ScepClientException {
+  public AuthorityCertStore scepNextCaCert() throws ScepClientException {
     initIfNotInited();
 
     if (!this.caCaps.supportsGetNextCACert()) {
@@ -479,8 +470,7 @@ public abstract class Client {
     return resp.getAuthorityCertStore();
   } // method retrieveNextCaAuthorityCertStore
 
-  private void initIfNotInited()
-      throws ScepClientException {
+  private void initIfNotInited() throws ScepClientException {
     if (caCaps == null) {
       init();
     }

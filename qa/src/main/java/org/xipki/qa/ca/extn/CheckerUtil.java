@@ -91,8 +91,7 @@ public class CheckerUtil {
     return Collections.unmodifiableMap(map);
   } // method buildConstantExtesions
 
-  static Map<ASN1ObjectIdentifier, ExtnSyntax> buildExtesionSyntaxes(Map<String, ExtensionType> extensions)
-      throws CertprofileException {
+  static Map<ASN1ObjectIdentifier, ExtnSyntax> buildExtesionSyntaxes(Map<String, ExtensionType> extensions) {
     if (extensions == null) {
       return null;
     }

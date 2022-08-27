@@ -76,8 +76,7 @@ public class Actions {
     private String outputFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
 
       ScepClient client = getScepClient();
@@ -125,8 +124,7 @@ public class Actions {
     private PrivateKey identityKey;
     private X509Cert identityCert;
 
-    protected ScepClient getScepClient()
-        throws CertificateException, IOException {
+    protected ScepClient getScepClient() throws CertificateException, IOException {
       if (scepClient == null) {
         X509Cert caCert = X509Util.parseCert(new File(caCertFile));
         CaIdentifier tmpCaId = new CaIdentifier(url, caId);
@@ -136,16 +134,14 @@ public class Actions {
       return scepClient;
     }
 
-    protected PrivateKey getIdentityKey()
-        throws Exception {
+    protected PrivateKey getIdentityKey() throws Exception {
       if (identityKey == null) {
         readIdentity();
       }
       return identityKey;
     }
 
-    protected X509Cert getIdentityCert()
-        throws Exception {
+    protected X509Cert getIdentityCert() throws Exception {
       if (identityCert == null) {
         readIdentity();
       }
@@ -153,8 +149,7 @@ public class Actions {
       return identityCert;
     }
 
-    private void readIdentity()
-        throws Exception {
+    private void readIdentity() throws Exception {
       char[] pwd = readPasswordIfNotSet(password);
 
       KeyStore ks = KeyUtil.getKeyStore("PKCS12");
@@ -203,8 +198,7 @@ public class Actions {
     private String method;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       ScepClient client = getScepClient();
 
       CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
@@ -251,14 +245,12 @@ public class Actions {
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "where to save the CA certificate")
+    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the CA certificate")
     @Completion(FileCompleter.class)
     protected String outFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       CaIdentifier tmpCaId = new CaIdentifier(url, caId);
       CaCertValidator caCertValidator = new CaCertValidator() {
         @Override
@@ -291,14 +283,12 @@ public class Actions {
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "where to save the certificate")
+    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the certificate")
     @Completion(FileCompleter.class)
     private String outputFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       ScepClient client = getScepClient();
       BigInteger serial = toBigInt(serialNumber);
       X509Cert caCert = client.getAuthorityCertStore().getCaCert();
@@ -332,8 +322,7 @@ public class Actions {
     private String outputFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       X509Cert cert = X509Util.parseCert(new File(certFile));
       ScepClient client = getScepClient();
       X509CRLHolder crl = client.scepGetCrl(getIdentityKey(), getIdentityCert(),

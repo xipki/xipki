@@ -159,8 +159,7 @@ public enum HashAlgo {
     throw new NoSuchAlgorithmException("Unknown HashAlgo OID '" + oid.getId() + "'");
   }
 
-  public static HashAlgo getInstance(String nameOrOid)
-      throws NoSuchAlgorithmException {
+  public static HashAlgo getInstance(String nameOrOid) throws NoSuchAlgorithmException {
     HashAlgo alg = map.get(nameOrOid.toUpperCase());
     if (alg == null) {
       throw new NoSuchAlgorithmException("Found no HashAlgo for name/OID '" + nameOrOid + "'");

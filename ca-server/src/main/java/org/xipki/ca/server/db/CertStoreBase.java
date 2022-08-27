@@ -237,8 +237,7 @@ public class CertStoreBase extends QueryExecutor {
     }
   }
 
-  protected PreparedStatement prepareStatement(String sqlQuery)
-      throws OperationException {
+  protected PreparedStatement prepareStatement(String sqlQuery) throws OperationException {
     try {
       return datasource.prepareStatement(sqlQuery);
     } catch (DataAccessException ex) {

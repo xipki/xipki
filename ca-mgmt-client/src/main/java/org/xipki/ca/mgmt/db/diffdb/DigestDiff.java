@@ -117,8 +117,7 @@ class DigestDiff {
     this.includeCaCerts = includeCaCerts;
   }
 
-  public void diff()
-      throws Exception {
+  public void diff() throws Exception {
     Map<Integer, byte[]> caIdCertMap = getCas(targetDatasource, targetDbType);
 
     List<Integer> refCaIds = new LinkedList<>();

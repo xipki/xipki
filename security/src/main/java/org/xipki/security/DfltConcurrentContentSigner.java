@@ -135,8 +135,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   }
 
   @Override
-  public ConcurrentBagEntrySigner borrowSigner()
-      throws NoIdleSignerException {
+  public ConcurrentBagEntrySigner borrowSigner() throws NoIdleSignerException {
     return borrowSigner(defaultSignServiceTimeout);
   }
 
@@ -231,8 +230,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   }
 
   @Override
-  public byte[] sign(byte[] data)
-      throws NoIdleSignerException, SignatureException {
+  public byte[] sign(byte[] data) throws NoIdleSignerException, SignatureException {
     ConcurrentBagEntrySigner signer = borrowSigner();
     try {
       OutputStream signatureStream = signer.value().getOutputStream();
@@ -249,8 +247,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   } // method sign
 
   @Override
-  public byte[][] sign(byte[][] data)
-      throws NoIdleSignerException, SignatureException {
+  public byte[][] sign(byte[][] data) throws NoIdleSignerException, SignatureException {
     byte[][] signatures = new byte[data.length][];
     ConcurrentBagEntrySigner signer = borrowSigner();
 

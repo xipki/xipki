@@ -135,8 +135,7 @@ public class QaOcspActions {
     private TripleState expectedNonceOccurrence;
 
     @Override
-    protected final Object execute0()
-        throws Exception {
+    protected final Object execute0() throws Exception {
       expectedCerthashOccurrence = TripleState.valueOf(certhashOccurrenceText);
       expectedNextUpdateOccurrence = TripleState.valueOf(nextUpdateOccurrenceText);
       expectedNonceOccurrence = TripleState.valueOf(nonceOccurrenceText);
@@ -476,8 +475,7 @@ public class QaOcspActions {
     private Integer queueSize = 50;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       int ii = 0;
       if (serialNumberList != null) {
         ii++;

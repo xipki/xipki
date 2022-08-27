@@ -158,8 +158,7 @@ public final class CmpClientImpl implements CmpClient {
     LOG.info("initialized");
   } // method init
 
-  private static CmpClientConf parse(InputStream configStream)
-      throws CmpClientException {
+  private static CmpClientConf parse(InputStream configStream) throws CmpClientException {
     CmpClientConf conf;
     try {
       conf = JSON.parseObject(configStream, CmpClientConf.class);

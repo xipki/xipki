@@ -54,8 +54,7 @@ public class DefaultCurl implements Curl {
     this.sslContextConf = sslContextConf;
   }
 
-  private synchronized void initIfNotDone()
-      throws ObjectCreationException {
+  private synchronized void initIfNotDone() throws ObjectCreationException {
     if (initException != null) {
       throw initException;
     }

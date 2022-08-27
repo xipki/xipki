@@ -400,8 +400,7 @@ public class CaEntry extends MgmtEntry {
         "\nsave keypair: ", saveKeypair,
         "\nvalidity mode: ", validityMode,
         "\npermission: ", permissionText,
-        "\nkeep expired certs: ",
-            (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),
+        "\nkeep expired certs: ", (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),
         "\nextra control: ", extraCtrlText,
         "\nserial number length: ", serialNoLen, " bytes",
         "\nnext CRL number: ", nextCrlNumber, "\n", caUris,
@@ -409,24 +408,6 @@ public class CaEntry extends MgmtEntry {
         "\ncert: \n", X509Util.formatCert(cert, verbose),
         certchainStr.toString());
   } // method toString(boolean, boolean)
-
-  protected static String urisToString(Collection<?> tokens) {
-    if (CollectionUtil.isEmpty(tokens)) {
-      return null;
-    }
-
-    StringBuilder sb = new StringBuilder();
-
-    int size = tokens.size();
-    int idx = 0;
-    for (Object token : tokens) {
-      sb.append(token);
-      if (idx++ < size - 1) {
-        sb.append(" ");
-      }
-    }
-    return sb.toString();
-  } // method urisToString
 
   @Override
   public boolean equals(Object obj) {
@@ -478,8 +459,7 @@ public class CaEntry extends MgmtEntry {
     return ident.hashCode();
   }
 
-  public void setCert(X509Cert cert)
-      throws CaMgmtException {
+  public void setCert(X509Cert cert) throws CaMgmtException {
     if (cert == null) {
       this.cert = null;
       this.subject = null;

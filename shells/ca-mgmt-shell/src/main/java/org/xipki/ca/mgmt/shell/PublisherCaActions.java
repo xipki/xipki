@@ -53,14 +53,12 @@ public class PublisherCaActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--publisher", required = true, multiValued = true,
-        description = "publisher name")
+    @Option(name = "--publisher", required = true, multiValued = true, description = "publisher name")
     @Completion(CaCompleters.PublisherNameCompleter.class)
     private List<String> publisherNames;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       for (String publisherName : publisherNames) {
         String msg = "publisher " + publisherName + " to CA " + caName;
         try {
@@ -85,8 +83,7 @@ public class PublisherCaActions {
     private String caName;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (caManager.getCa(caName) == null) {
         throw new CmdFailure("could not find CA '" + caName + "'");
       }
@@ -124,8 +121,7 @@ public class PublisherCaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       for (String publisherName : publisherNames) {
         String msg = "publisher " + publisherName + " from CA " + caName;
         if (force || confirm("Do you want to remove " + msg, 3)) {
@@ -162,8 +158,7 @@ public class PublisherCaActions {
     private String confFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (conf == null && confFile != null) {
         conf = StringUtil.toUtf8String(IoUtil.read(confFile));
       }
@@ -194,8 +189,7 @@ public class PublisherCaActions {
     private String confFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       PublisherEntry entry = caManager.getPublisher(name);
       if (entry == null) {
         throw new IllegalCmdParamException("no publisher named " + name + " is defined");
@@ -220,8 +214,7 @@ public class PublisherCaActions {
     private String name;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (name == null) {
         Set<String> names = caManager.getPublisherNames();
         int size = names.size();
@@ -267,8 +260,7 @@ public class PublisherCaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       String msg = "publisher " + name;
       if (force || confirm("Do you want to remove " + msg, 3)) {
         try {
@@ -303,8 +295,7 @@ public class PublisherCaActions {
     protected String confFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       if (type == null && conf == null && confFile == null) {
         throw new IllegalCmdParamException("nothing to update");
       }

@@ -376,8 +376,7 @@ public class EjbcaCertStatusStore extends OcspStore {
    * @return the next idle preparedStatement, {@code null} will be returned if no
    *     PreparedStatement can be created within 5 seconds.
    */
-  private PreparedStatement preparedStatement(String sqlQuery)
-      throws DataAccessException {
+  private PreparedStatement preparedStatement(String sqlQuery) throws DataAccessException {
     return datasource.prepareStatement(sqlQuery);
   }
 

@@ -44,7 +44,6 @@ public interface P11ModuleFactory {
    * @throws P11TokenException
    *         if PKCS#11 module could not be created.
    */
-  P11Module newModule(P11ModuleConf conf)
-      throws P11TokenException;
+  P11Module newModule(P11ModuleConf conf) throws P11TokenException;
 
 }

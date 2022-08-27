@@ -61,8 +61,7 @@ public class GenDSAKeypairParams extends ProxyMessage {
     this.g = Args.notNull(g, "g");
   }
 
-  private GenDSAKeypairParams(ASN1Sequence seq)
-      throws BadAsn1ObjectException {
+  private GenDSAKeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 4, 5);
     int idx = 0;
     slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();

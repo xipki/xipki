@@ -52,7 +52,6 @@ public interface CertPublisherFactory {
    * @throws ObjectCreationException
    *           if publisher could not be created.
    */
-  CertPublisher newPublisher(String type)
-      throws ObjectCreationException;
+  CertPublisher newPublisher(String type) throws ObjectCreationException;
 
 }

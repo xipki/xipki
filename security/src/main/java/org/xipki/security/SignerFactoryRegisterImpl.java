@@ -96,8 +96,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
   }
 
   @Override
-  public void refreshTokenForSignerType(String signerType)
-      throws XiSecurityException {
+  public void refreshTokenForSignerType(String signerType) throws XiSecurityException {
     for (SignerFactory service : factories) {
       if (service.canCreateSigner(signerType)) {
         service.refreshToken(signerType);

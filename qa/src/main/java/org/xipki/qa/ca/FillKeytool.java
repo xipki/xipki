@@ -69,8 +69,7 @@ public class FillKeytool {
     }
   }
 
-  public void execute(int numKeypairs, String encAlg, char[] password)
-      throws Exception {
+  public void execute(int numKeypairs, String encAlg, char[] password) throws Exception {
     Args.notNull(password, "password");
 
     int encAlgCode;

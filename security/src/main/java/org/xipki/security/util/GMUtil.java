@@ -117,7 +117,6 @@ public class GMUtil {
 
   public static boolean isSm2primev2Curve(ECCurve curve) {
     return curve.getB().toBigInteger().equals(bnSm2primev2B);
-
   }
 
 }

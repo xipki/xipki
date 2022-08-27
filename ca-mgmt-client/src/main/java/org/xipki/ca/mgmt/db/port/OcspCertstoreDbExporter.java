@@ -82,8 +82,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     this.resume = resume;
   } // constructor
 
-  public void export()
-      throws Exception {
+  public void export() throws Exception {
     OcspCertstore certstore;
     if (resume) {
       try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_OCSP_CERTSTORE))) {
@@ -121,8 +120,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     }
   } // method export
 
-  private void exportHashAlgo(OcspCertstore certstore)
-      throws DataAccessException {
+  private void exportHashAlgo(OcspCertstore certstore) throws DataAccessException {
     String certHashAlgoStr = dbSchemaInfo.getVariableValue("CERTHASH_ALGO");
     if (certHashAlgoStr == null) {
       throw new DataAccessException("CERTHASH_ALGO is not defined in table DBSCHEMA");
@@ -172,8 +170,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     System.out.println(" exported table ISSUER");
   } // method exportIssuer
 
-  private void exportCrlInfo(OcspCertstore certstore)
-      throws DataAccessException {
+  private void exportCrlInfo(OcspCertstore certstore) throws DataAccessException {
     System.out.println("exporting table CRL_INFO");
     List<OcspCertstore.CrlInfo> crlInfos = new LinkedList<>();
     certstore.setCrlInfos(crlInfos);

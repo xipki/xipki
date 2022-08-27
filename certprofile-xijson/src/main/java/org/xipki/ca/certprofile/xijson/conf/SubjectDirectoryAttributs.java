@@ -46,8 +46,7 @@ public class SubjectDirectoryAttributs extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notEmpty(types, "types");
     validate(types);
   }

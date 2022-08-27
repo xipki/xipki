@@ -101,8 +101,7 @@ class SM2Signer {
     return generateSignatureForHash(hash);
   } // method generateSignatureForMessage
 
-  public byte[] generateSignatureForHash(byte[] eHash)
-      throws CryptoException {
+  public byte[] generateSignatureForHash(byte[] eHash) throws CryptoException {
     BigInteger n = ecParams.getN();
     BigInteger e = new BigInteger(1, eHash);
     BigInteger d = ((ECPrivateKeyParameters)ecKey).getD();

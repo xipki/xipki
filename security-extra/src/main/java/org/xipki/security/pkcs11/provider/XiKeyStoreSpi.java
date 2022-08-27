@@ -218,8 +218,7 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
   }
 
   @Override
-  public void engineDeleteEntry(String alias)
-      throws KeyStoreException {
+  public void engineDeleteEntry(String alias) throws KeyStoreException {
     throw new KeyStoreException("keystore is read only");
   }
 

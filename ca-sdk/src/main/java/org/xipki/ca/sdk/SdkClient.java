@@ -79,16 +79,14 @@ public class SdkClient {
     }
   }
 
-  public byte[] cacert(String ca)
-      throws IOException, SdkErrorResponseException {
+  public byte[] cacert(String ca) throws IOException, SdkErrorResponseException {
     byte[] respBytes = send(ca, CMD_cacert, null);
     CertChainResponse resp = CertChainResponse.decode(respBytes);
     byte[][] certs = resp.getCertificates();
     return certs == null || certs.length == 0 ? null : certs[0];
   }
 
-  public byte[][] cacertchain(String ca)
-      throws IOException, SdkErrorResponseException {
+  public byte[][] cacertchain(String ca) throws IOException, SdkErrorResponseException {
     byte[] respBytes = send(ca, CMD_cacert, null);
     CertChainResponse resp = CertChainResponse.decode(respBytes);
     return resp.getCertificates();
@@ -103,8 +101,7 @@ public class SdkClient {
     return resp.getCrl();
   }
 
-  public byte[] currentCrl(String ca)
-      throws IOException, SdkErrorResponseException {
+  public byte[] currentCrl(String ca) throws IOException, SdkErrorResponseException {
     return currentCrl(ca, null, null, null);
   }
 

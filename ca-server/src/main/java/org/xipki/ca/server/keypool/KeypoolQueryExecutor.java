@@ -64,8 +64,7 @@ class KeypoolQueryExecutor {
     }
   }
 
-  Map<String, Integer> getKeyspecs()
-      throws DataAccessException {
+  Map<String, Integer> getKeyspecs() throws DataAccessException {
     final String sql = "SELECT ID,KEYSPEC FROM KEYSPEC";
     Statement ps = datasource.createStatement();
     ResultSet rs = null;

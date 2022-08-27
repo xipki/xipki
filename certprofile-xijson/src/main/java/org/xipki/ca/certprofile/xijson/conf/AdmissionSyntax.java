@@ -68,8 +68,7 @@ public class AdmissionSyntax extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       exactOne(regex, "regex", constant, "constant");
     }
 
@@ -111,8 +110,7 @@ public class AdmissionSyntax extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       if (oid == null && url == null && text == null) {
         throw new InvalidConfException("oid, url and text may not be all null");
       }
@@ -185,8 +183,7 @@ public class AdmissionSyntax extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       validate(namingAuthority);
       validate(professionOids);
       validate(registrationNumber);
@@ -233,8 +230,7 @@ public class AdmissionSyntax extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       validate(namingAuthority);
       notEmpty(professionInfos, "professionInfos");
       validate(professionInfos);
@@ -268,8 +264,7 @@ public class AdmissionSyntax extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notEmpty(contentsOfAdmissions, "contentsOfAdmissions");
     validate(contentsOfAdmissions);
   }

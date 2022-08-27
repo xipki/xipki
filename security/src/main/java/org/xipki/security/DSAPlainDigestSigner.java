@@ -134,8 +134,7 @@ public class DSAPlainDigestSigner implements Signer {
     digest.reset();
   }
 
-  private BigInteger[] decode(byte[] encoding)
-      throws IOException {
+  private BigInteger[] decode(byte[] encoding) throws IOException {
     int blockSize = (keyBitLen + 7) / 8;
     if (encoding.length != 2 * blockSize) {
       throw new IOException("invalid length of signature");

@@ -126,8 +126,7 @@ public class P12XdhMacContentSignerBuilder {
     init(keypairWithCert.getKey(), peerCert);
   }
 
-  private void init(PrivateKey privateKey, X509Cert peerCert)
-      throws XiSecurityException {
+  private void init(PrivateKey privateKey, X509Cert peerCert) throws XiSecurityException {
     String algorithm = privateKey.getAlgorithm();
     if (EdECConstants.X25519.equalsIgnoreCase(algorithm)) {
       this.algo = SignAlgo.DHPOP_X25519;

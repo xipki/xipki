@@ -65,9 +65,6 @@ public class MyUtil {
 
   private static final long DAY_IN_MS = 24L * 60 * MIN_IN_MS;
 
-  private static final AlgorithmIdentifier ALGID_RSA =
-      new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
-
   public static X509Cert issueSubCaCert(
       PrivateKey rcaKey, X500Name issuer, SubjectPublicKeyInfo pubKeyInfo, X500Name subject,
       BigInteger serialNumber, Date startTime)

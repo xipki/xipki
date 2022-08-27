@@ -56,13 +56,11 @@ public class CtlogControl {
 
   private ConfPairs confPairs;
 
-  public CtlogControl(String conf)
-      throws InvalidConfException {
+  public CtlogControl(String conf) throws InvalidConfException {
     this(new ConfPairs(Args.notNull(conf, "conf")));
   }
 
-  public CtlogControl(ConfPairs pairs)
-      throws InvalidConfException {
+  public CtlogControl(ConfPairs pairs) throws InvalidConfException {
     Args.notNull(pairs, "pairs");
 
     enabled = getBoolean(pairs, KEY_ENABLED, false);

@@ -92,13 +92,11 @@ public class CanonicalizeCode {
     }
   }
 
-  private void canonicalize()
-      throws Exception {
+  private void canonicalize() throws Exception {
     canonicalizeDir(new File(baseDir), true);
   }
 
-  private void canonicalizeDir(File dir, boolean root)
-      throws Exception {
+  private void canonicalizeDir(File dir, boolean root) throws Exception {
     if (dir.getName().equals(".idea")) {
       return;
     }
@@ -140,8 +138,7 @@ public class CanonicalizeCode {
     }
   } // method canonicalizeDir
 
-  private void canonicalizeFile(File file)
-      throws Exception {
+  private void canonicalizeFile(File file) throws Exception {
     byte[] newLine = detectNewline(file);
 
     BufferedReader reader = Files.newBufferedReader(file.toPath());
@@ -184,8 +181,7 @@ public class CanonicalizeCode {
     }
   } // method canonicalizeFile
 
-  private void canonicalizeTextFile(File file)
-      throws Exception {
+  private void canonicalizeTextFile(File file) throws Exception {
     byte[] newLine = new byte[]{'\n'};
     BufferedReader reader = Files.newBufferedReader(file.toPath());
     ByteArrayOutputStream writer = new ByteArrayOutputStream();
@@ -211,13 +207,11 @@ public class CanonicalizeCode {
     }
   } // method canonicalizeTextFile
 
-  private void checkWarnings()
-      throws Exception {
+  private void checkWarnings() throws Exception {
     checkWarningsInDir(new File(baseDir), true);
   }
 
-  private void checkWarningsInDir(File dir, boolean root)
-      throws Exception {
+  private void checkWarningsInDir(File dir, boolean root) throws Exception {
     if (!root) {
       // skip git submodules
       if (new File(dir, ".git").exists()) {
@@ -248,8 +242,7 @@ public class CanonicalizeCode {
     }
   } // method checkWarningsInDir
 
-  private void checkWarningsInFile(File file)
-      throws Exception {
+  private void checkWarningsInFile(File file) throws Exception {
     if (file.getName().equals("package-info.java")) {
       return;
     }
@@ -348,8 +341,7 @@ public class CanonicalizeCode {
     return (idx == n - 1) ?  line : line.substring(0, idx + 1);
   } // method removeTrailingSpaces
 
-  private static byte[] detectNewline(File file)
-      throws IOException {
+  private static byte[] detectNewline(File file) throws IOException {
     InputStream is = Files.newInputStream(file.toPath());
     byte[] bytes = new byte[200];
     int size;

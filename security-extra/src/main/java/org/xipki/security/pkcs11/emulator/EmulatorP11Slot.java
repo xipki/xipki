@@ -279,8 +279,7 @@ class EmulatorP11Slot extends P11Slot {
   } // constructor
 
   @Override
-  protected P11SlotRefreshResult refresh0()
-      throws P11TokenException {
+  protected P11SlotRefreshResult refresh0() throws P11TokenException {
     P11SlotRefreshResult ret = new P11SlotRefreshResult();
     for (long mech : supportedMechs) {
       ret.addMechanism(mech);
@@ -731,8 +730,7 @@ class EmulatorP11Slot extends P11Slot {
   } // method savePkcs11Entry
 
   @Override
-  public int removeObjects(byte[] id, String label)
-      throws P11TokenException {
+  public int removeObjects(byte[] id, String label) throws P11TokenException {
     if ((id == null || id.length == 0) && StringUtil.isBlank(label)) {
       throw new IllegalArgumentException("at least one of id and label may not be null");
     }
@@ -745,8 +743,7 @@ class EmulatorP11Slot extends P11Slot {
   } // method removeObjects
 
   @Override
-  protected void removeIdentity0(P11IdentityId identityId)
-      throws P11TokenException {
+  protected void removeIdentity0(P11IdentityId identityId) throws P11TokenException {
     P11ObjectIdentifier keyId = identityId.getKeyId();
 
     boolean b1 = true;
@@ -768,8 +765,7 @@ class EmulatorP11Slot extends P11Slot {
   } // method removeIdentity0
 
   @Override
-  protected void removeCerts0(P11ObjectIdentifier objectId)
-      throws P11TokenException {
+  protected void removeCerts0(P11ObjectIdentifier objectId) throws P11TokenException {
     deletePkcs11Entry(certDir, objectId.getId());
   }
 
@@ -921,8 +917,7 @@ class EmulatorP11Slot extends P11Slot {
   }
 
   @Override
-  protected PrivateKeyInfo generateSM2KeypairOtf0()
-      throws P11TokenException {
+  protected PrivateKeyInfo generateSM2KeypairOtf0() throws P11TokenException {
     return generateECKeypairOtf0(GMObjectIdentifiers.sm2p256v1);
   }
 

@@ -47,8 +47,7 @@ public class EmulatorP11Module extends P11Module {
 
   private final String description;
 
-  private EmulatorP11Module(P11ModuleConf moduleConf)
-      throws P11TokenException {
+  private EmulatorP11Module(P11ModuleConf moduleConf) throws P11TokenException {
     super(moduleConf);
 
     File baseDir;
@@ -173,8 +172,7 @@ public class EmulatorP11Module extends P11Module {
     setSlots(slots);
   } // constructor
 
-  public static P11Module getInstance(P11ModuleConf moduleConf)
-      throws P11TokenException {
+  public static P11Module getInstance(P11ModuleConf moduleConf) throws P11TokenException {
     notNull(moduleConf, "moduleConf");
     return new EmulatorP11Module(moduleConf);
   }
@@ -189,8 +187,7 @@ public class EmulatorP11Module extends P11Module {
     LOG.info("close pkcs11 module: {}", getName());
   }
 
-  private void createExampleRepository(File dir, int numSlots)
-      throws IOException {
+  private void createExampleRepository(File dir, int numSlots) throws IOException {
     for (int i = 0; i < numSlots; i++) {
       File slotDir = new File(dir, i + "-" + (800000 + i));
       slotDir.mkdirs();

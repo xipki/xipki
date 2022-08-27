@@ -897,8 +897,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return publisher;
   } // method changePublisher
 
-  public void removeCa(String caName)
-      throws CaMgmtException {
+  public void removeCa(String caName) throws CaMgmtException {
     notBlank(caName, "caName");
     final String sql = "DELETE FROM CA WHERE NAME=?";
 

@@ -227,8 +227,7 @@ public class FileMacAuditService extends MacAuditService {
   }
 
   @Override
-  public void doClose()
-      throws Exception {
+  public void doClose() throws Exception {
     writer.flush();
     writer.close();
   }

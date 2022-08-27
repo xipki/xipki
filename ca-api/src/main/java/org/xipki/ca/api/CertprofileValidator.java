@@ -50,8 +50,7 @@ public class CertprofileValidator {
 
   private static final Validity maxCabEeValidity = new Validity(397, Unit.DAY);
 
-  public static void validate(Certprofile certprofile)
-      throws CertprofileException {
+  public static void validate(Certprofile certprofile) throws CertprofileException {
     StringBuilder msg = new StringBuilder();
 
     Map<ASN1ObjectIdentifier, ExtensionControl> controls = certprofile.getExtensionControls();

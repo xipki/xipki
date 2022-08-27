@@ -65,8 +65,7 @@ public class PublicKeyChecker {
     this.keyAlgorithms = keyAlgorithms;
   }
 
-  public List<ValidationIssue> checkPublicKey(SubjectPublicKeyInfo publicKey,
-      SubjectPublicKeyInfo requestedPublicKey) {
+  public List<ValidationIssue> checkPublicKey(SubjectPublicKeyInfo publicKey, SubjectPublicKeyInfo requestedPublicKey) {
     notNull(publicKey, "publicKey");
     notNull(requestedPublicKey, "requestedPublicKey");
 

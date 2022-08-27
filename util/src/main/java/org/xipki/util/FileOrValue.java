@@ -62,13 +62,11 @@ public class FileOrValue extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     exactOne(file, "file", value, "value");
   }
 
-  public String readContent()
-      throws IOException {
+  public String readContent() throws IOException {
     if (value != null) {
       return value;
     }

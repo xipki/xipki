@@ -49,8 +49,7 @@ public class RestResponse {
     return body;
   }
 
-  public void fillResponse(HttpServletResponse resp)
-      throws IOException {
+  public void fillResponse(HttpServletResponse resp) throws IOException {
     resp.setStatus(statusCode);
     if (contentType != null) {
       resp.setContentType(contentType);

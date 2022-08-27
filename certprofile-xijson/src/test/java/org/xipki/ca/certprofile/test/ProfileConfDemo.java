@@ -315,8 +315,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions - extendedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_emailProtection},
-        null));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_emailProtection}, null));
 
     // Extensions - SMIMECapabilities
     list.add(createExtension(Extn.id_smimeCapabilities, true, false));
@@ -332,8 +331,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
                     + (curve25519 ? "25519" : "448")
                     + " curves";
 
-    X509ProfileType profile = getEeBaseProfileForEdwardsOrMontgomeryCurves(
-        desc, "2y", edwards, curve25519);
+    X509ProfileType profile = getEeBaseProfileForEdwardsOrMontgomeryCurves(desc, "2y", edwards, curve25519);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -377,8 +375,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions - extendedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth,
-            ObjectIdentifiers.XKU.id_kp_clientAuth},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth, ObjectIdentifiers.XKU.id_kp_clientAuth},
         null));
 
     marshall(profile, destFilename, true);
@@ -409,9 +406,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
           break;
         case EC:
           algo = createOidType(X9ObjectIdentifiers.id_ecPublicKey, "EC");
-
-          parameters.put("curve",
-              (sm2 ? GMObjectIdentifiers.sm2p256v1 : SECObjectIdentifiers.secp256r1).getId());
+          parameters.put("curve", (sm2 ? GMObjectIdentifiers.sm2p256v1 : SECObjectIdentifiers.secp256r1).getId());
           break;
         case ED448:
           algo = createOidType(EdECConstants.id_ED448, "ED448");
@@ -476,8 +471,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment},
-        null));
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment}, null));
 
     // Extensions - extendedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
@@ -521,14 +515,12 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment},
-        null));
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment}, null));
 
     // Extensions - extendedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth},
-        null));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}, null));
 
     marshall(profile, destFilename, true);
   } // method certprofileTlsC
@@ -567,8 +559,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment},
-        null));
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment}, null));
 
     marshall(profile, destFilename, true);
   } // method certprofileMaxTime
@@ -611,14 +602,12 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment},
-        null));
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment}, null));
 
     // Extensions - extendedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth},
-        null));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}, null));
 
     // Extension id_GMT_0015_ICRegistrationNumber
     ASN1ObjectIdentifier[] gmtOids = new ASN1ObjectIdentifier[] {

@@ -178,8 +178,7 @@ class OcspBenchRequestor {
     httpClient.send(request);
   } // method ask
 
-  private byte[] buildRequest(BigInteger[] serialNumbers)
-      throws OcspRequestorException {
+  private byte[] buildRequest(BigInteger[] serialNumbers) throws OcspRequestorException {
     boolean canCache = (serialNumbers.length == 1) && !requestOptions.isUseNonce();
     if (canCache) {
       byte[] request = requests.get(serialNumbers[0]);

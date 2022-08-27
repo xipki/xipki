@@ -38,8 +38,7 @@ public class CaIdentifier {
 
   private final String profile;
 
-  public CaIdentifier(String serverUrl, String profile)
-      throws MalformedURLException {
+  public CaIdentifier(String serverUrl, String profile) throws MalformedURLException {
     Args.notBlank(serverUrl, "serverUrl");
     URL tmpUrl = new URL(serverUrl);
     final String protocol = tmpUrl.getProtocol();
@@ -64,8 +63,7 @@ public class CaIdentifier {
     return profile;
   }
 
-  public String buildGetUrl(Operation operation)
-      throws TransactionException {
+  public String buildGetUrl(Operation operation) throws TransactionException {
     return buildGetUrl(operation, null);
   }
 

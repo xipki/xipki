@@ -95,8 +95,7 @@ public class DigestDiffWorker extends DbWorker {
   } // constructor
 
   @Override
-  protected void run0()
-      throws Exception {
+  protected void run0() throws Exception {
     long start = System.currentTimeMillis();
 
     try {

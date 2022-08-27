@@ -50,8 +50,7 @@ public class JceActions {
     private String algo;
 
     @Override
-    protected ConcurrentContentSigner getSigner()
-        throws Exception {
+    protected ConcurrentContentSigner getSigner() throws Exception {
       SignerConf conf = getJceSignerConf(alias, 1, SignAlgo.getInstance(algo));
       return securityFactory.createSigner(type, conf, (X509Cert[]) null);
     }

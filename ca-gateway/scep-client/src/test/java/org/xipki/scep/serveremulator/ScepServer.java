@@ -82,8 +82,7 @@ public class ScepServer {
     this.maxSigningTimeBiasInMs = ms;
   }
 
-  public ScepServlet getServlet()
-      throws Exception {
+  public ScepServlet getServlet() throws Exception {
     if (servlet != null) {
       return servlet;
     }

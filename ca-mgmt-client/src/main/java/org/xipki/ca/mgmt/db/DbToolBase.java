@@ -71,8 +71,7 @@ public class DbToolBase implements Closeable {
     this.baseDir = IoUtil.expandFilepath(baseDir);
   } // constructor
 
-  protected Statement createStatement()
-      throws DataAccessException {
+  protected Statement createStatement() throws DataAccessException {
     try {
       return connection.createStatement();
     } catch (SQLException ex) {
@@ -80,8 +79,7 @@ public class DbToolBase implements Closeable {
     }
   }
 
-  protected PreparedStatement prepareStatement(String sql)
-      throws DataAccessException {
+  protected PreparedStatement prepareStatement(String sql) throws DataAccessException {
     try {
       return connection.prepareStatement(sql);
     } catch (SQLException ex) {
@@ -118,8 +116,7 @@ public class DbToolBase implements Closeable {
     connection = null;
   }
 
-  public long min(String table, String column)
-      throws DataAccessException {
+  public long min(String table, String column) throws DataAccessException {
     return datasource.getMin(connection, table, column);
   }
 
@@ -128,8 +125,7 @@ public class DbToolBase implements Closeable {
     return datasource.getMin(connection, table, column, condition);
   }
 
-  public long max(String table, String column)
-      throws DataAccessException {
+  public long max(String table, String column) throws DataAccessException {
     return datasource.getMax(connection, table, column);
   }
 
@@ -138,8 +134,7 @@ public class DbToolBase implements Closeable {
     return datasource.getMax(connection, table, column, condition);
   }
 
-  public int count(String table)
-      throws DataAccessException {
+  public int count(String table) throws DataAccessException {
     return datasource.getCount(connection, table);
   }
 
@@ -148,13 +143,11 @@ public class DbToolBase implements Closeable {
     return datasource.tableHasColumn(connection, table, column);
   }
 
-  public boolean tableExists(String table)
-      throws DataAccessException {
+  public boolean tableExists(String table) throws DataAccessException {
     return datasource.tableExists(connection, table);
   }
 
-  protected Savepoint setSavepoint()
-      throws DataAccessException {
+  protected Savepoint setSavepoint() throws DataAccessException {
     try {
       return connection.setSavepoint();
     } catch (SQLException ex) {
@@ -162,8 +155,7 @@ public class DbToolBase implements Closeable {
     }
   }
 
-  protected void rollback()
-      throws DataAccessException {
+  protected void rollback() throws DataAccessException {
     try {
       connection.rollback();
     } catch (SQLException ex) {
@@ -175,8 +167,7 @@ public class DbToolBase implements Closeable {
     return datasource.translate(sql, Args.notNull(ex, "ex"));
   }
 
-  protected void disableAutoCommit()
-      throws DataAccessException {
+  protected void disableAutoCommit() throws DataAccessException {
     try {
       connection.setAutoCommit(false);
     } catch (SQLException ex) {
@@ -193,8 +184,7 @@ public class DbToolBase implements Closeable {
     }
   }
 
-  protected void commit(String task)
-      throws DataAccessException {
+  protected void commit(String task) throws DataAccessException {
     Args.notBlank(task, "task");
     try {
       connection.commit();
@@ -269,8 +259,8 @@ public class DbToolBase implements Closeable {
     os.write('\n');
   }
 
-  public static String buildFilename(String prefix, String suffix, long minIdOfCurrentFile,
-      long maxIdOfCurrentFile, long maxId) {
+  public static String buildFilename(
+      String prefix, String suffix, long minIdOfCurrentFile, long maxIdOfCurrentFile, long maxId) {
     Args.notNull(prefix, "prefix");
     Args.notNull(suffix, "suffix");
 

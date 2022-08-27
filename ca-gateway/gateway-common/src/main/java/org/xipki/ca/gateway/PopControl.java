@@ -50,8 +50,7 @@ public class PopControl {
 
   private final X509Cert[] dhCerts;
 
-  public PopControl(PopControlConf conf)
-      throws InvalidConfException {
+  public PopControl(PopControlConf conf) throws InvalidConfException {
     // pop signature algorithms
     if (conf.getSigAlgos() == null) {
       this.popAlgoValidator = CollectionAlgorithmValidator.INSTANCE;
@@ -137,8 +136,7 @@ public class PopControl {
     return (dhCerts == null || dhCerts.length == 0) ? null : Arrays.copyOf(dhCerts, dhCerts.length);
   } // method getCertificates
 
-  public DHSigStaticKeyCertPair getDhKeyCertPair(X500Name issuer, BigInteger serial,
-      String keyAlgorithm) {
+  public DHSigStaticKeyCertPair getDhKeyCertPair(X500Name issuer, BigInteger serial, String keyAlgorithm) {
     if (dhKeyAndCerts == null) {
       return null;
     }

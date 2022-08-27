@@ -43,8 +43,7 @@ public class SlotIdentifier extends ProxyMessage {
     this.value = Args.notNull(value, "value");
   }
 
-  private SlotIdentifier(ASN1Sequence seq)
-      throws BadAsn1ObjectException {
+  private SlotIdentifier(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 2, 2);
     int idx = 0;
     long id = getInteger(seq.getObjectAt(idx++)).longValue();
@@ -52,8 +51,7 @@ public class SlotIdentifier extends ProxyMessage {
     this.value = new P11SlotIdentifier(index, id);
   }
 
-  public static SlotIdentifier getInstance(Object obj)
-      throws BadAsn1ObjectException {
+  public static SlotIdentifier getInstance(Object obj) throws BadAsn1ObjectException {
     if (obj == null || obj instanceof SlotIdentifier) {
       return (SlotIdentifier) obj;
     }

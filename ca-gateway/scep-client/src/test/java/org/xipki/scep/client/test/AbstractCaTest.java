@@ -98,8 +98,7 @@ public abstract class AbstractCaTest {
   }
 
   @Before
-  public synchronized void startScepServer()
-      throws Exception {
+  public synchronized void startScepServer() throws Exception {
     if (scepServerContainer == null) {
       CaCaps caCaps = getExpectedCaCaps();
 
@@ -113,24 +112,21 @@ public abstract class AbstractCaTest {
   }
 
   @After
-  public synchronized void stopScepServer()
-      throws Exception {
+  public synchronized void stopScepServer() throws Exception {
     if (this.scepServerContainer != null) {
       this.scepServerContainer.stop();
     }
   }
 
   @Test
-  public void test()
-      throws Exception {
+  public void test() throws Exception {
     KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA");
     kpGen.initialize(2048);
     KeyPair keypair = kpGen.generateKeyPair();
     doTest(keypair);
   }
 
-  private void doTest(KeyPair keypair)
-      throws Exception {
+  private void doTest(KeyPair keypair) throws Exception {
     CaIdentifier caId = new CaIdentifier("http://localhost:" + port + "/scep/pkiclient.exe", null);
     CaCertValidator caCertValidator = new CaCertValidator.PreprovisionedCaCertValidator(scepServer.getCaCert());
     ScepClient client = new ScepClient(caId, caCertValidator);

@@ -163,8 +163,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  X509CRLHolder downloadCrl(
-      String caName, ReqRespDebug debug)
+  X509CRLHolder downloadCrl(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -255,7 +254,6 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  List<X509Cert> getDhPopPeerCertificates()
-      throws CmpClientException;
+  List<X509Cert> getDhPopPeerCertificates() throws CmpClientException;
 
 }

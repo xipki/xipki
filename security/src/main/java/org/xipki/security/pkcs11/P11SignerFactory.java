@@ -103,8 +103,7 @@ public class P11SignerFactory implements SignerFactory {
     str = conf.getConfValue("slot-id");
     Long slotId = (str == null) ? null : Long.parseLong(str);
 
-    if ((slotIndex == null && slotId == null)
-        || (slotIndex != null && slotId != null)) {
+    if ((slotIndex == null && slotId == null) || (slotIndex != null && slotId != null)) {
       throw new ObjectCreationException("exactly one of slot (index) and slot-id must be specified");
     }
 
@@ -167,8 +166,7 @@ public class P11SignerFactory implements SignerFactory {
   } // method newSigner
 
   @Override
-  public void refreshToken(String type)
-      throws XiSecurityException {
+  public void refreshToken(String type) throws XiSecurityException {
     if (!TYPE.equalsIgnoreCase(type)) {
       // Nothing to do
       return;

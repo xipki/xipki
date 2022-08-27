@@ -82,8 +82,7 @@ public abstract class Requestor {
     }
 
     public PBMParameter getParameter() {
-      return new PBMParameter(randomSalt(), owf.getAlgorithmIdentifier(),
-          iterationCount, mac.getAlgorithmIdentifier());
+      return new PBMParameter(randomSalt(), owf.getAlgorithmIdentifier(), iterationCount, mac.getAlgorithmIdentifier());
     }
 
     private byte[] randomSalt() {

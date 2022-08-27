@@ -413,8 +413,7 @@ public class ExtensionType extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notNull(type, "type");
     validate(type);
     validate(additionalInformation);

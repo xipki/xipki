@@ -39,8 +39,7 @@ public class QaCaNegActions {
   public static class NegCaAdd extends CaActions.CaAdd {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-ca-add");
 
       try {
@@ -59,8 +58,7 @@ public class QaCaNegActions {
   public static class NegCaaliasAdd extends CaActions.CaaliasAdd {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-caalias-add");
 
       try {
@@ -79,8 +77,7 @@ public class QaCaNegActions {
   public static class NegCaaliasRm extends CaActions.CaaliasRm {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-caalias-rm");
 
       try {
@@ -99,8 +96,7 @@ public class QaCaNegActions {
   public static class NegCaprofileAdd extends ProfileCaActions.CaprofileAdd {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-caprofile-add");
 
       try {
@@ -119,8 +115,7 @@ public class QaCaNegActions {
   public static class NegCaprofileRm extends ProfileCaActions.CaprofileRm {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-caprofile-rm");
 
       try {
@@ -139,8 +134,7 @@ public class QaCaNegActions {
   public static class NegCaPubAdd extends PublisherCaActions.CapubAdd {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-capub-add");
 
       try {
@@ -159,8 +153,7 @@ public class QaCaNegActions {
   public static class NegCapubRm extends PublisherCaActions.CapubRm {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-capub-rm");
 
       try {
@@ -179,8 +172,7 @@ public class QaCaNegActions {
   public static class NegCaRm extends CaActions.CaRm {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-ca-rm");
 
       try {
@@ -199,8 +191,7 @@ public class QaCaNegActions {
   public static class NegCaReqAdd extends RequestorCaActions.CareqAdd {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-careq-add");
 
       try {
@@ -219,8 +210,7 @@ public class QaCaNegActions {
   public static class NegCareqRm extends RequestorCaActions.CareqRm {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-careq-rm");
 
       try {
@@ -239,8 +229,7 @@ public class QaCaNegActions {
   public static class NegCaRevoke extends CaActions.CaRevoke {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-ca-revoke");
 
       try {
@@ -259,8 +248,7 @@ public class QaCaNegActions {
   public static class NegCaUnrevoke extends CaActions.CaUnrevoke {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-ca-unrevoke");
 
       try {
@@ -279,8 +267,7 @@ public class QaCaNegActions {
   public static class NegCaUp extends CaActions.CaUp {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-ca-up");
 
       try {
@@ -299,8 +286,7 @@ public class QaCaNegActions {
   public static class NegClearPublishQueue extends MiscCaActions.ClearPublishqueue {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-clear-publishqueue");
 
       try {
@@ -319,8 +305,7 @@ public class QaCaNegActions {
   public static class NegEnrollCert extends EnrollCert {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-enroll-cert");
 
       try {
@@ -339,8 +324,7 @@ public class QaCaNegActions {
   public static class NegGenRootCa extends CaActions.GenRootca {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-gen-rootca");
 
       try {
@@ -359,8 +343,7 @@ public class QaCaNegActions {
   public static class NegProfileAdd extends ProfileCaActions.ProfileAdd {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-profile-add");
 
       try {
@@ -379,8 +362,7 @@ public class QaCaNegActions {
   public static class NegProfileRm extends ProfileCaActions.ProfileRm {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-profile-rm");
 
       try {
@@ -399,8 +381,7 @@ public class QaCaNegActions {
   public static class NegProfileUp extends ProfileCaActions.ProfileUp {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-profile-up");
 
       try {
@@ -419,8 +400,7 @@ public class QaCaNegActions {
   public static class NegPublisherAdd extends PublisherCaActions.PublisherAdd {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-publisher-add");
 
       try {
@@ -439,8 +419,7 @@ public class QaCaNegActions {
   public static class NegPublisherRm extends PublisherCaActions.PublisherRm {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-publisher-rm");
 
       try {
@@ -459,8 +438,7 @@ public class QaCaNegActions {
   public static class NegPublisherUp extends PublisherCaActions.PublisherUp {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-publisher-up");
 
       try {
@@ -479,8 +457,7 @@ public class QaCaNegActions {
   public static class NegRepublish extends MiscCaActions.Republish {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-republish");
 
       try {
@@ -499,8 +476,7 @@ public class QaCaNegActions {
   public static class NegRequestorAdd extends RequestorCaActions.RequestorAdd {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-requestor-add");
 
       try {
@@ -519,8 +495,7 @@ public class QaCaNegActions {
   public static class NegRequestorRm extends RequestorCaActions.RequestorRm {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-requestor-rm");
 
       try {
@@ -539,8 +514,7 @@ public class QaCaNegActions {
   public static class NegRequestorUp extends RequestorCaActions.RequestorUp {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-requestor-up");
 
       try {
@@ -559,8 +533,7 @@ public class QaCaNegActions {
   public static class NegRmCert extends RmCert {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-remove-cert");
 
       try {
@@ -579,8 +552,7 @@ public class QaCaNegActions {
   public static class NegRevokeCert extends RevokeCert {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-remove-cert");
 
       try {
@@ -599,8 +571,7 @@ public class QaCaNegActions {
   public static class NegSignerAdd extends SignerCaActions.SignerAdd {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-signer-add");
 
       try {
@@ -619,8 +590,7 @@ public class QaCaNegActions {
   public static class NegSignerRm extends SignerCaActions.SignerRm {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-signer-rm");
 
       try {
@@ -639,8 +609,7 @@ public class QaCaNegActions {
   public static class NegSignerUp extends SignerCaActions.SignerUp {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-signer-up");
 
       try {
@@ -659,8 +628,7 @@ public class QaCaNegActions {
   public static class NegUnrevokeCert extends UnsuspendCert {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       println("neg-unrevoke-cert");
 
       try {

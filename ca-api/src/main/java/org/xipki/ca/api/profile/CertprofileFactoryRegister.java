@@ -77,8 +77,7 @@ public class CertprofileFactoryRegister {
    * @throws ObjectCreationException
    *           If certificate profile could not be created.
    */
-  public Certprofile newCertprofile(String type)
-      throws ObjectCreationException {
+  public Certprofile newCertprofile(String type) throws ObjectCreationException {
     Args.notBlank(type, "type");
 
     for (CertprofileFactory service : factories) {

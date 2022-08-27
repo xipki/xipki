@@ -39,8 +39,7 @@ public class InhibitAnyPolicy extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
   }
 
 } // class InhibitAnyPolicy

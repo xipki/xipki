@@ -77,8 +77,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     this.resume = resume;
   } // constructor
 
-  public void importToDb()
-      throws Exception {
+  public void importToDb() throws Exception {
     OcspCertstore certstore;
     try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_OCSP_CERTSTORE))) {
       certstore = JSON.parseObject(is, OcspCertstore.class);
@@ -106,8 +105,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     System.out.println(" imported OCSP certstore to database");
   } // method importToDB
 
-  private void importCertHashAlgo(String certHashAlgo)
-      throws DataAccessException {
+  private void importCertHashAlgo(String certHashAlgo) throws DataAccessException {
     String sql = "UPDATE DBSCHEMA SET VALUE2=? WHERE NAME='CERTHASH_ALGO'";
     PreparedStatement ps = prepareStatement(sql);
     try {

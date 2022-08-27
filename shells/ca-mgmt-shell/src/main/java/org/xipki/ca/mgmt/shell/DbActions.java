@@ -62,11 +62,9 @@ public class DbActions {
       datasourceFactory = new DataSourceFactory();
     }
 
-    protected abstract DbWorker getDbWorker()
-        throws Exception;
+    protected abstract DbWorker getDbWorker() throws Exception;
 
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       ExecutorService executor = Executors.newFixedThreadPool(1);
       DbWorker myRun = getDbWorker();
       executor.execute(myRun);
@@ -146,8 +144,7 @@ public class DbActions {
     private List<String> caCertFiles;
 
     @Override
-    protected DbWorker getDbWorker()
-        throws Exception {
+    protected DbWorker getDbWorker() throws Exception {
       Set<byte[]> caCerts = null;
       if (caCertFiles != null && !caCertFiles.isEmpty()) {
         caCerts = new HashSet<>(caCertFiles.size());
@@ -185,8 +182,7 @@ public class DbActions {
     private Boolean resume = Boolean.FALSE;
 
     @Override
-    protected DbPortWorker getDbWorker()
-        throws Exception {
+    protected DbPortWorker getDbWorker() throws Exception {
       return new DbPortWorker.ExportCaDb(datasourceFactory, passwordResolver, dbconfFile, outdir,
           resume, numCertsInBundle, numCertsPerCommit, readPassword());
     }
@@ -215,8 +211,7 @@ public class DbActions {
     private Boolean resume = Boolean.FALSE;
 
     @Override
-    protected DbPortWorker getDbWorker()
-        throws Exception {
+    protected DbPortWorker getDbWorker() throws Exception {
       return new DbPortWorker.ExportOcspDb(datasourceFactory, passwordResolver, dbconfFile, outdir,
           resume, numCertsInBundle, numCertsPerSelect, readPassword());
     }
@@ -242,8 +237,7 @@ public class DbActions {
     private Boolean resume = Boolean.FALSE;
 
     @Override
-    protected DbPortWorker getDbWorker()
-        throws Exception {
+    protected DbPortWorker getDbWorker() throws Exception {
       return new DbPortWorker.ImportCaDb(datasourceFactory, passwordResolver, dbconfFile, resume,
           indir, numCertsPerCommit, readPassword());
     }
@@ -269,8 +263,7 @@ public class DbActions {
     private Boolean resume = Boolean.FALSE;
 
     @Override
-    protected DbPortWorker getDbWorker()
-        throws Exception {
+    protected DbPortWorker getDbWorker() throws Exception {
       return new DbPortWorker.ImportOcspDb(datasourceFactory, passwordResolver, dbconfFile, resume,
           indir, numCertsPerCommit, readPassword());
     }
@@ -302,8 +295,7 @@ public class DbActions {
     private Boolean resume = Boolean.FALSE;
 
     @Override
-    protected DbPortWorker getDbWorker()
-        throws Exception {
+    protected DbPortWorker getDbWorker() throws Exception {
       return new DbPortWorker.ImportOcspFromCaDb(datasourceFactory, passwordResolver, dbconfFile,
           publisherName, resume, indir, numCertsPerCommit, readPassword());
     }

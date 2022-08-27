@@ -48,8 +48,7 @@ public class XiRSAContentVerifierProviderBuilder extends BcRSAContentVerifierPro
   }
 
   @Override
-  protected Signer createSigner(AlgorithmIdentifier sigAlgId)
-      throws OperatorCreationException {
+  protected Signer createSigner(AlgorithmIdentifier sigAlgId) throws OperatorCreationException {
     SignAlgo signAlgo;
     try {
       signAlgo = SignAlgo.getInstance(sigAlgId);

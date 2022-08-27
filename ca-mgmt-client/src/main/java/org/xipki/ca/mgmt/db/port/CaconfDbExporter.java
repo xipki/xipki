@@ -53,8 +53,7 @@ class CaconfDbExporter extends DbPorter {
     super(datasource, destDir, stopMe);
   }
 
-  public void export()
-      throws Exception {
+  public void export() throws Exception {
     CaCertstore.Caconf caconf = new CaCertstore.Caconf();
     caconf.setVersion(VERSION_V2);
 
@@ -146,7 +145,7 @@ class CaconfDbExporter extends DbPorter {
   } // method exportRequestor
 
   private void exportDbSchema(CaCertstore.Caconf caconf)
-          throws DataAccessException, InvalidConfException {
+      throws DataAccessException, InvalidConfException {
     System.out.println("exporting table DBSCHEMA");
     List<CaCertstore.DbSchemaEntry> entries = new LinkedList<>();
     final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";

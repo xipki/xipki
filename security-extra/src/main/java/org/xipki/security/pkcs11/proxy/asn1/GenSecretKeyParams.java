@@ -55,8 +55,7 @@ public class GenSecretKeyParams extends ProxyMessage {
     this.keysize = Args.min(keysize, "keysize", 1);
   }
 
-  private GenSecretKeyParams(ASN1Sequence seq)
-      throws BadAsn1ObjectException {
+  private GenSecretKeyParams(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 4, 4);
     int idx = 0;
     slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
@@ -66,8 +65,7 @@ public class GenSecretKeyParams extends ProxyMessage {
     Args.min(keysize, "keysize", 1);
   }
 
-  public static GenSecretKeyParams getInstance(Object obj)
-      throws BadAsn1ObjectException {
+  public static GenSecretKeyParams getInstance(Object obj) throws BadAsn1ObjectException {
     if (obj == null || obj instanceof GenSecretKeyParams) {
       return (GenSecretKeyParams) obj;
     }

@@ -741,8 +741,7 @@ public class CaConfType {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notBlank(name, "name");
       notBlank(type, "type");
       validate(conf);
@@ -793,8 +792,7 @@ public class CaConfType {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notBlank(name, "name");
       notBlank(type, "type");
       exactOne(conf, "conf", binaryConf, "binaryConf");
@@ -847,8 +845,7 @@ public class CaConfType {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notBlank(name, "name");
       notBlank(type, "type");
       notNull(conf, "conf");

@@ -60,8 +60,7 @@ public class SmimeCapabilities extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notNull(capabilityId, "capabilityId");
       validate(capabilityId);
       validate(parameter);
@@ -94,8 +93,7 @@ public class SmimeCapabilities extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       exactOne(integer, "integer", binary, "binary");
       validate(binary);
     }
@@ -116,8 +114,7 @@ public class SmimeCapabilities extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notEmpty(capabilities, "capabilities");
     validate(capabilities);
   }

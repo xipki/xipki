@@ -31,11 +31,9 @@ public interface SinglePasswordResolver {
 
   boolean canResolveProtocol(String protocol);
 
-  char[] resolvePassword(String passwordHint)
-      throws PasswordResolverException;
+  char[] resolvePassword(String passwordHint) throws PasswordResolverException;
 
-  String protectPassword(char[] password)
-      throws PasswordResolverException;
+  String protectPassword(char[] password) throws PasswordResolverException;
 
   class OBF implements SinglePasswordResolver {
 
@@ -48,14 +46,12 @@ public interface SinglePasswordResolver {
     }
 
     @Override
-    public char[] resolvePassword(String passwordHint)
-        throws PasswordResolverException {
+    public char[] resolvePassword(String passwordHint) throws PasswordResolverException {
       return OBFPasswordService.deobfuscate(passwordHint).toCharArray();
     }
 
     @Override
-    public String protectPassword(char[] password)
-        throws PasswordResolverException {
+    public String protectPassword(char[] password) throws PasswordResolverException {
       return OBFPasswordService.obfuscate(new String(password));
     }
 
@@ -149,14 +145,12 @@ public interface SinglePasswordResolver {
     }
 
     @Override
-    public char[] resolvePassword(String passwordHint)
-        throws PasswordResolverException {
+    public char[] resolvePassword(String passwordHint) throws PasswordResolverException {
       return PBEPasswordService.decryptPassword(getMasterPassword(passwordHint), passwordHint);
     }
 
     @Override
-    public String protectPassword(char[] password)
-        throws PasswordResolverException {
+    public String protectPassword(char[] password) throws PasswordResolverException {
       final int iterationCount = 2000;
       return PBEPasswordService.encryptPassword(PBEAlgo.PBEWithHmacSHA256AndAES_256, iterationCount,
           getMasterPassword(null), password);

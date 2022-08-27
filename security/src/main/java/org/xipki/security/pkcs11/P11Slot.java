@@ -462,8 +462,7 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  protected abstract PrivateKeyInfo generateSM2KeypairOtf0()
-      throws P11TokenException;
+  protected abstract PrivateKeyInfo generateSM2KeypairOtf0() throws P11TokenException;
 
   /**
    * Generates an RSA keypair.
@@ -481,8 +480,7 @@ public abstract class P11Slot implements Closeable {
   protected abstract P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent, P11NewKeyControl control)
       throws P11TokenException;
 
-  protected abstract P11SlotRefreshResult refresh0()
-      throws P11TokenException;
+  protected abstract P11SlotRefreshResult refresh0() throws P11TokenException;
 
   protected abstract void removeCerts0(P11ObjectIdentifier objectId)
       throws P11TokenException;
@@ -822,8 +820,7 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public X509Cert exportCert(P11ObjectIdentifier objectId)
-      throws P11TokenException {
+  public X509Cert exportCert(P11ObjectIdentifier objectId) throws P11TokenException {
     notNull(objectId, "objectId");
     try {
       return getIdentity(objectId).getCertificate();
@@ -845,8 +842,7 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public void removeCerts(P11ObjectIdentifier objectId)
-      throws P11TokenException {
+  public void removeCerts(P11ObjectIdentifier objectId) throws P11TokenException {
     notNull(objectId, "objectId");
     assertWritable("removeCerts");
 
@@ -881,8 +877,7 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public void removeIdentity(P11IdentityId identityId)
-      throws P11TokenException {
+  public void removeIdentity(P11IdentityId identityId) throws P11TokenException {
     notNull(identityId, "identityId");
     assertWritable("removeIdentity");
     P11ObjectIdentifier keyId = identityId.getKeyId();
@@ -907,8 +902,7 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public void removeIdentityByKeyId(P11ObjectIdentifier keyId)
-      throws P11TokenException {
+  public void removeIdentityByKeyId(P11ObjectIdentifier keyId) throws P11TokenException {
     notNull(keyId, "keyId");
     assertWritable("removeIdentityByKeyId");
 
@@ -1262,8 +1256,7 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public PrivateKeyInfo generateSM2KeypairOtf()
-      throws P11TokenException {
+  public PrivateKeyInfo generateSM2KeypairOtf() throws P11TokenException {
     assertMechanismSupported(PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
     return generateSM2KeypairOtf0();
   }
@@ -1371,8 +1364,7 @@ public abstract class P11Slot implements Closeable {
    * @throws IOException
    *         if IO error occurs.
    */
-  public void showDetails(OutputStream stream, boolean verbose)
-      throws IOException {
+  public void showDetails(OutputStream stream, boolean verbose) throws IOException {
     notNull(stream, "stream");
 
     List<P11ObjectIdentifier> sortedKeyIds = getSortedObjectIds(identities.keySet());
@@ -1441,8 +1433,7 @@ public abstract class P11Slot implements Closeable {
     }
   } // method showDetails
 
-  protected void assertWritable(String operationName)
-      throws P11PermissionException {
+  protected void assertWritable(String operationName) throws P11PermissionException {
     if (readOnly) {
       throw new P11PermissionException("Writable operation " + operationName + " is not permitted");
     }
@@ -1511,8 +1502,7 @@ public abstract class P11Slot implements Closeable {
     return algo;
   }
 
-  private static void formatString(Integer index, boolean verbose, StringBuilder sb,
-      X509Cert cert) {
+  private static void formatString(Integer index, boolean verbose, StringBuilder sb, X509Cert cert) {
     String subject = cert.getSubjectText();
     sb.append("\t\tCertificate");
     if (index != null) {

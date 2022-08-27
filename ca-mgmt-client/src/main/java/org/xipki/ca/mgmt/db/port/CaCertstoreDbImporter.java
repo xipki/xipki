@@ -66,17 +66,15 @@ class CaCertstoreDbImporter extends DbPorter {
   private static final String SQL_ADD_CRL = buildInsertSql("CRL",
       "ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL_SCOPE,SHA1,CRL");
 
-  private static final String SQL_ADD_REQUEST = buildInsertSql("REQUEST",
-      "ID,LUPDATE,DATA");
+  private static final String SQL_ADD_REQUEST = buildInsertSql("REQUEST", "ID,LUPDATE,DATA");
 
-  private static final String SQL_ADD_REQCERT = buildInsertSql("REQCERT",
-      "ID,RID,CID");
+  private static final String SQL_ADD_REQCERT = buildInsertSql("REQCERT", "ID,RID,CID");
 
   private final int numCertsPerCommit;
 
   CaCertstoreDbImporter(DataSourceWrapper datasource, String srcDir, int numCertsPerCommit,
       boolean resume, AtomicBoolean stopMe)
-          throws Exception {
+      throws Exception {
     super(datasource, srcDir, stopMe);
 
     this.numCertsPerCommit = Args.positive(numCertsPerCommit, "numCertsPerCommit");
@@ -94,8 +92,7 @@ class CaCertstoreDbImporter extends DbPorter {
     }
   } // constructor
 
-  public void importToDb()
-      throws Exception {
+  public void importToDb() throws Exception {
     CaCertstore certstore;
     try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_CA_CERTSTORE))) {
       certstore = JSON.parseObject(is, CaCertstore.class);
@@ -103,8 +100,7 @@ class CaCertstoreDbImporter extends DbPorter {
     certstore.validate();
 
     if (certstore.getVersion() > VERSION_V2) {
-      throw new Exception("could not import Certstore greater than " + VERSION_V2 + ": "
-          + certstore.getVersion());
+      throw new Exception("could not import Certstore greater than " + VERSION_V2 + ": " + certstore.getVersion());
     }
 
     File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);

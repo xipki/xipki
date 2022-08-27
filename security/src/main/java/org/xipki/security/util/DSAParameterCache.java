@@ -49,8 +49,7 @@ public final class DSAParameterCache {
   static {
     String resourceFile = "/conf/DSAParameters.cfg";
     InputStream confStream = DSAParameterCache.class.getResourceAsStream(resourceFile);
-    BufferedReader reader =
-        new BufferedReader(new InputStreamReader(confStream, StandardCharsets.UTF_8));
+    BufferedReader reader = new BufferedReader(new InputStreamReader(confStream, StandardCharsets.UTF_8));
 
     String line;
     try {

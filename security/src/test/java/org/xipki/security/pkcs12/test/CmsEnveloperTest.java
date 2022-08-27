@@ -63,8 +63,7 @@ public class CmsEnveloperTest {
   }
 
   @Test
-  public void testEeKeyAgree()
-      throws Exception {
+  public void testEeKeyAgree() throws Exception {
     KeyStore ks = KeyStore.getInstance("PKCS12");
     char[] password = "1234".toCharArray();
     ks.load(new FileInputStream("src/test/resources/pkcs12test/test-ec.p12"), password);
@@ -98,8 +97,7 @@ public class CmsEnveloperTest {
   }
 
   @Test
-  public void testAesGcm()
-      throws CMSException {
+  public void testAesGcm() throws CMSException {
     SecretKey kek = new SecretKeySpec(new byte[16], "AES");
     byte[] data = Hex.decode("1234567890abcdef");
     CMSEnvelopedDataGenerator edGen = new CMSEnvelopedDataGenerator();
@@ -122,8 +120,7 @@ public class CmsEnveloperTest {
   }
 
   @Test
-  public void testRsaOaep()
-      throws Exception {
+  public void testRsaOaep() throws Exception {
     HashAlgo hashAlgo = HashAlgo.SHA256;
     KeyStore ks = KeyStore.getInstance("PKCS12");
     char[] password = "1234".toCharArray();

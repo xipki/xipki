@@ -112,8 +112,7 @@ public class DbPorter extends DbToolBase {
 
     private String nextFilename;
 
-    public DbPortFileNameIterator(String filename)
-        throws IOException {
+    public DbPortFileNameIterator(String filename) throws IOException {
       Args.notNull(filename, "filename");
 
       this.reader = Files.newBufferedReader(Paths.get(filename));
@@ -151,8 +150,7 @@ public class DbPorter extends DbToolBase {
       }
     }
 
-    private String readNextFilenameLine()
-        throws IOException {
+    private String readNextFilenameLine() throws IOException {
       String line;
       while ((line = reader.readLine()) != null) {
         line = line.trim();
@@ -256,8 +254,7 @@ public class DbPorter extends DbToolBase {
     return ret;
   } // method buildFileOrBinary
 
-  protected byte[] readContent(FileOrBinary fileOrBinary)
-      throws IOException {
+  protected byte[] readContent(FileOrBinary fileOrBinary) throws IOException {
     if (fileOrBinary == null) {
       return null;
     }
@@ -270,8 +267,7 @@ public class DbPorter extends DbToolBase {
     return IoUtil.read(file);
   } // method readContent
 
-  protected String readContent(FileOrValue fileOrValue)
-      throws IOException {
+  protected String readContent(FileOrValue fileOrValue) throws IOException {
     if (fileOrValue == null) {
       return null;
     }

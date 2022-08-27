@@ -29,45 +29,6 @@ import org.xipki.util.ConfPairs;
 
 public class KeypairGenEntry extends MgmtEntry {
 
-  /**
-   * Specify how many parallel keypair generation processes are allowed.
-   * Default to 10.
-   */
-  public static final String KEY_PARALLELISM = "parallelism";
-
-  public static final String TYPE_SOFT = "soft";
-
-  public static final String TYPE_PKCS11 = "pkcs11";
-
-  public static final String TYPE_DATABASE = "database";
-
-  /**
-   * PKCS#11 module.
-   */
-  public static final String KEY_MODULE  = "module";
-
-  /**
-   * PKCS#11 slot index.
-   */
-  public static final String KEY_SLOT    = "slot";
-
-  /**
-   * PKCS#11 slot id.
-   */
-  public static final String KEY_SLOT_ID = "slot-id";
-
-  /**
-   * Datasource for the type database.
-   */
-  public static final String KEY_DATASOURCE = "datasource";
-
-  /**
-   * The key used to decrypt the saved keypair, for the type database.
-   * It is the hex-encoded key. For security, it should be encrypted by the
-   * master password.
-   */
-  public static final String KEY_ENC_KEY = "enc-key";
-
   private final String name;
 
   private final String type;

@@ -87,8 +87,7 @@ public class GeneralSubtreeType extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       int occurs = 0;
       if (directoryName != null) {
         occurs++;
@@ -151,8 +150,7 @@ public class GeneralSubtreeType extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notNull(base, "base");
     validate(base);
   }

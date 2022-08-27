@@ -69,8 +69,7 @@ public class KeyParametersType extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       validateRanges(plengths);
       validateRanges(qlengths);
     }
@@ -106,8 +105,7 @@ public class KeyParametersType extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       validate(curves);
     }
 
@@ -130,8 +128,7 @@ public class KeyParametersType extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       validateRanges(modulusLengths);
     }
 
@@ -212,8 +209,7 @@ public class KeyParametersType extends ValidatableConf {
     return ret;
   } // method buildParametersMap
 
-  private static void validateRanges(List<Range> ranges)
-      throws InvalidConfException {
+  private static void validateRanges(List<Range> ranges) throws InvalidConfException {
     if (ranges != null) {
       for (Range r : ranges) {
         try {
@@ -226,8 +222,7 @@ public class KeyParametersType extends ValidatableConf {
   } // method validateRanges
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     validate(dsa);
     validate(ec);
     validate(rsa);

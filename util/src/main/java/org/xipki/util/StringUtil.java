@@ -217,27 +217,6 @@ public class StringUtil {
     return ret;
   }
 
-  @SuppressWarnings("deprecation")
-  public static String getRelativeRequestUri(String servletPath, String requestUri) {
-    String path = "";
-    int len = servletPath.length();
-    if (requestUri.length() > len + 1) {
-      path = requestUri.substring(len + 1);
-    }
-
-    if (path.isEmpty()) {
-      path = "/";
-    } else if (path.charAt(0) != '/') {
-      path = "/" + path;
-    }
-
-    try {
-      return URLDecoder.decode(path, "UTF-8");
-    } catch (UnsupportedEncodingException ex) {
-      return URLDecoder.decode(path);
-    }
-  }
-
   public static String concat(String s1, String... strs) {
     int len = (s1 == null) ? 4 : s1.length();
     for (String str : strs) {

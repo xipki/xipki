@@ -169,8 +169,7 @@ public class EmbedAuditService implements AuditService {
   }
 
   @Override
-  public void close()
-      throws Exception {
+  public void close() throws Exception {
     writer.flush();
     writer.close();
   }

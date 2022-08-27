@@ -131,8 +131,7 @@ public class OcspServerUtil {
     }
   } // method initSigner
 
-  static OcspStore newStore(OcspServerConf.Store conf,
-      Map<String, DataSourceWrapper> datasources)
+  static OcspStore newStore(OcspServerConf.Store conf, Map<String, DataSourceWrapper> datasources)
       throws InvalidConfException {
     OcspStore store;
     try {
@@ -260,15 +259,13 @@ public class OcspServerUtil {
     return (bo == null) ? defaultValue : bo;
   }
 
-  private static InputStream getInputStream(FileOrBinary conf)
-      throws IOException {
+  private static InputStream getInputStream(FileOrBinary conf) throws IOException {
     return (conf.getFile() != null)
         ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile(), true)))
         : new ByteArrayInputStream(conf.getBinary());
   }
 
-  static InputStream getInputStream(FileOrValue conf)
-      throws IOException {
+  static InputStream getInputStream(FileOrValue conf) throws IOException {
     return (conf.getFile() != null)
         ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile(), true)))
         : new ByteArrayInputStream(StringUtil.toUtf8Bytes(conf.getValue()));
@@ -286,8 +283,7 @@ public class OcspServerUtil {
     }
   }
 
-  private static X509Cert parseCert(FileOrBinary certConf)
-      throws InvalidConfException {
+  private static X509Cert parseCert(FileOrBinary certConf) throws InvalidConfException {
     InputStream is = null;
     try {
       is = getInputStream(certConf);
@@ -303,8 +299,7 @@ public class OcspServerUtil {
     }
   } // method parseCert
 
-  static OcspServerConf parseConf(String confFilename)
-      throws InvalidConfException {
+  static OcspServerConf parseConf(String confFilename) throws InvalidConfException {
     try (InputStream is = Files.newInputStream(
           Paths.get(IoUtil.expandFilepath(confFilename, true)))) {
       OcspServerConf root = JSON.parseObject(is, OcspServerConf.class);

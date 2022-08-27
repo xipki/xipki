@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.security.cmp;
+package org.xipki.cmpclient;
 
 import org.xipki.util.Args;
 

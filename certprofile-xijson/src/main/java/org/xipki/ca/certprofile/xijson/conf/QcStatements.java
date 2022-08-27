@@ -60,8 +60,7 @@ public class QcStatements extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
     }
 
   } // method Range2Type
@@ -102,8 +101,7 @@ public class QcStatements extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notBlank(currency, "currency");
       notNull(amount, "amount");
       validate(amount);
@@ -138,8 +136,7 @@ public class QcStatements extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notBlank(url, "url");
       notBlank(language, "language");
     }
@@ -193,8 +190,7 @@ public class QcStatements extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       int num = 0;
       if (constant != null) {
         num++;
@@ -249,8 +245,7 @@ public class QcStatements extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notNull(statementId, "statementId");
       validate(statementId);
       validate(statementValue);
@@ -272,8 +267,7 @@ public class QcStatements extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notEmpty(qcStatements, "qcStatements");
     validate(qcStatements);
   }

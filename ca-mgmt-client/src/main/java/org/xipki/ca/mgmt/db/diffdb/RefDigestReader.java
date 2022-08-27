@@ -109,8 +109,7 @@ class RefDigestReader implements Closeable {
       selectCertStmt = null;
     } // method run
 
-    private void query()
-        throws InterruptedException {
+    private void query() throws InterruptedException {
       long startId = lastProcessedId + 1;
       DigestEntrySet result = new DigestEntrySet(startId);
 

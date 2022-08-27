@@ -168,8 +168,7 @@ public class P12SignerFactory implements SignerFactory {
     // Nothing to do.
   }
 
-  private static InputStream getInputStream(String str)
-      throws ObjectCreationException {
+  private static InputStream getInputStream(String str) throws ObjectCreationException {
     if (StringUtil.startsWithIgnoreCase(str, "base64:")) {
       return new ByteArrayInputStream(Base64.decode(str.substring("base64:".length())));
     } else if (StringUtil.startsWithIgnoreCase(str, "file:")) {

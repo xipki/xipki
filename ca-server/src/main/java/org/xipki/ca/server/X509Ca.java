@@ -232,8 +232,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     return certstore.getCertWithRevocationInfo(caIdent.getId(), serialNumber, caIdNameMap);
   }
 
-  public byte[] getCertRequest(BigInteger serialNumber)
-      throws OperationException {
+  public byte[] getCertRequest(BigInteger serialNumber) throws OperationException {
     return certstore.getCertRequest(caIdent, serialNumber);
   }
 

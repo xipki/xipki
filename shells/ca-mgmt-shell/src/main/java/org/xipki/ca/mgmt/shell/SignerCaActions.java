@@ -72,8 +72,7 @@ public class SignerCaActions {
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       String base64Cert = null;
       X509Cert signerCert = null;
       if (certFile != null) {
@@ -110,8 +109,7 @@ public class SignerCaActions {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       StringBuilder sb = new StringBuilder();
 
       if (name == null) {
@@ -157,8 +155,7 @@ public class SignerCaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       String msg = "signer " + name;
       if (force || confirm("Do you want to remove " + msg, 3)) {
         try {
@@ -195,8 +192,7 @@ public class SignerCaActions {
     @Option(name = "--conf", description = "conf of the signer or 'null'")
     private String conf;
 
-    protected String getSignerConf()
-        throws Exception {
+    protected String getSignerConf() throws Exception {
       if (conf == null) {
         return null;
       }
@@ -213,8 +209,7 @@ public class SignerCaActions {
     } // method getSigenrConf
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       String cert = null;
       if (CaManager.NULL.equalsIgnoreCase(certFile)) {
         cert = CaManager.NULL;

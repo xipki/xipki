@@ -58,7 +58,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.cmpclient.*;
 import org.xipki.security.*;
-import org.xipki.security.cmp.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.DateUtil;
 import org.xipki.util.*;
@@ -154,8 +153,7 @@ class CmpAgent {
     return (requestor instanceof Requestor.SignatureCmpRequestor) ? signatureResponder : pbmMacResponder;
   }
 
-  private HttpRespContent send(String caName, byte[] request)
-      throws IOException {
+  private HttpRespContent send(String caName, byte[] request) throws IOException {
     notNull(request, "request");
     return httpClient.httpPost(serverUrl + caName, CMP_REQUEST_MIMETYPE, request, CMP_RESPONSE_MIMETYPE);
   } // method send
@@ -292,8 +290,7 @@ class CmpAgent {
   }
 
   private PKIHeader buildPkiHeader(
-      Requestor requestor, Responder responder,
-      boolean addImplicitConfirm, ASN1OctetString tid,
+      Requestor requestor, Responder responder, boolean addImplicitConfirm, ASN1OctetString tid,
       CmpUtf8Pairs utf8Pairs, InfoTypeAndValue... additionalGeneralInfos) {
     if (additionalGeneralInfos != null) {
       for (InfoTypeAndValue itv : additionalGeneralInfos) {
@@ -1109,12 +1106,6 @@ class CmpAgent {
       throw new XiSecurityException("Error while decrypting the EncryptedValue", ex);
     }
   } // method decrypt
-
-  private static ASN1Encodable parseGenRep(VerifiedPkiMessage response, ASN1ObjectIdentifier expectedType)
-      throws CmpClientException, PkiErrorException {
-    checkProtection(notNull(response, "response"));
-    return parseGenRep(response.getPkiMessage(), expectedType);
-  }
 
   private static ASN1Encodable parseGenRep(GeneralPKIMessage response, ASN1ObjectIdentifier expectedType)
       throws CmpClientException, PkiErrorException {

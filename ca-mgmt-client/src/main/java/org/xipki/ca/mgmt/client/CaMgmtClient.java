@@ -107,8 +107,7 @@ public class CaMgmtClient implements CaManager {
     initialized = true;
   } // method initIfNotDone
 
-  public void setServerUrl(String serverUrl)
-      throws MalformedURLException {
+  public void setServerUrl(String serverUrl) throws MalformedURLException {
     Args.notBlank(serverUrl, "serverUrl");
     this.serverUrl = serverUrl.endsWith("/") ? serverUrl : serverUrl + "/";
 
@@ -118,28 +117,24 @@ public class CaMgmtClient implements CaManager {
   } // method setServerUrl
 
   @Override
-  public CaSystemStatus getCaSystemStatus()
-      throws CaMgmtException {
+  public CaSystemStatus getCaSystemStatus() throws CaMgmtException {
     byte[] respBytes = transmit(MgmtAction.getCaSystemStatus, null);
     MgmtResponse.GetCaSystemStatus resp = parse(respBytes, MgmtResponse.GetCaSystemStatus.class);
     return resp.getResult();
   } // method getCaSystemStatus
 
   @Override
-  public void unlockCa()
-      throws CaMgmtException {
+  public void unlockCa() throws CaMgmtException {
     voidTransmit(MgmtAction.unlockCa, null);
   } // method unlockCa
 
   @Override
-  public void notifyCaChange()
-      throws CaMgmtException {
+  public void notifyCaChange() throws CaMgmtException {
     voidTransmit(MgmtAction.notifyCaChange, null);
   } // method notifyCaChange
 
   @Override
-  public void addDbSchema(String name, String value)
-          throws CaMgmtException {
+  public void addDbSchema(String name, String value) throws CaMgmtException {
     MgmtRequest.AddOrChangeDbSchema req = new MgmtRequest.AddOrChangeDbSchema();
     req.setName(name);
     req.setValue(value);
@@ -147,8 +142,7 @@ public class CaMgmtClient implements CaManager {
   }
 
   @Override
-  public void changeDbSchema(String name, String value)
-          throws CaMgmtException {
+  public void changeDbSchema(String name, String value) throws CaMgmtException {
     MgmtRequest.AddOrChangeDbSchema req = new MgmtRequest.AddOrChangeDbSchema();
     req.setName(name);
     req.setValue(value);
@@ -160,8 +154,7 @@ public class CaMgmtClient implements CaManager {
   }
 
   @Override
-  public Map<String, String> getDbSchemas()
-          throws CaMgmtException {
+  public Map<String, String> getDbSchemas() throws CaMgmtException {
     byte[] respBytes = transmit(MgmtAction.getDbSchemas, null);
     MgmtResponse.GetDbSchemas resp = parse(respBytes, MgmtResponse.GetDbSchemas.class);
     return resp.getResult();
@@ -187,27 +180,23 @@ public class CaMgmtClient implements CaManager {
   } // class clearPublishQueue
 
   @Override
-  public void removeCa(String caName)
-      throws CaMgmtException {
+  public void removeCa(String caName) throws CaMgmtException {
     removeEntity(MgmtAction.removeCa, caName);
   } // method removeCa
 
   @Override
-  public void restartCa(String caName)
-      throws CaMgmtException {
+  public void restartCa(String caName) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(caName);
     voidTransmit(MgmtAction.restartCa, req);
   }
 
   @Override
-  public void restartCaSystem()
-      throws CaMgmtException {
+  public void restartCaSystem() throws CaMgmtException {
     voidTransmit(MgmtAction.restartCaSystem, null);
   }
 
   @Override
-  public void addCaAlias(String aliasName, String caName)
-      throws CaMgmtException {
+  public void addCaAlias(String aliasName, String caName) throws CaMgmtException {
     MgmtRequest.AddCaAlias req = new MgmtRequest.AddCaAlias();
     req.setAliasName(aliasName);
     req.setCaName(caName);
@@ -215,14 +204,12 @@ public class CaMgmtClient implements CaManager {
   }
 
   @Override
-  public void removeCaAlias(String aliasName)
-      throws CaMgmtException {
+  public void removeCaAlias(String aliasName) throws CaMgmtException {
     removeEntity(MgmtAction.removeCaAlias, aliasName);
   }
 
   @Override
-  public Set<String> getAliasesForCa(String caName)
-      throws CaMgmtException {
+  public Set<String> getAliasesForCa(String caName) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(caName);
     byte[] respBytes = transmit(MgmtAction.getAliasesForCa, req);
     MgmtResponse.StringSet resp = parse(respBytes, MgmtResponse.StringSet.class);
@@ -230,8 +217,7 @@ public class CaMgmtClient implements CaManager {
   } // method getAliasesForCa
 
   @Override
-  public String getCaNameForAlias(String aliasName)
-      throws CaMgmtException {
+  public String getCaNameForAlias(String aliasName) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(aliasName);
     byte[] respBytes = transmit(MgmtAction.getCaNameForAlias, req);
     MgmtResponse.StringResponse resp = parse(respBytes, MgmtResponse.StringResponse.class);
@@ -239,83 +225,70 @@ public class CaMgmtClient implements CaManager {
   } // method getCaNameForAlias
 
   @Override
-  public Set<String> getCaAliasNames()
-      throws CaMgmtException {
+  public Set<String> getCaAliasNames() throws CaMgmtException {
     return getNames(MgmtAction.getCaAliasNames);
   }
 
   @Override
-  public Set<String> getCertprofileNames()
-      throws CaMgmtException {
+  public Set<String> getCertprofileNames() throws CaMgmtException {
     return getNames(MgmtAction.getCertprofileNames);
   }
 
   @Override
-  public Set<String> getKeypairGenNames()
-          throws CaMgmtException {
+  public Set<String> getKeypairGenNames() throws CaMgmtException {
     return getNames(MgmtAction.getKeypairGenNames);
   }
 
   @Override
-  public Set<String> getPublisherNames()
-      throws CaMgmtException {
+  public Set<String> getPublisherNames() throws CaMgmtException {
     return getNames(MgmtAction.getPublisherNames);
   }
 
   @Override
-  public Set<String> getRequestorNames()
-      throws CaMgmtException {
+  public Set<String> getRequestorNames() throws CaMgmtException {
     return getNames(MgmtAction.getRequestorNames);
   }
 
   @Override
-  public Set<String> getSignerNames()
-      throws CaMgmtException {
+  public Set<String> getSignerNames() throws CaMgmtException {
     return getNames(MgmtAction.getSignerNames);
   }
 
   @Override
-  public Set<String> getCaNames()
-      throws CaMgmtException {
+  public Set<String> getCaNames() throws CaMgmtException {
     return getNames(MgmtAction.getCaNames);
   }
 
   @Override
-  public Set<String> getSuccessfulCaNames()
-      throws CaMgmtException {
+  public Set<String> getSuccessfulCaNames() throws CaMgmtException {
     return getNames(MgmtAction.getSuccessfulCaNames);
   }
 
   @Override
-  public Set<String> getFailedCaNames()
-      throws CaMgmtException {
+  public Set<String> getFailedCaNames() throws CaMgmtException {
     return getNames(MgmtAction.getFailedCaNames);
   }
 
   @Override
-  public Set<String> getInactiveCaNames()
-      throws CaMgmtException {
+  public Set<String> getInactiveCaNames() throws CaMgmtException {
     return getNames(MgmtAction.getInactiveCaNames);
   }
 
-  private Set<String> getNames(MgmtAction action)
-      throws CaMgmtException {
+  private Set<String> getNames(MgmtAction action) throws CaMgmtException {
     byte[] respBytes = transmit(action, null);
     MgmtResponse.StringSet resp = parse(respBytes, MgmtResponse.StringSet.class);
     return resp.getResult();
   } // method getNames
 
   @Override
-  public void addCa(CaEntry caEntry)
-      throws CaMgmtException {
+  public void addCa(CaEntry caEntry) throws CaMgmtException {
     MgmtRequest.AddCa req = new MgmtRequest.AddCa();
     req.setCaEntry(new CaEntryWrapper(caEntry));
     voidTransmit(MgmtAction.addCa, req);
   } // method addCa
 
   @Override
-  public CaEntry getCa(String caName)
-      throws CaMgmtException {
+  public CaEntry getCa(String caName) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(caName);
     byte[] respBytes = transmit(MgmtAction.getCa, req);
     MgmtResponse.GetCa resp = parse(respBytes, MgmtResponse.GetCa.class);
@@ -327,8 +300,7 @@ public class CaMgmtClient implements CaManager {
   } // method getCa
 
   @Override
-  public void changeCa(ChangeCaEntry changeCaEntry)
-      throws CaMgmtException {
+  public void changeCa(ChangeCaEntry changeCaEntry) throws CaMgmtException {
     MgmtRequest.ChangeCa req = new MgmtRequest.ChangeCa();
     req.setChangeCaEntry(changeCaEntry);
     voidTransmit(MgmtAction.changeCa, req);
@@ -371,8 +343,7 @@ public class CaMgmtClient implements CaManager {
   } // method addPublisherToCa
 
   @Override
-  public Set<String> getCertprofilesForCa(String caName)
-      throws CaMgmtException {
+  public Set<String> getCertprofilesForCa(String caName) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(caName);
     byte[] respBytes = transmit(MgmtAction.getCertprofilesForCa, req);
     MgmtResponse.StringSet resp = parse(respBytes, MgmtResponse.StringSet.class);
@@ -389,8 +360,7 @@ public class CaMgmtClient implements CaManager {
   } // method getRequestorsForCa
 
   @Override
-  public RequestorEntry getRequestor(String name)
-      throws CaMgmtException {
+  public RequestorEntry getRequestor(String name) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(name);
     byte[] respBytes = transmit(MgmtAction.getRequestor, req);
     MgmtResponse.GetRequestor resp = parse(respBytes, MgmtResponse.GetRequestor.class);
@@ -398,16 +368,14 @@ public class CaMgmtClient implements CaManager {
   } // method getRequestor
 
   @Override
-  public void addRequestor(RequestorEntry requestorEntry)
-      throws CaMgmtException {
+  public void addRequestor(RequestorEntry requestorEntry) throws CaMgmtException {
     MgmtRequest.AddRequestor req = new MgmtRequest.AddRequestor();
     req.setRequestorEntry(requestorEntry);
     voidTransmit(MgmtAction.addRequestor, req);
   } // method addRequestor
 
   @Override
-  public void removeRequestor(String requestorName)
-      throws CaMgmtException {
+  public void removeRequestor(String requestorName) throws CaMgmtException {
     removeEntity(MgmtAction.removeRequestor, requestorName);
   } // method removeRequestor
 
@@ -437,8 +405,7 @@ public class CaMgmtClient implements CaManager {
   } // method addRequestorToCa
 
   @Override
-  public KeypairGenEntry getKeypairGen(String name)
-          throws CaMgmtException {
+  public KeypairGenEntry getKeypairGen(String name) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(name);
     byte[] respBytes = transmit(MgmtAction.getKeypairGen, req);
     MgmtResponse.GetKeypairGen resp = parse(respBytes, MgmtResponse.GetKeypairGen.class);
@@ -446,8 +413,7 @@ public class CaMgmtClient implements CaManager {
   }
 
   @Override
-  public void removeKeypairGen(String name)
-          throws CaMgmtException {
+  public void removeKeypairGen(String name) throws CaMgmtException {
     removeEntity(MgmtAction.removeKeypairGen, name);
   }
 
@@ -459,16 +425,14 @@ public class CaMgmtClient implements CaManager {
   }
 
   @Override
-  public void addKeypairGen(KeypairGenEntry keypairGenEntry)
-          throws CaMgmtException {
+  public void addKeypairGen(KeypairGenEntry keypairGenEntry) throws CaMgmtException {
     MgmtRequest.AddKeypairGen req = new MgmtRequest.AddKeypairGen();
     req.setEntry(keypairGenEntry);
     voidTransmit(MgmtAction.addKeypairGen, req);
   }
 
   @Override
-  public CertprofileEntry getCertprofile(String profileName)
-      throws CaMgmtException {
+  public CertprofileEntry getCertprofile(String profileName) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(profileName);
     byte[] respBytes = transmit(MgmtAction.getCertprofile, req);
     MgmtResponse.GetCertprofile resp = parse(respBytes, MgmtResponse.GetCertprofile.class);
@@ -476,8 +440,7 @@ public class CaMgmtClient implements CaManager {
   } // method getCertprofile
 
   @Override
-  public void removeCertprofile(String profileName)
-      throws CaMgmtException {
+  public void removeCertprofile(String profileName) throws CaMgmtException {
     removeEntity(MgmtAction.removeCertprofile, profileName);
   } // method removeCertprofile
 
@@ -489,30 +452,26 @@ public class CaMgmtClient implements CaManager {
   } // method changeCertprofile
 
   @Override
-  public void addCertprofile(CertprofileEntry certprofileEntry)
-      throws CaMgmtException {
+  public void addCertprofile(CertprofileEntry certprofileEntry) throws CaMgmtException {
     MgmtRequest.AddCertprofile req = new MgmtRequest.AddCertprofile();
     req.setCertprofileEntry(certprofileEntry);
     voidTransmit(MgmtAction.addCertprofile, req);
   } // method addCertprofile
 
   @Override
-  public void addSigner(SignerEntry signerEntry)
-      throws CaMgmtException {
+  public void addSigner(SignerEntry signerEntry) throws CaMgmtException {
     MgmtRequest.AddSigner req = new MgmtRequest.AddSigner();
     req.setSignerEntry(new SignerEntryWrapper(signerEntry));
     voidTransmit(MgmtAction.addSigner, req);
   } // method addSigner
 
   @Override
-  public void removeSigner(String name)
-      throws CaMgmtException {
+  public void removeSigner(String name) throws CaMgmtException {
     removeEntity(MgmtAction.removeSigner, name);
   } // method removeSigner
 
   @Override
-  public SignerEntry getSigner(String name)
-      throws CaMgmtException {
+  public SignerEntry getSigner(String name) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(name);
     byte[] respBytes = transmit(MgmtAction.getSigner, req);
     MgmtResponse.GetSigner resp = parse(respBytes, MgmtResponse.GetSigner.class);
@@ -531,16 +490,14 @@ public class CaMgmtClient implements CaManager {
   } // method changeSigner
 
   @Override
-  public void addPublisher(PublisherEntry entry)
-      throws CaMgmtException {
+  public void addPublisher(PublisherEntry entry) throws CaMgmtException {
     MgmtRequest.AddPublisher req = new MgmtRequest.AddPublisher();
     req.setPublisherEntry(entry);
     voidTransmit(MgmtAction.addPublisher, req);
   } // method addPublisher
 
   @Override
-  public List<PublisherEntry> getPublishersForCa(String caName)
-      throws CaMgmtException {
+  public List<PublisherEntry> getPublishersForCa(String caName) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(caName);
     byte[] respBytes = transmit(MgmtAction.getPublishersForCa, req);
     MgmtResponse.GetPublischersForCa resp =
@@ -549,8 +506,7 @@ public class CaMgmtClient implements CaManager {
   } // method getPublishersForCa
 
   @Override
-  public PublisherEntry getPublisher(String publisherName)
-      throws CaMgmtException {
+  public PublisherEntry getPublisher(String publisherName) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(publisherName);
     byte[] respBytes = transmit(MgmtAction.getPublisher, req);
     MgmtResponse.GetPublisher resp = parse(respBytes, MgmtResponse.GetPublisher.class);
@@ -558,8 +514,7 @@ public class CaMgmtClient implements CaManager {
   } // method getPublisher
 
   @Override
-  public void removePublisher(String publisherName)
-      throws CaMgmtException {
+  public void removePublisher(String publisherName) throws CaMgmtException {
     removeEntity(MgmtAction.removePublisher, publisherName);
   } // method removePublisher
 
@@ -580,8 +535,7 @@ public class CaMgmtClient implements CaManager {
   } // method revokeCa
 
   @Override
-  public void unrevokeCa(String caName)
-      throws CaMgmtException {
+  public void unrevokeCa(String caName) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(caName);
     voidTransmit(MgmtAction.unrevokeCa, req);
   } // method unrevokeCa
@@ -682,8 +636,7 @@ public class CaMgmtClient implements CaManager {
   } // method generateRootCa
 
   @Override
-  public X509CRLHolder generateCrlOnDemand(String caName)
-      throws CaMgmtException {
+  public X509CRLHolder generateCrlOnDemand(String caName) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(caName);
     byte[] respBytes = transmit(MgmtAction.generateCrlOnDemand, req);
     return parseCrl(respBytes);
@@ -700,8 +653,7 @@ public class CaMgmtClient implements CaManager {
   } // method getCrl
 
   @Override
-  public X509CRLHolder getCurrentCrl(String caName)
-      throws CaMgmtException {
+  public X509CRLHolder getCurrentCrl(String caName) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(caName);
     byte[] respBytes = transmit(MgmtAction.getCurrentCrl, req);
     return parseCrl(respBytes);
@@ -763,8 +715,7 @@ public class CaMgmtClient implements CaManager {
   } // method loadConf
 
   @Override
-  public InputStream exportConf(List<String> caNames)
-      throws CaMgmtException {
+  public InputStream exportConf(List<String> caNames) throws CaMgmtException {
     MgmtRequest.ExportConf req = new MgmtRequest.ExportConf();
     req.setCaNames(caNames);
     byte[] respBytes = transmit(MgmtAction.exportConf, req);
@@ -808,24 +759,21 @@ public class CaMgmtClient implements CaManager {
   } // method getCertRequest
 
   @Override
-  public Set<String> getSupportedSignerTypes()
-      throws CaMgmtException {
+  public Set<String> getSupportedSignerTypes() throws CaMgmtException {
     byte[] respBytes = transmit(MgmtAction.getSupportedSignerTypes, null);
     MgmtResponse.StringSet resp = parse(respBytes, MgmtResponse.StringSet.class);
     return resp.getResult();
   } // method getSupportedSignerTypes
 
   @Override
-  public Set<String> getSupportedCertprofileTypes()
-      throws CaMgmtException {
+  public Set<String> getSupportedCertprofileTypes() throws CaMgmtException {
     byte[] respBytes = transmit(MgmtAction.getSupportedCertprofileTypes, null);
     MgmtResponse.StringSet resp = parse(respBytes, MgmtResponse.StringSet.class);
     return resp.getResult();
   } // method getSupportedCertprofileTypes
 
   @Override
-  public Set<String> getSupportedPublisherTypes()
-      throws CaMgmtException {
+  public Set<String> getSupportedPublisherTypes() throws CaMgmtException {
     byte[] respBytes = transmit(MgmtAction.getSupportedPublisherTypes, null);
     MgmtResponse.StringSet resp = parse(respBytes, MgmtResponse.StringSet.class);
     return resp.getResult();
@@ -841,14 +789,12 @@ public class CaMgmtClient implements CaManager {
   }
 
   @Override
-  public void refreshTokenForSignerType(String signerType)
-      throws CaMgmtException {
+  public void refreshTokenForSignerType(String signerType) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(signerType);
     voidTransmit(MgmtAction.refreshTokenForSignerType, req);
   } // method refreshTokenForSignerType
 
-  private X509Cert parseCert(byte[] certBytes)
-      throws CaMgmtException {
+  private X509Cert parseCert(byte[] certBytes) throws CaMgmtException {
     try {
       return X509Util.parseCert(certBytes);
     } catch (CertificateException ex) {
@@ -856,8 +802,7 @@ public class CaMgmtClient implements CaManager {
     }
   } // method parseCert
 
-  private X509CRLHolder parseCrl(byte[] respBytes)
-      throws CaMgmtException {
+  private X509CRLHolder parseCrl(byte[] respBytes) throws CaMgmtException {
     MgmtResponse.ByteArray resp = parse(respBytes, MgmtResponse.ByteArray.class);
 
     try {
@@ -867,19 +812,16 @@ public class CaMgmtClient implements CaManager {
     }
   } // method parseCrl
 
-  private void removeEntity(MgmtAction action, String name)
-      throws CaMgmtException {
+  private void removeEntity(MgmtAction action, String name) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(name);
     voidTransmit(action, req);
   } // method removeEntity
 
-  private void voidTransmit(MgmtAction action, MgmtRequest req)
-      throws CaMgmtException {
+  private void voidTransmit(MgmtAction action, MgmtRequest req) throws CaMgmtException {
     transmit(action, req, true);
   } // method voidTransmit
 
-  private byte[] transmit(MgmtAction action, MgmtRequest req)
-      throws CaMgmtException {
+  private byte[] transmit(MgmtAction action, MgmtRequest req) throws CaMgmtException {
     return transmit(action, req, false);
   } // method transmit
 

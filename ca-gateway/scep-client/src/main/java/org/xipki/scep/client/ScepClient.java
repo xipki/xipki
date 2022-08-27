@@ -46,8 +46,7 @@ public class ScepClient extends Client {
   }
 
   @Override
-  protected ScepHttpResponse httpGet(String url)
-      throws ScepClientException {
+  protected ScepHttpResponse httpGet(String url) throws ScepClientException {
     HttpRespContent resp;
     try {
       resp = httpClient.httpGet(url);

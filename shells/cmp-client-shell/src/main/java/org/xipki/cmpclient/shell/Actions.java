@@ -129,8 +129,7 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String respout;
 
-    protected static HashAlgo getHashAlgo(String algoStr)
-        throws ObjectCreationException {
+    protected static HashAlgo getHashAlgo(String algoStr) throws ObjectCreationException {
       try {
         return HashAlgo.getInstance(algoStr);
       } catch (NoSuchAlgorithmException ex) {
@@ -214,8 +213,7 @@ public class Actions {
     private String outFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       X509Cert caCert;
       try {
         caCert = client.caCert(caName, getReqRespDebug());
@@ -242,8 +240,7 @@ public class Actions {
     private String outFile;
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       List<X509Cert> caCertChain;
       try {
         caCertChain = client.caCerts(caName, getReqRespDebug());

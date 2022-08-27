@@ -269,8 +269,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   } // method validateSigner
 
   @Override
-  public void refreshTokenForSignerType(String signerType)
-      throws XiSecurityException {
+  public void refreshTokenForSignerType(String signerType) throws XiSecurityException {
     signerFactoryRegister.refreshTokenForSignerType(signerType);
   }
 

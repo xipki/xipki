@@ -118,8 +118,7 @@ public class NewKeyControl extends ProxyMessage {
     this.control.setExtractable(extractable);
   } // constructor
 
-  public static NewKeyControl getInstance(Object obj)
-      throws BadAsn1ObjectException {
+  public static NewKeyControl getInstance(Object obj) throws BadAsn1ObjectException {
     if (obj == null || obj instanceof NewKeyControl) {
       return (NewKeyControl) obj;
     }

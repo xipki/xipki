@@ -149,8 +149,7 @@ public class IaikP11Module extends P11Module {
     setSlots(slots);
   } // constructor
 
-  public static P11Module getInstance(P11ModuleConf moduleConf)
-      throws P11TokenException {
+  public static P11Module getInstance(P11ModuleConf moduleConf) throws P11TokenException {
     notNull(moduleConf, "moduleConf");
 
     String path = moduleConf.getNativeLibrary();

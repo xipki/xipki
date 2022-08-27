@@ -40,8 +40,7 @@ public class CCCSimpleExtensionSchema extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     if (version < 1) {
       throw new InvalidConfException("version must not be less than 1: " + version);
     }

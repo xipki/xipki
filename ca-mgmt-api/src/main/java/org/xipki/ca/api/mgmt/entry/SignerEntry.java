@@ -161,8 +161,7 @@ public class SignerEntry extends MgmtEntry {
     return name.hashCode();
   }
 
-  static String signerConfToString(String signerConf, boolean verbose,
-      boolean ignoreSensitiveInfo) {
+  static String signerConfToString(String signerConf, boolean verbose, boolean ignoreSensitiveInfo) {
     Args.notBlank(signerConf, "signerConf");
     if (ignoreSensitiveInfo) {
       signerConf = SignerConf.eraseSensitiveData(signerConf);

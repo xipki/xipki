@@ -46,8 +46,7 @@ public class SignTemplate extends ProxyMessage {
 
   private final byte[] message;
 
-  private SignTemplate(ASN1Sequence seq)
-      throws BadAsn1ObjectException {
+  private SignTemplate(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 4, 4);
     int idx = 0;
     this.slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++));
@@ -64,8 +63,7 @@ public class SignTemplate extends ProxyMessage {
     this.mechanism = new Mechanism(mechanism, parameter);
   }
 
-  public static SignTemplate getInstance(Object obj)
-      throws BadAsn1ObjectException {
+  public static SignTemplate getInstance(Object obj) throws BadAsn1ObjectException {
     if (obj == null || obj instanceof SignTemplate) {
       return (SignTemplate) obj;
     }

@@ -65,8 +65,7 @@ public class ProxyP11Slot extends P11Slot {
   }
 
   @Override
-  protected P11SlotRefreshResult refresh0()
-      throws P11TokenException {
+  protected P11SlotRefreshResult refresh0() throws P11TokenException {
     P11SlotRefreshResult refreshResult = new P11SlotRefreshResult();
 
     // mechanisms
@@ -100,7 +99,7 @@ public class ProxyP11Slot extends P11Slot {
         }
       }
 
-      java.security.PublicKey pubKey = null;
+      java.security.PublicKey pubKey;
       X509Cert cert = refreshResult.getCertForId(id);
       if (cert != null) {
         pubKey = cert.getPublicKey();
@@ -128,8 +127,7 @@ public class ProxyP11Slot extends P11Slot {
   public void close() {
   }
 
-  private PublicKey getPublicKey(P11ObjectIdentifier objectId)
-      throws P11TokenException {
+  private PublicKey getPublicKey(P11ObjectIdentifier objectId) throws P11TokenException {
     ASN1Object req = new SlotIdAndObjectId(asn1SlotId, new ObjectIdentifier(objectId));
     byte[] resp = module.send(P11ProxyConstants.ACTION_GET_PUBLICKEY, req);
     if (resp == null) {
@@ -144,8 +142,7 @@ public class ProxyP11Slot extends P11Slot {
     }
   }
 
-  private X509Cert getCertificate(P11ObjectIdentifier objectId)
-      throws P11TokenException {
+  private X509Cert getCertificate(P11ObjectIdentifier objectId) throws P11TokenException {
     ASN1Object req = new SlotIdAndObjectId(asn1SlotId, new ObjectIdentifier(objectId));
     byte[] resp = module.send(P11ProxyConstants.ACTION_GET_CERT, req);
     if (resp == null) {
@@ -160,8 +157,7 @@ public class ProxyP11Slot extends P11Slot {
   }
 
   @Override
-  public int removeObjects(byte[] id, String label)
-      throws P11TokenException {
+  public int removeObjects(byte[] id, String label) throws P11TokenException {
     if ((id == null || id.length == 0) && StringUtil.isBlank(label)) {
       throw new IllegalArgumentException("at least one of id and label must not be null");
     }
@@ -180,7 +176,7 @@ public class ProxyP11Slot extends P11Slot {
       throws P11TokenException {
     GenRSAKeypairParams asn1 = new GenRSAKeypairParams(slotId, null, keysize, publicExponent);
     byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_RSA_OTF, asn1);
-    return parseGenerateKeypairOtfResult(resp);
+    return PrivateKeyInfo.getInstance(resp);
   }
 
   @Override
@@ -188,12 +184,11 @@ public class ProxyP11Slot extends P11Slot {
       throws P11TokenException {
     GenDSAKeypairParams asn1 = new GenDSAKeypairParams(slotId, null, p, q, g);
     byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_DSA_OTF, asn1);
-    return parseGenerateKeypairOtfResult(resp);
+    return PrivateKeyInfo.getInstance(resp);
   }
 
   @Override
-  protected void removeIdentity0(P11IdentityId identityId)
-      throws P11TokenException {
+  protected void removeIdentity0(P11IdentityId identityId) throws P11TokenException {
     ASN1Object req =  new SlotIdAndObjectId(asn1SlotId, new ObjectIdentifier(identityId.getKeyId()));
     module.send(P11ProxyConstants.ACTION_REMOVE_IDENTITY, req);
   }
@@ -216,8 +211,7 @@ public class ProxyP11Slot extends P11Slot {
   }
 
   @Override
-  protected void removeCerts0(P11ObjectIdentifier objectId)
-      throws P11TokenException {
+  protected void removeCerts0(P11ObjectIdentifier objectId) throws P11TokenException {
     ASN1Object req = new SlotIdAndObjectId(asn1SlotId, new ObjectIdentifier(objectId));
     module.send(P11ProxyConstants.ACTION_REMOVE_CERTS, req);
   }
@@ -267,7 +261,7 @@ public class ProxyP11Slot extends P11Slot {
       throws P11TokenException {
     GenECKeypairParams asn1 = new GenECKeypairParams(slotId, null, curveId);
     byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_EC_OTF, asn1);
-    return parseGenerateKeypairOtfResult(resp);
+    return PrivateKeyInfo.getInstance(resp);
   }
 
   @Override
@@ -282,7 +276,7 @@ public class ProxyP11Slot extends P11Slot {
   protected PrivateKeyInfo generateECEdwardsKeypairOtf0(ASN1ObjectIdentifier curveId) throws P11TokenException {
     GenECKeypairParams asn1 = new GenECKeypairParams(slotId, null, curveId);
     byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_EC_EDWARDS_OTF, asn1);
-    return parseGenerateKeypairOtfResult(resp);
+    return PrivateKeyInfo.getInstance(resp);
   }
 
   @Override
@@ -298,7 +292,7 @@ public class ProxyP11Slot extends P11Slot {
       throws P11TokenException {
     GenECKeypairParams asn1 = new GenECKeypairParams(slotId, null, curveId);
     byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_EC_MONTGOMERY_OTF, asn1);
-    return parseGenerateKeypairOtfResult(resp);
+    return PrivateKeyInfo.getInstance(resp);
   }
 
   @Override
@@ -313,21 +307,14 @@ public class ProxyP11Slot extends P11Slot {
   protected PrivateKeyInfo generateSM2KeypairOtf0() throws P11TokenException {
     GenSM2KeypairParams asn1 = new GenSM2KeypairParams(slotId, null);
     byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_SM2, asn1);
-    return parseGenerateKeypairOtfResult(resp);
-  }
-
-  private P11Identity parseGenerateKeypairResult(byte[] resp)
-      throws P11TokenException {
-    return parseGenerateKeyResult(resp, true);
-  }
-
-  private PrivateKeyInfo parseGenerateKeypairOtfResult(byte[] resp)
-      throws P11TokenException {
     return PrivateKeyInfo.getInstance(resp);
   }
 
-  private P11Identity parseGenerateSecretKeyResult(byte[] resp)
-      throws P11TokenException {
+  private P11Identity parseGenerateKeypairResult(byte[] resp) throws P11TokenException {
+    return parseGenerateKeyResult(resp, true);
+  }
+
+  private P11Identity parseGenerateSecretKeyResult(byte[] resp) throws P11TokenException {
     return parseGenerateKeyResult(resp, false);
   }
 
@@ -364,8 +351,7 @@ public class ProxyP11Slot extends P11Slot {
     module.send(P11ProxyConstants.ACTION_UPDATE_CERT, asn1);
   }
 
-  private List<Long> getMechanismsFromServer()
-      throws P11TokenException {
+  private List<Long> getMechanismsFromServer() throws P11TokenException {
     SlotIdentifier asn1SlotId = new SlotIdentifier(slotId);
     byte[] resp = module.send(P11ProxyConstants.ACTION_GET_MECHANISMS, asn1SlotId);
     ASN1Sequence seq = requireSequence(resp);
@@ -398,8 +384,7 @@ public class ProxyP11Slot extends P11Slot {
     return objectIds;
   }
 
-  private ASN1Sequence requireSequence(byte[] response)
-      throws P11TokenException {
+  private ASN1Sequence requireSequence(byte[] response) throws P11TokenException {
     try {
       return ASN1Sequence.getInstance(response);
     } catch (IllegalArgumentException ex) {

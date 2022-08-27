@@ -56,8 +56,7 @@ public class P11ProxyConf extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     validate(security);
   }
 

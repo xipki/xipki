@@ -53,8 +53,7 @@ public class AdditionalInformation extends ValidatableConf {
   }
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     notBlank(text, "text");
     notNull(type, "type");
   }
