@@ -516,10 +516,7 @@ public class ExtensionsChecker {
     // KeyUsage
     type = Extension.keyUsage;
     if (extensionControls.containsKey(type)) {
-      boolean required = false;
-      if (requestedExtns != null && requestedExtns.getExtension(type) != null) {
-        required = true;
-      }
+      boolean required = requestedExtns != null && requestedExtns.getExtension(type) != null;
 
       if (!required) {
         Set<KeyUsageControl> requiredKeyusage = h2nChecker.getKeyusage(true);
@@ -590,10 +587,7 @@ public class ExtensionsChecker {
     // ExtendedKeyUsage
     type = Extension.extendedKeyUsage;
     if (extensionControls.containsKey(type)) {
-      boolean required = false;
-      if (requestedExtns != null && requestedExtns.getExtension(type) != null) {
-        required = true;
-      }
+      boolean required = requestedExtns != null && requestedExtns.getExtension(type) != null;
 
       if (!required) {
         Set<ExtKeyUsageControl> requiredExtKeyusage = getExtKeyusage(true);

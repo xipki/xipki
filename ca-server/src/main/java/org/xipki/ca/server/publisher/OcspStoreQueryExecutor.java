@@ -480,7 +480,7 @@ class OcspStoreQueryExecutor {
   } // method addIssuer
 
   /**
-   * Returns the database Id for the given issuer and serialNumber.
+   * Returns the database id for the given issuer and serialNumber.
    * @return the database table id if registered, <code>null</code> otherwise.
    */
   private Long getCertId(int issuerId, BigInteger serialNumber)

@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Configuration of the certificates's subject field.
+ * Configuration of the certificate's subject field.
  *
  * @author Lijun Liao
  * @since 2.0.0
@@ -134,7 +134,7 @@ public class Subject extends ValidatableConf {
     private String group;
 
     /**
-     * This RDN is for other purpose, will not contained in the Subject field of certificate.
+     * This RDN is for other purpose, will not be contained in the Subject field of certificate.
      */
     @JSONField(ordinal = 11)
     private Boolean notInSubject;

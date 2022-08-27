@@ -47,7 +47,7 @@ class RandomSerialNumberGenerator {
     random.nextBytes(rndBytes);
     // clear the highest bit.
     rndBytes[0] &= 0x7F;
-    // set the second highest bit
+    // set the second-highest bit
     rndBytes[0] |= 0x40;
     return new BigInteger(rndBytes);
 

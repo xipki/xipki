@@ -254,7 +254,7 @@ public abstract class Certprofile implements Closeable {
     private String group;
 
     /**
-     * This RDN is for other purpose, will not contained in the Subject field of certificate.
+     * This RDN is for other purpose, will not be contained in the Subject field of certificate.
      */
     private boolean notInSubject;
 
@@ -550,7 +550,7 @@ public abstract class Certprofile implements Closeable {
   }
 
   /**
-   * Returns whether use subject and serial number of the issuer certificate in the
+   * Returns whether to use subject and serial number of the issuer certificate in the
    * AuthorityKeyIdentifier extension.
    *
    * @return whether include subject and serial number of the issuer certificate in the

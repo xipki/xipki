@@ -91,13 +91,13 @@ public class ProfileCaActions {
       StringBuilder sb = new StringBuilder();
       Set<String> entries = caManager.getCertprofilesForCa(caName);
       if (CollectionUtil.isNotEmpty(entries)) {
-        sb.append("certificate Profiles supported by CA " + caName).append("\n");
+        sb.append("certificate Profiles supported by CA ").append(caName).append("\n");
 
         for (String name: entries) {
           sb.append("\t").append(name).append("\n");
         }
       } else {
-        sb.append("\tno profile for CA " + caName + " is configured");
+        sb.append("\tno profile for CA ").append(caName).append(" is configured");
       }
 
       println(sb.toString());

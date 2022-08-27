@@ -45,9 +45,8 @@ public class ObjectIdentifier extends ProxyMessage {
 
   private ObjectIdentifier(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 2, 2);
-    int idx = 0;
-    byte[] id = getOctetStringBytes(seq.getObjectAt(idx++));
-    String label = getUtf8String(seq.getObjectAt(idx++));
+    byte[] id = getOctetStringBytes(seq.getObjectAt(0));
+    String label = getUtf8String(seq.getObjectAt(1));
     this.value = new P11ObjectIdentifier(id, label);
   }
 

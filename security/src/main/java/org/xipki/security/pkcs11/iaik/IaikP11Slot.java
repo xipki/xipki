@@ -507,10 +507,7 @@ class IaikP11Slot extends P11Slot {
   private byte[] sign0(Session session, int expectedSignatureLen, Mechanism mechanism, byte[] content, Key signingKey)
       throws TokenException {
     long keytype = signingKey.getKeyType().getLongValue();
-    boolean weierstrausKey = false;
-    if (KeyType.EC == keytype || KeyType.VENDOR_SM2 == keytype) {
-      weierstrausKey = true;
-    }
+    boolean weierstrausKey = KeyType.EC == keytype || KeyType.VENDOR_SM2 == keytype;
 
     int len = content.length;
 
@@ -526,8 +523,8 @@ class IaikP11Slot extends P11Slot {
         session.signUpdate(content, i, blockLen);
       }
 
-      // some HSM vendor return not the EC plain signature (r || s), but the X.962 encoded
-      // so we need to increase the expectedSignatureLen
+      // Some HSM vendor return not the EC plain signature (r || s), but the X.962 encoded one.
+      // So we need to increase the expectedSignatureLen
       int maxSignatureLen = weierstrausKey ? expectedSignatureLen + 20 : expectedSignatureLen;
       sigvalue = session.signFinal(maxSignatureLen);
     }
@@ -577,7 +574,7 @@ class IaikP11Slot extends P11Slot {
         if (cause instanceof PKCS11Exception) {
           long ckr = ((PKCS11Exception) cause).getErrorCode();
           if (ckr == CKR_SESSION_HANDLE_INVALID || ckr == CKR_SESSION_CLOSED) {
-            continue;
+            break;
           }
         }
       }
@@ -778,7 +775,7 @@ class IaikP11Slot extends P11Slot {
       try {
         newCert = (X509PublicKeyCertificate) session.createObject(newCertTemp);
       } catch (PKCS11Exception ex) {
-         long errCode = ((PKCS11Exception) ex).getErrorCode();
+         long errCode = ex.getErrorCode();
          if (!omit && CKR_TEMPLATE_INCONSISTENT == errCode) {
            // some HSMs like NFAST does not like the attributes CKA_START_DATE and CKA_END_DATE
            // try without them.
@@ -942,7 +939,7 @@ class IaikP11Slot extends P11Slot {
   protected PrivateKeyInfo generateRSAKeypairOtf0(int keysize, BigInteger publicExponent)
       throws P11TokenException {
     RSAPublicKey publicKeyTemplate = new RSAPublicKey();
-    publicKeyTemplate.getModulusBits().setLongValue(Long.valueOf(keysize));
+    publicKeyTemplate.getModulusBits().setLongValue((long) keysize);
     if (publicExponent != null) {
       publicKeyTemplate.getPublicExponent().setByteArrayValue(publicExponent.toByteArray());
     }

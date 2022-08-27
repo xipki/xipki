@@ -540,8 +540,7 @@ public class IdentifiedCertprofile implements Closeable {
     }
 
     // Check the SubjectAltNames
-    if (certprofile.getCertDomain() == CertDomain.CABForumBR
-        && getCertLevel() == CertLevel.EndEntity) {
+    if (certprofile.getCertDomain() == CertDomain.CABForumBR && getCertLevel() == CertLevel.EndEntity) {
       // Make sure that the commonName included in SubjectAltName
       String commonName = X509Util.getCommonName(grantedSubject);
       boolean commonNameInSan = commonName == null;
@@ -551,7 +550,7 @@ public class IdentifiedCertprofile implements Closeable {
               values.getExtensionValue(Extension.subjectAlternativeName).getValue()).getNames();
       for (GeneralName m : genNames) {
         if (GeneralName.dNSName == m.getTagNo()) {
-          String domain = DERIA5String.getInstance(m.getName()).getString();
+          String domain = ASN1IA5String.getInstance(m.getName()).getString();
           if (!commonNameInSan && domain.equals(commonName)) {
             commonNameInSan = true;
           }

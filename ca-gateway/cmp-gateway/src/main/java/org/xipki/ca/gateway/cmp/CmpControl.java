@@ -69,7 +69,7 @@ public class CmpControl {
 
   private List<SignAlgo> requestPbmMacs;
 
-  private int responsePbmIterationCount = DFLT_PBM_ITERATIONCOUNT;
+  private int responsePbmIterationCount;
 
   private final CollectionAlgorithmValidator sigAlgoValidator;
 

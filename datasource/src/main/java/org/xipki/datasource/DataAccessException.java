@@ -219,7 +219,7 @@ public class DataAccessException extends Exception {
   /**
    * Constructor for DataAccessException.
    * @param msg the detail message
-   * @param cause the root cause (usually from using a underlying data access API such as JDBC)
+   * @param cause the root cause (usually from using an underlying data access API such as JDBC)
    */
   public DataAccessException(String msg, Throwable cause) {
     this(Reason.Root, msg, cause);
@@ -229,7 +229,7 @@ public class DataAccessException extends Exception {
    * Constructor for DataAccessException.
    * @param reason the reason
    * @param msg the detail message
-   * @param cause the root cause (usually from using a underlying data access API such as JDBC)
+   * @param cause the root cause (usually from using an underlying data access API such as JDBC)
    */
   public DataAccessException(Reason reason, String msg, Throwable cause) {
     super(reason + " - " + msg, cause);

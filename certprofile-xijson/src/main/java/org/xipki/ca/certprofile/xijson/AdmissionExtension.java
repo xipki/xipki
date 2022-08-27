@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Control of the extension extension Admission (Germany national standard CommonPKI).
+ * Control of the extension Admission (Germany national standard CommonPKI).
  *
  * @author Lijun Liao
  * @since 2.0.1

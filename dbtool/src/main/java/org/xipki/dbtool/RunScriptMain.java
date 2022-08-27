@@ -113,10 +113,8 @@ public class RunScriptMain {
 
   public static void runScript(LiquibaseMain.DatabaseConf dbConf, String scriptFile)
       throws Exception {
-    Connection conn = null;
-    try {
-      conn = DriverManager.getConnection(dbConf.getUrl(),
-          dbConf.getUsername(), dbConf.getPassword());
+    try (Connection conn = DriverManager.getConnection(dbConf.getUrl(),
+        dbConf.getUsername(), dbConf.getPassword())) {
       if (dbConf.getSchema() != null) {
         conn.setSchema(dbConf.getSchema());
       }
@@ -124,10 +122,6 @@ public class RunScriptMain {
       ScriptRunner runner = new ScriptRunner(conn, false, true);
       runner.runScript(IoUtil.expandFilepath(scriptFile));
       conn.commit();
-    } finally {
-      if (conn != null) {
-        conn.close();
-      }
     }
 
   } // method initDb

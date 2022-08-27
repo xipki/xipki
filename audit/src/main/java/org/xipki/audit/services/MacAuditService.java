@@ -120,16 +120,15 @@ public abstract class MacAuditService implements AuditService {
   private String buildMacPayload(
           Instant date, long thisId, int eventType, String levelText,
           long previousId, String previousTag, String message) {
-    StringBuilder sb = new StringBuilder(200 + message.length());
-    sb.append(formatDate(date))
-            .append(DELIM).append(levelText)
-            .append(DELIM).append(eventType)
-            .append(DELIM).append(shardId)
-            .append(DELIM).append(thisId)
-            .append(DELIM).append(previousId).append(INNER_DELIM)
-            .append(previousTag == null ? "" : previousTag)
-            .append(DELIM).append(message);
-    return sb.toString();
+    String sb = formatDate(date) +
+        DELIM + levelText +
+        DELIM + eventType +
+        DELIM + shardId +
+        DELIM + thisId +
+        DELIM + previousId + INNER_DELIM +
+        (previousTag == null ? "" : previousTag) +
+        DELIM + message;
+    return sb;
   }
 
   protected abstract void storeLog(

@@ -884,8 +884,6 @@ public class OcspServerImpl implements OcspServer {
           CertStatus status = certStatusInfo.getCertStatus();
           if (status == CertStatus.UNKNOWN || status == CertStatus.IGNORE) {
             switch (store.getUnknownCertBehaviour()) {
-              case unknown:
-                break;
               case good:
                 if (status == CertStatus.UNKNOWN) {
                   certStatusInfo.setCertStatus(CertStatus.GOOD);
@@ -897,6 +895,7 @@ public class OcspServerImpl implements OcspServer {
                 return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);
               case tryLater:
                 return unsuccesfulOCSPRespMap.get(OcspResponseStatus.tryLater);
+              case unknown:
               default:
                 break;
             }
@@ -1044,11 +1043,7 @@ public class OcspServerImpl implements OcspServer {
       }
     }
 
-    if (!responder.getSigner().isHealthy()) {
-      return false;
-    }
-
-    return true;
+    return responder.getSigner().isHealthy();
   } // method healthCheck
 
   public void refreshTokenForSignerType(String signerType)

@@ -207,7 +207,7 @@ class SignerManager {
     }
 
     for (P11SlotIdentifier slotId : slots) {
-      sb.append("\tslot[" + slotId.getIndex() + "]: " + slotId.getId()).append("\n");
+      sb.append("\tslot[").append(slotId.getIndex()).append("]: ").append(slotId.getId()).append("\n");
     }
   }
 

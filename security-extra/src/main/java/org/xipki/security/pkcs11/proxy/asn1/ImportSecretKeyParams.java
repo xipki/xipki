@@ -62,7 +62,7 @@ public class ImportSecretKeyParams extends ProxyMessage {
     slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
     control = NewKeyControl.getInstance(seq.getObjectAt(idx++)).getControl();
     keyType = getInteger(seq.getObjectAt(idx++)).longValue();
-    keyValue = ASN1OctetString.getInstance(seq.getObjectAt(idx++)).getOctets();
+    keyValue = ASN1OctetString.getInstance(seq.getObjectAt(idx)).getOctets();
   }
 
   public static ImportSecretKeyParams getInstance(Object obj)

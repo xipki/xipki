@@ -617,7 +617,7 @@ public class P11Actions {
 
         Key key = ks.getKey(alias, pwd);
         if (key instanceof SecretKey) {
-          keyValue = ((SecretKey) key).getEncoded();
+          keyValue = key.getEncoded();
           break;
         }
       }

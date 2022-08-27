@@ -67,8 +67,8 @@ class X509PublisherModule extends X509CaModule {
    * Publish certificate.
    *
    * @param certInfo certificate to be published.
-   * @return 0 for published successfully, 1 if could not be published to CA certstore and
-   *     any publishers, 2 if could be published to CA certstore but not to all publishers.
+   * @return 0: for published successfully, 1: if could not be published to CA certstore and
+   *     any publishers, 2: if could be published to CA certstore but not to all publishers.
    */
   int publishCert(CertificateInfo certInfo, boolean saveKeypair) {
     notNull(certInfo, "certInfo");

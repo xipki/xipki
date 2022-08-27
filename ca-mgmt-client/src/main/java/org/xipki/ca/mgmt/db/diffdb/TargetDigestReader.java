@@ -195,34 +195,31 @@ class TargetDigestReader implements Closeable {
     String singleSql;
     StringBuilder arrayBuffer = new StringBuilder(200);
 
-    switch (dbType) {
-      case XIPKI_OCSP_v4:
-        singleSql = StringUtil.concat("REV,RR,RT,RIT,HASH FROM CERT WHERE IID=", Integer.toString(caId), " AND SN=?");
-        arrayBuffer.append("SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=").append(caId).append(" AND SN IN (?");
-        for (int i = 1; i < numPerSelect; i++) {
-          arrayBuffer.append(",?");
-        }
-        arrayBuffer.append(")");
-        break;
-      default:
-        String hashOrCertColumn;
-        if (certHashAlgo == HashAlgo.SHA1) {
-          hashOrCertColumn = "SHA1";
-        } else {
-          hashOrCertColumn = "CERT";
-        }
+    if (dbType == DbType.XIPKI_OCSP_v4) {
+      singleSql = StringUtil.concat("REV,RR,RT,RIT,HASH FROM CERT WHERE IID=", Integer.toString(caId), " AND SN=?");
+      arrayBuffer.append("SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=").append(caId).append(" AND SN IN (?");
+      for (int i = 1; i < numPerSelect; i++) {
+        arrayBuffer.append(",?");
+      }
+      arrayBuffer.append(")");
+    } else {
+      String hashOrCertColumn;
+      if (certHashAlgo == HashAlgo.SHA1) {
+        hashOrCertColumn = "SHA1";
+      } else {
+        hashOrCertColumn = "CERT";
+      }
 
-        singleSql = StringUtil.concat("REV,RR,RT,RIT,", hashOrCertColumn,
+      singleSql = StringUtil.concat("REV,RR,RT,RIT,", hashOrCertColumn,
           " FROM CERT WHERE CA_ID=", Integer.toString(caId), " AND SN=?");
 
-        arrayBuffer.append("SN,REV,RR,RT,RIT,").append(hashOrCertColumn)
+      arrayBuffer.append("SN,REV,RR,RT,RIT,").append(hashOrCertColumn)
           .append(" FROM CERT WHERE CA_ID=").append(caId).append(" AND SN IN (?");
 
-        for (int i = 1; i < numPerSelect; i++) {
-          arrayBuffer.append(",?");
-        }
-        arrayBuffer.append(")");
-        break;
+      for (int i = 1; i < numPerSelect; i++) {
+        arrayBuffer.append(",?");
+      }
+      arrayBuffer.append(")");
     }
 
     singleCertSql = datasource.buildSelectFirstSql(1, singleSql);
@@ -373,16 +370,14 @@ class TargetDigestReader implements Closeable {
   } // method awaitTerminiation
 
   private String getBase64HashValue(ResultSet rs) throws SQLException {
-    switch (dbType) {
-      case XIPKI_OCSP_v4:
-        return rs.getString("HASH");
-      default:
-        if (certhashAlgo == HashAlgo.SHA1) {
-          return rs.getString("SHA1");
-        } else {
-          byte[] encodedCert = Base64.decodeFast(rs.getString("CERT"));
-          return certhashAlgo.base64Hash(encodedCert);
-        }
+    if (dbType == DbType.XIPKI_OCSP_v4) {
+      return rs.getString("HASH");
+    }
+    if (certhashAlgo == HashAlgo.SHA1) {
+      return rs.getString("SHA1");
+    } else {
+      byte[] encodedCert = Base64.decodeFast(rs.getString("CERT"));
+      return certhashAlgo.base64Hash(encodedCert);
     }
   } // method getBase64HashValue
 }

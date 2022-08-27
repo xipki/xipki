@@ -64,14 +64,18 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
     public static int getKeysize(String hmacAlgorithm) {
       hmacAlgorithm = hmacAlgorithm.toUpperCase();
       int keysize;
-      if ("AES128-GMAC".equals(hmacAlgorithm)) {
-        keysize = 128;
-      } else if ("AES192-GMAC".equals(hmacAlgorithm)) {
-        keysize = 192;
-      } else if ("AES256-GMAC".equals(hmacAlgorithm)) {
-        keysize = 256;
-      } else {
-        throw new IllegalArgumentException("unknown GMAC algorithm " + hmacAlgorithm);
+      switch (hmacAlgorithm) {
+        case "AES128-GMAC":
+          keysize = 128;
+          break;
+        case "AES192-GMAC":
+          keysize = 192;
+          break;
+        case "AES256-GMAC":
+          keysize = 256;
+          break;
+        default:
+          throw new IllegalArgumentException("unknown GMAC algorithm " + hmacAlgorithm);
       }
       return keysize;
     }
@@ -146,18 +150,28 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
     private static int getKeysize(String hmacAlgorithm) {
       hmacAlgorithm = hmacAlgorithm.toUpperCase();
       int keysize;
-      if ("HMACSHA1".equals(hmacAlgorithm)) {
-        keysize = 160;
-      } else if ("HMACSHA224".equals(hmacAlgorithm) || "HMACSHA3-224".equals(hmacAlgorithm)) {
-        keysize = 224;
-      } else if ("HMACSHA256".equals(hmacAlgorithm) || "HMACSHA3-256".equals(hmacAlgorithm)) {
-        keysize = 256;
-      } else if ("HMACSHA384".equals(hmacAlgorithm) || "HMACSHA3-384".equals(hmacAlgorithm)) {
-        keysize = 384;
-      } else if ("HMACSHA512".equals(hmacAlgorithm) || "HMACSHA3-512".equals(hmacAlgorithm)) {
-        keysize = 512;
-      } else {
-        throw new IllegalArgumentException("unknown HMAC algorithm " + hmacAlgorithm);
+      switch (hmacAlgorithm) {
+        case "HMACSHA1":
+          keysize = 160;
+          break;
+        case "HMACSHA224":
+        case "HMACSHA3-224":
+          keysize = 224;
+          break;
+        case "HMACSHA256":
+        case "HMACSHA3-256":
+          keysize = 256;
+          break;
+        case "HMACSHA384":
+        case "HMACSHA3-384":
+          keysize = 384;
+          break;
+        case "HMACSHA512":
+        case "HMACSHA3-512":
+          keysize = 512;
+          break;
+        default:
+          throw new IllegalArgumentException("unknown HMAC algorithm " + hmacAlgorithm);
       }
       return keysize;
     }

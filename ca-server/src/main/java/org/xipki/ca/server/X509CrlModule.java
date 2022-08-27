@@ -609,7 +609,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     int hmInMinutes = hm.getHour() * 60 + hm.getMinute();
 
     if (minutesInDay == hmInMinutes) {
-      // If time if == hm
+      // If time == hm
       return new Date(epochDaysInMillis + hmInMinutes * MS_PER_MINUTE);
     } else if (minutesInDay < hmInMinutes) {
       // If time is before hm, use the previous interval
@@ -617,7 +617,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     } else {
       // If time is after hm, use the nearest interval before reference time
       for (int i = 0;; i++) {
-        if (minutesInDay < (hmInMinutes + (i + 1) * intervalMinutes)) {
+        if (minutesInDay < (hmInMinutes + (i + 1L) * intervalMinutes)) {
           return new Date(epochDaysInMillis + (hmInMinutes + i * intervalMinutes) * MS_PER_MINUTE);
         }
       }

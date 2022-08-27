@@ -61,7 +61,7 @@ public abstract class ProxyMessage extends ASN1Object {
   protected static String getUtf8String(ASN1Encodable object)
       throws BadAsn1ObjectException {
     try {
-      return DERUTF8String.getInstance(object).getString();
+      return ASN1UTF8String.getInstance(object).getString();
     } catch (IllegalArgumentException ex) {
       throw new BadAsn1ObjectException("invalid object UTF8String: " + ex.getMessage(), ex);
     }

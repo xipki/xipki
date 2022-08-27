@@ -302,7 +302,7 @@ public class ExtensionsConfCreatorDemo {
     subFields.add(subField);
     ConstantExtnValue subsubField = new ConstantExtnValue(FieldType.UTF8String);
     subsubField.setValue("app");
-    subField.setListValue(Arrays.asList(subsubField));
+    subField.setListValue(Collections.singletonList(subsubField));
 
     // Line 5
     subField = new ConstantExtnValue(FieldType.UTF8String);
@@ -316,7 +316,7 @@ public class ExtensionsConfCreatorDemo {
     subField.setTag(new Tag(1, true));
     subsubField = new ConstantExtnValue(FieldType.UTF8String);
     subsubField.setValue("void");
-    subField.setListValue(Arrays.asList(subsubField));
+    subField.setListValue(Collections.singletonList(subsubField));
 
     // Line 8
     subField = new ConstantExtnValue(FieldType.UTF8String);
@@ -330,7 +330,7 @@ public class ExtensionsConfCreatorDemo {
     subField.setTag(new Tag(9, false));
     subsubField = new ConstantExtnValue(FieldType.UTF8String);
     subsubField.setValue("complication");
-    subField.setListValue(Arrays.asList(subsubField));
+    subField.setListValue(Collections.singletonList(subsubField));
 
     return subFields;
   } // method createConstantSequenceOrSet
@@ -434,7 +434,7 @@ public class ExtensionsConfCreatorDemo {
     subFields.add(subField);
     ConstantExtnValue subsubField = new ConstantExtnValue(FieldType.UTF8String);
     subsubField.setValue("app");
-    subField.setListValue(Arrays.asList(subsubField));
+    subField.setListValue(Collections.singletonList(subsubField));
 
     // Line 5
     subField = new ConstantExtnValue(FieldType.UTF8String);
@@ -446,7 +446,7 @@ public class ExtensionsConfCreatorDemo {
     subFields.add(subField);
     subsubField = new ConstantExtnValue(FieldType.UTF8String);
     subsubField.setValue("void");
-    subField.setListValue(Arrays.asList(subsubField));
+    subField.setListValue(Collections.singletonList(subsubField));
 
     // Line 8
     subField = new ConstantExtnValue(FieldType.UTF8String);
@@ -458,7 +458,7 @@ public class ExtensionsConfCreatorDemo {
     subFields.add(subField);
     subsubField = new ConstantExtnValue(FieldType.UTF8String);
     subsubField.setValue("complication");
-    subField.setListValue(Arrays.asList(subsubField));
+    subField.setListValue(Collections.singletonList(subsubField));
 
     X509ExtensionType extn = new X509ExtensionType();
     list.add(extn);

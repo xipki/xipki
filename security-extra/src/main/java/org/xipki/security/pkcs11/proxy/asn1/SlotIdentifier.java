@@ -45,9 +45,8 @@ public class SlotIdentifier extends ProxyMessage {
 
   private SlotIdentifier(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 2, 2);
-    int idx = 0;
-    long id = getInteger(seq.getObjectAt(idx++)).longValue();
-    int index = getInteger(seq.getObjectAt(idx++)).intValue();
+    long id = getInteger(seq.getObjectAt(0)).longValue();
+    int index = getInteger(seq.getObjectAt(1)).intValue();
     this.value = new P11SlotIdentifier(index, id);
   }
 

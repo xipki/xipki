@@ -77,7 +77,7 @@ public class GenRSAKeypairParams extends ProxyMessage {
     }
     keysize = Args.min(ksize, "keysize", 1);
 
-    publicExponent = (size > idx) ? getInteger(seq.getObjectAt(idx++)) : null;
+    publicExponent = (size > idx) ? getInteger(seq.getObjectAt(idx)) : null;
   }
 
   public static GenRSAKeypairParams getInstance(Object obj)

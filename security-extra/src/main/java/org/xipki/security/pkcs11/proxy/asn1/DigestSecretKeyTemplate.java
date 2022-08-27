@@ -48,10 +48,9 @@ public class DigestSecretKeyTemplate extends ProxyMessage {
 
   private DigestSecretKeyTemplate(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 3, 3);
-    int idx = 0;
-    this.slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++));
-    this.objectId = ObjectIdentifier.getInstance(seq.getObjectAt(idx++));
-    this.mechanism = Mechanism.getInstance(seq.getObjectAt(idx++));
+    this.slotId = SlotIdentifier.getInstance(seq.getObjectAt(0));
+    this.objectId = ObjectIdentifier.getInstance(seq.getObjectAt(1));
+    this.mechanism = Mechanism.getInstance(seq.getObjectAt(2));
   }
 
   public DigestSecretKeyTemplate(SlotIdentifier slotId, ObjectIdentifier objectId, long mechanism) {

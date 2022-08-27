@@ -74,9 +74,8 @@ public class SignerCaActions {
     @Override
     protected Object execute0() throws Exception {
       String base64Cert = null;
-      X509Cert signerCert = null;
       if (certFile != null) {
-        signerCert = X509Util.parseCert(new File(certFile));
+        X509Cert signerCert = X509Util.parseCert(new File(certFile));
         base64Cert = IoUtil.base64Encode(signerCert.getEncoded(), false);
       }
 

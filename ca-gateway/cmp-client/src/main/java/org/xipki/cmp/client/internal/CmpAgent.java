@@ -654,7 +654,7 @@ class CmpAgent {
         }
       } else {
         PKIFreeText statusString = statusInfo.getStatusString();
-        String errorMessage = (statusString == null) ? null : statusString.getStringAt(0).getString();
+        String errorMessage = (statusString == null) ? null : statusString.getStringAtUTF8(0).getString();
         int failureInfo = statusInfo.getFailInfo().intValue();
 
         resultEntry = new ResultEntry.Error(thisId, status, failureInfo, errorMessage);
@@ -1016,7 +1016,7 @@ class CmpAgent {
           ASN1TaggedObject to = (ASN1TaggedObject) params.getObjectAt(i);
           int tag = to.getTagNo();
           if (tag == 0) { // KDF
-            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
+            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getBaseObject());
             if (ObjectIdentifiers.Misc.id_iso18033_kdf2.equals(algId.getAlgorithm())) {
               AlgorithmIdentifier hashAlgorithm = AlgorithmIdentifier.getInstance(algId.getParameters());
               if (!hashAlgorithm.getAlgorithm().equals(HashAlgo.SHA1.getOid())) {
@@ -1027,12 +1027,12 @@ class CmpAgent {
               throw new XiSecurityException("unsupported KeyDerivationFunction " + algId.getAlgorithm().getId());
             }
           } else if (tag == 1) { // SymmetricEncryption
-            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
+            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getBaseObject());
             if (!ObjectIdentifiers.Secg.id_aes128_cbc_in_ecies.equals(algId.getAlgorithm())) {
               throw new XiSecurityException("unsupported SymmetricEncryption " + algId.getAlgorithm().getId());
             }
           } else if (tag == 2) { // MessageAuthenticationCode
-            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
+            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getBaseObject());
             if (ObjectIdentifiers.Secg.id_hmac_full_ecies.equals(algId.getAlgorithm())) {
               AlgorithmIdentifier hashAlgorithm = AlgorithmIdentifier.getInstance(algId.getParameters());
               if (!hashAlgorithm.getAlgorithm().equals(HashAlgo.SHA1.getOid())) {
@@ -1180,7 +1180,7 @@ class CmpAgent {
 
       if (status != PKIStatus.GRANTED && status != PKIStatus.GRANTED_WITH_MODS) {
         PKIFreeText text = statusInfo.getStatusString();
-        String statusString = (text == null) ? null : text.getStringAt(0).getString();
+        String statusString = (text == null) ? null : text.getStringAtUTF8(0).getString();
 
         ResultEntry resultEntry = new ResultEntry.Error(re.getId(), status,
             statusInfo.getFailInfo().intValue(), statusString);

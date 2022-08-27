@@ -89,7 +89,7 @@ public class CtLogVerifyTest {
         sct.getExtensions(), issuerKeyHash, preCertTbsCert);
 
     boolean sigValid = sig.verify(sct.getDigitallySigned().getSignature());
-    Assert.assertEquals("signature valid", true, sigValid);
+    Assert.assertTrue("signature valid", sigValid);
   }
 
   public static byte[] read(String name)

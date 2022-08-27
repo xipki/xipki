@@ -47,9 +47,8 @@ public class Mechanism extends ProxyMessage {
   private Mechanism(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 1, 2);
     int size = seq.size();
-    int idx = 0;
-    this.mechanism = getInteger(seq.getObjectAt(idx++)).longValue();
-    this.params = (size > 1)  ? P11Params.getInstance(seq.getObjectAt(idx++)) : null;
+    this.mechanism = getInteger(seq.getObjectAt(0)).longValue();
+    this.params = (size > 1)  ? P11Params.getInstance(seq.getObjectAt(1)) : null;
   }
 
   public static Mechanism getInstance(Object obj) throws BadAsn1ObjectException {

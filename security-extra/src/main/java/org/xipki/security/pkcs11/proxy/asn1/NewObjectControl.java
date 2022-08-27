@@ -59,7 +59,7 @@ public class NewObjectControl extends ProxyMessage {
       ASN1TaggedObject tagObj = (ASN1TaggedObject) obj;
       int tagNo = tagObj.getTagNo();
       if (tagNo == 0) {
-        id = DEROctetString.getInstance(tagObj.getObject()).getOctets();
+        id = DEROctetString.getInstance(tagObj.getBaseObject()).getOctets();
       }
     }
 

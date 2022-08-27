@@ -59,7 +59,7 @@ public class ErrorResponse extends SdkResponse {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     if (transactionId != null) {
-      sb.append("tid=" + transactionId).append(", ");
+      sb.append("tid=").append(transactionId).append(", ");
     }
     sb.append(code);
     if (message != null) {

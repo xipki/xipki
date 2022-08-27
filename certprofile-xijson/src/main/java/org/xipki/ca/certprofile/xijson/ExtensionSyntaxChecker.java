@@ -75,16 +75,16 @@ public class ExtensionSyntaxChecker {
       extnValue = getParsedImplicitValue(name, taggedExtnValue, syntax.type());
     } else {
       if (extnTag != null && extnTag.isExplicit()) {
-        extnValue = taggedExtnValue.getObject();
+        extnValue = taggedExtnValue.getBaseObject();
       }
 
       try {
         switch (syntax.type()) {
           case BIT_STRING:
-            extnValue = DERBitString.getInstance(extnValue);
+            extnValue = ASN1BitString.getInstance(extnValue);
             break;
           case BMPString:
-            extnValue = DERBMPString.getInstance(extnValue);
+            extnValue = ASN1BMPString.getInstance(extnValue);
             break;
           case BOOLEAN:
             extnValue = ASN1Boolean.getInstance(extnValue);
@@ -96,7 +96,7 @@ public class ExtensionSyntaxChecker {
             extnValue = DERGeneralizedTime.getInstance(extnValue);
             break;
           case IA5String:
-            extnValue = DERIA5String.getInstance(extnValue);
+            extnValue = ASN1IA5String.getInstance(extnValue);
             break;
           case INTEGER:
             extnValue = ASN1Integer.getInstance(extnValue);
@@ -114,7 +114,7 @@ public class ExtensionSyntaxChecker {
             extnValue = ASN1ObjectIdentifier.getInstance(extnValue);
             break;
           case PrintableString:
-            extnValue = DERPrintableString.getInstance(extnValue);
+            extnValue = ASN1PrintableString.getInstance(extnValue);
             break;
           case RAW:
             break;
@@ -127,13 +127,13 @@ public class ExtensionSyntaxChecker {
             extnValue = ASN1Set.getInstance(extnValue);
             break;
           case TeletexString:
-            extnValue = DERT61String.getInstance(extnValue);
+            extnValue = ASN1T61String.getInstance(extnValue);
             break;
           case UTCTime:
             extnValue = DERUTCTime.getInstance(extnValue);
             break;
           case UTF8String:
-            extnValue = DERUTF8String.getInstance(extnValue);
+            extnValue = ASN1UTF8String.getInstance(extnValue);
             break;
           default:
             throw new RuntimeException("Unknown FieldType " + syntax.type());
@@ -172,7 +172,7 @@ public class ExtensionSyntaxChecker {
         if (tag != null) {
           if (syntaxTag != null && (syntaxTag.getValue() == tag.getValue())) {
             if (syntaxTag.isExplicit() && tag.isExplicit()) {
-              obj = ((ASN1TaggedObject) obj).getObject();
+              obj = ((ASN1TaggedObject) obj).getBaseObject();
               FieldType expectedType = getFieldType(obj);
               if ((syntaxType == expectedType)
                   || (syntaxType == FieldType.SEQUENCE_OF && expectedType == FieldType.SEQUENCE)
@@ -186,10 +186,10 @@ public class ExtensionSyntaxChecker {
               // 1. [t] IMPLICIT SEQUENCE { type } is wired the same as [t] EXPLICIT type
               // 2. [t] IMPLICIT      SET { type } is wired the same as [t] EXPLICIT type
               if (syntaxType == FieldType.SEQUENCE || syntaxType == FieldType.SEQUENCE_OF) {
-                obj = new DERSequence(((ASN1TaggedObject) obj).getObject());
+                obj = new DERSequence(((ASN1TaggedObject) obj).getBaseObject());
                 matchIndex = j;
               } else if (syntaxType == FieldType.SET || syntaxType == FieldType.SET_OF) {
-                obj = new DERSet(((ASN1TaggedObject) obj).getObject());
+                obj = new DERSet(((ASN1TaggedObject) obj).getBaseObject());
                 matchIndex = j;
               }
             }
@@ -278,10 +278,10 @@ public class ExtensionSyntaxChecker {
             // 2. [t] IMPLICIT      SET { type } is wired the same as [t] EXPLICIT type
             FieldType type = m.type();
             if (type == FieldType.SEQUENCE || type == FieldType.SEQUENCE_OF) {
-              obj = new DERSequence(((ASN1TaggedObject) obj).getObject());
+              obj = new DERSequence(((ASN1TaggedObject) obj).getBaseObject());
               syntax = m;
             } else if (type == FieldType.SET || type == FieldType.SET_OF) {
-              obj = new DERSet(((ASN1TaggedObject) obj).getObject());
+              obj = new DERSet(((ASN1TaggedObject) obj).getBaseObject());
               syntax = m;
             }
           } else {
@@ -296,7 +296,7 @@ public class ExtensionSyntaxChecker {
 
       if (syntax != null) {
         if (syntax.getTag().isExplicit()) {
-          obj = taggedObj.getObject();
+          obj = taggedObj.getBaseObject();
           FieldType expectedType = getFieldType(obj);
           FieldType syntaxType = syntax.type();
 
@@ -405,9 +405,9 @@ public class ExtensionSyntaxChecker {
     try {
       switch (fieldType) {
         case BIT_STRING:
-          return DERBitString.getInstance(taggedObject, false);
+          return ASN1BitString.getInstance(taggedObject, false);
         case BMPString:
-          return DERBMPString.getInstance(taggedObject, false);
+          return ASN1BMPString.getInstance(taggedObject, false);
         case BOOLEAN:
           return ASN1Boolean.getInstance(taggedObject, false);
         case ENUMERATED:
@@ -415,14 +415,14 @@ public class ExtensionSyntaxChecker {
         case GeneralizedTime:
           return DERGeneralizedTime.getInstance(taggedObject, false);
         case IA5String:
-          return DERIA5String.getInstance(taggedObject, false);
+          return ASN1IA5String.getInstance(taggedObject, false);
         case INTEGER:
           return ASN1Integer.getInstance(taggedObject, false);
         case Name:
           return X500Name.getInstance(taggedObject, false);
         case NULL:
-          if (!(taggedObject.getObject() instanceof ASN1OctetString
-              && ((ASN1OctetString) taggedObject.getObject()).getOctets().length == 0)) {
+          if (!(taggedObject.getBaseObject() instanceof ASN1OctetString
+              && ((ASN1OctetString) taggedObject.getBaseObject()).getOctets().length == 0)) {
             throw new BadCertTemplateException("invalid " + name);
           }
           return DERNull.INSTANCE;
@@ -431,9 +431,9 @@ public class ExtensionSyntaxChecker {
         case OID:
           return ASN1ObjectIdentifier.getInstance(taggedObject, false);
         case PrintableString:
-          return DERPrintableString.getInstance(taggedObject, false);
+          return ASN1PrintableString.getInstance(taggedObject, false);
         case RAW:
-          return taggedObject.getObject();
+          return taggedObject.getBaseObject();
         case SEQUENCE:
         case SEQUENCE_OF:
           return ASN1Sequence.getInstance(taggedObject, false);
@@ -441,11 +441,11 @@ public class ExtensionSyntaxChecker {
         case SET_OF:
           return ASN1Set.getInstance(taggedObject, false);
         case TeletexString:
-          return DERT61String.getInstance(taggedObject, false);
+          return ASN1T61String.getInstance(taggedObject, false);
         case UTCTime:
           return DERUTCTime.getInstance(taggedObject, false);
         case UTF8String:
-          return DERUTF8String.getInstance(taggedObject, false);
+          return ASN1UTF8String.getInstance(taggedObject, false);
         default:
           throw new RuntimeException("Unknown FieldType " + fieldType);
       }

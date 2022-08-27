@@ -28,7 +28,6 @@ import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.cmp.client.*;
-import org.xipki.cmpclient.CmpClientConf;
 import org.xipki.security.CollectionAlgorithmValidator;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;

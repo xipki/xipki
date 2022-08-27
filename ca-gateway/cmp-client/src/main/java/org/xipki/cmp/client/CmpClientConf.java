@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.cmpclient;
+package org.xipki.cmp.client;
 
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.ValidatableConf;

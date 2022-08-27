@@ -35,6 +35,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -395,7 +396,7 @@ class CaconfDbExporter extends DbPorter {
             ccc.setRevokeSuspendedControl(new ConfPairs(str).asMap());
           }
 
-          ccc.setKeypairGenNames(Arrays.asList("software"));
+          ccc.setKeypairGenNames(Collections.singletonList("software"));
           ccc.setSaveCert(true);
           ccc.setSaveKeypair(false);
 

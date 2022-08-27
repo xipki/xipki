@@ -77,7 +77,7 @@ public class RemoveObjectsParams extends ProxyMessage {
     }
 
     objectId = (asn1Id == null) ? null : getOctetStringBytes(asn1Id);
-    objectLabel = (asn1Label == null) ? null : getUtf8String(seq.getObjectAt(idx++));
+    objectLabel = (asn1Label == null) ? null : getUtf8String(seq.getObjectAt(idx));
 
     if ((objectId == null || objectId.length == 0) && StringUtil.isBlank(objectLabel)) {
       throw new BadAsn1ObjectException("invalid object RemoveObjectsParams: "

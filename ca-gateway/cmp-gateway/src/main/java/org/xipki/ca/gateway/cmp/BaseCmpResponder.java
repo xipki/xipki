@@ -341,7 +341,7 @@ abstract class BaseCmpResponder {
         if (parameters != null) {
           dfltCertprofileName = parameters.get(HTTP_HEADER_certprofile);
           String str = parameters.get(HTTP_HEADER_groupenroll);
-          groupEnroll = StringUtil.isBlank(str) ? false : Boolean.parseBoolean(str);
+          groupEnroll = !StringUtil.isBlank(str) && Boolean.parseBoolean(str);
         }
 
         respBody = cmpEnrollCert(caName, dfltCertprofileName, groupEnroll, request, respHeader,

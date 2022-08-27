@@ -113,7 +113,7 @@ public class DemoCertprofile extends XijsonCertprofile {
 
   @Override
   public ExtensionValues getExtraExtensions(
-      Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
+      Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurrences,
       X500Name requestedSubject, X500Name grantedSubject,
       Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
       Date notBefore, Date notAfter, PublicCaInfo caInfo)
@@ -122,7 +122,7 @@ public class DemoCertprofile extends XijsonCertprofile {
 
     if (addExtraWithoutConf) {
       ASN1ObjectIdentifier type = id_demo_without_conf;
-      ExtensionControl extnControl = extensionOccurences.get(type);
+      ExtensionControl extnControl = extensionOccurrences.get(type);
       if (extnControl != null) {
         ConfPairs caExtraControl = caInfo.getExtraControl();
         String name = "name-a";
@@ -142,7 +142,7 @@ public class DemoCertprofile extends XijsonCertprofile {
 
     if (addExtraWithConf) {
       ASN1ObjectIdentifier type = id_demo_with_conf;
-      ExtensionControl extnControl = extensionOccurences.get(type);
+      ExtensionControl extnControl = extensionOccurrences.get(type);
       if (extnControl != null) {
         if (sequence == null) {
           throw new IllegalStateException("Certprofile is not initialized");

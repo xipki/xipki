@@ -46,9 +46,7 @@ import static org.xipki.util.CollectionUtil.isNotEmpty;
 public class CheckerUtil {
 
   static void addIfNotIn(Set<ASN1ObjectIdentifier> set, ASN1ObjectIdentifier oid) {
-    if (!set.contains(oid)) {
-      set.add(oid);
-    }
+    set.add(oid);
   }
 
   static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(Map<String, ExtensionType> extensions)
@@ -172,7 +170,7 @@ public class CheckerUtil {
           throw new BadCertTemplateException("otherName.type " + type.getId() + " is not allowed");
         }
 
-        ASN1Encodable value = ASN1TaggedObject.getInstance(reqSeq.getObjectAt(1)).getObject();
+        ASN1Encodable value = ASN1TaggedObject.getInstance(reqSeq.getObjectAt(1)).getBaseObject();
         String text;
         if (!(value instanceof ASN1String)) {
           throw new BadCertTemplateException("otherName.value is not a String");
@@ -193,12 +191,12 @@ public class CheckerUtil {
         int idx = 0;
         if (size > 1) {
           DirectoryString ds = DirectoryString.getInstance(
-              ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++)).getObject());
+              ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++)).getBaseObject());
           nameAssigner = ds.getString();
         }
 
         DirectoryString ds = DirectoryString.getInstance(
-            ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++)).getObject());
+            ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx)).getBaseObject());
         String partyName = ds.getString();
 
         vector = new ASN1EncodableVector();
@@ -259,8 +257,8 @@ public class CheckerUtil {
     }
 
     Set<String> isUris = new HashSet<>();
-    for (int i = 0; i < size; i++) {
-      GeneralName isAccessLocation = isAccessDescriptions.get(i).getAccessLocation();
+    for (AccessDescription isAccessDescription : isAccessDescriptions) {
+      GeneralName isAccessLocation = isAccessDescription.getAccessLocation();
       if (isAccessLocation.getTagNo() != GeneralName.uniformResourceIdentifier) {
         addViolation(failureMsg, "tag of accessLocation of AIA ",
             isAccessLocation.getTagNo(), GeneralName.uniformResourceIdentifier);

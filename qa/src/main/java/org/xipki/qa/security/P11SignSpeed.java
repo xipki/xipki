@@ -108,7 +108,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
     public HMAC(SecurityFactory securityFactory, P11Slot slot, byte[] keyId, String signatureAlgorithm, int threads)
         throws Exception {
-      this(!false, securityFactory, slot, keyId, null, signatureAlgorithm, threads);
+      this(true, securityFactory, slot, keyId, null, signatureAlgorithm, threads);
     }
 
     public HMAC(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,
@@ -134,22 +134,28 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
     private static int getKeysize(String hmacAlgorithm) {
       int keysize;
       hmacAlgorithm = hmacAlgorithm.toUpperCase();
-      if ("HMACSHA1".equals(hmacAlgorithm)) {
-        keysize = 160;
-      } else if ("HMACSHA224".equals(hmacAlgorithm)
-          || "HMACSHA3-224".equals(hmacAlgorithm)) {
-        keysize = 224;
-      } else if ("HMACSHA256".equals(hmacAlgorithm)
-          || "HMACSHA3-256".equals(hmacAlgorithm)) {
-        keysize = 256;
-      } else if ("HMACSHA384".equals(hmacAlgorithm)
-          || "HMACSHA3-384".equals(hmacAlgorithm)) {
-        keysize = 384;
-      } else if ("HMACSHA512".equals(hmacAlgorithm)
-          || "HMACSHA3-512".equals(hmacAlgorithm)) {
-        keysize = 512;
-      } else {
-        throw new IllegalArgumentException("unknown HMAC algorithm " + hmacAlgorithm);
+      switch (hmacAlgorithm) {
+        case "HMACSHA1":
+          keysize = 160;
+          break;
+        case "HMACSHA224":
+        case "HMACSHA3-224":
+          keysize = 224;
+          break;
+        case "HMACSHA256":
+        case "HMACSHA3-256":
+          keysize = 256;
+          break;
+        case "HMACSHA384":
+        case "HMACSHA3-384":
+          keysize = 384;
+          break;
+        case "HMACSHA512":
+        case "HMACSHA3-512":
+          keysize = 512;
+          break;
+        default:
+          throw new IllegalArgumentException("unknown HMAC algorithm " + hmacAlgorithm);
       }
       return keysize;
     }
@@ -190,7 +196,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
     public SM2(SecurityFactory securityFactory, P11Slot slot, byte[] keyId, int threads)
         throws Exception {
-      this(!false, securityFactory, slot, keyId, null, threads);
+      this(true, securityFactory, slot, keyId, null, threads);
     }
 
     public SM2(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,

@@ -126,7 +126,7 @@ public class Foo {
         AlgorithmIdentifier sigAlg2 = new AlgorithmIdentifier(
             PKCSObjectIdentifiers.sha1WithRSAEncryption, DERNull.INSTANCE);
         ASN1Sequence seq = new DERSequence(new ASN1Encodable[]{sigAlg1, sigAlg2});
-        arrays[offset++] = new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_pref_sig_algs,
+        arrays[offset] = new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_pref_sig_algs,
             control.extensionCritical, seq.getEncoded());
       }
 

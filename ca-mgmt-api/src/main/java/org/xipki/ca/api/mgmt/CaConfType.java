@@ -46,7 +46,7 @@ public class CaConfType {
     private String basedir;
 
     /**
-     * The element name specifies the property name, the the element
+     * The element name specifies the property name, the element
      * value specifies the property value. The property propname can be referenced by
      * ${propname}.
 
@@ -227,7 +227,7 @@ public class CaConfType {
   public static class CaInfo extends ValidatableConf {
 
     /**
-     * If genSelfIssued is preset, it must be absent. Otherwise it specifies the CA certificate
+     * If genSelfIssued is preset, it must be absent; Otherwise it specifies the CA certificate
      */
     private FileOrBinary cert;
 

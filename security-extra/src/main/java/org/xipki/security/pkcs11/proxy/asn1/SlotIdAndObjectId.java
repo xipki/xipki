@@ -60,9 +60,8 @@ public class SlotIdAndObjectId extends ProxyMessage {
 
   private SlotIdAndObjectId(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 2, 2);
-    int idx = 0;
-    this.slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++));
-    this.objectId = ObjectIdentifier.getInstance(seq.getObjectAt(idx++));
+    this.slotId = SlotIdentifier.getInstance(seq.getObjectAt(0));
+    this.objectId = ObjectIdentifier.getInstance(seq.getObjectAt(1));
   }
 
   public static SlotIdAndObjectId getInstance(Object obj) throws BadAsn1ObjectException {

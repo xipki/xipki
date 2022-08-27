@@ -576,8 +576,7 @@ public class RestResponder {
     byte[] csrBytes = null;
     byte[] targetCertBytes = null;
 
-    PemReader pemReader = new PemReader(new InputStreamReader(new ByteArrayInputStream(request)));
-    try {
+    try (PemReader pemReader = new PemReader(new InputStreamReader(new ByteArrayInputStream(request)))) {
       while (true) {
         PemObject pemObject = pemReader.readPemObject();
         if (pemObject == null) {
@@ -601,8 +600,6 @@ public class RestResponder {
               AuditLevel.INFO, AuditStatus.FAILED);
         }
       }
-    } finally {
-      pemReader.close();
     }
 
     if (csrBytes == null) {

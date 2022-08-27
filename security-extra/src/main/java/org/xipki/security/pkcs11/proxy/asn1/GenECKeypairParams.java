@@ -66,7 +66,7 @@ public class GenECKeypairParams extends ProxyMessage {
     }
 
     if (control != null) {
-      oid = getObjectIdentifier(seq.getObjectAt(idx++));
+      oid = getObjectIdentifier(seq.getObjectAt(idx));
     }
 
     curveId = oid;

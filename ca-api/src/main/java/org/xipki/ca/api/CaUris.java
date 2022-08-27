@@ -114,13 +114,11 @@ public class CaUris {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("CA URIs:");
-    sb.append("\n  CACert URIs:").append(formatUris(cacertUris));
-    sb.append("\n  OCSP URIs:").append(formatUris(ocspUris));
-    sb.append("\n  CRL URIs:").append(formatUris(crlUris));
-    sb.append("\n  DeltaCRL URIs:").append(formatUris(deltaCrlUris));
-    return sb.toString();
+    return "CA URIs:" +
+        "\n  CACert URIs:" + formatUris(cacertUris) +
+        "\n  OCSP URIs:" + formatUris(ocspUris) +
+        "\n  CRL URIs:" + formatUris(crlUris) +
+        "\n  DeltaCRL URIs:" + formatUris(deltaCrlUris);
   } // method toString
 
   private static String formatUris(List<String> uris) {

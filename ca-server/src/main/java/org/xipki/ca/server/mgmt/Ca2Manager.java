@@ -197,9 +197,7 @@ class Ca2Manager {
 
     Map<String, Integer> map = manager.queryExecutor.createCaAliases();
     manager.caAliases.clear();
-    for (Entry<String, Integer> entry : map.entrySet()) {
-      manager.caAliases.put(entry.getKey(), entry.getValue());
-    }
+    manager.caAliases.putAll(map);
 
     LOG.info("caAliases: {}", manager.caAliases);
     caAliasesInitialized = true;

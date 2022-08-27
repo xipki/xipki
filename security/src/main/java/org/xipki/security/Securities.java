@@ -35,6 +35,7 @@ import org.xipki.util.exception.InvalidConfException;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -179,8 +180,9 @@ public class Securities implements Closeable {
       }
 
       try {
-        factories.add((P11ModuleFactory) clazz.newInstance());
-      } catch (InstantiationException | IllegalAccessException ex) {
+        factories.add((P11ModuleFactory) clazz.getDeclaredConstructor().newInstance());
+      } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
+               InvocationTargetException ex) {
         LogUtil.error(LOG, ex, "could not create new instance of " + className);
       }
     }
@@ -279,9 +281,10 @@ public class Securities implements Closeable {
       for (String className : conf.getSignerFactories()) {
         try {
           Class<?> clazz = Class.forName(className);
-          SignerFactory factory = (SignerFactory) clazz.newInstance();
+          SignerFactory factory = (SignerFactory) clazz.getDeclaredConstructor().newInstance();
           signerFactoryRegister.registFactory(factory);
-        } catch (ClassCastException | ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
+        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException ex) {
           throw new InvalidConfException("error caught while initializing SignerFactory "
               + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
@@ -293,9 +296,10 @@ public class Securities implements Closeable {
       for (String className : conf.getKeypairGeneratorFactories()) {
         try {
           Class<?> clazz = Class.forName(className);
-          KeypairGeneratorFactory factory = (KeypairGeneratorFactory) clazz.newInstance();
+          KeypairGeneratorFactory factory = (KeypairGeneratorFactory) clazz.getDeclaredConstructor().newInstance();
           keypairFactoryRegister.registFactory(factory);
-        } catch (ClassCastException | ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
+        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException ex) {
           throw new InvalidConfException("error caught while initializing KeypairGeneratorFactory "
               + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }

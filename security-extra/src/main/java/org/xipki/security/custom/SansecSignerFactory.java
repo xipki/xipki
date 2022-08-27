@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The Signer Factory uses SANSEC HSM via the vendor's java SDK.
- * This is an example to show how to create signature using vendors's JCE provider.
+ * This is an example to show how to create signature using vendor's JCE provider.
  *
  * <p>
  * The configuration files must be put in the folder

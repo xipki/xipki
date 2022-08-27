@@ -86,19 +86,17 @@ class DigestDiff {
     this.refDbType = detectDbType(refDatasource);
     this.targetDbType = detectDbType(targetDatasource);
 
-    switch (refDbType) {
-      case XIPKI_OCSP_v4:
-        HashAlgo refAlgo = detectOcspDbCerthashAlgo(refDatasource);
-        HashAlgo targetAlgo = detectOcspDbCerthashAlgo(targetDatasource);
-        if (refAlgo != targetAlgo) {
-          throw new IllegalArgumentException(StringUtil.concatObjects(
-              "Could not compare OCSP datasources with different CERTHASH_ALGO: refDataSource (",
-              refAlgo, ") and targetDataSource (", targetAlgo, ")"));
-        }
-        this.certhashAlgo = refAlgo;
-        break;
-      default:
-        this.certhashAlgo = HashAlgo.SHA1;
+    if (refDbType == DbType.XIPKI_OCSP_v4) {
+      HashAlgo refAlgo = detectOcspDbCerthashAlgo(refDatasource);
+      HashAlgo targetAlgo = detectOcspDbCerthashAlgo(targetDatasource);
+      if (refAlgo != targetAlgo) {
+        throw new IllegalArgumentException(StringUtil.concatObjects(
+            "Could not compare OCSP datasources with different CERTHASH_ALGO: refDataSource (",
+            refAlgo, ") and targetDataSource (", targetAlgo, ")"));
+      }
+      this.certhashAlgo = refAlgo;
+    } else {
+      this.certhashAlgo = HashAlgo.SHA1;
     }
 
     // number of threads
@@ -123,13 +121,10 @@ class DigestDiff {
     List<Integer> refCaIds = new LinkedList<>();
 
     String refSql;
-    switch (refDbType) {
-      case XIPKI_OCSP_v4:
-        refSql = "SELECT ID FROM ISSUER";
-        break;
-      default:
-        refSql = "SELECT ID FROM CA";
-        break;
+    if (refDbType == DbType.XIPKI_OCSP_v4) {
+      refSql = "SELECT ID FROM ISSUER";
+    } else {
+      refSql = "SELECT ID FROM CA";
     }
 
     Statement refStmt = null;
@@ -232,13 +227,10 @@ class DigestDiff {
       throws DataAccessException {
     // get a list of available CAs in the target database
     String sql = "SELECT ID,CERT FROM ";
-    switch (dbType) {
-      case XIPKI_OCSP_v4:
-        sql += "ISSUER";
-        break;
-      default:
-        sql += "CA";
-        break;
+    if (dbType == DbType.XIPKI_OCSP_v4) {
+      sql += "ISSUER";
+    } else {
+      sql += "CA";
     }
 
     Statement stmt = datasource.createStatement();

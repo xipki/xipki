@@ -87,7 +87,7 @@ public class NextCaMessage {
 
       CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
 
-      // I don't known which hash algorithm is supported by the client, use SHA-1
+      // I don't know which hash algorithm is supported by the client, use SHA-1
       String signatureAlgo = getSignatureAlgorithm(signingKey, HashAlgo.SHA1);
       ContentSigner signer = new JcaContentSignerBuilder(signatureAlgo).build(signingKey);
 

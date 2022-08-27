@@ -45,8 +45,7 @@ public class ClrTestVectorGenerateMain {
   }
 
   private static void genTestVectors() throws Exception {
-    Securities securities = new Securities();
-    try {
+    try (Securities securities = new Securities()) {
       securities.init();
 
       ConfPairs conf = new ConfPairs();
@@ -101,8 +100,6 @@ public class ClrTestVectorGenerateMain {
         builder.addCRLEntry(BigInteger.valueOf(255), revokedDate, CRLReason.keyCompromise);
         buildCrl(builder, signer, "no-extensions.crl");
       }
-    } finally {
-      securities.close();
     }
   }
 

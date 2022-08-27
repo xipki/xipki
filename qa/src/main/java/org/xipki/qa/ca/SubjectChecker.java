@@ -461,7 +461,7 @@ public class SubjectChecker {
       return sb.toString();
     } else {
       if (!matchStringType(atvValue, stringType)) {
-        failureMsg.append(name).append(" is not of type " + stringType.name()).append("; ");
+        failureMsg.append(name).append(" is not of type ").append(stringType.name()).append("; ");
         return null;
       }
 

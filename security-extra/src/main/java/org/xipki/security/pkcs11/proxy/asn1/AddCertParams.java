@@ -65,10 +65,9 @@ public class AddCertParams extends ProxyMessage {
 
   private AddCertParams(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 3, 3);
-    int idx = 0;
-    slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
-    control = NewKeyControl.getInstance(seq.getObjectAt(idx++)).getControl();
-    this.certificate = getCertificate0(seq.getObjectAt(idx++));
+    slotId = SlotIdentifier.getInstance(seq.getObjectAt(0)).getValue();
+    control = NewKeyControl.getInstance(seq.getObjectAt(1)).getControl();
+    this.certificate = getCertificate0(seq.getObjectAt(2));
   }
 
   public static AddCertParams getInstance(Object obj) throws BadAsn1ObjectException {

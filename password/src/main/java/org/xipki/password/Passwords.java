@@ -23,6 +23,7 @@ import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -93,9 +94,10 @@ public class Passwords {
       for (String className : singlePasswordResolvers) {
         try {
           Class<?> clazz = Class.forName(className);
-          SinglePasswordResolver resolver = (SinglePasswordResolver) clazz.newInstance();
+          SinglePasswordResolver resolver = (SinglePasswordResolver) clazz.getDeclaredConstructor().newInstance();
           passwordResolver.registResolver(resolver);
-        } catch (ClassCastException | ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
+        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException ex) {
           throw new InvalidConfException("error caught while initializing SinglePasswordResolver "
               + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }

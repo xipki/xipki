@@ -104,12 +104,12 @@ public class RequestorCaActions {
 
       Set<CaHasRequestorEntry> entries = caManager.getRequestorsForCa(caName);
       if (isNotEmpty(entries)) {
-        sb.append("requestors trusted by CA " + caName).append("\n");
+        sb.append("requestors trusted by CA ").append(caName).append("\n");
         for (CaHasRequestorEntry entry : entries) {
           sb.append("----------\n").append(entry).append("\n");
         }
       } else {
-        sb.append("no requestor for CA " + caName + " is configured");
+        sb.append("no requestor for CA ").append(caName).append(" is configured");
       }
       println(sb.toString());
       return null;
@@ -219,7 +219,7 @@ public class RequestorCaActions {
         if (entry == null) {
           throw new CmdFailure("could not find CMP requestor '" + name + "'");
         } else {
-          sb.append(entry.toString(verbose.booleanValue()));
+          sb.append(entry.toString(verbose));
         }
       }
 

@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * This class starts and shutdowns he Jetty HTTP server.
+ * This class starts and shutdowns the Jetty HTTP server.
  *
  * @author Lijun Liao
  */

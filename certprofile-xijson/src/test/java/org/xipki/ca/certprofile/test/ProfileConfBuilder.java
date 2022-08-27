@@ -408,10 +408,8 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
   } // method getEeBaseProfileForEdwardsOrMontgomeryCurves
 
   protected static List<AlgorithmType> createCabKeyAlgorithms() {
-    List<AlgorithmType> list = new LinkedList<>();
-
     // RSA
-    list.addAll(createRSAKeyAlgorithms());
+    List<AlgorithmType> list = new LinkedList<>(createRSAKeyAlgorithms());
 
     // DSA
     list.add(new AlgorithmType());
@@ -460,10 +458,8 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
 
   protected static List<AlgorithmType> createKeyAlgorithms(
       ASN1ObjectIdentifier[] curveIds, CertLevel certLevel, boolean withEddsa) {
-    List<AlgorithmType> list = new LinkedList<>();
-
     // RSA
-    list.addAll(createRSAKeyAlgorithms());
+    List<AlgorithmType> list = new LinkedList<>(createRSAKeyAlgorithms());
 
     // DSA
     list.add(new AlgorithmType());

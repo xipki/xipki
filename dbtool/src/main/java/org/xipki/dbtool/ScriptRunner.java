@@ -180,7 +180,7 @@ public class ScriptRunner {
                     setDelimiter(delimMatch.group(2), false);
                 } else if (trimmedLine.startsWith("--")) {
                     println(trimmedLine);
-                } else if (trimmedLine.length() < 1 || trimmedLine.startsWith("--")) {
+                } else if (trimmedLine.length() < 1) {
                     // Do nothing
                 } else if (!fullLineDelimiter && trimmedLine.endsWith(getDelimiter())
                         ||  fullLineDelimiter && trimmedLine.equals(getDelimiter())) {

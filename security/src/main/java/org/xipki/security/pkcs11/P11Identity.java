@@ -223,14 +223,12 @@ public abstract class P11Identity implements Comparable<P11Identity> {
       if (parameters != null) {
         return false;
       }
-      if (PKCS11Constants.CKM_DSA == mechanism
+      return PKCS11Constants.CKM_DSA == mechanism
           || PKCS11Constants.CKM_DSA_SHA1 == mechanism
           || PKCS11Constants.CKM_DSA_SHA224 == mechanism
           || PKCS11Constants.CKM_DSA_SHA256 == mechanism
           || PKCS11Constants.CKM_DSA_SHA384 == mechanism
-          || PKCS11Constants.CKM_DSA_SHA512 == mechanism) {
-        return true;
-      }
+          || PKCS11Constants.CKM_DSA_SHA512 == mechanism;
     } else if (publicKey instanceof ECPublicKey) {
       if (PKCS11Constants.CKM_ECDSA == mechanism
           || PKCS11Constants.CKM_ECDSA_SHA1 == mechanism
@@ -244,9 +242,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
         return parameters instanceof P11Params.P11ByteArrayParams;
       }
     } else if (publicKey instanceof EdDSAKey) {
-      if (PKCS11Constants.CKM_EDDSA == mechanism) {
-        return true;
-      }
+      return PKCS11Constants.CKM_EDDSA == mechanism;
     }
 
     return false;

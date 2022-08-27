@@ -69,9 +69,6 @@ public class FileUtils {
    * <p>Will not return true if there is a Symbolic Link anywhere in the path,
    * only if the specific file is.
    *
-   * <p><b>Note:</b> the current implementation always returns {@code false} if the system
-   * is detected as Windows using {@link Configuration#isWindows()}
-   *
    * <p>For code that runs on Java 1.7 or later, use the following method instead:
    * <br>
    * {@code boolean java.nio.file.Files.isSymbolicLink(Path path)}
@@ -136,7 +133,7 @@ public class FileUtils {
   /**
    * Copied from the apache commons io project
    *
-   * <p>Deletes a file. If file is a directory, delete it and all sub-directories.
+   * <p>Deletes a file. If file is a directory, delete it and all subdirectories.
    *
    * <p>The difference between File.delete() and this method are:
    * <ul>

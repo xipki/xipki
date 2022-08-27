@@ -46,10 +46,9 @@ public class RSAPkcsPssParams extends ProxyMessage {
 
   private RSAPkcsPssParams(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 3, 3);
-    int idx = 0;
-    long contentHash = getInteger(seq.getObjectAt(idx++)).longValue();
-    long mgfHash = getInteger(seq.getObjectAt(idx++)).longValue();
-    int saltLength = getInteger(seq.getObjectAt(idx++)).intValue();
+    long contentHash = getInteger(seq.getObjectAt(0)).longValue();
+    long mgfHash = getInteger(seq.getObjectAt(1)).longValue();
+    int saltLength = getInteger(seq.getObjectAt(2)).intValue();
     this.pkcsPssParams = new P11RSAPkcsPssParams(contentHash, mgfHash, saltLength);
   } // constructor
 

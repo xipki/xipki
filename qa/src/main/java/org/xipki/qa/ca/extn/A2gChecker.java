@@ -301,12 +301,12 @@ class A2gChecker extends ExtensionChecker {
         addViolation(failureMsg, "biometricData[" + i + "].biometricDataHash", hex(isBytes), hex(expBytes));
       }
 
-      DERIA5String str = isData.getSourceDataUri();
+      ASN1IA5String str = isData.getSourceDataUriIA5();
       String isSourceDataUri = (str == null) ? null : str.getString();
 
       String expSourceDataUri = null;
       if (conf.getSourceDataUriOccurrence() != TripleState.forbidden) {
-        str = expData.getSourceDataUri();
+        str = expData.getSourceDataUriIA5();
         expSourceDataUri = (str == null) ? null : str.getString();
       }
 
@@ -367,7 +367,7 @@ class A2gChecker extends ExtensionChecker {
         ASN1ObjectIdentifier isPolicyQualifierId = isPolicyQualifierInfo.getPolicyQualifierId();
         ASN1Encodable isQualifier = isPolicyQualifierInfo.getQualifier();
         if (PolicyQualifierId.id_qt_cps.equals(isPolicyQualifierId)) {
-          String isCpsUri = DERIA5String.getInstance(isQualifier).getString();
+          String isCpsUri = ASN1IA5String.getInstance(isQualifier).getString();
           isCpsUris.add(isCpsUri);
         } else if (PolicyQualifierId.id_qt_unotice.equals(isPolicyQualifierId)) {
           UserNotice isUserNotice = UserNotice.getInstance(isQualifier);
@@ -431,7 +431,7 @@ class A2gChecker extends ExtensionChecker {
     for (DistributionPoint entry : isDistributionPoints) {
       int asn1Type = entry.getDistributionPoint().getType();
       if (asn1Type != DistributionPointName.FULL_NAME) {
-        addViolation(failureMsg, "tag of DistributionPointName of CRLDistibutionPoints of " + type,
+        addViolation(failureMsg, "tag of DistributionPointName of CRLDistributionPoints of " + type,
             asn1Type, DistributionPointName.FULL_NAME);
         continue;
       }
@@ -439,8 +439,7 @@ class A2gChecker extends ExtensionChecker {
       GeneralNames isDistributionPointNames = GeneralNames.getInstance(entry.getDistributionPoint().getName());
       GeneralName[] names = isDistributionPointNames.getNames();
 
-      for (int i = 0; i < names.length; i++) {
-        GeneralName name = names[i];
+      for (GeneralName name : names) {
         if (name.getTagNo() != GeneralName.uniformResourceIdentifier) {
           addViolation(failureMsg, "tag of URL of " + type, name.getTagNo(), GeneralName.uniformResourceIdentifier);
         } else {
@@ -537,7 +536,7 @@ class A2gChecker extends ExtensionChecker {
 
       String isStr = null;
       try {
-        isStr = DERPrintableString.getInstance(extnValue).getString();
+        isStr = ASN1PrintableString.getInstance(extnValue).getString();
       } catch (Exception ex) {
         failureMsg.append("exension value is not of type PrintableString; ");
       }
@@ -561,13 +560,13 @@ class A2gChecker extends ExtensionChecker {
           tag = tagged.getTagNo();
           // we allow the EXPLICIT in request
           if (tagged.isExplicit()) {
-            extnStr = ((ASN1String) tagged.getObject()).getString();
+            extnStr = ((ASN1String) tagged.getExplicitBaseObject()).getString();
           } else {
             // we also allow the IMPLICIT in request
             if (tag == 0 || tag == 2) {
-              extnStr = DERPrintableString.getInstance(tagged, false).getString();
+              extnStr = ASN1PrintableString.getInstance(tagged, false).getString();
             } else if (tag == 1) {
-              extnStr = DERUTF8String.getInstance(tagged, false).getString();
+              extnStr = ASN1UTF8String.getInstance(tagged, false).getString();
             }
           }
         }

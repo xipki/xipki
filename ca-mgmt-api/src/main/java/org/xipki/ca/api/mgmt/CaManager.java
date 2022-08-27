@@ -45,7 +45,7 @@ public interface CaManager {
   String NULL = "null";
 
   /**
-   * Although is is possible to configure it to 1, it is recommended to set it to at least 9.
+   * Although it is possible to configure it to 1, it is recommended to set it to at least 9.
    * At least 64 bit entropy is required. Since the highest bit is set to 0, at least
    * 9 bytes is recommended.
    */
@@ -87,7 +87,7 @@ public interface CaManager {
       throws CaMgmtException;
 
   /**
-   * Clear the publish queue for the CA {@code caName} and publishers {@code publisherNames}.
+   * Clear the publishing queue for the CA {@code caName} and publishers {@code publisherNames}.
    *
    * @param caName
    *          CA name. Could be {@code null}.
@@ -233,7 +233,7 @@ public interface CaManager {
   void removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException;
 
   /**
-   * Add the certificate profile {@code profileName} the the CA {@code caName}.
+   * Add the certificate profile {@code profileName} the CA {@code caName}.
    * @param profileName
    *          Profile name. Must not be {@code null}.
    * @param caName

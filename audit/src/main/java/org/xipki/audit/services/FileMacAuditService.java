@@ -67,17 +67,14 @@ public class FileMacAuditService extends MacAuditService {
   protected void storeLog(
           Instant date, long thisId, int eventType, String levelText,
           long previousId, String message, String thisTag) {
-    StringBuilder sb = new StringBuilder(message.length());
-    sb.append(formatDate(date))
-            .append(DELIM).append(levelText)
-            .append(DELIM).append(eventType)
-            .append(DELIM).append(shardId)
-            .append(DELIM).append(thisId)
-            .append(DELIM).append(previousId)
-            .append(DELIM).append(thisTag)
-            .append(DELIM).append(message);
-
-    String logLine = sb.toString();
+    String logLine = formatDate(date) +
+        DELIM + levelText +
+        DELIM + eventType +
+        DELIM + shardId +
+        DELIM + thisId +
+        DELIM + previousId +
+        DELIM + thisTag +
+        DELIM + message;
 
     long ms = date.toEpochMilli();
     try {

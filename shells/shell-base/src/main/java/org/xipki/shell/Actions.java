@@ -140,7 +140,7 @@ public class Actions {
         if (!destFile.isFile()) {
           throw new IllegalCmdParamException("cannot override an existing directory by a file");
         } else {
-          if (!force.booleanValue() && !confirm("Do you want to override the file " + dest, 3)) {
+          if (!force && !confirm("Do you want to override the file " + dest, 3)) {
             return null;
           }
         }
@@ -287,7 +287,7 @@ public class Actions {
 
         String paramName = token.substring(0, idx).trim();
         if ("charset".equalsIgnoreCase(paramName)) {
-          return token.substring(idx + 1, token.length());
+          return token.substring(idx + 1);
         }
       }
 
@@ -398,7 +398,7 @@ public class Actions {
         if (!destFile.isFile()) {
           throw new IllegalCmdParamException("cannot override an existing directory by a file");
         } else {
-          if (!force.booleanValue() && !confirm("Do you want to override the file " + dest, 3)) {
+          if (!force && !confirm("Do you want to override the file " + dest, 3)) {
             return null;
           }
         }
@@ -565,8 +565,8 @@ public class Actions {
         return name + "/" + arch;
       }
 
-      boolean bName = printName == null ? false : printName.booleanValue();
-      boolean bArch = printArch == null ? false : printArch.booleanValue();
+      boolean bName = printName != null && printName;
+      boolean bArch = printArch != null && printArch;
       if (bName && bArch) {
         return name + "/" + arch;
       } else if (bName) {

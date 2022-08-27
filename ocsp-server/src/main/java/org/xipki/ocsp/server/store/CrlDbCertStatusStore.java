@@ -30,6 +30,7 @@ import org.xipki.util.http.SslContextConf;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -460,8 +461,8 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     File tmpCrlFile = new File(generatedDir, "tmp-ca.crl");
 
     CompositeOutputStream crlStream = new CompositeOutputStream(
-            hashAlgo == null ? null : HashAlgo.getInstance(hashAlgo),
-            new FileOutputStream(tmpCrlFile));
+        hashAlgo == null ? null : HashAlgo.getInstance(hashAlgo),
+        Files.newOutputStream(tmpCrlFile.toPath()));
 
     Curl.CurlResult downResult;
     try {
@@ -513,7 +514,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
   static Properties loadProperties(File file) throws IOException {
     Properties props = new Properties();
     if (file.exists() && file.isFile()) {
-      try (InputStream is = new FileInputStream(file)) {
+      try (InputStream is = Files.newInputStream(file.toPath())) {
         props.load(is);
       }
     }

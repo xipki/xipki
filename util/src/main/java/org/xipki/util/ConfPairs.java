@@ -74,7 +74,7 @@ public class ConfPairs {
       } else if (obj instanceof Unmodifiable) {
         return underlying.equals(((Unmodifiable) obj).underlying);
       } else if (obj instanceof ConfPairs){
-        return underlying.equals((ConfPairs) obj);
+        return underlying.equals(obj);
       } else {
         return false;
       }

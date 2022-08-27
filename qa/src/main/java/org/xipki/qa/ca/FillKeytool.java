@@ -32,6 +32,8 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.security.interfaces.*;
@@ -64,7 +66,7 @@ public class FillKeytool {
   public FillKeytool(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String dbConfFile)
       throws PasswordResolverException, IOException {
     this.passwordResolver = passwordResolver;
-    try (InputStream dbConfStream = new FileInputStream(IoUtil.expandFilepath(dbConfFile))) {
+    try (InputStream dbConfStream = Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile)))) {
       this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, dbConfStream, passwordResolver);
     }
   }
@@ -222,7 +224,7 @@ public class FillKeytool {
           ps.setInt(idx++, 0); // SHARD_ID
           ps.setInt(idx++, encAlgCode); // AES128/GCM
           ps.setString(idx++, Base64.encodeToString(nonce));
-          ps.setString(idx++, Base64.encodeToString(encryptedData));
+          ps.setString(idx, Base64.encodeToString(encryptedData));
           ps.addBatch();
 
           if ((i == numKeypairs - 1) || (i % 100 == 0)) {

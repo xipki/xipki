@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.Collection;
@@ -197,7 +198,7 @@ public class SSLContextBuilder {
   public SSLContextBuilder loadTrustMaterial(File file, char[] storePassword)
       throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
     notNull(file, "Truststore file");
-    try (InputStream is = new FileInputStream(file)) {
+    try (InputStream is = Files.newInputStream(file.toPath())) {
       return loadTrustMaterial(is, storePassword);
     }
   }
@@ -226,7 +227,7 @@ public class SSLContextBuilder {
   public SSLContextBuilder loadKeyMaterial(File file, char[] storePassword, char[] keyPassword)
       throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException, CertificateException, IOException {
     notNull(file, "Keystore file");
-    try (InputStream is = new FileInputStream(file)) {
+    try (InputStream is = Files.newInputStream(file.toPath())) {
       return loadKeyMaterial(is, storePassword, keyPassword);
     }
   }

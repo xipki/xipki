@@ -165,7 +165,7 @@ public class OCSPRespBuilder {
     offset += arraycopy(signature, out, offset);
 
     if (taggedCertSequence != null) {
-      offset += taggedCertSequence.write(out, offset);
+      taggedCertSequence.write(out, offset);
     }
     return out;
   } // method buildOCSPResponse

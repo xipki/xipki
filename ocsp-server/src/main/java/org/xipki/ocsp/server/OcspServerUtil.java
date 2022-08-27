@@ -39,6 +39,7 @@ import org.xipki.util.exception.ObjectCreationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.cert.CertPathBuilderException;
@@ -154,8 +155,9 @@ public class OcspServerUtil {
         String className = type.substring("java:".length()).trim();
         try {
           Class<?> clazz = Class.forName(className, false, OcspServerUtil.class.getClassLoader());
-          store = (OcspStore) clazz.newInstance();
-        } catch (ClassNotFoundException | ClassCastException | InstantiationException | IllegalAccessException ex) {
+          store = (OcspStore) clazz.getDeclaredConstructor().newInstance();
+        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException ex) {
           throw new InvalidConfException("ObjectCreationException of store " + conf.getName() + ":" + ex.getMessage(),
               ex);
         }

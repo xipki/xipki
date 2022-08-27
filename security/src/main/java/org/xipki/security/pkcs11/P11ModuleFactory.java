@@ -30,7 +30,7 @@ public interface P11ModuleFactory {
    * Indicates whether a PKCS#11 module of the given {@code type} can be created or not.
    *
    * @param type
-   *          Type of the signer. Must no be {@code null}.
+   *          Type of the signer. Must not be {@code null}.
    * @return true if PKCS#11 module of the given type can be created, false otherwise.
    */
   boolean canCreateModule(String type);

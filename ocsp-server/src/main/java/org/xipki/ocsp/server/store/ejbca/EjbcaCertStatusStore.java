@@ -319,7 +319,7 @@ public class EjbcaCertStatusStore extends OcspStore {
       if (includeArchiveCutoff) {
         if (retentionInterval != 0) {
           Date date;
-          // expired certificate remains in status store for ever
+          // expired certificate remains in status store forever
           if (retentionInterval < 0) {
             date = issuer.getNotBefore();
           } else {

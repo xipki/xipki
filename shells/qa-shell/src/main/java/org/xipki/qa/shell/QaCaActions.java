@@ -160,7 +160,7 @@ public class QaCaActions {
       sb.append("\tcertificate is ");
       sb.append(result.isAllSuccessful() ? "valid" : "invalid");
 
-      if (verbose.booleanValue()) {
+      if (verbose) {
         for (ValidationIssue issue : result.getValidationIssues()) {
           sb.append("\n");
           format(issue, "    ", sb);
@@ -324,9 +324,9 @@ public class QaCaActions {
         }
         keyEntry = new ECKeyEntry(curveOid);
       } else if ("RSA".equalsIgnoreCase(keyType)) {
-        keyEntry = new RSAKeyEntry(keysize.intValue());
+        keyEntry = new RSAKeyEntry(keysize);
       } else if ("DSA".equalsIgnoreCase(keyType)) {
-        keyEntry = new DSAKeyEntry(keysize.intValue());
+        keyEntry = new DSAKeyEntry(keysize);
       } else {
         throw new IllegalCmdParamException("invalid keyType " + keyType);
       }

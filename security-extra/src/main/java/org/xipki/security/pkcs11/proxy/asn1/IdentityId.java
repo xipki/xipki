@@ -61,9 +61,9 @@ public class IdentityId extends ProxyMessage {
         ASN1TaggedObject tagAsn1 = (ASN1TaggedObject) asn1;
         int tag = tagAsn1.getTagNo();
         if (tag == 1) {
-          publicKeyLabel = DERUTF8String.getInstance(tagAsn1.getObject()).getString();
+          publicKeyLabel = ASN1UTF8String.getInstance(tagAsn1.getBaseObject()).getString();
         } else if (tag == 2) {
-          certLabel = DERUTF8String.getInstance(tagAsn1.getObject()).getString();
+          certLabel = ASN1UTF8String.getInstance(tagAsn1.getBaseObject()).getString();
         }
       }
 

@@ -126,18 +126,15 @@ class RefDigestReader implements Closeable {
           }
 
           String hash;
-          switch (dbType) {
-            case XIPKI_OCSP_v4:
-              hash = rs.getString("HASH");
-              break;
-            default:
-              if (certhashAlgo == HashAlgo.SHA1) {
-                hash = rs.getString("SHA1");
-              } else {
-                byte[] encodedCert = Base64.decodeFast(rs.getString("CERT"));
-                hash = certhashAlgo.base64Hash(encodedCert);
-              }
-              break;
+          if (dbType == DbType.XIPKI_OCSP_v4) {
+            hash = rs.getString("HASH");
+          } else {
+            if (certhashAlgo == HashAlgo.SHA1) {
+              hash = rs.getString("SHA1");
+            } else {
+              byte[] encodedCert = Base64.decodeFast(rs.getString("CERT"));
+              hash = certhashAlgo.base64Hash(encodedCert);
+            }
           }
 
           BigInteger serial = new BigInteger(rs.getString("SN"), 16);
@@ -197,22 +194,19 @@ class RefDigestReader implements Closeable {
     this.certhashAlgo = certhashAlgo;
 
     String coreSql;
-    switch (dbType) {
-      case XIPKI_OCSP_v4:
-        String certHashAlgoInDb = datasource.getFirstStringValue(
-            null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'");
-        if (certhashAlgo != HashAlgo.getInstance(certHashAlgoInDb)) {
-          throw new IllegalArgumentException(
-              "certHashAlgo in parameter (" + certhashAlgo + ") != in DB (" + certHashAlgoInDb + ")");
-        }
+    if (dbType == DbType.XIPKI_OCSP_v4) {
+      String certHashAlgoInDb = datasource.getFirstStringValue(
+          null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'");
+      if (certhashAlgo != HashAlgo.getInstance(certHashAlgoInDb)) {
+        throw new IllegalArgumentException(
+            "certHashAlgo in parameter (" + certhashAlgo + ") != in DB (" + certHashAlgoInDb + ")");
+      }
 
-        coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=",
-            Integer.toString(caId), " AND ID>=?");
-        break;
-      default:
-        coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,", (certhashAlgo == HashAlgo.SHA1 ? "SHA1" : "CERT"),
-            " FROM CERT WHERE CA_ID=", Integer.toString(caId), " AND ID>=?");
-        break;
+      coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=",
+          Integer.toString(caId), " AND ID>=?");
+    } else {
+      coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,", (certhashAlgo == HashAlgo.SHA1 ? "SHA1" : "CERT"),
+          " FROM CERT WHERE CA_ID=", Integer.toString(caId), " AND ID>=?");
     }
 
     this.selectCertSql = datasource.buildSelectFirstSql(numPerSelect, "ID ASC", coreSql);
@@ -253,15 +247,12 @@ class RefDigestReader implements Closeable {
 
       String tblCa;
       String colCaId;
-      switch (dbType) {
-        case XIPKI_OCSP_v4:
-          tblCa = "ISSUER";
-          colCaId = "IID";
-          break;
-        default:
-          tblCa = "CA";
-          colCaId = "CA_ID";
-          break;
+      if (dbType == DbType.XIPKI_OCSP_v4) {
+        tblCa = "ISSUER";
+        colCaId = "IID";
+      } else {
+        tblCa = "CA";
+        colCaId = "CA_ID";
       }
 
       sql = "SELECT CERT FROM " + tblCa + " WHERE ID=" + caId;

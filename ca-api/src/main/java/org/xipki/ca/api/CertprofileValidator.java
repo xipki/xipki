@@ -211,8 +211,8 @@ public class CertprofileValidator {
         }
       }
 
-      requiredUsages.removeAll(allowedUsages);
-      optionalUsages.removeAll(allowedUsages);
+      allowedUsages.forEach(requiredUsages::remove);
+      allowedUsages.forEach(optionalUsages::remove);
 
       if (!requiredUsages.isEmpty()) {
         msg.append("Required KeyUsage items ").append(requiredUsages).append(" are not permitted, ");
@@ -232,7 +232,7 @@ public class CertprofileValidator {
   } // method validate
 
   private static void validateCABForumBR(Certprofile certprofile, StringBuilder msg) {
-    // Subject only one entries in a RDN is allowed
+    // Subject with only one entry in a RDN is allowed
     SubjectControl subjectCtl = certprofile.getSubjectControl();
     if (CollectionUtil.isNotEmpty(subjectCtl.getGroups())) {
       msg.append("multiple AttributeAndTypes in one RDN is not permitted, ");

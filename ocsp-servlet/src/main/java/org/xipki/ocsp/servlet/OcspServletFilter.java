@@ -37,6 +37,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -94,8 +95,9 @@ public class OcspServletFilter implements Filter {
     String str = filterConfig.getInitParameter("licenseFactory");
     LOG.info("Use licenseFactory: {}", str);
     try {
-      licenseFactory = (LicenseFactory) Class.forName(str).newInstance();
-    } catch (InstantiationException | IllegalAccessException | ClassNotFoundException ex) {
+      licenseFactory = (LicenseFactory) Class.forName(str).getDeclaredConstructor().newInstance();
+    } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException |
+             InvocationTargetException ex) {
       throw new ServletException("could not initialize LicenseFactory", ex);
     }
 

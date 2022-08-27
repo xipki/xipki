@@ -28,7 +28,7 @@ import org.xipki.license.api.OcspLicense;
  */
 public class ExampleLicenseFactory implements LicenseFactory {
 
-  private class ExampleCmLicense implements CmLicense {
+  private static class ExampleCmLicense implements CmLicense {
 
     @Override
     public boolean isValid() {
@@ -56,7 +56,7 @@ public class ExampleLicenseFactory implements LicenseFactory {
 
   } // class ExampleCmLicense
 
-  private class ExampleOcspLicense implements OcspLicense {
+  private static class ExampleOcspLicense implements OcspLicense {
 
     @Override
     public boolean isValid() {

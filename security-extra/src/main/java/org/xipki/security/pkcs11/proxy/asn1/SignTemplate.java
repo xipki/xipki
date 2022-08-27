@@ -52,7 +52,7 @@ public class SignTemplate extends ProxyMessage {
     this.slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++));
     this.objectId = ObjectIdentifier.getInstance(seq.getObjectAt(idx++));
     this.mechanism = Mechanism.getInstance(seq.getObjectAt(idx++));
-    this.message = getOctetStringBytes(seq.getObjectAt(idx++));
+    this.message = getOctetStringBytes(seq.getObjectAt(idx));
   }
 
   public SignTemplate(SlotIdentifier slotId, ObjectIdentifier objectId,

@@ -221,7 +221,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
       }
     }
 
-    deleteCertGreatherThan(minId - 1, LOG);
+    deleteCertGreaterThan(minId - 1, LOG);
 
     final long total = certstore.getCountCerts() - numProcessedBefore;
     final ProcessLog processLog = new ProcessLog(total);
@@ -351,7 +351,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
             commit("(commit import cert to OCSP)");
           } catch (Throwable th) {
             rollback();
-            deleteCertGreatherThan(lastSuccessfulCertId, LOG);
+            deleteCertGreaterThan(lastSuccessfulCertId, LOG);
             if (th instanceof SQLException) {
               throw translate(SQL_ADD_CERT, (SQLException) th);
             } else if (th instanceof Exception) {

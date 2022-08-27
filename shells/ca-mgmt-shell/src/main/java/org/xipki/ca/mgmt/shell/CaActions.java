@@ -483,7 +483,7 @@ public class CaActions {
           }
           Set<String> aliases = caManager.getAliasesForCa(name);
           sb.append("aliases: ").append(toString(aliases)).append("\n");
-          sb.append(entry.toString(verbose.booleanValue()));
+          sb.append(entry.toString(verbose));
         }
       }
 
@@ -525,10 +525,9 @@ public class CaActions {
   public static class CaRevoke extends CaAction {
 
     public static final List<CrlReason> PERMITTED_REASONS = Collections.unmodifiableList(
-        Arrays.asList(new CrlReason[] {
-          CrlReason.UNSPECIFIED, CrlReason.KEY_COMPROMISE, CrlReason.CA_COMPROMISE,
-          CrlReason.AFFILIATION_CHANGED, CrlReason.SUPERSEDED, CrlReason.CESSATION_OF_OPERATION,
-          CrlReason.CERTIFICATE_HOLD, CrlReason.PRIVILEGE_WITHDRAWN}));
+        Arrays.asList(CrlReason.UNSPECIFIED, CrlReason.KEY_COMPROMISE, CrlReason.CA_COMPROMISE,
+            CrlReason.AFFILIATION_CHANGED, CrlReason.SUPERSEDED, CrlReason.CESSATION_OF_OPERATION,
+            CrlReason.CERTIFICATE_HOLD, CrlReason.PRIVILEGE_WITHDRAWN));
 
     @Argument(index = 0, name = "name", description = "CA name", required = true)
     @Completion(CaCompleters.CaNameCompleter.class)

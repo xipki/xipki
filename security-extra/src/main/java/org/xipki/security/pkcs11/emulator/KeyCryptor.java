@@ -51,7 +51,7 @@ class KeyCryptor {
 
   /**
    * KeyDerive: SCRYPT (S = 0x0000000000000000 (8 bytes), N = 16384, r = 8, p = 1) and
-   * AES_GCM_NoPadding with 128 bit key.
+   * AES_GCM_NoPadding with 128-bit key.
    */
   private static final byte ALG_SCRYPT1_AESGCMNopadding_128 = 1;
 

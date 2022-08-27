@@ -69,7 +69,7 @@ public class HttpMgmtServlet extends HttpServlet {
       return status;
     }
 
-  } // class class
+  }
 
   private static final Logger LOG = LoggerFactory.getLogger(HttpMgmtServlet.class);
 

@@ -269,8 +269,8 @@ class O2tChecker extends ExtensionChecker {
             if (size2 != 2) {
               throw new IllegalArgumentException("sequence size is " + size2 + " but expected 2");
             }
-            String url = DERIA5String.getInstance(pdsLocSeq.getObjectAt(0)).getString();
-            String lang = DERPrintableString.getInstance(pdsLocSeq.getObjectAt(1)).getString();
+            String url = ASN1IA5String.getInstance(pdsLocSeq.getObjectAt(0)).getString();
+            String lang = ASN1PrintableString.getInstance(pdsLocSeq.getObjectAt(1)).getString();
             pdsLocations.add("url=" + url + ",lang=" + lang);
           }
 
@@ -475,9 +475,7 @@ class O2tChecker extends ExtensionChecker {
     // copy the requested SubjectAltName entries
     if (reqNames != null) {
       GeneralName[] reqL = reqNames.getNames();
-      for (int i = 0; i < reqL.length; i++) {
-        grantedNames.add(reqL[i]);
-      }
+      Collections.addAll(grantedNames, reqL);
     }
 
     return grantedNames.isEmpty() ? null : grantedNames.toArray(new GeneralName[0]);
@@ -511,8 +509,8 @@ class O2tChecker extends ExtensionChecker {
     Map<ASN1ObjectIdentifier, Set<ASN1Encodable>> expOtherAttrs = new HashMap<>();
 
     final int expN = reqSubDirAttrs.size();
-    for (int i = 0; i < expN; i++) {
-      Attribute attr = Attribute.getInstance(reqSubDirAttrs.get(i));
+    for (Object reqSubDirAttr : reqSubDirAttrs) {
+      Attribute attr = Attribute.getInstance(reqSubDirAttr);
       ASN1ObjectIdentifier attrType = attr.getAttrType();
       ASN1Encodable attrVal = attr.getAttributeValues()[0];
 
@@ -521,19 +519,15 @@ class O2tChecker extends ExtensionChecker {
       } else if (ObjectIdentifiers.DN.placeOfBirth.equals(attrType)) {
         expPlaceOfBirth = DirectoryString.getInstance(attrVal).getString();
       } else if (ObjectIdentifiers.DN.gender.equals(attrType)) {
-        expGender = DERPrintableString.getInstance(attrVal).getString();
+        expGender = ASN1PrintableString.getInstance(attrVal).getString();
       } else if (ObjectIdentifiers.DN.countryOfCitizenship.equals(attrType)) {
-        String country = DERPrintableString.getInstance(attrVal).getString();
+        String country = ASN1PrintableString.getInstance(attrVal).getString();
         expCountryOfCitizenshipList.add(country);
       } else if (ObjectIdentifiers.DN.countryOfResidence.equals(attrType)) {
-        String country = DERPrintableString.getInstance(attrVal).getString();
+        String country = ASN1PrintableString.getInstance(attrVal).getString();
         expCountryOfResidenceList.add(country);
       } else {
-        Set<ASN1Encodable> otherAttrVals = expOtherAttrs.get(attrType);
-        if (otherAttrVals == null) {
-          otherAttrVals = new HashSet<>();
-          expOtherAttrs.put(attrType, otherAttrVals);
-        }
+        Set<ASN1Encodable> otherAttrVals = expOtherAttrs.computeIfAbsent(attrType, k -> new HashSet<>());
         otherAttrVals.add(attrVal);
       }
     }
@@ -549,18 +543,18 @@ class O2tChecker extends ExtensionChecker {
 
     List<ASN1ObjectIdentifier> attrTypes = new LinkedList<>(conf.getTypes());
     final int n = subDirAttrs.size();
-    for (int i = 0; i < n; i++) {
-      Attribute attr = Attribute.getInstance(subDirAttrs.get(i));
+    for (Object subDirAttr : subDirAttrs) {
+      Attribute attr = Attribute.getInstance(subDirAttr);
       ASN1ObjectIdentifier attrType = attr.getAttrType();
       if (!attrTypes.contains(attrType)) {
-        failureMsg.append("attribute of type " + attrType.getId()).append(" is present but not expected; ");
+        failureMsg.append("attribute of type ").append(attrType.getId()).append(" is present but not expected; ");
         continue;
       }
 
       ASN1Encodable[] attrs = attr.getAttributeValues();
       if (attrs.length != 1) {
         failureMsg.append("attribute of type ").append(attrType.getId())
-          .append(" does not single-value value: ").append(attrs.length).append("; ");
+            .append(" does not single-value value: ").append(attrs.length).append("; ");
         continue;
       }
 
@@ -571,19 +565,15 @@ class O2tChecker extends ExtensionChecker {
       } else if (ObjectIdentifiers.DN.placeOfBirth.equals(attrType)) {
         placeOfBirth = DirectoryString.getInstance(attrVal).getString();
       } else if (ObjectIdentifiers.DN.gender.equals(attrType)) {
-        gender = DERPrintableString.getInstance(attrVal).getString();
+        gender = ASN1PrintableString.getInstance(attrVal).getString();
       } else if (ObjectIdentifiers.DN.countryOfCitizenship.equals(attrType)) {
-        String country = DERPrintableString.getInstance(attrVal).getString();
+        String country = ASN1PrintableString.getInstance(attrVal).getString();
         countryOfCitizenshipList.add(country);
       } else if (ObjectIdentifiers.DN.countryOfResidence.equals(attrType)) {
-        String country = DERPrintableString.getInstance(attrVal).getString();
+        String country = ASN1PrintableString.getInstance(attrVal).getString();
         countryOfResidenceList.add(country);
       } else {
-        Set<ASN1Encodable> otherAttrVals = otherAttrs.get(attrType);
-        if (otherAttrVals == null) {
-          otherAttrVals = new HashSet<>();
-          otherAttrs.put(attrType, otherAttrVals);
-        }
+        Set<ASN1Encodable> otherAttrVals = otherAttrs.computeIfAbsent(attrType, k -> new HashSet<>());
         otherAttrVals.add(attrVal);
       }
     }
@@ -621,7 +611,7 @@ class O2tChecker extends ExtensionChecker {
     if (dateOfBirth != null) {
       String timeStirng = dateOfBirth.getTimeString();
       if (!TextVadidator.DATE_OF_BIRTH.isValid(timeStirng)) {
-        failureMsg.append("invalid dateOfBirth: " + timeStirng + "; ");
+        failureMsg.append("invalid dateOfBirth: ").append(timeStirng).append("; ");
       }
 
       String exp = (expDateOfBirth == null) ? null : expDateOfBirth.getTimeString();
@@ -681,7 +671,6 @@ class O2tChecker extends ExtensionChecker {
         Set<ASN1Encodable> attrValues = otherAttrs.get(attrType);
         if (!attrValues.equals(expAttrValues)) {
           failureMsg.append("attribute of type ").append(attrType.getId()).append(" differs from the requested one; ");
-          continue;
         }
       }
     }

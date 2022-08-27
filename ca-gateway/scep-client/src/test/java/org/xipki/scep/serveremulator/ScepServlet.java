@@ -138,7 +138,6 @@ public class ScepServlet extends HttpServlet {
           ct = ScepConstants.CT_X509_CA_CERT;
           respBytes = responder.getCaEmulator().getCaCertBytes();
         } else {
-          ct = ScepConstants.CT_X509_CA_RA_CERT;
           CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
           try {
             cmsSignedDataGen.addCertificate(responder.getCaEmulator().getCaCert().toBcCert());

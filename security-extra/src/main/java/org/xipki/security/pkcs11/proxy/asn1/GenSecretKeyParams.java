@@ -61,7 +61,7 @@ public class GenSecretKeyParams extends ProxyMessage {
     slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
     control = NewKeyControl.getInstance(seq.getObjectAt(idx++)).getControl();
     keyType = getInteger(seq.getObjectAt(idx++)).longValue();
-    keysize = getInteger(seq.getObjectAt(idx++)).intValue();
+    keysize = getInteger(seq.getObjectAt(idx)).intValue();
     Args.min(keysize, "keysize", 1);
   }
 

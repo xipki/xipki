@@ -22,7 +22,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 /**
- * Contains the CA certificate and the corresponding RA certificates, if exist.
+ * Contains the CA certificate and the corresponding RA certificates, if exists.
  *
  * @author Lijun Liao
  */

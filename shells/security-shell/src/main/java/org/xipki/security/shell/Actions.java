@@ -135,7 +135,7 @@ public class Actions {
       if (no instanceof Byte) {
         return "0x" + Hex.encode(new byte[]{(byte) no});
       } else if (no instanceof Short) {
-        return "0x" + Integer.toHexString((int) (short) no);
+        return "0x" + Integer.toHexString((short) no);
       } else if (no instanceof Integer) {
         return "0x" + Integer.toHexString((int) no);
       } else if (no instanceof Long) {
@@ -323,7 +323,7 @@ public class Actions {
       if (no instanceof Byte) {
         return "0X" + Hex.encode(new byte[]{(byte) no});
       } else if (no instanceof Short) {
-        return "0X" + Integer.toHexString(Integer.valueOf((short) no));
+        return "0X" + Integer.toHexString((short) no);
       } else if (no instanceof Integer) {
         return "0X" + Integer.toHexString((int) no);
       } else if (no instanceof Long) {
@@ -459,7 +459,7 @@ public class Actions {
     protected List<X509Cert> getPeerCertificates()
         throws CertificateException, IOException {
       if (StringUtil.isNotBlank(peerCertsFile)) {
-        return X509Util.parseCerts(new FileInputStream(peerCertsFile));
+        return X509Util.parseCerts(Files.newInputStream(Paths.get(peerCertsFile)));
       } else if (StringUtil.isNotBlank(peerCertFile)) {
         X509Cert cert = X509Util.parseCert(Paths.get(peerCertFile).toFile());
         return Collections.singletonList(cert);
@@ -840,7 +840,7 @@ public class Actions {
         KeyStore ks = KeyUtil.getKeyStore(keystoreType);
 
         File file = IoUtil.expandFilepath(new File(peerKeystoreFile));
-        try (InputStream is = new FileInputStream(file)) {
+        try (InputStream is = Files.newInputStream(file.toPath())) {
           ks.load(is, password);
 
           Enumeration<String> aliases = ks.aliases();
@@ -902,11 +902,8 @@ public class Actions {
 
       Set<String> aliases = new HashSet<>(10);
       if (realKsFile.exists()) {
-        InputStream inStream = Files.newInputStream(realKsFile.toPath());
-        try {
+        try (InputStream inStream = Files.newInputStream(realKsFile.toPath())) {
           ks.load(inStream, password);
-        } finally {
-          inStream.close();
         }
 
         Enumeration<String> strs = ks.aliases();

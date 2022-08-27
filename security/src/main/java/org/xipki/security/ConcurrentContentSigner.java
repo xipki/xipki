@@ -93,7 +93,7 @@ public interface ConcurrentContentSigner extends Closeable {
    * @throws NoIdleSignerException
    *         If no idle signer is available
    * @throws SignatureException
-   *         if could not sign the data.
+   *         If could not sign the data.
    */
   byte[] sign(byte[] data) throws NoIdleSignerException, SignatureException;
 
@@ -105,7 +105,7 @@ public interface ConcurrentContentSigner extends Closeable {
    * @throws NoIdleSignerException
    *         If no idle signer is available
    * @throws SignatureException
-   *         if could not sign the data.
+   *         If could not sign the data.
    */
   byte[][] sign(byte[][] data) throws NoIdleSignerException, SignatureException;
 

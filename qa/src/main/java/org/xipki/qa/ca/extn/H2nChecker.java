@@ -201,7 +201,7 @@ class H2nChecker extends ExtensionChecker {
       BigInteger bigInt = isSubtree.getMinimum();
       int isMinimum = (bigInt == null) ? 0 : bigInt.intValue();
       Integer minimum = expSubtree.getMinimum();
-      int expMinimum = (minimum == null) ? 0 : minimum.intValue();
+      int expMinimum = (minimum == null) ? 0 : minimum;
       String desc = description + " [" + i + "]";
       if (isMinimum != expMinimum) {
         addViolation(failureMsg, "minimum of " + desc, isMinimum, expMinimum);

@@ -230,7 +230,7 @@ public class LruCache<K, V> {
    * @param key the key
    * @param oldValue the old value of the {@code key}
    * @param newValue the new value for {@code key}, if it exists. If non-null,
-   *     this removal was caused by a {@link #put}. Otherwise it was caused by
+   *     this removal was caused by a {@link #put}; Otherwise it was caused by
    *     an eviction or a {@link #remove}.
    */
   protected void entryRemoved(boolean evicted, K key, V oldValue, V newValue) {

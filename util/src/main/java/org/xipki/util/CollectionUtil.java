@@ -117,9 +117,7 @@ public class CollectionUtil {
     }
 
     Set<T> ret = new HashSet<>();
-    for (T t : list) {
-      ret.add(t);
-    }
+    ret.addAll(list);
     return ret;
   }
 

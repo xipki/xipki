@@ -81,7 +81,7 @@ public class GenDSAKeypairParams extends ProxyMessage {
 
     p = bn;
     q = getInteger(seq.getObjectAt(idx++));
-    g = getInteger(seq.getObjectAt(idx++));
+    g = getInteger(seq.getObjectAt(idx));
   }
 
   public static GenDSAKeypairParams getInstance(Object obj)

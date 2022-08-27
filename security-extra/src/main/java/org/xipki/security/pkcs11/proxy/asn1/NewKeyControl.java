@@ -80,7 +80,7 @@ public class NewKeyControl extends ProxyMessage {
   private NewKeyControl(ASN1Sequence seq) {
     final int size = seq.size();
     Args.min(size, "seq.size", 1);
-    String label = DERUTF8String.getInstance(seq.getObjectAt(0)).getString();
+    String label = ASN1UTF8String.getInstance(seq.getObjectAt(0)).getString();
 
     Set<P11KeyUsage> usages = new HashSet<>();
     byte[] id = null;
@@ -95,9 +95,9 @@ public class NewKeyControl extends ProxyMessage {
       ASN1TaggedObject tagObj = (ASN1TaggedObject) obj;
       int tagNo = tagObj.getTagNo();
       if (tagNo == 0) {
-        id = DEROctetString.getInstance(tagObj.getObject()).getOctets();
+        id = DEROctetString.getInstance(tagObj.getBaseObject()).getOctets();
       } else if (tagNo == 1) {
-        ASN1Sequence usageSeq = ASN1Sequence.getInstance(tagObj.getObject());
+        ASN1Sequence usageSeq = ASN1Sequence.getInstance(tagObj.getBaseObject());
         final int usageSize = usageSeq.size();
         for (int j = 0; j < usageSize; j++) {
           ASN1Enumerated usageEnum = ASN1Enumerated.getInstance(usageSeq.getObjectAt(j));
@@ -109,7 +109,7 @@ public class NewKeyControl extends ProxyMessage {
           usages.add(usage);
         }
       } else if (tagNo == 2) {
-        extractable = ASN1Boolean.getInstance(tagObj.getObject()).isTrue();
+        extractable = ASN1Boolean.getInstance(tagObj.getBaseObject()).isTrue();
       }
     }
 

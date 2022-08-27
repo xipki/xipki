@@ -31,6 +31,8 @@ import org.xipki.util.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.time.Instant;
 
@@ -92,7 +94,7 @@ public class DatabaseMacAuditService extends MacAuditService {
         ps.setInt   (idx++, eventType);
         ps.setLong  (idx++, previousId);
         ps.setString(idx++, message);
-        ps.setString(idx++, thisTag);
+        ps.setString(idx, thisTag);
         ps.executeUpdate();
       } catch (SQLException ex) {
         throw datasource.translate(SQL_ADD_AUDIT, ex);
@@ -114,7 +116,7 @@ public class DatabaseMacAuditService extends MacAuditService {
 
     Connection conn = null;
     try {
-      try (InputStream is = new FileInputStream(IoUtil.expandFilepath(dataSourceFile, true))) {
+      try (InputStream is = Files.newInputStream(Paths.get(IoUtil.expandFilepath(dataSourceFile, true)))) {
         datasource = new DataSourceFactory().createDataSource("audit", is, passwordResolver);
       }
 

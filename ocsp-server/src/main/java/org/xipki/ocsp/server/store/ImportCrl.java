@@ -999,7 +999,7 @@ class ImportCrl {
       return;
     }
 
-    // we don't use the binary read from file, since it may contains redundant ending bytes.
+    // we don't use the binary read from file, since it may contain redundant ending bytes.
     byte[] encodedCert = cert.getEncoded();
     String b64CertHash = certhashAlgo.base64Hash(encodedCert);
 

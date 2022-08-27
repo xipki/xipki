@@ -40,7 +40,7 @@ public interface SignerFactory {
    * Indicates whether a signer of the given {@code type} can be created or not.
    *
    * @param type
-   *          Type of the signer. Must no be {@code null}.
+   *          Type of the signer. Must not be {@code null}.
    * @return true if signer of the given type can be created, false otherwise.
    */
   boolean canCreateSigner(String type);

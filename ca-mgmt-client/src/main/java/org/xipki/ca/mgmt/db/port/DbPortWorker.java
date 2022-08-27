@@ -36,6 +36,8 @@ import org.xipki.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -123,11 +125,12 @@ public abstract class DbPortWorker extends DbWorker {
       }
 
       List<File> failedList = new LinkedList<>();
-      if (f.isFile()) {
+      BasicFileAttributes basicFileAttributes = Files.readAttributes(f.toPath(), BasicFileAttributes.class);
+      if (basicFileAttributes.isRegularFile()) {
         if (!IoUtil.deleteFile(f)) {
           failedList.add(f);
         }
-      } else if (f.isDirectory()) {
+      } else if (basicFileAttributes.isDirectory()) {
         if (!IoUtil.deleteDir(f)) {
           failedList.add(f);
         }

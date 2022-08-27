@@ -55,8 +55,7 @@ public class Actions {
         throw new CmdFailure("could not restart OCSP server, error: " + ex.getMessage(), ex);
       }
 
-      StringBuilder sb = new StringBuilder("restarted OCSP server\n");
-      print(sb.toString());
+      print("restarted OCSP server\n");
       return null;
     } // method execute0
 

@@ -73,8 +73,7 @@ public class JceSignerBuilder {
       final int n = certificateChain.length;
       cert = certificateChain[0];
       if (n > 1) {
-        Set<X509Cert> caCerts = new HashSet<>();
-        caCerts.addAll(Arrays.asList(certificateChain).subList(1, n));
+        Set<X509Cert> caCerts = new HashSet<>(Arrays.asList(certificateChain).subList(1, n));
 
         try {
           chain = X509Util.buildCertPath(cert, caCerts);

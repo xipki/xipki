@@ -49,7 +49,7 @@ public abstract class KeypairGenControl {
 
     private ForbiddenKeypairGenControl() {
     }
-  } // class class
+  }
 
   public static class InheritCAKeypairGenControl extends KeypairGenControl {
     public static final InheritCAKeypairGenControl INSTANCE = new InheritCAKeypairGenControl();

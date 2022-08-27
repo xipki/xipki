@@ -192,13 +192,11 @@ public class QaOcspActions {
 
       IssuerHash issuerHash = new IssuerHash(requestOptions.getHashAlgorithm(), issuerCert);
 
-      OutputStream resultOut = Files.newOutputStream(Paths.get(outDir.getPath(), "overview.txt"));
-      BufferedReader snReader = Files.newBufferedReader(Paths.get(snFile));
-
       int numSucc = 0;
       int numFail = 0;
 
-      try {
+      try (OutputStream resultOut = Files.newOutputStream(Paths.get(outDir.getPath(), "overview.txt"));
+           BufferedReader snReader = Files.newBufferedReader(Paths.get(snFile))) {
         URL serverUrl = new URL(serverUrlStr);
 
         OcspQa ocspQa = new OcspQa(securityFactory);
@@ -282,12 +280,9 @@ public class QaOcspActions {
 
         String message = StringUtil.concatObjectsCap(200, "=====BEGIN SUMMARY=====",
             "\n       url: ", serverUrlStr, "\n       sum: ", numFail + numSucc,
-            "\nsuccessful: ", numSucc,      "\n    failed: ", numFail, "\n=====END SUMMARY=====");
+            "\nsuccessful: ", numSucc, "\n    failed: ", numFail, "\n=====END SUMMARY=====");
         println(message);
         println(message, resultOut);
-      } finally {
-        snReader.close();
-        resultOut.close();
       }
 
       return null;
@@ -301,7 +296,7 @@ public class QaOcspActions {
 
       int count = tokens.countTokens();
       BigInteger serialNumber;
-      OcspCertStatus status = null;
+      OcspCertStatus status;
       Date revTime = null;
       try {
         serialNumber = toBigInt(tokens.nextToken(), hex);
@@ -415,7 +410,7 @@ public class QaOcspActions {
       }
 
       ValidationResult ret = ocspQa.checkOcsp(response, issuerHash, serialNumber, null,
-          status, responseOption, revTime, noSigVerify.booleanValue());
+          status, responseOption, revTime, noSigVerify);
 
       String validity = ret.isAllSuccessful() ? "valid" : "invalid";
       String hexSerial = serialNumber.toString(16);

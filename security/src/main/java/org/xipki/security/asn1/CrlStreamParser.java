@@ -34,6 +34,7 @@ import org.xipki.util.LogUtil;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
@@ -148,7 +149,7 @@ public class CrlStreamParser extends Asn1StreamParser {
     private int offset;
 
     private RevokedCertsIterator() throws IOException {
-      this.instream = new BufferedInputStream(new FileInputStream(crlFile));
+      this.instream = new BufferedInputStream(Files.newInputStream(crlFile.toPath()));
       skip(this.instream, firstRevokedCertificateOffset);
       this.offset = firstRevokedCertificateOffset;
       next0();
@@ -278,8 +279,7 @@ public class CrlStreamParser extends Asn1StreamParser {
   public CrlStreamParser(File crlFile) throws IOException {
     this.crlFile = notNull(crlFile, "crlFile");
     // Round 1
-    try (BufferedInputStream instream = new BufferedInputStream(
-        new FileInputStream(crlFile))) {
+    try (BufferedInputStream instream = new BufferedInputStream(Files.newInputStream(crlFile.toPath()))) {
       int offset = 0;
       // Tag SEQUENCE of CertificateList
       int tag = markAndReadTag(instream);
@@ -423,7 +423,7 @@ public class CrlStreamParser extends Asn1StreamParser {
       }
 
       bytes = readBlock(BERTags.BIT_STRING, instream, "signature");
-      this.signature = DERBitString.getInstance(bytes).getBytes();
+      this.signature = ASN1BitString.getInstance(bytes).getBytes();
     }
   } // constructor
 
@@ -482,7 +482,7 @@ public class CrlStreamParser extends Asn1StreamParser {
       ContentVerifierProvider cvp = SignerUtil.getContentVerifierProvider(publicKey, null);
       ContentVerifier verifier = cvp.get(algorithmIdentifier);
       OutputStream sigOut = verifier.getOutputStream();
-      try (InputStream crlStream = new FileInputStream(crlFile)) {
+      try (InputStream crlStream = Files.newInputStream(crlFile.toPath())) {
         skip(crlStream, tbsCertListOffset);
 
         int remainingLength = tbsCertListEndIndex - tbsCertListOffset;

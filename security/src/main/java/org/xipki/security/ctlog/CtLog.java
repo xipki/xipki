@@ -555,7 +555,7 @@ public class CtLog {
     ASN1TaggedObject taggedExtns = (ASN1TaggedObject) tbs.getObjectAt(7);
     int tagNo = taggedExtns.getTagNo();
 
-    ASN1Sequence extns = (ASN1Sequence) taggedExtns.getObject().toASN1Primitive();
+    ASN1Sequence extns = (ASN1Sequence) taggedExtns.getBaseObject().toASN1Primitive();
     ASN1EncodableVector extnsVec = new ASN1EncodableVector(extns.size() - 1);
     final int size = extns.size();
     for (int i = 0; i < size; i++) {

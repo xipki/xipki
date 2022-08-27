@@ -56,18 +56,16 @@ public class CaUtil {
   private CaUtil() {
   }
 
+  @SafeVarargs
   public static <T> List<T> asModifiableList(T... a) {
     List<T> list = new ArrayList<>(a.length);
-    for (T element : a) {
-      list.add(element);
-    }
+    list.addAll(Arrays.asList(a));
     return list;
   }
 
+  @SafeVarargs
   public static <T> void addAll(List<T> list, T... a) {
-    for (T element : a) {
-      list.add(element);
-    }
+    list.addAll(Arrays.asList(a));
   }
 
   public static BasicConstraints createBasicConstraints(CertLevel level, Integer pathLen) {

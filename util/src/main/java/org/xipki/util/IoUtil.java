@@ -394,7 +394,7 @@ public class IoUtil {
         }
       }
 
-      // Since line is read from the last so it
+      // Since line is read from the last, so it
       // is in reverse so use reverse method to make it right
       builder.reverse();
 

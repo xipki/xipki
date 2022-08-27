@@ -52,9 +52,8 @@ public class GenSM2KeypairParams extends ProxyMessage {
 
   private GenSM2KeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
     requireRange(seq, 2, 2);
-    int idx = 0;
-    slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
-    control = NewKeyControl.getInstance(seq.getObjectAt(idx++)).getControl();
+    slotId = SlotIdentifier.getInstance(seq.getObjectAt(0)).getValue();
+    control = NewKeyControl.getInstance(seq.getObjectAt(1)).getControl();
   }
 
   public static GenSM2KeypairParams getInstance(Object obj)

@@ -22,7 +22,7 @@ import org.xipki.security.X509Cert;
 import java.io.IOException;
 
 /**
- * Interface to retrieve the meta data of HTTP request.
+ * Interface to retrieve the metadata of HTTP request.
  *
  * @author Lijun Liao
  * @since 3.0.1

@@ -23,7 +23,7 @@ public enum ErrorCode {
   PATH_NOT_FOUND(15),
   UNAUTHORIZED(16);
 
-  private int code;
+  private final int code;
 
   ErrorCode(int code) {
     this.code = code;

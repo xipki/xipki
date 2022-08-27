@@ -259,7 +259,7 @@ public enum SignAlgo {
      *
      */
 
-    // nonce here is only place holder, must be replaced before use: we use default
+    // nonce here is only placeholder, must be replaced before use: we use default
     // length (MACLength)
     // GMACParameters has exactly the same definition as GCMParameters (see RFC 5084)
     // so we use GCMParameters here (GMACParameters is not defined in BouncyCastle)

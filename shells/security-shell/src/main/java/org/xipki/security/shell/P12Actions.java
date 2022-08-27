@@ -196,7 +196,7 @@ public class P12Actions {
           || EdECConstants.X448.equalsIgnoreCase(keyAlgName)) {
         // cannot be checked via creating dummy signature, just compare the public keys
         char[] pwd = password.toCharArray();
-        KeypairWithCert kp = KeypairWithCert.fromKeystore(ks, null, pwd, (X509Cert[]) null);
+        KeypairWithCert kp = KeypairWithCert.fromKeystore(ks, null, pwd, null);
         byte[] expectedEncoded = kp.getPublicKey().getEncoded();
         byte[] encoded = cert.getPublicKey().getEncoded();
         if (!Arrays.equals(expectedEncoded, encoded)) {
@@ -479,7 +479,7 @@ public class P12Actions {
     @Override
     protected Object execute0() throws Exception {
       char[] password = getPassword();
-      try (InputStream keystoreStream = new FileInputStream(expandFilepath(p12File))) {
+      try (InputStream keystoreStream = Files.newInputStream(Paths.get(expandFilepath(p12File)))) {
         KeypairWithCert kp = KeypairWithCert.fromKeystore("PKCS12",
                               keystoreStream, password, null, password, (X509Cert) null);
         byte[] encodedKey = PemEncoder.encode(kp.getKey().getEncoded(), PemLabel.PRIVATE_KEY);

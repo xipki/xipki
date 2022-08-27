@@ -374,7 +374,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     CmLicense license = caManager.getLicense();
     if (!license.isValid()) {
       LOG.error("License not valid yet or expired, need new license");
-      throw new OperationExceptionWithIndex(0, // we have to specify a index, use 0.
+      throw new OperationExceptionWithIndex(0, // we have to specify an index, use 0.
           new OperationException( SYSTEM_FAILURE, "License not valid yet or expired"));
     }
 
@@ -383,8 +383,7 @@ public class X509Ca extends X509CaModule implements Closeable {
 
     List<KeypairGenerator> keypairGenerators = null;
     boolean caGenKeypair = false;
-    for (int i = 0; i < n; i++) {
-      CertTemplateData certTemplate = certTemplates.get(i);
+    for (CertTemplateData certTemplate : certTemplates) {
       if (certTemplate.isCaGenerateKeypair()) {
         caGenKeypair = true;
         break;

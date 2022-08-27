@@ -195,7 +195,7 @@ public class KeyUtil {
   /**
    * Convert XDH edwards private key to EdDSA private key. As the name indicates,
    * the converted key is dummy, you cannot verify the signature signed with
-   * the converted private key against the correspond public key.
+   * the converted private key against the corresponding public key.
    * @param key XDH private key
    * @return the corresponding EdDSA private key (dummy)
    * @throws InvalidKeySpecException

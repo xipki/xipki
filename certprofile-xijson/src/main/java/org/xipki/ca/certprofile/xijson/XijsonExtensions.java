@@ -903,22 +903,15 @@ public class XijsonExtensions {
           GeneralName gn;
           switch (tag) {
             case rfc822Name:
-              gn = new GeneralName(tag.getTag(), rdnValue.toLowerCase());
-              break;
             case IPAddress:
-              gn = new GeneralName(tag.getTag(), rdnValue);
-              break;
             case uniformResourceIdentifier:
-              gn = new GeneralName(tag.getTag(), rdnValue);
-              break;
             case DNSName:
             case directoryName:
             case registeredID:
               gn = new GeneralName(tag.getTag(), rdnValue);
               break;
             default:
-              throw new IllegalStateException(
-                  "unsupported GeneralName tag " + tag);
+              throw new IllegalStateException("unsupported GeneralName tag " + tag);
           } // end switch (tag)
 
           if (!grantedNames.contains(gn)) {

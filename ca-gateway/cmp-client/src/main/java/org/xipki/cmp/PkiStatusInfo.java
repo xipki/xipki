@@ -55,7 +55,7 @@ public class PkiStatusInfo {
     this.status = bcPkiStatusInfo.getStatus().intValue();
     this.pkiFailureInfo = (bcPkiStatusInfo.getFailInfo() == null) ? 0 : bcPkiStatusInfo.getFailInfo().intValue();
     PKIFreeText text = bcPkiStatusInfo.getStatusString();
-    this.statusMessage = (text == null) ? null : text.getStringAt(0).getString();
+    this.statusMessage = (text == null) ? null : text.getStringAtUTF8(0).getString();
   }
 
   public int status() {

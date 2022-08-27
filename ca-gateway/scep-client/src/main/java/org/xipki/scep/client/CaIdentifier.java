@@ -87,9 +87,7 @@ public class CaIdentifier {
 
   public String buildPostUrl(Operation operation) {
     Args.notNull(operation, "operation");
-    StringBuilder ub = new StringBuilder(url);
-    ub.append('?').append("operation=").append(operation.getCode());
-    return ub.toString();
+    return url + "?operation=" + operation.getCode();
   }
 
   @Override

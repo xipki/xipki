@@ -120,14 +120,11 @@ public class EmbedAuditService implements AuditService {
 
   protected void storeLog(int eventType, AuditLevel level, String message) {
     Instant date = Instant.now();
-    StringBuilder sb = new StringBuilder(message.length());
 
-    sb.append(DTF.format(date.atZone(timeZone)))
-            .append(DELIM).append(level.getText())
-            .append(DELIM).append(eventType)
-            .append(DELIM).append(message);
-
-    String payload = sb.toString();
+    String payload = DTF.format(date.atZone(timeZone)) +
+        DELIM + level.getText() +
+        DELIM + eventType +
+        DELIM + message;
 
     long ms = date.toEpochMilli();
     try {

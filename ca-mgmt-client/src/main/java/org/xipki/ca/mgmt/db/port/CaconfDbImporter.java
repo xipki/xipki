@@ -322,7 +322,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, readContent(ca.getCertchain()));
 
           String confColumn = readContent(ca.getConfColumn());
-          ps.setString(idx++, confColumn);
+          ps.setString(idx, confColumn);
 
           ps.executeUpdate();
         } catch (SQLException ex) {

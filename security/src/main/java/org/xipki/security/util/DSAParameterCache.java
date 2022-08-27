@@ -49,10 +49,9 @@ public final class DSAParameterCache {
   static {
     String resourceFile = "/conf/DSAParameters.cfg";
     InputStream confStream = DSAParameterCache.class.getResourceAsStream(resourceFile);
-    BufferedReader reader = new BufferedReader(new InputStreamReader(confStream, StandardCharsets.UTF_8));
 
-    String line;
-    try {
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(confStream, StandardCharsets.UTF_8))) {
+      String line;
       while ((line = reader.readLine()) != null) {
         line = line.trim();
         if (line.isEmpty() || line.startsWith("#")) {
@@ -89,11 +88,6 @@ public final class DSAParameterCache {
       }
     } catch (Exception ex) {
       LOG.error("error reading DSAParameters", ex);
-    } finally {
-      try {
-        reader.close();
-      } catch (IOException ex) {
-      }
     }
   }
 

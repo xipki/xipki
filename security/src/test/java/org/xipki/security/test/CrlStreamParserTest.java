@@ -137,7 +137,7 @@ public class CrlStreamParserTest {
     CrlStreamParser parser = getParser("no-crlnumber.crl");
 
     Assert.assertEquals("version", 1, parser.getVersion());
-    Assert.assertEquals("CRL number", null, parser.getCrlNumber());
+    Assert.assertNull("CRL number", parser.getCrlNumber());
 
     Assert.assertTrue("signature", parser.verifySignature(issuerSigner.getSubjectPublicKeyInfo()));
 
@@ -160,7 +160,7 @@ public class CrlStreamParserTest {
     CrlStreamParser parser = getParser("no-extensions.crl");
 
     Assert.assertEquals("version", 1, parser.getVersion());
-    Assert.assertEquals("CRL number", null, parser.getCrlNumber());
+    Assert.assertNull("CRL number", parser.getCrlNumber());
 
     Assert.assertTrue("signature", parser.verifySignature(issuerSigner.getSubjectPublicKeyInfo()));
 

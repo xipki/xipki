@@ -268,7 +268,7 @@ class PublisherManager {
       }
 
       try {
-        manager.certstore.clearPublishQueue((NameId) null, (NameId) null);
+        manager.certstore.clearPublishQueue(null, null);
       } catch (OperationException ex) {
         throw new CaMgmtException(ex.getMessage(), ex);
       }

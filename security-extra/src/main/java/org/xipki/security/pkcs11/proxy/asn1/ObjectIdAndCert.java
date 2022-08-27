@@ -64,10 +64,9 @@ public class ObjectIdAndCert extends ProxyMessage {
   private ObjectIdAndCert(ASN1Sequence seq)
       throws BadAsn1ObjectException {
     requireRange(seq, 3, 3);
-    int idx = 0;
-    this.slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++));
-    this.objectId = ObjectIdentifier.getInstance(seq.getObjectAt(idx++));
-    this.certificate = getCertificate0(seq.getObjectAt(idx++));
+    this.slotId = SlotIdentifier.getInstance(seq.getObjectAt(0));
+    this.objectId = ObjectIdentifier.getInstance(seq.getObjectAt(1));
+    this.certificate = getCertificate0(seq.getObjectAt(2));
   }
 
   public static ObjectIdAndCert getInstance(Object obj)
