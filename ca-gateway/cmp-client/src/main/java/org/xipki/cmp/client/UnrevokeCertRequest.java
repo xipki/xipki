@@ -15,51 +15,45 @@
  * limitations under the License.
  */
 
-package org.xipki.cmpclient;
+package org.xipki.cmp.client;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.util.Args;
 
 import java.math.BigInteger;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * CMP request to revoke certificates.
+ * CMP request to unrevoke or remove certificates.
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class RevokeCertRequest {
+public class UnrevokeCertRequest {
 
-  public static class Entry extends UnrevokeCertRequest.Entry {
+  public static class Entry extends IdentifiedObject {
 
-    private final int reason;
+    private final X500Name issuer;
 
-    private final Date invalidityDate;
+    private final BigInteger serialNumber;
 
     private byte[] authorityKeyIdentifier;
 
-    public Entry(String id, X500Name issuer, BigInteger serialNumber, int reason, Date invalidityDate) {
-      super(id, issuer, serialNumber);
-
-      if (!(reason >= 0 && reason <= 10 && reason != 7)) {
-        throw new IllegalArgumentException("invalid reason: " + reason);
-      }
-
-      this.reason = reason;
-      this.invalidityDate = invalidityDate;
+    public Entry(String id, X500Name issuer, BigInteger serialNumber) {
+      super(id);
+      this.serialNumber = Args.notNull(serialNumber, "serialNumber");
+      this.issuer = Args.notNull(issuer, "issuer");
     }
 
-    public int getReason() {
-      return reason;
+    public X500Name getIssuer() {
+      return issuer;
     }
 
-    public Date getInvalidityDate() {
-      return invalidityDate;
+    public BigInteger getSerialNumber() {
+      return serialNumber;
     }
 
     public byte[] getAuthorityKeyIdentifier() {

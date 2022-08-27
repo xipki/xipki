@@ -90,10 +90,7 @@ public class HttpCmpServlet extends HttpServlet {
       String path = req.getServletPath();
       if (path.length() > 1) {
         // skip the first char which is always '/'
-        String caAlias = path.substring(1);
-        if (caName == null) {
-          caName = caAlias.toLowerCase();
-        }
+        caName = path.substring(1).toLowerCase();
       }
 
       if (caName == null) {

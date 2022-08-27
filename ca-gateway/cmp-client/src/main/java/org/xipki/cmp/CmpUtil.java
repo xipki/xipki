@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.cmpclient;
+package org.xipki.cmp;
 
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cmp.*;

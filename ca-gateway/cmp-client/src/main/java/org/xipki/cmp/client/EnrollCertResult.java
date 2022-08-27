@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-package org.xipki.cmpclient;
+package org.xipki.cmp.client;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.xipki.cmp.PkiStatusInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 

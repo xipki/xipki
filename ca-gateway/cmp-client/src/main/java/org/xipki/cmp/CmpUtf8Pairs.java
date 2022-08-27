@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.cmpclient;
+package org.xipki.cmp;
 
 import java.util.*;
 import java.util.Map.Entry;

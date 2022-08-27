@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.cmpclient.internal;
+package org.xipki.cmp.client.internal;
 
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cmp.*;
@@ -56,7 +56,8 @@ import org.bouncycastle.operator.DigestCalculatorProvider;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.cmpclient.*;
+import org.xipki.cmp.*;
+import org.xipki.cmp.client.*;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.DateUtil;

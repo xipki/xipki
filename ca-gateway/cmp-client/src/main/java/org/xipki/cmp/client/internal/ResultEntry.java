@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package org.xipki.cmpclient.internal;
+package org.xipki.cmp.client.internal;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.crmf.CertId;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.cmpclient.IdentifiedObject;
-import org.xipki.cmpclient.PkiStatusInfo;
+import org.xipki.cmp.PkiStatusInfo;
+import org.xipki.cmp.client.IdentifiedObject;
 
 import java.math.BigInteger;
 

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.cmpclient.internal;
+package org.xipki.cmp.client.internal;
 
 import com.alibaba.fastjson.JSON;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
@@ -27,7 +27,8 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.cmpclient.*;
+import org.xipki.cmp.client.*;
+import org.xipki.cmpclient.CmpClientConf;
 import org.xipki.security.CollectionAlgorithmValidator;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;

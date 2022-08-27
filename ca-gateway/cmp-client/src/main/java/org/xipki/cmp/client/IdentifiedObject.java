@@ -15,42 +15,27 @@
  * limitations under the License.
  */
 
-package org.xipki.cmpclient;
+package org.xipki.cmp.client;
 
 import org.xipki.util.Args;
-import org.xipki.util.StringUtil;
 
 /**
- * Certprofile information.
+ * Object with id.
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class CertprofileInfo {
+public class IdentifiedObject {
 
-  private final String name;
+  private final String id;
 
-  private final String type;
-
-  private final String conf;
-
-  public CertprofileInfo(String name, String type, String conf) {
-    this.name = Args.toNonBlankLower(name, "name");
-    this.type = StringUtil.isBlank(type) ? null : type;
-    this.conf = StringUtil.isBlank(conf) ? null : conf;
+  public IdentifiedObject(String id) {
+    this.id = Args.notBlank(id, "id");
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public String getConf() {
-    return conf;
+  public String getId() {
+    return id;
   }
 
 }

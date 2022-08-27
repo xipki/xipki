@@ -15,34 +15,23 @@
  * limitations under the License.
  */
 
-package org.xipki.cmpclient;
-
-import org.xipki.util.Args;
+package org.xipki.cmp;
 
 /**
- * Protection verification result with the requestor.
+ * Protection verification result enum.
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class ProtectionVerificationResult {
+public enum ProtectionResult {
 
-  private final Object requestor;
-
-  private final ProtectionResult protectionResult;
-
-  public ProtectionVerificationResult(Object requestor, ProtectionResult protectionResult) {
-    this.requestor = requestor;
-    this.protectionResult = Args.notNull(protectionResult, "protectionResult");
-  }
-
-  public Object getRequestor() {
-    return requestor;
-  }
-
-  public ProtectionResult getProtectionResult() {
-    return protectionResult;
-  }
+  SIGNATURE_VALID,
+  SIGNATURE_INVALID,
+  SIGNATURE_ALGO_FORBIDDEN,
+  MAC_VALID,
+  MAC_INVALID,
+  MAC_ALGO_FORBIDDEN,
+  SENDER_NOT_AUTHORIZED
 
 }

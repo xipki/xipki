@@ -15,42 +15,32 @@
  * limitations under the License.
  */
 
-package org.xipki.cmpclient.internal;
+package org.xipki.cmp.client.internal;
 
-import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.xipki.util.Args;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Response of certificate enrollment.
+ * Response of revoking certificates.
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-class EnrollCertResponse {
-
-  private List<CMPCertificate> caCertificates;
+class RevokeCertResponse {
 
   private List<ResultEntry> resultEntries;
 
-  EnrollCertResponse() {
-  }
-
-  void addCaCertificate(CMPCertificate caCertificate) {
-    if (caCertificates == null) {
-      caCertificates = new ArrayList<>(1);
-    }
-    caCertificates.add(caCertificate);
+  List<ResultEntry> getResultEntries() {
+    return resultEntries;
   }
 
   void addResultEntry(ResultEntry resultEntry) {
     Args.notNull(resultEntry, "resultEntry");
-
-    if (!(resultEntry instanceof ResultEntry.EnrollCert || resultEntry instanceof ResultEntry.Error)) {
-      throw new IllegalArgumentException("Unaccepted parameter of class " + resultEntry.getClass().getName());
+    if (!(resultEntry instanceof ResultEntry.RevokeCert || resultEntry instanceof ResultEntry.Error)) {
+      throw new IllegalArgumentException("unaccepted parameter of class " + resultEntry.getClass().getName());
     }
 
     if (resultEntries == null) {
@@ -58,14 +48,6 @@ class EnrollCertResponse {
     }
 
     resultEntries.add(resultEntry);
-  }
-
-  List<CMPCertificate> getCaCertificates() {
-    return caCertificates;
-  }
-
-  List<ResultEntry> getResultEntries() {
-    return resultEntries;
   }
 
 }

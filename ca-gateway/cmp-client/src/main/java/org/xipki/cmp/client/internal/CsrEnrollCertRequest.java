@@ -15,41 +15,39 @@
  * limitations under the License.
  */
 
-package org.xipki.cmpclient;
+package org.xipki.cmp.client.internal;
 
-import org.bouncycastle.asn1.crmf.CertId;
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.xipki.cmp.client.IdentifiedObject;
 
+import static org.xipki.util.Args.notBlank;
 import static org.xipki.util.Args.notNull;
 
 /**
- * CertId or PKI error.
+ * CMP request to enroll certificate for given CSR.
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class CertIdOrError {
+class CsrEnrollCertRequest extends IdentifiedObject {
 
-  private final CertId certId;
+  private final String certprofile;
 
-  private final PkiStatusInfo error;
+  private final CertificationRequest csr;
 
-  public CertIdOrError(CertId certId) {
-    this.certId = notNull(certId, "certId");
-    this.error = null;
+  CsrEnrollCertRequest(String id, String certprofile, CertificationRequest csr) {
+    super(id);
+    this.certprofile = notBlank(certprofile, "certprofile");
+    this.csr = notNull(csr, "csr");
   }
 
-  public CertIdOrError(PkiStatusInfo error) {
-    this.certId = null;
-    this.error = notNull(error, "error");
+  CertificationRequest getCsr() {
+    return csr;
   }
 
-  public CertId getCertId() {
-    return certId;
-  }
-
-  public PkiStatusInfo getError() {
-    return error;
+  String getCertprofile() {
+    return certprofile;
   }
 
 }

@@ -15,39 +15,42 @@
  * limitations under the License.
  */
 
-package org.xipki.cmpclient.internal;
+package org.xipki.cmp.client;
 
 import org.xipki.util.Args;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.xipki.util.StringUtil;
 
 /**
- * Response of revoking certificates.
+ * Certprofile information.
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-class RevokeCertResponse {
+public class CertprofileInfo {
 
-  private List<ResultEntry> resultEntries;
+  private final String name;
 
-  List<ResultEntry> getResultEntries() {
-    return resultEntries;
+  private final String type;
+
+  private final String conf;
+
+  public CertprofileInfo(String name, String type, String conf) {
+    this.name = Args.toNonBlankLower(name, "name");
+    this.type = StringUtil.isBlank(type) ? null : type;
+    this.conf = StringUtil.isBlank(conf) ? null : conf;
   }
 
-  void addResultEntry(ResultEntry resultEntry) {
-    Args.notNull(resultEntry, "resultEntry");
-    if (!(resultEntry instanceof ResultEntry.RevokeCert || resultEntry instanceof ResultEntry.Error)) {
-      throw new IllegalArgumentException("unaccepted parameter of class " + resultEntry.getClass().getName());
-    }
+  public String getName() {
+    return name;
+  }
 
-    if (resultEntries == null) {
-      resultEntries = new ArrayList<>(1);
-    }
+  public String getType() {
+    return type;
+  }
 
-    resultEntries.add(resultEntry);
+  public String getConf() {
+    return conf;
   }
 
 }

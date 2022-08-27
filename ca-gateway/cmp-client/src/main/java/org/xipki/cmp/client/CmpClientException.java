@@ -15,27 +15,25 @@
  * limitations under the License.
  */
 
-package org.xipki.cmpclient;
-
-import org.xipki.util.Args;
+package org.xipki.cmp.client;
 
 /**
- * Object with id.
+ * CMP client exception.
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class IdentifiedObject {
+public class CmpClientException extends Exception {
 
-  private final String id;
+  private static final long serialVersionUID = 1L;
 
-  public IdentifiedObject(String id) {
-    this.id = Args.notBlank(id, "id");
+  public CmpClientException(String message) {
+    super(message);
   }
 
-  public String getId() {
-    return id;
+  public CmpClientException(String message, Throwable cause) {
+    super(message, cause);
   }
 
 }

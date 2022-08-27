@@ -46,13 +46,16 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
-import org.xipki.ca.gateway.*;
+import org.xipki.ca.gateway.CaNameSigners;
+import org.xipki.ca.gateway.PopControl;
+import org.xipki.ca.gateway.Requestor;
+import org.xipki.ca.gateway.RequestorAuthenticator;
 import org.xipki.ca.sdk.ErrorResponse;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.SdkErrorResponseException;
-import org.xipki.cmpclient.CmpUtil;
-import org.xipki.cmpclient.ProtectionResult;
-import org.xipki.cmpclient.ProtectionVerificationResult;
+import org.xipki.cmp.CmpUtil;
+import org.xipki.cmp.ProtectionResult;
+import org.xipki.cmp.ProtectionVerificationResult;
 import org.xipki.security.*;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
@@ -376,8 +379,7 @@ abstract class BaseCmpResponder {
     if (respBody.getType() == PKIBody.TYPE_ERROR) {
       ErrorMsgContent errorMsgContent = (ErrorMsgContent) respBody.getContent();
 
-      org.xipki.cmpclient.PkiStatusInfo pkiStatus =
-          new org.xipki.cmpclient.PkiStatusInfo(errorMsgContent.getPKIStatusInfo());
+      org.xipki.cmp.PkiStatusInfo pkiStatus = new org.xipki.cmp.PkiStatusInfo(errorMsgContent.getPKIStatusInfo());
 
       event.setStatus(AuditStatus.FAILED);
       String statusString = pkiStatus.statusMessage();
