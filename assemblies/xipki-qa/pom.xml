@@ -71,6 +71,14 @@
           <exclude>xipki/**</exclude>
         </excludes>
       </resource>
+      <resource>
+        <directory>../shared/karaf/filtered</directory>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>../shared/karaf/unfiltered</directory>
+        <filtering>false</filtering>
+      </resource>
     </resources>
     <plugins>
       <plugin>
