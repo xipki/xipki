@@ -20,6 +20,7 @@ package org.xipki.ca.server.mgmt;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -237,10 +238,11 @@ class SelfSignedCertBuilder {
     X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(grantedSubject,
         serialNumber, notBefore, notAfter, grantedSubject, publicKeyInfo);
 
-    PublicCaInfo publicCaInfo = new PublicCaInfo(grantedSubject, grantedSubject, serialNumber,
-        null, null, caUris, extraControl);
-
     try {
+      SubjectKeyIdentifier ski = certprofile.getSubjectKeyIdentifier(publicKeyInfo);
+      PublicCaInfo publicCaInfo = new PublicCaInfo(grantedSubject, grantedSubject, serialNumber,
+          null, ski.getKeyIdentifier(), caUris, extraControl);
+
       addExtensions(certBuilder, certprofile, requestedSubject, grantedSubject, null,
           publicKeyInfo, publicCaInfo, notBefore, notAfter);
 

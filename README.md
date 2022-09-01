@@ -15,7 +15,7 @@ a highly scalable and high-performance open source PKI (CA and OCSP responder).
 ## Support
 Just [create issue](https://github.com/xipki/xipki/issues) or [new discussion](https://github.com/xipki/xipki/discussions).
 
-For bug-report please upload the testdata and log files, describe the version of XiPKI, OS and
+For bug-report please upload the test data and log files, describe the version of XiPKI, OS and
 JRE/JDK, and the steps to reproduce the bug.
 
 ## Prerequisite
@@ -35,8 +35,7 @@ JRE/JDK, and the steps to reproduce the bug.
 ## Get Started
 
 ### JAVA_HOME
-  Set the environment variable `JAVA_HOME` to point to root directory of the to
-  the JRE/JDK installation.
+  Set the environment variable `JAVA_HOME` to the root directory of JRE/JDK installation.
 
 ### Binaries
 
@@ -49,7 +48,7 @@ Download the binaries `xipki-ca-<version>.zip`, `xipki-ocsp-<version>.zip`,
 Only if you want to use the development version, build it from source code as
 follows.
 
-- Get a copy of project code
+- Get a copy of project code, e.g.
   ```sh
   git clone https://github.com/xipki/xipki
   ```

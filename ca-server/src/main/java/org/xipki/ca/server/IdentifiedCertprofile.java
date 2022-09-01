@@ -676,6 +676,10 @@ public class IdentifiedCertprofile implements Closeable {
     return certprofile.checkPublicKey(notNull(publicKey, "publicKey"));
   }
 
+  public SubjectKeyIdentifier getSubjectKeyIdentifier(SubjectPublicKeyInfo publicKey) throws CertprofileException {
+    return certprofile.getSubjectKeyIdentifier(publicKey);
+  }
+
   @Override
   public void close() {
     if (certprofile != null) {
