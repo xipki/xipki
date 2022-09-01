@@ -544,7 +544,7 @@ public class RestResponder {
       bo.write(PemEncoder.encode(entry.getCert(), PemLabel.CERTIFICATE));
       bo.write(NEWLINE);
 
-      bo.write(PemEncoder.encode(entry.getCert(), PemLabel.PRIVATE_KEY));
+      bo.write(PemEncoder.encode(entry.getPrivateKey(), PemLabel.PRIVATE_KEY));
       bo.write(NEWLINE);
     }
     bo.flush();
