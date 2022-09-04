@@ -92,7 +92,7 @@ public class SdkResponder {
         }
 
         try {
-          ca.revokeCert(serialNumber, CrlReason.CESSATION_OF_OPERATION, invalidityDate);
+          ca.revokeCert(null, serialNumber, CrlReason.CESSATION_OF_OPERATION, invalidityDate);
         } catch (Throwable th) {
           LOG.error("could not revoke certificate (CA={}, serialNumber={}): {}",
               ca.getCaInfo().getIdent(), LogUtil.formatCsn(serialNumber), th.getMessage());
@@ -132,40 +132,20 @@ public class SdkResponder {
     threadPoolExecutor.scheduleAtFixedRate(new PendingPoolCleaner(), 10, 10, TimeUnit.MINUTES);
   }
 
-  public SdkResponse service(
-      String path, AuditEvent event, byte[] request, HttpRequestMetadataRetriever httpRetriever) {
-    AuditLevel auditLevel = AuditLevel.INFO;
-    AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
-    String auditMessage = null;
-
+  public SdkResponse service(String path, byte[] request, HttpRequestMetadataRetriever httpRetriever) {
     try {
-      SdkResponse resp = service0(path, event, request, httpRetriever);
+      SdkResponse resp = service0(path, request, httpRetriever);
       if (resp instanceof ErrorResponse) {
-        auditLevel = AuditLevel.ERROR;
-        auditStatus = AuditStatus.FAILED;
-        auditMessage = ((ErrorResponse) resp).getMessage();
+        LOG.warn("returned ErrorResponse: {}", resp);
       }
       return resp;
     } catch (Throwable th) {
       LOG.error("Throwable thrown, this should not happen!", th);
-      auditLevel = AuditLevel.ERROR;
-      auditStatus = AuditStatus.FAILED;
-      auditMessage = "internal error";
-      return new ErrorResponse(null, SYSTEM_FAILURE, auditMessage);
-    } finally {
-      event.setStatus(auditStatus);
-      event.setLevel(auditLevel);
-      if (auditMessage != null) {
-        event.addEventData(NAME_message, auditMessage);
-      }
+      return new ErrorResponse(null, SYSTEM_FAILURE, "internal error");
     }
   }
 
-  private SdkResponse service0(
-      String path, AuditEvent event, byte[] request, HttpRequestMetadataRetriever httpRetriever) {
-    event.setApplicationName(APPNAME);
-    event.setName(NAME_perf);
-
+  private SdkResponse service0(String path, byte[] request, HttpRequestMetadataRetriever httpRetriever) {
     try {
       if (caManager == null) {
         return new ErrorResponse(null, SYSTEM_FAILURE, "responderManager in servlet not configured");
@@ -208,9 +188,6 @@ public class SdkResponder {
         return new ErrorResponse(null, PATH_NOT_FOUND, message);
       }
 
-      event.addEventData(NAME_ca, ca.getCaIdent().getName());
-      event.addEventType(command);
-
       X509Cert clientCert;
       try {
         clientCert = httpRetriever.getTlsClientCert();
@@ -226,8 +203,6 @@ public class SdkResponder {
       if (requestor == null) {
         return new ErrorResponse(null, NOT_PERMITTED, "no requestor specified");
       }
-
-      event.addEventData(NAME_requestor, requestor.getIdent().getName());
 
       switch (command) {
         case CMD_health: {
@@ -258,15 +233,15 @@ public class SdkResponder {
         }
         case CMD_enroll: {
           assertPermitted(requestor, ENROLL_CERT);
-          return enroll(ca, request, requestor, false, false, event);
+          return enroll(ca, request, requestor, false, false);
         }
         case CMD_enroll_kup: {
           assertPermitted(requestor, KEY_UPDATE);
-          return enroll(ca, request, requestor, true, false, event);
+          return enroll(ca, request, requestor, true, false);
         }
         case CMD_enroll_cross: {
           assertPermitted(requestor, ENROLL_CROSS);
-          return enroll(ca, request, requestor, false, true, event);
+          return enroll(ca, request, requestor, false, true);
         }
         case CMD_poll_cert: {
           if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(KEY_UPDATE))) {
@@ -276,35 +251,35 @@ public class SdkResponder {
         }
         case CMD_revoke_cert: {
           assertPermitted(requestor, REVOKE_CERT);
-          return revoke(ca, request, event);
+          return revoke(requestor, ca, request);
         }
         case CMD_confirm_enroll: {
           if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(KEY_UPDATE))) {
             throw new OperationException(NOT_PERMITTED);
           }
-          return confirmCertificates(ca, request, event);
+          return confirmCertificates(requestor, ca, request);
         }
         case CMD_revoke_pending_cert: {
           if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(KEY_UPDATE))) {
             throw new OperationException(NOT_PERMITTED);
           }
           TransactionIdRequest req = TransactionIdRequest.decode(request);
-          revokePendingCertificates(ca, req.getTid());
+          revokePendingCertificates(requestor, ca, req.getTid());
           return null;
         }
         case CMD_unsuspend_cert:
         case CMD_remove_cert: {
           boolean unsuspend = CMD_unsuspend_cert.equals(command);
           assertPermitted(requestor, unsuspend ? UNSUSPEND_CERT : REMOVE_CERT);
-          return removeOrUnsuspend(ca, request, unsuspend, event);
+          return removeOrUnsuspend(requestor, ca, request, unsuspend);
         }
         case CMD_gen_crl: {
           assertPermitted(requestor, GEN_CRL);
-          return genCrl(ca, request);
+          return genCrl(requestor, ca, request);
         }
         case CMD_crl: {
           assertPermitted(requestor, GET_CRL);
-          return getCrl(ca, request, event);
+          return getCrl(requestor, ca, request);
         }
         case CMD_get_cert: {
           assertPermitted(requestor, GET_CERT);
@@ -319,8 +294,7 @@ public class SdkResponder {
     }
   } // method service
 
-  private SdkResponse enroll(
-      X509Ca ca, byte[] request, RequestorInfo requestor, boolean keyUpdate, boolean crossCert, final AuditEvent event)
+  private SdkResponse enroll(X509Ca ca, byte[] request, RequestorInfo requestor, boolean keyUpdate, boolean crossCert)
       throws OperationException {
     EnrollCertsRequest req = EnrollCertsRequest.decode(request);
     for (EnrollCertRequestEntry entry : req.getEntries()) {
@@ -456,8 +430,7 @@ public class SdkResponder {
     }
 
     List<EnrollOrPullCertResponseEntry> rentries =
-        generateCertificates(ca, certTemplates, requestor,
-            keyUpdate, req, request, waitForConfirmUtil, event);
+        generateCertificates(requestor, ca, certTemplates, keyUpdate, req, request, waitForConfirmUtil);
     if (rentries == null) {
       return new ErrorResponse(req.getTransactionId(), SYSTEM_FAILURE, null);
     } else {
@@ -519,7 +492,7 @@ public class SdkResponder {
     return resp;
   }
 
-  private SdkResponse revoke(X509Ca ca, byte[] request, AuditEvent event)
+  private SdkResponse revoke(RequestorInfo requestor, X509Ca ca, byte[] request)
       throws OperationException {
     RevokeCertsRequest req = RevokeCertsRequest.decode(request);
     assertIssuerMatch(ca, req);
@@ -541,7 +514,7 @@ public class SdkResponder {
         Date invalidityTime = entry.getInvalidityTime() == null
             ? null : new Date(entry.getInvalidityTime() * 1000);
         try {
-          ca.revokeCert(serialNumber, reason, invalidityTime, event);
+          ca.revokeCert(requestor, serialNumber, reason, invalidityTime);
         } catch (OperationException e) {
           String msg = e.getErrorMessage();
           rentry.setError(new ErrorEntry(e.getErrorCode(), msg));
@@ -553,8 +526,7 @@ public class SdkResponder {
     return resp;
   }
 
-  private SdkResponse removeOrUnsuspend(
-      X509Ca ca, byte[] request, boolean unsuspend, AuditEvent event)
+  private SdkResponse removeOrUnsuspend(RequestorInfo requestor, X509Ca ca, byte[] request, boolean unsuspend)
       throws OperationException {
     UnsuspendOrRemoveRequest req = UnsuspendOrRemoveRequest.decode(request);
     assertIssuerMatch(ca, req);
@@ -568,9 +540,9 @@ public class SdkResponder {
       rentries.add(rentry);
       try {
         if (unsuspend) {
-          ca.unsuspendCert(serialNumber, event);
+          ca.unsuspendCert(requestor, serialNumber);
         } else {
-          ca.removeCert(serialNumber, event);
+          ca.removeCert(requestor,serialNumber);
         }
       } catch (OperationException e) {
         rentry.setError(new ErrorEntry(e.getErrorCode(), e.getErrorMessage()));
@@ -625,20 +597,17 @@ public class SdkResponder {
     }
   }
 
-  private SdkResponse genCrl(X509Ca ca, byte[] request)
-      throws OperationException {
+  private SdkResponse genCrl(RequestorInfo requestor, X509Ca ca, byte[] request) throws OperationException {
     GenCRLRequest req = GenCRLRequest.decode(request);
     // TODO: consider req
-    X509CRLHolder crl = ca.generateCrlOnDemand();
+    X509CRLHolder crl = ca.generateCrlOnDemand(requestor);
     return buildCrlResp(crl, "generate CRL");
   }
 
-  private SdkResponse getCrl(X509Ca ca, byte[] request, AuditEvent event)
+  private SdkResponse getCrl(RequestorInfo requestor, X509Ca ca, byte[] request)
       throws OperationException {
     GetCRLRequest req = GetCRLRequest.decode(request);
-
-    BigInteger crlNumber = req.getCrlNumber();
-    X509CRLHolder crl = ca.getCrl(crlNumber, event);
+    X509CRLHolder crl = ca.getCrl(requestor, req.getCrlNumber());
     return buildCrlResp(crl, "get CRL");
   }
 
@@ -697,8 +666,8 @@ public class SdkResponder {
   }
 
   private List<EnrollOrPullCertResponseEntry> generateCertificates(
-      X509Ca ca, List<CertTemplateData> certTemplates, RequestorInfo requestor, boolean kup,
-      EnrollCertsRequest req, byte[] request, long waitForConfirmUtil, AuditEvent event) {
+      RequestorInfo requestor, X509Ca ca, List<CertTemplateData> certTemplates, boolean kup,
+      EnrollCertsRequest req, byte[] request, long waitForConfirmUtil) {
     String caName = ca.getCaInfo().getIdent().getName();
     final int n = certTemplates.size();
     String tid = req.getTransactionId();
@@ -714,8 +683,8 @@ public class SdkResponder {
       List<CertificateInfo> certInfos = null;
       try {
         certInfos = kup
-            ? ca.regenerateCerts(certTemplates, requestor, tid, event)
-            : ca.generateCerts(certTemplates,   requestor, tid, event);
+            ? ca.regenerateCerts(requestor, certTemplates, tid)
+            : ca.generateCerts  (requestor, certTemplates, tid);
 
         // save the request
         Long reqDbId = null;
@@ -751,13 +720,12 @@ public class SdkResponder {
           for (CertificateInfo certInfo : certInfos) {
             BigInteger sn = certInfo.getCert().getCert().getSerialNumber();
             try {
-              ca.revokeCert(sn, CrlReason.CESSATION_OF_OPERATION, null, event);
+              ca.revokeCert(requestor, sn, CrlReason.CESSATION_OF_OPERATION, null);
             } catch (OperationException ex2) {
               LogUtil.error(LOG, ex2, "CA " + caName + " could not revoke certificate " + sn);
             }
           }
         }
-        event.setStatus(AuditStatus.FAILED);
         return null;
       }
     }
@@ -774,8 +742,8 @@ public class SdkResponder {
       CertificateInfo certInfo;
       try {
         certInfo = kup
-            ? ca.regenerateCert(certTemplate, requestor, tid, event)
-            : ca.generateCert(certTemplate, requestor, tid, event);
+            ? ca.regenerateCert(requestor, certTemplate, tid)
+            : ca.generateCert  (requestor, certTemplate, tid);
 
         if (ca.getCaInfo().isSaveRequest()) {
           if (reqDbId == null && !savingRequestFailed) {
@@ -798,10 +766,6 @@ public class SdkResponder {
 
         fillResponseEntry(rentry, certInfo);
       } catch (OperationException ex) {
-        event.setStatus(AuditStatus.FAILED);
-        if (! (ex instanceof X509Ca.OperationExceptionWithIndex)) {
-          event.addEventData(NAME_message, ex.getMessage());
-        }
         rentry.setError(new ErrorEntry(ex.getErrorCode(), ex.getErrorMessage()));
       }
 
@@ -823,7 +787,7 @@ public class SdkResponder {
     rentry.setCert(certInfo.getCert().getCert().getEncoded());
   }
 
-  protected SdkResponse confirmCertificates(X509Ca ca, byte[] request, AuditEvent event) {
+  protected SdkResponse confirmCertificates(RequestorInfo requestor, X509Ca ca, byte[] request) {
     ConfirmCertsRequest req = ConfirmCertsRequest.decode(request);
     String tid = req.getTransactionId();
     boolean successful = true;
@@ -843,7 +807,7 @@ public class SdkResponder {
 
       BigInteger serialNumber = certInfo.getCert().getCert().getSerialNumber();
       try {
-        ca.revokeCert(serialNumber, CrlReason.CESSATION_OF_OPERATION, new Date(), event);
+        ca.revokeCert(requestor, serialNumber, CrlReason.CESSATION_OF_OPERATION, new Date());
       } catch (OperationException ex) {
         LogUtil.warn(LOG, ex, "could not revoke certificate ca=" + ca.getCaInfo().getIdent()
             + " serialNumber=" + LogUtil.formatCsn(serialNumber));
@@ -853,7 +817,7 @@ public class SdkResponder {
     }
 
     // all other certificates should be revoked
-    if (!revokePendingCertificates(ca, tid)) {
+    if (!revokePendingCertificates(requestor, ca, tid)) {
       successful = false;
     }
 
@@ -864,7 +828,7 @@ public class SdkResponder {
     return new ErrorResponse(tid, SYSTEM_FAILURE, null);
   } // method confirmCertificates
 
-  public boolean revokePendingCertificates(X509Ca ca, String transactionId) {
+  public boolean revokePendingCertificates(RequestorInfo requestor, X509Ca ca, String transactionId) {
     Set<CertificateInfo> remainingCerts = pendingCertPool.removeCertificates(transactionId);
 
     if (CollectionUtil.isEmpty(remainingCerts)) {
@@ -875,7 +839,7 @@ public class SdkResponder {
     Date invalidityDate = new Date();
     for (CertificateInfo remainingCert : remainingCerts) {
       try {
-        ca.revokeCert(remainingCert.getCert().getCert().getSerialNumber(),
+        ca.revokeCert(requestor, remainingCert.getCert().getCert().getSerialNumber(),
             CrlReason.CESSATION_OF_OPERATION, invalidityDate);
       } catch (OperationException ex) {
         successful = false;

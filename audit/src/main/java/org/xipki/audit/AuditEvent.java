@@ -113,8 +113,31 @@ public class AuditEvent {
     return Collections.unmodifiableList(eventDatas);
   }
 
+  public void setEventType(String type) {
+    setEventData("event_type", type);
+  }
+
   public AuditEventData addEventType(String type) {
     return addEventData("event_type", type);
+  }
+
+  public void setEventData(String name, Object value) {
+    Args.notNull(name, "name");
+    Args.notNull(value, "value");
+
+    int idx = -1;
+    for (int i = 0; i < eventDatas.size(); i++) {
+      final AuditEventData ed = eventDatas.get(i);
+      if (ed.getName().equals(name)) {
+        idx = i;
+        break;
+      }
+    }
+
+    if (idx != -1) {
+      eventDatas.remove(idx);
+    }
+    eventDatas.add(new AuditEventData(name, value));
   }
 
   public AuditEventData addEventData(String name, Object value) {

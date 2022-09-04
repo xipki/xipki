@@ -74,13 +74,12 @@ public class HttpRaServlet extends HttpServlet {
   private void service0(HttpServletRequest req, HttpServletResponse resp, boolean viaPost)
       throws IOException {
     AuditService auditService = Audits.getAuditService();
-    AuditEvent event = new AuditEvent(new Date());
     try {
       String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
       HttpRequestMetadataRetriever httpRetriever = new HttpRequestMetadataRetrieverImpl(req);
       byte[] requestBytes = IoUtil.read(req.getInputStream());
 
-      SdkResponse response = responder.service(path, event, requestBytes, httpRetriever);
+      SdkResponse response = responder.service(path, requestBytes, httpRetriever);
       byte[] respBody = response == null ? null : response.encode();
       int httpStatus = HttpServletResponse.SC_OK;
       if (response instanceof ErrorResponse) {
@@ -132,18 +131,9 @@ public class HttpRaServlet extends HttpServlet {
         resp.setContentLength(respBody.length);
         resp.getOutputStream().write(respBody);
       }
-      if (event.getStatus() == null) {
-        event.setStatus(AuditStatus.SUCCESSFUL);
-      }
     } catch (RuntimeException ex) {
-      event.setStatus(AuditStatus.FAILED);
-      event.setLevel(AuditLevel.ERROR);
       LOG.error("RuntimeException thrown, this should not happen!", ex);
       resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    } finally {
-      event.finish();
-      auditService.logEvent(event);
-      event.log(LOG);
     }
   } // method service0
 

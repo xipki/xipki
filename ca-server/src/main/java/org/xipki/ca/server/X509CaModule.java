@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
 import org.xipki.ca.api.NameId;
+import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.security.X509Cert;
 
@@ -78,17 +79,16 @@ public abstract class X509CaModule {
     return Audits.getAuditService();
   }
 
-  protected AuditEvent newPerfAuditEvent(String eventType) {
-    return newAuditEvent(eventType);
-  }
-
-  protected AuditEvent newAuditEvent(String eventType) {
+  protected AuditEvent newAuditEvent(String eventType, RequestorInfo requestor) {
     notNull(eventType, "eventType");
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName(CaAuditConstants.APPNAME);
     event.setName(CaAuditConstants.NAME_perf);
-    event.addEventData(CaAuditConstants.NAME_ca, caIdent.getName());
-    event.addEventType(eventType);
+    event.setEventData(CaAuditConstants.NAME_ca, caIdent.getName());
+    event.setEventType(eventType);
+    if (requestor != null) {
+      event.setEventData(CaAuditConstants.NAME_requestor, requestor.getIdent().getName());
+    }
     return event;
   }
 
@@ -101,6 +101,7 @@ public abstract class X509CaModule {
     setEventStatus(event, successful);
     event.finish();
     auditService().logEvent(event);
+    event.log(LOG);
   }
 
   protected boolean verifySignature(X509Cert cert) {

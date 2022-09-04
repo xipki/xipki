@@ -68,7 +68,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
 
       try {
         LOG.debug("revoking expired certificates");
-        AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_remove_expired_certs);
+        AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_remove_expired_certs, null);
         boolean successful = false;
         try {
           int num = removeExpiredCerts0(expiredAt, event);

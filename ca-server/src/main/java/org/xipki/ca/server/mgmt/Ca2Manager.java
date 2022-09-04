@@ -463,7 +463,7 @@ class Ca2Manager {
     manager.queryExecutor.revokeCa(caName, revocationInfo);
 
     try {
-      ca.revokeCa(revocationInfo);
+      ca.revokeCa(manager.byCaRequestor, revocationInfo);
     } catch (OperationException ex) {
       throw new CaMgmtException(concat("could not revoke CA ", ex.getMessage()), ex);
     }
@@ -486,7 +486,7 @@ class Ca2Manager {
 
     X509Ca ca = manager.x509cas.get(caName);
     try {
-      ca.unrevokeCa();
+      ca.unrevokeCa(manager.byCaRequestor);
     } catch (OperationException ex) {
       throw new CaMgmtException(concat("could not unrevoke CA " + caName + ": ", ex.getMessage()), ex);
     }
@@ -601,11 +601,6 @@ class Ca2Manager {
     notNull(encodedCsr, "encodedCsr");
     notNull(encodedTargetCert, "encodedTargetCert");
 
-    AuditEvent event = new AuditEvent(new Date());
-    event.setApplicationName(APPNAME);
-    event.setName(NAME_perf);
-    event.addEventType("CAMGMT_GEN_CROSS_CERT");
-
     X509Ca ca = getX509Ca(caName);
     CertificationRequest csr;
     try {
@@ -654,7 +649,7 @@ class Ca2Manager {
 
     CertificateInfo certInfo;
     try {
-      certInfo = ca.generateCert(certTemplateData, manager.byCaRequestor,null, event);
+      certInfo = ca.generateCert(manager.byCaRequestor, certTemplateData, null);
     } catch (OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
@@ -671,8 +666,7 @@ class Ca2Manager {
     return certInfo.getCert().getCert();
   }
 
-  KeyCertBytesPair generateKeyCert(
-      String caName, String profileName, String subject, Date notBefore, Date notAfter)
+  KeyCertBytesPair generateKeyCert(String caName, String profileName, String subject, Date notBefore, Date notAfter)
       throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     profileName = toNonBlankLower(profileName, "profileName");
@@ -692,7 +686,7 @@ class Ca2Manager {
 
     CertificateInfo certInfo;
     try {
-      certInfo = ca.generateCert(certTemplateData, manager.byCaRequestor,null, event);
+      certInfo = ca.generateCert(manager.byCaRequestor, certTemplateData, null);
     } catch (OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
@@ -704,8 +698,7 @@ class Ca2Manager {
     }
   }
 
-  X509Cert generateCertificate(
-      String caName, String profileName, byte[] encodedCsr, Date notBefore, Date notAfter)
+  X509Cert generateCertificate(String caName, String profileName, byte[] encodedCsr, Date notBefore, Date notAfter)
       throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     profileName = toNonBlankLower(profileName, "profileName");
@@ -746,7 +739,7 @@ class Ca2Manager {
 
     CertificateInfo certInfo;
     try {
-      certInfo = ca.generateCert(certTemplateData, manager.byCaRequestor,null, event);
+      certInfo = ca.generateCert(manager.byCaRequestor, certTemplateData, null);
     } catch (OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
@@ -772,7 +765,7 @@ class Ca2Manager {
 
     X509Ca ca = getX509Ca(caName);
     try {
-      if (ca.revokeCert(serialNumber, reason, invalidityTime) == null) {
+      if (ca.revokeCert(manager.byCaRequestor, serialNumber, reason, invalidityTime) == null) {
         throw new CaMgmtException("could not revoke non-existing certificate");
       }
     } catch (OperationException ex) {
@@ -788,7 +781,7 @@ class Ca2Manager {
 
     X509Ca ca = getX509Ca(caName);
     try {
-      if (ca.unsuspendCert(serialNumber) == null) {
+      if (ca.unsuspendCert(manager.byCaRequestor, serialNumber) == null) {
         throw new CaMgmtException("could not unsuspend non-existing certificate");
       }
     } catch (OperationException ex) {
@@ -804,7 +797,7 @@ class Ca2Manager {
     X509Ca ca = getX509Ca(caName);
 
     try {
-      if (ca.removeCert(serialNumber) == null) {
+      if (ca.removeCert(manager.byCaRequestor, serialNumber) == null) {
         throw new CaMgmtException("could not remove certificate");
       }
     } catch (OperationException ex) {
@@ -819,7 +812,7 @@ class Ca2Manager {
 
     X509Ca ca = getX509Ca(caName);
     try {
-      return ca.generateCrlOnDemand();
+      return ca.generateCrlOnDemand(manager.byCaRequestor);
     } catch (OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
@@ -830,7 +823,7 @@ class Ca2Manager {
     notNull(crlNumber, "crlNumber");
     X509Ca ca = getX509Ca(caName);
     try {
-      X509CRLHolder crl = ca.getCrl(crlNumber);
+      X509CRLHolder crl = ca.getCrl(manager.byCaRequestor, crlNumber);
       if (crl == null) {
         LOG.warn("found no CRL for CA {} and crlNumber {}", caName, crlNumber);
       }
@@ -844,7 +837,7 @@ class Ca2Manager {
     caName = toNonBlankLower(caName, "caName");
     X509Ca ca = getX509Ca(caName);
     try {
-      X509CRLHolder crl = ca.getCurrentCrl();
+      X509CRLHolder crl = ca.getCurrentCrl(manager.byCaRequestor);
       if (crl == null) {
         LOG.warn("found no CRL for CA {}", caName);
       }

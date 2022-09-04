@@ -61,8 +61,7 @@ import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import static org.xipki.ca.sdk.CaAuditConstants.TYPE_downlaod_crl4number;
-import static org.xipki.ca.sdk.CaAuditConstants.TYPE_download_crl;
+import static org.xipki.ca.sdk.CaAuditConstants.*;
 import static org.xipki.util.Args.notEmpty;
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.exception.ErrorCode.*;
@@ -261,39 +260,50 @@ public class X509Ca extends X509CaModule implements Closeable {
     return certstore.listCerts(caIdent, subjectPattern, validFrom, validTo, orderBy, numEntries);
   }
 
-  public X509CRLHolder getCurrentCrl() throws OperationException {
-    return getCrl(null);
+  public X509CRLHolder getCurrentCrl(RequestorInfo requestor) throws OperationException {
+    return getCrl(requestor, null);
   }
 
-  public X509CRLHolder getCrl(BigInteger crlNumber) throws OperationException {
-    AuditEvent event = newPerfAuditEvent(crlNumber == null ? TYPE_download_crl : TYPE_downlaod_crl4number);
-    boolean succ = false;
-    try {
-      X509CRLHolder ret = crlModule.getCrl(crlNumber, event);
-      succ = true;
-      return ret;
-    } finally {
-      finish(event, succ);
-    }
+  public X509CRLHolder getCrl(RequestorInfo requestor, BigInteger crlNumber) throws OperationException {
+    return crlModule.getCrl(requestor, crlNumber);
   } // method getCrl
 
-  public X509CRLHolder getCrl(BigInteger crlNumber, AuditEvent event) throws OperationException {
-    return crlModule.getCrl(crlNumber, event);
-  } // method getCrl
-
-  public X509CRLHolder generateCrlOnDemand() throws OperationException {
-    return crlModule.generateCrlOnDemand();
+  public X509CRLHolder generateCrlOnDemand(RequestorInfo requestor) throws OperationException {
+    return crlModule.generateCrlOnDemand(requestor);
   }
 
-  public CertificateInfo regenerateCert(CertTemplateData certTemplate, RequestorInfo requestor,
-      String transactionId, AuditEvent event) throws OperationException {
-    return regenerateCerts(Collections.singletonList(certTemplate), requestor, transactionId, event).get(0);
-  }
-
-  public List<CertificateInfo> regenerateCerts(List<CertTemplateData> certTemplates,
-      RequestorInfo requestor, String transactionId, AuditEvent event)
+  public CertificateInfo regenerateCert(RequestorInfo requestor, CertTemplateData certTemplate, String transactionId)
       throws OperationException {
-    return generateCerts(certTemplates, requestor, true, transactionId, event);
+    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_revoke_cert, requestor);
+    try {
+      CertificateInfo ret =
+          generateCerts(requestor, Collections.singletonList(certTemplate), true, transactionId, event).get(0);
+      finish(event, true);
+      return ret;
+    } catch (OperationException ex) {
+      if (!(ex instanceof OperationExceptionWithIndex)) {
+        event.addEventData(NAME_message, ex.getErrorMessage());
+      }
+      finish(event, false);
+      throw ex;
+    }
+  }
+
+  public List<CertificateInfo> regenerateCerts(
+      RequestorInfo requestor, List<CertTemplateData> certTemplates, String transactionId)
+      throws OperationException {
+    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_revoke_cert, requestor);
+    try {
+      List<CertificateInfo>  ret = generateCerts(requestor, certTemplates, true, transactionId, event);
+      finish(event, true);
+      return ret;
+    } catch (OperationException ex) {
+      if (!(ex instanceof OperationExceptionWithIndex)) {
+        event.addEventData(NAME_message, ex.getErrorMessage());
+      }
+      finish(event, false);
+      throw ex;
+    }
   }
 
   public boolean republishCerts(List<String> publisherNames, int numThreads) {
@@ -308,66 +318,61 @@ public class X509Ca extends X509CaModule implements Closeable {
     return publisherModule.publishCertsInQueue();
   }
 
-  public CertWithRevocationInfo revokeCert(BigInteger serialNumber, CrlReason reason, Date invalidityTime)
+  public CertWithRevocationInfo revokeCert(
+      RequestorInfo requestor, BigInteger serialNumber, CrlReason reason, Date invalidityTime)
       throws OperationException {
-    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_revoke_cert);
-    boolean succ = false;
+    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_revoke_cert, requestor);
     try {
       CertWithRevocationInfo ret = revokerModule.revokeCert(serialNumber, reason, invalidityTime, event);
-      succ = true;
+      finish(event, true);
       return ret;
-    } finally {
-      finish(event, succ);
+    } catch (OperationException ex) {
+      if (!(ex instanceof OperationExceptionWithIndex)) {
+        event.addEventData(NAME_message, ex.getErrorMessage());
+      }
+      finish(event, false);
+      throw ex;
     }
   }
 
-  public CertWithRevocationInfo revokeCert(BigInteger serialNumber, CrlReason reason,
-      Date invalidityTime, AuditEvent event) throws OperationException {
-    return revokerModule.revokeCert(serialNumber, reason, invalidityTime, event);
-  }
-
-  public CertWithDbId unsuspendCert(BigInteger serialNumber)
+  public CertWithDbId unsuspendCert(RequestorInfo requestor, BigInteger serialNumber)
       throws OperationException {
-    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_unsuspend_cert);
-    boolean succ = false;
+    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_unsuspend_cert, requestor);
     try {
-      CertWithDbId ret = unsuspendCert(serialNumber, event);
-      succ = true;
+      CertWithDbId ret = revokerModule.unsuspendCert(serialNumber, event);
+      finish(event, true);
       return ret;
-    } finally {
-      finish(event, succ);
+    } catch (OperationException ex) {
+      if (!(ex instanceof OperationExceptionWithIndex)) {
+        event.addEventData(NAME_message, ex.getErrorMessage());
+      }
+      finish(event, false);
+      throw ex;
     }
   }
 
-  public CertWithDbId unsuspendCert(BigInteger serialNumber, AuditEvent event)
+  public CertWithDbId removeCert(RequestorInfo requestor, BigInteger serialNumber)
       throws OperationException {
-    return revokerModule.unsuspendCert(serialNumber, event);
-  }
-
-  public CertWithDbId removeCert(BigInteger serialNumber)
-      throws OperationException {
-    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_remove_cert);
-    boolean succ = false;
+    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_remove_cert, requestor);
     try {
-      CertWithDbId ret = removeCert(serialNumber, event);
-      succ = true;
+      CertWithDbId ret = removerModule.removeCert(serialNumber, event);
+      finish(event, true);
       return ret;
-    } finally {
-      finish(event, succ);
+    } catch (OperationException ex) {
+      if (!(ex instanceof OperationExceptionWithIndex)) {
+        event.addEventData(NAME_message, ex.getErrorMessage());
+      }
+      finish(event, false);
+      throw ex;
     }
   }
 
-  public CertWithDbId removeCert(BigInteger serialNumber, AuditEvent event)
-      throws OperationException {
-    return removerModule.removeCert(serialNumber, event);
+  public void revokeCa(RequestorInfo requestor, CertRevocationInfo revocationInfo) throws OperationException {
+    revokerModule.revokeCa(requestor, revocationInfo);
   }
 
-  public void revokeCa(CertRevocationInfo revocationInfo) throws OperationException {
-    revokerModule.revokeCa(revocationInfo);
-  }
-
-  public void unrevokeCa() throws OperationException {
-    revokerModule.unrevokeCa();
+  public void unrevokeCa(RequestorInfo requestor) throws OperationException {
+    revokerModule.unrevokeCa(requestor);
   }
 
   public long addRequest(byte[] request) throws OperationException {
@@ -379,13 +384,24 @@ public class X509Ca extends X509CaModule implements Closeable {
   }
 
   public List<CertificateInfo> generateCerts(
-      List<CertTemplateData> certTemplates, RequestorInfo requestor, String transactionId, AuditEvent event)
+      RequestorInfo requestor, List<CertTemplateData> certTemplates, String transactionId)
       throws OperationException {
-    return generateCerts(certTemplates, requestor, false, transactionId, event);
+    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_revoke_cert, requestor);
+    try {
+      List<CertificateInfo> ret = generateCerts(requestor, certTemplates, false, transactionId, event);
+      finish(event, true);
+      return ret;
+    } catch (OperationException ex) {
+      if (!(ex instanceof OperationExceptionWithIndex)) {
+        event.addEventData(NAME_message, ex.getErrorMessage());
+      }
+      finish(event, false);
+      throw ex;
+    }
   }
 
   private List<CertificateInfo> generateCerts(
-      List<CertTemplateData> certTemplates, RequestorInfo requestor, boolean update,
+      RequestorInfo requestor, List<CertTemplateData> certTemplates, boolean update,
       String transactionId, AuditEvent event)
       throws OperationExceptionWithIndex {
     notEmpty(certTemplates, "certTemplates");
@@ -481,7 +497,7 @@ public class X509Ca extends X509CaModule implements Closeable {
         license.regulateSpeed();
         //-----end license-----
 
-        CertificateInfo certInfo = generateCert(i, gct, requestor, transactionId, event);
+        CertificateInfo certInfo = generateCert(requestor, i, gct, transactionId, event);
         successful = true;
         certInfos.add(certInfo);
 
@@ -511,7 +527,7 @@ public class X509Ca extends X509CaModule implements Closeable {
       for (CertificateInfo m : certInfos) {
         BigInteger serial = m.getCert().getCert().getSerialNumber();
         try {
-          removeCert(serial, event);
+          removeCert(requestor, serial);
         } catch (Throwable thr) {
           LogUtil.error(LOG, thr, "could not delete certificate serial=" + serial);
         }
@@ -525,34 +541,45 @@ public class X509Ca extends X509CaModule implements Closeable {
   }
 
   public CertificateInfo generateCert(
-      CertTemplateData certTemplate, RequestorInfo requestor, String transactionId, AuditEvent event)
+      RequestorInfo requestor, CertTemplateData certTemplate, String transactionId)
       throws OperationException {
     notNull(certTemplate, "certTemplate");
-    return generateCerts(Collections.singletonList(certTemplate), requestor, transactionId, event).get(0);
+    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_revoke_cert, requestor);
+    try {
+      CertificateInfo ret = generateCerts(requestor, Collections.singletonList(certTemplate),
+          false, transactionId, event).get(0);
+      finish(event, true);
+      return ret;
+    } catch (OperationException ex) {
+      if (!(ex instanceof OperationExceptionWithIndex)) {
+        event.addEventData(NAME_message, ex.getErrorMessage());
+      }
+      finish(event, false);
+      throw ex;
+    }
   }
 
   private CertificateInfo generateCert(
-      int index, GrantedCertTemplate gct, RequestorInfo requestor, String transactionId, AuditEvent event)
+      RequestorInfo requestor, int index, GrantedCertTemplate gct, String transactionId, AuditEvent event)
       throws OperationExceptionWithIndex {
-    boolean successful = false;
     try {
-      CertificateInfo ret = generateCert0(gct, requestor, transactionId, event);
-      successful = (ret != null);
+      CertificateInfo ret = generateCert0(requestor, gct, transactionId, event);
+      finish(event, ret != null);
+      setEventStatus(event, ret != null);
       return ret;
     } catch (OperationException ex) {
       event.addEventData(gct.certId + "." + CaAuditConstants.NAME_message, ex.getMessage());
+      setEventStatus(event, false);
       if (ex instanceof OperationExceptionWithIndex) {
         throw (OperationExceptionWithIndex) ex;
       } else {
         throw new OperationExceptionWithIndex(index, ex);
       }
-    } finally {
-      setEventStatus(event, successful);
     }
   }
 
   private CertificateInfo generateCert0(
-      GrantedCertTemplate gct, RequestorInfo requestor, String transactionId, AuditEvent event)
+      RequestorInfo requestor, GrantedCertTemplate gct, String transactionId, AuditEvent event)
       throws OperationException {
     notNull(gct, "gct");
 
