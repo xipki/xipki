@@ -143,6 +143,7 @@ public class HttpRaServlet extends HttpServlet {
     } finally {
       event.finish();
       auditService.logEvent(event);
+      event.log(LOG);
     }
   } // method service0
 

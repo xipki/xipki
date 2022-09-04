@@ -54,6 +54,8 @@ public class DatabaseMacAuditService extends MacAuditService {
 
   private static final String SQL_UPDATE_INTEGRITY = "UPDATE INTEGRITY SET TEXT=? WHERE ID=1";
 
+  private int maxMessageLength = 1000;
+
   private DataSourceWrapper datasource;
 
   public DatabaseMacAuditService() {
@@ -83,6 +85,9 @@ public class DatabaseMacAuditService extends MacAuditService {
   protected void storeLog(
           Instant date, long thisId, int eventType, String levelText,
           long previousId, String message, String thisTag) {
+    String logMessage = message.length() <= maxMessageLength
+        ? message : message.substring(0, maxMessageLength - 4) + " ...";
+
     try {
       PreparedStatement ps = datasource.prepareStatement(SQL_ADD_AUDIT);
       try {
@@ -93,7 +98,7 @@ public class DatabaseMacAuditService extends MacAuditService {
         ps.setString(idx++, levelText);
         ps.setInt   (idx++, eventType);
         ps.setLong  (idx++, previousId);
-        ps.setString(idx++, message);
+        ps.setString(idx++, logMessage);
         ps.setString(idx, thisTag);
         ps.executeUpdate();
       } catch (SQLException ex) {
@@ -121,6 +126,9 @@ public class DatabaseMacAuditService extends MacAuditService {
       }
 
       conn = datasource.getConnection();
+      String str = datasource.getFirstStringValue(conn, "DBSCHEMA", "VALUE2", "NAME='MAX_MESSAGE_LEN'");
+      this.maxMessageLength = str == null ? 1000: Integer.parseInt(str);
+
       long maxId = datasource.getMax(conn, "AUDIT", "ID", "SHARD_ID=" + shardId);
       if (maxId < 1) {
         id.set(0);

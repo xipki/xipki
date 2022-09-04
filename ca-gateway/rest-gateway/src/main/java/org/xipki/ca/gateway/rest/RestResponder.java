@@ -518,14 +518,9 @@ public class RestResponder {
     sdkReq.setCaCertMode(CertsMode.NONE);
 
     EnrollOrPollCertsResponse sdkResp = sdk.enrollCerts(caName, sdkReq);
-    List<EnrollOrPullCertResponseEntry> entries = sdkResp.getEntries();
-    int n = entries == null ? 0 : entries.size();
-    if (n != templates.size()) {
-      throw new HttpRespAuditException(INTERNAL_SERVER_ERROR,
-          "expected " + templates.size() + " cert, but received " + n, AuditLevel.INFO, AuditStatus.FAILED);
-    }
+    checkResponse(templates.size(), sdkResp);
 
-    EnrollOrPullCertResponseEntry entry = getEntry(entries, certId);
+    EnrollOrPullCertResponseEntry entry = getEntry(sdkResp.getEntries(), certId);
     if (!(caGenKeyPair || twin)) {
       return HttpRespContent.ofOk(RestAPIConstants.CT_pkix_cert, entry.getCert());
     }
@@ -535,12 +530,12 @@ public class RestResponder {
     bo.write(NEWLINE);
 
     if (caGenKeyPair) {
-      bo.write(PemEncoder.encode(entry.getCert(), PemLabel.PRIVATE_KEY));
+      bo.write(PemEncoder.encode(entry.getPrivateKey(), PemLabel.PRIVATE_KEY));
       bo.write(NEWLINE);
     }
 
     if (twin) {
-      entry = getEntry(entries, certIdEnc);
+      entry = getEntry(sdkResp.getEntries(), certIdEnc);
       bo.write(PemEncoder.encode(entry.getCert(), PemLabel.CERTIFICATE));
       bo.write(NEWLINE);
 
@@ -664,15 +659,28 @@ public class RestResponder {
     sdkReq.setCaCertMode(CertsMode.NONE);
 
     EnrollOrPollCertsResponse sdkResp = sdk.enrollCrossCerts(caName, sdkReq);
-    List<EnrollOrPullCertResponseEntry> entries = sdkResp.getEntries();
-    int n = entries == null ? 0 : entries.size();
-    if (n != templates.size()) {
-      throw new HttpRespAuditException(INTERNAL_SERVER_ERROR,
-          "expected " + templates.size() + " cert, but received " + n, AuditLevel.INFO, AuditStatus.FAILED);
+    checkResponse(templates.size(), sdkResp);
+
+    EnrollOrPullCertResponseEntry entry = getEntry(sdkResp.getEntries(), certId);
+    return HttpRespContent.ofOk(RestAPIConstants.CT_pkix_cert, entry.getCert());
+  }
+
+  private static void checkResponse(int expectedSize, EnrollOrPollCertsResponse resp) throws HttpRespAuditException {
+    List<EnrollOrPullCertResponseEntry> entries = resp.getEntries();
+    if (entries != null) {
+      for (EnrollOrPullCertResponseEntry entry : entries) {
+        if (entry.getError() != null) {
+          throw new HttpRespAuditException(INTERNAL_SERVER_ERROR,
+              entry.getError().toString(), AuditLevel.INFO, AuditStatus.FAILED);
+        }
+      }
     }
 
-    EnrollOrPullCertResponseEntry entry = getEntry(entries, certId);
-    return HttpRespContent.ofOk(RestAPIConstants.CT_pkix_cert, entry.getCert());
+    int n = entries == null ? 0 : entries.size();
+    if (n != expectedSize) {
+      throw new HttpRespAuditException(INTERNAL_SERVER_ERROR,
+          "expected " + expectedSize + " cert, but received " + n, AuditLevel.INFO, AuditStatus.FAILED);
+    }
   }
 
   private static String checkProfile(

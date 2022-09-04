@@ -21,6 +21,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.StringUtil;
 
@@ -87,35 +88,53 @@ public abstract class KeypairGenerator implements Closeable {
     }
 
     for (String token : tokens) {
-      if (token.indexOf('/') != -1) {
-        keyspecs.add(token);
-        continue;
-      }
-
-      switch (token) {
-        case "RSA":
-          for (int i = 2; i < 9; i++) {
-            keyspecs.add("RSA/" + (i * 1024));
-          }
-          break;
-        case "DSA":
-          keyspecs.add("DSA/1024/160");
-          keyspecs.add("DSA/2048/224");
-          keyspecs.add("DSA/2048/256");
-          keyspecs.add("DSA/3072/256");
-          break;
-        case "EC":
-          List<String> curveNames = AlgorithmUtil.getECCurveNames();
-          for (String curveName : curveNames) {
-            ASN1ObjectIdentifier curveId = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
-            if (curveId != null) {
-              String keyspec = "EC/" + curveId.getId();
-              keyspecs.add(keyspec);
+      try {
+        switch (token) {
+          case "RSA":
+            for (int i = 2; i < 9; i++) {
+              keyspecs.add("RSA/" + (i * 1024));
             }
-          }
-          break;
-        default:
-          keyspecs.add(token);
+            break;
+          case "DSA":
+            keyspecs.add("DSA/1024/160");
+            keyspecs.add("DSA/2048/224");
+            keyspecs.add("DSA/2048/256");
+            keyspecs.add("DSA/3072/256");
+            break;
+          case "EC":
+            List<String> curveNames = AlgorithmUtil.getECCurveNames();
+            for (String curveName : curveNames) {
+              ASN1ObjectIdentifier curveId = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
+              if (curveId != null) {
+                String keyspec = "EC/" + curveId.getId();
+                keyspecs.add(keyspec);
+              }
+            }
+            break;
+          default:
+            if (token.startsWith("EC/")) {
+              String nameOrOid = token.substring(3);
+              ASN1ObjectIdentifier curveId = AlgorithmUtil.getCurveOidForCurveNameOrOid(nameOrOid);
+              if (curveId == null) {
+                throw new XiSecurityException("invalid keyspec " + token);
+              } else {
+                String keyspec = "EC/" + curveId.getId();
+                keyspecs.add(keyspec);
+              }
+            } else if (token.startsWith("RSA/")) {
+              int keysize = Integer.parseInt(token.substring(4));
+              keyspecs.add("RSA/" + keysize);
+            } else if (token.startsWith("DSA/")) {
+              String[] strs = token.substring(4).split("/");
+              int pSize = Integer.parseInt(strs[0]);
+              int qSize = Integer.parseInt(strs[0]);
+              keyspecs.add("DSA/" + pSize + "/" + qSize);
+            } else {
+              keyspecs.add(token);
+            }
+        }
+      } catch (RuntimeException e) {
+        throw new XiSecurityException("invalid keyspec " + token);
       }
     }
 

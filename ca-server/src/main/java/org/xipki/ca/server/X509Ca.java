@@ -78,6 +78,8 @@ public class X509Ca extends X509CaModule implements Closeable {
 
   static class GrantedCertTemplate {
 
+    private final BigInteger certId;
+
     private final ConcurrentContentSigner signer;
     private final Extensions extensions;
     private final IdentifiedCertprofile certprofile;
@@ -91,10 +93,10 @@ public class X509Ca extends X509CaModule implements Closeable {
     private X500Name grantedSubject;
     private String grantedSubjectText;
 
-    GrantedCertTemplate(Extensions extensions, IdentifiedCertprofile certprofile,
-        Date grantedNotBefore, Date grantedNotAfter, X500Name requestedSubject,
-        SubjectPublicKeyInfo grantedPublicKey, PrivateKeyInfo privateKey,
-        ConcurrentContentSigner signer, String warning) {
+    GrantedCertTemplate(BigInteger certId, Extensions extensions, IdentifiedCertprofile certprofile,
+        Date grantedNotBefore, Date grantedNotAfter, X500Name requestedSubject, SubjectPublicKeyInfo grantedPublicKey,
+        PrivateKeyInfo privateKey, ConcurrentContentSigner signer, String warning) {
+      this.certId = certId == null ? BigInteger.ZERO : certId;
       this.extensions = extensions;
       this.certprofile = certprofile;
       this.grantedNotBefore = grantedNotBefore;
@@ -109,6 +111,23 @@ public class X509Ca extends X509CaModule implements Closeable {
     void setGrantedSubject(X500Name subject) {
       this.grantedSubject = subject;
       this.grantedSubjectText = X509Util.x500NameText(subject);
+    }
+
+    void audit(AuditEvent event) {
+      String prefix = certId + ".";
+      if (!grantedSubject.equals(requestedSubject)) {
+        event.addEventData(prefix + CaAuditConstants.NAME_req_subject,
+            "\"" + X509Util.x500NameText(requestedSubject) + "\"");
+      }
+
+      event.addEventData(prefix + CaAuditConstants.NAME_subject,
+          "\"" + X509Util.x500NameText(grantedSubject) + "\"");
+      event.addEventData(prefix + CaAuditConstants.NAME_certprofile,
+          certprofile.getIdent().getName());
+      event.addEventData(prefix + CaAuditConstants.NAME_not_before,
+          DateUtil.toUtcTimeyyyyMMddhhmmss(grantedNotBefore));
+      event.addEventData(prefix + CaAuditConstants.NAME_not_after,
+          DateUtil.toUtcTimeyyyyMMddhhmmss(grantedNotAfter));
     }
   }
 
@@ -413,10 +432,13 @@ public class X509Ca extends X509CaModule implements Closeable {
               "unknown cert profile " + certTemplate.getCertprofileName());
         }
 
-        gcts.add(grandCertTemplateBuilder.create(certprofile, certTemplate, keypairGenerators, update));
+        GrantedCertTemplate gct = grandCertTemplateBuilder.create(certprofile, certTemplate, keypairGenerators, update);
+        gct.audit(event);
+        gcts.add(gct);
       } catch (OperationException ex) {
         LOG.error("     FAILED createGrantedCertTemplate: CA={}, profile={}, subject='{}'",
             caIdent.getName(), certTemplate.getCertprofileName(), certTemplate.getSubject());
+        event.addEventData(certTemplate.getCertReqId() + "." + CaAuditConstants.NAME_message, ex.getMessage());
         throw new OperationExceptionWithIndex(i, ex);
       }
     }
@@ -459,7 +481,7 @@ public class X509Ca extends X509CaModule implements Closeable {
         license.regulateSpeed();
         //-----end license-----
 
-        CertificateInfo certInfo = generateCert(gct, requestor, transactionId, event);
+        CertificateInfo certInfo = generateCert(i, gct, requestor, transactionId, event);
         successful = true;
         certInfos.add(certInfo);
 
@@ -510,13 +532,20 @@ public class X509Ca extends X509CaModule implements Closeable {
   }
 
   private CertificateInfo generateCert(
-      GrantedCertTemplate gct, RequestorInfo requestor, String transactionId, AuditEvent event)
-      throws OperationException {
+      int index, GrantedCertTemplate gct, RequestorInfo requestor, String transactionId, AuditEvent event)
+      throws OperationExceptionWithIndex {
     boolean successful = false;
     try {
       CertificateInfo ret = generateCert0(gct, requestor, transactionId, event);
       successful = (ret != null);
       return ret;
+    } catch (OperationException ex) {
+      event.addEventData(gct.certId + "." + CaAuditConstants.NAME_message, ex.getMessage());
+      if (ex instanceof OperationExceptionWithIndex) {
+        throw (OperationExceptionWithIndex) ex;
+      } else {
+        throw new OperationExceptionWithIndex(index, ex);
+      }
     } finally {
       setEventStatus(event, successful);
     }
@@ -526,15 +555,6 @@ public class X509Ca extends X509CaModule implements Closeable {
       GrantedCertTemplate gct, RequestorInfo requestor, String transactionId, AuditEvent event)
       throws OperationException {
     notNull(gct, "gct");
-
-    if (!gct.grantedSubject.equals(gct.requestedSubject)) {
-      event.addEventData(CaAuditConstants.NAME_req_subject, "\"" + X509Util.x500NameText(gct.requestedSubject) + "\"");
-    }
-
-    event.addEventData(CaAuditConstants.NAME_subject, "\"" + X509Util.x500NameText(gct.grantedSubject) + "\"");
-    event.addEventData(CaAuditConstants.NAME_certprofile, gct.certprofile.getIdent().getName());
-    event.addEventData(CaAuditConstants.NAME_not_before, DateUtil.toUtcTimeyyyyMMddhhmmss(gct.grantedNotBefore));
-    event.addEventData(CaAuditConstants.NAME_not_after, DateUtil.toUtcTimeyyyyMMddhhmmss(gct.grantedNotAfter));
 
     IdentifiedCertprofile certprofile = gct.certprofile;
 
@@ -548,6 +568,8 @@ public class X509Ca extends X509CaModule implements Closeable {
             + " is required but CTLog of the CA is not activated");
       }
     }
+
+    String auditPrefix = gct.certId + ".";
 
     String serialNumberMode = certprofile.getSerialNumberMode();
 
@@ -570,11 +592,14 @@ public class X509Ca extends X509CaModule implements Closeable {
           // if the CertProfile generates always the serial number for fixed input,
           // do not repeat this process.
           if (serialNumber.equals(previousSerialNumber)) {
-            break;
+            String message = "serialNumber generated by the profile " + certprofile.getIdent().getName()
+                + " has been used before.";
+            throw new OperationException(BAD_CERT_TEMPLATE, message);
           }
         } catch (CertprofileException ex) {
-          LogUtil.error(LOG, ex, "error generateSerialNumber");
-          throw new OperationException(SYSTEM_FAILURE, "unknown SerialNumberMode '" + serialNumberMode + "'");
+          String message = "error generateSerialNumber";
+          LogUtil.error(LOG, ex, message);
+          throw new OperationException(SYSTEM_FAILURE, message);
         }
       } else {
         throw new OperationException(BAD_CERT_TEMPLATE, "unknown SerialNumberMode '" + serialNumberMode + "'");
@@ -584,6 +609,8 @@ public class X509Ca extends X509CaModule implements Closeable {
           break;
       }
     }
+
+    event.addEventData(auditPrefix + CaAuditConstants.NAME_serial, LogUtil.formatCsn(serialNumber));
 
     X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
         caInfo.getPublicCaInfo().getSubject(), serialNumber, gct.grantedNotBefore,
@@ -630,8 +657,7 @@ public class X509Ca extends X509CaModule implements Closeable {
           throw new OperationException(SYSTEM_FAILURE, "ctLog not configured for CA " + caInfo.getIdent().getName());
         }
 
-        SignedCertificateTimestampList scts =
-            ctlogClient.getCtLogScts(precert, caCert, caInfo.getCertchain(), finder);
+        SignedCertificateTimestampList scts = ctlogClient.getCtLogScts(precert, caCert, caInfo.getCertchain(), finder);
 
         // remove the precertificate extension
         certBuilder.removeExtension(Extn.id_precertificate);
@@ -671,7 +697,6 @@ public class X509Ca extends X509CaModule implements Closeable {
       }
 
       X509Cert cert = new X509Cert(bcCert, encodedCert);
-      event.addEventData(CaAuditConstants.NAME_serial, LogUtil.formatCsn(cert.getSerialNumber()));
       if (!verifySignature(cert)) {
         throw new OperationException(SYSTEM_FAILURE, "could not verify the signature of generated certificate");
       }

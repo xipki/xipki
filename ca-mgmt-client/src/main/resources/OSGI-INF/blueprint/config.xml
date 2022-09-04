@@ -3,7 +3,7 @@
     xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
   <cm:property-placeholder persistent-id="org.xipki.ca.mgmt.client">
     <cm:default-properties>
-      <cm:property name="serverUrl" value="https://localhost:8443/ca/mgmt"/>
+      <cm:property name="serverUrl" value="https://localhost:8444/ca/mgmt"/>
       <cm:property name="useSslConf" value="false" />
       <cm:property name="ssl.storeType" value="" />
       <cm:property name="ssl.keystore" value="" />

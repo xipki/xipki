@@ -51,7 +51,7 @@ import java.util.*;
  * @author Lijun Liao
  */
 
-public class FillKeytool {
+public class FillKeytool implements AutoCloseable {
 
   private static final int ENCALG_AES128GCM = 1;
 
@@ -68,6 +68,13 @@ public class FillKeytool {
     this.passwordResolver = passwordResolver;
     try (InputStream dbConfStream = Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile)))) {
       this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, dbConfStream, passwordResolver);
+    }
+  }
+
+  @Override
+  public void close() {
+    if (datasource != null) {
+      datasource.close();
     }
   }
 

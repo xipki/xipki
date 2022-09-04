@@ -21,6 +21,9 @@ import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.ConfPairs;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 /**
  * Keypair generation entry.
  * @author Lijun Liao
@@ -79,7 +82,8 @@ public class KeypairGenEntry extends MgmtEntry {
     } else {
       if (ignoreSensitiveInfo) {
         try {
-          sb.append(new ConfPairs(conf).toStringOmitSensitive("key"));
+          sb.append(new ConfPairs(conf).toStringOmitSensitive(
+              Arrays.asList("key", "password"), Collections.singletonList("keyspec")));
         } catch (Exception ex) {
           sb.append(conf);
         }

@@ -23,6 +23,7 @@
     <bundle>mvn:io.netty/netty-transport-native-unix-common/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-transport-native-epoll/${netty.version}/jar/linux-x86_64</bundle>
     <bundle>mvn:org.xipki/certprofile-xijson/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-sdk/${project.version}</bundle>
     <bundle>mvn:org.xipki/qa/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/qa-shell/${project.version}</bundle>
   </feature>

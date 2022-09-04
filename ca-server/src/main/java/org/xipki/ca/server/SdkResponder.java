@@ -387,7 +387,7 @@ public class SdkResponder {
           try {
             oldCert = caManager.getCert(issuer, serialNumber);
           } catch (CaMgmtException ex) {
-            // TODO: LOG me
+            LogUtil.warn(LOG, ex, "error in caManager.getCert");
             throw new OperationException(SYSTEM_FAILURE,
                 "error while finding certificate with the issuer " + issuer + "and serial number " + serialNumber);
           }
@@ -799,6 +799,9 @@ public class SdkResponder {
         fillResponseEntry(rentry, certInfo);
       } catch (OperationException ex) {
         event.setStatus(AuditStatus.FAILED);
+        if (! (ex instanceof X509Ca.OperationExceptionWithIndex)) {
+          event.addEventData(NAME_message, ex.getMessage());
+        }
         rentry.setError(new ErrorEntry(ex.getErrorCode(), ex.getErrorMessage()));
       }
 

@@ -170,7 +170,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     }
 
     if (cd == null) {
-      throw new XiSecurityException("found no keypair of spec " + keyspec + "in the keypool");
+      throw new XiSecurityException("found no keypair of spec " + keyspec + " in the keypool");
     }
 
     GCMParameterSpec spec = new GCMParameterSpec(128, cd.encMeta);

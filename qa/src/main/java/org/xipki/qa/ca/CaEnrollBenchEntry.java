@@ -140,7 +140,7 @@ public class CaEnrollBenchEntry {
     this.subject = new IncreasableSubject(subjectTemplate, randomDn);
   }
 
-  public SubjectPublicKeyInfo getSubjectPublicKeyInfo() {
+  public SubjectPublicKeyInfo getSubjectPublicKeyInfo() throws Exception {
     return keyEntry == null ? null : keyEntry.getSubjectPublicKeyInfo();
   }
 

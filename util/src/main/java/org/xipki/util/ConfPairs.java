@@ -311,14 +311,20 @@ public class ConfPairs {
   }
 
   public String toStringOmitSensitive(String... nameKeywords) {
+    return toStringOmitSensitive(Arrays.asList(nameKeywords), null);
+  }
+
+  public String toStringOmitSensitive(Collection<String> nameKeywords, Collection<String> ignoreList) {
     Set<String> names = new HashSet<>();
     for (Entry<String, String> entry : pairs.entrySet()) {
       String lname = entry.getKey().toLowerCase();
-      for (String nameKeyword : nameKeywords) {
-        if (lname.contains(nameKeyword)) {
-          names.add(entry.getKey());
-          break;
-        }
+      boolean sensitive = contains(lname, nameKeywords);
+      if (sensitive) {
+        sensitive = ignoreList == null || !contains(lname, ignoreList);
+      }
+
+      if (sensitive) {
+        names.add(entry.getKey());
       }
     }
 
@@ -337,6 +343,15 @@ public class ConfPairs {
     } catch (Exception ex) {
       return getEncoded();
     }
+  }
+
+  private static boolean contains(String name, Collection<String> list) {
+    for (String m : list) {
+      if (name.contains(m.toLowerCase(Locale.ROOT))) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

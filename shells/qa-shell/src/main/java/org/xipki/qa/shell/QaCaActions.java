@@ -218,7 +218,7 @@ public class QaCaActions {
 
   } // class CaAliasCheck
 
-  private static abstract  class AbstractCmpBenchmarkEnroll extends XiAction {
+  private static abstract  class AbstractBenchmarkEnroll extends XiAction {
 
     @Option(name = "--profile", aliases = "-p", required = true,
             description = "certificate profile that allows duplication of public key")
@@ -248,9 +248,10 @@ public class QaCaActions {
     protected Integer queueSize = 50;
   }
 
-  @Command(scope = "xiqa", name = "cmp-benchmark-cagen-enroll", description = "CA client enroll (benchmark)")
+  @Command(scope = "xiqa", name = "benchmark-enroll-genkey",
+      description = "Enroll certificate (CA generates keypairs, benchmark)")
   @Service
-  public static class CmpBenchmarkCaGenEnroll extends AbstractCmpBenchmarkEnroll {
+  public static class BenchmarkCaGenEnroll extends AbstractBenchmarkEnroll {
     @Override
     protected Object execute0() throws Exception {
       if (numThreads < 1) {
@@ -279,10 +280,10 @@ public class QaCaActions {
     } // method execute0
   }
 
-  @Command(scope = "xiqa", name = "cmp-benchmark-enroll",
-      description = "CA client enroll (benchmark)")
+  @Command(scope = "xiqa", name = "benchmark-enroll",
+      description = "Enroll certificate (benchmark)")
   @Service
-  public static class CmpBenchmarkEnroll extends AbstractCmpBenchmarkEnroll {
+  public static class BenchmarkEnroll extends AbstractBenchmarkEnroll {
 
     @Completion(value = StringsCompleter.class, values = {"RSA", "EC", "DSA"})
     @Option(name = "--key-type", description = "key type to be requested")
@@ -294,6 +295,9 @@ public class QaCaActions {
     @Option(name = "--curve", description = "EC curve name or OID of EC key")
     @Completion(Completers.ECCurveNameCompleter.class)
     private String curveName;
+
+    @Option(name = "--new-key", description = "Generate different keypair for each certificate")
+    private boolean newKey = false;
 
     @Override
     protected Object execute0() throws Exception {
@@ -322,11 +326,11 @@ public class QaCaActions {
         if (curveOid == null) {
           curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
         }
-        keyEntry = new ECKeyEntry(curveOid);
+        keyEntry = new ECKeyEntry(curveOid, !newKey);
       } else if ("RSA".equalsIgnoreCase(keyType)) {
-        keyEntry = new RSAKeyEntry(keysize);
+        keyEntry = new RSAKeyEntry(keysize, !newKey);
       } else if ("DSA".equalsIgnoreCase(keyType)) {
-        keyEntry = new DSAKeyEntry(keysize);
+        keyEntry = new DSAKeyEntry(keysize, !newKey);
       } else {
         throw new IllegalCmdParamException("invalid keyType " + keyType);
       }
@@ -423,7 +427,7 @@ public class QaCaActions {
 
       // Keep expired certificate
       if (ey.getKeepExpiredCertInDays() != null) {
-        assertObjEquals("keepExiredCertInDays", ey.getKeepExpiredCertInDays(), ca.getKeepExpiredCertInDays());
+        assertObjEquals("keepExpiredCertInDays", ey.getKeepExpiredCertInDays(), ca.getKeepExpiredCertInDays());
       }
 
       // Num CRLs

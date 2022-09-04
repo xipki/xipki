@@ -17,6 +17,7 @@
 
 package org.xipki.audit;
 
+import org.slf4j.Logger;
 import org.xipki.util.Args;
 
 import java.util.Collections;
@@ -72,7 +73,11 @@ public class AuditEvent {
   }
 
   public AuditLevel getLevel() {
-    return level;
+    if (status == AuditStatus.FAILED && AuditLevel.INFO == level) {
+      return AuditLevel.WARN;
+    } else {
+      return level;
+    }
   }
 
   public void setLevel(AuditLevel level) {
@@ -158,7 +163,14 @@ public class AuditEvent {
   }
 
   public void setStatus(AuditStatus status) {
-    this.status = Args.notNull(status, "status");
+    Args.notNull(status, "status");
+    if (this.status == status) {
+      return;
+    } else if (this.status == AuditStatus.FAILED) {
+      return;
+    } else {
+      this.status = status;
+    }
   }
 
   public void finish() {
@@ -208,5 +220,16 @@ public class AuditEvent {
 
     return sb.toString();
   } // method toTextMessage
+
+  public void log(Logger log) {
+    AuditLevel level = getLevel();
+    if (level == AuditLevel.ERROR) {
+      log.error(toTextMessage());
+    } else if (level == AuditLevel.WARN) {
+      log.warn(toTextMessage());
+    } else {
+      log.info(toTextMessage());
+    }
+  }
 
 }

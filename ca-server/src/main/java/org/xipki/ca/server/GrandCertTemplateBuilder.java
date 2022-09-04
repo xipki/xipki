@@ -31,12 +31,14 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.AuditEvent;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.KeypairGenControl;
 import org.xipki.ca.api.profile.NotAfterMode;
+import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.server.X509Ca.GrantedCertTemplate;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.security.ConcurrentContentSigner;
@@ -44,6 +46,7 @@ import org.xipki.security.KeypairGenerator;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.RSABrokenKey;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.DateUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.Validity;
 import org.xipki.util.exception.BadCertTemplateException;
@@ -93,6 +96,8 @@ class GrandCertTemplateBuilder {
       IdentifiedCertprofile certprofile, CertTemplateData certTemplate,
       List<KeypairGenerator> keypairGenerators, boolean update)
       throws OperationException {
+    String prefix = certTemplate.getCertReqId() + ".";
+
     if (caInfo.getRevocationInfo() != null) {
       throw new OperationException(NOT_PERMITTED, "CA is revoked");
     }
@@ -403,8 +408,9 @@ class GrandCertTemplateBuilder {
     if (msgBuilder.length() > 2) {
       warning = msgBuilder.substring(2);
     }
-    GrantedCertTemplate gct = new GrantedCertTemplate(certTemplate.getExtensions(), certprofile,
-        grantedNotBefore, grantedNotAfter, requestedSubject, grantedPublicKeyInfo, privateKey, signer, warning);
+    GrantedCertTemplate gct = new GrantedCertTemplate(
+        certTemplate.getCertReqId(), certTemplate.getExtensions(), certprofile, grantedNotBefore, grantedNotAfter,
+        requestedSubject, grantedPublicKeyInfo, privateKey, signer, warning);
     gct.setGrantedSubject(grantedSubject);
     return gct;
 

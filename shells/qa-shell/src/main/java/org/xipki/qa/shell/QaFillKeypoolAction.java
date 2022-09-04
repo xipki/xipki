@@ -59,8 +59,9 @@ public class QaFillKeypoolAction extends XiAction {
       passwordChars = password.toCharArray();
     }
 
-    FillKeytool fillKeytool = new FillKeytool(datasourceFactory, passwordResolver, dbconfFile);
-    fillKeytool.execute(num, encAlg, passwordChars);
+    try (FillKeytool fillKeytool = new FillKeytool(datasourceFactory, passwordResolver, dbconfFile)) {
+      fillKeytool.execute(num, encAlg, passwordChars);
+    }
     return null;
   }
 }

@@ -31,9 +31,7 @@ import org.xipki.util.Base64;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.SecureRandom;
+import java.security.*;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -90,14 +88,23 @@ public abstract class CaEnrollBenchKeyEntry {
 
     private static final BigInteger PUBLIC_EXPONENT = BigInteger.valueOf(65535);
 
-    private final SubjectPublicKeyInfo spki;
+    private static final AlgorithmIdentifier keyAlgId =
+        new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
 
-    public RSAKeyEntry(int keysize) throws Exception {
+    private SubjectPublicKeyInfo spki;
+
+    private KeyPairGenerator keyPairGenerator;
+
+    public RSAKeyEntry(int keysize, boolean reuse) throws Exception {
       if (keysize % 1024 != 0) {
         throw new IllegalArgumentException("invalid RSA keysize " + keysize);
       }
 
-      AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
+      if (!reuse) {
+        keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(keysize);
+        return;
+      }
 
       String modulusStr;
       if (keysize == 1024 || keysize == 2048 || keysize == 3072 || keysize == 4096) {
@@ -113,22 +120,29 @@ public abstract class CaEnrollBenchKeyEntry {
         BigInteger modulus = base64ToInt(modulusStr);
         this.spki = new SubjectPublicKeyInfo(keyAlgId,
             new org.bouncycastle.asn1.pkcs.RSAPublicKey(modulus, PUBLIC_EXPONENT));
-      } else {
+      }
+      else {
         KeyPairGenerator kp = KeyPairGenerator.getInstance("RSA");
         kp.initialize(keysize);
         RSAPublicKey publicKey = (RSAPublicKey) kp.generateKeyPair().getPublic();
         this.spki = new SubjectPublicKeyInfo(keyAlgId,
             new org.bouncycastle.asn1.pkcs.RSAPublicKey(publicKey.getModulus(), publicKey.getPublicExponent()));
       }
-    } // constructor
+    }
 
     private static BigInteger base64ToInt(String base64Str) {
       return new BigInteger(1, Base64.decode(base64Str));
     }
 
     @Override
-    public SubjectPublicKeyInfo getSubjectPublicKeyInfo() {
-      return spki;
+    public SubjectPublicKeyInfo getSubjectPublicKeyInfo() throws Exception {
+      if (spki != null) {
+        return spki;
+      }
+
+      RSAPublicKey publicKey = (RSAPublicKey) keyPairGenerator.generateKeyPair().getPublic();
+      return new SubjectPublicKeyInfo(keyAlgId,
+          new org.bouncycastle.asn1.pkcs.RSAPublicKey(publicKey.getModulus(), publicKey.getPublicExponent()));
     }
 
   } // class RSAKeyEntry
@@ -213,7 +227,14 @@ public abstract class CaEnrollBenchKeyEntry {
 
     private SubjectPublicKeyInfo spki;
 
-    public DSAKeyEntry(int plength) throws Exception {
+    private int plength;
+
+    public DSAKeyEntry(int plength, boolean reuse) throws Exception {
+      if (!reuse) {
+        this.plength = plength;
+        return;
+      }
+
       if (plength == 1024) {
         init(P_1024, Q_1024, G_1024, Y_1024);
       } else if (plength == 2048) {
@@ -229,7 +250,7 @@ public abstract class CaEnrollBenchKeyEntry {
         KeyPair kp = KeyUtil.generateDSAKeypair(plength, qlength, new SecureRandom());
         DSAPublicKey pk = (DSAPublicKey) kp.getPublic();
 
-        init(pk.getParams().getP(), pk.getParams().getQ(), pk.getParams().getG(), pk.getY());
+        this.spki = buildSpki(pk.getParams().getP(), pk.getParams().getQ(), pk.getParams().getG(), pk.getY());
       }
     }
 
@@ -238,10 +259,10 @@ public abstract class CaEnrollBenchKeyEntry {
     }
 
     private void init(String p, String q, String g, String y) throws IOException {
-      init(base64ToInt(p), base64ToInt(q), base64ToInt(g), base64ToInt(y));
+      this.spki = buildSpki(base64ToInt(p), base64ToInt(q), base64ToInt(g), base64ToInt(y));
     }
 
-    private void init(BigInteger p, BigInteger q, BigInteger g, BigInteger y)
+    private static SubjectPublicKeyInfo buildSpki(BigInteger p, BigInteger q, BigInteger g, BigInteger y)
         throws IOException {
       ASN1EncodableVector vec = new ASN1EncodableVector();
       vec.add(new ASN1Integer(p));
@@ -249,45 +270,70 @@ public abstract class CaEnrollBenchKeyEntry {
       vec.add(new ASN1Integer(g));
       ASN1Sequence dssParams = new DERSequence(vec);
       AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, dssParams);
-      this.spki = new SubjectPublicKeyInfo(algId, new ASN1Integer(y));
+      return new SubjectPublicKeyInfo(algId, new ASN1Integer(y));
     }
 
     @Override
-    public SubjectPublicKeyInfo getSubjectPublicKeyInfo() {
-      return spki;
+    public SubjectPublicKeyInfo getSubjectPublicKeyInfo() throws Exception {
+      if (spki != null) {
+        return spki;
+      }
+
+      int qlength = (plength >= 2048) ? 256 : 160;
+      KeyPair kp = KeyUtil.generateDSAKeypair(plength, qlength, new SecureRandom());
+      DSAPublicKey pk = (DSAPublicKey) kp.getPublic();
+
+      return buildSpki(pk.getParams().getP(), pk.getParams().getQ(), pk.getParams().getG(), pk.getY());
     }
 
   } // class DSAKeyEntry
 
-public static final class ECKeyEntry extends CaEnrollBenchKeyEntry {
+  public static final class ECKeyEntry extends CaEnrollBenchKeyEntry {
 
-    private final SubjectPublicKeyInfo spki;
+    private SubjectPublicKeyInfo spki;
 
-    public ECKeyEntry(final ASN1ObjectIdentifier curveOid) throws Exception {
+    private KeyPairGenerator keyPairGenerator;
+
+    public ECKeyEntry(final ASN1ObjectIdentifier curveOid, boolean reuse) throws Exception {
+      if (!reuse) {
+        if (!EdECConstants.isEdwardsOrMontgomeryCurve(curveOid)) {
+          keyPairGenerator = initKeyPairGenrator(curveOid);
+        }
+        return;
+      }
+
+      this.spki = buildSpki(curveOid);
+    }
+
+    private SubjectPublicKeyInfo buildSpki(ASN1ObjectIdentifier curveOid) throws Exception {
       notNull(curveOid, "curveOid");
       KeyPair keypair;
 
       if (EdECConstants.isEdwardsOrMontgomeryCurve(curveOid)) {
         keypair = KeyUtil.generateEdECKeypair(curveOid, null);
-        this.spki = KeyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
+        return KeyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
       } else {
-        String curveName = AlgorithmUtil.getCurveName(curveOid);
-        if (curveName == null) {
-          curveName = curveOid.getId();
-        }
-
+        KeyPairGenerator kpgen = keyPairGenerator != null ? keyPairGenerator : initKeyPairGenrator(curveOid);
         AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveOid);
-
-        KeyPairGenerator kpgen = KeyPairGenerator.getInstance("ECDSA", "BC");
-        ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveName);
-        kpgen.initialize(spec);
         KeyPair kp = kpgen.generateKeyPair();
 
         ECPublicKey pub = (ECPublicKey) kp.getPublic();
         int orderBitLength = pub.getParams().getOrder().bitLength();
         byte[] keyData = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), orderBitLength);
-        spki = new SubjectPublicKeyInfo(algId, keyData);
+        return new SubjectPublicKeyInfo(algId, keyData);
       }
+    }
+
+    private static KeyPairGenerator initKeyPairGenrator(ASN1ObjectIdentifier curveOid) throws Exception {
+      String curveName = AlgorithmUtil.getCurveName(curveOid);
+      if (curveName == null) {
+        curveName = curveOid.getId();
+      }
+
+      KeyPairGenerator kpgen = KeyPairGenerator.getInstance("ECDSA", "BC");
+      ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveName);
+      kpgen.initialize(spec);
+      return kpgen;
     }
 
     @Override
@@ -297,6 +343,6 @@ public static final class ECKeyEntry extends CaEnrollBenchKeyEntry {
 
   } // class ECKeyEntry
 
-  public abstract SubjectPublicKeyInfo getSubjectPublicKeyInfo();
+  public abstract SubjectPublicKeyInfo getSubjectPublicKeyInfo() throws IOException, Exception;
 
 }

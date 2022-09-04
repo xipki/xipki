@@ -43,4 +43,19 @@ public class ErrorEntry {
     this.message = message;
   }
 
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    try {
+      sb.append(ErrorCode.ofCode(code).name());
+    } catch (Exception e) {
+      sb.append("Unknown code " + code);
+    }
+
+    if (message != null) {
+      sb.append(", message: ").append(message);
+    }
+    return sb.toString();
+  }
+
 }

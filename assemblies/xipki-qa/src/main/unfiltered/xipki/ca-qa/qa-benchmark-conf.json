@@ -1,5 +1,5 @@
 {
-	"caUrl":"https://localhost:8443/ca/cmp/subca",
+	"caUrl":"https://localhost:8444/ca/ra/subca/",
 	"requestorCert":"xipki/keycerts/tlskeys/client/tls-client-cert.der",
 	"responderCert":"xipki/keycerts/tlskeys/server/tls-server-cert.der",
 	"ssl":{

@@ -22,17 +22,15 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.ssl.SslContext;
-import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.cmp.*;
-import org.bouncycastle.asn1.crmf.*;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.sdk.*;
 import org.xipki.qa.BenchmarkHttpClient;
 import org.xipki.qa.BenchmarkHttpClient.HttpClientException;
 import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.qa.BenchmarkHttpClient.SslConf;
+import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.BenchmarkExecutor;
@@ -50,7 +48,10 @@ import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -70,38 +71,14 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
 
     private String caUrl;
 
-    private String requestorCert;
-
-    private String responderCert;
-
     private SslConf ssl;
-
-    private GeneralName requestor;
-
-    private GeneralName responder;
 
     public String getCaUrl() {
       return caUrl;
     }
 
     public void setCaUrl(String caUrl) {
-      this.caUrl = caUrl;
-    }
-
-    public String getRequestorCert() {
-      return requestorCert;
-    }
-
-    public void setRequestorCert(String requestorCert) {
-      this.requestorCert = requestorCert;
-    }
-
-    public String getResponderCert() {
-      return responderCert;
-    }
-
-    public void setResponderCert(String responderCert) {
-      this.responderCert = responderCert;
+      this.caUrl = caUrl.endsWith("/") ? caUrl : caUrl + "/";
     }
 
     public SslConf getSsl() {
@@ -112,26 +89,8 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       this.ssl = ssl;
     }
 
-    public GeneralName requestor() throws CertificateException, IOException {
-      if (requestor == null && requestorCert != null) {
-        X500Name subject = X509Util.parseCert(new File(requestorCert)).getSubject();
-        requestor = new GeneralName(subject);
-      }
-      return requestor;
-    }
-
-    public GeneralName responder() throws CertificateException, IOException {
-      if (responder == null && responderCert != null) {
-        X500Name subject = X509Util.parseCert(new File(responderCert)).getSubject();
-        responder = new GeneralName(subject);
-      }
-      return responder;
-    }
-
     @Override
     public void validate() throws InvalidConfException {
-      notBlank(requestorCert, "requestorCert");
-      notBlank(responderCert, "responderCert");
       notBlank(caUrl, "caUrl");
       notNull(ssl, "ssl");
       validate(ssl);
@@ -153,16 +112,16 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
     public void run() {
       while (!stop() && getErrorAccout() < 1) {
         try {
-          PKIMessage certReq = nextCertRequest();
+          SdkRequest certReq = nextCertRequest();
           if (certReq == null) {
             break;
           }
 
           testNext(certReq);
-        } catch (HttpClientException | CertificateException | IOException ex) {
+        } catch (Exception ex) {
           LOG.warn("exception", ex);
           account(1, 1);
-        } catch (RuntimeException | Error ex) {
+        } catch (Error ex) {
           LOG.warn("unexpected exception", ex);
           account(1, 1);
         }
@@ -175,10 +134,12 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       }
     }
 
-    private void testNext(PKIMessage certReq) throws HttpClientException, IOException {
-      byte[] encoded = certReq.getEncoded();
+    private void testNext(SdkRequest request) throws HttpClientException, IOException {
+      SdkClient client = null;
+      byte[] encoded = request.encode();
       ByteBuf content = Unpooled.wrappedBuffer(encoded);
-      FullHttpRequest httpReq = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, conf.caUrl, content);
+      FullHttpRequest httpReq = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST,
+          conf.caUrl + "enroll", content);
       httpReq.headers().addInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes())
         .add(HttpHeaderNames.CONTENT_TYPE, REQUEST_MIMETYPE);
       httpClient.send(httpReq);
@@ -188,14 +149,9 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
 
   private static final String CONf_FILE = "xipki/ca-qa/qa-benchmark-conf.json";
 
-  private static final String REQUEST_MIMETYPE = "application/pkixcmp";
+  private static final String REQUEST_MIMETYPE = "application/json";
 
-  private static final String RESPONSE_MIMETYPE = "application/pkixcmp";
-
-  private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();
-
-  private static final InfoTypeAndValue IMPLICIT_CONFIRM =
-      new InfoTypeAndValue(CMPObjectIdentifiers.it_implicitConfirm, DERNull.INSTANCE);
+  private static final String RESPONSE_MIMETYPE = "application/json";
 
   private static final Logger LOG = LoggerFactory.getLogger(CaEnrollBenchmark.class);
 
@@ -219,13 +175,13 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
 
   private final int maxRequests;
 
-  private final SslContext sslContext;
+  private SslContext sslContext;
 
   private final boolean caGenKeyPair;
 
   public CaEnrollBenchmark(
       CaEnrollBenchEntry benchmarkEntry, int maxRequests, int num, int queueSize, String description)
-      throws IOException, InvalidConfException {
+      throws Exception {
     super(description);
     this.maxRequests = maxRequests;
     this.num = positive(num, "num");
@@ -238,10 +194,12 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       Conf tmpConf = JSON.parseObject(is, Conf.class);
       tmpConf.validate();
       this.conf = tmpConf;
-      try {
-        this.sslContext = tmpConf.getSsl().buildSslContext();
-      } catch (GeneralSecurityException ex) {
-        throw new InvalidConfException(ex.getMessage(), ex);
+      if (tmpConf.getSsl() != null) {
+        try {
+          this.sslContext = tmpConf.getSsl().buildSslContext();
+        } catch (GeneralSecurityException ex) {
+          throw new InvalidConfException(ex.getMessage(), ex);
+        }
       }
 
       URI uri;
@@ -272,7 +230,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
     return num * account;
   }
 
-  public PKIMessage nextCertRequest() throws IOException, CertificateException {
+  public SdkRequest nextCertRequest() throws Exception {
     if (maxRequests > 0) {
       int num = processedRequests.getAndAdd(1);
       if (num >= maxRequests) {
@@ -280,38 +238,24 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       }
     }
 
-    CertReqMsg[] certReqMsgs = new CertReqMsg[num];
+    List<EnrollCertRequestEntry> entries = new ArrayList<>(num);
 
     for (int i = 0; i < num; i++) {
-      CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
-
       long thisIndex = index.getAndIncrement();
-      certTempBuilder.setSubject(benchmarkEntry.getX500Name(thisIndex));
-
+      EnrollCertRequestEntry entry = new EnrollCertRequestEntry();
+      entry.setSubject(new X500NameType(benchmarkEntry.getX500Name(thisIndex)));
       if (!caGenKeyPair) {
-        certTempBuilder.setPublicKey(benchmarkEntry.getSubjectPublicKeyInfo());
+        entry.setSubjectPublicKey(benchmarkEntry.getSubjectPublicKeyInfo().getEncoded());
       }
-
-      CertTemplate certTemplate = certTempBuilder.build();
-      CertRequest certRequest = new CertRequest(new ASN1Integer(i + 1), certTemplate, null);
-      certReqMsgs[i] = new CertReqMsg(certRequest, RA_VERIFIED, null);
+      entry.setCertprofile(benchmarkEntry.getCertprofile());
+      entry.setCertReqId(BigInteger.valueOf(i + 1));
+      entries.add(entry);
     }
 
-    PKIHeaderBuilder builder = new PKIHeaderBuilder(PKIHeader.CMP_2000, conf.requestor(), conf.responder());
-    builder.setMessageTime(new ASN1GeneralizedTime(new Date()));
-    builder.setTransactionID(randomBytes(8));
-    builder.setSenderNonce(randomBytes(8));
-
-    ASN1EncodableVector vec = new ASN1EncodableVector(num);
-    for (int i = 0; i < num; i++) {
-      vec.add(new DERUTF8String(benchmarkEntry.getCertprofile()));
-    }
-    InfoTypeAndValue certprofileInfo =
-        new InfoTypeAndValue(ObjectIdentifiers.CMP.id_it_certProfile, new DERSequence(vec));
-    builder.setGeneralInfo(new InfoTypeAndValue[]{IMPLICIT_CONFIRM, certprofileInfo});
-
-    PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsgs));
-    return new PKIMessage(builder.build(), body);
+    EnrollCertsRequest req = new EnrollCertsRequest();
+    req.setTransactionId(Hex.toHexString(randomBytes(8)));
+    req.setEntries(entries);
+    return req;
   } // method nextCertRequest
 
   @Override
@@ -360,9 +304,9 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
     byte[] respBytes = new byte[buf.readableBytes()];
     buf.getBytes(buf.readerIndex(), respBytes);
 
-    PKIMessage cmpResponse = PKIMessage.getInstance(respBytes);
+    EnrollOrPollCertsResponse sdkResponse = EnrollOrPollCertsResponse.decode(respBytes);
     try {
-      parseEnrollCertResult(cmpResponse, PKIBody.TYPE_CERT_REP, num);
+      parseEnrollCertResult(sdkResponse, num);
       return true;
     } catch (Throwable th) {
       LOG.warn("exception while parsing response", th);
@@ -370,34 +314,18 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
     }
   } // method onComplete0
 
-  private void parseEnrollCertResult(PKIMessage response, int resonseBodyType, int numCerts)
+  private void parseEnrollCertResult(EnrollOrPollCertsResponse response, int numCerts)
       throws Exception {
-    PKIBody respBody = response.getBody();
-    final int bodyType = respBody.getType();
-
-    if (PKIBody.TYPE_ERROR == bodyType) {
-      ErrorMsgContent content = ErrorMsgContent.getInstance(respBody.getContent());
-      throw new Exception("Server returned PKIStatus: " + buildText(content.getPKIStatusInfo()));
-    } else if (resonseBodyType != bodyType) {
-      throw new Exception(String.format("unknown PKI body type %s instead the expected [%s, %s]",
-          bodyType, resonseBodyType, PKIBody.TYPE_ERROR));
-    }
-
-    CertRepMessage certRep = CertRepMessage.getInstance(respBody.getContent());
-    CertResponse[] certResponses = certRep.getResponse();
-
-    if (certResponses.length != numCerts) {
-      throw new Exception("expected " + numCerts + " CertResponse, but returned " + certResponses.length);
+    List<EnrollOrPullCertResponseEntry> entries = response.getEntries();
+    int n = entries == null ? 0 : entries.size();
+    if (n != numCerts) {
+      throw new Exception("expected " + numCerts + " CertResponse, but returned " + n);
     }
 
     for (int i = 0; i < numCerts; i++) {
-      CertResponse certResp = certResponses[i];
-      PKIStatusInfo statusInfo = certResp.getStatus();
-      int status = statusInfo.getStatus().intValue();
-      BigInteger certReqId = certResp.getCertReqId().getValue();
-
-      if (status != PKIStatus.GRANTED && status != PKIStatus.GRANTED_WITH_MODS) {
-        throw new Exception("CertReqId " + certReqId + ": server returned PKIStatus: " + buildText(statusInfo));
+      EnrollOrPullCertResponseEntry certResp = entries.get(i);
+      if (certResp.getError() != null) {
+        throw new Exception("CertReqId " + certResp.getId() + ": server returned PKIStatus: " + certResp.getError());
       }
     }
   } // method parseEnrollCertResult
@@ -412,27 +340,5 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
     random.nextBytes(bytes);
     return bytes;
   }
-
-  private static String buildText(PKIStatusInfo pkiStatusInfo) {
-    final int status = pkiStatusInfo.getStatus().intValue();
-    switch (status) {
-      case 0:
-        return "accepted (0)";
-      case 1:
-        return "grantedWithMods (1)";
-      case 2:
-        return "rejection (2)";
-      case 3:
-        return "waiting (3)";
-      case 4:
-        return "revocationWarning (4)";
-      case 5:
-        return "revocationNotification (5)";
-      case 6:
-        return "keyUpdateWarning (6)";
-      default:
-        return Integer.toString(status);
-    }
-  } // method buildText
 
 }
