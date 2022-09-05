@@ -274,7 +274,7 @@ public class X509Ca extends X509CaModule implements Closeable {
 
   public CertificateInfo regenerateCert(RequestorInfo requestor, CertTemplateData certTemplate, String transactionId)
       throws OperationException {
-    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_revoke_cert, requestor);
+    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_regen_cert, requestor);
     try {
       CertificateInfo ret =
           generateCerts(requestor, Collections.singletonList(certTemplate), true, transactionId, event).get(0);
@@ -292,7 +292,7 @@ public class X509Ca extends X509CaModule implements Closeable {
   public List<CertificateInfo> regenerateCerts(
       RequestorInfo requestor, List<CertTemplateData> certTemplates, String transactionId)
       throws OperationException {
-    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_revoke_cert, requestor);
+    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_regen_cert, requestor);
     try {
       List<CertificateInfo>  ret = generateCerts(requestor, certTemplates, true, transactionId, event);
       finish(event, true);
@@ -321,7 +321,8 @@ public class X509Ca extends X509CaModule implements Closeable {
   public CertWithRevocationInfo revokeCert(
       RequestorInfo requestor, BigInteger serialNumber, CrlReason reason, Date invalidityTime)
       throws OperationException {
-    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_revoke_cert, requestor);
+    AuditEvent event = newAuditEvent(
+        reason == CrlReason.CERTIFICATE_HOLD ? TYPE_suspend_cert : TYPE_revoke_cert, requestor);
     try {
       CertWithRevocationInfo ret = revokerModule.revokeCert(serialNumber, reason, invalidityTime, event);
       finish(event, true);
@@ -386,7 +387,7 @@ public class X509Ca extends X509CaModule implements Closeable {
   public List<CertificateInfo> generateCerts(
       RequestorInfo requestor, List<CertTemplateData> certTemplates, String transactionId)
       throws OperationException {
-    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_revoke_cert, requestor);
+    AuditEvent event = newAuditEvent(TYPE_gen_cert, requestor);
     try {
       List<CertificateInfo> ret = generateCerts(requestor, certTemplates, false, transactionId, event);
       finish(event, true);
@@ -544,7 +545,7 @@ public class X509Ca extends X509CaModule implements Closeable {
       RequestorInfo requestor, CertTemplateData certTemplate, String transactionId)
       throws OperationException {
     notNull(certTemplate, "certTemplate");
-    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_revoke_cert, requestor);
+    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_gen_cert, requestor);
     try {
       CertificateInfo ret = generateCerts(requestor, Collections.singletonList(certTemplate),
           false, transactionId, event).get(0);

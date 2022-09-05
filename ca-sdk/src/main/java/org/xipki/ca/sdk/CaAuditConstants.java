@@ -77,6 +77,8 @@ public class CaAuditConstants {
 
   public static final String TYPE_gen_cert = "gen_cert";
 
+  public static final String TYPE_regen_cert = "regen_cert";
+
   public static final String TYPE_gen_crl = "gen_crl";
 
   public static final String TYPE_unsuspend_cert = "unsuspend_cert";
@@ -87,6 +89,12 @@ public class CaAuditConstants {
   public static final String TYPE_remove_expired_certs = "remove_expired_certs";
 
   public static final String TYPE_revoke_cert = "revoke_cert";
+
+  public static final String TYPE_revoke_ca = "revoke_ca";
+
+  public static final String TYPE_suspend_ca = "revoke_ca";
+
+  public static final String TYPE_unsuspend_ca = "unrevoke_ca";
 
   public static final String TYPE_revoke_suspendedCert = "revoke_suspended_cert";
 

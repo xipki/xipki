@@ -270,7 +270,8 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     caInfo.setRevocationInfo(revocationInfo);
 
     if (caInfo.isSelfSigned()) {
-      AuditEvent event = newAuditEvent(TYPE_revoke_cert, requestor);
+      AuditEvent event = newAuditEvent(
+          revocationInfo.getReason() == CrlReason.CERTIFICATE_HOLD ? TYPE_suspend_ca :TYPE_revoke_ca, requestor);
       boolean successful = true;
       try {
         CertWithRevocationInfo ret = revokeCertificate0(caInfo.getSerialNumber(),
@@ -291,7 +292,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
   public void unrevokeCa(RequestorInfo requestor) throws OperationException {
     caInfo.setRevocationInfo(null);
     if (caInfo.isSelfSigned()) {
-      AuditEvent event = newAuditEvent(TYPE_unsuspend_cert, requestor);
+      AuditEvent event = newAuditEvent(TYPE_unsuspend_ca, requestor);
       boolean successful = false;
       try {
         unsuspendCert0(caInfo.getSerialNumber(), true, event);

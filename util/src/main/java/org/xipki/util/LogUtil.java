@@ -65,7 +65,7 @@ public class LogUtil {
     StackTraceElement[] traces = Thread.currentThread().getStackTrace();
     if (traces.length > 2) {
       StackTraceElement trace = traces[2];
-      log.error("({} {}), {}: {}", trace.getMethodName(), trace.getLineNumber(),
+      log.error("({}.{} {}), {}: {}", trace.getClassName(), trace.getMethodName(), trace.getLineNumber(),
           th.getClass().getName(), th.getMessage());
     } else {
       log.error("{}: {}", th.getClass().getName(), th.getMessage());
@@ -86,7 +86,7 @@ public class LogUtil {
     StackTraceElement[] traces = Thread.currentThread().getStackTrace();
     if (traces.length > 2) {
       StackTraceElement trace = traces[2];
-      log.error("({} {}) {}, {}: {}", trace.getMethodName(), trace.getLineNumber(), msg,
+      log.error("({}.{} {}) {}, {}: {}", trace.getClassName(), trace.getMethodName(), trace.getLineNumber(), msg,
           th.getClass().getName(), th.getMessage());
     } else {
       log.error("{}, {}: {}", msg, th.getClass().getName(), th.getMessage());
@@ -108,7 +108,7 @@ public class LogUtil {
     StackTraceElement[] traces = Thread.currentThread().getStackTrace();
     if (traces.length > 2) {
       StackTraceElement trace = traces[2];
-      log.error("({} {}), {}: {}", trace.getMethodName(), trace.getLineNumber(),
+      log.error("({}.{} {}), {}: {}", trace.getClassName(), trace.getMethodName(), trace.getLineNumber(),
           th.getClass().getName(), th.getMessage());
     } else {
       log.warn("{}: {}", th.getClass().getName(), th.getMessage());
@@ -130,7 +130,7 @@ public class LogUtil {
     StackTraceElement[] traces = Thread.currentThread().getStackTrace();
     if (traces.length > 2) {
       StackTraceElement trace = traces[2];
-      log.warn("({} {}) {}, {}: {}", trace.getMethodName(), trace.getLineNumber(), msg,
+      log.warn("({}.{} {}) {}, {}: {}", trace.getClassName(), trace.getMethodName(), trace.getLineNumber(), msg,
           th.getClass().getName(), th.getMessage());
     } else {
       log.warn("{}, {}: {}", msg, th.getClass().getName(), th.getMessage());

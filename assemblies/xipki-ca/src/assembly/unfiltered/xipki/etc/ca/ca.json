@@ -51,10 +51,14 @@
 	},
 	"audit":{
 		// embed: use the embedded slf4j logging
+		//
 		// file-mac: audit entries are chained, and each entry is MAC protected, saved in file
-		//   conf: keyid=<key-id>,password=<password>,file=<log file>,
+		//   conf: enc-interval=<integer>,keyid=<key-id>,password=<password or its PBE encrypted form>,file=<log file>,
 		// database-mac: audit entries are chained, and each entry is MAC protected, saved in file
-		//   conf: keyid=<key-id>,password=<password>,datasource=<database conf file>
+		//   conf: enc-interval=<integer>,keyid=<key-id>,password=<password or its PBE encrypted form>,datasource=<database conf file>
+		// For file-mac and database-mac, the enc-interval specifies the number of audit entries between writting an
+		// encrypted entry containing the last audit id.
+		//
 		// java:<name of class that implements org.xipki.audit.AuditService>
 		"type":"embed"
 		//,"conf":"..."
