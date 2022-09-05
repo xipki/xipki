@@ -55,7 +55,7 @@ if { $printUsage equals "true" } then {
 
     # Loadtest RSA key
     echo "Enroll benchmark"
-    xiqa:cmp-benchmark-enroll  --duration $duration --thread $threads \
+    xiqa:benchmark-enroll  --duration $duration --thread $threads \
       --key-type RSA --subject "CN=myorg.org,O=myorg PKI company RSA,C=DE" \
       --profile TLS -n 5 --random-dn O
 

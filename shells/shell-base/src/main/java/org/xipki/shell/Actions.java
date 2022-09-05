@@ -33,6 +33,7 @@ import org.xipki.util.StringUtil;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -110,38 +111,65 @@ public class Actions {
   @Service
   public static class CopyFile extends XiAction {
 
-    @Argument(index = 0, name = "source-file", required = true, description = "file to be copied")
+    @Argument(index = 0, name = "files or dir", multiValued = true, required = true,
+        description = "The last one is the destination file or dir (ending with '/'),\n" +
+            "the remaining are the files to be copied")
     @Completion(FileCompleter.class)
-    private String source;
-
-    @Argument(index = 1, name = "destination", required = true, description = "destination file")
-    @Completion(FileCompleter.class)
-    private String dest;
+    private List<String> files;
 
     @Option(name = "--force", aliases = "-f", description = "override existing file, never prompt")
     private Boolean force = Boolean.FALSE;
 
     @Override
     protected Object execute0() throws Exception {
-      source = expandFilepath(source);
+      int n = files.size();
+      if (n < 2) {
+        throw new IllegalCmdParamException("too less parameters");
+      }
+
+      String dest = files.get(n - 1);
+      char c = dest.charAt(dest.length() - 1);
+      boolean isDestDir = c == '\\' || c == '/';
       dest = expandFilepath(dest);
 
-      File sourceFile = new File(source);
-      if (!sourceFile.exists()) {
-        throw new IllegalCmdParamException(source + " does not exist");
+      if (n != 2 && !isDestDir) {
+        throw new IllegalCmdParamException(dest + " is not a folder");
       }
 
-      if (!sourceFile.isFile()) {
-        throw new IllegalCmdParamException(source + " is not a file");
+      List<File> sourceFiles = new ArrayList<>(n - 1);
+      for (int i = 0; i < n - 1; i++) {
+        String source = files.get(i);
+        File sourceFile = new File(source);
+
+        if (!sourceFile.exists()) {
+          throw new IllegalCmdParamException(source + " does not exist");
+        }
+
+        if (!sourceFile.isFile()) {
+          throw new IllegalCmdParamException(source + " is not a file");
+        }
+        sourceFiles.add(sourceFile);
+     }
+
+      if (isDestDir) {
+        for (File sourceFile : sourceFiles) {
+          copyFile(sourceFile, new File(dest, sourceFile.getName()));
+        }
+      } else {
+        copyFile(sourceFiles.get(0), new File(dest));
       }
 
-      File destFile = new File(dest);
+      return null;
+    }
+
+    private void copyFile(File sourceFile, File destFile)
+        throws IllegalCmdParamException, IOException {
       if (destFile.exists()) {
         if (!destFile.isFile()) {
           throw new IllegalCmdParamException("cannot override an existing directory by a file");
         } else {
-          if (!force && !confirm("Do you want to override the file " + dest, 3)) {
-            return null;
+          if (!force && !confirm("Do you want to override the file " + destFile.getPath(), 3)) {
+            return;
           }
         }
       } else {
@@ -149,8 +177,6 @@ public class Actions {
       }
 
       FileUtils.copyFile(sourceFile, destFile, true);
-
-      return null;
     }
 
   } // class CopyFile
