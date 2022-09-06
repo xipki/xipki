@@ -160,9 +160,6 @@ Security Commands
 
      return whether key and certs exist in PKCS#11 device)
 
-   * `xi:keystore-convert`
-     convert the keystore format
-
    * `xi:obfuscate`
 
      obfuscate password
