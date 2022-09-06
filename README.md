@@ -20,7 +20,7 @@ JRE/JDK, and the steps to reproduce the bug.
 
 ## Prerequisite
 * OS: Linux, Windows, MacOS
-* JRE / JDK 8 (build 162+), 11, 17
+* JRE / JDK: for `xipki-mgmt-cli` and `xipki-cli`: JDK 11 and 17; for others: JDK 8, 11 and 17.
 * Database: DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
 * Hardware: Any available hardware (tested on Raspberry Pi 2 Model B with 900MHz quad-core ARM CPU and 1 GB Memory)
 
@@ -40,10 +40,8 @@ JRE/JDK, and the steps to reproduce the bug.
 ### Binaries
 
 Download the binaries `xipki-ca-<version>.zip`, `xipki-ocsp-<version>.zip`, 
-`xipki-gateway-<version>.zip`, `xipki-mgmt-cli-<version>.tar.gz` 
-(or `xipki-mgmt-cli-jdk8-<version>.tar.gz` for JDK 8),
-`xipki-cli-<version>.tar.gz` (or `xipki-cli-jdk8-<version>.tar.gz` for JDK 8) from
-[releases](https://github.com/xipki/xipki/releases).
+`xipki-gateway-<version>.zip`, `xipki-mgmt-cli-<version>.tar.gz`, `xipki-cli-<version>.tar.gz`
+from [releases](https://github.com/xipki/xipki/releases).
 
 Only if you want to use the development version, build it from source code as
 follows.
@@ -64,10 +62,12 @@ follows.
    - CA: `assemblies/xipki-ca/target/xipki-ca-<version>.zip`
    - OCSP: `assemblies/xipki-ocsp/target/xipki-ocsp-<version>.zip`
    - Protocol Gateway (CMP, SCEP, REST): `assemblies/xipki-gateway/target/xipki-gateway-<version>.zip`
-   - Management CLI: `assemblies/xipki-mgmt-cli/target/xipki-mgmt-cli-<version>.tar.gz` (or `xipki-mgmt-cli-jdk8-<version>.tar.gz` for JDK 8)
-   - CLI: `assemblies/xipki-cli/target/xipki-cli-<version>.tar.gz` (or `xipki-cli-jdk8-<version>.tar.gz` for JDK 8)
+   - Management CLI: `assemblies/xipki-mgmt-cli/target/xipki-mgmt-cli-<version>.tar.gz`
+   - CLI: `assemblies/xipki-cli/target/xipki-cli-<version>.tar.gz`
 
 ## Install DB Tool
+
+JDK 8+ is required.
 
 1. Unpack the binary `xipki-dbtool-<version>.zip`.
 2. If you use database other than PostgreSQL, MariaDB and MySQL, you need to get the JDBC driver and
@@ -75,11 +75,15 @@ follows.
  
 ## Install CA Server
 
+JDK 8+ is required.
+
 1. Unpack tomcat to a new folder
 2. Unpack the binary `xipki-ca-<version>.zip` and install CA as described in the
    unpacked README file.
 
 ## Install OCSP Responder
+
+JDK 8+ is required.
 
 1. Unpack tomcat to a new folder
 2. Unpack the binary `xipki-ocsp-<version>.zip` and install OCSP responder as described in the
@@ -87,18 +91,24 @@ follows.
 
 ## Install Protocol Gateway
 
+JDK 8+ is required.
+
 1. Unpack tomcat to a new folder
 2. Unpack the binary `xipki-gate-<version>.zip` and install protocol gateway as described in the
    unpacked README file.
 
 ## Install Management Command Line Interface
 
-1. Unpack the binary `xipki-mgmt-cli-<version>.tar.gz` (or `xipki-mgmt-cli-jdk8-<version>.tar.gz` for JDK 8)
-3. If you get "java.lang.ClassNotFoundException: &lt;jdbc class&gt;", please copy the missing JDBC driver jar to the directory `lib/boot`.
+JDK 11+ is required.
+
+1. Unpack the binary `xipki-mgmt-cli-<version>.tar.gz`
+2. If you get "java.lang.ClassNotFoundException: &lt;jdbc class&gt;", please copy the missing JDBC driver jar to the directory `lib/boot`.
 
 ## Install Command Line Interface
 
-1. Unpack the binary `xipki-cli-<version>.tar.gz` (or `xipki-cli-jdk8-<version>.tar.gz` for JDK 8)
+JDK 11+ is required.
+
+1. Unpack the binary `xipki-cli-<version>.tar.gz`
 
 ## Configure PKCS#11 device (optional)
 
@@ -186,14 +196,14 @@ preload <start script>
 * SCEP  
   Using any SCEP client. XiPKI provides also a SCEP client.
 
-  The binary `xipki-cli-<version>`.tar.gz (or `xipki-cli-jdk8-<version>.tar.gz` for JDK 8) contains an example script in the folder xipki/client-script.
+  The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:  
   - `source xipki/client-script/scep-client.script`
 
 * CMP
   Using any CMP client. XiPKI provides also a CMP client.
 
-  The binary `xipki-cli-<version>`.tar.gz (or `xipki-cli-jdk8-<version>.tar.gz` for JDK 8) contains an example script in the folder xipki/client-script.
+  The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:  
   - `source xipki/client-script/cmp-client.script` (use argument 'help' to print the usage)
 
@@ -201,7 +211,7 @@ preload <start script>
   The shell script `xipki/client-script/rest.sh` of the `xipki-cli` demonstrates
   the use of REST API.
 
-  The binary `xipki-cli-<version>`.tar.gz (or `xipki-cli-jdk8-<version>.tar.gz` for JDK 8) contains an example script in the folder xipki/client-script.
+  The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:  
   - `source xipki/client-script/rest-client.script` (use argument 'help' to print the usage)
 

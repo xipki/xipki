@@ -66,7 +66,7 @@
     </fileSet>
     <!-- Copy over start scripts -->
     <fileSet>
-      <directory>${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/bin</directory>
+      <directory>${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin</directory>
       <includes>
         <include>inc</include>
         <include>karaf</include>
@@ -78,7 +78,7 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/bin</directory>
+      <directory>${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin</directory>
       <includes>
         <include>karaf.bat</include>
         <include>setenv.bat</include>
@@ -90,7 +90,7 @@
     </fileSet>
     <!-- Expanded Karaf -->
     <fileSet>
-      <directory>${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}</directory>
+      <directory>${project.build.directory}/apache-karaf-minimal-${karaf.version}</directory>
       <outputDirectory>.</outputDirectory>
       <excludes>
         <exclude>bin/**</exclude>
