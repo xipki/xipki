@@ -117,18 +117,10 @@ public abstract class MacAuditService implements AuditService {
     return DTF.format(date.atZone(timeZone));
   }
 
-  private String buildMacPayload(
-          Instant date, long thisId, int eventType, String levelText,
-          long previousId, String previousTag, String message) {
-    String sb = formatDate(date) +
-        DELIM + levelText +
-        DELIM + eventType +
-        DELIM + shardId +
-        DELIM + thisId +
-        DELIM + previousId + INNER_DELIM +
-        (previousTag == null ? "" : previousTag) +
-        DELIM + message;
-    return sb;
+  private String buildMacPayload(Instant date, long thisId, int eventType, String levelText,
+                                 long previousId, String previousTag, String message) {
+    return formatDate(date) + DELIM + levelText + DELIM + eventType + DELIM + shardId + DELIM + thisId
+        + DELIM + previousId + INNER_DELIM + (previousTag == null ? "" : previousTag) + DELIM + message;
   }
 
   protected abstract void storeLog(

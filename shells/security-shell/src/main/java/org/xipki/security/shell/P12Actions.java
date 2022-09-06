@@ -108,7 +108,7 @@ public class P12Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      KeyStore ks = getKeyStore();
+      KeyStore ks = getInKeyStore();
 
       String keyname = null;
       Enumeration<String> aliases = ks.aliases();
@@ -146,18 +146,18 @@ public class P12Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      KeyStore ks = getKeyStore();
+      KeyStore inKs = getInKeyStore();
 
       char[] pwd = getPassword();
       X509Cert newCert = X509Util.parseCert(new File(certFile));
 
-      assertMatch(ks, newCert, new String(pwd));
+      assertMatch(inKs, newCert, new String(pwd));
 
       String keyname = null;
-      Enumeration<String> aliases = ks.aliases();
+      Enumeration<String> aliases = inKs.aliases();
       while (aliases.hasMoreElements()) {
         String alias = aliases.nextElement();
-        if (ks.isKeyEntry(alias)) {
+        if (inKs.isKeyEntry(alias)) {
           keyname = alias;
           break;
         }
@@ -167,7 +167,7 @@ public class P12Actions {
         throw new XiSecurityException("could not find private key");
       }
 
-      Key key = ks.getKey(keyname, pwd);
+      Key key = inKs.getKey(keyname, pwd);
       Set<X509Cert> caCerts = new HashSet<>();
       if (isNotEmpty(caCertFiles)) {
         for (String caCertFile : caCertFiles) {
@@ -180,10 +180,25 @@ public class P12Actions {
         jceCertChain[i] = certChain[i].toJceCert();
       }
 
-      ks.setKeyEntry(keyname, key, pwd, jceCertChain);
+      KeyStore outKs = KeyUtil.getOutKeyStore("PKCS12");
+      outKs.load(null, null);
+
+      aliases = inKs.aliases();
+      while (aliases.hasMoreElements()) {
+        String alias = aliases.nextElement();
+        if (alias.equalsIgnoreCase(keyname)) {
+          outKs.setKeyEntry(keyname, key, pwd, jceCertChain);
+        } else {
+          if (inKs.isKeyEntry(alias)) {
+            outKs.setKeyEntry(alias, inKs.getKey(alias, pwd), pwd, inKs.getCertificateChain(alias));
+          } else {
+            outKs.setCertificateEntry(alias, inKs.getCertificate(alias));
+          }
+        }
+      }
 
       try (OutputStream out = Files.newOutputStream(Paths.get(expandFilepath(p12File)))) {
-        ks.store(out, pwd);
+        outKs.store(out, pwd);
         println("updated certificate");
         return null;
       }
@@ -247,7 +262,7 @@ public class P12Actions {
         throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException {
       KeyStore ks;
       try (InputStream in = Files.newInputStream(Paths.get(expandFilepath(p12File)))) {
-        ks = KeyUtil.getKeyStore("PKCS12");
+        ks = KeyUtil.getInKeyStore("PKCS12");
         ks.load(in, getPassword());
       }
       return ks;
@@ -434,11 +449,11 @@ public class P12Actions {
       return pwdInChar;
     }
 
-    protected KeyStore getKeyStore()
+    protected KeyStore getInKeyStore()
         throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
       KeyStore ks;
       try (InputStream in = Files.newInputStream(Paths.get(expandFilepath(p12File)))) {
-        ks = KeyUtil.getKeyStore("PKCS12");
+        ks = KeyUtil.getInKeyStore("PKCS12");
         ks.load(in, getPassword());
       }
       return ks;

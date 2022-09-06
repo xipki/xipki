@@ -147,8 +147,7 @@ class DigestDiffReporter implements Closeable {
     closeWriter(goodWriter);
     closeWriter(errorWriter);
 
-    int sum = numGood.get() + numDiff.get() + numMissing.get() + numUnexpected.get()
-              + numError.get();
+    int sum = numGood.get() + numDiff.get() + numMissing.get() + numUnexpected.get() + numError.get();
     Date now = new Date();
     int durationSec = (int) ((now.getTime() - startTime.getTime()) / 1000);
 

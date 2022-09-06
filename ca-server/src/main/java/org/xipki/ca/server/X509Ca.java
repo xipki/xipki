@@ -79,6 +79,8 @@ public class X509Ca extends X509CaModule implements Closeable {
 
     private final BigInteger certId;
 
+    private final boolean batch;
+
     private final ConcurrentContentSigner signer;
     private final Extensions extensions;
     private final IdentifiedCertprofile certprofile;
@@ -92,9 +94,10 @@ public class X509Ca extends X509CaModule implements Closeable {
     private X500Name grantedSubject;
     private String grantedSubjectText;
 
-    GrantedCertTemplate(BigInteger certId, Extensions extensions, IdentifiedCertprofile certprofile,
+    GrantedCertTemplate(boolean batch, BigInteger certId, Extensions extensions, IdentifiedCertprofile certprofile,
         Date grantedNotBefore, Date grantedNotAfter, X500Name requestedSubject, SubjectPublicKeyInfo grantedPublicKey,
         PrivateKeyInfo privateKey, ConcurrentContentSigner signer, String warning) {
+      this.batch = batch;
       this.certId = certId == null ? BigInteger.ZERO : certId;
       this.extensions = extensions;
       this.certprofile = certprofile;
@@ -112,8 +115,13 @@ public class X509Ca extends X509CaModule implements Closeable {
       this.grantedSubjectText = X509Util.x500NameText(subject);
     }
 
+    String auditPrefix() {
+      return batch ? certId + "." : "";
+    }
+
     void audit(AuditEvent event) {
-      String prefix = certId + ".";
+      String prefix = auditPrefix();
+
       if (!grantedSubject.equals(requestedSubject)) {
         event.addEventData(prefix + CaAuditConstants.NAME_req_subject,
             "\"" + X509Util.x500NameText(requestedSubject) + "\"");
@@ -439,6 +447,7 @@ public class X509Ca extends X509CaModule implements Closeable {
       }
     }
 
+    boolean batch = n > 1;
     for (int i = 0; i < n; i++) {
       CertTemplateData certTemplate = certTemplates.get(i);
       try {
@@ -449,13 +458,15 @@ public class X509Ca extends X509CaModule implements Closeable {
               "unknown cert profile " + certTemplate.getCertprofileName());
         }
 
-        GrantedCertTemplate gct = grandCertTemplateBuilder.create(certprofile, certTemplate, keypairGenerators, update);
+        GrantedCertTemplate gct = grandCertTemplateBuilder.create(
+            batch, certprofile, certTemplate, keypairGenerators, update);
         gct.audit(event);
         gcts.add(gct);
       } catch (OperationException ex) {
         LOG.error("     FAILED createGrantedCertTemplate: CA={}, profile={}, subject='{}'",
             caIdent.getName(), certTemplate.getCertprofileName(), certTemplate.getSubject());
-        event.addEventData(certTemplate.getCertReqId() + "." + CaAuditConstants.NAME_message, ex.getMessage());
+        event.addEventData((batch ? certTemplate.getCertReqId() + "." : "")+ CaAuditConstants.NAME_message,
+            ex.getMessage());
         throw new OperationExceptionWithIndex(i, ex);
       }
     }
@@ -569,7 +580,7 @@ public class X509Ca extends X509CaModule implements Closeable {
       setEventStatus(event, ret != null);
       return ret;
     } catch (OperationException ex) {
-      event.addEventData(gct.certId + "." + CaAuditConstants.NAME_message, ex.getMessage());
+      event.addEventData(gct.auditPrefix() + CaAuditConstants.NAME_message, ex.getMessage());
       setEventStatus(event, false);
       if (ex instanceof OperationExceptionWithIndex) {
         throw (OperationExceptionWithIndex) ex;
@@ -597,7 +608,7 @@ public class X509Ca extends X509CaModule implements Closeable {
       }
     }
 
-    String auditPrefix = gct.certId + ".";
+    String auditPrefix = gct.auditPrefix();
 
     String serialNumberMode = certprofile.getSerialNumberMode();
 
@@ -611,10 +622,8 @@ public class X509Ca extends X509CaModule implements Closeable {
 
           ConfPairs extraControl = caInfo.getExtraControl();
           serialNumber = certprofile.generateSerialNumber(
-                  caInfo.getCert().getSubject(),
-                  caInfo.getCert().getSubjectPublicKeyInfo(),
-                  gct.requestedSubject,
-                  gct.grantedPublicKey,
+                  caInfo.getCert().getSubject(), caInfo.getCert().getSubjectPublicKeyInfo(),
+                  gct.requestedSubject, gct.grantedPublicKey,
                   extraControl == null ? null : extraControl.unmodifiable());
 
           // if the CertProfile generates always the serial number for fixed input,

@@ -195,7 +195,7 @@ public class Actions {
         outKs = null;
       } else {
         outPemKs = null;
-        outKs = KeyStore.getInstance(outType);
+        outKs = KeyUtil.getOutKeyStore(outType);
         outKs.load(null);
       }
 
@@ -837,7 +837,7 @@ public class Actions {
         }
 
         char[] password = keystorePassword.toCharArray();
-        KeyStore ks = KeyUtil.getKeyStore(keystoreType);
+        KeyStore ks = KeyUtil.getInKeyStore(keystoreType);
 
         File file = IoUtil.expandFilepath(new File(peerKeystoreFile));
         try (InputStream is = Files.newInputStream(file.toPath())) {
@@ -897,7 +897,7 @@ public class Actions {
     @Override
     protected Object execute0() throws Exception {
       File realKsFile = new File(IoUtil.expandFilepath(ksFile));
-      KeyStore ks = KeyStore.getInstance(ksType);
+      KeyStore ks = KeyUtil.getOutKeyStore(ksType);
       char[] password = readPasswordIfNotSet(ksPwd);
 
       Set<String> aliases = new HashSet<>(10);

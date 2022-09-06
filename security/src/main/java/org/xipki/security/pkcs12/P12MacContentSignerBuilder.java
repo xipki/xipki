@@ -61,7 +61,7 @@ public class P12MacContentSignerBuilder {
     notNull(keyPassword, "keyPassword");
 
     try {
-      KeyStore ks = KeyUtil.getKeyStore(keystoreType);
+      KeyStore ks = KeyUtil.getInKeyStore(keystoreType);
       ks.load(keystoreStream, keystorePassword);
 
       String tmpKeyname = keyname;

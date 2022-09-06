@@ -103,7 +103,7 @@ public class PopControl {
 
     try {
       char[] password = passwordStr.toCharArray();
-      KeyStore ks = KeyUtil.getKeyStore(type);
+      KeyStore ks = KeyUtil.getInKeyStore(type);
       ks.load(is, password);
 
       Enumeration<String> aliases = ks.aliases();

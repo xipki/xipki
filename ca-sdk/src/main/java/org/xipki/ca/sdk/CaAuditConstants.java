@@ -54,8 +54,6 @@ public class CaAuditConstants {
 
   public static final String NAME_num = "num";
 
-  public static final String NAME_perf = "perf";
-
   public static final String NAME_reason = "reason";
 
   public static final String NAME_req_subject = "req_subject";

@@ -270,8 +270,7 @@ class TargetDigestReader implements Closeable {
       throws DataAccessException {
     final int n = serialNumbers.size();
     if (n != numPerSelect) {
-      throw new IllegalArgumentException("size of serialNumbers is not '" + numPerSelect
-          + "': " + n);
+      throw new IllegalArgumentException("size of serialNumbers is not '" + numPerSelect + "': " + n);
     }
 
     Collections.sort(serialNumbers);

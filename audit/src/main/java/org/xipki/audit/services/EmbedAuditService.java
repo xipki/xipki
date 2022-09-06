@@ -80,7 +80,7 @@ public class EmbedAuditService implements AuditService {
 
   @Override
   public void init(String conf, PasswordResolver passwordResolver)
-          throws PasswordResolverException {
+      throws PasswordResolverException {
     ConfPairs confPairs = new ConfPairs(conf);
     String logFilePath = confPairs.value(KEY_FILE);
 
@@ -121,10 +121,7 @@ public class EmbedAuditService implements AuditService {
   protected void storeLog(int eventType, AuditLevel level, String message) {
     Instant date = Instant.now();
 
-    String payload = DTF.format(date.atZone(timeZone)) +
-        DELIM + level.getText() +
-        DELIM + eventType +
-        DELIM + message;
+    String payload = DTF.format(date.atZone(timeZone)) + DELIM + level.getText() + DELIM + eventType + DELIM + message;
 
     long ms = date.toEpochMilli();
     try {
@@ -139,7 +136,6 @@ public class EmbedAuditService implements AuditService {
 
       writer.write(payload);
       writer.write('\n');
-      writer.flush(); // TODO do not flush every time
     } catch (Exception ex) {
       LogUtil.error(LOG, ex);
     }
@@ -167,8 +163,10 @@ public class EmbedAuditService implements AuditService {
 
   @Override
   public void close() throws Exception {
-    writer.flush();
-    writer.close();
+    if (writer != null) {
+      writer.flush();
+      writer.close();
+    }
   }
 
 }

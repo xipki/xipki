@@ -43,6 +43,7 @@ import org.xipki.cmp.client.EnrollCertResult.CertifiedKeyPairOrError;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.*;
 import org.xipki.security.X509ExtensionType.ExtensionsType;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
@@ -206,7 +207,7 @@ public class EnrollCertActions {
 
       PrivateKey privateKey = BouncyCastleProvider.getPrivateKey(privateKeyInfo);
 
-      KeyStore ks = KeyStore.getInstance("PKCS12");
+      KeyStore ks = KeyUtil.getOutKeyStore("PKCS12");
       char[] pwd = getPassword();
       ks.load(null, pwd);
       ks.setKeyEntry("main", privateKey, pwd, certchain);

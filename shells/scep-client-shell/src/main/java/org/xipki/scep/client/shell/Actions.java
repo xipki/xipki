@@ -152,7 +152,7 @@ public class Actions {
     private void readIdentity() throws Exception {
       char[] pwd = readPasswordIfNotSet(password);
 
-      KeyStore ks = KeyUtil.getKeyStore("PKCS12");
+      KeyStore ks = KeyUtil.getInKeyStore("PKCS12");
       try (InputStream is = Files.newInputStream(Paths.get(p12File))) {
         ks.load(is, pwd);
       }

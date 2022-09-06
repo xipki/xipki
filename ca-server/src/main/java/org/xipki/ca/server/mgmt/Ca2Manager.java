@@ -60,7 +60,6 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import static org.xipki.ca.sdk.CaAuditConstants.APPNAME;
-import static org.xipki.ca.sdk.CaAuditConstants.NAME_perf;
 import static org.xipki.ca.server.CaUtil.canonicalizeSignerConf;
 import static org.xipki.util.Args.*;
 import static org.xipki.util.StringUtil.concat;
@@ -525,12 +524,12 @@ class Ca2Manager {
     String signerType = caEntry.getSignerType();
 
     if (numCrls < 0) {
-      System.err.println("invalid numCrls: " + numCrls);
+      LOG.warn("invalid numCrls: {}", numCrls);
       return null;
     }
 
     if (caEntry.getExpirationPeriod() < 0) {
-      System.err.println("invalid expirationPeriod: " + caEntry.getExpirationPeriod());
+      LOG.warn("invalid expirationPeriod: {}", caEntry.getExpirationPeriod());
       return null;
     }
 
@@ -674,7 +673,6 @@ class Ca2Manager {
 
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName(APPNAME);
-    event.setName(NAME_perf);
     event.addEventType("CAMGMT_GEN_KEYCERT");
 
     X509Ca ca = getX509Ca(caName);
@@ -706,7 +704,6 @@ class Ca2Manager {
 
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName(APPNAME);
-    event.setName(NAME_perf);
     event.addEventType("CAMGMT_GEN_CERT");
 
     X509Ca ca = getX509Ca(caName);

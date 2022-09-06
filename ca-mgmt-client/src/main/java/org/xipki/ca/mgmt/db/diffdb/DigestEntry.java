@@ -47,9 +47,8 @@ class DigestEntry {
 
   private final String base64HashValue;
 
-  public DigestEntry(
-      BigInteger serialNumber, boolean revoked, Integer revReason, Long revTime,
-      Long revInvTime, String base64HashValue) {
+  public DigestEntry(BigInteger serialNumber, boolean revoked, Integer revReason,
+                     Long revTime, Long revInvTime, String base64HashValue) {
     Args.notNull(base64HashValue, "base64HashValue");
     if (revoked) {
       Args.notNull(revReason, "revReason");

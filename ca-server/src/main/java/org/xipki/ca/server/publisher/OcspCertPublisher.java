@@ -175,7 +175,6 @@ public class OcspCertPublisher extends CertPublisher {
 
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName("CAPublisher");
-    event.setName("SYSTEM");
     event.setLevel(AuditLevel.ERROR);
     event.setStatus(AuditStatus.FAILED);
     if (certId != null) {

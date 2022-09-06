@@ -35,6 +35,7 @@ import org.xipki.security.pkcs11.P11Slot.P11NewObjectControl;
 import org.xipki.security.shell.Actions.CsrGenAction;
 import org.xipki.security.shell.Actions.SecurityAction;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
@@ -598,7 +599,7 @@ public class P11Actions {
         throw new IllegalCmdParamException("invalid keyType " + keyType);
       }
 
-      KeyStore ks = KeyStore.getInstance("JCEKS");
+      KeyStore ks = KeyUtil.getInKeyStore("JCEKS");
       InputStream ksStream = Files.newInputStream(Paths.get(IoUtil.expandFilepath(keyOutFile)));
       char[] pwd = getPassword();
       try {

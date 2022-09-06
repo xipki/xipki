@@ -120,12 +120,7 @@ class DigestDiff {
 
     List<Integer> refCaIds = new LinkedList<>();
 
-    String refSql;
-    if (refDbType == DbType.XIPKI_OCSP_v4) {
-      refSql = "SELECT ID FROM ISSUER";
-    } else {
-      refSql = "SELECT ID FROM CA";
-    }
+    String refSql = (refDbType == DbType.XIPKI_OCSP_v4) ? "SELECT ID FROM ISSUER" : "SELECT ID FROM CA";
 
     Statement refStmt = null;
     try {
@@ -226,12 +221,7 @@ class DigestDiff {
   private static Map<Integer, byte[]> getCas(DataSourceWrapper datasource, DbType dbType)
       throws DataAccessException {
     // get a list of available CAs in the target database
-    String sql = "SELECT ID,CERT FROM ";
-    if (dbType == DbType.XIPKI_OCSP_v4) {
-      sql += "ISSUER";
-    } else {
-      sql += "CA";
-    }
+    String sql = "SELECT ID,CERT FROM " + (dbType == DbType.XIPKI_OCSP_v4 ? "ISSUER" : "CA");
 
     Statement stmt = datasource.createStatement();
     Map<Integer, byte[]> caIdCertMap = new HashMap<>(5);

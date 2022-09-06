@@ -85,7 +85,7 @@ public class KeypairWithCert {
 
     KeyStore keystore;
     try {
-      keystore = KeyUtil.getKeyStore(keystoreType);
+      keystore = KeyUtil.getInKeyStore(keystoreType);
     } catch (KeyStoreException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }

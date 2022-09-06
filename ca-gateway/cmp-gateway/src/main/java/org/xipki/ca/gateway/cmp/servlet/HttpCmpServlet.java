@@ -76,7 +76,6 @@ public class HttpCmpServlet extends HttpServlet {
     AuditService auditService = Audits.getAuditService();
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName(CaAuditConstants.APPNAME);
-    event.setName(CaAuditConstants.NAME_perf);
 
     try {
       String reqContentType = req.getHeader("Content-Type");

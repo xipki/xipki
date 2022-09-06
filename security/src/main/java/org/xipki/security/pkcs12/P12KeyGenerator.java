@@ -165,7 +165,7 @@ public class P12KeyGenerator {
 
     SecretKey secretKey = new SecretKeySpec(keyValue, algorithm);
 
-    KeyStore ks = KeyUtil.getKeyStore("JCEKS");
+    KeyStore ks = KeyUtil.getOutKeyStore("JCEKS");
     ks.load(null, params.getPassword());
 
     ks.setKeyEntry("main", secretKey, params.getPassword(), null);
@@ -223,7 +223,7 @@ public class P12KeyGenerator {
     KeyAndCertPair identity = new KeyAndCertPair(
         new X509Cert(certGenerator.build(contentSigner)), kp.getKeypair().getPrivate());
 
-    KeyStore ks = KeyUtil.getKeyStore("PKCS12");
+    KeyStore ks = KeyUtil.getOutKeyStore("PKCS12");
     ks.load(null, params.getPassword());
 
     ks.setKeyEntry("main", identity.key, params.getPassword(), new Certificate[]{identity.cert.toJceCert()});

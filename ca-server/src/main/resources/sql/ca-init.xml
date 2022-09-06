@@ -188,7 +188,7 @@
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="PERMISSION" type="INT"/>
-      <column name="PROFILES" type="VARCHAR(200)"/>
+      <column name="PROFILES" type="VARCHAR(500)"/>
     </createTable>
     <!-- table CA_HAS_PUBLISHER -->
     <createTable tableName="CA_HAS_PUBLISHER">

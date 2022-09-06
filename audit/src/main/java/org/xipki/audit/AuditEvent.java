@@ -40,11 +40,6 @@ public class AuditEvent {
   private String applicationName;
 
   /**
-   * The name of the event type.
-   */
-  private String name;
-
-  /**
    * The AuditLevel this Event belongs to.
    */
   private AuditLevel level;
@@ -84,17 +79,9 @@ public class AuditEvent {
     this.level = level;
   }
 
-  public String getName() {
-    return name;
-  }
-
   public void update(AuditLevel level, AuditStatus status) {
     this.level = level;
     this.status = status;
-  }
-
-  public void setName(String name) {
-    this.name = name;
   }
 
   public String getApplicationName() {
@@ -210,14 +197,9 @@ public class AuditEvent {
       applicationName = "undefined";
     }
 
-    String name = getName();
-    if (name == null) {
-      name = "undefined";
-    }
-
     StringBuilder sb = new StringBuilder(150);
 
-    sb.append(applicationName).append(" - ").append(name);
+    sb.append(applicationName);
 
     AuditStatus status = getStatus();
     if (status == null) {

@@ -813,7 +813,6 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
 
     publisherManager.close();
-
     certprofileManager.close();
 
     File caLockFile = new File("calock");
@@ -823,6 +822,11 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     auditLogPciEvent(true, "SHUTDOWN");
     LOG.info("stopped CA system");
+    try {
+      Audits.getAuditService().close();
+    } catch (Exception ex) {
+      LogUtil.warn(LOG, ex, concat("could not close audit service"));
+    }
   } // method close
 
   public ScheduledThreadPoolExecutor getScheduledThreadPoolExecutor() {

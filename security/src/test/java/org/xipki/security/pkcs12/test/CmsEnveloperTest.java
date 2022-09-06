@@ -34,6 +34,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.util.KeyUtil;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -66,7 +67,7 @@ public class CmsEnveloperTest {
 
   @Test
   public void testEeKeyAgree() throws Exception {
-    KeyStore ks = KeyStore.getInstance("PKCS12");
+    KeyStore ks = KeyUtil.getInKeyStore("PKCS12");
     char[] password = "1234".toCharArray();
     ks.load(Files.newInputStream(Paths.get("src/test/resources/pkcs12test/test-ec.p12")), password);
 
@@ -124,7 +125,7 @@ public class CmsEnveloperTest {
   @Test
   public void testRsaOaep() throws Exception {
     HashAlgo hashAlgo = HashAlgo.SHA256;
-    KeyStore ks = KeyStore.getInstance("PKCS12");
+    KeyStore ks = KeyUtil.getInKeyStore("PKCS12");
     char[] password = "1234".toCharArray();
     ks.load(Files.newInputStream(Paths.get("src/test/resources/pkcs12test/test1.p12")), password);
 

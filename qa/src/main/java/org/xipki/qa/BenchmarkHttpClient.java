@@ -31,6 +31,7 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ValidatableConf;
@@ -177,7 +178,7 @@ public class BenchmarkHttpClient {
       }
 
       try (InputStream stream = Files.newInputStream(Paths.get(store))) {
-        KeyStore keystore = KeyStore.getInstance(storeType);
+        KeyStore keystore = KeyUtil.getInKeyStore(storeType);
         keystore.load(stream, password);
         return keystore;
       }

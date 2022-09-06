@@ -72,16 +72,24 @@ public class KeyUtil {
   private KeyUtil() {
   }
 
-  public static KeyStore getKeyStore(String storeType) throws KeyStoreException {
+  public static KeyStore getInKeyStore(String storeType) throws KeyStoreException {
+    return getKeyStore(storeType, "BC");
+  }
+
+  public static KeyStore getOutKeyStore(String storeType) throws KeyStoreException {
+    return getKeyStore(storeType, "SunJSSE");
+  }
+
+  private static KeyStore getKeyStore(String storeType, String pkcs12Provider) throws KeyStoreException {
     notBlank(storeType, "storeType");
-    if ("JCEKS".equalsIgnoreCase(storeType)) {
-      return KeyStore.getInstance(storeType);
-    } else {
+    if ("PKCS12".equalsIgnoreCase(storeType) || "PKCS#12".equalsIgnoreCase(storeType)) {
       try {
-        return KeyStore.getInstance(storeType, "BC");
+        return KeyStore.getInstance(storeType, pkcs12Provider);
       } catch (KeyStoreException | NoSuchProviderException ex) {
         return KeyStore.getInstance(storeType);
       }
+    } else {
+      return KeyStore.getInstance(storeType);
     }
   }
 

@@ -93,7 +93,7 @@ class GrandCertTemplateBuilder {
   }
 
   GrantedCertTemplate create(
-      IdentifiedCertprofile certprofile, CertTemplateData certTemplate,
+      boolean batch, IdentifiedCertprofile certprofile, CertTemplateData certTemplate,
       List<KeypairGenerator> keypairGenerators, boolean update)
       throws OperationException {
     String prefix = certTemplate.getCertReqId() + ".";
@@ -408,7 +408,7 @@ class GrandCertTemplateBuilder {
     if (msgBuilder.length() > 2) {
       warning = msgBuilder.substring(2);
     }
-    GrantedCertTemplate gct = new GrantedCertTemplate(
+    GrantedCertTemplate gct = new GrantedCertTemplate(batch,
         certTemplate.getCertReqId(), certTemplate.getExtensions(), certprofile, grantedNotBefore, grantedNotAfter,
         requestedSubject, grantedPublicKeyInfo, privateKey, signer, warning);
     gct.setGrantedSubject(grantedSubject);

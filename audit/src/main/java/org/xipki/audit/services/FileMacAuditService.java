@@ -64,17 +64,10 @@ public class FileMacAuditService extends MacAuditService {
     If there is no previous log line, the previous id is 0, and previous tag is empty.
    */
   @Override
-  protected void storeLog(
-          Instant date, long thisId, int eventType, String levelText,
-          long previousId, String message, String thisTag) {
-    String logLine = formatDate(date) +
-        DELIM + levelText +
-        DELIM + eventType +
-        DELIM + shardId +
-        DELIM + thisId +
-        DELIM + previousId +
-        DELIM + thisTag +
-        DELIM + message;
+  protected void storeLog(Instant date, long thisId, int eventType, String levelText,
+                          long previousId, String message, String thisTag) {
+    String logLine = formatDate(date) + DELIM + levelText + DELIM + eventType + DELIM + shardId +
+        DELIM + thisId + DELIM + previousId + DELIM + thisTag + DELIM + message;
 
     long ms = date.toEpochMilli();
     try {
@@ -153,7 +146,7 @@ public class FileMacAuditService extends MacAuditService {
             latestYyyyMMdd = yyyyMMdd;
           }
         } catch (Exception ex) {
-          System.err.println("could not parse name of file " + f.getAbsolutePath() + ", ignore it");
+          LOG.warn("could not parse name of file {}, ignore it",  f.getAbsolutePath());
         }
 
         if (latestYyyyMMdd > yyyyMMddNow) {
@@ -225,8 +218,10 @@ public class FileMacAuditService extends MacAuditService {
 
   @Override
   public void doClose() throws Exception {
-    writer.flush();
-    writer.close();
+    if (writer != null) {
+      writer.flush();
+      writer.close();
+    }
   }
 
 }
