@@ -148,10 +148,6 @@ public class CertStore extends CertStoreBase {
 
   private final String sqlCrlWithNo;
 
-  private final String sqlReqIdForSerial;
-
-  private final String sqlReqForId;
-
   private final String sqlSelectUnrevokedSn100;
 
   private final String sqlSelectUnrevokedSn;
@@ -185,9 +181,6 @@ public class CertStore extends CertStoreBase {
     this.sqlCertInfo = buildSelectFirstSql("PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE CA_ID=? AND SN=?");
     this.sqlKnowsCertForSerial = buildSelectFirstSql("ID FROM CERT WHERE SN=? AND CA_ID=?");
     this.sqlCertStatusForSubjectFp = buildSelectFirstSql("REV FROM CERT WHERE FP_S=? AND CA_ID=?");
-    this.sqlReqIdForSerial = buildSelectFirstSql("REQCERT.RID as REQ_ID FROM REQCERT INNER JOIN "
-        + "CERT ON CERT.CA_ID=? AND CERT.SN=? AND REQCERT.CID=CERT.ID");
-    this.sqlReqForId = buildSelectFirstSql("DATA FROM REQUEST WHERE ID=?");
     this.sqlCrl = buildSelectFirstSql("THISUPDATE DESC", "THISUPDATE,CRL FROM CRL WHERE CA_ID=?");
     this.sqlCrlWithNo = buildSelectFirstSql("THISUPDATE DESC",
         "THISUPDATE,CRL FROM CRL WHERE CA_ID=? AND CRL_NO=?");
@@ -812,19 +805,6 @@ public class CertStore extends CertStoreBase {
     return rows == null || rows.isEmpty() ? null : parseCert(Base64.decodeFast(rows.get(0).getString("CERT")));
   } // method getCert
 
-  public byte[] getCertRequest(NameId ca, BigInteger serialNumber) throws OperationException {
-    notNulls(ca, "ca", serialNumber, "serialNumber");
-
-    ResultRow row = execQuery1PrepStmt0(sqlReqIdForSerial, col2Int(ca.getId()), col2Str(serialNumber.toString(16)));
-
-    if (row == null) {
-      return null;
-    }
-
-    row = execQuery1PrepStmt0(sqlReqForId, col2Long(row.getLong("REQ_ID")));
-    return (row == null) ? null : Base64.decodeFast(row.getString("DATA"));
-  } // method getCertRequest
-
   public List<CertListInfo> listCerts(
       NameId ca, X500Name subjectPattern, Date validFrom, Date validTo, CertListOrderBy orderBy, int numEntries)
       throws OperationException {
@@ -1097,26 +1077,6 @@ public class CertStore extends CertStoreBase {
       return false;
     }
   } // method isHealthy
-
-  public void deleteUnreferencedRequests() throws OperationException {
-    execUpdateStmt0(SQL_DELETE_UNREFERENCED_REQUEST);
-  } // method deleteUnreferencedRequests
-
-  public long addRequest(byte[] request) throws OperationException {
-    notNull(request, "request");
-
-    long id = idGenerator.nextId();
-    long currentTimeSeconds = System.currentTimeMillis() / 1000;
-    execUpdatePrepStmt0(SQL_ADD_REQUEST,
-        col2Long(id), col2Long(currentTimeSeconds), col2Str(Base64.encodeToString(request)));
-
-    return id;
-  } // method addRequest
-
-  public void addRequestCert(long requestId, long certId) throws OperationException {
-    long id = idGenerator.nextId();
-    execUpdatePrepStmt0(SQL_ADD_REQCERT, col2Long(id), col2Long(requestId), col2Long(certId));
-  } // method addRequestCert
 
   private static Long getDateSeconds(Date date) {
     return date == null ? null : date.getTime() / 1000;

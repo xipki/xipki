@@ -91,31 +91,6 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   } // class CertsInQueuePublisher
 
-  private class UnreferencedRequestCleaner implements Runnable {
-
-    private boolean inProcess;
-
-    @Override
-    public void run() {
-      if (inProcess) {
-        return;
-      }
-
-      inProcess = true;
-      try {
-        try {
-          certstore.deleteUnreferencedRequests();
-          LOG.info("deleted unreferenced requests");
-        } catch (Throwable th) {
-          LogUtil.error(LOG, th, "could not delete unreferenced requests");
-        }
-      } finally {
-        inProcess = false;
-      }
-    } // method run
-
-  } // class UnreferencedRequestCleaner
-
   private class CaRestarter implements Runnable {
 
     private boolean inProcess;
@@ -741,8 +716,6 @@ public class CaManagerImpl implements CaManager, Closeable {
 
         scheduledThreadPoolExecutor.scheduleAtFixedRate(
             new CertsInQueuePublisher(), 120, 120, SECONDS);
-        scheduledThreadPoolExecutor.scheduleAtFixedRate(
-            new UnreferencedRequestCleaner(), 60, 24L * 60 * 60, SECONDS); // 1 DAY
       } else {
         sb.append(": no CA is configured");
       }
@@ -1253,11 +1226,6 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public CertWithRevocationInfo getCert(X500Name issuer, BigInteger serialNumber) throws CaMgmtException {
     return ca2Manager.getCert(issuer, serialNumber);
-  }
-
-  @Override
-  public byte[] getCertRequest(String caName, BigInteger serialNumber) throws CaMgmtException {
-    return ca2Manager.getCertRequest(caName, serialNumber);
   }
 
   @Override

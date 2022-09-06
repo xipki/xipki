@@ -34,7 +34,6 @@ import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -323,7 +322,7 @@ class CaconfDbExporter extends DbPorter {
     if (dbSchemaVersion >= 7) {
       columns += ",CONF";
     } else {
-      columns += ",SN_SIZE,CA_URIS,MAX_VALIDITY,SAVE_REQ,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,"
+      columns += ",SN_SIZE,CA_URIS,MAX_VALIDITY,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,"
           + "VALIDITY_MODE,CRL_CONTROL,CTLOG_CONTROL,REVOKE_SUSPENDED_CONTROL,KEEP_EXPIRED_CERT_DAYS,EXTRA_CONTROL";
     }
 
@@ -378,7 +377,6 @@ class CaconfDbExporter extends DbPorter {
             ccc.setCtlogControl(new ConfPairs(str).asMap());
           }
 
-          ccc.setSaveRequest(rs.getInt("SAVE_REQ") != 0);
           ccc.setPermission(rs.getInt("PERMISSION"));
           ccc.setExpirationPeriod(rs.getInt("EXPIRATION_PERIOD"));
           ccc.setKeepExpiredCertDays(rs.getInt("KEEP_EXPIRED_CERT_DAYS"));

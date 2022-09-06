@@ -358,10 +358,6 @@ CA Management Commands
 
      get certificate
 
-   * `ca:get-request`
-
-     get certificate request
-
    * `ca:get-crl`
 
      download CRL

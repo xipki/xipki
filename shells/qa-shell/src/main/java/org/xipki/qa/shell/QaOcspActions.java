@@ -88,10 +88,10 @@ public class QaOcspActions {
     @Completion(Completers.DirCompleter.class)
     private String outDirStr;
 
-    @Option(name = "--save-req", description = "where to save the request")
+    @Option(name = "--save-req", description = "whether to save the request")
     private Boolean saveReq = Boolean.FALSE;
 
-    @Option(name = "--save-resp", description = "where to save the request")
+    @Option(name = "--save-resp", description = "whether to save the request")
     private Boolean saveResp = Boolean.FALSE;
 
     @Option(name = "--unknown-as", description = "expected status for unknown certificate")

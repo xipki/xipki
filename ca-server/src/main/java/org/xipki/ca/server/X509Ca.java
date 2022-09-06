@@ -208,14 +208,6 @@ public class X509Ca extends X509CaModule implements Closeable {
       LOG.warn("CA {}: Certificates will not be saved in the database and will not be published!",
           caInfo.getIdent().getName());
     }
-
-    if (!this.saveCert) {
-      if (caInfo.isSaveRequest()) {
-        // Request cannot be saved if SAVE_CERT (in EXTRA_CONTROL) is set to false.
-        caInfo.setSaveRequest(false);
-        LOG.warn("CA {}: SAVE_REQ is configured to true, ignore it, use 'false' instead", caInfo.getIdent().getName());
-      }
-    }
   } // constructor
 
   public NameId getCaIdent() {
@@ -256,10 +248,6 @@ public class X509Ca extends X509CaModule implements Closeable {
   public CertWithRevocationInfo getCertWithRevocationInfo(BigInteger serialNumber)
       throws CertificateException, OperationException {
     return certstore.getCertWithRevocationInfo(caIdent.getId(), serialNumber, caIdNameMap);
-  }
-
-  public byte[] getCertRequest(BigInteger serialNumber) throws OperationException {
-    return certstore.getCertRequest(caIdent, serialNumber);
   }
 
   public List<CertListInfo> listCerts(
@@ -382,14 +370,6 @@ public class X509Ca extends X509CaModule implements Closeable {
 
   public void unrevokeCa(RequestorInfo requestor) throws OperationException {
     revokerModule.unrevokeCa(requestor);
-  }
-
-  public long addRequest(byte[] request) throws OperationException {
-    return certstore.addRequest(request);
-  }
-
-  public void addRequestCert(long requestId, long certId) throws OperationException {
-    certstore.addRequestCert(requestId, certId);
   }
 
   public List<CertificateInfo> generateCerts(

@@ -76,12 +76,6 @@ public class CaConfColumn {
   @JSONField(ordinal = 35)
   private boolean saveKeypair;
 
-  /**
-   * Whether requests should be saved, default is false.
-   */
-  @JSONField(ordinal = 37)
-  private boolean saveRequest;
-
   @JSONField(ordinal = 39)
   private String validityMode;
 
@@ -211,14 +205,6 @@ public class CaConfColumn {
     this.saveKeypair = saveKeypair;
   }
 
-  public boolean isSaveRequest() {
-    return saveRequest;
-  }
-
-  public void setSaveRequest(boolean saveRequest) {
-    this.saveRequest = saveRequest;
-  }
-
   public String getValidityMode() {
     return validityMode;
   }
@@ -285,7 +271,6 @@ public class CaConfColumn {
     entry.setCrlControl(crlControl());
     entry.setCtlogControl(ctlogControl());
     entry.setSaveCert((isSaveCert()));
-    entry.setSaveRequest(isSaveRequest());
     entry.setSaveKeypair(isSaveKeypair());
     entry.setPermission(permission);
     entry.setValidityMode(validityMode());

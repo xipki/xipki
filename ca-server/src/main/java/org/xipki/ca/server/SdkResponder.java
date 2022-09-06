@@ -27,9 +27,6 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.AuditEvent;
-import org.xipki.audit.AuditLevel;
-import org.xipki.audit.AuditStatus;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaStatus;
@@ -52,7 +49,6 @@ import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static org.xipki.ca.sdk.CaAuditConstants.*;
 import static org.xipki.ca.sdk.SdkConstants.*;
 import static org.xipki.util.PermissionConstants.*;
 import static org.xipki.util.exception.ErrorCode.*;
@@ -686,16 +682,6 @@ public class SdkResponder {
             ? ca.regenerateCerts(requestor, certTemplates, tid)
             : ca.generateCerts  (requestor, certTemplates, tid);
 
-        // save the request
-        Long reqDbId = null;
-        if (ca.getCaInfo().isSaveRequest()) {
-          try {
-            reqDbId = ca.addRequest(request);
-          } catch (Exception ex) {
-            LOG.warn("could not save request");
-          }
-        }
-
         for (int i = 0; i < n; i++) {
           CertificateInfo certInfo = certInfos.get(i);
 
@@ -708,10 +694,6 @@ public class SdkResponder {
           rentry.setId(certReqId);
           fillResponseEntry(rentry, certInfo);
           ret.add(rentry);
-
-          if (reqDbId != null) {
-            ca.addRequestCert(reqDbId, certInfo.getCert().getCertId());
-          }
         }
 
         return ret;
@@ -744,21 +726,6 @@ public class SdkResponder {
         certInfo = kup
             ? ca.regenerateCert(requestor, certTemplate, tid)
             : ca.generateCert  (requestor, certTemplate, tid);
-
-        if (ca.getCaInfo().isSaveRequest()) {
-          if (reqDbId == null && !savingRequestFailed) {
-            try {
-              reqDbId = ca.addRequest(request);
-            } catch (Exception ex) {
-              savingRequestFailed = true;
-              LOG.warn("could not save request");
-            }
-          }
-
-          if (reqDbId != null) {
-            ca.addRequestCert(reqDbId, certInfo.getCert().getCertId());
-          }
-        }
 
         if (explicitConfirm) {
           pendingCertPool.addCertificate(tid, certReqId, certInfo, waitForConfirmUtil);

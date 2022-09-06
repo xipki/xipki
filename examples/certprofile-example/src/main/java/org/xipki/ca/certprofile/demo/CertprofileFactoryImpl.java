@@ -21,7 +21,6 @@ import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileFactory;
 import org.xipki.util.exception.ObjectCreationException;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;

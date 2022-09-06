@@ -850,126 +850,6 @@ public class CaCertstore extends ValidatableConf {
 
   } // class IdNameTypeConf
 
-  public static class ReqCert extends IdentifidDbObject {
-
-    private Long rid;
-
-    private Long cid;
-
-    public Long getRid() {
-      return rid;
-    }
-
-    public void setRid(long rid) {
-      this.rid = rid;
-    }
-
-    public Long getCid() {
-      return cid;
-    }
-
-    public void setCid(long cid) {
-      this.cid = cid;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      super.validate();
-      notNull(rid, "rid");
-      notNull(cid, "cid");
-    }
-
-  } // class ReqCert
-
-  public static class ReqCerts extends ValidatableConf {
-
-    private List<ReqCert> reqCerts;
-
-    public List<ReqCert> getReqCerts() {
-      if (reqCerts == null) {
-        reqCerts = new LinkedList<>();
-      }
-      return reqCerts;
-    }
-
-    public void setReqCerts(List<ReqCert> reqCerts) {
-      this.reqCerts = reqCerts;
-    }
-
-    public void add(ReqCert reqCert) {
-      if (reqCerts == null) {
-        reqCerts = new LinkedList<>();
-      }
-      reqCerts.add(reqCert);
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      validate(reqCerts);
-    }
-
-  } // class ReqCerts
-
-  public static class Request extends IdentifidDbObject {
-
-    private Long update;
-
-    private String file;
-
-    public Long getUpdate() {
-      return update;
-    }
-
-    public void setUpdate(Long update) {
-      this.update = update;
-    }
-
-    public String getFile() {
-      return file;
-    }
-
-    public void setFile(String file) {
-      this.file = file;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      super.validate();
-      notNull(update, "update");
-      notBlank(file, "file");
-    }
-
-  } // class Request
-
-  public static class Requests extends ValidatableConf {
-
-    private List<Request> requests;
-
-    public List<Request> getRequests() {
-      if (requests == null) {
-        requests = new LinkedList<>();
-      }
-      return requests;
-    }
-
-    public void setRequests(List<Request> requests) {
-      this.requests = requests;
-    }
-
-    public void add(Request request) {
-      if (requests == null) {
-        requests = new LinkedList<>();
-      }
-      requests.add(request);
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      validate(requests);
-    }
-
-  } // class Requests
-
   public static class Signer extends ValidatableConf {
 
     private String name;
@@ -1067,10 +947,6 @@ public class CaCertstore extends ValidatableConf {
 
   private int countCerts;
 
-  private int countRequests;
-
-  private int countReqCerts;
-
   private List<ToPublish> publishQueue;
 
   public int getVersion() {
@@ -1095,22 +971,6 @@ public class CaCertstore extends ValidatableConf {
 
   public void setCountCerts(int countCerts) {
     this.countCerts = countCerts;
-  }
-
-  public int getCountRequests() {
-    return countRequests;
-  }
-
-  public void setCountRequests(int countRequests) {
-    this.countRequests = countRequests;
-  }
-
-  public int getCountReqCerts() {
-    return countReqCerts;
-  }
-
-  public void setCountReqCerts(int countReqCerts) {
-    this.countReqCerts = countReqCerts;
   }
 
   public List<ToPublish> getPublishQueue() {

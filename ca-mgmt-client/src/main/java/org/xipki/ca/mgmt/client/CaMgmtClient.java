@@ -748,17 +748,6 @@ public class CaMgmtClient implements CaManager {
   } // method listCertificates
 
   @Override
-  public byte[] getCertRequest(String caName, BigInteger serialNumber)
-      throws CaMgmtException {
-    MgmtRequest.GetCertRequest req = new MgmtRequest.GetCertRequest();
-    req.setCaName(caName);
-    req.setSerialNumber(serialNumber);
-    byte[] respBytes = transmit(MgmtAction.getCertRequest, req);
-    MgmtResponse.ByteArray resp = parse(respBytes, MgmtResponse.ByteArray.class);
-    return resp.getResult();
-  } // method getCertRequest
-
-  @Override
   public Set<String> getSupportedSignerTypes() throws CaMgmtException {
     byte[] respBytes = transmit(MgmtAction.getSupportedSignerTypes, null);
     MgmtResponse.StringSet resp = parse(respBytes, MgmtResponse.StringSet.class);

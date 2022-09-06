@@ -349,7 +349,6 @@ public class CaConf {
                 new RevokeSuspendedControl(new ConfPairs(ci.getRevokeSuspendedControl())));
           }
 
-          caEntry.setSaveRequest(ci.isSaveRequest());
           caEntry.setSaveCert(ci.isSaveCert());
           caEntry.setSaveKeypair(ci.isSaveKeyPair());
           caEntry.setStatus(CaStatus.forName(ci.getStatus()));

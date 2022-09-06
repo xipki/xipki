@@ -38,7 +38,6 @@ import org.xipki.security.util.KeyUtil;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.*;

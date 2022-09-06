@@ -336,16 +336,6 @@ public class HttpMgmtServlet extends HttpServlet {
           resp = new MgmtResponse.StringSet(result);
           break;
         }
-        case getCertRequest: {
-          MgmtRequest.GetCertRequest req = parse(in, MgmtRequest.GetCertRequest.class);
-          byte[] result = caManager.getCertRequest(req.getCaName(), req.getSerialNumber());
-          if (result == null) {
-            throw new CaMgmtException("Found no CertRequest for CA " + req.getCaName()
-                        + " and serialNumber 0x" + req.getSerialNumber().toString(16));
-          }
-          resp = new MgmtResponse.ByteArray(result);
-          break;
-        }
         case getCrl: {
           MgmtRequest.GetCrl req = parse(in, MgmtRequest.GetCrl.class);
           X509CRLHolder crl = caManager.getCrl(req.getCaName(), req.getCrlNumber());

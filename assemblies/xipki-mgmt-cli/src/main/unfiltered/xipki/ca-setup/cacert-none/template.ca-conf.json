@@ -104,7 +104,6 @@
 			"nextCrlNo":2,
 			"permissions":["all"],
 			"saveCert": true,
-			"saveRequest":false,
 			"saveKeypair":false,
 			"signerType":"${token.type}",
 			"signerConf":{

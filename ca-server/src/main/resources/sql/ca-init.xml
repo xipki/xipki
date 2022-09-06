@@ -7,7 +7,7 @@
    - Table CERT: add column PRIVATE_KEY, remove columns UID, RTYPE
    - Table CA_HAS_REQUESTOR: remove column RA
    - Add table KEYPAIR_GEN
-   - Remove tables TUSER, CA_HAS_USER
+   - Remove tables TUSER, CA_HAS_USER, REQUEST, REQCERT
 
  Maximal column size: 4k
   - DB2: PAGESIZE 4 k
@@ -325,30 +325,6 @@
         -->
       </column>
     </createTable>
-    <createTable tableName="REQUEST">
-      <column name="ID" type="BIGINT">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="LUPDATE" type="BIGINT">
-        <!--remarks="time at which the request is added to database, seconds since January 1, 1970, 00:00:00 GMT"-->
-        <constraints nullable="false"/>
-      </column>
-      <column name="DATA" type="CLOB"/>
-    </createTable>
-    <!-- table REQCERT -->
-    <createTable tableName="REQCERT">
-      <column name="ID" type="BIGINT">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="RID" type="BIGINT">
-        <!--remarks="request id"-->
-        <constraints nullable="false"/>
-      </column>
-      <column name="CID" type="BIGINT">
-        <!--remarks="cert id"-->
-        <constraints nullable="false"/>
-      </column>
-    </createTable>
     <addUniqueConstraint tableName="CERT" columnNames="CA_ID, SN" constraintName="CONST_CA_SN"/>
     <createIndex tableName="CERT" unique="false" indexName="IDX_CA_FPS">
       <column name="CA_ID"/>
@@ -450,16 +426,6 @@
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
       baseColumnNames="CID" baseTableName="PUBLISHQUEUE"
-      referencedColumnNames="ID" referencedTableName="CERT"/>
-    <addForeignKeyConstraint constraintName="FK_REQCERT_REQ1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="RID" baseTableName="REQCERT"
-      referencedColumnNames="ID" referencedTableName="REQUEST"/>
-    <addForeignKeyConstraint constraintName="FK_REQCERT_CERT1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="CID" baseTableName="REQCERT"
       referencedColumnNames="ID" referencedTableName="CERT"/>
   </changeSet>
 </databaseChangeLog>

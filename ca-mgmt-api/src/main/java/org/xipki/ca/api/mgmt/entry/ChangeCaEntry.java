@@ -58,8 +58,6 @@ public class ChangeCaEntry extends MgmtEntry {
 
   private Boolean saveCert;
 
-  private Boolean saveRequest;
-
   private Boolean saveKeypair;
 
   private ValidityMode validityMode;
@@ -185,14 +183,6 @@ public class ChangeCaEntry extends MgmtEntry {
 
   public void setSaveCert(Boolean saveCert) {
     this.saveCert = saveCert;
-  }
-
-  public Boolean getSaveRequest() {
-    return saveRequest;
-  }
-
-  public void setSaveRequest(Boolean saveRequest) {
-    this.saveRequest = saveRequest;
   }
 
   public Boolean getSaveKeypair() {

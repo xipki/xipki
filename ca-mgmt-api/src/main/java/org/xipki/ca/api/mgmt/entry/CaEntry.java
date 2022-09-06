@@ -77,8 +77,6 @@ public class CaEntry extends MgmtEntry {
 
   private List<String> keypairGenNames;
 
-  private boolean saveRequest;
-
   private boolean saveKeypair;
 
   private boolean saveCert = true;
@@ -154,7 +152,6 @@ public class CaEntry extends MgmtEntry {
     ret.ctlogControl = ctlogControl;
     ret.revokeSuspendedControl = revokeSuspendedControl;
     ret.keypairGenNames = keypairGenNames;
-    ret.saveRequest = saveRequest;
     ret.saveKeypair = saveKeypair;
     ret.saveCert = saveCert;
     ret.validityMode = validityMode;
@@ -278,14 +275,6 @@ public class CaEntry extends MgmtEntry {
     this.keypairGenNames = (keypairGenNames == null) ? null : CollectionUtil.toLowerCaseList(keypairGenNames);
   }
 
-  public boolean isSaveRequest() {
-    return saveRequest;
-  }
-
-  public void setSaveRequest(boolean saveRequest) {
-    this.saveRequest = saveRequest;
-  }
-
   public boolean isSaveKeypair() {
     return saveKeypair;
   }
@@ -395,7 +384,6 @@ public class CaEntry extends MgmtEntry {
         "\nCRL signer name: ", crlSignerName,
         "\nKeyPair generation names: ", keypairGenNames,
         "\nsave certificate: ", saveCert,
-        "\nsave request: ", saveRequest,
         "\nsave keypair: ", saveKeypair,
         "\nvalidity mode: ", validityMode,
         "\npermission: ", permissionText,
@@ -443,7 +431,6 @@ public class CaEntry extends MgmtEntry {
         && CompareUtil.equalsObject(revocationInfo, obj.revocationInfo)
         && CompareUtil.equalsObject(revokeSuspendedControl, obj.revokeSuspendedControl)
         && (saveCert == obj.saveCert)
-        && (saveRequest == obj.saveRequest)
         && (saveKeypair == obj.saveKeypair)
         && CompareUtil.equalsObject(keypairGenNames, obj.keypairGenNames)
         && (serialNoLen == obj.serialNoLen)

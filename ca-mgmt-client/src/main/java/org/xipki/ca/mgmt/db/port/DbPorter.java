@@ -74,9 +74,7 @@ public class DbPorter extends DbToolBase {
 
   public enum CaDbEntryType {
     CERT("certs", "CERT", 1),
-    CRL("crls", "CRL", 0.1f),
-    REQUEST("requests", "REQUEST", 0.1f),
-    REQCERT("reqcerts", "REQCERT", 50);
+    CRL("crls", "CRL", 0.1f);
 
     private final String dirName;
 

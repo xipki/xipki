@@ -91,7 +91,6 @@ ca:gen-rootca \
   --crl-control "interval.hours=24,fullcrl.intervals=90,overlap=90d,interval.time=02:00" \
   --validity-mode cutoff \
   --save-cert yes \
-  --save-req yes \
   --save-keypair yes \
   --keypair-gen software
 
@@ -299,7 +298,6 @@ ca:ca-add \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://myorg.org/subca1.der \
   --save-cert yes \
-  --save-req yes \
   --save-keypair yes \
   --keypair-gen software \
   --revoke-suspended-control enabled=true,targetReason=cessationOfOperation,unchangedSince=15d \
@@ -373,7 +371,6 @@ ca:ca-add \
   --crl-control "interval.hours=24,fullcrl.intervals=7,overlap=3d,interval.time=02:00" \
   --validity-mode lax \
   --save-cert yes \
-  --save-req yes \
   --save-keypair yes \
   --keypair-gen software \
   --certchain output/rootca1.crt

@@ -321,7 +321,6 @@ if { $printUsage equals "true" } then {
     --cert output/subca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://myorg.org/subca1.der \
-    --save-req no \
     --revoke-suspended-control enabled=true,targetReason=cessationOfOperation,unchangedSince=15d \
     --certchain output/rootca1.crt \
     --certchain NULL

@@ -17,7 +17,6 @@
 
 package org.xipki.util;
 
-import javax.security.auth.login.Configuration;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;

@@ -263,8 +263,6 @@ public class CaConfType {
 
     private boolean saveCert = true;
 
-    private boolean saveRequest;
-
     private boolean saveKeyPair;
 
     private String signerType;
@@ -391,14 +389,6 @@ public class CaConfType {
 
     public void setKeypairGenNames(List<String> keypairGenNames) {
       this.keypairGenNames = keypairGenNames;
-    }
-
-    public boolean isSaveRequest() {
-      return saveRequest;
-    }
-
-    public void setSaveRequest(boolean saveRequest) {
-      this.saveRequest = saveRequest;
     }
 
     public boolean isSaveCert() {

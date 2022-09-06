@@ -21,7 +21,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.security.util.KeyUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.StringUtil;
 

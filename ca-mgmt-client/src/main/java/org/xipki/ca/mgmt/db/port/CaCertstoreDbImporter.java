@@ -66,10 +66,6 @@ class CaCertstoreDbImporter extends DbPorter {
   private static final String SQL_ADD_CRL = buildInsertSql("CRL",
       "ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL_SCOPE,SHA1,CRL");
 
-  private static final String SQL_ADD_REQUEST = buildInsertSql("REQUEST", "ID,LUPDATE,DATA");
-
-  private static final String SQL_ADD_REQCERT = buildInsertSql("REQCERT", "ID,RID,CID");
-
   private final int numCertsPerCommit;
 
   CaCertstoreDbImporter(DataSourceWrapper datasource, String srcDir, int numCertsPerCommit,
@@ -127,21 +123,12 @@ class CaCertstoreDbImporter extends DbPorter {
         numProcessedInLastProcess = 0;
         idProcessedInLastProcess = 0L;
 
-        switch (typeProcessedInLastProcess) {
-          case CRL:
-            typeProcessedInLastProcess = CaDbEntryType.CERT;
-            break;
-          case CERT:
-            typeProcessedInLastProcess = CaDbEntryType.REQUEST;
-            break;
-          case REQUEST:
-            typeProcessedInLastProcess = CaDbEntryType.REQCERT;
-            break;
-          case REQCERT:
-            entriesFinished = true;
-            break;
-          default:
-            throw new IllegalStateException("unsupported CaDbEntryType " + typeProcessedInLastProcess);
+        if (typeProcessedInLastProcess == CaDbEntryType.CRL) {
+          typeProcessedInLastProcess = CaDbEntryType.CERT;
+        } else if (typeProcessedInLastProcess == CaDbEntryType.CERT) {
+          entriesFinished = true;
+        } else {
+          throw new IllegalStateException("unsupported CaDbEntryType " + typeProcessedInLastProcess);
         }
       }
 
@@ -155,7 +142,7 @@ class CaCertstoreDbImporter extends DbPorter {
           idProcessedInLastProcess = null;
         }
 
-        CaDbEntryType[] types = {CaDbEntryType.CERT, CaDbEntryType.REQUEST, CaDbEntryType.REQCERT};
+        CaDbEntryType[] types = {CaDbEntryType.CERT};
 
         for (CaDbEntryType type : types) {
           if (exception == null && (type == typeProcessedInLastProcess || typeProcessedInLastProcess == null)) {
@@ -222,25 +209,14 @@ class CaCertstoreDbImporter extends DbPorter {
       final long total;
       String sql;
 
-      switch (type) {
-        case CERT:
-          total = certstore.getCountCerts();
-          sql = SQL_ADD_CERT;
-          break;
-        case CRL:
-          total = certstore.getCountCrls();
-          sql = SQL_ADD_CRL;
-          break;
-        case REQUEST:
-          total = certstore.getCountRequests();
-          sql = SQL_ADD_REQUEST;
-          break;
-        case REQCERT:
-          total = certstore.getCountReqCerts();
-          sql = SQL_ADD_REQCERT;
-          break;
-        default:
-          throw new IllegalStateException("unsupported DbEntryType " + type);
+      if (type == CaDbEntryType.CERT) {
+        total = certstore.getCountCerts();
+        sql = SQL_ADD_CERT;
+      } else if (type == CaDbEntryType.CRL) {
+        total = certstore.getCountCrls();
+        sql = SQL_ADD_CRL;
+      } else {
+        throw new IllegalStateException("unsupported DbEntryType " + type);
       }
 
       final long remainingTotal = total - numProcessedBefore;
@@ -278,21 +254,12 @@ class CaCertstoreDbImporter extends DbPorter {
 
           try {
             long lastId;
-            switch (type) {
-              case CERT:
-                lastId = importCerts(entriesFile, minId, processLogFile, processLog, numProcessedBefore, stmt, sql);
-                break;
-              case CRL:
-                lastId = importCrls(entriesFile, minId, processLogFile, processLog, numProcessedBefore, stmt, sql);
-                break;
-              case REQUEST:
-                lastId = importRequests(entriesFile, minId, processLogFile, processLog, numProcessedBefore, stmt, sql);
-                break;
-              case REQCERT:
-                lastId = importReqCerts(entriesFile, minId, processLogFile, processLog, numProcessedBefore, stmt, sql);
-                break;
-              default:
-                throw new IllegalStateException("unknown CaDbEntryType " + type);
+            if (type == CaDbEntryType.CERT) {
+              lastId = importCerts(entriesFile, minId, processLogFile, processLog, numProcessedBefore, stmt, sql);
+            } else if (type == CaDbEntryType.CRL) {
+              lastId = importCrls(entriesFile, minId, processLogFile, processLog, numProcessedBefore, stmt, sql);
+            } else {
+              throw new IllegalStateException("unknown CaDbEntryType " + type);
             }
 
             minId = lastId + 1;
@@ -624,195 +591,5 @@ class CaCertstoreDbImporter extends DbPorter {
       zipFile.close();
     }
   } // method importCrls
-
-  private long importRequests(
-      String entriesZipFile, long minId, File processLogFile, ProcessLog processLog, int numProcessedInLastProcess,
-      PreparedStatement stmt, String sql)
-      throws Exception {
-    final CaDbEntryType type = CaDbEntryType.REQUEST;
-    final int numEntriesPerCommit = Math.max(1, Math.round(type.getSqlBatchFactor() * numCertsPerCommit));
-
-    ZipFile zipFile = new ZipFile(new File(entriesZipFile));
-    ZipEntry entriesEntry = zipFile.getEntry("overview.json");
-
-    CaCertstore.Requests requests;
-    try {
-      requests = JSON.parseObject(zipFile.getInputStream(entriesEntry), CaCertstore.Requests.class);
-    } catch (Exception ex) {
-      try {
-        zipFile.close();
-      } catch (Exception e2) {
-        LOG.error("could not close ZIP file {}: {}", entriesZipFile, e2.getMessage());
-        LOG.debug("could not close ZIP file " + entriesZipFile, e2);
-      }
-      throw ex;
-    }
-    requests.validate();
-
-    disableAutoCommit();
-
-    try {
-      int numEntriesInBatch = 0;
-      long lastSuccessfulEntryId = 0;
-
-      List<CaCertstore.Request> list = requests.getRequests();
-      final int n = list.size();
-
-      for (int i = 0; i < n; i++) {
-        CaCertstore.Request request = list.get(i);
-
-        if (stopMe.get()) {
-          throw new InterruptedException("interrupted by the user");
-        }
-
-        long id = request.getId();
-        if (id < minId) {
-          continue;
-        }
-
-        numEntriesInBatch++;
-
-        String filename = request.getFile();
-
-        ZipEntry zipEnty = zipFile.getEntry(filename);
-        byte[] encodedRequest = IoUtil.read(zipFile.getInputStream(zipEnty));
-
-        try {
-          int idx = 1;
-          stmt.setLong(idx++, request.getId());
-          stmt.setLong(idx++, request.getUpdate());
-          stmt.setString(idx, Base64.encodeToString(encodedRequest));
-          stmt.addBatch();
-        } catch (SQLException ex) {
-          System.err.println("could not import REQUEST with ID=" + request.getId() + ", message: " + ex.getMessage());
-          throw ex;
-        }
-
-        boolean isLastBlock = i == n - 1;
-        if (numEntriesInBatch > 0
-            && (numEntriesInBatch % numEntriesPerCommit == 0 || isLastBlock)) {
-          try {
-            stmt.executeBatch();
-            commit("(commit import to CA)");
-          } catch (Throwable th) {
-            rollback();
-            deleteFromTableWithLargerId(type.getTableName(), "ID", id, LOG);
-            if (th instanceof SQLException) {
-              throw translate(sql, (SQLException) th);
-            } else if (th instanceof Exception) {
-              throw (Exception) th;
-            } else {
-              throw new Exception(th);
-            }
-          }
-
-          lastSuccessfulEntryId = id;
-          processLog.addNumProcessed(numEntriesInBatch);
-          numEntriesInBatch = 0;
-          echoToFile(type + ":" + (numProcessedInLastProcess + processLog.numProcessed()) + ":"
-              + lastSuccessfulEntryId, processLogFile);
-          processLog.printStatus();
-        }
-
-      } // end while
-
-      return lastSuccessfulEntryId;
-    } finally {
-      recoverAutoCommit();
-      zipFile.close();
-    }
-  } // method importRequests
-
-  private long importReqCerts(
-      String entriesZipFile, long minId, File processLogFile, ProcessLog processLog, int numProcessedInLastProcess,
-      PreparedStatement stmt, String sql)
-      throws Exception {
-    final CaDbEntryType type = CaDbEntryType.REQCERT;
-    final int numEntriesPerCommit = Math.max(1, Math.round(type.getSqlBatchFactor() * numCertsPerCommit));
-
-    ZipFile zipFile = new ZipFile(new File(entriesZipFile));
-    ZipEntry entriesEntry = zipFile.getEntry("overview.json");
-
-    CaCertstore.ReqCerts reqCerts;
-    try {
-      reqCerts = JSON.parseObject(zipFile.getInputStream(entriesEntry), CaCertstore.ReqCerts.class);
-    } catch (Exception ex) {
-      try {
-        zipFile.close();
-      } catch (Exception e2) {
-        LOG.error("could not close ZIP file {}: {}", entriesZipFile, e2.getMessage());
-        LOG.debug("could not close ZIP file " + entriesZipFile, e2);
-      }
-      throw ex;
-    }
-    reqCerts.validate();
-
-    disableAutoCommit();
-
-    try {
-      int numEntriesInBatch = 0;
-      long lastSuccessfulEntryId = 0;
-
-      List<CaCertstore.ReqCert> list = reqCerts.getReqCerts();
-      final int n = list.size();
-
-      for (int i = 0; i < n; i++) {
-        CaCertstore.ReqCert reqCert = list.get(i);
-        if (stopMe.get()) {
-          throw new InterruptedException("interrupted by the user");
-        }
-
-        long id = reqCert.getId();
-        if (id < minId) {
-          continue;
-        }
-
-        numEntriesInBatch++;
-
-        try {
-          int idx = 1;
-          stmt.setLong(idx++, reqCert.getId());
-          stmt.setLong(idx++, reqCert.getRid());
-          stmt.setLong(idx, reqCert.getCid());
-          stmt.addBatch();
-        } catch (SQLException ex) {
-          System.err.println("could not import REQUEST with ID=" + reqCert.getId() + ", message: " + ex.getMessage());
-          throw ex;
-        }
-
-        boolean isLastBlock = i == n - 1;
-        if (numEntriesInBatch > 0
-            && (numEntriesInBatch % numEntriesPerCommit == 0 || isLastBlock)) {
-          try {
-            stmt.executeBatch();
-            commit("(commit import to CA)");
-          } catch (Throwable th) {
-            rollback();
-            deleteFromTableWithLargerId(type.getTableName(), "ID", id, LOG);
-            if (th instanceof SQLException) {
-              throw translate(sql, (SQLException) th);
-            } else if (th instanceof Exception) {
-              throw (Exception) th;
-            } else {
-              throw new Exception(th);
-            }
-          }
-
-          lastSuccessfulEntryId = id;
-          processLog.addNumProcessed(numEntriesInBatch);
-          numEntriesInBatch = 0;
-          echoToFile(type + ":" + (numProcessedInLastProcess + processLog.numProcessed()) + ":"
-              + lastSuccessfulEntryId, processLogFile);
-          processLog.printStatus();
-        }
-
-      } // end while
-
-      return lastSuccessfulEntryId;
-    } finally {
-      recoverAutoCommit();
-      zipFile.close();
-    }
-  } // method importReqCerts
 
 }

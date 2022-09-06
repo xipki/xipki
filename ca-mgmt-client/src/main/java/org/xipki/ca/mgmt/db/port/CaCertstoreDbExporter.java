@@ -122,7 +122,7 @@ class CaCertstoreDbExporter extends DbPorter {
         idProcessedInLastProcess = null;
       }
 
-      CaDbEntryType[] types = {CaDbEntryType.CERT, CaDbEntryType.REQUEST, CaDbEntryType.REQCERT};
+      CaDbEntryType[] types = {CaDbEntryType.CERT};
 
       for (CaDbEntryType type : types) {
         if (exception == null && (type == typeProcessedInLastProcess || typeProcessedInLastProcess == null)) {
@@ -186,30 +186,19 @@ class CaCertstoreDbExporter extends DbPorter {
     int numProcessedBefore;
     String coreSql;
 
-    switch (type) {
-      case CERT:
-        numProcessedBefore = certstore.getCountCerts();
-        String columns = "ID,SN,CA_ID,PID,RID,TID,EE,LUPDATE,REV,RR,RT,RIT,FP_RS,"
-            + "REQ_SUBJECT,CRL_SCOPE,CERT";
-        if (dbSchemaVersion >= 7) {
-          columns += ",PRIVATE_KEY";
-        }
-        coreSql = columns + " FROM CERT WHERE ID>=?";
-        break;
-      case CRL:
-        numProcessedBefore = certstore.getCountCrls();
-        coreSql = "ID,CA_ID,CRL_SCOPE,CRL FROM CRL WHERE ID>=?";
-        break;
-      case REQUEST:
-        numProcessedBefore = certstore.getCountRequests();
-        coreSql = "ID,LUPDATE,DATA FROM REQUEST WHERE ID>=?";
-        break;
-      case REQCERT:
-        numProcessedBefore = certstore.getCountReqCerts();
-        coreSql = "ID,RID,CID FROM REQCERT WHERE ID>=?";
-        break;
-      default:
-        throw new IllegalStateException("unknown CaDbEntryType " + type);
+    if (type == CaDbEntryType.CERT) {
+      numProcessedBefore = certstore.getCountCerts();
+      String columns = "ID,SN,CA_ID,PID,RID,TID,EE,LUPDATE,REV,RR,RT,RIT,FP_RS,"
+          + "REQ_SUBJECT,CRL_SCOPE,CERT";
+      if (dbSchemaVersion >= 7) {
+        columns += ",PRIVATE_KEY";
+      }
+      coreSql = columns + " FROM CERT WHERE ID>=?";
+    } else if (type == CaDbEntryType.CRL) {
+      numProcessedBefore = certstore.getCountCrls();
+      coreSql = "ID,CA_ID,CRL_SCOPE,CRL FROM CRL WHERE ID>=?";
+    } else {
+      throw new IllegalStateException("unknown CaDbEntryType " + type);
     }
 
     long minId = (idProcessedInLastProcess != null) ? idProcessedInLastProcess + 1 : min(tableName, "ID");
@@ -393,33 +382,6 @@ class CaCertstoreDbExporter extends DbPorter {
 
             crl.validate();
             ((CaCertstore.Crls) entriesInCurrentFile).add(crl);
-          } else if (CaDbEntryType.REQUEST == type) {
-            byte[] dataBytes = Base64.decodeFast(rs.getString("DATA"));
-            String sha1 = HashAlgo.SHA1.hexHash(dataBytes);
-            final String dataFilename = sha1 + ".req";
-            ZipEntry certZipEntry = new ZipEntry(dataFilename);
-            currentEntriesZip.putNextEntry(certZipEntry);
-            try {
-              currentEntriesZip.write(dataBytes);
-            } finally {
-              currentEntriesZip.closeEntry();
-            }
-
-            CaCertstore.Request entry = new CaCertstore.Request();
-            entry.setId(id);
-            entry.setUpdate(rs.getLong("LUPDATE"));
-            entry.setFile(dataFilename);
-
-            entry.validate();
-            ((CaCertstore.Requests) entriesInCurrentFile).add(entry);
-          } else if (CaDbEntryType.REQCERT == type) {
-            CaCertstore.ReqCert entry = new CaCertstore.ReqCert();
-            entry.setId(id);
-            entry.setCid(rs.getLong("CID"));
-            entry.setRid(rs.getLong("RID"));
-
-            entry.validate();
-            ((CaCertstore.ReqCerts) entriesInCurrentFile).add(entry);
           } else {
             throw new IllegalStateException("unknown CaDbEntryType " + type);
           }
@@ -549,36 +511,22 @@ class CaCertstoreDbExporter extends DbPorter {
   } // method finalizeZip
 
   private static Object createContainer(CaDbEntryType type) {
-    switch (type) {
-      case CERT:
-        return new CaCertstore.Certs();
-      case CRL:
-        return new CaCertstore.Crls();
-      case REQUEST:
-        return new CaCertstore.Requests();
-      case REQCERT:
-        return new CaCertstore.ReqCerts();
-      default:
-        throw new IllegalStateException("unknown CaDbEntryType " + type);
+    if (type == CaDbEntryType.CERT) {
+      return new CaCertstore.Certs();
+    } else if (type == CaDbEntryType.CRL) {
+      return new CaCertstore.Crls();
+    } else {
+      throw new IllegalStateException("unknown CaDbEntryType " + type);
     }
   } // method createContainer
 
   private static void setCount(CaDbEntryType type, CaCertstore certstore, int num) {
-    switch (type) {
-      case CERT:
-        certstore.setCountCerts(num);
-        break;
-      case CRL:
-        certstore.setCountCrls(num);
-        break;
-      case REQUEST:
-        certstore.setCountRequests(num);
-        break;
-      case REQCERT:
-        certstore.setCountReqCerts(num);
-        break;
-      default:
-        throw new IllegalStateException("unknown CaDbEntryType " + type);
+    if (type == CaDbEntryType.CERT) {
+      certstore.setCountCerts(num);
+    } else if (type == CaDbEntryType.CRL) {
+      certstore.setCountCrls(num);
+    } else {
+      throw new IllegalStateException("unknown CaDbEntryType " + type);
     }
   } // method setCount
 }

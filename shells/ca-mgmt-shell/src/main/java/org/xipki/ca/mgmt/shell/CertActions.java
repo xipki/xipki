@@ -444,28 +444,6 @@ public class CertActions {
 
   } // class GetCrl
 
-  @Command(scope = "ca", name = "get-request", description = "get the request to enroll certificate")
-  @Service
-  public static class GetRequest extends UnsuspendRmCertAction {
-
-    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the request")
-    @Completion(FileCompleter.class)
-    private String outputFile;
-
-    @Override
-    protected Object execute0() throws Exception {
-      byte[] request = caManager.getCertRequest(caName, getSerialNumber());
-      if (request == null) {
-        System.out.println("unknown request unknown");
-        return null;
-      }
-
-      saveVerbose("request saved to file", outputFile, request);
-      return null;
-    } // method execute0
-
-  } // class GetRequest
-
   @Command(scope = "ca", name = "list-cert", description = "show a list of certificates")
   @Service
   public static class ListCert extends CaAction {

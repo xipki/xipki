@@ -81,7 +81,6 @@
 			"maxValidity":"10y",
 			"nextCrlNo":2,
 			"permissions":["all"],
-			"saveRequest":true,
 			"signerType":"${token.type}",
 			"signerConf":{
 				"value":"${ca.signerConf}"

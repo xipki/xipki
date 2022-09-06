@@ -39,7 +39,6 @@
 				"targetReason":"cessationOfOperation",
 				"unchangedSince":"15d"
 			},
-			"saveRequest":true,
 			"saveKeypair":true,
 			"signerType":"${token.type}",
 			"signerConf":{

@@ -39,7 +39,6 @@
 			"maxValidity":"5y",
 			"nextCrlNo":2,
 			"permissions":["all"],
-			"saveRequest":true,
 			"saveKeypair":true,
 			"signerType":"${token.type}",
 			"signerConf":{

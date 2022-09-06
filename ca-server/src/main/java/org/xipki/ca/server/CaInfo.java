@@ -277,14 +277,6 @@ public class CaInfo {
     return caEntry.isSaveCert();
   }
 
-  public boolean isSaveRequest() {
-    return caEntry.isSaveRequest();
-  }
-
-  public void setSaveRequest(boolean saveRequest) {
-    caEntry.setSaveRequest(saveRequest);
-  }
-
   public boolean isSaveKeypair() {
     return caEntry.isSaveKeypair();
   }

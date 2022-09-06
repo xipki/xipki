@@ -789,18 +789,6 @@ public interface CaManager {
       throws CaMgmtException;
 
   /**
-   * Returns the request used to enroll the given certificate.
-   * @param caName
-   *          CA name. Must not be {@code null}.
-   * @param serialNumber
-   *          Serial number. Must not be {@code null}.
-   * @return the request bytes
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  byte[] getCertRequest(String caName, BigInteger serialNumber) throws CaMgmtException;
-
-  /**
    * Retrieves the types of supported signers.
    * @return lower-case types of supported signers, never {@code null}.
    * @throws CaMgmtException

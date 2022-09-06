@@ -57,7 +57,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
 import java.util.*;
-import java.util.Map.Entry;
 
 import static org.xipki.ca.sdk.CaAuditConstants.APPNAME;
 import static org.xipki.ca.server.CaUtil.canonicalizeSignerConf;
@@ -653,15 +652,6 @@ class Ca2Manager {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
 
-    if (ca.getCaInfo().isSaveRequest()) {
-      try {
-        long dbId = ca.addRequest(encodedCsr);
-        ca.addRequestCert(dbId, certInfo.getCert().getCertId());
-      } catch (OperationException ex) {
-        LogUtil.warn(LOG, ex, "could not save request");
-      }
-    }
-
     return certInfo.getCert().getCert();
   }
 
@@ -739,15 +729,6 @@ class Ca2Manager {
       certInfo = ca.generateCert(manager.byCaRequestor, certTemplateData, null);
     } catch (OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
-    }
-
-    if (ca.getCaInfo().isSaveRequest()) {
-      try {
-        long dbId = ca.addRequest(encodedCsr);
-        ca.addRequestCert(dbId, certInfo.getCert().getCertId());
-      } catch (OperationException ex) {
-        LogUtil.warn(LOG, ex, "could not save request");
-      }
     }
 
     return certInfo.getCert().getCert();
@@ -880,17 +861,6 @@ class Ca2Manager {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
   } // method getCert
-
-  byte[] getCertRequest(String caName, BigInteger serialNumber) throws CaMgmtException {
-    caName = toNonBlankLower(caName, "caName");
-    notNull(serialNumber, "serialNumber");
-    X509Ca ca = getX509Ca(caName);
-    try {
-      return ca.getCertRequest(serialNumber);
-    } catch (OperationException ex) {
-      throw new CaMgmtException(ex.getMessage(), ex);
-    }
-  } // method getCertRequest
 
   List<CertListInfo> listCertificates(
       String caName, X500Name subjectPattern, Date validFrom, Date validTo, CertListOrderBy orderBy, int numEntries)

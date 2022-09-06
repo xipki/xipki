@@ -234,12 +234,6 @@ if { $printUsage equals "true" } then {
 
   ca:list-cert --ca rootca1 --subject "CN=*ca*,O=myorg" --order subject -n 100
 
-  # get the serial number
-  SERIAL = $(xi:cert-info --serial --hex --in output/subca1.crt)
-
-  # save the certificate request
-  ca:get-request --ca rootca1 --serial $SERIAL --out output/subca1.request
-
   source file:./qa/qa.d/ra.script
 
   source file:./qa/ca-qa.script

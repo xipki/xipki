@@ -30,14 +30,10 @@ import org.xipki.qa.BenchmarkHttpClient;
 import org.xipki.qa.BenchmarkHttpClient.HttpClientException;
 import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.qa.BenchmarkHttpClient.SslConf;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.ObjectIdentifiers;
-import org.xipki.security.util.X509Util;
 import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -47,11 +43,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 

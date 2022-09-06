@@ -79,7 +79,6 @@ public abstract class MgmtMessage {
     getCertprofile,
     getCertprofileNames,
     getCertprofilesForCa,
-    getCertRequest,
     getCrl,
     getCurrentCrl,
     getDbSchemas,
@@ -240,8 +239,6 @@ public abstract class MgmtMessage {
 
     private boolean saveCert;
 
-    private boolean saveRequest;
-
     private boolean saveKeypair;
 
     private ValidityMode validityMode = ValidityMode.STRICT;
@@ -312,7 +309,6 @@ public abstract class MgmtMessage {
       }
 
       saveCert = caEntry.isSaveCert();
-      saveRequest = caEntry.isSaveRequest();
       saveKeypair = caEntry.isSaveKeypair();
       keypairGenNames = caEntry.getKeypairGenNames();
 
@@ -419,14 +415,6 @@ public abstract class MgmtMessage {
 
     public void setSaveKeypair(boolean saveKeypair) {
       this.saveKeypair = saveKeypair;
-    }
-
-    public boolean isSaveRequest() {
-      return saveRequest;
-    }
-
-    public void setSaveRequest(boolean saveRequest) {
-      this.saveRequest = saveRequest;
     }
 
     public ValidityMode getValidityMode() {
@@ -564,7 +552,6 @@ public abstract class MgmtMessage {
       rv.setPermission(permission);
       rv.setRevocationInfo(revocationInfo);
       rv.setSaveCert(saveCert);
-      rv.setSaveRequest(saveRequest);
       rv.setSaveKeypair(saveKeypair);
 
       if (revokeSuspended != null) {

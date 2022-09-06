@@ -76,13 +76,6 @@ public class CertStoreBase extends QueryExecutor {
 
   protected static final String SQL_REMOVE_CERT_FOR_ID = "DELETE FROM CERT WHERE ID=?";
 
-  protected static final String SQL_DELETE_UNREFERENCED_REQUEST =
-      "DELETE FROM REQUEST WHERE ID NOT IN (SELECT req.RID FROM REQCERT req)";
-
-  protected static final String SQL_ADD_REQUEST = buildInsertSql("REQUEST", "ID,LUPDATE,DATA");
-
-  protected static final String SQL_ADD_REQCERT = buildInsertSql("REQCERT", "ID,RID,CID");
-
   protected final int dbSchemaVersion;
 
   protected final int maxX500nameLen;
