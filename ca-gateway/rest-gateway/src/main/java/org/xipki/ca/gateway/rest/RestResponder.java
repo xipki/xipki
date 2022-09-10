@@ -241,8 +241,8 @@ public class RestResponder {
           respContent = HttpRespContent.ofOk(RestAPIConstants.CT_pkix_cert, sdk.cacert(caName));
           break;
         }
-        case RestAPIConstants.CMD_cacertchain: {
-          byte[][] certsBytes = sdk.cacertchain(caName);
+        case RestAPIConstants.CMD_cacerts: {
+          byte[][] certsBytes = sdk.cacerts(caName);
           respContent = HttpRespContent.ofOk(RestAPIConstants.CT_pem_file,
               StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certsBytes)));
           break;

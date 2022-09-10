@@ -110,7 +110,7 @@ abstract class BaseCmpResponder {
 
   public static final String TYPE_error = "error";
 
-  public static final String TYPE_genm_cacertchain = "genm_cacertchain";
+  public static final String TYPE_genm_cacerts = "genm_cacerts";
 
   public static final String TYPE_genm_current_crl = "genm_current_crl";
 
@@ -983,8 +983,8 @@ abstract class BaseCmpResponder {
         CertificateList crl = CertificateList.getInstance(encodedCrl);
         itvResp = new InfoTypeAndValue(infoType, crl);
       } else { // if (CMPObjectIdentifiers.id_it_caCerts.equals(infoType)) {
-        event.addEventType(TYPE_genm_cacertchain);
-        byte[][] certchain = sdk.cacertchain(caName);
+        event.addEventType(TYPE_genm_cacerts);
+        byte[][] certchain = sdk.cacerts(caName);
         if (certchain == null || certchain.length == 0) {
           return buildErrorMsgPkiBody(rejection, systemFailure, "no certchain is available");
         }

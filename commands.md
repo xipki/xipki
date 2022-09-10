@@ -521,7 +521,7 @@ CMP Client Commands
 
      get CA certificate
 
-   * `xi:cmp-cacertchain`
+   * `xi:cmp-cacerts`
 
      get CA certificate chain
 

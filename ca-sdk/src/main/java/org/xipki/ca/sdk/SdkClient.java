@@ -86,7 +86,7 @@ public class SdkClient {
     return certs == null || certs.length == 0 ? null : certs[0];
   }
 
-  public byte[][] cacertchain(String ca) throws IOException, SdkErrorResponseException {
+  public byte[][] cacerts(String ca) throws IOException, SdkErrorResponseException {
     byte[] respBytes = send(ca, CMD_cacert, null);
     CertChainResponse resp = CertChainResponse.decode(respBytes);
     return resp.getCertificates();

@@ -19,5 +19,6 @@
     <module>rest-gateway</module>
     <module>scep-client</module>
     <module>scep-gateway</module>
+    <module>est-gateway</module>
   </modules>
 </project>

@@ -36,8 +36,8 @@ echo "# Get CA certificate"
 xi:cmp-cacert --ca ${CA} \
   --out ${CACERT}
 
-xi:cmp-cacertchain --ca ${CA} \
-  --out ${OUT_DIR}/cacertchain.pem
+xi:cmp-cacerts --ca ${CA} \
+  --out ${OUT_DIR}/cacerts.pem
 
 ## Enroll certificates (profile smime)
 

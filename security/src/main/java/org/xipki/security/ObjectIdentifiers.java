@@ -71,7 +71,7 @@ public class ObjectIdentifiers {
 
     public static final ASN1ObjectIdentifier id_xipki_cmp_cmpGenmsg = id_xipki_cmp.branch("1");
 
-    // deprecated id_xipki_cmp_cacertchain = id_xipki_cmp {2};
+    // deprecated id_xipki_cmp_cacerts = id_xipki_cmp {2};
 
     private static final ASN1ObjectIdentifier id_xipki_alg = id_xipki.branch("3");
 

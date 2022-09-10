@@ -39,8 +39,8 @@ curl ${OPTS} \
 echo "get CA certificate chain"
 
 curl ${OPTS} \
-    --output cacertchain.pem \
-    "${BASE_URL}/cacertchain"
+    --output cacerts.pem \
+    "${BASE_URL}/cacerts"
 
 echo "enroll certificate (CA generate keypair)"
 

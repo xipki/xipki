@@ -212,7 +212,7 @@ public class SdkResponder {
           resp.setCertificates(certs);
           return resp;
         }
-        case CMD_cacertchain: {
+        case CMD_cacerts: {
           List<X509Cert> certchain = ca.getCaInfo().getCertchain();
           int size = 1 + (certchain == null ? 0 : certchain.size());
           byte[][] certs = new byte[size][];

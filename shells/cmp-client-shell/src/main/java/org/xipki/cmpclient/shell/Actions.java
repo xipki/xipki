@@ -231,7 +231,7 @@ public class Actions {
 
   } // class CmpCacert
 
-  @Command(scope = "xi", name = "cmp-cacertchain", description = "get CA certificate chain")
+  @Command(scope = "xi", name = "cmp-cacerts", description = "get CA certificate chain")
   @Service
   public static class CmpCacertchain extends ClientAction {
 

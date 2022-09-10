@@ -49,8 +49,8 @@ curl ${OPTS} \
     "${CA_URL}/cacert"
 
 curl ${OPTS} \
-    --output ${OUT_DIR}/cacertchain.pem \
-    "${CA_URL}/cacertchain"
+    --output ${OUT_DIR}/cacerts.pem \
+    "${CA_URL}/cacerts"
 
 CA_SHA1FP=`openssl sha1 ${OUT_DIR}/cacert.der | cut -d '=' -f 2 | cut -d ' ' -f 2`
 

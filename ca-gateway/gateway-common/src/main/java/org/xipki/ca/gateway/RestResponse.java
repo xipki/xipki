@@ -1,5 +1,6 @@
 package org.xipki.ca.gateway;
 
+import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 
 import javax.servlet.http.HttpServletResponse;
@@ -20,14 +21,21 @@ public class RestResponse {
 
   private final Map<String, String> headers;
 
+  private boolean base64;
+
   private final byte[] body;
 
   public RestResponse(int statusCode) {
-    this(statusCode, null, null, null);
+    this(statusCode, null, null, false, null);
   }
 
   public RestResponse(int statusCode, String contentType, Map<String, String> headers, byte[] body) {
+    this(statusCode, contentType, headers, false, body);
+  }
+
+  public RestResponse(int statusCode, String contentType, Map<String, String> headers, boolean base64, byte[] body) {
     this.statusCode = statusCode;
+    this.base64 = base64;
     this.contentType = contentType;
     this.headers = headers;
     this.body = body;
@@ -64,8 +72,16 @@ public class RestResponse {
     if (body == null) {
       resp.setContentLength(0);
     } else {
-      resp.setContentLength(body.length);
-      resp.getOutputStream().write(body);
+      byte[] content;
+      if (base64) {
+        resp.setHeader("Content-Transfer-Encoding", "base64");
+        content = Base64.encodeToByte(body, true);
+      } else {
+        content = body;
+      }
+
+      resp.setContentLength(content.length);
+      resp.getOutputStream().write(content);
     }
   }
 

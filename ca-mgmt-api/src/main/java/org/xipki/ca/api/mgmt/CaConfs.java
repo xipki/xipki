@@ -201,7 +201,7 @@ public class CaConfs {
                 for (int i = 0; i < ci.getCertchain().size(); i++) {
                   FileOrBinary fi = ci.getCertchain().get(i);
                   if (fi.getFile() != null) {
-                    String zipEntryName = "files/cacertchain-" + name + "-" + i + ".crt";
+                    String zipEntryName = "files/cacerts-" + name + "-" + i + ".crt";
                     byte[] value = getBinary(fi.getFile(), properties, baseDir);
                     createFileOrBinary(zipStream, value, zipEntryName);
                     fi.setFile(zipEntryName);

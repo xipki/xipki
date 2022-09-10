@@ -33,7 +33,7 @@ echo "# Get CA certificate"
 
 xi:curl --out ${CACERT} $BASE_URL/cacert
 
-xi:curl --out ${OUT_DIR}/cacertchain.pem $BASE_URL/cacertchain
+xi:curl --out ${OUT_DIR}/cacerts.pem $BASE_URL/cacerts
 
 CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in ${CACERT})
 
