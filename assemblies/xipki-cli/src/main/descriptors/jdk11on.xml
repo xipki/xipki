@@ -68,6 +68,8 @@
     <fileSet>
       <directory>${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin</directory>
       <includes>
+        <include>inc</include>
+        <include>setenv</include>
         <include>client</include>
         <include>instance</include>
         <include>karaf</include>
@@ -84,8 +86,6 @@
     <fileSet>
       <directory>${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin</directory>
       <includes>
-        <include>inc</include>
-        <include>setenv</include>
         <include>*.bat</include>
       </includes>
       <outputDirectory>bin/</outputDirectory>
