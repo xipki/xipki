@@ -35,12 +35,10 @@ import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.sdk.*;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.CrlReason;
-import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
-import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.InsufficientPermissionException;
 import org.xipki.util.exception.OperationException;
 

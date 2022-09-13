@@ -19,7 +19,6 @@ package org.xipki.scep.client;
 
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.XiHttpClient;
-import org.xipki.util.http.XiHttpClientException;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;

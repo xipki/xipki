@@ -31,7 +31,6 @@ import org.xipki.ca.api.profile.Certprofile.CertDomain;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
 import org.xipki.ca.api.profile.Certprofile.X509CertVersion;
-import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
 import org.xipki.ca.certprofile.xijson.conf.*;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;

@@ -1,7 +1,5 @@
 package org.xipki.ca.sdk;
 
-import java.math.BigInteger;
-
 /**
  *
  * @author Lijun Liao

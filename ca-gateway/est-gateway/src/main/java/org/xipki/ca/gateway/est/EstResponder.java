@@ -18,7 +18,6 @@
 package org.xipki.ca.gateway.est;
 
 import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.cmc.CMCObjectIdentifiers;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.SignedData;
@@ -34,7 +33,6 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Attr;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
@@ -45,19 +43,24 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
-import org.xipki.util.*;
+import org.xipki.util.LogUtil;
+import org.xipki.util.PermissionConstants;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
 import org.xipki.util.http.HttpRespContent;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.util.*;
 
 import static org.xipki.util.Args.notNull;
-import static org.xipki.util.exception.ErrorCode.*;
 import static org.xipki.util.StringUtil.*;
+import static org.xipki.util.exception.ErrorCode.*;
 
 /**
  * EST responder.

@@ -22,7 +22,6 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.x509.Extension;
-import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.certprofile.xijson.DirectoryStringType;
 import org.xipki.ca.certprofile.xijson.conf.*;
 import org.xipki.ca.certprofile.xijson.conf.BiometricInfo.BiometricTypeType;

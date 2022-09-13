@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.Range;

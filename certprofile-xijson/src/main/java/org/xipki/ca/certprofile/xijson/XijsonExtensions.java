@@ -43,7 +43,6 @@ import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
-import org.xipki.util.TripleState;
 import org.xipki.util.Validity;
 import org.xipki.util.exception.BadCertTemplateException;
 
