@@ -18,6 +18,7 @@
 package org.xipki.security.shell;
 
 import com.alibaba.fastjson.JSON;
+import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -25,12 +26,16 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x509.qualified.*;
+import org.bouncycastle.mime.smime.SMimeMultipartContext;
 import org.bouncycastle.openssl.PKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JcaPKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8EncryptorBuilder;
@@ -44,14 +49,17 @@ import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.X509ExtensionType.ExtensionsType;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
+import org.xipki.util.Base64;
 import org.xipki.util.DateUtil;
 import org.xipki.util.*;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Key;
@@ -393,9 +401,17 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String peerCertsFile;
 
-    @Option(name = "--cert", description = "Certificate file, from which subject and extensions will be extracted.")
+    @Option(name = "--cert", description = "Certificate file, from which subject and extensions will be extracted.\n" +
+        "Maximal one of cert and old-cert is allowed.")
     @Completion(FileCompleter.class)
     private String certFile;
+
+    @Option(name = "--old-cert", description =
+            "Certificate file to be updated. The subject and subjectAltNames will be copied to the CSR.\n" +
+            "The subject and subject-alt-name specified here will be specified in the changeSubjectName attribute.\n" +
+            "Maximal one of cert and old-cert is allowed.")
+    @Completion(FileCompleter.class)
+    private String oldCertFile;
 
     @Option(name = "--subject", aliases = "-s", description = "subject in the CSR, "
             + "if not set, use the subject in the signer's certificate ")
@@ -470,6 +486,10 @@ public class Actions {
 
     @Override
     protected Object execute0() throws Exception {
+      if (certFile != null && oldCertFile != null) {
+        throw new IllegalCmdParamException("maximal one of cert and old-cert is allowed");
+      }
+
       ConcurrentContentSigner signer = getSigner();
 
       SubjectPublicKeyInfo subjectPublicKeyInfo;
@@ -532,18 +552,10 @@ public class Actions {
         extkeyusages = list;
       }
 
-      // SubjectAltNames
       List<Extension> extensions = new LinkedList<>();
 
-      ASN1OctetString extnValue = isEmpty(subjectAltNames) ? null
-              : X509Util.createExtnSubjectAltName(subjectAltNames, false).getExtnValue();
-      if (extnValue != null) {
-        ASN1ObjectIdentifier oid = Extension.subjectAlternativeName;
-        extensions.add(new Extension(oid, false, extnValue));
-      }
-
       // SubjectInfoAccess
-      extnValue = isEmpty(subjectInfoAccesses) ? null
+      ASN1OctetString extnValue = isEmpty(subjectInfoAccesses) ? null
               : X509Util.createExtnSubjectInfoAccess(subjectInfoAccesses, false).getExtnValue();
 
       if (extnValue != null) {
@@ -654,7 +666,9 @@ public class Actions {
 
       extensions.addAll(getAdditionalExtensions());
 
-      X500Name subjectDn;
+      final boolean updateOldCert = oldCertFile != null;
+
+      X500Name newSubjectDn = null;
       if (subject == null) {
         if (StringUtil.isNotBlank(dateOfBirth)) {
           throw new IllegalCmdParamException("dateOfBirth cannot be set if subject is not set");
@@ -664,19 +678,21 @@ public class Actions {
           throw new IllegalCmdParamException("postalAddress cannot be set if subject is not set");
         }
 
-        X509Cert signerCert = signer.getCertificate();
-        if (signerCert == null) {
-          throw new IllegalCmdParamException("subject must be set");
+        if (!updateOldCert) {
+          X509Cert signerCert = signer.getCertificate();
+          if (signerCert == null) {
+            throw new IllegalCmdParamException("subject must be set");
+          }
+          newSubjectDn = signerCert.getSubject();
         }
-        subjectDn = signerCert.getSubject();
       } else {
-        subjectDn = getSubject(subject);
+        newSubjectDn = getSubject(subject);
 
         List<RDN> list = new LinkedList<>();
 
         if (StringUtil.isNotBlank(dateOfBirth)) {
           ASN1ObjectIdentifier id = ObjectIdentifiers.DN.dateOfBirth;
-          RDN[] rdns = subjectDn.getRDNs(id);
+          RDN[] rdns = newSubjectDn.getRDNs(id);
 
           if (rdns == null || rdns.length == 0) {
             Date date = DateUtil.parseUtcTimeyyyyMMdd(dateOfBirth);
@@ -689,7 +705,7 @@ public class Actions {
 
         if (CollectionUtil.isNotEmpty(postalAddress)) {
           ASN1ObjectIdentifier id = ObjectIdentifiers.DN.postalAddress;
-          RDN[] rdns = subjectDn.getRDNs(id);
+          RDN[] rdns = newSubjectDn.getRDNs(id);
 
           if (rdns == null || rdns.length == 0) {
             ASN1EncodableVector vec = new ASN1EncodableVector();
@@ -706,14 +722,57 @@ public class Actions {
         }
 
         if (!list.isEmpty()) {
-          Collections.addAll(list, subjectDn.getRDNs());
+          Collections.addAll(list, newSubjectDn.getRDNs());
+          newSubjectDn = new X500Name(list.toArray(new RDN[0]));
+        }
+      }
 
-          subjectDn = new X500Name(list.toArray(new RDN[0]));
+      // SubjectAltNames
+      extnValue = isEmpty(subjectAltNames) ? null
+          : X509Util.createExtnSubjectAltName(subjectAltNames, false).getExtnValue();
+      Extension newSubjectAltNames = null;
+      if (extnValue != null) {
+        ASN1ObjectIdentifier oid = Extension.subjectAlternativeName;
+        newSubjectAltNames = new Extension(oid, false, extnValue);
+      }
+
+      Attribute attrChangeSubjectName = null;
+      X500Name subjectDn;
+      if (updateOldCert) {
+        Certificate oldCert = Certificate.getInstance(X509Util.toDerEncoded(IoUtil.read(oldCertFile)));
+        subjectDn = oldCert.getSubject();
+        Extension oldSan = oldCert.getTBSCertificate().getExtensions().getExtension(Extension.subjectAlternativeName);
+        if (oldSan != null) {
+          extensions.add(oldSan);
+        }
+
+        if (newSubjectDn != null || newSubjectAltNames != null) {
+          ASN1EncodableVector v = new ASN1EncodableVector();
+          v.add(newSubjectDn == null ? subjectDn : newSubjectDn);
+
+          GeneralNames subjectAlt = null;
+          if (newSubjectAltNames != null) {
+            subjectAlt = GeneralNames.getInstance(newSubjectAltNames.getExtnValue().getOctets());
+          } else if (oldSan != null) {
+            subjectAlt = GeneralNames.getInstance(oldSan.getParsedValue());
+          }
+
+          if (subjectAlt != null) {
+            v.add(subjectAlt);
+          }
+
+          attrChangeSubjectName = new Attribute(ObjectIdentifiers.CMC.id_cmc_changeSubjectName,
+              new DERSet(new DERSequence(v)));
+        }
+      } else {
+        subjectDn = newSubjectDn;
+        if (newSubjectAltNames != null) {
+          extensions.add(newSubjectAltNames);
         }
       }
 
       PKCS10CertificationRequest csr = generateRequest(signer, subjectPublicKeyInfo, subjectDn,
-              challengePassword, extensions);
+              challengePassword, extensions, attrChangeSubjectName);
       saveVerbose("saved CSR to file", outputFilename, encodeCsr(csr.getEncoded(), outform));
       return null;
     } // method execute0
@@ -755,8 +814,8 @@ public class Actions {
     } // method textToAsn1ObjectIdentifers
 
     private PKCS10CertificationRequest generateRequest(
-            ConcurrentContentSigner signer, SubjectPublicKeyInfo subjectPublicKeyInfo,
-            X500Name subjectDn, String challengePassword, List<Extension> extensions)
+        ConcurrentContentSigner signer, SubjectPublicKeyInfo subjectPublicKeyInfo,
+        X500Name subjectDn, String challengePassword, List<Extension> extensions, Attribute... attrs)
             throws XiSecurityException {
       Args.notNull(signer, "signer");
       Args.notNull(subjectPublicKeyInfo, "subjectPublicKeyInfo");
@@ -778,6 +837,14 @@ public class Actions {
       if (CollectionUtil.isNotEmpty(attributes)) {
         for (Entry<ASN1ObjectIdentifier, ASN1Encodable> entry : attributes.entrySet()) {
           csrBuilder.addAttribute(entry.getKey(), entry.getValue());
+        }
+      }
+
+      if (attrs != null) {
+        for (Attribute attr : attrs) {
+          if (attr != null) {
+            csrBuilder.addAttribute(attr.getAttrType(), attr.getAttrValues().toArray());
+          }
         }
       }
 
@@ -934,6 +1001,176 @@ public class Actions {
 
   } // class ImportCert
 
+  @Command(scope = "xi", name = "export-cert-p7m", description = "export (the first) certificate from CMS signed data")
+  @Service
+  public static class ExportCertP7m extends SecurityAction {
+
+    @Option(name = "--outform", description = "output format of the certificate")
+    @Completion(Completers.DerPemCompleter.class)
+    private String outform = "der";
+
+    @Argument(index = 0, name = "p7m file", required = true, description = "File of the CMS signed data")
+    @Completion(FileCompleter.class)
+    private String p7mFile;
+
+    @Argument(index = 1, name = "cert file", required = true, description = "File to save the certificate")
+    @Completion(FileCompleter.class)
+    private String certFile;
+
+    @Override
+    protected Object execute0() throws Exception {
+      byte[] encodedCert = extractCertFromSignedData(IoUtil.read(p7mFile));
+      saveVerbose("saved certificate to file", certFile, encodeCert(encodedCert, outform));
+      return null;
+    }
+
+  } // class ExportCertP7m
+
+  @Command(scope = "xi", name = "export-keycert-est",
+      description = "export key and certificate from the response of EST's serverkeygen")
+  @Service
+  public static class ExportKeyCertEst extends SecurityAction {
+
+    @Option(name = "--outform", description = "output format of the key and certificate")
+    @Completion(Completers.DerPemCompleter.class)
+    private String outform = "der";
+
+    @Argument(index = 0, name = "response-file", required = true, description = "File containing the response")
+    @Completion(FileCompleter.class)
+    private String estRespFile;
+
+    @Argument(index = 1, name = "key-file", required = true, description = "File to save the private key")
+    @Completion(FileCompleter.class)
+    private String keyFile;
+
+    @Argument(index = 2, name = "cert-file", required = true, description = "File to save the certificate")
+    @Completion(FileCompleter.class)
+    private String certFile;
+
+    @Override
+    protected Object execute0() throws Exception {
+      try (BufferedReader reader = new BufferedReader(new FileReader(IoUtil.expandFilepath(estRespFile)))) {
+        String bounary = null;
+
+        // detect the bounary
+        String line;
+        while (true) {
+          line = reader.readLine();
+          if (line == null) {
+            break;
+          }
+
+          if (line.startsWith("--")) {
+            bounary = line;
+            break;
+          }
+        }
+
+        if (bounary == null) {
+          throw new IOException("found no boundary");
+        }
+
+        Object[] blockInfo1 = readBlock(reader, bounary);
+        if ((boolean) blockInfo1[0]) {
+          throw new IOException("2 blocks is expected, found only 1");
+        }
+
+        Object[] blockInfo2 = readBlock(reader, bounary);
+        if (!(boolean) blockInfo2[0]) {
+          throw new IOException("2 blocks is expected, found more than 2");
+        }
+
+        byte[] keyBytes = null;
+        byte[] certBytes = null;
+
+        Object[][] blockInfos = new Object[][]{blockInfo1, blockInfo2};
+        for (Object[] blockInfo : blockInfos) {
+          String ct = (String) blockInfo[1];
+          byte[] bytes = (byte[]) blockInfo[2];
+          if (ct.startsWith("application/pkcs8")) {
+            keyBytes = bytes;
+          } else if (ct.startsWith("application/pkcs7-mime")) {
+            certBytes = bytes;
+          }
+        }
+
+        if (keyBytes == null) {
+          throw new IOException("found no private key block");
+        }
+
+        if (certBytes == null) {
+          throw new IOException("found no certificate block");
+        }
+
+        saveVerbose("private key saved to file", keyFile,
+            derPemEncode(keyBytes, outform, PemEncoder.PemLabel.PRIVATE_KEY));
+        saveVerbose("certificate saved to file", certFile,
+            encodeCert(extractCertFromSignedData(certBytes), outform));
+
+      }
+      return null;
+    }
+
+    private static Object[] readBlock(BufferedReader reader, String boundary) throws IOException {
+      StringBuilder sb = new StringBuilder();
+      String line;
+
+      String contentType = null;
+      String encoding = null;
+      boolean isLastBlock = false;
+
+      boolean bodyStarted = false;
+      boolean bodyFinished = false;
+
+      while (true) {
+        line = reader.readLine();
+        if (line == null) {
+          break;
+        }
+
+        if (bodyStarted) {
+          if (line.equals(boundary)) {
+            bodyFinished = true;
+            // end of block
+            break;
+          } else if (line.equals(boundary + "--")) {
+            // end of block and body
+            bodyFinished = true;
+            isLastBlock = true;
+            break;
+          }
+
+          sb.append(line);
+          sb.append("\r\n");
+        } else if (line.isEmpty()) {
+          bodyStarted = true;
+        } else {
+          if (StringUtil.startsWithIgnoreCase(line, "content-type:")) {
+            contentType = line.substring("content-type:".length()).trim();
+          } else if (StringUtil.startsWithIgnoreCase(line, "content-transfer-encoding:")) {
+            encoding = line.substring("content-transfer-encoding:".length()).trim();
+          }
+        }
+      }
+
+      if (!(bodyStarted && bodyFinished)) {
+        throw new IOException("invalid block");
+      }
+
+      byte[] content;
+      if ("base64".equalsIgnoreCase(encoding)) {
+        content = Base64.decodeFast(sb.toString());
+      } else if (StringUtil.isBlank(encoding)) {
+        content = sb.toString().getBytes(StandardCharsets.UTF_8);
+      } else {
+        throw new IOException("unknown content-transfer-encoding " + encoding);
+      }
+
+      return new Object[]{isLastBlock, contentType, content};
+    }
+
+  } // class ExportKeyCertEst
+
   public abstract static class SecurityAction extends XiAction {
 
     @Reference
@@ -944,5 +1181,17 @@ public class Actions {
     }
 
   } // class SecurityAction
+
+  private static byte[] extractCertFromSignedData(byte[] cmsBytes)
+      throws CmdFailure, IOException {
+    ContentInfo ci = ContentInfo.getInstance(X509Util.toDerEncoded(cmsBytes));
+    SignedData sd = SignedData.getInstance(ci.getContent());
+    ASN1Set certs = sd.getCertificates();
+    if (certs == null || certs.size() == 0) {
+      throw new CmdFailure("Found no certificate");
+    }
+
+    return certs.getObjectAt(0).toASN1Primitive().getEncoded();
+  }
 
 }

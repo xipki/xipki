@@ -61,7 +61,7 @@ follows.
    - DB Tool: `assemblies/xipki-dbtool/target/xipki-dbtool-<version>.zip`
    - CA: `assemblies/xipki-ca/target/xipki-ca-<version>.zip`
    - OCSP: `assemblies/xipki-ocsp/target/xipki-ocsp-<version>.zip`
-   - Protocol Gateway (CMP, SCEP, REST): `assemblies/xipki-gateway/target/xipki-gateway-<version>.zip`
+   - Protocol Gateway (CMP, SCEP, EST, REST): `assemblies/xipki-gateway/target/xipki-gateway-<version>.zip`
    - Management CLI: `assemblies/xipki-mgmt-cli/target/xipki-mgmt-cli-<version>.tar.gz`
    - CLI: `assemblies/xipki-cli/target/xipki-cli-<version>.tar.gz`
 
@@ -193,15 +193,22 @@ preload <start script>
 
 ## Enroll/Revoke Certificate
 
+* EST
+  Use any EST client.
+
+  The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
+  It can be executed in the CLI as follows:
+  - `source xipki/client-script/est-client.script` (use argument 'help' to print the usage)
+
 * SCEP  
-  Using any SCEP client. XiPKI provides also a SCEP client.
+  Use any SCEP client. XiPKI provides also a SCEP client.
 
   The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:  
   - `source xipki/client-script/scep-client.script`
 
 * CMP
-  Using any CMP client. XiPKI provides also a CMP client.
+  Use any CMP client. XiPKI provides also a CMP client.
 
   The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:  
@@ -230,6 +237,7 @@ See discussion in [discussion #205](https://github.com/xipki/xipki/discussions/2
 Features
 -----
 - CA Protocol Gateway
+  - EST (RFC 7030)
   - SCEP (RFC 8894)
   - CMP (RFC 4210 and RFC 4211)
   - RESTful API

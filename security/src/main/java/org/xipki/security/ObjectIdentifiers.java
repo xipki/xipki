@@ -18,6 +18,7 @@
 package org.xipki.security;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.cmc.CMCObjectIdentifiers;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -58,6 +59,10 @@ public class ObjectIdentifiers {
 
   public static final class CMP {
     public static final ASN1ObjectIdentifier id_it_certProfile = new ASN1ObjectIdentifier("1.3.6.1.5.5.7.4.21");
+  }
+
+  public static final class CMC {
+    public static final ASN1ObjectIdentifier id_cmc_changeSubjectName = CMCObjectIdentifiers.id_cmc.branch("36");
   }
 
   public static final class Xipki {

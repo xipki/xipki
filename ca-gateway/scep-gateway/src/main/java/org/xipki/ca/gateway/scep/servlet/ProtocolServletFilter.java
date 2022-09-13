@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * CA ServletFilter.
+ * SCEP Gateway ServletFilter.
  *
  * @author Lijun Liao
  * @since 6.0.0

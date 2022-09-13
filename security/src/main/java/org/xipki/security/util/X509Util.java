@@ -886,6 +886,24 @@ public class X509Util {
     return null;
   } // method getExtensions
 
+  public static String getChallengePassword(CertificationRequestInfo csr) {
+    Attribute attr = getAttribute(csr, PKCSObjectIdentifiers.pkcs_9_at_challengePassword);
+    return attr == null ? null : ((ASN1String) attr.getAttributeValues()[0]).getString();
+  }
+
+  public static Attribute getAttribute(CertificationRequestInfo csr, ASN1ObjectIdentifier type) {
+    notNull(csr, "csr");
+    notNull(type, "type");
+    ASN1Set attrs = csr.getAttributes();
+    for (int i = 0; i < attrs.size(); i++) {
+      Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
+      if (type.equals(attr.getAttrType())) {
+        return attr;
+      }
+    }
+    return null;
+  } // method getChallengePassword
+
   public static List<X509Cert> parseCerts(List<FileOrBinary> certsConf)
       throws InvalidConfException {
     if (CollectionUtil.isEmpty(certsConf)) {

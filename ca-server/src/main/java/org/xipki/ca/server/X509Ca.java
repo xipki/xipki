@@ -250,6 +250,11 @@ public class X509Ca extends X509CaModule implements Closeable {
     return certstore.getCertWithRevocationInfo(caIdent.getId(), serialNumber, caIdNameMap);
   }
 
+  public CertWithRevocationInfo getCertWithRevocationInfoBySubject(X500Name subject, byte[] san)
+      throws CertificateException, OperationException {
+    return certstore.getCertWithRevocationInfoBySubject(caIdent.getId(), subject, san, caIdNameMap);
+  }
+
   public List<CertListInfo> listCerts(
       X500Name subjectPattern, Date validFrom, Date validTo, CertListOrderBy orderBy, int numEntries)
       throws OperationException {

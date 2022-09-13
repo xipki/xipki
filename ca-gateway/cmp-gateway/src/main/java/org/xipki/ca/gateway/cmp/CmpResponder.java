@@ -128,7 +128,7 @@ public class CmpResponder extends BaseCmpResponder {
         }
       }
 
-      OldCertInfo oldCertInfo = null;
+      OldCertInfoByIssuerAndSerial oldCertInfo = null;
 
       if (kup) {
         // The regCtl-oldCertID will be ignored by calling
@@ -185,7 +185,7 @@ public class CmpResponder extends BaseCmpResponder {
           checkPermission(requestor, PermissionConstants.GEN_KEYPAIR);
         }
 
-        oldCertInfo = new OldCertInfo();
+        oldCertInfo = new OldCertInfoByIssuerAndSerial();
         oldCertInfo.setIssuer(new X500NameType(X500Name.getInstance(oldCertId.getIssuer().getName())));
         oldCertInfo.setSerialNumber(oldCertId.getSerialNumber().getValue());
         oldCertInfo.setReusePublicKey(false);
@@ -218,7 +218,7 @@ public class CmpResponder extends BaseCmpResponder {
       template.setSubject(new X500NameType(subject));
 
       if (oldCertInfo != null) {
-        template.setOldCert(oldCertInfo);
+        template.setOldCertIsn(oldCertInfo);
       }
 
       certTemplateDatas.add(template);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app>
-  <display-name>XiPKI CA Web Application</display-name>
+  <display-name>XiPKI REST Gateway</display-name>
   <session-config>
     <session-timeout>60</session-timeout>
   </session-config>

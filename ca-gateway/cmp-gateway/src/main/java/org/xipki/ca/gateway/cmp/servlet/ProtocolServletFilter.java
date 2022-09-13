@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * CA ServletFilter.
+ * CMP Gateway ServletFilter.
  *
  * @author Lijun Liao
  */

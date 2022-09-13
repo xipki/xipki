@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.security.FpIdCalculator;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
@@ -60,7 +61,7 @@ class CaCertstoreDbImporter extends DbPorter {
   private static final Logger LOG = LoggerFactory.getLogger(CaCertstoreDbImporter.class);
 
   private static final String SQL_ADD_CERT = buildInsertSql("CERT",
-      "ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,RR,RT,RIT,"
+      "ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,FP_SAN,NBEFORE,NAFTER,REV,RR,RT,RIT,"
       + "PID,CA_ID,RID,EE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT,PRIVATE_KEY");
 
   private static final String SQL_ADD_CRL = buildInsertSql("CRL",
@@ -376,6 +377,13 @@ class CaCertstoreDbImporter extends DbPorter {
 
           if (cert.getFpRs() != null) {
             stmt.setLong(idx++, cert.getFpRs());
+          } else {
+            stmt.setNull(idx++, Types.BIGINT);
+          }
+
+          byte[] san = X509Util.getCoreExtValue(tbsCert.getExtensions(), Extension.subjectAlternativeName);
+          if (san != null) {
+            stmt.setLong(idx++, FpIdCalculator.hash(san));
           } else {
             stmt.setNull(idx++, Types.BIGINT);
           }

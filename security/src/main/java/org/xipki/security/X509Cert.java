@@ -81,6 +81,10 @@ public class X509Cert {
 
   private boolean[] keyUsage;
 
+  private boolean sanProcessed;
+
+  private byte[] san;
+
   private SubjectPublicKeyInfo subjectPublicKeyInfo;
 
   private PublicKey publicKey;
@@ -112,6 +116,10 @@ public class X509Cert {
     this.subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
 
     this.selfSigned = subject.equals(issuer);
+
+    byte[] bytes = cert.getExtensionValue(Extension.subjectAlternativeName.getId());
+    this.san = bytes == null ? null : ASN1OctetString.getInstance(bytes).getOctets();
+    // TODO
   }
 
   public X509Cert(X509CertificateHolder cert) {
@@ -130,6 +138,7 @@ public class X509Cert {
     this.issuer = cert.getIssuer();
     this.subject = cert.getSubject();
     this.selfSigned = subject.equals(issuer);
+    this.san = X509Util.getCoreExtValue(cert.getExtensions(), Extension.subjectAlternativeName);
   }
 
   /**
@@ -235,6 +244,17 @@ public class X509Cert {
     }
 
     return keyUsage;
+  }
+
+  public byte[] getSubjectAltNames() {
+    if (!sanProcessed) {
+      synchronized (sync) {
+        this.san = getCoreExtValue(Extension.subjectAlternativeName);
+        sanProcessed = true;
+      }
+    }
+
+    return san == null ? null : san.clone();
   }
 
   public X500Name getIssuer() {

@@ -7,7 +7,7 @@ See also <https://github.com/xipki/xipki/releases>
 - CA
   - CA communicates only with RA over RESTful API with mutual TLS
   - Remove the support of protocols CMP and SCEP with CA
-  - Add protocol proxies (RA) for different protocols CMP, SCEP and RESTful API. 
+  - Add protocol proxies (RA) for different protocols CMP, SCEP, EST and RESTful API.
   - Change the database schema of CA
   - Reduce the minimal interval to generate CRL from 1 day to 1 hour
   - Add integrity protection of the audit entries

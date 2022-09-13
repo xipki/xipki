@@ -6,6 +6,10 @@ auto-complete the options and arguments by the `TAB` key.
 
 Basic Commands
 --
+   * `base64`
+
+     Base64 encode / decode
+
    * `xi:confirm`
 
      confirm an action
@@ -147,6 +151,14 @@ Security Commands
    * `xi:export-cert-p12`
 
      export certificate from PKCS#12 keystore
+
+   * `xi:export-cert-p7m`
+
+     export (the first) certificate from CMS signed data
+
+   * `xi:export-keycert-est`
+
+     export key and certificate from the response of EST's serverkeygen
 
    * `xi:import-cert`
 

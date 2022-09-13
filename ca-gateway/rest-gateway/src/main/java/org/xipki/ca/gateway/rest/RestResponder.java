@@ -118,6 +118,77 @@ public class RestResponder {
 
   private static final int SERVICE_UNAVAILABLE = 503;
 
+  private static final String CT_pkcs10 = "application/pkcs10";
+
+  private static final String CT_pkix_crl = "application/pkix-crl";
+
+  private static final String CT_pkix_cert = "application/pkix-cert";
+
+  private static final String CT_pem_file = "application/x-pem-file";
+
+  private static final String HEADER_PKISTATUS = "X-xipki-pkistatus";
+
+  private static final String PKISTATUS_accepted = "accepted";
+
+  private static final String PKISTATUS_rejection = "rejection";
+
+  private static final String HEADER_failInfo = "X-xipki-fail-info";
+
+  private static final String FAILINFO_badRequest = "badRequest";
+
+  private static final String FAILINFO_badCertId = "badCertId";
+
+  private static final String FAILINFO_badPOP = "badPOP";
+
+  private static final String FAILINFO_certRevoked = "certRevoked";
+
+  private static final String FAILINFO_badCertTemplate = "badCertTemplate";
+
+  private static final String FAILINFO_notAuthorized = "notAuthorized";
+
+  private static final String FAILINFO_systemUnavail = "systemUnavail";
+
+  private static final String FAILINFO_systemFailure = "systemFailure";
+
+  private static final String CMD_cacert = "cacert";
+
+  private static final String CMD_cacerts = "cacerts";
+
+  private static final String CMD_revoke_cert = "revoke-cert";
+
+  private static final String CMD_unsuspend_cert = "unsuspend-cert";
+
+  @Deprecated
+  private static final String CMD_unrevoke_cert = "unrevoke-cert";
+
+  private static final String CMD_enroll_cert = "enroll-cert";
+
+  private static final String CMD_enroll_cross_cert = "enroll-cross-cert";
+
+  private static final String CMD_enroll_cert_genkey = "enroll-cert-genkey";
+
+  private static final String CMD_enroll_cert_twin = "enroll-cert-twin";
+
+  private static final String CMD_enroll_cert_genkey_twin = "enroll-cert-genkey-twin";
+
+  private static final String CMD_crl = "crl";
+
+  private static final String PARAM_profile = "profile";
+
+  private static final String PARAM_reason = "reason";
+
+  private static final String PARAM_not_before = "not-before";
+
+  private static final String PARAM_not_after = "not-after";
+
+  private static final String PARAM_invalidity_time = "invalidity-time";
+
+  private static final String PARAM_crl_number = "crl-number";
+
+  private static final String PARAM_ca_sha1 = "ca-sha1";
+
+  private static final String PARAM_serial_number = "serial-number";
+
   private static final Logger LOG = LoggerFactory.getLogger(RestResponder.class);
 
   private final SdkClient sdk;
@@ -128,8 +199,8 @@ public class RestResponder {
 
   private final RequestorAuthenticator authenticator;
 
-  public RestResponder(
-      SdkClient sdk, SecurityFactory securityFactory, RequestorAuthenticator authenticator, PopControl popControl) {
+  public RestResponder(SdkClient sdk, SecurityFactory securityFactory,
+                       RequestorAuthenticator authenticator, PopControl popControl) {
     this.sdk = notNull(sdk, "sdk");
     this.securityFactory = notNull(securityFactory, "securityFactory");
     this.authenticator = notNull(authenticator, "authenticator");
@@ -237,35 +308,35 @@ public class RestResponder {
       HttpRespContent respContent;
 
       switch (command) {
-        case RestAPIConstants.CMD_cacert: {
-          respContent = HttpRespContent.ofOk(RestAPIConstants.CT_pkix_cert, sdk.cacert(caName));
+        case CMD_cacert: {
+          respContent = HttpRespContent.ofOk(CT_pkix_cert, sdk.cacert(caName));
           break;
         }
-        case RestAPIConstants.CMD_cacerts: {
+        case CMD_cacerts: {
           byte[][] certsBytes = sdk.cacerts(caName);
-          respContent = HttpRespContent.ofOk(RestAPIConstants.CT_pem_file,
+          respContent = HttpRespContent.ofOk(CT_pem_file,
               StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certsBytes)));
           break;
         }
-        case RestAPIConstants.CMD_enroll_cross_cert: {
+        case CMD_enroll_cross_cert: {
           respContent = enrollCrossCert(caName, requestor, request, httpRetriever, event);
           break;
         }
-        case RestAPIConstants.CMD_enroll_cert:
-        case RestAPIConstants.CMD_enroll_cert_genkey:
-        case RestAPIConstants.CMD_enroll_cert_twin:
-        case RestAPIConstants.CMD_enroll_cert_genkey_twin: {
+        case CMD_enroll_cert:
+        case CMD_enroll_cert_genkey:
+        case CMD_enroll_cert_twin:
+        case CMD_enroll_cert_genkey_twin: {
           respContent = enrollCerts(command, caName, requestor, request, httpRetriever, event);
           break;
         }
-        case RestAPIConstants.CMD_revoke_cert:
-        case RestAPIConstants.CMD_unsuspend_cert:
-        case RestAPIConstants.CMD_unrevoke_cert: {
+        case CMD_revoke_cert:
+        case CMD_unsuspend_cert:
+        case CMD_unrevoke_cert: {
           unRevoke(command, caName, requestor, httpRetriever, event);
           respContent = null;
           break;
         }
-        case RestAPIConstants.CMD_crl: {
+        case CMD_crl: {
           respContent = getCrl(caName, requestor, httpRetriever);
           break;
         }
@@ -277,7 +348,7 @@ public class RestResponder {
       }
 
       Map<String, String> headers = new HashMap<>();
-      headers.put(RestAPIConstants.HEADER_PKISTATUS, RestAPIConstants.PKISTATUS_accepted);
+      headers.put(HEADER_PKISTATUS, PKISTATUS_accepted);
       if (respContent == null) {
         return new RestResponse(OK, null, headers, null);
       } else {
@@ -300,60 +371,59 @@ public class RestResponder {
         case UNKNOWN_CERT_PROFILE:
         case CERT_UNREVOKED:
           sc = BAD_REQUEST;
-          failureInfo = RestAPIConstants.FAILINFO_badRequest;
+          failureInfo = FAILINFO_badRequest;
           break;
         case BAD_CERT_TEMPLATE:
           sc = BAD_REQUEST;
-          failureInfo = RestAPIConstants.FAILINFO_badCertTemplate;
+          failureInfo = FAILINFO_badCertTemplate;
           break;
         case CERT_REVOKED:
           sc = CONFLICT;
-          failureInfo = RestAPIConstants.FAILINFO_certRevoked;
+          failureInfo = FAILINFO_certRevoked;
           break;
         case NOT_PERMITTED:
         case UNAUTHORIZED:
           sc = UNAUTHORIZED;
-          failureInfo = RestAPIConstants.FAILINFO_notAuthorized;
+          failureInfo = FAILINFO_notAuthorized;
           break;
         case SYSTEM_UNAVAILABLE:
           sc = SERVICE_UNAVAILABLE;
-          failureInfo = RestAPIConstants.FAILINFO_systemUnavail;
+          failureInfo = FAILINFO_systemUnavail;
           break;
         case UNKNOWN_CERT:
           sc = BAD_REQUEST;
-          failureInfo = RestAPIConstants.FAILINFO_badCertId;
+          failureInfo = FAILINFO_badCertId;
           break;
         case BAD_POP:
           sc = BAD_REQUEST;
-          failureInfo = RestAPIConstants.FAILINFO_badPOP;
+          failureInfo = FAILINFO_badPOP;
           break;
         case PATH_NOT_FOUND:
           sc = NOT_FOUND;
-          failureInfo = RestAPIConstants.FAILINFO_systemUnavail;
+          failureInfo = FAILINFO_systemUnavail;
           break;
         case CRL_FAILURE:
         case DATABASE_FAILURE:
         case SYSTEM_FAILURE:
         default:
           sc = INTERNAL_SERVER_ERROR;
-          failureInfo = RestAPIConstants.FAILINFO_systemFailure;
+          failureInfo = FAILINFO_systemFailure;
           break;
       } // end switch (code)
 
       event.setStatus(AuditStatus.FAILED);
       event.addEventData(CaAuditConstants.NAME_message, code.name());
 
-      if (code == DATABASE_FAILURE || code == SYSTEM_FAILURE) {
-        auditMessage = code.name();
-      } else {
-        auditMessage = code.name() + ": " + ex.getErrorMessage();
+      auditMessage = code.name();
+      if (code != DATABASE_FAILURE && code == SYSTEM_FAILURE) {
+        auditMessage += ": " + ex.getErrorMessage();
       }
 
       Map<String, String> headers = new HashMap<>();
-      headers.put(RestAPIConstants.HEADER_PKISTATUS, RestAPIConstants.PKISTATUS_rejection);
+      headers.put(HEADER_PKISTATUS, PKISTATUS_rejection);
 
       if (StringUtil.isNotBlank(failureInfo)) {
-        headers.put(RestAPIConstants.HEADER_failInfo, failureInfo);
+        headers.put(HEADER_failInfo, failureInfo);
       }
       return new RestResponse(sc, null, headers, null);
     } catch (HttpRespAuditException ex) {
@@ -388,10 +458,8 @@ public class RestResponder {
       throw new OperationException(NOT_PERMITTED, "ENROLL_CERT is not allowed");
     }
 
-    boolean twin = RestAPIConstants.CMD_enroll_cert_twin.equals(command)
-        || RestAPIConstants.CMD_enroll_cert_genkey_twin.equals(command);
-    boolean caGenKeyPair = RestAPIConstants.CMD_enroll_cert_genkey.equals(command)
-        || RestAPIConstants.CMD_enroll_cert_genkey_twin.equals(command);
+    boolean twin = CMD_enroll_cert_twin.equals(command) || CMD_enroll_cert_genkey_twin.equals(command);
+    boolean caGenKeyPair = CMD_enroll_cert_genkey.equals(command) || CMD_enroll_cert_genkey_twin.equals(command);
 
     String profile = checkProfile(requestor, httpRetriever);
 
@@ -400,10 +468,10 @@ public class RestResponder {
       throw new OperationException(NOT_PERMITTED, "certprofile " + profileEnc + " is not allowed");
     }
 
-    String strNotBefore = httpRetriever.getParameter(RestAPIConstants.PARAM_not_before);
+    String strNotBefore = httpRetriever.getParameter(PARAM_not_before);
     Date notBefore = (strNotBefore == null) ? null :  DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotBefore);
 
-    String strNotAfter = httpRetriever.getParameter(RestAPIConstants.PARAM_not_after);
+    String strNotAfter = httpRetriever.getParameter(PARAM_not_after);
     Date notAfter = (strNotAfter == null) ? null : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotAfter);
 
     X500Name subject;
@@ -428,7 +496,7 @@ public class RestResponder {
           throw new OperationException(BAD_CERT_TEMPLATE, "invalid subject");
         }
         extensions = null;
-      } else if (RestAPIConstants.CT_pkcs10.equalsIgnoreCase(ct)) {
+      } else if (CT_pkcs10.equalsIgnoreCase(ct)) {
         // some clients may send the PEM encoded CSR.
         request = X509Util.toDerEncoded(request);
 
@@ -442,7 +510,7 @@ public class RestResponder {
         throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, AuditLevel.INFO, AuditStatus.FAILED);
       }
     } else {
-      if (!RestAPIConstants.CT_pkcs10.equalsIgnoreCase(ct)) {
+      if (!CT_pkcs10.equalsIgnoreCase(ct)) {
         String message = "unsupported media type " + ct;
         throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, AuditLevel.INFO, AuditStatus.FAILED);
       }
@@ -521,7 +589,7 @@ public class RestResponder {
 
     EnrollOrPullCertResponseEntry entry = getEntry(sdkResp.getEntries(), certId);
     if (!(caGenKeyPair || twin)) {
-      return HttpRespContent.ofOk(RestAPIConstants.CT_pkix_cert, entry.getCert());
+      return HttpRespContent.ofOk(CT_pkix_cert, entry.getCert());
     }
 
     ByteArrayOutputStream bo = new ByteArrayOutputStream();
@@ -543,7 +611,7 @@ public class RestResponder {
     }
     bo.flush();
 
-    return HttpRespContent.ofOk(RestAPIConstants.CT_pem_file, bo.toByteArray());
+    return HttpRespContent.ofOk(CT_pem_file, bo.toByteArray());
   }
 
   private HttpRespContent enrollCrossCert(
@@ -556,15 +624,15 @@ public class RestResponder {
     String profile = checkProfile(requestor, httpRetriever);
 
     String ct = httpRetriever.getHeader("Content-Type");
-    if (!RestAPIConstants.CT_pem_file.equalsIgnoreCase(ct)) {
+    if (!CT_pem_file.equalsIgnoreCase(ct)) {
       String message = "unsupported media type " + ct;
       throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, AuditLevel.INFO, AuditStatus.FAILED);
     }
 
-    String strNotBefore = httpRetriever.getParameter(RestAPIConstants.PARAM_not_before);
+    String strNotBefore = httpRetriever.getParameter(PARAM_not_before);
     Date notBefore = (strNotBefore == null) ? null : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotBefore);
 
-    String strNotAfter = httpRetriever.getParameter(RestAPIConstants.PARAM_not_after);
+    String strNotAfter = httpRetriever.getParameter(PARAM_not_after);
     Date notAfter = (strNotAfter == null) ? null : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotAfter);
 
     byte[] csrBytes = null;
@@ -661,7 +729,7 @@ public class RestResponder {
     checkResponse(templates.size(), sdkResp);
 
     EnrollOrPullCertResponseEntry entry = getEntry(sdkResp.getEntries(), certId);
-    return HttpRespContent.ofOk(RestAPIConstants.CT_pkix_cert, entry.getCert());
+    return HttpRespContent.ofOk(CT_pkix_cert, entry.getCert());
   }
 
   private static void checkResponse(int expectedSize, EnrollOrPollCertsResponse resp) throws HttpRespAuditException {
@@ -669,25 +737,24 @@ public class RestResponder {
     if (entries != null) {
       for (EnrollOrPullCertResponseEntry entry : entries) {
         if (entry.getError() != null) {
-          throw new HttpRespAuditException(INTERNAL_SERVER_ERROR,
-              entry.getError().toString(), AuditLevel.INFO, AuditStatus.FAILED);
+          throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, entry.getError().toString(),
+              AuditLevel.INFO, AuditStatus.FAILED);
         }
       }
     }
 
     int n = entries == null ? 0 : entries.size();
     if (n != expectedSize) {
-      throw new HttpRespAuditException(INTERNAL_SERVER_ERROR,
-          "expected " + expectedSize + " cert, but received " + n, AuditLevel.INFO, AuditStatus.FAILED);
+      throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, "expected " + expectedSize + " cert, but received " + n,
+          AuditLevel.INFO, AuditStatus.FAILED);
     }
   }
 
   private static String checkProfile(
       Requestor requestor, HttpRequestMetadataRetriever httpRetriever) throws HttpRespAuditException, OperationException {
-    String profile = httpRetriever.getParameter(RestAPIConstants.PARAM_profile);
+    String profile = httpRetriever.getParameter(PARAM_profile);
     if (StringUtil.isBlank(profile)) {
-      throw new HttpRespAuditException(BAD_REQUEST,
-          "required parameter " + RestAPIConstants.PARAM_profile + " not specified",
+      throw new HttpRespAuditException(BAD_REQUEST, "required parameter " + PARAM_profile + " not specified",
           AuditLevel.INFO, AuditStatus.FAILED);
     }
     profile = profile.toLowerCase();
@@ -706,31 +773,29 @@ public class RestResponder {
         return m;
       }
     }
-    throw new HttpRespAuditException(INTERNAL_SERVER_ERROR,
-        "found no response entry with certReqId " + certReqId, AuditLevel.INFO, AuditStatus.FAILED);
+    throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, "found no response entry with certReqId " + certReqId,
+        AuditLevel.INFO, AuditStatus.FAILED);
   }
 
   private void unRevoke(
       String command, String caName, Requestor requestor,HttpRequestMetadataRetriever httpRetriever, AuditEvent event)
       throws OperationException, HttpRespAuditException, IOException, SdkErrorResponseException {
-    boolean revoke = command.equals(RestAPIConstants.CMD_revoke_cert);
+    boolean revoke = command.equals(CMD_revoke_cert);
     int permission = revoke ? PermissionConstants.REVOKE_CERT : PermissionConstants.UNSUSPEND_CERT;
     if (!requestor.isPermitted(permission)) {
       throw new OperationException(NOT_PERMITTED, command + " is not allowed");
     }
 
-    String strCaSha1 = httpRetriever.getParameter(RestAPIConstants.PARAM_ca_sha1);
+    String strCaSha1 = httpRetriever.getParameter(PARAM_ca_sha1);
     if (StringUtil.isBlank(strCaSha1)) {
-      throw new HttpRespAuditException(BAD_REQUEST,
-          "required parameter " + RestAPIConstants.PARAM_ca_sha1 + " not specified",
+      throw new HttpRespAuditException(BAD_REQUEST, "required parameter " + PARAM_ca_sha1 + " not specified",
           AuditLevel.INFO, AuditStatus.FAILED);
     }
     byte[] caSha1 = Hex.decode(strCaSha1);
 
-    String strSerialNumber = httpRetriever.getParameter(RestAPIConstants.PARAM_serial_number);
+    String strSerialNumber = httpRetriever.getParameter(PARAM_serial_number);
     if (StringUtil.isBlank(strSerialNumber)) {
-      throw new HttpRespAuditException(BAD_REQUEST,
-          "required parameter " + RestAPIConstants.PARAM_serial_number + " not specified",
+      throw new HttpRespAuditException(BAD_REQUEST, "required parameter " + PARAM_serial_number + " not specified",
           AuditLevel.INFO, AuditStatus.FAILED);
     }
 
@@ -749,7 +814,7 @@ public class RestResponder {
       sdkReq.setEntries(Collections.singletonList(serialNumber));
       sdk.unsuspendCerts(caName, sdkReq);
     } else {
-      String strReason = httpRetriever.getParameter(RestAPIConstants.PARAM_reason);
+      String strReason = httpRetriever.getParameter(PARAM_reason);
       CrlReason reason = (strReason == null) ? CrlReason.UNSPECIFIED : CrlReason.forNameOrText(strReason);
       if (reason == CrlReason.REMOVE_FROM_CRL) {
         throw new OperationException(ErrorCode.BAD_REQUEST,
@@ -758,7 +823,7 @@ public class RestResponder {
       event.addEventData(CaAuditConstants.NAME_reason, reason);
 
       Date invalidityTime = null;
-      String strInvalidityTime = httpRetriever.getParameter(RestAPIConstants.PARAM_invalidity_time);
+      String strInvalidityTime = httpRetriever.getParameter(PARAM_invalidity_time);
       if (StringUtil.isNotBlank(strInvalidityTime)) {
         invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(strInvalidityTime);
       }
@@ -784,7 +849,7 @@ public class RestResponder {
       throw new OperationException(NOT_PERMITTED, "GET_CRL is not allowed");
     }
 
-    String strCrlNumber = httpRetriever.getParameter(RestAPIConstants.PARAM_crl_number);
+    String strCrlNumber = httpRetriever.getParameter(PARAM_crl_number);
     BigInteger crlNumber = null;
     if (StringUtil.isNotBlank(strCrlNumber)) {
       try {
@@ -803,7 +868,7 @@ public class RestResponder {
       throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, message, AuditLevel.INFO, AuditStatus.FAILED);
     }
 
-    return HttpRespContent.ofOk(RestAPIConstants.CT_pkix_crl, respBytes);
+    return HttpRespContent.ofOk(CT_pkix_crl, respBytes);
   }
 
 }

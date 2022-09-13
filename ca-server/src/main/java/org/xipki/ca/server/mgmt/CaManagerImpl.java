@@ -30,6 +30,7 @@ import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.ca.api.profile.CertprofileFactoryRegister;
 import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
+import org.xipki.ca.sdk.CertprofileInfoResponse;
 import org.xipki.ca.server.*;
 import org.xipki.ca.server.db.CaManagerQueryExecutor;
 import org.xipki.ca.server.db.CertStore;
@@ -954,6 +955,11 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void addCertprofile(CertprofileEntry certprofileEntry) throws CaMgmtException {
     certprofileManager.addCertprofile(certprofileEntry);
+  }
+
+  public CertprofileInfoResponse getCertprofileInfo(String profileName)
+      throws OperationException {
+    return certprofileManager.getCertprofileInfo(profileName);
   }
 
   @Override

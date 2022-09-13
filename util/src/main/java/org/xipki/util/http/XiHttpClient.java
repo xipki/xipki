@@ -18,6 +18,7 @@
 package org.xipki.util.http;
 
 import org.xipki.util.Args;
+import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 import org.xipki.util.exception.ObjectCreationException;
 
@@ -58,14 +59,14 @@ public class XiHttpClient {
     this.hostnameVerifier = hostnameVerifier;
   }
 
-  public HttpRespContent httpGet(String url) throws XiHttpClientException {
+  public HttpRespContent httpGet(String url) throws IOException {
     Args.notNull(url, "url");
     try {
       HttpURLConnection httpConn = openHttpConn(new URL(url));
       httpConn.setRequestMethod("GET");
       return parseResponse(httpConn);
-    } catch (IOException ex) {
-      throw new XiHttpClientException(ex);
+    } catch (XiHttpClientException ex) {
+      throw new IOException(ex);
     }
   } // method httpGet
 
@@ -129,6 +130,13 @@ public class XiHttpClient {
       }
 
       byte[] content = inputstream == null ? new byte[0] : IoUtil.read(inputstream);
+      if (content.length > 0) {
+        String encoding = conn.getHeaderField("content-transfer-encoding");
+        if (encoding != null && "base64".equalsIgnoreCase(encoding.trim())) {
+          content = Base64.decode(content);
+        }
+      }
+
       String ct = conn.getContentType();
 
       if (respCode == HttpURLConnection.HTTP_OK) {

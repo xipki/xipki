@@ -35,10 +35,12 @@ import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.sdk.*;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.CrlReason;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.InsufficientPermissionException;
 import org.xipki.util.exception.OperationException;
 
@@ -281,6 +283,9 @@ public class SdkResponder {
           assertPermitted(requestor, GET_CERT);
           return getCert(ca, request);
         }
+        case CMD_profileinfo: {
+          return getProfileInfo(request);
+        }
         default: {
           return new ErrorResponse(null, PATH_NOT_FOUND, "invalid command '" + command + "'");
         }
@@ -346,31 +351,55 @@ public class SdkResponder {
         }
 
         if (keyUpdate) {
-          OldCertInfo oc = entry.getOldCert();
-          if (oc == null) {
-            throw new OperationException(BAD_CERT_TEMPLATE, "oldCert is not specified in enroll_kup command");
+          CertWithRevocationInfo oldCert;
+
+          OldCertInfoByIssuerAndSerial ocIsn = entry.getOldCertIsn();
+          OldCertInfoBySubject ocSubject = entry.getOldCertSubject();
+
+          if (ocIsn == null && ocSubject == null) {
+            throw new OperationException(BAD_CERT_TEMPLATE,  "Neither oldCertIsn nor oldCertSubject is specified" +
+                " in enroll_kup command, but exactly one of them is permitted");
+          } else if (ocIsn != null && ocSubject != null) {
+            throw new OperationException(BAD_CERT_TEMPLATE, "Both oldCertIsn and oldCertSubject are specified" +
+                " in enroll_kup command, but exactly one of them is permitted");
           }
 
-          X500Name issuer = X500Name.getInstance(oc.getIssuer());
-          BigInteger serialNumber = oc.getSerialNumber();
-          CertWithRevocationInfo oldCert;
-          try {
-            oldCert = caManager.getCert(issuer, serialNumber);
-          } catch (CaMgmtException ex) {
-            LogUtil.warn(LOG, ex, "error in caManager.getCert");
-            throw new OperationException(SYSTEM_FAILURE,
-                "error while finding certificate with the issuer " + issuer + "and serial number " + serialNumber);
+          boolean reusePublicKey;
+          String text;
+
+          if (ocIsn != null) {
+            reusePublicKey = ocIsn.isReusePublicKey();
+            X500Name issuer = X500Name.getInstance(ocIsn.getIssuer());
+            BigInteger serialNumber = ocIsn.getSerialNumber();
+
+            text = "certificate with the issuer '" + X509Util.x500NameText(issuer) +
+                    "' and serial number " + serialNumber;
+
+            try {
+              oldCert = ca.getCertWithRevocationInfo(serialNumber);
+            } catch (CertificateException ex) {
+              LogUtil.warn(LOG, ex, "error in ca.getCertWithRevocationInfo");
+              throw new OperationException(SYSTEM_FAILURE, "error while finding " + text);
+            }
+          } else {
+            reusePublicKey = ocSubject.isReusePublicKey();
+            X500Name oldSubject = X500Name.getInstance(ocSubject.getSubject());
+            String subjectText = X509Util.x500NameText(oldSubject);
+            text = "certificate with subject '" + subjectText + "'";
+            try {
+              oldCert = ca.getCertWithRevocationInfoBySubject(oldSubject, ocSubject.getSan());
+            } catch (CertificateException ex) {
+              LogUtil.warn(LOG, ex, "error in ca.getCertWithRevocationInfoBySubject");
+              throw new OperationException(SYSTEM_FAILURE, "error while finding " + text);
+            }
           }
 
           if (oldCert == null) {
-            throw new OperationException(UNKNOWN_CERT,
-                "found no certificate with the issuer " + issuer + "and serial number " + serialNumber);
+            throw new OperationException(UNKNOWN_CERT, "found no " + text);
           }
 
           if (oldCert.isRevoked()) {
-            throw new OperationException(CERT_REVOKED,
-                "could not update a revoked certificate with the issuer " + issuer
-                    + "and serial number " + serialNumber);
+            throw new OperationException(CERT_REVOKED, "could not update a revoked " + text);
           }
 
           if (profile == null) {
@@ -381,7 +410,7 @@ public class SdkResponder {
             subject = oldCert.getCert().getCert().getSubject();
           }
 
-          if (publicKeyInfo == null && oc.isReusePublicKey()) {
+          if (publicKeyInfo == null && reusePublicKey) {
             publicKeyInfo = oldCert.getCert().getCert().getSubjectPublicKeyInfo();
           }
 
@@ -426,7 +455,7 @@ public class SdkResponder {
     }
 
     List<EnrollOrPullCertResponseEntry> rentries =
-        generateCertificates(requestor, ca, certTemplates, keyUpdate, req, request, waitForConfirmUtil);
+        generateCertificates(requestor, ca, certTemplates, req, request, waitForConfirmUtil);
     if (rentries == null) {
       return new ErrorResponse(req.getTransactionId(), SYSTEM_FAILURE, null);
     } else {
@@ -652,6 +681,13 @@ public class SdkResponder {
     return resp;
   }
 
+  private SdkResponse getProfileInfo(byte[] request)
+      throws OperationException {
+    CertprofileInfoRequest req = CertprofileInfoRequest.decode(request);
+    String profileName = req.getProfile();
+    return caManager.getCertprofileInfo(profileName);
+  }
+
   private static void assertPermitted(RequestorInfo requestor, int permission)
       throws OperationException {
     try {
@@ -662,7 +698,7 @@ public class SdkResponder {
   }
 
   private List<EnrollOrPullCertResponseEntry> generateCertificates(
-      RequestorInfo requestor, X509Ca ca, List<CertTemplateData> certTemplates, boolean kup,
+      RequestorInfo requestor, X509Ca ca, List<CertTemplateData> certTemplates,
       EnrollCertsRequest req, byte[] request, long waitForConfirmUtil) {
     String caName = ca.getCaInfo().getIdent().getName();
     final int n = certTemplates.size();
@@ -678,9 +714,7 @@ public class SdkResponder {
     if (groupEnroll) {
       List<CertificateInfo> certInfos = null;
       try {
-        certInfos = kup
-            ? ca.regenerateCerts(requestor, certTemplates, tid)
-            : ca.generateCerts  (requestor, certTemplates, tid);
+        certInfos = ca.generateCerts  (requestor, certTemplates, tid);
 
         for (int i = 0; i < n; i++) {
           CertificateInfo certInfo = certInfos.get(i);
@@ -723,9 +757,7 @@ public class SdkResponder {
 
       CertificateInfo certInfo;
       try {
-        certInfo = kup
-            ? ca.regenerateCert(requestor, certTemplate, tid)
-            : ca.generateCert  (requestor, certTemplate, tid);
+        certInfo = ca.generateCert(requestor, certTemplate, tid);
 
         if (explicitConfirm) {
           pendingCertPool.addCertificate(tid, certReqId, certInfo, waitForConfirmUtil);

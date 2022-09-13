@@ -50,7 +50,7 @@ public class ScepClient extends Client {
     HttpRespContent resp;
     try {
       resp = httpClient.httpGet(url);
-    } catch (XiHttpClientException ex) {
+    } catch (IOException ex) {
       throw new ScepClientException(ex);
     }
     return parseResp(resp);

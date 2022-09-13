@@ -1,0 +1,67 @@
+BASE_URL = https://localhost:8445/.well-known/est/myca/tls
+
+echo "#################################################################"
+echo "#             Manage certificate via EST interface              #"
+echo "#################################################################"
+
+CUR_TIME = $(date '+%Y%m%d-%H%M%S')
+
+OUT_DIR = output/est-${CUR_TIME}
+
+#####
+echo "generate example PKCS#12 file"
+xi:rsa-p12 --password 1234 --out ${OUT_DIR}/demo.p12 --subject "CN=dummy"
+
+#####
+echo "EST /cacerts"
+
+xi:curl --out ${OUT_DIR}/cacerts.p7m $BASE_URL/cacerts
+
+#####
+echo "EST /csrattrs"
+
+xi:curl --out ${OUT_DIR}/csrattrs.p7m $BASE_URL/csrattrs
+
+#####
+echo "EST /simpleenroll"
+
+xi:csr-p12 \
+  --p12 ${OUT_DIR}/demo.p12 --password 1234 \
+  --subject "CN=${CUR_TIME}-est-simpleenroll1.myorg.org,O=myorg,C=DE" \
+  --out ${OUT_DIR}/simpleenroll1.csr
+
+xi:curl --base64 --out ${OUT_DIR}/simpleenroll1.p7m \
+  --data-file ${OUT_DIR}/simpleenroll1.csr \
+  --header "Content-Type: application/pkcs10" \
+  "$BASE_URL/simpleenroll"
+
+xi:export-cert-p7m ${OUT_DIR}/simpleenroll1.p7m ${OUT_DIR}/simpleenroll1.crt
+
+#####
+echo "EST /simplereenroll"
+
+xi:csr-p12 \
+  --p12 ${OUT_DIR}/demo.p12 --password 1234 \
+  --subject "CN=${CUR_TIME}-est-simplereenroll1.myorg.org,O=myorg,C=DE" \
+  --old-cert ${OUT_DIR}/simpleenroll1.crt \
+  --out ${OUT_DIR}/simplereenroll1.csr
+
+xi:curl --base64 --out ${OUT_DIR}/simplereenroll1.p7m \
+  --data-file ${OUT_DIR}/simplereenroll1.csr \
+  --header "Content-Type: application/pkcs10" \
+  "$BASE_URL/simplereenroll"
+
+xi:export-cert-p7m ${OUT_DIR}/simplereenroll1.p7m ${OUT_DIR}/simplereenroll1.crt
+
+#####
+echo "EST /serverkeygen"
+
+xi:csr-p12 \
+  --p12 ${OUT_DIR}/demo.p12 --password 1234 \
+  --subject "CN=${CUR_TIME}-est-serverkeygen1.myorg.org,O=myorg,C=DE" \
+  --out ${OUT_DIR}/serverkeygen1.csr
+
+xi:curl --base64 --out ${OUT_DIR}/serverkeygen1.p7m \
+  --data-file ${OUT_DIR}/serverkeygen1.csr \
+  --header "Content-Type: application/pkcs10" \
+  "$BASE_URL/serverkeygen"

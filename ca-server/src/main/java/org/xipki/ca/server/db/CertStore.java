@@ -42,10 +42,7 @@ import org.xipki.ca.server.UniqueIdGenerator;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.CrlReason;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.X509Cert;
+import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
@@ -138,6 +135,8 @@ public class CertStore extends CertStoreBase {
 
   private final String sqlCertWithRevInfo;
 
+  private final String sqlCertWithRevInfoBySubjectAndSan;
+
   private final String sqlCertInfo;
 
   private final String sqlKnowsCertForSerial;
@@ -178,6 +177,9 @@ public class CertStore extends CertStoreBase {
 
     this.sqlCertForId = buildSelectFirstSql("PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE ID=?");
     this.sqlCertWithRevInfo = buildSelectFirstSql("ID,REV,RR,RT,RIT,PID,CERT FROM CERT WHERE CA_ID=? AND SN=?");
+    this.sqlCertWithRevInfoBySubjectAndSan = buildSelectFirstSql("NBEFORE DESC",
+        "ID,NBEFORE,REV,RR,RT,RIT,PID,CERT FROM CERT WHERE CA_ID=? AND FP_S=? AND FP_SAN=?");
+
     this.sqlCertInfo = buildSelectFirstSql("PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE CA_ID=? AND SN=?");
     this.sqlKnowsCertForSerial = buildSelectFirstSql("ID FROM CERT WHERE SN=? AND CA_ID=?");
     this.sqlCertStatusForSubjectFp = buildSelectFirstSql("REV FROM CERT WHERE FP_S=? AND CA_ID=?");
@@ -227,6 +229,9 @@ public class CertStore extends CertStoreBase {
       String subjectText = X509Util.cutText(cert.getCert().getSubjectText(), maxX500nameLen);
       long fpSubject = X509Util.fpCanonicalizedName(cert.getCert().getSubject());
 
+      byte[] san = cert.getCert().getSubjectAltNames();
+      Long fpSan = san == null ? null : FpIdCalculator.hash(san);
+
       String reqSubjectText = null;
       Long fpReqSubject = null;
       if (reqSubject != null) {
@@ -244,8 +249,6 @@ public class CertStore extends CertStoreBase {
       X509Cert cert0 = cert.getCert();
       boolean isEeCert = cert0.getBasicConstraints() == -1;
 
-      boolean withPrivateKey = dbSchemaVersion >= 7;
-
       List<SqlColumn2> columns = new ArrayList<>(20);
 
       columns.add(col2Long(certId));
@@ -255,6 +258,7 @@ public class CertStore extends CertStoreBase {
       columns.add(col2Str(subjectText));
       columns.add(col2Long(fpSubject));
       columns.add(col2Long(fpReqSubject));
+      columns.add(col2Long(fpSan));
       // notBeforeSeconds
       columns.add(col2Long(cert0.getNotBefore().getTime() / 1000));
       // notAfterSeconds
@@ -270,9 +274,7 @@ public class CertStore extends CertStoreBase {
       // in this version we set CRL_SCOPE to fixed value 0
       columns.add(col2Int(0));
       columns.add(col2Str(Base64.encodeToString(encodedCert)));
-      if (withPrivateKey) {
-        columns.add(col2Str(privateKeyInfo));
-      }
+      columns.add(col2Str(privateKeyInfo));
 
       execUpdatePrepStmt0(SQL_ADD_CERT, columns.toArray(new SqlColumn2[0]));
 
@@ -731,6 +733,23 @@ public class CertStore extends CertStoreBase {
 
     ResultRow rs = execQuery1PrepStmt0(sqlCertWithRevInfo,
         col2Int(caId), col2Str(serial.toString(16)));
+    if (rs == null) {
+      return null;
+    }
+
+    return buildCertWithRevInfo(rs.getLong("ID"), rs, idNameMap);
+  } // method getCertWithRevocationInfo
+
+  public CertWithRevocationInfo getCertWithRevocationInfoBySubject(
+      int caId, X500Name subject, byte[] san, CaIdNameMap idNameMap)
+      throws OperationException {
+    notNull(subject, "subject");
+
+    long fpSubject = X509Util.fpCanonicalizedName(subject);
+    Long fpSan = san == null ? null : FpIdCalculator.hash(san);
+
+    ResultRow rs = execQuery1PrepStmt0(sqlCertWithRevInfoBySubjectAndSan,
+        col2Int(caId), col2Long(fpSubject), col2Long(fpSan));
     if (rs == null) {
       return null;
     }

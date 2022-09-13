@@ -536,7 +536,7 @@ public class ScepResponder {
             throw new OperationException(BAD_CERT_TEMPLATE, "tid=" + tid + ": no CommonName in requested subject");
           }
 
-          String challengePwd = getChallengePassword(csrReqInfo);
+          String challengePwd = X509Util.getChallengePassword(csrReqInfo);
           if (challengePwd != null) {
             String[] strs = challengePwd.split(":");
             if (strs.length != 2) {
@@ -802,16 +802,4 @@ public class ScepResponder {
     audit.addEventData(name, (value == null) ? "null" : value);
   }
 
-  private static String getChallengePassword(CertificationRequestInfo csr) {
-    notNull(csr, "csr");
-    ASN1Set attrs = csr.getAttributes();
-    for (int i = 0; i < attrs.size(); i++) {
-      Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-      if (PKCSObjectIdentifiers.pkcs_9_at_challengePassword.equals(attr.getAttrType())) {
-        ASN1String str = (ASN1String) attr.getAttributeValues()[0];
-        return str.getString();
-      }
-    }
-    return null;
-  } // method getChallengePassword
 }

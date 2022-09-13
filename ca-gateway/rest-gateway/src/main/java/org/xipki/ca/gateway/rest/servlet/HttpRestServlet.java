@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.util.Date;
 
 /**
- * REST API exception.
+ * REST servlet.
  *
  * @author Lijun Liao
  * @since 3.0.1
@@ -81,7 +81,7 @@ public class HttpRestServlet extends HttpServlet {
       RestResponse restResp = responder.service(path, requestBytes, new HttpRequestMetadataRetrieverImpl(req), event);
       restResp.fillResponse(resp);
 
-      ServletHelper.logReqResp("REST Gateway", LOG, logReqResp, true, req, requestBytes, restResp.getBody());
+      ServletHelper.logReqResp("REST Gateway", LOG, logReqResp, viaPost, req, requestBytes, restResp.getBody());
 
       if (event.getStatus() == null) {
         event.setStatus(AuditStatus.SUCCESSFUL);

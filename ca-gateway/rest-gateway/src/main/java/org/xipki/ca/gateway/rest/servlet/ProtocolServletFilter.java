@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * CA ServletFilter.
+ * REST Gateway ServletFilter.
  *
  * @author Lijun Liao
  * @since 6.0.0

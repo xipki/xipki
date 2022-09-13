@@ -17,6 +17,7 @@
 
 package org.xipki.ca.server.mgmt;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertprofileValidator;
@@ -25,13 +26,18 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
+import org.xipki.ca.api.profile.KeyParametersOption;
+import org.xipki.ca.sdk.CertprofileInfoResponse;
+import org.xipki.ca.sdk.KeyType;
 import org.xipki.ca.server.IdentifiedCertprofile;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
+import org.xipki.util.TripleState;
+import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.util.exception.OperationException;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.Args.toNonBlankLower;
@@ -218,6 +224,71 @@ class CertprofileManager {
     manager.idNameMap.addCertprofile(certprofileEntry.getIdent());
     manager.certprofileDbEntries.put(name, certprofileEntry);
   } // method addCertprofile
+
+  CertprofileInfoResponse getCertprofileInfo(String profileName) throws OperationException {
+    IdentifiedCertprofile profile0 = manager.getIdentifiedCertprofile(profileName);
+    if (profile0 == null) {
+      throw new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE);
+    }
+
+    Certprofile profile = profile0.getCertprofile();
+    Map<ASN1ObjectIdentifier, Certprofile.ExtensionControl> extnControls = profile.getExtensionControls();
+
+    CertprofileInfoResponse ret = new CertprofileInfoResponse();
+
+    List<String> requiredExtensionsInReq = new LinkedList<>();
+    List<String> optionalExtensionsInReq = new LinkedList<>();
+    for (Map.Entry<ASN1ObjectIdentifier, Certprofile.ExtensionControl> m : extnControls.entrySet()) {
+      TripleState inRequest = m.getValue().getInRequest();
+      if (inRequest == null || inRequest == TripleState.forbidden) {
+        continue;
+      }
+
+      if (m.getValue().isRequired() && inRequest == TripleState.required) {
+        requiredExtensionsInReq.add(m.getKey().getId());
+      } else {
+        optionalExtensionsInReq.add(m.getKey().getId());
+      }
+    }
+
+    if (!requiredExtensionsInReq.isEmpty()) {
+      ret.setRequiredExtensionTypes(requiredExtensionsInReq.toArray(new String[0]));
+    }
+
+    if (!optionalExtensionsInReq.isEmpty()) {
+      ret.setOptionalExtensionTypes(optionalExtensionsInReq.toArray(new String[0]));
+    }
+
+    Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = profile.getKeyAlgorithms();
+    if (keyAlgorithms != null) {
+      List<KeyType> keyTypes = new LinkedList<>();
+
+      for (Map.Entry<ASN1ObjectIdentifier, KeyParametersOption> m : keyAlgorithms.entrySet()) {
+        KeyParametersOption params = m.getValue();
+        KeyType keyType = new KeyType();
+        keyTypes.add(keyType);
+
+        keyType.setKeyType(m.getKey().getId());
+
+        if (params instanceof KeyParametersOption.ECParamatersOption) {
+          // set the curve OIDs,
+          Set<ASN1ObjectIdentifier> curveOids = ((KeyParametersOption.ECParamatersOption) params).getCurveOids();
+          if (CollectionUtil.isNotEmpty(curveOids)) {
+            List<String> curveOidsInText = new LinkedList<>();
+            for (ASN1ObjectIdentifier curveOid : curveOids) {
+              curveOidsInText.add(curveOid.getId());
+            }
+            keyType.setEcCurves(curveOidsInText.toArray(new String[0]));
+          }
+        }
+      }
+
+      if (!keyTypes.isEmpty()) {
+        ret.setKeyTypes(keyTypes.toArray(new KeyType[0]));
+      }
+    }
+    return ret;
+  }
 
   void shutdownCertprofile(IdentifiedCertprofile profile) {
     if (profile == null) {

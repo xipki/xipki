@@ -56,8 +56,13 @@ public class SdkClient {
   private byte[] send(String ca, String command, SdkRequest request)
       throws IOException, SdkErrorResponseException {
     String ct = request == null ? null : CONTENT_TYPE_JSON;
-    HttpRespContent resp = client.httpPost(serverUrl + ca + "/" + command, ct,
-        request == null ? null : request.encode(), CONTENT_TYPE_JSON);
+    HttpRespContent resp;
+    if (request == null) {
+      resp = client.httpGet(serverUrl + ca + "/" + command);
+    } else {
+      resp = client.httpPost(serverUrl + ca + "/" + command, ct, request.encode(), CONTENT_TYPE_JSON);
+    }
+
     if (resp.isOK()) {
       return resp.getContent();
     }
@@ -90,6 +95,14 @@ public class SdkClient {
     byte[] respBytes = send(ca, CMD_cacert, null);
     CertChainResponse resp = CertChainResponse.decode(respBytes);
     return resp.getCertificates();
+  }
+
+  public CertprofileInfoResponse profileInfo(String ca, String profileName)
+      throws IOException, SdkErrorResponseException {
+    CertprofileInfoRequest req = new CertprofileInfoRequest();
+    req.setProfile(profileName);
+    byte[] respBytes = send(ca, CMD_profileinfo, req);
+    return CertprofileInfoResponse.decode(respBytes);
   }
 
   public byte[] generateCrl(String ca, String crldp)
@@ -169,11 +182,11 @@ public class SdkClient {
     EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry();
     reqEntry.setCertprofile(certprofile);
     reqEntry.setP10req(p10Req);
-    OldCertInfo oldCertInfo = new OldCertInfo();
+    OldCertInfoByIssuerAndSerial oldCertInfo = new OldCertInfoByIssuerAndSerial();
     oldCertInfo.setReusePublicKey(false);
     oldCertInfo.setSerialNumber(oldCertSerialNumber);
     oldCertInfo.setIssuer(new X500NameType(oldCertIssuer));
-    reqEntry.setOldCert(oldCertInfo);
+    reqEntry.setOldCertIsn(oldCertInfo);
     return enrollCert0("enrollKupCert", CMD_enroll_kup, ca, reqEntry);
   }
 
@@ -183,11 +196,11 @@ public class SdkClient {
     EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry();
     reqEntry.setCertprofile(certprofile);
     reqEntry.setSubject(new X500NameType(subject));
-    OldCertInfo oldCertInfo = new OldCertInfo();
+    OldCertInfoByIssuerAndSerial oldCertInfo = new OldCertInfoByIssuerAndSerial();
     oldCertInfo.setReusePublicKey(false);
     oldCertInfo.setSerialNumber(oldCertSerialNumber);
     oldCertInfo.setIssuer(new X500NameType(oldCertIssuer));
-    reqEntry.setOldCert(oldCertInfo);
+    reqEntry.setOldCertIsn(oldCertInfo);
     return enrollCertCaGenKeypair0("enrollKupCertCaGenKeypair", CMD_enroll_kup, ca, reqEntry);
   }
 

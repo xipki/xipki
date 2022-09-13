@@ -74,6 +74,10 @@ public class IdentifiedCertprofile implements Closeable {
     return dbEntry.getIdent();
   }
 
+  public Certprofile getCertprofile() {
+    return certprofile;
+  }
+
   public CertprofileEntry getDbEntry() {
     return dbEntry;
   }
@@ -317,7 +321,7 @@ public class IdentifiedCertprofile implements Closeable {
       ASN1ObjectIdentifier[] oids = requestedExtensions.getExtensionOIDs();
       for (ASN1ObjectIdentifier m : oids) {
         ExtensionControl control = controls.get(m);
-        if (control == null || control.isRequest()) {
+        if (control == null || control.isPermittedInRequest()) {
           requestedExtns.put(m, requestedExtensions.getExtension(m));
         }
       }
@@ -472,11 +476,11 @@ public class IdentifiedCertprofile implements Closeable {
 
       if (extControl.isCritical()
           && usages.contains(ObjectIdentifiers.XKU.id_kp_anyExtendedKeyUsage)) {
-        extControl = new ExtensionControl(false, extControl.isRequired(), extControl.isRequest());
+        extControl = new ExtensionControl(false, extControl.isRequired(), extControl.getInRequest());
       }
 
       if (!extControl.isCritical() && usages.contains(ObjectIdentifiers.XKU.id_kp_timeStamping)) {
-        extControl = new ExtensionControl(true, extControl.isRequired(), extControl.isRequest());
+        extControl = new ExtensionControl(true, extControl.isRequired(), extControl.getInRequest());
       }
 
       ExtendedKeyUsage value = X509Util.createExtendedUsage(usages);
@@ -514,7 +518,7 @@ public class IdentifiedCertprofile implements Closeable {
     for (ASN1ObjectIdentifier type : extTypes) {
       extControl = controls.get(type);
       ExtensionValue value = subvalues.getExtensionValue(type);
-      if (value == null && extControl.isRequest()) {
+      if (value == null && extControl.isPermittedInRequest()) {
         Extension reqExt = requestedExtns.get(type);
         if (reqExt != null) {
           value = new ExtensionValue(extControl.isCritical(), reqExt.getParsedValue());

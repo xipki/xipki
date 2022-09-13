@@ -39,6 +39,7 @@ import org.xipki.scep.transaction.*;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 
 import java.security.NoSuchAlgorithmException;
@@ -239,7 +240,7 @@ public class ScepResponder {
           }
         }
 
-        String challengePwd = getChallengePassword(csr.getCertificationRequestInfo());
+        String challengePwd = X509Util.getChallengePassword(csr.getCertificationRequestInfo());
         if (!control.getSecret().equals(challengePwd)) {
           LOG.warn("challengePassword is not trusted");
           return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
@@ -377,18 +378,6 @@ public class ScepResponder {
   public NextCaAndRa getNextCaAndRa() {
     return nextCaAndRa;
   }
-
-  private static String getChallengePassword(CertificationRequestInfo csr) {
-    ASN1Set attrs = csr.getAttributes();
-    for (int i = 0; i < attrs.size(); i++) {
-      Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-      if (PKCSObjectIdentifiers.pkcs_9_at_challengePassword.equals(attr.getAttrType())) {
-        ASN1String str = (ASN1String) attr.getAttributeValues()[0];
-        return str.getString();
-      }
-    }
-    return null;
-  } // method getChallengePassword
 
   private static PkiMessage buildPkiMessage(PkiMessage message, PkiStatus status, FailInfo failInfo) {
     message.setPkiStatus(status);

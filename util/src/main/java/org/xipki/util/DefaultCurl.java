@@ -208,6 +208,7 @@ public class DefaultCurl implements Curl {
 
       CurlResult result = new CurlResult();
       result.setContentType(httpConn.getHeaderField("Content-Type"));
+
       if (inputStream != null) {
         if (respContentStream == null) {
           result.setContent(IoUtil.read(inputStream));

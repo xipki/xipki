@@ -57,7 +57,9 @@ public class EnrollCertRequestEntry {
    */
   private Long notAfter;
 
-  private OldCertInfo oldCert;
+  private OldCertInfoByIssuerAndSerial oldCertIsn;
+
+  private OldCertInfoBySubject oldCertSubject;
 
   public BigInteger getCertReqId() {
     return certReqId;
@@ -141,12 +143,20 @@ public class EnrollCertRequestEntry {
     this.notAfter = notAfter == null ? null : notAfter.getTime() / 1000;
   }
 
-  public OldCertInfo getOldCert() {
-    return oldCert;
+  public OldCertInfoByIssuerAndSerial getOldCertIsn() {
+    return oldCertIsn;
   }
 
-  public void setOldCert(OldCertInfo oldCert) {
-    this.oldCert = oldCert;
+  public void setOldCertIsn(OldCertInfoByIssuerAndSerial oldCertIsn) {
+    this.oldCertIsn = oldCertIsn;
+  }
+
+  public OldCertInfoBySubject getOldCertSubject() {
+    return oldCertSubject;
+  }
+
+  public void setOldCertSubject(OldCertInfoBySubject oldCertSubject) {
+    this.oldCertSubject = oldCertSubject;
   }
 
 }

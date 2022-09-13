@@ -25,6 +25,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.util.Args;
+import org.xipki.util.Base64;
 import org.xipki.util.Curl.CurlResult;
 import org.xipki.util.FileUtils;
 import org.xipki.util.IoUtil;
@@ -196,6 +197,48 @@ public class Actions {
 
   } // class CopyFile
 
+  @Command(scope = "xi", name = "base64", description = "Base64 encode / decode")
+  @Service
+  public static class Base64 extends XiAction {
+
+    @Option(name = "--decode", aliases = "-d", description = "Decode")
+    private boolean decode = false;
+
+    @Argument(index = 0, name = "source", required = true, description = "source file")
+    @Completion(FileCompleter.class)
+    private String source;
+
+    @Argument(index = 1, name = "destination", required = true, description = "destination file")
+    @Completion(FileCompleter.class)
+    private String dest;
+
+    @Override
+    protected Object execute0() throws Exception {
+      source = expandFilepath(source);
+      dest = expandFilepath(dest);
+
+      File sourceFile = new File(source);
+      if (!sourceFile.exists()) {
+        throw new IllegalCmdParamException(source + " does not exist");
+      }
+
+      if (!sourceFile.isFile()) {
+        throw new IllegalCmdParamException(source + " is not a file");
+      }
+
+      byte[] sourceBytes = IoUtil.read(sourceFile);
+      byte[] targetBytes;
+      if (decode) {
+        targetBytes = org.xipki.util.Base64.decode(sourceBytes);
+      } else {
+        targetBytes = org.xipki.util.Base64.encodeToByte(sourceBytes, true);
+      }
+      IoUtil.save(dest, targetBytes);
+      return null;
+    }
+
+  } // class CopyDir
+
   @Command(scope = "xi", name = "curl", description = "transfer a URL")
   @Service
   public static class Curl extends XiAction {
@@ -229,6 +272,9 @@ public class Actions {
     @Option(name = "--user", aliases = "-u", description = "User and password of the form user:password")
     private String userPassword;
 
+    @Option(name = "--base64", description = "Base64-encode the content")
+    private boolean base64;
+
     @Reference
     private org.xipki.util.Curl curl;
 
@@ -245,9 +291,8 @@ public class Actions {
         usePost = Boolean.TRUE;
       }
 
-      Map<String, String> headerNameValues = null;
+      Map<String, String> headerNameValues = base64 || headers != null ? new HashMap<>() : null;
       if (headers != null) {
-        headerNameValues = new HashMap<>();
         for (String header : headers) {
           int idx = header.indexOf(':');
           if (idx == -1 || idx == header.length() - 1) {
@@ -257,6 +302,13 @@ public class Actions {
           String key = header.substring(0, idx);
           String value = header.substring(idx + 1).trim();
           headerNameValues.put(key, value);
+        }
+      }
+
+      if (base64) {
+        headerNameValues.put("Content-Transfer-Encoding", "base64");
+        if (content != null) {
+          content = org.xipki.util.Base64.encodeToByte(content, true);
         }
       }
 
