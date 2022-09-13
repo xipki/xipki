@@ -42,36 +42,52 @@ public class KeyParametersType extends ValidatableConf {
 
   public static class DsaParametersType extends ValidatableConf {
 
-    private List<Range> plengths;
+    private List<Integer> p;
 
-    private List<Range> qlengths;
+    private List<Integer> q;
 
-    public List<Range> getPlengths() {
-      if (plengths == null) {
-        plengths = new LinkedList<>();
-      }
-      return plengths;
+    public List<Integer> getP() {
+      return p;
     }
 
+    public void setP(List<Integer> p) {
+      this.p = p;
+    }
+
+    public List<Integer> getQ() {
+      return q;
+    }
+
+    public void setQ(List<Integer> q) {
+      this.q = q;
+    }
+
+    @Deprecated
     public void setPlengths(List<Range> plengths) {
-      if (qlengths == null) {
-        qlengths = new LinkedList<>();
+      if (CollectionUtil.isNotEmpty(plengths)) {
+        this.p = new LinkedList<>();
+        for (Range r : plengths) {
+          for (int i = r.getMin(); i < r.getMax(); i++) {
+            this.p.add(i);
+          }
+        }
       }
-      this.plengths = plengths;
     }
 
-    public List<Range> getQlengths() {
-      return qlengths;
-    }
-
+    @Deprecated
     public void setQlengths(List<Range> qlengths) {
-      this.qlengths = qlengths;
+      if (CollectionUtil.isNotEmpty(qlengths)) {
+        this.q = new LinkedList<>();
+        for (Range r : qlengths) {
+          for (int i = r.getMin(); i < r.getMax(); i++) {
+            this.q.add(i);
+          }
+        }
+      }
     }
 
     @Override
     public void validate() throws InvalidConfException {
-      validateRanges(plengths);
-      validateRanges(qlengths);
     }
 
   } // class DsaParametersType
@@ -113,25 +129,31 @@ public class KeyParametersType extends ValidatableConf {
 
   public static class RsaParametersType extends ValidatableConf {
 
-    @JSONField(ordinal = 1)
-    private List<Range> modulusLengths;
+    private List<Integer> modulus;
 
-    public List<Range> getModulusLengths() {
-      if (modulusLengths == null) {
-        modulusLengths = new LinkedList<>();
-      }
-      return modulusLengths;
+    public List<Integer> getModulus() {
+      return modulus;
     }
 
+    public void setModulus(List<Integer> modulus) {
+      this.modulus = modulus;
+    }
+
+    @Deprecated
     public void setModulusLengths(List<Range> modulusLengths) {
-      this.modulusLengths = modulusLengths;
+      if (CollectionUtil.isNotEmpty(modulusLengths)) {
+        this.modulus = new LinkedList<>();
+        for (Range r : modulusLengths) {
+          for (int i = r.getMin(); i < r.getMax(); i++) {
+            this.modulus.add(i);
+          }
+        }
+      }
     }
 
     @Override
     public void validate() throws InvalidConfException {
-      validateRanges(modulusLengths);
     }
-
   } // class RsaParametersType
 
   private DsaParametersType dsa;
@@ -182,32 +204,17 @@ public class KeyParametersType extends ValidatableConf {
       return option;
     } else if (rsa != null) {
       KeyParametersOption.RSAParametersOption option = new KeyParametersOption.RSAParametersOption();
-      option.setModulusLengths(buildParametersMap(rsa.getModulusLengths()));
+      option.setModulusLengths(rsa.getModulus());
       return option;
     } else if (dsa != null) {
       KeyParametersOption.DSAParametersOption option = new KeyParametersOption.DSAParametersOption();
-      option.setPlengths(buildParametersMap(dsa.getPlengths()));
-      option.setQlengths(buildParametersMap(dsa.getQlengths()));
+      option.setPlengths(dsa.getP());
+      option.setQlengths(dsa.getQ());
       return option;
     } else {
       return KeyParametersOption.ALLOW_ALL;
     }
   } // method toXiKeyParametersOption
-
-  private static Set<Range> buildParametersMap(List<Range> ranges) {
-    if (CollectionUtil.isEmpty(ranges)) {
-      return null;
-    }
-
-    Set<Range> ret = new HashSet<>();
-    for (Range range : ranges) {
-      if (range.getMin() != null || range.getMax() != null) {
-        ret.add(new Range(range.getMin(), range.getMax()));
-      }
-    }
-
-    return ret;
-  } // method buildParametersMap
 
   private static void validateRanges(List<Range> ranges) throws InvalidConfException {
     if (ranges != null) {

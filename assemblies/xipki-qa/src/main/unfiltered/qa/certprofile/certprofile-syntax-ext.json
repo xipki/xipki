@@ -21,16 +21,7 @@
 		}],
 		"parameters":{
 			"rsa":{
-				"modulusLengths":[{
-					"max":2048,
-					"min":2048
-				},{
-					"max":3072,
-					"min":3072
-				},{
-					"max":4096,
-					"min":4096
-				}]
+				"modulus":[2048,3072,4096]
 			}
 		}
 	},{
@@ -40,26 +31,8 @@
 		}],
 		"parameters":{
 			"dsa":{
-				"plengths":[{
-					"max":1024,
-					"min":1024
-				},{
-					"max":2048,
-					"min":2048
-				},{
-					"max":3072,
-					"min":3072
-				}],
-				"qlengths":[{
-					"max":160,
-					"min":160
-				},{
-					"max":224,
-					"min":224
-				},{
-					"max":256,
-					"min":256
-				}]
+				"p":[1024,2048,3072],
+				"q":[160,224,256]
 			}
 		}
 	},{
@@ -106,30 +79,23 @@
 			"type":{
 				"oid":"2.5.4.3",
 				"description":"cn"
-			},
-			"minOccurs":1,
-			"maxOccurs":1
+			}
 		},{
 			"type":{
 				"oid":"2.5.4.6",
 				"description":"c"
-			},
-			"minOccurs":1,
-			"maxOccurs":1
+			}
 		},{
 			"type":{
 				"oid":"2.5.4.10",
 				"description":"o"
-			},
-			"minOccurs":1,
-			"maxOccurs":1
+			}
 		},{
 			"type":{
 				"oid":"2.5.4.11",
 				"description":"ou"
 			},
-			"minOccurs":0,
-			"maxOccurs":1
+			"minOccurs":0
 		}]
 	},
 	"subjectToSubjectAltNames":[],
@@ -138,41 +104,29 @@
 			"oid":"2.5.29.14",
 			"description":"subjectKeyIdentifier"
 		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"2.5.29.31",
 			"description":"cRLDistributionPoints"
-		},
-		"critical":false,
-		"required":false,
-		"permittedInRequest":false
+		}
 	},{
 		"type":{
 			"oid":"2.5.29.46",
 			"description":"freshestCRL"
-		},
-		"critical":false,
-		"required":false,
-		"permittedInRequest":false
+		}
 	},{
 		"type":{
 			"oid":"2.5.29.19",
 			"description":"basicConstraints"
 		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"1.3.6.1.5.5.7.1.1",
 			"description":"authorityInfoAccess"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"authorityInfoAccess":{
 			"includeCaIssuers":true,
 			"includeOcsp":true,
@@ -184,9 +138,7 @@
 			"oid":"2.5.29.35",
 			"description":"authorityKeyIdentifier"
 		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"2.5.29.15",
@@ -194,7 +146,7 @@
 		},
 		"critical":true,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"optional",
 		"keyUsage":{
 			"usages":[{
 				"required":true,
@@ -212,9 +164,8 @@
 			"oid":"2.5.29.37",
 			"description":"extendedKeyUsage"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"optional",
 		"extendedKeyUsage":{
 			"usages":[{
 				"required":true,
@@ -231,9 +182,8 @@
 			"oid":"1.2.3.6.1.1",
 			"description":"custom syntax extension BIT STRING"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"BIT STRING"
 		}
@@ -242,9 +192,8 @@
 			"oid":"1.2.3.6.1.2",
 			"description":"custom syntax extension BMPString"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"BMPString"
 		}
@@ -253,9 +202,8 @@
 			"oid":"1.2.3.6.1.3",
 			"description":"custom syntax extension BOOLEAN"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"BOOLEAN"
 		}
@@ -264,9 +212,8 @@
 			"oid":"1.2.3.6.1.4",
 			"description":"custom syntax extension IA5String"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"IA5String"
 		}
@@ -275,9 +222,8 @@
 			"oid":"1.2.3.6.1.5",
 			"description":"custom syntax extension INTEGER"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"INTEGER"
 		}
@@ -286,9 +232,8 @@
 			"oid":"1.2.3.6.1.6",
 			"description":"custom syntax extension NULL"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"optional",
 		"syntax":{
 			"type":"NULL"
 		}
@@ -297,9 +242,8 @@
 			"oid":"1.2.3.6.1.7",
 			"description":"custom syntax extension OCTET STRING"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"OCTET STRING"
 		}
@@ -308,9 +252,8 @@
 			"oid":"1.2.3.6.1.8",
 			"description":"custom syntax extension OID"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"OID"
 		}
@@ -319,9 +262,8 @@
 			"oid":"1.2.3.6.1.9",
 			"description":"custom syntax extension PrintableString"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"PrintableString"
 		}
@@ -330,9 +272,8 @@
 			"oid":"1.2.3.6.1.10",
 			"description":"custom syntax extension RAW"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"RAW"
 		}
@@ -341,9 +282,8 @@
 			"oid":"1.2.3.6.1.11",
 			"description":"custom syntax extension TeletexString"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"TeletexString"
 		}
@@ -352,9 +292,8 @@
 			"oid":"1.2.3.6.1.12",
 			"description":"custom syntax extension UTF8String"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"UTF8String"
 		}
@@ -363,9 +302,8 @@
 			"oid":"1.2.3.6.1.13",
 			"description":"custom syntax extension ENUMERATED"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"ENUMERATED"
 		}
@@ -374,9 +312,8 @@
 			"oid":"1.2.3.6.1.14",
 			"description":"custom syntax extension GeneralizedTime"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"GeneralizedTime"
 		}
@@ -385,9 +322,8 @@
 			"oid":"1.2.3.6.1.15",
 			"description":"custom syntax extension UTCTime"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"UTCTime"
 		}
@@ -396,9 +332,8 @@
 			"oid":"1.2.3.6.1.16",
 			"description":"custom syntax extension Name"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"Name"
 		}
@@ -407,9 +342,8 @@
 			"oid":"1.2.3.6.1.17",
 			"description":"custom syntax extension SEQUENCE"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"SEQUENCE",
 			"subFields":[{
@@ -471,9 +405,8 @@
 			"oid":"1.2.3.6.1.18",
 			"description":"custom syntax extension SEQUENCE OF"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"SEQUENCE OF",
 			"subFields":[{
@@ -493,9 +426,8 @@
 			"oid":"1.2.3.6.1.19",
 			"description":"custom syntax extension SET"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"SET",
 			"subFields":[{
@@ -557,9 +489,8 @@
 			"oid":"1.2.3.6.1.20",
 			"description":"custom syntax extension SET OF"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"SET OF",
 			"subFields":[{

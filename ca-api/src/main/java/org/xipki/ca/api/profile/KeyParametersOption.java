@@ -21,6 +21,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,73 +39,44 @@ public class KeyParametersOption {
 
   public static class RSAParametersOption extends KeyParametersOption {
 
-    private Set<Range> modulusLengths;
+    private Set<Integer> modulusLengths;
 
     public RSAParametersOption() {
     }
 
-    public void setModulusLengths(Set<Range> modulusLengths) {
+    public void setModulusLengths(Collection<Integer> modulusLengths) {
       this.modulusLengths = (CollectionUtil.isEmpty(modulusLengths)) ? null : new HashSet<>(modulusLengths);
     }
 
     public boolean allowsModulusLength(int modulusLength) {
-      if (modulusLengths == null) {
-        return true;
-      }
-
-      for (Range range : modulusLengths) {
-        if (range.match(modulusLength)) {
-          return true;
-        }
-      }
-      return false;
+      return modulusLengths == null ? true : modulusLengths.contains(modulusLength);
     }
 
   } // class RSAParametersOption
 
   public static class DSAParametersOption extends KeyParametersOption {
 
-    private Set<Range> plengths;
+    private Set<Integer> plengths;
 
-    private Set<Range> qlengths;
+    private Set<Integer> qlengths;
 
     public DSAParametersOption() {
     }
 
-    public void setPlengths(Set<Range> plengths) {
+    public void setPlengths(Collection<Integer> plengths) {
       this.plengths = CollectionUtil.isEmpty(plengths) ? null : new HashSet<>(plengths);
     }
 
-    public void setQlengths(Set<Range> qlengths) {
+    public void setQlengths(Collection<Integer> qlengths) {
       this.qlengths = CollectionUtil.isEmpty(qlengths) ? null : new HashSet<>(qlengths);
     }
 
     public boolean allowsPlength(int plength) {
-      if (plengths == null) {
-        return true;
-      }
-
-      for (Range range : plengths) {
-        if (range.match(plength)) {
-          return true;
-        }
-      }
-
-      return false;
+      return plengths == null ? true : plengths.contains(plength);
     }
 
     public boolean allowsQlength(int qlength) {
-      if (qlengths == null) {
-        return true;
-      }
-
-      for (Range range : qlengths) {
-        if (range.match(qlength)) {
-          return true;
-        }
-      }
-
-      return false;
+      return qlengths == null ? true : qlengths.contains(qlength);
     }
 
   } // class DSAParametersOption

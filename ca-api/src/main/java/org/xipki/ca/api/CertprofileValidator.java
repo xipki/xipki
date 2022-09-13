@@ -65,7 +65,7 @@ public class CertprofileValidator {
     Set<ASN1ObjectIdentifier> set = new HashSet<>();
     for (ASN1ObjectIdentifier type : types) {
       ExtensionControl control = controls.get(type);
-      if (control.isRequest() && spec.isNonRequest(type)) {
+      if (control.isPermittedInRequest() && spec.isNonRequest(type)) {
         set.add(type);
       }
     }

@@ -419,16 +419,8 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     DsaParametersType dsaParams = new DsaParametersType();
     last(list).getParameters().setDsa(dsaParams);
 
-    List<Range> plengths = new LinkedList<>();
-    dsaParams.setPlengths(plengths);
-
-    plengths.add(createRange(2048));
-    plengths.add(createRange(3072));
-
-    List<Range> qlengths = new LinkedList<>();
-    dsaParams.setQlengths(qlengths);
-    qlengths.add(createRange(224));
-    qlengths.add(createRange(256));
+    dsaParams.setP(Arrays.asList(2048, 3072));
+    dsaParams.setQ(Arrays.asList(224, 256));
 
     // EC
     list.add(new AlgorithmType());
@@ -469,18 +461,8 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     DsaParametersType dsaParams = new DsaParametersType();
     last(list).getParameters().setDsa(dsaParams);
 
-    List<Range> plengths = new LinkedList<>();
-    dsaParams.setPlengths(plengths);
-
-    plengths.add(createRange(1024));
-    plengths.add(createRange(2048));
-    plengths.add(createRange(3072));
-
-    List<Range> qlengths = new LinkedList<>();
-    dsaParams.setQlengths(qlengths);
-    qlengths.add(createRange(160));
-    qlengths.add(createRange(224));
-    qlengths.add(createRange(256));
+    dsaParams.setP(Arrays.asList(1024, 2048, 3072));
+    dsaParams.setQ(Arrays.asList(160, 224, 256));
 
     // EC
     list.add(new AlgorithmType());
@@ -550,18 +532,11 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     last(list).setParameters(new KeyParametersType());
 
     RsaParametersType rsaParams = new RsaParametersType();
+    rsaParams.setModulus(Arrays.asList(2048, 3072, 4096));
     last(list).getParameters().setRsa(rsaParams);
-
-    rsaParams.getModulusLengths().add(createRange(2048));
-    rsaParams.getModulusLengths().add(createRange(3072));
-    rsaParams.getModulusLengths().add(createRange(4096));
 
     return list;
   } // method createRSAKeyAlgorithms
-
-  protected static Range createRange(int size) {
-    return createRange(size, size);
-  }
 
   protected static <T> T last(List<T> list) {
     if (list == null || list.isEmpty()) {

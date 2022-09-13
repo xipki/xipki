@@ -117,8 +117,7 @@ class H2nChecker extends ExtensionChecker {
     }
 
     Set<KeyUsageControl> optionalKeyusage = getKeyusage(false);
-    if (requestedExtns != null && extnControl.isRequest()
-        && isNotEmpty(optionalKeyusage)) {
+    if (requestedExtns != null && extnControl.isPermittedInRequest() && isNotEmpty(optionalKeyusage)) {
       Extension extension = requestedExtns.getExtension(Extension.keyUsage);
       if (extension != null) {
         org.bouncycastle.asn1.x509.KeyUsage reqKeyUsage =

@@ -29,124 +29,40 @@
 		}],
 		"parameters":{
 			"rsa":{
-				"modulusLengths":[{
-					"max":2048,
-					"min":2048
-				},{
-					"max":3072,
-					"min":3072
-				},{
-					"max":4096,
-					"min":4096
-				}]
-			}
-		}
-	},{
-		"algorithms":[{
-			"oid":"1.2.840.10040.4.1",
-			"description":"DSA"
-		}],
-		"parameters":{
-			"dsa":{
-				"plengths":[{
-					"max":1024,
-					"min":1024
-				},{
-					"max":2048,
-					"min":2048
-				},{
-					"max":3072,
-					"min":3072
-				}],
-				"qlengths":[{
-					"max":160,
-					"min":160
-				},{
-					"max":224,
-					"min":224
-				},{
-					"max":256,
-					"min":256
-				}]
-			}
-		}
-	},{
-		"algorithms":[{
-			"oid":"1.2.840.10045.2.1",
-			"description":"EC"
-		}],
-		"parameters":{
-			"ec":{
-				"curves":[{
-					"oid":"1.2.840.10045.3.1.7",
-					"description":"P-256"
-				},{
-					"oid":"1.3.132.0.34",
-					"description":"P-384"
-				},{
-					"oid":"1.3.132.0.35",
-					"description":"P-521"
-				},{
-					"oid":"1.3.36.3.3.2.8.1.1.7",
-					"description":"brainpoolp256r1"
-				},{
-					"oid":"1.3.36.3.3.2.8.1.1.7",
-					"description":"brainpoolp256r1"
-				},{
-					"oid":"1.3.36.3.3.2.8.1.1.11",
-					"description":"brainpoolp384r1"
-				},{
-					"oid":"1.3.36.3.3.2.8.1.1.13",
-					"description":"brainpoolp512r1"
-				},{
-					"oid":"1.2.156.10197.1.301",
-					"description":"sm2p256v1"
-				}],
-				"pointEncodings":[
-					4
-				]
+				"modulus":[2048,3072,4096]
 			}
 		}
 	}],
 	"subject":{
-		"keepRdnOrder":false,
 		"rdns":[{
 			"type":{
 				"oid":"2.5.4.6",
 				"description":"c"
-			},
-			"minOccurs":1,
-			"maxOccurs":1
+			}
 		},{
 			"type":{
 				"oid":"2.5.4.10",
 				"description":"o"
-			},
-			"minOccurs":1,
-			"maxOccurs":1
+			}
 		},{
 			"type":{
 				"oid":"2.5.4.11",
 				"description":"ou"
 			},
-			"minOccurs":0,
-			"maxOccurs":1
+			"minOccurs":0
 		},{
 			"type":{
 				"oid":"2.5.4.5",
 				"description":"serialNumber"
 			},
 			"regex":":NUMBER",
-			"minOccurs":0,
-			"maxOccurs":1
+			"minOccurs":0
 		},{
 			"type":{
 				"oid":"2.5.4.3",
 				"description":"cn"
 			},
-			"regex":":FQDN",
-			"minOccurs":1,
-			"maxOccurs":1
+			"regex":":FQDN"
 		}]
 	},
 	"subjectToSubjectAltNames":[{
@@ -161,33 +77,24 @@
 			"oid":"2.5.29.14",
 			"description":"subjectKeyIdentifier"
 		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"2.5.29.31",
 			"description":"cRLDistributionPoints"
-		},
-		"critical":false,
-		"required":false,
-		"permittedInRequest":false
+		}
 	},{
 		"type":{
 			"oid":"2.5.29.46",
 			"description":"freshestCRL"
-		},
-		"critical":false,
-		"required":false,
-		"permittedInRequest":false
+		}
 	},{
 		"type":{
 			"oid":"2.5.29.17",
 			"description":"subjectAlternativeName"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"optional",
 		"subjectAltName":{
 			"modes":["DNSName","IPAddress"]
 		}
@@ -197,16 +104,13 @@
 			"description":"basicConstraints"
 		},
 		"critical":true,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"1.3.6.1.5.5.7.1.1",
 			"description":"authorityInfoAccess"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"authorityInfoAccess":{
 			"includeCaIssuers":true,
 			"includeOcsp":true,
@@ -218,9 +122,7 @@
 			"oid":"2.5.29.35",
 			"description":"authorityKeyIdentifier"
 		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"2.5.29.15",
@@ -228,7 +130,7 @@
 		},
 		"critical":true,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"optional",
 		"keyUsage":{
 			"usages":[{
 				"required":true,
@@ -246,9 +148,8 @@
 			"oid":"2.5.29.37",
 			"description":"extendedKeyUsage"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"optional",
 		"extendedKeyUsage":{
 			"usages":[{
 				"required":true,

@@ -21,6 +21,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.security.X509ExtensionType.ConstantExtnValue;
+import org.xipki.util.TripleState;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
 
@@ -41,13 +42,17 @@ public class ExtensionType extends ValidatableConf {
    * otherwise it will be ignored.
    */
   @JSONField(ordinal = 2)
-  private boolean critical;
+  private Boolean critical;
 
   @JSONField(ordinal = 3)
-  private boolean required;
+  private Boolean required;
 
   @JSONField(ordinal = 4)
-  private boolean permittedInRequest;
+  @Deprecated
+  private Boolean permittedInRequest;
+
+  @JSONField(ordinal = 4)
+  private TripleState inRequest;
 
   @JSONField(ordinal = 5)
   private AdditionalInformation additionalInformation;
@@ -156,28 +161,54 @@ public class ExtensionType extends ValidatableConf {
     this.type = type;
   }
 
-  public boolean isCritical() {
+  public Boolean getCritical() {
     return critical;
   }
 
-  public void setCritical(boolean critical) {
+  public void setCritical(Boolean critical) {
     this.critical = critical;
   }
 
-  public boolean isRequired() {
+  public boolean critical() {
+    return critical == null ? false : critical;
+  }
+
+  public Boolean getRequired() {
     return required;
   }
 
-  public void setRequired(boolean required) {
+  public void setRequired(Boolean required) {
     this.required = required;
   }
 
-  public boolean isPermittedInRequest() {
-    return permittedInRequest;
+  public boolean required() {
+    return required == null ? false : required;
   }
 
+  @Deprecated
   public void setPermittedInRequest(boolean permittedInRequest) {
     this.permittedInRequest = permittedInRequest;
+  }
+
+  public boolean permittedInRequest() {
+    TripleState ts = getInRequest();
+    return TripleState.optional == ts || TripleState.required == ts;
+  }
+
+  public TripleState getInRequest() {
+    if (inRequest != null) {
+      return inRequest;
+    }
+
+    if (permittedInRequest != null) {
+      return TripleState.optional;
+    }
+
+    return TripleState.forbidden;
+  }
+
+  public void setInRequest(TripleState inRequest) {
+    this.inRequest = inRequest;
   }
 
   public AdditionalInformation getAdditionalInformation() {

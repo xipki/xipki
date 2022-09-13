@@ -21,16 +21,7 @@
 		}],
 		"parameters":{
 			"rsa":{
-				"modulusLengths":[{
-					"max":2048,
-					"min":2048
-				},{
-					"max":3072,
-					"min":3072
-				},{
-					"max":4096,
-					"min":4096
-				}]
+				"modulus":[2048,3072,4096]
 			}
 		}
 	},{
@@ -40,26 +31,8 @@
 		}],
 		"parameters":{
 			"dsa":{
-				"plengths":[{
-					"max":1024,
-					"min":1024
-				},{
-					"max":2048,
-					"min":2048
-				},{
-					"max":3072,
-					"min":3072
-				}],
-				"qlengths":[{
-					"max":160,
-					"min":160
-				},{
-					"max":224,
-					"min":224
-				},{
-					"max":256,
-					"min":256
-				}]
+				"p":[1024,2048,3072],
+				"q":[160,224,256]
 			}
 		}
 	},{
@@ -116,37 +89,27 @@
 			"type":{
 				"oid":"2.5.4.6",
 				"description":"c"
-			},
-			"minOccurs":1,
-			"maxOccurs":1
+			}
 		},{
 			"type":{
 				"oid":"2.5.4.10",
 				"description":"o"
-			},
-			"minOccurs":1,
-			"maxOccurs":1
+			}
 		},{
 			"type":{
 				"oid":"2.5.4.11",
 				"description":"ou"
-			},
-			"minOccurs":1,
-			"maxOccurs":1
+			}
 		},{
 			"type":{
 				"oid":"2.5.4.3",
 				"description":"cn"
-			},
-			"minOccurs":1,
-			"maxOccurs":1
+			}
 		},{
 			"type":{
 				"oid":"0.9.2342.19200300.100.1.1",
 				"description":"uid"
-			},
-			"minOccurs":1,
-			"maxOccurs":1
+			}
 		}]
 	},
 	"subjectToSubjectAltNames":[],
@@ -155,41 +118,32 @@
 			"oid":"2.5.29.14",
 			"description":"subjectKeyIdentifier"
 		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"2.5.29.19",
 			"description":"basicConstraints"
 		},
 		"critical":true,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"2.5.29.35",
 			"description":"authorityKeyIdentifier"
 		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"2.5.29.31",
 			"description":"cRLDistributionPoints"
 		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"2.5.29.32",
 			"description":"certificatePolicies"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"certificatePolicies":{
 			"certificatePolicyInformations":[{
 				"policyIdentifier":{
@@ -214,7 +168,7 @@
 		},
 		"critical":true,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"optional",
 		"keyUsage":{
 			"usages":[{
 				"required":true,
@@ -226,9 +180,8 @@
 			"oid":"2.5.29.37",
 			"description":"extendedKeyUsage"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"optional",
 		"extendedKeyUsage":{
 			"usages":[{
 				"required":true,
@@ -241,9 +194,7 @@
 			"oid":"1.2.840.113635.100.6.3.1",
 			"description":"custom constant extension NULL"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"NULL"
 		}
@@ -252,9 +203,7 @@
 			"oid":"1.2.840.113635.100.6.3.2",
 			"description":"custom constant extension NULL"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"NULL"
 		}
@@ -262,9 +211,8 @@
 		"type":{
 			"oid":"1.2.840.113635.100.6.3.6"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"required",
 		"syntax":{
 			"type":"SEQUENCE",
 			"subFields":[{

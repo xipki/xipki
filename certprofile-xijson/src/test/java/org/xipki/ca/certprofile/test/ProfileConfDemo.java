@@ -32,6 +32,7 @@ import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.security.ObjectIdentifiers.Extn;
+import org.xipki.util.TripleState;
 
 import java.util.HashMap;
 import java.util.List;
@@ -618,7 +619,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
         Extn.id_GMT_0015_TaxationNumber};
     for (ASN1ObjectIdentifier m : gmtOids) {
       list.add(createExtension(m, true, false));
-      last(list).setPermittedInRequest(true);
+      last(list).setInRequest(TripleState.required);
     }
 
     marshall(profile, destFilename, true);

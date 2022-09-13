@@ -21,16 +21,7 @@
 		}],
 		"parameters":{
 			"rsa":{
-				"modulusLengths":[{
-					"max":2048,
-					"min":2048
-				},{
-					"max":3072,
-					"min":3072
-				},{
-					"max":4096,
-					"min":4096
-				}]
+				"modulus":[2048,3072,4096]
 			}
 		}
 	},{
@@ -40,26 +31,8 @@
 		}],
 		"parameters":{
 			"dsa":{
-				"plengths":[{
-					"max":1024,
-					"min":1024
-				},{
-					"max":2048,
-					"min":2048
-				},{
-					"max":3072,
-					"min":3072
-				}],
-				"qlengths":[{
-					"max":160,
-					"min":160
-				},{
-					"max":224,
-					"min":224
-				},{
-					"max":256,
-					"min":256
-				}]
+				"p":[1024,2048,3072],
+				"q":[160,224,256]
 			}
 		}
 	},{
@@ -101,14 +74,11 @@
 		}
 	}],
 	"subject":{
-		"keepRdnOrder":false,
 		"rdns":[{
 			"type":{
 				"oid":"2.5.4.6",
 				"description":"c"
 			},
-			"minOccurs":1,
-			"maxOccurs":1,
 			"value":{
 				"overridable":true,
 				"text":"DE"
@@ -118,8 +88,6 @@
 				"oid":"2.5.4.10",
 				"description":"o"
 			},
-			"minOccurs":1,
-			"maxOccurs":1,
 			"value":{
 				"overridable":false,
 				"text":"fixed myorg.org"
@@ -129,23 +97,19 @@
 				"oid":"2.5.4.11",
 				"description":"ou"
 			},
-			"minOccurs":0,
-			"maxOccurs":1
+			"minOccurs":0
 		},{
 			"type":{
 				"oid":"2.5.4.5",
 				"description":"serialNumber"
 			},
 			"regex":":NUMBER",
-			"minOccurs":0,
-			"maxOccurs":1
+			"minOccurs":0
 		},{
 			"type":{
 				"oid":"2.5.4.3",
 				"description":"cn"
-			},
-			"minOccurs":1,
-			"maxOccurs":1
+			}
 		}]
 	},
 	"subjectToSubjectAltNames":[],
@@ -154,41 +118,30 @@
 			"oid":"2.5.29.14",
 			"description":"subjectKeyIdentifier"
 		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"2.5.29.31",
 			"description":"cRLDistributionPoints"
-		},
-		"critical":false,
-		"required":false,
-		"permittedInRequest":false
+		}
 	},{
 		"type":{
 			"oid":"2.5.29.46",
 			"description":"freshestCRL"
-		},
-		"critical":false,
-		"required":false,
-		"permittedInRequest":false
+		}
 	},{
 		"type":{
 			"oid":"2.5.29.19",
 			"description":"basicConstraints"
 		},
 		"critical":true,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"1.3.6.1.5.5.7.1.1",
 			"description":"authorityInfoAccess"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"authorityInfoAccess":{
 			"includeCaIssuers":true,
 			"includeOcsp":true,
@@ -200,9 +153,7 @@
 			"oid":"2.5.29.35",
 			"description":"authorityKeyIdentifier"
 		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"2.5.29.15",
@@ -210,7 +161,7 @@
 		},
 		"critical":true,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"optional",
 		"keyUsage":{
 			"usages":[{
 				"required":true,

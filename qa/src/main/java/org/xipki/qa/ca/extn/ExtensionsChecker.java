@@ -232,7 +232,7 @@ public class ExtensionsChecker {
     }
 
     ExtensionType ex = extensions.get(type.getId());
-    if (!ex.isCritical()) {
+    if (!ex.critical()) {
       throw new CertprofileException("CCC Extension must be set to critical, but configured non-critical.");
     }
 
@@ -475,7 +475,7 @@ public class ExtensionsChecker {
       ASN1ObjectIdentifier type, Extensions requestedExtns, ExtensionControl extControl) {
     if (constantExtensions != null && constantExtensions.containsKey(type)) {
       return constantExtensions.get(type).getValue();
-    } else if (requestedExtns != null && extControl.isRequest()) {
+    } else if (requestedExtns != null && extControl.isPermittedInRequest()) {
       Extension reqExt = requestedExtns.getExtension(type);
       if (reqExt != null) {
         return reqExt.getExtnValue().getOctets();

@@ -36,6 +36,7 @@ import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.TripleState;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
 
@@ -380,7 +381,7 @@ public class X509ProfileType extends ValidatableConf {
       } catch (InvalidConfException ex) {
         throw new CertprofileException(ex.getMessage(), ex);
       }
-      ExtensionValue extension = new ExtensionValue(m.isCritical(), value);
+      ExtensionValue extension = new ExtensionValue(m.critical(), value);
       map.put(oid, extension);
     }
 
@@ -426,16 +427,20 @@ public class X509ProfileType extends ValidatableConf {
         throw new CertprofileException("duplicated definition of extension " + oid.getId());
       }
 
-      boolean permittedInReq = extn.isPermittedInRequest();
-      if (permittedInReq && extn.getConstant() != null) {
+      TripleState inReq = extn.getInRequest();
+      if (inReq == null) {
+        inReq = TripleState.forbidden;
+      }
+
+      if (inReq != TripleState.forbidden && extn.getConstant() != null) {
         throw new CertprofileException("constant Extension is not permitted in request");
       }
 
-      if (!permittedInReq && extn.getSyntax() != null) {
+      if (inReq == TripleState.forbidden && extn.getSyntax() != null) {
         throw new CertprofileException("Extension with syntax must be permitted in request");
       }
 
-      ExtensionControl ctrl = new ExtensionControl(extn.isCritical(), extn.isRequired(), permittedInReq);
+      ExtensionControl ctrl = new ExtensionControl(extn.critical(), extn.required(), inReq);
       controls.put(oid, ctrl);
     }
 

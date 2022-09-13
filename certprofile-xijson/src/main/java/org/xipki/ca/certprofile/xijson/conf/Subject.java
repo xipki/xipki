@@ -36,20 +36,24 @@ import java.util.List;
 public class Subject extends ValidatableConf {
 
   /**
-   * whether the RDNs occurs as in the defined ASN.1 order
+   * whether the RDNs occurs as in the defined ASN.1 order.
    */
   @JSONField(ordinal = 2)
-  private boolean keepRdnOrder;
+  private Boolean keepRdnOrder;
 
   @JSONField(ordinal = 3)
   private List<RdnType> rdns;
 
-  public boolean isKeepRdnOrder() {
+  public Boolean getKeepRdnOrder() {
     return keepRdnOrder;
   }
 
-  public void setKeepRdnOrder(boolean keepRdnOrder) {
+  public void setKeepRdnOrder(Boolean keepRdnOrder) {
     this.keepRdnOrder = keepRdnOrder;
+  }
+
+  public boolean keepRdnOrder() {
+    return keepRdnOrder == null ? false: keepRdnOrder;
   }
 
   public List<RdnType> getRdns() {
@@ -158,12 +162,20 @@ public class Subject extends ValidatableConf {
       this.minLen = minLen;
     }
 
+    public int minLen() {
+      return minLen == null ? 1 : minLen;
+    }
+
     public Integer getMaxLen() {
       return maxLen;
     }
 
     public void setMaxLen(Integer maxLen) {
       this.maxLen = maxLen;
+    }
+
+    public int maxLen() {
+      return maxLen == null ? 1 : maxLen;
     }
 
     public StringType getStringType() {

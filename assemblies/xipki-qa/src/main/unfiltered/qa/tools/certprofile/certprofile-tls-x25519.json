@@ -9,7 +9,6 @@
 	"maxSize":4500,
 	"validity":"30y",
 	"notBeforeTime":"current",
-	"serialNumberInReq":false,
 	"keypairGeneration":{
 		"inheritCA":false,
 		"forbidden":false,
@@ -30,44 +29,35 @@
 		}]
 	}],
 	"subject":{
-		"incSerialNumber":false,
-		"keepRdnOrder":false,
 		"rdns":[{
 			"type":{
 				"oid":"2.5.4.6",
 				"description":"c"
-			},
-			"minOccurs":1,
-			"maxOccurs":1
+			}
 		},{
 			"type":{
 				"oid":"2.5.4.10",
 				"description":"o"
 			},
-			"minOccurs":0,
-			"maxOccurs":1
+			"minOccurs":0
 		},{
 			"type":{
 				"oid":"2.5.4.11",
 				"description":"ou"
 			},
-			"minOccurs":0,
-			"maxOccurs":1
+			"minOccurs":0
 		},{
 			"type":{
 				"oid":"2.5.4.5",
 				"description":"serialNumber"
 			},
 			"regex":":NUMBER",
-			"minOccurs":0,
-			"maxOccurs":1
+			"minOccurs":0
 		},{
 			"type":{
 				"oid":"2.5.4.3",
 				"description":"cn"
-			},
-			"minOccurs":1,
-			"maxOccurs":1
+			}
 		}]
 	},
 	"subjectToSubjectAltNames":[{
@@ -84,7 +74,7 @@
 		},
 		"critical":true,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"optional",
 		"keyUsage":{
 			"usages":[{
 				"required":true,
@@ -96,17 +86,14 @@
 			"oid":"2.5.29.14",
 			"description":"subjectKeyIdentifier"
 		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"2.5.29.17",
 			"description":"subjectAlternativeName"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"optional",
 		"subjectAltName":{
 			"modes":["DNSName","IPAddress"]
 		}
@@ -116,24 +103,20 @@
 			"description":"basicConstraints"
 		},
 		"critical":true,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"2.5.29.35",
 			"description":"authorityKeyIdentifier"
 		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"2.5.29.37",
 			"description":"extendedKeyUsage"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"optional",
 		"extendedKeyUsage":{
 			"usages":[{
 				"required":true,

@@ -78,7 +78,7 @@ public class CheckerUtil {
         throw new CertprofileException("could not parse the constant extension value of type" + type, ex);
       }
 
-      QaExtensionValue extension = new QaExtensionValue(extn.isCritical(), encodedValue);
+      QaExtensionValue extension = new QaExtensionValue(extn.critical(), encodedValue);
       map.put(oid, extension);
     }
 

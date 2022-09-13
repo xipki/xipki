@@ -21,16 +21,7 @@
 		}],
 		"parameters":{
 			"rsa":{
-				"modulusLengths":[{
-					"max":2048,
-					"min":2048
-				},{
-					"max":3072,
-					"min":3072
-				},{
-					"max":4096,
-					"min":4096
-				}]
+				"modulus":[2048,3072,4096]
 			}
 		}
 	},{
@@ -40,26 +31,8 @@
 		}],
 		"parameters":{
 			"dsa":{
-				"plengths":[{
-					"max":1024,
-					"min":1024
-				},{
-					"max":2048,
-					"min":2048
-				},{
-					"max":3072,
-					"min":3072
-				}],
-				"qlengths":[{
-					"max":160,
-					"min":160
-				},{
-					"max":224,
-					"min":224
-				},{
-					"max":256,
-					"min":256
-				}]
+				"p":[1024,2048,3072],
+				"q":[160,224,256]
 			}
 		}
 	},{
@@ -106,30 +79,23 @@
 			"type":{
 				"oid":"2.5.4.3",
 				"description":"cn"
-			},
-			"minOccurs":1,
-			"maxOccurs":1
+			}
 		},{
 			"type":{
 				"oid":"2.5.4.6",
 				"description":"c"
-			},
-			"minOccurs":1,
-			"maxOccurs":1
+			}
 		},{
 			"type":{
 				"oid":"2.5.4.10",
 				"description":"o"
-			},
-			"minOccurs":1,
-			"maxOccurs":1
+			}
 		},{
 			"type":{
 				"oid":"2.5.4.11",
 				"description":"ou"
 			},
-			"minOccurs":0,
-			"maxOccurs":1
+			"minOccurs":0
 		}]
 	},
 	"subjectToSubjectAltNames":[],
@@ -138,41 +104,29 @@
 			"oid":"2.5.29.14",
 			"description":"subjectKeyIdentifier"
 		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"2.5.29.31",
 			"description":"cRLDistributionPoints"
-		},
-		"critical":false,
-		"required":false,
-		"permittedInRequest":false
+		}
 	},{
 		"type":{
 			"oid":"2.5.29.46",
 			"description":"freshestCRL"
-		},
-		"critical":false,
-		"required":false,
-		"permittedInRequest":false
+		}
 	},{
 		"type":{
 			"oid":"2.5.29.19",
 			"description":"basicConstraints"
 		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"1.3.6.1.5.5.7.1.1",
 			"description":"authorityInfoAccess"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"authorityInfoAccess":{
 			"includeCaIssuers":true,
 			"includeOcsp":true,
@@ -184,9 +138,7 @@
 			"oid":"2.5.29.35",
 			"description":"authorityKeyIdentifier"
 		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false
+		"required":true
 	},{
 		"type":{
 			"oid":"2.5.29.15",
@@ -194,7 +146,7 @@
 		},
 		"critical":true,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"optional",
 		"keyUsage":{
 			"usages":[{
 				"required":true,
@@ -212,9 +164,8 @@
 			"oid":"2.5.29.37",
 			"description":"extendedKeyUsage"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
+		"inRequest":"optional",
 		"extendedKeyUsage":{
 			"usages":[{
 				"required":true,
@@ -231,9 +182,7 @@
 			"oid":"1.2.3.6.3.1",
 			"description":"custom constant extension BIT STRING (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"BIT STRING",
 			"tag":{
@@ -247,9 +196,7 @@
 			"oid":"1.2.3.6.3.2",
 			"description":"custom constant extension BMPString (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"BMPString",
 			"tag":{
@@ -263,9 +210,7 @@
 			"oid":"1.2.3.6.3.3",
 			"description":"custom constant extension BOOLEAN (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"BOOLEAN",
 			"tag":{
@@ -279,9 +224,7 @@
 			"oid":"1.2.3.6.3.4",
 			"description":"custom constant extension IA5String (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"IA5String",
 			"tag":{
@@ -295,9 +238,7 @@
 			"oid":"1.2.3.6.3.5",
 			"description":"custom constant extension INTEGER (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"INTEGER",
 			"tag":{
@@ -311,9 +252,7 @@
 			"oid":"1.2.3.6.3.6",
 			"description":"custom constant extension NULL (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"NULL",
 			"tag":{
@@ -326,9 +265,7 @@
 			"oid":"1.2.3.6.3.7",
 			"description":"custom constant extension OCTET STRING (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"OCTET STRING",
 			"tag":{
@@ -342,9 +279,7 @@
 			"oid":"1.2.3.6.3.8",
 			"description":"custom constant extension OID (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"OID",
 			"tag":{
@@ -358,9 +293,7 @@
 			"oid":"1.2.3.6.3.9",
 			"description":"custom constant extension PrintableString (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"PrintableString",
 			"tag":{
@@ -374,9 +307,7 @@
 			"oid":"1.2.3.6.3.10",
 			"description":"custom constant extension RAW (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"RAW",
 			"description":"DER NULL",
@@ -391,9 +322,7 @@
 			"oid":"1.2.3.6.3.11",
 			"description":"custom constant extension TeletexString (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"TeletexString",
 			"tag":{
@@ -407,9 +336,7 @@
 			"oid":"1.2.3.6.3.12",
 			"description":"custom constant extension UTF8String (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"UTF8String",
 			"tag":{
@@ -423,9 +350,7 @@
 			"oid":"1.2.3.6.3.13",
 			"description":"custom constant extension ENUMERATED (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"ENUMERATED",
 			"tag":{
@@ -439,9 +364,7 @@
 			"oid":"1.2.3.6.3.14",
 			"description":"custom constant extension GeneralizedTime (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"GeneralizedTime",
 			"tag":{
@@ -455,9 +378,7 @@
 			"oid":"1.2.3.6.3.15",
 			"description":"custom constant extension UTCTime (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"UTCTime",
 			"tag":{
@@ -471,9 +392,7 @@
 			"oid":"1.2.3.6.3.16",
 			"description":"custom constant extension Name (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"Name",
 			"tag":{
@@ -487,9 +406,7 @@
 			"oid":"1.2.3.6.3.17",
 			"description":"custom constant extension SEQUENCE (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"SEQUENCE",
 			"tag":{
@@ -552,9 +469,7 @@
 			"oid":"1.2.3.6.3.18",
 			"description":"custom constant extension SEQUENCE OF (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"SEQUENCE OF",
 			"tag":{
@@ -595,9 +510,7 @@
 			"oid":"1.2.3.6.3.19",
 			"description":"custom constant extension SET (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"SET",
 			"tag":{
@@ -660,9 +573,7 @@
 			"oid":"1.2.3.6.3.20",
 			"description":"custom constant extension SET OF (1, EXPLICIT)"
 		},
-		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
 		"constant":{
 			"type":"SET OF",
 			"tag":{

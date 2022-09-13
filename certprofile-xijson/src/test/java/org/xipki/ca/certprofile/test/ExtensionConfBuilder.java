@@ -60,24 +60,28 @@ import java.util.*;
 
 public class ExtensionConfBuilder {
 
-  private static final Set<ASN1ObjectIdentifier> REQUEST_EXTENSIONS;
+  private static final Set<ASN1ObjectIdentifier> REQUIRED_REQUEST_EXTENSIONS;
+
+  private static final Set<ASN1ObjectIdentifier> OPTIONAL_REQUEST_EXTENSIONS;
 
   static {
-    REQUEST_EXTENSIONS = new HashSet<>();
-    REQUEST_EXTENSIONS.add(Extension.keyUsage);
-    REQUEST_EXTENSIONS.add(Extension.extendedKeyUsage);
-    REQUEST_EXTENSIONS.add(Extension.subjectAlternativeName);
-    REQUEST_EXTENSIONS.add(Extension.subjectDirectoryAttributes);
-    REQUEST_EXTENSIONS.add(Extension.subjectInfoAccess);
-    REQUEST_EXTENSIONS.add(Extension.qCStatements);
-    REQUEST_EXTENSIONS.add(Extension.biometricInfo);
-    REQUEST_EXTENSIONS.add(Extn.id_extension_admission);
-    REQUEST_EXTENSIONS.add(Extn.id_extension_additionalInformation);
-    REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_ICRegistrationNumber);
-    REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_IdentityCode);
-    REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_InsuranceNumber);
-    REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_OrganizationCode);
-    REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_TaxationNumber);
+    REQUIRED_REQUEST_EXTENSIONS = new HashSet<>();
+    REQUIRED_REQUEST_EXTENSIONS.add(Extension.subjectAlternativeName);
+    REQUIRED_REQUEST_EXTENSIONS.add(Extension.subjectDirectoryAttributes);
+    REQUIRED_REQUEST_EXTENSIONS.add(Extension.subjectInfoAccess);
+    REQUIRED_REQUEST_EXTENSIONS.add(Extension.biometricInfo);
+    REQUIRED_REQUEST_EXTENSIONS.add(Extn.id_extension_admission);
+    REQUIRED_REQUEST_EXTENSIONS.add(Extn.id_extension_additionalInformation);
+    REQUIRED_REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_ICRegistrationNumber);
+    REQUIRED_REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_IdentityCode);
+    REQUIRED_REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_InsuranceNumber);
+    REQUIRED_REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_OrganizationCode);
+    REQUIRED_REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_TaxationNumber);
+
+    OPTIONAL_REQUEST_EXTENSIONS = new HashSet<>();
+    OPTIONAL_REQUEST_EXTENSIONS.add(Extension.keyUsage);
+    OPTIONAL_REQUEST_EXTENSIONS.add(Extension.extendedKeyUsage);
+    OPTIONAL_REQUEST_EXTENSIONS.add(Extension.qCStatements);
   } // method static
 
   public static List<ConstantExtnValue> createConstantSequenceOrSet() {
@@ -409,7 +413,13 @@ public class ExtensionConfBuilder {
     ExtensionType ret = new ExtensionType();
     // attributes
     ret.setRequired(required);
-    ret.setPermittedInRequest(REQUEST_EXTENSIONS.contains(type));
+
+    if (REQUIRED_REQUEST_EXTENSIONS.contains(type)) {
+      ret.setInRequest(TripleState.required);
+    } else if (OPTIONAL_REQUEST_EXTENSIONS.contains(type)) {
+      ret.setInRequest(TripleState.optional);
+    }
+
     // children
     ret.setType(createOidType(type, description));
     ret.setCritical(critical);
@@ -421,7 +431,6 @@ public class ExtensionConfBuilder {
     ExtensionType ret = new ExtensionType();
     // attributes
     ret.setRequired(required);
-    ret.setPermittedInRequest(false);
     // children
     String desc = "custom constant extension " + fieldType.getText();
     if (tag != null) {
@@ -448,7 +457,7 @@ public class ExtensionConfBuilder {
     ExtensionType ret = new ExtensionType();
     // attributes
     ret.setRequired(required);
-    ret.setPermittedInRequest(true);
+    ret.setInRequest(TripleState.required);
     // children
     String desc = "custom syntax extension " + fieldType.getText();
     if (tag != null) {
@@ -785,13 +794,6 @@ public class ExtensionConfBuilder {
     }
     return ret;
   } // method
-
-  public static Range createRange(Integer min, Integer max) {
-    Range ret = new Range();
-    ret.setMin(min);
-    ret.setMax(max);
-    return ret;
-  } // method createRange
 
   public static Map<String, String> createDescription(String details) {
     Map<String, String> map = new HashMap<>();

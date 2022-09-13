@@ -482,7 +482,7 @@ class A2gChecker extends ExtensionChecker {
     }
 
     Set<ExtKeyUsageControl> optionalExtKeyusage = caller.getExtKeyusage(false);
-    if (requestedExtns != null && extnControl.isRequest() && isNotEmpty(optionalExtKeyusage)) {
+    if (requestedExtns != null && extnControl.isPermittedInRequest() && isNotEmpty(optionalExtKeyusage)) {
       Extension extension = requestedExtns.getExtension(Extension.extendedKeyUsage);
       if (extension != null) {
         org.bouncycastle.asn1.x509.ExtendedKeyUsage reqKeyUsage =

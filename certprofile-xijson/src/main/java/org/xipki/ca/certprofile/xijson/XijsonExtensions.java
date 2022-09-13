@@ -43,6 +43,7 @@ import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.TripleState;
 import org.xipki.util.Validity;
 import org.xipki.util.exception.BadCertTemplateException;
 
@@ -374,7 +375,7 @@ public class XijsonExtensions {
       AdmissionSyntax extConf = extn.getAdmissionSyntax();
       if (extConf != null) {
         this.admission = extConf.toXiAdmissionSyntax(extensionControls.get(type).isCritical());
-        if (!extn.isPermittedInRequest() && this.admission.isInputFromRequestRequired()) {
+        if (!extn.permittedInRequest() && this.admission.isInputFromRequestRequired()) {
           throw new CertprofileException("Extension " + ObjectIdentifiers.getName(type)
             + " should be permitted in request");
         }
@@ -826,7 +827,7 @@ public class XijsonExtensions {
 
     extnIds.remove(type);
     ExtensionType ex = extensions.get(type.getId());
-    if (!ex.isCritical()) {
+    if (!ex.critical()) {
       throw new CertprofileException("CCC Extension must be set to critical, but configured non-critical.");
     }
 
@@ -851,7 +852,7 @@ public class XijsonExtensions {
 
     ASN1Sequence seq = new DERSequence(new ASN1Integer(schema.getVersion()));
     this.cccExtensionSchemaType = type;
-    this.cccExtensionSchemaValue = new ExtensionValue(ex.isCritical(), seq);
+    this.cccExtensionSchemaValue = new ExtensionValue(ex.critical(), seq);
   }
 
   private static List<ASN1ObjectIdentifier> toOidList(List<DescribableOid> oidWithDescTypes) {

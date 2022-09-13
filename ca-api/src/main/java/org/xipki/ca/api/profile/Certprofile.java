@@ -112,12 +112,11 @@ public abstract class Certprofile implements Closeable {
 
     private final boolean required;
 
-    private final boolean request;
-
-    public ExtensionControl(boolean critical, boolean required, boolean request) {
+    private final TripleState inRequest;
+    public ExtensionControl(boolean critical, boolean required, TripleState inRequest) {
       this.critical = critical;
       this.required = required;
-      this.request = request;
+      this.inRequest = inRequest == null ? TripleState.forbidden : inRequest;
     }
 
     public boolean isCritical() {
@@ -128,8 +127,12 @@ public abstract class Certprofile implements Closeable {
       return required;
     }
 
-    public boolean isRequest() {
-      return request;
+    public TripleState getInRequest() {
+      return inRequest;
+    }
+
+    public boolean isPermittedInRequest() {
+      return TripleState.required == inRequest || TripleState.optional == inRequest;
     }
 
   } // class CertLevel

@@ -43,6 +43,7 @@ import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.TlsExtensionType;
 import org.xipki.security.X509ExtensionType.FieldType;
 import org.xipki.security.X509ExtensionType.Tag;
+import org.xipki.util.TripleState;
 
 import java.util.*;
 
@@ -737,7 +738,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     list.add(createExtension(new ASN1ObjectIdentifier("1.2.840.113635.100.6.3.6"), true, false));
     ExtnSyntax syntax = new ExtnSyntax(FieldType.SEQUENCE);
     last(list).setSyntax(syntax);
-    last(list).setPermittedInRequest(true);
+    last(list).setInRequest(TripleState.required);
 
     /*
      *  1. SEQUENCE or SET {
