@@ -546,8 +546,4 @@ xi:update-cert-p12 --p12 output/gmt0015_2.p12 --password 1234 \
 xi:cmp-get-crl --ca subcawithcrl \
   --outform $OUTFORM --out output/subcawithcrl1-1-get.crl
 
-echo "#################################################################"
-echo "#              Uninstall unneeded features                      #"
-echo "#################################################################"
-
 source file:./qa/scep.script

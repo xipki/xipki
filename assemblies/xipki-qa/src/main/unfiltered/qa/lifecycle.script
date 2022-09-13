@@ -154,6 +154,7 @@ if { $printUsage equals "true" } then {
 
   ## Prepare scripts
   xi:copy-file -f qa/template.rest.script qa/rest.script
+  xi:copy-file -f qa/template.est.script  qa/est.script
 
   xi:copy-file -f qa/qa.d/template.ca-load.script \
     qa/qa.d/ca-load.script
@@ -172,8 +173,6 @@ if { $printUsage equals "true" } then {
   if { "$SIG_TYPE" equals "plainec" } then {
     dsaPlain = "--dsa-plain"
   }
-
-  xi:replace --old "REPLACEME-DSAPLAIN" --new "${dsaPlain}" qa/rest.script
 
   xi:replace --old "REPLACEME-DSAPLAIN" --new "${dsaPlain}" \
     qa/qa.d/ca-load.script
@@ -196,6 +195,9 @@ if { $printUsage equals "true" } then {
     qa/rest.script
 
   xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
+    qa/est.script
+
+  xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
     qa/qa.d/ca.script
 
   xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
@@ -208,6 +210,8 @@ if { $printUsage equals "true" } then {
   }
 
   xi:replace --old "REPLACEME-GM" --new "${gm}" qa/rest.script
+
+  xi:replace --old "REPLACEME-GM" --new "${gm}" qa/est.script
 
   xi:replace --old "REPLACEME-GM" --new "${gm}" \
     qa/qa.d/ca-load.script
@@ -239,6 +243,12 @@ if { $printUsage equals "true" } then {
   source file:./qa/ca-qa.script
 
   source file:./qa/rest.script
+
+  source file:./qa/est.script
+
+  echo "#################################################################"
+  echo "#                              CRL                              #"
+  echo "#################################################################"
 
   echo "generate new CRL"
   ca:gen-crl --ca subcawithcrl1 --out output/subcawithcrl1.crl

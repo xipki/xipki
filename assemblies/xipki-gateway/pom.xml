@@ -18,19 +18,25 @@
     <dependency>
       <groupId>org.xipki.gateway</groupId>
       <artifactId>cmp-gateway</artifactId>
-      <version>6.0.0-SNAPSHOT</version>
+      <version>${project.version}</version>
       <type>war</type>
     </dependency>
     <dependency>
       <groupId>org.xipki.gateway</groupId>
       <artifactId>scep-gateway</artifactId>
-      <version>6.0.0-SNAPSHOT</version>
+      <version>${project.version}</version>
       <type>war</type>
     </dependency>
     <dependency>
       <groupId>org.xipki.gateway</groupId>
       <artifactId>rest-gateway</artifactId>
-      <version>6.0.0-SNAPSHOT</version>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.gateway</groupId>
+      <artifactId>est-gateway</artifactId>
+      <version>${project.version}</version>
       <type>war</type>
     </dependency>
   </dependencies>
@@ -105,6 +111,12 @@
                 <artifactItem>
                   <groupId>org.xipki.gateway</groupId>
                   <artifactId>scep-gateway</artifactId>
+                  <version>${project.version}</version>
+                  <type>war</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.gateway</groupId>
+                  <artifactId>est-gateway</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>

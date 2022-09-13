@@ -6,7 +6,7 @@ echo "#################################################################"
 
 CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in output/subcawithcrl1.crt)
 
-xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
+xi:csr-p12 --hash $HASH REPLACEME-GM REPLACEME-RSAPSS \
   --p12 output/rest-tls1.p12 --password 1234 \
   --subject "CN=rest-tls1.myorg.org,O=myorg,C=DE" \
   --out output/rest/rest-tls1.csr

@@ -193,7 +193,7 @@ preload <start script>
 
 ## Enroll/Revoke Certificate
 
-* EST
+* EST  
   Use any EST client.
 
   The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
@@ -207,7 +207,7 @@ preload <start script>
   It can be executed in the CLI as follows:  
   - `source xipki/client-script/scep-client.script`
 
-* CMP
+* CMP  
   Use any CMP client. XiPKI provides also a CMP client.
 
   The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.

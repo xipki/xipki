@@ -4,7 +4,7 @@ Deployment in Tomcat 8 and 9
    The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
    `setenv.sh` and `setenv.bat` must be adapted to point to the new position.
    Note if you do not support all protocols CMP, SCEP and RESTful API, please delete the unsupported ones
-   (cmp.war for CMP, scep.war for SCEP, and rest.war for RESTful API)
+   (cmp.war for CMP, scep.war for SCEP, .well-known.war for EST, and rest.war for RESTful API)
 2. Optional, configure the TLS listener in the file
    `${CATALINA_HOME}conf/server.xml` (we use here the port 8082 and 8445, can be changed to any other port)
     - Use NIO connector

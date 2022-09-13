@@ -65,6 +65,12 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
+      <source>${project.build.directory}/webapps/est-gateway.war</source>
+      <outputDirectory>webapps</outputDirectory>
+      <destName>.well-known.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>${project.build.directory}/xipki/security/example/pkcs11-emulator.json</source>
       <outputDirectory>xipki/security</outputDirectory>
       <destName>pkcs11.json</destName>
