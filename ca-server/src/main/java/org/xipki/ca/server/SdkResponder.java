@@ -103,20 +103,20 @@ public class SdkResponder {
 
   private static final Logger LOG = LoggerFactory.getLogger(SdkResponder.class);
 
-  private static final Set<String> kupCertExtnIds;
+  private static final Set<String> reenrollCertExtnIds;
 
   private final CaManagerImpl caManager;
 
   private ScheduledThreadPoolExecutor threadPoolExecutor;
 
   static {
-    kupCertExtnIds = new HashSet<>();
-    kupCertExtnIds.add(Extension.biometricInfo.getId());
-    kupCertExtnIds.add(Extension.extendedKeyUsage.getId());
-    kupCertExtnIds.add(Extension.keyUsage.getId());
-    kupCertExtnIds.add(Extension.qCStatements.getId());
-    kupCertExtnIds.add(Extension.subjectAlternativeName.getId());
-    kupCertExtnIds.add(Extension.subjectInfoAccess.getId());
+    reenrollCertExtnIds = new HashSet<>();
+    reenrollCertExtnIds.add(Extension.biometricInfo.getId());
+    reenrollCertExtnIds.add(Extension.extendedKeyUsage.getId());
+    reenrollCertExtnIds.add(Extension.keyUsage.getId());
+    reenrollCertExtnIds.add(Extension.qCStatements.getId());
+    reenrollCertExtnIds.add(Extension.subjectAlternativeName.getId());
+    reenrollCertExtnIds.add(Extension.subjectInfoAccess.getId());
   }
 
   public SdkResponder(CaManagerImpl caManager) {
@@ -231,8 +231,8 @@ public class SdkResponder {
           assertPermitted(requestor, ENROLL_CERT);
           return enroll(ca, request, requestor, false, false);
         }
-        case CMD_enroll_kup: {
-          assertPermitted(requestor, KEY_UPDATE);
+        case CMD_reenroll: {
+          assertPermitted(requestor, REENROLL_CERT);
           return enroll(ca, request, requestor, true, false);
         }
         case CMD_enroll_cross: {
@@ -240,7 +240,7 @@ public class SdkResponder {
           return enroll(ca, request, requestor, false, true);
         }
         case CMD_poll_cert: {
-          if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(KEY_UPDATE))) {
+          if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(REENROLL_CERT))) {
             throw new OperationException(NOT_PERMITTED);
           }
           return poll(ca, request);
@@ -250,13 +250,13 @@ public class SdkResponder {
           return revoke(requestor, ca, request);
         }
         case CMD_confirm_enroll: {
-          if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(KEY_UPDATE))) {
+          if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(REENROLL_CERT))) {
             throw new OperationException(NOT_PERMITTED);
           }
           return confirmCertificates(requestor, ca, request);
         }
         case CMD_revoke_pending_cert: {
-          if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(KEY_UPDATE))) {
+          if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(REENROLL_CERT))) {
             throw new OperationException(NOT_PERMITTED);
           }
           TransactionIdRequest req = TransactionIdRequest.decode(request);
@@ -296,18 +296,15 @@ public class SdkResponder {
   private SdkResponse enroll(X509Ca ca, byte[] request, RequestorInfo requestor, boolean keyUpdate, boolean crossCert)
       throws OperationException {
     EnrollCertsRequest req = EnrollCertsRequest.decode(request);
-    for (EnrollCertRequestEntry entry : req.getEntries()) {
-      String profile = entry.getCertprofile();
-      if (!requestor.isCertprofilePermitted(profile)) {
-        throw new OperationException(NOT_PERMITTED, "certprofile " + profile + " is not allowed");
-      }
-    }
+    List<EnrollCertRequestEntry> entries = req.getEntries();
 
     List<CertTemplateData> certTemplates = new ArrayList<>(req.getEntries().size());
 
-    List<EnrollCertRequestEntry> entries = req.getEntries();
+    Set<String> profiles = new HashSet<>();
+
     for (EnrollCertRequestEntry entry : entries) {
       String profile = entry.getCertprofile();
+
       Long notBeforeInSec = entry.getNotBefore();
       Date notBefore = (notBeforeInSec == null) ? null : new Date(notBeforeInSec * 1000);
 
@@ -356,10 +353,10 @@ public class SdkResponder {
 
           if (ocIsn == null && ocSubject == null) {
             throw new OperationException(BAD_CERT_TEMPLATE,  "Neither oldCertIsn nor oldCertSubject is specified" +
-                " in enroll_kup command, but exactly one of them is permitted");
+                " in reenroll_cert command, but exactly one of them is permitted");
           } else if (ocIsn != null && ocSubject != null) {
             throw new OperationException(BAD_CERT_TEMPLATE, "Both oldCertIsn and oldCertSubject are specified" +
-                " in enroll_kup command, but exactly one of them is permitted");
+                " in reenroll_cert command, but exactly one of them is permitted");
           }
 
           boolean reusePublicKey;
@@ -402,6 +399,7 @@ public class SdkResponder {
 
           if (profile == null) {
             profile = oldCert.getCertprofile();
+            profiles.add(profile);
           }
 
           if (subject == null) {
@@ -427,7 +425,7 @@ public class SdkResponder {
           ASN1ObjectIdentifier[] oldOids = oldExtensions.getExtensionOIDs();
           for (ASN1ObjectIdentifier oid : oldOids) {
             String id = oid.getId();
-            if (!(extns.containsKey(id) || kupCertExtnIds.contains(id))) {
+            if (!(extns.containsKey(id) || reenrollCertExtnIds.contains(id))) {
               extns.put(id, oldExtensions.getExtension(oid));
             }
           }
@@ -436,9 +434,10 @@ public class SdkResponder {
         }
       }
 
-      boolean caGenerateKeypair = publicKeyInfo == null;
+      profiles.add(profile);
+      boolean serverkeygen = publicKeyInfo == null;
       CertTemplateData certTemplate = new CertTemplateData(subject, publicKeyInfo,
-          notBefore, notAfter, extensions, profile, entry.getCertReqId(), caGenerateKeypair);
+          notBefore, notAfter, extensions, profile, entry.getCertReqId(), serverkeygen);
       certTemplate.setForCrossCert(crossCert);
       certTemplates.add(certTemplate);
     }

@@ -248,7 +248,7 @@ public class QaCaActions {
     protected Integer queueSize = 50;
   }
 
-  @Command(scope = "xiqa", name = "benchmark-enroll-genkey",
+  @Command(scope = "xiqa", name = "benchmark-enroll-serverkeygen",
       description = "Enroll certificate (CA generates keypairs, benchmark)")
   @Service
   public static class BenchmarkCaGenEnroll extends AbstractBenchmarkEnroll {

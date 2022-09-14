@@ -93,8 +93,6 @@ class GrandCertTemplateBuilder {
       boolean batch, IdentifiedCertprofile certprofile, CertTemplateData certTemplate,
       List<KeypairGenerator> keypairGenerators, boolean update)
       throws OperationException {
-    String prefix = certTemplate.getCertReqId() + ".";
-
     if (caInfo.getRevocationInfo() != null) {
       throw new OperationException(NOT_PERMITTED, "CA is revoked");
     }
@@ -186,7 +184,7 @@ class GrandCertTemplateBuilder {
           throw new OperationException(BAD_CERT_TEMPLATE, "invalid format of RSA public key");
         }
       }
-    } else if (certTemplate.isCaGenerateKeypair()) {
+    } else if (certTemplate.isServerkeygen()) {
       KeypairGenControl kg = certprofile.getKeypairGenControl();
 
       ASN1ObjectIdentifier keyAlgOid;

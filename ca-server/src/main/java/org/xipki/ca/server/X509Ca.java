@@ -413,7 +413,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     List<KeypairGenerator> keypairGenerators = null;
     boolean caGenKeypair = false;
     for (CertTemplateData certTemplate : certTemplates) {
-      if (certTemplate.isCaGenerateKeypair()) {
+      if (certTemplate.isServerkeygen()) {
         caGenKeypair = true;
         break;
       }

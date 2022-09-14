@@ -84,9 +84,9 @@ public class CmpResponder extends BaseCmpResponder {
       }
     }
 
-    boolean kup = (request.getBody().getType() == PKIBody.TYPE_KEY_UPDATE_REQ);
+    boolean reenroll = (request.getBody().getType() == PKIBody.TYPE_KEY_UPDATE_REQ);
     int numCertprofileNames = (certprofileNames == null) ? 0 : certprofileNames.length;
-    if (!((numCertprofileNames == n) || (kup && numCertprofileNames == 0))) {
+    if (!((numCertprofileNames == n) || (reenroll && numCertprofileNames == 0))) {
       CertResponse[] certResps = new CertResponse[n];
       for (int i = 0; i < n; i++) {
         ASN1Integer certReqId = certReqMsgs[i].getCertReq().getCertReqId();
@@ -130,7 +130,7 @@ public class CmpResponder extends BaseCmpResponder {
 
       OldCertInfoByIssuerAndSerial oldCertInfo = null;
 
-      if (kup) {
+      if (reenroll) {
         // The regCtl-oldCertID will be ignored by calling
         // req.getControl(CMPObjectIdentifiers.regCtrl_oldCertID);
         Controls controls = reqMsg.getCertReq().getControls();
@@ -240,7 +240,7 @@ public class CmpResponder extends BaseCmpResponder {
     }
 
     boolean cross = request.getBody().getType() == PKIBody.TYPE_CROSS_CERT_REQ;
-    return enrollCerts(caName, groupEnroll, kup, cross, requestor, tid, certTemplateDatas, event);
+    return enrollCerts(caName, groupEnroll, reenroll, cross, requestor, tid, certTemplateDatas, event);
   } // method processCertReqMessages
 
   /**
@@ -339,7 +339,7 @@ public class CmpResponder extends BaseCmpResponder {
   } // method processP10cr
 
   private CertRepMessage enrollCerts(
-      String caName, boolean groupEnroll, boolean kup, boolean cross, Requestor requestor,
+      String caName, boolean groupEnroll, boolean reenroll, boolean cross, Requestor requestor,
       ASN1OctetString tid, List<EnrollCertRequestEntry> templates, AuditEvent event)
       throws IOException, SdkErrorResponseException {
     EnrollCertsRequest sdkReq = new EnrollCertsRequest();
@@ -366,7 +366,7 @@ public class CmpResponder extends BaseCmpResponder {
     if (cross) {
       resp = sdk.enrollCrossCerts(caName, sdkReq);
     } else {
-      resp = kup ? sdk.enrollKupCerts(caName, sdkReq) :sdk.enrollCerts(caName, sdkReq);
+      resp = reenroll ? sdk.reenrollCerts(caName, sdkReq) :sdk.enrollCerts(caName, sdkReq);
     }
 
     List<EnrollOrPullCertResponseEntry> rentries = resp.getEntries();
@@ -622,7 +622,7 @@ public class CmpResponder extends BaseCmpResponder {
             caName, dfltCertprofileName, groupEnroll, request, requestor, tid, cr, event);
         respBody = new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
       } else if (type == PKIBody.TYPE_KEY_UPDATE_REQ) {
-        checkPermission(requestor, PermissionConstants.KEY_UPDATE);
+        checkPermission(requestor, PermissionConstants.REENROLL_CERT);
         CertReqMessages kur = CertReqMessages.getInstance(reqBody.getContent());
         CertRepMessage repMessage = processCertReqMessages(
             caName, dfltCertprofileName, groupEnroll, request, requestor, tid, kur, event);

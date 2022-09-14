@@ -61,12 +61,12 @@ public class EnrollCertRequest {
     }
 
     public Entry(String id, String certprofile, CertRequest certReq,
-                 ProofOfPossession pop, boolean caGenerateKeypair, boolean kup) {
+                 ProofOfPossession pop, boolean serverkeygen, boolean reenroll) {
       super(id);
 
-      this.certprofile = kup ? certprofile : Args.notBlank(certprofile, "certprofile");
+      this.certprofile = reenroll ? certprofile : Args.notBlank(certprofile, "certprofile");
       this.certReq = Args.notNull(certReq, "certReq");
-      if (!caGenerateKeypair) {
+      if (!serverkeygen) {
         Args.notNull(pop, "pop");
       }
       this.pop = pop;

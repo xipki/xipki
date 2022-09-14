@@ -386,7 +386,7 @@ public class CaInfo {
     return PermissionConstants.contains(permission, PermissionConstants.ENROLL_CROSS)
         || PermissionConstants.contains(permission, PermissionConstants.ENROLL_CERT)
         || PermissionConstants.contains(permission, PermissionConstants.GEN_CRL)
-        || PermissionConstants.contains(permission, PermissionConstants.KEY_UPDATE);
+        || PermissionConstants.contains(permission, PermissionConstants.REENROLL_CERT);
   } // method isSignerRequired
 
   public RevokeSuspendedControl revokeSuspendedCertsControl() {

@@ -165,11 +165,11 @@ public class RestResponder {
 
   private static final String CMD_enroll_cross_cert = "enroll-cross-cert";
 
-  private static final String CMD_enroll_cert_genkey = "enroll-cert-genkey";
+  private static final String CMD_enroll_serverkeygen = "enroll-serverkeygen";
 
   private static final String CMD_enroll_cert_twin = "enroll-cert-twin";
 
-  private static final String CMD_enroll_cert_genkey_twin = "enroll-cert-genkey-twin";
+  private static final String CMD_enroll_serverkeygen_twin = "enroll-serverkeygen-twin";
 
   private static final String CMD_crl = "crl";
 
@@ -323,9 +323,9 @@ public class RestResponder {
           break;
         }
         case CMD_enroll_cert:
-        case CMD_enroll_cert_genkey:
+        case CMD_enroll_serverkeygen:
         case CMD_enroll_cert_twin:
-        case CMD_enroll_cert_genkey_twin: {
+        case CMD_enroll_serverkeygen_twin: {
           respContent = enrollCerts(command, caName, requestor, request, httpRetriever, event);
           break;
         }
@@ -458,8 +458,8 @@ public class RestResponder {
       throw new OperationException(NOT_PERMITTED, "ENROLL_CERT is not allowed");
     }
 
-    boolean twin = CMD_enroll_cert_twin.equals(command) || CMD_enroll_cert_genkey_twin.equals(command);
-    boolean caGenKeyPair = CMD_enroll_cert_genkey.equals(command) || CMD_enroll_cert_genkey_twin.equals(command);
+    boolean twin = CMD_enroll_cert_twin.equals(command) || CMD_enroll_serverkeygen_twin.equals(command);
+    boolean caGenKeyPair = CMD_enroll_serverkeygen.equals(command) || CMD_enroll_serverkeygen_twin.equals(command);
 
     String profile = checkProfile(requestor, httpRetriever);
 
