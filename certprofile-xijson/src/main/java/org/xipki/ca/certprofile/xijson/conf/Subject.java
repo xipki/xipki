@@ -44,8 +44,9 @@ public class Subject extends ValidatableConf {
   @JSONField(ordinal = 3)
   private List<RdnType> rdns;
 
+  // do not encode the default value.
   public Boolean getKeepRdnOrder() {
-    return keepRdnOrder;
+    return keepRdnOrder != null && keepRdnOrder ? Boolean.TRUE :null;
   }
 
   public void setKeepRdnOrder(Boolean keepRdnOrder) {
@@ -129,10 +130,10 @@ public class Subject extends ValidatableConf {
     private String suffix;
 
     @JSONField(ordinal = 8)
-    private int minOccurs = 1;
+    private Integer minOccurs;
 
     @JSONField(ordinal = 9)
-    private int maxOccurs = 1;
+    private Integer maxOccurs;
 
     @JSONField(ordinal = 10)
     private String group;
@@ -210,19 +211,29 @@ public class Subject extends ValidatableConf {
       this.suffix = suffix;
     }
 
-    public int getMinOccurs() {
-      return minOccurs;
+    public int minOccurs() {
+      return minOccurs == null ? 1 : minOccurs;
     }
 
-    public void setMinOccurs(int minOccurs) {
+    public int maxOccurs() {
+      return maxOccurs == null ? 1 : maxOccurs;
+    }
+
+    // do not encode the default value.
+    public Integer getMinOccurs() {
+      return minOccurs != null && minOccurs == 1 ? null : minOccurs;
+    }
+
+    public void setMinOccurs(Integer minOccurs) {
       this.minOccurs = minOccurs;
     }
 
-    public int getMaxOccurs() {
-      return maxOccurs;
+    // do not encode the default value.
+    public Integer getMaxOccurs() {
+      return maxOccurs != null && maxOccurs == 1 ? null : maxOccurs;
     }
 
-    public void setMaxOccurs(int maxOccurs) {
+    public void setMaxOccurs(Integer maxOccurs) {
       this.maxOccurs = maxOccurs;
     }
 
@@ -254,6 +265,10 @@ public class Subject extends ValidatableConf {
     public void validate() throws InvalidConfException {
       notNull(type, "type");
       validate(type);
+
+      int minOccurs = minOccurs();
+      int maxOccurs = maxOccurs();
+
       if (minOccurs > maxOccurs) {
         throw new InvalidConfException(
             "minOccurs (" + minOccurs + ") may not be greater than maxOccurs (" + maxOccurs + ")");

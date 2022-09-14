@@ -283,7 +283,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
       ValueType value = rdn.getValue();
       RdnControl rdnControl = (value == null)
-          ? new RdnControl(type, rdn.getMinOccurs(), rdn.getMaxOccurs())
+          ? new RdnControl(type, rdn.minOccurs(), rdn.maxOccurs())
           : new RdnControl(type, value.getText(), value.isOverridable());
 
       subjectDnControls.add(rdnControl);

@@ -100,7 +100,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     rdnControls.add(createRdn(DN.C, 1, 1));
     rdnControls.add(createRdn(DN.O, 1, 1));
     rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.SN, 0, 1));
     rdnControls.add(createRdn(DN.CN, 1, 1, null, "PREFIX ", " SUFFIX"));
 
     // Extensions
@@ -189,7 +189,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     rdnControls.add(createRdn(DN.O, 1, 1));
 
     rdnControls.add(createRdn(DN.OU, 2, 2));
-    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.SN, 0, 1));
     rdnControls.add(createRdn(DN.CN, 1, 1));
 
     // Extensions
@@ -231,7 +231,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     rdnControls.add(createRdn(DN.C, 1, 1));
     rdnControls.add(createRdn(DN.O, 1, 1, null, null, null, "group1"));
     rdnControls.add(createRdn(DN.OU, 1, 1, null, null, null, "group1"));
-    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.SN, 0, 1));
     rdnControls.add(createRdn(DN.CN, 1, 1));
 
     // Extensions
@@ -270,7 +270,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     rdnControls.add(createRdn(DN.O, 1, 1));
     rdnControls.add(createRdn(DN.organizationIdentifier, 0, 1));
     rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.SN, 0, 1));
     rdnControls.add(createRdn(DN.CN, 1, 1));
 
     // Extensions
@@ -326,7 +326,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     rdnControls.add(createRdn(DN.C, 1, 1));
     rdnControls.add(createRdn(DN.O, 1, 1));
     rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.SN, 0, 1));
     rdnControls.add(createRdn(DN.dateOfBirth, 0, 1));
     rdnControls.add(createRdn(DN.postalAddress, 0, 1));
     rdnControls.add(createRdn(DN.userid, 1, 1));
@@ -637,7 +637,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     rdnControls.add(createRdn(DN.O, null, null, value));
 
     rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.SN, 0, 1));
     rdnControls.add(createRdn(DN.CN, 1, 1));
 
     // Extensions
@@ -811,7 +811,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     rdnControls.add(createRdn(DN.C, 1, 1));
     rdnControls.add(createRdn(DN.O, 1, 1));
     rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.SN, 0, 1));
     rdnControls.add(createRdn(DN.CN, 1, 1, ":FQDN", null, null));
 
     // SubjectToSubjectAltName

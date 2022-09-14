@@ -180,8 +180,13 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
       String regex, String prefix, String suffix, String group, ValueType value) {
     RdnType ret = new RdnType();
     ret.setType(createOidType(type));
-    ret.setMinOccurs(min);
-    ret.setMaxOccurs(max);
+    if (min != 1) {
+      ret.setMinOccurs(min);
+    }
+
+    if (max != 1) {
+      ret.setMaxOccurs(max);
+    }
 
     if (regex != null) {
       ret.setRegex(regex);
@@ -266,7 +271,6 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     // Subject
     Subject subject = new Subject();
     profile.setSubject(subject);
-    subject.setKeepRdnOrder(false);
 
     // Key
     profile.setKeyAlgorithms(createCabKeyAlgorithms());
@@ -333,7 +337,6 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     // Subject
     Subject subject = new Subject();
     profile.setSubject(subject);
-    subject.setKeepRdnOrder(false);
 
     ASN1ObjectIdentifier[] curveIds = (CertLevel.EndEntity != certLevel) ? null :
       new ASN1ObjectIdentifier[] {
@@ -387,7 +390,6 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     // Subject
     Subject subject = new Subject();
     profile.setSubject(subject);
-    subject.setKeepRdnOrder(false);
 
     // KeyUsage
 

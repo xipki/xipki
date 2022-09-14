@@ -161,8 +161,9 @@ public class ExtensionType extends ValidatableConf {
     this.type = type;
   }
 
+  // do not encode the default value.
   public Boolean getCritical() {
-    return critical;
+    return critical != null && critical ? Boolean.TRUE :null;
   }
 
   public void setCritical(Boolean critical) {
@@ -173,8 +174,9 @@ public class ExtensionType extends ValidatableConf {
     return critical == null ? false : critical;
   }
 
+  // do not encode the default value.
   public Boolean getRequired() {
-    return required;
+    return required != null && required ? Boolean.TRUE :null;
   }
 
   public void setRequired(Boolean required) {
@@ -195,16 +197,18 @@ public class ExtensionType extends ValidatableConf {
     return TripleState.optional == ts || TripleState.required == ts;
   }
 
+  // do not encode the default value.
   public TripleState getInRequest() {
+    TripleState state = inRequest();
+    return state == TripleState.forbidden ? null : inRequest;
+  }
+
+  public TripleState inRequest() {
     if (inRequest != null) {
       return inRequest;
     }
 
-    if (permittedInRequest != null) {
-      return TripleState.optional;
-    }
-
-    return TripleState.forbidden;
+    return (permittedInRequest != null && permittedInRequest) ? TripleState.optional : TripleState.forbidden;
   }
 
   public void setInRequest(TripleState inRequest) {
