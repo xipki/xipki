@@ -111,8 +111,7 @@
 				"oid":"2.5.4.5",
 				"description":"serialNumber"
 			},
-			"regex":":NUMBER",
-			"minOccurs":0,
+			"minOccurs":0
 		},{
 			"type":{
 				"oid":"2.5.4.3",
