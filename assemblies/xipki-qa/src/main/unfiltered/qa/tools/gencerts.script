@@ -28,7 +28,7 @@ xi:move-file -f ${OUT_DIR}/ca/ca-tls-ca.crt ${OUT_DIR}/ca/tls-ca-cert.der
 ############## RA ###################
 ## Server
 
-xi:cmp-enroll-cagenkey --ca tls-ca --password 1234 --profile tls \
+xi:cmp-enroll-serverkeygen --ca tls-ca --password 1234 --profile tls \
   --p12-out ${OUT_DIR}/server/tls-server.p12 \
   --cert-out ${OUT_DIR}/server/tls-server-cert.der \
   --subject "CN=localhost,OU=${CA_TYPE},O=myorg demo,C=DE" \
@@ -37,7 +37,7 @@ xi:cmp-enroll-cagenkey --ca tls-ca --password 1234 --profile tls \
 list = [client client2 client3]
 each ($list) {
   name = $it
-  xi:cmp-enroll-cagenkey --ca tls-ca --password 1234 --profile tls \
+  xi:cmp-enroll-serverkeygen --ca tls-ca --password 1234 --profile tls \
     --p12-out ${OUT_DIR}/${name}/tls-${name}.p12 \
     --cert-out ${OUT_DIR}/${name}/tls-${name}-cert.der \
     --subject "CN=${name},OU=${CA_TYPE},O=myorg demo,C=DE" \

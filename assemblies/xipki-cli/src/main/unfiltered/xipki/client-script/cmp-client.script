@@ -62,7 +62,7 @@ echo "=====CMP: Enroll (CA generate key pair) via CRMF====="
 
 CN = cmp-crmf-ca-genkey-smime
 
-xi:cmp-enroll-cagenkey --ca ${CA} \
+xi:cmp-enroll-serverkeygen --ca ${CA} \
   --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert-out ${OUT_DIR}/${CN}.der --profile smime \
   --subject "C=DE,O=myorg,E=info@myorg.com,CN=${CN}-${CUR_TIME}" \
@@ -108,7 +108,7 @@ echo "=====CMP: Enroll (CA generate key pair) via CRMF====="
 
 CN = cmp-crmf-ca-genkey-tls
 
-xi:cmp-enroll-cagenkey --ca ${CA} \
+xi:cmp-enroll-serverkeygen --ca ${CA} \
   --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert-out ${OUT_DIR}/${CN}.der --profile tls \
   --subject "C=DE,O=myorg,CN=${CN}-${CUR_TIME}.myorg.org" \

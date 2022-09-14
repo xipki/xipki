@@ -87,7 +87,7 @@ curl ${OPTS} \
     --header "Content-Type: text/plain; encoding=utf-8" \
     --data-ascii "subject=C=DE,O=example,CN=${CN}.example.org" \
     --output ${OUT_DIR}/${CN}.pem \
-    "${CA_URL}/enroll-cert-genkey?profile=tls"
+    "${CA_URL}/enroll-serverkeygen?profile=tls"
 
 # enroll certificate tls
 CN=tls-${CUR_TIME}

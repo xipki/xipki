@@ -44,7 +44,7 @@ public class CertTemplateData {
 
   private final String certprofileName;
 
-  private final boolean caGenerateKeypair;
+  private final boolean serverkeygen;
 
   private final Extensions extensions;
 
@@ -60,7 +60,7 @@ public class CertTemplateData {
 
   public CertTemplateData(
       X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Date notBefore, Date notAfter, Extensions extensions,
-      String certprofileName, BigInteger certReqId, boolean caGenerateKeypair) {
+      String certprofileName, BigInteger certReqId, boolean serverkeygen) {
     this.publicKeyInfo = publicKeyInfo;
     this.subject = Args.notNull(subject, "subject");
     this.certprofileName = Args.toNonBlankLower(certprofileName, "certprofileName");
@@ -68,7 +68,7 @@ public class CertTemplateData {
     this.notBefore = notBefore;
     this.notAfter = notAfter;
     this.certReqId = certReqId;
-    this.caGenerateKeypair = caGenerateKeypair;
+    this.serverkeygen = serverkeygen;
   }
 
   public boolean isForCrossCert() {
@@ -87,8 +87,8 @@ public class CertTemplateData {
     return publicKeyInfo;
   }
 
-  public boolean isCaGenerateKeypair() {
-    return caGenerateKeypair;
+  public boolean isServerkeygen() {
+    return serverkeygen;
   }
 
   public Date getNotBefore() {

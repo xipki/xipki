@@ -198,7 +198,7 @@ preload <start script>
 
   The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:
-  - `source xipki/client-script/est-client.script` (use argument 'help' to print the usage)
+  - `source xipki/client-script/est-client.script`
 
 * SCEP  
   Use any SCEP client. XiPKI provides also a SCEP client.

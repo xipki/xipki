@@ -48,7 +48,7 @@ curl ${OPTS} \
     --header "Content-Type: text/plain; charset=utf-8" \
     --data-ascii "subject=CN=${filename}-genkey.example.org,O=myorg,C=DE" \
     --output ${filename}-genkey.pem -v \
-    "${BASE_URL}/enroll-cert-genkey?profile=tlsa"
+    "${BASE_URL}/enroll-serverkeygen?profile=tlsa"
 
 echo "enroll certificate"
 

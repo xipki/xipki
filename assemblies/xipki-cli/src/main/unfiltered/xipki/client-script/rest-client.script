@@ -62,7 +62,7 @@ CN = rest-tls-genkey-${CUR_TIME}
 xi:curl --out ${OUT_DIR}/${CN}.pem \
   --data "subject=C=DE,O=myorg,CN=${CN}.myorg.org" \
   --header "Content-Type: text/plain; encoding=utf-8" \
-  "$BASE_URL/enroll-cert-genkey?profile=tls"
+  "$BASE_URL/enroll-serverkeygen?profile=tls"
 
 echo "=====REST: Enroll====="
 
@@ -123,7 +123,7 @@ CN = rest-sm2-tls-twin-genkey-${CUR_TIME}
 xi:curl --out ${OUT_DIR}/${CN}.pem \
   --data "subject=C=CN,O=myorg,CN=${CN}.myorg.org" \
   --header "Content-Type: text/plain; encoding=utf-8" \
-  "$BASE_URL/enroll-cert-genkey-twin?profile=tls-sm2"
+  "$BASE_URL/enroll-serverkeygen-twin?profile=tls-sm2"
 
 echo "=====REST: Enroll Chinese SM2 Twin TLS Certificates (CA generates only keypair for the encryption)====="
 
