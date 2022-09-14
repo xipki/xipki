@@ -134,15 +134,7 @@ public class CertprofileValidator {
     // KeyUsage
     Set<KeyUsageControl> usages = certprofile.getKeyUsage();
 
-    if (certLevel == CertLevel.SubCA || certLevel == CertLevel.RootCA) {
-      // make sure the CA certificate contains usage keyCertSign and cRLSign
-      KeyUsage[] requiredUsages = new KeyUsage[] {KeyUsage.keyCertSign, KeyUsage.cRLSign};
-      for (KeyUsage usage : requiredUsages) {
-        if (!containsKeyusage(usages, usage)) {
-          msg.append("CA profile does not contain keyUsage ").append(usage).append(", ");
-        }
-      }
-    } else {
+    if (certLevel == CertLevel.EndEntity) {
       // make sure the EE certificate does not contain CA-only usages
       KeyUsage[] caOnlyUsages = {KeyUsage.keyCertSign};
 
@@ -155,6 +147,30 @@ public class CertprofileValidator {
 
       if (CollectionUtil.isNotEmpty(setUsages)) {
         msg.append("EndEntity profile must not contain CA-only keyUsage ").append(setUsages).append(", ");
+      }
+    } else {
+      // make sure the CA certificate contains usage keyCertSign and cRLSign
+      boolean containsCaUsage = containsKeyusage(usages, KeyUsage.keyCertSign)
+          || containsKeyusage(usages, KeyUsage.cRLSign);
+      if (!containsCaUsage) {
+        msg.append("CA profile does not contain any of keyCertSign and cRLSign, ");
+      }
+    }
+
+    if (certLevel == CertLevel.CROSS) {
+      Map<ASN1ObjectIdentifier, ExtensionControl> extnControls = certprofile.getExtensionControls();
+      ASN1ObjectIdentifier[] extnTypes = {Extension.subjectKeyIdentifier, Extension.basicConstraints};
+      for (ASN1ObjectIdentifier extnType : extnTypes) {
+        ExtensionControl control = extnControls.get(extnType);
+        if (control == null) {
+          msg.append("Mandatory extension ").append(ObjectIdentifiers.getName(extnType)).append(" is not set, ");
+        } else {
+          TripleState inRequest = control.getInRequest();
+          if (inRequest != TripleState.required && inRequest != TripleState.optional) {
+            msg.append("Extension ").append(ObjectIdentifiers.getName(extnType))
+                .append(" must be allowed in the request, ");
+          }
+        }
       }
     }
 
@@ -374,7 +390,7 @@ public class CertprofileValidator {
     Set<KeyUsageControl> usages = certprofile.getKeyUsage();
     if (certLevel == CertLevel.RootCA || certLevel == CertLevel.SubCA) {
       if (!containsKeyusage(usages, KeyUsage.cRLSign)) {
-        msg.append("RootCA profile does contain keyUsage ").append(KeyUsage.cRLSign).append(", ");
+        msg.append("CA profile does contain keyUsage ").append(KeyUsage.cRLSign).append(", ");
       }
     } else if (certLevel == CertLevel.EndEntity) {
       if (containsKeyusage(usages, KeyUsage.cRLSign)) {

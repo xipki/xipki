@@ -103,7 +103,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
   } // method certprofileRootCa
 
   private static void certprofileCross(String destFilename) {
-    X509ProfileType profile = getBaseProfile("certprofile cross", CertLevel.SubCA, "10y");
+    X509ProfileType profile = getBaseProfile("certprofile cross", CertLevel.CROSS, "10y");
 
     // Subject
     Subject subject = profile.getSubject();
@@ -117,12 +117,16 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    ExtensionType extensionType = createExtension(Extension.subjectKeyIdentifier, true, false);
+    extensionType.setInRequest(TripleState.optional);
+    list.add(extensionType);
     list.add(createExtension(Extension.cRLDistributionPoints, false, false));
     list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - basicConstraints
-    list.add(createExtension(Extension.basicConstraints, true, true));
+    extensionType = createExtension(Extension.basicConstraints, true, true);
+    extensionType.setInRequest(TripleState.optional);
+    list.add(extensionType);
 
     // Extensions - AuthorityInfoAccess
     list.add(createExtension(Extension.authorityInfoAccess, true, false));

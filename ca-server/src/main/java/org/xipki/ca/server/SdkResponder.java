@@ -32,6 +32,7 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.RequestorInfo;
+import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.sdk.*;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.CrlReason;
@@ -442,6 +443,24 @@ public class SdkResponder {
       certTemplates.add(certTemplate);
     }
 
+    // check the profile
+    for (String profile : profiles) {
+      if (!requestor.isCertprofilePermitted(profile)) {
+        throw new OperationException(NOT_PERMITTED, "cert profile " + profile + " is not allowed");
+      }
+
+      if (crossCert) {
+        IdentifiedCertprofile idProfile = caManager.getIdentifiedCertprofile(profile);
+        if (idProfile == null) {
+          throw new OperationException(UNKNOWN_CERT_PROFILE, "unknown cert profile " + profile);
+        }
+
+        if (Certprofile.CertLevel.CROSS != idProfile.getCertLevel()) {
+          throw new OperationException(BAD_CERT_TEMPLATE, "cert profile " + profile + " is not for CROSS certificate");
+        }
+      }
+    }
+
     long waitForConfirmUtil = 0;
     boolean explicitConform = req.getExplicitConfirm() != null && req.getExplicitConfirm();
 
@@ -711,7 +730,7 @@ public class SdkResponder {
     if (groupEnroll) {
       List<CertificateInfo> certInfos = null;
       try {
-        certInfos = ca.generateCerts  (requestor, certTemplates, tid);
+        certInfos = ca.generateCerts(requestor, certTemplates, tid);
 
         for (int i = 0; i < n; i++) {
           CertificateInfo certInfo = certInfos.get(i);

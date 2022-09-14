@@ -69,15 +69,9 @@ public class CaUtil {
   }
 
   public static BasicConstraints createBasicConstraints(CertLevel level, Integer pathLen) {
-    BasicConstraints basicConstraints;
-    if (level == CertLevel.RootCA || level == CertLevel.SubCA) {
-      basicConstraints = (pathLen != null)  ? new BasicConstraints(pathLen) : new BasicConstraints(true);
-    } else if (level == CertLevel.EndEntity) {
-      basicConstraints = new BasicConstraints(false);
-    } else {
-      throw new IllegalStateException("unknown CertLevel " + level);
-    }
-    return basicConstraints;
+    return (level == CertLevel.EndEntity)
+        ? new BasicConstraints(false)
+        : (pathLen != null) ? new BasicConstraints(pathLen) : new BasicConstraints(true);
   } // method createBasicConstraints
 
   public static AuthorityInformationAccess createAuthorityInformationAccess(

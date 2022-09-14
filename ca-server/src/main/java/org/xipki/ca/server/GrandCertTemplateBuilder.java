@@ -116,6 +116,7 @@ class GrandCertTemplateBuilder {
       case RootCA:
         throw new OperationException(NOT_PERMITTED, "CA is not allowed to generate Root CA certificate");
       case SubCA:
+      case CROSS:
         Integer reqPathlen = certprofile.getPathLenBasicConstraint();
         int caPathLen = caInfo.getPathLenConstraint();
         boolean allowed = (reqPathlen == null && caPathLen == Integer.MAX_VALUE)

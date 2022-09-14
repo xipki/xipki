@@ -103,6 +103,7 @@ public abstract class Certprofile implements Closeable {
   public enum CertLevel {
     RootCA,
     SubCA,
+    CROSS,
     EndEntity
   } // class CertLevel
 

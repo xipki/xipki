@@ -435,8 +435,30 @@ public class IdentifiedCertprofile implements Closeable {
     extType = Extension.basicConstraints;
     extControl = controls.remove(extType);
     if (extControl != null) {
-      BasicConstraints value = CaUtil.createBasicConstraints(
-          certprofile.getCertLevel(), certprofile.getPathLenBasicConstraint());
+      CertLevel certLevel = certprofile.getCertLevel();
+      BasicConstraints value;
+      if (certLevel == CertLevel.EndEntity) {
+        value = CaUtil.createBasicConstraints(CertLevel.EndEntity, null);
+      } else {
+        Integer pathLen = certprofile.getPathLenBasicConstraint();
+        Extension requestedExtn = requestedExtns.get(extType);
+        if (requestedExtn != null) {
+          BasicConstraints bc = BasicConstraints.getInstance(requestedExtn.getParsedValue());
+          if (!bc.isCA()) {
+            throw new CertprofileException("could not enroll a CA certificate for an EndEntity request");
+          }
+
+          if (bc.getPathLenConstraint() != null) {
+            int reqPathLen = bc.getPathLenConstraint().intValue();
+            if (reqPathLen >= 0 && (pathLen == null || reqPathLen < pathLen)) {
+              pathLen = reqPathLen;
+            }
+          }
+        }
+
+        value = CaUtil.createBasicConstraints(certLevel, pathLen);
+      }
+
       addExtension(values, extType, value, extControl);
     }
 

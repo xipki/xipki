@@ -205,7 +205,7 @@ class A2gChecker extends ExtensionChecker {
     XijsonCertprofile certprofile = getCertprofile();
     BasicConstraints bc = BasicConstraints.getInstance(extnValue);
     CertLevel certLevel = certprofile.getCertLevel();
-    boolean ca = (CertLevel.RootCA == certLevel) || (CertLevel.SubCA == certLevel);
+    boolean ca = CertLevel.EndEntity != certLevel;
     if (ca != bc.isCA()) {
       addViolation(failureMsg, "ca", bc.isCA(), ca);
     }

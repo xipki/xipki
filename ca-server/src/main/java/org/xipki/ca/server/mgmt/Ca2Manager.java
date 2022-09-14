@@ -37,6 +37,7 @@ import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
+import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.server.*;
 import org.xipki.ca.server.db.CaManagerQueryExecutor;
 import org.xipki.ca.server.mgmt.SelfSignedCertBuilder.GenerateSelfSignedResult;
@@ -598,6 +599,15 @@ class Ca2Manager {
     profileName = toNonBlankLower(profileName, "profileName");
     notNull(encodedCsr, "encodedCsr");
     notNull(encodedTargetCert, "encodedTargetCert");
+
+    IdentifiedCertprofile certProfile = manager.getIdentifiedCertprofile(profileName);
+    if (certProfile == null) {
+      throw new CaMgmtException("unknown certificate profile " + profileName);
+    }
+
+    if (certProfile.getCertLevel() != Certprofile.CertLevel.CROSS) {
+      throw new CaMgmtException("certificate profile " + profileName + " is not for CROSS certificate");
+    }
 
     X509Ca ca = getX509Ca(caName);
     CertificationRequest csr;

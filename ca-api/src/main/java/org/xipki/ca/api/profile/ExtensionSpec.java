@@ -55,10 +55,12 @@ public abstract class ExtensionSpec {
   static {
     rfc5280Instances.put(CertLevel.RootCA, new Rfc5280RootCA());
     rfc5280Instances.put(CertLevel.SubCA, new Rfc5280SubCA());
+    rfc5280Instances.put(CertLevel.CROSS, new Rfc5280SubCA());
     rfc5280Instances.put(CertLevel.EndEntity, new Rfc5280EndEntity());
 
     browserForumInstances.put(CertLevel.RootCA, new BrowserForumBRRootCA());
     browserForumInstances.put(CertLevel.SubCA, new BrowserForumBRSubCA());
+    browserForumInstances.put(CertLevel.CROSS, new BrowserForumBRSubCA());
     browserForumInstances.put(CertLevel.EndEntity, new BrowserForumBREndEntity());
   }
 
@@ -141,12 +143,10 @@ public abstract class ExtensionSpec {
 
     private static final Set<ASN1ObjectIdentifier> NON_REQUEST_EXTENSIONS =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            Extension.subjectKeyIdentifier,
             Extension.authorityKeyIdentifier,
             Extension.issuerAlternativeName,
             Extension.cRLDistributionPoints,
             Extension.freshestCRL,
-            Extension.basicConstraints,
             Extn.id_SCTs,
             Extension.inhibitAnyPolicy)));
 
