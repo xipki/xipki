@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2013 - 2020 Lijun Liao
+ * Copyright (c) 2013 - 2022 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -617,7 +617,7 @@ public class EstResponder {
     sdkReq.setExplicitConfirm(false);
     sdkReq.setCaCertMode(CertsMode.NONE);
 
-    EnrollOrPollCertsResponse sdkResp = sdk.enrollKupCerts(caName, sdkReq);
+    EnrollOrPollCertsResponse sdkResp = sdk.reenrollCerts(caName, sdkReq);
     checkResponse(1, sdkResp);
 
     EnrollOrPullCertResponseEntry entry = getEntry(sdkResp.getEntries(), reqId);

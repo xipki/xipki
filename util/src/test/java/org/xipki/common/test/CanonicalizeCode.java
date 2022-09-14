@@ -250,13 +250,19 @@ public class CanonicalizeCode {
     BufferedReader reader = Files.newBufferedReader(file.toPath());
 
     boolean authorsLineAvailable = false;
+    boolean licenseHeaderAvailable = false;
 
     List<Integer> lineNumbers = new LinkedList<>();
 
     int lineNumber = 0;
     try {
       String line;
+
       while ((line = reader.readLine()) != null) {
+        if (lineNumber == 0) {
+          licenseHeaderAvailable = !line.startsWith("package");
+        }
+
         lineNumber++;
         if (lineNumber == 1 && line.startsWith("// #THIRDPARTY")) {
           return;
@@ -277,6 +283,10 @@ public class CanonicalizeCode {
     if (!lineNumbers.isEmpty()) {
       System.out.println("Please check file " + file.getPath().substring(baseDirLen)
           + ": lines " + Arrays.toString(lineNumbers.toArray(new Integer[0])));
+    }
+
+    if (!licenseHeaderAvailable) {
+      System.out.println("Please check file " + file.getPath().substring(baseDirLen) + ": no license header");
     }
 
     if (!authorsLineAvailable) {

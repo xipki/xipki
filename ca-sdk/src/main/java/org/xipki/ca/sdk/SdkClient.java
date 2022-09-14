@@ -15,6 +15,23 @@
  * limitations under the License.
  */
 
+/*
+ *
+ * Copyright (c) 2013 - 2022 Lijun Liao
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.xipki.ca.sdk;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -176,7 +193,7 @@ public class SdkClient {
     return enrollCertCaGenKeypair0("enrollCertCaGenKeypair", CMD_enroll, ca, reqEntry);
   }
 
-  public byte[] enrollKupCert(
+  public byte[] reenrollCert(
       String ca, String certprofile, byte[] p10Req, X500Name oldCertIssuer, BigInteger oldCertSerialNumber)
       throws IOException, SdkErrorResponseException {
     EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry();
@@ -187,10 +204,10 @@ public class SdkClient {
     oldCertInfo.setSerialNumber(oldCertSerialNumber);
     oldCertInfo.setIssuer(new X500NameType(oldCertIssuer));
     reqEntry.setOldCertIsn(oldCertInfo);
-    return enrollCert0("enrollKupCert", CMD_enroll_kup, ca, reqEntry);
+    return enrollCert0("reenrollCert", CMD_reenroll, ca, reqEntry);
   }
 
-  public KeyCertBytesPair enrollKupCertCaGenKeypair(
+  public KeyCertBytesPair reenrollCertCaGenKeypair(
       String ca, String certprofile, X500Name subject, String oldCertIssuer, BigInteger oldCertSerialNumber)
       throws IOException, SdkErrorResponseException {
     EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry();
@@ -201,7 +218,7 @@ public class SdkClient {
     oldCertInfo.setSerialNumber(oldCertSerialNumber);
     oldCertInfo.setIssuer(new X500NameType(oldCertIssuer));
     reqEntry.setOldCertIsn(oldCertInfo);
-    return enrollCertCaGenKeypair0("enrollKupCertCaGenKeypair", CMD_enroll_kup, ca, reqEntry);
+    return enrollCertCaGenKeypair0("reenrollCertCaGenKeypair", CMD_reenroll, ca, reqEntry);
   }
 
   public EnrollOrPollCertsResponse enrollCerts(String ca, EnrollCertsRequest req)
@@ -216,9 +233,9 @@ public class SdkClient {
     return checkEnrollResp(respBytes, req);
   }
 
-  public EnrollOrPollCertsResponse enrollKupCerts(String ca, EnrollCertsRequest req)
+  public EnrollOrPollCertsResponse reenrollCerts(String ca, EnrollCertsRequest req)
       throws IOException, SdkErrorResponseException {
-    byte[] respBytes = send(ca, CMD_enroll_kup, req);
+    byte[] respBytes = send(ca, CMD_reenroll, req);
     return checkEnrollResp(respBytes, req);
   }
 
