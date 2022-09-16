@@ -335,10 +335,6 @@
       <column name="FP_S"/>
       <column name="FP_SAN"/>
     </createIndex>
-    <createIndex tableName="CERT" unique="false" indexName="IDX_CA_FPRS">
-      <column name="CA_ID"/>
-      <column name="FP_RS"/>
-    </createIndex>
     <!-- table PUBLISHQUEUE -->
     <createTable tableName="PUBLISHQUEUE">
       <column name="CID" type="BIGINT">
