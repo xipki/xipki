@@ -1,12 +1,13 @@
 {
-	"caUrl":"https://localhost:8444/ca/ra/subca/",
-	"requestorCert":"xipki/keycerts/tlskeys/client/tls-client-cert.der",
-	"responderCert":"xipki/keycerts/tlskeys/server/tls-server-cert.der",
+	"serverUrl":"https://localhost:8444/ca/ra/",
 	"ssl":{
-		"storeType":"PKCS12",
-		"keystore":"xipki/keycerts/tlskeys/client/tls-client.p12",
+		"storeType":"pkcs12",
 		"keystorePassword":"1234",
-		"trustanchors":["xipki/keycerts/tlskeys/server/tls-server-cert.der"]
+		"keystore":{
+			"file":"keycerts/tlskeys/client/tls-client.p12"
+		},
+		"trustanchors": [{
+			"file":"keycerts/tlskeys/ca/tls-ca-cert.pem"
+		}]
 	}
 }
-

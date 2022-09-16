@@ -220,6 +220,10 @@ public class QaCaActions {
 
   private static abstract  class AbstractBenchmarkEnroll extends XiAction {
 
+    @Option(name = "--ca", required = true, description = "CA name")
+    @Completion(CaCompleters.CaNameCompleter.class)
+    protected String caName;
+
     @Option(name = "--profile", aliases = "-p", required = true,
             description = "certificate profile that allows duplication of public key")
     protected String certprofile;
@@ -243,9 +247,6 @@ public class QaCaActions {
 
     @Option(name = "--max-num", description = "maximal number of requests\n0 for unlimited")
     protected Integer maxRequests = 0;
-
-    @Option(name = "--queue-size", description = "Number of maximal HTTP requests in the sending queue")
-    protected Integer queueSize = 50;
   }
 
   @Command(scope = "xiqa", name = "benchmark-enroll-serverkeygen",
@@ -270,7 +271,7 @@ public class QaCaActions {
       }
 
       CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(certprofile, null, subjectTemplate, randomDn);
-      CaEnrollBenchmark benchmark = new CaEnrollBenchmark(benchmarkEntry, maxRequests, num, queueSize, description);
+      CaEnrollBenchmark benchmark = new CaEnrollBenchmark(caName, benchmarkEntry, maxRequests, num, description);
 
       benchmark.setDuration(duration);
       benchmark.setThreads(numThreads);
@@ -336,7 +337,7 @@ public class QaCaActions {
       }
 
       CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(certprofile, keyEntry, subjectTemplate, randomDn);
-      CaEnrollBenchmark benchmark = new CaEnrollBenchmark(benchmarkEntry, maxRequests, num, queueSize, description);
+      CaEnrollBenchmark benchmark = new CaEnrollBenchmark(caName, benchmarkEntry, maxRequests, num, description);
 
       benchmark.setDuration(duration);
       benchmark.setThreads(numThreads);

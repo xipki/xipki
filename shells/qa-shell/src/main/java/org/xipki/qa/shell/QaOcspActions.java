@@ -466,9 +466,6 @@ public class QaOcspActions {
     @Option(name = "--max-num", description = "maximal number of OCSP queries\n0 for unlimited")
     private Integer maxRequests = 0;
 
-    @Option(name = "--queue-size", description = "Number of maximal HTTP requests in the sending queue")
-    private Integer queueSize = 50;
-
     @Override
     protected Object execute0() throws Exception {
       int ii = 0;
@@ -531,7 +528,7 @@ public class QaOcspActions {
 
         RequestOptions options = getRequestOptions();
         OcspBenchmark loadTest = new OcspBenchmark(issuerCert, serverUrl, options,
-            serialNumberIterator, maxRequests, queueSize, description);
+            serialNumberIterator, maxRequests, description);
         loadTest.setDuration(duration);
         loadTest.setThreads(numThreads);
         loadTest.execute();

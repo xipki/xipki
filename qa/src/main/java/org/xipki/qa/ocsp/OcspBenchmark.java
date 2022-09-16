@@ -17,21 +17,20 @@
 
 package org.xipki.qa.ocsp;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ocsp.client.HttpOcspRequestor;
+import org.xipki.ocsp.client.OcspRequestor;
 import org.xipki.ocsp.client.RequestOptions;
-import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.security.X509Cert;
 import org.xipki.util.BenchmarkExecutor;
 
-import java.io.IOException;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -45,16 +44,11 @@ import static org.xipki.util.Args.notNull;
  * @since 2.0.0
  */
 
-public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler {
+public class OcspBenchmark extends BenchmarkExecutor {
 
   final class Testor implements Runnable {
 
-    private final OcspBenchRequestor requestor;
-
-    Testor()
-        throws Exception {
-      this.requestor = new OcspBenchRequestor();
-      this.requestor.init(OcspBenchmark.this, responderUrl, issuerCert, requestOptions, queueSize);
+    Testor() throws Exception {
     }
 
     @Override
@@ -66,17 +60,12 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
         }
 
         try {
-          requestor.ask(new BigInteger[]{sn});
+          boolean valid = ask(new BigInteger[]{sn});
+          account(1, valid ? 0 : 1);
         } catch (Throwable th) {
           LOG.warn("{}: {}", th.getClass().getName(), th.getMessage());
           account(1, 1);
         }
-      }
-
-      try {
-        requestor.shutdown();
-      } catch (Exception ex) {
-        LOG.warn("got IOException in requestor.stop()");
       }
     }
 
@@ -84,9 +73,11 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
 
   private static final Logger LOG = LoggerFactory.getLogger(OcspBenchmark.class);
 
+  private OcspRequestor client;
+
   private final X509Cert issuerCert;
 
-  private final String responderUrl;
+  private final URL responderUrl;
 
   private final RequestOptions requestOptions;
 
@@ -94,26 +85,23 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
 
   private final int maxRequests;
 
-  private final int queueSize;
-
   private final AtomicInteger processedRequests = new AtomicInteger(0);
 
-  public OcspBenchmark(
-      X509Cert issuerCert, String responderUrl, RequestOptions requestOptions,
-      Iterator<BigInteger> serials, int maxRequests, int queueSize, String description) {
+  public OcspBenchmark(X509Cert issuerCert, String responderUrl, RequestOptions requestOptions,
+      Iterator<BigInteger> serials, int maxRequests, String description)
+      throws MalformedURLException {
     super(description);
 
+    this.client = new HttpOcspRequestor();
     this.issuerCert = notNull(issuerCert, "issuerCert");
-    this.responderUrl = notNull(responderUrl, "responderUrl");
+    this.responderUrl = new URL(notNull(responderUrl, "responderUrl"));
     this.requestOptions = notNull(requestOptions, "requestOptions");
     this.maxRequests = maxRequests;
     this.serials = notNull(serials, "serials");
-    this.queueSize = queueSize;
   }
 
   @Override
-  protected Runnable getTestor()
-      throws Exception {
+  protected Runnable getTestor() throws Exception {
     return new Testor();
   }
 
@@ -132,62 +120,12 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
     }
   }
 
-  @Override
-  public void onComplete(FullHttpResponse response) {
-    boolean success;
+  public boolean ask(BigInteger[] serialNumbers) {
+    OCSPResp ocspResp = null;
     try {
-      success = onComplete0(response);
-    } catch (Throwable th) {
-      LOG.warn("unexpected exception", th);
-      success = false;
-    }
-
-    account(1, success ? 0 : 1);
-  }
-
-  @Override
-  public synchronized void onError() {
-    account(1, 1);
-  }
-
-  private boolean onComplete0(FullHttpResponse response) {
-    if (response == null) {
-      LOG.warn("bad response: response is null");
-      return false;
-    }
-
-    if (response.decoderResult().isFailure()) {
-      LOG.warn("failed: {}", response.decoderResult());
-      return false;
-    }
-
-    if (response.status().code() != HttpResponseStatus.OK.code()) {
-      LOG.warn("bad response: {}", response.status());
-      return false;
-    }
-
-    String responseContentType = response.headers().get("Content-Type");
-    if (responseContentType == null) {
-      LOG.warn("bad response: mandatory Content-Type not specified");
-      return false;
-    } else if (!responseContentType.equalsIgnoreCase("application/ocsp-response")) {
-      LOG.warn("bad response: Content-Type {} unsupported", responseContentType);
-      return false;
-    }
-
-    ByteBuf buf = response.content();
-    if (buf == null || buf.readableBytes() == 0) {
-      LOG.warn("no body in response");
-      return false;
-    }
-    byte[] respBytes = new byte[buf.readableBytes()];
-    buf.getBytes(buf.readerIndex(), respBytes);
-
-    OCSPResp ocspResp;
-    try {
-      ocspResp = new OCSPResp(respBytes);
-    } catch (IOException ex) {
-      LOG.warn("could not parse OCSP response", ex);
+      ocspResp = client.ask(issuerCert, serialNumbers, responderUrl, requestOptions, null);
+    } catch (Exception e) {
+      LOG.warn("error client.ask", e);
       return false;
     }
 
@@ -210,6 +148,6 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
     }
 
     return true;
-  } // method onComplete0
+  } // method ask
 
 }
