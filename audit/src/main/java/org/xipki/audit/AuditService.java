@@ -19,6 +19,7 @@ package org.xipki.audit;
 
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
+import org.xipki.util.exception.InvalidConfException;
 
 /**
  * Audit service interface.
@@ -39,7 +40,7 @@ public interface AuditService extends AutoCloseable {
    * @since 6.0.0
    */
   void init(String conf, PasswordResolver passwordResolver)
-          throws PasswordResolverException;
+          throws PasswordResolverException, InvalidConfException;
 
   /**
    * Log audit event.

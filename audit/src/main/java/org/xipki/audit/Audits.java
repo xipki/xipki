@@ -19,6 +19,7 @@ package org.xipki.audit;
 
 import org.xipki.audit.services.EmbedAuditService;
 import org.xipki.audit.services.FileMacAuditService;
+import org.xipki.audit.services.NoopAuditService;
 import org.xipki.password.PasswordResolver;
 
 import java.lang.reflect.InvocationTargetException;
@@ -86,6 +87,8 @@ public class Audits {
       AuditService service;
       if ("embed".equalsIgnoreCase(auditType)) {
         service = new EmbedAuditService();
+      } else if ("noop".equalsIgnoreCase(auditType)) {
+        service = new NoopAuditService();
       } else if ("file-mac".equals(auditType)) {
         service = new FileMacAuditService();
       } else {

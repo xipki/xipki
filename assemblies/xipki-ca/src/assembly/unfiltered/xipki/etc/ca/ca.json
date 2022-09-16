@@ -49,17 +49,27 @@
 		"signerFactories": [],
 		"keypairGeneratorFactories": []
 	},
-	"audit":{
-		// embed: use the embedded slf4j logging
-		//
-		// file-mac: audit entries are chained, and each entry is MAC protected, saved in file
+	"audit": {
+		// type embed: use the embedded logging
+		//  conf: file=<audit file>,size=<integer><unit>.
+		//        The size unit is kb, mb and gb.
+		//        If not present, file is set to logs/audit.log, and size to 10mb.
+
+		// type noop: no logging.
+		//  conf: n/a
+
+		// type file-mac: audit entries are chained, and each entry is MAC protected, saved in file
 		//   conf: enc-interval=<integer>,keyid=<key-id>,password=<password or its PBE encrypted form>,file=<log file>,
-		// database-mac: audit entries are chained, and each entry is MAC protected, saved in file
+
+		// type database-mac: audit entries are chained, and each entry is MAC protected, saved in database
 		//   conf: enc-interval=<integer>,keyid=<key-id>,password=<password or its PBE encrypted form>,datasource=<database conf file>
-		// For file-mac and database-mac, the enc-interval specifies the number of audit entries between writting an
+
+		// For types file-mac and database-mac, the enc-interval specifies the number of audit entries between writting an
 		// encrypted entry containing the last audit id.
-		//
+
 		// java:<name of class that implements org.xipki.audit.AuditService>
+		// conf: custom defined.
+
 		"type":"embed"
 		//,"conf":"..."
 	}

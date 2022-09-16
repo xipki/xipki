@@ -25,16 +25,17 @@ import org.xipki.audit.AuditService;
 import org.xipki.audit.PciAuditEvent;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.DateUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -47,6 +48,8 @@ import java.util.TimeZone;
 public class EmbedAuditService implements AuditService {
 
   public static final String KEY_FILE = "file";
+
+  public static final String KEY_SIZE = "size";
 
   private static final String DELIM = " | ";
 
@@ -64,7 +67,13 @@ public class EmbedAuditService implements AuditService {
 
   private long lastMsOfToday;
 
+  private int maxFileSize;
+
   private OutputStreamWriter writer;
+
+  private Path writerPath;
+
+  private String writerFileCoreName;
 
   public EmbedAuditService() {
   }
@@ -73,15 +82,38 @@ public class EmbedAuditService implements AuditService {
   public void init(String conf) {
     try {
       init(conf, null);
-    } catch (PasswordResolverException ex) {
+    } catch (PasswordResolverException | InvalidConfException ex) {
       throw new IllegalStateException(ex);
     }
   }
 
   @Override
   public void init(String conf, PasswordResolver passwordResolver)
-      throws PasswordResolverException {
+      throws PasswordResolverException, InvalidConfException {
     ConfPairs confPairs = new ConfPairs(conf);
+    String str = confPairs.value(KEY_SIZE);
+
+    final int mb = 1024 * 1024;
+
+    if (str == null) {
+      this.maxFileSize = 10 * mb; // 10 MB
+    } else {
+      str = str.trim().toLowerCase(Locale.ROOT);
+      if (str.endsWith("gb")) {
+        this.maxFileSize = Integer.parseInt(str.substring(0, str.length() - 2).trim()) * 1024 * mb;
+      } else if (str.endsWith("mb")) {
+        this.maxFileSize = Integer.parseInt(str.substring(0, str.length() - 2).trim()) * mb;
+      } else if (str.endsWith("kb")) {
+        this.maxFileSize = Integer.parseInt(str.substring(0, str.length() - 2).trim()) * 1024;
+      } else {
+        this.maxFileSize = Integer.parseInt(str);
+      }
+
+      if (this.maxFileSize < mb) {
+        throw new InvalidConfException("invalid size " + str);
+      }
+    }
+
     String logFilePath = confPairs.value(KEY_FILE);
 
     if (StringUtil.isBlank(logFilePath)) {
@@ -125,12 +157,26 @@ public class EmbedAuditService implements AuditService {
 
     long ms = date.toEpochMilli();
     try {
-      if (ms > lastMsOfToday) {
+      long size = Files.size(writerPath);
+      if (ms > lastMsOfToday || size >= maxFileSize) {
+        long oldLastOfToday = lastMsOfToday;
+
         Calendar now = Calendar.getInstance(TimeZone.getDefault());
         now.setTimeInMillis(ms);
         int yyyyMMddNow = DateUtil.getYyyyMMdd(now);
         lastMsOfToday = DateUtil.getLastMsOfDay(now);
         writer.close();
+
+        if (oldLastOfToday == lastMsOfToday) {
+          for (int i = 1; ;i++) {
+            File renameTo = new File(logDir, writerFileCoreName + "-" + i + logFileNameSuffix);
+            if (!renameTo.exists()) {
+              writerPath.toFile().renameTo(renameTo);
+              break;
+            }
+          }
+        }
+
         writer = buildWriter(yyyyMMddNow);
       }
 
@@ -142,7 +188,8 @@ public class EmbedAuditService implements AuditService {
   }
 
   private OutputStreamWriter buildWriter(int yyyyMMdd) {
-    File currentLogFile = new File(logDir, buildFilename(yyyyMMdd));
+    this.writerFileCoreName = buildFileCoreName(yyyyMMdd);
+    File currentLogFile = new File(logDir, writerFileCoreName + logFileNameSuffix);
     OutputStream fw;
     try {
       fw = new FileOutputStream(currentLogFile, true);
@@ -150,15 +197,16 @@ public class EmbedAuditService implements AuditService {
       throw new IllegalStateException("error opening file " + currentLogFile.getPath());
     }
 
+    this.writerPath = currentLogFile.toPath();
     return new OutputStreamWriter(fw);
   }
 
-  private String buildFilename(int yyyyMMdd) {
+  private String buildFileCoreName(int yyyyMMdd) {
     int year = yyyyMMdd / 10000;
     int month = yyyyMMdd % 10000 / 100;
     int day = yyyyMMdd % 100;
     String dateStr = year + "." + (month < 10 ? "0" + month : month) + "." + (day < 10 ? "0" + day : day);
-    return logFileNamePrefix + dateStr + logFileNameSuffix;
+    return logFileNamePrefix + dateStr;
   }
 
   @Override
