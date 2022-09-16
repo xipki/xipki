@@ -18,6 +18,7 @@
 package org.xipki.ca.gateway.conf;
 
 import org.xipki.audit.Audits;
+import org.xipki.ca.sdk.SdkClientConf;
 import org.xipki.security.Securities;
 import org.xipki.util.exception.InvalidConfException;
 

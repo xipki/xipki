@@ -37,7 +37,9 @@ package org.xipki.ca.sdk;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.security.KeyCertBytesPair;
 import org.xipki.util.exception.ErrorCode;
+import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.HttpRespContent;
+import org.xipki.util.http.SslContextConf;
 import org.xipki.util.http.XiHttpClient;
 
 import javax.net.ssl.HostnameVerifier;
@@ -59,18 +61,25 @@ import static org.xipki.ca.sdk.SdkConstants.*;
 
 public class SdkClient {
 
+
   private static final String CONTENT_TYPE_JSON = "application/json";
 
   private final String serverUrl;
 
   private final XiHttpClient client;
 
+  public SdkClient(SdkClientConf conf) throws ObjectCreationException {
+    this.serverUrl = conf.getServerUrl();
+    SslContextConf sdkSslConf = SslContextConf.ofSslConf(conf.getSsl());
+    this.client = new XiHttpClient(sdkSslConf.getSslSocketFactory(), sdkSslConf.buildHostnameVerifier());
+  }
+
   public SdkClient(String serverUrl, SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
     this.serverUrl = serverUrl;
     this.client = new XiHttpClient(sslSocketFactory, hostnameVerifier);
   }
 
-  private byte[] send(String ca, String command, SdkRequest request)
+  public byte[] send(String ca, String command, SdkRequest request)
       throws IOException, SdkErrorResponseException {
     String ct = request == null ? null : CONTENT_TYPE_JSON;
     HttpRespContent resp;

@@ -23,6 +23,7 @@ import org.xipki.audit.Audits;
 import org.xipki.audit.Audits.AuditConf;
 import org.xipki.ca.gateway.conf.*;
 import org.xipki.ca.sdk.SdkClient;
+import org.xipki.ca.sdk.SdkClientConf;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.Securities;
 import org.xipki.security.X509Cert;
@@ -96,11 +97,7 @@ public class ProtocolProxyConfWrapper {
     }
 
     popControl = new PopControl(conf.getPop());
-
-    SdkClientConf sdkConf = conf.getSdkClient();
-    SslContextConf sdkSslConf = SslContextConf.ofSslConf(sdkConf.getSsl());
-    sdkClient = new SdkClient(sdkConf.getServerUrl(),
-        sdkSslConf.getSslSocketFactory(), sdkSslConf.buildHostnameVerifier());
+    sdkClient = new SdkClient(conf.getSdkClient());
 
     CaNameSignersConf signersConf = conf.getSigners();
     if (signersConf == null) {
