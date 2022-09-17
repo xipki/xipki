@@ -70,6 +70,7 @@ public class IaikP11Module extends P11Module {
       this.description = StringUtil.concatObjects("PKCS#11 IAIK",
           "\n\tPath ", moduleConf.getNativeLibrary());
     }
+    LOG.info("PKCS#11 module\n{}", this.description);
 
     Slot[] slotList;
     try {
@@ -217,7 +218,7 @@ public class IaikP11Module extends P11Module {
       return;
     }
 
-    LOG.info("close pkcs11 module: {}", modulePath);
+    LOG.info("close PKCS#11 module: {}", modulePath);
     try {
       module.finalize(null);
     } catch (Throwable th) {

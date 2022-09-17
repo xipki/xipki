@@ -81,6 +81,7 @@ public class EmulatorP11Module extends P11Module {
 
     this.description = StringUtil.concat("PKCS#11 emulator", "\nPath: ",
         baseDir.getAbsolutePath() + parametersStr);
+    LOG.info("PKCS#11 module\n{}", this.description);
 
     File[] children = baseDir.listFiles();
 
@@ -184,7 +185,7 @@ public class EmulatorP11Module extends P11Module {
 
   @Override
   public void close() {
-    LOG.info("close pkcs11 module: {}", getName());
+    LOG.info("close PKCS#11 module: {}", getName());
   }
 
   private void createExampleRepository(File dir, int numSlots) throws IOException {
