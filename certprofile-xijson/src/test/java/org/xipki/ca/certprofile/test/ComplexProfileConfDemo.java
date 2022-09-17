@@ -94,14 +94,8 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
         CertLevel.SubCA, "8y");
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1, null, "PREFIX ", " SUFFIX"));
+    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn01(DN.SN),
+      rdn(DN.CN, 1, 1, null, "PREFIX ", " SUFFIX"));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -182,15 +176,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     X509ProfileType profile = getBaseProfile("certprofile multiple-ous", CertLevel.EndEntity, "5y");
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-
-    rdnControls.add(createRdn(DN.OU, 2, 2));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1));
+    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn(DN.OU, 2, 2), rdn01(DN.SN), rdn(DN.CN));
 
     // Extensions
     // Extensions - general
@@ -221,18 +207,11 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
    * O and OU in one RDN
    */
   private static void certprofileMultipleValuedRdn(String destFilename) {
-    X509ProfileType profile = getBaseProfile("certprofile multiple-valued-rdn",
-        CertLevel.EndEntity, "5y");
+    X509ProfileType profile = getBaseProfile("certprofile multiple-valued-rdn", CertLevel.EndEntity, "5y");
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1, null, null, null, "group1"));
-    rdnControls.add(createRdn(DN.OU, 1, 1, null, null, null, "group1"));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1));
+    addRdns(profile, rdn(DN.C), rdn(DN.O, 1, 1, null, null, null, "group1"),
+        rdn(DN.OU, 1, 1, null, null, null, "group1"), rdn01(DN.SN), rdn(DN.CN));
 
     // Extensions
     // Extensions - general
@@ -263,15 +242,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     X509ProfileType profile = getBaseProfile("certprofile qc", CertLevel.EndEntity, "1000d");
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.organizationIdentifier, 0, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1));
+    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.organizationIdentifier), rdn01(DN.OU), rdn01(DN.SN), rdn(DN.CN));
 
     // Extensions
     // Extensions - general
@@ -319,21 +290,10 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
         "5y", true, false);
 
     // Subject
-    Subject subject = profile.getSubject();
-    subject.setKeepRdnOrder(false);
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.CN, 1, 1));
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.dateOfBirth, 0, 1));
-    rdnControls.add(createRdn(DN.postalAddress, 0, 1));
-    rdnControls.add(createRdn(DN.userid, 1, 1));
-    rdnControls.add(createRdn(DN.jurisdictionOfIncorporationCountryName, 1, 1));
-    rdnControls.add(createRdn(DN.jurisdictionOfIncorporationLocalityName, 1, 1));
-    rdnControls.add(createRdn(DN.jurisdictionOfIncorporationStateOrProvinceName, 1, 1));
-    rdnControls.add(createRdn(Extn.id_extension_admission, 0, 99));
+    addRdns(profile, rdn(DN.CN), rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn01(DN.SN), rdn01(DN.dateOfBirth),
+        rdn01(DN.postalAddress), rdn(DN.userid), rdn(DN.jurisdictionOfIncorporationCountryName),
+        rdn(DN.jurisdictionOfIncorporationLocalityName), rdn(DN.jurisdictionOfIncorporationStateOrProvinceName),
+        rdn(Extn.id_extension_admission, 0, 99));
 
     // Extensions
     // Extensions - general
@@ -358,8 +318,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment},
-        null));
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment}, null));
 
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
@@ -453,8 +412,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     gn.addTags(GeneralNameTag.rfc822Name, GeneralNameTag.DNSName, GeneralNameTag.directoryName,
         GeneralNameTag.ediPartyName, GeneralNameTag.uniformResourceIdentifier,
         GeneralNameTag.IPAddress, GeneralNameTag.registeredID);
-    gn.addOtherNames(
-        createOidType(new ASN1ObjectIdentifier("1.2.3.1")),
+    gn.addOtherNames(createOidType(new ASN1ObjectIdentifier("1.2.3.1")),
         createOidType(new ASN1ObjectIdentifier("1.2.3.2")));
 
     // SubjectInfoAccess
@@ -477,11 +435,9 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
       access.setAccessLocation(accessLocation);
 
       accessLocation.addTags(
-          GeneralNameTag.rfc822Name, GeneralNameTag.DNSName, GeneralNameTag.directoryName,
-          GeneralNameTag.ediPartyName, GeneralNameTag.uniformResourceIdentifier,
-          GeneralNameTag.IPAddress, GeneralNameTag.registeredID);
-      accessLocation.addOtherNames(
-          createOidType(new ASN1ObjectIdentifier("1.2.3.1")),
+          GeneralNameTag.rfc822Name, GeneralNameTag.DNSName, GeneralNameTag.directoryName, GeneralNameTag.ediPartyName,
+          GeneralNameTag.uniformResourceIdentifier, GeneralNameTag.IPAddress, GeneralNameTag.registeredID);
+      accessLocation.addOtherNames(createOidType(new ASN1ObjectIdentifier("1.2.3.1")),
           createOidType(new ASN1ObjectIdentifier("1.2.3.2")));
     }
 
@@ -498,8 +454,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.3"), new Tag(1, true));
   }
 
-  private static void certprofileConstantExt(String destFilename)
-      throws Exception {
+  private static void certprofileConstantExt(String destFilename) throws Exception {
     certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.1"), null);
   }
 
@@ -509,13 +464,8 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
         "5y", true, false);
 
     // Subject
-    Subject subject = profile.getSubject();
-    subject.setKeepRdnOrder(true);
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.CN, 1, 1));
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
+    profile.getSubject().setKeepRdnOrder(true);
+    addRdns(profile, rdn(DN.CN), rdn(DN.C), rdn(DN.O), rdn01(DN.OU));
 
     // Extensions
     // Extensions - general
@@ -539,8 +489,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment}, null));
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment}, null));
 
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
@@ -571,13 +520,8 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
         "5y", true, false);
 
     // Subject
-    Subject subject = profile.getSubject();
-    subject.setKeepRdnOrder(true);
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.CN, 1, 1));
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
+    profile.getSubject().setKeepRdnOrder(true);
+    addRdns(profile, rdn(DN.CN), rdn(DN.C), rdn(DN.O), rdn01(DN.OU));
 
     // Extensions
     // Extensions - general
@@ -601,9 +545,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment},
-        null));
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment}, null));
 
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
@@ -629,16 +571,16 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     ValueType value = new ValueType();
     value.setText("DE");
     value.setOverridable(true);
-    rdnControls.add(createRdn(DN.C, null, null, value));
+    rdnControls.add(rdn(DN.C, null, null, value));
 
     value = new ValueType();
     value.setText("fixed myorg.org");
     value.setOverridable(false);
-    rdnControls.add(createRdn(DN.O, null, null, value));
+    rdnControls.add(rdn(DN.O, null, null, value));
 
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1));
+    rdnControls.add(rdn(DN.OU, 0, 1));
+    rdnControls.add(rdn(DN.SN, 0, 1));
+    rdnControls.add(rdn(DN.CN));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -660,26 +602,17 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment}, null));
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment}, null));
 
     marshall(profile, destFilename, true);
   } // method certprofileFixedPartialSubject
 
   private static void certprofileAppleWwdr(String destFilename) {
-    X509ProfileType profile = getBaseProfile("certprofile apple WWDR",
-        CertLevel.EndEntity, "395d");
+    X509ProfileType profile = getBaseProfile("certprofile apple WWDR", CertLevel.EndEntity, "395d");
 
     // Subject
-    Subject subject = profile.getSubject();
-    subject.setKeepRdnOrder(true);
-    List<RdnType> rdnControls = subject.getRdns();
-
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 1, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1));
-    rdnControls.add(createRdn(DN.UID, 1, 1));
+    profile.getSubject().setKeepRdnOrder(true);
+    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn(DN.OU), rdn(DN.CN), rdn(DN.UID));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -718,8 +651,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature}, null));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.digitalSignature}, null));
 
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
@@ -805,14 +737,8 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     X509ProfileType profile = getBaseProfile("certprofile extended", CertLevel.EndEntity, "5y");
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1, ":FQDN", null, null));
+    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn01(DN.SN),
+        rdn(DN.CN, 1, 1, ":FQDN", null, null));
 
     // SubjectToSubjectAltName
     List<SubjectToSubjectAltNameType> subjectToSubjectAltNames = new LinkedList<>();
@@ -869,8 +795,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     last(list).setSmimeCapabilities(createSmimeCapabilities());
 
     // Extensions - 1.2.3.4.1 (demo_without_conf)
-    list.add(
-        createExtension(new ASN1ObjectIdentifier("1.2.3.4.1"), true, false, "demo_without_conf"));
+    list.add(createExtension(new ASN1ObjectIdentifier("1.2.3.4.1"), true, false, "demo_without_conf"));
 
     // Extensions - 1.2.3.4.2 (demo_with_conf)
     list.add(createExtension(new ASN1ObjectIdentifier("1.2.3.4.2"), true, false, "demo_with_conf"));

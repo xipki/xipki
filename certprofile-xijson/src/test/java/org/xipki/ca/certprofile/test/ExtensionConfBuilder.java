@@ -45,6 +45,7 @@ import org.xipki.security.X509ExtensionType.FieldType;
 import org.xipki.security.X509ExtensionType.Tag;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.TripleState;
 
 import java.io.IOException;
@@ -64,23 +65,16 @@ public class ExtensionConfBuilder {
   private static final Set<ASN1ObjectIdentifier> OPTIONAL_REQUEST_EXTENSIONS;
 
   static {
-    REQUIRED_REQUEST_EXTENSIONS = new HashSet<>();
-    REQUIRED_REQUEST_EXTENSIONS.add(Extension.subjectAlternativeName);
-    REQUIRED_REQUEST_EXTENSIONS.add(Extension.subjectDirectoryAttributes);
-    REQUIRED_REQUEST_EXTENSIONS.add(Extension.subjectInfoAccess);
-    REQUIRED_REQUEST_EXTENSIONS.add(Extension.biometricInfo);
-    REQUIRED_REQUEST_EXTENSIONS.add(Extn.id_extension_admission);
-    REQUIRED_REQUEST_EXTENSIONS.add(Extn.id_extension_additionalInformation);
-    REQUIRED_REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_ICRegistrationNumber);
-    REQUIRED_REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_IdentityCode);
-    REQUIRED_REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_InsuranceNumber);
-    REQUIRED_REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_OrganizationCode);
-    REQUIRED_REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_TaxationNumber);
+    REQUIRED_REQUEST_EXTENSIONS = CollectionUtil.asUnmodifiableSet(
+        Extension.subjectAlternativeName,      Extension.subjectDirectoryAttributes,
+        Extension.subjectInfoAccess,           Extension.biometricInfo,
+        Extn.id_extension_admission,           Extn.id_extension_additionalInformation,
+        Extn.id_GMT_0015_ICRegistrationNumber, Extn.id_GMT_0015_IdentityCode,
+        Extn.id_GMT_0015_InsuranceNumber,      Extn.id_GMT_0015_OrganizationCode,
+        Extn.id_GMT_0015_TaxationNumber);
 
-    OPTIONAL_REQUEST_EXTENSIONS = new HashSet<>();
-    OPTIONAL_REQUEST_EXTENSIONS.add(Extension.keyUsage);
-    OPTIONAL_REQUEST_EXTENSIONS.add(Extension.extendedKeyUsage);
-    OPTIONAL_REQUEST_EXTENSIONS.add(Extension.qCStatements);
+    OPTIONAL_REQUEST_EXTENSIONS = CollectionUtil.asUnmodifiableSet(
+        Extension.keyUsage, Extension.extendedKeyUsage, Extension.qCStatements);
   } // method static
 
   public static List<ConstantExtnValue> createConstantSequenceOrSet() {

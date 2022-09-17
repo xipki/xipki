@@ -46,6 +46,7 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
@@ -71,13 +72,9 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
   protected static final Set<ASN1ObjectIdentifier> NOT_IN_SUBJECT_RDNS;
 
   static {
-    NOT_IN_SUBJECT_RDNS = new HashSet<>();
-    NOT_IN_SUBJECT_RDNS.add(Extn.id_GMT_0015_ICRegistrationNumber);
-    NOT_IN_SUBJECT_RDNS.add(Extn.id_GMT_0015_IdentityCode);
-    NOT_IN_SUBJECT_RDNS.add(Extn.id_GMT_0015_InsuranceNumber);
-    NOT_IN_SUBJECT_RDNS.add(Extn.id_GMT_0015_OrganizationCode);
-    NOT_IN_SUBJECT_RDNS.add(Extn.id_GMT_0015_TaxationNumber);
-    NOT_IN_SUBJECT_RDNS.add(Extn.id_extension_admission);
+    NOT_IN_SUBJECT_RDNS = CollectionUtil.asUnmodifiableSet(
+        Extn.id_GMT_0015_ICRegistrationNumber, Extn.id_GMT_0015_IdentityCode,   Extn.id_GMT_0015_InsuranceNumber,
+        Extn.id_GMT_0015_OrganizationCode,     Extn.id_GMT_0015_TaxationNumber, Extn.id_extension_admission);
   } // method static
 
   protected static void marshall(X509ProfileType profile, String filename, boolean validate) {
@@ -162,22 +159,30 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     return profile;
   } // method getBaseCabSubscriberProfile
 
-  protected static RdnType createRdn(ASN1ObjectIdentifier type, int min, int max) {
-    return createRdn(type, min, max, null, null, null);
+  protected static RdnType rdn(ASN1ObjectIdentifier type) {
+    return rdn(type, 1, 1, null, null, null);
   }
 
-  protected static RdnType createRdn(ASN1ObjectIdentifier type, int min, int max,
-      String regex, String prefix, String suffix) {
-    return createRdn(type, min, max, regex, prefix, suffix, null);
+  protected static RdnType rdn01(ASN1ObjectIdentifier type) {
+    return rdn(type, 0, 1, null, null, null);
   }
 
-  protected static RdnType createRdn(ASN1ObjectIdentifier type, int min, int max,
-      String regex, String prefix, String suffix, String group) {
-    return createRdn(type, min, max, regex, prefix, suffix, group, null);
+  protected static RdnType rdn(ASN1ObjectIdentifier type, int min, int max) {
+    return rdn(type, min, max, null, null, null);
   }
 
-  protected static RdnType createRdn(ASN1ObjectIdentifier type, int min, int max,
-      String regex, String prefix, String suffix, String group, ValueType value) {
+  protected static RdnType rdn(ASN1ObjectIdentifier type, int min, int max,
+                               String regex, String prefix, String suffix) {
+    return rdn(type, min, max, regex, prefix, suffix, null);
+  }
+
+  protected static RdnType rdn(ASN1ObjectIdentifier type, int min, int max,
+                               String regex, String prefix, String suffix, String group) {
+    return rdn(type, min, max, regex, prefix, suffix, group, null);
+  }
+
+  protected static RdnType rdn(ASN1ObjectIdentifier type, int min, int max,
+                               String regex, String prefix, String suffix, String group, ValueType value) {
     RdnType ret = new RdnType();
     ret.setType(createOidType(type));
     if (min != 1) {
@@ -215,7 +220,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     return ret;
   } // method createRdn
 
-  protected static RdnType createRdn(ASN1ObjectIdentifier type, String regex, String group, ValueType value) {
+  protected static RdnType rdn(ASN1ObjectIdentifier type, String regex, String group, ValueType value) {
     RdnType ret = new RdnType();
     ret.setType(createOidType(type));
     ret.setMinOccurs(1);
@@ -326,13 +331,8 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
       }
     }
 
-    algos.add("SM3withSM2");
-    algos.add("Ed25519");
-    algos.add("Ed448");
-    algos.add("SHAKE128withRSAPSS");
-    algos.add("SHAKE256withRSAPSS");
-    algos.add("SHAKE128withECDSA");
-    algos.add("SHAKE256withECDSA");
+    algos.addAll(Arrays.asList("SM3withSM2", "Ed25519", "Ed448", "SHAKE128withRSAPSS",
+        "SHAKE256withRSAPSS", "SHAKE128withECDSA", "SHAKE256withECDSA"));
 
     // Subject
     Subject subject = new Subject();
@@ -340,14 +340,9 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
 
     ASN1ObjectIdentifier[] curveIds = (CertLevel.EndEntity != certLevel) ? null :
       new ASN1ObjectIdentifier[] {
-              SECObjectIdentifiers.secp256r1,
-              SECObjectIdentifiers.secp384r1,
-              SECObjectIdentifiers.secp521r1,
-              TeleTrusTObjectIdentifiers.brainpoolP256r1,
-              TeleTrusTObjectIdentifiers.brainpoolP256r1,
-              TeleTrusTObjectIdentifiers.brainpoolP384r1,
-              TeleTrusTObjectIdentifiers.brainpoolP512r1,
-              GMObjectIdentifiers.sm2p256v1};
+              SECObjectIdentifiers.secp256r1, SECObjectIdentifiers.secp384r1, SECObjectIdentifiers.secp521r1,
+              TeleTrusTObjectIdentifiers.brainpoolP256r1, TeleTrusTObjectIdentifiers.brainpoolP384r1,
+              TeleTrusTObjectIdentifiers.brainpoolP512r1, GMObjectIdentifiers.sm2p256v1};
 
     // Key
     profile.setKeyAlgorithms(createKeyAlgorithms(curveIds, certLevel, withEddsa));
@@ -397,8 +392,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
       ? new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.contentCommitment}
       : new KeyUsage[]{KeyUsage.keyAgreement};
 
-    List<AlgorithmType> keyAlgorithms = createEdwardsOrMontgomeryKeyAlgorithms(
-        edwards, curve25519, !curve25519);
+    List<AlgorithmType> keyAlgorithms = createEdwardsOrMontgomeryKeyAlgorithms(edwards, curve25519, !curve25519);
 
     profile.setKeyAlgorithms(keyAlgorithms);
     List<ExtensionType> extensions = profile.getExtensions();
@@ -433,9 +427,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     last(list).getParameters().setEc(ecParams);
 
     ASN1ObjectIdentifier[] curveIds = new ASN1ObjectIdentifier[] {
-            SECObjectIdentifiers.secp256r1,
-            SECObjectIdentifiers.secp384r1,
-            SECObjectIdentifiers.secp521r1};
+            SECObjectIdentifiers.secp256r1, SECObjectIdentifiers.secp384r1, SECObjectIdentifiers.secp521r1};
     List<DescribableOid> curves = new LinkedList<>();
     ecParams.setCurves(curves);
 
@@ -547,5 +539,12 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     }
 
   } // method last
+
+  protected static void addRdns(X509ProfileType profile, RdnType... rdns) {
+    List<RdnType> list = profile.getSubject().getRdns();
+    for (RdnType rdn : rdns) {
+      list.add(rdn);
+    }
+  }
 
 }

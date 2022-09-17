@@ -81,11 +81,11 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     Subject subject = profile.getSubject();
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1));
+    rdnControls.add(rdn(DN.C));
+    rdnControls.add(rdn(DN.O));
+    rdnControls.add(rdn01(DN.OU));
+    rdnControls.add(rdn01(DN.SN));
+    rdnControls.add(rdn(DN.CN));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -106,14 +106,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     X509ProfileType profile = getBaseProfile("certprofile cross", CertLevel.CROSS, "10y");
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1));
+    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn01(DN.SN), rdn(DN.CN));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -146,14 +139,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     X509ProfileType profile = getBaseProfile("certprofile subca", CertLevel.SubCA, "8y");
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1));
+    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn01(DN.SN), rdn(DN.CN));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -185,15 +171,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     X509ProfileType profile = getBaseProfile("certprofile ocsp", CertLevel.EndEntity, "5y", true);
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.organizationIdentifier, 0, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1));
+    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.organizationIdentifier), rdn01(DN.OU), rdn01(DN.SN), rdn(DN.CN));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -231,14 +209,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     profile.setKeyAlgorithms(createRSAKeyAlgorithms());
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1));
+    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn01(DN.SN), rdn(DN.CN));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -270,17 +241,11 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", true, false);
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
+    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.OU));
     if (legacy) {
-      rdnControls.add(createRdn(DN.emailAddress, 1, 1));
+      addRdns(profile, rdn(DN.emailAddress));
     }
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1));
+    addRdns(profile, rdn01(DN.SN), rdn(DN.CN));
 
     // SubjectToSubjectAltName
     SubjectToSubjectAltNameType s2sType = new SubjectToSubjectAltNameType();
@@ -331,22 +296,13 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
   private static void certprofileTlsEdwardsOrMontgomery(String destFilename, boolean edwards,
       boolean curve25519) {
-    String desc = "certprofile tls with "
-                    + (edwards ? "edwards " : "montmomery ")
-                    + (curve25519 ? "25519" : "448")
-                    + " curves";
+    String desc = "certprofile tls with " + (edwards ? "edwards " : "montmomery ")
+                    + (curve25519 ? "25519" : "448") + " curves";
 
     X509ProfileType profile = getEeBaseProfileForEdwardsOrMontgomeryCurves(desc, "2y", edwards, curve25519);
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 0, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1, REGEX_FQDN, null, null));
+    addRdns(profile, rdn(DN.C), rdn01(DN.O), rdn01(DN.OU), rdn01(DN.SN), rdn(DN.CN, 1, 1, REGEX_FQDN, null, null));
 
     // SubjectToSubjectAltName
     SubjectToSubjectAltNameType s2sType = new SubjectToSubjectAltNameType();
@@ -435,14 +391,8 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     }
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1, REGEX_FQDN, null, null));
+    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn01(DN.SN),
+        rdn(DN.CN, 1, 1, REGEX_FQDN, null, null));
 
     // SubjectToSubjectAltName
     SubjectToSubjectAltNameType s2sType = new SubjectToSubjectAltNameType();
@@ -491,14 +441,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     X509ProfileType profile = getBaseProfile("certprofile tls-c", CertLevel.EndEntity, "5y", false);
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1));
+    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn01(DN.SN), rdn(DN.CN));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -535,14 +478,8 @@ public class ProfileConfDemo extends ProfileConfBuilder {
         "9999y", false);
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1, ":FQDN", null, null));
+    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn01(DN.SN),
+        rdn(DN.CN, 1, 1, ":FQDN", null, null));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -574,18 +511,10 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", false);
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1));
-    rdnControls.add(createRdn(Extn.id_GMT_0015_ICRegistrationNumber, 0, 1));
-    rdnControls.add(createRdn(Extn.id_GMT_0015_IdentityCode, 0, 1));
-    rdnControls.add(createRdn(Extn.id_GMT_0015_InsuranceNumber, 0, 1));
-    rdnControls.add(createRdn(Extn.id_GMT_0015_OrganizationCode, 0, 1));
-    rdnControls.add(createRdn(Extn.id_GMT_0015_TaxationNumber, 0, 1));
+    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn(DN.CN),
+        rdn01(Extn.id_GMT_0015_ICRegistrationNumber), rdn01(Extn.id_GMT_0015_IdentityCode),
+        rdn01(Extn.id_GMT_0015_InsuranceNumber),  rdn01(Extn.id_GMT_0015_OrganizationCode),
+        rdn01(Extn.id_GMT_0015_TaxationNumber));
 
     // Extensions
     // Extensions - controls
@@ -616,11 +545,8 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
     // Extension id_GMT_0015_ICRegistrationNumber
     ASN1ObjectIdentifier[] gmtOids = new ASN1ObjectIdentifier[] {
-        Extn.id_GMT_0015_ICRegistrationNumber,
-        Extn.id_GMT_0015_IdentityCode,
-        Extn.id_GMT_0015_InsuranceNumber,
-        Extn.id_GMT_0015_OrganizationCode,
-        Extn.id_GMT_0015_TaxationNumber};
+        Extn.id_GMT_0015_ICRegistrationNumber, Extn.id_GMT_0015_IdentityCode,  Extn.id_GMT_0015_InsuranceNumber,
+        Extn.id_GMT_0015_OrganizationCode,     Extn.id_GMT_0015_TaxationNumber};
     for (ASN1ObjectIdentifier m : gmtOids) {
       list.add(createExtension(m, true, false));
       last(list).setInRequest(TripleState.required);

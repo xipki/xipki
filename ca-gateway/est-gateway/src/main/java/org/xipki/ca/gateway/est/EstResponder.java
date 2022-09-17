@@ -186,9 +186,9 @@ public class EstResponder {
   private static final Set<String> knownCommands;
 
   static {
-    knownCommands = Collections.unmodifiableSet(CollectionUtil.listToSet(java.util.Arrays.asList(
+    knownCommands = CollectionUtil.asUnmodifiableSet(
         CMD_cacerts, CMD_simpleenroll, CMD_simplereenroll, CMD_serverkeygen, CMD_ucacert,
-        CMD_usimpleenroll, CMD_usimplereenroll, CMD_userverkeygen, CMD_csrattrs, CMD_fullcmc)));
+        CMD_usimpleenroll, CMD_usimplereenroll, CMD_userverkeygen, CMD_csrattrs, CMD_fullcmc);
   }
 
   public EstResponder(

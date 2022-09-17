@@ -58,14 +58,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
         CertLevel.RootCA, "10y");
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1));
+    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn01(DN.SN), rdn(DN.CN));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -87,14 +80,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
         CertLevel.SubCA, "8y");
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1));
+    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn01(DN.SN), rdn(DN.CN));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -132,13 +118,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
     X509ProfileType profile = getBaseCabSubscriberProfile("certprofile TLS (CA/Browser Forum BR, Domain Validated)");
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1, REGEX_FQDN, null, null));
+    addRdns(profile, rdn(DN.C), rdn01(DN.OU), rdn01(DN.SN), rdn(DN.CN, 1, 1, REGEX_FQDN, null, null));
 
     List<ExtensionType> list = profile.getExtensions();
     // Extensions - CertificatePolicies
@@ -155,16 +135,8 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
         "certprofile TLS (CA/Browser Forum BR, Organization Validiated)");
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.ST, 0, 1));
-    rdnControls.add(createRdn(DN.localityName, 0, 1));
-    rdnControls.add(createRdn(DN.O, 1, 1));
-    rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1, REGEX_FQDN, null, null));
+    addRdns(profile, rdn(DN.C), rdn01(DN.ST), rdn01(DN.localityName), rdn(DN.O), rdn01(DN.OU), rdn01(DN.SN),
+        rdn(DN.CN, 1, 1, REGEX_FQDN, null, null));
 
     List<ExtensionType> list = profile.getExtensions();
     // Extensions - CertificatePolicies
@@ -181,16 +153,8 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
         "certprofile TLS (CA/Browser Forum BR, Individual Validiated)");
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(DN.C, 1, 1));
-    rdnControls.add(createRdn(DN.ST, 0, 1));
-    rdnControls.add(createRdn(DN.localityName, 0, 1));
-    rdnControls.add(createRdn(DN.givenName, 1, 1));
-    rdnControls.add(createRdn(DN.surname, 1, 1));
-    rdnControls.add(createRdn(DN.SN, 0, 1));
-    rdnControls.add(createRdn(DN.CN, 1, 1, REGEX_FQDN, null, null));
+    addRdns(profile, rdn(DN.C), rdn01(DN.ST), rdn01(DN.localityName), rdn(DN.givenName),
+        rdn(DN.surname), rdn01(DN.SN), rdn(DN.CN, 1, 1, REGEX_FQDN, null, null));
 
     List<ExtensionType> list = profile.getExtensions();
     // Extensions - CertificatePolicies

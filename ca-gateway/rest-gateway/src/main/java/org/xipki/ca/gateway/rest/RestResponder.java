@@ -202,10 +202,10 @@ public class RestResponder {
   private static final Set<String> knownCommands;
 
   static {
-    knownCommands = Collections.unmodifiableSet(CollectionUtil.listToSet(java.util.Arrays.asList(
+    knownCommands = CollectionUtil.asUnmodifiableSet(
         CMD_cacert, CMD_cacerts, CMD_revoke_cert, CMD_unsuspend_cert,
         CMD_unrevoke_cert, CMD_enroll_cert, CMD_enroll_cross_cert, CMD_enroll_serverkeygen,
-        CMD_enroll_cert_twin, CMD_enroll_serverkeygen_twin, CMD_crl)));
+        CMD_enroll_cert_twin, CMD_enroll_serverkeygen_twin, CMD_crl);
   }
 
   public RestResponder(SdkClient sdk, SecurityFactory securityFactory,

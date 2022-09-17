@@ -111,6 +111,22 @@ public class CollectionUtil {
     return (list == null) ? Collections.emptyList() : Collections.unmodifiableList(list);
   }
 
+  public static <T> Set<T> asUnmodifiableSet(T... list) {
+    return Collections.unmodifiableSet(asSet(list));
+  }
+
+  public static <T> Set<T> asSet(T... list) {
+    if (list == null) {
+      return Collections.emptySet();
+    }
+
+    Set<T> ret = new HashSet<>();
+    for (T t : list) {
+      ret.add(t);
+    }
+    return ret;
+  }
+
   public static <T> Set<T> listToSet(List<? extends T> list) {
     if (list == null) {
       return Collections.emptySet();
