@@ -1,4 +1,5 @@
 BASE_URL = https://localhost:8445/.well-known/est/myca/tls
+CT_PKCS10 = "Content-Type: application/pkcs10"
 
 echo "#################################################################"
 echo "#             Manage certificate via EST interface              #"
@@ -13,55 +14,122 @@ echo "generate example PKCS#12 file"
 xi:rsa-p12 --password 1234 --out ${OUT_DIR}/demo.p12 --subject "CN=dummy"
 
 #####
-echo "EST /cacerts"
+CMD = cacerts
 
-xi:curl --out ${OUT_DIR}/cacerts.p7m $BASE_URL/cacerts
+echo "=====EST /${CMD}====="
 
-#####
-echo "EST /csrattrs"
+FILE = ${OUT_DIR}/${CMD}
 
-xi:curl --out ${OUT_DIR}/csrattrs.p7m $BASE_URL/csrattrs
-
-#####
-echo "EST /simpleenroll"
-
-xi:csr-p12 \
-  --p12 ${OUT_DIR}/demo.p12 --password 1234 \
-  --subject "CN=${CUR_TIME}-est-simpleenroll1.myorg.org,O=myorg,C=DE" \
-  --out ${OUT_DIR}/simpleenroll1.csr
-
-xi:curl --base64 --out ${OUT_DIR}/simpleenroll1.p7m \
-  --data-file ${OUT_DIR}/simpleenroll1.csr \
-  --header "Content-Type: application/pkcs10" \
-  "$BASE_URL/simpleenroll"
-
-xi:export-cert-p7m ${OUT_DIR}/simpleenroll1.p7m ${OUT_DIR}/simpleenroll1.crt
+xi:curl --out ${FILE}.p7m $BASE_URL/${CMD}
 
 #####
-echo "EST /simplereenroll"
+CMD = csrattrs
 
-xi:csr-p12 \
-  --p12 ${OUT_DIR}/demo.p12 --password 1234 \
-  --subject "CN=${CUR_TIME}-est-simplereenroll1.myorg.org,O=myorg,C=DE" \
-  --old-cert ${OUT_DIR}/simpleenroll1.crt \
-  --out ${OUT_DIR}/simplereenroll1.csr
+echo "=====EST /${CMD}====="
 
-xi:curl --base64 --out ${OUT_DIR}/simplereenroll1.p7m \
-  --data-file ${OUT_DIR}/simplereenroll1.csr \
-  --header "Content-Type: application/pkcs10" \
-  "$BASE_URL/simplereenroll"
+FILE = ${OUT_DIR}/${CMD}
 
-xi:export-cert-p7m ${OUT_DIR}/simplereenroll1.p7m ${OUT_DIR}/simplereenroll1.crt
+xi:curl --out ${FILE}.p7m $BASE_URL/${CMD}
 
 #####
-echo "EST /serverkeygen"
+CMD = simpleenroll
 
-xi:csr-p12 \
-  --p12 ${OUT_DIR}/demo.p12 --password 1234 \
-  --subject "CN=${CUR_TIME}-est-serverkeygen1.myorg.org,O=myorg,C=DE" \
-  --out ${OUT_DIR}/serverkeygen1.csr
+echo "=====EST /${CMD}====="
 
-xi:curl --base64 --out ${OUT_DIR}/serverkeygen1.p7m \
-  --data-file ${OUT_DIR}/serverkeygen1.csr \
-  --header "Content-Type: application/pkcs10" \
-  "$BASE_URL/serverkeygen"
+FILE = ${OUT_DIR}/${CMD}
+
+xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password 1234 --out ${FILE}.csr \
+  --subject "CN=${CUR_TIME}-est-${CMD}.myorg.org,O=myorg,C=DE"
+
+xi:curl --base64 --header "${CT_PKCS10}" --out ${FILE}.p7m --data-file ${FILE}.csr "$BASE_URL/${CMD}"
+
+xi:export-cert-p7m ${FILE}.p7m ${FILE}.crt
+
+#####
+CMD = simplereenroll
+
+echo "=====EST /${CMD}====="
+
+OLD_FILE = ${FILE}
+FILE = ${OUT_DIR}/${CMD}
+
+xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password 1234 --out ${FILE}.csr \
+  --subject "CN=${CUR_TIME}-est-${CMD}.myorg.org,O=myorg,C=DE" \
+  --old-cert ${OLD_FILE}.crt
+
+xi:curl --base64 --header "${CT_PKCS10}" --out ${FILE}.p7m --data-file ${FILE}.csr "$BASE_URL/${CMD}"
+
+xi:export-cert-p7m ${FILE}.p7m ${FILE}.crt
+
+#####
+CMD = serverkeygen
+
+echo "=====EST /${CMD}====="
+
+FILE = ${OUT_DIR}/${CMD}
+
+xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password 1234 --out ${FILE}.csr \
+  --subject "CN=${CUR_TIME}-est-${CMD}.myorg.org,O=myorg,C=DE"
+
+xi:curl --base64 --header "${CT_PKCS10}" --out ${FILE}.p7m --data-file ${FILE}.csr "$BASE_URL/${CMD}"
+
+xi:export-keycert-est ${FILE}.p7m ${FILE}.key ${FILE}.crt
+
+echo "#################################################################"
+echo "#      Manage certificate via EST interface (XiPKI extension)   #"
+echo "#################################################################"
+
+#####
+CMD = ucacert
+
+echo "=====EST /${CMD}====="
+
+FILE = ${OUT_DIR}/${CMD}
+
+xi:curl --out ${FILE}.crt.b64 $BASE_URL/${CMD}
+
+xi:base64 -d ${FILE}.crt.b64 ${FILE}.crt
+
+#####
+CMD = usimpleenroll
+
+echo "=====EST /${CMD}====="
+
+FILE = ${OUT_DIR}/${CMD}
+
+xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password 1234 --out ${FILE}.csr \
+  --subject "CN=${CUR_TIME}-est-${CMD}.myorg.org,O=myorg,C=DE"
+
+xi:curl --base64 --header "${CT_PKCS10}" --out ${FILE}.crt.b64 --data-file ${FILE}.csr "$BASE_URL/${CMD}"
+
+xi:base64 -d ${FILE}.crt.b64 ${FILE}.crt
+
+#####
+CMD = usimplereenroll
+
+echo "=====EST /${CMD}====="
+
+OLD_FILE = ${FILE}
+FILE = ${OUT_DIR}/${CMD}
+
+xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password 1234 --out ${FILE}.csr \
+  --subject "CN=${CUR_TIME}-est-${CMD}.myorg.org,O=myorg,C=DE" \
+  --old-cert ${OLD_FILE}.crt
+
+xi:curl --base64 --header "${CT_PKCS10}" --out ${FILE}.crt.b64 --data-file ${FILE}.csr "$BASE_URL/${CMD}"
+
+xi:base64 -d ${FILE}.crt.b64 ${FILE}.crt
+
+#####
+CMD = userverkeygen
+
+echo "=====EST /${CMD}====="
+
+FILE = ${OUT_DIR}/${CMD}
+
+xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password 1234  --out ${FILE}.csr \
+  --subject "CN=${CUR_TIME}-est-${CMD}.myorg.org,O=myorg,C=DE"
+
+xi:curl --base64 --header "${CT_PKCS10}" --out ${FILE}.p7m --data-file ${FILE}.csr "$BASE_URL/${CMD}"
+
+xi:export-keycert-est ${FILE}.p7m ${FILE}.key ${FILE}.crt

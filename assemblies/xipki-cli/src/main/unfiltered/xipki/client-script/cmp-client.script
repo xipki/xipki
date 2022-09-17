@@ -170,6 +170,6 @@ if { "$ocsp" equals "true" } then {
   xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
 }
 
-echo "=====CMP: Get CRL===="
-xi:cmp-get-crl --ca myca --out ${OUT_DIR}/cmp-myca-get.crl
+#echo "=====CMP: Get CRL===="
+#xi:cmp-get-crl --ca myca --out ${OUT_DIR}/cmp-myca-get.crl
 }

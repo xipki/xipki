@@ -44,13 +44,9 @@ mkdir -p ${OUT_DIR}
 
 echo "get CA certificate"
 
-curl ${OPTS} \
-    --output ${OUT_DIR}/cacert.der \
-    "${CA_URL}/cacert"
+curl --insecure --output ${OUT_DIR}/cacert.der "${CA_URL}/cacert"
 
-curl ${OPTS} \
-    --output ${OUT_DIR}/cacerts.pem \
-    "${CA_URL}/cacerts"
+curl --insecure --output ${OUT_DIR}/cacerts.pem "${CA_URL}/cacerts"
 
 CA_SHA1FP=`openssl sha1 ${OUT_DIR}/cacert.der | cut -d '=' -f 2 | cut -d ' ' -f 2`
 
@@ -119,50 +115,41 @@ openssl x509 -inform der -in ${OUT_DIR}/${CN}.der -out ${OUT_DIR}/${CN}.pem
 if [[ $ocsp -eq 1 ]]; then
 	echo "Current OCSP status"
 
-	openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} \
-  		-issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
+	openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
 fi
 
 echo "suspend certificate"
 
-curl ${OPTS} \
-    "${CA_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
+curl ${OPTS} "${CA_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
 
 if [[ $ocsp -eq 1 ]]; then
 	echo "Current OCSP status"
 	echo "Current OCSP status"
 
-	openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} \
-		-issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
+	openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
 fi
 
 echo "unsuspend certificate"
 
-curl ${OPTS} \
-    "${CA_URL}/unsuspend-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}"
+curl ${OPTS} "${CA_URL}/unsuspend-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}"
 
 if [[ $ocsp -eq 1 ]]; then
 	echo "Current OCSP status"
 
-	openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} \
-		-issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
+	openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
 fi
 
 echo "revoke certificate"
 
-curl ${OPTS} \
-    "${CA_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
+curl ${OPTS} "${CA_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
 
 if [[ $ocsp -eq 1 ]]; then
 	echo "Current OCSP status"
 
-	openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} \
-  		-issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
+	openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
 fi
 
-echo "get current CRL"
+# echo "get current CRL"
 
-curl ${OPTS} \
-    --output ${OUT_DIR}/crl.crl \
-    "${CA_URL}/crl"
+# curl ${OPTS} --output ${OUT_DIR}/crl.crl "${CA_URL}/crl"
 

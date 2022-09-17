@@ -1,0 +1,10 @@
+[req]
+distinguished_name = req_distinguished_name
+req_extensions = req_ext
+
+[ req_distinguished_name ]
+
+[req_ext]
+subjectAltName = @alt_names
+
+[alt_names]
