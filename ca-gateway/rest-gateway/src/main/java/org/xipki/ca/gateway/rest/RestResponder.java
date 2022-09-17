@@ -199,6 +199,15 @@ public class RestResponder {
 
   private final RequestorAuthenticator authenticator;
 
+  private static final Set<String> knownCommands;
+
+  static {
+    knownCommands = Collections.unmodifiableSet(CollectionUtil.listToSet(java.util.Arrays.asList(
+        CMD_cacert, CMD_cacerts, CMD_revoke_cert, CMD_unsuspend_cert,
+        CMD_unrevoke_cert, CMD_enroll_cert, CMD_enroll_cross_cert, CMD_enroll_serverkeygen,
+        CMD_enroll_cert_twin, CMD_enroll_serverkeygen_twin, CMD_crl)));
+  }
+
   public RestResponder(SdkClient sdk, SecurityFactory securityFactory,
                        RequestorAuthenticator authenticator, PopControl popControl) {
     this.sdk = notNull(sdk, "sdk");
@@ -257,6 +266,20 @@ public class RestResponder {
       event.addEventData(CaAuditConstants.NAME_ca, caName);
       event.addEventType(command);
 
+      if (!knownCommands.contains(command)) {
+        String message = "invalid command '" + command + "'";
+        LOG.error(message);
+        throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
+      }
+
+      if (CMD_cacert.equals(command)) {
+        return toRestResponse(HttpRespContent.ofOk(CT_pkix_cert, sdk.cacert(caName)));
+      } else if (CMD_cacerts.equals(command)) {
+        byte[][] certsBytes = sdk.cacerts(caName);
+        return toRestResponse(HttpRespContent.ofOk(CT_pem_file,
+            StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certsBytes))));
+      }
+
       Requestor requestor;
       // Retrieve the user:password
       String hdrValue = httpRetriever.getHeader("Authorization");
@@ -308,16 +331,6 @@ public class RestResponder {
       HttpRespContent respContent;
 
       switch (command) {
-        case CMD_cacert: {
-          respContent = HttpRespContent.ofOk(CT_pkix_cert, sdk.cacert(caName));
-          break;
-        }
-        case CMD_cacerts: {
-          byte[][] certsBytes = sdk.cacerts(caName);
-          respContent = HttpRespContent.ofOk(CT_pem_file,
-              StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certsBytes)));
-          break;
-        }
         case CMD_enroll_cross_cert: {
           respContent = enrollCrossCert(caName, requestor, request, httpRetriever, event);
           break;
@@ -341,19 +354,11 @@ public class RestResponder {
           break;
         }
         default: {
-          String message = "invalid command '" + command + "'";
-          LOG.error(message);
-          throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
+          throw new IllegalStateException("invalid command '" + command + "'"); // should not reach here
         }
       }
 
-      Map<String, String> headers = new HashMap<>();
-      headers.put(HEADER_PKISTATUS, PKISTATUS_accepted);
-      if (respContent == null) {
-        return new RestResponse(OK, null, headers, null);
-      } else {
-        return new RestResponse(OK, respContent.getContentType(), headers, respContent.getContent());
-      }
+      return toRestResponse(respContent);
     } catch (OperationException ex) {
       ErrorCode code = ex.getErrorCode();
       if (LOG.isWarnEnabled()) {
@@ -449,6 +454,18 @@ public class RestResponder {
       }
     }
   } // method service
+
+  private RestResponse toRestResponse(HttpRespContent respContent) {
+    Map<String, String> headers = new HashMap<>();
+    headers.put(HEADER_PKISTATUS, PKISTATUS_accepted);
+
+    if (respContent == null) {
+      return new RestResponse(OK, null, headers, null);
+    } else {
+      return new RestResponse(OK, respContent.getContentType(), headers,
+          respContent.isBase64(), respContent.getContent());
+    }
+  }
 
   private HttpRespContent enrollCerts(
       String command, String caName, Requestor requestor, byte[] request,

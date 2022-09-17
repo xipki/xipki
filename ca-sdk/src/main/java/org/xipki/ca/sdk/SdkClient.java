@@ -61,7 +61,6 @@ import static org.xipki.ca.sdk.SdkConstants.*;
 
 public class SdkClient {
 
-
   private static final String CONTENT_TYPE_JSON = "application/json";
 
   private final String serverUrl;

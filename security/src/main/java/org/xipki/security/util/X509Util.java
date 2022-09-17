@@ -427,7 +427,9 @@ public class X509Util {
   }
 
   public static byte[] getCoreExtValue(Extensions extensions, ASN1ObjectIdentifier extnType) {
-    notNull(extensions, "extensions");
+    if (extensions == null) {
+      return null;
+    }
     notNull(extnType, "extnType");
     Extension extn = extensions.getExtension(extnType);
     if (extn == null) {

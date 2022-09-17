@@ -294,7 +294,7 @@ public class SdkResponder {
     }
   } // method service
 
-  private SdkResponse enroll(X509Ca ca, byte[] request, RequestorInfo requestor, boolean keyUpdate, boolean crossCert)
+  private SdkResponse enroll(X509Ca ca, byte[] request, RequestorInfo requestor, boolean reenroll, boolean crossCert)
       throws OperationException {
     EnrollCertsRequest req = EnrollCertsRequest.decode(request);
     List<EnrollCertRequestEntry> entries = req.getEntries();
@@ -327,7 +327,7 @@ public class SdkResponder {
       } else {
         X500NameType subject0 = entry.getSubject();
         if (subject0 == null) {
-          if (!keyUpdate) {
+          if (!reenroll) {
             throw new OperationException(BAD_CERT_TEMPLATE, "subject is not set");
           }
         } else {
@@ -346,7 +346,7 @@ public class SdkResponder {
           publicKeyInfo = SubjectPublicKeyInfo.getInstance(entry.getSubjectPublicKey());
         }
 
-        if (keyUpdate) {
+        if (reenroll) {
           CertWithRevocationInfo oldCert;
 
           OldCertInfoByIssuerAndSerial ocIsn = entry.getOldCertIsn();
