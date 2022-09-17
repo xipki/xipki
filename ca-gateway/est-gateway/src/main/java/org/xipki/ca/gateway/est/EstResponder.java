@@ -43,10 +43,8 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
+import org.xipki.util.*;
 import org.xipki.util.Base64;
-import org.xipki.util.LogUtil;
-import org.xipki.util.PermissionConstants;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
 import org.xipki.util.http.HttpRespContent;
@@ -119,11 +117,43 @@ public class EstResponder {
 
   private static final String CMD_serverkeygen = "serverkeygen";
 
+  /**
+   * XiPKI own command. The response returns the CA's certificate as raw certificate.
+   */
+  private static final String CMD_ucacert = "ucacert";
+
+  /**
+   * XiPKI own command. Same as simpleenroll, but returns the raw certificate.
+   */
+  private static final String CMD_usimpleenroll = "usimpleenroll";
+
+  /**
+   * XiPKI own command. Same as simplereenroll, but returns the raw certificate.
+   */
+  private static final String CMD_usimplereenroll = "usimplereenroll";
+
+  /**
+   * XiPKI own command. Same as serverkeygen, but returns the raw certificate in the certificate part.
+   */
+  private static final String CMD_userverkeygen = "userverkeygen";
+
   private static final String CMD_csrattrs = "csrattrs";
 
   private static final String CMD_fullcmc = "fullcmc";
 
-  private static final String CT_pkcs7_mime_certyonly = "application/pkcs7-mime; smime-type=certs-only";
+  private static final String CT_pkix_cert = "application/pkix-cert";
+
+  private static final String CT_pkcs8 = "application/pkcs8";
+
+  private static final String CT_pkcs10 = "application/pkcs10";
+
+  private static final String CT_csrattrs = "application/csrattrs";
+
+  private static final String CT_pkcs7_mime = "application/pkcs7-mime";
+
+  private static final String CT_multipart_mixed = "multipart/mixed";
+
+  private static final String CT_pkcs7_mime_certyonly = CT_pkcs7_mime + "; smime-type=certs-only";
 
   private static final int OK = 200;
 
@@ -152,6 +182,14 @@ public class EstResponder {
   private final RequestorAuthenticator authenticator;
 
   private final Random random = new Random();
+
+  private static final Set<String> knownCommands;
+
+  static {
+    knownCommands = Collections.unmodifiableSet(CollectionUtil.listToSet(java.util.Arrays.asList(
+        CMD_cacerts, CMD_simpleenroll, CMD_simplereenroll, CMD_serverkeygen, CMD_ucacert,
+        CMD_usimpleenroll, CMD_usimplereenroll, CMD_userverkeygen, CMD_csrattrs, CMD_fullcmc)));
+  }
 
   public EstResponder(
       SdkClient sdk, SecurityFactory securityFactory, RequestorAuthenticator authenticator, PopControl popControl) {
@@ -222,6 +260,31 @@ public class EstResponder {
       event.addEventData(CaAuditConstants.NAME_ca, caName);
       event.addEventType(command);
 
+      if (!knownCommands.contains(command)) {
+        String message = "invalid command '" + command + "'";
+        LOG.error(message);
+        throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
+      }
+
+      switch (command) {
+        case CMD_cacerts: {
+          byte[][] certsBytes = sdk.cacerts(caName);
+          return toRestResponse(HttpRespContent.ofOk(CT_pkcs7_mime, true, buildCertsOnly(certsBytes)));
+        }
+        case CMD_ucacert: {
+          byte[] certBytes = sdk.cacert(caName);
+          return toRestResponse(HttpRespContent.ofOk(CT_pkix_cert, true, certBytes));
+        }
+        case CMD_csrattrs: {
+          return toRestResponse(getCsrAttrs(caName, profile));
+        }
+        case CMD_fullcmc: {
+          String message = "supported command '" + command + "'";
+          LOG.error(message);
+          throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
+        }
+      }
+
       Requestor requestor;
       // Retrieve the user:password
       String hdrValue = httpRetriever.getHeader("Authorization");
@@ -270,67 +333,35 @@ public class EstResponder {
 
       event.addEventData(CaAuditConstants.NAME_requestor, requestor.getName());
 
+      String ct = httpRetriever.getHeader("Content-Type");
+      if (!CT_pkcs10.equalsIgnoreCase(ct)) {
+        String message = "unsupported media type " + ct;
+        throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, AuditLevel.INFO, AuditStatus.FAILED);
+      }
+
+      if (!requestor.isPermitted(PermissionConstants.ENROLL_CERT)) {
+        throw new OperationException(NOT_PERMITTED, "ENROLL_CERT is not allowed");
+      }
+
+      if (!requestor.isCertprofilePermitted(profile)) {
+        throw new OperationException(NOT_PERMITTED, "certprofile " + profile + " is not allowed");
+      }
+
+      CertificationRequest csr = CertificationRequest.getInstance(X509Util.toDerEncoded(request));
+      if (!CMD_serverkeygen.equals(command)) {
+        if (!GatewayUtil.verifyCsr(csr, securityFactory, popControl)) {
+          throw new OperationException(BAD_POP);
+        }
+      }
+
       HttpRespContent respContent;
-
-      switch (command) {
-        case CMD_cacerts: {
-          byte[][] certsBytes = sdk.cacerts(caName);
-          respContent = HttpRespContent.ofOk("application/pkcs7-mime", true, buildCertsOnly(certsBytes));
-          break;
-        }
-        case CMD_simplereenroll:
-        case CMD_simpleenroll:
-        case CMD_serverkeygen: {
-          String ct = httpRetriever.getHeader("Content-Type");
-          if (!"application/pkcs10".equalsIgnoreCase(ct)) {
-            String message = "unsupported media type " + ct;
-            throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, AuditLevel.INFO, AuditStatus.FAILED);
-          }
-
-          if (!requestor.isPermitted(PermissionConstants.ENROLL_CERT)) {
-            throw new OperationException(NOT_PERMITTED, "ENROLL_CERT is not allowed");
-          }
-
-          if (!requestor.isCertprofilePermitted(profile)) {
-            throw new OperationException(NOT_PERMITTED, "certprofile " + profile + " is not allowed");
-          }
-
-          CertificationRequest csr = CertificationRequest.getInstance(X509Util.toDerEncoded(request));
-          if (!CMD_serverkeygen.equals(command)) {
-            if (!GatewayUtil.verifyCsr(csr, securityFactory, popControl)) {
-              throw new OperationException(BAD_POP);
-            }
-          }
-
-          if (CMD_simplereenroll.equals(command)) {
-            respContent = reenrollCert(caName, profile, requestor, csr, httpRetriever, event);
-          } else {
-            respContent = enrollCert(command, caName, profile, requestor, csr, httpRetriever, event);
-          }
-          break;
-        }
-        case CMD_csrattrs: {
-          respContent = getCsrAttrs(caName, profile, requestor);
-          break;
-        }
-        case CMD_fullcmc: {
-          String message = "supported command '" + command + "'";
-          LOG.error(message);
-          throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
-        }
-        default: {
-          String message = "invalid command '" + command + "'";
-          LOG.error(message);
-          throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
-        }
-      }
-
-      if (respContent == null) {
-        return new RestResponse(OK, null, null, null);
+      if (CMD_simplereenroll.equals(command) || CMD_usimplereenroll.equals(command)) {
+        respContent = reenrollCert(command, caName, profile, requestor, csr, httpRetriever, event);
       } else {
-        return new RestResponse(OK, respContent.getContentType(), null,
-            respContent.isBase64(), respContent.getContent());
+        respContent = enrollCert(command, caName, profile, requestor, csr, httpRetriever, event);
       }
+
+      return toRestResponse(respContent);
     } catch (OperationException ex) {
       ErrorCode code = ex.getErrorCode();
       if (LOG.isWarnEnabled()) {
@@ -406,11 +437,22 @@ public class EstResponder {
     }
   } // method service
 
+  private RestResponse toRestResponse(HttpRespContent respContent) {
+    if (respContent == null) {
+      return new RestResponse(OK, null, null, null);
+    } else {
+      return new RestResponse(OK, respContent.getContentType(), null,
+          respContent.isBase64(), respContent.getContent());
+    }
+  }
+
   private HttpRespContent enrollCert(
       String command, String caName, String profile, Requestor requestor, CertificationRequest csr,
       HttpRequestMetadataRetriever httpRetriever, AuditEvent event)
       throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
-    boolean caGenKeyPair = CMD_serverkeygen.equals(command);
+    boolean caGenKeyPair  = CMD_serverkeygen.equals(command)  || CMD_userverkeygen.equals(command);
+    boolean returnRawCert = CMD_usimpleenroll.equals(command) || CMD_userverkeygen.equals(command);
+
     CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
     X500Name subject = certTemp.getSubject();
 
@@ -453,7 +495,11 @@ public class EstResponder {
 
     EnrollOrPullCertResponseEntry entry = getEntry(sdkResp.getEntries(), reqId);
     if (!caGenKeyPair) {
-      return HttpRespContent.ofOk(CT_pkcs7_mime_certyonly, true, buildCertsOnly(entry.getCert()));
+      if (returnRawCert) {
+        return HttpRespContent.ofOk(CT_pkix_cert, true, entry.getCert());
+      } else {
+        return HttpRespContent.ofOk(CT_pkcs7_mime_certyonly, true, buildCertsOnly(entry.getCert()));
+      }
     }
 
     byte[] t = new byte[9]; // length must be multiple of 3
@@ -466,32 +512,35 @@ public class EstResponder {
     writeLine(bo, "XiPKI EST server");
 
     // private key
-    bo.write(boundaryBytes);
-    bo.write(NEWLINE);
-    writeLine(bo, "Content-Type: application/pkcs8");
-    writeLine(bo, "Content-Transfer-Encoding: base64");
-    bo.write(NEWLINE);
-    bo.write(Base64.encodeToByte(entry.getPrivateKey(), true));
-    bo.write(NEWLINE);
+    writeMultipartEntry(bo, boundaryBytes, CT_pkcs8, entry.getPrivateKey());
 
     // certificate
-    bo.write(boundaryBytes);
-    bo.write(NEWLINE);
-    writeLine(bo, "Content-Type: " + CT_pkcs7_mime_certyonly);
-    writeLine(bo, "Content-Transfer-Encoding: base64");
-    bo.write(NEWLINE);
-    bo.write(Base64.encodeToByte(buildCertsOnly(entry.getCert()), true));
-    bo.write(NEWLINE);
+    String ct = returnRawCert ? CT_pkix_cert : CT_pkcs7_mime_certyonly;
+    byte[] certBytes = returnRawCert ? entry.getCert() : buildCertsOnly(entry.getCert());
+    writeMultipartEntry(bo, boundaryBytes, ct, certBytes);
+
+    // finalize the multipart
     bo.write(boundaryBytes);
     bo.write('-');
     bo.write('-');
     bo.write(NEWLINE);
 
-    return HttpRespContent.ofOk("multipart/mixed; boundary=" + boundary, false, bo.toByteArray());
+    return HttpRespContent.ofOk(CT_multipart_mixed + "; boundary=" + boundary, false, bo.toByteArray());
+  } // method enrollCert
+
+  private static void writeMultipartEntry(OutputStream os, byte[] boundaryBytes, String ct, byte[] data)
+      throws IOException {
+    os.write(boundaryBytes);
+    os.write(NEWLINE);
+    writeLine(os, "Content-Type: " + ct);
+    writeLine(os, "Content-Transfer-Encoding: base64");
+    os.write(NEWLINE);
+    os.write(Base64.encodeToByte(data, true));
+    os.write(NEWLINE);
   }
 
   private HttpRespContent reenrollCert(
-      String caName, String profile, Requestor requestor, CertificationRequest csr,
+      String command, String caName, String profile, Requestor requestor, CertificationRequest csr,
       HttpRequestMetadataRetriever httpRetriever, AuditEvent event)
       throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
     CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
@@ -621,10 +670,14 @@ public class EstResponder {
     checkResponse(1, sdkResp);
 
     EnrollOrPullCertResponseEntry entry = getEntry(sdkResp.getEntries(), reqId);
-    return HttpRespContent.ofOk(CT_pkcs7_mime_certyonly, true, buildCertsOnly(entry.getCert()));
-  }
+    if (CMD_simplereenroll.equals(command)) {
+      return HttpRespContent.ofOk(CT_pkcs7_mime_certyonly, true, buildCertsOnly(entry.getCert()));
+    } else { // CMD_usimplereenroll
+      return HttpRespContent.ofOk(CT_pkix_cert, true, entry.getCert());
+    }
+  } // method reenrollCert
 
-  private HttpRespContent getCsrAttrs(String caName, String profile, Requestor requestor)
+  private HttpRespContent getCsrAttrs(String caName, String profile)
       throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
     CertprofileInfoResponse sdkResp = sdk.profileInfo(caName, profile);
     ASN1EncodableVector csrAttrs = new ASN1EncodableVector();
@@ -658,7 +711,7 @@ public class EstResponder {
     }
 
     ASN1Sequence seq = new DERSequence(csrAttrs);
-    return HttpRespContent.ofOk("application/csrattrs", true, seq.getEncoded("DER"));
+    return HttpRespContent.ofOk(CT_csrattrs, true, seq.getEncoded("DER"));
   }
 
   private static void checkResponse(int expectedSize, EnrollOrPollCertsResponse resp)
