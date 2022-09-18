@@ -37,8 +37,7 @@ public class ScepProxyConf extends ProtocolProxyConf {
 
   private ScepControl scep;
 
-  public static ScepProxyConf readConfFromFile(String fileName)
-      throws IOException, InvalidConfException {
+  public static ScepProxyConf readConfFromFile(String fileName) throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");
     try (InputStream is = Files.newInputStream(Paths.get(fileName))) {
       ScepProxyConf conf = JSON.parseObject(is, ScepProxyConf.class);

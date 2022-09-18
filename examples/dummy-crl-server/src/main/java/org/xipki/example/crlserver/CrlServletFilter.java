@@ -25,6 +25,7 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 import org.xipki.util.XipkiBaseDir;
 
 import javax.servlet.*;
@@ -83,7 +84,7 @@ public class CrlServletFilter implements Filter {
     String hashalgo = req.getParameter("hashalgo");
     String caName = req.getParameter("name");
     String type = req.getParameter("type");
-    if (!("crl".equalsIgnoreCase(type) || "deltacrl".equalsIgnoreCase(type))) {
+    if (!StringUtil.orEqualsIgnoreCase(type, "crl", "deltacrl")) {
       LOG.warn("Type {} is not in the supported types [crl, deltacrl]", type);
       sendError(resp, HttpServletResponse.SC_NOT_FOUND);
       return;
@@ -92,7 +93,7 @@ public class CrlServletFilter implements Filter {
     if (hashalgo == null) {
       LOG.info("GET CRL for CA {}", caName);
     } else {
-      if ("sha1".equalsIgnoreCase(hashalgo) || "sha-1".equalsIgnoreCase(hashalgo)) {
+      if (StringUtil.orEqualsIgnoreCase(hashalgo, "sha1", "sha-1")) {
         LOG.info("Get {} hash value for CA {}", hashalgo, caName);
       } else {
         LOG.warn("Unknown hashalgo  {}", hashalgo);

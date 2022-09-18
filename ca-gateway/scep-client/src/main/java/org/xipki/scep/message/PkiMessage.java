@@ -33,6 +33,7 @@ import org.xipki.scep.util.ScepUtil;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 
 import java.io.IOException;
 import java.security.PrivateKey;
@@ -50,7 +51,7 @@ import java.util.Set;
 
 public class PkiMessage {
 
-  private static final Set<ASN1ObjectIdentifier> SCEP_ATTR_TYPES = new HashSet<>();
+  private static final Set<ASN1ObjectIdentifier> SCEP_ATTR_TYPES;
 
   private final Map<ASN1ObjectIdentifier, ASN1Encodable> signedAttributes = new HashMap<>();
 
@@ -73,14 +74,11 @@ public class PkiMessage {
   private ASN1Encodable messageData;
 
   static {
-    SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_FAILINFO);
-    SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_MESSAGE_TYPE);
-    SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_PKI_STATUS);
-    SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_RECIPIENT_NONCE);
-    SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_SENDER_NONCE);
-    SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_TRANSACTION_ID);
-    SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_SCEP_FAILINFOTEXT);
-    SCEP_ATTR_TYPES.add(CMSAttributes.signingTime);
+    SCEP_ATTR_TYPES = CollectionUtil.asSet(
+        ScepObjectIdentifiers.ID_FAILINFO, ScepObjectIdentifiers.ID_MESSAGE_TYPE,
+        ScepObjectIdentifiers.ID_PKI_STATUS, ScepObjectIdentifiers.ID_RECIPIENT_NONCE,
+        ScepObjectIdentifiers.ID_SENDER_NONCE, ScepObjectIdentifiers.ID_TRANSACTION_ID,
+        ScepObjectIdentifiers.ID_SCEP_FAILINFOTEXT, CMSAttributes.signingTime);
   }
 
   public PkiMessage(TransactionId transactionId, MessageType messageType) {
@@ -238,9 +236,8 @@ public class PkiMessage {
     return encode(signer, signerCert, signerCertSet, recipientCert, encAlgId);
   } // method encode
 
-  public ContentInfo encode(
-      ContentSigner signer, X509Cert signerCert, X509Cert[] cmsCertSet,
-      X509Cert recipientCert, ASN1ObjectIdentifier encAlgId)
+  public ContentInfo encode(ContentSigner signer, X509Cert signerCert, X509Cert[] cmsCertSet,
+                            X509Cert recipientCert, ASN1ObjectIdentifier encAlgId)
       throws MessageEncodingException {
     Args.notNull(signer, "signer");
     Args.notNull(signerCert, "signerCert");
@@ -311,8 +308,7 @@ public class PkiMessage {
 
     CMSEnvelopedDataGenerator edGenerator = new CMSEnvelopedDataGenerator();
     CMSTypedData envelopable = new CMSProcessableByteArray(messageDataBytes);
-    RecipientInfoGenerator recipientGenerator =
-        new KeyTransRecipientInfoGenerator(
+    RecipientInfoGenerator recipientGenerator = new KeyTransRecipientInfoGenerator(
             new IssuerAndSerialNumber(recipient.getIssuer(), recipient.getSerialNumber()),
             new JceAsymmetricKeyWrapper(recipient.getPublicKey())) {};
 

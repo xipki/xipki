@@ -25,6 +25,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.util.Args;
+import org.xipki.util.Base64;
 import org.xipki.util.Curl.CurlResult;
 import org.xipki.util.FileUtils;
 import org.xipki.util.IoUtil;
@@ -162,8 +163,7 @@ public class Actions {
       return null;
     }
 
-    private void copyFile(File sourceFile, File destFile)
-        throws IllegalCmdParamException, IOException {
+    private void copyFile(File sourceFile, File destFile) throws IllegalCmdParamException, IOException {
       if (destFile.exists()) {
         if (!destFile.isFile()) {
           throw new IllegalCmdParamException("cannot override an existing directory by a file");
@@ -198,7 +198,7 @@ public class Actions {
 
   @Command(scope = "xi", name = "base64", description = "Base64 encode / decode")
   @Service
-  public static class Base64 extends XiAction {
+  public static class Base64EnDecode extends XiAction {
 
     @Option(name = "--decode", aliases = "-d", description = "Decode")
     private boolean decode = false;
@@ -226,12 +226,7 @@ public class Actions {
       }
 
       byte[] sourceBytes = IoUtil.read(sourceFile);
-      byte[] targetBytes;
-      if (decode) {
-        targetBytes = org.xipki.util.Base64.decode(sourceBytes);
-      } else {
-        targetBytes = org.xipki.util.Base64.encodeToByte(sourceBytes, true);
-      }
+      byte[] targetBytes = decode ? Base64.decode(sourceBytes) : Base64.encodeToByte(sourceBytes, true);
       IoUtil.save(dest, targetBytes);
       return null;
     }
@@ -307,16 +302,12 @@ public class Actions {
       if (base64) {
         headerNameValues.put("Content-Transfer-Encoding", "base64");
         if (content != null) {
-          content = org.xipki.util.Base64.encodeToByte(content, true);
+          content = Base64.encodeToByte(content, true);
         }
       }
 
-      CurlResult result;
-      if (usePost) {
-        result = curl.curlPost(url, verbose, headerNameValues, userPassword, content);
-      } else {
-        result = curl.curlGet(url, verbose, headerNameValues, userPassword);
-      }
+      CurlResult result = usePost ? curl.curlPost(url, verbose, headerNameValues, userPassword, content)
+          : curl.curlGet(url, verbose, headerNameValues, userPassword);
 
       if (result.getContent() == null && result.getErrorContent() == null) {
         println("NO response content");
@@ -548,8 +539,7 @@ public class Actions {
 
       if (changed) {
         File newFile = new File(file.getPath() + "-new");
-        byte[] newBytes = writer.toByteArray();
-        IoUtil.save(file, newBytes);
+        IoUtil.save(newFile, writer.toByteArray());
         newFile.renameTo(file);
       }
     }
@@ -611,8 +601,7 @@ public class Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      SimpleDateFormat sdf = new SimpleDateFormat(format);
-      return sdf.format(new Date());
+      return new SimpleDateFormat(format).format(new Date());
     }
   }
 

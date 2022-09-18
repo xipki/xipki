@@ -129,9 +129,8 @@ public class ScepResponder {
 
   private final CaNameScepSigners signers;
 
-  public ScepResponder(
-      ScepControl control, SdkClient sdk, SecurityFactory securityFactory,
-      CaNameScepSigners signers, RequestorAuthenticator authenticator, PopControl popControl) {
+  public ScepResponder(ScepControl control, SdkClient sdk, SecurityFactory securityFactory, CaNameScepSigners signers,
+                       RequestorAuthenticator authenticator, PopControl popControl) {
     this.control = notNull(control, "control");
     this.sdk = notNull(sdk, "sdk");
     this.securityFactory = notNull(securityFactory, "securityFactory");
@@ -292,15 +291,7 @@ public class ScepResponder {
       }
       ret = new RestResponse(HttpServletResponse.SC_OK, contentType, null, respBody);
     } catch (Throwable th) {
-      if (th instanceof EOFException) {
-        final String msg = "connection reset by peer";
-        if (LOG.isWarnEnabled()) {
-          LogUtil.warn(LOG, th, msg);
-        }
-        LOG.debug(msg, th);
-      } else {
-        LOG.error("Throwable thrown, this should not happen!", th);
-      }
+      LOG.error("Throwable thrown, this should not happen!", th);
 
       auditLevel = AuditLevel.ERROR;
       auditStatus = AuditStatus.FAILED;
@@ -336,8 +327,7 @@ public class ScepResponder {
     GatewayUtil.logAuditEvent(LOG, event);
   } // method audit
 
-  private byte[] getCaCertResp(String caName)
-      throws OperationException, SdkErrorResponseException {
+  private byte[] getCaCertResp(String caName) throws OperationException, SdkErrorResponseException {
     try {
       ScepSigner signer = signers.getSigner(caName);
       if (signer == null) {

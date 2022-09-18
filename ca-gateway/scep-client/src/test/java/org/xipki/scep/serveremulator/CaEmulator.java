@@ -174,13 +174,11 @@ public class CaEmulator {
   }
 
   public X509Cert pollCert(X500Name issuer, X500Name subject) {
-    Args.notNull(issuer, "issuer");
-    Args.notNull(subject, "subject");
-    if (!caSubject.equals(issuer)) {
+    if (!caSubject.equals(Args.notNull(issuer, "issuer"))) {
       return null;
     }
 
-    return reqSubjectCertMap.get(subject);
+    return reqSubjectCertMap.get(Args.notNull(subject, "subject"));
   }
 
   public synchronized CertificateList getCrl(X500Name issuer, BigInteger serialNumber)
@@ -229,18 +227,14 @@ public class CaEmulator {
 
     BcContentVerifierProviderBuilder builder = VERIFIER_PROVIDER_BUILDER.get(keyAlg);
     if (builder == null) {
-      switch (keyAlg) {
-        case "RSA":
-          builder = new BcRSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
-          break;
-        case "DSA":
-          builder = new BcDSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
-          break;
-        case "ECDSA":
-          builder = new BcECContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
-          break;
-        default:
-          throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
+      if ("RSA".equals(keyAlg)) {
+        builder = new BcRSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
+      } else if ("DSA".equals(keyAlg)) {
+        builder = new BcDSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
+      } else if ("ECDSA".equals(keyAlg)) {
+        builder = new BcECContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
+      } else {
+        throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
       }
       VERIFIER_PROVIDER_BUILDER.put(keyAlg, builder);
     }
@@ -253,8 +247,7 @@ public class CaEmulator {
     }
   } // method getContentVerifierProvider
 
-  private static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)
-      throws InvalidKeySpecException {
+  private static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo) throws InvalidKeySpecException {
     Args.notNull(pkInfo, "pkInfo");
 
     X509EncodedKeySpec keyspec;
@@ -286,8 +279,7 @@ public class CaEmulator {
     return kf.generatePublic(keyspec);
   } // method generatePublicKey
 
-  private static AsymmetricKeyParameter generatePublicKeyParameter(PublicKey key)
-      throws InvalidKeyException {
+  private static AsymmetricKeyParameter generatePublicKeyParameter(PublicKey key) throws InvalidKeyException {
     Args.notNull(key, "key");
 
     if (key instanceof RSAPublicKey) {

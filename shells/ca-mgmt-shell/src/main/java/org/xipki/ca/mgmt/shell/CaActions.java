@@ -248,7 +248,7 @@ public class CaActions {
         throw new IllegalCmdParamException("invalid expirationPeriod: " + expirationPeriod);
       }
 
-      if ("PKCS12".equalsIgnoreCase(signerType) || "JCEKS".equalsIgnoreCase(signerType)) {
+      if (StringUtil.orEqualsIgnoreCase(signerType, "PKCS12", "JCEKS")) {
         signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, securityFactory);
       }
 

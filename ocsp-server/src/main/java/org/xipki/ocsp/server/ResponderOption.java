@@ -17,6 +17,7 @@
 
 package org.xipki.ocsp.server;
 
+import org.xipki.util.StringUtil;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.ArrayList;
@@ -58,9 +59,9 @@ class ResponderOption {
   ResponderOption(OcspServerConf.Responder conf) throws InvalidConfException {
     notNull(conf, "conf");
     String str = conf.getMode();
-    if (str == null || "RFC6960".equalsIgnoreCase(str) || "RFC 6960".equalsIgnoreCase(str)) {
+    if (str == null || StringUtil.orEqualsIgnoreCase(str, "RFC6960", "RFC 6960")) {
       this.mode = OcspMode.RFC6960;
-    } else if ("RFC2560".equalsIgnoreCase(str) || "RFC 2560".equals(str)) {
+    } else if (StringUtil.orEqualsIgnoreCase(str, "RFC2560", "RFC 2560")) {
       this.mode = OcspMode.RFC2560;
     } else {
       throw new InvalidConfException("invalid OCSP mode '" + str + "'");

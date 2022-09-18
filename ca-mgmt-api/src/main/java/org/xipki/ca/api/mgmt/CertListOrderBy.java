@@ -17,6 +17,8 @@
 
 package org.xipki.ca.api.mgmt;
 
+import org.xipki.util.StringUtil;
+
 /**
  * The mode to sort the certificates.
  *
@@ -45,7 +47,7 @@ public enum CertListOrderBy {
 
   public static CertListOrderBy forValue(String value) {
     for (CertListOrderBy m : values()) {
-      if (m.name().equalsIgnoreCase(value) || m.text.equalsIgnoreCase(value)) {
+      if (StringUtil.orEqualsIgnoreCase(value, m.name(), m.text)) {
         return m;
       }
     }

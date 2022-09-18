@@ -237,8 +237,7 @@ public class Actions {
 
           sns.add(sn);
 
-          byte[] encodedCert = IoUtil.read(certFile);
-          encodedCerts.put(sn, encodedCert);
+          encodedCerts.put(sn, IoUtil.read(certFile));
         } // end for
 
         if (isBlank(serverUrl)) {
@@ -316,21 +315,14 @@ public class Actions {
 
     public static List<String> extractOcspUrls(X509Cert cert) {
       byte[] extnValue = cert.getExtensionCoreValue(Extension.authorityInfoAccess);
-      if (extnValue == null) {
-        return Collections.emptyList();
-      }
-
-      AuthorityInformationAccess aia = AuthorityInformationAccess.getInstance(extnValue);
-      return extractOcspUrls(aia);
+      return (extnValue == null) ? Collections.emptyList()
+          : extractOcspUrls(AuthorityInformationAccess.getInstance(extnValue));
     } // method extractOcspUrls
 
     public static List<String> extractOcspUrls(X509AttributeCertificateHolder cert) {
       byte[] extValue = X509Util.getCoreExtValue(cert.getExtensions(), Extension.authorityInfoAccess);
-      if (extValue == null) {
-        return Collections.emptyList();
-      }
-      AuthorityInformationAccess aia = AuthorityInformationAccess.getInstance(extValue);
-      return extractOcspUrls(aia);
+      return (extValue == null) ? Collections.emptyList()
+          : extractOcspUrls(AuthorityInformationAccess.getInstance(extValue));
     } // method extractOcspUrls
 
     public static List<String> extractOcspUrls(AuthorityInformationAccess aia) {
@@ -347,8 +339,7 @@ public class Actions {
       for (AccessDescription ocspAccessDescription : ocspAccessDescriptions) {
         GeneralName accessLocation = ocspAccessDescription.getAccessLocation();
         if (accessLocation.getTagNo() == GeneralName.uniformResourceIdentifier) {
-          String ocspUri = ((ASN1String) accessLocation.getName()).getString();
-          ocspUris.add(ocspUri);
+          ocspUris.add(((ASN1String) accessLocation.getName()).getString());
         }
       }
 

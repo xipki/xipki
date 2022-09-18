@@ -166,7 +166,7 @@ public class X509ExtensionType extends ValidatableConf {
       } else {
         this.type = null;
         for (FieldType m : FieldType.values()) {
-          if (m.name().equalsIgnoreCase(text) || m.getText().equalsIgnoreCase(text)) {
+          if (StringUtil.orEqualsIgnoreCase(text, m.name(), m.getText())) {
             this.type = m;
           }
         }

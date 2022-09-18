@@ -211,12 +211,8 @@ public class Actions {
         inKs.load(inStream, inPassword);
       }
 
-      char[] outPassword;
-      if ("PEM".equalsIgnoreCase(outType) && "NONE".equalsIgnoreCase(outPwd)) {
-        outPassword = null;
-      } else {
-        outPassword = readPasswordIfNotSet("password of the destination keystore", outPwd);
-      }
+      char[] outPassword = ("PEM".equalsIgnoreCase(outType) && "NONE".equalsIgnoreCase(outPwd)) ? null
+          : readPasswordIfNotSet("password of the destination keystore", outPwd);
 
       OutputEncryptor pemOe = null;
       if ("PEM".equalsIgnoreCase(outType) && outPassword != null) {
@@ -471,8 +467,7 @@ public class Actions {
      */
     protected abstract ConcurrentContentSigner getSigner() throws Exception;
 
-    protected List<X509Cert> getPeerCertificates()
-        throws CertificateException, IOException {
+    protected List<X509Cert> getPeerCertificates() throws CertificateException, IOException {
       if (StringUtil.isNotBlank(peerCertsFile)) {
         return X509Util.parseCerts(Files.newInputStream(Paths.get(peerCertsFile)));
       } else if (StringUtil.isNotBlank(peerCertFile)) {
@@ -510,18 +505,10 @@ public class Actions {
         Extensions certExtns = cert.getTBSCertificate().getExtensions();
 
         List<ASN1ObjectIdentifier> excludeOids = Arrays.asList(
-            Extension.authorityKeyIdentifier,
-            Extension.authorityInfoAccess,
-            Extension.certificateIssuer,
-            Extension.certificatePolicies,
-            Extension.cRLDistributionPoints,
-            Extension.freshestCRL,
-            Extension.nameConstraints,
-            Extension.policyMappings,
-            Extension.policyConstraints,
-            Extension.certificatePolicies,
-            Extension.subjectInfoAccess,
-            Extension.subjectDirectoryAttributes);
+            Extension.authorityKeyIdentifier, Extension.authorityInfoAccess,   Extension.certificateIssuer,
+            Extension.certificatePolicies,    Extension.cRLDistributionPoints, Extension.freshestCRL,
+            Extension.nameConstraints,        Extension.policyMappings,        Extension.policyConstraints,
+            Extension.certificatePolicies,    Extension.subjectInfoAccess,     Extension.subjectDirectoryAttributes);
 
         for (ASN1ObjectIdentifier certExtnOid : certExtns.getExtensionOIDs()) {
           if (!excludeOids.contains(certExtnOid)) {
@@ -630,16 +617,13 @@ public class Actions {
         if (biometricUri != null) {
           tmpSourceDataUri = new DERIA5String(biometricUri);
         }
-        BiometricData biometricData = new BiometricData(tmpBiometricType,
-                tmpBiometricHashAlgo.getAlgorithmIdentifier(),
+        BiometricData biometricData = new BiometricData(tmpBiometricType, tmpBiometricHashAlgo.getAlgorithmIdentifier(),
                 new DEROctetString(tmpBiometricDataHash), tmpSourceDataUri);
 
         ASN1EncodableVector vec = new ASN1EncodableVector();
         vec.add(biometricData);
 
-        ASN1ObjectIdentifier extType = Extension.biometricInfo;
-        ASN1Sequence extValue = new DERSequence(vec);
-        extensions.add(new Extension(extType, false, extValue.getEncoded()));
+        extensions.add(new Extension(Extension.biometricInfo, false, new DERSequence(vec).getEncoded()));
       } else if (biometricType == null && biometricHashAlgo == null && biometricFile == null) {
         // Do nothing
       } else {
@@ -696,9 +680,7 @@ public class Actions {
           if (rdns == null || rdns.length == 0) {
             Date date = DateUtil.parseUtcTimeyyyyMMdd(dateOfBirth);
             date = new Date(date.getTime() + _12_HOURS_MS);
-            ASN1Encodable atvValue = new DERGeneralizedTime(DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z");
-            RDN rdn = new RDN(id, atvValue);
-            list.add(rdn);
+            list.add(new RDN(id, new DERGeneralizedTime(DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z")));
           }
         }
 
@@ -713,9 +695,7 @@ public class Actions {
             }
 
             if (vec.size() > 0) {
-              ASN1Sequence atvValue = new DERSequence(vec);
-              RDN rdn = new RDN(id, atvValue);
-              list.add(rdn);
+              list.add(new RDN(id, new DERSequence(vec)));
             }
           }
         }
@@ -788,8 +768,7 @@ public class Actions {
       return Collections.emptyList();
     }
 
-    protected List<Extension> getAdditionalExtensions()
-            throws BadInputException {
+    protected List<Extension> getAdditionalExtensions() throws BadInputException {
       return Collections.emptyList();
     }
 
@@ -827,8 +806,7 @@ public class Actions {
       }
 
       if (StringUtil.isNotBlank(challengePassword)) {
-        attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword,
-            new DERPrintableString(challengePassword));
+        attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword, new DERPrintableString(challengePassword));
       }
 
       PKCS10CertificationRequestBuilder csrBuilder =
@@ -895,12 +873,7 @@ public class Actions {
           return null;
         }
 
-        String requiredKeyAlg;
-        if (Xipki.id_alg_dhPop_x25519.equals(algOid)) {
-          requiredKeyAlg = EdECConstants.X25519;
-        } else {
-          requiredKeyAlg = EdECConstants.X448;
-        }
+        String requiredKeyAlg = Xipki.id_alg_dhPop_x25519.equals(algOid) ? EdECConstants.X25519 : EdECConstants.X448;
 
         char[] password = keystorePassword.toCharArray();
         KeyStore ks = KeyUtil.getInKeyStore(keystoreType);
@@ -918,8 +891,8 @@ public class Actions {
 
             PrivateKey key = (PrivateKey) ks.getKey(alias, password);
             if (key.getAlgorithm().equalsIgnoreCase(requiredKeyAlg)) {
-              X509Cert cert = new X509Cert((X509Certificate) ks.getCertificate(alias));
-              peerKeyAndCert = new DHSigStaticKeyCertPair(key, cert);
+              peerKeyAndCert = new DHSigStaticKeyCertPair(key,
+                  new X509Cert((X509Certificate) ks.getCertificate(alias)));
               break;
             }
           }
@@ -933,9 +906,8 @@ public class Actions {
       }
 
       boolean bo = securityFactory.verifyPop(csr, null, peerKeyAndCert);
-      String txt = bo ? "valid" : "invalid";
       SignAlgo signAlgo = SignAlgo.getInstance(csr.getSignatureAlgorithm());
-      println("The POP is " + txt + " (signature algorithm " + signAlgo.getJceName() + ").");
+      println("The POP is " + (bo ? "" : "in") + "valid (signature algorithm " + signAlgo.getJceName() + ").");
       return null;
     }
 
@@ -1049,9 +1021,9 @@ public class Actions {
     @Override
     protected Object execute0() throws Exception {
       try (BufferedReader reader = new BufferedReader(new FileReader(IoUtil.expandFilepath(estRespFile)))) {
-        String bounary = null;
+        String boundary = null;
 
-        // detect the bounary
+        // detect the boundary
         String line;
         while (true) {
           line = reader.readLine();
@@ -1060,21 +1032,21 @@ public class Actions {
           }
 
           if (line.startsWith("--")) {
-            bounary = line;
+            boundary = line;
             break;
           }
         }
 
-        if (bounary == null) {
+        if (boundary == null) {
           throw new IOException("found no boundary");
         }
 
-        Object[] blockInfo1 = readBlock(reader, bounary);
+        Object[] blockInfo1 = readBlock(reader, boundary);
         if ((boolean) blockInfo1[0]) {
           throw new IOException("2 blocks is expected, found only 1");
         }
 
-        Object[] blockInfo2 = readBlock(reader, bounary);
+        Object[] blockInfo2 = readBlock(reader, boundary);
         if (!(boolean) blockInfo2[0]) {
           throw new IOException("2 blocks is expected, found more than 2");
         }
@@ -1186,8 +1158,7 @@ public class Actions {
 
   } // class SecurityAction
 
-  private static byte[] extractCertFromSignedData(byte[] cmsBytes)
-      throws CmdFailure, IOException {
+  private static byte[] extractCertFromSignedData(byte[] cmsBytes) throws CmdFailure, IOException {
     ContentInfo ci = ContentInfo.getInstance(X509Util.toDerEncoded(cmsBytes));
     SignedData sd = SignedData.getInstance(ci.getContent());
     ASN1Set certs = sd.getCertificates();

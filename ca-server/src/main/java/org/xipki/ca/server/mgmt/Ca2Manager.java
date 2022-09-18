@@ -576,7 +576,7 @@ class Ca2Manager {
     String signerConf = result.getSignerConf();
     X509Cert caCert = result.getCert();
 
-    if ("PKCS12".equalsIgnoreCase(signerType) || "JCEKS".equalsIgnoreCase(signerType)) {
+    if (StringUtil.orEqualsIgnoreCase(signerType, "PKCS12", "JCEKS")) {
       try {
         signerConf = canonicalizeSignerConf(signerConf);
       } catch (Exception ex) {

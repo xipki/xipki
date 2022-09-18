@@ -56,8 +56,7 @@ public class ScepUtil {
   /*
    * The first one is a non-CA certificate if there exists one non-CA certificate.
    */
-  public static List<X509Cert> getCertsFromSignedData(SignedData signedData)
-      throws CertificateException {
+  public static List<X509Cert> getCertsFromSignedData(SignedData signedData) throws CertificateException {
     Args.notNull(signedData, "signedData");
     ASN1Set set = signedData.getCertificates();
     if (set == null) {
@@ -94,10 +93,8 @@ public class ScepUtil {
     return certs;
   } // method getCertsFromSignedData
 
-  public static X509CRLHolder getCrlFromPkiMessage(SignedData signedData)
-      throws CRLException {
-    Args.notNull(signedData, "signedData");
-    ASN1Set set = signedData.getCRLs();
+  public static X509CRLHolder getCrlFromPkiMessage(SignedData signedData) throws CRLException {
+    ASN1Set set = Args.notNull(signedData, "signedData").getCRLs();
     if (set == null || set.size() == 0) {
       return null;
     }
@@ -110,8 +107,7 @@ public class ScepUtil {
     }
   } // method getCrlFromPkiMessage
 
-  public static String getSignatureAlgName(Key key, HashAlgo hashAlgo)
-      throws NoSuchAlgorithmException {
+  public static String getSignatureAlgName(Key key, HashAlgo hashAlgo) throws NoSuchAlgorithmException {
     return SignAlgo.getInstance(key, hashAlgo, null).getJceName();
   }
 

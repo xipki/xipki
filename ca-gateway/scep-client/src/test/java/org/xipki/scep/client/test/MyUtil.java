@@ -127,8 +127,7 @@ public class MyUtil {
 
   public static X509Cert generateSelfsignedCert(CertificationRequest csr, PrivateKey identityKey)
       throws CertificateException {
-    Args.notNull(csr, "csr");
-    return generateSelfsignedCert(csr.getCertificationRequestInfo().getSubject(),
+    return generateSelfsignedCert(Args.notNull(csr, "csr").getCertificationRequestInfo().getSubject(),
         csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(), identityKey);
   }
 

@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.scep.message.CaCaps;
 import org.xipki.scep.message.MessageDecodingException;
 import org.xipki.scep.message.NextCaMessage;
-import org.xipki.scep.serveremulator.AuditEvent.AuditLevel;
 import org.xipki.scep.transaction.Operation;
 import org.xipki.scep.util.ScepConstants;
 import org.xipki.security.X509Cert;
@@ -76,24 +75,17 @@ public class ScepServlet extends HttpServlet {
       return;
     }
 
-    AuditEvent event = new AuditEvent();
-    event.setName(AuditEvent.NAME_PERF);
-    event.putEventData(AuditEvent.NAME_servletPath, req.getServletPath());
-
-    AuditLevel auditLevel = AuditLevel.INFO;
     String auditMessage = null;
 
     try {
       CaCaps caCaps = responder.getCaCaps();
       if (post && !caCaps.supportsPost()) {
         auditMessage = "HTTP POST is not supported";
-        auditLevel = AuditLevel.ERROR;
         resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
         return;
       }
 
       String operation = req.getParameter("operation");
-      event.putEventData(AuditEvent.NAME_operation, operation);
 
       if ("PKIOperation".equalsIgnoreCase(operation)) {
         CMSSignedData reqMessage;
@@ -104,23 +96,20 @@ public class ScepServlet extends HttpServlet {
           reqMessage = new CMSSignedData(content);
         } catch (Exception ex) {
           auditMessage = "invalid request";
-          auditLevel = AuditLevel.ERROR;
           resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
           return;
         }
 
         ContentInfo ci;
         try {
-          ci = responder.servicePkiOperation(reqMessage, event);
+          ci = responder.servicePkiOperation(reqMessage);
         } catch (MessageDecodingException ex) {
           auditMessage = "could not decrypt and/or verify the request";
-          auditLevel = AuditLevel.ERROR;
           resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
           return;
         } catch (CaException ex) {
           ex.printStackTrace();
           auditMessage = "system internal error";
-          auditLevel = AuditLevel.ERROR;
           resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
           return;
         }
@@ -148,7 +137,6 @@ public class ScepServlet extends HttpServlet {
           } catch (CMSException ex) {
             ex.printStackTrace();
             auditMessage = "system internal error";
-            auditLevel = AuditLevel.ERROR;
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
           }
@@ -158,7 +146,6 @@ public class ScepServlet extends HttpServlet {
       } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation)) {
         if (responder.getNextCaAndRa() == null) {
           auditMessage = "SCEP operation '" + operation + "' is not permitted";
-          auditLevel = AuditLevel.ERROR;
           resp.sendError(HttpServletResponse.SC_FORBIDDEN);
           return;
         }
@@ -177,12 +164,10 @@ public class ScepServlet extends HttpServlet {
         } catch (Exception ex) {
           ex.printStackTrace();
           auditMessage = "system internal error";
-          auditLevel = AuditLevel.ERROR;
           resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
       } else {
         auditMessage = "unknown SCEP operation '" + operation + "'";
-        auditLevel = AuditLevel.ERROR;
         resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
       } // end if ("PKIOperation".equalsIgnoreCase(operation))
     } catch (EOFException ex) {
@@ -190,19 +175,12 @@ public class ScepServlet extends HttpServlet {
       resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     } catch (Throwable th) {
       LOG.error("Throwable thrown, this should not happen!", th);
-      auditLevel = AuditLevel.ERROR;
       auditMessage = "internal error";
       resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     } finally {
-      if (event.getLevel() != AuditLevel.ERROR) {
-        event.setLevel(auditLevel);
-      }
-
       if (auditMessage != null) {
-        event.putEventData("error", auditMessage);
+        LOG.error("error {}", auditMessage);
       }
-
-      event.log(LOG);
     } // end try
   } // method service
 

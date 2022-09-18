@@ -28,7 +28,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.util.ConfPairs;
 
 /**
- * Actions for PKCS#11 security.
+ * Actions for JCE device.
  *
  * @author Lijun Liao
  */

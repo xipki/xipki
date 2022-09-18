@@ -86,9 +86,7 @@ public interface CaCertValidator {
     public PreprovisionedCaCertValidator(X509Cert cert) {
       Args.notNull(cert, "cert");
       fpOfCerts = new HashSet<>(1);
-
-      String hexFp = HashAlgo.SHA256.hexHash(cert.getEncoded());
-      fpOfCerts.add(hexFp);
+      fpOfCerts.add(HashAlgo.SHA256.hexHash(cert.getEncoded()));
     }
 
     public PreprovisionedCaCertValidator(Set<X509Cert> certs) {
@@ -96,16 +94,13 @@ public interface CaCertValidator {
       fpOfCerts = new HashSet<>(certs.size());
 
       for (X509Cert m : certs) {
-        String hexFp = HashAlgo.SHA256.hexHash(m.getEncoded());
-        fpOfCerts.add(hexFp);
+        fpOfCerts.add(HashAlgo.SHA256.hexHash(m.getEncoded()));
       }
     }
 
     @Override
     public boolean isTrusted(X509Cert cert) {
-      Args.notNull(cert, "cert");
-
-      String hextFp = HashAlgo.SHA256.hexHash(cert.getEncoded());
+      String hextFp = HashAlgo.SHA256.hexHash(Args.notNull(cert, "cert").getEncoded());
       return fpOfCerts.contains(hextFp);
     }
 
@@ -136,8 +131,7 @@ public interface CaCertValidator {
 
     @Override
     public boolean isTrusted(X509Cert cert) {
-      Args.notNull(cert, "cert");
-      byte[] actual = hashAlgo.hash(cert.getEncoded());
+      byte[] actual = hashAlgo.hash(Args.notNull(cert, "cert").getEncoded());
 
       for (byte[] m : hashValues) {
         if (Arrays.equals(actual, m)) {

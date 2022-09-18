@@ -34,6 +34,7 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.LogUtil;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -174,10 +175,8 @@ public class DecodedNextCaMessage {
         }
       } // end if
     } catch (NoSuchAlgorithmException ex) {
-      String msg = ex.getMessage();
-      LOG.error(msg);
-      LOG.debug(msg, ex);
-      ret.setFailureMessage(msg);
+      LogUtil.error(LOG, ex);
+      ret.setFailureMessage(ex.getMessage());
       return ret;
     }
 
@@ -189,10 +188,9 @@ public class DecodedNextCaMessage {
     try {
       verifier = new JcaSimpleSignerInfoVerifierBuilder().build(signerCert);
     } catch (OperatorCreationException | CertificateException ex) {
-      final String msg = "could not build signature verifier: " + ex.getMessage();
-      LOG.error(msg);
-      LOG.debug(msg, ex);
-      ret.setFailureMessage(msg);
+      final String msg = "could not build signature verifier";
+      LogUtil.error(LOG, ex, msg);
+      ret.setFailureMessage(msg + ": " +  ex.getMessage());
       return ret;
     }
 
@@ -200,10 +198,9 @@ public class DecodedNextCaMessage {
     try {
       signatureValid = signerInfo.verify(verifier);
     } catch (CMSException ex) {
-      final String msg = "could not verify the signature: " + ex.getMessage();
-      LOG.error(msg);
-      LOG.debug(msg, ex);
-      ret.setFailureMessage(msg);
+      final String msg = "could not verify the signature";
+      LogUtil.error(LOG, ex, msg);
+      ret.setFailureMessage(msg + ": " +  ex.getMessage());
       return ret;
     }
 
@@ -230,10 +227,9 @@ public class DecodedNextCaMessage {
     try {
       certs = ScepUtil.getCertsFromSignedData(signedData);
     } catch (CertificateException ex) {
-      final String msg = "could not extract Certificates from the message: " + ex.getMessage();
-      LOG.error(msg);
-      LOG.debug(msg, ex);
-      ret.setFailureMessage(msg);
+      final String msg = "could not extract Certificates from the message";
+      LogUtil.error(LOG, ex, msg);
+      ret.setFailureMessage(msg + ": " +  ex.getMessage());
       return ret;
     }
 

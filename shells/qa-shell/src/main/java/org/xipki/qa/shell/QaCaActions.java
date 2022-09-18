@@ -76,8 +76,7 @@ public class QaCaActions {
 
     @Override
     protected Object execute0() throws Exception {
-      boolean succ = qaSystemManager.init();
-      if (succ) {
+      if (qaSystemManager.init()) {
         println("CA QA system initialized successfully");
       } else {
         println("CA QA system initialization failed");
@@ -735,8 +734,7 @@ public class QaCaActions {
 
   } // class SignerCheck
 
-  private static void assertTypeEquals(String desc, String ex, String is)
-      throws CmdFailure {
+  private static void assertTypeEquals(String desc, String ex, String is) throws CmdFailure {
     String tmpEx = ex;
     if (CaManager.NULL.equals(tmpEx)) {
       tmpEx = null;
@@ -748,8 +746,7 @@ public class QaCaActions {
     }
   } // method assertTypeEquals
 
-  private static void assertEquals(String desc, String ex, String is)
-      throws CmdFailure {
+  private static void assertEquals(String desc, String ex, String is) throws CmdFailure {
     String tmpEx = ex;
     if (CaManager.NULL.equals(tmpEx)) {
       tmpEx = null;
@@ -761,10 +758,8 @@ public class QaCaActions {
     }
   } // method assertEquals
 
-  private static void assertObjEquals(String desc, Object ex, Object is)
-      throws CmdFailure {
-    boolean bo = Objects.equals(ex, is);
-    if (!bo) {
+  private static void assertObjEquals(String desc, Object ex, Object is) throws CmdFailure {
+    if (!Objects.equals(ex, is)) {
       throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
     }
   } // method assertObjEquals
@@ -774,9 +769,7 @@ public class QaCaActions {
       return true;
     } else if (certBytes1 != null && certBytes2 != null) {
       try {
-        byte[] encoded1 = X509Util.parseCert(certBytes1).getEncoded();
-        byte[] encoded2 = X509Util.parseCert(certBytes2).getEncoded();
-        return Arrays.equals(encoded1, encoded2);
+        return Arrays.equals(X509Util.parseCert(certBytes1).getEncoded(), X509Util.parseCert(certBytes2).getEncoded());
       } catch (Exception ex) {
         return false;
       }

@@ -18,6 +18,7 @@
 package org.xipki.ca.api.profile;
 
 import org.xipki.util.LruCache;
+import org.xipki.util.StringUtil;
 
 import java.util.regex.Pattern;
 
@@ -84,15 +85,15 @@ public abstract class TextVadidator {
   public abstract String pattern();
 
   public static TextVadidator compile(String regex) {
-    if (":COUNTRY".equalsIgnoreCase(regex) || "COUNTRY".equalsIgnoreCase(regex)) {
+    if (StringUtil.orEqualsIgnoreCase(regex, ":COUNTRY", "COUNTRY")) {
       return COUNTRY;
-    } else if (":DATE_OF_BIRTH".equalsIgnoreCase(regex) || "DATE_OF_BIRTH".equalsIgnoreCase(regex)) {
+    } else if (StringUtil.orEqualsIgnoreCase(regex, ":DATE_OF_BIRTH", "DATE_OF_BIRTH")) {
       return DATE_OF_BIRTH;
-    } else if (":FQDN".equalsIgnoreCase(regex) || "FQDN".equalsIgnoreCase(regex)) {
+    } else if (StringUtil.orEqualsIgnoreCase(regex, ":FQDN", "FQDN")) {
       return FQDN;
-    } else if (":GENDER".equalsIgnoreCase(regex) || "GENDER".equalsIgnoreCase(regex)) {
+    } else if (StringUtil.orEqualsIgnoreCase(regex, ":GENDER", "GENDER")) {
       return GENDER;
-    } else if (":NUMBER".equalsIgnoreCase(regex) || "NUMBER".equalsIgnoreCase(regex)) {
+    } else if (StringUtil.orEqualsIgnoreCase(regex, ":NUMBER", "NUMBER")) {
       return NUMBER;
     } else {
       TextVadidator validator = cache.get(regex);

@@ -35,6 +35,7 @@ import org.bouncycastle.util.BigIntegers;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.EdECConstants;
 import org.xipki.util.CompareUtil;
+import org.xipki.util.StringUtil;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -82,7 +83,7 @@ public class KeyUtil {
 
   private static KeyStore getKeyStore(String storeType, String pkcs12Provider) throws KeyStoreException {
     notBlank(storeType, "storeType");
-    if ("PKCS12".equalsIgnoreCase(storeType) || "PKCS#12".equalsIgnoreCase(storeType)) {
+    if (StringUtil.orEqualsIgnoreCase(storeType, "PKCS12", "PKCS#12")) {
       try {
         return KeyStore.getInstance(storeType, pkcs12Provider);
       } catch (KeyStoreException | NoSuchProviderException ex) {

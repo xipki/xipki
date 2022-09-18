@@ -263,13 +263,7 @@ public class P11Actions {
       }
 
       if (qlen == null) {
-        if (plen <= 1024) {
-          qlen = 160;
-        } else if (plen <= 2048) {
-          qlen = 224;
-        } else {
-          qlen = 256;
-        }
+        qlen = (plen <= 1024) ? 160 : ((plen <= 2048) ? 224 : 256);
       }
 
       P11Slot slot = getSlot();
@@ -358,8 +352,7 @@ public class P11Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      P11ObjectIdentifier keyId = getObjectIdentifier(id, label);
-      return keyId != null;
+      return null != getObjectIdentifier(id, label);
     }
 
   } // class KeyExistsP11
@@ -633,8 +626,7 @@ public class P11Actions {
       return null;
     } // method execute0
 
-    protected char[] getPassword()
-        throws IOException {
+    protected char[] getPassword() throws IOException {
       char[] pwdInChar = readPasswordIfNotSet(password);
       if (pwdInChar != null) {
         password = new String(pwdInChar);
@@ -658,8 +650,7 @@ public class P11Actions {
     @Reference (optional = true)
     protected P11CryptServiceFactory p11CryptServiceFactory;
 
-    protected P11Slot getSlot()
-        throws XiSecurityException, P11TokenException, IllegalCmdParamException {
+    protected P11Slot getSlot() throws XiSecurityException, P11TokenException, IllegalCmdParamException {
       P11Module module = getP11Module(moduleName);
       P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
       return module.getSlot(slotId);
@@ -683,8 +674,7 @@ public class P11Actions {
       } else if (hexId == null && label != null) {
         objIdentifier = slot.getObjectId(null, label);
       } else {
-        throw new IllegalCmdParamException(
-            "exactly one of keyId or keyLabel should be specified");
+        throw new IllegalCmdParamException("exactly one of keyId or keyLabel should be specified");
       }
       return objIdentifier;
     }

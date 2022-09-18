@@ -69,13 +69,7 @@ public class QaFillKeypoolAction extends XiAction {
       throw new IllegalCmdParamException("invalid num " + num);
     }
 
-    char[] passwordChars;
-    if (password == null) {
-      passwordChars = readPassword();
-    } else {
-      passwordChars = password.toCharArray();
-    }
-
+    char[] passwordChars = (password == null) ? readPassword() : password.toCharArray();
     try (FillKeytool fillKeytool = new FillKeytool(datasourceFactory, passwordResolver, dbconfFile)) {
       fillKeytool.execute(num, encAlg, passwordChars);
     }

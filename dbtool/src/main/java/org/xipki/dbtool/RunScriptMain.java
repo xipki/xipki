@@ -139,7 +139,7 @@ public class RunScriptMain {
   private static boolean confirm(String command) {
     String prompt = "Do you wish to " + command + " the database (Yes/No)? ";
     String answer = IoUtil.readLineFromConsole(prompt);
-    return "yes".equalsIgnoreCase(answer) || "y".equalsIgnoreCase(answer);
+    return StringUtil.orEqualsIgnoreCase(answer, "yes", "y");
   }
 
   private static void printUsage(String prefix) {

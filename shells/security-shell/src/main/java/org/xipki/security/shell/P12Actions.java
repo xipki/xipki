@@ -39,10 +39,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.util.Args;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.IoUtil;
-import org.xipki.util.PemEncoder;
+import org.xipki.util.*;
 import org.xipki.util.PemEncoder.PemLabel;
 import org.xipki.util.exception.ObjectCreationException;
 
@@ -83,8 +80,7 @@ public class P12Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      if (!("AES".equalsIgnoreCase(keyType) || "DES3".equalsIgnoreCase(keyType)
-          || "GENERIC".equalsIgnoreCase(keyType))) {
+      if (!StringUtil.orEqualsIgnoreCase(keyType, "AES", "DES3", "GENERIC")) {
         throw new IllegalCmdParamException("invalid keyType " + keyType);
       }
 
@@ -210,8 +206,7 @@ public class P12Actions {
     private void assertMatch(KeyStore ks, X509Cert cert, String password)
         throws Exception {
       String keyAlgName = cert.getPublicKey().getAlgorithm();
-      if (EdECConstants.X25519.equalsIgnoreCase(keyAlgName)
-          || EdECConstants.X448.equalsIgnoreCase(keyAlgName)) {
+      if (StringUtil.orEqualsIgnoreCase(keyAlgName, EdECConstants.X25519, EdECConstants.X448)) {
         // cannot be checked via creating dummy signature, just compare the public keys
         char[] pwd = password.toCharArray();
         KeypairWithCert kp = KeypairWithCert.fromKeystore(ks, null, pwd, null);
@@ -323,17 +318,10 @@ public class P12Actions {
       }
 
       if (qlen == null) {
-        if (plen <= 1024) {
-          qlen = 160;
-        } else if (plen <= 2048) {
-          qlen = 224;
-        } else {
-          qlen = 256;
-        }
+        qlen = (plen <= 1024) ? 160 : ((plen <= 2048) ? 224 : 256);
       }
 
-      KeyStoreWrapper keypair = new P12KeyGenerator().generateDSAKeypair(plen, qlen, getKeyGenParameters(), subject);
-      saveKey(keypair);
+      saveKey(new P12KeyGenerator().generateDSAKeypair(plen, qlen, getKeyGenParameters(), subject));
 
       return null;
     } // method execute0
@@ -355,15 +343,13 @@ public class P12Actions {
     protected Object execute0() throws Exception {
       P12KeyGenerator keyGen = new P12KeyGenerator();
       KeystoreGenerationParameters keyGenParams = getKeyGenParameters();
-      KeyStoreWrapper keypair;
 
       ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(curveName);
-      if (curveOid != null) {
-        keypair = keyGen.generateEdECKeypair(curveOid, keyGenParams, subject);
-      } else {
-        curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
-        keypair = new P12KeyGenerator().generateECKeypair(curveOid, keyGenParams, subject);
-      }
+      KeyStoreWrapper keypair = (curveOid != null)
+          ? keyGen.generateEdECKeypair(curveOid, keyGenParams, subject)
+          : keyGen.generateECKeypair(AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName),
+          keyGenParams, subject);
+
       saveKey(keypair);
 
       return null;
@@ -385,8 +371,7 @@ public class P12Actions {
       saveVerbose("saved PKCS#12 keystore to file", keyOutFile, keyGenerationResult.keystore());
     }
 
-    protected KeystoreGenerationParameters getKeyGenParameters()
-        throws IOException {
+    protected KeystoreGenerationParameters getKeyGenParameters() throws IOException {
       KeystoreGenerationParameters params = new KeystoreGenerationParameters(getPassword());
 
       SecureRandom random = securityFactory.getRandom4Key();
@@ -426,10 +411,8 @@ public class P12Actions {
         throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
       }
 
-      KeyStoreWrapper keypair = new P12KeyGenerator().generateRSAKeypair(keysize,
-          toBigInt(publicExponent), getKeyGenParameters(), subject);
-      saveKey(keypair);
-
+      saveKey(new P12KeyGenerator().generateRSAKeypair(
+          keysize, toBigInt(publicExponent), getKeyGenParameters(), subject));
       return null;
     }
 
@@ -454,12 +437,11 @@ public class P12Actions {
 
     protected KeyStore getInKeyStore()
         throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
-      KeyStore ks;
       try (InputStream in = Files.newInputStream(Paths.get(expandFilepath(p12File)))) {
-        ks = KeyUtil.getInKeyStore("PKCS12");
+        KeyStore ks = KeyUtil.getInKeyStore("PKCS12");
         ks.load(in, getPassword());
+        return ks;
       }
-      return ks;
     }
 
   } // class P12SecurityAction
@@ -473,10 +455,8 @@ public class P12Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      KeyStoreWrapper keypair = new P12KeyGenerator().generateECKeypair(
-          GMObjectIdentifiers.sm2p256v1, getKeyGenParameters(), subject);
-      saveKey(keypair);
-
+      saveKey(new P12KeyGenerator().generateECKeypair(
+          GMObjectIdentifiers.sm2p256v1, getKeyGenParameters(), subject));
       return null;
     }
 

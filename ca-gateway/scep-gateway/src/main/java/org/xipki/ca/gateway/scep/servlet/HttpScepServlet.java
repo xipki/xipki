@@ -74,8 +74,7 @@ public class HttpScepServlet extends HttpServlet {
       throws IOException {
     String path = req.getServletPath();
 
-    byte[] requestBytes = viaPost
-        ? IoUtil.read(req.getInputStream())
+    byte[] requestBytes = viaPost ? IoUtil.read(req.getInputStream())
         : Base64.decode(req.getParameter("message"));
 
     RestResponse restResp = responder.service(path, requestBytes, new HttpRequestMetadataRetrieverImpl(req));

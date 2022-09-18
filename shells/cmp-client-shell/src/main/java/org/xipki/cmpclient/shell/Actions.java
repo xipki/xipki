@@ -97,8 +97,7 @@ public class Actions {
         return new Requestor.SignatureCmpRequestor(signer);
       } else {
         if (signerPassword == null) {
-          char[] pwd = readPassword("Enter the password for the user/keyID " + signerKeyId);
-          signerPassword = new String(pwd);
+          signerPassword = new String(readPassword("Enter the password for the user/keyID " + signerKeyId));
         }
         byte[] senderKID = StringUtil.startsWithIgnoreCase(signerKeyId, "0x")
             ? Hex.decode(signerKeyId) : signerKeyId.getBytes(StandardCharsets.UTF_8);

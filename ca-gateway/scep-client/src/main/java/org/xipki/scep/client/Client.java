@@ -162,8 +162,7 @@ public abstract class Client {
     } // end if
   } // method httpSend
 
-  private ScepHttpResponse httpSend(Operation operation)
-      throws ScepClientException {
+  private ScepHttpResponse httpSend(Operation operation) throws ScepClientException {
     return httpSend(operation, null);
   }
 
@@ -522,8 +521,7 @@ public abstract class Client {
     return resp;
   } // method decode
 
-  private static CMSSignedData parsePkiMessage(byte[] messageBytes)
-      throws ScepClientException {
+  private static CMSSignedData parsePkiMessage(byte[] messageBytes) throws ScepClientException {
     try {
       return new CMSSignedData(messageBytes);
     } catch (CMSException ex) {

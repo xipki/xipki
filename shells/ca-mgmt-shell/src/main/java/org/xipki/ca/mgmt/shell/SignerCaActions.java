@@ -35,6 +35,7 @@ import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
+import org.xipki.util.StringUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public class SignerCaActions {
         base64Cert = IoUtil.base64Encode(signerCert.getEncoded(), false);
       }
 
-      if ("PKCS12".equalsIgnoreCase(type) || "JCEKS".equalsIgnoreCase(type)) {
+      if (StringUtil.orEqualsIgnoreCase(type, "PKCS12", "JCEKS")) {
         conf = ShellUtil.canonicalizeSignerConf(type, conf, securityFactory);
       }
       SignerEntry entry = new SignerEntry(name, type, conf, base64Cert);

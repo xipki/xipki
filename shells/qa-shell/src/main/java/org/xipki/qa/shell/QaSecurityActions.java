@@ -172,10 +172,6 @@ public class QaSecurityActions {
       return null;
     }
 
-    protected List<String> getECCurveNames() {
-      return AlgorithmUtil.getECCurveNames();
-    }
-
     protected int getNumThreads() {
       return numThreads;
     }
@@ -197,15 +193,13 @@ public class QaSecurityActions {
     @Completion(QaCompleters.P11ModuleNameCompleter.class)
     protected String moduleName = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
-    protected P11Slot getSlot()
-        throws XiSecurityException, P11TokenException, IllegalCmdParamException {
+    protected P11Slot getSlot() throws XiSecurityException, P11TokenException, IllegalCmdParamException {
       P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
       if (p11Service == null) {
         throw new IllegalCmdParamException("undefined module " + moduleName);
       }
       P11Module module = p11Service.getModule();
-      P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
-      return module.getSlot(slotId);
+      return module.getSlot(module.getSlotIdForIndex(slotIndex));
     }
 
     protected byte[] getKeyId() {
@@ -219,23 +213,12 @@ public class QaSecurityActions {
   @Service
   public static class BspeedDsaGenP11 extends BSpeedP11Action {
 
-    private final Queue<KeyControl.DSA> queue = new LinkedList<>();
-
-    public BspeedDsaGenP11() {
-      queue.add(new KeyControl.DSA(1024, 160));
-      queue.add(new KeyControl.DSA(2048, 224));
-      queue.add(new KeyControl.DSA(2048, 256));
-      queue.add(new KeyControl.DSA(3072, 256));
-    }
+    private final Queue<KeyControl.DSA> queue = getKeyControlDSA();
 
     @Override
     protected BenchmarkExecutor nextTester() throws Exception {
       KeyControl.DSA control = queue.poll();
-      if (control == null) {
-        return null;
-      }
-
-      return new P11KeyGenSpeed.DSA(getSlot(), getKeyId(), control.plen(), control.qlen());
+      return (control == null) ? null : new P11KeyGenSpeed.DSA(getSlot(), getKeyId(), control.plen(), control.qlen());
     }
 
     @Override
@@ -254,14 +237,7 @@ public class QaSecurityActions {
     @Completion(QaCompleters.DSASigAlgCompleter.class)
     private String signAlgo;
 
-    private final Queue<KeyControl.DSA> queue = new LinkedList<>();
-
-    public BspeedDsaSignP11() {
-      queue.add(new KeyControl.DSA(1024, 160));
-      queue.add(new KeyControl.DSA(2048, 224));
-      queue.add(new KeyControl.DSA(2048, 256));
-      queue.add(new KeyControl.DSA(3072, 256));
-    }
+    private final Queue<KeyControl.DSA> queue = getKeyControlDSA();
 
     @Override
     protected BenchmarkExecutor nextTester() throws Exception {
@@ -287,13 +263,7 @@ public class QaSecurityActions {
   @Service
   public static class BspeedEcGenP11 extends BSpeedP11Action {
 
-    private final Queue<KeyControl.EC> queue = new LinkedList<>();
-
-    public BspeedEcGenP11() {
-      for (String curveName : getECCurveNames()) {
-        queue.add(new KeyControl.EC(curveName));
-      }
-    }
+    private final Queue<KeyControl.EC> queue = getKeyControlEC();
 
     @Override
     protected BenchmarkExecutor nextTester() throws Exception {
@@ -321,13 +291,7 @@ public class QaSecurityActions {
     @Completion(QaCompleters.ECDSASigAlgCompleter.class)
     private String signAlgo;
 
-    private final Queue<KeyControl.EC> queue = new LinkedList<>();
-
-    public BspeedEcSignP11() {
-      for (String curveName : getECCurveNames()) {
-        queue.add(new KeyControl.EC(curveName));
-      }
-    }
+    private final Queue<KeyControl.EC> queue = getKeyControlEC();
 
     @Override
     protected BenchmarkExecutor nextTester() throws Exception {
@@ -347,24 +311,13 @@ public class QaSecurityActions {
   @Service
   public static class BspeedRsaGenP11 extends BSpeedP11Action {
 
-    private final Queue<KeyControl.RSA> queue = new LinkedList<>();
-
-    public BspeedRsaGenP11() {
-      queue.add(new KeyControl.RSA(1024));
-      queue.add(new KeyControl.RSA(2048));
-      queue.add(new KeyControl.RSA(3072));
-      queue.add(new KeyControl.RSA(4096));
-    }
+    private final Queue<KeyControl.RSA> queue = getKeyControlRSA();
 
     @Override
     protected BenchmarkExecutor nextTester() throws Exception {
       KeyControl.RSA control = queue.poll();
-      if (control == null) {
-        return null;
-      }
-
-      return new P11KeyGenSpeed.RSA(getSlot(), getKeyId(), control.modulusLen(),
-          toBigInt("0x10001"));
+      return (control == null) ? null
+          : new P11KeyGenSpeed.RSA(getSlot(), getKeyId(), control.modulusLen(), toBigInt("0x10001"));
     }
 
   } // class BspeedRsaGenP11
@@ -378,24 +331,14 @@ public class QaSecurityActions {
     @Completion(QaCompleters.RSASigAlgCompleter.class)
     private String signAlgo;
 
-    private final Queue<KeyControl.RSA> queue = new LinkedList<>();
-
-    public BspeedRsaSignP11() {
-      queue.add(new KeyControl.RSA(1024));
-      queue.add(new KeyControl.RSA(2048));
-      queue.add(new KeyControl.RSA(3072));
-      queue.add(new KeyControl.RSA(4096));
-    }
+    private final Queue<KeyControl.RSA> queue = getKeyControlRSA();
 
     @Override
     protected BenchmarkExecutor nextTester() throws Exception {
       KeyControl.RSA control = queue.poll();
-      if (control == null) {
-        return null;
-      }
-
-      return new P11SignSpeed.RSA(securityFactory, getSlot(), getKeyId(), signAlgo, getNumThreads(),
-          control.modulusLen(), toBigInt("0x10001"));
+      return (control == null) ? null
+          : new P11SignSpeed.RSA(securityFactory, getSlot(), getKeyId(), signAlgo, getNumThreads(),
+                control.modulusLen(), toBigInt("0x10001"));
     }
 
   } // class BspeedRsaGenP11
@@ -680,14 +623,7 @@ public class QaSecurityActions {
   @Service
   public static class BspeedDsaGenP12 extends BatchSpeedAction {
 
-    private final Queue<KeyControl.DSA> queue = new LinkedList<>();
-
-    public BspeedDsaGenP12() {
-      queue.add(new KeyControl.DSA(1024, 160));
-      queue.add(new KeyControl.DSA(2048, 224));
-      queue.add(new KeyControl.DSA(2048, 256));
-      queue.add(new KeyControl.DSA(3072, 256));
-    }
+    private final Queue<KeyControl.DSA> queue = getKeyControlDSA();
 
     @Override
     protected BenchmarkExecutor nextTester() throws Exception {
@@ -702,14 +638,7 @@ public class QaSecurityActions {
   @Service
   public static class BspeedDsaSignP12 extends BSpeedP12SignAction {
 
-    private final Queue<KeyControl.DSA> queue = new LinkedList<>();
-
-    public BspeedDsaSignP12() {
-      queue.add(new KeyControl.DSA(1024, 160));
-      queue.add(new KeyControl.DSA(2048, 224));
-      queue.add(new KeyControl.DSA(2048, 256));
-      queue.add(new KeyControl.DSA(3072, 256));
-    }
+    private final Queue<KeyControl.DSA> queue = getKeyControlDSA();
 
     @Override
     protected BenchmarkExecutor nextTester() throws Exception {
@@ -731,19 +660,12 @@ public class QaSecurityActions {
   @Service
   public static class BspeedEcGenP12 extends BatchSpeedAction {
 
-    private final Queue<KeyControl.EC> queue = new LinkedList<>();
-
-    public BspeedEcGenP12() {
-      for (String curveName : getECCurveNames()) {
-        queue.add(new KeyControl.EC(curveName));
-      }
-    }
+    private final Queue<KeyControl.EC> queue = getKeyControlEC();
 
     @Override
     protected BenchmarkExecutor nextTester() throws Exception {
       KeyControl.EC control = queue.poll();
-      ASN1ObjectIdentifier curveOid = getCurveOid(control.curveName());
-      return new P12KeyGenSpeed.EC(curveOid, securityFactory);
+      return new P12KeyGenSpeed.EC(getCurveOid(control.curveName()), securityFactory);
     }
 
   } // class BspeedEcGenP12
@@ -753,13 +675,7 @@ public class QaSecurityActions {
   @Service
   public static class BspeedEcSignP12 extends BSpeedP12SignAction {
 
-    private final Queue<KeyControl.EC> queue = new LinkedList<>();
-
-    public BspeedEcSignP12() {
-      for (String curveName : getECCurveNames()) {
-        queue.add(new KeyControl.EC(curveName));
-      }
-    }
+    private final Queue<KeyControl.EC> queue = getKeyControlEC();
 
     @Override
     protected BenchmarkExecutor nextTester() throws Exception {
@@ -775,14 +691,7 @@ public class QaSecurityActions {
   @Service
   public static class BspeedRsaGenP12 extends BatchSpeedAction {
 
-    private final Queue<KeyControl.RSA> queue = new LinkedList<>();
-
-    public BspeedRsaGenP12() {
-      queue.add(new KeyControl.RSA(1024));
-      queue.add(new KeyControl.RSA(2048));
-      queue.add(new KeyControl.RSA(3072));
-      queue.add(new KeyControl.RSA(4096));
-    }
+    private final Queue<KeyControl.RSA> queue = getKeyControlRSA();
 
     @Override
     protected BenchmarkExecutor nextTester() throws Exception {
@@ -798,21 +707,14 @@ public class QaSecurityActions {
   @Service
   public static class BspeedRsaSignP12 extends BSpeedP12SignAction {
 
-    private final Queue<KeyControl.RSA> queue = new LinkedList<>();
-
-    public BspeedRsaSignP12() {
-      queue.add(new KeyControl.RSA(1024));
-      queue.add(new KeyControl.RSA(2048));
-      queue.add(new KeyControl.RSA(3072));
-      queue.add(new KeyControl.RSA(4096));
-    }
+    private final Queue<KeyControl.RSA> queue = getKeyControlRSA();
 
     @Override
     protected BenchmarkExecutor nextTester() throws Exception {
       KeyControl.RSA control = queue.poll();
       return (control == null) ? null
         : new P12SignSpeed.RSA(securityFactory, signAlgo, getNumThreads(),
-          control.modulusLen(), toBigInt("0x10001"));
+              control.modulusLen(), toBigInt("0x10001"));
     }
   } // class BspeedRsaSignP12
 
@@ -948,8 +850,7 @@ public class QaSecurityActions {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
-      ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(signAlgo);
-      return new P12SignSpeed.EC(securityFactory, signAlgo, getNumThreads(), curveOid);
+      return new P12SignSpeed.EC(securityFactory, signAlgo, getNumThreads(), EdECConstants.getCurveOid(signAlgo));
     }
 
   } // class SpeedEdSignP12
@@ -1053,7 +954,7 @@ public class QaSecurityActions {
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
       return new JceSignSpeed(securityFactory, type, alias, algo,
-              "alias-" + alias + "_algo-" + algo, getNumThreads());
+          "alias-" + alias + "_algo-" + algo, getNumThreads());
     }
 
   } // class SpeedEcSignP11
@@ -1069,5 +970,31 @@ public class QaSecurityActions {
     }
     return curveOid;
   } // method getCurveOid
+
+  private static Queue<KeyControl.DSA> getKeyControlDSA() {
+    Queue<KeyControl.DSA> queue = new LinkedList<>();
+    queue.add(new KeyControl.DSA(1024, 160));
+    queue.add(new KeyControl.DSA(2048, 224));
+    queue.add(new KeyControl.DSA(2048, 256));
+    queue.add(new KeyControl.DSA(3072, 256));
+    return queue;
+  }
+
+  private static Queue<KeyControl.RSA> getKeyControlRSA() {
+    Queue<KeyControl.RSA> queue = new LinkedList<>();
+    queue.add(new KeyControl.RSA(1024));
+    queue.add(new KeyControl.RSA(2048));
+    queue.add(new KeyControl.RSA(3072));
+    queue.add(new KeyControl.RSA(4096));
+    return queue;
+  }
+
+  private static Queue<KeyControl.EC> getKeyControlEC() {
+    Queue<KeyControl.EC> queue = new LinkedList<>();
+    for (String curveName : AlgorithmUtil.getECCurveNames()) {
+      queue.add(new KeyControl.EC(curveName));
+    }
+    return queue;
+  }
 
 }

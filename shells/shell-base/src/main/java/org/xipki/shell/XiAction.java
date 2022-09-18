@@ -89,13 +89,11 @@ public abstract class XiAction implements Action {
     return newPairs;
   } // method embedFileContent
 
-  protected void saveVerbose(String promptPrefix, String file, byte[] encoded)
-      throws IOException {
+  protected void saveVerbose(String promptPrefix, String file, byte[] encoded) throws IOException {
     saveVerbose(promptPrefix, new File(file), encoded);
   }
 
-  protected void saveVerbose(String promptPrefix, File file, byte[] encoded)
-      throws IOException {
+  protected void saveVerbose(String promptPrefix, File file, byte[] encoded) throws IOException {
     File saveTo = expandFilepath(file);
 
     if (saveTo.exists()) {
@@ -114,9 +112,9 @@ public abstract class XiAction implements Action {
             throw new IOException("interrupted");
           }
 
-          if ("yes".equalsIgnoreCase(answer) || "y".equalsIgnoreCase(answer)) {
+          if (StringUtil.orEqualsIgnoreCase(answer, "yes", "y")) {
             break;
-          } else if ("no".equalsIgnoreCase(answer) || "n".equalsIgnoreCase(answer)) {
+          } else if (StringUtil.orEqualsIgnoreCase(answer, "no", "n")) {
             bo = true;
             String newFn;
             while (true) {
@@ -194,8 +192,7 @@ public abstract class XiAction implements Action {
   } // method save
 
   private static String randomHex(int numOfBytes) {
-    byte[] bytes = RandomUtil.nextBytes(numOfBytes);
-    return Hex.encode(bytes);
+    return Hex.encode(RandomUtil.nextBytes(numOfBytes));
   }
 
   protected static boolean isEnabled(String enabledS, boolean defaultEnabled, String optionName) {
@@ -203,10 +200,9 @@ public abstract class XiAction implements Action {
   }
 
   private static boolean isEnabled(String enabledS, String optionName) {
-    if ("yes".equalsIgnoreCase(enabledS) || "enabled".equalsIgnoreCase(enabledS) || "true".equalsIgnoreCase(enabledS)) {
+    if (StringUtil.orEqualsIgnoreCase(enabledS, "yes", "enabled", "true")) {
       return true;
-    } else if ("no".equalsIgnoreCase(enabledS) || "disabled".equalsIgnoreCase(enabledS)
-        || "false".equalsIgnoreCase(enabledS)) {
+    } else if (StringUtil.orEqualsIgnoreCase(enabledS, "no", "disabled", "false")) {
       return false;
     } else {
       throw new IllegalArgumentException("invalid option " + optionName + ": " + enabledS);
@@ -227,8 +223,7 @@ public abstract class XiAction implements Action {
     return readPasswordIfNotSet(null, password);
   }
 
-  protected char[] readPasswordIfNotSet(String prompt, String password)
-      throws IOException {
+  protected char[] readPasswordIfNotSet(String prompt, String password) throws IOException {
     return (password != null) ? password.toCharArray() : readPassword(prompt);
   }
 
@@ -245,8 +240,7 @@ public abstract class XiAction implements Action {
 
     String passwordUi = System.getProperty("org.xipki.console.passwordui");
     return "gui".equalsIgnoreCase(passwordUi)
-              ? SecurePasswordInputPanel.readPassword(tmpPrompt)
-              : readLine(tmpPrompt, '*').toCharArray();
+              ? SecurePasswordInputPanel.readPassword(tmpPrompt) : readLine(tmpPrompt, '*').toCharArray();
   }
 
   private String readLine(String prompt, Character ch) throws IOException {
@@ -328,11 +322,7 @@ public abstract class XiAction implements Action {
     if (prompt == null || prompt.isEmpty()) {
       tmpPrompt = "(Yes/No)? ";
     } else {
-      if ('?' == prompt.charAt(prompt.length() - 1)) {
-        tmpPrompt = prompt.substring(0, prompt.length() - 1);
-      } else {
-        tmpPrompt = prompt;
-      }
+      tmpPrompt = ('?' == prompt.charAt(prompt.length() - 1)) ? prompt.substring(0, prompt.length() - 1) : prompt;
       tmpPrompt += " (Yes/No)? ";
     }
 
@@ -344,9 +334,9 @@ public abstract class XiAction implements Action {
     int tries = 1;
 
     while (tries < maxTries) {
-      if ("yes".equalsIgnoreCase(answer) || "y".equalsIgnoreCase(answer)) {
+      if (StringUtil.orEqualsIgnoreCase(answer, "yes", "y")) {
         return true;
-      } else if ("no".equalsIgnoreCase(answer) || "n".equalsIgnoreCase(answer)) {
+      } else if (StringUtil.orEqualsIgnoreCase(answer, "no", "n")) {
         return false;
       } else {
         tries++;

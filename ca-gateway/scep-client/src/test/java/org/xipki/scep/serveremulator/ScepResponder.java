@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.scep.message.*;
 import org.xipki.scep.message.EnvelopedDataDecryptor.EnvelopedDataDecryptorInstance;
-import org.xipki.scep.serveremulator.AuditEvent.AuditLevel;
 import org.xipki.scep.transaction.*;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
@@ -90,7 +89,7 @@ public class ScepResponder {
     this.maxSigningTimeBiasInMs = ms;
   }
 
-  public ContentInfo servicePkiOperation(CMSSignedData requestContent, AuditEvent event)
+  public ContentInfo servicePkiOperation(CMSSignedData requestContent)
       throws MessageDecodingException, CaException, NoSuchAlgorithmException {
     Args.notNull(requestContent, "requestContent");
     PrivateKey recipientKey = (raEmulator != null) ? raEmulator.getRaKey() : caEmulator.getCaKey();
@@ -102,14 +101,6 @@ public class ScepResponder {
     DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, recipient, null);
 
     PkiMessage rep = servicePkiOperation0(req);
-    event.putEventData(AuditEvent.NAME_pkiStatus, rep.getPkiStatus());
-    if (rep.getPkiStatus() == PkiStatus.FAILURE) {
-      event.setLevel(AuditLevel.ERROR);
-    }
-
-    if (rep.getFailInfo() != null) {
-      event.putEventData(AuditEvent.NAME_failInfo, rep.getFailInfo());
-    }
 
     SignAlgo signatureAlgorithm = SignAlgo.getInstance(getSigningKey(), req.getDigestAlgorithm(), null);
 
@@ -135,8 +126,7 @@ public class ScepResponder {
     }
   }
 
-  private PkiMessage servicePkiOperation0(DecodedPkiMessage req)
-      throws CaException {
+  private PkiMessage servicePkiOperation0(DecodedPkiMessage req) throws CaException {
     TransactionId tid = req.getTransactionId();
     PkiMessage rep = new PkiMessage(tid, MessageType.CertRep, Nonce.randomNonce());
     rep.setPkiStatus(PkiStatus.SUCCESS);

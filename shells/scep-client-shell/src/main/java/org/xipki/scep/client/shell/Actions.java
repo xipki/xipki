@@ -298,8 +298,7 @@ public class Actions {
         throw new CmdFailure("received no certficate from server");
       }
 
-      saveVerbose("saved certificate to file", new File(outputFile),
-          encodeCert(certs.get(0).getEncoded(), outform));
+      saveVerbose("saved certificate to file", new File(outputFile), encodeCert(certs.get(0).getEncoded(), outform));
       return null;
     }
 

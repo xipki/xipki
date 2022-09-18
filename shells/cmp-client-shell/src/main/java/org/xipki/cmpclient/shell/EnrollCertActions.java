@@ -320,8 +320,7 @@ public class EnrollCertActions {
     private ConcurrentContentSigner signer;
 
     @Override
-    protected ConcurrentContentSigner getSigner()
-        throws ObjectCreationException, CmpClientException {
+    protected ConcurrentContentSigner getSigner() throws ObjectCreationException, CmpClientException {
       if (signer == null) {
         if (password == null) {
           try {

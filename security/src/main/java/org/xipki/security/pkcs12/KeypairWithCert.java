@@ -23,6 +23,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.StringUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,7 +76,7 @@ public class KeypairWithCert {
       String keystoreType, InputStream keystoreStream, char[] keystorePassword,
       String keyname, char[] keyPassword, X509Cert[] certchain)
       throws XiSecurityException {
-    if (!("PKCS12".equalsIgnoreCase(keystoreType) || "JCEKS".equalsIgnoreCase(keystoreType))) {
+    if (!StringUtil.orEqualsIgnoreCase(keystoreType, "PKCS12", "JCEKS")) {
       throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
     }
 

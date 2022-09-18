@@ -36,6 +36,7 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
 import java.security.NoSuchAlgorithmException;
@@ -56,7 +57,7 @@ public class DecodedPkiMessage extends PkiMessage {
 
   private static final Logger LOG = LoggerFactory.getLogger(DecodedPkiMessage.class);
 
-  private static final Set<ASN1ObjectIdentifier> SCEP_ATTR_TYPES = new HashSet<>();
+  private static final Set<ASN1ObjectIdentifier> SCEP_ATTR_TYPES;
 
   private X509Cert signatureCert;
 
@@ -73,13 +74,10 @@ public class DecodedPkiMessage extends PkiMessage {
   private String failureMessage;
 
   static {
-    SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_FAILINFO);
-    SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_MESSAGE_TYPE);
-    SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_PKI_STATUS);
-    SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_RECIPIENT_NONCE);
-    SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_SENDER_NONCE);
-    SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_TRANSACTION_ID);
-    SCEP_ATTR_TYPES.add(CMSAttributes.signingTime);
+    SCEP_ATTR_TYPES = CollectionUtil.asSet(
+        ScepObjectIdentifiers.ID_FAILINFO, ScepObjectIdentifiers.ID_MESSAGE_TYPE, ScepObjectIdentifiers.ID_PKI_STATUS,
+        ScepObjectIdentifiers.ID_RECIPIENT_NONCE, ScepObjectIdentifiers.ID_SENDER_NONCE,
+        ScepObjectIdentifiers.ID_TRANSACTION_ID,  CMSAttributes.signingTime);
   }
 
   public DecodedPkiMessage(TransactionId transactionId, MessageType messageType, Nonce senderNonce) {
@@ -142,9 +140,8 @@ public class DecodedPkiMessage extends PkiMessage {
     this.signingTime = signingTime;
   }
 
-  public static DecodedPkiMessage decode(
-      CMSSignedData pkiMessage, PrivateKey recipientKey,
-      X509Cert recipientCert, CollectionStore<X509CertificateHolder> certStore)
+  public static DecodedPkiMessage decode(CMSSignedData pkiMessage, PrivateKey recipientKey,
+                                         X509Cert recipientCert, CollectionStore<X509CertificateHolder> certStore)
       throws MessageDecodingException {
     EnvelopedDataDecryptorInstance decInstance = new EnvelopedDataDecryptorInstance(recipientCert, recipientKey);
     EnvelopedDataDecryptor recipient = new EnvelopedDataDecryptor(decInstance);
@@ -197,30 +194,28 @@ public class DecodedPkiMessage extends PkiMessage {
     if (StringUtil.isBlank(str)) {
       throw new MessageDecodingException("missing required SCEP attribute transactionId");
     }
-    TransactionId transactionId = new TransactionId(str);
+    TransactionId tid = new TransactionId(str);
 
     // messageType
     Integer intValue = getIntegerPrintStringAttrValue(signedAttrs, ScepObjectIdentifiers.ID_MESSAGE_TYPE);
     if (intValue == null) {
-      throw new MessageDecodingException(
-          "tid " + transactionId.getId() + ": missing required SCEP attribute messageType");
+      throw new MessageDecodingException("tid " + tid.getId() + ": missing required SCEP attribute messageType");
     }
 
     MessageType messageType;
     try {
       messageType = MessageType.forValue(intValue);
     } catch (IllegalArgumentException ex) {
-      throw new MessageDecodingException("tid " + transactionId.getId() + ": invalid messageType '" + intValue + "'");
+      throw new MessageDecodingException("tid " + tid.getId() + ": invalid messageType '" + intValue + "'");
     }
 
     // senderNonce
     Nonce senderNonce = getNonceAttrValue(signedAttrs, ScepObjectIdentifiers.ID_SENDER_NONCE);
     if (senderNonce == null) {
-      throw new MessageDecodingException(
-          "tid " + transactionId.getId() + ": missing required SCEP attribute senderNonce");
+      throw new MessageDecodingException("tid " + tid.getId() + ": missing required SCEP attribute senderNonce");
     }
 
-    DecodedPkiMessage ret = new DecodedPkiMessage(transactionId, messageType, senderNonce);
+    DecodedPkiMessage ret = new DecodedPkiMessage(tid, messageType, senderNonce);
     if (signingTime != null) {
       ret.setSigningTime(signingTime);
     }
@@ -328,10 +323,8 @@ public class DecodedPkiMessage extends PkiMessage {
         }
       }
     } catch (NoSuchAlgorithmException ex) {
-      String msg = ex.getMessage();
-      LOG.error(msg);
-      LOG.debug(msg, ex);
-      ret.setFailureMessage(msg);
+      LogUtil.error(LOG, ex);
+      ret.setFailureMessage(ex.getMessage());
       return ret;
     }
 
@@ -343,10 +336,9 @@ public class DecodedPkiMessage extends PkiMessage {
     try {
       verifier = new JcaSimpleSignerInfoVerifierBuilder().build(signerCert);
     } catch (OperatorCreationException | CertificateException ex) {
-      final String msg = "could not build signature verifier: " + ex.getMessage();
-      LOG.error(msg);
-      LOG.debug(msg, ex);
-      ret.setFailureMessage(msg);
+      final String msg = "could not build signature verifier";
+      LogUtil.error(LOG, ex);
+      ret.setFailureMessage(msg + ": " + ex.getMessage());
       return ret;
     }
 
@@ -354,10 +346,9 @@ public class DecodedPkiMessage extends PkiMessage {
     try {
       signatureValid = signerInfo.verify(verifier);
     } catch (CMSException ex) {
-      final String msg = "could not verify the signature: " + ex.getMessage();
-      LOG.error(msg);
-      LOG.debug(msg, ex);
-      ret.setFailureMessage(msg);
+      final String msg = "could not verify the signature";
+      LogUtil.error(LOG, ex);
+      ret.setFailureMessage(msg + ": " + ex.getMessage());
       return ret;
     }
 
@@ -385,10 +376,9 @@ public class DecodedPkiMessage extends PkiMessage {
     try {
       envData = new CMSEnvelopedData((byte[]) signedContent.getContent());
     } catch (CMSException ex) {
-      final String msg = "could not create the CMSEnvelopedData: " + ex.getMessage();
-      LOG.error(msg);
-      LOG.debug(msg, ex);
-      ret.setFailureMessage(msg);
+      final String msg = "could not create the CMSEnvelopedData";
+      LogUtil.error(LOG, ex);
+      ret.setFailureMessage(msg + ": " + ex.getMessage());
       return ret;
     }
 
@@ -397,10 +387,9 @@ public class DecodedPkiMessage extends PkiMessage {
     try {
       encodedMessageData = recipient.decrypt(envData);
     } catch (MessageDecodingException ex) {
-      final String msg = "could not create the CMSEnvelopedData: " + ex.getMessage();
-      LOG.error(msg);
-      LOG.debug(msg, ex);
-      ret.setFailureMessage(msg);
+      final String msg = "could not create the CMSEnvelopedData";
+      LogUtil.error(LOG, ex);
+      ret.setFailureMessage(msg + ": " + ex.getMessage());
 
       ret.setDecryptionSuccessful(false);
       return ret;
@@ -426,10 +415,9 @@ public class DecodedPkiMessage extends PkiMessage {
         throw new RuntimeException("should not reach here, unknown messageType " + messageType);
       }
     } catch (Exception ex) {
-      final String msg = "could not parse the messageData: " + ex.getMessage();
-      LOG.error(msg);
-      LOG.debug(msg, ex);
-      ret.setFailureMessage(msg);
+      final String msg = "could not parse the messageData";
+      LogUtil.error(LOG, ex);
+      ret.setFailureMessage(msg + ": " + ex.getMessage());
       return ret;
     }
 

@@ -18,6 +18,7 @@
 package org.xipki.password;
 
 import org.xipki.util.RandomUtil;
+import org.xipki.util.StringUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -92,7 +93,7 @@ public class SecurePasswordInputPanel extends Panel {
         button.setFont(button.getFont().deriveFont(Font.TRUETYPE_FONT));
         if (CLEAR.equalsIgnoreCase(text)) {
           button.setBackground(Color.red);
-        } else if (CAPS.equalsIgnoreCase(text) || BACKSPACE.equalsIgnoreCase(text)) {
+        } else if (StringUtil.orEqualsIgnoreCase(text, CAPS, BACKSPACE)) {
           button.setBackground(Color.lightGray);
         } else {
           buttons.add(button);

@@ -414,9 +414,8 @@ public class QaOcspActions {
 
       String validity = ret.isAllSuccessful() ? "valid" : "invalid";
       String hexSerial = serialNumber.toString(16);
-      StringBuilder sb = new StringBuilder(50);
-      sb.append("OCSP response for ").append(serialNumber).append(" (0x").append(hexSerial)
-          .append(") is ").append(validity);
+      StringBuilder sb = new StringBuilder("OCSP response for ");
+      sb.append(serialNumber).append(" (0x").append(hexSerial).append(") is ").append(validity);
 
       for (ValidationIssue issue : ret.getValidationIssues()) {
         sb.append("\n");

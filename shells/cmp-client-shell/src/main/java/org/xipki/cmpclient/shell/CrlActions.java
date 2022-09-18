@@ -81,8 +81,7 @@ public class CrlActions {
     @Completion(FileCompleter.class)
     protected String outFile;
 
-    protected abstract X509CRLHolder retrieveCrl()
-        throws CmpClientException, PkiErrorException;
+    protected abstract X509CRLHolder retrieveCrl() throws CmpClientException, PkiErrorException;
 
     @Override
     protected Object execute0() throws Exception {

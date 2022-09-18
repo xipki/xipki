@@ -279,7 +279,7 @@ public class OcspServerImpl implements OcspServer {
     for (OcspServerConf.Responder m : conf.getResponders()) {
       String name = m.getName();
 
-      if ("health".equalsIgnoreCase(name) || "mgmt".equalsIgnoreCase(name)) {
+      if (StringUtil.orEqualsIgnoreCase(name, "health", "mgmt")) {
         throw new InvalidConfException("responder name '" + name + "' is not permitted");
       }
 

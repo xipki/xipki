@@ -105,6 +105,19 @@ public class StringUtil {
     return prefix.equalsIgnoreCase(str.substring(0, prefix.length()));
   }
 
+  public static boolean orEqualsIgnoreCase(String str, String... tokens) {
+    if (str == null) {
+      return false;
+    }
+
+    for (String token : tokens) {
+      if (str.equalsIgnoreCase(token)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public static boolean isNumber(String str) {
     return isNumber(str, 10);
   }

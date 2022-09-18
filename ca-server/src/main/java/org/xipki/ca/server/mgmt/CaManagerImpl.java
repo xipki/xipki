@@ -628,8 +628,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   private static void checkModificationOfDbSchema(String name) throws CaMgmtException {
-    if ("VERSION".equalsIgnoreCase(name) || "VENDOR".equalsIgnoreCase(name)
-        || "X500NAME_MAXLEN".equalsIgnoreCase(name)) {
+    if (StringUtil.orEqualsIgnoreCase(name, "VERSION", "VENDOR", "X500NAME_MAXLEN")) {
       throw new CaMgmtException("modification of reserved DBSCHEMA " + name + " is not allowed");
     }
   }

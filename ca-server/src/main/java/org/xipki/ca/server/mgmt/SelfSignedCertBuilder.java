@@ -40,6 +40,7 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
+import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
 import org.xipki.util.exception.*;
 
@@ -107,7 +108,7 @@ class SelfSignedCertBuilder {
       throw new IllegalArgumentException("certprofile is not of level " + Certprofile.CertLevel.RootCA);
     }
 
-    if ("PKCS12".equalsIgnoreCase(signerType) || "JCEKS".equalsIgnoreCase(signerType)) {
+    if (StringUtil.orEqualsIgnoreCase(signerType, "PKCS12", "JCEKS")) {
       ConfPairs keyValues = new ConfPairs(signerConf);
       String keystoreConf = keyValues.value("keystore");
       if (keystoreConf == null) {
