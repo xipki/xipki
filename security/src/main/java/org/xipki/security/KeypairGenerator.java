@@ -163,8 +163,7 @@ public abstract class KeypairGenerator implements Closeable {
    * @throws XiSecurityException
    *         if could not generate keypair.
    */
-  public abstract PrivateKeyInfo generateKeypair(String keyspec)
-      throws XiSecurityException;
+  public abstract PrivateKeyInfo generateKeypair(String keyspec) throws XiSecurityException;
 
   public abstract boolean isHealthy();
 

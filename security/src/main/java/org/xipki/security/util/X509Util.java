@@ -150,10 +150,8 @@ public class X509Util {
     return certs;
   }
 
-  public static X509Cert parseCert(InputStream certStream)
-      throws IOException, CertificateException {
-    notNull(certStream, "certStream");
-    return parseCert(read(certStream));
+  public static X509Cert parseCert(InputStream certStream) throws IOException, CertificateException {
+    return parseCert(read(notNull(certStream, "certStream")));
   }
 
   public static X509Cert parseCert(byte[] bytes) throws CertificateEncodingException {
@@ -199,21 +197,17 @@ public class X509Util {
   }
 
   public static CertificationRequest parseCsr(File file) throws IOException {
-    notNull(file, "file");
-    try (InputStream in = Files.newInputStream(expandFilepath(file).toPath())) {
+    try (InputStream in = Files.newInputStream(expandFilepath(notNull(file, "file")).toPath())) {
       return parseCsr(in);
     }
   }
 
-  private static CertificationRequest parseCsr(InputStream csrStream)
-      throws IOException {
-    notNull(csrStream, "csrStream");
-    return parseCsr(read(csrStream));
+  private static CertificationRequest parseCsr(InputStream csrStream) throws IOException {
+    return parseCsr(read(notNull(csrStream, "csrStream")));
   }
 
   public static CertificationRequest parseCsr(byte[] csrBytes) {
-    notNull(csrBytes, "csrBytes");
-    return CertificationRequest.getInstance(toDerEncoded(csrBytes));
+    return CertificationRequest.getInstance(toDerEncoded(notNull(csrBytes, "csrBytes")));
   }
 
   public static byte[] toDerEncoded(byte[] bytes) {
@@ -285,16 +279,13 @@ public class X509Util {
     return (X509Certificate) getCertFactory().generateCertificate(crlStream);
   }
 
-  public static X509CRLHolder parseCrl(File file)
-      throws IOException, CRLException {
+  public static X509CRLHolder parseCrl(File file) throws IOException, CRLException {
     notNull(file, "file");
     return parseCrl(Files.readAllBytes(expandFilepath(file).toPath()));
   }
 
   public static X509CRLHolder parseCrl(byte[] encodedCrl) throws CRLException {
-    notNull(encodedCrl, "encodedCrl");
-
-    byte[] derBytes = toDerEncoded(encodedCrl);
+    byte[] derBytes = toDerEncoded(notNull(encodedCrl, "encodedCrl"));
     try {
       return new X509CRLHolder(derBytes);
     } catch (IOException ex) {
@@ -303,20 +294,17 @@ public class X509Util {
   }
 
   public static String x500NameText(X500Name name) {
-    notNull(name, "name");
-    return BCStyle.INSTANCE.toString(name);
+    return BCStyle.INSTANCE.toString(notNull(name, "name"));
   }
 
   public static long fpCanonicalizedName(X500Name name) {
-    notNull(name, "name");
-    String canonicalizedName = canonicalizName(name);
+    String canonicalizedName = canonicalizName(notNull(name, "name"));
     byte[] encoded = toUtf8Bytes(canonicalizedName);
     return FpIdCalculator.hash(encoded);
   }
 
   public static String canonicalizName(X500Name name) {
-    notNull(name, "name");
-    ASN1ObjectIdentifier[] tmpTypes = name.getAttributeTypes();
+    ASN1ObjectIdentifier[] tmpTypes = notNull(name, "name").getAttributeTypes();
     int len = tmpTypes.length;
     List<String> types = new ArrayList<>(len);
     for (ASN1ObjectIdentifier type : tmpTypes) {
@@ -408,8 +396,7 @@ public class X509Util {
 
   // sort the list and remove duplicated OID.
   private static List<ASN1ObjectIdentifier> sortOidList(List<ASN1ObjectIdentifier> oids) {
-    notNull(oids, "oids");
-    List<String> list = new ArrayList<>(oids.size());
+    List<String> list = new ArrayList<>(notNull(oids, "oids").size());
     for (ASN1ObjectIdentifier m : oids) {
       list.add(m.getId());
     }
@@ -591,8 +578,7 @@ public class X509Util {
     return null;
   }
 
-  public static boolean issues(X509Cert issuerCert, X509Cert cert)
-      throws CertificateEncodingException {
+  public static boolean issues(X509Cert issuerCert, X509Cert cert) throws CertificateEncodingException {
     notNull(issuerCert, "issuerCert");
     notNull(cert, "cert");
 
@@ -678,8 +664,7 @@ public class X509Util {
   } // method toRfc3279Style
 
   public static String cutText(String text, int maxLen) {
-    notNull(text, "text");
-    if (text.length() <= maxLen) {
+    if (notNull(text, "text").length() <= maxLen) {
       return text;
     }
     return concat(text.substring(0, maxLen - 13), "...skipped...");
@@ -766,8 +751,7 @@ public class X509Util {
   * @throws BadInputException
   *         if the {@code taggedValue} is invalid.
   */
-  private static GeneralName createGeneralName(String taggedValue)
-      throws BadInputException {
+  private static GeneralName createGeneralName(String taggedValue) throws BadInputException {
     notBlank(taggedValue, "taggedValue");
 
     String tagS = null;
@@ -786,7 +770,7 @@ public class X509Util {
         tag = 0;
       } else if ("1".equals(tagS) || "email".equals(tagS) || "rfc822".equals(tagS)) {
         tag = 1;
-      } else if ("2".equals(tagS) || "dns".equals(tagS)) {
+      } else if ("2".equals(tagS) || "dns".equals(tagS) || "dnsname".equals(tagS)) {
         tag = 2;
       } else if ("4".equals(tagS) || "dirname".equals(tagS)) {
         tag = 4;
@@ -794,7 +778,7 @@ public class X509Util {
         tag = 5;
       } else if ("6".equals(tagS) || "uri".equals(tagS)) {
         tag = 6;
-      } else if ("7".equals(tagS) || "ip".equals(tagS)) {
+      } else if ("7".equals(tagS) || "ip".equals(tagS) || "ipaddress".equals(tagS)) {
         tag = 7;
       } else if ("8".equals(tagS) || "rid".equals(tagS) || "registeredid".equals(tagS)) {
         tag = 8;
@@ -894,9 +878,8 @@ public class X509Util {
   }
 
   public static Attribute getAttribute(CertificationRequestInfo csr, ASN1ObjectIdentifier type) {
-    notNull(csr, "csr");
     notNull(type, "type");
-    ASN1Set attrs = csr.getAttributes();
+    ASN1Set attrs = notNull(csr, "csr").getAttributes();
     for (int i = 0; i < attrs.size(); i++) {
       Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
       if (type.equals(attr.getAttrType())) {
@@ -906,8 +889,7 @@ public class X509Util {
     return null;
   } // method getChallengePassword
 
-  public static List<X509Cert> parseCerts(List<FileOrBinary> certsConf)
-      throws InvalidConfException {
+  public static List<X509Cert> parseCerts(List<FileOrBinary> certsConf) throws InvalidConfException {
     if (CollectionUtil.isEmpty(certsConf)) {
       return Collections.emptyList();
     }

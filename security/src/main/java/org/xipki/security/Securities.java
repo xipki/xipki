@@ -35,7 +35,6 @@ import org.xipki.util.exception.InvalidConfException;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -134,8 +133,7 @@ public class Securities implements Closeable {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       validate(password);
     }
 
@@ -164,10 +162,7 @@ public class Securities implements Closeable {
     List<P11ModuleFactory> factories = new ArrayList<>(3);
     factories.add(new IaikP11ModuleFactory());
 
-    String[] classNames = {
-        "org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory",
-        "org.xipki.security.pkcs11.proxy.ProxyP11ModuleFactory"
-    };
+    String[] classNames = {"org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory"};
     ClassLoader cl = Securities.class.getClassLoader();
 
     for (String className : classNames) {
@@ -181,8 +176,7 @@ public class Securities implements Closeable {
 
       try {
         factories.add((P11ModuleFactory) clazz.getDeclaredConstructor().newInstance());
-      } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
-               InvocationTargetException ex) {
+      } catch (Exception ex) {
         LogUtil.error(LOG, ex, "could not create new instance of " + className);
       }
     }
@@ -198,13 +192,11 @@ public class Securities implements Closeable {
     return p11CryptServiceFactory;
   }
 
-  public void init()
-      throws IOException, InvalidConfException {
+  public void init() throws IOException, InvalidConfException {
     init(null);
   }
 
-  public void init(SecurityConf conf)
-      throws IOException, InvalidConfException {
+  public void init(SecurityConf conf) throws IOException, InvalidConfException {
     if (Security.getProvider("BC") == null) {
       LOG.info("add BouncyCastleProvider");
       Security.addProvider(new BouncyCastleProvider());
@@ -240,8 +232,7 @@ public class Securities implements Closeable {
     }
   } // method close
 
-  private void initSecurityFactory(SecurityConf conf)
-      throws IOException, InvalidConfException {
+  private void initSecurityFactory(SecurityConf conf) throws IOException, InvalidConfException {
     Passwords passwords = new Passwords();
     passwords.init(conf.getPassword());
 
@@ -283,8 +274,7 @@ public class Securities implements Closeable {
           Class<?> clazz = Class.forName(className);
           SignerFactory factory = (SignerFactory) clazz.getDeclaredConstructor().newInstance();
           signerFactoryRegister.registFactory(factory);
-        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException |
-                 InvocationTargetException ex) {
+        } catch (Exception ex) {
           throw new InvalidConfException("error caught while initializing SignerFactory "
               + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
@@ -298,8 +288,7 @@ public class Securities implements Closeable {
           Class<?> clazz = Class.forName(className);
           KeypairGeneratorFactory factory = (KeypairGeneratorFactory) clazz.getDeclaredConstructor().newInstance();
           keypairFactoryRegister.registFactory(factory);
-        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException |
-                 InvocationTargetException ex) {
+        } catch (Exception ex) {
           throw new InvalidConfException("error caught while initializing KeypairGeneratorFactory "
               + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }

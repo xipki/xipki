@@ -78,14 +78,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     X509ProfileType profile = getBaseProfile("certprofile rootca", CertLevel.RootCA, "10y");
 
     // Subject
-    Subject subject = profile.getSubject();
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(rdn(DN.C));
-    rdnControls.add(rdn(DN.O));
-    rdnControls.add(rdn01(DN.OU));
-    rdnControls.add(rdn01(DN.SN));
-    rdnControls.add(rdn(DN.CN));
+    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn01(DN.SN), rdn(DN.CN));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -176,10 +169,10 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
 
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
-    list.add(createExtension(Extn.id_extension_pkix_ocsp_nocheck, false, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.freshestCRL, false, false));
+    list.add(createExtension(Extn.id_extension_pkix_ocsp_nocheck, false, false));
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, true));
@@ -214,9 +207,9 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
 
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, true));
@@ -256,9 +249,9 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions
     // Extensions - controls
     List<ExtensionType> list = profile.getExtensions();
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - SubjectAltNames
     list.add(createExtension(Extension.subjectAlternativeName, true, false));
@@ -313,9 +306,9 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions
     // Extensions - controls
     List<ExtensionType> list = profile.getExtensions();
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - SubjectAltNames
     list.add(createExtension(Extension.subjectAlternativeName, true, false));
@@ -403,9 +396,9 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions
     // Extensions - controls
     List<ExtensionType> list = profile.getExtensions();
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - SubjectAltNames
     list.add(createExtension(Extension.subjectAlternativeName, true, false));
@@ -446,9 +439,9 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
 
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, true));
@@ -484,9 +477,9 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
 
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, true));
@@ -513,15 +506,15 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Subject
     addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn(DN.CN),
         rdn01(Extn.id_GMT_0015_ICRegistrationNumber), rdn01(Extn.id_GMT_0015_IdentityCode),
-        rdn01(Extn.id_GMT_0015_InsuranceNumber),  rdn01(Extn.id_GMT_0015_OrganizationCode),
+        rdn01(Extn.id_GMT_0015_InsuranceNumber),      rdn01(Extn.id_GMT_0015_OrganizationCode),
         rdn01(Extn.id_GMT_0015_TaxationNumber));
 
     // Extensions
     // Extensions - controls
     List<ExtensionType> list = profile.getExtensions();
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, true));

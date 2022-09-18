@@ -128,17 +128,10 @@ public enum HashAlgo {
   }
 
   public boolean isShake() {
-    switch (this) {
-      case SHAKE128:
-      case SHAKE256:
-        return true;
-      default:
-        return false;
-    }
+    return this == SHAKE128 || this == SHAKE256;
   }
 
-  public static HashAlgo getInstance(AlgorithmIdentifier id)
-      throws NoSuchAlgorithmException {
+  public static HashAlgo getInstance(AlgorithmIdentifier id) throws NoSuchAlgorithmException {
     Args.notNull(id, "id");
     ASN1Encodable params = id.getParameters();
     if (params != null && !DERNull.INSTANCE.equals(params)) {
@@ -148,8 +141,7 @@ public enum HashAlgo {
     return getInstance(id.getAlgorithm());
   }
 
-  public static HashAlgo getInstance(ASN1ObjectIdentifier oid)
-      throws NoSuchAlgorithmException {
+  public static HashAlgo getInstance(ASN1ObjectIdentifier oid) throws NoSuchAlgorithmException {
     Args.notNull(oid, "oid");
     for (HashAlgo hashAlgo : values()) {
       if (hashAlgo.oid.equals(oid)) {
@@ -167,8 +159,7 @@ public enum HashAlgo {
     return alg;
   }
 
-  public static HashAlgo getInstanceForEncoded(byte[] encoded)
-      throws NoSuchAlgorithmException {
+  public static HashAlgo getInstanceForEncoded(byte[] encoded) throws NoSuchAlgorithmException {
     return getInstanceForEncoded(encoded, 0, encoded.length);
   }
 

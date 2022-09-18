@@ -82,19 +82,12 @@ public class OcspServerImpl implements OcspServer {
 
     @Override
     public boolean equals(Object obj) {
-      if (!(obj instanceof SizeComparableString)) {
-        return false;
-      }
-      return str.contentEquals(((SizeComparableString) obj).str);
+      return obj instanceof SizeComparableString ? str.contentEquals(((SizeComparableString) obj).str) : false;
     }
 
     @Override
     public int compareTo(SizeComparableString obj) {
-      if (str.length() == obj.str.length()) {
-        return 0;
-      }
-
-      return (str.length() > obj.str.length()) ? 1 : -1;
+      return (str.length() == obj.str.length()) ? 0 : (str.length() > obj.str.length()) ? 1 : -1;
     }
 
   } // class SizeComparableString
@@ -211,21 +204,18 @@ public class OcspServerImpl implements OcspServer {
   }
 
   public ResponderImpl getResponder(String name) {
-    notBlank(name, "name");
-    return responders.get(name);
+    return responders.get(notBlank(name, "name"));
   }
 
   public boolean isInitialized() {
     return initialized.get();
   }
 
-  public void init()
-      throws InvalidConfException, DataAccessException, PasswordResolverException {
+  public void init() throws InvalidConfException, PasswordResolverException {
     init(true);
   }
 
-  public void init(boolean force)
-      throws InvalidConfException, PasswordResolverException {
+  public void init(boolean force) throws InvalidConfException, PasswordResolverException {
     LOG.info("starting OCSPResponder server ...");
     if (initialized.get()) {
       if (!force) {
@@ -247,8 +237,7 @@ public class OcspServerImpl implements OcspServer {
     }
   } // method init
 
-  private void init0()
-      throws OcspStoreException, InvalidConfException, PasswordResolverException {
+  private void init0() throws OcspStoreException, InvalidConfException, PasswordResolverException {
     if (confFile == null) {
       throw new IllegalStateException("confFile is not set");
     }
@@ -1046,8 +1035,7 @@ public class OcspServerImpl implements OcspServer {
     return responder.getSigner().isHealthy();
   } // method healthCheck
 
-  public void refreshTokenForSignerType(String signerType)
-      throws XiSecurityException {
+  public void refreshTokenForSignerType(String signerType) throws XiSecurityException {
     securityFactory.refreshTokenForSignerType(signerType);
   }
 

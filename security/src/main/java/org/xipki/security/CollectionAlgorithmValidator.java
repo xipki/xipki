@@ -118,8 +118,7 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
 
   @Override
   public boolean isAlgorithmPermitted(SignAlgo algo) {
-    notNull(algo, "algo");
-    return algos.contains(algo);
+    return algos.contains(notNull(algo, "algo"));
   }
 
 }

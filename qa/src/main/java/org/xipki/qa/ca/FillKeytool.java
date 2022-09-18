@@ -132,39 +132,20 @@ public class FillKeytool implements AutoCloseable {
       sql = "DELETE FROM KEYSPEC";
       datasource.createStatement(conn).executeUpdate(sql);
 
-      List<String> keyspecs = new LinkedList<>();
-
-      // DSA
-      keyspecs.add("DSA/1024/160");
-      keyspecs.add("DSA/2048/224");
-      keyspecs.add("DSA/2048/256");
-      keyspecs.add("DSA/3072/256");
-
-      // EDDSA/XDH
-      keyspecs.add("ED25519");
-      keyspecs.add("ED448");
-      keyspecs.add("X25519");
-      keyspecs.add("X448");
+      List<String> keyspecs = Arrays.asList("DSA/1024/160", "DSA/2048/224", "DSA/2048/256", "DSA/3072/256",
+          "RSA/2048", "RSA/3072", "RSA/4096", "ED25519", "ED448", "X25519", "X448");
 
       // EC
       ASN1ObjectIdentifier[] curves = {
-          SECObjectIdentifiers.secp256r1,
-          SECObjectIdentifiers.secp384r1,
-          SECObjectIdentifiers.secp521r1,
-          TeleTrusTObjectIdentifiers.brainpoolP256r1,
-          TeleTrusTObjectIdentifiers.brainpoolP384r1,
-          TeleTrusTObjectIdentifiers.brainpoolP512r1,
+          SECObjectIdentifiers.secp256r1,             SECObjectIdentifiers.secp384r1,
+          SECObjectIdentifiers.secp521r1,             TeleTrusTObjectIdentifiers.brainpoolP256r1,
+          TeleTrusTObjectIdentifiers.brainpoolP384r1, TeleTrusTObjectIdentifiers.brainpoolP512r1,
           GMObjectIdentifiers.sm2p256v1,
       };
 
       for (ASN1ObjectIdentifier curve : curves) {
         keyspecs.add("EC/" + curve.getId());
       }
-
-      // RSA
-      keyspecs.add("RSA/2048");
-      keyspecs.add("RSA/3072");
-      keyspecs.add("RSA/4096");
 
       Map<String, Integer> keyspecToIdMap = new HashMap<>();
 
@@ -283,8 +264,7 @@ public class FillKeytool implements AutoCloseable {
         }
 
         KeyPair kp = KeyUtil.generateRSAKeypair(keysize, null, random);
-        java.security.interfaces.RSAPublicKey rsaPubKey =
-            (java.security.interfaces.RSAPublicKey) kp.getPublic();
+        RSAPublicKey rsaPubKey = (RSAPublicKey) kp.getPublic();
         return KeyUtil.toPrivateKeyInfo((RSAPrivateCrtKey) kp.getPrivate());
       }
       case "EC": {

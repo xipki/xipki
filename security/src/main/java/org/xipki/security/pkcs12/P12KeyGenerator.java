@@ -240,8 +240,7 @@ public class P12KeyGenerator {
     return result;
   } // method generateIdentity
 
-  private static ContentSigner getContentSigner(PrivateKey key, PublicKey publicKey)
-      throws Exception {
+  private static ContentSigner getContentSigner(PrivateKey key, PublicKey publicKey) throws Exception {
     if (key instanceof XDHKey) {
       String algorithm = key.getAlgorithm();
       ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(algorithm);

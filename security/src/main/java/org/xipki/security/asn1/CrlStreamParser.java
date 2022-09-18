@@ -109,13 +109,9 @@ public class CrlStreamParser extends Asn1StreamParser {
       this.serialNumber = serialNumber;
       this.revocationDate = revocationDate.getTime() / 1000;
       this.reason = reason;
-      if (invalidityDate == null) {
-        this.invalidityDate = 0;
-      } else {
-        this.invalidityDate = revocationDate.equals(invalidityDate) ? 0 : invalidityDate.getTime() / 1000;
-      }
-
       this.certificateIssuer = certificateIssuer;
+      this.invalidityDate = (invalidityDate == null)
+          ? 0 : revocationDate.equals(invalidityDate) ? 0 : invalidityDate.getTime() / 1000;
     }
 
     public BigInteger getSerialNumber() {
@@ -224,11 +220,8 @@ public class CrlStreamParser extends Asn1StreamParser {
         }
 
         coreExtValue = X509Util.getCoreExtValue(extns, Extension.reasonCode);
-        if (coreExtValue == null) {
-          reason = CrlReason.UNSPECIFIED.getCode();
-        } else {
-          reason = CRLReason.getInstance(coreExtValue).getValue().intValue();
-        }
+        reason = coreExtValue == null ? CrlReason.UNSPECIFIED.getCode()
+            : CRLReason.getInstance(coreExtValue).getValue().intValue();
       }
 
       next = new RevokedCert(serialNumber, revocationDate, reason, invalidityDate, certificateIssuer);
@@ -405,11 +398,7 @@ public class CrlStreamParser extends Asn1StreamParser {
         this.crlNumber = (bytes == null) ? null : ASN1Integer.getInstance(bytes).getValue();
 
         bytes = X509Util.getCoreExtValue(this.crlExtensions, Extension.deltaCRLIndicator);
-        if (bytes == null) {
-          this.baseCrlNumber = null;
-        } else {
-          this.baseCrlNumber = ASN1Integer.getInstance(bytes).getPositiveValue();
-        }
+        this.baseCrlNumber = (bytes == null) ? null : ASN1Integer.getInstance(bytes).getPositiveValue();
       } else {
         this.crlNumber = null;
         this.baseCrlNumber = null;

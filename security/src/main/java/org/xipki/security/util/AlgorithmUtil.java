@@ -42,57 +42,53 @@ public class AlgorithmUtil {
   private static final Map<ASN1ObjectIdentifier, String> curveOidToNameMap;
 
   static {
-    {
-      //----- initialize the static fields curveNames, curveNameOidMap, curveOidNameMap
-      Map<String, ASN1ObjectIdentifier> nameOidMap = new HashMap<>();
+    //----- initialize the static fields curveNames, curveNameOidMap, curveOidNameMap
+    Map<String, ASN1ObjectIdentifier> nameOidMap = new HashMap<>();
 
-      Enumeration<?> names = ECNamedCurveTable.getNames();
-      List<String> nameList = new LinkedList<>();
-      while (names.hasMoreElements()) {
-        String name = ((String) names.nextElement()).toLowerCase();
-        ASN1ObjectIdentifier oid = org.bouncycastle.asn1.x9.ECNamedCurveTable.getOID(name);
-        if (oid == null) {
-          continue;
-        }
-
-        nameList.add(name);
-        nameOidMap.put(name, oid);
+    Enumeration<?> names = ECNamedCurveTable.getNames();
+    List<String> nameList = new LinkedList<>();
+    while (names.hasMoreElements()) {
+      String name = ((String) names.nextElement()).toLowerCase();
+      ASN1ObjectIdentifier oid = org.bouncycastle.asn1.x9.ECNamedCurveTable.getOID(name);
+      if (oid == null) {
+        continue;
       }
 
-      Map<ASN1ObjectIdentifier, String> oidNameMap = new HashMap<>();
-
-      // X962, SEC and NIST give the same curve different name, we use here only NIST names
-      @SuppressWarnings("rawtypes")
-      Enumeration nistNames = NISTNamedCurves.getNames();
-      while (nistNames.hasMoreElements()) {
-        String nistName = (String) nistNames.nextElement();
-        ASN1ObjectIdentifier oid = NISTNamedCurves.getOID(nistName);
-        oidNameMap.put(oid, nistName);
-      }
-
-      for (String name : nameList) {
-        ASN1ObjectIdentifier oid = nameOidMap.get(name);
-
-        nameOidMap.put(name, oid);
-        if (!oidNameMap.containsKey(oid)) {
-          oidNameMap.put(oid, name);
-        }
-      }
-
-      Collections.sort(nameList);
-      curveNames = Collections.unmodifiableList(nameList);
-      curveNameToOidMap = Collections.unmodifiableMap(nameOidMap);
-      curveOidToNameMap = Collections.unmodifiableMap(oidNameMap);
+      nameList.add(name);
+      nameOidMap.put(name, oid);
     }
+
+    Map<ASN1ObjectIdentifier, String> oidNameMap = new HashMap<>();
+
+    // X962, SEC and NIST give the same curve different name, we use here only NIST names
+    @SuppressWarnings("rawtypes")
+    Enumeration nistNames = NISTNamedCurves.getNames();
+    while (nistNames.hasMoreElements()) {
+      String nistName = (String) nistNames.nextElement();
+      ASN1ObjectIdentifier oid = NISTNamedCurves.getOID(nistName);
+      oidNameMap.put(oid, nistName);
+    }
+
+    for (String name : nameList) {
+      ASN1ObjectIdentifier oid = nameOidMap.get(name);
+
+      nameOidMap.put(name, oid);
+      if (!oidNameMap.containsKey(oid)) {
+        oidNameMap.put(oid, name);
+      }
+    }
+
+    Collections.sort(nameList);
+    curveNames = Collections.unmodifiableList(nameList);
+    curveNameToOidMap = Collections.unmodifiableMap(nameOidMap);
+    curveOidToNameMap = Collections.unmodifiableMap(oidNameMap);
   } // method static
 
   private AlgorithmUtil() {
   }
 
   public static boolean equalsAlgoName(String algoNameA, String algoNameB) {
-    notBlank(algoNameA, "algoNameA");
-    notBlank(algoNameB, "algoNameB");
-    if (algoNameA.equalsIgnoreCase(algoNameB)) {
+    if (notBlank(algoNameA, "algoNameA").equalsIgnoreCase(notBlank(algoNameB, "algoNameB"))) {
       return true;
     }
 
@@ -114,8 +110,7 @@ public class AlgorithmUtil {
   } // method equalsAlgoName
 
   private static Set<String> splitAlgoNameTokens(String algoName) {
-    notBlank(algoName, "algoName");
-    String tmpAlgoName = algoName.toUpperCase();
+    String tmpAlgoName = notBlank(algoName, "algoName").toUpperCase();
     int idx = tmpAlgoName.indexOf("AND");
     Set<String> set = new HashSet<>();
 

@@ -80,8 +80,7 @@ public class AESGmacContentSigner implements XiContentSigner {
 
   private final int nonceOffset;
 
-  public AESGmacContentSigner(SignAlgo signAlgo, SecretKey signingKey)
-      throws XiSecurityException {
+  public AESGmacContentSigner(SignAlgo signAlgo, SecretKey signingKey) throws XiSecurityException {
     this.signAlgo = notNull(signAlgo, "signAlgo");
     this.signingKey = notNull(signingKey, "signingKey");
 

@@ -223,8 +223,6 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
   protected static RdnType rdn(ASN1ObjectIdentifier type, String regex, String group, ValueType value) {
     RdnType ret = new RdnType();
     ret.setType(createOidType(type));
-    ret.setMinOccurs(1);
-    ret.setMaxOccurs(1);
     ret.setValue(value);
 
     if (regex != null) {
@@ -283,8 +281,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     return profile;
   } // method getBaseCabProfile
 
-  protected static X509ProfileType getBaseProfile(
-      String description, CertLevel certLevel, String validity) {
+  protected static X509ProfileType getBaseProfile(String description, CertLevel certLevel, String validity) {
     return  getBaseProfile(description, certLevel, validity, true);
   }
 

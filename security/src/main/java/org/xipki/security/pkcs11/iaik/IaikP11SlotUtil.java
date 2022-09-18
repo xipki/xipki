@@ -69,8 +69,7 @@ class IaikP11SlotUtil {
 
   private static final Logger LOG = LoggerFactory.getLogger(IaikP11SlotUtil.class);
 
-  static void singleLogin(Session session, long userType, char[] pin)
-      throws P11TokenException {
+  static void singleLogin(Session session, long userType, char[] pin) throws P11TokenException {
     char[] tmpPin = pin;
     // some driver does not accept null PIN
     if (pin == null) {
@@ -113,8 +112,7 @@ class IaikP11SlotUtil {
     return digest;
   } // method digestKey0
 
-  static Mechanism getMechanism(long mechanism, P11Params parameters)
-      throws P11TokenException {
+  static Mechanism getMechanism(long mechanism, P11Params parameters) throws P11TokenException {
     Mechanism ret = Mechanism.get(mechanism);
     if (parameters == null) {
       return ret;
@@ -155,8 +153,7 @@ class IaikP11SlotUtil {
     return certs[0];
   } // method getCertificateObject
 
-  static boolean checkSessionLoggedIn(Session session, long userType)
-      throws P11TokenException {
+  static boolean checkSessionLoggedIn(Session session, long userType) throws P11TokenException {
     SessionInfo info;
     try {
       info = session.getSessionInfo();
@@ -200,8 +197,7 @@ class IaikP11SlotUtil {
     return chars == null ? null : new String(chars);
   }
 
-  static List<Storage> getObjects(Session session, Storage template)
-      throws P11TokenException {
+  static List<Storage> getObjects(Session session, Storage template) throws P11TokenException {
     return getObjects(session, template, 9999);
   }
 
@@ -340,8 +336,7 @@ class IaikP11SlotUtil {
     }
   } // method generatePublicKey
 
-  static X509Cert parseCert(X509PublicKeyCertificate p11Cert)
-      throws P11TokenException {
+  static X509Cert parseCert(X509PublicKeyCertificate p11Cert) throws P11TokenException {
     try {
       byte[] encoded = value(p11Cert.getValue());
       return X509Util.parseCert(encoded);

@@ -132,7 +132,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
 
   private static void certprofileCabOrganizationValidatedTls(String destFilename) {
     X509ProfileType profile = getBaseCabSubscriberProfile(
-        "certprofile TLS (CA/Browser Forum BR, Organization Validiated)");
+        "certprofile TLS (CA/Browser Forum BR, Organization Validated)");
 
     // Subject
     addRdns(profile, rdn(DN.C), rdn01(DN.ST), rdn01(DN.localityName), rdn(DN.O), rdn01(DN.OU), rdn01(DN.SN),
@@ -150,7 +150,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
 
   private static void certprofileCabIndividualValidatedTls(String destFilename) {
     X509ProfileType profile = getBaseCabSubscriberProfile(
-        "certprofile TLS (CA/Browser Forum BR, Individual Validiated)");
+        "certprofile TLS (CA/Browser Forum BR, Individual Validated)");
 
     // Subject
     addRdns(profile, rdn(DN.C), rdn01(DN.ST), rdn01(DN.localityName), rdn(DN.givenName),

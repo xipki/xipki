@@ -62,7 +62,7 @@ public class CtLog {
       SignatureAndHashAlgorithm algorithm = SignatureAndHashAlgorithm.getInstance(copyOf(encoded, offset, 2));
       offset += 2;
 
-      int signatureLen = readInt(encoded, offset, 2);
+      int signatureLen = readInt2(encoded, offset);
       offset += 2;
       byte[] signature = copyOf(encoded, offset, signatureLen);
       offset += signatureLen;
@@ -124,7 +124,7 @@ public class CtLog {
     private final List<SignedCertificateTimestamp> scts;
 
     public static SerializedSCT getInstance(byte[] encoded) {
-      int length = readInt(encoded, 0, 2);
+      int length = readInt2(encoded, 0);
       if (2 + length != encoded.length) {
         throw new IllegalArgumentException("length unmatch");
       }
@@ -133,7 +133,7 @@ public class CtLog {
 
       AtomicInteger offsetObj = new AtomicInteger(2);
       while (offsetObj.get() < encoded.length) {
-        int sctLen = readInt(encoded, offsetObj.getAndAdd(2), 2);
+        int sctLen = readInt2(encoded, offsetObj.getAndAdd(2));
         SignedCertificateTimestamp sct = SignedCertificateTimestamp.getInstance(encoded, offsetObj, sctLen);
         scts.add(sct);
       }
@@ -348,15 +348,11 @@ public class CtLog {
       long timestamp = Pack.bigEndianToLong(encoded, offset);
       offset += 8;
 
-      int extensionsLen = readInt(encoded, offset, 2);
+      int extensionsLen = readInt2(encoded, offset);
       offset += 2;
-      byte[] extensions;
-      if (extensionsLen == 0) {
-        extensions = new byte[0];
-      } else {
-        extensions = copyOf(encoded, offset, extensionsLen);
-        offset += extensionsLen;
-      }
+
+      byte[] extensions = (extensionsLen == 0) ? new byte[0] : copyOf(encoded, offset, extensionsLen);
+      offset += extensionsLen;
 
       offsetObj.set(offset);
 
@@ -402,10 +398,7 @@ public class CtLog {
 
     public byte[] getEncoded() {
       byte[] encodedDs = digitallySigned.getEncoded();
-      int totoalLen = 41 //37 = 1 + 32 + 8
-          + 2 // length of extensions
-          + extensions.length
-          + encodedDs.length;
+      int totoalLen = 41 + 2 + extensions.length + encodedDs.length; //41: 1 + 32 + 8, 2:  length of extensions
 
       byte[] res = new byte[totoalLen];
       int offset = 0;
@@ -474,47 +467,29 @@ public class CtLog {
    */
   private static int writeInt(int value, byte[] buffer, int offset, int bytesLenOfValue) {
     if (bytesLenOfValue == 4) {
-      buffer[offset]     = (byte) (value >>> 24);
-      buffer[offset + 1] = (byte) (value >>> 16);
-      buffer[offset + 2] = (byte) (value >>> 8);
-      buffer[offset + 3] = (byte)  value;
-    } else if (bytesLenOfValue == 3) {
-      buffer[offset]     = (byte) (value >>> 16);
-      buffer[offset + 1] = (byte) (value >>> 8);
-      buffer[offset + 2] = (byte)  value;
-    } else if (bytesLenOfValue == 2) {
-      buffer[offset]     = (byte) (value >>> 8);
-      buffer[offset + 1] = (byte)  value;
-    } else {
-      buffer[offset]     = (byte)  value;
+      buffer[offset++] = (byte) (value >>> 24);
     }
 
+    if (bytesLenOfValue >= 3) {
+      buffer[offset++] = (byte) (value >>> 16);
+    }
+
+    if (bytesLenOfValue >= 2) {
+      buffer[offset++] = (byte) (value >>> 8);
+    }
+
+    buffer[offset] = (byte)  value;
     return bytesLenOfValue;
   } // method writeInt
 
   /**
-   * Read integer value from the buffer.
+   * Read integer value from the buffer (2 bytes).
    * @param buffer buffer
    * @param offset offset of the buffer
-   * @param bytesLenOfValue number of bytes to represent the length, between 1 and 4.
    * @return bytesLenOfLength
    */
-  private static int readInt(byte[] buffer, int offset, int bytesLenOfValue) {
-    if (bytesLenOfValue == 4) {
-      return (0xFF & buffer[offset])    << 24
-          | (0xFF & buffer[offset + 1]) << 16
-          | (0xFF & buffer[offset + 2]) << 8
-          | (0xFF & buffer[offset + 3]);
-    } else if (bytesLenOfValue == 3) {
-      return  (0xFF & buffer[offset])   << 16
-          | (0xFF & buffer[offset + 1]) << 8
-          | (0xFF & buffer[offset + 2]);
-    } else if (bytesLenOfValue == 2) {
-      return  (0xFF & buffer[offset])   << 8
-          | (0xFF & buffer[offset + 1]);
-    } else {
-      return 0xFF & buffer[offset];
-    }
+  private static int readInt2(byte[] buffer, int offset) {
+    return ((0xFF & buffer[offset]) << 8) | (0xFF & buffer[offset + 1]);
   } // method readInt
 
   private static byte[] copyOf(byte[] original, int from, int len) {
@@ -542,8 +517,7 @@ public class CtLog {
     }
   }
 
-  public static byte[] getPreCertTbsCert(TBSCertificate tbsCert)
-      throws IOException {
+  public static byte[] getPreCertTbsCert(TBSCertificate tbsCert) throws IOException {
     ASN1EncodableVector vec = new ASN1EncodableVector();
     ASN1Sequence tbs = (ASN1Sequence) tbsCert.toASN1Primitive();
 

@@ -60,15 +60,11 @@ public class IaikP11Module extends P11Module {
     String library = moduleConf.getNativeLibrary();
     try {
       Info info = module.getInfo();
-      this.description = StringUtil.concatObjects("PKCS#11 IAIK",
-          "\n\tPath: ", library,
-          "\n\tCryptoki Version: ", info.getCryptokiVersion(),
-          "\n\tManufacturerID: ", info.getManufacturerID(),
-          "\n\tLibrary Description: ", info.getLibraryDescription(),
-          "\n\tLibrary Version: ", info.getLibraryVersion());
+      this.description = StringUtil.concatObjects("PKCS#11 IAIK", "\n\tPath: ", library,
+          "\n\tCryptoki Version: ", info.getCryptokiVersion(), "\n\tManufacturerID: ", info.getManufacturerID(),
+          "\n\tLibrary Description: ", info.getLibraryDescription(), "\n\tLibrary Version: ", info.getLibraryVersion());
     } catch (TokenException ex) {
-      this.description = StringUtil.concatObjects("PKCS#11 IAIK",
-          "\n\tPath ", moduleConf.getNativeLibrary());
+      this.description = StringUtil.concatObjects("PKCS#11 IAIK", "\n\tPath ", moduleConf.getNativeLibrary());
     }
     LOG.info("PKCS#11 module\n{}", this.description);
 
@@ -137,8 +133,7 @@ public class IaikP11Module extends P11Module {
       P11Slot p11Slot = new IaikP11Slot(moduleConf.getName(), slotId, slot,
           moduleConf.isReadOnly(), moduleConf.getUserType(), pwd, moduleConf.getMaxMessageSize(),
           moduleConf.getP11MechanismFilter(), moduleConf.getP11NewObjectConf(),
-          moduleConf.getNumSessions(), moduleConf.getSecretKeyTypes(),
-          moduleConf.getKeyPairTypes());
+          moduleConf.getNumSessions(), moduleConf.getSecretKeyTypes(), moduleConf.getKeyPairTypes());
 
       slots.add(p11Slot);
     }

@@ -159,8 +159,8 @@ public class CertprofileQa {
         issue.setFailureMessage("Certificate.tbsCertificate.signature != Certificate.signatureAlgorithm");
       }
 
-      try {
-        if (!issue.isFailed()) {
+      if (!issue.isFailed()) {
+        try {
           SignAlgo signAlgo = SignAlgo.getInstance(sigAlgId);
 
           if (!signatureAlgorithms.contains(signAlgo)) {
@@ -172,9 +172,9 @@ public class CertprofileQa {
               issue.setFailureMessage("signatureAlgorithm has invalid content");
             }
           }
+        } catch (NoSuchAlgorithmException ex) {
+          issue.setFailureMessage("unsupported signature algorithm " + sigAlgId.getAlgorithm().getId());
         }
-      } catch (NoSuchAlgorithmException ex) {
-        issue.setFailureMessage("unsupported signature algorithm " + sigAlgId.getAlgorithm().getId());
       }
     }
 
@@ -219,8 +219,7 @@ public class CertprofileQa {
           expectedNotAfter = new Date(MAX_CERT_TIME_MS);
         }
 
-        if (issuerInfo.isCutoffNotAfter()
-            && expectedNotAfter.after(issuerInfo.getCaNotAfter())) {
+        if (issuerInfo.isCutoffNotAfter() && expectedNotAfter.after(issuerInfo.getCaNotAfter())) {
           expectedNotAfter = issuerInfo.getCaNotAfter();
         }
 

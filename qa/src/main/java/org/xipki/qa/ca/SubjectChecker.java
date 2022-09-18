@@ -118,12 +118,9 @@ public class SubjectChecker {
 
   private ValidationIssue checkSubjectAttribute(ASN1ObjectIdentifier type, X500Name subject, X500Name requestedSubject)
       throws BadCertTemplateException {
-    boolean multiValuedRdn = subjectControl.getGroup(type) != null;
-    if (multiValuedRdn) {
-      return checkSubjectAttributeMultiValued(type, subject, requestedSubject);
-    } else {
-      return checkSubjectAttributeNotMultiValued(type, subject, requestedSubject);
-    }
+    return subjectControl.getGroup(type) != null
+        ? checkSubjectAttributeMultiValued(type, subject, requestedSubject)
+        : checkSubjectAttributeNotMultiValued(type, subject, requestedSubject);
   } // method checkSubjectAttribute
 
   private ValidationIssue checkSubjectAttributeNotMultiValued(
@@ -297,23 +294,23 @@ public class SubjectChecker {
     } else if (rdnControl != null) {
       String prefix = rdnControl.getPrefix();
       if (prefix != null) {
-        if (!atvTextValue.startsWith(prefix)) {
-          failureMsg.append(name).append(" '").append(atvTextValue)
-            .append("' does not start with prefix '").append(prefix).append("'; ");
-          return;
-        } else {
+        if (atvTextValue.startsWith(prefix)) {
           atvTextValue = atvTextValue.substring(prefix.length());
+        } else {
+          failureMsg.append(name).append(" '").append(atvTextValue)
+              .append("' does not start with prefix '").append(prefix).append("'; ");
+          return;
         }
       }
 
       String suffix = rdnControl.getSuffix();
       if (suffix != null) {
-        if (!atvTextValue.endsWith(suffix)) {
-          failureMsg.append(name).append(" '").append(atvTextValue)
-            .append("' does not end with suffix '").append(suffix).append("'; ");
-          return;
-        } else {
+        if (atvTextValue.endsWith(suffix)) {
           atvTextValue = atvTextValue.substring(0, atvTextValue.length() - suffix.length());
+        } else {
+          failureMsg.append(name).append(" '").append(atvTextValue)
+              .append("' does not end with suffix '").append(suffix).append("'; ");
+          return;
         }
       }
 

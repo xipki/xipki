@@ -145,8 +145,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
    * @param soTimeout timeout in milliseconds, 0 for infinitely.
    */
   @Override
-  public ConcurrentBagEntrySigner borrowSigner(int soTimeout)
-      throws NoIdleSignerException {
+  public ConcurrentBagEntrySigner borrowSigner(int soTimeout) throws NoIdleSignerException {
     ConcurrentBagEntrySigner signer = null;
     try {
       signer = signers.borrow(soTimeout, TimeUnit.MILLISECONDS);

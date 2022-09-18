@@ -96,8 +96,7 @@ public class P12MacContentSignerBuilder {
 
     for (int i = 0; i < parallelism; i++) {
       XiContentSigner signer = sigAlgo.isGmac()
-          ? new AESGmacContentSigner(sigAlgo, key)
-          : new HmacContentSigner(sigAlgo, key);
+          ? new AESGmacContentSigner(sigAlgo, key) : new HmacContentSigner(sigAlgo, key);
       signers.add(signer);
     }
 

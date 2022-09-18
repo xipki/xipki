@@ -74,8 +74,7 @@ public class IssuerHash {
     notNull(issuerNameHash, "issuerNameHash");
     notNull(issuerKeyHash, "issuerKeyHash");
 
-    return this.hashAlgo == hashAlgo
-        && Arrays.equals(this.issuerNameHash, issuerNameHash)
+    return this.hashAlgo == hashAlgo && Arrays.equals(this.issuerNameHash, issuerNameHash)
         && Arrays.equals(this.issuerKeyHash, issuerKeyHash);
   }
 

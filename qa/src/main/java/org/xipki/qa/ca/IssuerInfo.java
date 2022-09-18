@@ -54,27 +54,10 @@ public class IssuerInfo {
     notNull(certBytes, "certBytes");
 
     this.cutoffNotAfter = cutoffNotAfter;
-
-    if (isEmpty(caIssuerUrls)) {
-      this.caIssuerUrls = null;
-    } else {
-      this.caIssuerUrls = Collections.unmodifiableSet(new HashSet<>(caIssuerUrls));
-    }
-
-    if (isEmpty(ocspUrls)) {
-      this.ocspUrls = null;
-    } else {
-      this.ocspUrls = Collections.unmodifiableSet(new HashSet<>(ocspUrls));
-    }
-
-    if (isEmpty(crlUrls)) {
-      this.crlUrls = null;
-    } else {
-      this.crlUrls = Collections.unmodifiableSet(new HashSet<>(crlUrls));
-    }
-
+    this.caIssuerUrls = isEmpty(caIssuerUrls) ? null : Collections.unmodifiableSet(new HashSet<>(caIssuerUrls));
+    this.ocspUrls = isEmpty(ocspUrls) ? null : Collections.unmodifiableSet(new HashSet<>(ocspUrls));
+    this.crlUrls = isEmpty(crlUrls) ? null : Collections.unmodifiableSet(new HashSet<>(crlUrls));
     this.deltaCrlUrls = isEmpty(deltaCrlUrls) ? null : Collections.unmodifiableSet(new HashSet<>(deltaCrlUrls));
-
     this.cert = X509Util.parseCert(certBytes);
   } // constructor
 

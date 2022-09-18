@@ -553,25 +553,9 @@ CMP Client Commands
 
      enroll certificate (PKCS#12 keystore)
 
-   * `xi:cmp-gen-crl`
-
-     generate CRL
-
    * `xi:cmp-get-crl`
 
      download CRL
-
-   * `xi:cmp-health`
-
-     check healthy status of CA
-
-   * `xi:cmp-init`
-
-     initialize CMP client
-
-   * `xi:cmp-rm-cert`
-
-     remove certificate
 
    * `xi:cmp-revoke`
 
@@ -617,9 +601,3 @@ SCEP Client Commands
 
      download CRL
 
-OCSP Client Commands
------
-
-   * `xi:ocsp-status`
-
-     request certificate status

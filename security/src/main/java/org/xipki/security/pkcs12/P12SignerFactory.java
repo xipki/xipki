@@ -141,8 +141,7 @@ public class P12SignerFactory implements SignerFactory {
           }
 
           if (peerCert == null) {
-            throw new ObjectCreationException(
-                "could not find peer certificate for algorithm " + publicKeyAlg);
+            throw new ObjectCreationException("could not find peer certificate for algorithm " + publicKeyAlg);
           }
 
           P12XdhMacContentSignerBuilder signerBuilder = new P12XdhMacContentSignerBuilder(keypairWithCert, peerCert);

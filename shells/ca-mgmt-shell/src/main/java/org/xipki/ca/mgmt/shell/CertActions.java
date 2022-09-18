@@ -385,8 +385,7 @@ public class CertActions {
     protected String outFile;
 
     @Override
-    protected X509CRLHolder retrieveCrl()
-        throws Exception {
+    protected X509CRLHolder retrieveCrl() throws Exception {
       return caManager.getCurrentCrl(caName);
     }
 
@@ -605,8 +604,7 @@ public class CertActions {
     @Option(name = "--serial", aliases = "-s", description = "serial number\n(either cert or serial must be specified)")
     private String serialNumberS;
 
-    protected BigInteger getSerialNumber()
-        throws CmdFailure, IllegalCmdParamException, CertificateException, IOException, CaMgmtException  {
+    protected BigInteger getSerialNumber() throws Exception  {
       CaEntry ca = caManager.getCa(caName);
       if (ca == null) {
         throw new CmdFailure("CA " + caName + " not available");

@@ -18,7 +18,6 @@
 package org.xipki.cmp;
 
 import org.bouncycastle.asn1.cmp.PKIFreeText;
-import org.xipki.security.util.CmpFailureUtil;
 
 import static org.xipki.util.Args.notNull;
 

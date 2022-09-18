@@ -39,10 +39,7 @@ public class CtLogTest {
   @Test
   public void parseCtLogInCerts()
       throws Exception {
-    String[] certFiles = new String[]{
-        "/ctlog-certs/githubcom.pem",
-        "/ctlog-certs/cab-domain-validated1.crt"
-    };
+    String[] certFiles = new String[]{"/ctlog-certs/githubcom.pem", "/ctlog-certs/cab-domain-validated1.crt"};
 
     for (String m : certFiles) {
       try {
@@ -53,21 +50,17 @@ public class CtLogTest {
     }
   }
 
-  private void parseCtLogInCert(String certFile)
-      throws Exception {
+  private void parseCtLogInCert(String certFile) throws Exception {
     byte[] certBytes = IoUtil.read(getClass().getResourceAsStream(certFile));
     certBytes = X509Util.toDerEncoded(certBytes);
     Certificate cert = Certificate.getInstance(certBytes);
-    Extension extn = cert.getTBSCertificate().getExtensions().getExtension(
-                        ObjectIdentifiers.Extn.id_SCTs);
+    Extension extn = cert.getTBSCertificate().getExtensions().getExtension(ObjectIdentifiers.Extn.id_SCTs);
     byte[] encodedScts = DEROctetString.getInstance(extn.getParsedValue()).getOctets();
-    SignedCertificateTimestampList sctList2 =
-        SignedCertificateTimestampList.getInstance(encodedScts);
+    SignedCertificateTimestampList sctList2 = SignedCertificateTimestampList.getInstance(encodedScts);
     SignedCertificateTimestamp sct = sctList2.getSctList().get(0);
     sct.getDigitallySigned().getEncoded();
     sctList2.getSctList().get(0).getDigitallySigned().getSignatureObject();
-    byte[] encoded2 = sctList2.getEncoded();
-    Assert.assertArrayEquals(encodedScts, encoded2);
+    Assert.assertArrayEquals(encodedScts, sctList2.getEncoded());
   }
 
 }

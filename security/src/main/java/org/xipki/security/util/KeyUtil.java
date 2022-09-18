@@ -111,8 +111,7 @@ public class KeyUtil {
     }
   }
 
-  public static PrivateKeyInfo toPrivateKeyInfo(RSAPrivateCrtKey priv)
-      throws IOException {
+  public static PrivateKeyInfo toPrivateKeyInfo(RSAPrivateCrtKey priv) throws IOException {
     /*
      * RSA private keys are BER-encoded according to PKCS #1’s RSAPrivateKey ASN.1 type.
      *
@@ -131,10 +130,8 @@ public class KeyUtil {
      */
     return new PrivateKeyInfo(ALGID_RSA,
         new org.bouncycastle.asn1.pkcs.RSAPrivateKey(priv.getModulus(),
-            priv.getPublicExponent(), priv.getPrivateExponent(),
-            priv.getPrimeP(), priv.getPrimeQ(),
-            priv.getPrimeExponentP(), priv.getPrimeExponentQ(),
-            priv.getCrtCoefficient()));
+            priv.getPublicExponent(), priv.getPrivateExponent(), priv.getPrimeP(), priv.getPrimeQ(),
+            priv.getPrimeExponentP(), priv.getPrimeExponentQ(),  priv.getCrtCoefficient()));
   }
 
   public static KeyPair generateDSAKeypair(int plength, int qlength, SecureRandom random)
@@ -173,8 +170,7 @@ public class KeyUtil {
 
   public static KeyPair generateEdECKeypair(ASN1ObjectIdentifier curveId, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-    notNull(curveId, "curveId");
-    String algorithm = EdECConstants.getName(curveId);
+    String algorithm = EdECConstants.getName(notNull(curveId, "curveId"));
     KeyPairGenerator kpGen = getKeyPairGenerator(algorithm);
     synchronized (kpGen) {
       if (random != null) {
@@ -186,9 +182,7 @@ public class KeyUtil {
 
   public static KeyPair generateECKeypair(ASN1ObjectIdentifier curveId, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-    notNull(curveId, "curveId");
-
-    ECGenParameterSpec spec = new ECGenParameterSpec(curveId.getId());
+    ECGenParameterSpec spec = new ECGenParameterSpec(notNull(curveId, "curveId").getId());
     KeyPairGenerator kpGen = getKeyPairGenerator("EC");
     synchronized (kpGen) {
       if (random == null) {
@@ -239,8 +233,7 @@ public class KeyUtil {
     }
   } // method convertXDHToDummyEdDSAPrivateKey
 
-  private static KeyFactory getKeyFactory(String algorithm)
-      throws InvalidKeySpecException {
+  private static KeyFactory getKeyFactory(String algorithm) throws InvalidKeySpecException {
     String alg = algorithm.toUpperCase();
     if ("ECDSA".equals(alg)) {
       alg = "EC";
@@ -395,8 +388,7 @@ public class KeyUtil {
 
       try {
         return new SubjectPublicKeyInfo(
-            new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, dssParams),
-            new ASN1Integer(dsaPubKey.getY()));
+            new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, dssParams), new ASN1Integer(dsaPubKey.getY()));
       } catch (IOException ex) {
         throw new InvalidKeyException(ex.getMessage(), ex);
       }
@@ -492,12 +484,10 @@ public class KeyUtil {
     notNull(encodedAlgorithmIdParameters, "encodedAlgorithmIdParameters");
     notNull(encodedPoint, "encodedPoint");
 
-    ASN1Encodable algParams;
-    if (encodedAlgorithmIdParameters[0] == 6) {
-      algParams = ASN1ObjectIdentifier.getInstance(encodedAlgorithmIdParameters);
-    } else {
-      algParams = X962Parameters.getInstance(encodedAlgorithmIdParameters);
-    }
+    ASN1Encodable algParams =(encodedAlgorithmIdParameters[0] == 6)
+        ? ASN1ObjectIdentifier.getInstance(encodedAlgorithmIdParameters)
+        : X962Parameters.getInstance(encodedAlgorithmIdParameters);
+
     AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, algParams);
 
     SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo(algId, encodedPoint);
@@ -518,8 +508,7 @@ public class KeyUtil {
   } // method createECPublicKey
 
   public static ASN1ObjectIdentifier detectCurveOid(ECParameterSpec paramSpec) {
-    org.bouncycastle.jce.spec.ECParameterSpec bcParamSpec = EC5Util.convertSpec(paramSpec);
-    return ECUtil.getNamedCurveOid(bcParamSpec);
+    return ECUtil.getNamedCurveOid(EC5Util.convertSpec(paramSpec));
   }
 
   public static byte[] getUncompressedEncodedECPoint(ECPoint point, int orderBitLength) {

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.security.util;
+package org.xipki.cmp;
 
 import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.bouncycastle.asn1.cmp.PKIStatus;

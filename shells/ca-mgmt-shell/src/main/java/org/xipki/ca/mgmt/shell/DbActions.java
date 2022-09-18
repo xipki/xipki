@@ -72,8 +72,7 @@ public class DbActions {
       executor.shutdown();
       while (true) {
         try {
-          boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
-          if (terminated) {
+          if (executor.awaitTermination(1, TimeUnit.SECONDS)) {
             break;
           }
         } catch (InterruptedException ex) {

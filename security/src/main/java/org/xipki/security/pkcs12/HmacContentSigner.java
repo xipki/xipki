@@ -69,8 +69,7 @@ public class HmacContentSigner implements XiContentSigner {
 
   private final int outLen;
 
-  public HmacContentSigner(SignAlgo algorithm, SecretKey signingKey)
-      throws XiSecurityException {
+  public HmacContentSigner(SignAlgo algorithm, SecretKey signingKey) throws XiSecurityException {
     this.algorithm = notNull(algorithm, "algorithm");
     notNull(signingKey, "signingKey");
     try {

@@ -96,8 +96,7 @@ public class PublicKeyChecker {
     return resultIssues;
   } // method checkPublicKey
 
-  private void checkPublicKey(SubjectPublicKeyInfo publicKey)
-      throws BadCertTemplateException {
+  private void checkPublicKey(SubjectPublicKeyInfo publicKey) throws BadCertTemplateException {
     if (isEmpty(keyAlgorithms)) {
       return;
     }
@@ -175,20 +174,13 @@ public class PublicKeyChecker {
 
       try {
         ASN1Sequence seq = ASN1Sequence.getInstance(params);
-        ASN1Integer p = ASN1Integer.getInstance(seq.getObjectAt(0));
-        ASN1Integer q = ASN1Integer.getInstance(seq.getObjectAt(1));
-        plength = p.getPositiveValue().bitLength();
-        qlength = q.getPositiveValue().bitLength();
+        plength = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue().bitLength();
+        qlength = ASN1Integer.getInstance(seq.getObjectAt(1)).getPositiveValue().bitLength();
       } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException ex) {
         throw new BadCertTemplateException("illegal Dss-Parms");
       }
 
-      boolean match = dsaOption.allowsPlength(plength);
-      if (match) {
-        match = dsaOption.allowsQlength(qlength);
-      }
-
-      if (match) {
+      if (dsaOption.allowsPlength(plength) && dsaOption.allowsQlength(qlength)) {
         return;
       }
     } else {

@@ -208,15 +208,9 @@ class IaikP11Slot extends P11Slot {
       for (Mechanism mech : mechanisms) {
         long code = mech.getMechanismCode();
         if (smartcard) {
-          if (code == CKM_ECDSA_SHA1 ||
-              code == CKM_ECDSA_SHA224 ||
-              code == CKM_ECDSA_SHA256 ||
-              code == CKM_ECDSA_SHA384 ||
-              code == CKM_ECDSA_SHA512 ||
-              code == CKM_ECDSA_SHA3_224 ||
-              code == CKM_ECDSA_SHA3_256 ||
-              code == CKM_ECDSA_SHA3_384 ||
-              code == CKM_ECDSA_SHA3_512) {
+          if (code == CKM_ECDSA_SHA1     || code == CKM_ECDSA_SHA224   || code == CKM_ECDSA_SHA256 ||
+              code == CKM_ECDSA_SHA384   || code == CKM_ECDSA_SHA512   || code == CKM_ECDSA_SHA3_224 ||
+              code == CKM_ECDSA_SHA3_256 || code == CKM_ECDSA_SHA3_384 || code == CKM_ECDSA_SHA3_512) {
             ignoreMechs.append(Functions.getMechanismDescription(code)).append(", ");
           } else {
             ret.addMechanism(code);
@@ -405,9 +399,8 @@ class IaikP11Slot extends P11Slot {
   } // method analyseSingleKey
 
   byte[] digestKey(long mech, IaikP11Identity identity) throws P11TokenException {
-    notNull(identity, "identity");
+    Key key = notNull(identity, "identity").getSigningKey();
     assertMechanismSupported(mech);
-    Key key = identity.getSigningKey();
     if (!(key instanceof SecretKey)) {
       throw new P11TokenException("digestSecretKey could not be applied to non-SecretKey");
     }
@@ -613,8 +606,7 @@ class IaikP11Slot extends P11Slot {
     return session;
   } // method borrowSession
 
-  private void firstLogin(Session session, List<char[]> password)
-      throws P11TokenException {
+  private void firstLogin(Session session, List<char[]> password) throws P11TokenException {
     try {
       boolean isProtectedAuthenticationPath = session.getToken().getTokenInfo().isProtectedAuthenticationPath();
 
@@ -811,15 +803,9 @@ class IaikP11Slot extends P11Slot {
       mech = CKM_DES3_KEY_GEN;
     } else if (CKK_GENERIC_SECRET == keyType) {
       mech = CKM_GENERIC_SECRET_KEY_GEN;
-    } else if (CKK_SHA_1_HMAC == keyType
-        || CKK_SHA224_HMAC == keyType
-        || CKK_SHA256_HMAC == keyType
-        || CKK_SHA384_HMAC == keyType
-        || CKK_SHA512_HMAC == keyType
-        || CKK_SHA3_224_HMAC == keyType
-        || CKK_SHA3_256_HMAC == keyType
-        || CKK_SHA3_384_HMAC == keyType
-        || CKK_SHA3_512_HMAC == keyType) {
+    } else if (CKK_SHA_1_HMAC == keyType || CKK_SHA224_HMAC == keyType   || CKK_SHA256_HMAC == keyType
+        || CKK_SHA384_HMAC == keyType    || CKK_SHA512_HMAC == keyType   || CKK_SHA3_224_HMAC == keyType
+        || CKK_SHA3_256_HMAC == keyType  || CKK_SHA3_384_HMAC == keyType || CKK_SHA3_512_HMAC == keyType) {
       mech = CKM_GENERIC_SECRET_KEY_GEN;
     } else {
       throw new IllegalArgumentException("unsupported key type 0x" + Functions.toFullHex((int)keyType));
@@ -959,14 +945,9 @@ class IaikP11Slot extends P11Slot {
 
         return new PrivateKeyInfo(ALGID_RSA,
             new org.bouncycastle.asn1.pkcs.RSAPrivateKey(
-                toBigInt(sk.getModulus()),
-                toBigInt(sk.getPublicExponent()),
-                toBigInt(sk.getPrivateExponent()),
-                toBigInt(sk.getPrime1()),
-                toBigInt(sk.getPrime2()),
-                toBigInt(sk.getExponent1()),
-                toBigInt(sk.getExponent2()),
-                toBigInt(sk.getCoefficient())));
+                toBigInt(sk.getModulus()),   toBigInt(sk.getPublicExponent()), toBigInt(sk.getPrivateExponent()),
+                toBigInt(sk.getPrime1()),    toBigInt(sk.getPrime2()),         toBigInt(sk.getExponent1()),
+                toBigInt(sk.getExponent2()), toBigInt(sk.getCoefficient())));
 
       } catch (TokenException | IOException ex) {
         throw new P11TokenException("could not generate keypair "
@@ -1190,8 +1171,7 @@ class IaikP11Slot extends P11Slot {
   }
 
   @Override
-  protected P11Identity generateSM2Keypair0(P11NewKeyControl control)
-      throws P11TokenException {
+  protected P11Identity generateSM2Keypair0(P11NewKeyControl control) throws P11TokenException {
     long ckm = CKM_VENDOR_SM2_KEY_PAIR_GEN;
     if (supportsMechanism(ckm)) {
       ECPrivateKey privateKey = ECPrivateKey.newSM2PrivateKey(slot.getModule());
@@ -1459,8 +1439,7 @@ class IaikP11Slot extends P11Slot {
     }
   }
 
-  private boolean labelExists(Session session, char[] keyLabel)
-      throws P11TokenException {
+  private boolean labelExists(Session session, char[] keyLabel) throws P11TokenException {
     notNull(keyLabel, "keyLabel");
 
     String strLabel = new String(keyLabel);
@@ -1519,8 +1498,7 @@ class IaikP11Slot extends P11Slot {
       } else {
         long keyType = privateKey.getKeyType().getLongValue();
         // if not set
-        if (keyType == PKCS11Constants.CKK_EC
-            || keyType == PKCS11Constants.CKK_RSA
+        if (keyType == PKCS11Constants.CKK_EC || keyType == PKCS11Constants.CKK_RSA
             || keyType == PKCS11Constants.CKK_DSA) {
           privateKey.getSign().setBooleanValue(TRUE);
         }

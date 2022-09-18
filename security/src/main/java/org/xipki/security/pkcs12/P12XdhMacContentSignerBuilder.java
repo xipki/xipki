@@ -172,8 +172,7 @@ public class P12XdhMacContentSignerBuilder {
         X500Name.getInstance(trailingInfo), peerCert.getSerialNumber());
   } // method init
 
-  public ConcurrentContentSigner createSigner(int parallelism)
-      throws XiSecurityException {
+  public ConcurrentContentSigner createSigner(int parallelism) throws XiSecurityException {
     positive(parallelism, "parallelism");
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);

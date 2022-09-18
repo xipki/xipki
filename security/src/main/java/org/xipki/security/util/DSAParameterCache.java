@@ -114,20 +114,16 @@ public final class DSAParameterCache {
 
   public static DSAParameterSpec getDSAParameterSpec(int plength, int qlength, SecureRandom random) {
     DSAParameterSpec spec = cache.get(plength + "-" + qlength);
-    if (spec != null) {
-      return new DSAParameterSpec(spec.getP(), spec.getQ(), spec.getG());
-    }
-
-    return getNewDSAParameterSpec(plength, qlength, random);
+    return (spec != null)
+        ? new DSAParameterSpec(spec.getP(), spec.getQ(), spec.getG())
+        : getNewDSAParameterSpec(plength, qlength, random);
   }
 
   public static DSAParameterSpec getNewDSAParameterSpec(int plength, int qlength, SecureRandom random) {
     final int certainty = 80;
     SecureRandom tmpRandom = (random == null) ? new SecureRandom() : random;
     DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());
-    DSAParameterGenerationParameters genParams =
-        new DSAParameterGenerationParameters(plength, qlength, certainty, tmpRandom);
-    paramGen.init(genParams);
+    paramGen.init(new DSAParameterGenerationParameters(plength, qlength, certainty, tmpRandom));
     DSAParameters dsaParams = paramGen.generateParameters();
     return new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(), dsaParams.getG());
   }

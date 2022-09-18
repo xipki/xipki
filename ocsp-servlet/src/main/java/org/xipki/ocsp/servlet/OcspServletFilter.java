@@ -107,7 +107,7 @@ public class OcspServletFilter implements Filter {
 
     try {
       ocspServer.init();
-    } catch (InvalidConfException | DataAccessException | PasswordResolverException ex) {
+    } catch (InvalidConfException | PasswordResolverException ex) {
       LogUtil.error(LOG, ex, "could not start OCSP server");
     }
 

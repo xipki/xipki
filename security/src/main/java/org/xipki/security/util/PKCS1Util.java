@@ -119,23 +119,17 @@ public class PKCS1Util {
         return block;
     } // method EMSA_PKCS1_v1_5_encoding
 
-    public static byte[] EMSA_PSS_ENCODE(
-        HashAlgo contentDigest, byte[] hashValue, HashAlgo mgfDigest,
-        int saltLen, int modulusBitLength, SecureRandom random)
+    public static byte[] EMSA_PSS_ENCODE(HashAlgo contentDigest, byte[] hashValue, HashAlgo mgfDigest,
+                                         int saltLen, int modulusBitLength, SecureRandom random)
         throws XiSecurityException {
-        switch (contentDigest) {
-            case SHAKE128:
-            case SHAKE256:
-                if (mgfDigest != contentDigest) {
-                    throw new XiSecurityException("contentDigest != mgfDigest");
-                }
+        if (contentDigest.isShake()) {
+            if (mgfDigest != contentDigest) {
+                throw new XiSecurityException("contentDigest != mgfDigest");
+            }
 
-                if (saltLen != contentDigest.getLength()) {
-                    throw new XiSecurityException("saltLen != " + contentDigest.getLength() + ": " + saltLen);
-                }
-                break;
-            default:
-                break;
+            if (saltLen != contentDigest.getLength()) {
+                throw new XiSecurityException("saltLen != " + contentDigest.getLength() + ": " + saltLen);
+            }
         }
 
         final int hLen = contentDigest.getLength();
@@ -164,17 +158,13 @@ public class PKCS1Util {
 
         byte[] dbMask;
         int dbMaskLen = block.length - hLen - 1;
-        switch (contentDigest) {
-            case SHAKE128:
-            case SHAKE256:
-                Xof xof = (Xof) contentDigest.createDigest();
-                xof.update(hv, 0, hv.length);
-                dbMask = new byte[dbMaskLen];
-                xof.doFinal(dbMask, 0, dbMaskLen);
-                break;
-            default:
-                dbMask = mgf1(mgfDigest, hv, dbMaskLen);
-                break;
+        if (contentDigest.isShake()) {
+            Xof xof = (Xof) contentDigest.createDigest();
+            xof.update(hv, 0, hv.length);
+            dbMask = new byte[dbMaskLen];
+            xof.doFinal(dbMask, 0, dbMaskLen);
+        } else {
+            dbMask = mgf1(mgfDigest, hv, dbMaskLen);
         }
 
         for (int i = 0; i != dbMask.length; i++) {
@@ -228,8 +218,7 @@ public class PKCS1Util {
         byte[] maskedSeed = xor(seed, seedMask);
 
         // EM = 0x00 || maskedSeed || maskedDB
-        byte[] EM = concat(new byte[]{0}, maskedSeed, maskedDB);
-        return EM;
+        return concat(new byte[]{0}, maskedSeed, maskedDB);
     }
 
     public static byte[] RSAES_OAEP_DECODE(byte[] EM, int modulusBigLength, HashAlgo hashAlgo) {

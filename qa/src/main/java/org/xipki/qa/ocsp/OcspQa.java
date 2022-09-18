@@ -160,12 +160,10 @@ public class OcspQa {
     boolean hasSignature = basicResp.getSignature() != null;
 
     // check the signature if available
-    if (noSigVerify) {
-      issue = new ValidationIssue("OCSP.SIG",
-          (hasSignature ? "signature presence (Ignore)" : "signature presence"));
-    } else {
-      issue = new ValidationIssue("OCSP.SIG", "signature presence");
-    }
+    issue = noSigVerify
+        ? new ValidationIssue("OCSP.SIG", (hasSignature ? "signature presence (Ignore)" : "signature presence"))
+        : new ValidationIssue("OCSP.SIG", "signature presence");
+
     resultIssues.add(issue);
 
     if (!hasSignature) {
@@ -264,8 +262,7 @@ public class OcspQa {
         try {
           PublicKey responderPubKey = KeyUtil.generatePublicKey(respSigner.getSubjectPublicKeyInfo());
           ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(responderPubKey);
-          boolean sigValid = basicResp.isSignatureValid(cvp);
-          if (!sigValid) {
+          if (!basicResp.isSignatureValid(cvp)) {
             sigValIssue.setFailureMessage("signature is invalid");
           }
         } catch (Exception ex) {
@@ -411,8 +408,7 @@ public class OcspQa {
 
     // nextUpdate
     Date nextUpdate = singleResp.getNextUpdate();
-    issue = checkOccurrence("OCSP.RESPONSE." + index + ".NEXTUPDATE",
-        nextUpdate, nextupdateOccurrence);
+    issue = checkOccurrence("OCSP.RESPONSE." + index + ".NEXTUPDATE", nextUpdate, nextupdateOccurrence);
     issues.add(issue);
 
     Extension extension = singleResp.getExtension(ISISMTTObjectIdentifiers.id_isismtt_at_certHash);

@@ -100,9 +100,9 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
 
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, true));
@@ -217,9 +217,9 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     // Extensions - general
     List<ExtensionType> list = profile.getExtensions();
 
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, true));
@@ -249,9 +249,9 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     List<ExtensionType> list = profile.getExtensions();
 
     // Extensions - controls
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, false));
@@ -300,9 +300,9 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     List<ExtensionType> list = profile.getExtensions();
 
     // Extensions - controls
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, false));
@@ -472,9 +472,9 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     List<ExtensionType> list = profile.getExtensions();
 
     // Extensions - controls
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, false));
@@ -528,9 +528,9 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     List<ExtensionType> list = profile.getExtensions();
 
     // Extensions - controls
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, false));
@@ -585,9 +585,9 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
 
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, true));
@@ -617,13 +617,13 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
 
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, true));
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
 
-    list.add(createExtension(Extension.cRLDistributionPoints, true, false, null));
+    list.add(createExtension(Extension.cRLDistributionPoints, true, false));
 
     // Extensions - CeritifcatePolicies
     // Certificate Policies
@@ -754,9 +754,9 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - controls
     List<ExtensionType> list = profile.getExtensions();
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - SubjectAltNames
     list.add(createExtension(Extension.subjectAlternativeName, true, false));

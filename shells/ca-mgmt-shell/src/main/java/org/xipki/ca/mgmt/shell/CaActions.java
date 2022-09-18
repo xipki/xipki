@@ -532,8 +532,7 @@ public class CaActions {
     @Completion(CaCompleters.CaCrlReasonCompleter.class)
     private String reason;
 
-    @Option(name = "--rev-date", valueToShowInHelp = "current time",
-        description = "revocation date, UTC time of format yyyyMMddHHmmss")
+    @Option(name = "--rev-date", description = "revocation date, UTC time of format yyyyMMddHHmmss")
     private String revocationDateS;
 
     @Option(name = "--inv-date", description = "invalidity date, UTC time of format yyyyMMddHHmmss")
@@ -559,14 +558,12 @@ public class CaActions {
         invalidityDate = DateUtil.parseUtcTimeyyyyMMddhhmmss(invalidityDateS);
       }
 
-      CertRevocationInfo revInfo = new CertRevocationInfo(crlReason, revocationDate, invalidityDate);
-      String msg = "CA " + caName;
       try {
-        caManager.revokeCa(caName, revInfo);
-        println("revoked " + msg);
+        caManager.revokeCa(caName, new CertRevocationInfo(crlReason, revocationDate, invalidityDate));
+        println("revoked CA " + caName);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not revoke " + msg + ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not revoke CA " + caName + ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 
@@ -586,13 +583,12 @@ public class CaActions {
         throw new IllegalCmdParamException("invalid CA name " + caName);
       }
 
-      String msg = "CA " + caName;
       try {
         caManager.unrevokeCa(caName);
-        println("unrevoked " + msg);
+        println("unrevoked CA " + caName);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not unrevoke " + msg + ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not unrevoke CA " + caName + ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 
@@ -754,16 +750,14 @@ public class CaActions {
       }
 
       if (CollectionUtil.isNotEmpty(permissions)) {
-        int intPermission = ShellUtil.getPermission(permissions);
-        entry.setPermission(intPermission);
+        entry.setPermission(ShellUtil.getPermission(permissions));
       }
 
       CaUris caUris = new CaUris(getUris(caCertUris), getUris(ocspUris), getUris(crlUris), getUris(deltaCrlUris));
       entry.setCaUris(caUris);
 
       if (validityModeS != null) {
-        ValidityMode validityMode = ValidityMode.forName(validityModeS);
-        entry.setValidityMode(validityMode);
+        entry.setValidityMode(ValidityMode.forName(validityModeS));
       }
 
       if (maxValidity != null) {
@@ -806,13 +800,12 @@ public class CaActions {
 
     @Override
     protected Object execute0() throws Exception {
-      String msg = "CA " + caName;
       try {
         caManager.changeCa(getChangeCaEntry());
-        println("updated " + msg);
+        println("updated CA " + caName);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not update CA " + caName + ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 
