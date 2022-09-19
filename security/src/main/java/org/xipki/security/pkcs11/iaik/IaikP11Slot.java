@@ -249,6 +249,8 @@ class IaikP11Slot extends P11Slot {
         SecretKey secKey = (SecretKey) m;
         byte[] keyId = value(secKey.getId());
         if (keyId == null || keyId.length == 0) {
+          String label = (secKey.getLabel() == null) ? null : new String(secKey.getLabel().getCharArrayValue());
+          LOG.warn("ignored secret key with ID: null and label: " + label);
           continue;
         }
 
@@ -303,6 +305,8 @@ class IaikP11Slot extends P11Slot {
         PrivateKey privKey = (PrivateKey) m;
         byte[] keyId = value(privKey.getId());
         if (keyId == null || keyId.length == 0) {
+          String label = (privKey.getLabel() == null) ? null : new String(privKey.getLabel().getCharArrayValue());
+          LOG.warn("ignored private key with ID: null and label: " + label);
           continue;
         }
 
@@ -376,7 +380,7 @@ class IaikP11Slot extends P11Slot {
     }
 
     String certLabel = null;
-    java.security.PublicKey pubKey;
+    java.security.PublicKey pubKey = null;
     X509Cert cert = refreshResult.getCertForId(id);
 
     if (cert != null) {
@@ -385,8 +389,19 @@ class IaikP11Slot extends P11Slot {
     } else if (p11PublicKey != null) {
       pubKey = generatePublicKey(p11PublicKey);
     } else {
-      LOG.info("neither certificate nor public key for the key (" + hex(id) + " is available");
-      return;
+      if (privKey instanceof RSAPrivateKey) {
+        RSAPrivateKey p11RsaSk = (RSAPrivateKey) privKey;
+        if (p11RsaSk.getPublicExponent() != null && p11RsaSk.getModulus() == null) {
+          BigInteger exp = new BigInteger(1, value(p11RsaSk.getPublicExponent()));
+          BigInteger mod = new BigInteger(1, value(p11RsaSk.getModulus()));
+          pubKey = buildRSAKey(mod, exp);
+        }
+      }
+
+      if (pubKey == null) {
+        LOG.info("neither certificate nor public key for the key (" + hex(id) + " is available");
+        return;
+      }
     }
 
     P11ObjectIdentifier objectId = new P11ObjectIdentifier(id, label);

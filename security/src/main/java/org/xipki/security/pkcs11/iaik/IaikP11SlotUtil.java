@@ -237,15 +237,9 @@ class IaikP11SlotUtil {
     if (p11Key instanceof RSAPublicKey) {
       RSAPublicKey rsaP11Key = (RSAPublicKey) p11Key;
       BigInteger exp = new BigInteger(1, value(rsaP11Key.getPublicExponent()));
-
       byte[] modBytes = value(rsaP11Key.getModulus());
       BigInteger mod = new BigInteger(1, modBytes);
-      RSAPublicKeySpec keySpec = new RSAPublicKeySpec(mod, exp);
-      try {
-        return KeyUtil.generateRSAPublicKey(keySpec);
-      } catch (InvalidKeySpecException ex) {
-        throw new XiSecurityException(ex.getMessage(), ex);
-      }
+      return buildRSAKey(mod, exp);
     } else if (p11Key instanceof DSAPublicKey) {
       DSAPublicKey dsaP11Key = (DSAPublicKey) p11Key;
 
@@ -335,6 +329,16 @@ class IaikP11SlotUtil {
       throw new XiSecurityException("unknown publicKey class " + p11Key.getClass().getName());
     }
   } // method generatePublicKey
+
+  static java.security.interfaces.RSAPublicKey buildRSAKey(BigInteger mod, BigInteger exp)
+      throws XiSecurityException {
+    RSAPublicKeySpec keySpec = new RSAPublicKeySpec(mod, exp);
+    try {
+      return KeyUtil.generateRSAPublicKey(keySpec);
+    } catch (InvalidKeySpecException ex) {
+      throw new XiSecurityException(ex.getMessage(), ex);
+    }
+  }
 
   static X509Cert parseCert(X509PublicKeyCertificate p11Cert) throws P11TokenException {
     try {
