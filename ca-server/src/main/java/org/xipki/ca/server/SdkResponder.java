@@ -275,7 +275,6 @@ public class SdkResponder {
           return genCrl(requestor, ca, request);
         }
         case CMD_crl: {
-          assertPermitted(requestor, GET_CRL);
           return getCrl(requestor, ca, request);
         }
         case CMD_get_cert: {

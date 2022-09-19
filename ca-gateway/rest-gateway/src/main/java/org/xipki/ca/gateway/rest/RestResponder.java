@@ -278,6 +278,8 @@ public class RestResponder {
         byte[][] certsBytes = sdk.cacerts(caName);
         return toRestResponse(HttpRespContent.ofOk(CT_pem_file,
             StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certsBytes))));
+      } else if (CMD_crl.equals(command)) {
+        return toRestResponse(getCrl(caName, httpRetriever));
       }
 
       Requestor requestor;
@@ -347,10 +349,6 @@ public class RestResponder {
         case CMD_unrevoke_cert: {
           unRevoke(command, caName, requestor, httpRetriever, event);
           respContent = null;
-          break;
-        }
-        case CMD_crl: {
-          respContent = getCrl(caName, requestor, httpRetriever);
           break;
         }
         default: {
@@ -859,13 +857,8 @@ public class RestResponder {
     }
   }
 
-  private HttpRespContent getCrl(
-      String caName, Requestor requestor, HttpRequestMetadataRetriever httpRetriever)
+  private HttpRespContent getCrl(String caName, HttpRequestMetadataRetriever httpRetriever)
       throws OperationException, HttpRespAuditException, IOException, SdkErrorResponseException {
-    if (!requestor.isPermitted(PermissionConstants.GET_CRL)) {
-      throw new OperationException(NOT_PERMITTED, "GET_CRL is not allowed");
-    }
-
     String strCrlNumber = httpRetriever.getParameter(PARAM_crl_number);
     BigInteger crlNumber = null;
     if (StringUtil.isNotBlank(strCrlNumber)) {
