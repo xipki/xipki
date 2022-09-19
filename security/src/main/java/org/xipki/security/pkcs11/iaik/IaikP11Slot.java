@@ -221,8 +221,7 @@ class IaikP11Slot extends P11Slot {
       }
 
       if (ignoreMechs.length() > 0) {
-        LOG.info("This is a smartcard-based HSM, ignore the mechanisms {}",
-            ignoreMechs.substring(0, ignoreMechs.length() - 2));
+        LOG.info("Ignore mechanisms in smartcard-based HSM: {}", ignoreMechs.substring(0, ignoreMechs.length() - 2));
       }
     }
 
@@ -1096,8 +1095,7 @@ class IaikP11Slot extends P11Slot {
   } // method generateECKeypair0
 
   @Override
-  protected PrivateKeyInfo generateECKeypairOtf0(ASN1ObjectIdentifier curveId)
-      throws P11TokenException {
+  protected PrivateKeyInfo generateECKeypairOtf0(ASN1ObjectIdentifier curveId) throws P11TokenException {
     return generateECKeypairOtf0(KeyType.EC, CKM_EC_KEY_PAIR_GEN, curveId);
   }
 

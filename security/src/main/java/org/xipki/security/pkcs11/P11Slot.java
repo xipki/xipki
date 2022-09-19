@@ -295,8 +295,7 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  protected abstract void removeIdentity0(P11IdentityId identityId)
-      throws P11TokenException;
+  protected abstract void removeIdentity0(P11IdentityId identityId) throws P11TokenException;
 
   /**
    * Adds the certificate to the PKCS#11 token under the given identifier {@code objectId}.
@@ -482,8 +481,7 @@ public abstract class P11Slot implements Closeable {
 
   protected abstract P11SlotRefreshResult refresh0() throws P11TokenException;
 
-  protected abstract void removeCerts0(P11ObjectIdentifier objectId)
-      throws P11TokenException;
+  protected abstract void removeCerts0(P11ObjectIdentifier objectId) throws P11TokenException;
 
   @Override
   public abstract void close();
@@ -499,8 +497,7 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *           If PKCS#11 error happens.
    */
-  public abstract int removeObjects(byte[] id, String label)
-      throws P11TokenException;
+  public abstract int removeObjects(byte[] id, String label) throws P11TokenException;
 
   /**
    * Gets certificate with the given identifier {@code id}.
@@ -580,8 +577,7 @@ public abstract class P11Slot implements Closeable {
     return null;
   } // method getIssuerForCert
 
-  public void refresh()
-      throws P11TokenException {
+  public void refresh() throws P11TokenException {
     P11SlotRefreshResult res = refresh0();
 
     mechanisms.clear();
@@ -655,8 +651,7 @@ public abstract class P11Slot implements Closeable {
     }
   } // method refresh
 
-  protected void addIdentity(P11Identity identity)
-      throws P11DuplicateEntityException {
+  protected void addIdentity(P11Identity identity) throws P11DuplicateEntityException {
     if (!slotId.equals(identity.getId().getSlotId())) {
       throw new IllegalArgumentException("invalid identity");
     }
@@ -682,8 +677,7 @@ public abstract class P11Slot implements Closeable {
     return mechanisms.contains(mechanism);
   }
 
-  public void assertMechanismSupported(long mechanism)
-      throws P11UnsupportedMechanismException {
+  public void assertMechanismSupported(long mechanism) throws P11UnsupportedMechanismException {
     if (!mechanisms.contains(mechanism)) {
       throw new P11UnsupportedMechanismException(mechanism, slotId);
     }
@@ -709,8 +703,7 @@ public abstract class P11Slot implements Closeable {
     return readOnly;
   }
 
-  public P11Identity getIdentity(P11ObjectIdentifier keyId)
-      throws P11UnknownEntityException {
+  public P11Identity getIdentity(P11ObjectIdentifier keyId) throws P11UnknownEntityException {
     P11Identity ident = identities.get(keyId);
     if (ident == null) {
       throw new P11UnknownEntityException(slotId, keyId);
@@ -718,8 +711,7 @@ public abstract class P11Slot implements Closeable {
     return ident;
   }
 
-  protected void assertNoIdentityAndCert(byte[] id, String label)
-      throws P11DuplicateEntityException {
+  protected void assertNoIdentityAndCert(byte[] id, String label) throws P11DuplicateEntityException {
     if (id == null && label == null) {
       return;
     }
@@ -1045,8 +1037,7 @@ public abstract class P11Slot implements Closeable {
     return objId;
   } // method importSecretKey
 
-  private void assertSecretKeyAllowed(long keyType)
-      throws P11TokenException {
+  private void assertSecretKeyAllowed(long keyType) throws P11TokenException {
     if (secretKeyTypes == null) {
       return;
     }
@@ -1270,8 +1261,7 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public P11IdentityId generateSM2Keypair(P11NewKeyControl control)
-      throws P11TokenException {
+  public P11IdentityId generateSM2Keypair(P11NewKeyControl control) throws P11TokenException {
     assertCanGenKeypair("generateSM2Keypair", PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN, control);
     P11Identity identity = generateSM2Keypair0(control);
     addIdentity(identity);
