@@ -134,6 +134,9 @@ follows.
  
 ## Install CA Server
 
+**Note that all keys and certificates in the delivery are only for demo purpose. In production environment
+they MUST be replaced.**
+
 1. Unpack the binary `xipki-ca-<version>.zip` and install CA as described in the
    unpacked README file.
 
@@ -141,10 +144,16 @@ follows.
 
 Note that CA and OCSP can be installed in the same servlet container.
 
+**Note that all keys and certificates in the delivery are only for demo purpose. In production environment
+they MUST be replaced.**
+
 1. Unpack the binary `xipki-ocsp-<version>.zip` and install OCSP responder as described in the
    unpacked README file.
 
 ## Install Command Line Interface
+
+**Note that all keys and certificates in the delivery are only for demo purpose. In production environment
+they MUST be replaced.**
 
 1. Unpack the binary `xipki-cli-<version>.tar.gz` (or `xipki-cli-jdk8-<version>.tar.gz` for JDK 8)
 2. Adapt the CMP client configuration `xipki/cmpclient/cmpclient.json`
