@@ -77,6 +77,9 @@ JDK 8+ is required.
 
 JDK 8+ is required.
 
+**Note that all keys and certificates in the delivery are only for demo purpose. In production environment
+they MUST be replaced.**
+
 1. Unpack tomcat to a new folder
 2. Unpack the binary `xipki-ca-<version>.zip` and install CA as described in the
    unpacked README file.
@@ -84,6 +87,9 @@ JDK 8+ is required.
 ## Install OCSP Responder
 
 JDK 8+ is required.
+
+**Note that all keys and certificates in the delivery are only for demo purpose. In production environment
+they MUST be replaced.**
 
 1. Unpack tomcat to a new folder
 2. Unpack the binary `xipki-ocsp-<version>.zip` and install OCSP responder as described in the
@@ -93,6 +99,9 @@ JDK 8+ is required.
 
 JDK 8+ is required.
 
+**Note that all keys and certificates in the delivery are only for demo purpose. In production environment
+they MUST be replaced.**
+
 1. Unpack tomcat to a new folder
 2. Unpack the binary `xipki-gate-<version>.zip` and install protocol gateway as described in the
    unpacked README file.
@@ -101,12 +110,18 @@ JDK 8+ is required.
 
 JDK 11+ is required.
 
+**Note that all keys and certificates in the delivery are only for demo purpose. In production environment
+they MUST be replaced.**
+
 1. Unpack the binary `xipki-mgmt-cli-<version>.tar.gz`
 2. If you get "java.lang.ClassNotFoundException: &lt;jdbc class&gt;", please copy the missing JDBC driver jar to the directory `lib/boot`.
 
 ## Install Command Line Interface
 
 JDK 11+ is required.
+
+**Note that all keys and certificates in the delivery are only for demo purpose. In production environment
+they MUST be replaced.**
 
 1. Unpack the binary `xipki-cli-<version>.tar.gz`
 
