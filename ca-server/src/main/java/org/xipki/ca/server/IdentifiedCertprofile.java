@@ -68,6 +68,9 @@ public class IdentifiedCertprofile implements Closeable {
     this.certprofile = notNull(certprofile, "certprofile");
 
     this.certprofile.initialize(dbEntry.getConf());
+    if (this.certprofile.getCertLevel() != CertLevel.EndEntity && this.certprofile.hasNoWellDefinedExpirationDate()) {
+      throw new CertprofileException("CA certificate is not allowed to have notAfter 99991231235959Z");
+    }
   } // constructor
 
   public NameId getIdent() {

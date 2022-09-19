@@ -215,23 +215,17 @@ class SelfSignedCertBuilder {
       notBefore = new Date();
     }
 
-    if (certprofile.hasNoWellDefinedExpirationDate()) {
-      if (notAfter == null) {
-        notAfter = new Date(253402300799982L); //9999-12-31-23-59-59
-      }
-    } else {
-      Validity validity = certprofile.getValidity();
-      if (validity == null) {
-        throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
-            "no validity specified in the profile " + certprofile.getIdent());
-      }
+    Validity validity = certprofile.getValidity();
+    if (validity == null) {
+      throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+          "no validity specified in the profile " + certprofile.getIdent());
+    }
 
-      Date maxNotAfter = validity.add(notBefore);
-      if (notAfter == null) {
-        notAfter = maxNotAfter;
-      } else if (notAfter.after(maxNotAfter)) {
-        notAfter = maxNotAfter;
-      }
+    Date maxNotAfter = validity.add(notBefore);
+    if (notAfter == null) {
+      notAfter = maxNotAfter;
+    } else if (notAfter.after(maxNotAfter)) {
+      notAfter = maxNotAfter;
     }
 
     X500Name grantedSubject = subjectInfo.getGrantedSubject();
