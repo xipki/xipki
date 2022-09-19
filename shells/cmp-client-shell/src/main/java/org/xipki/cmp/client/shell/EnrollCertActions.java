@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.cmpclient.shell;
+package org.xipki.cmp.client.shell;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.karaf.shell.api.action.Command;

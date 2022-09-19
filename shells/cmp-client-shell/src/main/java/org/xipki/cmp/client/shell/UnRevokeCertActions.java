@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.cmpclient.shell;
+package org.xipki.cmp.client.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;

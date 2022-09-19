@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.cmpclient.shell;
+package org.xipki.cmp.client.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -25,9 +25,9 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.cmp.client.CmpClientException;
 import org.xipki.cmp.client.PkiErrorException;
-import org.xipki.cmpclient.shell.Actions.ClientAction;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
+import org.xipki.shell.XiAction;
 import org.xipki.util.ReqRespDebug;
 
 /**
@@ -65,13 +65,13 @@ public class CrlActions {
         throw new CmdFailure("received no CRL from server");
       }
 
-      saveVerbose("saved CRL to file", outFile, encodeCrl(crl.getEncoded(), outform));
+      saveVerbose("saved CRL to file", outFile, XiAction.encodeCrl(crl.getEncoded(), outform));
       return null;
     } // method execute0
 
   } // class CmpGetCrl
 
-  public abstract static class CrlAction extends ClientAction {
+  public abstract static class CrlAction extends Actions.ClientAction {
 
     @Option(name = "--outform", description = "output format of the CRL")
     @Completion(Completers.DerPemCompleter.class)
