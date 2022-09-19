@@ -456,7 +456,7 @@ public class X509Util {
     }
 
     if (!trustAnchors.isEmpty()) {
-      Set<X509Cert> coll = certs == null ? new Hashset<>() : new HashSet<>(certs);
+      Set<X509Cert> coll = certs == null ? new HashSet<>() : new HashSet<>(certs);
       coll.addAll(trustAnchors);
       certs = coll;
     }

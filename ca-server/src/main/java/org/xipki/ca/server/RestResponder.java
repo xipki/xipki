@@ -174,6 +174,15 @@ public class RestResponder {
 
   private final CaManagerImpl responderManager;
 
+  private static final Set<String> knownCommands;
+
+  static {
+    knownCommands = new HashSet<>(java.util.Arrays.asList(
+        CMD_cacert, CMD_cacertchain, CMD_dhpop_certs, CMD_revoke_cert,
+        CMD_delete_cert, CMD_enroll_cert, CMD_enroll_cert_cagenkeypair,
+        CMD_crl, CMD_new_crl));
+  }
+
   public RestResponder(CaManagerImpl responderManager) {
     this.responderManager = responderManager;
   }
@@ -233,6 +242,12 @@ public class RestResponder {
         throw new HttpRespAuditException(NOT_FOUND, message, INFO, FAILED);
       }
 
+      if (!knownCommands.contains(command)) {
+        String message = "invalid command '" + command + "'";
+        LOG.error(message);
+        throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
+      }
+
       if (ca == null || !ca.getCaInfo().supportsRest()
           || ca.getCaInfo().getStatus() != CaStatus.ACTIVE) {
         String message;
@@ -250,322 +265,310 @@ public class RestResponder {
       event.addEventData(NAME_ca, ca.getCaIdent().getName());
       event.addEventType(command);
 
-      RequestorInfo requestor;
-      // Retrieve the user:password
-      String hdrValue = httpRetriever.getHeader("Authorization");
-      if (hdrValue != null && hdrValue.startsWith("Basic ")) {
-        String user = null;
-        byte[] password = null;
-        if (hdrValue.length() > 6) {
-          String b64 = hdrValue.substring(6);
-          byte[] userPwd = Base64.decodeFast(b64);
-          int idx = -1;
-          for (int i = 0; i < userPwd.length; i++) {
-            if (userPwd[i] == ':') {
-              idx = i;
-              break;
-            }
-          }
-
-          if (idx != -1 && idx < userPwd.length - 1) {
-            user = StringUtil.toUtf8String(Arrays.copyOfRange(userPwd, 0, idx));
-            password = Arrays.copyOfRange(userPwd, idx + 1, userPwd.length);
-          }
-        }
-
-        if (user == null) {
-          throw new HttpRespAuditException(UNAUTHORIZED, "invalid Authorization information",
-              INFO, FAILED);
-        }
-        NameId userIdent = ca.authenticateUser(user, password);
-        if (userIdent == null) {
-          throw new HttpRespAuditException(UNAUTHORIZED, "could not authenticate user",
-              INFO, FAILED);
-        }
-        requestor = ca.getByUserRequestor(userIdent);
-      } else {
-        X509Cert clientCert = httpRetriever.getTlsClientCert();
-        if (clientCert == null) {
-          throw new HttpRespAuditException(UNAUTHORIZED, "no client certificate", INFO, FAILED);
-        }
-        requestor = ca.getRequestor(clientCert);
-      }
-
-      if (requestor == null) {
-        throw new OperationException(NOT_PERMITTED, "no requestor specified");
-      }
-
-      event.addEventData(NAME_requestor, requestor.getIdent().getName());
-
       String respCt = null;
       byte[] respBytes = null;
-
-      switch (command) {
-        case CMD_cacert: {
-          respCt = CT_pkix_cert;
-          respBytes = ca.getCaInfo().getCert().getEncoded();
-          break;
-        }
-        case CMD_dhpop_certs: {
-          DhpopControl control = responderManager.getX509Ca(caName).getCaInfo().getDhpopControl();
-          if (control == null) {
-            respBytes = new byte[0];
-          } else {
-            respCt = CT_pem_file;
-            respBytes = StringUtil.toUtf8Bytes(
-                    X509Util.encodeCertificates(control.getCertificates()));
+      if (CMD_cacert.equals(command)) {
+        respCt = CT_pkix_cert;
+        respBytes = ca.getCaInfo().getCert().getEncoded();
+      } else if (CMD_dhpop_certs.equals(command)) {
+        respCt = CT_pem_file;
+        List<X509Cert> certchain = ca.getCaInfo().getCertchain();
+        int size = 1 + (certchain == null ? 0 : certchain.size());
+        X509Cert[] certchainWithCaCert = new X509Cert[size];
+        certchainWithCaCert[0] = ca.getCaInfo().getCert();
+        if (size > 1) {
+          for (int i = 1; i < size; i++) {
+            certchainWithCaCert[i] = certchain.get(i - 1);
           }
-          break;
         }
-        case CMD_cacertchain: {
+
+        respBytes = StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certchainWithCaCert));
+      } else if (CMD_dhpop_certs.equals(command)) {
+        DhpopControl control = responderManager.getX509Ca(caName).getCaInfo().getDhpopControl();
+        if (control == null) {
+          respBytes = new byte[0];
+        } else {
           respCt = CT_pem_file;
-          List<X509Cert> certchain = ca.getCaInfo().getCertchain();
-          int size = 1 + (certchain == null ? 0 : certchain.size());
-          X509Cert[] certchainWithCaCert = new X509Cert[size];
-          certchainWithCaCert[0] = ca.getCaInfo().getCert();
-          if (size > 1) {
-            for (int i = 1; i < size; i++) {
-              certchainWithCaCert[i] = certchain.get(i - 1);
-            }
-          }
-
-          respBytes = StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certchainWithCaCert));
-          break;
+          respBytes = StringUtil.toUtf8Bytes(
+              X509Util.encodeCertificates(control.getCertificates()));
         }
-        case CMD_enroll_cert:
-        case CMD_enroll_cert_cagenkeypair: {
-          String profile = httpRetriever.getParameter(PARAM_profile);
-          if (StringUtil.isBlank(profile)) {
-            throw new HttpRespAuditException(BAD_REQUEST,
-                    "required parameter " + PARAM_profile + " not specified",
-                    INFO, FAILED);
-          }
-          profile = profile.toLowerCase();
-
+      } else if (CMD_crl.equals(command)) {
+        String strCrlNumber = httpRetriever.getParameter(PARAM_crl_number);
+        BigInteger crlNumber = null;
+        if (StringUtil.isNotBlank(strCrlNumber)) {
           try {
-            requestor.assertPermitted(PermissionConstants.ENROLL_CERT);
-          } catch (InsufficientPermissionException ex) {
-            throw new OperationException(NOT_PERMITTED, ex.getMessage());
-          }
-
-          if (!requestor.isCertprofilePermitted(profile)) {
-            throw new OperationException(NOT_PERMITTED,
-                    "certprofile " + profile + " is not allowed");
-          }
-
-          String strNotBefore = httpRetriever.getParameter(PARAM_not_before);
-          Date notBefore = (strNotBefore == null) ? null
-                  : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotBefore);
-
-          String strNotAfter = httpRetriever.getParameter(PARAM_not_after);
-          Date notAfter = (strNotAfter == null) ? null
-                  : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotAfter);
-
-          if (CMD_enroll_cert_cagenkeypair.equals(command)) {
-            String ct = httpRetriever.getHeader("Content-Type");
-
-            X500Name subject;
-            Extensions extensions;
-
-            if (ct.startsWith("text/plain")) {
-              Properties props = new Properties();
-              props.load(new ByteArrayInputStream(request));
-              String strSubject = props.getProperty("subject");
-              if (strSubject == null) {
-                throw new OperationException(BAD_CERT_TEMPLATE, "subject is not specified");
-              }
-
-              try {
-                subject = new X500Name(strSubject);
-              } catch (Exception ex) {
-                throw new OperationException(BAD_CERT_TEMPLATE, "invalid subject");
-              }
-              extensions = null;
-            } else if (CT_pkcs10.equalsIgnoreCase(ct)) {
-              // some clients may send the PEM encoded CSR.
-              request = X509Util.toDerEncoded(request);
-
-              // The PKCS#10 will only be used for transport of subject and extensions.
-              // The associated key will not be used, so the verification of POP is skipped.
-              CertificationRequestInfo certTemp =
-                      CertificationRequest.getInstance(request).getCertificationRequestInfo();
-              subject = certTemp.getSubject();
-              extensions = CaUtil.getExtensions(certTemp);
-            } else {
-              String message = "unsupported media type " + ct;
-              throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, INFO, FAILED);
-            }
-
-            CertTemplateData certTemplate = new CertTemplateData(subject, null,
-                    notBefore, notAfter, extensions, profile, null, true);
-            CertificateInfo certInfo = ca.generateCert(certTemplate, requestor, RequestType.REST,
-                    null, msgId);
-
-            if (ca.getCaInfo().isSaveRequest()) {
-              long dbId = ca.addRequest(request);
-              ca.addRequestCert(dbId, certInfo.getCert().getCertId());
-            }
-
-            respCt = CT_pem_file;
-            byte[] keyBytes =
-                    PemEncoder.encode(certInfo.getPrivateKey().getEncoded(), PemLabel.PRIVATE_KEY);
-            byte[] certBytes =
-                    PemEncoder.encode(certInfo.getCert().getCert().getEncoded(),
-                            PemLabel.CERTIFICATE);
-
-            respBytes = new byte[keyBytes.length + 2 + certBytes.length];
-            System.arraycopy(keyBytes, 0, respBytes, 0, keyBytes.length);
-            respBytes[keyBytes.length] = '\r';
-            respBytes[keyBytes.length + 1] = '\n';
-            System.arraycopy(certBytes, 0, respBytes, keyBytes.length + 2, certBytes.length);
-          } else {
-            String ct = httpRetriever.getHeader("Content-Type");
-            if (!CT_pkcs10.equalsIgnoreCase(ct)) {
-              String message = "unsupported media type " + ct;
-              throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, INFO, FAILED);
-            }
-
-            CertificationRequest csr = CertificationRequest.getInstance(request);
-            if (!ca.verifyCsr(csr)) {
-              throw new OperationException(BAD_POP);
-            }
-
-            CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
-
-            X500Name subject = certTemp.getSubject();
-            SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
-
-            Extensions extensions = CaUtil.getExtensions(certTemp);
-            CertTemplateData certTemplate = new CertTemplateData(subject, publicKeyInfo,
-                    notBefore, notAfter, extensions, profile);
-            CertificateInfo certInfo = ca.generateCert(certTemplate, requestor, RequestType.REST,
-                    null, msgId);
-
-            if (ca.getCaInfo().isSaveRequest()) {
-              long dbId = ca.addRequest(request);
-              ca.addRequestCert(dbId, certInfo.getCert().getCertId());
-            }
-
-            CertWithDbId cert = certInfo.getCert();
-            if (cert == null) {
-              String message = "could not generate certificate";
-              LOG.warn(message);
-              throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, message, INFO, FAILED);
-            }
-            respCt = CT_pkix_cert;
-            respBytes = cert.getCert().getEncoded();
-          }
-          break;
-        }
-        case CMD_revoke_cert:
-        case CMD_delete_cert: {
-          int permission;
-          if (CMD_revoke_cert.equals(command)) {
-            permission = PermissionConstants.REVOKE_CERT;
-          } else {
-            permission = PermissionConstants.REMOVE_CERT;
-          }
-          try {
-            requestor.assertPermitted(permission);
-          } catch (InsufficientPermissionException ex) {
-            throw new OperationException(NOT_PERMITTED, ex.getMessage());
-          }
-
-          String strCaSha1 = httpRetriever.getParameter(PARAM_ca_sha1);
-          if (StringUtil.isBlank(strCaSha1)) {
-            throw new HttpRespAuditException(BAD_REQUEST,
-                    "required parameter " + PARAM_ca_sha1 + " not specified",
-                    INFO, FAILED);
-          }
-
-          String strSerialNumber = httpRetriever.getParameter(
-                  PARAM_serial_number);
-          if (StringUtil.isBlank(strSerialNumber)) {
-            throw new HttpRespAuditException(BAD_REQUEST,
-                    "required parameter " + PARAM_serial_number + " not specified",
-                    INFO, FAILED);
-          }
-
-          if (!strCaSha1.equalsIgnoreCase(ca.getHexSha1OfCert())) {
-            throw new HttpRespAuditException(BAD_REQUEST,
-                    "unknown " + PARAM_ca_sha1, INFO, FAILED);
-          }
-
-          BigInteger serialNumber;
-          try {
-            serialNumber = toBigInt(strSerialNumber);
+            crlNumber = toBigInt(strCrlNumber);
           } catch (NumberFormatException ex) {
-            throw new OperationException(ErrorCode.BAD_REQUEST, ex.getMessage());
+            String message = "invalid crlNumber '" + strCrlNumber + "'";
+            LOG.warn(message);
+            throw new HttpRespAuditException(BAD_REQUEST, message, INFO, FAILED);
+          }
+        }
+
+        X509CRLHolder crl = ca.getCrl(crlNumber, msgId);
+        if (crl == null) {
+          String message = "could not get CRL";
+          LOG.warn(message);
+          throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, message, INFO, FAILED);
+        }
+
+        respCt = CT_pkix_crl;
+        respBytes = crl.getEncoded();
+      }
+
+      if (respCt == null) {
+        RequestorInfo requestor;
+        // Retrieve the user:password
+        String hdrValue = httpRetriever.getHeader("Authorization");
+        if (hdrValue != null && hdrValue.startsWith("Basic ")) {
+          String user = null;
+          byte[] password = null;
+          if (hdrValue.length() > 6) {
+            String b64 = hdrValue.substring(6);
+            byte[] userPwd = Base64.decodeFast(b64);
+            int idx = -1;
+            for (int i = 0; i < userPwd.length; i++) {
+              if (userPwd[i] == ':') {
+                idx = i;
+                break;
+              }
+            }
+
+            if (idx != -1 && idx < userPwd.length - 1) {
+              user = StringUtil.toUtf8String(Arrays.copyOfRange(userPwd, 0, idx));
+              password = Arrays.copyOfRange(userPwd, idx + 1, userPwd.length);
+            }
           }
 
-          if (CMD_revoke_cert.equals(command)) {
-            String strReason = httpRetriever.getParameter(PARAM_reason);
-            CrlReason reason = (strReason == null) ? CrlReason.UNSPECIFIED
-                    : CrlReason.forNameOrText(strReason);
+          if (user == null) {
+            throw new HttpRespAuditException(UNAUTHORIZED, "invalid Authorization information",
+                INFO, FAILED);
+          }
+          NameId userIdent = ca.authenticateUser(user, password);
+          if (userIdent == null) {
+            throw new HttpRespAuditException(UNAUTHORIZED, "could not authenticate user",
+                INFO, FAILED);
+          }
+          requestor = ca.getByUserRequestor(userIdent);
+        } else {
+          X509Cert clientCert = httpRetriever.getTlsClientCert();
+          if (clientCert == null) {
+            throw new HttpRespAuditException(UNAUTHORIZED, "no client certificate", INFO, FAILED);
+          }
+          requestor = ca.getRequestor(clientCert);
+        }
 
-            if (reason == CrlReason.REMOVE_FROM_CRL) {
-              ca.unrevokeCert(serialNumber, msgId);
-            } else {
-              Date invalidityTime = null;
-              String strInvalidityTime = httpRetriever.getParameter(
-                      PARAM_invalidity_time);
-              if (StringUtil.isNotBlank(strInvalidityTime)) {
-                invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(strInvalidityTime);
+        if (requestor == null) {
+          throw new OperationException(NOT_PERMITTED, "no requestor specified");
+        }
+
+        event.addEventData(NAME_requestor, requestor.getIdent().getName());
+
+        switch (command) {
+          case CMD_enroll_cert:
+          case CMD_enroll_cert_cagenkeypair: {
+            String profile = httpRetriever.getParameter(PARAM_profile);
+            if (StringUtil.isBlank(profile)) {
+              throw new HttpRespAuditException(BAD_REQUEST,
+                  "required parameter " + PARAM_profile + " not specified",
+                  INFO, FAILED);
+            }
+            profile = profile.toLowerCase();
+
+            try {
+              requestor.assertPermitted(PermissionConstants.ENROLL_CERT);
+            } catch (InsufficientPermissionException ex) {
+              throw new OperationException(NOT_PERMITTED, ex.getMessage());
+            }
+
+            if (!requestor.isCertprofilePermitted(profile)) {
+              throw new OperationException(NOT_PERMITTED,
+                  "certprofile " + profile + " is not allowed");
+            }
+
+            String strNotBefore = httpRetriever.getParameter(PARAM_not_before);
+            Date notBefore = (strNotBefore == null) ? null
+                : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotBefore);
+
+            String strNotAfter = httpRetriever.getParameter(PARAM_not_after);
+            Date notAfter = (strNotAfter == null) ? null
+                : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotAfter);
+
+            if (CMD_enroll_cert_cagenkeypair.equals(command)) {
+              String ct = httpRetriever.getHeader("Content-Type");
+
+              X500Name subject;
+              Extensions extensions;
+
+              if (ct.startsWith("text/plain")) {
+                Properties props = new Properties();
+                props.load(new ByteArrayInputStream(request));
+                String strSubject = props.getProperty("subject");
+                if (strSubject == null) {
+                  throw new OperationException(BAD_CERT_TEMPLATE, "subject is not specified");
+                }
+
+                try {
+                  subject = new X500Name(strSubject);
+                } catch (Exception ex) {
+                  throw new OperationException(BAD_CERT_TEMPLATE, "invalid subject");
+                }
+                extensions = null;
+              } else if (CT_pkcs10.equalsIgnoreCase(ct)) {
+                // some clients may send the PEM encoded CSR.
+                request = X509Util.toDerEncoded(request);
+
+                // The PKCS#10 will only be used for transport of subject and extensions.
+                // The associated key will not be used, so the verification of POP is skipped.
+                CertificationRequestInfo certTemp =
+                    CertificationRequest.getInstance(request).getCertificationRequestInfo();
+                subject = certTemp.getSubject();
+                extensions = CaUtil.getExtensions(certTemp);
+              } else {
+                String message = "unsupported media type " + ct;
+                throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, INFO, FAILED);
               }
 
-              ca.revokeCert(serialNumber, reason, invalidityTime, msgId);
-            }
-          } else { // if (CMD_delete_cert.equals(command)) {
-            ca.removeCert(serialNumber, msgId);
-          }
-          break;
-        }
-        case CMD_crl: {
-          try {
-            requestor.assertPermitted(PermissionConstants.GET_CRL);
-          } catch (InsufficientPermissionException ex) {
-            throw new OperationException(NOT_PERMITTED, ex.getMessage());
-          }
+              CertTemplateData certTemplate = new CertTemplateData(subject, null,
+                  notBefore, notAfter, extensions, profile, null, true);
+              CertificateInfo certInfo = ca.generateCert(certTemplate, requestor, RequestType.REST,
+                  null, msgId);
 
-          String strCrlNumber = httpRetriever.getParameter(PARAM_crl_number);
-          BigInteger crlNumber = null;
-          if (StringUtil.isNotBlank(strCrlNumber)) {
+              if (ca.getCaInfo().isSaveRequest()) {
+                long dbId = ca.addRequest(request);
+                ca.addRequestCert(dbId, certInfo.getCert().getCertId());
+              }
+
+              respCt = CT_pem_file;
+              byte[] keyBytes =
+                  PemEncoder.encode(certInfo.getPrivateKey().getEncoded(), PemLabel.PRIVATE_KEY);
+              byte[] certBytes =
+                  PemEncoder.encode(certInfo.getCert().getCert().getEncoded(),
+                      PemLabel.CERTIFICATE);
+
+              respBytes = new byte[keyBytes.length + 2 + certBytes.length];
+              System.arraycopy(keyBytes, 0, respBytes, 0, keyBytes.length);
+              respBytes[keyBytes.length] = '\r';
+              respBytes[keyBytes.length + 1] = '\n';
+              System.arraycopy(certBytes, 0, respBytes, keyBytes.length + 2, certBytes.length);
+            } else {
+              String ct = httpRetriever.getHeader("Content-Type");
+              if (!CT_pkcs10.equalsIgnoreCase(ct)) {
+                String message = "unsupported media type " + ct;
+                throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, INFO, FAILED);
+              }
+
+              CertificationRequest csr = CertificationRequest.getInstance(request);
+              if (!ca.verifyCsr(csr)) {
+                throw new OperationException(BAD_POP);
+              }
+
+              CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
+
+              X500Name subject = certTemp.getSubject();
+              SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
+
+              Extensions extensions = CaUtil.getExtensions(certTemp);
+              CertTemplateData certTemplate = new CertTemplateData(subject, publicKeyInfo,
+                  notBefore, notAfter, extensions, profile);
+              CertificateInfo certInfo = ca.generateCert(certTemplate, requestor, RequestType.REST,
+                  null, msgId);
+
+              if (ca.getCaInfo().isSaveRequest()) {
+                long dbId = ca.addRequest(request);
+                ca.addRequestCert(dbId, certInfo.getCert().getCertId());
+              }
+
+              CertWithDbId cert = certInfo.getCert();
+              if (cert == null) {
+                String message = "could not generate certificate";
+                LOG.warn(message);
+                throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, message, INFO, FAILED);
+              }
+              respCt = CT_pkix_cert;
+              respBytes = cert.getCert().getEncoded();
+            }
+            break;
+          }
+          case CMD_revoke_cert:
+          case CMD_delete_cert: {
+            int permission;
+            if (CMD_revoke_cert.equals(command)) {
+              permission = PermissionConstants.REVOKE_CERT;
+            } else {
+              permission = PermissionConstants.REMOVE_CERT;
+            }
             try {
-              crlNumber = toBigInt(strCrlNumber);
-            } catch (NumberFormatException ex) {
-              String message = "invalid crlNumber '" + strCrlNumber + "'";
-              LOG.warn(message);
-              throw new HttpRespAuditException(BAD_REQUEST, message, INFO, FAILED);
+              requestor.assertPermitted(permission);
+            } catch (InsufficientPermissionException ex) {
+              throw new OperationException(NOT_PERMITTED, ex.getMessage());
             }
-          }
 
-          X509CRLHolder crl = ca.getCrl(crlNumber, msgId);
-          if (crl == null) {
-            String message = "could not get CRL";
-            LOG.warn(message);
-            throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, message, INFO, FAILED);
-          }
+            String strCaSha1 = httpRetriever.getParameter(PARAM_ca_sha1);
+            if (StringUtil.isBlank(strCaSha1)) {
+              throw new HttpRespAuditException(BAD_REQUEST,
+                  "required parameter " + PARAM_ca_sha1 + " not specified",
+                  INFO, FAILED);
+            }
 
-          respCt = CT_pkix_crl;
-          respBytes = crl.getEncoded();
-          break;
-        }
-        case CMD_new_crl: {
-          try {
-            requestor.assertPermitted(PermissionConstants.GEN_CRL);
-          } catch (InsufficientPermissionException ex) {
-            throw new OperationException(NOT_PERMITTED, ex.getMessage());
-          }
+            String strSerialNumber = httpRetriever.getParameter(
+                PARAM_serial_number);
+            if (StringUtil.isBlank(strSerialNumber)) {
+              throw new HttpRespAuditException(BAD_REQUEST,
+                  "required parameter " + PARAM_serial_number + " not specified",
+                  INFO, FAILED);
+            }
 
-          X509CRLHolder crl = ca.generateCrlOnDemand(msgId);
-          respCt = CT_pkix_crl;
-          respBytes = crl.getEncoded();
-          break;
-        }
-        default: {
-          String message = "invalid command '" + command + "'";
-          LOG.error(message);
-          throw new HttpRespAuditException(NOT_FOUND, message, INFO, FAILED);
+            if (!strCaSha1.equalsIgnoreCase(ca.getHexSha1OfCert())) {
+              throw new HttpRespAuditException(BAD_REQUEST,
+                  "unknown " + PARAM_ca_sha1, INFO, FAILED);
+            }
+
+            BigInteger serialNumber;
+            try {
+              serialNumber = toBigInt(strSerialNumber);
+            } catch (NumberFormatException ex) {
+              throw new OperationException(ErrorCode.BAD_REQUEST, ex.getMessage());
+            }
+
+            if (CMD_revoke_cert.equals(command)) {
+              String strReason = httpRetriever.getParameter(PARAM_reason);
+              CrlReason reason = (strReason == null) ? CrlReason.UNSPECIFIED
+                  : CrlReason.forNameOrText(strReason);
+
+              if (reason == CrlReason.REMOVE_FROM_CRL) {
+                ca.unrevokeCert(serialNumber, msgId);
+              } else {
+                Date invalidityTime = null;
+                String strInvalidityTime = httpRetriever.getParameter(
+                    PARAM_invalidity_time);
+                if (StringUtil.isNotBlank(strInvalidityTime)) {
+                  invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(strInvalidityTime);
+                }
+
+                ca.revokeCert(serialNumber, reason, invalidityTime, msgId);
+              }
+            } else { // if (CMD_delete_cert.equals(command)) {
+              ca.removeCert(serialNumber, msgId);
+            }
+            break;
+          }
+          case CMD_new_crl: {
+            try {
+              requestor.assertPermitted(PermissionConstants.GEN_CRL);
+            } catch (InsufficientPermissionException ex) {
+              throw new OperationException(NOT_PERMITTED, ex.getMessage());
+            }
+
+            X509CRLHolder crl = ca.generateCrlOnDemand(msgId);
+            respCt = CT_pkix_crl;
+            respBytes = crl.getEncoded();
+            break;
+          }
+          default: {
+            // should not reach here
+            throw new IllegalStateException("invalid command '" + command + "'");
+          }
         }
       }
 

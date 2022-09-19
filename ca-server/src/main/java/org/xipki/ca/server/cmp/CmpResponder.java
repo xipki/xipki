@@ -1053,7 +1053,6 @@ public class CmpResponder extends BaseCmpResponder {
       X509Ca ca = getCa();
       if (CMPObjectIdentifiers.it_currentCRL.equals(infoType)) {
         event.addEventType(CaAuditConstants.Cmp.TYPE_genm_current_crl);
-        checkPermission(requestor, PermissionConstants.GET_CRL);
         CertificateList crl;
 
         if (itv.getInfoValue() == null) { // as defined in RFC 4210
@@ -1095,7 +1094,6 @@ public class CmpResponder extends BaseCmpResponder {
           respValue = tmpCrl.toASN1Structure();
         } else if (action == XiSecurityConstants.CMP_ACTION_GET_CRL_WITH_SN) {
           event.addEventType(CaAuditConstants.Cmp.TYPE_genm_crl4number);
-          checkPermission(requestor, PermissionConstants.GET_CRL);
 
           respValue = ca.getBcCrl(ASN1Integer.getInstance(reqValue).getPositiveValue(), msgId);
           if (respValue == null) {

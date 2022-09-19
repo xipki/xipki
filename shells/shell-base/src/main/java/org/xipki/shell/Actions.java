@@ -492,7 +492,7 @@ public class Actions {
       if (changed) {
         File newFile = new File(file.getPath() + "-new");
         byte[] newBytes = writer.toByteArray();
-        IoUtil.save(file, newBytes);
+        IoUtil.save(newFile, newBytes);
         newFile.renameTo(file);
       }
     }
