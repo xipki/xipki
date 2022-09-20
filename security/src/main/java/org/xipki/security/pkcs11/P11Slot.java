@@ -96,9 +96,7 @@ public abstract class P11Slot implements Closeable {
     }
 
     public void addCertificate(P11ObjectIdentifier objectId, X509Cert certificate) {
-      notNull(objectId, "objectId");
-      notNull(certificate, "certificate");
-      this.certificates.put(objectId, certificate);
+      this.certificates.put(notNull(objectId, "objectId"), notNull(certificate, "certificate"));
     }
 
     /**

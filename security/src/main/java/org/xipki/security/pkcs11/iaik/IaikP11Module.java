@@ -52,15 +52,13 @@ public class IaikP11Module extends P11Module {
 
   private String description;
 
-  private IaikP11Module(iaik.pkcs.pkcs11.Module module, P11ModuleConf moduleConf)
-      throws P11TokenException {
+  private IaikP11Module(iaik.pkcs.pkcs11.Module module, P11ModuleConf moduleConf) throws P11TokenException {
     super(moduleConf);
     this.module = notNull(module, "module");
 
-    String library = moduleConf.getNativeLibrary();
     try {
       Info info = module.getInfo();
-      this.description = StringUtil.concatObjects("PKCS#11 IAIK", "\n\tPath: ", library,
+      this.description = StringUtil.concatObjects("PKCS#11 IAIK", "\n\tPath: ", moduleConf.getNativeLibrary(),
           "\n\tCryptoki Version: ", info.getCryptokiVersion(), "\n\tManufacturerID: ", info.getManufacturerID(),
           "\n\tLibrary Description: ", info.getLibraryDescription(), "\n\tLibrary Version: ", info.getLibraryVersion());
     } catch (TokenException ex) {
@@ -169,12 +167,10 @@ public class IaikP11Module extends P11Module {
         throw new P11TokenException(ex.getMessage(), ex);
       } else {
         LOG.info("PKCS#11 module already initialized");
-        if (LOG.isInfoEnabled()) {
-          try {
-            LOG.info("pkcs11.getInfo():\n{}", module.getInfo());
-          } catch (TokenException e2) {
-            LOG.debug("module.getInfo()", e2);
-          }
+        try {
+          LOG.info("pkcs11.getInfo():\n{}", module.getInfo());
+        } catch (TokenException e2) {
+          LOG.debug("module.getInfo()", e2);
         }
       }
     } catch (Throwable th) {

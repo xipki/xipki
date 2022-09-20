@@ -302,7 +302,7 @@ public class AdmissionSyntax extends ValidatableConf {
 
       GeneralName admissionAuthority = null;
       if (at.getNamingAuthority() != null) {
-        admissionAuthority = GeneralName.getInstance(asn1PrimitivefromByteArray(at.getAdmissionAuthority()));
+        admissionAuthority = GeneralName.getInstance(asn1PrimitiveFromByteArray(at.getAdmissionAuthority()));
       }
 
       NamingAuthority namingAuthority = null;
@@ -323,7 +323,7 @@ public class AdmissionSyntax extends ValidatableConf {
     return new AdmissionExtension.AdmissionSyntaxOption(critical, tmpAdmissionAuthority, admissionsList);
   } // method toXiAdmissionSyntax
 
-  private static ASN1Primitive asn1PrimitivefromByteArray(byte[] encoded)
+  private static ASN1Primitive asn1PrimitiveFromByteArray(byte[] encoded)
       throws CertprofileException {
     try {
       return ASN1Primitive.fromByteArray(encoded);

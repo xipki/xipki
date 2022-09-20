@@ -69,7 +69,7 @@ public class GMUtil {
       byte[] userID, ASN1ObjectIdentifier curveOid, BigInteger pubPointX, BigInteger pubPointY) {
     SM3Digest digest = new SM3Digest();
 
-    addUserId(digest, userID);
+    addUserId(digest, userID == null ? defaultIDA : userID);
 
     int fieldSize;
     if (GMObjectIdentifiers.sm2p256v1.equals(curveOid)) {

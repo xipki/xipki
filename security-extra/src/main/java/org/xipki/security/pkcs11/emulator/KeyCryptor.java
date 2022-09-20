@@ -78,11 +78,7 @@ class KeyCryptor {
      */
     byte[] P = StringUtil.toUtf8Bytes(new String(password)); // password
     byte[] S = new byte[8];
-    int N = 16384;
-    int r = 8;
-    int p = 1;
-    int dkLen = 16;
-    byte[] dkey = SCrypt.generate(P, S, N, r, p, dkLen);
+    byte[] dkey = SCrypt.generate(P, S, 16384, 8, 1, 16); //N: 16384, r: 8, p: 1, dkLen: 16
     this.key = new SecretKeySpec(dkey, "AES");
 
     this.rnd = new SecureRandom();
@@ -149,8 +145,7 @@ class KeyCryptor {
   } // method decrypt
 
   byte[] encrypt(PrivateKey privateKey) throws P11TokenException {
-    notNull(privateKey, "privateKey");
-    return encrypt(privateKey.getEncoded());
+    return encrypt(notNull(privateKey, "privateKey").getEncoded());
   }
 
   byte[] encrypt(SecretKey secretKey) throws P11TokenException {

@@ -105,10 +105,9 @@ class IaikP11Slot extends P11Slot {
 
   private boolean omitDateAttrsInCertObject;
 
-  IaikP11Slot(
-      String moduleName, P11SlotIdentifier slotId, Slot slot, boolean readOnly, long userType,
-      List<char[]> password, int maxMessageSize, P11MechanismFilter mechanismFilter, P11NewObjectConf newObjectConf,
-      Integer numSessions, List<Long> secretKeyTypes, List<Long> keyPairTypes)
+  IaikP11Slot(String moduleName, P11SlotIdentifier slotId, Slot slot, boolean readOnly, long userType,
+              List<char[]> password, int maxMessageSize, P11MechanismFilter mechanismFilter,
+              P11NewObjectConf newObjectConf, Integer numSessions, List<Long> secretKeyTypes, List<Long> keyPairTypes)
       throws P11TokenException {
     super(moduleName, slotId, readOnly, mechanismFilter, numSessions, secretKeyTypes, keyPairTypes);
 
@@ -358,10 +357,8 @@ class IaikP11Slot extends P11Slot {
       return;
     }
 
-    P11ObjectIdentifier objectId = new P11ObjectIdentifier(id, label);
-
     IaikP11Identity identity = new IaikP11Identity(this,
-        new P11IdentityId(slotId, objectId, null, null), secretKey);
+        new P11IdentityId(slotId, new P11ObjectIdentifier(id, label), null, null), secretKey);
     refreshResult.addIdentity(identity);
   } // method analyseSingleKey
 
@@ -392,9 +389,8 @@ class IaikP11Slot extends P11Slot {
       if (privKey instanceof RSAPrivateKey) {
         RSAPrivateKey p11RsaSk = (RSAPrivateKey) privKey;
         if (p11RsaSk.getPublicExponent() != null && p11RsaSk.getModulus() == null) {
-          BigInteger exp = new BigInteger(1, value(p11RsaSk.getPublicExponent()));
-          BigInteger mod = new BigInteger(1, value(p11RsaSk.getModulus()));
-          pubKey = buildRSAKey(mod, exp);
+          pubKey = buildRSAKey(new BigInteger(1, value(p11RsaSk.getPublicExponent())),
+                              new BigInteger(1, value(p11RsaSk.getModulus())));
         }
       }
 
@@ -404,11 +400,10 @@ class IaikP11Slot extends P11Slot {
       }
     }
 
-    P11ObjectIdentifier objectId = new P11ObjectIdentifier(id, label);
-
     X509Cert[] certs = (cert == null) ? null : new X509Cert[]{cert};
     IaikP11Identity identity = new IaikP11Identity(this,
-        new P11IdentityId(slotId, objectId, pubKeyLabel, certLabel), privKey, pubKey, certs);
+        new P11IdentityId(slotId, new P11ObjectIdentifier(id, label), pubKeyLabel, certLabel),
+        privKey, pubKey, certs);
     refreshResult.addIdentity(identity);
   } // method analyseSingleKey
 
@@ -783,8 +778,7 @@ class IaikP11Slot extends P11Slot {
       } catch (PKCS11Exception ex) {
          long errCode = ex.getErrorCode();
          if (!omit && CKR_TEMPLATE_INCONSISTENT == errCode) {
-           // some HSMs like NFAST does not like the attributes CKA_START_DATE and CKA_END_DATE
-           // try without them.
+           // some HSMs like NFAST does not like the attributes CKA_START_DATE and CKA_END_DATE, try without them.
            newCertTemp = createPkcs11Template(session, cert, control, true);
            newCert = (X509PublicKeyCertificate) session.createObject(newCertTemp);
            omitDateAttrsInCertObject = true;

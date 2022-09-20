@@ -18,7 +18,6 @@
 package org.xipki.security.pkcs11.emulator;
 
 import iaik.pkcs.pkcs11.wrapper.Functions;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.macs.GMac;
@@ -51,6 +50,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.xipki.util.Args.notNull;
+import static iaik.pkcs.pkcs11.wrapper.PKCS11Constants.*;
+import static org.xipki.security.HashAlgo.*;
 
 /**
  * {@link P11Identity} for PKCS#11 emulator.
@@ -85,85 +86,85 @@ public class EmulatorP11Identity extends P11Identity {
 
   static {
     // MGF1 mechanisms
-    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA1,     HashAlgo.SHA1);
-    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA224,   HashAlgo.SHA224);
-    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA256,   HashAlgo.SHA256);
-    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA384,   HashAlgo.SHA384);
-    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA512,   HashAlgo.SHA512);
-    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA3_224, HashAlgo.SHA3_224);
-    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA3_256, HashAlgo.SHA3_256);
-    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA3_384, HashAlgo.SHA3_384);
-    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA3_512, HashAlgo.SHA3_512);
+    mgfMechHashMap.put(CKG_MGF1_SHA1,     SHA1);
+    mgfMechHashMap.put(CKG_MGF1_SHA224,   SHA224);
+    mgfMechHashMap.put(CKG_MGF1_SHA256,   SHA256);
+    mgfMechHashMap.put(CKG_MGF1_SHA384,   SHA384);
+    mgfMechHashMap.put(CKG_MGF1_SHA512,   SHA512);
+    mgfMechHashMap.put(CKG_MGF1_SHA3_224, SHA3_224);
+    mgfMechHashMap.put(CKG_MGF1_SHA3_256, SHA3_256);
+    mgfMechHashMap.put(CKG_MGF1_SHA3_384, SHA3_384);
+    mgfMechHashMap.put(CKG_MGF1_SHA3_512, SHA3_512);
 
     // Hash mechanisms
-    mechHashMap.put(PKCS11Constants.CKM_SHA_1,      HashAlgo.SHA1);
-    mechHashMap.put(PKCS11Constants.CKM_SHA224,     HashAlgo.SHA224);
-    mechHashMap.put(PKCS11Constants.CKM_SHA256,     HashAlgo.SHA256);
-    mechHashMap.put(PKCS11Constants.CKM_SHA384,     HashAlgo.SHA384);
-    mechHashMap.put(PKCS11Constants.CKM_SHA512,     HashAlgo.SHA512);
-    mechHashMap.put(PKCS11Constants.CKM_SHA3_224,   HashAlgo.SHA3_224);
-    mechHashMap.put(PKCS11Constants.CKM_SHA3_256,   HashAlgo.SHA3_256);
-    mechHashMap.put(PKCS11Constants.CKM_SHA3_384,   HashAlgo.SHA3_384);
-    mechHashMap.put(PKCS11Constants.CKM_SHA3_512,   HashAlgo.SHA3_512);
-    mechHashMap.put(PKCS11Constants.CKM_VENDOR_SM3, HashAlgo.SM3);
+    mechHashMap.put(CKM_SHA_1,      SHA1);
+    mechHashMap.put(CKM_SHA224,     SHA224);
+    mechHashMap.put(CKM_SHA256,     SHA256);
+    mechHashMap.put(CKM_SHA384,     SHA384);
+    mechHashMap.put(CKM_SHA512,     SHA512);
+    mechHashMap.put(CKM_SHA3_224,   SHA3_224);
+    mechHashMap.put(CKM_SHA3_256,   SHA3_256);
+    mechHashMap.put(CKM_SHA3_384,   SHA3_384);
+    mechHashMap.put(CKM_SHA3_512,   SHA3_512);
+    mechHashMap.put(CKM_VENDOR_SM3, SM3);
 
     // ECDSA sign mechanisms
-    mechHashMap.put(PKCS11Constants.CKM_ECDSA_SHA1,     HashAlgo.SHA1);
-    mechHashMap.put(PKCS11Constants.CKM_ECDSA_SHA224,   HashAlgo.SHA224);
-    mechHashMap.put(PKCS11Constants.CKM_ECDSA_SHA256,   HashAlgo.SHA256);
-    mechHashMap.put(PKCS11Constants.CKM_ECDSA_SHA384,   HashAlgo.SHA384);
-    mechHashMap.put(PKCS11Constants.CKM_ECDSA_SHA512,   HashAlgo.SHA512);
-    mechHashMap.put(PKCS11Constants.CKM_ECDSA_SHA3_224, HashAlgo.SHA3_224);
-    mechHashMap.put(PKCS11Constants.CKM_ECDSA_SHA3_256, HashAlgo.SHA3_256);
-    mechHashMap.put(PKCS11Constants.CKM_ECDSA_SHA3_384, HashAlgo.SHA3_384);
-    mechHashMap.put(PKCS11Constants.CKM_ECDSA_SHA3_512, HashAlgo.SHA3_512);
+    mechHashMap.put(CKM_ECDSA_SHA1,     SHA1);
+    mechHashMap.put(CKM_ECDSA_SHA224,   SHA224);
+    mechHashMap.put(CKM_ECDSA_SHA256,   SHA256);
+    mechHashMap.put(CKM_ECDSA_SHA384,   SHA384);
+    mechHashMap.put(CKM_ECDSA_SHA512,   SHA512);
+    mechHashMap.put(CKM_ECDSA_SHA3_224, SHA3_224);
+    mechHashMap.put(CKM_ECDSA_SHA3_256, SHA3_256);
+    mechHashMap.put(CKM_ECDSA_SHA3_384, SHA3_384);
+    mechHashMap.put(CKM_ECDSA_SHA3_512, SHA3_512);
 
     // SM2 sign mechanisms
-    mechHashMap.put(PKCS11Constants.CKM_VENDOR_SM2_SM3, HashAlgo.SM3);
+    mechHashMap.put(CKM_VENDOR_SM2_SM3, SM3);
 
     // DSA sign mechanisms
-    mechHashMap.put(PKCS11Constants.CKM_DSA_SHA1,     HashAlgo.SHA1);
-    mechHashMap.put(PKCS11Constants.CKM_DSA_SHA224,   HashAlgo.SHA224);
-    mechHashMap.put(PKCS11Constants.CKM_DSA_SHA256,   HashAlgo.SHA256);
-    mechHashMap.put(PKCS11Constants.CKM_DSA_SHA384,   HashAlgo.SHA384);
-    mechHashMap.put(PKCS11Constants.CKM_DSA_SHA512,   HashAlgo.SHA512);
-    mechHashMap.put(PKCS11Constants.CKM_DSA_SHA3_224, HashAlgo.SHA3_224);
-    mechHashMap.put(PKCS11Constants.CKM_DSA_SHA3_256, HashAlgo.SHA3_256);
-    mechHashMap.put(PKCS11Constants.CKM_DSA_SHA3_384, HashAlgo.SHA3_384);
-    mechHashMap.put(PKCS11Constants.CKM_DSA_SHA3_512, HashAlgo.SHA3_512);
+    mechHashMap.put(CKM_DSA_SHA1,     SHA1);
+    mechHashMap.put(CKM_DSA_SHA224,   SHA224);
+    mechHashMap.put(CKM_DSA_SHA256,   SHA256);
+    mechHashMap.put(CKM_DSA_SHA384,   SHA384);
+    mechHashMap.put(CKM_DSA_SHA512,   SHA512);
+    mechHashMap.put(CKM_DSA_SHA3_224, SHA3_224);
+    mechHashMap.put(CKM_DSA_SHA3_256, SHA3_256);
+    mechHashMap.put(CKM_DSA_SHA3_384, SHA3_384);
+    mechHashMap.put(CKM_DSA_SHA3_512, SHA3_512);
 
     // RSA PKCS#1v1.5 sign mechanisms
-    mechHashMap.put(PKCS11Constants.CKM_SHA1_RSA_PKCS,       HashAlgo.SHA1);
-    mechHashMap.put(PKCS11Constants.CKM_SHA224_RSA_PKCS,     HashAlgo.SHA224);
-    mechHashMap.put(PKCS11Constants.CKM_SHA256_RSA_PKCS,     HashAlgo.SHA256);
-    mechHashMap.put(PKCS11Constants.CKM_SHA384_RSA_PKCS,     HashAlgo.SHA384);
-    mechHashMap.put(PKCS11Constants.CKM_SHA512_RSA_PKCS,     HashAlgo.SHA512);
-    mechHashMap.put(PKCS11Constants.CKM_SHA3_224_RSA_PKCS,   HashAlgo.SHA3_224);
-    mechHashMap.put(PKCS11Constants.CKM_SHA3_256_RSA_PKCS,   HashAlgo.SHA3_256);
-    mechHashMap.put(PKCS11Constants.CKM_SHA3_384_RSA_PKCS,   HashAlgo.SHA3_384);
-    mechHashMap.put(PKCS11Constants.CKM_SHA3_512_RSA_PKCS,   HashAlgo.SHA3_512);
+    mechHashMap.put(CKM_SHA1_RSA_PKCS,       SHA1);
+    mechHashMap.put(CKM_SHA224_RSA_PKCS,     SHA224);
+    mechHashMap.put(CKM_SHA256_RSA_PKCS,     SHA256);
+    mechHashMap.put(CKM_SHA384_RSA_PKCS,     SHA384);
+    mechHashMap.put(CKM_SHA512_RSA_PKCS,     SHA512);
+    mechHashMap.put(CKM_SHA3_224_RSA_PKCS,   SHA3_224);
+    mechHashMap.put(CKM_SHA3_256_RSA_PKCS,   SHA3_256);
+    mechHashMap.put(CKM_SHA3_384_RSA_PKCS,   SHA3_384);
+    mechHashMap.put(CKM_SHA3_512_RSA_PKCS,   SHA3_512);
 
     // RSA PSS MGF1 sign mechanisms
-    mechHashMap.put(PKCS11Constants.CKM_SHA1_RSA_PKCS_PSS,     HashAlgo.SHA1);
-    mechHashMap.put(PKCS11Constants.CKM_SHA224_RSA_PKCS_PSS,   HashAlgo.SHA224);
-    mechHashMap.put(PKCS11Constants.CKM_SHA256_RSA_PKCS_PSS,   HashAlgo.SHA256);
-    mechHashMap.put(PKCS11Constants.CKM_SHA384_RSA_PKCS_PSS,   HashAlgo.SHA384);
-    mechHashMap.put(PKCS11Constants.CKM_SHA512_RSA_PKCS_PSS,   HashAlgo.SHA512);
-    mechHashMap.put(PKCS11Constants.CKM_SHA3_224_RSA_PKCS_PSS, HashAlgo.SHA3_224);
-    mechHashMap.put(PKCS11Constants.CKM_SHA3_256_RSA_PKCS_PSS, HashAlgo.SHA3_256);
-    mechHashMap.put(PKCS11Constants.CKM_SHA3_384_RSA_PKCS_PSS, HashAlgo.SHA3_384);
-    mechHashMap.put(PKCS11Constants.CKM_SHA3_512_RSA_PKCS_PSS, HashAlgo.SHA3_512);
+    mechHashMap.put(CKM_SHA1_RSA_PKCS_PSS,     SHA1);
+    mechHashMap.put(CKM_SHA224_RSA_PKCS_PSS,   SHA224);
+    mechHashMap.put(CKM_SHA256_RSA_PKCS_PSS,   SHA256);
+    mechHashMap.put(CKM_SHA384_RSA_PKCS_PSS,   SHA384);
+    mechHashMap.put(CKM_SHA512_RSA_PKCS_PSS,   SHA512);
+    mechHashMap.put(CKM_SHA3_224_RSA_PKCS_PSS, SHA3_224);
+    mechHashMap.put(CKM_SHA3_256_RSA_PKCS_PSS, SHA3_256);
+    mechHashMap.put(CKM_SHA3_384_RSA_PKCS_PSS, SHA3_384);
+    mechHashMap.put(CKM_SHA3_512_RSA_PKCS_PSS, SHA3_512);
 
     // HMAC
-    mechHashMap.put(PKCS11Constants.CKM_SHA_1_HMAC,    HashAlgo.SHA1);
-    mechHashMap.put(PKCS11Constants.CKM_SHA224_HMAC,   HashAlgo.SHA224);
-    mechHashMap.put(PKCS11Constants.CKM_SHA256_HMAC,   HashAlgo.SHA256);
-    mechHashMap.put(PKCS11Constants.CKM_SHA384_HMAC,   HashAlgo.SHA384);
-    mechHashMap.put(PKCS11Constants.CKM_SHA512_HMAC,   HashAlgo.SHA512);
-    mechHashMap.put(PKCS11Constants.CKM_SHA3_224_HMAC, HashAlgo.SHA224);
-    mechHashMap.put(PKCS11Constants.CKM_SHA3_256_HMAC, HashAlgo.SHA256);
-    mechHashMap.put(PKCS11Constants.CKM_SHA3_384_HMAC, HashAlgo.SHA384);
-    mechHashMap.put(PKCS11Constants.CKM_SHA3_512_HMAC, HashAlgo.SHA512);
+    mechHashMap.put(CKM_SHA_1_HMAC,    SHA1);
+    mechHashMap.put(CKM_SHA224_HMAC,   SHA224);
+    mechHashMap.put(CKM_SHA256_HMAC,   SHA256);
+    mechHashMap.put(CKM_SHA384_HMAC,   SHA384);
+    mechHashMap.put(CKM_SHA512_HMAC,   SHA512);
+    mechHashMap.put(CKM_SHA3_224_HMAC, SHA224);
+    mechHashMap.put(CKM_SHA3_256_HMAC, SHA256);
+    mechHashMap.put(CKM_SHA3_384_HMAC, SHA384);
+    mechHashMap.put(CKM_SHA3_512_HMAC, SHA512);
   }
 
   public EmulatorP11Identity(
@@ -279,76 +280,49 @@ public class EmulatorP11Identity extends P11Identity {
       throws P11TokenException {
     init();
 
-    if (mechanism == PKCS11Constants.CKM_ECDSA) {
+    if (mechanism == CKM_ECDSA) {
       return dsaAndEcdsaSign(content, null);
-    } else if (mechanism == PKCS11Constants.CKM_VENDOR_SM2) {
+    } else if (mechanism == CKM_VENDOR_SM2) {
       return sm2SignHash(content);
-    } else if (mechanism == PKCS11Constants.CKM_DSA) {
+    } else if (mechanism == CKM_DSA) {
       return dsaAndEcdsaSign(content, null);
-    } else if (mechanism == PKCS11Constants.CKM_EDDSA) {
+    } else if (mechanism == CKM_EDDSA) {
       return eddsaSign(content);
-    } else if (mechanism == PKCS11Constants.CKM_RSA_X_509) {
+    } else if (mechanism == CKM_RSA_X_509) {
       return rsaX509Sign(content);
-    } else if (mechanism == PKCS11Constants.CKM_RSA_PKCS) {
+    } else if (mechanism == CKM_RSA_PKCS) {
       return rsaPkcsSign(content, null);
-    } else if (PKCS11Constants.CKM_RSA_PKCS_PSS == mechanism) {
+    } else if (CKM_RSA_PKCS_PSS == mechanism) {
       return rsaPkcsPssSign(parameters, content, null);
-    } else if (PKCS11Constants.CKM_AES_GMAC == mechanism) {
+    } else if (CKM_AES_GMAC == mechanism) {
       return aesGmac(parameters, content);
     }
 
     HashAlgo hashAlgo = mechHashMap.get(mechanism);
-    if (mechanism == PKCS11Constants.CKM_ECDSA_SHA1
-        || mechanism == PKCS11Constants.CKM_ECDSA_SHA224
-        || mechanism == PKCS11Constants.CKM_ECDSA_SHA256
-        || mechanism == PKCS11Constants.CKM_ECDSA_SHA384
-        || mechanism == PKCS11Constants.CKM_ECDSA_SHA512
-        || mechanism == PKCS11Constants.CKM_ECDSA_SHA3_224
-        || mechanism == PKCS11Constants.CKM_ECDSA_SHA3_256
-        || mechanism == PKCS11Constants.CKM_ECDSA_SHA3_384
-        || mechanism == PKCS11Constants.CKM_ECDSA_SHA3_512) {
+    if (   mechanism == CKM_ECDSA_SHA1     || mechanism == CKM_ECDSA_SHA224   || mechanism == CKM_ECDSA_SHA256
+        || mechanism == CKM_ECDSA_SHA384   || mechanism == CKM_ECDSA_SHA512   || mechanism == CKM_ECDSA_SHA3_224
+        || mechanism == CKM_ECDSA_SHA3_256 || mechanism == CKM_ECDSA_SHA3_384 || mechanism == CKM_ECDSA_SHA3_512) {
       return dsaAndEcdsaSign(content, hashAlgo);
-    } else if (mechanism == PKCS11Constants.CKM_VENDOR_SM2_SM3) {
+    } else if (mechanism == CKM_VENDOR_SM2_SM3) {
       return sm2Sign(parameters, content);
-    } else if (mechanism == PKCS11Constants.CKM_DSA_SHA1
-        || mechanism == PKCS11Constants.CKM_DSA_SHA224
-        || mechanism == PKCS11Constants.CKM_DSA_SHA256
-        || mechanism == PKCS11Constants.CKM_DSA_SHA384
-        || mechanism == PKCS11Constants.CKM_DSA_SHA512
-        || mechanism == PKCS11Constants.CKM_DSA_SHA3_224
-        || mechanism == PKCS11Constants.CKM_DSA_SHA3_256
-        || mechanism == PKCS11Constants.CKM_DSA_SHA3_384
-        || mechanism == PKCS11Constants.CKM_DSA_SHA3_512) {
+    } else if (mechanism == CKM_DSA_SHA1 || mechanism == CKM_DSA_SHA224   || mechanism == CKM_DSA_SHA256
+        || mechanism == CKM_DSA_SHA384   || mechanism == CKM_DSA_SHA512   || mechanism == CKM_DSA_SHA3_224
+        || mechanism == CKM_DSA_SHA3_256 || mechanism == CKM_DSA_SHA3_384 || mechanism == CKM_DSA_SHA3_512) {
       return dsaAndEcdsaSign(content, hashAlgo);
-    } else if (mechanism == PKCS11Constants.CKM_SHA1_RSA_PKCS
-        || mechanism == PKCS11Constants.CKM_SHA224_RSA_PKCS
-        || mechanism == PKCS11Constants.CKM_SHA256_RSA_PKCS
-        || mechanism == PKCS11Constants.CKM_SHA384_RSA_PKCS
-        || mechanism == PKCS11Constants.CKM_SHA512_RSA_PKCS
-        || mechanism == PKCS11Constants.CKM_SHA3_224_RSA_PKCS
-        || mechanism == PKCS11Constants.CKM_SHA3_256_RSA_PKCS
-        || mechanism == PKCS11Constants.CKM_SHA3_384_RSA_PKCS
-        || mechanism == PKCS11Constants.CKM_SHA3_512_RSA_PKCS) {
+    } else if (mechanism == CKM_SHA1_RSA_PKCS  || mechanism == CKM_SHA224_RSA_PKCS || mechanism == CKM_SHA256_RSA_PKCS
+        || mechanism == CKM_SHA384_RSA_PKCS    || mechanism == CKM_SHA512_RSA_PKCS || mechanism == CKM_SHA3_224_RSA_PKCS
+        || mechanism == CKM_SHA3_256_RSA_PKCS  || mechanism == CKM_SHA3_384_RSA_PKCS
+        || mechanism == CKM_SHA3_512_RSA_PKCS) {
       return rsaPkcsSign(content, hashAlgo);
-    } else if (mechanism == PKCS11Constants.CKM_SHA1_RSA_PKCS_PSS
-        || mechanism == PKCS11Constants.CKM_SHA224_RSA_PKCS_PSS
-        || mechanism == PKCS11Constants.CKM_SHA256_RSA_PKCS_PSS
-        || mechanism == PKCS11Constants.CKM_SHA384_RSA_PKCS_PSS
-        || mechanism == PKCS11Constants.CKM_SHA512_RSA_PKCS_PSS
-        || mechanism == PKCS11Constants.CKM_SHA3_224_RSA_PKCS_PSS
-        || mechanism == PKCS11Constants.CKM_SHA3_256_RSA_PKCS_PSS
-        || mechanism == PKCS11Constants.CKM_SHA3_384_RSA_PKCS_PSS
-        || mechanism == PKCS11Constants.CKM_SHA3_512_RSA_PKCS_PSS) {
+    } else if (mechanism == CKM_SHA1_RSA_PKCS_PSS || mechanism == CKM_SHA224_RSA_PKCS_PSS
+        || mechanism == CKM_SHA256_RSA_PKCS_PSS   || mechanism == CKM_SHA384_RSA_PKCS_PSS
+        || mechanism == CKM_SHA512_RSA_PKCS_PSS   || mechanism == CKM_SHA3_224_RSA_PKCS_PSS
+        || mechanism == CKM_SHA3_256_RSA_PKCS_PSS || mechanism == CKM_SHA3_384_RSA_PKCS_PSS
+        || mechanism == CKM_SHA3_512_RSA_PKCS_PSS) {
       return rsaPkcsPssSign(parameters, content, hashAlgo);
-    } else if (mechanism == PKCS11Constants.CKM_SHA_1_HMAC
-        || mechanism == PKCS11Constants.CKM_SHA224_HMAC
-        || mechanism == PKCS11Constants.CKM_SHA256_HMAC
-        || mechanism == PKCS11Constants.CKM_SHA384_HMAC
-        || mechanism == PKCS11Constants.CKM_SHA512_HMAC
-        || mechanism == PKCS11Constants.CKM_SHA3_224_HMAC
-        || mechanism == PKCS11Constants.CKM_SHA3_256_HMAC
-        || mechanism == PKCS11Constants.CKM_SHA3_384_HMAC
-        || mechanism == PKCS11Constants.CKM_SHA3_512_HMAC) {
+    } else if (mechanism == CKM_SHA_1_HMAC || mechanism == CKM_SHA224_HMAC   || mechanism == CKM_SHA256_HMAC
+        || mechanism == CKM_SHA384_HMAC    || mechanism == CKM_SHA512_HMAC   || mechanism == CKM_SHA3_224_HMAC
+        || mechanism == CKM_SHA3_256_HMAC  || mechanism == CKM_SHA3_384_HMAC || mechanism == CKM_SHA3_512_HMAC) {
       return hmac(content, hashAlgo);
     } else {
       throw new P11TokenException("unsupported mechanism " + mechanism);
@@ -364,8 +338,7 @@ public class EmulatorP11Identity extends P11Identity {
     return signature;
   } // method hmac
 
-  private byte[] aesGmac(P11Params params, byte[] contentToSign)
-      throws P11TokenException {
+  private byte[] aesGmac(P11Params params, byte[] contentToSign) throws P11TokenException {
     if (params == null) {
       throw new P11TokenException("iv may not be null");
     }
@@ -416,8 +389,7 @@ public class EmulatorP11Identity extends P11Identity {
     return rsaX509Sign(encodedHashValue);
   } // method rsaPkcsPssSign
 
-  private byte[] rsaPkcsSign(byte[] contentToSign, HashAlgo hashAlgo)
-      throws P11TokenException {
+  private byte[] rsaPkcsSign(byte[] contentToSign, HashAlgo hashAlgo) throws P11TokenException {
     int modulusBitLen = getSignatureKeyBitLength();
     byte[] paddedHash;
     try {
@@ -457,8 +429,7 @@ public class EmulatorP11Identity extends P11Identity {
     }
   } // method rsaX509Sign
 
-  private byte[] dsaAndEcdsaSign(byte[] dataToSign, HashAlgo hashAlgo)
-      throws P11TokenException {
+  private byte[] dsaAndEcdsaSign(byte[] dataToSign, HashAlgo hashAlgo) throws P11TokenException {
     byte[] hash = (hashAlgo == null) ? dataToSign : hashAlgo.hash(dataToSign);
 
     ConcurrentBagEntry<Signature> sig0;

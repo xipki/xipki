@@ -56,9 +56,8 @@ public class P11ContentSignerBuilder {
 
   private final P11IdentityId identityId;
 
-  public P11ContentSignerBuilder(
-      P11CryptService cryptService, SecurityFactory securityFactory,
-      P11IdentityId identityId, X509Cert[] certificateChain)
+  public P11ContentSignerBuilder(P11CryptService cryptService, SecurityFactory securityFactory,
+                                 P11IdentityId identityId, X509Cert[] certificateChain)
       throws XiSecurityException, P11TokenException {
     this.cryptService = notNull(cryptService, "cryptService");
     this.securityFactory = notNull(securityFactory, "securityFactory");
@@ -157,11 +156,9 @@ public class P11ContentSignerBuilder {
 
   private XiContentSigner createRSAContentSigner(SignAlgo signAlgo)
       throws XiSecurityException, P11TokenException {
-    if (signAlgo.isRSAPSSSigAlgo()) {
-      return new P11ContentSigner.RSAPSS(cryptService, identityId, signAlgo, securityFactory.getRandom4Sign());
-    } else {
-      return new P11ContentSigner.RSA(cryptService, identityId, signAlgo);
-    }
+    return  signAlgo.isRSAPSSSigAlgo()
+      ? new P11ContentSigner.RSAPSS(cryptService, identityId, signAlgo, securityFactory.getRandom4Sign())
+      : new P11ContentSigner.RSA(cryptService, identityId, signAlgo);
   }
 
   private XiContentSigner createECContentSigner(SignAlgo signAlgo)

@@ -82,17 +82,9 @@ class SM2Signer {
     this.digest = HashAlgo.SM3.createDigest();
   } // constructor
 
-  public byte[] generateSignatureForMessage(byte[] userId, byte[] message)
-      throws CryptoException {
-    byte[] z;
-    if (userId == null) {
-      // use default userId
-      z = GMUtil.getSM2Z(GMObjectIdentifiers.sm2p256v1,
-            pubPoint.getAffineXCoord().toBigInteger(), pubPoint.getAffineYCoord().toBigInteger());
-    } else {
-      z = GMUtil.getSM2Z(userId, GMObjectIdentifiers.sm2p256v1,
-            pubPoint.getAffineXCoord().toBigInteger(), pubPoint.getAffineYCoord().toBigInteger());
-    }
+  public byte[] generateSignatureForMessage(byte[] userId, byte[] message) throws CryptoException {
+    byte[] z = GMUtil.getSM2Z(userId, GMObjectIdentifiers.sm2p256v1, pubPoint.getAffineXCoord().toBigInteger(),
+                  pubPoint.getAffineYCoord().toBigInteger());
     digest.reset();
     digest.update(z, 0, z.length);
     digest.update(message, 0, message.length);
@@ -134,10 +126,7 @@ class SM2Signer {
 
     // A7
     try {
-      ASN1EncodableVector v = new ASN1EncodableVector();
-      v.add(new ASN1Integer(r));
-      v.add(new ASN1Integer(s));
-      return new DERSequence(v).getEncoded(ASN1Encoding.DER);
+      return new DERSequence(new ASN1Integer[]{new ASN1Integer(r), new ASN1Integer(s)}).getEncoded(ASN1Encoding.DER);
     } catch (IOException ex) {
       throw new CryptoException("unable to encode signature: " + ex.getMessage(), ex);
     }

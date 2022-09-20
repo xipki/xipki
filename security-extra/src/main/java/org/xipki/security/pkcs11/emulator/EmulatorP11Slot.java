@@ -737,9 +737,9 @@ class EmulatorP11Slot extends P11Slot {
       mech = CKM_DES3_KEY_GEN;
     } else if (CKK_GENERIC_SECRET == keyType) {
       mech = CKM_GENERIC_SECRET_KEY_GEN;
-    } else if (CKK_SHA_1_HMAC == keyType || CKK_SHA224_HMAC == keyType || CKK_SHA256_HMAC == keyType
-        || CKK_SHA384_HMAC == keyType || CKK_SHA512_HMAC == keyType || CKK_SHA3_224_HMAC == keyType
-        || CKK_SHA3_256_HMAC == keyType || CKK_SHA3_384_HMAC == keyType || CKK_SHA3_512_HMAC == keyType) {
+    } else if (CKK_SHA_1_HMAC == keyType || CKK_SHA224_HMAC   == keyType || CKK_SHA256_HMAC   == keyType
+        || CKK_SHA384_HMAC    == keyType || CKK_SHA512_HMAC   == keyType || CKK_SHA3_224_HMAC == keyType
+        || CKK_SHA3_256_HMAC  == keyType || CKK_SHA3_384_HMAC == keyType || CKK_SHA3_512_HMAC == keyType) {
       mech = CKM_GENERIC_SECRET_KEY_GEN;
     } else {
       throw new IllegalArgumentException("unsupported key type 0x" + Functions.toFullHex((int)keyType));
@@ -990,9 +990,7 @@ class EmulatorP11Slot extends P11Slot {
     while (true) {
       byte[] id = new byte[newObjectConf.getIdLength()];
       random.nextBytes(id);
-
-      boolean duplicated = existsIdentityForId(id) || existsCertForId(id);
-      if (!duplicated) {
+      if (!(existsIdentityForId(id) || existsCertForId(id))) { // not duplicated
         return id;
       }
     }
