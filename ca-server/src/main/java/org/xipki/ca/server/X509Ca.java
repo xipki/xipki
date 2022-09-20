@@ -648,7 +648,17 @@ public class X509Ca extends X509CaModule implements Closeable {
           gct.grantedSubject, gct.extensions, gct.grantedPublicKey, caInfo.getPublicCaInfo(),
           crlSignerCert, gct.grantedNotBefore, gct.grantedNotAfter);
       if (extensionTuples != null) {
+        List<ASN1ObjectIdentifier> lowPriTypes = new LinkedList<>();
         for (ASN1ObjectIdentifier extensionType : extensionTuples.getExtensionTypes()) {
+          if (extensionType.on(ObjectIdentifiers.id_pen)) {
+            lowPriTypes.add(extensionType);
+          } else {
+            ExtensionValue extValue = extensionTuples.getExtensionValue(extensionType);
+            certBuilder.addExtension(extensionType, extValue.isCritical(), extValue.getValue());
+          }
+        }
+
+        for (ASN1ObjectIdentifier extensionType : lowPriTypes) {
           ExtensionValue extValue = extensionTuples.getExtensionValue(extensionType);
           certBuilder.addExtension(extensionType, extValue.isCritical(), extValue.getValue());
         }

@@ -48,7 +48,7 @@ public class ObjectIdentifiers {
   /**
    * registered PEN for xipki.org: 45522
    */
-  private static final ASN1ObjectIdentifier id_pen = new ASN1ObjectIdentifier("1.3.6.1.4.1");
+  public static final ASN1ObjectIdentifier id_pen = new ASN1ObjectIdentifier("1.3.6.1.4.1");
 
   private static final ASN1ObjectIdentifier id_xipki = id_pen.branch("45522");
 
