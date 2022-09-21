@@ -67,8 +67,8 @@ public class ExtensionValues {
     return extensions.get(Args.notNull(type, "type"));
   }
 
-  public boolean removeExtensionTuple(ASN1ObjectIdentifier type) {
-    return extensions.remove(Args.notNull(type, "type")) != null;
+  public ExtensionValue removeExtensionTuple(ASN1ObjectIdentifier type) {
+    return extensions.remove(Args.notNull(type, "type"));
   }
 
   public boolean containsExtension(ASN1ObjectIdentifier type) {

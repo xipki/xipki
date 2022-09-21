@@ -179,6 +179,19 @@ public class X509Ca extends X509CaModule implements Closeable {
 
   private final boolean saveKeypair;
 
+  private static final ASN1ObjectIdentifier id_ce = new ASN1ObjectIdentifier("2.5.29");
+  private static final List<ASN1ObjectIdentifier> SORTED_EXTENSIONS;
+
+  static {
+    SORTED_EXTENSIONS = Collections.unmodifiableList(
+        Arrays.asList(Extension.subjectKeyIdentifier, Extension.authorityKeyIdentifier,
+            Extension.basicConstraints,      Extension.keyUsage,               Extension.extendedKeyUsage,
+            Extension.privateKeyUsagePeriod, Extension.subjectAlternativeName, Extension.issuerAlternativeName,
+            Extension.authorityInfoAccess,   Extension.cRLDistributionPoints,  Extension.freshestCRL,
+            Extension.certificatePolicies,   Extension.qCStatements,           Extension.nameConstraints,
+            Extension.policyConstraints,     Extension.policyMappings,         Extension.subjectInfoAccess));
+  }
+
   public X509Ca(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore,
       CtLogClient ctlogClient) throws OperationException {
     super(caInfo);
@@ -648,19 +661,35 @@ public class X509Ca extends X509CaModule implements Closeable {
           gct.grantedSubject, gct.extensions, gct.grantedPublicKey, caInfo.getPublicCaInfo(),
           crlSignerCert, gct.grantedNotBefore, gct.grantedNotAfter);
       if (extensionTuples != null) {
-        List<ASN1ObjectIdentifier> lowPriTypes = new LinkedList<>();
-        for (ASN1ObjectIdentifier extensionType : extensionTuples.getExtensionTypes()) {
-          if (extensionType.on(ObjectIdentifiers.id_pen)) {
-            lowPriTypes.add(extensionType);
-          } else {
-            ExtensionValue extValue = extensionTuples.getExtensionValue(extensionType);
-            certBuilder.addExtension(extensionType, extValue.isCritical(), extValue.getValue());
+        // sort the extensions
+        // 1. extensions with given order
+        for (ASN1ObjectIdentifier type : SORTED_EXTENSIONS) {
+          ExtensionValue value = extensionTuples.removeExtensionTuple(type);
+          if (value != null) {
+            certBuilder.addExtension(type, value.isCritical(), value.getValue());
           }
         }
 
-        for (ASN1ObjectIdentifier extensionType : lowPriTypes) {
-          ExtensionValue extValue = extensionTuples.getExtensionValue(extensionType);
-          certBuilder.addExtension(extensionType, extValue.isCritical(), extValue.getValue());
+        // 2. id-ce
+        for (ASN1ObjectIdentifier type : extensionTuples.getExtensionTypes()) {
+          if (type.on(id_ce)) {
+            ExtensionValue value = extensionTuples.removeExtensionTuple(type);
+            certBuilder.addExtension(type, value.isCritical(), value.getValue());
+          }
+        }
+
+        // 3. non-PEN extensions
+        for (ASN1ObjectIdentifier type : extensionTuples.getExtensionTypes()) {
+          if (!type.on(ObjectIdentifiers.id_pen)) {
+            ExtensionValue value = extensionTuples.removeExtensionTuple(type);
+            certBuilder.addExtension(type, value.isCritical(), value.getValue());
+          }
+        }
+
+        // 4. PEN extensions
+        for (ASN1ObjectIdentifier type : extensionTuples.getExtensionTypes()) {
+          ExtensionValue value = extensionTuples.removeExtensionTuple(type);
+          certBuilder.addExtension(type, value.isCritical(), value.getValue());
         }
       }
 
