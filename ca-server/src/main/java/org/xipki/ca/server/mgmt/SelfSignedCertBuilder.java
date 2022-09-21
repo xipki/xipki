@@ -34,6 +34,7 @@ import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
+import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.IdentifiedCertprofile;
 import org.xipki.security.*;
 import org.xipki.security.util.KeyUtil;
@@ -238,8 +239,9 @@ class SelfSignedCertBuilder {
       PublicCaInfo publicCaInfo = new PublicCaInfo(grantedSubject, grantedSubject, serialNumber,
           null, ski.getKeyIdentifier(), caUris, extraControl);
 
-      addExtensions(certBuilder, certprofile, requestedSubject, grantedSubject, null,
-          publicKeyInfo, publicCaInfo, notBefore, notAfter);
+      ExtensionValues extensionTuples = certprofile.getExtensions(requestedSubject, grantedSubject,
+          null, publicKeyInfo, publicCaInfo, null, notBefore, notAfter);
+      CaUtil.addExtensions(extensionTuples, certBuilder);
 
       ConcurrentBagEntrySigner signer0 = signer.borrowSigner();
       X509CertificateHolder certHolder;
@@ -255,19 +257,5 @@ class SelfSignedCertBuilder {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
     }
   } // method generateCertificate
-
-  private static void addExtensions(
-      X509v3CertificateBuilder certBuilder, IdentifiedCertprofile profile, X500Name requestedSubject,
-      X500Name grantedSubject, Extensions extensions, SubjectPublicKeyInfo requestedPublicKeyInfo,
-      PublicCaInfo publicCaInfo, Date notBefore, Date notAfter)
-      throws CertprofileException, IOException, BadCertTemplateException {
-    ExtensionValues extensionTuples = profile.getExtensions(requestedSubject, grantedSubject,
-        extensions, requestedPublicKeyInfo, publicCaInfo, null, notBefore, notAfter);
-
-    for (ASN1ObjectIdentifier extType : extensionTuples.getExtensionTypes()) {
-      ExtensionValue extValue = extensionTuples.getExtensionValue(extType);
-      certBuilder.addExtension(extType, extValue.isCritical(), extValue.getValue());
-    }
-  } // method addExtensions
 
 }

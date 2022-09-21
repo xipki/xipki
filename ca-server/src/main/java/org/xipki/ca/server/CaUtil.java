@@ -22,22 +22,25 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.cert.CertIOException;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
+import org.xipki.ca.api.profile.ExtensionValue;
+import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.SubjectDnSpec;
+import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.Base64;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -53,7 +56,64 @@ import static org.xipki.util.Args.notNull;
 
 public class CaUtil {
 
+  private static final ASN1ObjectIdentifier id_ce = new ASN1ObjectIdentifier("2.5.29");
+
+  private static final List<ASN1ObjectIdentifier> SORTED_EXTENSIONS;
+
+  static {
+    SORTED_EXTENSIONS = Collections.unmodifiableList(
+        Arrays.asList(Extension.subjectKeyIdentifier, Extension.authorityKeyIdentifier,
+            Extension.basicConstraints,      Extension.keyUsage,               Extension.extendedKeyUsage,
+            Extension.privateKeyUsagePeriod, Extension.subjectAlternativeName, Extension.issuerAlternativeName,
+            Extension.authorityInfoAccess,   Extension.cRLDistributionPoints,  Extension.freshestCRL,
+            Extension.certificatePolicies,   Extension.qCStatements,           Extension.nameConstraints,
+            Extension.policyConstraints,     Extension.policyMappings,         Extension.subjectInfoAccess,
+            Extension.subjectDirectoryAttributes));
+  }
+
   private CaUtil() {
+  }
+
+  public static void addExtensions(ExtensionValues extensionValues, X509v3CertificateBuilder certBuilder)
+      throws CertIOException {
+    if (extensionValues == null) {
+      return;
+    }
+
+    // sort the extensions
+    // 1. extensions with given order
+    for (ASN1ObjectIdentifier type : SORTED_EXTENSIONS) {
+      ExtensionValue value = extensionValues.removeExtensionTuple(type);
+      if (value != null) {
+        certBuilder.addExtension(type, value.isCritical(), value.getValue());
+      }
+    }
+
+    // 2. id-ce
+    // Get a copy of the types, without copy concurrent access exception may be thrown.
+    Set<ASN1ObjectIdentifier> types = new HashSet<>(extensionValues.getExtensionTypes());
+    for (ASN1ObjectIdentifier type : types) {
+      if (type.on(id_ce)) {
+        ExtensionValue value = extensionValues.removeExtensionTuple(type);
+        certBuilder.addExtension(type, value.isCritical(), value.getValue());
+      }
+    }
+
+    // 3. non-PEN extensions
+    types = new HashSet<>(extensionValues.getExtensionTypes());
+    for (ASN1ObjectIdentifier type : types) {
+      if (!type.on(ObjectIdentifiers.id_pen)) {
+        ExtensionValue value = extensionValues.removeExtensionTuple(type);
+        certBuilder.addExtension(type, value.isCritical(), value.getValue());
+      }
+    }
+
+    // 4. PEN extensions
+    types = new HashSet<>(extensionValues.getExtensionTypes());
+    for (ASN1ObjectIdentifier type : types) {
+      ExtensionValue value = extensionValues.removeExtensionTuple(type);
+      certBuilder.addExtension(type, value.isCritical(), value.getValue());
+    }
   }
 
   @SafeVarargs
