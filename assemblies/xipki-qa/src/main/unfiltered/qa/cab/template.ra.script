@@ -2,6 +2,8 @@ echo "#################################################################"
 echo "#              Manage certificate with RA Client                #"
 echo "#################################################################"
 
+SIGNER_P12 = xipki/keycerts/tlskeys/client/tls-client.p12
+
 # Certificate cab-domain-validated1
 
 xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
@@ -12,7 +14,7 @@ xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
 xi:cmp-csr-enroll --ca subca \
   --csr output/cab-domain-validated1.csr \
   --out output/cab-domain-validated1.crt --profile cab-domain-validated \
-  --signer-password 1234 --signer-p12 keycerts/tlskeys/client/tls-client.p12
+  --signer-password 1234 --signer-p12 ${SIGNER_P12}
 
 xi:update-cert-p12 --p12 output/cab-domain-validated1.p12 --password 1234 \
   --cert output/cab-domain-validated1.crt \
@@ -29,7 +31,7 @@ xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
 xi:cmp-csr-enroll --ca subca \
   --csr output/cab-domain-validated2.csr \
   --out output/cab-domain-validated2.crt --profile cab-domain-validated \
-  --signer-password 1234 --signer-p12 keycerts/tlskeys/client/tls-client.p12
+  --signer-password 1234 --signer-p12 ${SIGNER_P12}
 
 xi:update-cert-p12 --p12 output/cab-domain-validated2.p12 --password 1234 \
   --cert output/cab-domain-validated2.crt \
@@ -46,7 +48,7 @@ xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
 xi:cmp-csr-enroll --ca subca \
   --csr output/cab-org-validated1.csr \
   --out output/cab-org-validated1.crt --profile cab-org-validated \
-  --signer-password 1234 --signer-p12 keycerts/tlskeys/client/tls-client.p12
+  --signer-password 1234 --signer-p12 ${SIGNER_P12}
 
 xi:update-cert-p12 --p12 output/cab-org-validated1.p12 --password 1234 \
   --cert output/cab-org-validated1.crt \
@@ -62,7 +64,7 @@ xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
 
 xi:cmp-csr-enroll --ca subca --csr output/cab-org-validated2.csr \
   --out output/cab-org-validated2.crt --profile cab-org-validated \
-  --signer-password 1234 --signer-p12 keycerts/tlskeys/client/tls-client.p12
+  --signer-password 1234 --signer-p12 ${SIGNER_P12}
 
 xi:update-cert-p12 --p12 output/cab-org-validated2.p12 --password 1234 \
   --cert output/cab-org-validated2.crt \
@@ -78,7 +80,7 @@ xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
 
 xi:cmp-csr-enroll --ca subca --csr output/cab-individual-validated1.csr \
   --out output/cab-individual-validated1.crt --profile cab-individual-validated \
-  --signer-password 1234 --signer-p12 keycerts/tlskeys/client/tls-client.p12
+  --signer-password 1234 --signer-p12 ${SIGNER_P12}
 
 xi:update-cert-p12 --p12 output/cab-individual-validated1.p12 --password 1234 \
   --cert output/cab-individual-validated1.crt \
@@ -94,7 +96,7 @@ xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
 
 xi:cmp-csr-enroll --ca subca --csr output/cab-individual-validated2.csr \
   --out output/cab-individual-validated2.crt --profile cab-individual-validated \
-  --signer-password 1234 --signer-p12 keycerts/tlskeys/client/tls-client.p12
+  --signer-password 1234 --signer-p12 ${SIGNER_P12}
 
 xi:update-cert-p12 --p12 output/cab-individual-validated2.p12 --password 1234 \
   --cert output/cab-individual-validated2.crt \

@@ -1,3 +1,5 @@
+SIGNER_P12 = xipki/keycerts/tlskeys/client/tls-client.p12
+
 sleep 1
 
 OS_NAME = $(osinfo --name)
@@ -32,7 +34,7 @@ xi:cmp-enroll-serverkeygen --ca tls-ca --password 1234 --profile tls \
   --p12-out ${OUT_DIR}/server/tls-server.p12 \
   --cert-out ${OUT_DIR}/server/tls-server-cert.der \
   --subject "CN=localhost,OU=${CA_TYPE},O=myorg demo,C=DE" \
-  --signer-password 1234 --signer-p12 keycerts/tlskeys/client/tls-client.p12
+  --signer-password 1234 --signer-p12 xipki/keycerts/tlskeys/client/tls-client.p12
 
 list = [client client2 client3]
 each ($list) {
@@ -41,7 +43,7 @@ each ($list) {
     --p12-out ${OUT_DIR}/${name}/tls-${name}.p12 \
     --cert-out ${OUT_DIR}/${name}/tls-${name}-cert.der \
     --subject "CN=${name},OU=${CA_TYPE},O=myorg demo,C=DE" \
-    --signer-password 1234 --signer-p12 keycerts/tlskeys/client/tls-client.p12
+    --signer-password 1234 --signer-p12 xipki/keycerts/tlskeys/client/tls-client.p12
 
 }
 
