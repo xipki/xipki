@@ -100,8 +100,7 @@ public class ScepUtil {
     }
 
     try {
-      CertificateList cl = CertificateList.getInstance(set.getObjectAt(0));
-      return new X509CRLHolder(cl);
+      return new X509CRLHolder(CertificateList.getInstance(set.getObjectAt(0)));
     } catch (IllegalArgumentException ex) {
       throw new CRLException(ex);
     }
@@ -127,14 +126,13 @@ public class ScepUtil {
     if (cmsCertSet == null || cmsCertSet.length == 0) {
       return;
     }
-    Args.notNull(generator, "geneator");
+    Args.notNull(generator, "generator");
     Collection<X509CertificateHolder> certColl = new LinkedList<>();
     for (X509Cert m : cmsCertSet) {
       certColl.add(m.toBcCert());
     }
 
-    JcaCertStore certStore = new JcaCertStore(certColl);
-    generator.addCertificates(certStore);
+    generator.addCertificates(new JcaCertStore(certColl));
   } // method addCmsCertSet
 
   public static Date getTime(Object obj) {

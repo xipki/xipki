@@ -149,12 +149,10 @@ public abstract class Client {
     }
 
     if (Operation.GetCACaps == operation || Operation.GetCACert == operation || Operation.GetNextCACert == operation) {
-      String url = caId.buildGetUrl(operation, caId.getProfile());
-      return httpGet(url);
+      return httpGet(caId.buildGetUrl(operation, caId.getProfile()));
     } else {
       if (!httpGetOnly && caCaps.supportsPost()) {
-        String url = caId.buildPostUrl(operation);
-        return httpPost(url, REQ_CONTENT_TYPE, request);
+        return httpPost(caId.buildPostUrl(operation), REQ_CONTENT_TYPE, request);
       } else {
         String url = caId.buildGetUrl(operation, (request == null) ? null : Base64.encodeToString(request));
         return httpGet(url);
@@ -385,8 +383,7 @@ public abstract class Client {
       throw new OperationNotSupportedException("unsupported operation '" + Operation.GetNextCACert.getCode() + "'");
     }
 
-    ScepHttpResponse resp = httpSend(Operation.GetNextCACert);
-    return retrieveNextCaAuthorityCertStore(resp);
+    return retrieveNextCaAuthorityCertStore(httpSend(Operation.GetNextCACert));
   } // method scepNextCaCert
 
   private ContentInfo encryptThenSign(PkiMessage request, PrivateKey identityKey, X509Cert identityCert)
@@ -451,13 +448,7 @@ public abstract class Client {
         throw new ScepClientException("CMS signingTime attribute is not present");
       }
 
-      long now = System.currentTimeMillis();
-      long diff = now - signingTime.getTime();
-      if (diff < 0) {
-        diff = -1 * diff;
-      }
-
-      if (diff > maxSigningTimeBias) {
+      if (Math.abs(System.currentTimeMillis() - signingTime.getTime()) > maxSigningTimeBias) {
         throw new ScepClientException("CMS signingTime is out of permitted period");
       }
     }
@@ -505,12 +496,7 @@ public abstract class Client {
         throw new ScepClientException("CMS signingTime attribute is not present");
       }
 
-      long now = System.currentTimeMillis();
-      long diff = now - signingTime.getTime();
-      if (diff < 0) {
-        diff = -1 * diff;
-      }
-      if (diff > maxSigningTimeBias) {
+      if (Math.abs(System.currentTimeMillis() - signingTime.getTime()) > maxSigningTimeBias) {
         throw new ScepClientException("CMS signingTime is out of permitted period");
       }
     }

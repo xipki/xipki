@@ -26,8 +26,6 @@ package org.xipki.shell;
 
 public class CmdFailure extends Exception {
 
-  private static final long serialVersionUID = 1L;
-
   public CmdFailure() {
   }
 

@@ -26,8 +26,6 @@ package org.xipki.ocsp.client;
 
 public class OcspRequestorException extends Exception {
 
-  private static final long serialVersionUID = 1L;
-
   public OcspRequestorException(String message) {
     super(message);
   }

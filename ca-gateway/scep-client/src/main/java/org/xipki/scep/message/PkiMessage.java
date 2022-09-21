@@ -43,6 +43,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import static org.xipki.scep.util.ScepConstants.*;
+
 /**
  * SCEP PKI-Message.
  *
@@ -74,11 +76,8 @@ public class PkiMessage {
   private ASN1Encodable messageData;
 
   static {
-    SCEP_ATTR_TYPES = CollectionUtil.asSet(
-        ScepObjectIdentifiers.ID_FAILINFO, ScepObjectIdentifiers.ID_MESSAGE_TYPE,
-        ScepObjectIdentifiers.ID_PKI_STATUS, ScepObjectIdentifiers.ID_RECIPIENT_NONCE,
-        ScepObjectIdentifiers.ID_SENDER_NONCE, ScepObjectIdentifiers.ID_TRANSACTION_ID,
-        ScepObjectIdentifiers.ID_SCEP_FAILINFOTEXT, CMSAttributes.signingTime);
+    SCEP_ATTR_TYPES = CollectionUtil.asSet(ID_FAILINFO, ID_MESSAGE_TYPE, ID_PKI_STATUS, ID_RECIPIENT_NONCE,
+        ID_SENDER_NONCE, ID_TRANSACTION_ID, ID_SCEP_FAILINFOTEXT, CMSAttributes.signingTime);
   }
 
   public PkiMessage(TransactionId transactionId, MessageType messageType) {
@@ -173,35 +172,32 @@ public class PkiMessage {
   private AttributeTable getSignedAttributes() {
     ASN1EncodableVector vec = new ASN1EncodableVector();
     // messageType
-    addAttribute(vec, ScepObjectIdentifiers.ID_MESSAGE_TYPE,
-        new DERPrintableString(Integer.toString(messageType.getCode())));
+    addAttribute(vec, ID_MESSAGE_TYPE, new DERPrintableString(Integer.toString(messageType.getCode())));
 
     // senderNonce
-    addAttribute(vec, ScepObjectIdentifiers.ID_SENDER_NONCE, new DEROctetString(senderNonce.getBytes()));
+    addAttribute(vec, ID_SENDER_NONCE, new DEROctetString(senderNonce.getBytes()));
 
     // transactionID
-    addAttribute(vec, ScepObjectIdentifiers.ID_TRANSACTION_ID, new DERPrintableString(transactionId.getId()));
+    addAttribute(vec, ID_TRANSACTION_ID, new DERPrintableString(transactionId.getId()));
 
     // failInfo
     if (failInfo != null) {
-      addAttribute(vec, ScepObjectIdentifiers.ID_FAILINFO,
-          new DERPrintableString(Integer.toString(failInfo.getCode())));
+      addAttribute(vec, ID_FAILINFO, new DERPrintableString(Integer.toString(failInfo.getCode())));
     }
 
     // failInfoText
     if (failInfoText != null && !failInfoText.isEmpty()) {
-      addAttribute(vec, ScepObjectIdentifiers.ID_SCEP_FAILINFOTEXT, new DERUTF8String(failInfoText));
+      addAttribute(vec, ID_SCEP_FAILINFOTEXT, new DERUTF8String(failInfoText));
     }
 
     // pkiStatus
     if (pkiStatus != null) {
-      addAttribute(vec, ScepObjectIdentifiers.ID_PKI_STATUS,
-          new DERPrintableString(Integer.toString(pkiStatus.getCode())));
+      addAttribute(vec, ID_PKI_STATUS, new DERPrintableString(Integer.toString(pkiStatus.getCode())));
     }
 
     // recipientNonce
     if (recipientNonce != null) {
-      addAttribute(vec, ScepObjectIdentifiers.ID_RECIPIENT_NONCE, new DEROctetString(recipientNonce.getBytes()));
+      addAttribute(vec, ID_RECIPIENT_NONCE, new DEROctetString(recipientNonce.getBytes()));
     }
 
     for (Entry<ASN1ObjectIdentifier, ASN1Encodable> entry : signedAttributes.entrySet()) {
@@ -286,8 +282,7 @@ public class PkiMessage {
 
       generator.addSignerInfoGenerator(signerInfo);
 
-      CMSSignedData signedData = generator.generate(content, true);
-      return signedData.toASN1Structure();
+      return generator.generate(content, true).toASN1Structure();
     } catch (Exception ex) {
       throw new MessageEncodingException(ex);
     }
@@ -314,8 +309,7 @@ public class PkiMessage {
 
     edGenerator.addRecipientInfoGenerator(recipientGenerator);
     try {
-      OutputEncryptor encryptor = new JceCMSContentEncryptorBuilder(encAlgId).build();
-      return edGenerator.generate(envelopable, encryptor);
+      return edGenerator.generate(envelopable, new JceCMSContentEncryptorBuilder(encAlgId).build());
     } catch (CMSException ex) {
       throw new MessageEncodingException(ex);
     }

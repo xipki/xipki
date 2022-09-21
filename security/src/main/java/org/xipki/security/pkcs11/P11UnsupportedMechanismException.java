@@ -28,8 +28,6 @@ import iaik.pkcs.pkcs11.wrapper.Functions;
 
 public class P11UnsupportedMechanismException extends P11TokenException {
 
-  private static final long serialVersionUID = 1L;
-
   public P11UnsupportedMechanismException(long mechanism, P11SlotIdentifier slotId) {
     super("mechanism " + Functions.getMechanismDescription(mechanism)
         + " is not supported by PKCS11 slot " + slotId);

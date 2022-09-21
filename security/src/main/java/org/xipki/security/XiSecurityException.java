@@ -26,8 +26,6 @@ package org.xipki.security;
 
 public class XiSecurityException extends Exception {
 
-  private static final long serialVersionUID = 1L;
-
   public XiSecurityException() {
     super();
   }

@@ -26,8 +26,6 @@ package org.xipki.cmp.client;
 
 public class CmpClientException extends Exception {
 
-  private static final long serialVersionUID = 1L;
-
   public CmpClientException(String message) {
     super(message);
   }

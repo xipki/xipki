@@ -55,8 +55,7 @@ abstract class Responder {
 
     private final List<SignAlgo> macAlgos;
 
-    PbmMacCmpResponder(List<String> owfs, List<String> macs)
-        throws NoSuchAlgorithmException {
+    PbmMacCmpResponder(List<String> owfs, List<String> macs) throws NoSuchAlgorithmException {
       super(new X500Name(""));
 
       this.owfAlgos = new ArrayList<>(owfs.size());

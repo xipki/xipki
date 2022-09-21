@@ -98,13 +98,12 @@ public class MyUtil {
     Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
 
     if (StringUtil.isNotBlank(challengePassword)) {
-      DERPrintableString asn1Pwd = new DERPrintableString(challengePassword);
-      attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword, asn1Pwd);
+      attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword, new DERPrintableString(challengePassword));
     }
 
     if (CollectionUtil.isNotEmpty(extensions)) {
-      Extensions asn1Extensions = new Extensions(extensions.toArray(new Extension[0]));
-      attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest, asn1Extensions);
+      attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest,
+          new Extensions(extensions.toArray(new Extension[0])));
     }
 
     PKCS10CertificationRequestBuilder csrBuilder =

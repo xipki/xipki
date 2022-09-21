@@ -70,8 +70,7 @@ public class CaNameScepSigners {
   }
 
   public ScepSigner getSigner(String caName) {
-    String loName = Args.toNonBlankLower(caName, "caName");
-    ScepSigner signer = signers.get(loName);
+    ScepSigner signer = signers.get(Args.toNonBlankLower(caName, "caName"));
     return signer != null ? signer : defaultSigner;
   }
 

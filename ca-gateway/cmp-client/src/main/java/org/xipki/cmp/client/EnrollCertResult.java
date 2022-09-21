@@ -82,8 +82,7 @@ public class EnrollCertResult {
   }
 
   public CertifiedKeyPairOrError getCertOrError(String id) {
-    Args.notBlank(id, "id");
-    return certsOrErrors.get(id);
+    return certsOrErrors.get(Args.notBlank(id, "id"));
   }
 
   public Set<String> getAllIds() {

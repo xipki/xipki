@@ -99,8 +99,7 @@ public class EnrollCertRequest {
   }
 
   public boolean addRequestEntry(Entry requestEntry) {
-    Args.notNull(requestEntry, "requestEntry");
-    String id = requestEntry.getId();
+    String id = Args.notNull(requestEntry, "requestEntry").getId();
     ASN1Integer certReqId = requestEntry.getCertReq().getCertReqId();
     for (Entry re : requestEntries) {
       if (re.getId().equals(id)) {

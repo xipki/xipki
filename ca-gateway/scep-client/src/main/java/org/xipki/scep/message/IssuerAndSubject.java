@@ -54,10 +54,7 @@ public class IssuerAndSubject extends ASN1Object {
 
   @Override
   public ASN1Primitive toASN1Primitive() {
-    ASN1EncodableVector vec = new ASN1EncodableVector();
-    vec.add(issuer);
-    vec.add(subject);
-    return new DERSequence(vec);
+    return new DERSequence(new ASN1Encodable[]{issuer, subject});
   }
 
   public static IssuerAndSubject getInstance(Object obj) {

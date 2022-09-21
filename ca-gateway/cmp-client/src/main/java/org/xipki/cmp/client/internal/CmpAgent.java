@@ -159,8 +159,7 @@ class CmpAgent {
     return httpClient.httpPost(serverUrl + caName, CMP_REQUEST_MIMETYPE, request, CMP_RESPONSE_MIMETYPE);
   } // method send
 
-  private PKIMessage sign(Requestor requestor, PKIMessage request)
-      throws CmpClientException {
+  private PKIMessage sign(Requestor requestor, PKIMessage request) throws CmpClientException {
     notNull(request, "request");
     if (requestor == null) {
       throw new CmpClientException("no request signer is configured");
@@ -188,13 +187,11 @@ class CmpAgent {
   private VerifiedPkiMessage signAndSend(
       String caName, Requestor requestor, Responder responder, PKIMessage request, ReqRespDebug debug)
       throws CmpClientException {
-    ASN1OctetString tid = request.getHeader().getTransactionID();
-    notNull(request, "request");
+    ASN1OctetString tid = notNull(request, "request").getHeader().getTransactionID();
     PKIMessage tmpRequest = sign(requestor, request);
     GeneralPKIMessage response = send(caName, tmpRequest, debug);
-    PKIHeader respHeader = response.getHeader();
 
-    GeneralName rec = respHeader.getRecipient();
+    GeneralName rec = response.getHeader().getRecipient();
     if (!requestor.getName().equals(rec)) {
       LOG.warn("tid={}: unknown CMP requestor '{}'", tid, rec);
     }
@@ -209,8 +206,7 @@ class CmpAgent {
         throw new CmpClientException(ex.getMessage(), ex);
       }
     } else {
-      PKIBody respBody = response.getBody();
-      int bodyType = respBody.getType();
+      int bodyType = response.getBody().getType();
       if (bodyType != PKIBody.TYPE_ERROR) {
         throw new CmpClientException("response is not signed");
       }
@@ -370,7 +366,6 @@ class CmpAgent {
         return new ProtectionVerificationResult(null, ProtectionResult.SENDER_NOT_AUTHORIZED);
       }
 
-      Responder.PbmMacCmpResponder macResponder = (Responder.PbmMacCmpResponder) responder;
       PBMParameter parameter = PBMParameter.getInstance(pkiMessage.getHeader().getProtectionAlg().getParameters());
       HashAlgo owf;
       try {
@@ -380,6 +375,7 @@ class CmpAgent {
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
       }
 
+      Responder.PbmMacCmpResponder macResponder = (Responder.PbmMacCmpResponder) responder;
       if (!macResponder.isPbmOwfPermitted(owf)) {
         LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.owf: {})", owf);
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
@@ -455,9 +451,7 @@ class CmpAgent {
 
     PKIHeader header = buildPkiHeader(null, null, null);
     InfoTypeAndValue itv = (value != null) ? new InfoTypeAndValue(type, value) : new InfoTypeAndValue(type);
-    GenMsgContent genMsgContent = new GenMsgContent(itv);
-    PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
-    return new PKIMessage(header, body);
+    return new PKIMessage(header, new PKIBody(PKIBody.TYPE_GEN_MSG, new GenMsgContent(itv)));
   } // method buildMessageWithGeneralMsgContent
 
   X509CRLHolder downloadCurrentCrl(String caName, ReqRespDebug debug)
@@ -467,8 +461,7 @@ class CmpAgent {
 
     GeneralPKIMessage response = send(caName, request, debug);
     ASN1Encodable itvValue = parseGenRep(response, type);
-    CertificateList certList = CertificateList.getInstance(itvValue);
-    return new X509CRLHolder(certList);
+    return new X509CRLHolder(CertificateList.getInstance(itvValue));
   } // method downloadCrl
 
   List<X509Cert> caCerts(String caName, int maxNumCerts, ReqRespDebug debug)
@@ -728,9 +721,7 @@ class CmpAgent {
         throw new CmpClientException(ex.getMessage(), ex);
       }
 
-      Extensions exts = new Extensions(extensions);
-
-      RevDetails revDetails = new RevDetails(certTempBuilder.build(), exts);
+      RevDetails revDetails = new RevDetails(certTempBuilder.build(), new Extensions(extensions));
       revDetailsArray.add(revDetails);
     }
 
@@ -771,8 +762,7 @@ class CmpAgent {
     }
 
     RevReqContent content = new RevReqContent(revDetailsArray.toArray(new RevDetails[0]));
-    PKIBody body = new PKIBody(PKIBody.TYPE_REVOCATION_REQ, content);
-    return new PKIMessage(header, body);
+    return new PKIMessage(header, new PKIBody(PKIBody.TYPE_REVOCATION_REQ, content));
   } // method buildUnrevokeOrRemoveCertRequest
 
   private PKIMessage buildPkiMessage(
@@ -797,9 +787,7 @@ class CmpAgent {
     }
 
     PKIHeader header = buildPkiHeader(requestor, responder, implicitConfirm, null, utf8Pairs, certProfileItv);
-    PKIBody body = new PKIBody(PKIBody.TYPE_P10_CERT_REQ, csr.getCsr());
-
-    return new PKIMessage(header, body);
+    return new PKIMessage(header, new PKIBody(PKIBody.TYPE_P10_CERT_REQ, csr.getCsr()));
   } // method buildPkiMessage
 
   private PKIMessage buildPkiMessage(Requestor requestor, Responder responder, EnrollCertRequest req) {
@@ -872,18 +860,13 @@ class CmpAgent {
   private static byte[] decrypt(EncryptedKey ek, char[] password)
       throws XiSecurityException {
     ASN1Encodable ekValue = ek.getValue();
-    if (ekValue instanceof EnvelopedData) {
-      return decrypt((EnvelopedData) ekValue, password);
-    } else {
-      return decrypt((EncryptedValue) ekValue, password);
-    }
+    return (ekValue instanceof EnvelopedData) ? decrypt((EnvelopedData) ekValue, password)
+        : decrypt((EncryptedValue) ekValue, password);
   }
 
-  private static byte[] decrypt(EnvelopedData ed0, char[] password)
-      throws XiSecurityException {
+  private static byte[] decrypt(EnvelopedData ed0, char[] password) throws XiSecurityException {
     try {
-      ContentInfo ci = new ContentInfo(CMSObjectIdentifiers.envelopedData, ed0);
-      CMSEnvelopedData ed = new CMSEnvelopedData(ci);
+      CMSEnvelopedData ed = new CMSEnvelopedData(new ContentInfo(CMSObjectIdentifiers.envelopedData, ed0));
 
       RecipientInformationStore recipients = ed.getRecipientInfos();
       Iterator<RecipientInformation> it = recipients.getRecipients().iterator();
@@ -895,8 +878,7 @@ class CmpAgent {
     }
   }
 
-  private static byte[] decrypt(EncryptedValue ev, char[] password)
-      throws XiSecurityException {
+  private static byte[] decrypt(EncryptedValue ev, char[] password) throws XiSecurityException {
     AlgorithmIdentifier symmAlg = ev.getSymmAlg();
     if (!PKCSObjectIdentifiers.id_PBES2.equals(symmAlg.getAlgorithm())) {
       throw new XiSecurityException("unsupported symmAlg " + symmAlg.getAlgorithm().getId());
@@ -930,8 +912,7 @@ class CmpAgent {
     }
   } // method decrypt
 
-  private static byte[] decrypt(EncryptedKey ek, PrivateKey decKey)
-      throws XiSecurityException {
+  private static byte[] decrypt(EncryptedKey ek, PrivateKey decKey) throws XiSecurityException {
     ASN1Encodable ekValue = ek.getValue();
     return (ekValue instanceof EnvelopedData) ? decrypt((EnvelopedData) ekValue, decKey)
         : decrypt((EncryptedValue) ekValue, decKey);
@@ -949,12 +930,9 @@ class CmpAgent {
 
       ASN1ObjectIdentifier encAlg = ri.getKeyEncryptionAlgorithm().getAlgorithm();
       Recipient recipient;
-      if (encAlg.equals(CMSAlgorithm.ECDH_SHA1KDF)
-          || encAlg.equals(CMSAlgorithm.ECDH_SHA224KDF)
-          || encAlg.equals(CMSAlgorithm.ECDH_SHA256KDF)
-          || encAlg.equals(CMSAlgorithm.ECDH_SHA384KDF)
-          || encAlg.equals(CMSAlgorithm.ECDH_SHA384KDF)
-          || encAlg.equals(CMSAlgorithm.ECDH_SHA512KDF)) {
+      if (encAlg.equals(CMSAlgorithm.ECDH_SHA1KDF)      || encAlg.equals(CMSAlgorithm.ECDH_SHA224KDF)
+          || encAlg.equals(CMSAlgorithm.ECDH_SHA256KDF) || encAlg.equals(CMSAlgorithm.ECDH_SHA384KDF)
+          || encAlg.equals(CMSAlgorithm.ECDH_SHA384KDF) || encAlg.equals(CMSAlgorithm.ECDH_SHA512KDF)) {
         recipient = new JceKeyAgreeEnvelopedRecipient(decKey).setProvider("BC");
       } else {
         recipient = new JceKeyTransEnvelopedRecipient(decKey).setProvider("BC");
@@ -1050,11 +1028,9 @@ class CmpAgent {
         AlgorithmParameterSpec spec = new IESParameterSpec(null, null, aesKeySize, aesKeySize, iv);
 
         BlockCipher cbcCipher = new CBCBlockCipher(new AESEngine());
-        IESCipher keyCipher = new IESCipher(
-            new IESEngine(new ECDHBasicAgreement(),
-                new KDF2BytesGenerator(DigestFactory.createSHA1()),
-                new HMac(DigestFactory.createSHA1()),
-                new PaddedBufferedBlockCipher(cbcCipher)), 16);
+        IESEngine engine = new IESEngine(new ECDHBasicAgreement(), new KDF2BytesGenerator(DigestFactory.createSHA1()),
+            new HMac(DigestFactory.createSHA1()), new PaddedBufferedBlockCipher(cbcCipher));
+        IESCipher keyCipher = new IESCipher(engine, 16);
         // no random is required
         keyCipher.engineInit(Cipher.DECRYPT_MODE, decKey, spec, null);
 

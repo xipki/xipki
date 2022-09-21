@@ -464,8 +464,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     File tmpCrlFile = new File(generatedDir, "tmp-ca.crl");
 
     CompositeOutputStream crlStream = new CompositeOutputStream(
-        hashAlgo == null ? null : HashAlgo.getInstance(hashAlgo),
-        Files.newOutputStream(tmpCrlFile.toPath()));
+        hashAlgo == null ? null : HashAlgo.getInstance(hashAlgo), Files.newOutputStream(tmpCrlFile.toPath()));
 
     Curl.CurlResult downResult;
     try {
@@ -499,11 +498,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       String hashProp = hashAlgo + " " + Hex.encode(crlStream.getHashValue());
       IoUtil.save(new File(generatedDir, "new-ca.crl.fp"), hashProp.getBytes(StandardCharsets.UTF_8));
       tmpCrlFile.renameTo(new File(generatedDir, "new-ca.crl"));
-      if (crlNumber == null) {
-        LOG.info("Downloaded CRL at first time");
-      } else {
-        LOG.info("Downloaded CRL is newer than existing one");
-      }
+      LOG.info(crlNumber == null ? "Downloaded CRL at first time" : "Downloaded CRL is newer than existing one");
       // notify the change
       updatemeFile.createNewFile();
     } else {

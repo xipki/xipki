@@ -24,6 +24,8 @@ import org.xipki.util.Args;
 
 import java.security.PrivateKey;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -62,14 +64,11 @@ public final class EnvelopedDataDecryptor {
   private final List<EnvelopedDataDecryptorInstance> decryptors;
 
   public EnvelopedDataDecryptor(List<EnvelopedDataDecryptorInstance> decryptors) {
-    Args.notEmpty(decryptors, "decryptors");
-    this.decryptors = new ArrayList<>(decryptors);
+    this.decryptors = new ArrayList<>(Args.notEmpty(decryptors, "decryptors"));
   }
 
   public EnvelopedDataDecryptor(EnvelopedDataDecryptorInstance decryptor) {
-    Args.notNull(decryptor, "decryptor");
-    this.decryptors = new ArrayList<>(1);
-    this.decryptors.add(decryptor);
+    this.decryptors = Collections.singletonList(Args.notNull(decryptor, "decryptor"));
   }
 
   public byte[] decrypt(CMSEnvelopedData envData) throws MessageDecodingException {

@@ -246,17 +246,12 @@ public class OcspRequest {
       if (lenSize == 1) {
         len = 0xFF & encoded[off++];
       } else if (lenSize == 2) {
-        len = ((0xFF & encoded[off++]) << 8)
-            | (0xFF & encoded[off++]);
+        len = ((0xFF & encoded[off++]) << 8)  | (0xFF & encoded[off++]);
       } else if (lenSize == 3) {
-        len = ((0xFF & encoded[off++]) << 16)
-            | ((0xFF & encoded[off++]) << 8)
-            | (0xFF & encoded[off++]);
+        len = ((0xFF & encoded[off++]) << 16) | ((0xFF & encoded[off++]) << 8)  | (0xFF & encoded[off++]);
       } else if (lenSize == 4) {
-        len = ((0xFF & encoded[off++]) << 24)
-            | ((0xFF & encoded[off++]) << 16)
-            | ((0xFF & encoded[off++]) << 8)
-            | (0xFF & encoded[off++]);
+        len = ((0xFF & encoded[off++]) << 24) | ((0xFF & encoded[off++]) << 16)
+            | ((0xFF & encoded[off++]) << 8)  | (0xFF & encoded[off++]);
       } else {
         throw new EncodingException("invalid length field at " + readerIndex);
       }

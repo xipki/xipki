@@ -1086,8 +1086,7 @@ public class OcspServerImpl implements OcspServer {
       return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
     }
 
-    boolean sigValid = ocspReq.isSignatureValid(cvp);
-    if (!sigValid) {
+    if (!ocspReq.isSignatureValid(cvp)) {
       LOG.warn("request signature is invalid");
       return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
     }

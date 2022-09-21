@@ -122,8 +122,7 @@ public abstract class AbstractCaTest {
   public void test() throws Exception {
     KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA");
     kpGen.initialize(2048);
-    KeyPair keypair = kpGen.generateKeyPair();
-    doTest(keypair);
+    doTest(kpGen.generateKeyPair());
   }
 
   private void doTest(KeyPair keypair) throws Exception {
@@ -240,14 +239,12 @@ public abstract class AbstractCaTest {
 
     List<X509Cert> certs = enrolResp.getCertificates();
     Assert.assertTrue("number of received certificates", certs.size() > 0);
-    X509Cert cert = certs.get(0);
-    Assert.assertNotNull("enrolled certificate", cert);
+    Assert.assertNotNull("enrolled certificate", certs.get(0));
 
     // getCert
     certs = client.scepGetCert(privKey, selfSignedCert, issuerName, enroledCert.getSerialNumber());
     Assert.assertTrue("number of received certificates", certs.size() > 0);
-    cert = certs.get(0);
-    Assert.assertNotNull("received certificate", cert);
+    Assert.assertNotNull("received certificate", certs.get(0));
 
     // getCRL
     X509CRLHolder crl = client.scepGetCrl(privKey, enroledCert, issuerName, enroledCert.getSerialNumber());

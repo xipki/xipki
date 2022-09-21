@@ -26,8 +26,6 @@ package org.xipki.ca.api.publisher;
 
 public class CertPublisherException extends Exception {
 
-  private static final long serialVersionUID = 1L;
-
   public CertPublisherException() {
   }
 

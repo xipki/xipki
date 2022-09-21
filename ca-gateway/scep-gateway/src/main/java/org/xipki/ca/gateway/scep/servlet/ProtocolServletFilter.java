@@ -66,11 +66,9 @@ public class ProtocolServletFilter implements Filter {
 
     try {
       conf = new ProtocolProxyConfWrapper(conf0);
-      ScepControl scepControl = conf0.getScep();
 
       CaNameScepSigners signers = new CaNameScepSigners(conf.getSigners());
-
-      ScepResponder responder = new ScepResponder(scepControl, conf.getSdkClient(),
+      ScepResponder responder = new ScepResponder(conf0.getScep(), conf.getSdkClient(),
           conf.getSecurities().getSecurityFactory(),  signers, conf.getAuthenticator(), conf.getPopControl());
 
       servlet = new HttpScepServlet();

@@ -44,8 +44,6 @@ public class HealthCheckServlet extends HttpServlet {
 
   private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);
 
-  private static final long serialVersionUID = 1L;
-
   private OcspServer server;
 
   public void setServer(OcspServer server) {

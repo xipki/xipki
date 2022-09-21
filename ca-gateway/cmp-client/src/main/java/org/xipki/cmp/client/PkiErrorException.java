@@ -30,8 +30,6 @@ import org.xipki.cmp.CmpFailureUtil;
 
 public class PkiErrorException extends Exception {
 
-  private static final long serialVersionUID = 1L;
-
   private final int status;
 
   private final int pkiFailureInfo;

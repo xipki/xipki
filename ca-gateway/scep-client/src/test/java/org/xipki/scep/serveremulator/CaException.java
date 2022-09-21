@@ -25,8 +25,6 @@ package org.xipki.scep.serveremulator;
 
 public class CaException extends Exception {
 
-  private static final long serialVersionUID = 1L;
-
   public CaException() {
   }
 

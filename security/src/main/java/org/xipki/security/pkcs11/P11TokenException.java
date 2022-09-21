@@ -26,8 +26,6 @@ package org.xipki.security.pkcs11;
 
 public class P11TokenException extends Exception {
 
-  private static final long serialVersionUID = 1L;
-
   public P11TokenException(String message, Throwable cause) {
     super(message, cause);
   }

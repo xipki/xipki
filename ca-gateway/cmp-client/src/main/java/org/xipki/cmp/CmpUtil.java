@@ -90,15 +90,13 @@ public class CmpUtil {
       PKIMessage pkiMessage, char[] password, PBMParameter pbmParameter, GeneralName signerName, byte[] senderKid)
       throws CMPException {
     ProtectedPKIMessageBuilder builder = newProtectedPKIMessageBuilder(pkiMessage, signerName, senderKid);
-    ProtectedPKIMessage signedMessage;
     try {
       PKMACBuilder pkMacBuilder = new PKMACBuilder(new JcePKMACValuesCalculator());
       pkMacBuilder.setParameters(pbmParameter);
-      signedMessage = builder.build(pkMacBuilder.build(password));
+      return builder.build(pkMacBuilder.build(password)).toASN1Structure();
     } catch (CRMFException ex) {
       throw new CMPException(ex.getMessage(), ex);
     }
-    return signedMessage.toASN1Structure();
   } // method addProtection
 
   private static ProtectedPKIMessageBuilder newProtectedPKIMessageBuilder(PKIMessage pkiMessage,
@@ -150,9 +148,7 @@ public class CmpUtil {
   } // method newProtectedPKIMessageBuilder
 
   public static boolean isImplicitConfirm(PKIHeader header) {
-    notNull(header, "header");
-
-    InfoTypeAndValue[] regInfos = header.getGeneralInfo();
+    InfoTypeAndValue[] regInfos = notNull(header, "header").getGeneralInfo();
     if (regInfos != null) {
       for (InfoTypeAndValue regInfo : regInfos) {
         if (CMPObjectIdentifiers.it_implicitConfirm.equals(regInfo.getInfoType())) {
@@ -172,8 +168,7 @@ public class CmpUtil {
     if (generalInfo != null) {
       for (InfoTypeAndValue itv : generalInfo) {
         if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(itv.getInfoType())) {
-          String regInfoValue = ((ASN1String) itv.getInfoValue()).getString();
-          return new CmpUtf8Pairs(regInfoValue);
+          return new CmpUtf8Pairs(((ASN1String) itv.getInfoValue()).getString());
         }
       }
     }
@@ -213,8 +208,7 @@ public class CmpUtil {
 
   public static InfoTypeAndValue buildInfoTypeAndValue(CmpUtf8Pairs utf8Pairs) {
     notNull(utf8Pairs, "utf8Pairs");
-    return new InfoTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
-        new DERUTF8String(utf8Pairs.encoded()));
+    return new InfoTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs, new DERUTF8String(utf8Pairs.encoded()));
   }
 
   public static AttributeTypeAndValue buildAttributeTypeAndValue(CmpUtf8Pairs utf8Pairs) {

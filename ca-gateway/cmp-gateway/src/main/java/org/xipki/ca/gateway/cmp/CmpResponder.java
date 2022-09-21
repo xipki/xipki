@@ -524,15 +524,10 @@ public class CmpResponder extends BaseCmpResponder {
     for (SingleCertSerialEntry m : respEntries) {
       ErrorEntry error = m.getError();
 
-      PKIStatusInfo status;
-      if (error == null) {
-        status = new PKIStatusInfo(granted);
-      } else {
-        status = buildPKIStatusInfo(error.getCode(), error.getMessage());
-      }
+      PKIStatusInfo status = error == null ? new PKIStatusInfo(granted)
+          : buildPKIStatusInfo(error.getCode(), error.getMessage());
 
-      BigInteger sn = m.getSerialNumber();
-      repContentBuilder.add(status, new CertId(caGn, sn));
+      repContentBuilder.add(status, new CertId(caGn, m.getSerialNumber()));
     }
 
     return new PKIBody(PKIBody.TYPE_REVOCATION_REP, repContentBuilder.build());

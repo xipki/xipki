@@ -26,8 +26,6 @@ package org.xipki.security.pkcs11;
 
 public class P11PermissionException extends P11TokenException {
 
-  private static final long serialVersionUID = 1L;
-
   public P11PermissionException(String message) {
     super(message);
   }

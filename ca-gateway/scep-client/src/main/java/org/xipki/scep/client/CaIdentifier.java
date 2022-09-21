@@ -67,7 +67,6 @@ public class CaIdentifier {
     return buildGetUrl(operation, null);
   }
 
-  @SuppressWarnings("deprecation")
   public String buildGetUrl(Operation operation, String message) {
     Args.notNull(operation, "operation");
     StringBuilder ub = new StringBuilder(url);
@@ -92,8 +91,7 @@ public class CaIdentifier {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("URL: ").append(url);
+    StringBuilder sb = new StringBuilder("URL: ").append(url);
     if (StringUtil.isNotBlank(profile)) {
       sb.append(", CA-Ident: ").append(profile);
     }

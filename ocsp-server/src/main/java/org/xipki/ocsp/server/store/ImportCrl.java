@@ -163,8 +163,6 @@ class ImportCrl {
 
   private static class ImportCrlException extends Exception {
 
-    private static final long serialVersionUID = 1L;
-
     public ImportCrlException(String message, Throwable cause) {
       super(message, cause);
     }

@@ -26,8 +26,6 @@ package org.xipki.security.pkcs11;
 
 public class P11DuplicateEntityException extends P11TokenException {
 
-  private static final long serialVersionUID = 1L;
-
   public P11DuplicateEntityException(P11IdentityId identityId) {
     super("duplicate identity '" + identityId + "'");
   }

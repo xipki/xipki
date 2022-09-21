@@ -36,8 +36,6 @@ import java.util.Set;
 
 public class SecurePasswordInputPanel extends Panel {
 
-  private static final long serialVersionUID = 1L;
-
   private static final String BACKSPACE = "\u21E6"; // ⇦
 
   private static final String CAPS = "\u21E7"; // ⇧

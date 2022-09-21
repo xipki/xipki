@@ -234,8 +234,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  X509Cert caCert(String caName, ReqRespDebug debug)
-      throws CmpClientException, PkiErrorException;
+  X509Cert caCert(String caName, ReqRespDebug debug) throws CmpClientException, PkiErrorException;
 
   /**
    * Returns the CA certificate chain.
@@ -245,8 +244,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  List<X509Cert> caCerts(String caName, ReqRespDebug debug)
-      throws CmpClientException, PkiErrorException;
+  List<X509Cert> caCerts(String caName, ReqRespDebug debug) throws CmpClientException, PkiErrorException;
 
   /**
    * Returns the certificates held by CA for the DH KeyAgreement.

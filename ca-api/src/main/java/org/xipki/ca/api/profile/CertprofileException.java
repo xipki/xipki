@@ -26,8 +26,6 @@ package org.xipki.ca.api.profile;
 
 public class CertprofileException extends Exception {
 
-  private static final long serialVersionUID = 1L;
-
   public CertprofileException() {
   }
 

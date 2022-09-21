@@ -47,6 +47,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.xipki.scep.util.ScepConstants.*;
+
 /**
  * Decoded {@link PkiMessage}.
  *
@@ -74,10 +76,8 @@ public class DecodedPkiMessage extends PkiMessage {
   private String failureMessage;
 
   static {
-    SCEP_ATTR_TYPES = CollectionUtil.asSet(
-        ScepObjectIdentifiers.ID_FAILINFO, ScepObjectIdentifiers.ID_MESSAGE_TYPE, ScepObjectIdentifiers.ID_PKI_STATUS,
-        ScepObjectIdentifiers.ID_RECIPIENT_NONCE, ScepObjectIdentifiers.ID_SENDER_NONCE,
-        ScepObjectIdentifiers.ID_TRANSACTION_ID,  CMSAttributes.signingTime);
+    SCEP_ATTR_TYPES = CollectionUtil.asSet(ID_FAILINFO, ID_MESSAGE_TYPE, ID_PKI_STATUS,
+        ID_RECIPIENT_NONCE, ID_SENDER_NONCE, ID_TRANSACTION_ID,  CMSAttributes.signingTime);
   }
 
   public DecodedPkiMessage(TransactionId transactionId, MessageType messageType, Nonce senderNonce) {
@@ -144,18 +144,16 @@ public class DecodedPkiMessage extends PkiMessage {
                                          X509Cert recipientCert, CollectionStore<X509CertificateHolder> certStore)
       throws MessageDecodingException {
     EnvelopedDataDecryptorInstance decInstance = new EnvelopedDataDecryptorInstance(recipientCert, recipientKey);
-    EnvelopedDataDecryptor recipient = new EnvelopedDataDecryptor(decInstance);
-    return decode(pkiMessage, recipient, certStore);
+    return decode(pkiMessage, new EnvelopedDataDecryptor(decInstance), certStore);
   }
 
   @SuppressWarnings("unchecked")
   public static DecodedPkiMessage decode(
       CMSSignedData pkiMessage, EnvelopedDataDecryptor recipient, CollectionStore<X509CertificateHolder> certStore)
       throws MessageDecodingException {
-    Args.notNull(pkiMessage, "pkiMessage");
     Args.notNull(recipient, "recipient");
 
-    SignerInformationStore signerStore = pkiMessage.getSignerInfos();
+    SignerInformationStore signerStore = Args.notNull(pkiMessage, "pkiMessage").getSignerInfos();
     Collection<SignerInformation> signerInfos = signerStore.getSigners();
     if (signerInfos.size() != 1) {
       throw new MessageDecodingException("number of signerInfos is not 1, but " + signerInfos.size());
@@ -164,11 +162,7 @@ public class DecodedPkiMessage extends PkiMessage {
     SignerInformation signerInfo = signerInfos.iterator().next();
     SignerId sid = signerInfo.getSID();
 
-    Collection<?> signedDataCerts = null;
-    if (certStore != null) {
-      signedDataCerts = certStore.getMatches(sid);
-    }
-
+    Collection<?> signedDataCerts = (certStore == null) ? null : certStore.getMatches(sid);
     if (CollectionUtil.isEmpty(signedDataCerts)) {
       signedDataCerts = pkiMessage.getCertificates().getMatches(signerInfo.getSID());
     }
@@ -182,22 +176,19 @@ public class DecodedPkiMessage extends PkiMessage {
       throw new MessageDecodingException("missing SCEP attributes");
     }
 
-    Date signingTime = null;
     // signingTime
     ASN1Encodable attrValue = ScepUtil.getFirstAttrValue(signedAttrs, CMSAttributes.signingTime);
-    if (attrValue != null) {
-      signingTime = ScepUtil.getTime(attrValue);
-    }
+    Date signingTime = (attrValue == null) ? null : ScepUtil.getTime(attrValue);
 
     // transactionId
-    String str = getPrintableStringAttrValue(signedAttrs, ScepObjectIdentifiers.ID_TRANSACTION_ID);
+    String str = getPrintableStringAttrValue(signedAttrs, ID_TRANSACTION_ID);
     if (StringUtil.isBlank(str)) {
       throw new MessageDecodingException("missing required SCEP attribute transactionId");
     }
     TransactionId tid = new TransactionId(str);
 
     // messageType
-    Integer intValue = getIntegerPrintStringAttrValue(signedAttrs, ScepObjectIdentifiers.ID_MESSAGE_TYPE);
+    Integer intValue = getIntegerPrintStringAttrValue(signedAttrs, ID_MESSAGE_TYPE);
     if (intValue == null) {
       throw new MessageDecodingException("tid " + tid.getId() + ": missing required SCEP attribute messageType");
     }
@@ -210,7 +201,7 @@ public class DecodedPkiMessage extends PkiMessage {
     }
 
     // senderNonce
-    Nonce senderNonce = getNonceAttrValue(signedAttrs, ScepObjectIdentifiers.ID_SENDER_NONCE);
+    Nonce senderNonce = getNonceAttrValue(signedAttrs, ID_SENDER_NONCE);
     if (senderNonce == null) {
       throw new MessageDecodingException("tid " + tid.getId() + ": missing required SCEP attribute senderNonce");
     }
@@ -222,7 +213,7 @@ public class DecodedPkiMessage extends PkiMessage {
 
     Nonce recipientNonce = null;
     try {
-      recipientNonce = getNonceAttrValue(signedAttrs, ScepObjectIdentifiers.ID_RECIPIENT_NONCE);
+      recipientNonce = getNonceAttrValue(signedAttrs, ID_RECIPIENT_NONCE);
     } catch (MessageDecodingException ex) {
       ret.setFailureMessage("could not parse recipientNonce: " + ex.getMessage());
     }
@@ -236,7 +227,7 @@ public class DecodedPkiMessage extends PkiMessage {
     if (MessageType.CertRep == messageType) {
       // pkiStatus
       try {
-        intValue = getIntegerPrintStringAttrValue(signedAttrs, ScepObjectIdentifiers.ID_PKI_STATUS);
+        intValue = getIntegerPrintStringAttrValue(signedAttrs, ID_PKI_STATUS);
       } catch (MessageDecodingException ex) {
         ret.setFailureMessage("could not parse pkiStatus: " + ex.getMessage());
         return ret;
@@ -258,7 +249,7 @@ public class DecodedPkiMessage extends PkiMessage {
       // failureInfo
       if (pkiStatus == PkiStatus.FAILURE) {
         try {
-          intValue = getIntegerPrintStringAttrValue(signedAttrs, ScepObjectIdentifiers.ID_FAILINFO);
+          intValue = getIntegerPrintStringAttrValue(signedAttrs, ID_FAILINFO);
         } catch (MessageDecodingException ex) {
           ret.setFailureMessage("could not parse failInfo: " + ex.getMessage());
           return ret;
@@ -279,7 +270,7 @@ public class DecodedPkiMessage extends PkiMessage {
         ret.setFailInfo(failInfo);
 
         // failInfoText
-        ASN1Encodable value = ScepUtil.getFirstAttrValue(signedAttrs, ScepObjectIdentifiers.ID_SCEP_FAILINFOTEXT);
+        ASN1Encodable value = ScepUtil.getFirstAttrValue(signedAttrs, ID_SCEP_FAILINFOTEXT);
         if (value != null) {
           if (value instanceof ASN1UTF8String) {
             ret.setFailInfoText(((ASN1UTF8String) value).getString());
@@ -399,18 +390,13 @@ public class DecodedPkiMessage extends PkiMessage {
 
     try {
       if (MessageType.PKCSReq == messageType || MessageType.RenewalReq == messageType) {
-        CertificationRequest messageData = CertificationRequest.getInstance(encodedMessageData);
-        ret.setMessageData(messageData);
+        ret.setMessageData(CertificationRequest.getInstance(encodedMessageData));
       } else if (MessageType.CertPoll == messageType) {
-        IssuerAndSubject messageData = IssuerAndSubject.getInstance(encodedMessageData);
-        ret.setMessageData(messageData);
+        ret.setMessageData(IssuerAndSubject.getInstance(encodedMessageData));
       } else if (MessageType.GetCert == messageType || MessageType.GetCRL == messageType) {
-        IssuerAndSerialNumber messageData = IssuerAndSerialNumber.getInstance(encodedMessageData);
-        ret.setMessageData(messageData);
-        ret.setMessageData(messageData);
+        ret.setMessageData(IssuerAndSerialNumber.getInstance(encodedMessageData));
       } else if (MessageType.CertRep == messageType) {
-        ContentInfo ci = ContentInfo.getInstance(encodedMessageData);
-        ret.setMessageData(ci);
+        ret.setMessageData(ContentInfo.getInstance(encodedMessageData));
       } else {
         throw new RuntimeException("should not reach here, unknown messageType " + messageType);
       }

@@ -26,8 +26,6 @@ package org.xipki.shell;
 
 public class IllegalCmdParamException extends Exception {
 
-  private static final long serialVersionUID = 1L;
-
   public IllegalCmdParamException() {
   }
 

@@ -71,8 +71,6 @@ public class EstResponder {
 
   private static class HttpRespAuditException extends Exception {
 
-    private static final long serialVersionUID = 1L;
-
     private final int httpStatus;
 
     private final String auditMessage;

@@ -49,8 +49,6 @@ import java.util.Collections;
 
 public class ScepServlet extends HttpServlet {
 
-  private static final long serialVersionUID = 1L;
-
   private static final Logger LOG = LoggerFactory.getLogger(ScepServlet.class);
 
   private static final String CT_RESPONSE = ScepConstants.CT_PKI_MESSAGE;

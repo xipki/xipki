@@ -120,11 +120,9 @@ abstract class CrmfKeyWrapper {
     public byte[] generateWrappedKey(byte[] keyToWrap) throws OperatorException {
       try {
         BlockCipher cbcCipher = new CBCBlockCipher(new AESEngine());
-        IESCipher cipher = new IESCipher(
-            new IESEngine(new ECDHBasicAgreement(),
-                new KDF2BytesGenerator(new SHA1Digest()),
-                new HMac(new SHA1Digest()),
-                new PaddedBufferedBlockCipher(cbcCipher)), 16);
+        IESEngine engine = new IESEngine(new ECDHBasicAgreement(), new KDF2BytesGenerator(new SHA1Digest()),
+            new HMac(new SHA1Digest()), new PaddedBufferedBlockCipher(cbcCipher));
+        IESCipher cipher = new IESCipher(engine, 16);
 
         // According to the §3.8 in SEC 1, Version 2.0:
         // "Furthermore here the 16 octet or 128 bit IV for AES in CBC mode should always take

@@ -148,17 +148,8 @@ public class ScepResponder {
 
     Date signingTime = req.getSigningTime();
     if (maxSigningTimeBiasInMs > 0) {
-      boolean isTimeBad;
-      if (signingTime == null) {
-        isTimeBad = true;
-      } else {
-        long now = System.currentTimeMillis();
-        long diff = now - signingTime.getTime();
-        if (diff < 0) {
-          diff = -1 * diff;
-        }
-        isTimeBad = diff > maxSigningTimeBiasInMs;
-      }
+      boolean isTimeBad = signingTime == null ? true
+          : Math.abs(System.currentTimeMillis() - signingTime.getTime()) > maxSigningTimeBiasInMs;
 
       if (isTimeBad) {
         return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badTime);

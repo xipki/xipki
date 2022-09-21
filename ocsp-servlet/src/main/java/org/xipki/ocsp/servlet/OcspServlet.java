@@ -48,8 +48,6 @@ public class OcspServlet extends HttpServlet {
 
   private static final long DFLT_CACHE_MAX_AGE = 60; // 1 minute
 
-  private static final long serialVersionUID = 1L;
-
   private static final String CT_REQUEST = "application/ocsp-request";
 
   private static final String CT_RESPONSE = "application/ocsp-response";

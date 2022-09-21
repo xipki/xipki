@@ -72,10 +72,9 @@ public class CmpFailureUtil {
 
   public static String formatPkiStatusInfo(org.bouncycastle.asn1.cmp.PKIStatusInfo pkiStatusInfo) {
     int status = Args.notNull(pkiStatusInfo, "pkiStatusInfo").getStatus().intValue();
-    int failureInfo = pkiStatusInfo.getFailInfo().intValue();
     PKIFreeText text = pkiStatusInfo.getStatusString();
     String statusMessage = (text == null) ? null : text.getStringAtUTF8(0).getString();
-    return formatPkiStatusInfo(status, failureInfo, statusMessage);
+    return formatPkiStatusInfo(status, pkiStatusInfo.getFailInfo().intValue(), statusMessage);
   } // method formatPkiStatusInfo
 
   public static String formatPkiStatusInfo(int status, int failureInfo, String statusMessage) {

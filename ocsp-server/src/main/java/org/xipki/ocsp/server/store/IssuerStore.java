@@ -44,8 +44,7 @@ class IssuerStore {
     for (IssuerEntry issuer : issuers) {
       int id = issuer.getId();
       if (newIds.contains(id)) {
-        throw new IllegalArgumentException(
-            "issuer with the same id " + id + " duplicated");
+        throw new IllegalArgumentException("issuer with the same id " + id + " duplicated");
       }
       newIds.add(id);
     }

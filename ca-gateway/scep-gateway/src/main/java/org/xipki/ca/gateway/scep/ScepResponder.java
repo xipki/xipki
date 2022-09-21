@@ -18,6 +18,7 @@
 package org.xipki.ca.gateway.scep;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
@@ -91,8 +92,6 @@ public class ScepResponder {
     public static final FailInfoException BAD_MESSAGE_CHECK = new FailInfoException(FailInfo.badMessageCheck);
 
     public static final FailInfoException BAD_REQUEST = new FailInfoException(FailInfo.badRequest);
-
-    private static final long serialVersionUID = 1L;
 
     private final FailInfo failInfo;
 
@@ -376,15 +375,16 @@ public class ScepResponder {
     String tid = notNull(req, "req").getTransactionId().getId();
     // verify and decrypt the request
     audit(event, CaAuditConstants.NAME_tid, tid);
+
     if (req.getFailureMessage() != null) {
       audit(event, NAME_failure_message, req.getFailureMessage());
     }
-    Boolean bo = req.isSignatureValid();
-    if (bo != null && !bo) {
+
+    if (!dfltTrue(req.isSignatureValid())) {
       audit(event, NAME_signature, "invalid");
     }
-    bo = req.isDecryptionSuccessful();
-    if (bo != null && !bo) {
+
+    if (!dfltTrue(req.isDecryptionSuccessful())) {
       audit(event, NAME_decryption, "failed");
     }
 
@@ -392,44 +392,25 @@ public class ScepResponder {
     rep.setRecipientNonce(req.getSenderNonce());
 
     if (req.getFailureMessage() != null) {
-      rep.setPkiStatus(PkiStatus.FAILURE);
-      rep.setFailInfo(FailInfo.badRequest);
-      return rep;
+      return fail(rep, FailInfo.badRequest);
     }
 
-    bo = req.isSignatureValid();
-    if (bo != null && !bo) {
-      rep.setPkiStatus(PkiStatus.FAILURE);
-      rep.setFailInfo(FailInfo.badMessageCheck);
-      return rep;
+    if (!dfltTrue(req.isSignatureValid())) {
+      return fail(rep, FailInfo.badMessageCheck);
     }
 
-    bo = req.isDecryptionSuccessful();
-    if (bo != null && !bo) {
-      rep.setPkiStatus(PkiStatus.FAILURE);
-      rep.setFailInfo(FailInfo.badRequest);
-      return rep;
+    if (!dfltTrue(req.isDecryptionSuccessful())) {
+      return fail(rep, FailInfo.badRequest);
     }
 
     Date signingTime = req.getSigningTime();
     long maxSigningTimeBiasInMs = 1000L * control.getMaxSigningTimeBias();
     if (maxSigningTimeBiasInMs > 0) {
-      boolean isTimeBad;
-      if (signingTime == null) {
-        isTimeBad = true;
-      } else {
-        long now = System.currentTimeMillis();
-        long diff = now - signingTime.getTime();
-        if (diff < 0) {
-          diff = -1 * diff;
-        }
-        isTimeBad = diff > maxSigningTimeBiasInMs;
-      }
+      boolean isTimeBad = signingTime == null ? true
+          : Math.abs(System.currentTimeMillis() - signingTime.getTime()) > maxSigningTimeBiasInMs;
 
       if (isTimeBad) {
-        rep.setPkiStatus(PkiStatus.FAILURE);
-        rep.setFailInfo(FailInfo.badTime);
-        return rep;
+        return fail(rep, FailInfo.badTime);
       }
     } // end if
 
@@ -452,9 +433,7 @@ public class ScepResponder {
 
     if (!supported) {
       LOG.warn("tid={}: unsupported digest algorithm {}", tid, hashAlgo);
-      rep.setPkiStatus(PkiStatus.FAILURE);
-      rep.setFailInfo(FailInfo.badAlg);
-      return rep;
+      return fail(rep, FailInfo.badAlg);
     }
 
     // check the content encryption algorithm
@@ -462,22 +441,16 @@ public class ScepResponder {
     if (CMSAlgorithm.DES_EDE3_CBC.equals(encOid)) {
       if (!caCaps.supportsDES3()) {
         LOG.warn("tid={}: encryption with DES3 algorithm {} is not permitted", tid, encOid);
-        rep.setPkiStatus(PkiStatus.FAILURE);
-        rep.setFailInfo(FailInfo.badAlg);
-        return rep;
+        return fail(rep, FailInfo.badAlg);
       }
     } else if (CMSAlgorithm.AES128_CBC.equals(encOid)) {
       if (!caCaps.supportsAES()) {
         LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid, encOid);
-        rep.setPkiStatus(PkiStatus.FAILURE);
-        rep.setFailInfo(FailInfo.badAlg);
-        return rep;
+        return fail(rep, FailInfo.badAlg);
       }
     } else {
       LOG.warn("tid={}: encryption with algorithm {} is not permitted", tid, encOid);
-      rep.setPkiStatus(PkiStatus.FAILURE);
-      rep.setFailInfo(FailInfo.badAlg);
-      return rep;
+      return fail(rep, FailInfo.badAlg);
     }
 
     try {
@@ -507,13 +480,11 @@ public class ScepResponder {
 
           CertificationRequestInfo csrReqInfo = csr.getCertificationRequestInfo();
           X509Cert reqSignatureCert = req.getSignatureCert();
-          X500Name reqSigCertSubject = reqSignatureCert.getSubject();
 
-          boolean selfSigned = reqSignatureCert.isSelfSigned();
-          if (selfSigned) {
-            if (!reqSigCertSubject.equals(csrReqInfo.getSubject())) {
+          if (reqSignatureCert.isSelfSigned()) {
+            if (!reqSignatureCert.getSubject().equals(csrReqInfo.getSubject())) {
               LOG.warn("tid={}, self-signed identityCert.subject ({}) != csr.subject ({})",
-                  tid, reqSigCertSubject, csrReqInfo.getSubject());
+                  tid, reqSignatureCert.getSubject(), csrReqInfo.getSubject());
               throw FailInfoException.BAD_REQUEST;
             }
           }
@@ -540,7 +511,7 @@ public class ScepResponder {
             }
           } // end if
 
-          if (selfSigned) {
+          if (reqSignatureCert.isSelfSigned()) {
             if (MessageType.PKCSReq != mt) {
               LOG.warn("tid={}: self-signed certificate is not permitted for messageType {}", tid, mt);
               throw FailInfoException.BAD_REQUEST;
@@ -646,16 +617,13 @@ public class ScepResponder {
           throw FailInfoException.BAD_REQUEST;
       } // end switch
 
-      ContentInfo ci = new ContentInfo(CMSObjectIdentifiers.signedData, signedData);
-      rep.setMessageData(ci);
+      rep.setMessageData(new ContentInfo(CMSObjectIdentifiers.signedData, signedData));
       rep.setPkiStatus(PkiStatus.SUCCESS);
+      return rep;
     } catch (FailInfoException ex) {
       LogUtil.error(LOG, ex);
-      rep.setPkiStatus(PkiStatus.FAILURE);
-      rep.setFailInfo(ex.getFailInfo());
+      return fail(rep, ex.getFailInfo());
     }
-
-    return rep;
   } // method servicePkiOperation0
 
   private SignedData getCert(String caName, X500Name issuer, BigInteger serialNumber)
@@ -669,6 +637,7 @@ public class ScepResponder {
       LogUtil.error(LOG, ex, message);
       throw new OperationException(SYSTEM_FAILURE, ex);
     }
+
     if (encodedCert == null) {
       throw FailInfoException.BAD_CERTID;
     }
@@ -703,8 +672,7 @@ public class ScepResponder {
           cmsSignedDataGen.addCertificate(new X509CertificateHolder(Certificate.getInstance(c)));
         }
       }
-      CMSSignedData signedData = cmsSignedDataGen.generate(new CMSAbsentContent());
-      return SignedData.getInstance(signedData.toASN1Structure().getContent());
+      return SignedData.getInstance(cmsSignedDataGen.generate(new CMSAbsentContent()).toASN1Structure().getContent());
     } catch (CMSException ex) {
       LogUtil.error(LOG, ex);
       throw new OperationException(SYSTEM_FAILURE, ex);
@@ -786,6 +754,16 @@ public class ScepResponder {
 
   private static void audit(AuditEvent audit, String name, String value) {
     audit.addEventData(name, (value == null) ? "null" : value);
+  }
+
+  private static PkiMessage fail(PkiMessage rep, FailInfo failInfo) {
+    rep.setPkiStatus(PkiStatus.FAILURE);
+    rep.setFailInfo(FailInfo.badMessageCheck);
+    return rep;
+  }
+
+  private static boolean dfltTrue(Boolean b) {
+    return b == null ? true : b;
   }
 
 }

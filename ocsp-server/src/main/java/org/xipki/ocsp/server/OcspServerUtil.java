@@ -65,8 +65,7 @@ public class OcspServerUtil {
 
   private static final String STORE_TYPE_EJBCA_DB = "ejbca-db";
 
-  static ResponseSigner initSigner(
-      OcspServerConf.Signer signerType, SecurityFactory securityFactory)
+  static ResponseSigner initSigner(OcspServerConf.Signer signerType, SecurityFactory securityFactory)
       throws InvalidConfException {
     X509Cert[] explicitCertificateChain = null;
 
@@ -103,9 +102,8 @@ public class OcspServerUtil {
     List<String> failSigAlgos = new LinkedList<>();
     for (String sigAlgo : sigAlgos) {
       try {
-        ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
-            responderSignerType, new SignerConf("algo=" + sigAlgo + "," + responderKeyConf),
-            explicitCertificateChain);
+        ConcurrentContentSigner requestorSigner = securityFactory.createSigner(responderSignerType,
+            new SignerConf("algo=" + sigAlgo + "," + responderKeyConf), explicitCertificateChain);
         singleSigners.add(requestorSigner);
         succSigAlgos.add(sigAlgo);
       } catch (Exception ex) {

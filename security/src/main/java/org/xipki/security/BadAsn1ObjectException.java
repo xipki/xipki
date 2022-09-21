@@ -26,8 +26,6 @@ package org.xipki.security;
 
 public class BadAsn1ObjectException extends Exception {
 
-  private static final long serialVersionUID = 1L;
-
   public BadAsn1ObjectException() {
   }
 

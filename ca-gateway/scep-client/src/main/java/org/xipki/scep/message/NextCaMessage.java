@@ -111,8 +111,7 @@ public class NextCaMessage {
   } // method encode
 
   private static String getSignatureAlgorithm(PrivateKey key, HashAlgo hashAlgo) {
-    String algorithm = key.getAlgorithm();
-    if ("RSA".equalsIgnoreCase(algorithm)) {
+    if ("RSA".equalsIgnoreCase(key.getAlgorithm())) {
       return hashAlgo.getJceName() + "withRSA";
     } else {
       throw new UnsupportedOperationException("getSignatureAlgorithm() for non-RSA is not supported yet.");

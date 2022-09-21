@@ -89,8 +89,7 @@ public class CrlInfo {
     return str;
   }
 
-  public CrlInfo(BigInteger crlNumber, BigInteger baseCrlNumber,
-      Date thisUpdate, Date nextUpdate, CrlID crlId) {
+  public CrlInfo(BigInteger crlNumber, BigInteger baseCrlNumber, Date thisUpdate, Date nextUpdate, CrlID crlId) {
     this.crlNumber = notNull(crlNumber, "crlNumber");
     this.baseCrlNumber = baseCrlNumber;
     this.thisUpdate = notNull(thisUpdate, "thisUpdate");

@@ -81,10 +81,8 @@ public class CmpUtf8Pairs {
       if (sepIdx == -1 || sepIdx == token.length() - 1) {
         throw new IllegalArgumentException("invalid token: " + token);
       }
-      String name = token.substring(0, sepIdx);
-      name = decodeNameOrValue(name);
-      String value = token.substring(sepIdx + 1);
-      value = decodeNameOrValue(value);
+      String name = decodeNameOrValue(token.substring(0, sepIdx));
+      String value = decodeNameOrValue(token.substring(sepIdx + 1));
       pairs.put(name, value);
 
       beginIndex = endIndex + 1;
@@ -103,13 +101,11 @@ public class CmpUtf8Pairs {
   }
 
   public void removeUtf8Pair(String name) {
-    notNull(name, "name");
-    pairs.remove(name);
+    pairs.remove(notNull(name, "name"));
   }
 
   public String value(String name) {
-    notNull(name, "name");
-    return pairs.get(name);
+    return pairs.get(notNull(name, "name"));
   }
 
   public Set<String> names() {

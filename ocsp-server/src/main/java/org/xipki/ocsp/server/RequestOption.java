@@ -21,6 +21,7 @@ import org.xipki.security.CertpathValidationModel;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.exception.InvalidConfException;
 
@@ -43,21 +44,13 @@ import static org.xipki.util.Args.notNull;
 
 public class RequestOption {
 
-  static final Set<HashAlgo> SUPPORTED_HASH_ALGORITHMS = new HashSet<>();
+  static final Set<HashAlgo> SUPPORTED_HASH_ALGORITHMS;
 
   static {
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA1);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA224);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA256);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA384);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA512);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA3_224);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA3_256);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA3_384);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA3_512);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHAKE128);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHAKE256);
-    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SM3);
+    SUPPORTED_HASH_ALGORITHMS = CollectionUtil.asSet(HashAlgo.SHA1,
+        HashAlgo.SHA224,   HashAlgo.SHA256,   HashAlgo.SHA384,   HashAlgo.SHA512,
+        HashAlgo.SHA3_224, HashAlgo.SHA3_256, HashAlgo.SHA3_384, HashAlgo.SHA3_512,
+        HashAlgo.SHAKE128, HashAlgo.SHAKE256, HashAlgo.SM3);
   }
 
   private final boolean supportsHttpGet;

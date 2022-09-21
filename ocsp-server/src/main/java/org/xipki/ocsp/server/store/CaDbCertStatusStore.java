@@ -203,8 +203,7 @@ public class CaDbCertStatusStore extends OcspStore {
           if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             for (IssuerEntry m : caInfos) {
-              sb.append(overviewString(m.getCert()));
-              sb.append("\n");
+              sb.append(overviewString(m.getCert())).append("\n");
             }
             if (sb.length() > 1) {
               sb.deleteCharAt(sb.length() - 1);
@@ -387,8 +386,7 @@ public class CaDbCertStatusStore extends OcspStore {
    * @return the next idle preparedStatement, {@code null} will be returned if no
    *     PreparedStatement can be created within 5 seconds.
    */
-  private PreparedStatement preparedStatement(String sqlQuery)
-      throws DataAccessException {
+  private PreparedStatement preparedStatement(String sqlQuery) throws DataAccessException {
     return datasource.prepareStatement(sqlQuery);
   }
 
@@ -432,8 +430,7 @@ public class CaDbCertStatusStore extends OcspStore {
    * @param datasource DataSource.
    */
   @Override
-  public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource)
-      throws OcspStoreException {
+  public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource) throws OcspStoreException {
     OcspServerConf.CaCerts caCerts = null;
     if (sourceConf != null) {
       Object objValue = sourceConf.get("caCerts");

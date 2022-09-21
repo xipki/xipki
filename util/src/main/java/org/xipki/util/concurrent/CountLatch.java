@@ -31,7 +31,6 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 public class CountLatch {
 
   private class Sync extends AbstractQueuedSynchronizer {
-    private static final long serialVersionUID = 1L;
 
     public Sync() {
     }

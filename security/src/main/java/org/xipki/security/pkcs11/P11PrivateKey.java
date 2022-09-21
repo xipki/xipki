@@ -38,8 +38,6 @@ import static org.xipki.util.Args.notNull;
 
 public class P11PrivateKey implements PrivateKey {
 
-  private static final long serialVersionUID = 1L;
-
   private final P11CryptService p11CryptService;
 
   private final P11IdentityId identityId;

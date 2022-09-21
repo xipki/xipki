@@ -26,8 +26,6 @@ package org.xipki.password;
 
 public class PasswordResolverException extends Exception {
 
-  private static final long serialVersionUID = 1L;
-
   public PasswordResolverException() {
   }
 

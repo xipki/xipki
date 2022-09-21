@@ -31,7 +31,6 @@ import java.util.function.UnaryOperator;
  * @author Brett Wooldridge
  */
 public final class FastList<T> implements List<T>, RandomAccess, Serializable {
-  private static final long serialVersionUID = -4598088075242913858L;
 
   private final Class<?> clazz;
   private T[] elementData;

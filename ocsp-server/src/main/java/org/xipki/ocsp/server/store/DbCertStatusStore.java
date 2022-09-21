@@ -483,8 +483,7 @@ public class DbCertStatusStore extends OcspStore {
    * @return the next idle preparedStatement, {@code null} will be returned if no
    *     PreparedStatement can be created within 5 seconds.
    */
-  private PreparedStatement preparedStatement(String sqlQuery)
-      throws DataAccessException {
+  private PreparedStatement preparedStatement(String sqlQuery) throws DataAccessException {
     return datasource.prepareStatement(sqlQuery);
   }
 
@@ -622,8 +621,7 @@ public class DbCertStatusStore extends OcspStore {
     return initialized;
   }
 
-  static Set<X509Cert> parseCerts(Collection<String> certFiles)
-      throws OcspStoreException {
+  static Set<X509Cert> parseCerts(Collection<String> certFiles) throws OcspStoreException {
     Set<X509Cert> certs = new HashSet<>(certFiles.size());
     for (String certFile : certFiles) {
       try {

@@ -26,8 +26,6 @@ package org.xipki.security.pkcs11;
 
 public class P11UnknownEntityException extends P11TokenException {
 
-  private static final long serialVersionUID = 1L;
-
   public P11UnknownEntityException(P11IdentityId identityId) {
     super("unknown identity '" + identityId + "'");
   }

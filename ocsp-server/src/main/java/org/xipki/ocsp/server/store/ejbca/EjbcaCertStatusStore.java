@@ -188,8 +188,7 @@ public class EjbcaCertStatusStore extends OcspStore {
           if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             for (Map.Entry<String, EjbcaIssuerEntry> m : newIssuers.entrySet()) {
-              sb.append(overviewString(m.getValue().getCert()));
-              sb.append("\n");
+              sb.append(overviewString(m.getValue().getCert())).append("\n");
             }
             if (sb.length() > 1) {
               sb.deleteCharAt(sb.length() - 1);

@@ -113,8 +113,7 @@ public class CmpClientConf extends ValidatableConf {
       }
 
       @Override
-      public void validate()
-          throws InvalidConfException {
+      public void validate() throws InvalidConfException {
         notEmpty(owfAlgos, "owfAlgos");
         notEmpty(macAlgos, "macAlgos");
       }

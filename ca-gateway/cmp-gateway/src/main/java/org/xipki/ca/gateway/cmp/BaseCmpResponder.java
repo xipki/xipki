@@ -301,10 +301,9 @@ abstract class BaseCmpResponder {
     event.addEventData(NAME_requestor, requestor == null ? "null" : requestor.getName());
 
     PKIHeader reqHeader = message.getHeader();
-    GeneralName sender = reqHeader.getRecipient();
 
     PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
-        reqHeader.getPvno().getValue().intValue(), sender, reqHeader.getSender());
+        reqHeader.getPvno().getValue().intValue(), reqHeader.getRecipient(), reqHeader.getSender());
     respHeader.setTransactionID(tid);
     ASN1OctetString senderNonce = reqHeader.getSenderNonce();
     if (senderNonce != null) {
@@ -402,8 +401,7 @@ abstract class BaseCmpResponder {
     PKIHeader reqHeader = message.getHeader();
     ASN1OctetString tid = reqHeader.getTransactionID();
     if (tid == null) {
-      byte[] randomBytes = randomTransactionId();
-      tid = new DEROctetString(randomBytes);
+      tid = new DEROctetString(randomTransactionId());
     }
     String tidStr = Base64.encodeToString(tid.getOctets());
     event.addEventData(NAME_tid, tidStr);
@@ -660,8 +658,7 @@ abstract class BaseCmpResponder {
 
       event.update(AuditLevel.ERROR, AuditStatus.FAILED);
       event.addEventData(NAME_message, "could not sign the PKIMessage");
-      PKIBody body = new PKIBody(PKIBody.TYPE_ERROR, new ErrorMsgContent(status));
-      return new PKIMessage(pkiMessage.getHeader(), body);
+      return new PKIMessage(pkiMessage.getHeader(), new PKIBody(PKIBody.TYPE_ERROR, new ErrorMsgContent(status)));
     }
   } // method addProtection
 
@@ -682,10 +679,8 @@ abstract class BaseCmpResponder {
     }
 
     PKIStatusInfo status = generateRejectionStatus(failureCode, statusText);
-    ErrorMsgContent error = new ErrorMsgContent(status);
-    PKIBody body = new PKIBody(PKIBody.TYPE_ERROR, error);
 
-    return new PKIMessage(respHeader.build(), body);
+    return new PKIMessage(respHeader.build(), new PKIBody(PKIBody.TYPE_ERROR, new ErrorMsgContent(status)));
   } // method buildErrorPkiMessage
 
   protected static PKIStatusInfo generateRejectionStatus(Integer info, String errorMessage) {
@@ -785,15 +780,10 @@ abstract class BaseCmpResponder {
     ErrorCode code = ex.getErrorCode();
     LOG.warn("generate certificate, OperationException: code={}, message={}", code.name(), ex.getErrorMessage());
 
-    String errorMessage;
-    if (code == ErrorCode.DATABASE_FAILURE || code == ErrorCode.SYSTEM_FAILURE) {
-      errorMessage = code.name();
-    } else {
-      errorMessage = code.name() + ": " + ex.getErrorMessage();
-    } // end switch code
+    String errorMessage = (code == ErrorCode.DATABASE_FAILURE || code == ErrorCode.SYSTEM_FAILURE)
+        ? code.name() : code.name() + ": " + ex.getErrorMessage();
 
-    int failureInfo = getPKiFailureInfo(ex);
-    return new CertResponse(certReqId, generateRejectionStatus(failureInfo, errorMessage));
+    return new CertResponse(certReqId, generateRejectionStatus(getPKiFailureInfo(ex), errorMessage));
   }
 
   protected CertResponse postProcessCertInfo(
@@ -935,12 +925,11 @@ abstract class BaseCmpResponder {
                     new PBKDF2Params(pbkdfSalt, iterCount, keysizeBits / 8, prf_hmacWithSHA256)),
                 new EncryptionScheme(encAlgOid, new GCMParameters(nonce, tagByteLen))));
 
-        encKey = new EncryptedValue(intendedAlg, symmAlg,
-            null, null, null, new DERBitString(encValue));
+        encKey = new EncryptedValue(intendedAlg, symmAlg, null, null, null, new DERBitString(encValue));
       }
     } catch (Throwable th) {
       String msg = "error while encrypting the private key";
-      LOG.error(msg);
+      LogUtil.error(LOG, th, msg);
       return new CertResponse(certReqId, new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(msg)));
     }
 

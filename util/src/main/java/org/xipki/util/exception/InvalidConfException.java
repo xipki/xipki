@@ -26,8 +26,6 @@ package org.xipki.util.exception;
 
 public class InvalidConfException extends Exception {
 
-  private static final long serialVersionUID = 1L;
-
   public InvalidConfException() {
   }
 

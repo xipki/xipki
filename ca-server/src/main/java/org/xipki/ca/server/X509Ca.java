@@ -140,8 +140,6 @@ public class X509Ca extends X509CaModule implements Closeable {
 
   static class OperationExceptionWithIndex extends OperationException {
 
-    private static final long serialVersionUID = 1L;
-
     private final int index;
 
     public OperationExceptionWithIndex(int index, OperationException underlying) {

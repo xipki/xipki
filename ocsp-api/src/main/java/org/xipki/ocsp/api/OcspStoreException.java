@@ -26,8 +26,6 @@ package org.xipki.ocsp.api;
 
 public class OcspStoreException extends Exception {
 
-  private static final long serialVersionUID = 1L;
-
   public OcspStoreException() {
   }
 

@@ -282,8 +282,7 @@ public final class CmpClientImpl implements CmpClient {
   @Override
   public X509CRLHolder downloadCrl(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    caName = toNonBlankLower(caName, "caName");
-    return agent.downloadCurrentCrl(caName, debug);
+    return agent.downloadCurrentCrl(toNonBlankLower(caName, "caName"), debug);
   } // method downloadCrl
 
   private static X509Cert getCertificate(CMPCertificate cmpCert)
@@ -317,8 +316,7 @@ public final class CmpClientImpl implements CmpClient {
   public CertIdOrError unsuspendCert(
       String caName, Requestor requestor, X509Cert issuerCert, X509Cert cert, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    notNull(cert, "cert");
-    assertIssuedByCa(cert, issuerCert);
+    assertIssuedByCa(notNull(cert, "cert"), issuerCert);
     return unsuspendCert(caName, requestor, issuerCert, cert.getSerialNumber(), debug);
   } // method unrevokeCert
 
@@ -346,9 +344,7 @@ public final class CmpClientImpl implements CmpClient {
   public Map<String, CertIdOrError> unsuspendCerts(
       String caName, Requestor requestor, UnrevokeCertRequest request, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    notNull(request, "request");
-
-    List<UnrevokeCertRequest.Entry> requestEntries = request.getRequestEntries();
+    List<UnrevokeCertRequest.Entry> requestEntries = notNull(request, "request").getRequestEntries();
     if (CollectionUtil.isEmpty(requestEntries)) {
       return Collections.emptyMap();
     }
@@ -357,7 +353,7 @@ public final class CmpClientImpl implements CmpClient {
     for (int i = 1; i < requestEntries.size(); i++) {
       if (!issuer.equals(requestEntries.get(i).getIssuer())) {
         throw new PkiErrorException(PKIStatus.REJECTION, PKIFailureInfo.badRequest,
-            "unrevoking certificates issued by more than one CA is not allowed");
+            "unsuspending certificates issued by more than one CA is not allowed");
       }
     }
 
@@ -454,8 +450,7 @@ public final class CmpClientImpl implements CmpClient {
     return new EnrollCertResult(caCertChain, certOrErrors);
   } // method parseEnrollCertResult
 
-  private static void assertIssuedByCa(X509Cert cert, X509Cert ca)
-      throws CmpClientException {
+  private static void assertIssuedByCa(X509Cert cert, X509Cert ca) throws CmpClientException {
     boolean issued;
     try {
       issued = X509Util.issues(ca, cert);

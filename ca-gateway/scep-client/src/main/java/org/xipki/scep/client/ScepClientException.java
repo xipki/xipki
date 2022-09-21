@@ -25,8 +25,6 @@ package org.xipki.scep.client;
 
 public class ScepClientException extends Exception {
 
-  private static final long serialVersionUID = 1L;
-
   public ScepClientException(String message, Throwable cause) {
     super(message, cause);
   }
@@ -40,8 +38,6 @@ public class ScepClientException extends Exception {
   }
 
   public static class OperationNotSupportedException extends ScepClientException {
-
-    private static final long serialVersionUID = 1L;
 
     public OperationNotSupportedException(String message) {
       super(message);
