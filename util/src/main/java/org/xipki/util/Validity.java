@@ -75,9 +75,7 @@ public class Validity implements Comparable<Validity> {
   }
 
   public static Validity getInstance(String validityS) {
-    notBlank(validityS, "validityS");
-
-    final int len = validityS.length();
+    final int len = notBlank(validityS, "validityS").length();
     final char suffix = validityS.charAt(len - 1);
     Unit unit;
     String numValdityS;
@@ -103,13 +101,11 @@ public class Validity implements Comparable<Validity> {
       throw new IllegalArgumentException(String.format("invalid validityS: %s", validityS));
     }
 
-    int validity;
     try {
-      validity = Integer.parseInt(numValdityS);
+      return new Validity(Integer.parseInt(numValdityS), unit);
     } catch (NumberFormatException ex) {
       throw new IllegalArgumentException(String.format("invalid validityS: %s", validityS));
     }
-    return new Validity(validity, unit);
   } // method getInstance
 
   public void setValidity(int validity) {
@@ -196,11 +192,7 @@ public class Validity implements Comparable<Validity> {
     } else {
       long thisMinutes = approxMinutes();
       long thatMinutes = obj.approxMinutes();
-      if (thisMinutes == thatMinutes) {
-        return 0;
-      } else {
-        return (thisMinutes < thatMinutes) ? -1 : 1;
-      }
+      return (thisMinutes == thatMinutes) ? 0 : (thisMinutes < thatMinutes) ? -1 : 1;
     }
   }
 
@@ -235,13 +227,7 @@ public class Validity implements Comparable<Validity> {
   }
 
   private static boolean isLeapYear(int year) {
-    if (year % 4 != 0) {
-      return false;
-    } else if (year % 100 != 0) {
-      return true;
-    } else {
-      return year % 400 == 0;
-    }
+    return (year % 4 != 0) ? false : (year % 100 != 0) ? true : year % 400 == 0;
   }
 
 }

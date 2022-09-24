@@ -114,8 +114,7 @@ public abstract class BenchmarkExecutor {
     while (true) {
       printStatus();
       try {
-        boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
-        if (terminated) {
+        if (executor.awaitTermination(1, TimeUnit.SECONDS)) {
           break;
         }
       } catch (InterruptedException ex) {
@@ -157,18 +156,14 @@ public abstract class BenchmarkExecutor {
       throw new IllegalArgumentException("invalid duration " + duration);
     }
 
-    switch (unit) {
-      case 's':
-        this.duration = num;
-        break;
-      case 'm':
-        this.duration = num * 60;
-        break;
-      case 'h':
-        this.duration = num * 3600; // 3600 = 60 * 60
-        break;
-      default:
-        throw new IllegalStateException("invalid duration unit " + unit);
+    if (unit == 's') {
+      this.duration = num;
+    } else if (unit == 'm') {
+      this.duration = num * 60;
+    } else if (unit == 'h') {
+      this.duration = num * 3600; // 3600 = 60 * 60
+    } else {
+      throw new IllegalStateException("invalid duration unit " + unit);
     }
 
     return this;

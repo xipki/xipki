@@ -109,8 +109,7 @@ public class IoUtil {
     save(file, content, false);
   }
 
-  public static void save(File file, byte[] content, boolean prependBaseDir)
-      throws IOException {
+  public static void save(File file, byte[] content, boolean prependBaseDir) throws IOException {
     File tmpFile = expandFilepath(file, prependBaseDir);
     mkdirsParent(tmpFile.toPath());
 
@@ -205,24 +204,23 @@ public class IoUtil {
     notBlank(path, "path");
     if (path.startsWith("~")) {
       return USER_HOME + path.substring(1);
-    } else {
-      if (path.startsWith("/")) {
-        // unix
-        return path;
-      } else {
-        int index = path.indexOf(':');
-        if (index == 1 || index == 2) {
-          // windows
-          return path;
-        }
+    }
 
-        if (prependBaseDir) {
-          String basedir = XipkiBaseDir.basedir();
-          return basedir == null ? path : Paths.get(basedir, path).toString();
-        } else {
-          return path;
-        }
-      }
+    if (path.startsWith("/")) {
+      // unix
+      return path;
+    }
+
+    int index = path.indexOf(':');
+    if (index == 1 || index == 2) {
+      // windows
+      return path;
+    }
+
+    if (prependBaseDir) {
+      return XipkiBaseDir.basedir() == null ? path : Paths.get(XipkiBaseDir.basedir(), path).toString();
+    } else {
+      return path;
     }
   }
 
@@ -267,10 +265,8 @@ public class IoUtil {
   }
 
   public static int parseInt(byte[] bytes, int offset) {
-    return (0xFF & bytes[offset++]) << 24
-        | (0xFF & bytes[offset++]) << 16
-        | (0xFF & bytes[offset++]) << 8
-        |  0xFF & bytes[offset];
+    return (0xFF & bytes[offset++]) << 24 | (0xFF & bytes[offset++]) << 16
+          | (0xFF & bytes[offset++]) << 8 |  0xFF & bytes[offset];
   }
 
   public static int getIndex(byte[] arrayA, byte[] arrayB) {
@@ -295,8 +291,7 @@ public class IoUtil {
   }
 
   public static HttpURLConnection openHttpConn(URL url) throws IOException {
-    notNull(url, "url");
-    URLConnection conn = url.openConnection();
+    URLConnection conn = notNull(url, "url").openConnection();
     if (conn instanceof HttpURLConnection) {
       return (HttpURLConnection) conn;
     }

@@ -186,9 +186,7 @@ public class Actions {
 
       if (isNotEmpty(certFiles)) {
         encodedCerts = new HashMap<>(certFiles.size());
-
         String ocspUrl = null;
-
         X500Name issuerX500Name = null;
 
         for (String certFile : certFiles) {
@@ -204,8 +202,7 @@ public class Actions {
             // no signature validation
             AttributeCertificateIssuer reqIssuer = cert.getIssuer();
             if (reqIssuer != null && issuerX500Name != null) {
-              X500Name reqIssuerName = reqIssuer.getNames()[0];
-              if (!issuerX500Name.equals(reqIssuerName)) {
+              if (!issuerX500Name.equals(reqIssuer.getNames()[0])) {
                 throw new IllegalCmdParamException("certificate " + certFile + " is not issued by the given issuer");
               }
             }
@@ -236,7 +233,6 @@ public class Actions {
           } // end if
 
           sns.add(sn);
-
           encodedCerts.put(sn, IoUtil.read(certFile));
         } // end for
 
@@ -556,11 +552,8 @@ public class Actions {
         } else if (singleCertStatus instanceof RevokedStatus) {
           RevokedStatus revStatus = (RevokedStatus) singleCertStatus;
           Date revTime = revStatus.getRevocationTime();
-          Date invTime = null;
           Extension ext = singleResp.getExtension(Extension.invalidityDate);
-          if (ext != null) {
-            invTime = ASN1GeneralizedTime.getInstance(ext.getParsedValue()).getDate();
-          }
+          Date invTime = (ext == null) ? null : ASN1GeneralizedTime.getInstance(ext.getParsedValue()).getDate();
 
           if (revStatus.hasRevocationReason()) {
             int reason = revStatus.getRevocationReason();
@@ -621,9 +614,8 @@ public class Actions {
           extension = singleResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff);
           if (extension != null) {
             ASN1Encodable extensionValue = extension.getParsedValue();
-            ASN1GeneralizedTime time = ASN1GeneralizedTime.getInstance(extensionValue);
             msg.append("\nArchive-CutOff: ");
-            msg.append(time.getTimeString());
+            msg.append(ASN1GeneralizedTime.getInstance(extensionValue).getTimeString());
           }
 
           AlgorithmIdentifier sigAlgo = basicResp.getSignatureAlgorithmID();

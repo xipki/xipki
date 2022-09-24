@@ -92,8 +92,7 @@ public class Actions {
           sc = new SignerConf(cp.getEncoded());
         }
 
-        ConcurrentContentSigner signer = securityFactory.createSigner(
-            "PKCS12", sc, (X509Cert)  null);
+        ConcurrentContentSigner signer = securityFactory.createSigner("PKCS12", sc, (X509Cert)  null);
         return new Requestor.SignatureCmpRequestor(signer);
       } else {
         if (signerPassword == null) {
@@ -191,10 +190,7 @@ public class Actions {
         return filename + "-" + index;
       }
 
-      StringBuilder sb = new StringBuilder(filename);
-      sb.insert(idx, index);
-      sb.insert(idx, '-');
-      return sb.toString();
+      return new StringBuilder(filename).insert(idx, index).insert(idx, '-').toString();
     }
 
   } // class ClientAction

@@ -123,9 +123,8 @@ public class StringUtil {
   }
 
   public static boolean isNumber(String str, int radix) {
-    notNull(str, "str");
     try {
-      Integer.parseInt(str, radix);
+      Integer.parseInt(notNull(str, "str"), radix);
       return true;
     } catch (NumberFormatException ex) {
       return false;
@@ -148,8 +147,7 @@ public class StringUtil {
   }
 
   public static String formatAccount(long account, boolean withPrefix) {
-    int minLen = withPrefix ? 12 : 0;
-    return formatAccount(account, minLen);
+    return formatAccount(account, withPrefix ? 12 : 0);
   }
 
   public static String formatAccount(long account, int minLen) {
@@ -160,8 +158,7 @@ public class StringUtil {
       StringBuilder sb = new StringBuilder(n + 3);
       int firstBlockLen = n % 3;
       if (firstBlockLen != 0) {
-        sb.append(accountS, 0, firstBlockLen);
-        sb.append(',');
+        sb.append(accountS, 0, firstBlockLen).append(',');
       }
 
       for (int i = 0;; i++) {
@@ -182,8 +179,7 @@ public class StringUtil {
   }
 
   public static String formatTime(long seconds, boolean withPrefix) {
-    int minLen = withPrefix ? 12 : 0;
-    return formatTime(seconds, minLen);
+    return formatTime(seconds, withPrefix ? 12 : 0);
   }
 
   public static String formatTime(long seconds, int minLen) {
@@ -233,8 +229,7 @@ public class StringUtil {
     for (String str : strs) {
       len += (str == null) ? 4 : str.length();
     }
-    StringBuilder sb = new StringBuilder(len);
-    sb.append(s1);
+    StringBuilder sb = new StringBuilder(len).append(s1);
     for (String str : strs) {
       sb.append(str);
     }
@@ -242,8 +237,7 @@ public class StringUtil {
   }
 
   public static String concatObjects(Object o1, Object... objs) {
-    StringBuilder sb = new StringBuilder();
-    sb.append(o1);
+    StringBuilder sb = new StringBuilder().append(o1);
     for (Object obj : objs) {
       sb.append(obj);
     }
@@ -251,8 +245,7 @@ public class StringUtil {
   }
 
   public static String concatObjectsCap(int cap, Object o1, Object... objs) {
-    StringBuilder sb = new StringBuilder(cap);
-    sb.append(o1);
+    StringBuilder sb = new StringBuilder(cap).append(o1);
     for (Object obj : objs) {
       sb.append(obj);
     }

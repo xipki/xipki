@@ -114,14 +114,12 @@ public class OcspMgmtClient implements OcspManager {
     voidTransmit(MgmtAction.refreshTokenForSignerType, req);
   }
 
-  private void voidTransmit(MgmtAction action, MgmtRequest req)
-      throws OcspMgmtException {
+  private void voidTransmit(MgmtAction action, MgmtRequest req) throws OcspMgmtException {
     transmit(action, req, true);
   }
 
   @SuppressWarnings("unused")
-  private byte[] transmit(MgmtAction action, MgmtRequest req)
-      throws OcspMgmtException {
+  private byte[] transmit(MgmtAction action, MgmtRequest req) throws OcspMgmtException {
     return transmit(action, req, false);
   }
 

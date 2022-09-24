@@ -67,8 +67,7 @@ public interface PasswordCallback {
     private String passwordFile;
 
     @Override
-    public char[] getPassword(String prompt, String testToken)
-        throws PasswordResolverException {
+    public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
       if (passwordFile == null) {
         throw new PasswordResolverException("please initialize me first");
       }
@@ -134,8 +133,7 @@ public interface PasswordCallback {
     }
 
     @Override
-    public char[] getPassword(String prompt, String testToken)
-        throws PasswordResolverException {
+    public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
       String tmpPrompt = prompt;
       if (StringUtil.isBlank(tmpPrompt)) {
         tmpPrompt = "Password required";
@@ -198,8 +196,7 @@ public interface PasswordCallback {
     private char[] password;
 
     @Override
-    public char[] getPassword(String prompt, String testToken)
-        throws PasswordResolverException {
+    public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
       if (password == null) {
         throw new PasswordResolverException("please initialize me first");
       }

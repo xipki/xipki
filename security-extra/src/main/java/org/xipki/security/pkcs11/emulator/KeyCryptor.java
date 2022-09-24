@@ -168,11 +168,7 @@ class KeyCryptor {
 
       int offset = 1 + nonce.length;
       int realCipherLen = cipher.doFinal(data, 0, data.length, cipherBlob, offset);
-      if (cipherLen == realCipherLen) {
-        return cipherBlob;
-      } else {
-        return Arrays.copyOf(cipherBlob, offset + realCipherLen);
-      }
+      return (cipherLen == realCipherLen) ? cipherBlob : Arrays.copyOf(cipherBlob, offset + realCipherLen);
     } catch (GeneralSecurityException ex) {
       throw new P11TokenException(ex);
     }

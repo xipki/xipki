@@ -71,8 +71,7 @@ public class RequestorCaActions {
     protected Object execute0() throws Exception {
       CaHasRequestorEntry entry = new CaHasRequestorEntry(new NameId(null, requestorName));
       entry.setProfiles(profiles);
-      int intPermission = ShellUtil.getPermission(permissions);
-      entry.setPermission(intPermission);
+      entry.setPermission(ShellUtil.getPermission(permissions));
 
       String msg = "requestor " + requestorName + " to CA " + caName;
       try {
@@ -202,10 +201,9 @@ public class RequestorCaActions {
         int size = names.size();
 
         if (size == 0 || size == 1) {
-          sb.append((size == 0) ? "no" : "1");
-          sb.append(" CMP requestor is configured\n");
+          sb.append((size == 0) ? "no" : "1").append(" requestor is configured\n");
         } else {
-          sb.append(size).append(" CMP requestors are configured:\n");
+          sb.append(size).append(" requestors are configured:\n");
         }
 
         List<String> sorted = new ArrayList<>(names);
@@ -217,7 +215,7 @@ public class RequestorCaActions {
       } else {
         RequestorEntry entry = caManager.getRequestor(name);
         if (entry == null) {
-          throw new CmdFailure("could not find CMP requestor '" + name + "'");
+          throw new CmdFailure("could not find requestor '" + name + "'");
         } else {
           sb.append(entry.toString(verbose));
         }
@@ -271,13 +269,12 @@ public class RequestorCaActions {
     @Override
     protected Object execute0() throws Exception {
       // check if the certificate is valid
-      String msg = "CMP requestor " + name;
+      String msg = "requestor " + name;
 
-      String type = RequestorEntry.TYPE_CERT;
       String conf = Base64.encodeToString(X509Util.parseCert(IoUtil.read(certFile)).getEncoded());
 
       try {
-        caManager.changeRequestor(name, type, conf);
+        caManager.changeRequestor(name, RequestorEntry.TYPE_CERT, conf);
         println("updated " + msg);
         return null;
       } catch (CaMgmtException ex) {

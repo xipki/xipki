@@ -244,18 +244,15 @@ public class ConfPairs {
   }
 
   public void removePair(String name) {
-    notBlank(name, "name");
-    pairs.remove(name);
+    pairs.remove(notBlank(name, "name"));
   }
 
   public String value(String name) {
-    notBlank(name, "name");
-    return pairs.get(name);
+    return pairs.get(notBlank(name, "name"));
   }
 
   public String value(String name, String defaultValue) {
-    notBlank(name, "name");
-    String value = pairs.get(name);
+    String value = pairs.get(notBlank(name, "name"));
     return value == null ? defaultValue : value;
   }
 

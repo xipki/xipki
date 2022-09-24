@@ -116,8 +116,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
     if (weakThreadLocals) {
       this.threadList = ThreadLocal.withInitial(() -> new ArrayList<>(16));
     } else {
-      this.threadList = ThreadLocal.withInitial(() ->
-                 new FastList<>(IConcurrentBagEntry.class, 16));
+      this.threadList = ThreadLocal.withInitial(() -> new FastList<>(IConcurrentBagEntry.class, 16));
     }
   }
 
@@ -233,8 +232,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
     if (!bagEntry.compareAndSet(STATE_IN_USE, STATE_REMOVED)
         && !bagEntry.compareAndSet(STATE_RESERVED, STATE_REMOVED)
         && !closed) {
-      LOG.warn("Attempt to remove an object from the bag that was not borrowed or reserved: {}",
-          bagEntry);
+      LOG.warn("Attempt to remove an object from the bag that was not borrowed or reserved: {}", bagEntry);
       return false;
     }
 
@@ -264,8 +262,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
    * @return a possibly empty list of objects having the state specified
    */
   public List<T> values(int state) {
-    final List<T> list =
-        sharedList.stream().filter(e -> e.getState() == state).collect(Collectors.toList());
+    final List<T> list = sharedList.stream().filter(e -> e.getState() == state).collect(Collectors.toList());
     Collections.reverse(list);
     return list;
   }

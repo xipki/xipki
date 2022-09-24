@@ -99,12 +99,10 @@ public class ProcessLog {
     if (hasTotal) {
       sb.append(formatText("", PERCENT_LEN));
     }
-    sb.append(formatText("average", SPEED_LEN))
-        .append(formatText("current", SPEED_LEN))
+    sb.append(formatText("average", SPEED_LEN)).append(formatText("current", SPEED_LEN))
         .append(formatText("time", DURATION_LEN));
     if (hasTotal) {
-      sb.append(formatText("time", DURATION_LEN))
-        .append(formatText("finish", TIME_LEN));
+      sb.append(formatText("time", DURATION_LEN)).append(formatText("finish", TIME_LEN));
     }
     sb.append('\n');
 
@@ -113,12 +111,10 @@ public class ProcessLog {
     if (hasTotal) {
       sb.append(formatText("%", PERCENT_LEN));
     }
-    sb.append(formatText("speed", SPEED_LEN))
-      .append(formatText("speed", SPEED_LEN))
+    sb.append(formatText("speed", SPEED_LEN)).append(formatText("speed", SPEED_LEN))
       .append(formatText("spent", DURATION_LEN));
     if (hasTotal) {
-      sb.append(formatText("left", DURATION_LEN))
-        .append(formatText("at", TIME_LEN));
+      sb.append(formatText("left", DURATION_LEN)).append(formatText("at", TIME_LEN));
     }
     sb.append('\n');
 
@@ -140,8 +136,7 @@ public class ProcessLog {
   public void printTrailer() {
     finish();
     printStatus(true);
-    StringBuilder sb = new StringBuilder();
-    sb.append('\n');
+    StringBuilder sb = new StringBuilder().append('\n');
 
     final int lineLength = getLineLength();
     for (int i = 0; i < lineLength; i++) {
@@ -213,8 +208,7 @@ public class ProcessLog {
     // processed percent
     if (hasTotal) {
       int percent = (int) (tmpNumProcessed * 100 / total);
-      String percentS = percent + "%";
-      sb.append(formatText(percentS, PERCENT_LEN));
+      sb.append(formatText(percent + "%", PERCENT_LEN));
     }
 
     // average speed
@@ -339,13 +333,10 @@ public class ProcessLog {
       len += PERCENT_LEN;
     }
 
-    len += SPEED_LEN;
-    len += SPEED_LEN;
-    len += DURATION_LEN;
+    len += SPEED_LEN + SPEED_LEN + DURATION_LEN;
 
     if (hasTotal) {
-      len += DURATION_LEN;
-      len += TIME_LEN;
+      len += DURATION_LEN + TIME_LEN;
     }
 
     return len;

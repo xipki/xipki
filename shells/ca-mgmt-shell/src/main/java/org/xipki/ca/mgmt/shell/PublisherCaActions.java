@@ -90,8 +90,7 @@ public class PublisherCaActions {
 
       List<PublisherEntry> entries = caManager.getPublishersForCa(caName);
       if (isNotEmpty(entries)) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("publishers for CA ").append(caName).append("\n");
+        StringBuilder sb = new StringBuilder().append("publishers for CA ").append(caName).append("\n");
         for (PublisherEntry entry : entries) {
           sb.append("\t").append(entry.getIdent().getName()).append("\n");
         }
@@ -163,10 +162,9 @@ public class PublisherCaActions {
         conf = StringUtil.toUtf8String(IoUtil.read(confFile));
       }
 
-      PublisherEntry entry = new PublisherEntry(new NameId(null, name), type, conf);
       String msg = "publisher " + name;
       try {
-        caManager.addPublisher(entry);
+        caManager.addPublisher(new PublisherEntry(new NameId(null, name), type, conf));
         println("added " + msg);
         return null;
       } catch (CaMgmtException ex) {
@@ -221,8 +219,7 @@ public class PublisherCaActions {
 
         StringBuilder sb = new StringBuilder();
         if (size == 0 || size == 1) {
-          sb.append((size == 0) ? "no" : "1");
-          sb.append(" publisher is configured\n");
+          sb.append((size == 0) ? "no" : "1").append(" publisher is configured\n");
         } else {
           sb.append(size).append(" publishers are configured:\n");
         }

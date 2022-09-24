@@ -272,8 +272,7 @@ public class QaSecurityActions {
         return null;
       }
 
-      ASN1ObjectIdentifier curveOid = getCurveOid(control.curveName());
-      return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), curveOid);
+      return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), getCurveOid(control.curveName()));
     }
 
     protected int getNumThreads(int numThreads) {
@@ -443,8 +442,7 @@ public class QaSecurityActions {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
-      ASN1ObjectIdentifier curveOid = getCurveOid(curveName);
-      return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), curveOid);
+      return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), getCurveOid(curveName));
     }
 
     @Override
@@ -485,8 +483,7 @@ public class QaSecurityActions {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
-      ASN1ObjectIdentifier curveOid = getCurveOid(curveName);
-      return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), curveOid);
+      return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), getCurveOid(curveName));
     }
 
     @Override
@@ -714,7 +711,7 @@ public class QaSecurityActions {
       KeyControl.RSA control = queue.poll();
       return (control == null) ? null
         : new P12SignSpeed.RSA(securityFactory, signAlgo, getNumThreads(),
-              control.modulusLen(), toBigInt("0x10001"));
+          control.modulusLen(), toBigInt("0x10001"));
     }
   } // class BspeedRsaSignP12
 

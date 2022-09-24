@@ -148,8 +148,7 @@ public class DbActions {
       if (caCertFiles != null && !caCertFiles.isEmpty()) {
         caCerts = new HashSet<>(caCertFiles.size());
         for (String fileName : caCertFiles) {
-          byte[] derEncodedCert = X509Util.parseCert(new File(fileName)).getEncoded();
-          caCerts.add(derEncodedCert);
+          caCerts.add(X509Util.parseCert(new File(fileName)).getEncoded());
         }
       }
 

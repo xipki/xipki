@@ -269,8 +269,7 @@ public class EmulatorP11Identity extends P11Identity {
 
     HashAlgo hashAlgo =  mechHashMap.get(mechanism);
     if (hashAlgo == null) {
-      throw new P11TokenException(
-          "unknown mechanism " + Functions.mechanismCodeToString(mechanism));
+      throw new P11TokenException("unknown mechanism " + Functions.mechanismCodeToString(mechanism));
     }
     return hashAlgo.hash(signingKey.getEncoded());
   }
@@ -351,8 +350,7 @@ public class EmulatorP11Identity extends P11Identity {
     }
 
     GMac gmac = new GMac(new GCMBlockCipher(new AESEngine()));
-    ParametersWithIV paramsWithIv = new ParametersWithIV(new KeyParameter(signingKey.getEncoded()), iv);
-    gmac.init(paramsWithIv);
+    gmac.init(new ParametersWithIV(new KeyParameter(signingKey.getEncoded()), iv));
     gmac.update(contentToSign, 0, contentToSign.length);
     byte[] signature = new byte[gmac.getMacSize()];
     gmac.doFinal(signature, 0);
@@ -393,12 +391,8 @@ public class EmulatorP11Identity extends P11Identity {
     int modulusBitLen = getSignatureKeyBitLength();
     byte[] paddedHash;
     try {
-      if (hashAlgo == null) {
-        paddedHash = PKCS1Util.EMSA_PKCS1_v1_5_encoding(contentToSign, modulusBitLen);
-      } else {
-        byte[] hash = hashAlgo.hash(contentToSign);
-        paddedHash = PKCS1Util.EMSA_PKCS1_v1_5_encoding(hash, modulusBitLen, hashAlgo);
-      }
+      paddedHash = (hashAlgo == null) ? PKCS1Util.EMSA_PKCS1_v1_5_encoding(contentToSign, modulusBitLen)
+          : PKCS1Util.EMSA_PKCS1_v1_5_encoding(hashAlgo.hash(contentToSign), modulusBitLen, hashAlgo);
     } catch (XiSecurityException ex) {
       throw new P11TokenException("XiSecurityException: " + ex.getMessage(), ex);
     }

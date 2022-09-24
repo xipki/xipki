@@ -104,8 +104,7 @@ public class QaCompleters {
   public static class EDDSASigAlgCompleter extends EnumCompleter {
 
     public EDDSASigAlgCompleter() {
-      String[] hashAlgs = new String[]{EdECConstants.ED25519, EdECConstants.ED448};
-      setTokens(hashAlgs);
+      setTokens(EdECConstants.ED25519, EdECConstants.ED448);
     }
 
   } // class EDDSASigAlgCompleter

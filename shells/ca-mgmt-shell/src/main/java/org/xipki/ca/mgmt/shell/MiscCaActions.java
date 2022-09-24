@@ -112,8 +112,7 @@ public class MiscCaActions {
     protected Object execute0() throws Exception {
       String msg = "configuration to file " + confFile;
       try {
-        InputStream is = caManager.exportConf(caNames);
-        save(new File(confFile), IoUtil.read(is));
+        save(new File(confFile), IoUtil.read(caManager.exportConf(caNames)));
         println("exported " + msg);
         return null;
       } catch (CaMgmtException ex) {
@@ -143,12 +142,8 @@ public class MiscCaActions {
     protected Object execute0() throws Exception {
       String msg = "configuration " + confFile;
       try {
-        InputStream confStream;
-        if (confFile.endsWith(".json")) {
-          confStream = CaConfs.convertFileConfToZip(confFile);
-        } else {
-          confStream = Files.newInputStream(Paths.get(confFile));
-        }
+        InputStream confStream = confFile.endsWith(".json")
+            ? CaConfs.convertFileConfToZip(confFile) : Files.newInputStream(Paths.get(confFile));
 
         Map<String, X509Cert> rootCerts = caManager.loadConf(confStream);
         if (CollectionUtil.isEmpty(rootCerts)) {
@@ -356,8 +351,7 @@ public class MiscCaActions {
     @Override
     protected Object execute0() throws Exception {
       try {
-        String tokenInfo = caManager.getTokenInfoP11(moduleName, slotIndex, verbose);
-        println(tokenInfo);
+        println(caManager.getTokenInfoP11(moduleName, slotIndex, verbose));
         return null;
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not get token-info-p11, error: " + ex.getMessage(), ex);

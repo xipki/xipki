@@ -213,8 +213,7 @@ public class CertActions {
       byte[] certBytes;
       if (StringUtil.isNotBlank(csrFile)) {
         byte[] encodedCsr = StringUtil.isNotBlank(csrFile) ? X509Util.toDerEncoded(IoUtil.read(csrFile)) : null;
-        X509Cert cert = caManager.generateCertificate(caName, profileName, encodedCsr, notBefore, notAfter);
-        certBytes = cert.getEncoded();
+        certBytes = caManager.generateCertificate(caName, profileName, encodedCsr, notBefore, notAfter).getEncoded();
       } else {
         char[] keyPwd;
         if (StringUtil.isNotBlank(keyOutform)) {
@@ -238,8 +237,7 @@ public class CertActions {
 
         String ksFilePrefix = outFile.substring(0, outFile.lastIndexOf('.'));
 
-        PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(keyCertBytesPair.getKey());
-        PrivateKey privKey = BouncyCastleProvider.getPrivateKey(privateKeyInfo);
+        PrivateKey privKey = BouncyCastleProvider.getPrivateKey(PrivateKeyInfo.getInstance(keyCertBytesPair.getKey()));
 
         if (StringUtil.orEqualsIgnoreCase(keyOutform, "p12", "pkcs12")) {
           CertificateFactory cf = CertificateFactory.getInstance("X509");
@@ -265,8 +263,7 @@ public class CertActions {
                 new JceOpenSSLPKCS8EncryptorBuilder(PKCS8Generator.PBE_SHA1_3DES);
             encryptorBuilder.setRandom(securityFactory.getRandom4Sign());
             encryptorBuilder.setPassword(keyPwd);
-            OutputEncryptor oe = encryptorBuilder.build();
-            JcaPKCS8Generator gen = new JcaPKCS8Generator(privKey, oe);
+            JcaPKCS8Generator gen = new JcaPKCS8Generator(privKey, encryptorBuilder.build());
             PemObject obj = gen.generate();
 
             saveVerbose("save key to file", ksFilePrefix + "-key.pem",
@@ -470,12 +467,7 @@ public class CertActions {
 
     @Override
     protected Object execute0() throws Exception {
-      Date validFrom = parseDate(validFromS);
-      Date validTo = parseDate(validToS);
-      X500Name subjectPattern = null;
-      if (StringUtil.isNotBlank(subjectPatternS)) {
-        subjectPattern = new X500Name(subjectPatternS);
-      }
+      X500Name subjectPattern = StringUtil.isBlank(subjectPatternS) ? null : new X500Name(subjectPatternS);
 
       CertListOrderBy orderBy = null;
       if (orderByS != null) {
@@ -486,7 +478,7 @@ public class CertActions {
       }
 
       List<CertListInfo> certInfos =
-          caManager.listCertificates(caName, subjectPattern, validFrom, validTo, orderBy, num);
+          caManager.listCertificates(caName, subjectPattern, parseDate(validFromS), parseDate(validToS), orderBy, num);
       final int n = certInfos.size();
       if (n == 0) {
         println("found no certificate");
@@ -496,8 +488,7 @@ public class CertActions {
       println("     | serial               | notBefore      | notAfter       | subject");
       println("-----+----------------------+----------------+----------------+-----------------");
       for (int i = 0; i < n; i++) {
-        CertListInfo info = certInfos.get(i);
-        println(format(i + 1, info));
+        println(format(i + 1, certInfos.get(i)));
       }
 
       return null;
@@ -555,12 +546,10 @@ public class CertActions {
         throw new InvalidConfException("reason " + reason + " is not permitted");
       }
 
-      Date invalidityDate = parseDate(invalidityDateS);
-
       BigInteger serialNo = getSerialNumber();
       String msg = "certificate (serial number = 0x" + serialNo.toString(16) + ")";
       try {
-        caManager.revokeCertificate(caName, serialNo, crlReason, invalidityDate);
+        caManager.revokeCertificate(caName, serialNo, crlReason, parseDate(invalidityDateS));
         println("revoked " + msg);
         return null;
       } catch (CaMgmtException ex) {

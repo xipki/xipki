@@ -113,9 +113,8 @@ public class DemoCertprofile extends XijsonCertprofile {
 
   @Override
   public ExtensionValues getExtraExtensions(
-      Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurrences,
-      X500Name requestedSubject, X500Name grantedSubject,
-      Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
+      Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurrences, X500Name requestedSubject,
+      X500Name grantedSubject, Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
       Date notBefore, Date notAfter, PublicCaInfo caInfo)
       throws CertprofileException, BadCertTemplateException {
     ExtensionValues extnValues = new ExtensionValues();

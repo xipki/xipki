@@ -70,8 +70,7 @@ public interface SinglePasswordResolver {
     public PBE() {
     }
 
-    protected char[] getMasterPassword(String encryptedPassword)
-        throws PasswordResolverException {
+    protected char[] getMasterPassword(String encryptedPassword) throws PasswordResolverException {
       synchronized (masterPasswordLock) {
         init();
         if (masterPassword == null) {

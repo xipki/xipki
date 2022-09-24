@@ -116,19 +116,12 @@ public class XiHttpClient {
     }
   } // method httpPost
 
-  private HttpRespContent parseResponse(HttpURLConnection conn)
-      throws XiHttpClientException {
+  private HttpRespContent parseResponse(HttpURLConnection conn) throws XiHttpClientException {
     Args.notNull(conn, "conn");
 
     try {
-      InputStream inputstream;
       int respCode = conn.getResponseCode();
-      if (respCode == HttpURLConnection.HTTP_OK) {
-        inputstream = conn.getInputStream();
-      } else {
-        inputstream = conn.getErrorStream();
-      }
-
+      InputStream inputstream = respCode == HttpURLConnection.HTTP_OK ? conn.getInputStream() : conn.getErrorStream();
       byte[] content = inputstream == null ? new byte[0] : IoUtil.read(inputstream);
       if (content.length > 0) {
         String encoding = conn.getHeaderField("content-transfer-encoding");
@@ -137,13 +130,8 @@ public class XiHttpClient {
         }
       }
 
-      String ct = conn.getContentType();
-
-      if (respCode == HttpURLConnection.HTTP_OK) {
-        return HttpRespContent.ofOk(ct, content);
-      } else {
-        return HttpRespContent.ofError(respCode, ct, content);
-      }
+      return respCode == HttpURLConnection.HTTP_OK ? HttpRespContent.ofOk(conn.getContentType(), content)
+          : HttpRespContent.ofError(respCode, conn.getContentType(), content);
     } catch (IOException ex) {
       throw new XiHttpClientException(ex);
     }

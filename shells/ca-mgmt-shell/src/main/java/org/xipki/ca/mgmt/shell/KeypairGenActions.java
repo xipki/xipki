@@ -98,8 +98,7 @@ public class KeypairGenActions {
 
         StringBuilder sb = new StringBuilder();
         if (size == 0 || size == 1) {
-          sb.append((size == 0) ? "no" : "1");
-          sb.append(" keypair generation is configured\n");
+          sb.append((size == 0) ? "no" : "1").append(" keypair generation is configured\n");
         } else {
           sb.append(size).append(" keypair generation entries are configured:\n");
         }

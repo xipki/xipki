@@ -70,8 +70,7 @@ public class CaActions {
         return "null";
       }
 
-      StringBuilder sb = new StringBuilder();
-      sb.append("{");
+      StringBuilder sb = new StringBuilder().append("{");
       int size = col.size();
 
       int idx = 0;
@@ -95,10 +94,9 @@ public class CaActions {
 
       for (String caName : caNames) {
         Set<String> aliases = caManager.getAliasesForCa(caName);
-        if (CollectionUtil.isEmpty(aliases)) {
-          sb.append(prefix).append(caName);
-        } else {
-          sb.append(prefix).append(caName).append(" (aliases ").append(aliases).append(")");
+        sb.append(prefix).append(caName);
+        if (!CollectionUtil.isEmpty(aliases)) {
+          sb.append(" (aliases ").append(aliases).append(")");
         }
         sb.append("\n");
       }
@@ -122,8 +120,7 @@ public class CaActions {
     protected Object execute0() throws Exception {
       CaEntry caEntry = getCaEntry();
       if (certFile != null) {
-        X509Cert caCert = X509Util.parseCert(new File(certFile));
-        caEntry.setCert(caCert);
+        caEntry.setCert(X509Util.parseCert(new File(certFile)));
       }
 
       if (CollectionUtil.isNotEmpty(issuerCertFiles)) {
@@ -257,13 +254,9 @@ public class CaActions {
           signerType, signerConf, caUris, numCrls, expirationPeriod);
 
       entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
-
       entry.setSaveCert(isEnabled(saveCertS, false, "save-cert"));
       entry.setSaveKeypair(isEnabled(saveKeypairS, false, "save-keypair"));
-
-      ValidityMode validityMode = ValidityMode.forName(validityModeS);
-      entry.setValidityMode(validityMode);
-
+      entry.setValidityMode(ValidityMode.forName(validityModeS));
       entry.setStatus(CaStatus.forName(caStatus));
 
       if (crlControl != null) {
@@ -288,9 +281,7 @@ public class CaActions {
 
       entry.setMaxValidity(Validity.getInstance(maxValidity));
       entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
-
-      int intPermission = ShellUtil.getPermission(permissions);
-      entry.setPermission(intPermission);
+      entry.setPermission(ShellUtil.getPermission(permissions));
 
       if (extraControl != null) {
         extraControl = extraControl.trim();
@@ -346,8 +337,7 @@ public class CaActions {
         int size = aliasNames.size();
 
         if (size == 0 || size == 1) {
-          sb.append((size == 0) ? "no" : "1");
-          sb.append(" CA alias is configured\n");
+          sb.append((size == 0) ? "no" : "1").append(" CA alias is configured\n");
         } else {
           sb.append(size).append(" CA aliases are configured:\n");
         }
@@ -360,8 +350,7 @@ public class CaActions {
         }
       } else {
         if (aliasNames.contains(caAlias)) {
-          String paramValue = caManager.getCaNameForAlias(caAlias);
-          sb.append(caAlias).append("\n\t").append(paramValue);
+          sb.append(caAlias).append("\n\t").append(caManager.getCaNameForAlias(caAlias));
         } else {
           throw new CmdFailure("could not find CA alias '" + caAlias + "'");
         }
@@ -477,8 +466,7 @@ public class CaActions {
             sb.append("started: ").append(started).append("\n");
           }
           Set<String> aliases = caManager.getAliasesForCa(name);
-          sb.append("aliases: ").append(toString(aliases)).append("\n");
-          sb.append(entry.toString(verbose));
+          sb.append("aliases: ").append(toString(aliases)).append("\n").append(entry.toString(verbose));
         }
       }
 
@@ -550,8 +538,8 @@ public class CaActions {
         throw new IllegalCmdParamException("invalid CA name " + caName);
       }
 
-      Date revocationDate;
-      revocationDate = isNotBlank(revocationDateS) ? DateUtil.parseUtcTimeyyyyMMddhhmmss(revocationDateS) : new Date();
+      Date revocationDate = isNotBlank(revocationDateS)
+          ? DateUtil.parseUtcTimeyyyyMMddhhmmss(revocationDateS) : new Date();
 
       Date invalidityDate = null;
       if (isNotBlank(invalidityDateS)) {
@@ -753,8 +741,7 @@ public class CaActions {
         entry.setPermission(ShellUtil.getPermission(permissions));
       }
 
-      CaUris caUris = new CaUris(getUris(caCertUris), getUris(ocspUris), getUris(crlUris), getUris(deltaCrlUris));
-      entry.setCaUris(caUris);
+      entry.setCaUris(new CaUris(getUris(caCertUris), getUris(ocspUris), getUris(crlUris), getUris(deltaCrlUris)));
 
       if (validityModeS != null) {
         entry.setValidityMode(ValidityMode.forName(validityModeS));

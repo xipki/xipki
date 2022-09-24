@@ -37,31 +37,23 @@ public class PBEWithHmacSHA256AndAES256Test {
   private static byte[] salt = new byte[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 15, 16};
 
   @Test
-  public void encrypThenDecrypt()
-      throws Exception {
+  public void encrypThenDecrypt() throws Exception {
     char[] password = "qwert".toCharArray();
     byte[] plainText = StringUtil.toUtf8Bytes("123456");
     int iterationCount = 1000;
-    byte[] encrypted = PasswordBasedEncryption.encrypt(algo, plainText, password,
-        iterationCount, salt);
-    byte[] decrypted = PasswordBasedEncryption.decrypt(algo, encrypted, password,
-        iterationCount, salt);
+    byte[] encrypted = PasswordBasedEncryption.encrypt(algo, plainText, password, iterationCount, salt);
+    byte[] decrypted = PasswordBasedEncryption.decrypt(algo, encrypted, password, iterationCount, salt);
     Assert.assertArrayEquals(plainText, decrypted);
   }
 
   @Test
-  public void decrypt()
-      throws Exception {
+  public void decrypt() throws Exception {
     char[] password = "qwert".toCharArray();
-    int iterationCount = 1000;
     byte[] encrypted = new byte[]{16, // length of IV
       -15, -2, 113, -42, -46, 43, -65, -8, -51, 48, 6, 26, -73, -38, -111, -1, // IV
       75, 76, -36, -17, -96, -123, 2, -107, 92, -27, -114, -74, -80, 105, 46, 91};
-    byte[] decrypted = PasswordBasedEncryption.decrypt(algo, encrypted, password,
-        iterationCount, salt);
-
-    byte[] plainText = StringUtil.toUtf8Bytes("123456");
-    Assert.assertArrayEquals(plainText, decrypted);
+    byte[] decrypted = PasswordBasedEncryption.decrypt(algo, encrypted, password, 1000, salt);
+    Assert.assertArrayEquals(StringUtil.toUtf8Bytes("123456"), decrypted);
   }
 
 }

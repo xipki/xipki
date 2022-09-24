@@ -127,9 +127,8 @@ public class Actions {
     protected ScepClient getScepClient() throws CertificateException, IOException {
       if (scepClient == null) {
         X509Cert caCert = X509Util.parseCert(new File(caCertFile));
-        CaIdentifier tmpCaId = new CaIdentifier(url, caId);
         CaCertValidator caCertValidator = new CaCertValidator.PreprovisionedCaCertValidator(caCert);
-        scepClient = new ScepClient(tmpCaId, caCertValidator);
+        scepClient = new ScepClient(new CaIdentifier(url, caId), caCertValidator);
       }
       return scepClient;
     }
@@ -323,8 +322,7 @@ public class Actions {
     @Override
     protected Object execute0() throws Exception {
       X509Cert cert = X509Util.parseCert(new File(certFile));
-      ScepClient client = getScepClient();
-      X509CRLHolder crl = client.scepGetCrl(getIdentityKey(), getIdentityCert(),
+      X509CRLHolder crl = getScepClient().scepGetCrl(getIdentityKey(), getIdentityCert(),
           cert.getIssuer(), cert.getSerialNumber());
       if (crl == null) {
         throw new CmdFailure("received no CRL from server");

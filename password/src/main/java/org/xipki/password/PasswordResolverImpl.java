@@ -110,8 +110,7 @@ public class PasswordResolverImpl implements PasswordResolver {
   } // method resolvePassword
 
   @Override
-  public String protectPassword(String protocol, char[] password)
-      throws PasswordResolverException {
+  public String protectPassword(String protocol, char[] password) throws PasswordResolverException {
     notNull(protocol, "protocol");
     notNull(password, "password");
 

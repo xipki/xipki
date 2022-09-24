@@ -164,10 +164,9 @@ public class ProfileCaActions {
         conf = StringUtil.toUtf8String(IoUtil.read(confFile));
       }
 
-      CertprofileEntry entry = new CertprofileEntry(new NameId(null, name), type, conf);
       String msg = "certificate profile " + name;
       try {
-        caManager.addCertprofile(entry);
+        caManager.addCertprofile(new CertprofileEntry(new NameId(null, name), type, conf));
         println("added " + msg);
         return null;
       } catch (CaMgmtException ex) {
@@ -227,8 +226,7 @@ public class ProfileCaActions {
         int size = names.size();
 
         if (size == 0 || size == 1) {
-          sb.append((size == 0) ? "no" : "1");
-          sb.append(" profile is configured\n");
+          sb.append((size == 0) ? "no" : "1").append(" profile is configured\n");
         } else {
           sb.append(size).append(" profiles are configured:\n");
         }

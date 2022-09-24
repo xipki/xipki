@@ -38,22 +38,24 @@ public class LogUtil {
   }
 
   public static void logSystemInfo(Logger log) {
-    if (!systemInfoLogged) {
-      String[] prefixes = {"java.", "jdk.", "os.", "user."};
-      StringBuilder sb = new StringBuilder(1000);
-      Properties props = System.getProperties();
-      Set<String> propNames = props.stringPropertyNames();
-      for (String prefix : prefixes) {
-        for (String propName : propNames) {
-          if (propName.startsWith(prefix)) {
-            sb.append(propName).append(": ").append(props.getProperty(propName)).append("\n");
-          }
+    if (systemInfoLogged) {
+      return;
+    }
+
+    String[] prefixes = {"java.", "jdk.", "os.", "user."};
+    StringBuilder sb = new StringBuilder(1000);
+    Properties props = System.getProperties();
+    Set<String> propNames = props.stringPropertyNames();
+    for (String prefix : prefixes) {
+      for (String propName : propNames) {
+        if (propName.startsWith(prefix)) {
+          sb.append(propName).append(": ").append(props.getProperty(propName)).append("\n");
         }
       }
-      sb.deleteCharAt(sb.length() - 1);
-      log.info(sb.toString());
-      systemInfoLogged = true;
     }
+    sb.deleteCharAt(sb.length() - 1);
+    log.info(sb.toString());
+    systemInfoLogged = true;
   }
 
   public static void error(Logger log, Throwable th) {
@@ -152,13 +154,8 @@ public class LogUtil {
   }
 
   public static String base64Encode(byte[] bytes) {
-    if (bytes == null) {
-      return "NULL";
-    } else if (bytes.length == 0) {
-      return "EMPTY";
-    } else {
-      return Base64.encodeToString(bytes, true);
-    }
+    return (bytes == null) ? "NULL"
+        : (bytes.length == 0) ? "EMPTY" : Base64.encodeToString(bytes, true);
   }
 
 }

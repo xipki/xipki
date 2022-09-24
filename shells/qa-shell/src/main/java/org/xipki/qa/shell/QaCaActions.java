@@ -280,8 +280,7 @@ public class QaCaActions {
     } // method execute0
   }
 
-  @Command(scope = "xiqa", name = "benchmark-enroll",
-      description = "Enroll certificate (benchmark)")
+  @Command(scope = "xiqa", name = "benchmark-enroll", description = "Enroll certificate (benchmark)")
   @Service
   public static class BenchmarkEnroll extends AbstractBenchmarkEnroll {
 
@@ -747,13 +746,8 @@ public class QaCaActions {
   } // method assertTypeEquals
 
   private static void assertEquals(String desc, String ex, String is) throws CmdFailure {
-    String tmpEx = ex;
-    if (CaManager.NULL.equals(tmpEx)) {
-      tmpEx = null;
-    }
-
-    boolean bo = Objects.equals(tmpEx, is);
-    if (!bo) {
+    String tmpEx = CaManager.NULL.equals(ex) ? null : ex;
+    if (!Objects.equals(tmpEx, is)) {
       throw new CmdFailure(desc + ": is '" + is + "', but expected '" + tmpEx + "'");
     }
   } // method assertEquals

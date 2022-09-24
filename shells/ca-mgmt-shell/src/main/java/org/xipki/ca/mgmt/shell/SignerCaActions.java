@@ -83,11 +83,10 @@ public class SignerCaActions {
       if (StringUtil.orEqualsIgnoreCase(type, "PKCS12", "JCEKS")) {
         conf = ShellUtil.canonicalizeSignerConf(type, conf, securityFactory);
       }
-      SignerEntry entry = new SignerEntry(name, type, conf, base64Cert);
 
       String msg = "signer " + name;
       try {
-        caManager.addSigner(entry);
+        caManager.addSigner(new SignerEntry(name, type, conf, base64Cert));
         println("added " + msg);
         return null;
       } catch (CaMgmtException ex) {
@@ -214,9 +213,7 @@ public class SignerCaActions {
       if (CaManager.NULL.equalsIgnoreCase(certFile)) {
         cert = CaManager.NULL;
       } else if (certFile != null) {
-        X509Cert bcCert = X509Util.parseCert(new File(certFile));
-        byte[] certBytes = bcCert.getEncoded();
-        cert = Base64.encodeToString(certBytes);
+        cert = Base64.encodeToString(X509Util.parseCert(new File(certFile)).getEncoded());
       }
 
       String msg = "signer " + name;

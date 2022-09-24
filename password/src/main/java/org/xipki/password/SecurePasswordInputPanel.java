@@ -56,13 +56,11 @@ public class SecurePasswordInputPanel extends Panel {
   static {
     int idx = 0;
     KEYS_MAP.put(idx++, new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"});
-    KEYS_MAP.put(idx++, new String[]{"!", "@", "§", "#", "$", "%", "^", "&", "*",
-        "(", ")", "{", "}"});
-    KEYS_MAP.put(idx++, new String[]{"'", "\"", "=", "_", ":", ";", "?", "~", "|", ",",
-        ".", "-", "/"});
+    KEYS_MAP.put(idx++, new String[]{"!", "@", "§", "#", "$", "%", "^", "&", "*", "(", ")", "{", "}"});
+    KEYS_MAP.put(idx++, new String[]{"'", "\"", "=", "_", ":", ";", "?", "~", "|", ",", ".", "-", "/"});
     KEYS_MAP.put(idx++, new String[]{"q", "w", "e", "r", "z", "y", "u", "i", "o", "p"});
     KEYS_MAP.put(idx++, new String[]{"a", "s", "d", "f", "g", "h", "j", "k", "j", BACKSPACE});
-    KEYS_MAP.put(idx, new String[] {CAPS, "z", "x", "c", "v", "b", "n", "m", CLEAR});
+    KEYS_MAP.put(idx,   new String[] {CAPS, "z", "x", "c", "v", "b", "n", "m", CLEAR});
   } // method static
 
   private SecurePasswordInputPanel() {

@@ -80,8 +80,7 @@ public class DateUtil {
 
     try {
       LocalDateTime localDate = LocalDateTime.parse(coreUtcTime + "000000", SDF1);
-      Instant instant = localDate.atZone(ZONE_UTC).toInstant();
-      return Date.from(instant);
+      return Date.from(localDate.atZone(ZONE_UTC).toInstant());
     } catch (DateTimeParseException ex) {
       throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': " + ex.getMessage());
     }
@@ -95,17 +94,16 @@ public class DateUtil {
     return SDF2.format(utcTime.toInstant().atZone(ZONE_UTC));
   }
 
-  public static long getLastMsOfDay(Calendar calendar) {
-    calendar.set(Calendar.HOUR_OF_DAY, 23);
-    calendar.set(Calendar.MINUTE, 59);
-    calendar.set(Calendar.SECOND, 59);
-    calendar.set(Calendar.MILLISECOND, 999);
-    return calendar.getTimeInMillis();
+  public static long getLastMsOfDay(Calendar cal) {
+    cal.set(Calendar.HOUR_OF_DAY, 23);
+    cal.set(Calendar.MINUTE, 59);
+    cal.set(Calendar.SECOND, 59);
+    cal.set(Calendar.MILLISECOND, 999);
+    return cal.getTimeInMillis();
   }
 
-  public static int getYyyyMMdd(Calendar calendar) {
-    return calendar.get(Calendar.YEAR) * 10000 + (1 + calendar.get(Calendar.MONTH)) * 100
-            + calendar.get(Calendar.DAY_OF_MONTH);
+  public static int getYyyyMMdd(Calendar cal) {
+    return cal.get(Calendar.YEAR) * 10000 + (1 + cal.get(Calendar.MONTH)) * 100 + cal.get(Calendar.DAY_OF_MONTH);
   }
 
 }

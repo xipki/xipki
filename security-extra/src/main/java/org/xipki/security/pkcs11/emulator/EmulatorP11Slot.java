@@ -244,9 +244,8 @@ class EmulatorP11Slot extends P11Slot {
 
         try {
           Properties props = loadProperties(secKeyInfoFile);
-          String label = props.getProperty(PROP_LABEL);
           String keyAlgo = props.getProperty(PROP_ALGO);
-          P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
+          P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, props.getProperty(PROP_LABEL));
           byte[] encodedValue = read(new File(secKeyDir, hexId + VALUE_FILE_SUFFIX));
 
           byte[] keyValue = keyCryptor.decrypt(encodedValue);
@@ -269,11 +268,9 @@ class EmulatorP11Slot extends P11Slot {
       for (File infoFile : certInfoFiles) {
         byte[] id = getKeyIdFromInfoFilename(infoFile.getName());
         Properties props = loadProperties(infoFile);
-        String label = props.getProperty(PROP_LABEL);
-        P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
+        P11ObjectIdentifier objId = new P11ObjectIdentifier(id, props.getProperty(PROP_LABEL));
         try {
-          X509Cert cert = readCertificate(id);
-          ret.addCertificate(objId, cert);
+          ret.addCertificate(objId, readCertificate(id));
         } catch (CertificateException | IOException ex) {
           LOG.warn("could not parse certificate " + objId);
         }
@@ -329,8 +326,7 @@ class EmulatorP11Slot extends P11Slot {
   }
 
   private PublicKey readPublicKey(byte[] keyId) throws P11TokenException {
-    String hexKeyId = hex(keyId);
-    File pubKeyFile = new File(pubKeyDir, hexKeyId + INFO_FILE_SUFFIX);
+    File pubKeyFile = new File(pubKeyDir, hex(keyId) + INFO_FILE_SUFFIX);
     Properties props = loadProperties(pubKeyFile);
 
     String algorithm = props.getProperty(PROP_ALGORITHM);
@@ -381,8 +377,7 @@ class EmulatorP11Slot extends P11Slot {
   } // method readPublicKey
 
   private X509Cert readCertificate(byte[] keyId) throws CertificateException, IOException {
-    byte[] encoded = read(new File(certDir, hex(keyId) + VALUE_FILE_SUFFIX));
-    return X509Util.parseCert(encoded);
+    return X509Util.parseCert(read(new File(certDir, hex(keyId) + VALUE_FILE_SUFFIX)));
   }
 
   private Properties loadProperties(File file) throws P11TokenException {
@@ -424,7 +419,6 @@ class EmulatorP11Slot extends P11Slot {
         return deletePkcs11Entry(dir, id);
       } else {
         Properties props = loadProperties(infoFile);
-
         return label.equals(props.getProperty("label")) && deletePkcs11Entry(dir, id);
       }
     }
@@ -453,16 +447,10 @@ class EmulatorP11Slot extends P11Slot {
   private static boolean deletePkcs11Entry(File dir, byte[] objectId) {
     String hextId = hex(objectId);
     File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
-    boolean b1 = true;
-    if (infoFile.exists()) {
-      b1 = infoFile.delete();
-    }
+    boolean b1 = infoFile.exists() ? infoFile.delete() : true;
 
     File valueFile = new File(dir, hextId + VALUE_FILE_SUFFIX);
-    boolean b2 = true;
-    if (valueFile.exists()) {
-      b2 = valueFile.delete();
-    }
+    boolean b2 = valueFile.exists() ? valueFile.delete() : true;
 
     return b1 || b2;
   } // method deletePkcs11Entry
@@ -534,10 +522,8 @@ class EmulatorP11Slot extends P11Slot {
 
     if (publicKey instanceof RSAPublicKey) {
       sb.append(PROP_ALGORITHM).append('=').append(PKCSObjectIdentifiers.rsaEncryption.getId()).append('\n');
-
       RSAPublicKey rsaKey = (RSAPublicKey) publicKey;
       sb.append(PROP_RSA_MODUS).append('=').append(hex(rsaKey.getModulus().toByteArray())).append('\n');
-
       sb.append(PROP_RSA_PUBLIC_EXPONENT).append('=')
           .append(hex(rsaKey.getPublicExponent().toByteArray())).append('\n');
     } else if (publicKey instanceof DSAPublicKey) {
@@ -545,11 +531,8 @@ class EmulatorP11Slot extends P11Slot {
 
       DSAPublicKey dsaKey = (DSAPublicKey) publicKey;
       sb.append(PROP_DSA_PRIME).append('=').append(hex(dsaKey.getParams().getP().toByteArray())).append('\n');
-
       sb.append(PROP_DSA_SUBPRIME).append('=').append(hex(dsaKey.getParams().getQ().toByteArray())).append('\n');
-
       sb.append(PROP_DSA_BASE).append('=').append(hex(dsaKey.getParams().getG().toByteArray())).append('\n');
-
       sb.append(PROP_DSA_VALUE).append('=').append(hex(dsaKey.getY().toByteArray())).append('\n');
     } else if (publicKey instanceof ECPublicKey) {
       sb.append(PROP_ALGORITHM).append('=').append(X9ObjectIdentifiers.id_ecPublicKey.getId()).append('\n');
@@ -566,11 +549,7 @@ class EmulatorP11Slot extends P11Slot {
 
       byte[] encodedParams;
       try {
-        if (namedCurveSupported) {
-          encodedParams = curveOid.getEncoded();
-        } else {
-          encodedParams = ECNamedCurveTable.getByOID(curveOid).getEncoded();
-        }
+        encodedParams = namedCurveSupported ? curveOid.getEncoded() : ECNamedCurveTable.getByOID(curveOid).getEncoded();
       } catch (IOException | NullPointerException ex) {
         throw new P11TokenException(ex.getMessage(), ex);
       }
@@ -648,11 +627,10 @@ class EmulatorP11Slot extends P11Slot {
   private void savePkcs11Entry(File dir, byte[] id, String label, String algo, byte[] value)
       throws P11TokenException {
     notNull(dir, "dir");
-    notNull(id, "id");
     notBlank(label, "label");
     notNull(value, "value");
 
-    String hexId = hex(id);
+    String hexId = hex(notNull(id, "id"));
 
     String str = StringUtil.concat(PROP_ID, "=", hexId, "\n", PROP_LABEL, "=", label, "\n");
     if (algo != null) {
@@ -675,11 +653,10 @@ class EmulatorP11Slot extends P11Slot {
       throw new IllegalArgumentException("at least one of id and label may not be null");
     }
 
-    int num = deletePkcs11Entry(privKeyDir, id, label);
-    num += deletePkcs11Entry(pubKeyDir, id, label);
-    num += deletePkcs11Entry(certDir, id, label);
-    num += deletePkcs11Entry(secKeyDir, id, label);
-    return num;
+    return deletePkcs11Entry(privKeyDir, id, label)
+        + deletePkcs11Entry(pubKeyDir, id, label)
+        + deletePkcs11Entry(certDir, id, label)
+        + deletePkcs11Entry(secKeyDir, id, label);
   } // method removeObjects
 
   @Override
@@ -718,7 +695,6 @@ class EmulatorP11Slot extends P11Slot {
     }
 
     String label = control.getLabel();
-
     savePkcs11Cert(id, label, cert);
     return new P11ObjectIdentifier(id, label);
   } // method addCert0

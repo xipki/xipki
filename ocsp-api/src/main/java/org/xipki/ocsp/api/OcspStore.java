@@ -263,8 +263,7 @@ public abstract class OcspStore implements Closeable {
   }
 
   protected static String overviewString(X509Cert cert) {
-    return "subject: " + cert.getSubjectText() +
-        ", issuer: " + cert.getIssuerText() +
+    return "subject: " + cert.getSubjectText() + ", issuer: " + cert.getIssuerText() +
         ", serialNo: " + cert.getSerialNumberHex();
   }
 

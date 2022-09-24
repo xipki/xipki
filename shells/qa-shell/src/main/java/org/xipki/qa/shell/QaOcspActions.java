@@ -338,7 +338,7 @@ public class QaOcspActions {
                 status = OcspCertStatus.unspecified;
                 break;
               default:
-                throw new Exception("invalid reason");
+                throw new Exception("invalid reason " + reason);
             }
           }
         } else {
@@ -675,7 +675,6 @@ public class QaOcspActions {
       }
 
       ValidationResult result;
-
       if (expectedOcspError != null) {
         result = ocspQa.checkOcsp(response, expectedOcspError);
       } else {
@@ -684,8 +683,7 @@ public class QaOcspActions {
       }
 
       StringBuilder sb = new StringBuilder(50);
-      sb.append("OCSP response is ");
-      sb.append(result.isAllSuccessful() ? "valid" : "invalid");
+      sb.append("OCSP response is ").append(result.isAllSuccessful() ? "valid" : "invalid");
 
       if (verbose) {
         for (ValidationIssue issue : result.getValidationIssues()) {
