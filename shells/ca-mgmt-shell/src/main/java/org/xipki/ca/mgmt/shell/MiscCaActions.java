@@ -322,8 +322,7 @@ public class MiscCaActions {
   public static class Unlock extends CaAction {
 
     @Override
-    protected Object execute0()
-        throws Exception {
+    protected Object execute0() throws Exception {
       try {
         caManager.unlockCa();
         println("unlocked CA system, calling ca:restart to restart CA system");

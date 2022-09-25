@@ -242,8 +242,7 @@ public class OcspServerConf extends ValidatableConf {
     public void validate() throws InvalidConfException {
       notEmpty(versions, "versions");
       notNull(nonce, "nonce");
-      validate(nonce);
-      validate(certpathValidation);
+      validate(nonce, certpathValidation);
     }
 
   } // class RequestOption
@@ -284,8 +283,7 @@ public class OcspServerConf extends ValidatableConf {
     public void validate() throws InvalidConfException {
       notNull(validationModel, "validationModel");
       notNull(trustanchors, "trustanchors");
-      validate(trustanchors);
-      validate(certs);
+      validate(trustanchors, certs);
     }
 
   } // class CertpathValidation
@@ -925,21 +923,12 @@ public class OcspServerConf extends ValidatableConf {
   @Override
   public void validate() throws InvalidConfException {
     notEmpty(responders, "responders");
-    validate(responders);
-
     notEmpty(signers, "signers");
-    validate(signers);
-
     notEmpty(stores, "stores");
-    validate(stores);
-
-    validate(datasources);
-
     notEmpty(requestOptions, "requestOptions");
-    validate(requestOptions);
-
     notEmpty(responseOptions, "responseOptions");
-    validate(responseOptions);
+
+    validate(responders, signers, stores, datasources, requestOptions, responseOptions);
   } // method validate
 
 }

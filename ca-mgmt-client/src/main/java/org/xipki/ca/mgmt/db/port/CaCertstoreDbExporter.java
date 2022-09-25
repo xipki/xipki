@@ -188,8 +188,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
     if (type == CaDbEntryType.CERT) {
       numProcessedBefore = certstore.getCountCerts();
-      String columns = "ID,SN,CA_ID,PID,RID,TID,EE,LUPDATE,REV,RR,RT,RIT,FP_RS,"
-          + "REQ_SUBJECT,CRL_SCOPE,CERT";
+      String columns = "ID,SN,CA_ID,PID,RID,TID,EE,LUPDATE,REV,RR,RT,RIT,FP_RS,REQ_SUBJECT,CRL_SCOPE,CERT";
       if (dbSchemaVersion >= 7) {
         columns += ",PRIVATE_KEY";
       }
@@ -207,11 +206,7 @@ class CaCertstoreDbExporter extends DbPorter {
     System.out.println("exporting " + tablesText + " from ID " + minId);
 
     final long maxId = max(tableName, "ID");
-    long total = count(tableName) - numProcessedBefore;
-    if (total < 1) {
-      total = 1; // to avoid exception
-    }
-
+    long total = Math.max(1, count(tableName) - numProcessedBefore); // 1: to avoid exception
     String sql = datasource.buildSelectFirstSql(numEntriesPerSelect, "ID ASC", coreSql);
 
     Object entriesInCurrentFile = createContainer(type);
@@ -242,7 +237,6 @@ class CaCertstoreDbExporter extends DbPorter {
         }
 
         ps.setLong(1, lastMaxId + 1);
-
         ResultSet rs = ps.executeQuery();
 
         // no entries anymore
@@ -278,8 +272,7 @@ class CaCertstoreDbExporter extends DbPorter {
             String sha1 = HashAlgo.SHA1.hexHash(certBytes);
 
             String certFileName = sha1 + ".der";
-            ZipEntry certZipEntry = new ZipEntry(certFileName);
-            currentEntriesZip.putNextEntry(certZipEntry);
+            currentEntriesZip.putNextEntry(new ZipEntry(certFileName));
             try {
               currentEntriesZip.write(certBytes);
             } finally {
@@ -288,8 +281,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
             String privateKeyFileName = sha1 + "-key.bin";
             if (privateKey != null) {
-              ZipEntry keyZipEntry = new ZipEntry(privateKeyFileName);
-              currentEntriesZip.putNextEntry(keyZipEntry);
+              currentEntriesZip.putNextEntry(new ZipEntry(privateKeyFileName));
               try {
                 currentEntriesZip.write(privateKey.getBytes(StandardCharsets.UTF_8));
               } finally {
@@ -345,16 +337,12 @@ class CaCertstoreDbExporter extends DbPorter {
             X509CRLHolder x509Crl;
             try {
               x509Crl = X509Util.parseCrl(crlBytes);
-            } catch (CRLException ex) {
-              LogUtil.error(LOG, ex, "could not parse CRL with id " + id);
-              throw ex;
             } catch (Exception ex) {
               LogUtil.error(LOG, ex, "could not parse CRL with id " + id);
-              throw new CRLException(ex.getMessage(), ex);
+              throw (ex instanceof CRLException) ? (CRLException) ex : new CRLException(ex.getMessage(), ex);
             }
 
-            byte[] extnValue = X509Util.getCoreExtValue(x509Crl.getExtensions(),
-                                  Extension.cRLNumber);
+            byte[] extnValue = X509Util.getCoreExtValue(x509Crl.getExtensions(), Extension.cRLNumber);
             if (extnValue == null) {
               LOG.warn("CRL without CRL number, ignore it");
               continue;
@@ -452,8 +440,7 @@ class CaCertstoreDbExporter extends DbPorter {
     System.out.println(" exported " + sum + " entries from " + tablesText);
   } // method exportEntries
 
-  private void exportPublishQueue(CaCertstore certstore)
-      throws DataAccessException, InvalidConfException {
+  private void exportPublishQueue(CaCertstore certstore) throws DataAccessException, InvalidConfException {
     System.out.println("exporting table PUBLISHQUEUE");
 
     String sql = "SELECT CID,PID,CA_ID FROM PUBLISHQUEUE WHERE CID>=? AND CID<? ORDER BY CID ASC";

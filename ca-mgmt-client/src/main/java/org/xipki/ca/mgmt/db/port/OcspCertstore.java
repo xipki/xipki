@@ -341,8 +341,7 @@ public class OcspCertstore extends ValidatableConf {
   @Override
   public void validate() throws InvalidConfException {
     notBlank(certhashAlgo, "certhashAlgo");
-    validate(issuers);
-    validate(crlInfos);
+    validate(issuers, crlInfos);
   }
 
 }

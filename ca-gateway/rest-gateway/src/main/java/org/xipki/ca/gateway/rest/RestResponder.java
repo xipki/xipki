@@ -50,10 +50,12 @@ import java.io.*;
 import java.math.BigInteger;
 import java.util.*;
 
+import static org.xipki.audit.AuditLevel.ERROR;
+import static org.xipki.audit.AuditLevel.INFO;
+import static org.xipki.audit.AuditStatus.FAILED;
+import static org.xipki.audit.AuditStatus.SUCCESSFUL;
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.exception.ErrorCode.*;
-import static org.xipki.audit.AuditLevel.*;
-import static org.xipki.audit.AuditStatus.*;
 
 /**
  * REST API responder.

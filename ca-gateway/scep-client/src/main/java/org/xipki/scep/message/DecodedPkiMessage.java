@@ -44,7 +44,6 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 import static org.xipki.scep.util.ScepConstants.*;

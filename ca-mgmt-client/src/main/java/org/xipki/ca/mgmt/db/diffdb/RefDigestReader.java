@@ -125,17 +125,10 @@ class RefDigestReader implements Closeable {
             lastProcessedId = id;
           }
 
-          String hash;
-          if (dbType == DbType.XIPKI_OCSP_v4) {
-            hash = rs.getString("HASH");
-          } else {
-            if (certhashAlgo == HashAlgo.SHA1) {
-              hash = rs.getString("SHA1");
-            } else {
-              byte[] encodedCert = Base64.decodeFast(rs.getString("CERT"));
-              hash = certhashAlgo.base64Hash(encodedCert);
-            }
-          }
+          String hash = (dbType == DbType.XIPKI_OCSP_v4) ? rs.getString("HASH")
+                        : (certhashAlgo == HashAlgo.SHA1)
+                            ? rs.getString("SHA1")
+                            : certhashAlgo.base64Hash(Base64.decodeFast(rs.getString("CERT")));
 
           BigInteger serial = new BigInteger(rs.getString("SN"), 16);
           boolean revoked = rs.getBoolean("REV");
@@ -186,8 +179,7 @@ class RefDigestReader implements Closeable {
     this.outQueue = new ArrayBlockingQueue<>(numBlocksToRead);
   } // constructor
 
-  private void init(DbType dbType, HashAlgo certhashAlgo, int caId, int numPerSelect)
-      throws Exception {
+  private void init(DbType dbType, HashAlgo certhashAlgo, int caId, int numPerSelect) throws Exception {
     this.caId = caId;
     this.conn = datasource.getConnection();
     this.dbType = dbType;
@@ -212,9 +204,8 @@ class RefDigestReader implements Closeable {
     this.selectCertSql = datasource.buildSelectFirstSql(numPerSelect, "ID ASC", coreSql);
 
     try {
-      Retriever retriever = new Retriever();
       executor = Executors.newFixedThreadPool(1);
-      executor.execute(retriever);
+      executor.execute(new Retriever());
     } catch (Exception ex) {
       LOG.error("could not initialize DigestReader", ex);
       close();
@@ -245,15 +236,8 @@ class RefDigestReader implements Closeable {
     try {
       stmt = datasource.createStatement();
 
-      String tblCa;
-      String colCaId;
-      if (dbType == DbType.XIPKI_OCSP_v4) {
-        tblCa = "ISSUER";
-        colCaId = "IID";
-      } else {
-        tblCa = "CA";
-        colCaId = "CA_ID";
-      }
+      String tblCa = (dbType == DbType.XIPKI_OCSP_v4) ? "ISSUER" : "CA";
+      String colCaId = (dbType == DbType.XIPKI_OCSP_v4) ? "IID" : "CA_ID";
 
       sql = "SELECT CERT FROM " + tblCa + " WHERE ID=" + caId;
       rs = stmt.executeQuery(sql);
@@ -296,8 +280,7 @@ class RefDigestReader implements Closeable {
     return totalAccount;
   }
 
-  public synchronized CertsBundle nextCerts()
-      throws Exception {
+  public synchronized CertsBundle nextCerts() throws Exception {
     if (endReached.get() && outQueue.isEmpty()) {
       return null;
     }

@@ -49,8 +49,7 @@ public class OcspCertPublisherFactory implements CertPublisherFactory {
   }
 
   @Override
-  public CertPublisher newPublisher(String type)
-      throws ObjectCreationException {
+  public CertPublisher newPublisher(String type) throws ObjectCreationException {
     if (TYPE.equalsIgnoreCase(type)) {
       return new OcspCertPublisher();
     } else {

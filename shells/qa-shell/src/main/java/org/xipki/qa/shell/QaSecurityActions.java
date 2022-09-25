@@ -38,7 +38,6 @@ import org.xipki.shell.XiAction;
 import org.xipki.util.*;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 /**
@@ -113,8 +112,7 @@ public class QaSecurityActions {
     @Option(name = "--thread", description = "number of threads")
     private Integer numThreads = 5;
 
-    protected abstract BenchmarkExecutor getTester()
-        throws Exception;
+    protected abstract BenchmarkExecutor getTester() throws Exception;
 
     @Override
     protected Object execute0() throws Exception {

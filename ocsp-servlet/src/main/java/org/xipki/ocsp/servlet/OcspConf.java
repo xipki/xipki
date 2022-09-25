@@ -60,8 +60,7 @@ public class OcspConf extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
     }
 
   } // class RemoteMgmt
@@ -76,8 +75,7 @@ public class OcspConf extends ValidatableConf {
 
   private SecurityConf security;
 
-  public static OcspConf readConfFromFile(String fileName)
-      throws IOException, InvalidConfException {
+  public static OcspConf readConfFromFile(String fileName) throws IOException, InvalidConfException {
     notBlank(fileName, "fileName");
     try (InputStream is = Files.newInputStream(Paths.get(IoUtil.expandFilepath(fileName, true)))) {
       OcspConf conf = JSON.parseObject(is, OcspConf.class);
@@ -121,8 +119,7 @@ public class OcspConf extends ValidatableConf {
 
   @Override
   public void validate() throws InvalidConfException {
-    validate(remoteMgmt);
-    validate(security);
+    validate(remoteMgmt, security);
   }
 
 }

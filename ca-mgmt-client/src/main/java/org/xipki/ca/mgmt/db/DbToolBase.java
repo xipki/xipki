@@ -97,11 +97,11 @@ public class DbToolBase implements Closeable {
       log.error("could not create statement", ex);
       return false;
     }
+
     try {
       stmt.execute(sql);
     } catch (Throwable th) {
-      String msg = String.format("could not delete columns from table %s with %s > %s", table, idColumn, id);
-      LogUtil.error(log, th, msg);
+      LogUtil.error(log, th, String.format("could not delete columns from table %s with %s > %s", table, idColumn, id));
       return false;
     } finally {
       releaseResources(stmt, null);
@@ -120,8 +120,7 @@ public class DbToolBase implements Closeable {
     return datasource.getMin(connection, table, column);
   }
 
-  public long min(String table, String column, String condition)
-      throws DataAccessException {
+  public long min(String table, String column, String condition) throws DataAccessException {
     return datasource.getMin(connection, table, column, condition);
   }
 
@@ -129,8 +128,7 @@ public class DbToolBase implements Closeable {
     return datasource.getMax(connection, table, column);
   }
 
-  public long max(String table, String column, String condition)
-      throws DataAccessException {
+  public long max(String table, String column, String condition) throws DataAccessException {
     return datasource.getMax(connection, table, column, condition);
   }
 
@@ -138,8 +136,7 @@ public class DbToolBase implements Closeable {
     return datasource.getCount(connection, table);
   }
 
-  public boolean tableHasColumn(String table, String column)
-      throws DataAccessException {
+  public boolean tableHasColumn(String table, String column) throws DataAccessException {
     return datasource.tableHasColumn(connection, table, column);
   }
 
@@ -193,8 +190,7 @@ public class DbToolBase implements Closeable {
     }
   }
 
-  protected static void setLong(PreparedStatement ps, int index, Long value)
-      throws SQLException {
+  protected static void setLong(PreparedStatement ps, int index, Long value) throws SQLException {
     if (value != null) {
       ps.setLong(index, value);
     } else {
@@ -202,8 +198,7 @@ public class DbToolBase implements Closeable {
     }
   }
 
-  protected static void setInt(PreparedStatement ps, int index, Integer value)
-      throws SQLException {
+  protected static void setInt(PreparedStatement ps, int index, Integer value) throws SQLException {
     if (value != null) {
       ps.setInt(index, value);
     } else {
@@ -211,13 +206,11 @@ public class DbToolBase implements Closeable {
     }
   }
 
-  protected static void setBoolean(PreparedStatement ps, int index, boolean value)
-      throws SQLException {
+  protected static void setBoolean(PreparedStatement ps, int index, boolean value) throws SQLException {
     ps.setInt(index, value ? 1 : 0);
   }
 
-  public static Properties getDbConfProperties(InputStream is)
-      throws IOException {
+  public static Properties getDbConfProperties(InputStream is) throws IOException {
     Properties props = new Properties();
     try {
       props.load(is);
@@ -253,8 +246,7 @@ public class DbToolBase implements Closeable {
     }
   } // method deleteTmpFiles
 
-  protected static void writeLine(OutputStream os, String text)
-      throws IOException {
+  protected static void writeLine(OutputStream os, String text) throws IOException {
     os.write(StringUtil.toUtf8Bytes(text));
     os.write('\n');
   }
@@ -264,31 +256,25 @@ public class DbToolBase implements Closeable {
     Args.notNull(prefix, "prefix");
     Args.notNull(suffix, "suffix");
 
-    StringBuilder sb = new StringBuilder();
-    sb.append(prefix);
+    StringBuilder sb = new StringBuilder().append(prefix);
 
     int len = Long.toString(maxId).length();
     String minIdStr = Long.toString(minIdOfCurrentFile);
     for (int i = 0; i < len - minIdStr.length(); i++) {
       sb.append('0');
     }
-    sb.append(minIdStr);
-    sb.append("-");
+    sb.append(minIdStr).append("-");
 
     String maxIdStr = Long.toString(maxIdOfCurrentFile);
     for (int i = 0; i < len - maxIdStr.length(); i++) {
       sb.append('0');
     }
-    sb.append(maxIdStr);
-
-    sb.append(suffix);
+    sb.append(maxIdStr).append(suffix);
     return sb.toString();
   } // method buildFilename
 
-  public static ZipOutputStream getZipOutputStream(File zipFile)
-      throws IOException {
-    BufferedOutputStream out = new BufferedOutputStream(
-        Files.newOutputStream(zipFile.toPath()), STREAM_BUFFER_SIZE);
+  public static ZipOutputStream getZipOutputStream(File zipFile) throws IOException {
+    BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(zipFile.toPath()), STREAM_BUFFER_SIZE);
     ZipOutputStream zipOutStream = new ZipOutputStream(out);
     zipOutStream.setLevel(Deflater.BEST_SPEED);
     return zipOutStream;

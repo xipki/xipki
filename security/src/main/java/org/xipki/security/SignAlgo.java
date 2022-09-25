@@ -195,10 +195,7 @@ public enum SignAlgo {
 
         int index = name.indexOf("WITH");
         if (index != -1) {
-          String before = name.substring(0, index);
-          String after = name.substring(index + "WITH".length());
-
-          String inverseName = after + "WITH" + before;
+          String inverseName = name.substring(index + "WITH".length()) + "WITH" + name.substring(0, index);
           map.put(inverseName, type);
           if (withMinus) {
             map.put(inverseName.replace("-", ""), type);
@@ -291,8 +288,7 @@ public enum SignAlgo {
     return Signature.getInstance(jceName);
   }
 
-  public Signature newSignature(String provider)
-      throws NoSuchAlgorithmException, NoSuchProviderException {
+  public Signature newSignature(String provider) throws NoSuchAlgorithmException, NoSuchProviderException {
     return Signature.getInstance(jceName, provider);
   }
 
@@ -441,8 +437,7 @@ public enum SignAlgo {
     return isHmac() || isGmac();
   }
 
-  public static SignAlgo getInstance(AlgorithmIdentifier algId)
-      throws NoSuchAlgorithmException {
+  public static SignAlgo getInstance(AlgorithmIdentifier algId) throws NoSuchAlgorithmException {
     ASN1ObjectIdentifier oid = algId.getAlgorithm();
     ASN1Encodable params = algId.getParameters();
 
@@ -472,8 +467,7 @@ public enum SignAlgo {
       }
 
       return mgf1HashToSigMap.get(hashAlgo);
-    } else if (SignAlgo.GMAC_AES128.oid.equals(oid)
-        || SignAlgo.GMAC_AES192.oid.equals(oid)
+    } else if (SignAlgo.GMAC_AES128.oid.equals(oid) || SignAlgo.GMAC_AES192.oid.equals(oid)
         || SignAlgo.GMAC_AES256.oid.equals(oid)) {
       if (SignAlgo.GMAC_AES128.oid.equals(oid)) {
         return SignAlgo.GMAC_AES128;
@@ -498,8 +492,7 @@ public enum SignAlgo {
     return rv;
   }
 
-  public static SignAlgo getInstance(String nameOrOid)
-      throws NoSuchAlgorithmException {
+  public static SignAlgo getInstance(String nameOrOid) throws NoSuchAlgorithmException {
     SignAlgo alg = map.get(nameOrOid.toUpperCase().replace("-", ""));
     if (alg == null) {
       throw new NoSuchAlgorithmException("Unknown HashAlgo OID/name '" + nameOrOid + "'");
@@ -507,8 +500,7 @@ public enum SignAlgo {
     return alg;
   }
 
-  public static SignAlgo getInstance(Key key, SignerConf signerConf)
-      throws NoSuchAlgorithmException {
+  public static SignAlgo getInstance(Key key, SignerConf signerConf) throws NoSuchAlgorithmException {
     if (notNull(signerConf, "signerConf").getHashAlgo() == null) {
       return getInstance(signerConf.getConfValue("algo"));
     }
@@ -567,8 +559,7 @@ public enum SignAlgo {
     }
   } // method getInstance
 
-  private static SignAlgo getRSAInstance(HashAlgo hashAlgo, boolean rsaPss)
-      throws NoSuchAlgorithmException {
+  private static SignAlgo getRSAInstance(HashAlgo hashAlgo, boolean rsaPss) throws NoSuchAlgorithmException {
     notNull(hashAlgo, "hashAlgo");
     switch (hashAlgo) {
       case SHAKE128:
@@ -598,8 +589,7 @@ public enum SignAlgo {
     }
   } // method getRSAInstance
 
-  private static SignAlgo getDSASigAlgo(HashAlgo hashAlgo)
-      throws NoSuchAlgorithmException {
+  private static SignAlgo getDSASigAlgo(HashAlgo hashAlgo) throws NoSuchAlgorithmException {
     notNull(hashAlgo, "hashAlgo");
     switch (hashAlgo) {
       case SHAKE128:

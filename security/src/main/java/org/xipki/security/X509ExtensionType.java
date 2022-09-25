@@ -86,8 +86,7 @@ public class X509ExtensionType extends ValidatableConf {
   public void validate() throws InvalidConfException {
     notNull(type, "type");
     notNull(constant, "constant");
-    validate(type);
-    validate(constant);
+    validate(type, constant);
   }
 
   public static class DescribableOid extends ValidatableConf {

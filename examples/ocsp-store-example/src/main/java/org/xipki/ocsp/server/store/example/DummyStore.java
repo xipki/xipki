@@ -82,15 +82,13 @@ public class DummyStore extends OcspStore {
   private IssuerEntry issuerEntry;
 
   public DummyStore() {
-    LOG.error("\n"
-        + "--------------------------------------------------------\n"
+    LOG.error("\n--------------------------------------------------------\n"
         + " ONLY FOR DEMO, DO NOT USE IT IN PRODUCTION ENVIRONMENT\n"
         + "--------------------------------------------------------");
   }
 
   @Override
-  public void close()
-      throws IOException {
+  public void close() throws IOException {
   }
 
   @Override
@@ -139,8 +137,7 @@ public class DummyStore extends OcspStore {
    * @param datasource DataSource.
    */
   @Override
-  public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource)
-      throws OcspStoreException {
+  public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource) throws OcspStoreException {
     Object objVal = sourceConf.get("caCert");
     if (objVal == null) {
       throw new IllegalArgumentException("mandatory caCert is not specified in sourceConf");

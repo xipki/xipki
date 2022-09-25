@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.gateway.ProtocolProxyConfWrapper;
 import org.xipki.ca.gateway.scep.CaNameScepSigners;
-import org.xipki.ca.gateway.scep.ScepControl;
 import org.xipki.ca.gateway.scep.ScepProxyConf;
 import org.xipki.ca.gateway.scep.ScepResponder;
 import org.xipki.util.IoUtil;

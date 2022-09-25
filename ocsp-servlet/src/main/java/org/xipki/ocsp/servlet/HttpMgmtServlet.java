@@ -111,29 +111,23 @@ public class HttpMgmtServlet extends HttpServlet {
 
       InputStream in = request.getInputStream();
 
-      switch (action) {
-        case restartServer: {
-          try {
-            ocspServer.init(true);
-          } catch (InvalidConfException | PasswordResolverException ex) {
-            LOG.warn(action + ": could not restart OCSP server", ex);
-            throw new MyException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                "could not build the CaEntry: " + ex.getMessage());
-          }
-          break;
+      if (action == MgmtAction.restartServer) {
+        try {
+          ocspServer.init(true);
+        } catch (InvalidConfException | PasswordResolverException ex) {
+          LOG.warn(action + ": could not restart OCSP server", ex);
+          throw new MyException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+              "could not build the CaEntry: " + ex.getMessage());
         }
-        case refreshTokenForSignerType: {
-          String type = getNameFromRequest(in);
-          try {
-            ocspServer.refreshTokenForSignerType(type);
-          } catch (XiSecurityException ex) {
-            throw new OcspMgmtException("could not refresh token for signer type " + type + ": " + ex.getMessage(), ex);
-          }
-          break;
+      } else if (action == MgmtAction.refreshTokenForSignerType) {
+        String type = getNameFromRequest(in);
+        try {
+          ocspServer.refreshTokenForSignerType(type);
+        } catch (XiSecurityException ex) {
+          throw new OcspMgmtException("could not refresh token for signer type " + type + ": " + ex.getMessage(), ex);
         }
-        default: {
+      } else {
           throw new MyException(HttpServletResponse.SC_NOT_FOUND, "unsupported action " + action);
-        }
       }
 
       response.setContentType(CT_RESPONSE);

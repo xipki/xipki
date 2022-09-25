@@ -115,7 +115,7 @@ public class HttpMgmtServlet extends HttpServlet {
       }
 
       InputStream in = request.getInputStream();
-      final MgmtResponse resp;
+      MgmtResponse resp = null;
 
       switch (action) {
         case addCa: {
@@ -129,91 +129,76 @@ public class HttpMgmtServlet extends HttpServlet {
                 "could not build the CaEntry: " + ex.getMessage());
           }
           caManager.addCa(caEntry);
-          resp = null;
           break;
         }
         case addCaAlias: {
           MgmtRequest.AddCaAlias req = parse(in, MgmtRequest.AddCaAlias.class);
           caManager.addCaAlias(req.getAliasName(), req.getCaName());
-          resp = null;
           break;
         }
         case addCertprofile: {
           MgmtRequest.AddCertprofile req = parse(in, MgmtRequest.AddCertprofile.class);
           caManager.addCertprofile(req.getCertprofileEntry());
-          resp = null;
           break;
         }
         case addCertprofileToCa: {
           MgmtRequest.AddCertprofileToCa req = parse(in, MgmtRequest.AddCertprofileToCa.class);
           caManager.addCertprofileToCa(req.getProfileName(), req.getCaName());
-          resp = null;
           break;
         }
         case addPublisher: {
           MgmtRequest.AddPublisher req = parse(in, MgmtRequest.AddPublisher.class);
           caManager.addPublisher(req.getPublisherEntry());
-          resp = null;
           break;
         }
         case addPublisherToCa: {
           MgmtRequest.AddPublisherToCa req = parse(in, MgmtRequest.AddPublisherToCa.class);
           caManager.addPublisherToCa(req.getPublisherName(), req.getCaName());
-          resp = null;
           break;
         }
         case addRequestor: {
           MgmtRequest.AddRequestor req = parse(in, MgmtRequest.AddRequestor.class);
           caManager.addRequestor(req.getRequestorEntry());
-          resp = null;
           break;
         }
         case addRequestorToCa: {
           MgmtRequest.AddRequestorToCa req = parse(in, MgmtRequest.AddRequestorToCa.class);
           caManager.addRequestorToCa(req.getRequestor(), req.getCaName());
-          resp = null;
           break;
         }
         case addSigner: {
           MgmtRequest.AddSigner req = parse(in, MgmtRequest.AddSigner.class);
           caManager.addSigner(req.getSignerEntry().toSignerEntry());
-          resp = null;
           break;
         }
         case changeCa: {
           MgmtRequest.ChangeCa req = parse(in, MgmtRequest.ChangeCa.class);
           caManager.changeCa(req.getChangeCaEntry());
-          resp = null;
           break;
         }
         case changeCertprofile: {
           MgmtRequest.ChangeTypeConfEntity req = parse(in, MgmtRequest.ChangeTypeConfEntity.class);
           caManager.changeCertprofile(req.getName(), req.getType(), req.getConf());
-          resp = null;
           break;
         }
         case changePublisher: {
           MgmtRequest.ChangeTypeConfEntity req = parse(in, MgmtRequest.ChangeTypeConfEntity.class);
           caManager.changePublisher(req.getName(), req.getType(), req.getConf());
-          resp = null;
           break;
         }
         case changeRequestor: {
           MgmtRequest.ChangeTypeConfEntity req = parse(in, MgmtRequest.ChangeTypeConfEntity.class);
           caManager.changeRequestor(req.getName(), req.getType(), req.getConf());
-          resp = null;
           break;
         }
         case changeSigner: {
           MgmtRequest.ChangeSigner req = parse(in, MgmtRequest.ChangeSigner.class);
           caManager.changeSigner(req.getName(), req.getType(), req.getConf(), req.getBase64Cert());
-          resp = null;
           break;
         }
         case clearPublishQueue: {
           MgmtRequest.ClearPublishQueue req = new MgmtRequest.ClearPublishQueue();
           caManager.clearPublishQueue(req.getCaName(), req.getPublisherNames());
-          resp = null;
           break;
         }
         case exportConf: {
@@ -230,8 +215,7 @@ public class HttpMgmtServlet extends HttpServlet {
           break;
         }
         case generateCrossCertificate: {
-          MgmtRequest.GenerateCrossCertificate req =
-              parse(in, MgmtRequest.GenerateCrossCertificate.class);
+          MgmtRequest.GenerateCrossCertificate req = parse(in, MgmtRequest.GenerateCrossCertificate.class);
           X509Cert cert = caManager.generateCrossCertificate(req.getCaName(), req.getProfileName(),
               req.getEncodedCsr(), req.getEncodedTargetCert(), req.getNotBefore(), req.getNotAfter());
           resp = toByteArray(cert);
@@ -245,9 +229,7 @@ public class HttpMgmtServlet extends HttpServlet {
           break;
         }
         case generateCrlOnDemand: {
-          String caName = getNameFromRequest(in);
-          X509CRLHolder crl = caManager.generateCrlOnDemand(caName);
-          resp = toByteArray(action, crl);
+          resp = toByteArray(action, caManager.generateCrlOnDemand(getNameFromRequest(in)));
           break;
         }
         case generateRootCa: {
@@ -268,9 +250,7 @@ public class HttpMgmtServlet extends HttpServlet {
           break;
         }
         case getAliasesForCa: {
-          String caName = getNameFromRequest(in);
-          Set<String> result = caManager.getAliasesForCa(caName);
-          resp = new MgmtResponse.StringSet(result);
+          resp = new MgmtResponse.StringSet(caManager.getAliasesForCa(getNameFromRequest(in)));
           break;
         }
         case getCa: {
@@ -283,24 +263,20 @@ public class HttpMgmtServlet extends HttpServlet {
           break;
         }
         case getCaAliasNames: {
-          Set<String> result = caManager.getCaAliasNames();
-          resp = new MgmtResponse.StringSet(result);
+          resp = new MgmtResponse.StringSet(caManager.getCaAliasNames());
           break;
         }
         case getCaNameForAlias: {
           String aliasName = getNameFromRequest(in);
-          String result = caManager.getCaNameForAlias(aliasName);
-          resp = new MgmtResponse.StringResponse(result);
+          resp = new MgmtResponse.StringResponse(caManager.getCaNameForAlias(aliasName));
           break;
         }
         case getCaNames: {
-          Set<String> result = caManager.getCaNames();
-          resp = new MgmtResponse.StringSet(result);
+          resp = new MgmtResponse.StringSet(caManager.getCaNames());
           break;
         }
         case getCaSystemStatus: {
-          CaSystemStatus result = caManager.getCaSystemStatus();
-          resp = new MgmtResponse.GetCaSystemStatus(result);
+          resp = new MgmtResponse.GetCaSystemStatus(caManager.getCaSystemStatus());
           break;
         }
         case getCert: {
@@ -326,14 +302,11 @@ public class HttpMgmtServlet extends HttpServlet {
           break;
         }
         case getCertprofileNames: {
-          Set<String> result = caManager.getCertprofileNames();
-          resp = new MgmtResponse.StringSet(result);
+          resp = new MgmtResponse.StringSet(caManager.getCertprofileNames());
           break;
         }
         case getCertprofilesForCa: {
-          String caName = getNameFromRequest(in);
-          Set<String> result = caManager.getCertprofilesForCa(caName);
-          resp = new MgmtResponse.StringSet(result);
+          resp = new MgmtResponse.StringSet(caManager.getCertprofilesForCa(getNameFromRequest(in)));
           break;
         }
         case getCrl: {
@@ -356,13 +329,11 @@ public class HttpMgmtServlet extends HttpServlet {
           break;
         }
         case getFailedCaNames: {
-          Set<String> result = caManager.getFailedCaNames();
-          resp = new MgmtResponse.StringSet(result);
+          resp = new MgmtResponse.StringSet(caManager.getFailedCaNames());
           break;
         }
         case getInactiveCaNames: {
-          Set<String> result = caManager.getInactiveCaNames();
-          resp = new MgmtResponse.StringSet(result);
+          resp = new MgmtResponse.StringSet(caManager.getInactiveCaNames());
           break;
         }
         case getPublisher: {
@@ -375,14 +346,11 @@ public class HttpMgmtServlet extends HttpServlet {
           break;
         }
         case getPublisherNames: {
-          Set<String> result = caManager.getPublisherNames();
-          resp = new MgmtResponse.StringSet(result);
+          resp = new MgmtResponse.StringSet(caManager.getPublisherNames());
           break;
         }
         case getPublishersForCa: {
-          String caName = getNameFromRequest(in);
-          List<PublisherEntry> result = caManager.getPublishersForCa(caName);
-          resp = new MgmtResponse.GetPublischersForCa(result);
+          resp = new MgmtResponse.GetPublischersForCa(caManager.getPublishersForCa(getNameFromRequest(in)));
           break;
         }
         case getRequestor: {
@@ -395,14 +363,11 @@ public class HttpMgmtServlet extends HttpServlet {
           break;
         }
         case getRequestorNames: {
-          Set<String> result = caManager.getRequestorNames();
-          resp = new MgmtResponse.StringSet(result);
+          resp = new MgmtResponse.StringSet(caManager.getRequestorNames());
           break;
         }
         case getRequestorsForCa: {
-          String caName = getNameFromRequest(in);
-          Set<CaHasRequestorEntry> result = caManager.getRequestorsForCa(caName);
-          resp = new MgmtResponse.GetRequestorsForCa(result);
+          resp = new MgmtResponse.GetRequestorsForCa(caManager.getRequestorsForCa(getNameFromRequest(in)));
           break;
         }
         case getSigner: {
@@ -415,28 +380,23 @@ public class HttpMgmtServlet extends HttpServlet {
           break;
         }
         case getSignerNames: {
-          Set<String> result = caManager.getSignerNames();
-          resp = new MgmtResponse.StringSet(result);
+          resp = new MgmtResponse.StringSet(caManager.getSignerNames());
           break;
         }
         case getSuccessfulCaNames: {
-          Set<String> result = caManager.getSuccessfulCaNames();
-          resp = new MgmtResponse.StringSet(result);
+          resp = new MgmtResponse.StringSet(caManager.getSuccessfulCaNames());
           break;
         }
         case getSupportedCertprofileTypes: {
-          Set<String> result = caManager.getSupportedCertprofileTypes();
-          resp = new MgmtResponse.StringSet(result);
+          resp = new MgmtResponse.StringSet(caManager.getSupportedCertprofileTypes());
           break;
         }
         case getSupportedPublisherTypes: {
-          Set<String> result = caManager.getSupportedPublisherTypes();
-          resp = new MgmtResponse.StringSet(result);
+          resp = new MgmtResponse.StringSet(caManager.getSupportedPublisherTypes());
           break;
         }
         case getSupportedSignerTypes: {
-          Set<String> result = caManager.getSupportedSignerTypes();
-          resp = new MgmtResponse.StringSet(result);
+          resp = new MgmtResponse.StringSet(caManager.getSupportedSignerTypes());
           break;
         }
         case listCertificates: {
@@ -466,104 +426,78 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case notifyCaChange: {
           caManager.notifyCaChange();
-          resp = null;
           break;
         }
         case refreshTokenForSignerType: {
-          String type = getNameFromRequest(in);
-          caManager.refreshTokenForSignerType(type);
-          resp = null;
+          caManager.refreshTokenForSignerType(getNameFromRequest(in));
           break;
         }
         case removeCa: {
-          String name = getNameFromRequest(in);
-          caManager.removeCa(name);
-          resp = null;
+          caManager.removeCa(getNameFromRequest(in));
           break;
         }
         case removeCaAlias: {
-          String name = getNameFromRequest(in);
-          caManager.removeCaAlias(name);
-          resp = null;
+          caManager.removeCaAlias(getNameFromRequest(in));
           break;
         }
         case removeCertificate: {
           MgmtRequest.RemoveCertificate req = parse(in, MgmtRequest.RemoveCertificate.class);
           caManager.removeCertificate(req.getCaName(), req.getSerialNumber());
-          resp = null;
           break;
         }
         case removeCertprofile: {
-          String name = getNameFromRequest(in);
-          caManager.removeCertprofile(name);
-          resp = null;
+          caManager.removeCertprofile(getNameFromRequest(in));
           break;
         }
         case removeCertprofileFromCa: {
           MgmtRequest.RemoveEntityFromCa req = parse(in, MgmtRequest.RemoveEntityFromCa.class);
           caManager.removeCertprofileFromCa(req.getEntityName(), req.getCaName());
-          resp = null;
           break;
         }
         case removePublisher: {
-          String name = getNameFromRequest(in);
-          caManager.removePublisher(name);
-          resp = null;
+          caManager.removePublisher(getNameFromRequest(in));
           break;
         }
         case removePublisherFromCa: {
           MgmtRequest.RemoveEntityFromCa req = parse(in, MgmtRequest.RemoveEntityFromCa.class);
           caManager.removePublisherFromCa(req.getEntityName(), req.getCaName());
-          resp = null;
           break;
         }
         case removeRequestor: {
-          String name = getNameFromRequest(in);
-          caManager.removeRequestor(name);
-          resp = null;
+          caManager.removeRequestor(getNameFromRequest(in));
           break;
         }
         case removeRequestorFromCa: {
           MgmtRequest.RemoveEntityFromCa req = parse(in, MgmtRequest.RemoveEntityFromCa.class);
           caManager.removeRequestorFromCa(req.getEntityName(), req.getCaName());
-          resp = null;
           break;
         }
         case removeSigner: {
-          String name = getNameFromRequest(in);
-          caManager.removeSigner(name);
-          resp = null;
+          caManager.removeSigner(getNameFromRequest(in));
           break;
         }
         case republishCertificates: {
-          MgmtRequest.RepublishCertificates req =
-              parse(in, MgmtRequest.RepublishCertificates.class);
+          MgmtRequest.RepublishCertificates req = parse(in, MgmtRequest.RepublishCertificates.class);
           caManager.republishCertificates(req.getCaName(), req.getPublisherNames(), req.getNumThreads());
-          resp = null;
           break;
         }
         case restartCa: {
-          String name = getNameFromRequest(in);
-          caManager.restartCa(name);
-          resp = null;
+          caManager.restartCa(getNameFromRequest(in));
           break;
         }
         case restartCaSystem: {
           caManager.restartCaSystem();
-          resp = null;
           break;
         }
         case revokeCa: {
           MgmtRequest.RevokeCa req = parse(in, MgmtRequest.RevokeCa.class);
           caManager.revokeCa(req.getCaName(), req.getRevocationInfo());
-          resp = null;
           break;
         }
         case revokeCertficate:
         case revokeCertificate: {
           MgmtRequest.RevokeCertificate req = parse(in, MgmtRequest.RevokeCertificate.class);
           caManager.revokeCertificate(req.getCaName(), req.getSerialNumber(), req.getReason(), req.getInvalidityTime());
-          resp = null;
           break;
         }
         case tokenInfoP11: {
@@ -574,37 +508,29 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case unlockCa: {
           caManager.unlockCa();
-          resp = null;
           break;
         }
         case unrevokeCa: {
-          String name = getNameFromRequest(in);
-          caManager.unrevokeCa(name);
-          resp = null;
+          caManager.unrevokeCa(getNameFromRequest(in));
           break;
         }
         case unsuspendCertificate: {
           MgmtRequest.UnsuspendCertificate req = parse(in, MgmtRequest.UnsuspendCertificate.class);
           caManager.unsuspendCertificate(req.getCaName(), req.getSerialNumber());
-          resp = null;
           break;
         }
         case addDbSchema: {
           MgmtRequest.AddOrChangeDbSchema req = parse(in, MgmtRequest.AddOrChangeDbSchema.class);
           caManager.addDbSchema(req.getName(), req.getValue());
-          resp = null;
           break;
         }
         case changeDbSchema: {
           MgmtRequest.AddOrChangeDbSchema req = parse(in, MgmtRequest.AddOrChangeDbSchema.class);
           caManager.changeDbSchema(req.getName(), req.getValue());
-          resp = null;
           break;
         }
         case removeDbSchema: {
-          String name = getNameFromRequest(in);
-          caManager.removeDbSchema(name);
-          resp = null;
+          caManager.removeDbSchema(getNameFromRequest(in));
           break;
         }
         case getDbSchemas: {
@@ -614,24 +540,19 @@ public class HttpMgmtServlet extends HttpServlet {
         case addKeypairGen: {
           MgmtRequest.AddKeypairGen req = parse(in, MgmtRequest.AddKeypairGen.class);
           caManager.addKeypairGen(req.getEntry());
-          resp = null;
           break;
         }
         case changeKeypairGen: {
           MgmtRequest.ChangeTypeConfEntity req = parse(in, MgmtRequest.ChangeTypeConfEntity.class);
           caManager.changeKeypairGen(req.getName(), req.getType(), req.getConf());
-          resp = null;
           break;
         }
         case removeKeypairGen: {
-          String name = getNameFromRequest(in);
-          caManager.removeKeypairGen(name);
-          resp = null;
+          caManager.removeKeypairGen(getNameFromRequest(in));
           break;
         }
         case getKeypairGenNames: {
-          Set<String> result = caManager.getKeypairGenNames();
-          resp = new MgmtResponse.StringSet(result);
+          resp = new MgmtResponse.StringSet(caManager.getKeypairGenNames());
           break;
         }
         case getKeypairGen: {
@@ -698,8 +619,7 @@ public class HttpMgmtServlet extends HttpServlet {
     return new MgmtResponse.ByteArray(encoded);
   } // method toByteArray
 
-  private static String getNameFromRequest(InputStream in)
-      throws CaMgmtException {
+  private static String getNameFromRequest(InputStream in) throws CaMgmtException {
     MgmtRequest.Name req = parse(in, MgmtRequest.Name.class);
     return req.getName();
   } // method getNameFromRequest

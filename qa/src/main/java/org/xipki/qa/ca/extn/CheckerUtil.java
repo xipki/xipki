@@ -110,8 +110,7 @@ public class CheckerUtil {
     return Collections.unmodifiableMap(map);
   } // method buildExtesionSyntaxes
 
-  static ASN1Encodable readAsn1Encodable(byte[] encoded)
-      throws CertprofileException {
+  static ASN1Encodable readAsn1Encodable(byte[] encoded) throws CertprofileException {
     ASN1StreamParser parser = new ASN1StreamParser(encoded);
     try {
       return parser.readObject();

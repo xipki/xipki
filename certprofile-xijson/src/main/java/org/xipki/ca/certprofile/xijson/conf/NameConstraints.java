@@ -72,8 +72,7 @@ public class NameConstraints extends ValidatableConf {
     if (CollectionUtil.isEmpty(permittedSubtrees) && CollectionUtil.isEmpty(excludedSubtrees)) {
       throw new InvalidConfException("permittedSubtrees and excludedSubtrees may not be both null");
     }
-    validate(permittedSubtrees);
-    validate(excludedSubtrees);
+    validate(permittedSubtrees, excludedSubtrees);
   } // method validate
 
   public org.bouncycastle.asn1.x509.NameConstraints toXiNameConstrains()

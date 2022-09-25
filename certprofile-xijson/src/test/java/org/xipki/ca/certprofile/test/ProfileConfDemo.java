@@ -26,7 +26,6 @@ import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
 import org.xipki.ca.certprofile.xijson.conf.*;
-import org.xipki.ca.certprofile.xijson.conf.Subject.RdnType;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;

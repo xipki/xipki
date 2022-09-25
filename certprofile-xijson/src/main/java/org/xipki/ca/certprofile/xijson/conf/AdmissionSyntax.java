@@ -184,9 +184,8 @@ public class AdmissionSyntax extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      validate(namingAuthority);
+      validate(namingAuthority, registrationNumber);
       validate(professionOids);
-      validate(registrationNumber);
     }
 
   } // class ProfessionInfoType

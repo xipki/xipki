@@ -201,8 +201,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return new KeypairGenEntry(name, rs.getString("TYPE"), rs.getString("CONF"));
   } // method createSigner
 
-  public CaInfo createCaInfo(String name, CertStore certstore)
-      throws CaMgmtException {
+  public CaInfo createCaInfo(String name, CertStore certstore) throws CaMgmtException {
     ResultRow rs = execQuery1PrepStmt0(sqlSelectCa, col2Str(name));
     if (rs == null) {
       throw new CaMgmtException("unknown CA " + name);
@@ -486,8 +485,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     String profilesText = StringUtil.collectionAsString(requestor.getProfiles(), ",");
     final NameId requestorIdent = requestor.getRequestorIdent();
 
-    int num = execUpdatePrepStmt0(sql,
-          col2Int(ca.getId()), col2Int(requestorIdent.getId()),
+    int num = execUpdatePrepStmt0(sql, col2Int(ca.getId()), col2Int(requestorIdent.getId()),
           col2Int(requestor.getPermission()), col2Str(profilesText));
 
     if (num == 0) {
@@ -515,9 +513,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     LOG.info("added publisher '{}': {}", dbEntry.getIdent(), dbEntry);
   } // method addPublisher
 
-  public void changeCa(
-      ChangeCaEntry changeCaEntry, CaEntry currentCaEntry, CaConfColumn currentCaConfColumn,
-      SecurityFactory securityFactory)
+  public void changeCa(ChangeCaEntry changeCaEntry, CaEntry currentCaEntry,
+                       CaConfColumn currentCaConfColumn, SecurityFactory securityFactory)
       throws CaMgmtException {
     notNulls(changeCaEntry, "changeCaEntry", securityFactory, "securityFactory");
 
@@ -618,17 +615,14 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     String status = (changeCaEntry.getStatus() == null) ? null : changeCaEntry.getStatus().name();
 
     List<SqlColumn> cols = CaUtil.asModifiableList(
-        colStr("STATUS", status),
-        colStr("CRL_SIGNER_NAME", changeCaEntry.getCrlSignerName()),
-        colStr("SUBJECT", subject),
-        colStr("SIGNER_TYPE", signerType),
+        colStr("STATUS", status),    colStr("CRL_SIGNER_NAME", changeCaEntry.getCrlSignerName()),
+        colStr("SUBJECT", subject),  colStr("SIGNER_TYPE", signerType),
         colStr("SIGNER_CONF", signerConf, false, true),
-        colStr("CERT", base64Cert),
-        colStr("CERTCHAIN", certchainStr));
+        colStr("CERT", base64Cert),  colStr("CERTCHAIN", certchainStr));
 
     cols.add(buildChangeCaConfColumn(changeCaEntry, currentCaEntry, currentCaConfColumn));
 
-    changeIfNotNull("CA", colInt("ID", changeCaEntry.getIdent().getId()), // where column
+    changeIfNotNull("CA", colInt("ID", changeCaEntry.getIdent().getId()),
         cols.toArray(new SqlColumn[0]));
   } // method changeCa
 
@@ -787,8 +781,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return colStr("CONF", encodedConf, confIsSensitive, false);
   }
 
-  public void commitNextCrlNoIfLess(NameId ca, long nextCrlNo)
-      throws CaMgmtException {
+  public void commitNextCrlNoIfLess(NameId ca, long nextCrlNo) throws CaMgmtException {
     ResultRow rs = execQuery1PrepStmt0(sqlNextSelectCrlNo, col2Int(ca.getId()));
     long nextCrlNoInDb = getLong(rs, "NEXT_CRLNO");
 
@@ -958,8 +951,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
   } // method removeEntityFromCa
 
-  public void revokeCa(String caName, CertRevocationInfo revocationInfo)
-      throws CaMgmtException {
+  public void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {
     notBlank(caName, "caName");
     notNull(revocationInfo, "revocationInfo");
     int num = execUpdatePrepStmt0("UPDATE CA SET REV_INFO=? WHERE NAME=?",
@@ -974,8 +966,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
     int num = execUpdatePrepStmt0(
             "INSERT INTO KEYPAIR_GEN (NAME,TYPE,CONF) VALUES (?,?,?)",
-            col2Str(dbEntry.getName()),       col2Str(dbEntry.getType()),
-            col2Str(dbEntry.getConf()));
+            col2Str(dbEntry.getName()), col2Str(dbEntry.getType()), col2Str(dbEntry.getConf()));
 
     if (num == 0) {
       throw new CaMgmtException("could not add keypair generation " + dbEntry.getName());

@@ -21,8 +21,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
-import org.xipki.ca.certprofile.xijson.conf.Subject;
-import org.xipki.ca.certprofile.xijson.conf.Subject.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers.BaseRequirements;

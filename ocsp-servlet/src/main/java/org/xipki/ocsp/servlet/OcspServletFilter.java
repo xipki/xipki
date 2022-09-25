@@ -19,7 +19,6 @@ package org.xipki.ocsp.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.datasource.DataAccessException;
 import org.xipki.license.api.LicenseFactory;
 import org.xipki.ocsp.server.OcspServerImpl;
 import org.xipki.ocsp.servlet.OcspConf.RemoteMgmt;

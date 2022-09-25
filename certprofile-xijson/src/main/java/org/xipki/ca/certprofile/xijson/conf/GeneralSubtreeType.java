@@ -31,19 +31,14 @@ import org.xipki.util.exception.InvalidConfException;
 public class GeneralSubtreeType extends ValidatableConf {
 
   public static class Base extends ValidatableConf {
-    @JSONField(ordinal = 1)
     private String rfc822Name;
 
-    @JSONField(ordinal = 2)
     private String dnsName;
 
-    @JSONField(ordinal = 3)
     private String directoryName;
 
-    @JSONField(ordinal = 4)
     private String uri;
 
-    @JSONField(ordinal = 5)
     private String ipAddress;
 
     public String getRfc822Name() {

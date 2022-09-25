@@ -62,8 +62,7 @@ public class SmimeCapabilities extends ValidatableConf {
     @Override
     public void validate() throws InvalidConfException {
       notNull(capabilityId, "capabilityId");
-      validate(capabilityId);
-      validate(parameter);
+      validate(capabilityId, parameter);
     }
 
   } // class SmimeCapability

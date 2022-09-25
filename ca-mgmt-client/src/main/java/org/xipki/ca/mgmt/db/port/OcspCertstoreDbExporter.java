@@ -64,9 +64,8 @@ class OcspCertstoreDbExporter extends DbPorter {
 
   private final boolean resume;
 
-  OcspCertstoreDbExporter(
-      DataSourceWrapper datasource, String baseDir, int numCertsInBundle,
-      int numCertsPerSelect, boolean resume, AtomicBoolean stopMe)
+  OcspCertstoreDbExporter(DataSourceWrapper datasource, String baseDir, int numCertsInBundle,
+                          int numCertsPerSelect, boolean resume, AtomicBoolean stopMe)
       throws Exception {
     super(datasource, baseDir, stopMe);
 
@@ -129,8 +128,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     certstore.setCerthashAlgo(certHashAlgoStr);
   } // method exportHashAlgo
 
-  private void exportIssuer(OcspCertstore certstore)
-      throws DataAccessException, IOException {
+  private void exportIssuer(OcspCertstore certstore) throws DataAccessException, IOException {
     System.out.println("exporting table ISSUER");
     List<OcspCertstore.Issuer> issuers = new LinkedList<>();
     certstore.setIssuers(issuers);
@@ -206,9 +204,8 @@ class OcspCertstoreDbExporter extends DbPorter {
     OutputStream certsFileOs = null;
 
     try {
-      certsFileOs = Files.newOutputStream(
-          Paths.get(baseDir, OcspDbEntryType.CERT.getDirName() + ".mf"),
-          StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+      certsFileOs = Files.newOutputStream(Paths.get(baseDir, OcspDbEntryType.CERT.getDirName() + ".mf"),
+                      StandardOpenOption.CREATE, StandardOpenOption.APPEND);
       exportCert0(certstore, processLogFile, certsFileOs);
       return null;
     } catch (Exception ex) {
@@ -230,8 +227,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     if (processLogFile.exists()) {
       byte[] content = IoUtil.read(processLogFile);
       if (content != null && content.length > 0) {
-        minId = Long.parseLong(StringUtil.toUtf8String(content).trim());
-        minId++;
+        minId = 1 + Long.parseLong(StringUtil.toUtf8String(content).trim());
       }
     }
 
@@ -241,8 +237,7 @@ class OcspCertstoreDbExporter extends DbPorter {
 
     System.out.println("exporting table CERT from ID " + minId);
 
-    final String coreSql = "ID,SN,IID,LUPDATE,REV,RR,RT,RIT,NAFTER,NBEFORE,HASH,SUBJECT,CRL_ID "
-        + "FROM CERT WHERE ID>=?";
+    final String coreSql = "ID,SN,IID,LUPDATE,REV,RR,RT,RIT,NAFTER,NBEFORE,HASH,SUBJECT,CRL_ID FROM CERT WHERE ID>=?";
     final String certSql = datasource.buildSelectFirstSql(numCertsPerSelect, "ID ASC", coreSql);
 
     final long maxId = max("CERT", "ID");
@@ -417,8 +412,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     System.out.println(" exported " + processLog.numProcessed() + " certificates from tables CERT");
   } // method exportCert0
 
-  private void finalizeZip(ZipOutputStream zipOutStream, OcspCertstore.Certs certs)
-      throws IOException {
+  private void finalizeZip(ZipOutputStream zipOutStream, OcspCertstore.Certs certs) throws IOException {
     ZipEntry certZipEntry = new ZipEntry("certs.json");
     zipOutStream.putNextEntry(certZipEntry);
     try {

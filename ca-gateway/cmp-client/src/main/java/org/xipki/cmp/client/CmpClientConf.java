@@ -80,8 +80,7 @@ public class CmpClientConf extends ValidatableConf {
       if (pbmMac == null && signature == null) {
         throw new InvalidConfException("at least one of pbmMac and signature must be specified");
       }
-      validate(pbmMac);
-      validate(signature);
+      validate(pbmMac, signature);
     }
 
     public static class PbmMac extends ValidatableConf {
@@ -186,8 +185,7 @@ public class CmpClientConf extends ValidatableConf {
 
   @Override
   public void validate() throws InvalidConfException {
-    validate(responder);
-    validate(ssl);
+    validate(responder, ssl);
   }
 
 }

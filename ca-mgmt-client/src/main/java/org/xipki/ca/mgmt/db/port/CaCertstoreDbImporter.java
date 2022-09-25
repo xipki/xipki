@@ -109,8 +109,7 @@ class CaCertstoreDbImporter extends DbPorter {
       if (processLogFile.exists()) {
         byte[] content = IoUtil.read(processLogFile);
         if (content != null && content.length > 5) {
-          String str = StringUtil.toUtf8String(content);
-          StringTokenizer st = new StringTokenizer(str, ":");
+          StringTokenizer st = new StringTokenizer(StringUtil.toUtf8String(content), ":");
           String type = st.nextToken();
           typeProcessedInLastProcess = CaDbEntryType.valueOf(type);
           numProcessedInLastProcess = Integer.parseInt(st.nextToken());
@@ -167,8 +166,7 @@ class CaCertstoreDbImporter extends DbPorter {
     System.out.println(" imported CA certstore to database");
   } // method importToDb
 
-  private void importPublishQueue(List<CaCertstore.ToPublish> publishQueue)
-      throws DataAccessException {
+  private void importPublishQueue(List<CaCertstore.ToPublish> publishQueue) throws DataAccessException {
     final String sql = buildInsertSql("PUBLISHQUEUE", "CID,PID,CA_ID");
     System.out.println("importing table PUBLISHQUEUE");
     PreparedStatement ps = prepareStatement(sql);
@@ -288,19 +286,17 @@ class CaCertstoreDbImporter extends DbPorter {
     }
   } // method importEntries
 
-  private long importCerts
-      (String entriesZipFile, long minId, File processLogFile, ProcessLog processLog, int numProcessedInLastProcess,
-      PreparedStatement stmt, String sql)
+  private long importCerts(String entriesZipFile, long minId, File processLogFile, ProcessLog processLog,
+                           int numProcessedInLastProcess, PreparedStatement stmt, String sql)
       throws Exception {
     final CaDbEntryType type = CaDbEntryType.CERT;
     final int numEntriesPerCommit = Math.max(1, Math.round(type.getSqlBatchFactor() * numCertsPerCommit));
 
     ZipFile zipFile = new ZipFile(new File(entriesZipFile));
-    ZipEntry entriesEntry = zipFile.getEntry("overview.json");
 
     CaCertstore.Certs certs;
     try {
-      certs = JSON.parseObject(zipFile.getInputStream(entriesEntry), CaCertstore.Certs.class);
+      certs = JSON.parseObject(zipFile.getInputStream(zipFile.getEntry("overview.json")), CaCertstore.Certs.class);
     } catch (Exception ex) {
       try {
         zipFile.close();
@@ -337,13 +333,11 @@ class CaCertstoreDbImporter extends DbPorter {
 
         String filename = cert.getFile();
         // rawcert
-        ZipEntry certZipEnty = zipFile.getEntry(filename);
-        byte[] encodedCert = IoUtil.read(zipFile.getInputStream(certZipEnty));
+        byte[] encodedCert = IoUtil.read(zipFile.getInputStream(zipFile.getEntry(filename)));
 
         TBSCertificate tbsCert;
         try {
-          Certificate cc = Certificate.getInstance(encodedCert);
-          tbsCert = cc.getTBSCertificate();
+          tbsCert = Certificate.getInstance(encodedCert).getTBSCertificate();
         } catch (RuntimeException ex) {
           LOG.error("could not parse certificate in file {}", filename);
           LOG.debug("could not parse certificate in file " + filename, ex);
@@ -464,11 +458,10 @@ class CaCertstoreDbImporter extends DbPorter {
     final int numEntriesPerCommit = Math.max(1, Math.round(type.getSqlBatchFactor() * numCertsPerCommit));
 
     ZipFile zipFile = new ZipFile(new File(entriesZipFile));
-    ZipEntry entriesEntry = zipFile.getEntry("overview.json");
 
     CaCertstore.Crls crls;
     try {
-      crls = JSON.parseObject(zipFile.getInputStream(entriesEntry), CaCertstore.Crls.class);
+      crls = JSON.parseObject(zipFile.getInputStream(zipFile.getEntry("overview.json")), CaCertstore.Crls.class);
     } catch (Exception ex) {
       try {
         zipFile.close();
@@ -530,11 +523,8 @@ class CaCertstoreDbImporter extends DbPorter {
           }
           BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
-          BigInteger baseCrlNumber = null;
           extnValue = X509Util.getCoreExtValue(extns, Extension.deltaCRLIndicator);
-          if (extnValue != null) {
-            baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
-          }
+          BigInteger baseCrlNumber = (extnValue == null) ? null : ASN1Integer.getInstance(extnValue).getPositiveValue();
 
           int idx = 1;
           stmt.setLong(idx++, crl.getId());

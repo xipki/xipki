@@ -33,8 +33,8 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.*;
 import org.xipki.util.Base64;
+import org.xipki.util.*;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -160,8 +160,8 @@ public class CaUtil {
     return AuthorityInformationAccess.getInstance(seq);
   } // method createAuthorityInformationAccess
 
-  public static CRLDistPoint createCrlDistributionPoints(List<String> crlUris, X500Name caSubject,
-      X500Name crlSignerSubject) {
+  public static CRLDistPoint createCrlDistributionPoints(
+      List<String> crlUris, X500Name caSubject, X500Name crlSignerSubject) {
     notEmpty(crlUris, "crlUris");
     int size = crlUris.size();
     DistributionPoint[] points = new DistributionPoint[1];
@@ -171,8 +171,7 @@ public class CaUtil {
       names[i] = new GeneralName(GeneralName.uniformResourceIdentifier, crlUris.get(i));
     }
     // Distribution Point
-    GeneralNames gns = new GeneralNames(names);
-    DistributionPointName pointName = new DistributionPointName(gns);
+    DistributionPointName pointName = new DistributionPointName(new GeneralNames(names));
 
     GeneralNames crlIssuer = null;
     if (crlSignerSubject != null && !crlSignerSubject.equals(caSubject)) {
@@ -186,9 +185,7 @@ public class CaUtil {
   } // method createCrlDistributionPoints
 
   public static X500Name sortX509Name(X500Name name) {
-    notNull(name, "name");
-    RDN[] requestedRdns = name.getRDNs();
-
+    RDN[] requestedRdns = notNull(name, "name").getRDNs();
     List<RDN> rdns = new LinkedList<>();
 
     List<ASN1ObjectIdentifier> sortedDNs = SubjectDnSpec.getForwardDNs();
@@ -220,8 +217,7 @@ public class CaUtil {
     return CollectionUtil.isEmpty(ret) ? null : ret.toArray(new RDN[0]);
   } // method getRdns
 
-  public static String canonicalizeSignerConf(String signerConf)
-      throws CaMgmtException {
+  public static String canonicalizeSignerConf(String signerConf) throws CaMgmtException {
     if (!signerConf.contains("file:") && !signerConf.contains("base64:")) {
       return signerConf;
     }
@@ -326,8 +322,7 @@ public class CaUtil {
     return list;
   } // method getPermissions
 
-  public static String encodeCertchain(List<X509Cert> certs)
-      throws CaMgmtException {
+  public static String encodeCertchain(List<X509Cert> certs) throws CaMgmtException {
     try {
       return X509Util.encodeCertificates(certs.toArray(new X509Cert[0]));
     } catch (CertificateException | IOException ex) {
@@ -350,8 +345,7 @@ public class CaUtil {
     return Arrays.asList(certchain);
   } // method buildCertChain
 
-  public static X509Cert parseCert(byte[] encodedCert)
-      throws CaMgmtException {
+  public static X509Cert parseCert(byte[] encodedCert) throws CaMgmtException {
     try {
       return X509Util.parseCert(encodedCert);
     } catch (CertificateException ex) {

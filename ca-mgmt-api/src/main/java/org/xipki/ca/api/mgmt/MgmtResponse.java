@@ -134,8 +134,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.certprofile = certprofile;
     }
 
-    public CertWithRevocationInfo toCertWithRevocationInfo()
-        throws CertificateException {
+    public CertWithRevocationInfo toCertWithRevocationInfo() throws CertificateException {
       CertWithRevocationInfo ret = new CertWithRevocationInfo();
       ret.setCert(cert.toCertWithDbId());
       ret.setCertprofile(certprofile);

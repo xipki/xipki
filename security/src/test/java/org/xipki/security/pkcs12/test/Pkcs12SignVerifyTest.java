@@ -91,13 +91,11 @@ public abstract class Pkcs12SignVerifyTest {
     Assert.assertTrue("Signature invalid", signatureValid);
   }
 
-  protected byte[] sign(byte[] data)
-      throws Exception {
+  protected byte[] sign(byte[] data) throws Exception {
     return getSigner().sign(data);
   }
 
-  protected boolean verify(byte[] data, byte[] signatureValue, X509Cert cert)
-      throws Exception {
+  protected boolean verify(byte[] data, byte[] signatureValue, X509Cert cert) throws Exception {
     Signature signature = Signature.getInstance(getSignatureAlgorithm().getJceName());
     signature.initVerify(cert.getPublicKey());
     signature.update(data);

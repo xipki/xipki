@@ -229,9 +229,7 @@ public class KeyParametersType extends ValidatableConf {
 
   @Override
   public void validate() throws InvalidConfException {
-    validate(dsa);
-    validate(ec);
-    validate(rsa);
+    validate(dsa, ec, rsa);
   } // method validate
 
 }

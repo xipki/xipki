@@ -37,8 +37,7 @@ import org.xipki.util.IoUtil;
 public class CtLogTest {
 
   @Test
-  public void parseCtLogInCerts()
-      throws Exception {
+  public void parseCtLogInCerts() throws Exception {
     String[] certFiles = new String[]{"/ctlog-certs/githubcom.pem", "/ctlog-certs/cab-domain-validated1.crt"};
 
     for (String m : certFiles) {

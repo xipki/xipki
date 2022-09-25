@@ -49,17 +49,11 @@ class DigestEntry {
 
   public DigestEntry(BigInteger serialNumber, boolean revoked, Integer revReason,
                      Long revTime, Long revInvTime, String base64HashValue) {
-    Args.notNull(base64HashValue, "base64HashValue");
-    if (revoked) {
-      Args.notNull(revReason, "revReason");
-      Args.notNull(revTime, "revTime");
-    }
-    this.base64HashValue = base64HashValue;
-
+    this.base64HashValue = Args.notNull(base64HashValue, "base64HashValue");
     this.serialNumber = serialNumber;
     this.revoked = revoked;
-    this.revReason = revReason;
-    this.revTime = revTime;
+    this.revReason = revoked ? Args.notNull(revReason, "revReason") : null;
+    this.revTime = revoked ? Args.notNull(revTime, "revTime") : null;
     this.revInvTime = revInvTime;
   } // constructor
 
@@ -107,63 +101,36 @@ class DigestEntry {
   }
 
   public boolean contentEquals(DigestEntry obj) {
-    if (obj == null) {
-      return false;
-    }
-
-    if (!serialNumber.equals(obj.serialNumber)) {
-      return false;
-    }
-
-    if (revoked != obj.revoked) {
-      return false;
-    }
-
-    if (!equals(revReason, obj.revReason)) {
-      return false;
-    }
-
-    if (!equals(revTime, obj.revTime)) {
-      return false;
-    }
-
-    if (!equals(revInvTime, obj.revInvTime)) {
-      return false;
-    }
-
-    return equals(base64HashValue, obj.base64HashValue);
+    return obj != null && serialNumber.equals(obj.serialNumber) && (revoked == obj.revoked)
+        && equals(revReason,  obj.revReason)  && equals(revTime, obj.revTime)
+        && equals(revInvTime, obj.revInvTime) && equals(base64HashValue, obj.base64HashValue);
   } // method contentEquals
 
   public static DigestEntry decode(String encoded) {
-    Args.notNull(encoded, "encoded");
-
-    List<Integer> indexes = getIndexes(encoded);
+    List<Integer> indexes = getIndexes(Args.notNull(encoded, "encoded"));
     if (indexes.size() != 5) {
       throw new IllegalArgumentException("invalid DbDigestEntry: " + encoded);
     }
 
-    String str = encoded.substring(0, indexes.get(0));
+    int idx = 0;
+    String str = encoded.substring(0, indexes.get(idx));
     BigInteger serialNumber = new BigInteger(str, 16);
 
-    String sha1Fp = encoded.substring(indexes.get(0) + 1, indexes.get(1));
+    String sha1Fp = encoded.substring(indexes.get(idx) + 1, indexes.get(++idx));
 
-    int idx = 1;
-    str = encoded.substring(indexes.get(idx) + 1, indexes.get(idx + 1));
+    str = encoded.substring(indexes.get(idx) + 1, indexes.get(++idx));
     boolean revoked = !"0".equals(str);
 
     Integer revReason = null;
     Long revTime = null;
     Long revInvTime = null;
     if (revoked) {
-      idx++;
-      str = encoded.substring(indexes.get(idx) + 1, indexes.get(idx + 1));
+      str = encoded.substring(indexes.get(idx) + 1, indexes.get(++idx));
       revReason = Integer.parseInt(str);
 
-      idx++;
-      str = encoded.substring(indexes.get(idx) + 1, indexes.get(idx + 1));
+      str = encoded.substring(indexes.get(idx) + 1, indexes.get(++idx));
       revTime = Long.parseLong(str);
 
-      idx++;
       str = encoded.substring(indexes.get(idx) + 1);
       if (str.length() != 0) {
         revInvTime = Long.parseLong(str);

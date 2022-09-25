@@ -57,8 +57,8 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
   private final int numCertsPerCommit;
 
-  OcspCertstoreDbImporter(
-      DataSourceWrapper datasource, String srcDir, int numCertsPerCommit, boolean resume, AtomicBoolean stopMe)
+  OcspCertstoreDbImporter(DataSourceWrapper datasource, String srcDir, int numCertsPerCommit,
+                          boolean resume, AtomicBoolean stopMe)
       throws Exception {
     super(datasource, srcDir, stopMe);
 
@@ -132,8 +132,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     try {
       for (OcspCertstore.Issuer issuer : issuers) {
         try {
-          String certFilename = issuer.getCertFile();
-          String b64Cert = StringUtil.toUtf8String(IoUtil.read(new File(baseDir, certFilename)));
+          String b64Cert = StringUtil.toUtf8String(IoUtil.read(new File(baseDir, issuer.getCertFile())));
           byte[] encodedCert = Base64.decode(b64Cert);
 
           Certificate cert;
@@ -174,8 +173,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     System.out.println(" imported table ISSUER");
   }
 
-  private void importCrlInfo(List<OcspCertstore.CrlInfo> crlInfos)
-      throws DataAccessException {
+  private void importCrlInfo(List<OcspCertstore.CrlInfo> crlInfos) throws DataAccessException {
     if (CollectionUtil.isEmpty(crlInfos)) {
       return;
     }
@@ -202,8 +200,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     System.out.println(" imported table CRL_INFO");
   }
 
-  private void importCert(OcspCertstore certstore, File processLogFile)
-      throws Exception {
+  private void importCert(OcspCertstore certstore, File processLogFile) throws Exception {
     int numProcessedBefore = 0;
     long minId = 1;
     if (processLogFile.exists()) {
@@ -216,8 +213,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
         StringTokenizer st = new StringTokenizer(str, ":");
         numProcessedBefore = Integer.parseInt(st.nextToken());
-        minId = Long.parseLong(st.nextToken());
-        minId++;
+        minId = 1 + Long.parseLong(st.nextToken());
       }
     }
 
@@ -230,7 +226,6 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     processLog.printHeader();
 
     PreparedStatement psCert = prepareStatement(SQL_ADD_CERT);
-
     OcspDbEntryType type = OcspDbEntryType.CERT;
 
     try (DbPortFileNameIterator certsFileIterator = new DbPortFileNameIterator(
@@ -274,9 +269,8 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     System.out.println(" imported " + processLog.numProcessed() + " certificates");
   } // method importCert
 
-  private long importCert0(
-      PreparedStatement psCert, String certsZipFile, long minId,
-      File processLogFile, ProcessLog processLog, int numProcessedInLastProcess)
+  private long importCert0(PreparedStatement psCert, String certsZipFile, long minId,
+                           File processLogFile, ProcessLog processLog, int numProcessedInLastProcess)
       throws Exception {
     ZipFile zipFile = new ZipFile(new File(certsZipFile));
     ZipEntry certsEntry = zipFile.getEntry("certs.json");
@@ -344,8 +338,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
         boolean isLastBlock = i == n - 1;
 
-        if (numEntriesInBatch > 0
-            && (numEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock)) {
+        if (numEntriesInBatch > 0 && (numEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock)) {
           try {
             psCert.executeBatch();
             commit("(commit import cert to OCSP)");

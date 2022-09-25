@@ -168,8 +168,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
    * </ul>
    * @param datasource DataSource.
    */
-  public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource)
-      throws OcspStoreException {
+  public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource) throws OcspStoreException {
     this.sourceConf = notNull(sourceConf, "sourceConf");
 
     // check the dir
@@ -230,11 +229,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       }
     }
 
-    if (objVal instanceof String) {
-      return (String) objVal;
-    } else {
-      return objVal.toString();
-    }
+    return (objVal instanceof String) ? (String) objVal : objVal.toString();
   } // method getStrValue
 
   @Override

@@ -166,11 +166,9 @@ public class DbCertStatusStore extends OcspStore {
             Long revTimeMs = null;
             String str = rs.getString("REV_INFO");
             if (str != null) {
-              CertRevocationInfo revInfo = CertRevocationInfo.fromEncoded(str);
-              revTimeMs = revInfo.getRevocationTime().getTime();
+              revTimeMs = CertRevocationInfo.fromEncoded(str).getRevocationTime().getTime();
             }
-            SimpleIssuerEntry issuerEntry = new SimpleIssuerEntry(id, revTimeMs);
-            newIssuers.put(id, issuerEntry);
+            newIssuers.put(id, new SimpleIssuerEntry(id, revTimeMs));
           }
 
           // no change in the issuerStore
@@ -182,9 +180,7 @@ public class DbCertStatusStore extends OcspStore {
 
           if (issuersUnchanged) {
             for (Integer id : newIds) {
-              IssuerEntry entry = issuerStore.getIssuerForId(id);
-              SimpleIssuerEntry newEntry = newIssuers.get(id);
-              if (!newEntry.match(entry)) {
+              if (!newIssuers.get(id).match(issuerStore.getIssuerForId(id))) {
                 issuersUnchanged = false;
                 break;
               }
@@ -263,10 +259,7 @@ public class DbCertStatusStore extends OcspStore {
 
         rs = ps.executeQuery();
         while (rs.next()) {
-          int id = rs.getInt("ID");
-          String str = rs.getString("INFO");
-          CrlInfo crlInfo = new CrlInfo(str);
-          crlInfos.put(id, crlInfo);
+          crlInfos.put(rs.getInt("ID"), new CrlInfo(rs.getString("INFO")));
         }
 
         issuerStore.setCrlInfos(crlInfos);
@@ -281,9 +274,8 @@ public class DbCertStatusStore extends OcspStore {
   } // method updateCrls
 
   @Override
-  protected CertStatusInfo getCertStatus0(
-      Date time, RequestIssuer reqIssuer, BigInteger serialNumber,
-      boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
+  protected CertStatusInfo getCertStatus0(Date time, RequestIssuer reqIssuer, BigInteger serialNumber,
+                                          boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
       throws OcspStoreException {
     if (serialNumber.signum() != 1) { // non-positive serial number
       return CertStatusInfo.getUnknownCertStatusInfo(new Date(), null);
@@ -425,15 +417,9 @@ public class DbCertStatusStore extends OcspStore {
 
       if (includeArchiveCutoff) {
         if (retentionInterval != 0) {
-          Date date;
-          // expired certificate remains in status store forever
-          if (retentionInterval < 0) {
-            date = issuer.getNotBefore();
-          } else {
-            long nowInMs = System.currentTimeMillis();
-            long dateInMs = Math.max(issuer.getNotBefore().getTime(), nowInMs - DAY * retentionInterval);
-            date = new Date(dateInMs);
-          }
+          Date date = (retentionInterval < 0)
+            ? issuer.getNotBefore() // expired certificate remains in status store forever
+            : new Date(Math.max(issuer.getNotBefore().getTime(), System.currentTimeMillis() - DAY * retentionInterval));
 
           certStatusInfo.setArchiveCutOff(date);
         }
@@ -459,17 +445,14 @@ public class DbCertStatusStore extends OcspStore {
       }
 
       if (replaced) {
-        CertRevocationInfo newRevInfo;
-        if (caRevInfo.getReason() == CrlReason.CA_COMPROMISE) {
-          newRevInfo = caRevInfo;
-        } else {
-          newRevInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
-              caRevInfo.getRevocationTime(), caRevInfo.getInvalidityTime());
-        }
+        CertRevocationInfo newRevInfo = (caRevInfo.getReason() == CrlReason.CA_COMPROMISE)
+            ? caRevInfo
+            : new CertRevocationInfo(CrlReason.CA_COMPROMISE, caRevInfo.getRevocationTime(),
+                  caRevInfo.getInvalidityTime());
+
         certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
             certStatusInfo.getCertHashAlgo(), certStatusInfo.getCertHash(),
-            certStatusInfo.getThisUpdate(), certStatusInfo.getNextUpdate(),
-            certStatusInfo.getCertprofile());
+            certStatusInfo.getThisUpdate(), certStatusInfo.getNextUpdate(), certStatusInfo.getCertprofile());
       }
       return certStatusInfo;
     } catch (DataAccessException ex) {
@@ -527,8 +510,7 @@ public class DbCertStatusStore extends OcspStore {
    * @param datasource DataSource.
    */
   @Override
-  public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource)
-      throws OcspStoreException {
+  public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource) throws OcspStoreException {
     OcspServerConf.CaCerts caCerts = null;
     if (sourceConf != null) {
       Object objValue = sourceConf.get("caCerts");

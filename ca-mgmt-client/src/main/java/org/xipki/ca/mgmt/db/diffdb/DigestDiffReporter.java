@@ -108,10 +108,8 @@ class DigestDiffReporter implements Closeable {
   }
 
   public void addDiff(DigestEntry refCert, DigestEntry targetCert) throws IOException {
-    Args.notNull(refCert, "refCert");
-    Args.notNull(targetCert, "targetCert");
-
-    if (refCert.getSerialNumber().equals(targetCert.getSerialNumber())) {
+    if (Args.notNull(refCert, "refCert").getSerialNumber().equals(
+        Args.notNull(targetCert, "targetCert").getSerialNumber())) {
       throw new IllegalArgumentException("refCert and targetCert are not of the same serialNumber");
     }
 
@@ -124,10 +122,8 @@ class DigestDiffReporter implements Closeable {
   } // method addDiff
 
   public void addError(String errorMessage) throws IOException {
-    Args.notNull(errorMessage, "errorMessage");
-
+    String msg = StringUtil.concat(Args.notNull(errorMessage, "errorMessage"), "\n");
     numError.incrementAndGet();
-    String msg = StringUtil.concat(errorMessage, "\n");
     synchronized (errorWriter) {
       errorWriter.write(msg);
     }
@@ -141,11 +137,7 @@ class DigestDiffReporter implements Closeable {
 
   @Override
   public void close() {
-    closeWriter(missingWriter);
-    closeWriter(unexpectedWriter);
-    closeWriter(diffWriter);
-    closeWriter(goodWriter);
-    closeWriter(errorWriter);
+    closeWriter(missingWriter, unexpectedWriter, diffWriter, goodWriter, errorWriter);
 
     int sum = numGood.get() + numDiff.get() + numMissing.get() + numUnexpected.get() + numError.get();
     Date now = new Date();
@@ -175,17 +167,18 @@ class DigestDiffReporter implements Closeable {
 
   private static void writeSerialNumberLine(BufferedWriter writer, BigInteger serialNumber)
       throws IOException {
-    String msg = StringUtil.concat(serialNumber.toString(16), "\n");
     synchronized (writer) {
-      writer.write(msg);
+      writer.write(StringUtil.concat(serialNumber.toString(16), "\n"));
     }
   } // method writeSerialNumberLine
 
-  private static void closeWriter(Writer writer) {
-    try {
-      writer.close();
-    } catch (Exception ex) {
-      LogUtil.warn(LOG, ex, "could not close writer");
+  private static void closeWriter(Writer... writers) {
+    for (Writer writer : writers) {
+      try {
+        writer.close();
+      } catch (Exception ex) {
+        LogUtil.warn(LOG, ex, "could not close writer " + writer);
+      }
     }
   } // method closeWriter
 

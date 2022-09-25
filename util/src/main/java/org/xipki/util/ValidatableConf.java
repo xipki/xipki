@@ -29,16 +29,20 @@ import java.util.Collection;
 
 public abstract class ValidatableConf {
 
-  protected static void validate(ValidatableConf conf) throws InvalidConfException {
-    if (conf != null) {
-      conf.validate();
+  protected static void validate(ValidatableConf... confs) throws InvalidConfException {
+    for (ValidatableConf conf : confs) {
+      if (conf != null) {
+        conf.validate();
+      }
     }
   }
 
-  protected static void validate(Collection<? extends ValidatableConf> conf) throws InvalidConfException {
-    if (conf != null) {
-      for (ValidatableConf m : conf) {
-        m.validate();
+  protected static void validate(Collection<? extends ValidatableConf>... confLists) throws InvalidConfException {
+    for (Collection<? extends ValidatableConf> confList : confLists) {
+      if (confList != null) {
+        for (ValidatableConf conf : confList) {
+          conf.validate();
+        }
       }
     }
   }

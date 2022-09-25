@@ -18,7 +18,6 @@
 package org.xipki.security.pkcs11.emulator;
 
 import iaik.pkcs.pkcs11.wrapper.Functions;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERBitString;
@@ -68,10 +67,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
+import static iaik.pkcs.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.util.Args.*;
 import static org.xipki.util.IoUtil.read;
 import static org.xipki.util.IoUtil.save;
-import static iaik.pkcs.pkcs11.wrapper.PKCS11Constants.*;
 
 /**
  * {@link P11Slot} for PKCS#11 emulator.

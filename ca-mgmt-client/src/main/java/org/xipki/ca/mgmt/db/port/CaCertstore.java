@@ -344,16 +344,8 @@ public class CaCertstore extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      validate(signers);
-      validate(requestors);
-      validate(publishers);
-      validate(profiles);
-      validate(cas);
-      validate(caaliases);
-      validate(caHasRequestors);
-      validate(caHasPublishers);
-      validate(caHasProfiles);
-      validate(keypairGens);
+      validate(signers, requestors, publishers, profiles, cas, caaliases,
+          caHasRequestors, caHasPublishers, caHasProfiles, keypairGens);
     }
 
   } // class Caconf

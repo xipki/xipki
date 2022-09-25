@@ -49,9 +49,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static org.xipki.util.Args.notNull;
 import static iaik.pkcs.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.security.HashAlgo.*;
+import static org.xipki.util.Args.notNull;
 
 /**
  * {@link P11Identity} for PKCS#11 emulator.

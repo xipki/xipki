@@ -104,9 +104,8 @@ public class QcStatements extends ValidatableConf {
     public void validate() throws InvalidConfException {
       notBlank(currency, "currency");
       notNull(amount, "amount");
-      validate(amount);
       notNull(exponent, "exponent");
-      validate(exponent);
+      validate(amount, exponent);
     } // method validate
 
   } // class QcEuLimitValueType
@@ -213,8 +212,7 @@ public class QcStatements extends ValidatableConf {
             + "qcEuLimitValue, pdsLocations is set");
       }
 
-      validate(constant);
-      validate(qcEuLimitValue);
+      validate(constant, qcEuLimitValue);
       validate(pdsLocations);
     } // method QcStatementValueType
 
@@ -247,8 +245,7 @@ public class QcStatements extends ValidatableConf {
     @Override
     public void validate() throws InvalidConfException {
       notNull(statementId, "statementId");
-      validate(statementId);
-      validate(statementValue);
+      validate(statementId, statementValue);
     }
 
   }

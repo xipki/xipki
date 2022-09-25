@@ -78,8 +78,7 @@ public class CaServerConf extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notBlank(name, "name");
     }
 
@@ -108,8 +107,7 @@ public class CaServerConf extends ValidatableConf {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
     }
 
   } // class RemoteMgmt
@@ -172,8 +170,7 @@ public class CaServerConf extends ValidatableConf {
   @JSONField(serialize = false, deserialize = false)
   private Map<String, SslContextConf> sslContextConfMap = new HashMap<>();
 
-  public static CaServerConf readConfFromFile(String fileName)
-      throws IOException, InvalidConfException {
+  public static CaServerConf readConfFromFile(String fileName) throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");
     try (InputStream is = Files.newInputStream(Paths.get(fileName))) {
       CaServerConf conf = JSON.parseObject(is, CaServerConf.class);
@@ -318,15 +315,13 @@ public class CaServerConf extends ValidatableConf {
   } // method getSslContextConf
 
   @Override
-  public void validate()
-      throws InvalidConfException {
+  public void validate() throws InvalidConfException {
     if (shardId < 0 || shardId > 127) {
       throw new InvalidConfException("shardId is not in [0, 127]");
     }
 
     notEmpty(datasources, "datasources");
-    validate(remoteMgmt);
-    validate(security);
+    validate(remoteMgmt, security);
   } // method validate
 
 }

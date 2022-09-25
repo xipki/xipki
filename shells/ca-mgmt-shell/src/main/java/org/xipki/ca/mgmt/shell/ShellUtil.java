@@ -68,8 +68,7 @@ public class ShellUtil {
     return pairs.getEncoded();
   } // method canonicalizeSignerConf
 
-  public static int getPermission(Set<String> permissions)
-      throws IllegalCmdParamException {
+  public static int getPermission(Set<String> permissions) throws IllegalCmdParamException {
     int ret = 0;
     for (String permission : permissions) {
       Integer code = PermissionConstants.getPermissionForText(permission);

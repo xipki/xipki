@@ -30,7 +30,6 @@ import org.bouncycastle.cert.ocsp.OCSPReq;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;

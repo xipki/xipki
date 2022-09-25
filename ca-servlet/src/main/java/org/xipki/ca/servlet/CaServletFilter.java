@@ -251,8 +251,7 @@ public class CaServletFilter implements Filter {
     if (factories != null) {
       for (String className : factories) {
         try {
-          Class<?> clazz = Class.forName(className);
-          CertprofileFactory factory = (CertprofileFactory) clazz.getConstructor().newInstance();
+          CertprofileFactory factory = (CertprofileFactory) Class.forName(className).getConstructor().newInstance();
           certprofileFactoryRegister.registFactory(factory);
         } catch (Exception ex) {
           LOG.error("error caught while initializing CertprofileFactory "

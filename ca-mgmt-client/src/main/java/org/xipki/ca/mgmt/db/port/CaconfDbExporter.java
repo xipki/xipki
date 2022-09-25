@@ -80,8 +80,7 @@ class CaconfDbExporter extends DbPorter {
     System.out.println(" exported CA configuration from database");
   } // method export
 
-  private void exportCaalias(CaCertstore.Caconf caconf)
-      throws DataAccessException, InvalidConfException {
+  private void exportCaalias(CaCertstore.Caconf caconf) throws DataAccessException, InvalidConfException {
     System.out.println("exporting table CAALIAS");
     List<CaCertstore.Caalias> caaliases = new LinkedList<>();
     final String sql = "SELECT NAME,CA_ID FROM CAALIAS";
@@ -144,8 +143,7 @@ class CaconfDbExporter extends DbPorter {
     System.out.println(" exported table REQUESTOR");
   } // method exportRequestor
 
-  private void exportDbSchema(CaCertstore.Caconf caconf)
-      throws DataAccessException, InvalidConfException {
+  private void exportDbSchema(CaCertstore.Caconf caconf) throws DataAccessException, InvalidConfException {
     System.out.println("exporting table DBSCHEMA");
     List<CaCertstore.DbSchemaEntry> entries = new LinkedList<>();
     final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
@@ -316,9 +314,7 @@ class CaconfDbExporter extends DbPorter {
     //    "ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,"
     //    + "SUBJECT,REV_INFO,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN,CONF "
     //
-    String columns =
-        "SELECT ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,"
-        + "REV_INFO,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN";
+    String columns = "SELECT ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,REV_INFO,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN";
     if (dbSchemaVersion >= 7) {
       columns += ",CONF";
     } else {
@@ -402,9 +398,7 @@ class CaconfDbExporter extends DbPorter {
         }
 
         ca.validate();
-
         ca.setConfColumn(buildFileOrValue(confColumn, "ca-conf/" + name + ".conf"));
-
         cas.add(ca);
       }
     } catch (SQLException ex) {

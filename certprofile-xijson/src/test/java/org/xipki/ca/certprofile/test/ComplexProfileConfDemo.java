@@ -284,8 +284,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileQc
 
-  private static void certprofileEeComplex(String destFilename)
-      throws Exception {
+  private static void certprofileEeComplex(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile ee-complex", CertLevel.EndEntity,
         "5y", true, false);
 
@@ -444,13 +443,11 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileEeComplex
 
-  private static void certprofileConstantExtImplicitTag(String destFilename)
-      throws Exception {
+  private static void certprofileConstantExtImplicitTag(String destFilename) throws Exception {
     certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.2"), new Tag(1, false));
   }
 
-  private static void certprofileConstantExtExplicitTag(String destFilename)
-      throws Exception {
+  private static void certprofileConstantExtExplicitTag(String destFilename) throws Exception {
     certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.3"), new Tag(1, true));
   }
 

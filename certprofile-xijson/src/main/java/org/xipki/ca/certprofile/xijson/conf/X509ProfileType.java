@@ -148,8 +148,7 @@ public class X509ProfileType extends ValidatableConf {
   @JSONField(ordinal = 15)
   private List<ExtensionType> extensions;
 
-  public static X509ProfileType parse(InputStream confStream)
-      throws CertprofileException {
+  public static X509ProfileType parse(InputStream confStream) throws CertprofileException {
     Args.notNull(confStream, "confStream");
     try {
       X509ProfileType root = JSON.parseObject(confStream, X509ProfileType.class);
@@ -340,13 +339,10 @@ public class X509ProfileType extends ValidatableConf {
     notNull(certLevel, "certLevel");
     notBlank(validity, "validity");
     notBlank(notBeforeTime, "notBeforeTime");
-    validate(keypairGeneration);
-    validate(keyAlgorithms);
     notNull(subject, "subject");
-    validate(subject);
-    validate(subjectToSubjectAltNames);
     notNull(extensions, "extensions");
-    validate(extensions);
+    validate(keypairGeneration, subject);
+    validate(keyAlgorithms, subjectToSubjectAltNames, extensions);
 
     Set<String> extnTypes = new HashSet<>();
     for (ExtensionType m : extensions) {
@@ -359,8 +355,7 @@ public class X509ProfileType extends ValidatableConf {
 
   } // method validate
 
-  public Map<ASN1ObjectIdentifier, ExtensionValue> buildConstantExtesions()
-      throws CertprofileException {
+  public Map<ASN1ObjectIdentifier, ExtensionValue> buildConstantExtesions() throws CertprofileException {
     Map<ASN1ObjectIdentifier, ExtensionValue> map = new HashMap<>();
 
     for (ExtensionType m : getExtensions()) {
@@ -417,8 +412,7 @@ public class X509ProfileType extends ValidatableConf {
     return Collections.unmodifiableMap(map);
   } // buildExtesionsWithSyntax
 
-  public Map<ASN1ObjectIdentifier, ExtensionControl> buildExtensionControls()
-      throws CertprofileException {
+  public Map<ASN1ObjectIdentifier, ExtensionControl> buildExtensionControls() throws CertprofileException {
     // Extension controls
     Map<ASN1ObjectIdentifier, ExtensionControl> controls = new HashMap<>();
     for (ExtensionType extn : getExtensions()) {

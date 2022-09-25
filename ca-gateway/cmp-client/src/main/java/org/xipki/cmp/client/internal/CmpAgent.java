@@ -199,9 +199,8 @@ class CmpAgent {
     VerifiedPkiMessage ret = new VerifiedPkiMessage(response);
     if (response.hasProtection()) {
       try {
-        ProtectionVerificationResult verifyProtection =
-            verifyProtection(requestor, responder, Hex.encode(tid.getOctets()), response);
-        ret.setProtectionVerificationResult(verifyProtection);
+        ret.setProtectionVerificationResult(
+            verifyProtection(requestor, responder, Hex.encode(tid.getOctets()), response));
       } catch (InvalidKeyException | CMPException ex) {
         throw new CmpClientException(ex.getMessage(), ex);
       }
@@ -834,8 +833,7 @@ class CmpAgent {
     return new PKIMessage(header, new PKIBody(bodyType, new CertReqMessages(certReqMsgs)));
   } // method buildPkiMessage
 
-  private static void checkProtection(VerifiedPkiMessage response)
-      throws PkiErrorException {
+  private static void checkProtection(VerifiedPkiMessage response) throws PkiErrorException {
     notNull(response, "response");
 
     if (!response.hasProtection()) {
@@ -857,8 +855,7 @@ class CmpAgent {
     }
   } // method checkProtection
 
-  private static byte[] decrypt(EncryptedKey ek, char[] password)
-      throws XiSecurityException {
+  private static byte[] decrypt(EncryptedKey ek, char[] password) throws XiSecurityException {
     ASN1Encodable ekValue = ek.getValue();
     return (ekValue instanceof EnvelopedData) ? decrypt((EnvelopedData) ekValue, password)
         : decrypt((EncryptedValue) ekValue, password);
@@ -918,8 +915,7 @@ class CmpAgent {
         : decrypt((EncryptedValue) ekValue, decKey);
   }
 
-  private static byte[] decrypt(EnvelopedData ed0, PrivateKey decKey)
-      throws XiSecurityException {
+  private static byte[] decrypt(EnvelopedData ed0, PrivateKey decKey) throws XiSecurityException {
     try {
       ContentInfo ci = new ContentInfo(CMSObjectIdentifiers.envelopedData, ed0);
       CMSEnvelopedData ed = new CMSEnvelopedData(ci);
@@ -944,8 +940,7 @@ class CmpAgent {
     }
   }
 
-  private static byte[] decrypt(EncryptedValue ev, PrivateKey decKey)
-      throws XiSecurityException {
+  private static byte[] decrypt(EncryptedValue ev, PrivateKey decKey) throws XiSecurityException {
     AlgorithmIdentifier keyAlg = ev.getKeyAlg();
     ASN1ObjectIdentifier keyOid = keyAlg.getAlgorithm();
 
@@ -1187,8 +1182,7 @@ class CmpAgent {
     return result;
   } // method parse
 
-  private static Extensions getCertTempExtensions(byte[] authorityKeyIdentifier)
-      throws CmpClientException {
+  private static Extensions getCertTempExtensions(byte[] authorityKeyIdentifier) throws CmpClientException {
     AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(authorityKeyIdentifier);
     byte[] encodedAki;
     try {
@@ -1196,8 +1190,7 @@ class CmpAgent {
     } catch (IOException ex) {
       throw new CmpClientException("could not encoded AuthorityKeyIdentifier", ex);
     }
-    Extension extAki = new Extension(Extension.authorityKeyIdentifier, false, encodedAki);
-    return new Extensions(extAki);
+    return new Extensions(new Extension(Extension.authorityKeyIdentifier, false, encodedAki));
   } // method getCertTempExtensions
 
 }

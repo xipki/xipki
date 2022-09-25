@@ -18,7 +18,6 @@
 package org.xipki.ca.gateway.scep;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
@@ -52,7 +51,6 @@ import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.EOFException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;

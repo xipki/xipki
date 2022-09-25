@@ -177,10 +177,8 @@ public class SSLContextBuilder {
 
   public SSLContextBuilder loadTrustMaterial(KeyStore truststore)
       throws NoSuchAlgorithmException, KeyStoreException {
-    final TrustManagerFactory tmfactory = TrustManagerFactory
-            .getInstance(trustManagerFactoryAlgorithm == null
-                ? TrustManagerFactory.getDefaultAlgorithm()
-                : trustManagerFactoryAlgorithm);
+    final TrustManagerFactory tmfactory = TrustManagerFactory.getInstance(trustManagerFactoryAlgorithm == null
+                ? TrustManagerFactory.getDefaultAlgorithm() : trustManagerFactoryAlgorithm);
     tmfactory.init(truststore);
     final TrustManager[] tms = tmfactory.getTrustManagers();
     if (tms != null) {
@@ -189,8 +187,7 @@ public class SSLContextBuilder {
     return this;
   }
 
-  public SSLContextBuilder loadTrustMaterial()
-    throws NoSuchAlgorithmException, KeyStoreException {
+  public SSLContextBuilder loadTrustMaterial() throws NoSuchAlgorithmException, KeyStoreException {
     return loadTrustMaterial(null);
   }
 
@@ -249,8 +246,7 @@ public class SSLContextBuilder {
         secureRandom);
   }
 
-  public SSLContext build()
-      throws NoSuchAlgorithmException, KeyManagementException {
+  public SSLContext build() throws NoSuchAlgorithmException, KeyManagementException {
     final String protocolStr = this.protocol != null ? this.protocol : TLS;
     final SSLContext sslContext;
     if (this.provider != null) {

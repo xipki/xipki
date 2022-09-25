@@ -299,13 +299,10 @@ public class Pkcs11conf extends ValidatableConf {
       notBlank(name, "name");
       notBlank(type, "type");
       notEmpty(nativeLibraries, "nativeLibraries");
-      validate(nativeLibraries);
-      validate(newObjectConf);
-      validate(includeSlots);
-      validate(excludeSlots);
-      validate(passwordSets);
       notEmpty(mechanismFilters, "mechanismFilters");
-      validate(mechanismFilters);
+
+      validate(newObjectConf);
+      validate(nativeLibraries, includeSlots, excludeSlots, passwordSets, mechanismFilters);
     }
 
   } // class Module
@@ -511,9 +508,8 @@ public class Pkcs11conf extends ValidatableConf {
   @Override
   public void validate() throws InvalidConfException {
     notEmpty(modules, "modules");
-    validate(modules);
     notEmpty(mechanismSets, "mechanismSets");
-    validate(mechanismSets);
+    validate(modules, mechanismSets);
   }
 
 }

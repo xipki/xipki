@@ -83,8 +83,7 @@ class CaconfDbImporter extends DbPorter {
     System.out.println(" imported CA configuration to database");
   } // method importToDb
 
-  private void importDbSchema(List<CaCertstore.DbSchemaEntry> entries)
-          throws DataAccessException {
+  private void importDbSchema(List<CaCertstore.DbSchemaEntry> entries) throws DataAccessException {
     System.out.println("importing table DBSCHEMA");
     if (entries == null) {
       System.out.println(" imported table DBSCHEMA: nothing to import");
@@ -122,8 +121,7 @@ class CaconfDbImporter extends DbPorter {
     System.out.println(" imported table DBSCHEMA");
   } // method importDbSchema
 
-  private void importSigner(List<CaCertstore.Signer> signers)
-      throws DataAccessException, IOException {
+  private void importSigner(List<CaCertstore.Signer> signers) throws DataAccessException, IOException {
     System.out.println("importing table SIGNER");
     if (signers == null) {
       System.out.println(" imported table SIGNER: nothing to import");
@@ -309,10 +307,10 @@ class CaconfDbImporter extends DbPorter {
           X509Cert cert = X509Util.parseCert(certBytes);
 
           int idx = 1;
-          ps.setInt(idx++, ca.getId());
+          ps.setInt(   idx++, ca.getId());
           ps.setString(idx++, ca.getName().toLowerCase());
           ps.setString(idx++, ca.getStatus());
-          ps.setLong(idx++, ca.getNextCrlNo());
+          ps.setLong(  idx++, ca.getNextCrlNo());
           ps.setString(idx++, ca.getCrlSignerName());
           ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
           ps.setString(idx++, ca.getRevInfo());
@@ -320,9 +318,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, readContent(ca.getSignerConf()));
           ps.setString(idx++, Base64.encodeToString(certBytes));
           ps.setString(idx++, readContent(ca.getCertchain()));
-
-          String confColumn = readContent(ca.getConfColumn());
-          ps.setString(idx, confColumn);
+          ps.setString(idx,   readContent(ca.getConfColumn()));
 
           ps.executeUpdate();
         } catch (SQLException ex) {
@@ -340,8 +336,7 @@ class CaconfDbImporter extends DbPorter {
     System.out.println(" imported table CA");
   } // method importCa
 
-  private void importCaalias(List<CaCertstore.Caalias> caaliases)
-      throws DataAccessException {
+  private void importCaalias(List<CaCertstore.Caalias> caaliases) throws DataAccessException {
     System.out.println("importing table CAALIAS");
     final String sql = buildInsertSql("CAALIAS", "NAME,CA_ID");
     PreparedStatement ps = prepareStatement(sql);

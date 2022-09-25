@@ -166,13 +166,8 @@ public class CaConfType {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
-      validate(signers);
-      validate(requestors);
-      validate(publishers);
-      validate(profiles);
-      validate(cas);
+    public void validate() throws InvalidConfException {
+      validate(signers, requestors, publishers, profiles, cas);
     } // methdo validate
 
   } // class CaSystem
@@ -216,8 +211,7 @@ public class CaConfType {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notBlank(requestorName, "requestorName");
       notEmpty(permissions, "permissions");
     }
@@ -474,21 +468,18 @@ public class CaConfType {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       if (genSelfIssued != null) {
         if (cert != null) {
           throw new InvalidConfException("cert and genSelfIssued may not be both non-null");
         }
       }
-      validate(genSelfIssued);
-      validate(cert);
       notBlank(maxValidity, "maxValidity");
       notBlank(signerType, "signerType");
       notNull(signerConf, "signerConf");
-      validate(signerConf);
       notBlank(status, status);
-      validate(caUris);
+
+      validate(genSelfIssued, cert, signerConf, caUris);
     } // method validate
 
   } // class CaInfo
@@ -568,8 +559,7 @@ public class CaConfType {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notBlank(name, "name");
       validate(caInfo);
       validate(requestors);
@@ -632,8 +622,7 @@ public class CaConfType {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
     }
 
   } // class CaUris
@@ -691,8 +680,7 @@ public class CaConfType {
     }
 
     @Override
-    public void validate()
-        throws InvalidConfException {
+    public void validate() throws InvalidConfException {
       notBlank(subject, "subject");
     }
 
@@ -786,8 +774,7 @@ public class CaConfType {
       notBlank(name, "name");
       notBlank(type, "type");
       exactOne(conf, "conf", binaryConf, "binaryConf");
-      validate(conf);
-      validate(binaryConf);
+      validate(conf, binaryConf);
     }
 
   } // class Requestor
@@ -839,8 +826,7 @@ public class CaConfType {
       notBlank(name, "name");
       notBlank(type, "type");
       notNull(conf, "conf");
-      validate(conf);
-      validate(cert);
+      validate(conf, cert);
     }
 
   } // class Signer

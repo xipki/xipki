@@ -95,8 +95,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     }
   } // constructor
 
-  public byte[] sign(long mechanism, P11Params parameters, byte[] content)
-      throws P11TokenException {
+  public byte[] sign(long mechanism, P11Params parameters, byte[] content) throws P11TokenException {
     if (publicKey instanceof XDHKey) {
       throw new P11TokenException("this identity is not suitable for sign");
     }
@@ -128,8 +127,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
   protected abstract byte[] sign0(long mechanism, P11Params parameters, byte[] content)
       throws P11TokenException;
 
-  public byte[] digestSecretKey(long mechanism)
-      throws P11TokenException, XiSecurityException {
+  public byte[] digestSecretKey(long mechanism) throws P11TokenException, XiSecurityException {
     slot.assertMechanismSupported(mechanism);
     if (LOG.isDebugEnabled()) {
       LOG.debug("digest secret with mechanism {}", Functions.getMechanismDescription(mechanism));
@@ -137,8 +135,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     return digestSecretKey0(mechanism);
   }
 
-  protected abstract byte[] digestSecretKey0(long mechanism)
-      throws P11TokenException;
+  protected abstract byte[] digestSecretKey0(long mechanism) throws P11TokenException;
 
   public P11IdentityId getId() {
     return id;
@@ -188,25 +185,18 @@ public abstract class P11Identity implements Comparable<P11Identity> {
   public boolean supportsMechanism(long mechanism, P11Params parameters) {
     if (publicKey == null) {
       if (PKCS11Constants.CKM_SHA_1_HMAC == mechanism
-          || PKCS11Constants.CKM_SHA224_HMAC == mechanism
-          || PKCS11Constants.CKM_SHA256_HMAC == mechanism
-          || PKCS11Constants.CKM_SHA384_HMAC == mechanism
-          || PKCS11Constants.CKM_SHA512_HMAC == mechanism
-          || PKCS11Constants.CKM_SHA3_224_HMAC == mechanism
-          || PKCS11Constants.CKM_SHA3_256_HMAC == mechanism
-          || PKCS11Constants.CKM_SHA3_384_HMAC == mechanism
-          || PKCS11Constants.CKM_SHA3_512_HMAC == mechanism) {
+          || PKCS11Constants.CKM_SHA224_HMAC == mechanism  || PKCS11Constants.CKM_SHA256_HMAC == mechanism
+          || PKCS11Constants.CKM_SHA384_HMAC == mechanism  || PKCS11Constants.CKM_SHA512_HMAC == mechanism
+          || PKCS11Constants.CKM_SHA3_224_HMAC == mechanism || PKCS11Constants.CKM_SHA3_256_HMAC == mechanism
+          || PKCS11Constants.CKM_SHA3_384_HMAC == mechanism || PKCS11Constants.CKM_SHA3_512_HMAC == mechanism) {
         return parameters == null;
       }
     }
 
     if (publicKey instanceof RSAPublicKey) {
-      if (PKCS11Constants.CKM_RSA_9796 == mechanism
-          || PKCS11Constants.CKM_RSA_PKCS == mechanism
-          || PKCS11Constants.CKM_SHA1_RSA_PKCS == mechanism
-          || PKCS11Constants.CKM_SHA224_RSA_PKCS == mechanism
-          || PKCS11Constants.CKM_SHA256_RSA_PKCS == mechanism
-          || PKCS11Constants.CKM_SHA384_RSA_PKCS == mechanism
+      if (PKCS11Constants.CKM_RSA_9796 == mechanism || PKCS11Constants.CKM_RSA_PKCS == mechanism
+          || PKCS11Constants.CKM_SHA1_RSA_PKCS == mechanism   || PKCS11Constants.CKM_SHA224_RSA_PKCS == mechanism
+          || PKCS11Constants.CKM_SHA256_RSA_PKCS == mechanism || PKCS11Constants.CKM_SHA384_RSA_PKCS == mechanism
           || PKCS11Constants.CKM_SHA512_RSA_PKCS == mechanism) {
         return parameters == null;
       } else if (PKCS11Constants.CKM_RSA_PKCS_PSS == mechanism
@@ -223,19 +213,13 @@ public abstract class P11Identity implements Comparable<P11Identity> {
       if (parameters != null) {
         return false;
       }
-      return PKCS11Constants.CKM_DSA == mechanism
-          || PKCS11Constants.CKM_DSA_SHA1 == mechanism
-          || PKCS11Constants.CKM_DSA_SHA224 == mechanism
-          || PKCS11Constants.CKM_DSA_SHA256 == mechanism
-          || PKCS11Constants.CKM_DSA_SHA384 == mechanism
-          || PKCS11Constants.CKM_DSA_SHA512 == mechanism;
+      return PKCS11Constants.CKM_DSA == mechanism || PKCS11Constants.CKM_DSA_SHA1 == mechanism
+          || PKCS11Constants.CKM_DSA_SHA224 == mechanism || PKCS11Constants.CKM_DSA_SHA256 == mechanism
+          || PKCS11Constants.CKM_DSA_SHA384 == mechanism || PKCS11Constants.CKM_DSA_SHA512 == mechanism;
     } else if (publicKey instanceof ECPublicKey) {
-      if (PKCS11Constants.CKM_ECDSA == mechanism
-          || PKCS11Constants.CKM_ECDSA_SHA1 == mechanism
-          || PKCS11Constants.CKM_ECDSA_SHA224 == mechanism
-          || PKCS11Constants.CKM_ECDSA_SHA256 == mechanism
-          || PKCS11Constants.CKM_ECDSA_SHA384 == mechanism
-          || PKCS11Constants.CKM_ECDSA_SHA512 == mechanism
+      if (PKCS11Constants.CKM_ECDSA == mechanism || PKCS11Constants.CKM_ECDSA_SHA1 == mechanism
+          || PKCS11Constants.CKM_ECDSA_SHA224 == mechanism || PKCS11Constants.CKM_ECDSA_SHA256 == mechanism
+          || PKCS11Constants.CKM_ECDSA_SHA384 == mechanism || PKCS11Constants.CKM_ECDSA_SHA512 == mechanism
           || PKCS11Constants.CKM_VENDOR_SM2 == mechanism) {
         return parameters == null;
       } else if (PKCS11Constants.CKM_VENDOR_SM2_SM3 == mechanism) {

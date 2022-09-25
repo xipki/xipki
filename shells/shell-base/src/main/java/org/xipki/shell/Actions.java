@@ -24,12 +24,9 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.util.Args;
 import org.xipki.util.Base64;
+import org.xipki.util.*;
 import org.xipki.util.Curl.CurlResult;
-import org.xipki.util.FileUtils;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

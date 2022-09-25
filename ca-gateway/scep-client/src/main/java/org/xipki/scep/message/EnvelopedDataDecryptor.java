@@ -24,7 +24,6 @@ import org.xipki.util.Args;
 
 import java.security.PrivateKey;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 

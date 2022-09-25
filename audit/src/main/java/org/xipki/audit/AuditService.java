@@ -40,7 +40,7 @@ public interface AuditService extends AutoCloseable {
    * @since 6.0.0
    */
   void init(String conf, PasswordResolver passwordResolver)
-          throws PasswordResolverException, InvalidConfException;
+      throws PasswordResolverException, InvalidConfException;
 
   /**
    * Log audit event.

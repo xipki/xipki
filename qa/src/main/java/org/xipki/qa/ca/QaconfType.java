@@ -173,8 +173,7 @@ public class QaconfType extends ValidatableConf {
 
   @Override
   public void validate() throws InvalidConfException {
-    validate(issuers);
-    validate(certprofiles);
+    validate(issuers, certprofiles);
   }
 
 }

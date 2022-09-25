@@ -70,8 +70,7 @@ public class TlsHelper {
     LOG.info("set reverseProxyMode to {}", reverseProxyMode);
   } // method static
 
-  public static X509Cert getTlsClientCert(HttpServletRequest request)
-      throws IOException {
+  public static X509Cert getTlsClientCert(HttpServletRequest request) throws IOException {
     if (reverseProxyMode == null) {
       X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
       return (certs == null || certs.length < 1) ? null : new X509Cert(certs[0]);

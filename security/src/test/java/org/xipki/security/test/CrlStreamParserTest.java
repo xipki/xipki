@@ -51,19 +51,16 @@ public class CrlStreamParserTest {
 
   }
 
-  private static Certificate getIssuerSigner()
-      throws CertificateEncodingException, IOException {
+  private static Certificate getIssuerSigner() throws CertificateEncodingException, IOException {
     return parseCert(baseDir + "ca.crt");
   }
 
-  private static CrlStreamParser getParser(String crlFile)
-      throws IOException {
+  private static CrlStreamParser getParser(String crlFile) throws IOException {
     return new CrlStreamParser(new File(baseDir + crlFile));
   }
 
   @Test
-  public void parseCrl_revoked()
-      throws Exception {
+  public void parseCrl_revoked() throws Exception {
     Certificate issuerSigner = getIssuerSigner();
     CrlStreamParser parser = getParser("revoked-certs.crl");
 
@@ -85,8 +82,7 @@ public class CrlStreamParserTest {
   }
 
   @Test
-  public void parseCrlWithInvalidityDate()
-      throws Exception {
+  public void parseCrlWithInvalidityDate() throws Exception {
     Certificate issuerSigner = getIssuerSigner();
     CrlStreamParser parser = getParser("invaliditydate.crl");
 
@@ -108,8 +104,7 @@ public class CrlStreamParserTest {
   }
 
   @Test
-  public void parseCrlWithNoRevokedCerts()
-      throws Exception {
+  public void parseCrlWithNoRevokedCerts() throws Exception {
     Certificate issuerSigner = getIssuerSigner();
     CrlStreamParser parser = getParser("no-revoked-certs.crl");
 
@@ -131,8 +126,7 @@ public class CrlStreamParserTest {
   }
 
   @Test
-  public void parseCrlWithNoCrlNumber()
-      throws Exception {
+  public void parseCrlWithNoCrlNumber() throws Exception {
     Certificate issuerSigner = getIssuerSigner();
     CrlStreamParser parser = getParser("no-crlnumber.crl");
 
@@ -154,8 +148,7 @@ public class CrlStreamParserTest {
   }
 
   @Test
-  public void parseCrlWithNoExtension()
-      throws Exception {
+  public void parseCrlWithNoExtension() throws Exception {
     Certificate issuerSigner = getIssuerSigner();
     CrlStreamParser parser = getParser("no-extensions.crl");
 
@@ -176,8 +169,7 @@ public class CrlStreamParserTest {
     Assert.assertEquals("#revokedCertificates", 2, numRevokedCerts);
   }
 
-  private static Certificate parseCert(String fileName)
-      throws IOException, CertificateEncodingException {
+  private static Certificate parseCert(String fileName) throws IOException, CertificateEncodingException {
     try {
       return Certificate.getInstance(
           X509Util.toDerEncoded(Files.readAllBytes(Paths.get(fileName))));

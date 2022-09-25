@@ -111,13 +111,10 @@ public class SdkResponder {
   private ScheduledThreadPoolExecutor threadPoolExecutor;
 
   static {
-    reenrollCertExtnIds = new HashSet<>();
-    reenrollCertExtnIds.add(Extension.biometricInfo.getId());
-    reenrollCertExtnIds.add(Extension.extendedKeyUsage.getId());
-    reenrollCertExtnIds.add(Extension.keyUsage.getId());
-    reenrollCertExtnIds.add(Extension.qCStatements.getId());
-    reenrollCertExtnIds.add(Extension.subjectAlternativeName.getId());
-    reenrollCertExtnIds.add(Extension.subjectInfoAccess.getId());
+    reenrollCertExtnIds = CollectionUtil.asUnmodifiableSet(
+        Extension.biometricInfo.getId(),          Extension.extendedKeyUsage.getId(),
+        Extension.keyUsage.getId(),               Extension.qCStatements.getId(),
+        Extension.subjectAlternativeName.getId(), Extension.subjectInfoAccess.getId());
   }
 
   public SdkResponder(CaManagerImpl caManager) {
@@ -594,8 +591,7 @@ public class SdkResponder {
     return resp;
   }
 
-  private void assertIssuerMatch(X509Ca ca, ChangeCertStatusRequest req)
-      throws OperationException {
+  private void assertIssuerMatch(X509Ca ca, ChangeCertStatusRequest req) throws OperationException {
     assertIssuerMatch(ca, req.getIssuer(), req.getAuthorityKeyIdentifier(), req.getIssuerCertSha1Fp());
   }
 
@@ -644,8 +640,7 @@ public class SdkResponder {
     return buildCrlResp(crl, "generate CRL");
   }
 
-  private SdkResponse getCrl(RequestorInfo requestor, X509Ca ca, byte[] request)
-      throws OperationException {
+  private SdkResponse getCrl(RequestorInfo requestor, X509Ca ca, byte[] request) throws OperationException {
     GetCRLRequest req = GetCRLRequest.decode(request);
     X509CRLHolder crl = ca.getCrl(requestor, req.getCrlNumber());
     return buildCrlResp(crl, "get CRL");
@@ -667,8 +662,7 @@ public class SdkResponder {
     }
   }
 
-  private SdkResponse getCert(X509Ca ca, byte[] request)
-      throws OperationException {
+  private SdkResponse getCert(X509Ca ca, byte[] request) throws OperationException {
     GetCertRequest req = GetCertRequest.decode(request);
 
     X500Name issuer;
@@ -703,8 +697,7 @@ public class SdkResponder {
     return caManager.getCertprofileInfo(profileName);
   }
 
-  private static void assertPermitted(RequestorInfo requestor, int permission)
-      throws OperationException {
+  private static void assertPermitted(RequestorInfo requestor, int permission) throws OperationException {
     try {
       requestor.assertPermitted(permission);
     } catch (InsufficientPermissionException ex) {

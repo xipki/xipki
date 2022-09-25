@@ -236,8 +236,6 @@ class ImportCrl {
     this.datasource = notNull(datasource, "datasource");
     this.basedir = notNull(basedir, "basedir");
     this.certhashAlgo = DbCertStatusStore.getCertHashAlgo(datasource);
-
-    LOG.info("UPDATE_CERTSTORE");
     this.sqlSelectIdCert = datasource.buildSelectFirstSql(1, CORE_SQL_SELECT_ID_CERT);
   }
 
@@ -950,8 +948,7 @@ class ImportCrl {
     }
   } // method importCrlRevokedCertificates
 
-  private static X509Cert parseCert(File certFile)
-      throws ImportCrlException {
+  private static X509Cert parseCert(File certFile) throws ImportCrlException {
     try {
       return X509Util.parseCert(certFile);
     } catch (CertificateException | IOException ex) {
@@ -960,8 +957,7 @@ class ImportCrl {
     }
   } // method parseCert
 
-  private CertInfo getCertInfo(int caId, BigInteger serialNumber)
-      throws DataAccessException {
+  private CertInfo getCertInfo(int caId, BigInteger serialNumber) throws DataAccessException {
     ResultSet rs = null;
     try {
       psSelectIdCert.setInt(1, caId);
@@ -1179,8 +1175,7 @@ class ImportCrl {
     return intvalue;
   }
 
-  private void commit(Connection conn)
-      throws DataAccessException {
+  private void commit(Connection conn) throws DataAccessException {
     try {
       conn.commit();
     } catch (SQLException ex) {

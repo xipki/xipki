@@ -337,8 +337,7 @@ public class XijsonCertprofile extends BaseCertprofile {
   }
 
   @Override
-  protected void verifySubjectDnOccurrence(X500Name requestedSubject)
-      throws BadCertTemplateException {
+  protected void verifySubjectDnOccurrence(X500Name requestedSubject) throws BadCertTemplateException {
     notNull(requestedSubject, "requestedSubject");
 
     Map<ASN1ObjectIdentifier, GeneralNameTag> subjectToSubjectAltNameModes =

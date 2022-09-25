@@ -450,33 +450,11 @@ public class ExtensionType extends ValidatableConf {
   @Override
   public void validate() throws InvalidConfException {
     notNull(type, "type");
-    validate(type);
-    validate(additionalInformation);
-    validate(admissionSyntax);
-    validate(authorityInfoAccess);
-    validate(authorityKeyIdentifier);
-    validate(basicConstrains);
-    validate(biometricInfo);
-    validate(certificatePolicies);
-    validate(constant);
-    validate(extendedKeyUsage);
-    validate(inhibitAnyPolicy);
-    validate(keyUsage);
-    validate(nameConstraints);
-    validate(policyMappings);
-    validate(privateKeyUsagePeriod);
-    validate(policyConstraints);
-    validate(qcStatements);
-    validate(restriction);
-    validate(smimeCapabilities);
-    validate(subjectAltName);
-    validate(subjectDirectoryAttributs);
-    validate(subjectInfoAccess);
-    validate(subjectKeyIdentifier);
-    validate(tlsFeature);
-    validate(validityModel);
-    validate(cccExtensionSchema);
-    validate(syntax);
+    validate(type, additionalInformation, admissionSyntax, authorityInfoAccess, authorityKeyIdentifier);
+    validate(basicConstrains, biometricInfo, certificatePolicies, constant, extendedKeyUsage, inhibitAnyPolicy);
+    validate(keyUsage, nameConstraints, policyMappings, privateKeyUsagePeriod, policyConstraints, qcStatements);
+    validate(restriction, smimeCapabilities, subjectAltName, subjectDirectoryAttributs, subjectInfoAccess);
+    validate(subjectKeyIdentifier, tlsFeature, validityModel, cccExtensionSchema, syntax);
   } // method validate
 
 }

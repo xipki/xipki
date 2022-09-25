@@ -313,8 +313,7 @@ public class CaInfo {
     return randomSnGenerator.nextSerialNumber(caEntry.getSerialNoLen());
   }
 
-  public BigInteger nextCrlNumber()
-      throws OperationException {
+  public BigInteger nextCrlNumber() throws OperationException {
     long crlNo = caEntry.getNextCrlNumber();
     long currentMaxNo = certStore.getMaxCrlNumber(caEntry.getIdent());
     if (crlNo <= currentMaxNo) {
@@ -324,8 +323,7 @@ public class CaInfo {
     return BigInteger.valueOf(crlNo);
   }
 
-  public BigInteger getMaxFullCrlNumber()
-      throws OperationException {
+  public BigInteger getMaxFullCrlNumber() throws OperationException {
     long crlNumber = certStore.getMaxFullCrlNumber(caEntry.getIdent());
     return crlNumber == 0 ? null : BigInteger.valueOf(crlNumber);
   }
@@ -344,8 +342,7 @@ public class CaInfo {
     return null;
   } // method getSigner
 
-  public boolean initSigner(SecurityFactory securityFactory)
-      throws XiSecurityException {
+  public boolean initSigner(SecurityFactory securityFactory) throws XiSecurityException {
     if (signers != null) {
       return true;
     }

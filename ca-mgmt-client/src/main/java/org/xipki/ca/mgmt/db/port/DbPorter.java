@@ -200,8 +200,7 @@ public class DbPorter extends DbToolBase {
     this.maxX500nameLen = Integer.parseInt(dbSchemaInfo.getVariableValue("X500NAME_MAXLEN"));
   }
 
-  protected FileOrValue buildFileOrValue(String content, String fileName)
-      throws IOException {
+  protected FileOrValue buildFileOrValue(String content, String fileName) throws IOException {
     if (content == null) {
       return null;
     }
@@ -224,14 +223,10 @@ public class DbPorter extends DbToolBase {
 
   protected FileOrBinary buildFileOrBase64Binary(String base64Content, String fileName)
       throws IOException {
-    if (base64Content == null) {
-      return null;
-    }
-    return buildFileOrBinary(Base64.decode(base64Content), fileName);
+    return (base64Content == null) ? null : buildFileOrBinary(Base64.decode(base64Content), fileName);
   } // method buildFileOrBase64Binary
 
-  protected FileOrBinary buildFileOrBinary(byte[] content, String fileName)
-      throws IOException {
+  protected FileOrBinary buildFileOrBinary(byte[] content, String fileName) throws IOException {
     if (content == null) {
       return null;
     }
@@ -261,8 +256,7 @@ public class DbPorter extends DbToolBase {
       return fileOrBinary.getBinary();
     }
 
-    File file = new File(baseDir, fileOrBinary.getFile());
-    return IoUtil.read(file);
+    return IoUtil.read(new File(baseDir, fileOrBinary.getFile()));
   } // method readContent
 
   protected String readContent(FileOrValue fileOrValue) throws IOException {
@@ -274,12 +268,10 @@ public class DbPorter extends DbToolBase {
       return fileOrValue.getValue();
     }
 
-    File file = new File(baseDir, fileOrValue.getFile());
-    return StringUtil.toUtf8String(IoUtil.read(file));
+    return StringUtil.toUtf8String(IoUtil.read(new File(baseDir, fileOrValue.getFile())));
   } // method readContent
 
-  public static void echoToFile(String content, File file)
-      throws IOException {
+  public static void echoToFile(String content, File file) throws IOException {
     Files.write(Args.notNull(file, "file").toPath(), StringUtil.toUtf8Bytes(Args.notNull(content, "content")));
   }
 

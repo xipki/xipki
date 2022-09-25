@@ -18,8 +18,8 @@
 package org.xipki.cmp.client;
 
 import org.bouncycastle.asn1.cmp.PKIStatusInfo;
-import org.xipki.cmp.PkiStatusInfo;
 import org.xipki.cmp.CmpFailureUtil;
+import org.xipki.cmp.PkiStatusInfo;
 
 /**
  * Exception that wraps the PKIStatusInfo.

@@ -62,9 +62,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
   private final int numCertsPerCommit;
 
-  OcspCertStoreFromCaDbImporter(
-      DataSourceWrapper datasource,  String srcDir, String publisherName,
-      int numCertsPerCommit, boolean resume, AtomicBoolean stopMe)
+  OcspCertStoreFromCaDbImporter(DataSourceWrapper datasource,  String srcDir, String publisherName,
+                                int numCertsPerCommit, boolean resume, AtomicBoolean stopMe)
       throws Exception {
     super(datasource, srcDir, stopMe);
 
@@ -152,8 +151,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
         return;
       }
 
-      List<Integer> relatedCertStoreCaIds = resume
-          ? getIssuerIds(relatedCas) : importIssuer(relatedCas);
+      List<Integer> relatedCertStoreCaIds = resume ? getIssuerIds(relatedCas) : importIssuer(relatedCas);
 
       File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);
       importCert(certstore, revokedOnly, relatedCertStoreCaIds, processLogFile);
@@ -165,8 +163,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     System.out.println(" imported OCSP certstore to database");
   } // method importToDb
 
-  private List<Integer> getIssuerIds(List<CaCertstore.Ca> cas)
-      throws IOException {
+  private List<Integer> getIssuerIds(List<CaCertstore.Ca> cas) throws IOException {
     List<Integer> relatedCaIds = new LinkedList<>();
     for (CaCertstore.Ca issuer : cas) {
       byte[] encodedCert = issuer.getCert() == null ? null : readContent(issuer.getCert());
@@ -209,9 +206,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     return relatedCaIds;
   } // method importIssuer
 
-  private void importIssuer0(CaCertstore.Ca issuer, String sql, PreparedStatement ps,
-      List<Integer> relatedCaIds)
-          throws IOException, DataAccessException, CertificateException {
+  private void importIssuer0(CaCertstore.Ca issuer, String sql, PreparedStatement ps, List<Integer> relatedCaIds)
+      throws IOException, DataAccessException, CertificateException {
     try {
       byte[] encodedCert = readContent(issuer.getCert());
       relatedCaIds.add(issuer.getId());
@@ -261,8 +257,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
         StringTokenizer st = new StringTokenizer(str, ":");
         numProcessedBefore = Integer.parseInt(st.nextToken());
-        minId = Long.parseLong(st.nextToken());
-        minId++;
+        minId = 1 + Long.parseLong(st.nextToken());
       }
     }
 
@@ -321,18 +316,16 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
         + importLog.numProcessed() + " certificates");
   } // method importCert
 
-  private long importCert0(
-      HashAlgo certhashAlgo, PreparedStatement psCert, String certsZipFile,
-      boolean revokedOnly, List<Integer> caIds, long minId, File processLogFile,
-      ProcessLog processLog, int numProcessedInLastProcess, ProcessLog importLog)
+  private long importCert0(HashAlgo certhashAlgo, PreparedStatement psCert, String certsZipFile,
+                           boolean revokedOnly, List<Integer> caIds, long minId, File processLogFile,
+                           ProcessLog processLog, int numProcessedInLastProcess, ProcessLog importLog)
       throws Exception {
     ZipFile zipFile = new ZipFile(new File(certsZipFile));
     ZipEntry certsEntry = zipFile.getEntry("overview.json");
 
     CaCertstore.Certs certs;
     try {
-      certs = JSON.parseObject(zipFile.getInputStream(certsEntry), StandardCharsets.UTF_8,
-          CaCertstore.Certs.class);
+      certs = JSON.parseObject(zipFile.getInputStream(certsEntry), StandardCharsets.UTF_8, CaCertstore.Certs.class);
     } catch (Exception ex) {
       try {
         zipFile.close();
@@ -377,15 +370,12 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
             String filename = cert.getFile();
 
             // rawcert
-            ZipEntry certZipEnty = zipFile.getEntry(filename);
-            // rawcert
-            byte[] encodedCert = IoUtil.read(zipFile.getInputStream(certZipEnty));
+            byte[] encodedCert = IoUtil.read(zipFile.getInputStream(zipFile.getEntry(filename)));
             String certhash = certhashAlgo.base64Hash(encodedCert);
 
             TBSCertificate tbsCert;
             try {
-              Certificate cc = Certificate.getInstance(encodedCert);
-              tbsCert = cc.getTBSCertificate();
+              tbsCert = Certificate.getInstance(encodedCert).getTBSCertificate();
             } catch (RuntimeException ex) {
               LogUtil.error(LOG, ex, "could not parse certificate in file " + filename);
               throw new CertificateException(ex.getMessage(), ex);
@@ -421,8 +411,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
         boolean isLastBlock = i == n - 1;
 
-        if (numImportedEntriesInBatch > 0
-            && (numImportedEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock)) {
+        if (numImportedEntriesInBatch > 0 && (numImportedEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock)) {
           try {
             psCert.executeBatch();
             commit("(commit import cert to OCSP)");
@@ -466,8 +455,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     }
   } // method importCert0
 
-  private HashAlgo getCertHashAlgo()
-      throws DataAccessException {
+  private HashAlgo getCertHashAlgo() throws DataAccessException {
     String certHashAlgoStr = dbSchemaInfo.getVariableValue("CERTHASH_ALGO");
     if (certHashAlgoStr == null) {
       throw new DataAccessException("Column with NAME='CERTHASH_ALGO' is not defined in table DBSCHEMA");

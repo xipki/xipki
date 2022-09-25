@@ -54,8 +54,8 @@ public abstract class DbPortWorker extends DbWorker {
 
   protected char[] password;
 
-  public DbPortWorker(
-      DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String dbConfFile, char[] password)
+  public DbPortWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
+                      String dbConfFile, char[] password)
       throws PasswordResolverException, IOException {
     super(datasourceFactory, passwordResolver, dbConfFile);
     this.password = password;
@@ -150,9 +150,8 @@ public abstract class DbPortWorker extends DbWorker {
 
     private final int batchEntriesPerCommit;
 
-    public ImportCaDb(
-        DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String dbConfFile,
-        boolean resume, String srcFolder, int batchEntriesPerCommit, char[] password)
+    public ImportCaDb(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String dbConfFile,
+                      boolean resume, String srcFolder, int batchEntriesPerCommit, char[] password)
         throws PasswordResolverException, IOException {
       super(datasourceFactory, passwordResolver, dbConfFile, password);
       this.resume = resume;
@@ -203,8 +202,7 @@ public abstract class DbPortWorker extends DbWorker {
           LOG.error("datasource.close()", th);
         }
         deleteDecryptedFiles(srcFolder);
-        long end = System.currentTimeMillis();
-        System.out.println("Finished in " + StringUtil.formatTime((end - start) / 1000, false));
+        printFinishedIn(start);
       }
     } // method run0
 
@@ -285,8 +283,7 @@ public abstract class DbPortWorker extends DbWorker {
         } catch (Throwable th) {
           LOG.error("datasource.close()", th);
         }
-        long end = System.currentTimeMillis();
-        System.out.println("Finished in " + StringUtil.formatTime((end - start) / 1000, false));
+        printFinishedIn(start);
       }
     } // method run0
 
@@ -353,8 +350,7 @@ public abstract class DbPortWorker extends DbWorker {
         } catch (Throwable th) {
           LOG.error("datasource.close()", th);
         }
-        long end = System.currentTimeMillis();
-        System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
+        printFinishedIn(start);
       }
     }
 
@@ -398,8 +394,7 @@ public abstract class DbPortWorker extends DbWorker {
           LOG.error("datasource.close()", th);
         }
         deleteDecryptedFiles(srcFolder);
-        long end = System.currentTimeMillis();
-        System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
+        printFinishedIn(start);
       }
     }
 
@@ -447,11 +442,15 @@ public abstract class DbPortWorker extends DbWorker {
         }
 
         deleteDecryptedFiles(srcFolder);
-        long end = System.currentTimeMillis();
-        System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
+        printFinishedIn(start);
       }
     }
 
   } // class ImportOcspFromCaDb
+
+  private static void printFinishedIn(long startMs) {
+    long duration = (System.currentTimeMillis() - startMs) / 1000;
+    System.out.println("Finished in " + StringUtil.formatTime(duration, false));
+  }
 
 }

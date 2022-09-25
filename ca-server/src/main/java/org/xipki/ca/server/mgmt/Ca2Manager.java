@@ -835,8 +835,7 @@ class Ca2Manager {
     }
   } // method getCurrentCrl
 
-  CertWithRevocationInfo getCert(String caName, BigInteger serialNumber)
-      throws CaMgmtException {
+  CertWithRevocationInfo getCert(String caName, BigInteger serialNumber) throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     notNull(serialNumber, "serialNumber");
     X509Ca ca = getX509Ca(caName);
@@ -847,8 +846,7 @@ class Ca2Manager {
     }
   } // method getCert
 
-  CertWithRevocationInfo getCert(X500Name issuer, BigInteger serialNumber)
-      throws CaMgmtException {
+  CertWithRevocationInfo getCert(X500Name issuer, BigInteger serialNumber) throws CaMgmtException {
     notNull(issuer, "issuer");
     notNull(serialNumber, "serialNumber");
 
@@ -885,8 +883,7 @@ class Ca2Manager {
     }
   } // method listCertificates
 
-  void commitNextCrlNo(NameId ca, long nextCrlNo)
-      throws OperationException {
+  void commitNextCrlNo(NameId ca, long nextCrlNo) throws OperationException {
     try {
       manager.queryExecutor.commitNextCrlNoIfLess(ca, nextCrlNo);
     } catch (CaMgmtException ex) {

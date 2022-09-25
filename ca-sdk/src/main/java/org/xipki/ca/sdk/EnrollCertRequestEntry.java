@@ -102,8 +102,7 @@ public class EnrollCertRequestEntry {
     this.subjectPublicKey = subjectPublicKey;
   }
 
-  public void subjectPublicKey(SubjectPublicKeyInfo subjectPublicKey)
-      throws IOException {
+  public void subjectPublicKey(SubjectPublicKeyInfo subjectPublicKey) throws IOException {
     this.subjectPublicKey = subjectPublicKey == null ? null : subjectPublicKey.getEncoded();
   }
 
@@ -123,8 +122,7 @@ public class EnrollCertRequestEntry {
     this.extensions = extensions;
   }
 
-  public void extensions(Extensions extensions)
-      throws IOException {
+  public void extensions(Extensions extensions) throws IOException {
     this.extensions = extensions == null ? null : extensions.getEncoded();
   }
 

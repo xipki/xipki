@@ -18,15 +18,11 @@
 package org.xipki.ca.sdk;
 
 import com.alibaba.fastjson.JSON;
-import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.SslConf;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
  *

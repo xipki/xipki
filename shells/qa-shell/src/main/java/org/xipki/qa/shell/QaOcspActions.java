@@ -426,8 +426,7 @@ public class QaOcspActions {
       return ret;
     } // method processOcspQuery
 
-    private void println(String message, OutputStream out)
-        throws IOException {
+    private void println(String message, OutputStream out) throws IOException {
       out.write(StringUtil.toUtf8Bytes(message));
       out.write('\n');
     } // method println

@@ -63,8 +63,7 @@ public class PolicyConstraints extends ValidatableConf {
     }
   }
 
-  public ASN1Sequence toXiPolicyConstrains()
-      throws CertprofileException {
+  public ASN1Sequence toXiPolicyConstrains() throws CertprofileException {
     if (requireExplicitPolicy != null && requireExplicitPolicy < 0) {
       throw new CertprofileException("negative requireExplicitPolicy is not allowed: " + requireExplicitPolicy);
     }
