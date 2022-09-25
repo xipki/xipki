@@ -129,13 +129,8 @@ class GrandCertTemplateBuilder {
     }
 
     boolean forCrossCert = certTemplate.isForCrossCert();
-    X500Name requestedSubject;
-
-    if (forCrossCert) {
-      requestedSubject = certTemplate.getSubject();
-    } else {
-      requestedSubject = CaUtil.removeEmptyRdns(certTemplate.getSubject());
-    }
+    X500Name requestedSubject = forCrossCert ? certTemplate.getSubject()
+        : CaUtil.removeEmptyRdns(certTemplate.getSubject());
 
     Date reqNotBefore = certTemplate.getNotBefore();
 

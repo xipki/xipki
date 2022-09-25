@@ -66,7 +66,7 @@ public class IdentifiedCertPublisher implements Closeable {
   }
 
   public boolean certificateRevoked(X509Cert caCert, CertWithDbId cert, String certprofile,
-      CertRevocationInfo revInfo) {
+                                    CertRevocationInfo revInfo) {
     return certPublisher.certificateRevoked(caCert, cert, certprofile, revInfo);
   }
 

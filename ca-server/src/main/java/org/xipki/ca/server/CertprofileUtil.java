@@ -69,9 +69,7 @@ public class CertprofileUtil {
 
         // subject:street
         if (containsRdn(subject, DN.street)) {
-          if (!containsRdn(subject, DN.O)
-              && !containsRdn(subject, DN.givenName)
-              && !containsRdn(subject, DN.surname)) {
+          if (!containsRdn(subject, DN.O) && !containsRdn(subject, DN.givenName) && !containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:street is prohibited if the "
                 + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
           }
@@ -79,17 +77,13 @@ public class CertprofileUtil {
 
         // subject:localityName
         if (containsRdn(subject, DN.localityName)) {
-          if (!containsRdn(subject, DN.O)
-              && !containsRdn(subject, DN.givenName)
-              && !containsRdn(subject, DN.surname)) {
+          if (!containsRdn(subject, DN.O) && !containsRdn(subject, DN.givenName) && !containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:localityName is prohibited if the "
                 + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
           }
         } else {
-          if (!containsRdn(subject, DN.ST)
-              && (containsRdn(subject, DN.O)
-                  || containsRdn(subject, DN.givenName)
-                  || containsRdn(subject, DN.surname))) {
+          if (!containsRdn(subject, DN.ST) &&
+              (containsRdn(subject, DN.O) || containsRdn(subject, DN.givenName) || containsRdn(subject, DN.surname))) {
             throw new BadCertTemplateException("subject:localityName is required if the "
                 + "subject:organizationName field, subject:givenName field, or subject:surname "
                 + "field are present and the subject:stateOrProvinceName field is absent.");
@@ -98,17 +92,13 @@ public class CertprofileUtil {
 
         // subject:stateOrProvinceName
         if (containsRdn(subject, DN.ST)) {
-          if (!containsRdn(subject, DN.O)
-              && !containsRdn(subject, DN.givenName)
-              && !containsRdn(subject, DN.surname)) {
+          if (!containsRdn(subject, DN.O) && !containsRdn(subject, DN.givenName) && !containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:stateOrProvinceName is prohibited if the "
                 + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
           }
         } else {
-          if (!containsRdn(subject, DN.localityName)
-              && (containsRdn(subject, DN.O)
-                  || containsRdn(subject, DN.givenName)
-                  || containsRdn(subject, DN.surname))) {
+          if (!containsRdn(subject, DN.localityName) &&
+              (containsRdn(subject, DN.O) || containsRdn(subject, DN.givenName) || containsRdn(subject, DN.surname))) {
             throw new BadCertTemplateException("subject:stateOrProvinceName is required if the "
                 + "subject:organizationName field, subject:givenName field, or subject:surname "
                 +  "field are present and the subject:localityName field is absent.");
@@ -117,9 +107,7 @@ public class CertprofileUtil {
 
         // subject:postalCode
         if (containsRdn(subject, DN.postalCode)) {
-          if (!containsRdn(subject, DN.O)
-              && !containsRdn(subject, DN.givenName)
-              && !containsRdn(subject, DN.surname)) {
+          if (!containsRdn(subject, DN.O) && !containsRdn(subject, DN.givenName) && !containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:postalCode is prohibited if the "
                 + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
           }
@@ -127,9 +115,7 @@ public class CertprofileUtil {
 
         // subject:countryCode
         if (!containsRdn(subject, DN.C)) {
-          if (containsRdn(subject, DN.O)
-              || containsRdn(subject, DN.givenName)
-              || containsRdn(subject, DN.surname)) {
+          if (containsRdn(subject, DN.O) || containsRdn(subject, DN.givenName) || containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:countryCode is required if the "
                 + "subject:organizationName field, subject:givenName, and subject:surname field are present");
           }
@@ -218,8 +204,7 @@ public class CertprofileUtil {
   } // method containsRdn
 
   static void addRequestedKeyusage(Set<KeyUsage> usages,
-      Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
-      Set<KeyUsageControl> usageOccs) {
+          Map<ASN1ObjectIdentifier, Extension> requestedExtensions, Set<KeyUsageControl> usageOccs) {
     Extension extension = requestedExtensions.get(Extension.keyUsage);
     if (extension == null) {
       return;

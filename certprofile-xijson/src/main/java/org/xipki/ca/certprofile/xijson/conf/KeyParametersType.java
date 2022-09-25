@@ -190,15 +190,11 @@ public class KeyParametersType extends ValidatableConf {
       KeyParametersOption.ECParamatersOption option = new KeyParametersOption.ECParamatersOption();
 
       if (ec.getCurves() != null) {
-        List<DescribableOid> curves = ec.getCurves();
-        Set<ASN1ObjectIdentifier> curveOids = X509ProfileType.toOidSet(curves);
-        option.setCurveOids(curveOids);
+        option.setCurveOids(X509ProfileType.toOidSet(ec.getCurves()));
       }
 
       if (ec.getPointEncodings() != null) {
-        List<Byte> bytes = ec.getPointEncodings();
-        Set<Byte> pointEncodings = new HashSet<>(bytes);
-        option.setPointEncodings(pointEncodings);
+        option.setPointEncodings(new HashSet<>(ec.getPointEncodings()));
       }
       return option;
     } else if (rsa != null) {

@@ -134,9 +134,7 @@ public class IdentifiedCertprofile implements Closeable {
 
         // subject:street
         if (containsRdn(subject, DN.street)) {
-          if (!containsRdn(subject, DN.O)
-              && !containsRdn(subject, DN.givenName)
-              && !containsRdn(subject, DN.surname)) {
+          if (!containsRdn(subject, DN.O) && !containsRdn(subject, DN.givenName) && !containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:street is prohibited if the "
                 + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
           }
@@ -144,17 +142,13 @@ public class IdentifiedCertprofile implements Closeable {
 
         // subject:localityName
         if (containsRdn(subject, DN.localityName)) {
-          if (!containsRdn(subject, DN.O)
-              && !containsRdn(subject, DN.givenName)
-              && !containsRdn(subject, DN.surname)) {
+          if (!containsRdn(subject, DN.O) && !containsRdn(subject, DN.givenName) && !containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:localityName is prohibited if the "
                 + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
           }
         } else {
-          if (!containsRdn(subject, DN.ST)
-              && (containsRdn(subject, DN.O)
-                  || containsRdn(subject, DN.givenName)
-                  || containsRdn(subject, DN.surname))) {
+          if (!containsRdn(subject, DN.ST) &&
+              (containsRdn(subject, DN.O) || containsRdn(subject, DN.givenName) || containsRdn(subject, DN.surname))) {
             throw new BadCertTemplateException("subject:localityName is required if the "
                 + "subject:organizationName field, subject:givenName field, or subject:surname "
                 + "field are present and the subject:stateOrProvinceName field is absent.");
@@ -163,17 +157,13 @@ public class IdentifiedCertprofile implements Closeable {
 
         // subject:stateOrProvinceName
         if (containsRdn(subject, DN.ST)) {
-          if (!containsRdn(subject, DN.O)
-              && !containsRdn(subject, DN.givenName)
-              && !containsRdn(subject, DN.surname)) {
+          if (!containsRdn(subject, DN.O) && !containsRdn(subject, DN.givenName) && !containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:stateOrProvinceName is prohibited if the "
                 + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
           }
         } else {
-          if (!containsRdn(subject, DN.localityName)
-              && (containsRdn(subject, DN.O)
-                  || containsRdn(subject, DN.givenName)
-                  || containsRdn(subject, DN.surname))) {
+          if (!containsRdn(subject, DN.localityName) &&
+              (containsRdn(subject, DN.O) || containsRdn(subject, DN.givenName) || containsRdn(subject, DN.surname))) {
             throw new BadCertTemplateException("subject:stateOrProvinceName is required if the "
                 + "subject:organizationName field, subject:givenName field, or subject:surname "
                 +  "field are present and the subject:localityName field is absent.");
@@ -182,9 +172,7 @@ public class IdentifiedCertprofile implements Closeable {
 
         // subject:postalCode
         if (containsRdn(subject, DN.postalCode)) {
-          if (!containsRdn(subject, DN.O)
-              && !containsRdn(subject, DN.givenName)
-              && !containsRdn(subject, DN.surname)) {
+          if (!containsRdn(subject, DN.O) && !containsRdn(subject, DN.givenName) && !containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:postalCode is prohibited if the "
                 + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
           }
@@ -192,9 +180,7 @@ public class IdentifiedCertprofile implements Closeable {
 
         // subject:countryCode
         if (!containsRdn(subject, DN.C)) {
-          if (containsRdn(subject, DN.O)
-              || containsRdn(subject, DN.givenName)
-              || containsRdn(subject, DN.surname)) {
+          if (containsRdn(subject, DN.O) || containsRdn(subject, DN.givenName) || containsRdn(subject, DN.surname)) {
             throw new BadCertTemplateException("subject:countryCode is required if the "
                 + "subject:organizationName field, subject:givenName, and subject:surname field are present");
           }
@@ -254,10 +240,8 @@ public class IdentifiedCertprofile implements Closeable {
 
     // check the country
     ASN1ObjectIdentifier[] countryOids = new ASN1ObjectIdentifier[] {
-        ObjectIdentifiers.DN.C,
-        ObjectIdentifiers.DN.countryOfCitizenship,
-        ObjectIdentifiers.DN.countryOfResidence,
-        ObjectIdentifiers.DN.jurisdictionOfIncorporationCountryName};
+        ObjectIdentifiers.DN.C,  ObjectIdentifiers.DN.countryOfCitizenship,
+        ObjectIdentifiers.DN.countryOfResidence, ObjectIdentifiers.DN.jurisdictionOfIncorporationCountryName};
 
     for (ASN1ObjectIdentifier oid : countryOids) {
       RDN[] countryRdns = subjectInfo.getGrantedSubject().getRDNs(oid);
@@ -499,8 +483,7 @@ public class IdentifiedCertprofile implements Closeable {
       // the optional ExtKeyUsage will only be set if requested explicitly
       addRequestedExtKeyusage(usages, requestedExtns, usageOccs);
 
-      if (extControl.isCritical()
-          && usages.contains(ObjectIdentifiers.XKU.id_kp_anyExtendedKeyUsage)) {
+      if (extControl.isCritical() && usages.contains(ObjectIdentifiers.XKU.id_kp_anyExtendedKeyUsage)) {
         extControl = new ExtensionControl(false, extControl.isRequired(), extControl.getInRequest());
       }
 
@@ -705,7 +688,8 @@ public class IdentifiedCertprofile implements Closeable {
     return certprofile.checkPublicKey(notNull(publicKey, "publicKey"));
   }
 
-  public SubjectKeyIdentifier getSubjectKeyIdentifier(SubjectPublicKeyInfo publicKey) throws CertprofileException {
+  public SubjectKeyIdentifier getSubjectKeyIdentifier(SubjectPublicKeyInfo publicKey)
+      throws CertprofileException {
     return certprofile.getSubjectKeyIdentifier(publicKey);
   }
 

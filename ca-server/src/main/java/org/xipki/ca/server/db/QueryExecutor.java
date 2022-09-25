@@ -121,9 +121,7 @@ class QueryExecutor {
 
         rs = stmt.executeQuery(sql);
         while (rs.next()) {
-          String name = rs.getString("NAME");
-          String value = rs.getString("VALUE2");
-          variables.put(name, value);
+          variables.put(rs.getString("NAME"), rs.getString("VALUE2"));
         }
       } catch (SQLException ex) {
         throw datasource.translate(sql, ex);
@@ -207,8 +205,7 @@ class QueryExecutor {
     }
   }
 
-  protected int execUpdatePrepStmt(String sql, SqlColumn2... params)
-      throws DataAccessException {
+  protected int execUpdatePrepStmt(String sql, SqlColumn2... params) throws DataAccessException {
     PreparedStatement ps = buildPrepStmt(sql, params);
     try {
       return ps.executeUpdate();
@@ -244,14 +241,12 @@ class QueryExecutor {
     }
   }
 
-  protected ResultRow execQuery1PrepStmt(String sql, SqlColumn2... params)
-      throws DataAccessException {
+  protected ResultRow execQuery1PrepStmt(String sql, SqlColumn2... params) throws DataAccessException {
     List<ResultRow> rows = execQueryPrepStmt(true, sql, params);
     return rows.isEmpty() ? null : rows.get(0);
   }
 
-  protected List<ResultRow> execQueryPrepStmt(String sql, SqlColumn2... params)
-      throws DataAccessException {
+  protected List<ResultRow> execQueryPrepStmt(String sql, SqlColumn2... params) throws DataAccessException {
     return execQueryPrepStmt(false, sql, params);
   }
 
@@ -276,8 +271,7 @@ class QueryExecutor {
     }
   }
 
-  protected PreparedStatement buildPrepStmt(String sql,  SqlColumn2... columns)
-      throws DataAccessException {
+  protected PreparedStatement buildPrepStmt(String sql,  SqlColumn2... columns) throws DataAccessException {
     PreparedStatement ps = null;
     boolean succ = false;
     try {
@@ -339,8 +333,7 @@ class QueryExecutor {
     notNull(param2, name2);
   }
 
-  protected void notNulls(Object param1, String name1, Object param2, String name2,
-      Object param3, String name3) {
+  protected void notNulls(Object param1, String name1, Object param2, String name2, Object param3, String name3) {
     notNull(param1, name1);
     notNull(param2, name2);
     notNull(param3, name3);

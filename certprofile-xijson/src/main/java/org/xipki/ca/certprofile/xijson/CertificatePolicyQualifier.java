@@ -52,8 +52,7 @@ public class CertificatePolicyQualifier {
   }
 
   public static CertificatePolicyQualifier getInstanceForCpsUri(String cpsUri) {
-    Args.notNull(cpsUri, "cpsUri");
-    return new CertificatePolicyQualifier(cpsUri, null);
+    return new CertificatePolicyQualifier(Args.notNull(cpsUri, "cpsUri"), null);
   }
 
 }

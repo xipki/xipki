@@ -116,8 +116,7 @@ public class CertStoreBase extends QueryExecutor {
     updateDbInfo(passwordResolver);
   } // constructor
 
-  public void updateDbInfo(PasswordResolver passwordResolver)
-      throws DataAccessException, CaMgmtException {
+  public void updateDbInfo(PasswordResolver passwordResolver) throws DataAccessException, CaMgmtException {
     DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
 
     // Save keypair control
@@ -131,8 +130,7 @@ public class CertStoreBase extends QueryExecutor {
           throw new CaMgmtException("error resolving KEYPAIR_ENC_KEY");
         }
         this.keypairEncKey = new SecretKeySpec(encodedEncKey, "AES");
-        byte[] keyIdBytes = Arrays.copyOf(HashAlgo.SHA1.hash(encodedEncKey), 8);
-        this.keypairEncKeyId = Hex.encode(keyIdBytes);
+        this.keypairEncKeyId = Hex.encode(Arrays.copyOf(HashAlgo.SHA1.hash(encodedEncKey), 8));
       } catch (PasswordResolverException ex) {
         throw new CaMgmtException("error resolving KEYPAIR_ENC_KEY", ex);
       }
@@ -180,8 +178,7 @@ public class CertStoreBase extends QueryExecutor {
     }
   }
 
-  protected int execUpdatePrepStmt0(String sql, SqlColumn2... params)
-      throws OperationException {
+  protected int execUpdatePrepStmt0(String sql, SqlColumn2... params) throws OperationException {
     try {
       return execUpdatePrepStmt(sql, params);
     } catch (DataAccessException ex) {
@@ -189,8 +186,7 @@ public class CertStoreBase extends QueryExecutor {
     }
   }
 
-  protected ResultRow execQuery1PrepStmt0(String sql, SqlColumn2... params)
-      throws OperationException {
+  protected ResultRow execQuery1PrepStmt0(String sql, SqlColumn2... params) throws OperationException {
     try {
       return execQuery1PrepStmt(sql, params);
     } catch (DataAccessException ex) {
@@ -198,8 +194,7 @@ public class CertStoreBase extends QueryExecutor {
     }
   }
 
-  protected List<ResultRow> execQueryPrepStmt0(String sql, SqlColumn2... params)
-      throws OperationException {
+  protected List<ResultRow> execQueryPrepStmt0(String sql, SqlColumn2... params) throws OperationException {
     try {
       return execQueryPrepStmt(sql, params);
     } catch (DataAccessException ex) {
@@ -207,8 +202,7 @@ public class CertStoreBase extends QueryExecutor {
     }
   }
 
-  protected PreparedStatement buildPrepStmt0(String sql, SqlColumn2... columns)
-      throws OperationException {
+  protected PreparedStatement buildPrepStmt0(String sql, SqlColumn2... columns) throws OperationException {
     try {
       return buildPrepStmt(sql, columns);
     } catch (DataAccessException ex) {
@@ -216,8 +210,7 @@ public class CertStoreBase extends QueryExecutor {
     }
   }
 
-  protected long execQueryLongPrepStmt(String sql, SqlColumn2... params)
-      throws OperationException {
+  protected long execQueryLongPrepStmt(String sql, SqlColumn2... params) throws OperationException {
     PreparedStatement ps = buildPrepStmt0(sql, params);
     ResultSet rs = null;
     try {

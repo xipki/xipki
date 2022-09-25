@@ -299,7 +299,8 @@ public class XijsonCertprofile extends BaseCertprofile {
       if (rdn.getNotInSubject() != null) {
         rdnControl.setNotInSubject(rdn.getNotInSubject());
       }
-      fixRdnControl(rdnControl);
+
+      SubjectDnSpec.fixRdnControl(rdnControl);
     }
 
     this.subjectControl = new SubjectControl(subjectDnControls, subject.keepRdnOrder());

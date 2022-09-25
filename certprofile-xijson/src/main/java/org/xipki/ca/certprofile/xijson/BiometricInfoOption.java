@@ -71,9 +71,7 @@ public class BiometricInfoOption {
   } // constructor
 
   public boolean isTypePermitted(TypeOfBiometricData type) {
-    notNull(type, "type");
-
-    if (type.isPredefined()) {
+    if (notNull(type, "type").isPredefined()) {
       return predefinedTypes.contains(type.getPredefinedBiometricType());
     } else {
       return idTypes.contains(type.getBiometricDataOid());
@@ -81,8 +79,7 @@ public class BiometricInfoOption {
   }
 
   public boolean isHashAlgorithmPermitted(HashAlgo hashAlgorithm) {
-    notNull(hashAlgorithm, "hashAlgorithm");
-    return hashAlgorithms.contains(hashAlgorithm);
+    return hashAlgorithms.contains(notNull(hashAlgorithm, "hashAlgorithm"));
   }
 
   public TripleState getSourceDataUriOccurrence() {

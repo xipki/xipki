@@ -158,8 +158,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     }
   } // method revokeCertificate
 
-  public CertWithDbId unsuspendCert(BigInteger serialNumber, AuditEvent event)
-      throws OperationException {
+  public CertWithDbId unsuspendCert(BigInteger serialNumber, AuditEvent event) throws OperationException {
     if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
       throw new OperationException(NOT_PERMITTED, "insufficient permission to unsuspend CA certificate");
     }
@@ -264,8 +263,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     return unrevokedCert;
   } // doUnrevokeCertificate
 
-  public void revokeCa(RequestorInfo requestor, CertRevocationInfo revocationInfo)
-      throws OperationException {
+  public void revokeCa(RequestorInfo requestor, CertRevocationInfo revocationInfo) throws OperationException {
     notNull(revocationInfo, "revocationInfo");
     caInfo.setRevocationInfo(revocationInfo);
 

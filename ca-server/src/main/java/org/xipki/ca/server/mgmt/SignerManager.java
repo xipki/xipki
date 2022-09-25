@@ -161,8 +161,7 @@ class SignerManager {
     return ret;
   } // method createSigner
 
-  String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose)
-          throws CaMgmtException {
+  String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose) throws CaMgmtException {
     StringBuilder sb = new StringBuilder();
     final String NL = "\n";
     try {

@@ -321,8 +321,7 @@ class ConfLoader {
             if (requestor.equals(requestorB, ignoreId)) {
               LOG.info("ignored adding requestor {} to CA {}", requestorName, caName);
             } else {
-              throw logAndCreateException(
-                  concat("could not add requestor ", requestorName, " to CA", caName));
+              throw logAndCreateException(concat("could not add requestor ", requestorName, " to CA", caName));
             }
           } else {
             try {

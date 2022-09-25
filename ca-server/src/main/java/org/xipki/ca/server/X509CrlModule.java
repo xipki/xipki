@@ -97,11 +97,9 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         // still no CRL available. Create a new FullCRL
         createFullCrlNow = true;
       } else {
-        Date nearestScheduledCrlIssueTime = getScheduledCrlGenTimeNotAfter(
-            new Date(lastIssueTimeOfFullCrl * 1000));
+        Date nearestScheduledCrlIssueTime = getScheduledCrlGenTimeNotAfter(new Date(lastIssueTimeOfFullCrl * 1000));
         Date nextScheduledCrlIssueTime = new Date(
-                    nearestScheduledCrlIssueTime.getTime()
-                    + control.getFullCrlIntervals() * control.getIntervalMillis());
+            nearestScheduledCrlIssueTime.getTime() + control.getFullCrlIntervals() * control.getIntervalMillis());
         if (!nextScheduledCrlIssueTime.after(now)) {
           // at least one interval was skipped
           createFullCrlNow = true;
@@ -115,11 +113,9 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         long lastIssueTimeOfDeltaCrl = certstore.getThisUpdateOfCurrentCrl(caIdent, true);
         long lastIssueTime = Math.max(lastIssueTimeOfDeltaCrl, lastIssueTimeOfFullCrl);
 
-        Date nearestScheduledCrlIssueTime = getScheduledCrlGenTimeNotAfter(
-            new Date(lastIssueTime * 1000));
+        Date nearestScheduledCrlIssueTime = getScheduledCrlGenTimeNotAfter(new Date(lastIssueTime * 1000));
         Date nextScheduledCrlIssueTime = new Date(
-                    nearestScheduledCrlIssueTime.getTime()
-                    + control.getDeltaCrlIntervals() * control.getIntervalMillis());
+            nearestScheduledCrlIssueTime.getTime() + control.getDeltaCrlIntervals() * control.getIntervalMillis());
         if (!nextScheduledCrlIssueTime.after(now)) {
           // at least one interval was skipped
           createDeltaCrlNow = true;
@@ -143,8 +139,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       }
 
       Date scheduledCrlGenTime = getScheduledCrlGenTimeNotAfter(now);
-      Date nextUpdate = new Date(scheduledCrlGenTime.getTime()
-                        + intervals * control.getIntervalMillis());
+      Date nextUpdate = new Date(scheduledCrlGenTime.getTime() + intervals * control.getIntervalMillis());
       // add overlap
       nextUpdate = control.getOverlap().add(nextUpdate);
 
@@ -511,8 +506,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       try {
         // AuthorityKeyIdentifier
         byte[] akiValues = indirectCrl
-            ? crlSigner.getSigner().getCertificate().getSubjectKeyId()
-            : pci.getSubjectKeyIdentifer();
+            ? crlSigner.getSigner().getCertificate().getSubjectKeyId() : pci.getSubjectKeyIdentifer();
         AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(akiValues);
         crlBuilder.addExtension(Extension.authorityKeyIdentifier, false, aki);
 

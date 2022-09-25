@@ -25,6 +25,7 @@ import org.xipki.ca.api.profile.Certprofile.StringType;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
 
 import java.io.BufferedReader;
@@ -69,13 +70,13 @@ public class SubjectDnSpec {
   private static final Range RANGE_NAME = new Range(1, 256);
 
   // stringTypes
-  private static final Set<StringType> DIRECTORY_STRINGS = new HashSet<>(Arrays.asList(
-      StringType.bmpString, StringType.printableString, StringType.teletexString, StringType.utf8String));
+  private static final Set<StringType> DIRECTORY_STRINGS = CollectionUtil.asUnmodifiableSet(
+      StringType.bmpString, StringType.printableString, StringType.teletexString, StringType.utf8String);
 
-  private static final Set<StringType> PRINTABLE_STRING_ONLY =
-      new HashSet<>(Collections.singletonList(StringType.printableString));
+  private static final Set<StringType> PRINTABLE_STRING_ONLY = CollectionUtil.asUnmodifiableSet(
+      StringType.printableString);
 
-  private static final Set<StringType> IA5_STRING_ONLY = new HashSet<>(Collections.singletonList(StringType.ia5String));
+  private static final Set<StringType> IA5_STRING_ONLY = CollectionUtil.asUnmodifiableSet(StringType.ia5String);
 
   private static final Map<ASN1ObjectIdentifier, StringType> DFLT_STRING_TYPES = new HashMap<>();
 
@@ -291,9 +292,8 @@ public class SubjectDnSpec {
     conf(ids, DN.unstructuredName, null, DIRECTORY_STRINGS);
 
     for (ASN1ObjectIdentifier type : ids) {
-      StringType stringType = DFLT_STRING_TYPES.get(type);
       RdnControl control = new RdnControl(type, 0, 9);
-      control.setStringType(stringType);
+      control.setStringType(DFLT_STRING_TYPES.get(type));
       control.setStringLengthRange(RANGES.get(type));
       TextVadidator pattern = PATTERNS.get(type);
       if (pattern != null) {
@@ -343,9 +343,7 @@ public class SubjectDnSpec {
   } // method getRdnControl
 
   public static void fixRdnControl(RdnControl control) throws CertprofileException {
-    Args.notNull(control, "control");
-
-    ASN1ObjectIdentifier type = control.getType();
+    ASN1ObjectIdentifier type = Args.notNull(control, "control").getType();
     StringType stringType = control.getStringType();
     if (stringType != null) {
       if (STRING_TYPE_SET.containsKey(type) && !STRING_TYPE_SET.get(type).contains(stringType)) {
@@ -397,7 +395,7 @@ public class SubjectDnSpec {
 
     if (changed) {
       isRange.setRange(min, max);
-    } // isRange
+    }
   } // method fixRdnControl
 
   public static List<ASN1ObjectIdentifier> getForwardDNs() {

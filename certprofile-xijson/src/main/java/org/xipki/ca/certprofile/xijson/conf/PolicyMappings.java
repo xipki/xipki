@@ -97,11 +97,12 @@ public class PolicyMappings extends ValidatableConf {
 
     for (int i = 0; i < n; i++) {
       PolicyIdMappingType mapping = mappings.get(i);
-      ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(mapping.getIssuerDomainPolicy().getOid());
-      issuerDomainPolicy[i] = CertPolicyId.getInstance(oid);
 
-      oid = new ASN1ObjectIdentifier(mapping.getSubjectDomainPolicy().getOid());
-      subjectDomainPolicy[i] = CertPolicyId.getInstance(oid);
+      issuerDomainPolicy[i] = CertPolicyId.getInstance(
+          new ASN1ObjectIdentifier(mapping.getIssuerDomainPolicy().getOid()));
+
+      subjectDomainPolicy[i] = CertPolicyId.getInstance(
+          new ASN1ObjectIdentifier(mapping.getSubjectDomainPolicy().getOid()));
     }
 
     return new org.bouncycastle.asn1.x509.PolicyMappings(issuerDomainPolicy, subjectDomainPolicy);

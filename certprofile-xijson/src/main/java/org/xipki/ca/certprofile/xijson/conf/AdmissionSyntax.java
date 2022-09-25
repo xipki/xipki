@@ -292,11 +292,8 @@ public class AdmissionSyntax extends ValidatableConf {
         AdmissionExtension.RegistrationNumberOption rno = (rnType == null) ? null
             : new AdmissionExtension.RegistrationNumberOption(rnType.getRegex(), rnType.getConstant());
 
-        AdmissionExtension.ProfessionInfoOption pio =
-            new AdmissionExtension.ProfessionInfoOption(namingAuthorityL3,
-                pi.getProfessionItems(), oids, rno, pi.getAddProfessionInfo());
-
-        professionInfos.add(pio);
+        professionInfos.add(new AdmissionExtension.ProfessionInfoOption(namingAuthorityL3,
+                              pi.getProfessionItems(), oids, rno, pi.getAddProfessionInfo()));
       }
 
       GeneralName admissionAuthority = null;
@@ -309,21 +306,16 @@ public class AdmissionSyntax extends ValidatableConf {
         namingAuthority = buildNamingAuthority(at.getNamingAuthority());
       }
 
-      AdmissionExtension.AdmissionsOption admissionsOption =
-          new AdmissionExtension.AdmissionsOption(admissionAuthority, namingAuthority, professionInfos);
-      admissionsList.add(admissionsOption);
+      admissionsList.add(new AdmissionExtension.AdmissionsOption(admissionAuthority, namingAuthority, professionInfos));
     }
 
-    GeneralName tmpAdmissionAuthority = null;
-    if (admissionAuthority != null) {
-      tmpAdmissionAuthority = GeneralName.getInstance(admissionAuthority);
-    }
+    GeneralName tmpAdmissionAuthority = (admissionAuthority == null)
+        ? null : GeneralName.getInstance(admissionAuthority);
 
     return new AdmissionExtension.AdmissionSyntaxOption(critical, tmpAdmissionAuthority, admissionsList);
   } // method toXiAdmissionSyntax
 
-  private static ASN1Primitive asn1PrimitiveFromByteArray(byte[] encoded)
-      throws CertprofileException {
+  private static ASN1Primitive asn1PrimitiveFromByteArray(byte[] encoded) throws CertprofileException {
     try {
       return ASN1Primitive.fromByteArray(encoded);
     } catch (IOException ex) {

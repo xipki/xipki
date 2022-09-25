@@ -161,8 +161,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   final Map<String, Set<String>> caHasPublishers = new ConcurrentHashMap<>();
 
-  final Map<String, Set<CaHasRequestorEntry>> caHasRequestors =
-      new ConcurrentHashMap<>();
+  final Map<String, Set<CaHasRequestorEntry>> caHasRequestors = new ConcurrentHashMap<>();
 
   final Map<String, Integer> caAliases = new ConcurrentHashMap<>();
 
@@ -714,8 +713,7 @@ public class CaManagerImpl implements CaManager, Closeable {
         int len = sb.length();
         sb.delete(len - 2, len);
 
-        scheduledThreadPoolExecutor.scheduleAtFixedRate(
-            new CertsInQueuePublisher(), 120, 120, SECONDS);
+        scheduledThreadPoolExecutor.scheduleAtFixedRate(new CertsInQueuePublisher(), 120, 120, SECONDS);
       } else {
         sb.append(": no CA is configured");
       }
@@ -931,8 +929,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void addRequestorToCa(CaHasRequestorEntry requestor, String caName)
-      throws CaMgmtException {
+  public void addRequestorToCa(CaHasRequestorEntry requestor, String caName) throws CaMgmtException {
     requestorManager.addRequestorToCa(requestor, caName);
   }
 
@@ -956,8 +953,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     certprofileManager.addCertprofile(certprofileEntry);
   }
 
-  public CertprofileInfoResponse getCertprofileInfo(String profileName)
-      throws OperationException {
+  public CertprofileInfoResponse getCertprofileInfo(String profileName) throws OperationException {
     return certprofileManager.getCertprofileInfo(profileName);
   }
 
@@ -1160,8 +1156,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   public IdentifiedCertprofile getIdentifiedCertprofile(String profileName) {
-    profileName = toNonBlankLower(profileName, "profileName");
-    return certprofiles.get(profileName);
+    return certprofiles.get(toNonBlankLower(profileName, "profileName"));
   }
 
   public List<IdentifiedCertPublisher> getIdentifiedPublishersForCa(String caName) {

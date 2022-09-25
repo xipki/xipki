@@ -53,16 +53,11 @@ public class NotBeforeOption {
     long now = System.currentTimeMillis();
     if (requestedNotBefore != null) {
       long notOlderThan = (offsetMillis != null && offsetMillis < 0) ? now + offsetMillis : now;
-
       long notBefore = Math.max(requestedNotBefore.getTime(), notOlderThan);
 
       return (midNightTimeZone == null) ? new Date(notBefore) : setToMidnight(notBefore);
     } else {
-      if (midNightTimeZone != null) {
-        return setToMidnight(now);
-      } else {
-        return new Date(System.currentTimeMillis() + offsetMillis);
-      }
+      return (midNightTimeZone != null) ? setToMidnight(now) : new Date(System.currentTimeMillis() + offsetMillis);
     }
   } // method getNotBefore
 

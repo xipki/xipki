@@ -176,7 +176,7 @@ public class ExtensionSyntaxChecker {
               FieldType expectedType = getFieldType(obj);
               if ((syntaxType == expectedType)
                   || (syntaxType == FieldType.SEQUENCE_OF && expectedType == FieldType.SEQUENCE)
-                  || (syntaxType == FieldType.SET_OF && expectedType == FieldType.SET)) {
+                  || (syntaxType == FieldType.SET_OF      && expectedType == FieldType.SET)) {
                 matchIndex = j;
               }
             } else if (!syntaxTag.isExplicit() && !tag.isExplicit()) {
@@ -199,7 +199,7 @@ public class ExtensionSyntaxChecker {
           FieldType expectedType = getFieldType(obj);
           if ((syntaxType == expectedType)
               || (syntaxType == FieldType.SEQUENCE_OF && expectedType == FieldType.SEQUENCE)
-              || (syntaxType == FieldType.SET_OF && expectedType == FieldType.SET)) {
+              || (syntaxType == FieldType.SET_OF      && expectedType == FieldType.SET)) {
             matchIndex = j;
             break;
           }
@@ -302,7 +302,7 @@ public class ExtensionSyntaxChecker {
 
           if (!((syntaxType == expectedType)
                   || (syntaxType == FieldType.SEQUENCE_OF && expectedType == FieldType.SEQUENCE)
-                  || (syntaxType == FieldType.SET_OF && expectedType == FieldType.SET))) {
+                  || (syntaxType == FieldType.SET_OF      && expectedType == FieldType.SET))) {
             throw new BadCertTemplateException("invalid " + name);
           }
         } else {
@@ -318,7 +318,7 @@ public class ExtensionSyntaxChecker {
         if ((m.getTag() == null)
             && (syntaxType == expectedType
             || (syntaxType == FieldType.SEQUENCE_OF && expectedType == FieldType.SEQUENCE)
-            || (syntaxType == FieldType.SET_OF && expectedType == FieldType.SET))) {
+            || (syntaxType == FieldType.SET_OF      && expectedType == FieldType.SET))) {
           syntax = m;
           break;
         }
@@ -393,8 +393,7 @@ public class ExtensionSyntaxChecker {
     return expectedType;
   } // method getFieldType
 
-  private static void assertMatch(String name, String pattern, String text)
-      throws BadCertTemplateException {
+  private static void assertMatch(String name, String pattern, String text) throws BadCertTemplateException {
     if (!TextVadidator.compile(pattern).isValid(text)) {
       throw new BadCertTemplateException(String.format("invalid %s '%s' against regex '%s'", name, text, pattern));
     }

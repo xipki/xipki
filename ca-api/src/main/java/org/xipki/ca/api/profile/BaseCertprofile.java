@@ -369,10 +369,6 @@ public abstract class BaseCertprofile extends Certprofile {
     return new RDN(type, rdnValue);
   } // method createSubjectRdn
 
-  protected void fixRdnControl(RdnControl rdnControl) throws CertprofileException {
-    SubjectDnSpec.fixRdnControl(rdnControl);
-  }
-
   /**
    * Creates GeneralName.
    *
@@ -444,14 +440,12 @@ public abstract class BaseCertprofile extends Certprofile {
         String nameAssigner = null;
         int idx = 0;
         if (size > 1) {
-          DirectoryString ds = DirectoryString.getInstance(
-              ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++)).getBaseObject());
-          nameAssigner = ds.getString();
+          nameAssigner = DirectoryString.getInstance(
+              ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++)).getBaseObject()).getString();
         }
 
-        DirectoryString ds = DirectoryString.getInstance(
-            ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx)).getBaseObject());
-        String partyName = ds.getString();
+        String partyName = DirectoryString.getInstance(
+            ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx)).getBaseObject()).getString();
 
         vector = new ASN1EncodableVector();
         if (nameAssigner != null) {
@@ -514,8 +508,7 @@ public abstract class BaseCertprofile extends Certprofile {
         throw new BadCertTemplateException(String.format("postalAddress[%d] has incorrect syntax", i));
       }
 
-      ASN1Encodable asn1Line = createRdnValue(text, type, control);
-      vec.add(asn1Line);
+      vec.add(createRdnValue(text, type, control));
     }
 
     return new RDN(type, new DERSequence(vec));
@@ -593,11 +586,9 @@ public abstract class BaseCertprofile extends Certprofile {
       isPrintableString = isPrintableString(tmpText);
       stringType = isPrintableString ? StringType.printableString : StringType.utf8String;
     } else if (stringType == StringType.printableString) {
-      isPrintableString = isPrintableString(tmpText);
-    }
-
-    if (stringType == StringType.printableString && !isPrintableString) {
-      throw new BadCertTemplateException("'" + tmpText + "' contains non-printableString chars.");
+      if (!isPrintableString(tmpText)) {
+        throw new BadCertTemplateException("'" + tmpText + "' contains non-printableString chars.");
+      }
     }
 
     return stringType.createString(tmpText);
@@ -618,14 +609,12 @@ public abstract class BaseCertprofile extends Certprofile {
 
   private static void checkEcSubjectPublicKeyInfo(ASN1ObjectIdentifier curveOid, byte[] encoded)
       throws BadCertTemplateException {
-    Args.notNull(curveOid, "curveOid");
     Args.notNull(encoded, "encoded");
     Args.positive(encoded.length, "encoded.length");
 
-    Integer expectedLength = ecCurveFieldSizes.get(curveOid);
+    Integer expectedLength = ecCurveFieldSizes.get(Args.notNull(curveOid, "curveOid"));
     if (expectedLength == null) {
-      X9ECParameters ecP = ECUtil.getNamedCurveByOid(curveOid);
-      ECCurve curve = ecP.getCurve();
+      ECCurve curve = ECUtil.getNamedCurveByOid(curveOid).getCurve();
       expectedLength = (curve.getFieldSize() + 7) / 8;
       ecCurveFieldSizes.put(curveOid, expectedLength);
     }
@@ -638,20 +627,17 @@ public abstract class BaseCertprofile extends Certprofile {
      compressed form of the ECC public key.  The hybrid form of the ECC
      public key from [X9.62] MUST NOT be used.
      */
-    switch (encoded[0]) {
-      case 0x02: // compressed
-      case 0x03: // compressed
-        if (encoded.length != (expectedLength + 1)) {
-          throw new BadCertTemplateException("incorrect length for compressed encoding");
-        }
-        break;
-      case 0x04: // uncompressed
-        if (encoded.length != (2 * expectedLength + 1)) {
-          throw new BadCertTemplateException("incorrect length for uncompressed/hybrid encoding");
-        }
-        break;
-      default:
-        throw new BadCertTemplateException(String.format("invalid point encoding 0x%02x", encoded[0]));
+    byte encoding = encoded[0];
+    if (encoding == 0x02 || encoding == 0x03) { // compressed
+      if (encoded.length != (expectedLength + 1)) {
+        throw new BadCertTemplateException("incorrect length for compressed encoding");
+      }
+    } else if (encoding == 0x04) { // uncompressed
+      if (encoded.length != (2 * expectedLength + 1)) {
+        throw new BadCertTemplateException("incorrect length for uncompressed/hybrid encoding");
+      }
+    } else {
+      throw new BadCertTemplateException(String.format("invalid point encoding 0x%02x", encoded[0]));
     }
   } // method checkEcSubjectPublicKeyInfo
 

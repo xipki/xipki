@@ -36,12 +36,8 @@ import java.util.List;
 public class SubjectToSubjectAltNameType extends ValidatableConf {
 
   private static final List<GeneralNameTag> allowedTargets = Arrays.asList(
-      GeneralNameTag.rfc822Name,
-      GeneralNameTag.DNSName,
-      GeneralNameTag.directoryName,
-      GeneralNameTag.uniformResourceIdentifier,
-      GeneralNameTag.IPAddress,
-      GeneralNameTag.registeredID);
+      GeneralNameTag.rfc822Name,                GeneralNameTag.DNSName,   GeneralNameTag.directoryName,
+      GeneralNameTag.uniformResourceIdentifier, GeneralNameTag.IPAddress, GeneralNameTag.registeredID);
 
   @JSONField(ordinal = 1)
   private DescribableOid source;

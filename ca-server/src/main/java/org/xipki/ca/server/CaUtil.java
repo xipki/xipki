@@ -17,6 +17,7 @@
 
 package org.xipki.ca.server;
 
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x500.RDN;
@@ -91,8 +92,7 @@ public class CaUtil {
 
     // 2. id-ce
     // Get a copy of the types, without copy concurrent access exception may be thrown.
-    Set<ASN1ObjectIdentifier> types = new HashSet<>(extensionValues.getExtensionTypes());
-    for (ASN1ObjectIdentifier type : types) {
+    for (ASN1ObjectIdentifier type : new HashSet<>(extensionValues.getExtensionTypes())) {
       if (type.on(id_ce)) {
         ExtensionValue value = extensionValues.removeExtensionTuple(type);
         certBuilder.addExtension(type, value.isCritical(), value.getValue());
@@ -100,8 +100,7 @@ public class CaUtil {
     }
 
     // 3. non-PEN extensions
-    types = new HashSet<>(extensionValues.getExtensionTypes());
-    for (ASN1ObjectIdentifier type : types) {
+    for (ASN1ObjectIdentifier type : new HashSet<>(extensionValues.getExtensionTypes())) {
       if (!type.on(ObjectIdentifiers.id_pen)) {
         ExtensionValue value = extensionValues.removeExtensionTuple(type);
         certBuilder.addExtension(type, value.isCritical(), value.getValue());
@@ -109,8 +108,7 @@ public class CaUtil {
     }
 
     // 4. PEN extensions
-    types = new HashSet<>(extensionValues.getExtensionTypes());
-    for (ASN1ObjectIdentifier type : types) {
+    for (ASN1ObjectIdentifier type : new HashSet<>(extensionValues.getExtensionTypes())) {
       ExtensionValue value = extensionValues.removeExtensionTuple(type);
       certBuilder.addExtension(type, value.isCritical(), value.getValue());
     }
@@ -129,8 +127,7 @@ public class CaUtil {
   }
 
   public static BasicConstraints createBasicConstraints(CertLevel level, Integer pathLen) {
-    return (level == CertLevel.EndEntity)
-        ? new BasicConstraints(false)
+    return (level == CertLevel.EndEntity) ? new BasicConstraints(false)
         : (pathLen != null) ? new BasicConstraints(pathLen) : new BasicConstraints(true);
   } // method createBasicConstraints
 
@@ -140,7 +137,7 @@ public class CaUtil {
       throw new IllegalArgumentException("caIssuerUris and ospUris may not be both empty");
     }
 
-    List<AccessDescription> accessDescriptions = new ArrayList<>();
+    ASN1EncodableVector accessDescriptions = new ASN1EncodableVector();
 
     if (CollectionUtil.isNotEmpty(caIssuerUris)) {
       for (String uri : caIssuerUris) {
@@ -156,8 +153,7 @@ public class CaUtil {
       }
     }
 
-    DERSequence seq = new DERSequence(accessDescriptions.toArray(new AccessDescription[0]));
-    return AuthorityInformationAccess.getInstance(seq);
+    return AuthorityInformationAccess.getInstance(new DERSequence(accessDescriptions));
   } // method createAuthorityInformationAccess
 
   public static CRLDistPoint createCrlDistributionPoints(

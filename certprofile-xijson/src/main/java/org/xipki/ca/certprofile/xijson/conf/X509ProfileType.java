@@ -434,8 +434,7 @@ public class X509ProfileType extends ValidatableConf {
         throw new CertprofileException("Extension with syntax must be permitted in request");
       }
 
-      ExtensionControl ctrl = new ExtensionControl(extn.critical(), extn.required(), inReq);
-      controls.put(oid, ctrl);
+      controls.put(oid, new ExtensionControl(extn.critical(), extn.required(), inReq));
     }
 
     return Collections.unmodifiableMap(controls);

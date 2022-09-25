@@ -190,8 +190,7 @@ class CertprofileManager {
       type = type.toLowerCase();
     }
 
-    IdentifiedCertprofile profile =
-        manager.queryExecutor.changeCertprofile(ident, type, conf, manager);
+    IdentifiedCertprofile profile = manager.queryExecutor.changeCertprofile(ident, type, conf, manager);
 
     manager.certprofileDbEntries.remove(name);
     IdentifiedCertprofile oldProfile = manager.certprofiles.remove(name);

@@ -50,8 +50,7 @@ public class CtLogPublicKeyFinder {
 
   private final boolean withPublicKeys;
 
-  public CtLogPublicKeyFinder(CtLogConf conf)
-      throws IOException {
+  public CtLogPublicKeyFinder(CtLogConf conf) throws IOException {
     String keydirName = conf.getKeydir();
     File[] keyFiles = null;
     if (keydirName != null && !keydirName.isEmpty()) {
@@ -59,8 +58,7 @@ public class CtLogPublicKeyFinder {
       keyFiles = new File(keydirName).listFiles(pathname -> {
         String name = pathname.getName();
         return pathname.isFile()
-            && (name.endsWith(".pem") || name.endsWith(".der")
-                || name.endsWith(".key") || name.endsWith(".publickey"));
+            && (name.endsWith(".pem") || name.endsWith(".der") || name.endsWith(".key") || name.endsWith(".publickey"));
       });
     }
 

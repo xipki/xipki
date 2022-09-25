@@ -18,6 +18,7 @@
 package org.xipki.ca.certprofile.xijson.conf;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
@@ -125,8 +126,7 @@ public class CertificatePolicies extends ValidatableConf {
     return certificatePolicyInformations;
   }
 
-  public void setCertificatePolicyInformations(
-      List<CertificatePolicyInformationType> certificatePolicyInformations) {
+  public void setCertificatePolicyInformations(List<CertificatePolicyInformationType> certificatePolicyInformations) {
     this.certificatePolicyInformations = certificatePolicyInformations;
   }
 
@@ -154,9 +154,7 @@ public class CertificatePolicies extends ValidatableConf {
         }
       }
 
-      CertificatePolicyInformation cpi = new CertificatePolicyInformation(
-          policyPair.getPolicyIdentifier().getOid(), qualifiers);
-      policyInfos.add(cpi);
+      policyInfos.add(new CertificatePolicyInformation(policyPair.getPolicyIdentifier().getOid(), qualifiers));
     }
 
     int size = policyInfos.size();
@@ -164,17 +162,12 @@ public class CertificatePolicies extends ValidatableConf {
 
     int idx = 0;
     for (CertificatePolicyInformation policyInfo : policyInfos) {
-      String policyId = policyInfo.getCertPolicyId();
       List<CertificatePolicyQualifier> qualifiers = policyInfo.getQualifiers();
+      ASN1Sequence policyQualifiers = CollectionUtil.isEmpty(qualifiers) ? null : createPolicyQualifiers(qualifiers);
+      ASN1ObjectIdentifier policyOid = new ASN1ObjectIdentifier(policyInfo.getCertPolicyId());
 
-      ASN1Sequence policyQualifiers = null;
-      if (CollectionUtil.isNotEmpty(qualifiers)) {
-        policyQualifiers = createPolicyQualifiers(qualifiers);
-      }
-
-      ASN1ObjectIdentifier policyOid = new ASN1ObjectIdentifier(policyId);
-      infos[idx++] = (policyQualifiers == null) ? new PolicyInformation(policyOid)
-          : new PolicyInformation(policyOid, policyQualifiers);
+      infos[idx++] = (policyQualifiers == null)
+          ? new PolicyInformation(policyOid) : new PolicyInformation(policyOid, policyQualifiers);
     }
 
     return new org.bouncycastle.asn1.x509.CertificatePolicies(infos);
@@ -182,7 +175,7 @@ public class CertificatePolicies extends ValidatableConf {
 
   private  static ASN1Sequence createPolicyQualifiers(List<CertificatePolicyQualifier> qualifiers) {
     Args.notNull(qualifiers, "qualifiers");
-    List<PolicyQualifierInfo> qualifierInfos = new ArrayList<>(qualifiers.size());
+    ASN1EncodableVector qualifierInfos = new ASN1EncodableVector();
     for (CertificatePolicyQualifier qualifier : qualifiers) {
       PolicyQualifierInfo qualifierInfo;
       if (qualifier.getCpsUri() != null) {
@@ -200,7 +193,7 @@ public class CertificatePolicies extends ValidatableConf {
       //PolicyQualifierId qualifierId
     }
 
-    return new DERSequence(qualifierInfos.toArray(new PolicyQualifierInfo[0]));
+    return new DERSequence(qualifierInfos);
   } // method createPolicyQualifiers
 
 } // class CertificatePolicies

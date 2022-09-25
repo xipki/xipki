@@ -299,8 +299,7 @@ class Ca2Manager {
         }
       }
     } catch (XiSecurityException | ObjectCreationException ex) {
-      throw new CaMgmtException(
-        concat("could not create signer for new CA ", name, ": ", ex.getMessage()), ex);
+      throw new CaMgmtException(concat("could not create signer for new CA ", name, ": ", ex.getMessage()), ex);
     }
 
     manager.queryExecutor.addCa(caEntry);
@@ -351,9 +350,7 @@ class Ca2Manager {
     assertMasterMode();
 
     aliasName = toNonBlankLower(aliasName, "aliasName");
-    caName = toNonBlankLower(caName, "caName");
-
-    X509Ca ca = manager.x509cas.get(caName);
+    X509Ca ca = getX509Ca(caName);
     if (ca == null) {
       throw new CaMgmtException("unknown CA " + caName);
     }
@@ -494,11 +491,11 @@ class Ca2Manager {
     CaManagerImpl.auditLogPciEvent(true, concat("UNREVOKE CA ", caName));
   } // method unrevokeCa
 
-  X509Ca getX509Ca(String name) throws CaMgmtException {
-    name = toNonBlankLower(name, "name");
-    X509Ca ca = manager.x509cas.get(name);
+  X509Ca getX509Ca(String caName) throws CaMgmtException {
+    caName = toNonBlankLower(caName, "caName");
+    X509Ca ca = manager.x509cas.get(caName);
     if (ca == null) {
-      throw new CaMgmtException("unknown CA " + name);
+      throw new CaMgmtException("unknown CA " + caName);
     }
     return ca;
   } // method getX509Ca
@@ -667,7 +664,6 @@ class Ca2Manager {
 
   KeyCertBytesPair generateKeyCert(String caName, String profileName, String subject, Date notBefore, Date notAfter)
       throws CaMgmtException {
-    caName = toNonBlankLower(caName, "caName");
     profileName = toNonBlankLower(profileName, "profileName");
     notBlank(subject, "subject");
 
@@ -698,7 +694,6 @@ class Ca2Manager {
 
   X509Cert generateCertificate(String caName, String profileName, byte[] encodedCsr, Date notBefore, Date notAfter)
       throws CaMgmtException {
-    caName = toNonBlankLower(caName, "caName");
     profileName = toNonBlankLower(profileName, "profileName");
     notNull(encodedCsr, "encodedCsr");
 
@@ -748,7 +743,6 @@ class Ca2Manager {
       throws CaMgmtException {
     assertMasterModeAndSetuped();
 
-    caName = toNonBlankLower(caName, "caName");
     notNull(serialNumber, "serialNumber");
 
     X509Ca ca = getX509Ca(caName);
@@ -763,8 +757,6 @@ class Ca2Manager {
 
   void unsuspendCertificate(String caName, BigInteger serialNumber) throws CaMgmtException {
     assertMasterModeAndSetuped();
-
-    caName = toNonBlankLower(caName, "caName");
     notNull(serialNumber, "serialNumber");
 
     X509Ca ca = getX509Ca(caName);
@@ -780,7 +772,6 @@ class Ca2Manager {
   void removeCertificate(String caName, BigInteger serialNumber) throws CaMgmtException {
     assertMasterModeAndSetuped();
 
-    caName = toNonBlankLower(caName, "caName");
     notNull(serialNumber, "serialNumber");
     X509Ca ca = getX509Ca(caName);
 
@@ -796,8 +787,6 @@ class Ca2Manager {
   X509CRLHolder generateCrlOnDemand(String caName) throws CaMgmtException {
     assertMasterModeAndSetuped();
 
-    caName = toNonBlankLower(caName, "caName");
-
     X509Ca ca = getX509Ca(caName);
     try {
       return ca.generateCrlOnDemand(manager.byCaRequestor);
@@ -807,7 +796,6 @@ class Ca2Manager {
   } // method generateCrlOnDemand
 
   X509CRLHolder getCrl(String caName, BigInteger crlNumber) throws CaMgmtException {
-    caName = toNonBlankLower(caName, "caName");
     notNull(crlNumber, "crlNumber");
     X509Ca ca = getX509Ca(caName);
     try {
@@ -836,7 +824,6 @@ class Ca2Manager {
   } // method getCurrentCrl
 
   CertWithRevocationInfo getCert(String caName, BigInteger serialNumber) throws CaMgmtException {
-    caName = toNonBlankLower(caName, "caName");
     notNull(serialNumber, "serialNumber");
     X509Ca ca = getX509Ca(caName);
     try {
@@ -873,7 +860,6 @@ class Ca2Manager {
   List<CertListInfo> listCertificates(
       String caName, X500Name subjectPattern, Date validFrom, Date validTo, CertListOrderBy orderBy, int numEntries)
       throws CaMgmtException {
-    caName = toNonBlankLower(caName, "caName");
     range(numEntries, "numEntries", 1, 1000);
     X509Ca ca = getX509Ca(caName);
     try {

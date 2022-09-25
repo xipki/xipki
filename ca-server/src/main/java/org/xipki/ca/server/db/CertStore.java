@@ -293,8 +293,7 @@ public class CertStore extends CertStoreBase {
   public void addToPublishQueue(NameId publisher, long certId, NameId ca)
       throws OperationException {
     notNull(ca, "ca");
-    execUpdatePrepStmt0(SQL_INSERT_PUBLISHQUEUE,
-        col2Int(publisher.getId()), col2Int(ca.getId()), col2Long(certId));
+    execUpdatePrepStmt0(SQL_INSERT_PUBLISHQUEUE, col2Int(publisher.getId()), col2Int(ca.getId()), col2Long(certId));
   } // method addToPublishQueue
 
   public void removeFromPublishQueue(NameId publisher, long certId) throws OperationException {
@@ -397,8 +396,7 @@ public class CertStore extends CertStoreBase {
       throws OperationException {
     notNulls(ca, "ca", serialNumber, "serialNumber", revInfo, "revInfo");
 
-    CertWithRevocationInfo certWithRevInfo =
-        getCertWithRevocationInfo(ca.getId(), serialNumber, idNameMap);
+    CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(ca.getId(), serialNumber, idNameMap);
     if (certWithRevInfo == null) {
       LOG.warn("certificate with CA={} and serialNumber={} does not exist",
           ca.getName(), LogUtil.formatCsn(serialNumber));
@@ -410,15 +408,15 @@ public class CertStore extends CertStoreBase {
       CrlReason currentReason = currentRevInfo.getReason();
       if (currentReason == CrlReason.CERTIFICATE_HOLD) {
         if (revInfo.getReason() == CrlReason.CERTIFICATE_HOLD) {
-          throw new OperationException(CERT_REVOKED, "certificate already revoked with the "
-              + "requested reason " + currentReason.getDescription());
+          throw new OperationException(CERT_REVOKED, "certificate already revoked with the requested reason "
+              + currentReason.getDescription());
         } else {
           revInfo.setRevocationTime(currentRevInfo.getRevocationTime());
           revInfo.setInvalidityTime(currentRevInfo.getInvalidityTime());
         }
       } else if (!force) {
         throw new OperationException(CERT_REVOKED,
-          "certificate already revoked with reason " + currentReason.getDescription());
+            "certificate already revoked with reason " + currentReason.getDescription());
       }
     }
 
@@ -447,8 +445,7 @@ public class CertStore extends CertStoreBase {
       throws OperationException {
     notNulls(ca, "ca", serialNumber, "serialNumber", reason, "reason");
 
-    CertWithRevocationInfo certWithRevInfo =
-        getCertWithRevocationInfo(serialNumber.getId(), idNameMap);
+    CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(serialNumber.getId(), idNameMap);
     if (certWithRevInfo == null) {
       LOG.warn("certificate with CA={} and serialNumber={} does not exist",
           ca.getName(), LogUtil.formatCsn(serialNumber.getSerial()));
@@ -466,9 +463,8 @@ public class CertStore extends CertStoreBase {
           + CrlReason.CERTIFICATE_HOLD.getDescription());
     }
 
-    int count = execUpdatePrepStmt0(SQL_REVOKE_SUSPENDED_CERT,
-        col2Long(System.currentTimeMillis() / 1000), col2Int(reason.getCode()),
-        col2Long(serialNumber.getId())); // certId
+    int count = execUpdatePrepStmt0(SQL_REVOKE_SUSPENDED_CERT, col2Long(System.currentTimeMillis() / 1000),
+        col2Int(reason.getCode()), col2Long(serialNumber.getId())); // certId
 
     if (count != 1) {
       String message = (count > 1) ? count + " rows modified, but exactly one is expected"
@@ -484,8 +480,7 @@ public class CertStore extends CertStoreBase {
       throws OperationException {
     notNulls(ca, "ca", serialNumber, "serialNumber");
 
-    CertWithRevocationInfo certWithRevInfo =
-        getCertWithRevocationInfo(ca.getId(), serialNumber, idNamMap);
+    CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(ca.getId(), serialNumber, idNamMap);
     if (certWithRevInfo == null) {
       if (LOG.isWarnEnabled()) {
         LOG.warn("certificate with CA={} and serialNumber={} does not exist",
@@ -502,14 +497,13 @@ public class CertStore extends CertStoreBase {
     CrlReason currentReason = currentRevInfo.getReason();
     if (!force) {
       if (currentReason != CrlReason.CERTIFICATE_HOLD) {
-        throw new OperationException(NOT_PERMITTED, "could not unsuspend certificate revoked with "
-            + "reason " + currentReason.getDescription());
+        throw new OperationException(NOT_PERMITTED, "could not unsuspend certificate revoked with reason "
+            + currentReason.getDescription());
       }
     }
 
     SqlColumn2 nullInt = new SqlColumn2(ColumnType.INT, null);
-    int count = execUpdatePrepStmt0(
-        "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?",
+    int count = execUpdatePrepStmt0("UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?",
         col2Long(System.currentTimeMillis() / 1000), // currentTimeSeconds
         col2Bool(false), nullInt, nullInt, nullInt,
         col2Long(certWithRevInfo.getCert().getCertId())); // certId
@@ -773,8 +767,7 @@ public class CertStore extends CertStoreBase {
   public long getCertId(NameId ca, BigInteger serial) throws OperationException {
     notNulls(ca, "ca", serial, "serial");
 
-    ResultRow rs = execQuery1PrepStmt0(sqlCertInfo,
-        col2Int(ca.getId()), col2Str(serial.toString(16)));
+    ResultRow rs = execQuery1PrepStmt0(sqlCertInfo, col2Int(ca.getId()), col2Str(serial.toString(16)));
     if (rs == null) {
       return 0;
     }

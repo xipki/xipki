@@ -194,9 +194,8 @@ public class AdmissionExtension {
             continue;
           }
 
-          Pattern regex = option.getRegex();
           String regNum = registrationNumbers.get(j);
-          if (regNum == null || !regex.matcher(regNum).matches()) {
+          if (regNum == null || !option.getRegex().matcher(regNum).matches()) {
             throw new BadCertTemplateException("invalid registrationNumber[" + i + "][" + j + "]: '" + regNum + "'");
           }
           newRegNumbers.add(regNum);
@@ -294,7 +293,7 @@ public class AdmissionExtension {
       return registrationNumberOption;
     }
 
-  } // class ProfiessionInfoOption
+  } // class ProfessionInfoOption
 
   /**
    * Control of the RegistrationNumber.

@@ -57,8 +57,7 @@ public class CtLogClient {
     this.curl  = new DefaultCurl(sslContextConf);
     this.addPreChainUrls = new ArrayList<>(serverUrls.size());
     for (String m : serverUrls) {
-      String addPreChainUrl = m.endsWith("/")
-          ? m + "ct/v1/add-pre-chain" : m + "/ct/v1/add-pre-chain";
+      String addPreChainUrl = m.endsWith("/") ? m + "ct/v1/add-pre-chain" : m + "/ct/v1/add-pre-chain";
       this.addPreChainUrls.add(addPreChainUrl);
     }
   } // constructor
@@ -186,16 +185,14 @@ public class CtLogClient {
     }
 
     String encAlgo;
-    switch (algorithm.getSignature()) {
-      case ecdsa:
-        encAlgo = "ECDSA";
-        break;
-      case rsa:
-        encAlgo = "RSA";
-        break;
-      default:
-        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-            "unsupported signature algorithm " + algorithm.getSignature());
+    SignatureAlgorithm signatureType = algorithm.getSignature();
+    if (SignatureAlgorithm.ecdsa == signatureType) {
+      encAlgo = "ECDSA";
+    } else if (SignatureAlgorithm.rsa == signatureType) {
+      encAlgo = "RSA";
+    } else {
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+          "unsupported signature algorithm " + algorithm.getSignature());
     }
 
     return hashName + "WITH" + encAlgo;

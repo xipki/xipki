@@ -126,13 +126,11 @@ public class XijsonExtensions {
 
   private ExtensionValue cccExtensionSchemaValue;
 
-  XijsonExtensions(X509ProfileType conf, SubjectControl subjectControl)
-      throws CertprofileException {
-    notNull(conf, "conf");
+  XijsonExtensions(X509ProfileType conf, SubjectControl subjectControl) throws CertprofileException {
     notNull(subjectControl, "subjectControl");
 
     // Extensions
-    Map<String, ExtensionType> extensions = conf.buildExtensions();
+    Map<String, ExtensionType> extensions = notNull(conf, "conf").buildExtensions();
 
     // Extension controls
     this.extensionControls = conf.buildExtensionControls();
@@ -271,8 +269,7 @@ public class XijsonExtensions {
       }
 
       if (subjectAltNameModes != null) {
-        for (Entry<ASN1ObjectIdentifier, GeneralNameTag> entry
-            : subjectToSubjectAltNameModes.entrySet()) {
+        for (Entry<ASN1ObjectIdentifier, GeneralNameTag> entry : subjectToSubjectAltNameModes.entrySet()) {
           GeneralNameTag nameTag = entry.getValue();
 
           boolean allowed = false;
@@ -291,14 +288,10 @@ public class XijsonExtensions {
     }
 
     // Remove the extension processed not by the Certprofile, but by the CA
-    extnIds.remove(Extension.issuerAlternativeName);
-    extnIds.remove(Extension.authorityInfoAccess);
-    extnIds.remove(Extension.cRLDistributionPoints);
-    extnIds.remove(Extension.freshestCRL);
-    extnIds.remove(Extension.subjectKeyIdentifier);
-    extnIds.remove(Extension.subjectInfoAccess);
-    extnIds.remove(Extn.id_extension_pkix_ocsp_nocheck);
-    extnIds.remove(Extn.id_SCTs);
+    extnIds.removeAll(Arrays.asList(
+        Extension.issuerAlternativeName,     Extension.authorityInfoAccess,  Extension.cRLDistributionPoints,
+        Extension.freshestCRL,               Extension.subjectKeyIdentifier, Extension.subjectInfoAccess,
+        Extn.id_extension_pkix_ocsp_nocheck, Extn.id_SCTs));
 
     // to avoid race conflict.
     Set<ASN1ObjectIdentifier> copyOfExtnIds = new HashSet<>(extnIds);
@@ -347,8 +340,7 @@ public class XijsonExtensions {
           throw new CertprofileException("unsupported target tag " + targetTag);
       }
 
-      subjectToSubjectAltNameModes.put(
-          new ASN1ObjectIdentifier(m.getSource().getOid()), targetTag);
+      subjectToSubjectAltNameModes.put(new ASN1ObjectIdentifier(m.getSource().getOid()), targetTag);
     }
   } // method initSubjectToSubjectAltNames
 
@@ -358,8 +350,8 @@ public class XijsonExtensions {
       extnIds.remove(type);
       AdditionalInformation extConf = getExtension(type, extensions).getAdditionalInformation();
       if (extConf != null) {
-        ASN1Encodable extValue = extConf.getType().createDirectoryString(extConf.getText());
-        additionalInformation = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+        additionalInformation = new ExtensionValue(critical(type),
+            extConf.getType().createDirectoryString(extConf.getText()));
       }
     }
   } // method initAdditionalInformation
@@ -373,7 +365,7 @@ public class XijsonExtensions {
       ExtensionType extn = getExtension(type, extensions);
       AdmissionSyntax extConf = extn.getAdmissionSyntax();
       if (extConf != null) {
-        this.admission = extConf.toXiAdmissionSyntax(extensionControls.get(type).isCritical());
+        this.admission = extConf.toXiAdmissionSyntax(critical(type));
         if (!extn.permittedInRequest() && this.admission.isInputFromRequestRequired()) {
           throw new CertprofileException("Extension " + ObjectIdentifiers.getName(type)
             + " should be permitted in request");
@@ -387,12 +379,10 @@ public class XijsonExtensions {
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       AuthorityInfoAccess extConf = getExtension(type, extensions).getAuthorityInfoAccess();
-      if (extConf == null) {
-        this.aiaControl = new AuthorityInfoAccessControl(false, true, null, null);
-      } else {
-        this.aiaControl = new AuthorityInfoAccessControl(extConf.isIncludeCaIssuers(),
-            extConf.isIncludeOcsp(), extConf.getCaIssuersProtocols(), extConf.getOcspProtocols());
-      }
+      this.aiaControl = (extConf == null)
+        ? new AuthorityInfoAccessControl(false, true, null, null)
+        : new AuthorityInfoAccessControl(extConf.isIncludeCaIssuers(), extConf.isIncludeOcsp(),
+              extConf.getCaIssuersProtocols(), extConf.getOcspProtocols());
     }
   } // method initAuthorityInfoAccess
 
@@ -491,8 +481,7 @@ public class XijsonExtensions {
         if (skipCerts < 0) {
           throw new CertprofileException("negative inhibitAnyPolicy.skipCerts is not allowed: " + skipCerts);
         }
-        ASN1Integer value = new ASN1Integer(BigInteger.valueOf(skipCerts));
-        this.inhibitAnyPolicy = new ExtensionValue(extensionControls.get(type).isCritical(), value);
+        this.inhibitAnyPolicy = new ExtensionValue(critical(type), new ASN1Integer(BigInteger.valueOf(skipCerts)));
       }
     }
   } // method initInhibitAnyPolicy
@@ -515,8 +504,7 @@ public class XijsonExtensions {
       extnIds.remove(type);
       NameConstraints extConf = getExtension(type, extensions).getNameConstraints();
       if (extConf != null) {
-        org.bouncycastle.asn1.x509.NameConstraints value = extConf.toXiNameConstrains();
-        this.nameConstraints = new ExtensionValue(extensionControls.get(type).isCritical(), value);
+        this.nameConstraints = new ExtensionValue(critical(type), extConf.toXiNameConstrains());
       }
     }
   } // method initNameConstraints
@@ -539,8 +527,7 @@ public class XijsonExtensions {
       extnIds.remove(type);
       PolicyConstraints extConf = getExtension(type, extensions).getPolicyConstraints();
       if (extConf != null) {
-        ASN1Sequence value = extConf.toXiPolicyConstrains();
-        this.policyConstraints = new ExtensionValue(extensionControls.get(type).isCritical(), value);
+        this.policyConstraints = new ExtensionValue(critical(type), extConf.toXiPolicyConstrains());
       }
     }
   } // method initPolicyConstraints
@@ -551,8 +538,7 @@ public class XijsonExtensions {
       extnIds.remove(type);
       PolicyMappings extConf = getExtension(type, extensions).getPolicyMappings();
       if (extConf != null) {
-        org.bouncycastle.asn1.x509.PolicyMappings value = extConf.toXiPolicyMappings();
-        this.policyMappings = new ExtensionValue(extensionControls.get(type).isCritical(), value);
+        this.policyMappings = new ExtensionValue(critical(type), extConf.toXiPolicyMappings());
       }
     }
   } // method initPolicyMappings
@@ -581,8 +567,7 @@ public class XijsonExtensions {
 
       QcStatementValueType statementValue = m.getStatementValue();
       if (statementValue == null) {
-        QCStatement qcStatment = new QCStatement(qcStatementId);
-        qcStatementOption = new QcStatementOption(qcStatment);
+        qcStatementOption = new QcStatementOption(new QCStatement(qcStatementId));
       } else if (statementValue.getQcRetentionPeriod() != null) {
         QCStatement qcStatment = new QCStatement(qcStatementId, new ASN1Integer(statementValue.getQcRetentionPeriod()));
         qcStatementOption = new QcStatementOption(qcStatment);
@@ -593,8 +578,7 @@ public class XijsonExtensions {
         } catch (IOException ex) {
           throw new CertprofileException("can not parse the constant value of QcStatement");
         }
-        QCStatement qcStatment = new QCStatement(qcStatementId, constantStatementValue);
-        qcStatementOption = new QcStatementOption(qcStatment);
+        qcStatementOption = new QcStatementOption(new QCStatement(qcStatementId, constantStatementValue));
       } else if (statementValue.getQcEuLimitValue() != null) {
         QcEuLimitValueType euLimitType = statementValue.getQcEuLimitValue();
         String tmpCurrency = euLimitType.getCurrency().toUpperCase();
@@ -611,29 +595,23 @@ public class XijsonExtensions {
         Range2Type r2 = euLimitType.getExponent();
         if (r1.getMin() == r1.getMax() && r2.getMin() == r2.getMax()) {
           MonetaryValue monetaryValue = new MonetaryValue(currency, r1.getMin(), r2.getMin());
-          QCStatement qcStatement = new QCStatement(qcStatementId, monetaryValue);
-          qcStatementOption = new QcStatementOption(qcStatement);
+          qcStatementOption = new QcStatementOption(new QCStatement(qcStatementId, monetaryValue));
         } else {
-          MonetaryValueOption monetaryValueOption = new MonetaryValueOption(currency, r1, r2);
-          qcStatementOption = new QcStatementOption(qcStatementId, monetaryValueOption);
+          qcStatementOption = new QcStatementOption(qcStatementId, new MonetaryValueOption(currency, r1, r2));
           requireInfoFromReq = true;
         }
         currencyCodes.add(tmpCurrency);
       } else if (statementValue.getPdsLocations() != null) {
         ASN1EncodableVector vec = new ASN1EncodableVector();
         for (PdsLocationType pl : statementValue.getPdsLocations()) {
-          ASN1EncodableVector vec2 = new ASN1EncodableVector();
-          vec2.add(new DERIA5String(pl.getUrl()));
           String lang = pl.getLanguage();
           if (lang.length() != 2) {
             throw new CertprofileException("invalid language '" + lang + "'");
           }
-          vec2.add(new DERPrintableString(lang));
-          DERSequence seq = new DERSequence(vec2);
-          vec.add(seq);
+
+          vec.add(new DERSequence(new ASN1Encodable[]{new DERIA5String(pl.getUrl()), new DERPrintableString(lang)}));
         }
-        QCStatement qcStatement = new QCStatement(qcStatementId, new DERSequence(vec));
-        qcStatementOption = new QcStatementOption(qcStatement);
+        qcStatementOption = new QcStatementOption(new QCStatement(qcStatementId, new DERSequence(vec)));
       } else {
         throw new CertprofileException("unknown value of qcStatment");
       }
@@ -652,8 +630,7 @@ public class XijsonExtensions {
       }
       vec.add(m.getStatement());
     }
-    ASN1Sequence seq = new DERSequence(vec);
-    qcStatments = new ExtensionValue(extensionControls.get(type).isCritical(), seq);
+    qcStatments = new ExtensionValue(critical(type), new DERSequence(vec));
     qcStatementsOption = null;
   } // method initQcStatements
 
@@ -663,8 +640,7 @@ public class XijsonExtensions {
       extnIds.remove(type);
       Restriction extConf = getExtension(type, extensions).getRestriction();
       if (extConf != null) {
-        ASN1Encodable extValue = extConf.getType().createDirectoryString(extConf.getText());
-        restriction = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+        restriction = new ExtensionValue(critical(type), extConf.getType().createDirectoryString(extConf.getText()));
       }
     }
   } // method initRestriction
@@ -696,12 +672,10 @@ public class XijsonExtensions {
           params = readAsn1Encodable(capParams.getBinary().getValue());
         }
       }
-      org.bouncycastle.asn1.smime.SMIMECapability cap = new org.bouncycastle.asn1.smime.SMIMECapability(oid, params);
-      vec.add(cap);
+      vec.add(new org.bouncycastle.asn1.smime.SMIMECapability(oid, params));
     }
 
-    ASN1Encodable extValue = new DERSequence(vec);
-    smimeCapabilities = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+    smimeCapabilities = new ExtensionValue(critical(type), new DERSequence(vec));
   } // method initSmimeCapabilities
 
   private void initSubjectAlternativeName(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
@@ -726,8 +700,7 @@ public class XijsonExtensions {
         List<Access> list = extConf.getAccesses();
         this.subjectInfoAccessModes = new HashMap<>();
         for (Access entry : list) {
-          this.subjectInfoAccessModes.put(
-              new ASN1ObjectIdentifier(entry.getAccessMethod().getOid()),
+          this.subjectInfoAccessModes.put(new ASN1ObjectIdentifier(entry.getAccessMethod().getOid()),
               entry.getAccessLocation().toGeneralNameModes());
         }
       }
@@ -760,8 +733,7 @@ public class XijsonExtensions {
     for (Integer m : features) {
       vec.add(new ASN1Integer(m));
     }
-    ASN1Encodable extValue = new DERSequence(vec);
-    tlsFeature = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+    tlsFeature = new ExtensionValue(critical(type), new DERSequence(vec));
   } // method initTlsFeature
 
   /**
@@ -781,8 +753,7 @@ public class XijsonExtensions {
       ValidityModel extConf = getExtension(type, extensions).getValidityModel();
       if (extConf != null) {
         ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(extConf.getModelId().getOid());
-        ASN1Encodable extValue = new DERSequence(oid);
-        validityModel = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+        validityModel = new ExtensionValue(critical(type), new DERSequence(oid));
       }
     }
   } // method initValidityModel
@@ -791,21 +762,16 @@ public class XijsonExtensions {
     ASN1ObjectIdentifier type = Extension.subjectDirectoryAttributes;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
-      SubjectDirectoryAttributs extConf =
-          getExtension(type, extensions).getSubjectDirectoryAttributs();
+      SubjectDirectoryAttributs extConf = getExtension(type, extensions).getSubjectDirectoryAttributs();
       if (extConf != null) {
-        List<ASN1ObjectIdentifier> types = toOidList(extConf.getTypes());
-        subjectDirAttrsControl = new SubjectDirectoryAttributesControl(types);
+        subjectDirAttrsControl = new SubjectDirectoryAttributesControl(toOidList(extConf.getTypes()));
       }
     }
   } // method initSubjectDirAttrs
 
   private void initGmt0015Extensions(Set<ASN1ObjectIdentifier> extnIds) {
-    extnIds.remove(Extn.id_GMT_0015_ICRegistrationNumber);
-    extnIds.remove(Extn.id_GMT_0015_IdentityCode);
-    extnIds.remove(Extn.id_GMT_0015_InsuranceNumber);
-    extnIds.remove(Extn.id_GMT_0015_OrganizationCode);
-    extnIds.remove(Extn.id_GMT_0015_TaxationNumber);
+    extnIds.removeAll(Arrays.asList(Extn.id_GMT_0015_ICRegistrationNumber,   Extn.id_GMT_0015_IdentityCode,
+        Extn.id_GMT_0015_InsuranceNumber, Extn.id_GMT_0015_OrganizationCode, Extn.id_GMT_0015_TaxationNumber));
   } // method initGmt0015Extensions
 
   private void initCCCExtensionSchemas(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
@@ -831,14 +797,9 @@ public class XijsonExtensions {
     }
 
     List<ASN1ObjectIdentifier> simpleSchemaTypes = Arrays.asList(
-        Extn.id_ccc_Vehicle_Cert_K,
-        Extn.id_ccc_External_CA_Cert_F,
-        Extn.id_ccc_VehicleOEM_Enc_Cert,
-        Extn.id_ccc_VehicleOEM_Sig_Cert,
-        Extn.id_ccc_Device_Enc_Cert,
-        Extn.id_ccc_Vehicle_Intermediate_Cert,
-        Extn.id_ccc_VehicleOEM_CA_Cert_J,
-        Extn.id_ccc_VehicleOEM_CA_Cert_M);
+        Extn.id_ccc_Vehicle_Cert_K,       Extn.id_ccc_External_CA_Cert_F,   Extn.id_ccc_VehicleOEM_Enc_Cert,
+        Extn.id_ccc_VehicleOEM_Sig_Cert,  Extn.id_ccc_Device_Enc_Cert,      Extn.id_ccc_Vehicle_Intermediate_Cert,
+        Extn.id_ccc_VehicleOEM_CA_Cert_J, Extn.id_ccc_VehicleOEM_CA_Cert_M);
 
     if (!simpleSchemaTypes.contains(type)) {
       return;
@@ -849,9 +810,9 @@ public class XijsonExtensions {
       throw new CertprofileException("ccExtensionSchema is not set for " + type);
     }
 
-    ASN1Sequence seq = new DERSequence(new ASN1Integer(schema.getVersion()));
     this.cccExtensionSchemaType = type;
-    this.cccExtensionSchemaValue = new ExtensionValue(ex.critical(), seq);
+    this.cccExtensionSchemaValue = new ExtensionValue(ex.critical(),
+        new DERSequence(new ASN1Integer(schema.getVersion())));
   }
 
   private static List<ASN1ObjectIdentifier> toOidList(List<DescribableOid> oidWithDescTypes) {
@@ -932,8 +893,7 @@ public class XijsonExtensions {
       }
     }
 
-    return grantedNames.isEmpty() ? null :
-      new GeneralNames(grantedNames.toArray(new GeneralName[0]));
+    return grantedNames.isEmpty() ? null : new GeneralNames(grantedNames.toArray(new GeneralName[0]));
   } // method createRequestedSubjectAltNames
 
   public ExtensionValue getAdditionalInformation() {
@@ -1075,8 +1035,7 @@ public class XijsonExtensions {
     return extension;
   } // method getExtension
 
-  private static ASN1Encodable readAsn1Encodable(byte[] encoded)
-      throws CertprofileException {
+  private static ASN1Encodable readAsn1Encodable(byte[] encoded) throws CertprofileException {
     ASN1StreamParser parser = new ASN1StreamParser(encoded);
     try {
       return parser.readObject();
@@ -1084,5 +1043,13 @@ public class XijsonExtensions {
       throw new CertprofileException("could not parse the constant extension value", ex);
     }
   } // method readAsn1Encodable
+
+  private boolean critical(ASN1ObjectIdentifier type) {
+    return extensionControls.get(type).isCritical();
+  }
+
+  private boolean permittedInReq(ASN1ObjectIdentifier type) {
+    return extensionControls.get(type).isPermittedInRequest();
+  }
 
 }

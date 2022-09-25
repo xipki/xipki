@@ -100,11 +100,7 @@ public class ExtnSyntax extends Describable {
   }
 
   public void setStringRegex(String stringRegex) {
-    if (StringUtil.isNotBlank(stringRegex)) {
-      this.stringRegex = stringRegex;
-    } else {
-      this.stringRegex = null;
-    }
+    this.stringRegex = StringUtil.isBlank(stringRegex) ? null : stringRegex;
   } // method setStringRegex
 
   public List<SubFieldSyntax> getSubFields() {

@@ -199,8 +199,7 @@ public class ExtensionType extends ValidatableConf {
 
   // do not encode the default value.
   public TripleState getInRequest() {
-    TripleState state = inRequest();
-    return state == TripleState.forbidden ? null : inRequest;
+    return inRequest() == TripleState.forbidden ? null : inRequest;
   }
 
   public TripleState inRequest() {

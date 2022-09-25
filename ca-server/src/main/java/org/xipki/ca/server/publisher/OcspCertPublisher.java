@@ -108,8 +108,7 @@ public class OcspCertPublisher extends CertPublisher {
 
       LOG.info("loaded datasource.{}", datasourceName);
       return datasource;
-    } catch (DataAccessException | PasswordResolverException | IOException
-        | RuntimeException ex) {
+    } catch (DataAccessException | PasswordResolverException | IOException | RuntimeException ex) {
       throw new CertPublisherException(
           ex.getClass().getName() + " while parsing datasource " + datasourceName + ": " + ex.getMessage(), ex);
     }
@@ -241,7 +240,6 @@ public class OcspCertPublisher extends CertPublisher {
     if (datasource != null) {
       datasource.close();
     }
-
   }
 
 }

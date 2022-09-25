@@ -224,8 +224,7 @@ class OcspStoreQueryExecutor {
     X509Cert cert = certificate.getCert();
     long notBeforeSeconds = cert.getNotBefore().getTime() / 1000;
     long notAfterSeconds = cert.getNotAfter().getTime() / 1000;
-    String cuttedSubject = X509Util.cutText(certificate.getCert().getSubjectText(),
-                            maxX500nameLen);
+    String cuttedSubject = X509Util.cutText(certificate.getCert().getSubjectText(), maxX500nameLen);
 
     PreparedStatement ps = datasource.prepareStatement(sql);
 
@@ -368,10 +367,9 @@ class OcspStoreQueryExecutor {
   } // method unrevokeCert
 
   void removeCert(X509Cert issuer, CertWithDbId cert) throws DataAccessException {
-    notNull(issuer, "issuer");
     notNull(cert, "cert");
 
-    Integer issuerId = issuerStore.getIdForCert(issuer.getEncoded());
+    Integer issuerId = issuerStore.getIdForCert(notNull(issuer, "issuer").getEncoded());
     if (issuerId == null) {
       return;
     }
@@ -391,10 +389,9 @@ class OcspStoreQueryExecutor {
   } // method removeCert
 
   void revokeCa(X509Cert caCert, CertRevocationInfo revInfo) throws DataAccessException {
-    notNull(caCert, "caCert");
     notNull(revInfo, "revInfo");
 
-    int issuerId = getIssuerId(caCert);
+    int issuerId = getIssuerId(notNull(caCert, "caCert"));
     final String sql = "UPDATE ISSUER SET REV_INFO=? WHERE ID=?";
     PreparedStatement ps = datasource.prepareStatement(sql);
 

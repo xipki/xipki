@@ -182,9 +182,9 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     // Extensions - general
     List<ExtensionType> list = profile.getExtensions();
 
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, true));

@@ -74,8 +74,7 @@ class KeypairGenManager {
     List<String> names = manager.queryExecutor.namesFromTable("KEYPAIR_GEN");
     entries = new ArrayList<>(names.size());
     for (String name : names) {
-      KeypairGenEntry entry = manager.queryExecutor.createKeypairGen(name);
-      entries.add(entry);
+      entries.add(manager.queryExecutor.createKeypairGen(name));
     }
 
     for (KeypairGenEntry entry : entries) {
@@ -139,8 +138,7 @@ class KeypairGenManager {
     LOG.info("removed keypair generation '{}'", name);
   } // method removeKeypairGen
 
-  void changeKeypairGen(String name, String type, String conf)
-      throws CaMgmtException {
+  void changeKeypairGen(String name, String type, String conf) throws CaMgmtException {
     manager.assertMasterMode();
 
     name = toNonBlankLower(name, "name");

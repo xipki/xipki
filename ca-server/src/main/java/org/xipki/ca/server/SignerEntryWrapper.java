@@ -61,8 +61,7 @@ public class SignerEntryWrapper {
     return signer;
   }
 
-  public void initSigner(SecurityFactory securityFactory)
-      throws ObjectCreationException {
+  public void initSigner(SecurityFactory securityFactory) throws ObjectCreationException {
     notNull(securityFactory, "securityFactory");
     if (signer != null) {
       return;

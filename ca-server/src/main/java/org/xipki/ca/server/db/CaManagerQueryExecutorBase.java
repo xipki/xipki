@@ -141,8 +141,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     }
   }
 
-  protected ResultRow execQuery1PrepStmt0(String sql, SqlColumn2... params)
-      throws CaMgmtException {
+  protected ResultRow execQuery1PrepStmt0(String sql, SqlColumn2... params) throws CaMgmtException {
     try {
       return execQuery1PrepStmt(sql, params);
     } catch (DataAccessException ex) {
@@ -150,8 +149,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     }
   }
 
-  protected List<ResultRow> execQueryPrepStmt0(String sql, SqlColumn2... params)
-      throws CaMgmtException {
+  protected List<ResultRow> execQueryPrepStmt0(String sql, SqlColumn2... params) throws CaMgmtException {
     try {
       return execQueryPrepStmt(sql, params);
     } catch (DataAccessException ex) {
@@ -159,8 +157,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     }
   }
 
-  protected PreparedStatement buildPrepStmt0(String sql, SqlColumn2... columns)
-      throws CaMgmtException {
+  protected PreparedStatement buildPrepStmt0(String sql, SqlColumn2... columns) throws CaMgmtException {
     try {
       return buildPrepStmt(sql, columns);
     } catch (DataAccessException ex) {
@@ -216,8 +213,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     }
   } // method changeIfNotNull
 
-  private void setColumn(
-      Map<String, String> changedColumns, PreparedStatement ps, int index, SqlColumn column)
+  private void setColumn(Map<String, String> changedColumns, PreparedStatement ps, int index, SqlColumn column)
       throws SQLException {
     String name = column.name();
     ColumnType type = column.type();

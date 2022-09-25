@@ -175,8 +175,8 @@ public class X509Ca extends X509CaModule implements Closeable {
 
   private final boolean saveKeypair;
 
-  public X509Ca(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore,
-      CtLogClient ctlogClient) throws OperationException {
+  public X509Ca(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore, CtLogClient ctlogClient)
+      throws OperationException {
     super(caInfo);
 
     if (caInfo.isSignerRequired()) {
@@ -222,8 +222,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     return encodedCaCertChain;
   }
 
-  public X509Cert getCert(BigInteger serialNumber)
-      throws CertificateException, OperationException {
+  public X509Cert getCert(BigInteger serialNumber) throws CertificateException, OperationException {
     CertificateInfo certInfo = certstore.getCertInfo(caIdent, caCert, serialNumber, caIdNameMap);
     return (certInfo == null) ? null : certInfo.getCert().getCert();
   }
@@ -236,8 +235,7 @@ public class X509Ca extends X509CaModule implements Closeable {
    * @throws OperationException
    *         if error occurs.
    */
-  public X509Cert getCert(X500Name subjectName, String transactionId)
-      throws OperationException {
+  public X509Cert getCert(X500Name subjectName, String transactionId) throws OperationException {
     return certstore.getCert(subjectName, transactionId);
   }
 
@@ -533,8 +531,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     return certInfos;
   }
 
-  public CertificateInfo generateCert(
-      RequestorInfo requestor, CertTemplateData certTemplate, String transactionId)
+  public CertificateInfo generateCert(RequestorInfo requestor, CertTemplateData certTemplate, String transactionId)
       throws OperationException {
     notNull(certTemplate, "certTemplate");
     AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_gen_cert, requestor);

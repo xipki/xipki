@@ -35,8 +35,7 @@ public class SubjectDirectoryAttributesControl {
   private final List<ASN1ObjectIdentifier> types;
 
   public SubjectDirectoryAttributesControl(List<ASN1ObjectIdentifier> types) {
-    Args.notEmpty(types, "types");
-    this.types = new ArrayList<>(types);
+    this.types = new ArrayList<>(Args.notEmpty(types, "types"));
   }
 
   public List<ASN1ObjectIdentifier> getTypes() {

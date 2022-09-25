@@ -158,8 +158,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
     }
   } // method removeCertificate
 
-  private int removeExpiredCerts0(Date expiredAtTime, AuditEvent event)
-      throws OperationException {
+  private int removeExpiredCerts0(Date expiredAtTime, AuditEvent event) throws OperationException {
     notNull(expiredAtTime, "expiredtime");
     if (!masterMode) {
       throw new OperationException(NOT_PERMITTED, "CA could not remove expired certificates in slave mode");
