@@ -46,6 +46,7 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAParameterSpec;
 import java.security.spec.ECParameterSpec;
+import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1064,7 +1065,7 @@ public abstract class P11Slot implements Closeable {
     }
 
     assertMechanismSupported(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
-    return generateRSAKeypairOtf0(keysize, publicExponent);
+    return generateRSAKeypairOtf0(keysize, publicExponent == null ? RSAKeyGenParameterSpec.F4 : publicExponent);
   }
 
   protected abstract PrivateKeyInfo generateRSAKeypairOtf0(int keysize, BigInteger publicExponent)
@@ -1090,12 +1091,8 @@ public abstract class P11Slot implements Closeable {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + keysize);
     }
     assertCanGenKeypair("generateRSAKeypair", PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN, control);
-    BigInteger tmpPublicExponent = publicExponent;
-    if (tmpPublicExponent == null) {
-      tmpPublicExponent = BigInteger.valueOf(65537);
-    }
-
-    P11Identity identity = generateRSAKeypair0(keysize, tmpPublicExponent, control);
+    P11Identity identity = generateRSAKeypair0(keysize,
+        publicExponent == null ? RSAKeyGenParameterSpec.F4 : publicExponent, control);
     addIdentity(identity);
     P11IdentityId id = identity.getId();
     LOG.info("generated RSA keypair {}", id);

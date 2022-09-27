@@ -922,9 +922,7 @@ class IaikP11Slot extends P11Slot {
     setKeyAttributes(control, publicKey, privateKey, newObjectConf);
 
     publicKey.getModulusBits().setLongValue((long) keysize);
-    if (publicExponent != null) {
-      publicKey.getPublicExponent().setByteArrayValue(publicExponent.toByteArray());
-    }
+    publicKey.getPublicExponent().setByteArrayValue(publicExponent.toByteArray());
 
     return generateKeyPair(CKM_RSA_PKCS_KEY_PAIR_GEN, control.getId(), privateKey, publicKey);
   } // method generateRSAKeypair0
@@ -934,9 +932,7 @@ class IaikP11Slot extends P11Slot {
       throws P11TokenException {
     RSAPublicKey publicKeyTemplate = new RSAPublicKey();
     publicKeyTemplate.getModulusBits().setLongValue((long) keysize);
-    if (publicExponent != null) {
-      publicKeyTemplate.getPublicExponent().setByteArrayValue(publicExponent.toByteArray());
-    }
+    publicKeyTemplate.getPublicExponent().setByteArrayValue(publicExponent.toByteArray());
 
     RSAPrivateKey privateKeyTemplate = new RSAPrivateKey();
     setPrivateKeyAttrsOtf(privateKeyTemplate);
@@ -1123,12 +1119,12 @@ class IaikP11Slot extends P11Slot {
     } else {
       privateKeyTemplate = new ECPrivateKey(keyType);
       publicKeyTemplate  = new ECPublicKey(keyType);
+    }
 
-      try {
-        publicKeyTemplate.getEcdsaParams().setByteArrayValue(curveId.getEncoded());
-      } catch (IOException ex) {
-        throw new P11TokenException(ex.getMessage(), ex);
-      }
+    try {
+      publicKeyTemplate.getEcdsaParams().setByteArrayValue(curveId.getEncoded());
+    } catch (IOException ex) {
+      throw new P11TokenException(ex.getMessage(), ex);
     }
 
     setPrivateKeyAttrsOtf(privateKeyTemplate);
@@ -1183,6 +1179,7 @@ class IaikP11Slot extends P11Slot {
     if (supportsMechanism(ckm)) {
       ECPrivateKey privateKey = ECPrivateKey.newSM2PrivateKey(slot.getModule());
       ECPublicKey publicKey = ECPublicKey.newSM2PublicKey(slot.getModule());
+      publicKey.getEcdsaParams().setByteArrayValue(Hex.decode("06082A811CCF5501822D"));
       setKeyAttributes(control, publicKey, privateKey, newObjectConf);
 
       return generateKeyPair(ckm, control.getId(), privateKey, publicKey);
