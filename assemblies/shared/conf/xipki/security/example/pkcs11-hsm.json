@@ -57,14 +57,9 @@
 					}
 				]
 			}
-		]
-		//,
-		//"vendorCodes":{
-		//	"CKK_VENDOR_SM2": "0x80000001",
-		//	"CKM_VENDOR_SM2_KEY_PAIR_GEN": "0x80000001",
-		//	"CKM_VENDOR_SM2": "0x80000002",
-		//	"CKM_VENDOR_SM2_SM3": "0x80000003"
-		//}
+		],
+		"vendorCodes":{
+		}
 	}],
 	"mechanismSets":[{
 		"name":"allMechanisms",
