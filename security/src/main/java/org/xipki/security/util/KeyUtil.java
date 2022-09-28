@@ -274,6 +274,39 @@ public class KeyUtil {
     }
   } // method getKeyPairGenerator
 
+  public static PrivateKey generatePrivateKey(PrivateKeyInfo pkInfo)
+      throws InvalidKeySpecException {
+    notNull(pkInfo, "pkInfo");
+
+    PKCS8EncodedKeySpec keyspec;
+    try {
+      keyspec = new PKCS8EncodedKeySpec(pkInfo.getEncoded());
+    } catch (IOException ex) {
+      throw new InvalidKeySpecException(ex.getMessage(), ex);
+    }
+    ASN1ObjectIdentifier oid = pkInfo.getPrivateKeyAlgorithm().getAlgorithm();
+
+    String algorithm;
+    if (PKCSObjectIdentifiers.rsaEncryption.equals(oid)) {
+      algorithm = "RSA";
+    } else if (X9ObjectIdentifiers.id_dsa.equals(oid)) {
+      algorithm = "DSA";
+    } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(oid)) {
+      algorithm = "EC";
+    } else {
+      algorithm = EdECConstants.getName(oid);
+    }
+
+    if (algorithm == null) {
+      throw new InvalidKeySpecException("unsupported key algorithm: " + oid);
+    }
+
+    KeyFactory kf = getKeyFactory(algorithm);
+    synchronized (kf) {
+      return kf.generatePrivate(keyspec);
+    }
+  } // method generatePublicKey
+
   public static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)
       throws InvalidKeySpecException {
     notNull(pkInfo, "pkInfo");
@@ -284,21 +317,21 @@ public class KeyUtil {
     } catch (IOException ex) {
       throw new InvalidKeySpecException(ex.getMessage(), ex);
     }
-    ASN1ObjectIdentifier aid = pkInfo.getAlgorithm().getAlgorithm();
+    ASN1ObjectIdentifier oid = pkInfo.getAlgorithm().getAlgorithm();
 
     String algorithm;
-    if (PKCSObjectIdentifiers.rsaEncryption.equals(aid)) {
+    if (PKCSObjectIdentifiers.rsaEncryption.equals(oid)) {
       algorithm = "RSA";
-    } else if (X9ObjectIdentifiers.id_dsa.equals(aid)) {
+    } else if (X9ObjectIdentifiers.id_dsa.equals(oid)) {
       algorithm = "DSA";
-    } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(aid)) {
+    } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(oid)) {
       algorithm = "EC";
     } else {
-      algorithm = EdECConstants.getName(pkInfo.getAlgorithm().getAlgorithm());
+      algorithm = EdECConstants.getName(oid);
     }
 
     if (algorithm == null) {
-      throw new InvalidKeySpecException("unsupported key algorithm: " + aid);
+      throw new InvalidKeySpecException("unsupported key algorithm: " + oid);
     }
 
     KeyFactory kf = getKeyFactory(algorithm);

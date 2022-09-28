@@ -61,13 +61,13 @@ import static org.xipki.util.Args.notNull;
 
 public class P12KeyGenerator {
 
-  private static class KeyPairWithSubjectPublicKeyInfo {
+  public static class KeyPairWithSubjectPublicKeyInfo {
 
     private final KeyPair keypair;
 
     private final SubjectPublicKeyInfo subjectPublicKeyInfo;
 
-    KeyPairWithSubjectPublicKeyInfo(KeyPair keypair, SubjectPublicKeyInfo subjectPublicKeyInfo)
+    public KeyPairWithSubjectPublicKeyInfo(KeyPair keypair, SubjectPublicKeyInfo subjectPublicKeyInfo)
         throws InvalidKeySpecException {
       super();
       this.keypair = keypair;
@@ -200,7 +200,7 @@ public class P12KeyGenerator {
     return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
   }
 
-  private static KeyStoreWrapper generateIdentity(
+  public static KeyStoreWrapper generateIdentity(
       KeyPairWithSubjectPublicKeyInfo kp, KeystoreGenerationParameters params, String selfSignedCertSubject)
       throws Exception {
     Date now = new Date();

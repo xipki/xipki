@@ -535,9 +535,8 @@ public class Actions {
       }
 
       if (changed) {
-        File newFile = new File(file.getPath() + "-new");
+        File newFile = new File(file.getPath());
         IoUtil.save(newFile, writer.toByteArray());
-        newFile.renameTo(file);
       }
     }
 
