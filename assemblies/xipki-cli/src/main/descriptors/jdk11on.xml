@@ -26,6 +26,9 @@
     <fileSet>
       <directory>${project.build.directory}/jdk11on</directory>
       <outputDirectory>.</outputDirectory>
+      <excludes>
+        <exclude>system/org/apache/karaf/features/**</exclude>
+      </excludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
