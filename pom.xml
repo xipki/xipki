@@ -33,7 +33,7 @@
     <servlet.version>3.1.0</servlet.version>
     <karaf.version>4.3.7</karaf.version>
     <karaf.bc.version>1.69</karaf.bc.version>
-    <bc.version>1.71</bc.version>
+    <bc.version>1.72</bc.version>
     <slf4j.version>1.7.32</slf4j.version>
     <pkcs11-wrapper.version>1.4.10</pkcs11-wrapper.version>
     <hikaricp.version>4.0.3</hikaricp.version>
