@@ -11,7 +11,6 @@
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-extra/${project.version}</bundle>
     <bundle>mvn:org.osgi/org.osgi.service.jdbc/1.0.0</bundle>
     <bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
@@ -32,7 +31,6 @@
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-extra/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-mgmt-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>

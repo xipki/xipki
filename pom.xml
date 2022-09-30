@@ -58,7 +58,6 @@
     <module>dbtool</module>
     <module>password</module>
     <module>security</module>
-    <module>security-extra</module>
     <!-- PKI SDK/Client -->
     <module>ocsp-client</module>
     <!-- PKI -->

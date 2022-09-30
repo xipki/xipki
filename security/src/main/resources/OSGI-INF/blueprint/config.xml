@@ -88,4 +88,12 @@
   <service ref="iaikP11ModuleFactory"
       interface="org.xipki.security.pkcs11.P11ModuleFactory"/>
 
+  <!-- PKCS#11 Emulator -->
+  <bean id="emulatorP11ModuleFactory"
+      class="org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory">
+  </bean>
+
+  <service ref="emulatorP11ModuleFactory"
+      interface="org.xipki.security.pkcs11.P11ModuleFactory"/>
+
 </blueprint>

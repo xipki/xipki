@@ -25,6 +25,7 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.password.Passwords;
 import org.xipki.password.Passwords.PasswordConf;
 import org.xipki.security.pkcs11.*;
+import org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory;
 import org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory;
 import org.xipki.security.pkcs12.P12SignerFactory;
 import org.xipki.util.CollectionUtil;
@@ -161,26 +162,7 @@ public class Securities implements Closeable {
   private static List<P11ModuleFactory> createDefaultFactories() {
     List<P11ModuleFactory> factories = new ArrayList<>(3);
     factories.add(new IaikP11ModuleFactory());
-
-    String[] classNames = {"org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory"};
-    ClassLoader cl = Securities.class.getClassLoader();
-
-    for (String className : classNames) {
-      Class<?> clazz;
-      try {
-        clazz = cl.loadClass(className);
-      } catch (ClassNotFoundException ex) {
-        LOG.info("{} not in the classpath, ignore it", className);
-        continue;
-      }
-
-      try {
-        factories.add((P11ModuleFactory) clazz.getDeclaredConstructor().newInstance());
-      } catch (Exception ex) {
-        LogUtil.error(LOG, ex, "could not create new instance of " + className);
-      }
-    }
-
+    factories.add(new EmulatorP11ModuleFactory());
     return factories;
   }
 

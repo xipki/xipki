@@ -11,7 +11,6 @@
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-extra/${project.version}</bundle>
     <bundle>mvn:org.xipki.gateway/cmp-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/security-shell/${project.version}</bundle>
@@ -27,7 +26,6 @@
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-extra/${project.version}</bundle>
     <bundle>mvn:org.xipki.gateway/scep-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/security-shell/${project.version}</bundle>
@@ -42,7 +40,6 @@
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-extra/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/security-shell/${project.version}</bundle>
