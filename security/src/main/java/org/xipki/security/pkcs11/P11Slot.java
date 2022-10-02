@@ -31,6 +31,7 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.DSAParameterCache;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.CompareUtil;
 import org.xipki.util.Hex;
 
 import java.io.Closeable;
@@ -490,6 +491,28 @@ public abstract class P11Slot implements Closeable {
    *
    * @param id
    *         Id of the objects to be deleted. At least one of id and label may not be {@code null}.
+   * @return how many objects have been deleted
+   * @throws P11TokenException
+   *           If PKCS#11 error happens.
+   */
+  public abstract int removeObjectsForId(byte[] id) throws P11TokenException;
+
+  /**
+   * Remove objects.
+   *
+   * @param label
+   *         Label of the objects to be deleted
+   * @return how many objects have been deleted
+   * @throws P11TokenException
+   *           If PKCS#11 error happens.
+   */
+  public abstract int removeObjectsForLabel(String label) throws P11TokenException;
+
+  /**
+   * Remove objects.
+   *
+   * @param id
+   *         Id of the objects to be deleted. At least one of id and label may not be {@code null}.
    * @param label
    *         Label of the objects to be deleted
    * @return how many objects have been deleted
@@ -720,7 +743,7 @@ public abstract class P11Slot implements Closeable {
 
     for (P11ObjectIdentifier objectId : objectIds) {
       boolean matchId = id != null && objectId.matchesId(id);
-      boolean matchLabel = label != null && label.equals(objectId.getLabel());
+      boolean matchLabel = CompareUtil.equalsObject(label, objectId.getLabel());
 
       if (matchId || matchLabel) {
         StringBuilder sb = new StringBuilder("Identity or Certificate with ");
@@ -741,7 +764,15 @@ public abstract class P11Slot implements Closeable {
     }
   } // method assertNoIdentityAndCert
 
-  public P11ObjectIdentifier getObjectId(byte[] id, String label) {
+  public P11ObjectIdentifier getObjectIdForId(byte[] id) {
+    return getObjectId(id, null);
+  }
+
+  public P11ObjectIdentifier getObjectIdForLabel(String label) {
+    return getObjectId(null, label);
+  }
+
+  private P11ObjectIdentifier getObjectId(byte[] id, String label) {
     if (id == null && label == null) {
       return null;
     }
@@ -753,7 +784,7 @@ public abstract class P11Slot implements Closeable {
       }
 
       if (label != null) {
-        match = label.equals(objectId.getLabel());
+        match = objectId.matchesLabel(label);
       }
 
       if (match) {
@@ -1333,9 +1364,8 @@ public abstract class P11Slot implements Closeable {
 
     certificates.put(keyId, newCert);
 
-    P11IdentityId identityId = identity.getId();
-    identityId.setCertLabel(keyId.getLabel());
     identity.setCertificates(new X509Cert[]{newCert});
+    identity.getId().addCertLabel(keyId.getLabel());
     updateCaCertsOfIdentities();
     LOG.info("updated certificate for key {}", keyId);
   } // method updateCertificate

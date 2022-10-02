@@ -342,8 +342,7 @@ class IaikP11SlotUtil {
 
   static X509Cert parseCert(X509PublicKeyCertificate p11Cert) throws P11TokenException {
     try {
-      byte[] encoded = value(p11Cert.getValue());
-      return X509Util.parseCert(encoded);
+      return X509Util.parseCert(value(p11Cert.getValue()));
     } catch (CertificateException ex) {
       throw new P11TokenException("could not parse certificate: " + ex.getMessage(), ex);
     }
@@ -351,8 +350,7 @@ class IaikP11SlotUtil {
 
   static List<X509PublicKeyCertificate> getAllCertificateObjects(Session session)
       throws P11TokenException {
-    X509PublicKeyCertificate template = new X509PublicKeyCertificate();
-    List<Storage> tmpObjects = getObjects(session, template);
+    List<Storage> tmpObjects = getObjects(session, new X509PublicKeyCertificate());
 
     List<X509PublicKeyCertificate> certs = new ArrayList<>(tmpObjects.size());
     for (PKCS11Object tmpObject : tmpObjects) {
@@ -407,13 +405,24 @@ class IaikP11SlotUtil {
     }
   }
 
+  static X509PublicKeyCertificate[] getCertificateObjectsForId(Session session, byte[] keyId)
+      throws P11TokenException {
+    return getCertificateObjects0(session, keyId, true, null);
+  }
+
   static X509PublicKeyCertificate[] getCertificateObjects(Session session, byte[] keyId, char[] keyLabel)
+      throws P11TokenException {
+    return getCertificateObjects0(session, keyId, false, keyLabel);
+  }
+
+  private static X509PublicKeyCertificate[] getCertificateObjects0(
+      Session session, byte[] keyId, boolean ignoreKeyLabel, char[] keyLabel)
       throws P11TokenException {
     X509PublicKeyCertificate template = new X509PublicKeyCertificate();
     if (keyId != null) {
       template.getId().setByteArrayValue(keyId);
     }
-    if (keyLabel != null) {
+    if (!ignoreKeyLabel) {
       template.getLabel().setCharArrayValue(keyLabel);
     }
 

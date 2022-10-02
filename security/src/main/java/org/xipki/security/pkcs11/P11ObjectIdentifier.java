@@ -17,6 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
+import org.xipki.util.CompareUtil;
 import org.xipki.util.Hex;
 
 import java.math.BigInteger;
@@ -45,12 +46,12 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
    * @param id
    *          Identifier. Must not be {@code null}.
    * @param label
-   *          Label. Must not be {@code null}.
+   *          Label. May be {@code null}.
    */
   public P11ObjectIdentifier(byte[] id, String label) {
     this.id = notNull(id, "id");
-    this.label = notNull(label, "label");
     this.idHex = Hex.encode(id);
+    this.label = label;
   }
 
   public byte[] getId() {
@@ -62,7 +63,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
   }
 
   public boolean matchesLabel(String label) {
-    return this.label.equals(label);
+    return CompareUtil.equalsObject(label, this.label);
   }
 
   public String getIdHex() {
@@ -74,7 +75,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
   }
 
   public char[] getLabelChars() {
-    return label.toCharArray();
+    return label == null ? null : label.toCharArray();
   }
 
   @Override
@@ -85,7 +86,9 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
   @Override
   public int hashCode() {
     int hashCode = new BigInteger(1, id).hashCode();
-    hashCode += 31 * label.hashCode();
+    if (label != null) {
+      hashCode += 31 * label.hashCode();
+    }
     return hashCode;
   }
 
@@ -98,7 +101,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
     }
 
     P11ObjectIdentifier another = (P11ObjectIdentifier) obj;
-    return Arrays.equals(id, another.id) && label.equals(another.label);
+    return Arrays.equals(id, another.id) && CompareUtil.equalsObject(label, another.label);
   }
 
   @Override
@@ -108,7 +111,11 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
       return 0;
     }
 
-    return label.compareTo(obj.label);
+    if (label == null) {
+      return obj.label == null ? 0 : 1;
+    } else {
+      return obj.label == null ? -1 : label.compareTo(obj.label);
+    }
   }
 
 }

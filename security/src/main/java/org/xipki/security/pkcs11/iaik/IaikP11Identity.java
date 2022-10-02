@@ -102,7 +102,7 @@ class IaikP11Identity extends P11Identity {
       throw new P11TokenException("could not digest unextractable key");
     }
 
-    return ((IaikP11Slot) slot).digestKey(mechanism, this);
+    return ((IaikP11Slot) slot).digestSecretKey(mechanism, this);
   } // constructor
 
   @Override

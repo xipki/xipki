@@ -18,6 +18,7 @@
 package org.xipki.security.pkcs11;
 
 import org.xipki.util.CompareUtil;
+import org.xipki.util.StringUtil;
 
 import static org.xipki.util.Args.notNull;
 
@@ -45,23 +46,40 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
    *          Slot identifier. Must not be {@code null}.
    * @param keyId
    *          Object identifier. Must not be {@code null}.
+   */
+  public P11IdentityId(P11SlotIdentifier slotId, P11ObjectIdentifier keyId) {
+    this.slotId = notNull(slotId, "slotId");
+    this.keyId = notNull(keyId, "keyId");
+    this.publicKeyId = null;
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param slotId
+   *          Slot identifier. Must not be {@code null}.
+   * @param keyId
+   *          Object identifier. Must not be {@code null}.
    * @param publicKeyLabel
    *          Label of the public key
    * @param certLabel
    *          Label of the certificate
    */
-  public P11IdentityId(P11SlotIdentifier slotId, P11ObjectIdentifier keyId, String publicKeyLabel, String certLabel) {
+  public P11IdentityId(P11SlotIdentifier slotId, P11ObjectIdentifier keyId,
+                       boolean publicKeyAvailable, String publicKeyLabel,
+                       boolean certAvailable, String certLabel) {
     this.slotId = notNull(slotId, "slotId");
     this.keyId = notNull(keyId, "keyId");
-    if (publicKeyLabel != null) {
-      this.publicKeyId = publicKeyLabel.equals(keyId.getLabel())
+    if (publicKeyAvailable) {
+      this.publicKeyId = CompareUtil.equalsObject(publicKeyLabel, keyId.getLabel())
           ? keyId : new P11ObjectIdentifier(keyId.getId(), publicKeyLabel);
     } else {
       this.publicKeyId = null;
     }
 
-    if (certLabel != null) {
-      this.certId = certLabel.equals(keyId.getLabel()) ? keyId : new P11ObjectIdentifier(keyId.getId(), certLabel);
+    if (certAvailable) {
+      this.certId = CompareUtil.equalsObject(certLabel, keyId.getLabel())
+          ? keyId : new P11ObjectIdentifier(keyId.getId(), certLabel);
     } else {
       this.certId = null;
     }
@@ -79,12 +97,9 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
     return publicKeyId;
   }
 
-  public void setCertLabel(String certLabel) {
-    if (certLabel != null) {
-      this.certId = certLabel.equals(keyId.getLabel()) ? keyId : new P11ObjectIdentifier(keyId.getId(), certLabel);
-    } else {
-      this.certId = null;
-    }
+  public void addCertLabel(String certLabel) {
+    this.certId = CompareUtil.equalsObject(certLabel, keyId.getLabel())
+        ? keyId : new P11ObjectIdentifier(keyId.getId(), certLabel);
   }
 
   public P11ObjectIdentifier getCertId() {
@@ -117,7 +132,7 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
 
   public boolean match(P11SlotIdentifier slotId, String keyLabel) {
     notNull(keyLabel, "objectLabel");
-    return this.slotId.equals(slotId) && keyLabel.equals(this.keyId.getLabel());
+    return this.slotId.equals(slotId) && CompareUtil.equalsObject(keyLabel, this.keyId.getLabel());
   }
 
   @Override

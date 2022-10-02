@@ -250,7 +250,7 @@ class EmulatorP11Slot extends P11Slot {
           byte[] keyValue = keyCryptor.decrypt(encodedValue);
           SecretKey key = new SecretKeySpec(keyValue, keyAlgo);
           EmulatorP11Identity identity = new EmulatorP11Identity(this,
-              new P11IdentityId(slotId, p11ObjId, null, null), key, maxSessions, random);
+              new P11IdentityId(slotId, p11ObjId), key, maxSessions, random);
           LOG.info("added PKCS#11 secret key {}", p11ObjId);
           ret.addIdentity(identity);
         } catch (ClassCastException ex) {
@@ -306,7 +306,8 @@ class EmulatorP11Slot extends P11Slot {
           X509Cert[] certs = (cert == null) ? null : new X509Cert[]{cert};
 
           EmulatorP11Identity identity = new EmulatorP11Identity(this,
-              new P11IdentityId(slotId, p11ObjId, label, label), privateKey, publicKey, certs, maxSessions, random);
+              new P11IdentityId(slotId, p11ObjId, true, label, true, label),
+              privateKey, publicKey, certs, maxSessions, random);
           LOG.info("added PKCS#11 key {}", p11ObjId);
           ret.addIdentity(identity);
         } catch (InvalidKeyException ex) {
@@ -647,6 +648,16 @@ class EmulatorP11Slot extends P11Slot {
   } // method savePkcs11Entry
 
   @Override
+  public int removeObjectsForId(byte[] id) throws P11TokenException {
+    return removeObjects(id, null);
+  }
+
+  @Override
+  public int removeObjectsForLabel(String label) throws P11TokenException {
+    return removeObjects(null, label);
+  }
+
+  @Override
   public int removeObjects(byte[] id, String label) throws P11TokenException {
     if ((id == null || id.length == 0) && StringUtil.isBlank(label)) {
       throw new IllegalArgumentException("at least one of id and label may not be null");
@@ -929,7 +940,8 @@ class EmulatorP11Slot extends P11Slot {
     long t2 = System.currentTimeMillis();
     String pubKeyLabel = savePkcs11PublicKey(id, label, keypair.getPublic());
     long t3 = System.currentTimeMillis();
-    P11IdentityId identityId = new P11IdentityId(slotId, new P11ObjectIdentifier(id, keyLabel), pubKeyLabel, null);
+    P11IdentityId identityId = new P11IdentityId(slotId, new P11ObjectIdentifier(id, keyLabel),
+        true, pubKeyLabel, false, null);
     long t4 = System.currentTimeMillis();
     try {
       EmulatorP11Identity ret = new EmulatorP11Identity(this,identityId, keypair.getPrivate(),
@@ -950,7 +962,7 @@ class EmulatorP11Slot extends P11Slot {
     String label = control.getLabel();
 
     savePkcs11SecretKey(id, label, key);
-    P11IdentityId identityId = new P11IdentityId(slotId, new P11ObjectIdentifier(id, label), null, null);
+    P11IdentityId identityId = new P11IdentityId(slotId, new P11ObjectIdentifier(id, label));
     return new EmulatorP11Identity(this,identityId, key, maxSessions, random);
   } // method saveP11Entity
 

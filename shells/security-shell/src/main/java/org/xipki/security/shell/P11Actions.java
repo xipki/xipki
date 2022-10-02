@@ -105,7 +105,7 @@ public class P11Actions {
     protected Object execute0() throws Exception {
       if (force || confirm("Do you want to remove PKCS#11 certificate object with id 0x" + id, 3)) {
         P11Slot slot = getSlot();
-        P11ObjectIdentifier objectId = slot.getObjectId(Hex.decode(id), null);
+        P11ObjectIdentifier objectId = slot.getObjectIdForId(Hex.decode(id));
         if (objectId == null) {
           println("unknown certificates");
         } else {
@@ -408,7 +408,7 @@ public class P11Actions {
     private String id;
 
     @Option(name = "--label", description = "label of the objects in the PKCS#11 device\n"
-            + "at least one of id and label must be specified")
+            + "at least one of id and label must be specified. Use NULL to specify that label is not set.")
     private String label;
 
     @Option(name = "--force", aliases = "-f", description = "remove identifies without prompt")
@@ -420,10 +420,18 @@ public class P11Actions {
           + ", label = " + label + ")", 3)) {
         P11Slot slot = getSlot();
         byte[] idBytes = null;
+
+        int num;
         if (id != null) {
           idBytes = Hex.decode(id);
+          if (label == null) {
+            num = slot.removeObjectsForId(idBytes);
+          } else {
+            num = slot.removeObjects(idBytes, "NULL".equals(label) ? null : label);
+          }
+        } else {
+          num = slot.removeObjectsForLabel(label);
         }
-        int num = slot.removeObjects(idBytes, label);
         println("deleted " + num + " objects");
       }
       return null;
@@ -670,9 +678,9 @@ public class P11Actions {
       P11Slot slot = getSlot();
       P11ObjectIdentifier objIdentifier;
       if (hexId != null && label == null) {
-        objIdentifier = slot.getObjectId(Hex.decode(hexId), null);
+        objIdentifier = slot.getObjectIdForId(Hex.decode(hexId));
       } else if (hexId == null && label != null) {
-        objIdentifier = slot.getObjectId(null, label);
+        objIdentifier = slot.getObjectIdForLabel(label);
       } else {
         throw new IllegalCmdParamException("exactly one of keyId or keyLabel should be specified");
       }

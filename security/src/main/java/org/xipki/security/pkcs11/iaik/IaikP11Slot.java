@@ -162,7 +162,7 @@ class IaikP11Slot extends P11Slot {
         throw new P11TokenException("could not get tokenInfo: " + ex.getMessage(), ex);
       }
 
-      if (maxSessionCount2 == 0) {
+      if (maxSessionCount2 <= 0) {
         maxSessionCount2 = DEFAULT_MAX_COUNT_SESSION;
       } else {
         // 2 sessions as buffer, they may be used elsewhere.
@@ -231,41 +231,42 @@ class IaikP11Slot extends P11Slot {
       // secret keys
       List<Storage> secretKeys;
       if (secretKeyTypes == null) {
-        SecretKey template = new SecretKey();
-        secretKeys = getObjects(session, template);
+        secretKeys = getObjects(session, new SecretKey());
       } else if (secretKeyTypes.isEmpty()) {
         secretKeys = Collections.emptyList();
       } else {
         secretKeys = new LinkedList<>();
         for (Long keyType : secretKeyTypes) {
-          SecretKey template = new ValuedSecretKey(keyType);
-          secretKeys.addAll(getObjects(session, template));
+          secretKeys.addAll(getObjects(session, new ValuedSecretKey(keyType)));
         }
       }
 
       LOG.info("found {} secret keys", secretKeys.size());
-      for (Storage m : secretKeys) {
-        SecretKey secKey = (SecretKey) m;
-        byte[] keyId = value(secKey.getId());
-        if (keyId == null || keyId.length == 0) {
-          String label = (secKey.getLabel() == null) ? null : new String(secKey.getLabel().getCharArrayValue());
-          LOG.warn("ignored secret key with ID: null and label: " + label);
-          continue;
+      int count = 0;
+      for (Storage secretKey : secretKeys) {
+        if (analyseSingleKey((SecretKey) secretKey, ret)) {
+          count++;
         }
-
-        analyseSingleKey(secKey, ret);
       }
+      LOG.info("accepted {} secret keys", count);
 
       // first get the list of all CA certificates
       List<X509PublicKeyCertificate> p11Certs = getAllCertificateObjects(session);
+      LOG.info("found {} X.509 certificates", p11Certs.size());
+
+      count = 0;
       for (X509PublicKeyCertificate p11Cert : p11Certs) {
         byte[] id = value(p11Cert.getId());
         String label = valueStr(p11Cert.getLabel());
-        if (id != null && label != null) {
-          P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
-          ret.addCertificate(objId, parseCert(p11Cert));
+        if (id == null || id.length == 0) {
+          LOG.warn("ignored X.509 certificate with ID: null and label: " + label);
+        } else {
+          ret.addCertificate(new P11ObjectIdentifier(id, label), parseCert(p11Cert));
+          count++;
         }
       }
+
+      LOG.info("accepted {} X.509 certificates", count);
 
       List<Storage> privKeys;
       if (keyPairTypes == null) {
@@ -300,28 +301,13 @@ class IaikP11Slot extends P11Slot {
       }
 
       LOG.info("found {} private keys", privKeys.size());
-      for (Storage m : privKeys) {
-        PrivateKey privKey = (PrivateKey) m;
-        byte[] keyId = value(privKey.getId());
-        if (keyId == null || keyId.length == 0) {
-          String label = (privKey.getLabel() == null) ? null : new String(privKey.getLabel().getCharArrayValue());
-          LOG.warn("ignored private key with ID: null and label: " + label);
-          continue;
-        }
-
-        try {
-          analyseSingleKey(session, privKey, ret);
-        } catch (XiSecurityException ex) {
-          LogUtil.error(LOG, ex, "XiSecurityException while initializing private key with id " + hex(keyId));
-        } catch (Throwable th) {
-          String label = "";
-          if (privKey.getLabel() != null) {
-            label = valueStr(privKey.getLabel());
-          }
-          LOG.error("unexpected exception while initializing private key with id "
-              + hex(keyId) + " and label " + label, th);
+      count = 0;
+      for (Storage privKey : privKeys) {
+        if (analyseSingleKey(session, (PrivateKey) privKey, ret)) {
+          count++;
         }
       }
+      LOG.info("accepted {} private keys", count);
 
       return ret;
     } finally {
@@ -350,64 +336,77 @@ class IaikP11Slot extends P11Slot {
     countSessions.lazySet(0);
   } // method close
 
-  private void analyseSingleKey(SecretKey secretKey, P11SlotRefreshResult refreshResult) {
+  private boolean analyseSingleKey(SecretKey secretKey, P11SlotRefreshResult refreshResult) {
     byte[] id = value(secretKey.getId());
     String label = valueStr(secretKey.getLabel());
-    if (id == null || label == null) {
-      return;
+
+    if (id == null || id.length == 0) {
+      LOG.warn("ignored secret key with ID: null and label: " + label);
+      return false;
     }
 
     IaikP11Identity identity = new IaikP11Identity(this,
-        new P11IdentityId(slotId, new P11ObjectIdentifier(id, label), null, null), secretKey);
+        new P11IdentityId(slotId, new P11ObjectIdentifier(id, label)), secretKey);
     refreshResult.addIdentity(identity);
+    return true;
   } // method analyseSingleKey
 
-  private void analyseSingleKey(Session session, PrivateKey privKey, P11SlotRefreshResult refreshResult)
-      throws P11TokenException, XiSecurityException {
+  private boolean analyseSingleKey(Session session, PrivateKey privKey, P11SlotRefreshResult refreshResult) {
     byte[] id = value(privKey.getId());
     String label = valueStr(privKey.getLabel());
-    if (id == null || label == null) {
-      return;
+
+    if (id == null || id.length == 0) {
+      LOG.warn("ignored private key with ID: null and label: " + label);
+      return false;
     }
 
-    String pubKeyLabel = null;
-    PublicKey p11PublicKey = (PublicKey) getKeyObject(session, new PublicKey(), id, null);
-    if (p11PublicKey != null) {
-      pubKeyLabel = valueStr(p11PublicKey.getLabel());
-    }
+    try {
+      String pubKeyLabel = null;
+      PublicKey p11PublicKey = (PublicKey) getKeyObjectById(session, new PublicKey(), id);
+      if (p11PublicKey != null) {
+        pubKeyLabel = valueStr(p11PublicKey.getLabel());
+      }
 
-    String certLabel = null;
-    java.security.PublicKey pubKey = null;
-    X509Cert cert = refreshResult.getCertForId(id);
+      String certLabel = null;
+      java.security.PublicKey pubKey = null;
+      X509Cert cert = refreshResult.getCertForId(id);
 
-    if (cert != null) {
-      certLabel = refreshResult.getCertLabelForId(id);
-      pubKey = cert.getPublicKey();
-    } else if (p11PublicKey != null) {
-      pubKey = generatePublicKey(p11PublicKey);
-    } else {
-      if (privKey instanceof RSAPrivateKey) {
-        RSAPrivateKey p11RsaSk = (RSAPrivateKey) privKey;
-        if (p11RsaSk.getPublicExponent() != null && p11RsaSk.getModulus() == null) {
-          pubKey = buildRSAKey(new BigInteger(1, value(p11RsaSk.getPublicExponent())),
-                              new BigInteger(1, value(p11RsaSk.getModulus())));
+      if (cert != null) {
+        certLabel = refreshResult.getCertLabelForId(id);
+        pubKey = cert.getPublicKey();
+      } else if (p11PublicKey != null) {
+        pubKey = generatePublicKey(p11PublicKey);
+      } else {
+        if (privKey instanceof RSAPrivateKey) {
+          RSAPrivateKey p11RsaSk = (RSAPrivateKey) privKey;
+          if (p11RsaSk.getPublicExponent() != null && p11RsaSk.getModulus() == null) {
+            pubKey = buildRSAKey(new BigInteger(1, value(p11RsaSk.getPublicExponent())),
+                new BigInteger(1, value(p11RsaSk.getModulus())));
+          }
+        }
+
+        if (pubKey == null) {
+          LOG.info("neither certificate nor public key for the key (" + hex(id) + " is available");
+          return false;
         }
       }
 
-      if (pubKey == null) {
-        LOG.info("neither certificate nor public key for the key (" + hex(id) + " is available");
-        return;
-      }
+      X509Cert[] certs = (cert == null) ? null : new X509Cert[]{cert};
+      P11IdentityId p11Id = new P11IdentityId(slotId, new P11ObjectIdentifier(id, label),
+          pubKey != null, pubKeyLabel, cert != null, certLabel);
+      refreshResult.addIdentity(new IaikP11Identity(this, p11Id, privKey, pubKey, certs));
+      return true;
+    } catch (XiSecurityException ex) {
+      LogUtil.error(LOG, ex, "XiSecurityException while initializing private key with id " + hex(id));
+    } catch (Throwable th) {
+      LOG.error("unexpected exception while initializing private key with id "
+          + hex(id) + " and label " + label, th);
     }
 
-    X509Cert[] certs = (cert == null) ? null : new X509Cert[]{cert};
-    IaikP11Identity identity = new IaikP11Identity(this,
-        new P11IdentityId(slotId, new P11ObjectIdentifier(id, label), pubKeyLabel, certLabel),
-        privKey, pubKey, certs);
-    refreshResult.addIdentity(identity);
+    return false;
   } // method analyseSingleKey
 
-  byte[] digestKey(long mech, IaikP11Identity identity) throws P11TokenException {
+  byte[] digestSecretKey(long mech, IaikP11Identity identity) throws P11TokenException {
     Key key = notNull(identity, "identity").getSigningKey();
     assertMechanismSupported(mech);
     if (!(key instanceof SecretKey)) {
@@ -679,12 +678,20 @@ class IaikP11Slot extends P11Slot {
     }
   } // method forceLogin
 
+  private Key getKeyObjectById(Session session, Key template, byte[] keyId)
+      throws P11TokenException {
+    return getKeyObject(session, template, keyId, true, null);
+  }
+
   private Key getKeyObject(Session session, Key template, byte[] keyId, char[] keyLabel)
       throws P11TokenException {
-    if (keyId != null) {
-      template.getId().setByteArrayValue(keyId);
-    }
-    if (keyLabel != null) {
+    return getKeyObject(session, template, keyId, false, keyLabel);
+  }
+
+  private Key getKeyObject(Session session, Key template, byte[] keyId, boolean ignoreLabel, char[] keyLabel)
+      throws P11TokenException {
+    template.getId().setByteArrayValue(notNull(keyId, "keyId"));
+    if (!ignoreLabel) {
       template.getLabel().setCharArrayValue(keyLabel);
     }
 
@@ -692,6 +699,7 @@ class IaikP11Slot extends P11Slot {
     if (isEmpty(tmpObjects)) {
       return null;
     }
+
     int size = tmpObjects.size();
     if (size > 1) {
       LOG.warn("found {} public key identified by {}, use the first one", size, getDescription(keyId, keyLabel));
@@ -701,13 +709,26 @@ class IaikP11Slot extends P11Slot {
   } // method getKeyObject
 
   @Override
-  public int removeObjects(byte[] id, String label) throws P11TokenException {
-    return removeObjects(id, (label == null) ? null : label.toCharArray());
+  public int removeObjectsForId(byte[] id) throws P11TokenException {
+    return removeObjects(id, true, null);
   }
 
-  private int removeObjects(byte[] id, char[] label) throws P11TokenException {
-    boolean labelNotBlank = (label != null && label.length != 0);
-    if ((id == null || id.length == 0) && !labelNotBlank) {
+  @Override
+  public int removeObjectsForLabel(String label) throws P11TokenException {
+    return removeObjects(null, false, notNull(label, "label").toCharArray());
+  }
+
+  @Override
+  public int removeObjects(byte[] id, String label) throws P11TokenException {
+    return removeObjects(id, false, (label == null) ? null : label.toCharArray());
+  }
+
+  private int removeObjects(byte[] id, boolean ignoreLabel, char[] label) throws P11TokenException {
+    if (ignoreLabel) {
+      label = null;
+    }
+    boolean labelBlank = label == null || label.length == 0;
+    if ((id == null || id.length == 0) && labelBlank) {
       throw new IllegalArgumentException("at least one of id and label may not be null");
     }
 
@@ -715,7 +736,8 @@ class IaikP11Slot extends P11Slot {
     if (id != null && id.length > 0) {
       keyTemplate.getId().setByteArrayValue(id);
     }
-    if (labelNotBlank) {
+
+    if (!ignoreLabel) {
       keyTemplate.getLabel().setCharArrayValue(label);
     }
 
@@ -729,11 +751,11 @@ class IaikP11Slot extends P11Slot {
       if (id != null && id.length > 0) {
         certTemplate.getId().setByteArrayValue(id);
       }
-      if (labelNotBlank) {
+      if (!ignoreLabel) {
         certTemplate.getLabel().setCharArrayValue(label);
       }
 
-      num += removeObjects0(session, certTemplate, "certificates" + objIdDesc);
+      num += removeObjects0(session, certTemplate, "certificates " + objIdDesc);
       return num;
     } finally {
       sessions.requite(bagEntry);
@@ -859,7 +881,7 @@ class IaikP11Slot extends P11Slot {
       }
 
       P11ObjectIdentifier objId = new P11ObjectIdentifier(id, valueStr(key.getLabel()));
-      P11IdentityId entityId = new P11IdentityId(slotId, objId, null, null);
+      P11IdentityId entityId = new P11IdentityId(slotId, objId);
 
       return new IaikP11Identity(this, entityId, key);
     } finally {
@@ -906,7 +928,7 @@ class IaikP11Slot extends P11Slot {
       }
 
       P11ObjectIdentifier objId = new P11ObjectIdentifier(id, valueStr(key.getLabel()));
-      P11IdentityId entityId = new P11IdentityId(slotId, objId, null, null);
+      P11IdentityId entityId = new P11IdentityId(slotId, objId);
 
       return new IaikP11Identity(this, entityId, key);
     } finally {
@@ -954,8 +976,7 @@ class IaikP11Slot extends P11Slot {
                 toBigInt(sk.getExponent2()), toBigInt(sk.getCoefficient())));
 
       } catch (TokenException | IOException ex) {
-        throw new P11TokenException("could not generate keypair "
-            + Functions.mechanismCodeToString(mech), ex);
+        throw new P11TokenException("could not generate keypair " + Functions.mechanismCodeToString(mech), ex);
       } finally {
         if (keypair != null) {
           destroyObject(session, keypair.getPrivateKey());
@@ -1260,7 +1281,7 @@ class IaikP11Slot extends P11Slot {
           }
         }
 
-        P11IdentityId entityId = new P11IdentityId(slotId, objId, pubKeyLabel, certLabel);
+        P11IdentityId entityId = new P11IdentityId(slotId, objId, true, pubKeyLabel, certs != null, certLabel);
         IaikP11Identity ret = new IaikP11Identity(this, entityId, privKey2, jcePublicKey, certs);
         succ = true;
         return ret;
@@ -1268,9 +1289,9 @@ class IaikP11Slot extends P11Slot {
         sessions.requite(bagEntry);
       }
     } finally {
-      if (!succ && (id != null || labelChars != null)) {
+      if (!succ && (id != null)) {
         try {
-          removeObjects(id, labelChars);
+          removeObjects(id, false, labelChars);
         } catch (Throwable th) {
           LogUtil.error(LOG, th, "could not remove objects");
         }
@@ -1346,8 +1367,7 @@ class IaikP11Slot extends P11Slot {
     } catch (InterruptedException ex) {
     }
 
-    P11NewObjectControl control = new P11NewObjectControl(keyId.getId(), keyId.getLabel());
-    addCert0(newCert, control);
+    addCert0(newCert, new P11NewObjectControl(keyId.getId(), keyId.getLabel()));
   } // method updateCertificate0
 
   @Override
