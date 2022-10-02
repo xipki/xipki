@@ -212,19 +212,18 @@ public class CertActions {
         byte[] encodedCsr = StringUtil.isNotBlank(csrFile) ? X509Util.toDerEncoded(IoUtil.read(csrFile)) : null;
         certBytes = caManager.generateCertificate(caName, profileName, encodedCsr, notBefore, notAfter).getEncoded();
       } else {
-        char[] keyPwd;
-        if (StringUtil.isNotBlank(keyOutform)) {
-          if ("NONE".equalsIgnoreCase(keyPassword)) {
-            if ("pem".equalsIgnoreCase(keyOutform)) {
-              keyPwd = null;
-            } else {
-              throw new IllegalCmdParamException("Password NONE is not allowed");
-            }
-          } else {
-            keyPwd = keyPassword.toCharArray();
+        boolean needKeyPwd = true;
+        if ("NONE".equalsIgnoreCase(keyPassword)) {
+          needKeyPwd = false;
+          if (!"pem".equalsIgnoreCase(keyOutform)) {
+            throw new IllegalCmdParamException("Password NONE is not allowed");
           }
-        } else {
-          keyPwd = readPassword("Enter password to protect the private key");
+        }
+
+        char[] keyPwd = null;
+        if (needKeyPwd) {
+          keyPwd = (keyPassword != null) ? keyPassword.toCharArray()
+                    : readPassword("Enter password to protect the private key");
         }
 
         KeyCertBytesPair keyCertBytesPair =
