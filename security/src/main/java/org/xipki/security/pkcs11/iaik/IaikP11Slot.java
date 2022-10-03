@@ -244,8 +244,10 @@ class IaikP11Slot extends P11Slot {
       LOG.info("found {} secret keys", secretKeys.size());
       int count = 0;
       for (Storage secretKey : secretKeys) {
-        if (analyseSingleKey((SecretKey) secretKey, ret)) {
-          count++;
+        if (secretKey instanceof SecretKey) {
+          if (analyseSingleSecretKey((SecretKey) secretKey, ret)) {
+            count++;
+          }
         }
       }
       LOG.info("accepted {} secret keys", count);
@@ -303,8 +305,10 @@ class IaikP11Slot extends P11Slot {
       LOG.info("found {} private keys", privKeys.size());
       count = 0;
       for (Storage privKey : privKeys) {
-        if (analyseSingleKey(session, (PrivateKey) privKey, ret)) {
-          count++;
+        if (privKey instanceof PrivateKey) {
+          if (analyseSinglePrivateKey(session, (PrivateKey) privKey, ret)) {
+            count++;
+          }
         }
       }
       LOG.info("accepted {} private keys", count);
@@ -336,7 +340,7 @@ class IaikP11Slot extends P11Slot {
     countSessions.lazySet(0);
   } // method close
 
-  private boolean analyseSingleKey(SecretKey secretKey, P11SlotRefreshResult refreshResult) {
+  private boolean analyseSingleSecretKey(SecretKey secretKey, P11SlotRefreshResult refreshResult) {
     byte[] id = value(secretKey.getId());
     String label = valueStr(secretKey.getLabel());
 
@@ -351,7 +355,7 @@ class IaikP11Slot extends P11Slot {
     return true;
   } // method analyseSingleKey
 
-  private boolean analyseSingleKey(Session session, PrivateKey privKey, P11SlotRefreshResult refreshResult) {
+  private boolean analyseSinglePrivateKey(Session session, PrivateKey privKey, P11SlotRefreshResult refreshResult) {
     byte[] id = value(privKey.getId());
     String label = valueStr(privKey.getLabel());
 
@@ -362,7 +366,7 @@ class IaikP11Slot extends P11Slot {
 
     try {
       String pubKeyLabel = null;
-      PublicKey p11PublicKey = (PublicKey) getKeyObjectById(session, new PublicKey(), id);
+      PublicKey p11PublicKey = (PublicKey) getKeyObjectForId(session, new PublicKey(), id);
       if (p11PublicKey != null) {
         pubKeyLabel = valueStr(p11PublicKey.getLabel());
       }
@@ -380,8 +384,8 @@ class IaikP11Slot extends P11Slot {
         if (privKey instanceof RSAPrivateKey) {
           RSAPrivateKey p11RsaSk = (RSAPrivateKey) privKey;
           if (p11RsaSk.getPublicExponent() != null && p11RsaSk.getModulus() == null) {
-            pubKey = buildRSAKey(new BigInteger(1, value(p11RsaSk.getPublicExponent())),
-                new BigInteger(1, value(p11RsaSk.getModulus())));
+            pubKey = buildRSAKey(new BigInteger(1, value(p11RsaSk.getModulus())),
+                new BigInteger(1, value(p11RsaSk.getPublicExponent())));
           }
         }
 
@@ -678,7 +682,7 @@ class IaikP11Slot extends P11Slot {
     }
   } // method forceLogin
 
-  private Key getKeyObjectById(Session session, Key template, byte[] keyId)
+  private Key getKeyObjectForId(Session session, Key template, byte[] keyId)
       throws P11TokenException {
     return getKeyObject(session, template, keyId, true, null);
   }

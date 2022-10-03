@@ -236,10 +236,8 @@ class IaikP11SlotUtil {
       throws XiSecurityException {
     if (p11Key instanceof RSAPublicKey) {
       RSAPublicKey rsaP11Key = (RSAPublicKey) p11Key;
-      BigInteger exp = new BigInteger(1, value(rsaP11Key.getPublicExponent()));
-      byte[] modBytes = value(rsaP11Key.getModulus());
-      BigInteger mod = new BigInteger(1, modBytes);
-      return buildRSAKey(mod, exp);
+      return buildRSAKey(new BigInteger(1, value(rsaP11Key.getModulus())),
+          new BigInteger(1, value(rsaP11Key.getPublicExponent())));
     } else if (p11Key instanceof DSAPublicKey) {
       DSAPublicKey dsaP11Key = (DSAPublicKey) p11Key;
 

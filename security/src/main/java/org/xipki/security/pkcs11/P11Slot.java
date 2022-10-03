@@ -490,7 +490,7 @@ public abstract class P11Slot implements Closeable {
    * Remove objects.
    *
    * @param id
-   *         Id of the objects to be deleted. At least one of id and label may not be {@code null}.
+   *         Id of the objects to be deleted.
    * @return how many objects have been deleted
    * @throws P11TokenException
    *           If PKCS#11 error happens.
