@@ -301,7 +301,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       super(cryptService, identityId, signAlgo);
 
       if (SignAlgo.ED25519 != signAlgo) {
-        throw new XiSecurityException("unsupproted signature algorithm " + signAlgo);
+        throw new XiSecurityException("unsupported signature algorithm " + signAlgo);
       }
 
       mechanism = PKCS11Constants.CKM_EDDSA;

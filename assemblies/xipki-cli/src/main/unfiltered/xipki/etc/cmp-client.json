@@ -15,6 +15,8 @@
 	},
 	"ssl":{
 		"name":"ssl1",
+		// valid values: 'default' for standard verification, 'no_op' for no-operation, or
+		// 'java:'<class implements javax.net.ssl.HostnameVerifier>
 		"hostnameVerifier":"default",
 		"trustanchors":[{
 			"file":"xipki/keycerts/tlskeys/server/tls-server-cert.der"

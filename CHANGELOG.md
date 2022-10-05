@@ -150,7 +150,7 @@ See also <https://github.com/xipki/xipki/releases>
     - Removed table DELTACRL_CACHE. Use better method to generate the delta CRL.
     - Removed generation of CRL with only CA or EE certs, this feature will not be used in usual.
     - Removed support of custom extension xipki-authorizationTemplate
-    - Removed unsupproted options duplicate-subject and duplicate-key
+    - Removed unsupported options duplicate-subject and duplicate-key
     - Removed xipki custom request extension cmpRequestExtensions (1.3.6.1.4.1.45522.1.3)
   - OCSP
     - Fixed "Duplicate primary key ID" database error in some cluster databases. #186
