@@ -74,6 +74,8 @@ public class HttpEstServlet extends HttpServlet {
       throws IOException {
     AuditService auditService = Audits.getAuditService();
     AuditEvent event = new AuditEvent(new Date());
+    event.setApplicationName("est-gw");
+
     try {
       String path = req.getServletPath();
       byte[] requestBytes = viaPost ? IoUtil.read(req.getInputStream()) : null;

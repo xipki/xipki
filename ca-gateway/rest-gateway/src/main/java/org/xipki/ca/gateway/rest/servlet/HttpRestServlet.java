@@ -74,6 +74,7 @@ public class HttpRestServlet extends HttpServlet {
       throws IOException {
     AuditService auditService = Audits.getAuditService();
     AuditEvent event = new AuditEvent(new Date());
+    event.setApplicationName("rest-gw");
     try {
       String path = req.getServletPath();
       byte[] requestBytes = viaPost ? IoUtil.read(req.getInputStream()) : null;

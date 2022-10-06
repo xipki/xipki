@@ -207,8 +207,6 @@ public class EstResponder {
 
   public RestResponse service(
       String path, byte[] request, HttpRequestMetadataRetriever httpRetriever, AuditEvent event) {
-    event.setApplicationName(CaAuditConstants.APPNAME);
-
     AuditLevel auditLevel = AuditLevel.INFO;
     AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
     String auditMessage = null;

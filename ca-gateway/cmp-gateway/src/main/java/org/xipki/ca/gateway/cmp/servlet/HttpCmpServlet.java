@@ -75,7 +75,7 @@ public class HttpCmpServlet extends HttpServlet {
     X509Cert clientCert = ServletHelper.getTlsClientCert(req);
     AuditService auditService = Audits.getAuditService();
     AuditEvent event = new AuditEvent(new Date());
-    event.setApplicationName(CaAuditConstants.APPNAME);
+    event.setApplicationName("cmp-gw");
 
     try {
       String reqContentType = req.getHeader("Content-Type");

@@ -226,8 +226,6 @@ public class RestResponder {
 
   public RestResponse service(
       String path, byte[] request, HttpRequestMetadataRetriever httpRetriever, AuditEvent event) {
-    event.setApplicationName(CaAuditConstants.APPNAME);
-
     AuditLevel auditLevel = INFO;
     AuditStatus auditStatus = SUCCESSFUL;
     String auditMessage = null;
