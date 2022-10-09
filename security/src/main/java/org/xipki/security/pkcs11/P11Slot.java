@@ -1422,9 +1422,17 @@ public abstract class P11Slot implements Closeable {
       }
     }
 
+    Set<P11ObjectIdentifier> certIdsWithIdentities = new HashSet<>();
+    for (P11Identity identity : identities.values()) {
+      P11ObjectIdentifier certId = identity.getId().getCertId();
+      if (certId != null) {
+        certIdsWithIdentities.add(certId);
+      }
+    }
+
     sortedKeyIds.clear();
     for (P11ObjectIdentifier objectId : certificates.keySet()) {
-      if (!identities.containsKey(objectId)) {
+      if (!certIdsWithIdentities.contains(objectId)) {
         sortedKeyIds.add(objectId);
       }
     }
@@ -1432,7 +1440,6 @@ public abstract class P11Slot implements Closeable {
     Collections.sort(sortedKeyIds);
 
     if (!sortedKeyIds.isEmpty()) {
-      Collections.sort(sortedKeyIds);
       size = sortedKeyIds.size();
       for (int i = 0; i < size; i++) {
         P11ObjectIdentifier objectId = sortedKeyIds.get(i);
