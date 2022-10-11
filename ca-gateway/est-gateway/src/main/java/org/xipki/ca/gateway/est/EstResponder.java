@@ -696,12 +696,9 @@ public class EstResponder {
         if (ecCurves == null || ecCurves.length == 0) {
           csrAttrs.add(typeOid);
         } else {
-          ASN1EncodableVector asn1Curves = new ASN1EncodableVector();
           for (String ecCurve : ecCurves) {
-            asn1Curves.add(new ASN1ObjectIdentifier(ecCurve));
+            csrAttrs.add(new Attribute(typeOid, new DERSet(new ASN1ObjectIdentifier(ecCurve))));
           }
-
-          csrAttrs.add(new Attribute(typeOid, new DERSet(asn1Curves)));
         }
       }
     }
