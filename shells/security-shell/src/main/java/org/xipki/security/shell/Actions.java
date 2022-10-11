@@ -1053,7 +1053,6 @@ public class Actions {
 
         byte[] keyBytes = null;
         byte[] certBytes = null;
-        boolean isRawCert = false;
 
         Object[][] blockInfos = new Object[][]{blockInfo1, blockInfo2};
         for (Object[] blockInfo : blockInfos) {
@@ -1063,10 +1062,6 @@ public class Actions {
             keyBytes = bytes;
           } else if (ct.startsWith("application/pkcs7-mime")) {
             certBytes = bytes;
-            isRawCert = false;
-          } else if (ct.startsWith("application/pkix-cert")) {
-            certBytes = bytes;
-            isRawCert = true;
           }
         }
 
@@ -1081,7 +1076,7 @@ public class Actions {
         saveVerbose("private key saved to file", keyFile,
             derPemEncode(keyBytes, outform, PemEncoder.PemLabel.PRIVATE_KEY));
 
-        byte[] rawCertBytes = isRawCert ? certBytes : extractCertFromSignedData(certBytes);
+        byte[] rawCertBytes = extractCertFromSignedData(certBytes);
         saveVerbose("certificate saved to file", certFile, encodeCert(rawCertBytes, outform));
       }
       return null;

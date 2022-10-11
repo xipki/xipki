@@ -225,6 +225,12 @@ curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
     --header "Content-Transfer-Encoding: base64" \
     --data-binary "@${FILE}.csr.b64" \
-    --output ${FILE}.p7m \
+    --output ${FILE}.pem \
     "${CA_URL}/${CMD}"
+
+echo "extract private key"
+openssl pkey -in ${FILE}.pem -out ${FILE}-key.pem
+
+echo "extract certificate"
+openssl x509 -in ${FILE}.pem -out ${FILE}-cert.pem
 

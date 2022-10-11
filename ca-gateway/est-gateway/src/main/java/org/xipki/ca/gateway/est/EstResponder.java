@@ -153,6 +153,8 @@ public class EstResponder {
 
   private static final String CT_pkcs7_mime_certyonly = CT_pkcs7_mime + "; smime-type=certs-only";
 
+  private static final String CT_pem_file = "application/x-pem-file";
+
   private static final int OK = 200;
 
   private static final int BAD_REQUEST = 400;
@@ -446,8 +448,7 @@ public class EstResponder {
       String command, String caName, String profile, Requestor requestor, CertificationRequest csr,
       HttpRequestMetadataRetriever httpRetriever, AuditEvent event)
       throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
-    boolean caGenKeyPair  = CMD_serverkeygen.equals(command)  || CMD_userverkeygen.equals(command);
-    boolean returnRawCert = CMD_usimpleenroll.equals(command) || CMD_userverkeygen.equals(command);
+    boolean caGenKeyPair  = CMD_serverkeygen.equals(command) || CMD_userverkeygen.equals(command);
 
     CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
     X500Name subject = certTemp.getSubject();
@@ -491,11 +492,24 @@ public class EstResponder {
 
     EnrollOrPullCertResponseEntry entry = getEntry(sdkResp.getEntries(), reqId);
     if (!caGenKeyPair) {
-      if (returnRawCert) {
+      if (CMD_usimpleenroll.equals(command)) {
         return HttpRespContent.ofOk(CT_pkix_cert, true, entry.getCert());
       } else {
         return HttpRespContent.ofOk(CT_pkcs7_mime_certyonly, true, buildCertsOnly(entry.getCert()));
       }
+    }
+
+    if (CMD_userverkeygen.equals(command)) {
+      ByteArrayOutputStream bo = new ByteArrayOutputStream();
+      bo.write(PemEncoder.encode(entry.getPrivateKey(), PemEncoder.PemLabel.PRIVATE_KEY));
+      bo.write(NEWLINE);
+
+      bo.write(PemEncoder.encode(entry.getCert(), PemEncoder.PemLabel.CERTIFICATE));
+      bo.write(NEWLINE);
+
+      bo.flush();
+
+      return HttpRespContent.ofOk(CT_pem_file, bo.toByteArray());
     }
 
     byte[] t = new byte[9]; // length must be multiple of 3
@@ -511,8 +525,8 @@ public class EstResponder {
     writeMultipartEntry(bo, boundaryBytes, CT_pkcs8, entry.getPrivateKey());
 
     // certificate
-    String ct = returnRawCert ? CT_pkix_cert : CT_pkcs7_mime_certyonly;
-    byte[] certBytes = returnRawCert ? entry.getCert() : buildCertsOnly(entry.getCert());
+    String ct = CT_pkcs7_mime_certyonly;
+    byte[] certBytes = buildCertsOnly(entry.getCert());
     writeMultipartEntry(bo, boundaryBytes, ct, certBytes);
 
     // finalize the multipart
@@ -520,6 +534,8 @@ public class EstResponder {
     bo.write('-');
     bo.write('-');
     bo.write(NEWLINE);
+
+    bo.flush();
 
     return HttpRespContent.ofOk(CT_multipart_mixed + "; boundary=" + boundary, false, bo.toByteArray());
   } // method enrollCert
