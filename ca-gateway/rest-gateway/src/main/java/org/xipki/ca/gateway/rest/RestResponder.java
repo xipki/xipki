@@ -594,20 +594,22 @@ public class RestResponder {
     }
 
     ByteArrayOutputStream bo = new ByteArrayOutputStream();
-    bo.write(PemEncoder.encode(entry.getCert(), PemLabel.CERTIFICATE));
-    bo.write(NEWLINE);
 
     if (caGenKeyPair) {
       bo.write(PemEncoder.encode(entry.getPrivateKey(), PemLabel.PRIVATE_KEY));
       bo.write(NEWLINE);
     }
 
+    bo.write(PemEncoder.encode(entry.getCert(), PemLabel.CERTIFICATE));
+    bo.write(NEWLINE);
+
     if (twin) {
       entry = getEntry(sdkResp.getEntries(), certIdEnc);
-      bo.write(PemEncoder.encode(entry.getCert(), PemLabel.CERTIFICATE));
-      bo.write(NEWLINE);
 
       bo.write(PemEncoder.encode(entry.getPrivateKey(), PemLabel.PRIVATE_KEY));
+      bo.write(NEWLINE);
+
+      bo.write(PemEncoder.encode(entry.getCert(), PemLabel.CERTIFICATE));
       bo.write(NEWLINE);
     }
     bo.flush();
