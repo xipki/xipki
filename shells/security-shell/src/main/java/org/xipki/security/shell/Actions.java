@@ -401,6 +401,10 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String certFile;
 
+    @Option(name = "--cert-exclude-ext", multiValued = true,
+        description = "OIDs of extension types which are not copied from the --cert option to CSR.")
+    private List<String> excludeCertExtns;
+
     @Option(name = "--old-cert", description =
             "Certificate file to be updated. The subject and subjectAltNames will be copied to the CSR.\n" +
             "The subject and subject-alt-name specified here will be specified in the changeSubjectName attribute.\n" +
@@ -455,9 +459,10 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String biometricUri;
 
-    @Option(name = "--extra-extensions-file", description = "Configuration file for extral extensions")
+    @Option(name = "--extension-file", multiValued = true,
+        description = "File containing the DER-encoded Extension.")
     @Completion(FileCompleter.class)
-    private String extraExtensionsFile;
+    private List<String> extensionFiles;
 
     /**
      * Gets the signer for the give signatureAlgoControl.
@@ -486,41 +491,9 @@ public class Actions {
 
       ConcurrentContentSigner signer = getSigner();
 
-      SubjectPublicKeyInfo subjectPublicKeyInfo;
-      if (signer.getCertificate() != null) {
-        Certificate cert = Certificate.getInstance(signer.getCertificate().getEncoded());
-        subjectPublicKeyInfo = cert.getSubjectPublicKeyInfo();
-      } else {
-        subjectPublicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(signer.getPublicKey());
-      }
-
-      if (certFile != null) {
-        Certificate cert = Certificate.getInstance(X509Util.toDerEncoded(IoUtil.read(certFile)));
-        if (!Arrays.equals(subjectPublicKeyInfo.getEncoded(), cert.getSubjectPublicKeyInfo().getEncoded())) {
-          throw new IllegalCmdParamException("PublicKey extracted from signer is different than in the certificate");
-        }
-
-        X500Name subjectDn = cert.getSubject();
-        List<Extension> extensions = new LinkedList<>();
-        Extensions certExtns = cert.getTBSCertificate().getExtensions();
-
-        List<ASN1ObjectIdentifier> excludeOids = Arrays.asList(
-            Extension.authorityKeyIdentifier, Extension.authorityInfoAccess,   Extension.certificateIssuer,
-            Extension.certificatePolicies,    Extension.cRLDistributionPoints, Extension.freshestCRL,
-            Extension.nameConstraints,        Extension.policyMappings,        Extension.policyConstraints,
-            Extension.certificatePolicies,    Extension.subjectInfoAccess,     Extension.subjectDirectoryAttributes);
-
-        for (ASN1ObjectIdentifier certExtnOid : certExtns.getExtensionOIDs()) {
-          if (!excludeOids.contains(certExtnOid)) {
-            extensions.add(certExtns.getExtension(certExtnOid));
-          }
-        }
-
-        PKCS10CertificationRequest csr = generateRequest(signer, subjectPublicKeyInfo, subjectDn,
-            challengePassword, extensions);
-        saveVerbose("saved CSR to file", outputFilename, encodeCsr(csr.getEncoded(), outform));
-        return null;
-      }
+      SubjectPublicKeyInfo subjectPublicKeyInfo = (signer.getCertificate() == null)
+          ? KeyUtil.createSubjectPublicKeyInfo(signer.getPublicKey())
+          : signer.getCertificate().getSubjectPublicKeyInfo();
 
       if (extkeyusages != null) {
         List<String> list = new ArrayList<>(extkeyusages.size());
@@ -545,8 +518,7 @@ public class Actions {
               : X509Util.createExtnSubjectInfoAccess(subjectInfoAccesses, false).getExtnValue();
 
       if (extnValue != null) {
-        ASN1ObjectIdentifier oid = Extension.subjectInfoAccess;
-        extensions.add(new Extension(oid, false, extnValue));
+        extensions.add(new Extension(Extension.subjectInfoAccess, false, extnValue));
       }
 
       // Keyusage
@@ -555,16 +527,13 @@ public class Actions {
         for (String usage : keyusages) {
           usages.add(KeyUsage.getKeyUsage(usage));
         }
-        org.bouncycastle.asn1.x509.KeyUsage extValue = X509Util.createKeyUsage(usages);
-        ASN1ObjectIdentifier extType = Extension.keyUsage;
-        extensions.add(new Extension(extType, false, extValue.getEncoded()));
+        extensions.add(new Extension(Extension.keyUsage, false, X509Util.createKeyUsage(usages).getEncoded()));
       }
 
       // ExtendedKeyusage
       if (isNotEmpty(extkeyusages)) {
-        ExtendedKeyUsage extValue = X509Util.createExtendedUsage(textToAsn1ObjectIdentifers(extkeyusages));
-        ASN1ObjectIdentifier extType = Extension.extendedKeyUsage;
-        extensions.add(new Extension(extType, false, extValue.getEncoded()));
+        extensions.add(new Extension(Extension.extendedKeyUsage, false,
+            X509Util.createExtendedUsage(textToAsn1ObjectIdentifers(extkeyusages)).getEncoded()));
       }
 
       // QcEuLimitValue
@@ -585,10 +554,8 @@ public class Actions {
               currency = new Iso4217CurrencyCode(currencyS);
             }
 
-            int amount = Integer.parseInt(amountS);
-            int exponent = Integer.parseInt(exponentS);
-
-            MonetaryValue monterayValue = new MonetaryValue(currency, amount, exponent);
+            MonetaryValue monterayValue =
+                new MonetaryValue(currency, Integer.parseInt(amountS), Integer.parseInt(exponentS));
             QCStatement statment = new QCStatement(ObjectIdentifiers.Extn.id_etsi_qcs_QcLimitValue, monterayValue);
             vec.add(statment);
           } catch (Exception ex) {
@@ -596,9 +563,7 @@ public class Actions {
           }
         }
 
-        ASN1ObjectIdentifier extType = Extension.qCStatements;
-        ASN1Sequence extValue = new DERSequence(vec);
-        extensions.add(new Extension(extType, false, extValue.getEncoded()));
+        extensions.add(new Extension(Extension.qCStatements, false, new DERSequence(vec).getEncoded()));
       }
 
       // biometricInfo
@@ -607,23 +572,17 @@ public class Actions {
                 ? new TypeOfBiometricData(Integer.parseInt(biometricType))
                 : new TypeOfBiometricData(new ASN1ObjectIdentifier(biometricType));
 
-        HashAlgo tmpBiometricHashAlgo = HashAlgo.getInstance(biometricHashAlgo);
-        byte[] biometricBytes = IoUtil.read(biometricFile);
-        MessageDigest md = MessageDigest.getInstance(tmpBiometricHashAlgo.getJceName());
-        md.reset();
-        byte[] tmpBiometricDataHash = md.digest(biometricBytes);
+        HashAlgo ha = HashAlgo.getInstance(biometricHashAlgo);
+        byte[] tmpBiometricDataHash = ha.hash(IoUtil.read(biometricFile));
 
         DERIA5String tmpSourceDataUri = null;
         if (biometricUri != null) {
           tmpSourceDataUri = new DERIA5String(biometricUri);
         }
-        BiometricData biometricData = new BiometricData(tmpBiometricType, tmpBiometricHashAlgo.getAlgorithmIdentifier(),
+        BiometricData biometricData = new BiometricData(tmpBiometricType, ha.getAlgorithmIdentifier(),
                 new DEROctetString(tmpBiometricDataHash), tmpSourceDataUri);
 
-        ASN1EncodableVector vec = new ASN1EncodableVector();
-        vec.add(biometricData);
-
-        extensions.add(new Extension(Extension.biometricInfo, false, new DERSequence(vec).getEncoded()));
+        extensions.add(new Extension(Extension.biometricInfo, false, new DERSequence(biometricData).getEncoded()));
       } else if (biometricType == null && biometricHashAlgo == null && biometricFile == null) {
         // Do nothing
       } else {
@@ -631,23 +590,63 @@ public class Actions {
                 + " must be set or none of them should be set");
       }
 
-      // extra extensions
-      if (extraExtensionsFile != null) {
-        byte[] bytes = IoUtil.read(extraExtensionsFile);
-        ExtensionsType extraExtensions = JSON.parseObject(bytes, ExtensionsType.class);
-        extraExtensions.validate();
+      List<ASN1ObjectIdentifier> addedExtnTypes = new ArrayList<>(extensions.size());
+      for (Extension extn : extensions) {
+        addedExtnTypes.add(extn.getExtnId());
+      }
 
-        List<X509ExtensionType> extnConfs = extraExtensions.getExtensions();
-        if (CollectionUtil.isNotEmpty(extnConfs)) {
-          for (X509ExtensionType m : extnConfs) {
-            byte[] encodedExtnValue = m.getConstant().toASN1Encodable().toASN1Primitive().getEncoded(ASN1Encoding.DER);
-            extensions.add(new Extension(
-                new ASN1ObjectIdentifier(m.getType().getOid()), false, encodedExtnValue));
+      // extra extensions
+      if (isNotEmpty(extensionFiles)) {
+        for (String extensionFile : extensionFiles) {
+          Extension extn;
+          try {
+            extn = Extension.getInstance(IoUtil.read(extensionFile));
+          } catch (Exception e) {
+            throw new Exception("invalid extension file " + extensionFile, e);
           }
+
+          ASN1ObjectIdentifier extnId = extn.getExtnId();
+          if (addedExtnTypes.contains(extnId)) {
+            throw new Exception("duplicated extension " + extnId.getId());
+          }
+
+          extensions.add(new Extension(extnId, extn.isCritical(), extn.getExtnValue()));
+          addedExtnTypes.add(extnId);
         }
       }
 
       extensions.addAll(getAdditionalExtensions());
+
+      if (certFile != null) {
+        Certificate cert = Certificate.getInstance(X509Util.toDerEncoded(IoUtil.read(certFile)));
+        if (!Arrays.equals(subjectPublicKeyInfo.getEncoded(), cert.getSubjectPublicKeyInfo().getEncoded())) {
+          throw new IllegalCmdParamException("PublicKey extracted from signer is different than in the certificate");
+        }
+
+        Extensions certExtns = cert.getTBSCertificate().getExtensions();
+
+        List<ASN1ObjectIdentifier> excludeOids = Arrays.asList(
+            Extension.authorityKeyIdentifier, Extension.authorityInfoAccess,   Extension.certificateIssuer,
+            Extension.certificatePolicies,    Extension.cRLDistributionPoints, Extension.freshestCRL,
+            Extension.nameConstraints,        Extension.policyMappings,        Extension.policyConstraints,
+            Extension.certificatePolicies,    Extension.subjectInfoAccess,     Extension.subjectDirectoryAttributes);
+
+        for (ASN1ObjectIdentifier certExtnOid : certExtns.getExtensionOIDs()) {
+          boolean add = !excludeOids.contains(certExtnOid) && !addedExtnTypes.contains(certExtnOid);
+          if (add && isNotEmpty(excludeCertExtns)) {
+            add = !excludeCertExtns.contains(certExtnOid.getId());
+          }
+
+          if (add) {
+            extensions.add(certExtns.getExtension(certExtnOid));
+          }
+        }
+
+        PKCS10CertificationRequest csr = generateRequest(signer, subjectPublicKeyInfo, cert.getSubject(),
+            challengePassword, extensions);
+        saveVerbose("saved CSR to file", outputFilename, encodeCsr(csr.getEncoded(), outform));
+        return null;
+      }
 
       final boolean updateOldCert = oldCertFile != null;
 
@@ -711,8 +710,7 @@ public class Actions {
           : X509Util.createExtnSubjectAltName(subjectAltNames, false).getExtnValue();
       Extension newSubjectAltNames = null;
       if (extnValue != null) {
-        ASN1ObjectIdentifier oid = Extension.subjectAlternativeName;
-        newSubjectAltNames = new Extension(oid, false, extnValue);
+        newSubjectAltNames = new Extension(Extension.subjectAlternativeName, false, extnValue);
       }
 
       Attribute attrChangeSubjectName = null;
@@ -800,12 +798,12 @@ public class Actions {
       Args.notNull(subjectDn, "subjectDn");
 
       Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
-      if (CollectionUtil.isNotEmpty(extensions)) {
+      if (isNotEmpty(extensions)) {
         attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest,
             new Extensions(extensions.toArray(new Extension[0])));
       }
 
-      if (StringUtil.isNotBlank(challengePassword)) {
+      if (isNotBlank(challengePassword)) {
         attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword, new DERPrintableString(challengePassword));
       }
 
@@ -1155,8 +1153,7 @@ public class Actions {
 
   private static byte[] extractCertFromSignedData(byte[] cmsBytes) throws CmdFailure, IOException {
     ContentInfo ci = ContentInfo.getInstance(X509Util.toDerEncoded(cmsBytes));
-    SignedData sd = SignedData.getInstance(ci.getContent());
-    ASN1Set certs = sd.getCertificates();
+    ASN1Set certs = SignedData.getInstance(ci.getContent()).getCertificates();
     if (certs == null || certs.size() == 0) {
       throw new CmdFailure("Found no certificate");
     }
