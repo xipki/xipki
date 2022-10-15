@@ -1,4 +1,4 @@
-BASE_URL = https://localhost:8445/.well-known/est/subca/tls 
+BASE_URL = https://localhost:8445/.well-known/est/subca/tls
 CT_PKCS10 = "Content-Type: application/pkcs10"
 
 echo "#################################################################"

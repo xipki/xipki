@@ -401,9 +401,13 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String certFile;
 
-    @Option(name = "--cert-exclude-ext", multiValued = true,
+    @Option(name = "--cert-ext-exclude", multiValued = true,
         description = "OIDs of extension types which are not copied from the --cert option to CSR.")
     private List<String> excludeCertExtns;
+
+    @Option(name = "--cert-ext-include", multiValued = true,
+        description = "OIDs of extension types which are copied from the --cert option to CSR.")
+    private List<String> includeCertExtns;
 
     @Option(name = "--old-cert", description =
             "Certificate file to be updated. The subject and subjectAltNames will be copied to the CSR.\n" +
@@ -625,14 +629,19 @@ public class Actions {
 
         Extensions certExtns = cert.getTBSCertificate().getExtensions();
 
-        List<ASN1ObjectIdentifier> excludeOids = Arrays.asList(
+        List<ASN1ObjectIdentifier> stdExcludeOids = Arrays.asList(
             Extension.authorityKeyIdentifier, Extension.authorityInfoAccess,   Extension.certificateIssuer,
             Extension.certificatePolicies,    Extension.cRLDistributionPoints, Extension.freshestCRL,
             Extension.nameConstraints,        Extension.policyMappings,        Extension.policyConstraints,
             Extension.certificatePolicies,    Extension.subjectInfoAccess,     Extension.subjectDirectoryAttributes);
 
         for (ASN1ObjectIdentifier certExtnOid : certExtns.getExtensionOIDs()) {
-          boolean add = !excludeOids.contains(certExtnOid) && !addedExtnTypes.contains(certExtnOid);
+          boolean add = !addedExtnTypes.contains(certExtnOid);
+          if (add) {
+            add = isNotEmpty(includeCertExtns) ? includeCertExtns.contains(certExtnOid.getId())
+                : !stdExcludeOids.contains(certExtnOid);
+          }
+
           if (add && isNotEmpty(excludeCertExtns)) {
             add = !excludeCertExtns.contains(certExtnOid.getId());
           }
