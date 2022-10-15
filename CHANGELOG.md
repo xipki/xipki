@@ -2,8 +2,23 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 6.0.0
+## 6.0.1
 - Release date: -
+- CA
+    - N/A
+- OCSP
+    - N/A
+- CLI
+    - N/A
+- MGMT-CLI (Management Client)
+    - N/A
+- DB Tool
+    - N/A
+- Dependencies
+    - N/A
+
+## 6.0.0
+- Release date: October 15, 2022
 - CA
   - CA communicates only with RA over RESTful API with mutual TLS.
   - Remove the support of protocols CMP and SCEP with CA.
