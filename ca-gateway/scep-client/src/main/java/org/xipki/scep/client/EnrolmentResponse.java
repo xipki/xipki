@@ -77,9 +77,9 @@ public final class EnrolmentResponse {
   } // constructor
 
   /**
-   * Returns <tt>true</tt> for a pending response, <tt>false</tt> otherwise.
+   * Returns true for a pending response, false otherwise.
    *
-   * @return <tt>true</tt> for a pending response, <tt>false</tt> otherwise.
+   * @return true for a pending response, false otherwise.
    */
   public boolean isPending() {
     return pkcsRep.getPkiStatus() == PkiStatus.PENDING;
