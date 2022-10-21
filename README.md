@@ -30,7 +30,7 @@ JRE/JDK, and the steps to reproduce the bug.
 * [nCipher Connect](https://www.ncipher.com/products/general-purpose-hsms/nshield-connect)
 * [nCipher Solo](https://www.ncipher.com/products/general-purpose-hsms/nshield-solo)
 * [Utimaco Se](https://hsm.utimaco.com/products-hardware-security-modules/general-purpose-hsm/)
-* [Sansec HSM](https://en.sansec.com.cn/product/HSM-52.html) / [三未信安服务器密码机](http://www.sansec.com.cn/product/4.html): tested SM2, ECDSA and RSA.
+* [Sansec HSM](https://en.sansec.com.cn) : tested SM2, ECDSA and RSA.
 
 ## Get Started
 
@@ -307,11 +307,11 @@ Features
     - CT Precertificate SCTs (RFC 6962)
     - ExtendedKeyUsage (RFC 5280)
     - FreshestCRL (RFC 5280)
-    - GM/T 0015 ICRegistrationNumber (企业工商注册号, Chinese Standard GM/T 0015-2012)
-    - GM/T 0015 IdentityCode (个人身份标识码, Chinese Standard GM/T 0015-2012)
-    - GM/T 0015 InsuranceNumber (个人社会保险号, Chinese Standard GM/T 0015-2012)
-    - GM/T 0015 OrganizationCode (企业组织机构代码, Chinese Standard GM/T 0015-2012)
-    - GM/T 0015 TaxationNumber (企业税号, Chinese Standard GM/T 0015-2012)
+    - ICRegistrationNumber (GM/T 0015-2012)
+    - IdentityCode (GM/T 0015-2012)
+    - InsuranceNumber (GM/T 0015-2012)
+    - OrganizationCode (GM/T 0015-2012)
+    - TaxationNumber (GM/T 0015-2012)
     - InhibitAnyPolicy (RFC 5280)
     - IssuerAltName (RFC 5280)
     - KeyUsage (RFC 5280)
