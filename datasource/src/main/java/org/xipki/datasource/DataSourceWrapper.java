@@ -257,8 +257,8 @@ public abstract class DataSourceWrapper implements Closeable {
     }
 
     @Override
-    protected String getSqlToDropUniqueConstraint(String contraintName, String table) {
-      return concat("ALTER TABLE ", table, " DROP CONSTRAINT ", contraintName, " DROP INDEX");
+    protected String getSqlToDropUniqueConstraint(String constraintName, String table) {
+      return concat("ALTER TABLE ", table, " DROP CONSTRAINT ", constraintName, " DROP INDEX");
     }
 
     @Override

@@ -63,7 +63,7 @@ public class PolicyConstraints extends ValidatableConf {
     }
   }
 
-  public ASN1Sequence toXiPolicyConstrains() throws CertprofileException {
+  public ASN1Sequence toXiPolicyConstraints() throws CertprofileException {
     if (requireExplicitPolicy != null && requireExplicitPolicy < 0) {
       throw new CertprofileException("negative requireExplicitPolicy is not allowed: " + requireExplicitPolicy);
     }
@@ -87,6 +87,6 @@ public class PolicyConstraints extends ValidatableConf {
     }
 
     return new DERSequence(vec);
-  } //method toXiPolicyConstrains
+  } //method toXiPolicyConstraints
 
 } // class PolicyConstraints

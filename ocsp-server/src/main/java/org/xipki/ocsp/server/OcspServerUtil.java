@@ -47,7 +47,7 @@ import java.security.cert.CertificateException;
 import java.util.*;
 
 /**
- * Implementation of {@link OcspServer}.
+ * Utility functions for {@link OcspServer}.
  *
  * @author Lijun Liao
  * @since 2.0.0
@@ -168,8 +168,8 @@ public class OcspServerUtil {
 
     store.setName(conf.getName());
     Integer interval = conf.getRetentionInterval();
-    int retentionInterva = (interval == null) ? -1 : interval;
-    store.setRetentionInterval(retentionInterva);
+    int retentionInterval = (interval == null) ? -1 : interval;
+    store.setRetentionInterval(retentionInterval);
     store.setUnknownCertBehaviour(conf.getUnknownCertBehaviour());
 
     store.setIncludeArchiveCutoff(getBoolean(conf.getIncludeArchiveCutoff(), true));

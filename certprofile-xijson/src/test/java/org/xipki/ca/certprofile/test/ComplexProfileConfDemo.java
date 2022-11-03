@@ -106,7 +106,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, true));
-    last(list).setBasicConstrains(createBasicConstraints(1));
+    last(list).setBasicConstraints(createBasicConstraints(1));
 
     // Extensions - AuthorityInfoAccess
     list.add(createExtension(Extension.authorityInfoAccess, true, false));
@@ -139,7 +139,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     list.add(createExtension(Extension.policyConstraints, true, true));
     last(list).setPolicyConstraints(createPolicyConstraints(2, 2));
 
-    // Name Constrains
+    // Name Constraints
     list.add(createExtension(Extension.nameConstraints, true, true));
     last(list).setNameConstraints(createNameConstraints());
 
@@ -255,7 +255,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, false));
-    last(list).setBasicConstrains(createBasicConstraints(1));
+    last(list).setBasicConstraints(createBasicConstraints(1));
 
     // Extensions - AuthorityInfoAccess
     list.add(createExtension(Extension.authorityInfoAccess, true, false));

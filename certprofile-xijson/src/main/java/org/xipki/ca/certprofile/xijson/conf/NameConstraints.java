@@ -75,13 +75,13 @@ public class NameConstraints extends ValidatableConf {
     validate(permittedSubtrees, excludedSubtrees);
   } // method validate
 
-  public org.bouncycastle.asn1.x509.NameConstraints toXiNameConstrains()
+  public org.bouncycastle.asn1.x509.NameConstraints toXiNameConstraints()
       throws CertprofileException {
     GeneralSubtree[] permitted = buildGeneralSubtrees(getPermittedSubtrees());
     GeneralSubtree[] excluded = buildGeneralSubtrees(getExcludedSubtrees());
     return (permitted == null && excluded == null) ? null
         : new org.bouncycastle.asn1.x509.NameConstraints(permitted, excluded);
-  } // method toXiNameConstrains
+  } // method toXiNameConstraints
 
   private static GeneralSubtree[] buildGeneralSubtrees(List<GeneralSubtreeType> subtrees)
       throws CertprofileException {

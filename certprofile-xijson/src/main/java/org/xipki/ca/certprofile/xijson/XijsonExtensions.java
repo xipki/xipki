@@ -154,7 +154,7 @@ public class XijsonExtensions {
     // SubjectKeyIdentifier
     initSubjectKeyIdentifier(extnIds, extensions);
 
-    // BasicConstrains
+    // BasicConstraints
     initBasicConstraints(extnIds, extensions);
 
     // BiometricInfo
@@ -178,7 +178,7 @@ public class XijsonExtensions {
     // KeyUsage
     initKeyUsage(extnIds, extensions);
 
-    // Name Constrains
+    // Name Constraints
     initNameConstraints(extnIds, extensions);
 
     // Policy Constraints
@@ -196,7 +196,7 @@ public class XijsonExtensions {
     // Restriction
     initRestriction(extnIds, extensions);
 
-    // SMIMECapatibilities
+    // SMIMECapabilities
     initSmimeCapabilities(extnIds, extensions);
 
     // SubjectAltNameMode
@@ -407,7 +407,7 @@ public class XijsonExtensions {
     ASN1ObjectIdentifier type = Extension.basicConstraints;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
-      BasicConstraints extConf = getExtension(type, extensions).getBasicConstrains();
+      BasicConstraints extConf = getExtension(type, extensions).getBasicConstraints();
       if (extConf != null) {
         this.pathLen = extConf.getPathLen();
       }
@@ -504,7 +504,7 @@ public class XijsonExtensions {
       extnIds.remove(type);
       NameConstraints extConf = getExtension(type, extensions).getNameConstraints();
       if (extConf != null) {
-        this.nameConstraints = new ExtensionValue(critical(type), extConf.toXiNameConstrains());
+        this.nameConstraints = new ExtensionValue(critical(type), extConf.toXiNameConstraints());
       }
     }
   } // method initNameConstraints
@@ -527,7 +527,7 @@ public class XijsonExtensions {
       extnIds.remove(type);
       PolicyConstraints extConf = getExtension(type, extensions).getPolicyConstraints();
       if (extConf != null) {
-        this.policyConstraints = new ExtensionValue(critical(type), extConf.toXiPolicyConstrains());
+        this.policyConstraints = new ExtensionValue(critical(type), extConf.toXiPolicyConstraints());
       }
     }
   } // method initPolicyConstraints

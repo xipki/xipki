@@ -121,7 +121,7 @@ public class ExtensionsChecker {
       this.policyMappings = extensions.get(type.getId()).getPolicyMappings();
     }
 
-    // Name Constrains
+    // Name Constraints
     type = Extension.nameConstraints;
     if (extensionControls.containsKey(type)) {
       this.nameConstraints = extensions.get(type.getId()).getNameConstraints();
@@ -576,7 +576,7 @@ public class ExtensionsChecker {
       }
     }
 
-    // PolicyConstrains
+    // PolicyConstraints
     type = Extension.policyConstraints;
     if (extensionControls.containsKey(type)) {
       if (policyConstraints != null) {

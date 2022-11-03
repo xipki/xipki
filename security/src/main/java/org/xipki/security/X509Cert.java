@@ -75,7 +75,7 @@ public class X509Cert {
 
   private byte[] authorityKeyId;
 
-  private int basicConstrains = -2;
+  private int basicConstraints = -2;
 
   private boolean keyUsageProcessed;
 
@@ -170,28 +170,28 @@ public class X509Cert {
    *     limit to the allowed length of the certification path.
    */
   public int getBasicConstraints() {
-    if (basicConstrains == -2) {
+    if (basicConstraints == -2) {
       synchronized (sync) {
         if (bcInstance != null) {
           byte[] extnValue = getCoreExtValue(Extension.basicConstraints);
           if (extnValue == null) {
-            basicConstrains = -1;
+            basicConstraints = -1;
           } else {
             BasicConstraints bc = BasicConstraints.getInstance(extnValue);
             if (bc.isCA()) {
               BigInteger bn = bc.getPathLenConstraint();
-              basicConstrains = bn == null ? Integer.MAX_VALUE : bn.intValueExact();
+              basicConstraints = bn == null ? Integer.MAX_VALUE : bn.intValueExact();
             } else {
-              basicConstrains = -1;
+              basicConstraints = -1;
             }
           }
         } else {
-          basicConstrains = jceInstance.getBasicConstraints();
+          basicConstraints = jceInstance.getBasicConstraints();
         }
       }
     }
 
-    return basicConstrains;
+    return basicConstraints;
   }
 
   public BigInteger getSerialNumber() {

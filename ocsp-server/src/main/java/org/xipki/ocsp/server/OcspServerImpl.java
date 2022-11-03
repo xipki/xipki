@@ -562,13 +562,13 @@ public class OcspServerImpl implements OcspServer {
     OcspServerConf.ResponseOption repOpt = responder.getResponseOption();
 
     try {
-      Object reqOrRrrorResp = checkSignature(request, reqOpt);
-      if (reqOrRrrorResp instanceof OcspRespWithCacheInfo) {
+      Object reqOrErrorResp = checkSignature(request, reqOpt);
+      if (reqOrErrorResp instanceof OcspRespWithCacheInfo) {
         // error
-        return (OcspRespWithCacheInfo) reqOrRrrorResp;
+        return (OcspRespWithCacheInfo) reqOrErrorResp;
       }
 
-      OcspRequest req = (OcspRequest) reqOrRrrorResp;
+      OcspRequest req = (OcspRequest) reqOrErrorResp;
 
       List<CertID> requestList = req.getRequestList();
       int requestsSize = requestList.size();
