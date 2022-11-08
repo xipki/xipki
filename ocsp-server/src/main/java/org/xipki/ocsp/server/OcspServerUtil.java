@@ -150,7 +150,7 @@ public class OcspServerUtil {
       } else if (STORE_TYPE_EJBCA_DB.equals(type)) {
         store = new EjbcaCertStatusStore();
       } else if (type.startsWith("java:")) {
-        String className = type.substring("java:".length()).trim();
+        String className = conf.getSource().getType().substring("java:".length()).trim();
         try {
           Class<?> clazz = Class.forName(className, false, OcspServerUtil.class.getClassLoader());
           store = (OcspStore) clazz.getDeclaredConstructor().newInstance();
