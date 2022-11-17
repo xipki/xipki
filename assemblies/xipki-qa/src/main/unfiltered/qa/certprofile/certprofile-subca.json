@@ -109,7 +109,7 @@
 		},
 		"critical":true,
 		"required":true,
-		"basicConstrains":{
+		"basicConstraints":{
 			"pathLen":1
 		}
 	},{

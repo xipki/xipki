@@ -359,7 +359,7 @@ Features
   - Support of health check
 
 - CLI
-  - Configurating CA
+  - Configuring CA
   - Client to enroll, revoke, unrevoke and remove certificates, to generate and download CRLs
   - Client to send OCSP request
   - Generating keypairs of RSA, EC and DSA in token

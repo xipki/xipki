@@ -70,7 +70,7 @@ public class ExtensionType extends ValidatableConf {
   private SubjectKeyIdentifierControl subjectKeyIdentifier;
 
   @JSONField(ordinal = 5)
-  private BasicConstraints basicConstrains;
+  private BasicConstraints basicConstraints;
 
   @JSONField(ordinal = 5)
   private BiometricInfo biometricInfo;
@@ -254,12 +254,12 @@ public class ExtensionType extends ValidatableConf {
     this.subjectKeyIdentifier = subjectKeyIdentifier;
   }
 
-  public BasicConstraints getBasicConstrains() {
-    return basicConstrains;
+  public BasicConstraints getBasicConstraints() {
+    return basicConstraints;
   }
 
-  public void setBasicConstrains(BasicConstraints basicConstrains) {
-    this.basicConstrains = basicConstrains;
+  public void setBasicConstraints(BasicConstraints basicConstraints) {
+    this.basicConstraints = basicConstraints;
   }
 
   public BiometricInfo getBiometricInfo() {
@@ -450,7 +450,7 @@ public class ExtensionType extends ValidatableConf {
   public void validate() throws InvalidConfException {
     notNull(type, "type");
     validate(type, additionalInformation, admissionSyntax, authorityInfoAccess, authorityKeyIdentifier);
-    validate(basicConstrains, biometricInfo, certificatePolicies, constant, extendedKeyUsage, inhibitAnyPolicy);
+    validate(basicConstraints, biometricInfo, certificatePolicies, constant, extendedKeyUsage, inhibitAnyPolicy);
     validate(keyUsage, nameConstraints, policyMappings, privateKeyUsagePeriod, policyConstraints, qcStatements);
     validate(restriction, smimeCapabilities, subjectAltName, subjectDirectoryAttributs, subjectInfoAccess);
     validate(subjectKeyIdentifier, tlsFeature, validityModel, cccExtensionSchema, syntax);

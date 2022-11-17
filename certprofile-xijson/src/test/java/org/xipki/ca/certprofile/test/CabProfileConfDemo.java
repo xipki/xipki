@@ -90,7 +90,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, true));
-    last(list).setBasicConstrains(createBasicConstraints(1));
+    last(list).setBasicConstraints(createBasicConstraints(1));
 
     // Extensions - AuthorityInfoAccess
     list.add(createExtension(Extension.authorityInfoAccess, true, false));
