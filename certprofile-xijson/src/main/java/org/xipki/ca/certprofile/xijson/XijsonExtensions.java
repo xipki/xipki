@@ -408,6 +408,9 @@ public class XijsonExtensions {
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       BasicConstraints extConf = getExtension(type, extensions).getBasicConstraints();
+      if (extConf == null) {
+        extConf = getExtension(type, extensions).getBasicConstrains();
+      }
       if (extConf != null) {
         this.pathLen = extConf.getPathLen();
       }

@@ -254,8 +254,18 @@ public class ExtensionType extends ValidatableConf {
     this.subjectKeyIdentifier = subjectKeyIdentifier;
   }
 
+  @Deprecated
+  public BasicConstraints getBasicConstrains() {
+    return getBasicConstraints();
+  }
+
   public BasicConstraints getBasicConstraints() {
     return basicConstraints;
+  }
+
+  @Deprecated
+  public void setBasicConstrains(BasicConstraints basicConstraints) {
+    setBasicConstraints(basicConstraints);
   }
 
   public void setBasicConstraints(BasicConstraints basicConstraints) {

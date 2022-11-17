@@ -20,7 +20,7 @@ JRE/JDK, and the steps to reproduce the bug.
 
 ## Prerequisite
 * OS: Linux, Windows, MacOS
-* JRE / JDK: for `xipki-mgmt-cli` and `xipki-cli`: JDK 11 and 17; for others: JDK 8, 11 and 17.
+* JRE / JDK: for `xipki-mgmt-cli` and `xipki-cli`: JDK 11+; for others: JDK 8+.
 * Database: DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
 * Hardware: Any available hardware (tested on Raspberry Pi 2 Model B with 900MHz quad-core ARM CPU and 1 GB Memory)
 
@@ -128,7 +128,7 @@ they MUST be replaced.**
 ## Configure PKCS#11 device (optional)
 
    This step is only required if the real PKCS#11 device instead of the emulator
-   is used. **Note that this step should be applied to all components tomcat, xipki-mgmt-cli, and xipki-cli**.
+   is used. **Note that this step should be applied to all components (tomcat, xipki-mgmt-cli, and xipki-cli)**.
 
   * Copy `xipki/security/example/pkcs11-hsm.json` to `xipki/security/pkcs11.json`, and adapt the PKCS#11 configuration.
 
@@ -188,7 +188,7 @@ preload <start script>
      preload bin/karaf
      ```
  
-   * Setup CA (choose p11 if the key is saved in PKCS#11 device, p12 in PKCS#12 device.
+   * Setup CA (choose p11 if the key is saved in PKCS#11 device, p12 in PKCS#12 device)
       * In case of using new keys and certificates, in CLI:  
         `source xipki/ca-setup/cacert-none/setup-*-*.script`
          where * is place holder.
@@ -197,7 +197,7 @@ preload <start script>
         `source xipki/ca-setup/cacert-present/setup-*-*.script`
          where * is place holder.
 
-      * If you wish to generate the siging key and certificate for the OCSP responder, in CLI:  
+      * If you wish to generate the signing key and certificate for the OCSP responder, in CLI:  
          `source xipki/ca-setup/setup-ocsp-*.script`.
 
       * If you wish to add the SCEP support, in CLI:  
@@ -373,7 +373,7 @@ Features
 - For CA, OCSP Responder, Protocol Gateway and CLI
   - Support of PKCS#12 and JCEKS keystore
   - Support of PKCS#11 devices, e.g. HSM
-  - API to use customized key types, e.g. smartcard
+  - API to use customized key types, e.g. smart card
   - API to resolve password
   - Support of PBE (password based encryption) password resolver
      - All passwords can be encrypted by the master password
