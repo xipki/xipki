@@ -127,7 +127,7 @@ public class DbCertStatusStore extends OcspStore {
           try {
             wait(1000);
           } catch (InterruptedException ex) {
-            LOG.warn("interrputed, continue waiting");
+            LOG.warn("interrupted, continue waiting");
           }
         }
       }
