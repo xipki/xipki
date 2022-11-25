@@ -1026,7 +1026,7 @@ public class OcspServerImpl implements OcspServer {
 
     for (OcspStore store : responder.getStores()) {
       boolean storeHealthy = store.isHealthy();
-      if (storeHealthy) {
+      if (!storeHealthy) {
         return false;
       }
     }
