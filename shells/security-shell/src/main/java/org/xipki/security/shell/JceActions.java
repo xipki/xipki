@@ -56,10 +56,10 @@ public class JceActions {
     }
 
     private static SignerConf getJceSignerConf(String alias, int parallelism, SignAlgo signAlgo) {
-      ConfPairs conf = new ConfPairs();
-      conf.putPair("parallelism", Integer.toString(parallelism));
-      conf.putPair("alias", alias);
-      conf.putPair("algo", signAlgo.getJceName());
+      ConfPairs conf = new ConfPairs()
+          .putPair("parallelism", Integer.toString(parallelism))
+          .putPair("alias", alias)
+          .putPair("algo", signAlgo.getJceName());
       return new SignerConf(conf.getEncoded());
     } // method getJceSignerConf
 

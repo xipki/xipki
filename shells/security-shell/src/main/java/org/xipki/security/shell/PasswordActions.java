@@ -43,7 +43,8 @@ public class PasswordActions {
   @Service
   public static class Deobfuscate extends SecurityAction {
 
-    @Option(name = "--password", description = "obfuscated password, starts with OBF:\n"
+    @Option(name = "--password", description = "obfuscated password, starts with "
+            + OBFPasswordService.PROTOCOL_OBF + ":\n"
             + "exactly one of password and password-file must be specified")
     private String passwordHint;
 
@@ -65,7 +66,7 @@ public class PasswordActions {
         passwordHint = StringUtil.toUtf8String(IoUtil.read(passwordFile));
       }
 
-      if (!StringUtil.startsWithIgnoreCase(passwordHint, "OBF:")) {
+      if (!StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordService.PROTOCOL_OBF + ":")) {
         throw new IllegalCmdParamException("encrypted password '" + passwordHint + "' does not start with OBF:");
       }
 
@@ -151,14 +152,14 @@ public class PasswordActions {
         passwordHint = StringUtil.toUtf8String(IoUtil.read(passwordFile));
       }
 
-      if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:")) {
+      if (!StringUtil.startsWithIgnoreCase(passwordHint, PBEPasswordService.PROTOCOL_PBE + ":")) {
         throw new IllegalCmdParamException("encrypted password '" + passwordHint + "' does not start with PBE:");
       }
 
       char[] masterPassword;
       if (masterPasswordFile != null) {
         String str = StringUtil.toUtf8String(IoUtil.read(masterPasswordFile));
-        if (str.startsWith("OBF:") || str.startsWith("obf:")) {
+        if (StringUtil.startsWithIgnoreCase(str, OBFPasswordService.PROTOCOL_OBF + ":")) {
           str = OBFPasswordService.deobfuscate(str);
         }
         masterPassword = str.toCharArray();
@@ -215,7 +216,7 @@ public class PasswordActions {
       char[] masterPassword;
       if (masterPasswordFile != null) {
         String str = StringUtil.toUtf8String(IoUtil.read(masterPasswordFile));
-        if (str.startsWith("OBF:") || str.startsWith("obf:")) {
+        if (StringUtil.startsWithIgnoreCase(str, OBFPasswordService.PROTOCOL_OBF + ":")) {
           str = OBFPasswordService.deobfuscate(str);
         }
         masterPassword = str.toCharArray();

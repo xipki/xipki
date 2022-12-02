@@ -527,9 +527,7 @@ public class QaOcspActions {
         RequestOptions options = getRequestOptions();
         OcspBenchmark loadTest = new OcspBenchmark(issuerCert, serverUrl, options,
             serialNumberIterator, maxRequests, description);
-        loadTest.setDuration(duration);
-        loadTest.setThreads(numThreads);
-        loadTest.execute();
+        loadTest.setDuration(duration).setThreads(numThreads).execute();
       } finally {
         if (serialNumberIterator instanceof FileBigIntegerIterator) {
           ((FileBigIntegerIterator) serialNumberIterator).close();

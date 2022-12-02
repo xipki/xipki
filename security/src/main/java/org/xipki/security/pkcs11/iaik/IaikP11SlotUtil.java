@@ -205,16 +205,26 @@ class IaikP11SlotUtil {
       throws P11TokenException {
     List<Storage> objList = new LinkedList<>();
 
+    boolean initialized = false;
+
     try {
       session.findObjectsInit(template);
+      initialized = true;
 
       while (objList.size() < maxNo) {
-        PKCS11Object[] foundObjects = session.findObjects(1);
-        if (foundObjects == null || foundObjects.length == 0) {
+        long[] foundObjectHandles = session.findObjects2(1);
+        if (foundObjectHandles == null || foundObjectHandles.length == 0) {
           break;
         }
 
-        for (PKCS11Object object : foundObjects) {
+        for (long hObject : foundObjectHandles) {
+          PKCS11Object object;
+          try {
+            object = PKCS11Object.getInstance(session, hObject);
+          } catch (TokenException ex) {
+            LogUtil.error(LOG, ex, "error building PKCS11Object " + hObject);
+            continue;
+          }
           logPkcs11ObjectAttributes("found object: ", object);
           objList.add((Storage) object);
         }
@@ -222,10 +232,12 @@ class IaikP11SlotUtil {
     } catch (TokenException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     } finally {
-      try {
-        session.findObjectsFinal();
-      } catch (Exception ex) {
-        LogUtil.error(LOG, ex, "session.findObjectsFinal() failed");
+      if (initialized) {
+        try {
+          session.findObjectsFinal();
+        } catch (Exception ex) {
+          LogUtil.error(LOG, ex, "session.findObjectsFinal() failed");
+        }
       }
     }
 

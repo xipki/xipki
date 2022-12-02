@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.shell;
+package org.xipki.security.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -26,11 +26,11 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.qa.security.*;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.*;
+import org.xipki.security.qa.*;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
@@ -48,7 +48,7 @@ import java.util.Queue;
 
 public class QaSecurityActions {
 
-  public static class KeyControl {
+  private static class KeyControl {
 
     public static class DSA extends KeyControl {
       private final int plen;
@@ -97,14 +97,14 @@ public class QaSecurityActions {
 
   } // class KeyControl
 
-  public abstract static class SecurityAction extends XiAction {
+  public abstract static class QaSecurityAction extends XiAction {
 
     @Reference
     protected SecurityFactory securityFactory;
 
   } // class SecurityAction
 
-  public abstract static class SingleSpeedAction extends SecurityAction {
+  public abstract static class SingleSpeedActionQa extends QaSecurityAction {
 
     @Option(name = "--duration", description = "duration")
     private String duration = "30s";
@@ -116,11 +116,7 @@ public class QaSecurityActions {
 
     @Override
     protected Object execute0() throws Exception {
-      BenchmarkExecutor tester = getTester();
-      tester.setDuration(duration);
-      tester.setThreads(getNumThreads());
-
-      tester.execute();
+      getTester().setDuration(duration).setThreads(getNumThreads()).execute();
       return null;
     }
 
@@ -130,9 +126,9 @@ public class QaSecurityActions {
 
   } // class SingleSpeedAction
 
-  public abstract static class BatchSpeedAction extends SecurityAction {
+  public abstract static class BatchSpeedActionQa extends QaSecurityAction {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BatchSpeedAction.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BatchSpeedActionQa.class);
 
     @Option(name = "--duration", description = "duration for each test case")
     private String duration = "10s";
@@ -160,9 +156,7 @@ public class QaSecurityActions {
           break;
         }
 
-        tester.setDuration(duration);
-        tester.setThreads(numThreads);
-        tester.execute();
+        tester.setDuration(duration).setThreads(numThreads).execute();
         if (tester.isInterrupted()) {
           throw new InterruptedException("cancelled by the user");
         }
@@ -176,7 +170,7 @@ public class QaSecurityActions {
 
   } // class BatchSpeedAction
 
-  public abstract static class BSpeedP11Action extends BatchSpeedAction {
+  public abstract static class BSpeedP11ActionQa extends BatchSpeedActionQa {
 
     @Reference (optional = true)
     protected P11CryptServiceFactory p11CryptServiceFactory;
@@ -188,7 +182,7 @@ public class QaSecurityActions {
     protected int slotIndex = 0;
 
     @Option(name = "--module", description = "name of the PKCS#11 module.")
-    @Completion(QaCompleters.P11ModuleNameCompleter.class)
+    @Completion(SecurityCompleters.P11ModuleNameCompleter.class)
     protected String moduleName = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
     protected P11Slot getSlot() throws XiSecurityException, P11TokenException, IllegalCmdParamException {
@@ -209,7 +203,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "bspeed-dsa-gen-p11",
       description = "performance test of PKCS#11 DSA key generation (batch)")
   @Service
-  public static class BspeedDsaGenP11 extends BSpeedP11Action {
+  public static class BspeedDsaGenP11 extends BSpeedP11ActionQa {
 
     private final Queue<KeyControl.DSA> queue = getKeyControlDSA();
 
@@ -229,7 +223,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "bspeed-dsa-sign-p11",
       description = "performance test of PKCS#11 DSA signature creation (batch)")
   @Service
-  public static class BspeedDsaSignP11 extends BSpeedP11Action {
+  public static class BspeedDsaSignP11 extends BSpeedP11ActionQa {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.DSASigAlgCompleter.class)
@@ -259,7 +253,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "bspeed-ec-gen-p11",
       description = "performance test of PKCS#11 EC key generation (batch)")
   @Service
-  public static class BspeedEcGenP11 extends BSpeedP11Action {
+  public static class BspeedEcGenP11 extends BSpeedP11ActionQa {
 
     private final Queue<KeyControl.EC> queue = getKeyControlEC();
 
@@ -282,7 +276,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "bspeed-ec-sign-p11",
       description = "performance test of PKCS#11 EC signature creation (batch)")
   @Service
-  public static class BspeedEcSignP11 extends BSpeedP11Action {
+  public static class BspeedEcSignP11 extends BSpeedP11ActionQa {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.ECDSASigAlgCompleter.class)
@@ -306,7 +300,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "bspeed-rsa-gen-p11",
       description = "performance test of PKCS#11 RSA key generation (batch)")
   @Service
-  public static class BspeedRsaGenP11 extends BSpeedP11Action {
+  public static class BspeedRsaGenP11 extends BSpeedP11ActionQa {
 
     private final Queue<KeyControl.RSA> queue = getKeyControlRSA();
 
@@ -322,7 +316,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "bspeed-rsa-sign-p11",
       description = "performance test of PKCS#11 RSA signature creation (batch)")
   @Service
-  public static class BspeedRsaSignP11 extends BSpeedP11Action {
+  public static class BspeedRsaSignP11 extends BSpeedP11ActionQa {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.RSASigAlgCompleter.class)
@@ -340,7 +334,7 @@ public class QaSecurityActions {
 
   } // class BspeedRsaGenP11
 
-  public abstract static class SpeedP11Action extends SingleSpeedAction {
+  public abstract static class SpeedP11ActionQa extends SingleSpeedActionQa {
 
     @Reference (optional = true)
     protected P11CryptServiceFactory p11CryptServiceFactory;
@@ -352,7 +346,7 @@ public class QaSecurityActions {
     protected int slotIndex = 0;
 
     @Option(name = "--module", description = "Name of the PKCS#11 module.")
-    @Completion(QaCompleters.P11ModuleNameCompleter.class)
+    @Completion(SecurityCompleters.P11ModuleNameCompleter.class)
     protected String moduleName = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
     protected P11Slot getSlot()
@@ -374,7 +368,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "speed-dsa-gen-p11",
       description = "performance test of PKCS#11 DSA key generation")
   @Service
-  public static class SpeedDsaGenP11 extends SpeedP11Action {
+  public static class SpeedDsaGenP11 extends SpeedP11ActionQa {
 
     @Option(name = "--plen", description = "bit length of the prime")
     private Integer plen = 2048;
@@ -400,7 +394,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "speed-dsa-sign-p11",
       description = "performance test of PKCS#11 DSA signature creation")
   @Service
-  public static class SpeedDsaSignP11 extends SpeedP11SignAction {
+  public static class SpeedDsaSignP11 extends SpeedP11SignActionQa {
 
     @Option(name = "--plen", description = "bit length of the prime")
     private Integer plen = 2048;
@@ -432,7 +426,7 @@ public class QaSecurityActions {
 
   @Command(scope = "xi", name = "speed-ec-gen-p11", description = "performance test of PKCS#11 EC key generation")
   @Service
-  public static class SpeedEcGenP11 extends SpeedP11Action {
+  public static class SpeedEcGenP11 extends SpeedP11ActionQa {
 
     @Option(name = "--curve", required = true, description = "EC curve name")
     @Completion(Completers.ECCurveNameCompleter.class)
@@ -452,7 +446,7 @@ public class QaSecurityActions {
 
   @Command(scope = "xi", name = "speed-ec-sign-p11", description = "performance test of PKCS#11 EC signature creation")
   @Service
-  public static class SpeedEcSignP11 extends SpeedP11SignAction {
+  public static class SpeedEcSignP11 extends SpeedP11SignActionQa {
 
     @Option(name = "--curve", description = "EC curve name")
     @Completion(Completers.ECCurveNameCompleter.class)
@@ -473,7 +467,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "speed-ed-gen-p11",
       description = "performance test of PKCS#11 Edwards and montgomery EC key generation")
   @Service
-  public static class SpeedEdGenP11 extends SpeedP11Action {
+  public static class SpeedEdGenP11 extends SpeedP11ActionQa {
 
     @Option(name = "--curve", required = true, description = "curve name")
     @Completion(Completers.EdCurveNameCompleter.class)
@@ -494,7 +488,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "speed-ed-sign-p11",
       description = "performance test of PKCS#11 EdDSA signature creation")
   @Service
-  public static class SpeedEdSignP11 extends SpeedP11SignAction {
+  public static class SpeedEdSignP11 extends SpeedP11SignActionQa {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.EDDSASigAlgCompleter.class)
@@ -516,7 +510,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "speed-hmac-sign-p11",
       description = "performance test of PKCS#11 HMAC signature creation")
   @Service
-  public static class SpeedHmacSignP11 extends SpeedP11SignAction {
+  public static class SpeedHmacSignP11 extends SpeedP11SignActionQa {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.HMACSigAlgCompleter.class)
@@ -532,7 +526,7 @@ public class QaSecurityActions {
 
   @Command(scope = "xi", name = "speed-rsa-gen-p11", description = "performance test of PKCS#11 RSA key generation")
   @Service
-  public static class SpeedRsaGenP11 extends SpeedP11Action {
+  public static class SpeedRsaGenP11 extends SpeedP11ActionQa {
 
     @Option(name = "--key-size", description = "keysize in bit")
     private Integer keysize = 2048;
@@ -555,7 +549,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "speed-rsa-sign-p11",
       description = "performance test of PKCS#11 RSA signature creation")
   @Service
-  public static class SpeedRsaSignP11 extends SpeedP11SignAction {
+  public static class SpeedRsaSignP11 extends SpeedP11SignActionQa {
 
     @Option(name = "--key-size", description = "keysize in bit")
     private Integer keysize = 2048;
@@ -575,7 +569,7 @@ public class QaSecurityActions {
 
   } // class SpeedRsaSignP11
 
-  public abstract static class SpeedP11SignAction extends SpeedP11Action {
+  public abstract static class SpeedP11SignActionQa extends SpeedP11ActionQa {
 
     @Option(name = "--key-present", description = "the PKCS#11 key is present")
     protected Boolean keyPresent = Boolean.FALSE;
@@ -587,7 +581,7 @@ public class QaSecurityActions {
 
   @Command(scope = "xi", name = "speed-sm2-gen-p11", description = "performance test of PKCS#11 SM2 key generation")
   @Service
-  public static class SpeedSm2GenP11 extends SpeedP11Action {
+  public static class SpeedSm2GenP11 extends SpeedP11ActionQa {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
@@ -604,7 +598,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "speed-sm2-sign-p11",
       description = "performance test of PKCS#11 SM2 signature creation")
   @Service
-  public static class SpeedSm2SignP11 extends SpeedP11SignAction {
+  public static class SpeedSm2SignP11 extends SpeedP11SignActionQa {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
@@ -616,7 +610,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "bspeed-dsa-gen-p12",
       description = "performance test of PKCS#12 DSA key generation (batch)")
   @Service
-  public static class BspeedDsaGenP12 extends BatchSpeedAction {
+  public static class BspeedDsaGenP12 extends BatchSpeedActionQa {
 
     private final Queue<KeyControl.DSA> queue = getKeyControlDSA();
 
@@ -631,7 +625,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "bspeed-dsa-sign-p12",
       description = "performance test of PKCS#12 DSA signature creation")
   @Service
-  public static class BspeedDsaSignP12 extends BSpeedP12SignAction {
+  public static class BspeedDsaSignP12 extends BSpeedP12SignActionQa {
 
     private final Queue<KeyControl.DSA> queue = getKeyControlDSA();
 
@@ -653,7 +647,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "bspeed-ec-gen-p12",
       description = "performance test of PKCS#12 EC key generation (batch)")
   @Service
-  public static class BspeedEcGenP12 extends BatchSpeedAction {
+  public static class BspeedEcGenP12 extends BatchSpeedActionQa {
 
     private final Queue<KeyControl.EC> queue = getKeyControlEC();
 
@@ -668,7 +662,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "bspeed-ec-sign-p12",
       description = "performance test of PKCS#12 EC signature creation (batch)")
   @Service
-  public static class BspeedEcSignP12 extends BSpeedP12SignAction {
+  public static class BspeedEcSignP12 extends BSpeedP12SignActionQa {
 
     private final Queue<KeyControl.EC> queue = getKeyControlEC();
 
@@ -684,7 +678,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "bspeed-rsa-gen-p12",
       description = "performance test of PKCS#12 RSA key generation (batch)")
   @Service
-  public static class BspeedRsaGenP12 extends BatchSpeedAction {
+  public static class BspeedRsaGenP12 extends BatchSpeedActionQa {
 
     private final Queue<KeyControl.RSA> queue = getKeyControlRSA();
 
@@ -700,7 +694,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "bspeed-rsa-sign-p12",
       description = "performance test of PKCS#12 RSA signature creation (batch)")
   @Service
-  public static class BspeedRsaSignP12 extends BSpeedP12SignAction {
+  public static class BspeedRsaSignP12 extends BSpeedP12SignActionQa {
 
     private final Queue<KeyControl.RSA> queue = getKeyControlRSA();
 
@@ -713,7 +707,7 @@ public class QaSecurityActions {
     }
   } // class BspeedRsaSignP12
 
-  public abstract static class BSpeedP12SignAction extends BatchSpeedAction {
+  public abstract static class BSpeedP12SignActionQa extends BatchSpeedActionQa {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     protected String signAlgo;
@@ -723,13 +717,13 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "speed-gmac-sign-p12",
       description = "performance test of PKCS#12 AES GMAC signature creation")
   @Service
-  public static class SpeedP12AESGmacSignAction extends SpeedP12SignAction {
+  public static class SpeedP12AESGmacSignActionQa extends SpeedP12SignActionQa {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.GMACSigAlgCompleter.class)
     private String signAlgo;
 
-    public SpeedP12AESGmacSignAction() {
+    public SpeedP12AESGmacSignActionQa() {
     }
 
     @Override
@@ -741,7 +735,7 @@ public class QaSecurityActions {
 
   @Command(scope = "xi", name = "speed-dsa-gen-p12", description = "performance test of PKCS#12 DSA key generation")
   @Service
-  public static class SpeedDsaGenP12 extends SingleSpeedAction {
+  public static class SpeedDsaGenP12 extends SingleSpeedActionQa {
 
     @Option(name = "--plen", description = "bit length of the prime")
     private Integer plen = 2048;
@@ -762,7 +756,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "speed-dsa-sign-p12",
       description = "performance test of PKCS#12 DSA signature creation")
   @Service
-  public static class SpeedDsaSignP12 extends SpeedP12SignAction {
+  public static class SpeedDsaSignP12 extends SpeedP12SignActionQa {
 
     @Option(name = "--plen", description = "bit length of the prime")
     private Integer plen = 2048;
@@ -786,7 +780,7 @@ public class QaSecurityActions {
 
   @Command(scope = "xi", name = "speed-ec-gen-p12", description = "performance test of PKCS#12 EC key generation")
   @Service
-  public static class SpeedEcGenP12 extends SingleSpeedAction {
+  public static class SpeedEcGenP12 extends SingleSpeedActionQa {
 
     @Option(name = "--curve", required = true, description = "EC curve name")
     @Completion(Completers.ECCurveNameCompleter.class)
@@ -801,7 +795,7 @@ public class QaSecurityActions {
 
   @Command(scope = "xi", name = "speed-ec-sign-p12", description = "performance test of PKCS#12 EC signature creation")
   @Service
-  public static class SpeedEcSignP12 extends SpeedP12SignAction {
+  public static class SpeedEcSignP12 extends SpeedP12SignActionQa {
 
     @Option(name = "--curve", required = true, description = "EC curve name")
     @Completion(Completers.ECCurveNameCompleter.class)
@@ -821,7 +815,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "speed-ed-gen-p12",
       description = "performance test of PKCS#12 Edwards and montgomery EC key generation")
   @Service
-  public static class SpeedEdGenP12 extends SingleSpeedAction {
+  public static class SpeedEdGenP12 extends SingleSpeedActionQa {
 
     @Option(name = "--curve", required = true, description = "curve name")
     @Completion(Completers.EdCurveNameCompleter.class)
@@ -837,7 +831,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "speed-ed-sign-p12",
       description = "performance test of PKCS#12 EdDSA signature creation")
   @Service
-  public static class SpeedEdSignP12 extends SpeedP12SignAction {
+  public static class SpeedEdSignP12 extends SpeedP12SignActionQa {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.EDDSASigAlgCompleter.class)
@@ -853,7 +847,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "speed-hmac-sign-p12",
       description = "performance test of PKCS#12 HMAC signature creation")
   @Service
-  public static class SpeedHmacSignP12 extends SpeedP12SignAction {
+  public static class SpeedHmacSignP12 extends SpeedP12SignActionQa {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.HMACSigAlgCompleter.class)
@@ -868,7 +862,7 @@ public class QaSecurityActions {
 
   @Command(scope = "xi", name = "speed-rsa-gen-p12", description = "performance test of PKCS#12 RSA key generation")
   @Service
-  public static class SpeedRsaGenP12 extends SingleSpeedAction {
+  public static class SpeedRsaGenP12 extends SingleSpeedActionQa {
 
     @Option(name = "--key-size", description = "keysize in bit")
     private Integer keysize = 2048;
@@ -886,7 +880,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "speed-rsa-sign-p12",
       description = "performance test of PKCS#12 RSA signature creation")
   @Service
-  public static class SpeedRsaSignP12 extends SpeedP12SignAction {
+  public static class SpeedRsaSignP12 extends SpeedP12SignActionQa {
 
     @Option(name = "--key-size", description = "keysize in bit")
     private Integer keysize = 2048;
@@ -905,13 +899,13 @@ public class QaSecurityActions {
 
   } // class SpeedRsaSignP12
 
-  public abstract static class SpeedP12SignAction extends SingleSpeedAction {
+  public abstract static class SpeedP12SignActionQa extends SingleSpeedActionQa {
 
   } // class SpeedP12SignAction
 
   @Command(scope = "xi", name = "speed-sm2-gen-p12", description = "performance test of PKCS#12 SM2 key generation")
   @Service
-  public static class SpeedSm2GenP12 extends SingleSpeedAction {
+  public static class SpeedSm2GenP12 extends SingleSpeedActionQa {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
@@ -923,7 +917,7 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "speed-sm2-sign-p12",
       description = "performance test of PKCS#12 SM2 signature creation")
   @Service
-  public static class SpeedSm2SignP12 extends SpeedP12SignAction {
+  public static class SpeedSm2SignP12 extends SpeedP12SignActionQa {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
@@ -934,7 +928,7 @@ public class QaSecurityActions {
 
   @Command(scope = "xi", name = "speed-sign-jce", description = "performance test of JCE signature creation")
   @Service
-  public static class SpeedSignJce extends SingleSpeedAction {
+  public static class SpeedSignJce extends SingleSpeedActionQa {
 
     @Option(name = "--type", required = true, description = "JCE signer type")
     private String type;
@@ -943,7 +937,7 @@ public class QaSecurityActions {
     private String alias;
 
     @Option(name = "--algo", required = true, description = "signature algorithm")
-    @Completion(QaCompleters.SignAlgoCompleter.class)
+    @Completion(SecurityCompleters.SignAlgoCompleter.class)
     private String algo;
 
     @Override

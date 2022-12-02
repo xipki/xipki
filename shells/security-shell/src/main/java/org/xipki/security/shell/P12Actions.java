@@ -276,9 +276,9 @@ public class P12Actions {
         throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
       }
 
-      ConfPairs conf = new ConfPairs("password", new String(pwd));
-      conf.putPair("parallelism", Integer.toString(1));
-      conf.putPair("keystore", "file:" + p12File);
+      ConfPairs conf = new ConfPairs("password", new String(pwd))
+          .putPair("parallelism", Integer.toString(1))
+          .putPair("keystore", "file:" + p12File);
 
       HashAlgo ha;
       try {

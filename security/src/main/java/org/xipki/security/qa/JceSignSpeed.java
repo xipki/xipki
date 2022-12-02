@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security;
+package org.xipki.security.qa;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,16 +92,15 @@ public class JceSignSpeed extends BenchmarkExecutor {
   }
 
   @Override
-  protected Runnable getTestor()
-      throws Exception {
+  protected Runnable getTestor() throws Exception {
     return new Testor();
   }
 
   private static SignerConf getJceSignerConf(String alias, int parallelism, SignAlgo signAlgo) {
-    ConfPairs conf = new ConfPairs();
-    conf.putPair("parallelism", Integer.toString(parallelism));
-    conf.putPair("alias", alias);
-    conf.putPair("algo", signAlgo.getJceName());
+    ConfPairs conf = new ConfPairs()
+        .putPair("parallelism", Integer.toString(parallelism))
+        .putPair("alias", alias)
+        .putPair("algo", signAlgo.getJceName());
     return new SignerConf(conf.getEncoded());
   } // method getJceSignerConf
 

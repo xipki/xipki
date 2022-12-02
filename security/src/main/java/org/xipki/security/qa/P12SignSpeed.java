@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security;
+package org.xipki.security.qa;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
@@ -113,18 +113,15 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
           "PKCS#12 EC signature creation\ncurve: " + curveOid.getId(), threads);
     }
 
-    private static byte[] generateKeystore(ASN1ObjectIdentifier curveOid)
-        throws Exception {
+    private static byte[] generateKeystore(ASN1ObjectIdentifier curveOid) throws Exception {
       byte[] keystoreBytes = getPrecomputedECKeystore(curveOid);
       if (keystoreBytes == null) {
         KeystoreGenerationParameters params = new KeystoreGenerationParameters(PASSWORD.toCharArray());
         params.setRandom(new SecureRandom());
-        KeyStoreWrapper identity;
-        if (EdECConstants.isEdwardsOrMontgomeryCurve(curveOid)) {
-          identity = new P12KeyGenerator().generateEdECKeypair(curveOid, params, null);
-        } else {
-          identity = new P12KeyGenerator().generateECKeypair(curveOid, params, null);
-        }
+        KeyStoreWrapper identity = EdECConstants.isEdwardsOrMontgomeryCurve(curveOid)
+            ? new P12KeyGenerator().generateEdECKeypair(curveOid, params, null)
+            : new P12KeyGenerator().generateECKeypair(curveOid, params, null);
+
         keystoreBytes = identity.keystore();
       }
       return keystoreBytes;
@@ -281,18 +278,15 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
     return new Testor();
   }
 
-  protected static byte[] getPrecomputedRSAKeystore(int keysize, BigInteger publicExponent)
-      throws IOException {
+  protected static byte[] getPrecomputedRSAKeystore(int keysize, BigInteger publicExponent) throws IOException {
     return getPrecomputedKeystore("rsa-" + keysize + "-0x" + publicExponent.toString(16) + ".p12");
   }
 
-  protected static byte[] getPrecomputedDSAKeystore(int plength, int qlength)
-      throws IOException {
+  protected static byte[] getPrecomputedDSAKeystore(int plength, int qlength) throws IOException {
     return getPrecomputedKeystore("dsa-" + plength + "-" + qlength + ".p12");
   }
 
-  protected static byte[] getPrecomputedECKeystore(ASN1ObjectIdentifier curveOid)
-      throws IOException {
+  protected static byte[] getPrecomputedECKeystore(ASN1ObjectIdentifier curveOid) throws IOException {
     return getPrecomputedKeystore("ec-" + curveOid.getId() + ".p12");
   }
 
@@ -304,10 +298,10 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
   private static SignerConf getKeystoreSignerConf(
       InputStream keystoreStream, String password, String signatureAlgorithm, int parallelism)
       throws IOException {
-    ConfPairs conf = new ConfPairs("password", password);
-    conf.putPair("algo", signatureAlgorithm);
-    conf.putPair("parallelism", Integer.toString(parallelism));
-    conf.putPair("keystore", "base64:" + Base64.encodeToString(IoUtil.read(keystoreStream)));
+    ConfPairs conf = new ConfPairs("password", password)
+        .putPair("algo", signatureAlgorithm)
+        .putPair("parallelism", Integer.toString(parallelism))
+        .putPair("keystore", "base64:" + Base64.encodeToString(IoUtil.read(keystoreStream)));
     return new SignerConf(conf.getEncoded());
   }
 }

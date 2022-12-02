@@ -17,6 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
+import iaik.pkcs.pkcs11.objects.Key;
 import iaik.pkcs.pkcs11.wrapper.Functions;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -1410,15 +1411,13 @@ public abstract class P11Slot implements Closeable {
         String algo = getAlgorithmDesc(identity.getPublicKey());
         sb.append("\t\tAlgorithm: ").append(algo).append("\n");
         X509Cert[] certs = identity.certificateChain();
-        if (certs == null || certs.length == 0) {
-          sb.append("\t\tCertificate: NONE\n");
-        } else {
+        if (certs != null && certs.length > 0) {
           for (int j = 0; j < certs.length; j++) {
             formatString(j, verbose, sb, certs[j]);
           }
         }
       } else {
-        sb.append("\t\tSymmetric key\n");
+        sb.append("\t\tSymmetric key: ").append(Key.getKeyTypeName(identity.getKeyType())).append("\n");
       }
     }
 

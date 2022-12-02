@@ -45,6 +45,7 @@ import org.xipki.security.pkcs11.P11ModuleConf.P11NewObjectConf;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
 
@@ -90,6 +91,8 @@ class IaikP11Slot extends P11Slot {
   private List<char[]> password;
 
   private final int maxSessionCount;
+
+  private final boolean supportCert;
 
   private final long timeOutWaitNewSession = 10000; // maximal wait for 10 second
 
@@ -176,6 +179,17 @@ class IaikP11Slot extends P11Slot {
       this.maxSessionCount = (int) maxSessionCount2;
       LOG.info("maxSessionCount: {}", this.maxSessionCount);
 
+      // test whether supports X.509 certificates
+      boolean supports = true;
+      try {
+        session.findObjectsInit(new X509PublicKeyCertificate());
+        session.findObjectsFinal();
+      } catch (Exception ex) {
+        supports = false;
+      }
+      this.supportCert = supports;
+      LOG.info("support certificates: {}", this.supportCert);
+
       sessions.add(new ConcurrentBagEntry<>(session));
       refresh();
       successful = true;
@@ -252,23 +266,25 @@ class IaikP11Slot extends P11Slot {
       }
       LOG.info("accepted {} secret keys", count);
 
-      // first get the list of all CA certificates
-      List<X509PublicKeyCertificate> p11Certs = getAllCertificateObjects(session);
-      LOG.info("found {} X.509 certificates", p11Certs.size());
+      if (supportCert) {
+        // first get the list of all CA certificates
+        List<X509PublicKeyCertificate> p11Certs = getAllCertificateObjects(session);
+        LOG.info("found {} X.509 certificates", p11Certs.size());
 
-      count = 0;
-      for (X509PublicKeyCertificate p11Cert : p11Certs) {
-        byte[] id = value(p11Cert.getId());
-        String label = valueStr(p11Cert.getLabel());
-        if (id == null || id.length == 0) {
-          LOG.warn("ignored X.509 certificate with ID: null and label: " + label);
-        } else {
-          ret.addCertificate(new P11ObjectIdentifier(id, label), parseCert(p11Cert));
-          count++;
+        count = 0;
+        for (X509PublicKeyCertificate p11Cert : p11Certs) {
+          byte[] id = value(p11Cert.getId());
+          String label = valueStr(p11Cert.getLabel());
+          if (id == null || id.length == 0) {
+            LOG.warn("ignored X.509 certificate with ID: null and label: " + label);
+          } else {
+            ret.addCertificate(new P11ObjectIdentifier(id, label), parseCert(p11Cert));
+            count++;
+          }
         }
-      }
 
-      LOG.info("accepted {} X.509 certificates", count);
+        LOG.info("accepted {} X.509 certificates", count);
+      }
 
       List<Storage> privKeys;
       if (keyPairTypes == null) {
@@ -344,7 +360,7 @@ class IaikP11Slot extends P11Slot {
     byte[] id = value(secretKey.getId());
     String label = valueStr(secretKey.getLabel());
 
-    if (id == null || id.length == 0) {
+    if ((id == null || id.length == 0) && StringUtil.isBlank(label)) {
       LOG.warn("ignored secret key with ID: null and label: " + label);
       return false;
     }
@@ -358,22 +374,33 @@ class IaikP11Slot extends P11Slot {
   private boolean analyseSinglePrivateKey(Session session, PrivateKey privKey, P11SlotRefreshResult refreshResult) {
     byte[] id = value(privKey.getId());
     String label = valueStr(privKey.getLabel());
+    int idLen = id == null ? 0 : id.length;
+    String name = "id " + (idLen == 0 ? "" : hex(id)) + " and label " + label;
+    String keyTypeName = Key.getKeyTypeName(privKey.getKeyType().getLongValue());
 
-    if (id == null || id.length == 0) {
-      LOG.warn("ignored private key with ID: null and label: " + label);
-      return false;
+    if (idLen == 0) {
+      if (privKey instanceof RSAPrivateKey) {
+        if (StringUtil.isBlank(label)) {
+          // We do not need id to identify the public key and certificate.
+          // The public key can be constructed from the private key
+          LOG.warn("ignored {} private key with ID: null and label: {}", keyTypeName, label);
+        }
+      } else{
+        LOG.warn("ignored {] private key with ID: null and label: {}", keyTypeName, label);
+        return false;
+      }
     }
 
     try {
       String pubKeyLabel = null;
-      PublicKey p11PublicKey = (PublicKey) getKeyObjectForId(session, new PublicKey(), id);
+      PublicKey p11PublicKey = idLen == 0 ? null : (PublicKey) getKeyObjectForId(session, new PublicKey(), id);
       if (p11PublicKey != null) {
         pubKeyLabel = valueStr(p11PublicKey.getLabel());
       }
 
       String certLabel = null;
       java.security.PublicKey pubKey = null;
-      X509Cert cert = refreshResult.getCertForId(id);
+      X509Cert cert = idLen == 0 ? null : refreshResult.getCertForId(id);
 
       if (cert != null) {
         certLabel = refreshResult.getCertLabelForId(id);
@@ -390,7 +417,8 @@ class IaikP11Slot extends P11Slot {
         }
 
         if (pubKey == null) {
-          LOG.info("neither certificate nor public key for the key (" + hex(id) + " is available");
+          LOG.info("neither certificate nor public key for the {} key ({}) is available",
+              keyTypeName, name);
           return false;
         }
       }
@@ -401,10 +429,9 @@ class IaikP11Slot extends P11Slot {
       refreshResult.addIdentity(new IaikP11Identity(this, p11Id, privKey, pubKey, certs));
       return true;
     } catch (XiSecurityException ex) {
-      LogUtil.error(LOG, ex, "XiSecurityException while initializing private key with id " + hex(id));
+      LogUtil.error(LOG, ex, "XiSecurityException while initializing private key with " + name);
     } catch (Throwable th) {
-      LOG.error("unexpected exception while initializing private key with id "
-          + hex(id) + " and label " + label, th);
+      LOG.error("unexpected exception while initializing private key with " + name, th);
     }
 
     return false;
@@ -751,15 +778,17 @@ class IaikP11Slot extends P11Slot {
       String objIdDesc = getDescription(id, label);
       int num = removeObjects0(session, keyTemplate, "keys " + objIdDesc);
 
-      X509PublicKeyCertificate certTemplate = new X509PublicKeyCertificate();
-      if (id != null && id.length > 0) {
-        certTemplate.getId().setByteArrayValue(id);
-      }
-      if (!ignoreLabel) {
-        certTemplate.getLabel().setCharArrayValue(label);
-      }
+      if (supportCert) {
+        X509PublicKeyCertificate certTemplate = new X509PublicKeyCertificate();
+        if (id != null && id.length > 0) {
+          certTemplate.getId().setByteArrayValue(id);
+        }
+        if (!ignoreLabel) {
+          certTemplate.getLabel().setCharArrayValue(label);
+        }
 
-      num += removeObjects0(session, certTemplate, "certificates " + objIdDesc);
+        num += removeObjects0(session, certTemplate, "certificates " + objIdDesc);
+      }
       return num;
     } finally {
       sessions.requite(bagEntry);
@@ -1272,16 +1301,19 @@ class IaikP11Slot extends P11Slot {
         }
 
         // certificate: some vendors generate also certificate
-        X509PublicKeyCertificate cert2 = getCertificateObject(session, id, null);
         String certLabel = null;
         X509Cert[] certs = null;
-        if (cert2 != null) {
-          certLabel = valueStr(cert2.getLabel());
-          certs = new X509Cert[1];
-          try {
-            certs[0] = X509Util.parseCert(value(cert2.getValue()));
-          } catch (CertificateException ex) {
-            throw new P11TokenException("could not parse certifcate", ex);
+
+        if (supportCert) {
+          X509PublicKeyCertificate cert2 = getCertificateObject(session, id, null);
+          if (cert2 != null) {
+            certLabel = valueStr(cert2.getLabel());
+            certs = new X509Cert[1];
+            try {
+              certs[0] = X509Util.parseCert(value(cert2.getValue()));
+            } catch (CertificateException ex) {
+              throw new P11TokenException("could not parse certifcate", ex);
+            }
           }
         }
 
@@ -1457,10 +1489,12 @@ class IaikP11Slot extends P11Slot {
         continue;
       }
 
-      X509PublicKeyCertificate cert = new X509PublicKeyCertificate();
-      cert.getId().setByteArrayValue(keyId);
-      if (!isEmpty(getObjects(session, cert, 1))) {
-        continue;
+      if (supportCert) {
+        X509PublicKeyCertificate cert = new X509PublicKeyCertificate();
+        cert.getId().setByteArrayValue(keyId);
+        if (!isEmpty(getObjects(session, cert, 1))) {
+          continue;
+        }
       }
 
       return keyId;
@@ -1481,9 +1515,13 @@ class IaikP11Slot extends P11Slot {
       return true;
     }
 
-    X509PublicKeyCertificate cert = new X509PublicKeyCertificate();
-    cert.getLabel().setCharArrayValue(keyLabel);
-    return !isEmpty(getObjects(session, cert, 1));
+    if (supportCert) {
+      X509PublicKeyCertificate cert = new X509PublicKeyCertificate();
+      cert.getLabel().setCharArrayValue(keyLabel);
+      return !isEmpty(getObjects(session, cert, 1));
+    }
+
+    return false;
   } // method labelExists
 
   void setKeyAttributes(

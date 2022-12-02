@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security;
+package org.xipki.security.qa;
 
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -269,8 +269,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
     P11SlotIdentifier slotId = slot.getSlotId();
     SignerConf signerConf = getPkcs11SignerConf(slot.getModuleName(),
-        slotId.getId(), objectId.getId(), signatureAlgorithm,
-        threads + Math.max(2, threads * 5 / 4));
+        slotId.getId(), objectId.getId(), signatureAlgorithm, threads + Math.max(2, threads * 5 / 4));
     try {
       this.signer = securityFactory.createSigner("PKCS11", signerConf, (X509Cert) null);
     } catch (ObjectCreationException ex) {
@@ -313,8 +312,8 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
   private static SignerConf getPkcs11SignerConf(
       String pkcs11ModuleName, Long slotId, byte[] keyId, String signatureAlgorithm, int parallelism) {
-    ConfPairs conf = new ConfPairs("algo", signatureAlgorithm);
-    conf.putPair("parallelism", Integer.toString(parallelism));
+    ConfPairs conf = new ConfPairs("algo", signatureAlgorithm)
+                      .putPair("parallelism", Integer.toString(parallelism));
 
     if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0) {
       conf.putPair("module", pkcs11ModuleName);

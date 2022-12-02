@@ -17,6 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
+import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.Hex;
 
@@ -44,14 +45,20 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
    * Constructor.
    *
    * @param id
-   *          Identifier. Must not be {@code null}.
+   *          Identifier. Cannot be null or zero-length if label is {@code null} or blank.
    * @param label
-   *          Label. May be {@code null}.
+   *          Label. Cannot be {@code null} and blank if id is null or zero-length.
    */
   public P11ObjectIdentifier(byte[] id, String label) {
-    this.id = notNull(id, "id");
-    this.idHex = Hex.encode(id);
-    this.label = label;
+    if (id == null || id.length == 0) {
+      this.id = null;
+      this.idHex = null;
+      this.label = Args.notBlank(label, "label");
+    } else {
+      this.id = id;
+      this.idHex = Hex.encode(id);
+      this.label = label;
+    }
   }
 
   public byte[] getId() {
@@ -85,7 +92,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
 
   @Override
   public int hashCode() {
-    int hashCode = new BigInteger(1, id).hashCode();
+    int hashCode = id == null ? 0 : Arrays.hashCode(id);
     if (label != null) {
       hashCode += 31 * label.hashCode();
     }

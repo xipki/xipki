@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security;
+package org.xipki.security.qa;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
@@ -91,8 +91,7 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
     }
 
     @Override
-    protected void generateKeypair(SecureRandom random)
-        throws Exception {
+    protected void generateKeypair(SecureRandom random) throws Exception {
       KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
     }
 
@@ -124,8 +123,7 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
     this.securityFactory = notNull(securityFactory, "securityFactory");
   }
 
-  protected abstract void generateKeypair(SecureRandom random)
-      throws Exception;
+  protected abstract void generateKeypair(SecureRandom random) throws Exception;
 
   @Override
   protected Runnable getTestor() throws Exception {

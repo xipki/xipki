@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security;
+package org.xipki.security.qa;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
@@ -141,8 +141,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
     this.id = id;
   }
 
-  protected abstract void genKeypair()
-      throws Exception;
+  protected abstract void genKeypair() throws Exception;
 
   protected P11NewKeyControl getControl() {
     return new P11NewKeyControl(id, "speed-" + idx.getAndIncrement());

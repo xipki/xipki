@@ -128,9 +128,9 @@ public class CertRevocationInfo {
   }
 
   public String getEncoded() {
-    ConfPairs pairs = new ConfPairs();
-    pairs.putPair("reason", reason.getDescription());
-    pairs.putPair("revocationTime", Long.toString(revocationTime.getTime() / 1000));
+    ConfPairs pairs = new ConfPairs()
+        .putPair("reason", reason.getDescription())
+        .putPair("revocationTime", Long.toString(revocationTime.getTime() / 1000));
     if (invalidityTime != null) {
       pairs.putPair("invalidityTime", Long.toString(invalidityTime.getTime() / 1000));
     }

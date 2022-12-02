@@ -50,14 +50,14 @@ class IaikP11Identity extends P11Identity {
   private final int expectedSignatureLen;
 
   IaikP11Identity(IaikP11Slot slot, P11IdentityId identityId, SecretKey signingKey) {
-    super(slot, identityId, 0);
+    super(slot, identityId, signingKey.getKeyType().getLongValue(), 0);
     this.signingKey = notNull(signingKey, "signingKey");
     this.expectedSignatureLen = 0;
   }
 
   IaikP11Identity(IaikP11Slot slot, P11IdentityId identityId, PrivateKey privateKey,
                   PublicKey publicKey, X509Cert[] certificateChain) {
-    super(slot, identityId, publicKey, certificateChain);
+    super(slot, identityId, privateKey.getKeyType().getLongValue(), publicKey, certificateChain);
     this.signingKey = notNull(privateKey, "privateKey");
 
     int keyBitLen = getSignatureKeyBitLength();

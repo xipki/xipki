@@ -48,10 +48,10 @@ public class ClrTestVectorGenerateMain {
     try (Securities securities = new Securities()) {
       securities.init();
 
-      ConfPairs conf = new ConfPairs();
-      conf.putPair("parallelism", Integer.toString(1));
-      conf.putPair("password", "1234");
-      conf.putPair("keystore", "file:src/test/resources/crls/ca.p12");
+      ConfPairs conf = new ConfPairs()
+          .putPair("parallelism", Integer.toString(1))
+          .putPair("password", "1234")
+          .putPair("keystore", "file:src/test/resources/crls/ca.p12");
 
       SignerConf sconf = new SignerConf(conf.getEncoded(), null, new SignatureAlgoControl());
 

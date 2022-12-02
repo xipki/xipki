@@ -168,18 +168,19 @@ public class EmulatorP11Identity extends P11Identity {
   }
 
   public EmulatorP11Identity(
-      P11Slot slot, P11IdentityId identityId, SecretKey signingKey, int maxSessions, SecureRandom random) {
-    super(slot, identityId, 0);
+      P11Slot slot, P11IdentityId identityId, long keyType, SecretKey signingKey,
+      int maxSessions, SecureRandom random) {
+    super(slot, identityId, keyType, 0);
     this.signingKey = notNull(signingKey, "signingKey");
     this.random = notNull(random, "random");
     this.maxSessions = maxSessions;
   } // constructor
 
   public EmulatorP11Identity(
-      P11Slot slot, P11IdentityId identityId, PrivateKey privateKey, PublicKey publicKey,
+      P11Slot slot, P11IdentityId identityId, long keyType, PrivateKey privateKey, PublicKey publicKey,
       X509Cert[] certificateChain, int maxSessions, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
-    super(slot, identityId, publicKey, certificateChain);
+    super(slot, identityId, keyType, publicKey, certificateChain);
     this.signingKey = notNull(privateKey, "privateKey");
     this.random = notNull(random, "random");
     this.maxSessions = maxSessions;

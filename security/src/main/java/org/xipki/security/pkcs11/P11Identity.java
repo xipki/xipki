@@ -50,22 +50,27 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
   protected final P11IdentityId id;
 
+  private final long keyType;
+
   protected final PublicKey publicKey;
 
   private final int signatureKeyBitLength;
 
   protected X509Cert[] certificateChain;
 
-  protected P11Identity(P11Slot slot, P11IdentityId id, int signatureBitLen) {
+  protected P11Identity(P11Slot slot, P11IdentityId id, long keyType, int signatureBitLen) {
     this.slot = notNull(slot, "slot");
     this.id = notNull(id, "id");
+    this.keyType = keyType;
     this.publicKey = null;
     this.signatureKeyBitLength = signatureBitLen;
   } // constructor
 
-  protected P11Identity(P11Slot slot, P11IdentityId id, PublicKey publicKey, X509Cert[] certificateChain) {
+  protected P11Identity(P11Slot slot, P11IdentityId id, long keyType,
+                        PublicKey publicKey, X509Cert[] certificateChain) {
     this.slot = notNull(slot, "slot");
     this.id = notNull(id, "id");
+    this.keyType = keyType;
 
     if (certificateChain != null && certificateChain.length > 0 && certificateChain[0] != null) {
       this.publicKey = certificateChain[0].getPublicKey();
@@ -139,6 +144,10 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
   public P11IdentityId getId() {
     return id;
+  }
+
+  public long getKeyType() {
+    return keyType;
   }
 
   public X509Cert getCertificate() {

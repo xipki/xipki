@@ -272,9 +272,7 @@ public class QaCaActions {
       CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(certprofile, null, subjectTemplate, randomDn);
       CaEnrollBenchmark benchmark = new CaEnrollBenchmark(caName, benchmarkEntry, maxRequests, num, description);
 
-      benchmark.setDuration(duration);
-      benchmark.setThreads(numThreads);
-      benchmark.execute();
+      benchmark.setDuration(duration).setThreads(numThreads).execute();
 
       return null;
     } // method execute0
@@ -337,9 +335,7 @@ public class QaCaActions {
       CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(certprofile, keyEntry, subjectTemplate, randomDn);
       CaEnrollBenchmark benchmark = new CaEnrollBenchmark(caName, benchmarkEntry, maxRequests, num, description);
 
-      benchmark.setDuration(duration);
-      benchmark.setThreads(numThreads);
-      benchmark.execute();
+      benchmark.setDuration(duration).setThreads(numThreads).execute();
 
       return null;
     } // method execute0

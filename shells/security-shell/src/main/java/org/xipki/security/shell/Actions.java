@@ -45,7 +45,6 @@ import org.bouncycastle.util.io.pem.PemObject;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.*;
 import org.xipki.security.ObjectIdentifiers.Xipki;
-import org.xipki.security.X509ExtensionType.ExtensionsType;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -463,10 +462,9 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String biometricUri;
 
-    @Option(name = "--extension-file", multiValued = true,
-        description = "File containing the DER-encoded Extension.")
+    @Option(name = "--extensions-file", description = "File containing the DER-encoded Extensions.")
     @Completion(FileCompleter.class)
-    private List<String> extensionFiles;
+    private String extensionsFile;
 
     /**
      * Gets the signer for the give signatureAlgoControl.
@@ -600,21 +598,15 @@ public class Actions {
       }
 
       // extra extensions
-      if (isNotEmpty(extensionFiles)) {
-        for (String extensionFile : extensionFiles) {
-          Extension extn;
-          try {
-            extn = Extension.getInstance(IoUtil.read(extensionFile));
-          } catch (Exception e) {
-            throw new Exception("invalid extension file " + extensionFile, e);
-          }
-
-          ASN1ObjectIdentifier extnId = extn.getExtnId();
+      if (extensionsFile != null) {
+        Extensions extns = Extensions.getInstance(IoUtil.read(extensionsFile));
+        for (ASN1ObjectIdentifier extnId : extns.getExtensionOIDs()) {
           if (addedExtnTypes.contains(extnId)) {
             throw new Exception("duplicated extension " + extnId.getId());
           }
 
-          extensions.add(new Extension(extnId, extn.isCritical(), extn.getExtnValue()));
+          Extension extn = extns.getExtension(extnId);
+          extensions.add(extn);
           addedExtnTypes.add(extnId);
         }
       }
