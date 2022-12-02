@@ -212,7 +212,8 @@ class IaikP11SlotUtil {
       initialized = true;
 
       while (objList.size() < maxNo) {
-        long[] foundObjectHandles = session.findObjects2(1);
+        int maxObjectCount = Math.min(maxNo - objList.size(), 100);
+        long[] foundObjectHandles = session.findObjects2(maxObjectCount);
         if (foundObjectHandles == null || foundObjectHandles.length == 0) {
           break;
         }

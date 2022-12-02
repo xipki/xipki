@@ -170,7 +170,7 @@ public class EmulatorP11Identity extends P11Identity {
   public EmulatorP11Identity(
       P11Slot slot, P11IdentityId identityId, long keyType, SecretKey signingKey,
       int maxSessions, SecureRandom random) {
-    super(slot, identityId, keyType, 0);
+    super(slot, identityId, keyType, signingKey.getEncoded().length * 8);
     this.signingKey = notNull(signingKey, "signingKey");
     this.random = notNull(random, "random");
     this.maxSessions = maxSessions;

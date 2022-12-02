@@ -1409,7 +1409,7 @@ public abstract class P11Slot implements Closeable {
 
       if (identity.getPublicKey() != null) {
         String algo = getAlgorithmDesc(identity.getPublicKey());
-        sb.append("\t\tAlgorithm: ").append(algo).append("\n");
+        sb.append("\t\tAsymmetric key: ").append(algo).append("\n");
         X509Cert[] certs = identity.certificateChain();
         if (certs != null && certs.length > 0) {
           for (int j = 0; j < certs.length; j++) {
@@ -1417,7 +1417,8 @@ public abstract class P11Slot implements Closeable {
           }
         }
       } else {
-        sb.append("\t\tSymmetric key: ").append(Key.getKeyTypeName(identity.getKeyType())).append("\n");
+        sb.append("\t\tSymmetric key: ").append(Key.getKeyTypeName(identity.getKeyType()))
+            .append("/").append(identity.getSignatureKeyBitLength()).append("\n");
       }
     }
 

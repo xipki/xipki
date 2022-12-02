@@ -17,9 +17,8 @@
 
 package org.xipki.security.pkcs11.iaik;
 
-import iaik.pkcs.pkcs11.objects.Key;
-import iaik.pkcs.pkcs11.objects.PrivateKey;
-import iaik.pkcs.pkcs11.objects.SecretKey;
+import iaik.pkcs.pkcs11.objects.*;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.xipki.security.EdECConstants;
@@ -50,7 +49,7 @@ class IaikP11Identity extends P11Identity {
   private final int expectedSignatureLen;
 
   IaikP11Identity(IaikP11Slot slot, P11IdentityId identityId, SecretKey signingKey) {
-    super(slot, identityId, signingKey.getKeyType().getLongValue(), 0);
+    super(slot, identityId, signingKey.getKeyType().getLongValue(), getKeyBitLen(signingKey));
     this.signingKey = notNull(signingKey, "signingKey");
     this.expectedSignatureLen = 0;
   }
@@ -116,6 +115,18 @@ class IaikP11Identity extends P11Identity {
 
   int getExpectedSignatureLen() {
     return expectedSignatureLen;
+  }
+
+  private static int getKeyBitLen(SecretKey key) {
+    long keyType = key.getKeyType().getLongValue();
+    if (keyType == PKCS11Constants.CKK_DES3) {
+      return 192;
+    } else if (key instanceof ValuedSecretKey){
+      LongAttribute la = ((ValuedSecretKey) key).getValueLen();
+      return la == null ? 0 : la.getLongValue().intValue() * 8;
+    } else {
+      return 0;
+    }
   }
 
 }
