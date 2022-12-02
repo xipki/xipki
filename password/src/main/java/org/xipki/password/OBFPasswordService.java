@@ -31,14 +31,14 @@ import static org.xipki.util.Args.notNull;
  */
 public class OBFPasswordService {
 
-  public static final String OBFUSCATE = "OBF:";
+  public static final String PROTOCOL_OBF = "OBF";
 
   public static String obfuscate(String str) {
     notNull(str, "str");
     StringBuilder buf = new StringBuilder();
     byte[] bytes = StringUtil.toUtf8Bytes(str);
 
-    buf.append(OBFUSCATE);
+    buf.append(PROTOCOL_OBF).append(":");
     for (int i = 0; i < bytes.length; i++) {
       byte b1 = bytes[i];
       byte b2 = bytes[bytes.length - (i + 1)];
@@ -63,7 +63,7 @@ public class OBFPasswordService {
   public static String deobfuscate(String str) {
     notNull(str, "str");
 
-    if (startsWithIgnoreCase(str, OBFUSCATE)) {
+    if (startsWithIgnoreCase(str, PROTOCOL_OBF + ":")) {
       str = str.substring(4);
     }
 

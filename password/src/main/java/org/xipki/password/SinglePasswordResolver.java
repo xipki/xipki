@@ -42,7 +42,7 @@ public interface SinglePasswordResolver {
 
     @Override
     public boolean canResolveProtocol(String protocol) {
-      return "OBF".equalsIgnoreCase(protocol);
+      return OBFPasswordService.PROTOCOL_OBF.equalsIgnoreCase(protocol);
     }
 
     @Override
@@ -115,10 +115,10 @@ public interface SinglePasswordResolver {
         case "PBE-GUI":
           pwdCallback = new PasswordCallback.PBEGui();
           break;
-        case "OBF":
+        case OBFPasswordService.PROTOCOL_OBF:
           pwdCallback = new PasswordCallback.OBF();
-          if (conf != null && !StringUtil.startsWithIgnoreCase(conf, "OBF:")) {
-            conf = StringUtil.concat("OBF:", conf);
+          if (conf != null && !StringUtil.startsWithIgnoreCase(conf, OBFPasswordService.PROTOCOL_OBF + ":")) {
+            conf = StringUtil.concat(OBFPasswordService.PROTOCOL_OBF, ":", conf);
           }
           break;
         default:
@@ -140,7 +140,7 @@ public interface SinglePasswordResolver {
 
     @Override
     public boolean canResolveProtocol(String protocol) {
-      return "PBE".equalsIgnoreCase(protocol);
+      return PBEPasswordService.PROTOCOL_PBE.equalsIgnoreCase(protocol);
     }
 
     @Override

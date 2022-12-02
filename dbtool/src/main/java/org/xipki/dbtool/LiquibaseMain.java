@@ -32,10 +32,7 @@ import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.password.PBEPasswordService;
-import org.xipki.password.PasswordResolver;
-import org.xipki.password.PasswordResolverException;
-import org.xipki.password.SinglePasswordResolver;
+import org.xipki.password.*;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
@@ -220,10 +217,10 @@ public class LiquibaseMain implements Closeable {
 
       if (password != null) {
         char[] newPassword = null;
-        if (StringUtil.startsWithIgnoreCase(password, "OBF:")) {
+        if (StringUtil.startsWithIgnoreCase(password, OBFPasswordService.PROTOCOL_OBF + ":")) {
           SinglePasswordResolver.OBF resolver = new SinglePasswordResolver.OBF();
           newPassword = resolver.resolvePassword(password);
-        } else if (StringUtil.startsWithIgnoreCase(password, "PBE:")) {
+        } else if (StringUtil.startsWithIgnoreCase(password, PBEPasswordService.PROTOCOL_PBE + ":")) {
           char[] masterPassword = IoUtil.readPasswordFromConsole("Enter the master password");
           newPassword = PBEPasswordService.decryptPassword(masterPassword, password);
         }

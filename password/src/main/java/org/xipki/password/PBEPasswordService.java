@@ -29,12 +29,14 @@ import static org.xipki.util.Args.notNull;
 import static org.xipki.util.Args.range;
 
 /**
- * PBE (Password Based Encrytion) password service.
+ * PBE (Password Based Encryption) password service.
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 public class PBEPasswordService {
+
+  public static final String PROTOCOL_PBE = "PBE";
 
   public PBEPasswordService() {
   }
@@ -44,7 +46,7 @@ public class PBEPasswordService {
     notNull(masterPassword, "masterPassword");
     notNull(passwordHint, "passwordHint");
 
-    byte[] bytes = Base64.decode(passwordHint.substring("PBE:".length()));
+    byte[] bytes = Base64.decode(passwordHint.substring(PROTOCOL_PBE.length() + 1));
     int len = bytes.length;
     if (len <= 16 && len != 0) {
       throw new PasswordResolverException("invalid length of the encrypted password");
@@ -123,7 +125,7 @@ public class PBEPasswordService {
 
     // cipher text
     System.arraycopy(encrypted, 0, encryptedText, offset, encrypted.length);
-    return StringUtil.concat("PBE:", Base64.encodeToString(encryptedText));
+    return StringUtil.concat(PROTOCOL_PBE, ":", Base64.encodeToString(encryptedText));
   } // method encryptPassword
 
 }

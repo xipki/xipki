@@ -102,7 +102,7 @@ public interface PasswordCallback {
         throw new PasswordResolverException("no password is specified in file " + passwordFile);
       }
 
-      if (StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordService.OBFUSCATE)) {
+      if (StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordService.PROTOCOL_OBF + ":")) {
         return OBFPasswordService.deobfuscate(passwordHint).toCharArray();
       } else {
         return passwordHint.toCharArray();

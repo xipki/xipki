@@ -105,8 +105,13 @@ public class PasswordResolverImpl implements PasswordResolver {
       }
     }
 
-    throw new PasswordResolverException("could not find password resolver to resolve password "
-        + "of protocol '" + protocol + "'");
+    if (OBFPasswordService.PROTOCOL_OBF.equalsIgnoreCase(protocol)
+        || PBEPasswordService.PROTOCOL_PBE.equalsIgnoreCase(protocol)) {
+      throw new PasswordResolverException("could not find password resolver to resolve password "
+          + "of protocol '" + protocol + "'");
+    } else {
+      return passwordHint.toCharArray();
+    }
   } // method resolvePassword
 
   @Override
