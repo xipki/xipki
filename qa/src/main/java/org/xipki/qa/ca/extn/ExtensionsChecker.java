@@ -29,7 +29,6 @@ import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.certprofile.xijson.DirectoryStringType;
-import org.xipki.ca.certprofile.xijson.ExtensionSyntaxChecker;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
 import org.xipki.ca.certprofile.xijson.conf.*;
 import org.xipki.ca.certprofile.xijson.conf.SmimeCapabilities.SmimeCapability;
@@ -87,8 +86,6 @@ public class ExtensionsChecker {
   private byte[] cccExtensionSchemaValue;
 
   private Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
-
-  private Map<ASN1ObjectIdentifier, ExtnSyntax> extensionSyntaxes;
 
   private XijsonCertprofile certprofile;
 
@@ -203,9 +200,6 @@ public class ExtensionsChecker {
 
     // constant extensions
     this.constantExtensions = buildConstantExtesions(extensions);
-
-    // extensions with syntax
-    this.extensionSyntaxes = buildExtesionSyntaxes(extensions);
 
     this.a2gChecker = new A2gChecker(this);
     this.h2nChecker = new H2nChecker(this);
@@ -326,7 +320,7 @@ public class ExtensionsChecker {
     List<ValidationIssue> result = new LinkedList<>();
 
     // detect the list of extension types in certificate
-    Set<ASN1ObjectIdentifier> presentExtenionTypes = getExensionTypes(cert, issuerInfo, requestedExtns);
+    Set<ASN1ObjectIdentifier> presentExtensionTypes = getExtensionTypes(cert, issuerInfo, requestedExtns);
 
     Extensions extensions = cert.getTBSCertificate().getExtensions();
     ASN1ObjectIdentifier[] oids = extensions.getExtensionOIDs();
@@ -340,7 +334,7 @@ public class ExtensionsChecker {
 
     List<ASN1ObjectIdentifier> certExtTypes = Arrays.asList(oids);
 
-    for (ASN1ObjectIdentifier extType : presentExtenionTypes) {
+    for (ASN1ObjectIdentifier extType : presentExtensionTypes) {
       if (!certExtTypes.contains(extType)) {
         ValidationIssue issue = createExtensionIssue(extType);
         result.add(issue);
@@ -352,7 +346,7 @@ public class ExtensionsChecker {
     for (ASN1ObjectIdentifier oid : certExtTypes) {
       ValidationIssue issue = createExtensionIssue(oid);
       result.add(issue);
-      if (!presentExtenionTypes.contains(oid)) {
+      if (!presentExtensionTypes.contains(oid)) {
         issue.setFailureMessage("extension is present but is not permitted");
         continue;
       }
@@ -367,20 +361,7 @@ public class ExtensionsChecker {
 
       byte[] extnValue = ext.getExtnValue().getOctets();
       try {
-        if (extensionSyntaxes != null && extensionSyntaxes.containsKey(oid)) {
-          Extension requestedExtn = requestedExtns.getExtension(oid);
-          if (!Arrays.equals(requestedExtn.getExtnValue().getOctets(), extnValue)) {
-            failureMsg.append("extension in certificate does not equal the one contained in the request");
-          } else {
-            ExtnSyntax syntax = extensionSyntaxes.get(oid);
-            String extnName = "extension " + ObjectIdentifiers.oidToDisplayName(oid);
-            try {
-              ExtensionSyntaxChecker.checkExtension(extnName, ext.getParsedValue(), syntax);
-            } catch (BadCertTemplateException ex) {
-              failureMsg.append(ex.getMessage());
-            }
-          }
-        } else if (Extension.authorityKeyIdentifier.equals(oid)) {
+        if (Extension.authorityKeyIdentifier.equals(oid)) {
           a2gChecker.checkExtnAuthorityKeyId(failureMsg, extnValue, issuerInfo);
         } else if (Extension.subjectKeyIdentifier.equals(oid)) {
           // SubjectKeyIdentifier
@@ -485,7 +466,7 @@ public class ExtensionsChecker {
     return null;
   } // getExpectedExtValue
 
-  private Set<ASN1ObjectIdentifier> getExensionTypes(
+  private Set<ASN1ObjectIdentifier> getExtensionTypes(
       Certificate cert, IssuerInfo issuerInfo, Extensions requestedExtns) {
     Set<ASN1ObjectIdentifier> types = new HashSet<>();
     // profile required extension types
@@ -495,8 +476,7 @@ public class ExtensionsChecker {
       ASN1ObjectIdentifier oid = entry.getKey();
       if (entry.getValue().isRequired()) {
         types.add(oid);
-      } else if ((requestedExtns != null && requestedExtns.getExtension(oid) != null)
-          && (extensionSyntaxes != null && extensionSyntaxes.containsKey(oid))) {
+      } else if ((requestedExtns != null && requestedExtns.getExtension(oid) != null)) {
         types.add(oid);
       }
     }

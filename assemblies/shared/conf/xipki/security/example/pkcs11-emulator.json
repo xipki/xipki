@@ -22,7 +22,7 @@
 		],
 		"nativeLibraries":[
 			{
-				"path":"~/.xipki/pkcs11-emulator"
+				"path":"~/.xipki/pkcs11-emulator?supportcert=false"
 			}
 		],
 		"newObjectConf":{

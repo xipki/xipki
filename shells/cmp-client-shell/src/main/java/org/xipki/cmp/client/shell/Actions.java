@@ -80,9 +80,9 @@ public class Actions {
           signerPassword = new String(pwd);
         }
 
-        ConfPairs cp = new ConfPairs();
-        cp.putPair("password", signerPassword);
-        cp.putPair("keystore", "file:" + signerP12File);
+        ConfPairs cp = new ConfPairs()
+            .putPair("password", signerPassword)
+            .putPair("keystore", "file:" + signerP12File);
 
         SignerConf sc;
         if (signerP12SigAlgo == null) {

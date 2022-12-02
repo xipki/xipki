@@ -65,8 +65,6 @@ import java.util.*;
 
 public class ProfileConfBuilder extends ExtensionConfBuilder {
 
-  protected static final String REGEX_SN = ":NUMBER";
-
   protected static final String REGEX_FQDN = ":FQDN";
 
   protected static final Set<ASN1ObjectIdentifier> NOT_IN_SUBJECT_RDNS;

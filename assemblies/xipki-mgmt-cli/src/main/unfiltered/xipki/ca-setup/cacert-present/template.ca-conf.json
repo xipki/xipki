@@ -91,6 +91,7 @@
 			"cert":{
 				"file":"xipki/ca-setup/keycerts/myca1.der"
 			},
+			"certchain":[],
 			"keepExpiredCertDays":-1,
 			"maxValidity":"10y",
 			"nextCrlNo":2,

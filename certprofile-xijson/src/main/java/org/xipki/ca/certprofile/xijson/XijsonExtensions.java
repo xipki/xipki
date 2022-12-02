@@ -82,8 +82,6 @@ public class XijsonExtensions {
 
   private org.bouncycastle.asn1.x509.CertificatePolicies certificatePolicies;
 
-  private final Map<ASN1ObjectIdentifier, ExtnSyntax> extensionsWithSyntax;
-
   private final Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions;
 
   private Set<ExtKeyUsageControl> extendedKeyusages;
@@ -224,12 +222,6 @@ public class XijsonExtensions {
     this.constantExtensions = conf.buildConstantExtesions();
     if (this.constantExtensions != null) {
       extnIds.removeAll(this.constantExtensions.keySet());
-    }
-
-    // extensions with syntax
-    this.extensionsWithSyntax = conf.buildExtesionsWithSyntax();
-    if (this.extensionsWithSyntax != null) {
-      extnIds.removeAll(this.extensionsWithSyntax.keySet());
     }
 
     // validate the configuration
@@ -937,10 +929,6 @@ public class XijsonExtensions {
 
   public org.bouncycastle.asn1.x509.CertificatePolicies getCertificatePolicies() {
     return certificatePolicies;
-  }
-
-  public Map<ASN1ObjectIdentifier, ExtnSyntax> getExtensionsWithSyntax() {
-    return extensionsWithSyntax;
   }
 
   public Map<ASN1ObjectIdentifier, ExtensionValue> getConstantExtensions() {

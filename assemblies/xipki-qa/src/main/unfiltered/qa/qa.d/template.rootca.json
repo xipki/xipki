@@ -105,36 +105,6 @@
 			"file":"${profiles.dir}/certprofile-constant-ext.json"
 		}
 	},{
-		"name":"constant-ext-implicit-tag",
-		"type":"xijson",
-		"conf":{
-			"file":"${profiles.dir}/certprofile-constant-ext-implicit-tag.json"
-		}
-	},{
-		"name":"constant-ext-explicit-tag",
-		"type":"xijson",
-		"conf":{
-			"file":"${profiles.dir}/certprofile-constant-ext-explicit-tag.json"
-		}
-	},{
-		"name":"syntax-ext",
-		"type":"xijson",
-		"conf":{
-			"file":"${profiles.dir}/certprofile-syntax-ext.json"
-		}
-	},{
-		"name":"syntax-ext-implicit-tag",
-		"type":"xijson",
-		"conf":{
-			"file":"${profiles.dir}/certprofile-syntax-ext-implicit-tag.json"
-		}
-	},{
-		"name":"syntax-ext-explicit-tag",
-		"type":"xijson",
-		"conf":{
-			"file":"${profiles.dir}/certprofile-syntax-ext-explicit-tag.json"
-		}
-	},{
 		"name":"smime",
 		"type":"xijson",
 		"conf":{
@@ -199,12 +169,6 @@
 		"type":"xijson",
 		"conf":{
 			"file":"${profiles.dir}/certprofile-tls-c.json"
-		}
-	},{
-		"name":"apple-wwdr",
-		"type":"xijson",
-		"conf":{
-			"file":"${profiles.dir}/certprofile-apple-wwdr.json"
 		}
 	},{
 		"name":"gmt0015",

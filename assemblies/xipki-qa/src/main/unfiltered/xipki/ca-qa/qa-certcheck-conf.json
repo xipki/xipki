@@ -88,9 +88,6 @@
 		"name":"max-time",
 		"file":"qa/certprofile/certprofile-max-time.json"
 	},{
-		"name":"apple-wwdr",
-		"file":"qa/certprofile/certprofile-apple-wwdr.json"
-	},{
 		"name":"gmt0015",
 		"file":"qa/certprofile/certprofile-gmt0015.json"
 	},{

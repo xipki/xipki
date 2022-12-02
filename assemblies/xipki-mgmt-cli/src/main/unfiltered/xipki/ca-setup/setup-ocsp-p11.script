@@ -52,9 +52,6 @@ if { $printUsage equals "true" } then {
 
   ca:enroll-cert --ca myca1 --csr ${KEYCERTS_DIR}/${P11_LABEL}.csr --out ${KEYCERTS_DIR}/${P11_LABEL}.der --profile ocsp
 
-  echo "# Update the certificate in the device"
-  xi:update-cert-p11 --slot ${SLOT} --label ${P11_LABEL} --cert ${KEYCERTS_DIR}/${P11_LABEL}.der
-
   echo "Please"
   echo "  1. Modify <tomcat.dir>/xipki/etc/ocsp/ocsp-responder.json"
   echo "     - replace signer\'s type \'pkcs12\' with \'pkcs11\'"

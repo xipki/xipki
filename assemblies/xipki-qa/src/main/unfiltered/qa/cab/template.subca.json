@@ -21,6 +21,9 @@
 					"http://localhost:8080/ocsp/responder1"
 				]
 			},
+			"cert":{
+				"file":"output/subca1.crt"
+			},
 			"certchain":[{
 				"file":"output/rootca1.crt"
 			}],

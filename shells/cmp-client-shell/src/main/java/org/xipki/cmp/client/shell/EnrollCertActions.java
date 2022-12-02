@@ -42,7 +42,6 @@ import org.xipki.cmp.client.EnrollCertResult;
 import org.xipki.cmp.client.EnrollCertResult.CertifiedKeyPairOrError;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.*;
-import org.xipki.security.X509ExtensionType.ExtensionsType;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -330,9 +329,10 @@ public class EnrollCertActions {
           }
         }
 
-        ConfPairs conf = new ConfPairs("password", password);
-        conf.putPair("parallelism", Integer.toString(1));
-        conf.putPair("keystore", "file:" + p12File);
+        ConfPairs conf = new ConfPairs("password", password)
+            .putPair("parallelism", Integer.toString(1))
+            .putPair("keystore", "file:" + p12File);
+
         SignerConf signerConf = new SignerConf(conf.getEncoded(), getHashAlgo(hashAlgo), getSignatureAlgoControl());
 
         List<X509Cert> peerCerts = client.getDhPopPeerCertificates();
@@ -416,9 +416,9 @@ public class EnrollCertActions {
     @Option(name = "--postalAddress", multiValued = true, description = "postal address in subject")
     private List<String> postalAddress;
 
-    @Option(name = "--extra-extensions-file", description = "Configuration file for extral extensions")
+    @Option(name = "--extensions-file", description = "File containing the DER-encoded Extension.s")
     @Completion(FileCompleter.class)
-    private String extraExtensionsFile;
+    private String extensionsFile;
 
     protected abstract SubjectPublicKeyInfo getPublicKey() throws Exception;
 
@@ -596,19 +596,22 @@ public class EnrollCertActions {
             + " must be set or none of them should be set");
       }
 
-      // extra extensions
-      if (extraExtensionsFile != null) {
-        byte[] bytes = IoUtil.read(extraExtensionsFile);
-        ExtensionsType extraExtensions = JSON.parseObject(bytes, ExtensionsType.class);
-        extraExtensions.validate();
+      List<ASN1ObjectIdentifier> addedExtnTypes = new ArrayList<>(extensions.size());
+      for (Extension extn : extensions) {
+        addedExtnTypes.add(extn.getExtnId());
+      }
 
-        List<X509ExtensionType> extnConfs = extraExtensions.getExtensions();
-        if (CollectionUtil.isNotEmpty(extnConfs)) {
-          for (X509ExtensionType m : extnConfs) {
-            String id = m.getType().getOid();
-            byte[] encodedExtnValue = m.getConstant().toASN1Encodable().toASN1Primitive().getEncoded(ASN1Encoding.DER);
-            extensions.add(new Extension(new ASN1ObjectIdentifier(id), false, encodedExtnValue));
+      // extra extensions
+      if (extensionsFile != null) {
+        Extensions extns = Extensions.getInstance(IoUtil.read(extensionsFile));
+        for (ASN1ObjectIdentifier extnId : extns.getExtensionOIDs()) {
+          if (addedExtnTypes.contains(extnId)) {
+            throw new Exception("duplicated extension " + extnId.getId());
           }
+
+          Extension extn = extns.getExtension(extnId);
+          extensions.add(extn);
+          addedExtnTypes.add(extnId);
         }
       }
 

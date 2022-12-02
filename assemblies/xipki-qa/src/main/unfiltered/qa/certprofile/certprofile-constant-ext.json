@@ -55,9 +55,6 @@
 					"oid":"1.3.36.3.3.2.8.1.1.7",
 					"description":"brainpoolp256r1"
 				},{
-					"oid":"1.3.36.3.3.2.8.1.1.7",
-					"description":"brainpoolp256r1"
-				},{
 					"oid":"1.3.36.3.3.2.8.1.1.11",
 					"description":"brainpoolp384r1"
 				},{
@@ -78,22 +75,22 @@
 		"rdns":[{
 			"type":{
 				"oid":"2.5.4.3",
-				"description":"cn"
+				"description":"CN"
 			}
 		},{
 			"type":{
 				"oid":"2.5.4.6",
-				"description":"c"
+				"description":"C"
 			}
 		},{
 			"type":{
 				"oid":"2.5.4.10",
-				"description":"o"
+				"description":"O"
 			}
 		},{
 			"type":{
 				"oid":"2.5.4.11",
-				"description":"ou"
+				"description":"OU"
 			},
 			"minOccurs":0
 		}]
@@ -184,8 +181,7 @@
 		},
 		"required":true,
 		"constant":{
-			"type":"BIT STRING",
-			"value":"AQI="
+			"value":"AwMAAQI="
 		}
 	},{
 		"type":{
@@ -194,18 +190,16 @@
 		},
 		"required":true,
 		"constant":{
-			"type":"BMPString",
-			"value":"A BMP string"
+			"value":"HhgAQQAgAEIATQBQACAAcwB0AHIAaQBuAGc="
 		}
 	},{
 		"type":{
 			"oid":"1.2.3.6.1.3",
-			"description":"custom constant extension BOOLEAN"
+			"description":"ASN1Boolean"
 		},
 		"required":true,
 		"constant":{
-			"type":"BOOLEAN",
-			"value":"true"
+			"value":"AQH/"
 		}
 	},{
 		"type":{
@@ -214,8 +208,7 @@
 		},
 		"required":true,
 		"constant":{
-			"type":"IA5String",
-			"value":"An IA5 string"
+			"value":"Fg1BbiBJQTUgc3RyaW5n"
 		}
 	},{
 		"type":{
@@ -224,8 +217,7 @@
 		},
 		"required":true,
 		"constant":{
-			"type":"INTEGER",
-			"value":"10"
+			"value":"AgEK"
 		}
 	},{
 		"type":{
@@ -234,7 +226,7 @@
 		},
 		"required":true,
 		"constant":{
-			"type":"NULL"
+			"value":"BQA="
 		}
 	},{
 		"type":{
@@ -243,8 +235,7 @@
 		},
 		"required":true,
 		"constant":{
-			"type":"OCTET STRING",
-			"value":"AwQ="
+			"value":"BAIDBA=="
 		}
 	},{
 		"type":{
@@ -253,8 +244,7 @@
 		},
 		"required":true,
 		"constant":{
-			"type":"OID",
-			"value":"2.3.4.5"
+			"value":"BgNTBAU="
 		}
 	},{
 		"type":{
@@ -263,29 +253,16 @@
 		},
 		"required":true,
 		"constant":{
-			"type":"PrintableString",
-			"value":"A printable string"
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.6.1.10",
-			"description":"custom constant extension RAW"
-		},
-		"required":true,
-		"constant":{
-			"type":"RAW",
-			"description":"DER NULL",
-			"value":"BQA="
+			"value":"ExJBIHByaW50YWJsZSBzdHJpbmc="
 		}
 	},{
 		"type":{
 			"oid":"1.2.3.6.1.11",
-			"description":"custom constant extension TeletexString"
+			"description":"custom constant extension TeletexString(T61String)"
 		},
 		"required":true,
 		"constant":{
-			"type":"TeletexString",
-			"value":"A teletax string"
+			"value":"FBBBIHRlbGV0YXggc3RyaW5n"
 		}
 	},{
 		"type":{
@@ -294,18 +271,16 @@
 		},
 		"required":true,
 		"constant":{
-			"type":"UTF8String",
-			"value":"A UTF8 string"
+			"value":"DA1BIFVURjggc3RyaW5n"
 		}
 	},{
 		"type":{
 			"oid":"1.2.3.6.1.13",
-			"description":"custom constant extension ENUMERATED"
+			"description":"custom constant extension Enumerated"
 		},
 		"required":true,
 		"constant":{
-			"type":"ENUMERATED",
-			"value":"2"
+			"value":"CgEC"
 		}
 	},{
 		"type":{
@@ -314,8 +289,7 @@
 		},
 		"required":true,
 		"constant":{
-			"type":"GeneralizedTime",
-			"value":"20180314130102Z"
+			"value":"GA8yMDIyMTIwMTIxMDIyMlo="
 		}
 	},{
 		"type":{
@@ -324,8 +298,7 @@
 		},
 		"required":true,
 		"constant":{
-			"type":"UTCTime",
-			"value":"190314130102Z"
+			"value":"Fw0yMjEyMDEyMTAyMjJa"
 		}
 	},{
 		"type":{
@@ -334,200 +307,7 @@
 		},
 		"required":true,
 		"constant":{
-			"type":"Name",
-			"value":"CN=abc,C=DE"
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.6.1.17",
-			"description":"custom constant extension SEQUENCE"
-		},
-		"required":true,
-		"constant":{
-			"type":"SEQUENCE",
-			"listValue":[{
-				"type":"UTF8String",
-				"value":"abc.def.myBlog"
-			},{
-				"type":"SEQUENCE",
-				"listValue":[
-					{
-						"type":"UTF8String",
-						"value":"app"
-					}
-				]
-			},{
-				"type":"UTF8String",
-				"tag":{
-					"explicit":true,
-					"value":0
-				},
-				"value":"abc.def.myBlog.voip"
-			},{
-				"type":"SEQUENCE",
-				"tag":{
-					"explicit":true,
-					"value":1
-				},
-				"listValue":[
-					{
-						"type":"UTF8String",
-						"value":"void"
-					}
-				]
-			},{
-				"type":"UTF8String",
-				"tag":{
-					"explicit":false,
-					"value":2
-				},
-				"value":"abc.def.myBlog.complication"
-			},{
-				"type":"SEQUENCE",
-				"tag":{
-					"explicit":false,
-					"value":9
-				},
-				"listValue":[
-					{
-						"type":"UTF8String",
-						"value":"complication"
-					}
-				]
-			}]
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.6.1.18",
-			"description":"custom constant extension SEQUENCE OF"
-		},
-		"required":true,
-		"constant":{
-			"type":"SEQUENCE OF",
-			"listValue":[{
-				"type":"SEQUENCE",
-				"listValue":[{
-					"type":"UTF8String",
-					"value":"abc.def.myBlog"
-				},{
-					"type":"UTF8String",
-					"value":"app"
-				}]
-			},{
-				"type":"SEQUENCE",
-				"listValue":[{
-					"type":"UTF8String",
-					"value":"abc.def.myBlog.voip"
-				},{
-					"type":"UTF8String",
-					"value":"voip"
-				}]
-			},{
-				"type":"SEQUENCE",
-				"listValue":[{
-					"type":"UTF8String",
-					"value":"abc.def.myBlog.complication"
-				},{
-					"type":"UTF8String",
-					"value":"complication"
-				}]
-			}]
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.6.1.19",
-			"description":"custom constant extension SET"
-		},
-		"required":true,
-		"constant":{
-			"type":"SET",
-			"listValue":[{
-				"type":"UTF8String",
-				"value":"abc.def.myBlog"
-			},{
-				"type":"SEQUENCE",
-				"listValue":[
-					{
-						"type":"UTF8String",
-						"value":"app"
-					}
-				]
-			},{
-				"type":"UTF8String",
-				"tag":{
-					"explicit":true,
-					"value":0
-				},
-				"value":"abc.def.myBlog.voip"
-			},{
-				"type":"SEQUENCE",
-				"tag":{
-					"explicit":true,
-					"value":1
-				},
-				"listValue":[
-					{
-						"type":"UTF8String",
-						"value":"void"
-					}
-				]
-			},{
-				"type":"UTF8String",
-				"tag":{
-					"explicit":false,
-					"value":2
-				},
-				"value":"abc.def.myBlog.complication"
-			},{
-				"type":"SEQUENCE",
-				"tag":{
-					"explicit":false,
-					"value":9
-				},
-				"listValue":[
-					{
-						"type":"UTF8String",
-						"value":"complication"
-					}
-				]
-			}]
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.6.1.20",
-			"description":"custom constant extension SET OF"
-		},
-		"required":true,
-		"constant":{
-			"type":"SET OF",
-			"listValue":[{
-				"type":"SEQUENCE",
-				"listValue":[{
-					"type":"UTF8String",
-					"value":"abc.def.myBlog"
-				},{
-					"type":"UTF8String",
-					"value":"app"
-				}]
-			},{
-				"type":"SEQUENCE",
-				"listValue":[{
-					"type":"UTF8String",
-					"value":"abc.def.myBlog.voip"
-				},{
-					"type":"UTF8String",
-					"value":"voip"
-				}]
-			},{
-				"type":"SEQUENCE",
-				"listValue":[{
-					"type":"UTF8String",
-					"value":"abc.def.myBlog.complication"
-				},{
-					"type":"UTF8String",
-					"value":"complication"
-				}]
-			}]
+			"value":"MBsxDDAKBgNVBAMMA2FiYzELMAkGA1UEBhMCREU="
 		}
 	}]
 }

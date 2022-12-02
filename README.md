@@ -30,7 +30,8 @@ JRE/JDK, and the steps to reproduce the bug.
 * [nCipher Connect](https://www.ncipher.com/products/general-purpose-hsms/nshield-connect)
 * [nCipher Solo](https://www.ncipher.com/products/general-purpose-hsms/nshield-solo)
 * [Utimaco Se](https://hsm.utimaco.com/products-hardware-security-modules/general-purpose-hsm/)
-* [Sansec HSM](https://en.sansec.com.cn) : tested SM2, ECDSA and RSA.
+* [Sansec HSM](https://en.sansec.com.cn)
+* [AWS CloudHSM](https://aws.amazon.com/cloudhsm)
 
 ## Get Started
 

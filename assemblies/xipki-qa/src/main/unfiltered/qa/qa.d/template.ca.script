@@ -16,8 +16,7 @@ ca:dbschema-add --name KEYPAIR_ENC_KEY --value 00112233445566778899AABBCCDDEEFF
 
 list = [ cross subca subca-complex ocsp scep multiple-ous multi-valued-rdn \
   qc ee-complex smime smime-legacy tls tls-c max-time fixed-partial-subject \
-  constant-ext constant-ext-implicit-tag constant-ext-explicit-tag \
-  syntax-ext syntax-ext-implicit-tag syntax-ext-explicit-tag apple-wwdr gmt0015 \
+  constant-ext gmt0015 \
   tls-dsa tls-ec tls-ed25519 tls-rsa tls-sm2]
 
 each ($list) {
@@ -98,12 +97,7 @@ ca:gen-rootca \
 ca:profile-rm -f rootca
 
 ## Update the certificate in the device
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  xi:update-cert-p11 \
-    --slot $SLOT \
-    --label rootca1 \
-    --cert output/rootca1.crt
-} else {
+if { $TOKEN_TYPE equals "pkcs12" } then {
   xi:update-cert-p12 \
     --p12 output/rootca1.p12 \
     --password 1234 \
@@ -160,12 +154,7 @@ ca:enroll-cert \
   --out output/subca1.crt \
   --profile subca
 
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  xi:update-cert-p11 \
-    --slot $SLOT \
-    --label subca1 \
-    --cert output/subca1.crt \
-} else {
+if { $TOKEN_TYPE equals "pkcs12" } then {
   xi:update-cert-p12 \
     --p12 output/subca1.p12 \
     --password 1234 \
@@ -216,12 +205,7 @@ ca:enroll-cert \
   --out output/subcawithcrl1.crt \
   --profile subca-complex
 
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  xi:update-cert-p11 \
-    --slot $SLOT \
-    --label subcawithcrl1 \
-    --cert output/subcawithcrl1.crt \
-} else {
+if { $TOKEN_TYPE equals "pkcs12" } then {
   xi:update-cert-p12 \
     --p12 output/subcawithcrl1.p12 \
     --password 1234 \
@@ -255,12 +239,7 @@ ca:enroll-cert \
   --out output/ocsp99.crt \
   --profile ocsp
 
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  xi:update-cert-p11 \
-    --slot $SLOT \
-    --label ocsp99 \
-    --cert output/ocsp99.crt \
-} else {
+if { $TOKEN_TYPE equals "pkcs12" } then {
   xi:update-cert-p12 \
     --p12 output/ocsp99.p12 \
     --password 1234 \
@@ -301,6 +280,7 @@ ca:ca-add \
   --save-keypair yes \
   --keypair-gen software \
   --revoke-suspended-control enabled=true,targetReason=cessationOfOperation,unchangedSince=15d \
+  --cert output/subca1.crt \
   --certchain output/rootca1.crt \
   --ctlog-control "enabled=true,sslcontext.name=localhost,servers=https://localhost/ctlog/"
 
@@ -314,11 +294,6 @@ ca:caprofile-add \
   --profile qc \
   --profile ee-complex \
   --profile constant-ext \
-  --profile constant-ext-implicit-tag \
-  --profile constant-ext-explicit-tag \
-  --profile syntax-ext \
-  --profile syntax-ext-implicit-tag \
-  --profile syntax-ext-explicit-tag \
   --profile smime \
   --profile smime-legacy \
   --profile tls \
@@ -373,6 +348,7 @@ ca:ca-add \
   --save-cert yes \
   --save-keypair yes \
   --keypair-gen software \
+  --cert output/subcawithcrl1.crt \
   --certchain output/rootca1.crt
 
 ca:caalias-add \
@@ -388,7 +364,6 @@ ca:caprofile-add \
   --profile multiple-ous \
   --profile multi-valued-rdn \
   --profile max-time \
-  --profile apple-wwdr \
   --profile gmt0015
 
 ## Add CMP requestor to CA

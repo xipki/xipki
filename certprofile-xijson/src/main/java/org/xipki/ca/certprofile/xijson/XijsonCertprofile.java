@@ -955,26 +955,6 @@ public class XijsonCertprofile extends BaseCertprofile {
       }
     }
 
-    // extensions with syntax
-    Map<ASN1ObjectIdentifier, ExtnSyntax> extensionsWithSyntax = extensions.getExtensionsWithSyntax();
-    if (extensionsWithSyntax != null) {
-      for (Entry<ASN1ObjectIdentifier, ExtnSyntax> entry : extensionsWithSyntax.entrySet()) {
-        ASN1ObjectIdentifier m = entry.getKey();
-        if (!occurrences.remove(m)) {
-          continue;
-        }
-
-        String extnName = "extension " + ObjectIdentifiers.oidToDisplayName(m);
-        extension = (requestedExtensions == null) ? null : requestedExtensions.get(m);
-        if (extension == null) {
-          throw new BadCertTemplateException("no " + extnName + " is contained in the request");
-        }
-
-        ASN1Encodable reqExtValue = extension.getParsedValue();
-        ExtensionSyntaxChecker.checkExtension(extnName, reqExtValue, entry.getValue());
-      }
-    }
-
     ExtensionValues extraExtensions = getExtraExtensions(extensionControls, requestedSubject,
         grantedSubject, requestedExtensions, notBefore, notAfter, caInfo);
     if (extraExtensions != null) {

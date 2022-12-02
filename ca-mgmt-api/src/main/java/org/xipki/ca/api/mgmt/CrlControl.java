@@ -219,17 +219,16 @@ public class CrlControl {
   }
 
   public ConfPairs getConfPairs() {
-    ConfPairs pairs = new ConfPairs();
-    pairs.putPair(KEY_DELTACRL_INTERVALS, Integer.toString(deltaCrlIntervals));
-    pairs.putPair(KEY_EXCLUDE_REASON, Boolean.toString(excludeReason));
-    pairs.putPair(KEY_INCLUDE_EXPIREDCERTS, Boolean.toString(includeExpiredCerts));
-    pairs.putPair(KEY_FULLCRL_EXTENDED_NEXTUPDATE, Boolean.toString(extendedNextUpdate));
-    pairs.putPair(KEY_FULLCRL_INTERVALS, Integer.toString(fullCrlIntervals));
-    pairs.putPair(KEY_INTERVAL_HOURS, Integer.toString(intervalHours));
-    pairs.putPair(KEY_INTERVAL_TIME, intervalDayTime.toString());
-    pairs.putPair(KEY_INVALIDITY_DATE, invalidityDateMode.name());
-    pairs.putPair(KEY_OVERLAP, overlap.toString());
-    return pairs;
+    return new ConfPairs()
+        .putPair(KEY_DELTACRL_INTERVALS, Integer.toString(deltaCrlIntervals))
+        .putPair(KEY_EXCLUDE_REASON, Boolean.toString(excludeReason))
+        .putPair(KEY_INCLUDE_EXPIREDCERTS, Boolean.toString(includeExpiredCerts))
+        .putPair(KEY_FULLCRL_EXTENDED_NEXTUPDATE, Boolean.toString(extendedNextUpdate))
+        .putPair(KEY_FULLCRL_INTERVALS, Integer.toString(fullCrlIntervals))
+        .putPair(KEY_INTERVAL_HOURS, Integer.toString(intervalHours))
+        .putPair(KEY_INTERVAL_TIME, intervalDayTime.toString())
+        .putPair(KEY_INVALIDITY_DATE, invalidityDateMode.name())
+        .putPair(KEY_OVERLAP, overlap.toString());
   } // method getConf
 
   @Override

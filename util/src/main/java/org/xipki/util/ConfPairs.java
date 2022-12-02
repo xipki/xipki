@@ -86,7 +86,7 @@ public class ConfPairs {
     }
 
     @Override
-    public void putPair(String name, String value) {
+    public ConfPairs putPair(String name, String value) {
       throw new UnsupportedOperationException("putPair() is not supported");
     }
 
@@ -232,7 +232,7 @@ public class ConfPairs {
     return pairs.isEmpty();
   }
 
-  public void putPair(String name, String value) {
+  public ConfPairs putPair(String name, String value) {
     notBlank(name, "name");
     notNull(value, "value");
 
@@ -241,6 +241,7 @@ public class ConfPairs {
       throw new IllegalArgumentException("name begin with " + ch);
     }
     pairs.put(name, value);
+    return this;
   }
 
   public void removePair(String name) {

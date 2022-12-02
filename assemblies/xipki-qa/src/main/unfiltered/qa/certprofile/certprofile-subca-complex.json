@@ -59,29 +59,29 @@
 		"rdns":[{
 			"type":{
 				"oid":"2.5.4.6",
-				"description":"c"
+				"description":"C"
 			}
 		},{
 			"type":{
 				"oid":"2.5.4.10",
-				"description":"o"
+				"description":"O"
 			}
 		},{
 			"type":{
 				"oid":"2.5.4.11",
-				"description":"ou"
+				"description":"OU"
 			},
 			"minOccurs":0
 		},{
 			"type":{
 				"oid":"2.5.4.5",
-				"description":"serialNumber"
+				"description":"SERIALNUMBER"
 			},
 			"minOccurs":0
 		},{
 			"type":{
 				"oid":"2.5.4.3",
-				"description":"cn"
+				"description":"CN"
 			},
 			"prefix":"PREFIX ",
 			"suffix":" SUFFIX"
@@ -105,6 +105,9 @@
 			"description":"freshestCRL"
 		}
 	},{
+		"basicConstrains":{
+			"pathLen":1
+		},
 		"type":{
 			"oid":"2.5.29.19",
 			"description":"basicConstraints"
@@ -244,7 +247,7 @@
 		},
 		"critical":true,
 		"required":true,
-		"inRequest":"optional",
+		"inRequest":"required",
 		"subjectAltName":{
 			"modes":["rfc822Name","DNSName","directoryName","ediPartyName","uniformResourceIdentifier","IPAddress","registeredID","otherName:2.5.4.10"]
 		}

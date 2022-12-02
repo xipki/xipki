@@ -18,6 +18,9 @@
 					"http://localhost:8080/ocsp/responder1"
 				]
 			},
+			"cert":{
+				"file":"output/subca1.crt"
+			},
 			"certchain":[{
 				"file":"output/rootca1.crt"
 			}],
@@ -51,8 +54,7 @@
 		"profiles":[
 			"qc",
 			"ee-complex",
-			"constant-ext", "constant-ext-implicit-tag", "constant-ext-explicit-tag",
-			"syntax-ext", "syntax-ext-implicit-tag", "syntax-ext-explicit-tag",
+			"constant-ext",
 			"smime",
 			"smime-legacy",
 			"tls",

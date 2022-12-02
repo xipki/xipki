@@ -55,9 +55,6 @@
 					"oid":"1.3.36.3.3.2.8.1.1.7",
 					"description":"brainpoolp256r1"
 				},{
-					"oid":"1.3.36.3.3.2.8.1.1.7",
-					"description":"brainpoolp256r1"
-				},{
 					"oid":"1.3.36.3.3.2.8.1.1.11",
 					"description":"brainpoolp384r1"
 				},{
@@ -87,29 +84,29 @@
 		"rdns":[{
 			"type":{
 				"oid":"2.5.4.6",
-				"description":"c"
+				"description":"C"
 			}
 		},{
 			"type":{
 				"oid":"2.5.4.10",
-				"description":"o"
+				"description":"O"
 			}
 		},{
 			"type":{
 				"oid":"2.5.4.11",
-				"description":"ou"
+				"description":"OU"
 			},
 			"minOccurs":0
 		},{
 			"type":{
 				"oid":"2.5.4.5",
-				"description":"serialNumber"
+				"description":"SERIALNUMBER"
 			},
 			"minOccurs":0
 		},{
 			"type":{
 				"oid":"2.5.4.3",
-				"description":"cn"
+				"description":"CN"
 			},
 			"regex":":FQDN"
 		}]
@@ -117,7 +114,7 @@
 	"subjectToSubjectAltNames":[{
 		"source":{
 			"oid":"2.5.4.3",
-			"description":"cn"
+			"description":"CN"
 		},
 		"target":"DNSName"
 	}],
@@ -143,7 +140,7 @@
 			"description":"subjectAlternativeName"
 		},
 		"required":true,
-		"inRequest":"optional",
+		"inRequest":"required",
 		"subjectAltName":{
 			"modes":["DNSName","IPAddress"]
 		}

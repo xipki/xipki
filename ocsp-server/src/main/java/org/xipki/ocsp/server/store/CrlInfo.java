@@ -99,13 +99,14 @@ public class CrlInfo {
   }
 
   private void initEncoded() {
-    ConfPairs pairs = new ConfPairs();
-    pairs.putPair(CRL_NUMBER, crlNumber.toString(16));
+    ConfPairs pairs = new ConfPairs()
+        .putPair(CRL_NUMBER, crlNumber.toString(16))
+        .putPair(THIS_UPDATE, DateUtil.toUtcTimeyyyyMMddhhmmss(thisUpdate))
+        .putPair(NEXT_UPDATE, DateUtil.toUtcTimeyyyyMMddhhmmss(nextUpdate));
     if (baseCrlNumber != null) {
       pairs.putPair(BASE_CRL_NUMBER, baseCrlNumber.toString(16));
     }
-    pairs.putPair(THIS_UPDATE, DateUtil.toUtcTimeyyyyMMddhhmmss(thisUpdate));
-    pairs.putPair(NEXT_UPDATE, DateUtil.toUtcTimeyyyyMMddhhmmss(nextUpdate));
+
     byte[] encodedCrlId;
     try {
       encodedCrlId = crlId.getEncoded();

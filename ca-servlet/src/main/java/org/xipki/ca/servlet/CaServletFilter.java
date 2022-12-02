@@ -103,9 +103,7 @@ public class CaServletFilter implements Filter {
     int shardId = conf.getShardId();
     String auditConf = audit.getConf();
     if ("file-mac".equals(auditType) || "database-mac".equals(auditType)) {
-      ConfPairs cp = new ConfPairs(auditConf);
-      cp.putPair("shard-id", Integer.toString(shardId));
-      auditConf = cp.getEncoded();
+      auditConf = new ConfPairs(auditConf).putPair("shard-id", Integer.toString(shardId)).getEncoded();
     }
 
     Audits.init(auditType, auditConf, securities.getSecurityFactory().getPasswordResolver());

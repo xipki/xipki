@@ -20,7 +20,6 @@ package org.xipki.ca.certprofile.xijson.conf;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.security.X509ExtensionType.ConstantExtnValue;
 import org.xipki.util.TripleState;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
@@ -146,12 +145,6 @@ public class ExtensionType extends ValidatableConf {
 
   @JSONField(ordinal = 5)
   private Object custom;
-
-  /**
-   * For extension with syntax.
-   */
-  @JSONField(ordinal = 5)
-  private ExtnSyntax syntax;
 
   public DescribableOid getType() {
     return type;
@@ -448,14 +441,6 @@ public class ExtensionType extends ValidatableConf {
     this.custom = custom;
   }
 
-  public ExtnSyntax getSyntax() {
-    return syntax;
-  }
-
-  public void setSyntax(ExtnSyntax syntax) {
-    this.syntax = syntax;
-  }
-
   @Override
   public void validate() throws InvalidConfException {
     notNull(type, "type");
@@ -463,7 +448,7 @@ public class ExtensionType extends ValidatableConf {
     validate(basicConstraints, biometricInfo, certificatePolicies, constant, extendedKeyUsage, inhibitAnyPolicy);
     validate(keyUsage, nameConstraints, policyMappings, privateKeyUsagePeriod, policyConstraints, qcStatements);
     validate(restriction, smimeCapabilities, subjectAltName, subjectDirectoryAttributs, subjectInfoAccess);
-    validate(subjectKeyIdentifier, tlsFeature, validityModel, cccExtensionSchema, syntax);
+    validate(subjectKeyIdentifier, tlsFeature, validityModel, cccExtensionSchema);
   } // method validate
 
 }

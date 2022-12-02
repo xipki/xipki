@@ -33,7 +33,6 @@ import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.CertificatePolic
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.PolicyQualfierType;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.PolicyQualifier;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax.SubFieldSyntax;
 import org.xipki.ca.certprofile.xijson.conf.Subject.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.Subject.ValueType;
 import org.xipki.security.KeyUsage;
@@ -41,8 +40,6 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.TlsExtensionType;
-import org.xipki.security.X509ExtensionType.FieldType;
-import org.xipki.security.X509ExtensionType.Tag;
 import org.xipki.util.TripleState;
 
 import java.util.*;
@@ -76,14 +73,8 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
       certprofileMultipleOus("certprofile-multiple-ous.json");
       certprofileMultipleValuedRdn("certprofile-multi-valued-rdn.json");
       certprofileFixedPartialSubject("certprofile-fixed-partial-subject.json");
-      certprofileConstantExt("certprofile-constant-ext.json");
-      certprofileConstantExtImplicitTag("certprofile-constant-ext-implicit-tag.json");
-      certprofileConstantExtExplicitTag("certprofile-constant-ext-explicit-tag.json");
-      certprofileSyntaxExt("certprofile-syntax-ext.json");
-      certprofileSyntaxExtImplicitTag("certprofile-syntax-ext-implicit-tag.json");
-      certprofileSyntaxExtExplicitTag("certprofile-syntax-ext-explicit-tag.json");
       certprofileExtended("certprofile-extended.json");
-      certprofileAppleWwdr("certprofile-apple-wwdr.json");
+      certprofileConstantExt("certprofile-constant-ext.json");
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -319,23 +310,11 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     last(list).setKeyUsage(createKeyUsage(
         new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment}, null));
 
-    // Extensions - extenedKeyUsage
+    // Extensions - extendedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
-
-    // Extension - subjectDirectoryAttributes
-    list.add(createExtension(Extension.subjectDirectoryAttributes, true, false));
-    SubjectDirectoryAttributs subjectDirAttrType = new SubjectDirectoryAttributs();
-    last(list).setSubjectDirectoryAttributs(subjectDirAttrType);
-
-    List<DescribableOid> attrTypes = subjectDirAttrType.getTypes();
-    attrTypes.add(createOidType(DN.countryOfCitizenship));
-    attrTypes.add(createOidType(DN.countryOfResidence));
-    attrTypes.add(createOidType(DN.gender));
-    attrTypes.add(createOidType(DN.dateOfBirth));
-    attrTypes.add(createOidType(DN.placeOfBirth));
 
     // Extensions - tlsFeature
     list.add(createExtension(Extn.id_pe_tlsfeature, true, true));
@@ -443,19 +422,11 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileEeComplex
 
-  private static void certprofileConstantExtImplicitTag(String destFilename) throws Exception {
-    certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.2"), new Tag(1, false));
-  }
-
-  private static void certprofileConstantExtExplicitTag(String destFilename) throws Exception {
-    certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.3"), new Tag(1, true));
-  }
-
   private static void certprofileConstantExt(String destFilename) throws Exception {
-    certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.1"), null);
+    certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.1"));
   }
 
-  private static void certprofileConstantExt(String destFilename, ASN1ObjectIdentifier oidPrefix, Tag tag)
+  private static void certprofileConstantExt(String destFilename, ASN1ObjectIdentifier oidPrefix)
       throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile constant-extension", CertLevel.EndEntity,
         "5y", true, false);
@@ -495,66 +466,10 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
 
     // Custom Constant Extension Value
-    list.addAll(createConstantExtensions(oidPrefix, tag));
+    list.addAll(createConstantExtensions(oidPrefix));
 
     marshall(profile, destFilename, true);
   } // method certprofileConstantExt
-
-  private static void certprofileSyntaxExtImplicitTag(String destFilename) {
-    certprofileSyntaxExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.2"), new Tag(1, false));
-  }
-
-  private static void certprofileSyntaxExtExplicitTag(String destFilename) {
-    certprofileSyntaxExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.3"), new Tag(1, true));
-  }
-
-  private static void certprofileSyntaxExt(String destFilename) {
-    certprofileSyntaxExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.1"), null);
-  }
-
-  private static void certprofileSyntaxExt(String destFilename, ASN1ObjectIdentifier oidPrefix, Tag tag) {
-    X509ProfileType profile = getBaseProfile("certprofile syntax-extension", CertLevel.EndEntity,
-        "5y", true, false);
-
-    // Subject
-    profile.getSubject().setKeepRdnOrder(true);
-    addRdns(profile, rdn(DN.CN), rdn(DN.C), rdn(DN.O), rdn01(DN.OU));
-
-    // Extensions
-    // Extensions - general
-    List<ExtensionType> list = profile.getExtensions();
-
-    // Extensions - controls
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
-    list.add(createExtension(Extension.freshestCRL, false, false));
-
-    // Extensions - basicConstraints
-    list.add(createExtension(Extension.basicConstraints, true, false));
-
-    // Extensions - AuthorityInfoAccess
-    list.add(createExtension(Extension.authorityInfoAccess, true, false));
-    last(list).setAuthorityInfoAccess(createAuthorityInfoAccess());
-
-    // Extensions - AuthorityKeyIdentifier
-    list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-
-    // Extensions - keyUsage
-    list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment}, null));
-
-    // Extensions - extenedKeyUsage
-    list.add(createExtension(Extension.extendedKeyUsage, true, false));
-    last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
-
-    // Custom extension with syntax
-    list.addAll(createSyntaxExtensions(oidPrefix, tag));
-
-    marshall(profile, destFilename, true);
-  } // method certprofileSyntaxExt
 
   private static void certprofileFixedPartialSubject(String destFilename) {
     X509ProfileType profile = getBaseProfile("certprofile fixed subject O and C",
@@ -603,132 +518,6 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     marshall(profile, destFilename, true);
   } // method certprofileFixedPartialSubject
-
-  private static void certprofileAppleWwdr(String destFilename) {
-    X509ProfileType profile = getBaseProfile("certprofile apple WWDR", CertLevel.EndEntity, "395d");
-
-    // Subject
-    profile.getSubject().setKeepRdnOrder(true);
-    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn(DN.OU), rdn(DN.CN), rdn(DN.UID));
-
-    // Extensions
-    List<ExtensionType> list = profile.getExtensions();
-
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
-    // Extensions - basicConstraints
-    list.add(createExtension(Extension.basicConstraints, true, true));
-    // Extensions - AuthorityKeyIdentifier
-    list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-
-    list.add(createExtension(Extension.cRLDistributionPoints, true, false));
-
-    // Extensions - CeritifcatePolicies
-    // Certificate Policies
-    list.add(createExtension(Extension.certificatePolicies, true, false));
-    CertificatePolicies extValue = new CertificatePolicies();
-    last(list).setCertificatePolicies(extValue);
-
-    List<CertificatePolicyInformationType> pis = extValue.getCertificatePolicyInformations();
-    CertificatePolicyInformationType single = new CertificatePolicyInformationType();
-    pis.add(single);
-    single.setPolicyIdentifier(createOidType(new ASN1ObjectIdentifier("1.2.840.113635.100.5.1")));
-    List<PolicyQualifier> qualifiers = new ArrayList<>(1);
-    single.setPolicyQualifiers(qualifiers);
-
-    PolicyQualifier qualifier = new PolicyQualifier();
-    qualifiers.add(qualifier);
-    qualifier.setType(PolicyQualfierType.userNotice);
-    qualifier.setValue("Reliance on this certificate by any party assumes acceptance of the then "
-        + "applicable standard terms and conditions of use, certificate policy and certification practice statements.");
-
-    qualifier = new PolicyQualifier();
-    qualifiers.add(qualifier);
-    qualifier.setType(PolicyQualfierType.cpsUri);
-    qualifier.setValue("http://www.apple.com/certificateauthority");
-
-    // Extensions - keyUsage
-    list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.digitalSignature}, null));
-
-    // Extensions - extenedKeyUsage
-    list.add(createExtension(Extension.extendedKeyUsage, true, false));
-    last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}, null));
-
-    // apple custom extension 1.2.840.113635.100.6.3.1
-    list.add(createConstantExtension(new ASN1ObjectIdentifier("1.2.840.113635.100.6.3.1"),
-            true, false, null, FieldType.NULL, null));
-
-    // apple custom extension 1.2.840.113635.100.6.3.2
-    list.add(createConstantExtension(new ASN1ObjectIdentifier("1.2.840.113635.100.6.3.2"),
-        true, false, null, FieldType.NULL, null));
-
-    // apple custom extension 1.2.840.113635.100.6.3.6
-    list.add(createExtension(new ASN1ObjectIdentifier("1.2.840.113635.100.6.3.6"), true, false));
-    ExtnSyntax syntax = new ExtnSyntax(FieldType.SEQUENCE);
-    last(list).setSyntax(syntax);
-    last(list).setInRequest(TripleState.required);
-
-    /*
-     *  1. SEQUENCE or SET {
-     *  2.    UTF8String # abc.def.myBlog EXPLICIT
-     *  3.    SEQUENCE
-     *  4.      UTF8String  # app
-     *  5.    UTF8String  # abc.def.myBlog.voip EXPLICIT
-     *  6.    SEQUENCE EXPLICIT
-     *  7.      UTF8String  # voip
-     *  8.    UTF8String  # abc.def.myBlog.complication IMPLICIT
-     *  9.    SEQUENCE IMPLICIT
-     * 10.      UTF8String  # complication
-     * 11. }
-     */
-    List<SubFieldSyntax> subFields = new LinkedList<>();
-    // Line 2
-    SubFieldSyntax subField = new SubFieldSyntax(FieldType.UTF8String);
-    subFields.add(subField);
-    subField.setRequired(true);
-
-    // Line 3-4
-    subField = new SubFieldSyntax(FieldType.SEQUENCE);
-    subFields.add(subField);
-    subField.setRequired(true);
-
-    SubFieldSyntax subsubField = new SubFieldSyntax(FieldType.UTF8String);
-    subsubField.setRequired(true);
-    subField.setSubFields(Collections.singletonList(subsubField));
-
-    // Line 5
-    subField = new SubFieldSyntax(FieldType.UTF8String);
-    subField.setRequired(true);
-    subFields.add(subField);
-
-    // Line 6-7
-    subField = new SubFieldSyntax(FieldType.SEQUENCE);
-    subFields.add(subField);
-
-    subField.setRequired(true);
-    subsubField = new SubFieldSyntax(FieldType.UTF8String);
-    subsubField.setRequired(true);
-    subField.setSubFields(Collections.singletonList(subsubField));
-
-    // Line 8
-    subField = new SubFieldSyntax(FieldType.UTF8String);
-    subFields.add(subField);
-    subField.setRequired(true);
-
-    // Line 9-10
-    subField = new SubFieldSyntax(FieldType.SEQUENCE);
-    subFields.add(subField);
-
-    subField.setRequired(true);
-    subsubField = new SubFieldSyntax(FieldType.UTF8String);
-    subsubField.setRequired(true);
-    subField.setSubFields(Collections.singletonList(subsubField));
-
-    syntax.setSubFields(subFields);
-
-    marshall(profile, destFilename, true);
-  } // method certprofileAppleWwdr
 
   private static void certprofileExtended(String destFilename) {
     X509ProfileType profile = getBaseProfile("certprofile extended", CertLevel.EndEntity, "5y");

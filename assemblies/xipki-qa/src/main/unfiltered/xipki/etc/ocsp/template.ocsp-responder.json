@@ -97,6 +97,9 @@
 		"type":"REPLACEME-TOKENTYPE",
 		"algorithms":["REPLACEME-SIGALGO"],
 		"caCerts":[],
+		"cert": {
+			"file":"keycerts/ocsp.crt"
+		},
 		"key":"REPLACEME-TOKENKEY"
 	}],
 	"stores":[{

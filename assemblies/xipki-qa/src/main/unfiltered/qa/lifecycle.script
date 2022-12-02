@@ -258,6 +258,9 @@ if { $printUsage equals "true" } then {
     xipki/etc/ocsp/ocsp-responder.json \
     ${OCSP_XIPKI_DIR}/etc/ocsp/ocsp-responder.json
 
+  xi:copy-file -f output/ocsp99.crt \
+      ${OCSP_XIPKI_DIR}/keycerts/ocsp.crt
+
   if { "$TOKEN_TYPE" equals "pkcs12" } then {
     xi:copy-file -f output/ocsp99.p12 \
       ${OCSP_XIPKI_DIR}/keycerts/ocsp99.p12

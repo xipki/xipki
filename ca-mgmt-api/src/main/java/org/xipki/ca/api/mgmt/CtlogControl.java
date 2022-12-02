@@ -83,9 +83,9 @@ public class CtlogControl {
 
     ConfPairs pairs = new ConfPairs();
     this.enabled = enabled != null && enabled;
-    pairs.putPair(KEY_ENABLED, Boolean.toString(this.enabled));
+    pairs.putPair(KEY_ENABLED, Boolean.toString(this.enabled))
+        .putPair(KEY_SERVERS, StringUtil.collectionAsString(servers, ";"));
 
-    pairs.putPair(KEY_SERVERS, StringUtil.collectionAsString(servers, ";"));
     this.servers = servers;
 
     this.sslContextName = sslContextName;

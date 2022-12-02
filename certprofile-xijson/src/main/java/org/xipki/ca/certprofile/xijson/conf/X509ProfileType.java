@@ -387,31 +387,6 @@ public class X509ProfileType extends ValidatableConf {
     return Collections.unmodifiableMap(map);
   } // buildConstantExtesions
 
-  public Map<ASN1ObjectIdentifier, ExtnSyntax> buildExtesionsWithSyntax() {
-    Map<ASN1ObjectIdentifier, ExtnSyntax> map = new HashMap<>();
-
-    for (ExtensionType m : getExtensions()) {
-      ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getOid());
-      if (Extension.subjectAlternativeName.equals(oid)
-          || Extension.subjectInfoAccess.equals(oid)
-          || Extension.biometricInfo.equals(oid)) {
-        continue;
-      }
-
-      if (m.getSyntax() == null) {
-        continue;
-      }
-
-      map.put(oid, m.getSyntax());
-    }
-
-    if (CollectionUtil.isEmpty(map)) {
-      return null;
-    }
-
-    return Collections.unmodifiableMap(map);
-  } // buildExtesionsWithSyntax
-
   public Map<ASN1ObjectIdentifier, ExtensionControl> buildExtensionControls() throws CertprofileException {
     // Extension controls
     Map<ASN1ObjectIdentifier, ExtensionControl> controls = new HashMap<>();
@@ -428,10 +403,6 @@ public class X509ProfileType extends ValidatableConf {
 
       if (inReq != TripleState.forbidden && extn.getConstant() != null) {
         throw new CertprofileException("constant Extension is not permitted in request");
-      }
-
-      if (inReq == TripleState.forbidden && extn.getSyntax() != null) {
-        throw new CertprofileException("Extension with syntax must be permitted in request");
       }
 
       controls.put(oid, new ExtensionControl(extn.critical(), extn.required(), inReq));

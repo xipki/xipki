@@ -17,10 +17,8 @@
 
 package org.xipki.ca.certprofile.test;
 
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.ca.certprofile.xijson.DirectoryStringType;
 import org.xipki.ca.certprofile.xijson.conf.*;
@@ -31,7 +29,6 @@ import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.PolicyQualifier;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableBinary;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax.SubFieldSyntax;
 import org.xipki.ca.certprofile.xijson.conf.PolicyMappings.PolicyIdMappingType;
 import org.xipki.ca.certprofile.xijson.conf.QcStatements.*;
 import org.xipki.ca.certprofile.xijson.conf.SmimeCapabilities.SmimeCapability;
@@ -40,9 +37,6 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.TlsExtensionType;
-import org.xipki.security.X509ExtensionType.ConstantExtnValue;
-import org.xipki.security.X509ExtensionType.FieldType;
-import org.xipki.security.X509ExtensionType.Tag;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
@@ -77,325 +71,43 @@ public class ExtensionConfBuilder {
         Extension.keyUsage, Extension.extendedKeyUsage, Extension.qCStatements);
   } // method static
 
-  public static List<ConstantExtnValue> createConstantSequenceOrSet() {
-    /*
-     *  1. SEQUENCE or SET {
-     *  2.       UTF8String abc.def.myBlog EXPLICIT
-     *  3.       SEQUENCE
-     *  4.         UTF8String app
-     *  5.   [0] UTF8String abc.def.myBlog.voip EXPLICIT
-     *  6.   [1] SEQUENCE EXPLICIT
-     *  7.         UTF8String voip
-     *  8.   [2] UTF8String abc.def.myBlog.complication IMPLICIT
-     *  9.   [3] SEQUENCE IMPLICIT
-     * 10.         UTF8String complication
-     * 11. }
-     */
-    List<ConstantExtnValue> subFields = new LinkedList<>();
-    // Line 2
-    ConstantExtnValue subField = new ConstantExtnValue(FieldType.UTF8String);
-    subFields.add(subField);
-    subField.setValue("abc.def.myBlog");
-
-    // Line 3-4
-    subField = new ConstantExtnValue(FieldType.SEQUENCE);
-    subFields.add(subField);
-    ConstantExtnValue subsubField = new ConstantExtnValue(FieldType.UTF8String);
-    subsubField.setValue("app");
-    subField.setListValue(Collections.singletonList(subsubField));
-
-    // Line 5
-    subField = new ConstantExtnValue(FieldType.UTF8String);
-    subFields.add(subField);
-    subField.setTag(new Tag(0, true));
-    subField.setValue("abc.def.myBlog.voip");
-
-    // Line 6-7
-    subField = new ConstantExtnValue(FieldType.SEQUENCE);
-    subFields.add(subField);
-    subField.setTag(new Tag(1, true));
-    subsubField = new ConstantExtnValue(FieldType.UTF8String);
-    subsubField.setValue("void");
-    subField.setListValue(Collections.singletonList(subsubField));
-
-    // Line 8
-    subField = new ConstantExtnValue(FieldType.UTF8String);
-    subFields.add(subField);
-    subField.setTag(new Tag(2, false));
-    subField.setValue("abc.def.myBlog.complication");
-
-    // Line 9-10
-    subField = new ConstantExtnValue(FieldType.SEQUENCE);
-    subFields.add(subField);
-    subField.setTag(new Tag(9, false));
-    subsubField = new ConstantExtnValue(FieldType.UTF8String);
-    subsubField.setValue("complication");
-    subField.setListValue(Collections.singletonList(subsubField));
-
-    return subFields;
-  } // method createConstantSequenceOrSet
-
-  public static List<SubFieldSyntax> createSyntaxSequenceOrSet() {
-    /*
-     *  1. SEQUENCE or SET {
-     *  2.       UTF8String # abc.def.myBlog EXPLICIT
-     *  3.       SEQUENCE
-     *  4.         UTF8String  # app
-     *  5.   [0] UTF8String  # abc.def.myBlog.voip EXPLICIT
-     *  6.   [1] SEQUENCE EXPLICIT
-     *  7.         UTF8String  # voip
-     *  8.   [2] UTF8String  # abc.def.myBlog.complication IMPLICIT
-     *  9.   [3] SEQUENCE IMPLICIT
-     * 10.         UTF8String  # complication
-     * 11. }
-     */
-    List<SubFieldSyntax> subFields = new LinkedList<>();
-    // Line 2
-    SubFieldSyntax subField = new SubFieldSyntax(FieldType.UTF8String);
-    subFields.add(subField);
-
-    // Line 3-4
-    subField = new SubFieldSyntax(FieldType.SEQUENCE);
-    subFields.add(subField);
-    SubFieldSyntax subsubField = new SubFieldSyntax(FieldType.UTF8String);
-    subField.setSubFields(Collections.singletonList(subsubField));
-
-    // Line 5
-    subField = new SubFieldSyntax(FieldType.UTF8String);
-    subFields.add(subField);
-    subField.setTag(new Tag(0, true));
-
-    // Line 6-7
-    subField = new SubFieldSyntax(FieldType.SEQUENCE);
-    subFields.add(subField);
-    subField.setTag(new Tag(1, true));
-    subsubField = new SubFieldSyntax(FieldType.UTF8String);
-    subField.setSubFields(Collections.singletonList(subsubField));
-
-    // Line 8
-    subField = new SubFieldSyntax(FieldType.UTF8String);
-    subFields.add(subField);
-    subField.setTag(new Tag(2, false));
-
-    // Line 9-10
-    subField = new SubFieldSyntax(FieldType.SEQUENCE);
-    subFields.add(subField);
-    subField.setTag(new Tag(9, false));
-    subsubField = new SubFieldSyntax(FieldType.UTF8String);
-    subField.setSubFields(Collections.singletonList(subsubField));
-
-    return subFields;
-  } // method createSyntaxSequenceOrSet
-
-  public static List<ConstantExtnValue> createConstantSequenceOfOrSetOf() {
-    /*
-     *  1. SEQUENCE or SET {
-     *  3.   SEQUENCE
-     *  3.     UTF8String abc.def.myBlog
-     *  4.     UTF8String app
-     *  5.   SEQUENCE
-     *  6.       UTF8String abc.def.myBlog.voip
-     *  7.       UTF8String voip
-     *  8.   SEQUENCE
-     *  9.     UTF8String abc.def.myBlog.complication
-     * 10.     UTF8String complication
-     * 11. }
-     */
-    List<ConstantExtnValue> subFields = new LinkedList<>();
-
-    // Line 2-4
-    {
-      ConstantExtnValue subField = new ConstantExtnValue(FieldType.SEQUENCE);
-      subFields.add(subField);
-
-      List<ConstantExtnValue> subsubFields = new LinkedList<>();
-      subField.setListValue(subsubFields);
-
-      ConstantExtnValue subsubField = new ConstantExtnValue(FieldType.UTF8String);
-      subsubField.setValue("abc.def.myBlog");
-      subsubFields.add(subsubField);
-
-      subsubField = new ConstantExtnValue(FieldType.UTF8String);
-      subsubField.setValue("app");
-      subsubFields.add(subsubField);
-    }
-
-    // Line 5-7
-    {
-      ConstantExtnValue subField = new ConstantExtnValue(FieldType.SEQUENCE);
-      subFields.add(subField);
-
-      List<ConstantExtnValue> subsubFields = new LinkedList<>();
-      subField.setListValue(subsubFields);
-
-      ConstantExtnValue subsubField = new ConstantExtnValue(FieldType.UTF8String);
-      subsubField.setValue("abc.def.myBlog.voip");
-      subsubFields.add(subsubField);
-
-      subsubField = new ConstantExtnValue(FieldType.UTF8String);
-      subsubField.setValue("voip");
-      subsubFields.add(subsubField);
-    }
-
-    // Line 5-7
-    {
-      ConstantExtnValue subField = new ConstantExtnValue(FieldType.SEQUENCE);
-      subFields.add(subField);
-
-      List<ConstantExtnValue> subsubFields = new LinkedList<>();
-      subField.setListValue(subsubFields);
-
-      ConstantExtnValue subsubField = new ConstantExtnValue(FieldType.UTF8String);
-      subsubField.setValue("abc.def.myBlog.complication");
-      subsubFields.add(subsubField);
-
-      subsubField = new ConstantExtnValue(FieldType.UTF8String);
-      subsubField.setValue("complication");
-      subsubFields.add(subsubField);
-    }
-
-    return subFields;
-  } // method createConstantSequenceOfOrSetOf
-
-  public static List<SubFieldSyntax> createSyntaxSequenceOfOrSetOf() {
-    /*
-     *  1. SEQUENCE OF or SET OF{
-     *  3.   SEQUENCE
-     *  3.     UTF8String
-     *  4.     UTF8String
-     *  5. }
-     */
-    List<SubFieldSyntax> subFields = new LinkedList<>();
-
-    // Line 2-4
-    SubFieldSyntax subField = new SubFieldSyntax(FieldType.SEQUENCE);
-    subFields.add(subField);
-
-    List<SubFieldSyntax> subsubFields = new LinkedList<>();
-    subField.setSubFields(subsubFields);
-
-    SubFieldSyntax subsubField = new SubFieldSyntax(FieldType.UTF8String);
-    subsubFields.add(subsubField);
-
-    subsubField = new SubFieldSyntax(FieldType.UTF8String);
-    subsubFields.add(subsubField);
-
-    return subFields;
-  } // method createSyntaxSequenceOfOrSetOf
-
-  public static List<ExtensionType> createConstantExtensions(ASN1ObjectIdentifier oidPrefix, Tag tag)
-      throws IOException {
+  public static List<ExtensionType> createConstantExtensions(ASN1ObjectIdentifier oidPrefix) {
     List<ExtensionType> list = new LinkedList<>();
 
     // Custom Constant Extension Value
-    list.add(createConstantExtension(oidPrefix.branch("1"), true, false, tag,
-        FieldType.BIT_STRING, Base64.encodeToString(new byte[] {1, 2})));
-    list.add(createConstantExtension(oidPrefix.branch("2"), true, false, tag,
-        FieldType.BMPString, "A BMP string"));
-    list.add(createConstantExtension(oidPrefix.branch("3"), true, false, tag,
-        FieldType.BOOLEAN, Boolean.TRUE.toString()));
-    list.add(createConstantExtension(oidPrefix.branch("4"), true, false, tag,
-        FieldType.IA5String, "An IA5 string"));
-    list.add(createConstantExtension(oidPrefix.branch("5"), true, false, tag,
-        FieldType.INTEGER, "10"));
-    list.add(createConstantExtension(oidPrefix.branch("6"), true, false, tag,
-        FieldType.NULL, null));
-    list.add(createConstantExtension(oidPrefix.branch("7"), true, false, tag,
-        FieldType.OCTET_STRING, Base64.encodeToString(new byte[] {3, 4})));
-    list.add(createConstantExtension(oidPrefix.branch("8"), true, false, tag,
-        FieldType.OID, "2.3.4.5"));
-    list.add(createConstantExtension(oidPrefix.branch("9"), true, false, tag,
-        FieldType.PrintableString, "A printable string"));
-    list.add(createConstantExtension(oidPrefix.branch("10"), true, false, tag,
-        FieldType.RAW, Base64.encodeToString(DERNull.INSTANCE.getEncoded())));
-    last(list).getConstant().setDescription("DER NULL");
-
-    list.add(createConstantExtension(oidPrefix.branch("11"), true, false, tag,
-        FieldType.TeletexString, "A teletax string"));
-    list.add(createConstantExtension(oidPrefix.branch("12"), true, false, tag,
-        FieldType.UTF8String, "A UTF8 string"));
-    list.add(createConstantExtension(oidPrefix.branch("13"), true, false, tag,
-        FieldType.ENUMERATED, "2"));
-    list.add(createConstantExtension(oidPrefix.branch("14"), true, false, tag,
-        FieldType.GeneralizedTime, new ASN1GeneralizedTime("20180314130102Z").getTimeString()));
-    list.add(createConstantExtension(oidPrefix.branch("15"), true, false, tag,
-        FieldType.UTCTime, "190314130102Z"));
-    list.add(createConstantExtension(oidPrefix.branch("16"), true, false, tag,
-        FieldType.Name, "CN=abc,C=DE"));
-
-    list.add(createConstantExtension(oidPrefix.branch("17"), true, false, tag,
-        FieldType.SEQUENCE, null));
-    last(list).getConstant().setListValue(createConstantSequenceOrSet());
-
-    list.add(createConstantExtension(oidPrefix.branch("18"), true, false, tag,
-        FieldType.SEQUENCE_OF, null));
-    last(list).getConstant().setListValue(createConstantSequenceOfOrSetOf());
-
-    list.add(createConstantExtension(oidPrefix.branch("19"), true, false, tag,
-        FieldType.SET, null));
-    last(list).getConstant().setListValue(createConstantSequenceOrSet());
-
-    list.add(createConstantExtension(oidPrefix.branch("20"), true, false, tag,
-        FieldType.SET_OF, null));
-    last(list).getConstant().setListValue(createConstantSequenceOfOrSetOf());
+    list.add(createConstantExtension(oidPrefix.branch("1"), true, false,
+        new DERBitString(new byte[] {1, 2})));
+    list.add(createConstantExtension(oidPrefix.branch("2"), true, false,
+        new DERBMPString("A BMP string")));
+    list.add(createConstantExtension(oidPrefix.branch("3"), true, false,
+        ASN1Boolean.TRUE));
+    list.add(createConstantExtension(oidPrefix.branch("4"), true, false,
+        new DERIA5String("An IA5 string")));
+    list.add(createConstantExtension(oidPrefix.branch("5"), true, false,
+        new ASN1Integer(BigInteger.valueOf(10))));
+    list.add(createConstantExtension(oidPrefix.branch("6"), true, false,
+        DERNull.INSTANCE));
+    list.add(createConstantExtension(oidPrefix.branch("7"), true, false,
+        new DEROctetString(new byte[] {3, 4})));
+    list.add(createConstantExtension(oidPrefix.branch("8"), true, false,
+        new ASN1ObjectIdentifier("2.3.4.5")));
+    list.add(createConstantExtension(oidPrefix.branch("9"), true, false,
+        new DERPrintableString("A printable string")));
+    list.add(createConstantExtension(oidPrefix.branch("11"), true, false,
+       new DERT61String("A teletax string")));
+    list.add(createConstantExtension(oidPrefix.branch("12"), true, false,
+        new DERUTF8String("A UTF8 string")));
+    list.add(createConstantExtension(oidPrefix.branch("13"), true, false,
+        new ASN1Enumerated(2)));
+    list.add(createConstantExtension(oidPrefix.branch("14"), true, false,
+        new ASN1GeneralizedTime(new Date())));
+    list.add(createConstantExtension(oidPrefix.branch("15"), true, false,
+        new DERUTCTime(new Date())));
+    list.add(createConstantExtension(oidPrefix.branch("16"), true, false,
+        new X500Name("CN=abc,C=DE")));
 
     return list;
   } // method createConstantExtensions
-
-  public static List<ExtensionType> createSyntaxExtensions(ASN1ObjectIdentifier oidPrefix, Tag tag) {
-    List<ExtensionType> list = new LinkedList<>();
-    // Custom extension with syntax
-    list.add(createSyntaxExtension(oidPrefix.branch("1"), true, false, tag,
-        FieldType.BIT_STRING));
-    list.add(createSyntaxExtension(oidPrefix.branch("2"), true, false, tag,
-        FieldType.BMPString));
-    list.add(createSyntaxExtension(oidPrefix.branch("3"), true, false, tag,
-        FieldType.BOOLEAN));
-    list.add(createSyntaxExtension(oidPrefix.branch("4"), true, false, tag,
-        FieldType.IA5String));
-    list.add(createSyntaxExtension(oidPrefix.branch("5"), true, false, tag,
-        FieldType.INTEGER));
-    list.add(createSyntaxExtension(oidPrefix.branch("6"), true, false, tag,
-        FieldType.NULL));
-    list.add(createSyntaxExtension(oidPrefix.branch("7"), true, false, tag,
-        FieldType.OCTET_STRING));
-    list.add(createSyntaxExtension(oidPrefix.branch("8"), true, false, tag,
-        FieldType.OID));
-    list.add(createSyntaxExtension(oidPrefix.branch("9"), true, false, tag,
-        FieldType.PrintableString));
-    list.add(createSyntaxExtension(oidPrefix.branch("10"), true, false, tag,
-        FieldType.RAW));
-    list.add(createSyntaxExtension(oidPrefix.branch("11"), true, false, tag,
-        FieldType.TeletexString));
-    list.add(createSyntaxExtension(oidPrefix.branch("12"), true, false, tag,
-        FieldType.UTF8String));
-    list.add(createSyntaxExtension(oidPrefix.branch("13"), true, false, tag,
-        FieldType.ENUMERATED));
-    list.add(createSyntaxExtension(oidPrefix.branch("14"), true, false, tag,
-        FieldType.GeneralizedTime));
-    list.add(createSyntaxExtension(oidPrefix.branch("15"), true, false, tag,
-        FieldType.UTCTime));
-    list.add(createSyntaxExtension(oidPrefix.branch("16"), true, false, tag,
-        FieldType.Name));
-
-    list.add(createSyntaxExtension(oidPrefix.branch("17"), true, false, tag,
-        FieldType.SEQUENCE));
-    last(list).getSyntax().setSubFields(createSyntaxSequenceOrSet());
-
-    list.add(createSyntaxExtension(oidPrefix.branch("18"), true, false, tag,
-        FieldType.SEQUENCE_OF));
-    last(list).getSyntax().setSubFields(createSyntaxSequenceOfOrSetOf());
-
-    list.add(createSyntaxExtension(oidPrefix.branch("19"), true, false, tag,
-        FieldType.SET));
-    last(list).getSyntax().setSubFields(createSyntaxSequenceOrSet());
-
-    list.add(createSyntaxExtension(oidPrefix.branch("20"), true, false, tag,
-        FieldType.SET_OF));
-    last(list).getSyntax().setSubFields(createSyntaxSequenceOfOrSetOf());
-
-    return list;
-  } // method createSyntaxExtensions
 
   public static ExtensionType createExtension(ASN1ObjectIdentifier type, boolean required, boolean critical) {
     return createExtension(type, required, critical, null);
@@ -420,54 +132,23 @@ public class ExtensionConfBuilder {
   }
 
   public static ExtensionType createConstantExtension(
-      ASN1ObjectIdentifier type, boolean required, boolean critical, Tag tag, FieldType fieldType, String value) {
+      ASN1ObjectIdentifier type, boolean required, boolean critical, ASN1Object value) {
     ExtensionType ret = new ExtensionType();
     // attributes
     ret.setRequired(required);
-    // children
-    String desc = "custom constant extension " + fieldType.getText();
-    if (tag != null) {
-      desc += " (" + tag.getValue() + ", " + (tag.isExplicit() ? "EXPLICIT)" : "IMPLICIT)");
-    }
-    ret.setType(createOidType(type, desc));
+    ret.setType(createOidType(type, value.getClass().getSimpleName()));
     ret.setCritical(critical);
 
-    ConstantExtnValue constantExtn = new ConstantExtnValue(fieldType);
+    ConstantExtnValue constantExtn = new ConstantExtnValue();
     ret.setConstant(constantExtn);
-    if (value != null) {
-      constantExtn.setValue(value);
-    }
-
-    if (tag != null) {
-      constantExtn.setTag(tag);
+    try {
+      constantExtn.setValue(value.getEncoded());
+    } catch (IOException ex) {
+      throw new RuntimeException(ex);
     }
 
     return ret;
   } // method createConstantExtension
-
-  public static ExtensionType createSyntaxExtension(
-      ASN1ObjectIdentifier type, boolean required, boolean critical, Tag tag, FieldType fieldType) {
-    ExtensionType ret = new ExtensionType();
-    // attributes
-    ret.setRequired(required);
-    ret.setInRequest(TripleState.required);
-    // children
-    String desc = "custom syntax extension " + fieldType.getText();
-    if (tag != null) {
-      desc += " (" + tag.getValue() + ", " + (tag.isExplicit() ? "EXPLICIT)" : "IMPLICIT)");
-    }
-    ret.setType(createOidType(type, desc));
-    ret.setCritical(critical);
-
-    ExtnSyntax extnSyntax = new ExtnSyntax(fieldType);
-    if (tag != null) {
-      extnSyntax.setTag(tag);
-    }
-
-    ret.setSyntax(extnSyntax);
-
-    return ret;
-  } // method createSyntaxExtension
 
   public static KeyUsage createKeyUsage(
       org.xipki.security.KeyUsage[] requiredUsages, org.xipki.security.KeyUsage[] optionalUsages) {

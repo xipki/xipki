@@ -115,11 +115,10 @@ public class RevokeSuspendedControl {
   }
 
   public ConfPairs getConfPairs() {
-    ConfPairs pairs = new ConfPairs();
-    pairs.putPair(KEY_ENABLED, Boolean.toString(enabled));
-    pairs.putPair(KEY_REVOCATION_REASON, targetReason.getDescription());
-    pairs.putPair(KEY_UNCHANGED_SINCE, unchangedSince.toString());
-    return pairs;
+    return new ConfPairs()
+        .putPair(KEY_ENABLED, Boolean.toString(enabled))
+        .putPair(KEY_REVOCATION_REASON, targetReason.getDescription())
+        .putPair(KEY_UNCHANGED_SINCE, unchangedSince.toString());
   }
 
   @Override

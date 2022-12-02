@@ -229,9 +229,9 @@ public class UpdateCertActions {
           }
         }
 
-        ConfPairs conf = new ConfPairs("password", password);
-        conf.putPair("parallelism", Integer.toString(1));
-        conf.putPair("keystore", "file:" + p12File);
+        ConfPairs conf = new ConfPairs("password", password)
+            .putPair("parallelism", Integer.toString(1))
+            .putPair("keystore", "file:" + p12File);
         SignerConf signerConf = new SignerConf(conf.getEncoded(), getHashAlgo(hashAlgo), getSignatureAlgoControl());
         signer = securityFactory.createSigner("PKCS12", signerConf, (X509Cert[]) null);
       }

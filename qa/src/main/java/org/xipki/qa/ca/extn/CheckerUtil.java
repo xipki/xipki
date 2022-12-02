@@ -23,7 +23,6 @@ import org.bouncycastle.asn1.x509.*;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameMode;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
-import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax;
 import org.xipki.security.KeyUsage;
 import org.xipki.util.Hex;
 import org.xipki.util.exception.BadCertTemplateException;
@@ -88,27 +87,6 @@ public class CheckerUtil {
 
     return Collections.unmodifiableMap(map);
   } // method buildConstantExtesions
-
-  static Map<ASN1ObjectIdentifier, ExtnSyntax> buildExtesionSyntaxes(Map<String, ExtensionType> extensions) {
-    if (extensions == null) {
-      return null;
-    }
-
-    Map<ASN1ObjectIdentifier, ExtnSyntax> map = new HashMap<>();
-
-    for (Entry<String, ExtensionType> entry : extensions.entrySet()) {
-      ExtensionType extn = entry.getValue();
-      if (extn.getSyntax() != null) {
-        map.put(extn.getType().toXiOid(), extn.getSyntax());
-      }
-    }
-
-    if (isEmpty(map)) {
-      return null;
-    }
-
-    return Collections.unmodifiableMap(map);
-  } // method buildExtesionSyntaxes
 
   static ASN1Encodable readAsn1Encodable(byte[] encoded) throws CertprofileException {
     ASN1StreamParser parser = new ASN1StreamParser(encoded);
