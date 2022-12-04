@@ -595,7 +595,7 @@ class IaikP11Slot extends P11Slot {
     Session session;
     try {
       boolean rw = !isReadOnly();
-      session = slot.getToken().openSession(Token.SessionType.SERIAL_SESSION, rw, null, null);
+      session = slot.getToken().openSession(rw);
     } catch (TokenException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
@@ -1096,7 +1096,7 @@ class IaikP11Slot extends P11Slot {
     } catch (IOException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
-    publicKey.getEcdsaParams().setByteArrayValue(encodedCurveId);
+    publicKey.getEcParams().setByteArrayValue(encodedCurveId);
     return generateKeyPair(CKM_EC_EDWARDS_KEY_PAIR_GEN, control.getId(), privateKey, publicKey);
   } // method generateECEdwardsKeypair0
 
@@ -1113,7 +1113,7 @@ class IaikP11Slot extends P11Slot {
     ECPublicKey publicKey = new ECPublicKey(KeyType.EC_MONTGOMERY);
     setKeyAttributes(control, publicKey, privateKey, newObjectConf);
     try {
-      publicKey.getEcdsaParams().setByteArrayValue(curveId.getEncoded());
+      publicKey.getEcParams().setByteArrayValue(curveId.getEncoded());
     } catch (IOException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
@@ -1142,7 +1142,7 @@ class IaikP11Slot extends P11Slot {
 
     long mech = CKM_EC_KEY_PAIR_GEN;
     try {
-      publicKey.getEcdsaParams().setByteArrayValue(encodedCurveId);
+      publicKey.getEcParams().setByteArrayValue(encodedCurveId);
       return generateKeyPair(mech, control.getId(), privateKey, publicKey);
     } catch (P11TokenException ex) {
       X9ECParameters ecParams = ECNamedCurveTable.getByOID(curveId);
@@ -1151,7 +1151,7 @@ class IaikP11Slot extends P11Slot {
       }
 
       try {
-        publicKey.getEcdsaParams().setByteArrayValue(ecParams.getEncoded());
+        publicKey.getEcParams().setByteArrayValue(ecParams.getEncoded());
       } catch (IOException ex2) {
         throw new P11TokenException(ex2.getMessage(), ex2);
       }
@@ -1182,7 +1182,7 @@ class IaikP11Slot extends P11Slot {
     }
 
     try {
-      publicKeyTemplate.getEcdsaParams().setByteArrayValue(curveId.getEncoded());
+      publicKeyTemplate.getEcParams().setByteArrayValue(curveId.getEncoded());
     } catch (IOException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
@@ -1239,7 +1239,7 @@ class IaikP11Slot extends P11Slot {
     if (supportsMechanism(ckm)) {
       ECPrivateKey privateKey = ECPrivateKey.newSM2PrivateKey(slot.getModule());
       ECPublicKey publicKey = ECPublicKey.newSM2PublicKey(slot.getModule());
-      publicKey.getEcdsaParams().setByteArrayValue(Hex.decode("06082A811CCF5501822D"));
+      publicKey.getEcParams().setByteArrayValue(Hex.decode("06082A811CCF5501822D"));
       setKeyAttributes(control, publicKey, privateKey, newObjectConf);
 
       return generateKeyPair(ckm, control.getId(), privateKey, publicKey);

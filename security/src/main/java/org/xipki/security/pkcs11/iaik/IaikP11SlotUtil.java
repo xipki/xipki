@@ -267,7 +267,7 @@ class IaikP11SlotUtil {
     } else if (p11Key instanceof ECPublicKey) {
       ECPublicKey ecP11Key = (ECPublicKey) p11Key;
       long keyType = ecP11Key.getKeyType().getLongValue();
-      byte[] ecParameters = value(ecP11Key.getEcdsaParams());
+      byte[] ecParameters = value(ecP11Key.getEcParams());
       byte[] ecPoint = value(ecP11Key.getEcPoint());
 
       byte[] encodedPoint = null;
