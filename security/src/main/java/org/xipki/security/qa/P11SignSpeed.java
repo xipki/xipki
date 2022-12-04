@@ -218,7 +218,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
   } // class SM2
 
-  class Testor implements Runnable {
+  private class Testor implements Runnable {
 
     private static final int batch = 10;
 

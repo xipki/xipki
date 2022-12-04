@@ -100,19 +100,6 @@ public class QaCompleters {
   } // class HMACSigAlgCompleter
 
   @Service
-  public static class OccurrenceCompleter extends EnumCompleter {
-
-    public OccurrenceCompleter() {
-      List<String> enums = new LinkedList<>();
-      for (TripleState entry : TripleState.values()) {
-        enums.add(entry.name());
-      }
-      setTokens(enums);
-    }
-
-  } // class OccurrenceCompleter
-
-  @Service
   public static class RSASigAlgCompleter extends EnumCompleter {
 
     public RSASigAlgCompleter() {

@@ -37,7 +37,7 @@ import static org.xipki.util.Args.notBlank;
 
 public class JceSignSpeed extends BenchmarkExecutor {
 
-  class Testor implements Runnable {
+  private class Testor implements Runnable {
 
     private static final int batch = 10;
 

@@ -1096,7 +1096,12 @@ public abstract class P11Slot implements Closeable {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + keysize);
     }
 
-    assertMechanismSupported(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
+    if (supportsMechanism(PKCS11Constants.CKM_RSA_X9_31_KEY_PAIR_GEN)
+        || supportsMechanism(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN)) {
+      throw new P11UnsupportedMechanismException(
+          "None of CKM_RSA_X9_31_KEY_PAIR_GEN and CKM_RSA_PKCS_KEY_PAIR_GEN is supported");
+    }
+
     return generateRSAKeypairOtf0(keysize, publicExponent == null ? RSAKeyGenParameterSpec.F4 : publicExponent);
   }
 

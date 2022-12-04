@@ -104,6 +104,8 @@ class IaikP11Slot extends P11Slot {
 
   private final ConcurrentBag<ConcurrentBagEntry<Session>> sessions = new ConcurrentBag<>();
 
+  private final long rsaKeyPaiGenMech;
+
   private String libDesc;
 
   private boolean omitDateAttrsInCertObject;
@@ -192,6 +194,10 @@ class IaikP11Slot extends P11Slot {
 
       sessions.add(new ConcurrentBagEntry<>(session));
       refresh();
+
+      rsaKeyPaiGenMech = supportsMechanism(CKM_RSA_X9_31_KEY_PAIR_GEN)
+          ? CKM_RSA_X9_31_KEY_PAIR_GEN : CKM_RSA_PKCS_KEY_PAIR_GEN;
+
       successful = true;
     } finally {
       if (!successful) {
@@ -979,7 +985,7 @@ class IaikP11Slot extends P11Slot {
     publicKey.getModulusBits().setLongValue((long) keysize);
     publicKey.getPublicExponent().setByteArrayValue(publicExponent.toByteArray());
 
-    return generateKeyPair(CKM_RSA_PKCS_KEY_PAIR_GEN, control.getId(), privateKey, publicKey);
+    return generateKeyPair(rsaKeyPaiGenMech, control.getId(), privateKey, publicKey);
   } // method generateRSAKeypair0
 
   @Override
@@ -992,7 +998,7 @@ class IaikP11Slot extends P11Slot {
     RSAPrivateKey privateKeyTemplate = new RSAPrivateKey();
     setPrivateKeyAttrsOtf(privateKeyTemplate);
 
-    long mech = CKM_RSA_PKCS_KEY_PAIR_GEN;
+    long mech = rsaKeyPaiGenMech;
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
       Session session = bagEntry.value();

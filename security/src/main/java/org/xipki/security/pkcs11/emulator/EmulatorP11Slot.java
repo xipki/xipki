@@ -128,9 +128,9 @@ class EmulatorP11Slot extends P11Slot {
   private static final String PROP_EC_EC_POINT = "ecPoint";
 
   private static final long[] supportedMechs = new long[]{
-    CKM_DSA_KEY_PAIR_GEN,        CKM_RSA_PKCS_KEY_PAIR_GEN,      CKM_EC_KEY_PAIR_GEN,
+    CKM_DSA_KEY_PAIR_GEN, CKM_RSA_X9_31_KEY_PAIR_GEN, CKM_RSA_PKCS_KEY_PAIR_GEN, CKM_EC_KEY_PAIR_GEN,
     CKM_EC_EDWARDS_KEY_PAIR_GEN, CKM_EC_MONTGOMERY_KEY_PAIR_GEN, CKM_GENERIC_SECRET_KEY_GEN,
-      CKM_AES_KEY_GEN, CKM_DES3_KEY_GEN, CKM_GENERIC_SECRET_KEY_GEN,
+    CKM_AES_KEY_GEN, CKM_DES3_KEY_GEN, CKM_GENERIC_SECRET_KEY_GEN,
 
     // Digest
     CKM_SHA_1, CKM_SHA224, CKM_SHA256, CKM_SHA384, CKM_SHA512, CKM_SHA3_224, CKM_SHA3_256, CKM_SHA3_384, CKM_SHA3_512,
@@ -194,12 +194,7 @@ class EmulatorP11Slot extends P11Slot {
     this.newObjectConf = notNull(newObjectConf, "newObjectConf");
     this.slotDir = notNull(slotDir, "slotDir");
     this.keyCryptor = notNull(keyCryptor, "privateKeyCryptor");
-
-    if (numSessions != null) {
-      this.maxSessions = positive(numSessions, "numSessions");
-    } else {
-      this.maxSessions = 20;
-    }
+    this.maxSessions = numSessions == null ? 20 : positive(numSessions, "numSessions");
 
     this.privKeyDir = new File(slotDir, DIR_PRIV_KEY);
     if (!this.privKeyDir.exists()) {

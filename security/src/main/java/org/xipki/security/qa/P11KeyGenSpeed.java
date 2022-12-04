@@ -53,8 +53,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
     @Override
     protected void genKeypair() throws Exception {
-      P11IdentityId objId = slot.generateDSAKeypair(plength, qlength, getControl());
-      slot.removeIdentity(objId);
+      slot.removeIdentity(slot.generateDSAKeypair(plength, qlength, getControl()));
     }
 
   } // class DSA
@@ -70,8 +69,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
     @Override
     protected void genKeypair() throws Exception {
-      P11IdentityId objId = slot.generateECKeypair(curveOid, getControl());
-      slot.removeIdentity(objId);
+      slot.removeIdentity(slot.generateECKeypair(curveOid, getControl()));
     }
 
   } // class EC
@@ -91,8 +89,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
     @Override
     protected void genKeypair() throws Exception {
-      P11IdentityId objId = slot.generateRSAKeypair(keysize, publicExponent, getControl());
-      slot.removeIdentity(objId);
+      slot.removeIdentity(slot.generateRSAKeypair(keysize, publicExponent, getControl()));
     }
 
   } // class RSA
@@ -104,8 +101,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
     @Override
     protected void genKeypair() throws Exception {
-      P11IdentityId objId = slot.generateSM2Keypair(getControl());
-      slot.removeIdentity(objId);
+      slot.removeIdentity(slot.generateSM2Keypair(getControl()));
     }
 
   } // class SM2

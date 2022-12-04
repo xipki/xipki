@@ -97,7 +97,7 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
 
   } // class RSA
 
-  class Testor implements Runnable {
+  private class Testor implements Runnable {
 
     @Override
     public void run() {

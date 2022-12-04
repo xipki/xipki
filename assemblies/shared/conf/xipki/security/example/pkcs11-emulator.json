@@ -57,6 +57,7 @@
 	},{
 		"name":"standardMechanisms",
 		"mechanisms":[
+			"CKM_RSA_X9_31_KEY_PAIR_GEN",
 			"CKM_RSA_PKCS_KEY_PAIR_GEN",
 			"CKM_DSA_KEY_PAIR_GEN",
 			"CKM_EC_KEY_PAIR_GEN",
