@@ -24,7 +24,7 @@
 		"nativeLibraries":[
 			{
 				"operationSystems":[
-					"nix", "nux", "aix"
+					"nix", "nux", "aix", "mac"
 				],
 				"path":"/usr/local/lib/softhsm/libsofthsm2.so"
 			},

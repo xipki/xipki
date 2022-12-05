@@ -561,7 +561,11 @@ public class P11Actions {
 
         P11ObjectIdentifier objId = slot.importSecretKey(p11KeyType, keyValue, control);
         Arrays.fill(keyValue, (byte) 0); // clear the memory
-        println("generated in memory and imported " + keyType + " key " + objId);
+        String msg = "generated in memory and imported " + keyType + " key " + objId;
+        if (LOG.isInfoEnabled()) {
+          LOG.info(msg);
+        }
+        println(msg);
       }
 
       return null;
