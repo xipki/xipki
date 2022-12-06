@@ -91,7 +91,10 @@ public abstract class P11Slot implements Closeable {
 
     public void addIdentity(P11Identity identity) {
       notNull(identity, "identity");
-      this.identities.put(identity.getId().getKeyId(), identity);
+      P11Identity old = this.identities.put(identity.getId().getKeyId(), identity);
+      if (old != null) {
+        LOG.warn("duplicated P11Identity {}", identity.getId().getKeyId());
+      }
     }
 
     public void addMechanism(long mechanism) {
@@ -99,7 +102,10 @@ public abstract class P11Slot implements Closeable {
     }
 
     public void addCertificate(P11ObjectIdentifier objectId, X509Cert certificate) {
-      this.certificates.put(notNull(objectId, "objectId"), notNull(certificate, "certificate"));
+      X509Cert old = this.certificates.put(notNull(objectId, "objectId"), notNull(certificate, "certificate"));
+      if (old != null) {
+        LOG.warn("duplicated P11 certificate {}", objectId);
+      }
     }
 
     /**

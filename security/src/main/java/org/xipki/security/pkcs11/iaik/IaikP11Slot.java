@@ -416,7 +416,7 @@ class IaikP11Slot extends P11Slot {
       } else {
         if (privKey instanceof RSAPrivateKey) {
           RSAPrivateKey p11RsaSk = (RSAPrivateKey) privKey;
-          if (p11RsaSk.getPublicExponent() != null && p11RsaSk.getModulus() == null) {
+          if (p11RsaSk.getPublicExponent() != null && p11RsaSk.getModulus() != null) {
             pubKey = buildRSAKey(new BigInteger(1, value(p11RsaSk.getModulus())),
                 new BigInteger(1, value(p11RsaSk.getPublicExponent())));
           }
