@@ -1387,7 +1387,7 @@ class IaikP11Slot extends P11Slot {
       }
 
       if (setCertAttributes.contains(CKA_END_DATE)) {
-        newCertTemp.getStartDate().setDateValue(cert.getNotAfter());
+        newCertTemp.getEndDate().setDateValue(cert.getNotAfter());
       }
     }
 
