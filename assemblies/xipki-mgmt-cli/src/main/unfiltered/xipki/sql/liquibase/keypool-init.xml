@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ XiPKI version 5.4.0
+ Maximal column size: 4k
+  - DB2: PAGESIZE 4 k
+-->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+  logicalFilePath="keypool-init.xml">
+  <changeSet author="xipki" id="1">
+    <!-- table DBSCHEMA -->
+    <createTable tableName="DBSCHEMA" remarks="database schema information">
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="VALUE2" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="VENDOR"/>
+      <column name="VALUE2" value="XIPKI"/>
+    </insert>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="VERSION"/>
+      <column name="VALUE2" value="7"/>
+    </insert>
+    <!-- table ISSUER -->
+    <createTable tableName="KEYSPEC">
+      <column name="ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="KEYSPEC" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <createTable tableName="KEYPOOL">
+      <column name="ID" type="BIGINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="SHARD_ID" type="SMALLINT" remarks="Shard id, match the shard id of the CA software instance">
+        <constraints nullable="false"/>
+      </column>
+      <column name="KID" type="SMALLINT" remarks="KEYSPEC ID">
+        <constraints nullable="false"/>
+      </column>
+      <column name="ENC_ALG" type="SMALLINT" remarks="Encryption algorithm: 1 for AES128/GCM, 2 for AES192/GCM, 3 for AES256/GCM">
+        <constraints nullable="false"/>
+      </column>
+      <column name="ENC_META" type="VARCHAR(100)" remarks="For ENC_ALG 1, 2, 3: base64(nonce)">
+      </column>
+      <column name="DATA" type="VARCHAR(3300)" remarks="base64(encrypted PrivateKeyInfo)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+</databaseChangeLog>

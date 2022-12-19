@@ -38,7 +38,6 @@
     <pkcs11-wrapper.version>1.4.11-SNAPSHOT</pkcs11-wrapper.version>
     <hikaricp.version>4.0.3</hikaricp.version>
     <fastjson.version>1.2.83</fastjson.version>
-    <liquibase.version>4.15.0</liquibase.version>
     <zip4j.version>2.11.1</zip4j.version>
     <!-- only for runtime -->
     <tinylog.version>2.5.0</tinylog.version>
@@ -55,7 +54,6 @@
     <module>audit-extra</module>
     <module>license-api</module>
     <module>datasource</module>
-    <module>dbtool</module>
     <module>password</module>
     <module>security</module>
     <!-- PKI SDK/Client -->

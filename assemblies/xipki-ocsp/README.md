@@ -34,11 +34,11 @@ Deployment in Tomcat 8 and 9
 4. (Optional, required only when OCSP cache will be activated) 
    To activate the OCSP cache:
    1) Uncomment the `responseCache` block in the configuration file `ocsp-responder.json`;
-   2) In xipki-dbtool, call
-      `bin/initdb.sh --db-schema sql/ocsp-cache-init.xml --db-conf /path/to/ocsp-cache-db.json`.
+   2) In xipki-mgmt-cli, call
+      `ca:sql --db-conf /path/to/ocsp-cache-db.json xipki/sql/ocsp-cache-init.sql`.
 5. (Optional, required only when CRL is used as OCSPSore) 
-   1) In xipki-dbtool, call 
-      `bin/initdb.sh --db-schema sql/ocsp-init.xml --db-conf /path/to/ocsp-crl-db.json`.
+   1) In xipki-mgmt-cli, call 
+      `ca:sql --db-conf /path/to/ocsp-crl-db.json xipki/ocsp-init.sql`.
 6. Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
    to the file `conf/catalina.properties` if OCSP over HTTP GET support is activated.
 7. (optional) To accelerate the start process, append the following block to the property

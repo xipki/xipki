@@ -12,56 +12,26 @@ OS_NAME = $(osinfo --name)
 ## CA Database
 
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties"
-DB_SCHEMA = xipki/sql/ca-init.xml
-
-if { "${OS_NAME}" equals "windows" } then {
-  shell:exec dbtool\\bin\\initdb.bat --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-} else {
-  shell:exec dbtool/bin/initdb.sh --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-}
+ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
 
 ## OCSP Database
 
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties"
-DB_SCHEMA = xipki/sql/ocsp-init.xml
-
-if { "${OS_NAME}" equals "windows" } then {
-  shell:exec dbtool\\bin\\initdb.bat --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-} else {
-  shell:exec dbtool/bin/initdb.sh --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-}
+ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ocsp-init.sql
 
 ## OCSP Cache Database
 
 DB_CONF = "${OCSP_XIPKI_DIR}/etc/ocsp/database/ocsp-cache-db.properties"
-DB_SCHEMA = xipki/sql/ocsp-cache-init.xml
-
-if { "${OS_NAME}" equals "windows" } then {
-  shell:exec dbtool\\bin\\initdb.bat --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-} else {
-  shell:exec dbtool/bin/initdb.sh --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-}
+ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ocsp-cache-init.sql
 
 # OCSP CRL Database
 
 DB_CONF = "${OCSP_XIPKI_DIR}/etc/ocsp/database/ocsp-crl-db.properties"
-DB_SCHEMA = xipki/sql/ocsp-init.xml
-
-if { "${OS_NAME}" equals "windows" } then {
-  shell:exec dbtool\\bin\\initdb.bat --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-} else {
-  shell:exec dbtool/bin/initdb.sh --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-}
+ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ocsp-init.sql
 
 # KEYPOOL Database
 
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/keypool-db.properties"
-DB_SCHEMA = xipki/sql/keypool-init.xml
-
-if { "${OS_NAME}" equals "windows" } then {
-  shell:exec dbtool\\bin\\initdb.bat --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-} else {
-  shell:exec dbtool/bin/initdb.sh --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-}
+ca:sql --force --db-conf "${DB_CONF}" xipki/sql/keypool-init.sql
 
 qa:fill-keypool --db-conf "${DB_CONF}" --password CHANGEME

@@ -17,6 +17,7 @@
 
 package org.xipki.ca.mgmt.shell;
 
+import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -27,17 +28,27 @@ import org.xipki.ca.mgmt.db.DbWorker;
 import org.xipki.ca.mgmt.db.diffdb.DigestDiffWorker;
 import org.xipki.ca.mgmt.db.port.DbPortWorker;
 import org.xipki.datasource.DataSourceFactory;
+import org.xipki.datasource.tool.DatabaseConf;
+import org.xipki.datasource.tool.ScriptRunner;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.Completers;
+import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
 import org.xipki.util.Args;
+import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -89,6 +100,35 @@ public class DbActions {
     } // method execute0
 
   } // class DbAction
+
+  @Command(scope = "ca", name = "export-ca", description = "export CA database")
+  @Service
+  public static class ExportCa extends DbPortAction {
+
+    @Option(name = "--db-conf", required = true, description = "database configuration file")
+    @Completion(FileCompleter.class)
+    private String dbconfFile;
+
+    @Option(name = "--out-dir", required = true, description = "output directory")
+    @Completion(Completers.DirCompleter.class)
+    private String outdir;
+
+    @Option(name = "-n", description = "number of certificates in one zip file")
+    private Integer numCertsInBundle = 10000;
+
+    @Option(name = "-k", description = "number of certificates per SELECT")
+    private Integer numCertsPerCommit = 100;
+
+    @Option(name = "--resume", description = "resume from the last successful point")
+    private Boolean resume = Boolean.FALSE;
+
+    @Override
+    protected DbPortWorker getDbWorker() throws Exception {
+      return new DbPortWorker.ExportCaDb(datasourceFactory, passwordResolver, dbconfFile, outdir,
+          resume, numCertsInBundle, numCertsPerCommit, readPassword());
+    }
+
+  } // class ExportCa
 
   public abstract static class DbPortAction extends DbAction {
 
@@ -158,34 +198,64 @@ public class DbActions {
 
   } // class DiffDigest
 
-  @Command(scope = "ca", name = "export-ca", description = "export CA database")
+  @Command(scope = "ca", name = "sql", description = "Run SQL script")
   @Service
-  public static class ExportCa extends DbPortAction {
+  public static class Sql extends XiAction {
+
+    @Reference
+    private PasswordResolver passwordResolver;
 
     @Option(name = "--db-conf", required = true, description = "database configuration file")
     @Completion(FileCompleter.class)
-    private String dbconfFile;
+    private String dbConfFile;
 
-    @Option(name = "--out-dir", required = true, description = "output directory")
-    @Completion(Completers.DirCompleter.class)
-    private String outdir;
+    @Argument(name = "script", required = true, description = "SQL script file")
+    @Completion(FileCompleter.class)
+    private String scriptFile;
 
-    @Option(name = "-n", description = "number of certificates in one zip file")
-    private Integer numCertsInBundle = 10000;
-
-    @Option(name = "-k", description = "number of certificates per SELECT")
-    private Integer numCertsPerCommit = 100;
-
-    @Option(name = "--resume", description = "resume from the last successful point")
-    private Boolean resume = Boolean.FALSE;
+    @Option(name = "--force", aliases = "-f", description = "without prompt")
+    private Boolean force = Boolean.FALSE;
 
     @Override
-    protected DbPortWorker getDbWorker() throws Exception {
-      return new DbPortWorker.ExportCaDb(datasourceFactory, passwordResolver, dbconfFile, outdir,
-          resume, numCertsInBundle, numCertsPerCommit, readPassword());
+    protected Object execute0() throws Exception {
+      Properties props = new Properties();
+      try (InputStream is = Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile)))) {
+        props.load(is);
+      }
+
+      DatabaseConf dbConf = DatabaseConf.getInstance(props, passwordResolver);
+      scriptFile = expandFilepath(scriptFile);
+      Path p = Paths.get(scriptFile);
+      String derivedScriptFile = null;
+      if (!Files.exists(p,  new LinkOption[0])) {
+        if (!scriptFile.contains("." + dbConf.getType() + ".")) {
+          // script file does not exist, try script file with database type identifier
+          String fn = p.getFileName().toString();
+          int idx = fn.lastIndexOf('.');
+          fn = fn.substring(0, idx) + "." + dbConf.getType() + fn.substring(idx);
+          p = Paths.get(p.getParent().toString(), fn);
+          derivedScriptFile = p.toString();
+        }
+      }
+
+      if (!Files.exists(p, new LinkOption[0])) {
+        if (derivedScriptFile != null) {
+          throw new IllegalCmdParamException("Could not find script files " + scriptFile
+              + " and " + derivedScriptFile);
+        } else {
+          throw new IllegalCmdParamException("Could not find script file " + scriptFile);
+        }
+      }
+
+      if (force || confirm("Do you want to execute the SQL script?", 3)) {
+        System.out.println("Start executing script " + p.toString()) ;
+        ScriptRunner.runScript(dbConf, p.toString());
+        System.out.println("  End executing script " + p.toString()) ;
+      }
+      return null;
     }
 
-  } // class ExportCa
+  } // class Sql
 
   @Command(scope = "ca", name = "export-ocsp", description = "export OCSP database")
   @Service

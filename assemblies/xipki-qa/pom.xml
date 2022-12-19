@@ -15,7 +15,7 @@
     <app.name>QA</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <patchkaraf.repos>mvn:org.xipki.feature/qa/${project.version}/xml/features</patchkaraf.repos>
-    <patchkaraf.features>(-jaas,-ssh,-config,aries-blueprint,wrap),xipki-cmp-client,xipki-scep-client,xipki-ocsp-client,xipki-ca-mgmt,xipki-ocsp-mgmt,xipki-dbtool,xipki-qa</patchkaraf.features>
+    <patchkaraf.features>(-jaas,-ssh,-config,aries-blueprint,wrap),xipki-cmp-client,xipki-scep-client,xipki-ocsp-client,xipki-ca-mgmt,xipki-ocsp-mgmt,xipki-qa</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
@@ -70,6 +70,13 @@
         <excludes>
           <exclude>xipki/**</exclude>
         </excludes>
+      </resource>
+      <resource>
+        <directory>../xipki-mgmt-cli/src/main/unfiltered</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>xipki/sql/**</include>
+        </includes>
       </resource>
       <resource>
         <directory>../shared/karaf/filtered</directory>
@@ -173,33 +180,6 @@
             </configuration>
           </execution>
           <execution>
-            <!-- Extract the SQL scripts -->
-            <id>unpack-sql</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/classes/xipki</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>ca-server</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>sql/**</includes>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>ocsp-server</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>sql/**</includes>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
             <!-- Extract the TLS keys -->
             <id>unpack-tlskeys</id>
             <phase>generate-resources</phase>
@@ -260,9 +240,6 @@
             <phase>prepare-package</phase>
             <configuration>
               <target>
-                <unzip failOnEmptyArchive="true"
-                   src="../xipki-dbtool/target/xipki-dbtool-${project.version}.zip"
-                   dest="${project.build.directory}"/>
                 <unzip src="../xipki-ca/target/xipki-ca-${project.version}.zip"
                    dest="${project.build.directory}"/>
                 <unzip src="../xipki-ocsp/target/xipki-ocsp-${project.version}.zip"

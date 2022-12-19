@@ -14,7 +14,6 @@
   <packaging>pom</packaging>
   <modules>
     <module>features</module>
-    <module>xipki-dbtool</module>
     <module>xipki-cli</module>
     <module>xipki-mgmt-cli</module>
     <module>xipki-ocsp</module>

@@ -39,13 +39,7 @@ OS_NAME = $(osinfo --name)
 ## CA Database
 
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties"
-DB_SCHEMA = xipki/sql/ca-init.xml
-
-if { "${OS_NAME}" equals "windows" } then {
-  shell:exec dbtool\\bin\\initdb.bat --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-} else {
-  shell:exec dbtool/bin/initdb.sh --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-}
+ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
 
 ca:import-ca --in-dir output/dbexport/ca \
   --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties
@@ -59,13 +53,7 @@ echo "==========================================================================
 ## OCSP Database
 
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties"
-DB_SCHEMA = xipki/sql/ocsp-init.xml
-
-if { "${OS_NAME}" equals "windows" } then {
-  shell:exec dbtool\\bin\\initdb.bat --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-} else {
-  shell:exec dbtool/bin/initdb.sh --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-}
+ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ocsp-init.sql
 
 ca:import-ocsp --in-dir output/dbexport/ocsp \
   --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties
@@ -77,13 +65,7 @@ echo "||                        IMPORT OCSP DATABASE FROM CA                    
 echo "============================================================================"
 
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties"
-DB_SCHEMA = xipki/sql/ocsp-init.xml
-
-if { "${OS_NAME}" equals "windows" } then {
-  shell:exec dbtool\\bin\\initdb.bat --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-} else {
-  shell:exec dbtool/bin/initdb.sh --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-}
+ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ocsp-init.sql
 
 ca:import-ocspfromca --in-dir output/dbexport/ca \
   --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties

@@ -5,17 +5,17 @@ See also <https://github.com/xipki/xipki/releases>
 ## 6.0.1
 - Release date: -
 - CA
-    - N/A
+    - Use SQL scripts instead the Liquibase XML file to initialize the database
 - OCSP
-    - N/A
+    - Use SQL scripts instead the Liquibase XML file to initialize the database
 - CLI
     - N/A
 - MGMT-CLI (Management Client)
-    - N/A
+    - Add command ca:sql to execute SQL scripts.
 - DB Tool
-    - N/A
+    - Removed. Merged to MGMT-CLI.
 - Dependencies
-    - N/A
+    - Removed dependency liquibase.
 
 ## 6.0.0
 - Release date: October 15, 2022

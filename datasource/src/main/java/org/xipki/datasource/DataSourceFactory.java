@@ -137,7 +137,7 @@ public class DataSourceFactory {
 
     Set<Object> keySet = new HashSet<>(conf.keySet());
     for (Object key : keySet) {
-      if (((String) key).startsWith("liquibase")) {
+      if (((String) key).startsWith("sqlscript.") || ((String) key).startsWith("liquibase.")) {
         conf.remove(key);
       }
     }

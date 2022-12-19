@@ -85,6 +85,10 @@ Database Commands
 
      reset and initialize the CA and OCSP databases
 
+   * `ca:import-ocspfromca`
+
+     Run SQL script
+
 Security Commands
 -----
 

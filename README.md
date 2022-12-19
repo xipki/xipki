@@ -59,21 +59,12 @@ follows.
   ```
  
   Then you will find the following binaries:
-   - DB Tool: `assemblies/xipki-dbtool/target/xipki-dbtool-<version>.zip`
    - CA: `assemblies/xipki-ca/target/xipki-ca-<version>.zip`
    - OCSP: `assemblies/xipki-ocsp/target/xipki-ocsp-<version>.zip`
    - Protocol Gateway (CMP, SCEP, EST, REST): `assemblies/xipki-gateway/target/xipki-gateway-<version>.zip`
    - Management CLI: `assemblies/xipki-mgmt-cli/target/xipki-mgmt-cli-<version>.tar.gz`
    - CLI: `assemblies/xipki-cli/target/xipki-cli-<version>.tar.gz`
 
-## Install DB Tool
-
-JDK 8+ is required.
-
-1. Unpack the binary `xipki-dbtool-<version>.zip`.
-2. If you use database other than PostgreSQL, MariaDB and MySQL, you need to get the JDBC driver and
-   copy it to the directory `lib/jdbc`.
- 
 ## Install CA Server
 
 JDK 8+ is required.

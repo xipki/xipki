@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ Maximal column size: 4k
+  - DB2: PAGESIZE 4 k
+-->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+  logicalFilePath="ocsp-cache-init.xml">
+  <changeSet author="xipki" id="1">
+    <!-- table ISSUER -->
+    <createTable tableName="ISSUER">
+      <column name="ID" type="INT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="S1C" type="CHAR(28)" remarks="base64 encoded SHA1 sum of the certificate">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CERT" type="VARCHAR(6000)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <!-- table OCSP -->
+    <createTable tableName="OCSP" remarks="Only OCSP response without nonce is cached here">
+      <column name="ID" type="BIGINT">
+        <!--remarks="ID is derived from IID and IDENT"-->
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="IID" type="INT">
+        <!--remarks="issuer id"-->
+        <constraints nullable="false"/>
+      </column>
+      <column name="IDENT" type="VARCHAR(48)" remarks="Identifier consists of hex(SIG_ALG) | hex(CERTHASH_ALG) | hex(serial number)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="GENERATED_AT" type="BIGINT" remarks="generatedAt, seconds since January 1, 1970, 00:00:00 GMT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="NEXT_UPDATE" type="BIGINT" remarks="next update, seconds since January 1, 1970, 00:00:00 GMT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="RESP" type="VARCHAR(4000)" remarks="Base64 DER-encoded OCSP response">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  <!-- foreign key -->
+  <changeSet author="xipki" id="2">
+    <addForeignKeyConstraint constraintName="FK_OCSP_ISSUER1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="IID" baseTableName="OCSP"
+      referencedColumnNames="ID" referencedTableName="ISSUER"/>
+  </changeSet>
+</databaseChangeLog>

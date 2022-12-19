@@ -5,13 +5,7 @@ sleep 1
 OS_NAME = $(osinfo --name)
 
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties"
-DB_SCHEMA = xipki/sql/ca-init.xml
-
-if { "${OS_NAME}" equals "windows" } then {
-  shell:exec dbtool\\bin\\initdb.bat --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-} else {
-  shell:exec dbtool/bin/initdb.sh --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
-}
+ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
 
 ca:restart
 
