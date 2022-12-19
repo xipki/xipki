@@ -184,19 +184,6 @@ class IaikP11SlotUtil {
     return sessionLoggedIn;
   } // method checkSessionLoggedIn
 
-  static byte[] value(ByteArrayAttribute attr) {
-    return attr == null ? null : attr.getByteArrayValue();
-  }
-
-  static char[] value(CharArrayAttribute attr) {
-    return attr == null ? null : attr.getCharArrayValue();
-  }
-
-  static String valueStr(CharArrayAttribute attr) {
-    char[] chars = attr == null ? null : attr.getCharArrayValue();
-    return chars == null ? null : new String(chars);
-  }
-
   static List<Storage> getObjects(Session session, Storage template) throws P11TokenException {
     return getObjects(session, template, 9999);
   }
@@ -249,16 +236,12 @@ class IaikP11SlotUtil {
       throws XiSecurityException {
     if (p11Key instanceof RSAPublicKey) {
       RSAPublicKey rsaP11Key = (RSAPublicKey) p11Key;
-      return buildRSAKey(new BigInteger(1, value(rsaP11Key.getModulus())),
-          new BigInteger(1, value(rsaP11Key.getPublicExponent())));
+      return buildRSAKey(rsaP11Key.modulus(), rsaP11Key.publicExponent());
     } else if (p11Key instanceof DSAPublicKey) {
       DSAPublicKey dsaP11Key = (DSAPublicKey) p11Key;
 
-      BigInteger prime = new BigInteger(1, value(dsaP11Key.getPrime())); // p
-      BigInteger subPrime = new BigInteger(1, value(dsaP11Key.getSubprime())); // q
-      BigInteger base = new BigInteger(1, value(dsaP11Key.getBase())); // g
-      BigInteger value = new BigInteger(1, value(dsaP11Key.getValue())); // y
-      DSAPublicKeySpec keySpec = new DSAPublicKeySpec(value, prime, subPrime, base);
+      DSAPublicKeySpec keySpec = new DSAPublicKeySpec(dsaP11Key.value(), dsaP11Key.prime(),
+          dsaP11Key.subprime(), dsaP11Key.base());
       try {
         return KeyUtil.generateDSAPublicKey(keySpec);
       } catch (InvalidKeySpecException ex) {
@@ -266,9 +249,9 @@ class IaikP11SlotUtil {
       }
     } else if (p11Key instanceof ECPublicKey) {
       ECPublicKey ecP11Key = (ECPublicKey) p11Key;
-      long keyType = ecP11Key.getKeyType().getLongValue();
-      byte[] ecParameters = value(ecP11Key.getEcParams());
-      byte[] ecPoint = value(ecP11Key.getEcPoint());
+      long keyType = ecP11Key.keyType();
+      byte[] ecParameters = ecP11Key.ecParams();
+      byte[] ecPoint = ecP11Key.ecPoint();
 
       byte[] encodedPoint = null;
       if (keyType == KeyType.VENDOR_SM2) {
@@ -343,9 +326,8 @@ class IaikP11SlotUtil {
 
   static java.security.interfaces.RSAPublicKey buildRSAKey(BigInteger mod, BigInteger exp)
       throws XiSecurityException {
-    RSAPublicKeySpec keySpec = new RSAPublicKeySpec(mod, exp);
     try {
-      return KeyUtil.generateRSAPublicKey(keySpec);
+      return KeyUtil.generateRSAPublicKey(new RSAPublicKeySpec(mod, exp));
     } catch (InvalidKeySpecException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
@@ -353,7 +335,7 @@ class IaikP11SlotUtil {
 
   static X509Cert parseCert(X509PublicKeyCertificate p11Cert) throws P11TokenException {
     try {
-      return X509Util.parseCert(value(p11Cert.getValue()));
+      return X509Util.parseCert(p11Cert.value());
     } catch (CertificateException ex) {
       throw new P11TokenException("could not parse certificate: " + ex.getMessage(), ex);
     }
@@ -386,31 +368,30 @@ class IaikP11SlotUtil {
   } // method removeObjects
 
   static void setKeyAttributes(P11NewKeyControl control, SecretKey template, char[] label) {
-    template.getToken().setBooleanValue(true);
+    template.token(true);
     if (label != null) {
-      template.getLabel().setCharArrayValue(label);
+      template.label(label);
     }
 
     if (control.getExtractable() != null) {
-      template.getExtractable().setBooleanValue(control.getExtractable());
+      template.extractable(control.getExtractable());
     }
 
     if (control.getSensitive() != null) {
-      template.getSensitive().setBooleanValue(control.getSensitive());
+      template.sensitive(control.getSensitive());
     }
 
     Set<P11KeyUsage> usages = control.getUsages();
-    final Boolean TRUE = Boolean.TRUE;
     if (isNotEmpty(usages)) {
       for (P11KeyUsage usage : usages) {
         if (usage == P11KeyUsage.DECRYPT) {
-          template.getDecrypt().setBooleanValue(TRUE);
+          template.decrypt(true);
         } else if (usage == P11KeyUsage.DERIVE) {
-          template.getDerive().setBooleanValue(TRUE);
+          template.derive(true);
         } else if (usage == P11KeyUsage.SIGN) {
-          template.getSign().setBooleanValue(TRUE);
+          template.sign(true);
         } else if (usage == P11KeyUsage.UNWRAP) {
-          template.getUnwrap().setBooleanValue(TRUE);
+          template.unwrap(true);
         }
       }
     }
@@ -431,10 +412,10 @@ class IaikP11SlotUtil {
       throws P11TokenException {
     X509PublicKeyCertificate template = new X509PublicKeyCertificate();
     if (keyId != null) {
-      template.getId().setByteArrayValue(keyId);
+      template.id(keyId);
     }
     if (!ignoreKeyLabel) {
-      template.getLabel().setCharArrayValue(keyLabel);
+      template.label(keyLabel);
     }
 
     List<Storage> tmpObjects = getObjects(session, template);
