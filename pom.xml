@@ -31,8 +31,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <xipki.tools.version>1.0.5</xipki.tools.version>
     <servlet.version>3.1.0</servlet.version>
-    <karaf.version>4.3.7</karaf.version>
-    <karaf.bc.version>1.69</karaf.bc.version>
+    <karaf.version>4.4.2</karaf.version>
+    <karaf.bc.version>1.70</karaf.bc.version>
     <bc.version>1.72</bc.version>
     <slf4j.version>1.7.32</slf4j.version>
     <pkcs11-wrapper.version>1.4.11-SNAPSHOT</pkcs11-wrapper.version>
