@@ -57,9 +57,7 @@
 					}
 				]
 			}
-		],
-		"vendorCodes":{
-		}
+		]
 	}],
 	"mechanismSets":[{
 		"name":"allMechanisms",

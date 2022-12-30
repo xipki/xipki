@@ -17,7 +17,6 @@
 
 package org.xipki.security.pkcs11.iaik;
 
-import iaik.pkcs.pkcs11.objects.*;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
@@ -44,20 +43,24 @@ import static org.xipki.util.Args.notNull;
 
 class IaikP11Identity extends P11Identity {
 
-  private final Key signingKey;
+  private final long signingKeyHandle;
 
   private final int expectedSignatureLen;
 
-  IaikP11Identity(IaikP11Slot slot, P11IdentityId identityId, SecretKey signingKey) {
-    super(slot, identityId, signingKey.getKeyType().getLongValue(), getKeyBitLen(signingKey));
-    this.signingKey = notNull(signingKey, "signingKey");
+  private final boolean secretKey;
+
+  IaikP11Identity(IaikP11Slot slot, P11IdentityId identityId, long signingKeyHandle, long keyType, int keyBitLen) {
+    super(slot, identityId, keyType, keyBitLen);
+    this.secretKey = true;
+    this.signingKeyHandle = signingKeyHandle;
     this.expectedSignatureLen = 0;
   }
 
-  IaikP11Identity(IaikP11Slot slot, P11IdentityId identityId, PrivateKey privateKey,
+  IaikP11Identity(IaikP11Slot slot, P11IdentityId identityId, long privateKeyHandle, long keyType,
                   PublicKey publicKey, X509Cert[] certificateChain) {
-    super(slot, identityId, privateKey.getKeyType().getLongValue(), publicKey, certificateChain);
-    this.signingKey = notNull(privateKey, "privateKey");
+    super(slot, identityId, keyType, publicKey, certificateChain);
+    this.secretKey = false;
+    this.signingKeyHandle = privateKeyHandle;
 
     int keyBitLen = getSignatureKeyBitLength();
     if (publicKey instanceof RSAPublicKey) {
@@ -87,18 +90,8 @@ class IaikP11Identity extends P11Identity {
 
   @Override
   protected byte[] digestSecretKey0(long mechanism) throws P11TokenException {
-    if (! (signingKey instanceof SecretKey)) {
+    if (!secretKey) {
       throw new P11TokenException("could not digest asymmetric key");
-    }
-
-    Boolean bv = ((SecretKey) signingKey).getExtractable().getBooleanValue();
-    if (bv != null && !bv) {
-      throw new P11TokenException("could not digest unextractable key");
-    }
-
-    bv = ((SecretKey) signingKey).getNeverExtractable().getBooleanValue();
-    if (bv != null && bv) {
-      throw new P11TokenException("could not digest unextractable key");
     }
 
     return ((IaikP11Slot) slot).digestSecretKey(mechanism, this);
@@ -109,24 +102,16 @@ class IaikP11Identity extends P11Identity {
     return ((IaikP11Slot) slot).sign(mechanism, parameters, content, this);
   }
 
-  Key getSigningKey() {
-    return signingKey;
+  long getSigningKeyHandle() {
+    return signingKeyHandle;
+  }
+
+  boolean isSecretKey() {
+    return secretKey;
   }
 
   int getExpectedSignatureLen() {
     return expectedSignatureLen;
-  }
-
-  private static int getKeyBitLen(SecretKey key) {
-    long keyType = key.getKeyType().getLongValue();
-    if (keyType == PKCS11Constants.CKK_DES3) {
-      return 192;
-    } else if (key instanceof ValuedSecretKey){
-      LongAttribute la = ((ValuedSecretKey) key).getValueLen();
-      return la == null ? 0 : la.getLongValue().intValue() * 8;
-    } else {
-      return 0;
-    }
   }
 
 }

@@ -23,9 +23,11 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
+import org.xipki.security.util.DSAParameterCache;
 import org.xipki.util.BenchmarkExecutor;
 
 import java.math.BigInteger;
+import java.security.spec.DSAParameterSpec;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.xipki.util.Args.notNull;
@@ -53,7 +55,8 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
     @Override
     protected void genKeypair() throws Exception {
-      slot.removeIdentity(slot.generateDSAKeypair(plength, qlength, getControl()));
+      DSAParameterSpec spec = DSAParameterCache.getDSAParameterSpec(plength, qlength, null);
+      slot.generateDSAKeypairOtf(spec.getP(), spec.getQ(), spec.getG());
     }
 
   } // class DSA
@@ -69,7 +72,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
     @Override
     protected void genKeypair() throws Exception {
-      slot.removeIdentity(slot.generateECKeypair(curveOid, getControl()));
+      slot.generateECKeypairOtf(curveOid);
     }
 
   } // class EC
@@ -89,7 +92,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
     @Override
     protected void genKeypair() throws Exception {
-      slot.removeIdentity(slot.generateRSAKeypair(keysize, publicExponent, getControl()));
+      slot.generateRSAKeypairOtf(keysize, publicExponent);
     }
 
   } // class RSA
@@ -101,7 +104,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
     @Override
     protected void genKeypair() throws Exception {
-      slot.removeIdentity(slot.generateSM2Keypair(getControl()));
+      slot.generateSM2KeypairOtf();
     }
 
   } // class SM2
@@ -138,10 +141,6 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
   }
 
   protected abstract void genKeypair() throws Exception;
-
-  protected P11NewKeyControl getControl() {
-    return new P11NewKeyControl(id, "speed-" + idx.getAndIncrement());
-  }
 
   @Override
   protected Runnable getTestor() throws Exception {

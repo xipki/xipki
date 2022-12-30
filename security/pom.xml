@@ -23,7 +23,7 @@
     </dependency>
     <dependency>
       <groupId>org.xipki.iaik</groupId>
-      <artifactId>sunpkcs11-wrapper</artifactId>
+      <artifactId>sunpkcs11-wrapper2</artifactId>
     </dependency>
     <dependency>
       <groupId>com.alibaba</groupId>

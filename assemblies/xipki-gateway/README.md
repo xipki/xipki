@@ -58,7 +58,7 @@ log4j-*.jar,\
 password-*.jar,\
 security-*.jar,\
 slf4j-*.jar,\
-sunpkcs11-wrapper-*.jar,\
+sunpkcs11-wrapper2-*.jar,\
 tinylog*.jar,\
 util-*.jar,\
 gateway-common-*.jar

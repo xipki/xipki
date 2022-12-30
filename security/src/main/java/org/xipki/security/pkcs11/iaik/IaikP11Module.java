@@ -48,11 +48,11 @@ public class IaikP11Module extends P11Module {
 
   private static final Logger LOG = LoggerFactory.getLogger(IaikP11Module.class);
 
-  private final iaik.pkcs.pkcs11.Module module;
+  private final PKCS11Module module;
 
   private String description;
 
-  private IaikP11Module(iaik.pkcs.pkcs11.Module module, P11ModuleConf moduleConf) throws P11TokenException {
+  private IaikP11Module(PKCS11Module module, P11ModuleConf moduleConf) throws P11TokenException {
     super(moduleConf);
     this.module = notNull(module, "module");
 
@@ -68,7 +68,7 @@ public class IaikP11Module extends P11Module {
 
     Slot[] slotList;
     try {
-      slotList = module.getSlotList(iaik.pkcs.pkcs11.Module.SlotRequirement.ALL_SLOTS);
+      slotList = module.getSlotList(false);
     } catch (Throwable th) {
       final String msg = "could not getSlotList of module " + moduleConf.getName();
       LogUtil.error(LOG, th, msg);
@@ -149,9 +149,9 @@ public class IaikP11Module extends P11Module {
     String path = moduleConf.getNativeLibrary();
     path = IoUtil.expandFilepath(path, false);
 
-    iaik.pkcs.pkcs11.Module module;
+    PKCS11Module module;
     try {
-      module = iaik.pkcs.pkcs11.Module.getInstance(path);
+      module = PKCS11Module.getInstance(path);
     } catch (IOException ex) {
       final String msg = "could not load the PKCS#11 module " + moduleConf.getName() + ": " + path;
       LogUtil.error(LOG, ex, msg);
@@ -179,10 +179,6 @@ public class IaikP11Module extends P11Module {
       throw new P11TokenException(th.getMessage());
     }
 
-    if (null != moduleConf.getVendorCodeConverter()) {
-      module.setVendorCodeConverter(moduleConf.getVendorCodeConverter());
-    }
-
     return new IaikP11Module(module, moduleConf);
   } // method getInstance
 
@@ -204,7 +200,7 @@ public class IaikP11Module extends P11Module {
     close(conf.getNativeLibrary(), module);
   }
 
-  private static void close(String modulePath, iaik.pkcs.pkcs11.Module module) {
+  private static void close(String modulePath, PKCS11Module module) {
     if (module == null) {
       return;
     }

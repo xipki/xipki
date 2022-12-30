@@ -137,7 +137,7 @@ public class P11SignerFactory implements SignerFactory {
     P11IdentityId identityId = slot.getIdentityId(keyId, keyLabel);
     if (identityId == null) {
       String str2 = (keyId != null) ? "id " + Hex.encode(keyId) : "label " + keyLabel;
-      throw new ObjectCreationException("cound not find identity with " + str2);
+      throw new ObjectCreationException("could not find identity with " + str2);
     }
 
     try {

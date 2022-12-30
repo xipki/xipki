@@ -85,7 +85,7 @@ public abstract class P11Module {
       throw new P11UnknownEntityException(slotId);
     }
     return slot;
-  } // method gestSlot
+  } // method getSlot
 
   void destroySlot(long slotId) {
     P11SlotIdentifier p11SlotId = null;

@@ -20,11 +20,11 @@ package org.xipki.security.pkcs11.iaik;
 import iaik.pkcs.pkcs11.Mechanism;
 import iaik.pkcs.pkcs11.*;
 import iaik.pkcs.pkcs11.objects.*;
-import iaik.pkcs.pkcs11.objects.Key.KeyType;
 import iaik.pkcs.pkcs11.parameters.InitializationVectorParameters;
 import iaik.pkcs.pkcs11.parameters.OpaqueParameters;
 import iaik.pkcs.pkcs11.parameters.Parameters;
 import iaik.pkcs.pkcs11.parameters.RSAPkcsPssParameters;
+import iaik.pkcs.pkcs11.wrapper.Functions;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -47,6 +47,8 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
+import sun.net.www.content.text.Generic;
+import sun.security.pkcs11.wrapper.CK_AES_CTR_PARAMS;
 
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
@@ -55,6 +57,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.*;
 
+import static iaik.pkcs.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.security.pkcs11.P11Slot.getDescription;
 import static org.xipki.util.CollectionUtil.isEmpty;
 import static org.xipki.util.CollectionUtil.isNotEmpty;
@@ -103,10 +106,10 @@ class IaikP11SlotUtil {
     }
   }
 
-  static byte[] digestKey(Session session, int digestLen, Mechanism mechanism, SecretKey key)
+  static byte[] digestKey(Session session, int digestLen, Mechanism mechanism, long hKey)
       throws TokenException {
     session.digestInit(mechanism);
-    session.digestKey(key);
+    session.digestKey(hKey);
     byte[] digest = new byte[digestLen];
     session.digestFinal(digest, 0, digestLen);
     return digest;
@@ -136,21 +139,21 @@ class IaikP11SlotUtil {
     return ret;
   } // method getMechanism
 
-  static X509PublicKeyCertificate getCertificateObject(Session session, byte[] keyId, char[] keyLabel)
+  static Long getCertificateObject(Session session, byte[] keyId, char[] keyLabel)
       throws P11TokenException {
-    X509PublicKeyCertificate[] certs = getCertificateObjects(session, keyId, keyLabel);
+    List<Long> certs = getCertificateObjects(session, keyId, keyLabel);
 
-    if (isEmpty(certs)) {
+    if (certs == null || certs.isEmpty()) {
       LOG.info("found no certificate identified by {}", getDescription(keyId, keyLabel));
       return null;
     }
 
-    int size = certs.length;
+    int size = certs.size();
     if (size > 1) {
       LOG.warn("found {} public key identified by {}, use the first one", size, getDescription(keyId, keyLabel));
     }
 
-    return certs[0];
+    return certs.get(0);
   } // method getCertificateObject
 
   static boolean checkSessionLoggedIn(Session session, long userType) throws P11TokenException {
@@ -184,13 +187,17 @@ class IaikP11SlotUtil {
     return sessionLoggedIn;
   } // method checkSessionLoggedIn
 
-  static List<Storage> getObjects(Session session, Storage template) throws P11TokenException {
+  static List<Long> getObjects(Session session, AttributeVector template) throws P11TokenException {
     return getObjects(session, template, 9999);
   }
 
-  static List<Storage> getObjects(Session session, Storage template, int maxNo)
+  static List<Long> getObjects(Session session, Attribute... attributes) throws P11TokenException {
+    return getObjects(session, new AttributeVector(attributes), 9999);
+  }
+
+  static List<Long> getObjects(Session session, AttributeVector template, int maxNo)
       throws P11TokenException {
-    List<Storage> objList = new LinkedList<>();
+    List<Long> objList = new LinkedList<>();
 
     boolean initialized = false;
 
@@ -200,21 +207,13 @@ class IaikP11SlotUtil {
 
       while (objList.size() < maxNo) {
         int maxObjectCount = Math.min(maxNo - objList.size(), 100);
-        long[] foundObjectHandles = session.findObjects2(maxObjectCount);
+        long[] foundObjectHandles = session.findObjects(maxObjectCount);
         if (foundObjectHandles == null || foundObjectHandles.length == 0) {
           break;
         }
 
         for (long hObject : foundObjectHandles) {
-          PKCS11Object object;
-          try {
-            object = PKCS11Object.getInstance(session, hObject);
-          } catch (TokenException ex) {
-            LogUtil.error(LOG, ex, "error building PKCS11Object " + hObject);
-            continue;
-          }
-          logPkcs11ObjectAttributes("found object: ", object);
-          objList.add((Storage) object);
+          objList.add(hObject);
         }
       }
     } catch (TokenException ex) {
@@ -232,95 +231,101 @@ class IaikP11SlotUtil {
     return objList;
   } // method getObjects
 
-  static java.security.PublicKey generatePublicKey(PublicKey p11Key)
+  static java.security.PublicKey generatePublicKey(Session session, long hP11Key, long keyType)
       throws XiSecurityException {
-    if (p11Key instanceof RSAPublicKey) {
-      RSAPublicKey rsaP11Key = (RSAPublicKey) p11Key;
-      return buildRSAKey(rsaP11Key.modulus(), rsaP11Key.publicExponent());
-    } else if (p11Key instanceof DSAPublicKey) {
-      DSAPublicKey dsaP11Key = (DSAPublicKey) p11Key;
+    try {
+      if (keyType == CKK_RSA) {
+        byte[][] attrValues = session.getByteArrayAttributeValues(hP11Key, CKA_MODULUS, CKA_PUBLIC_EXPONENT);
+        return buildRSAKey(asUnsignedBigInt(attrValues[0]), asUnsignedBigInt(attrValues[1]));
+      } else if (keyType == CKK_DSA) {
+        byte[][] attrValues = session.getByteArrayAttributeValues(hP11Key,
+            CKA_VALUE, CKA_PRIME, CKA_SUBPRIME, CKA_BASE);
 
-      DSAPublicKeySpec keySpec = new DSAPublicKeySpec(dsaP11Key.value(), dsaP11Key.prime(),
-          dsaP11Key.subprime(), dsaP11Key.base());
-      try {
-        return KeyUtil.generateDSAPublicKey(keySpec);
-      } catch (InvalidKeySpecException ex) {
-        throw new XiSecurityException(ex.getMessage(), ex);
-      }
-    } else if (p11Key instanceof ECPublicKey) {
-      ECPublicKey ecP11Key = (ECPublicKey) p11Key;
-      long keyType = ecP11Key.keyType();
-      byte[] ecParameters = ecP11Key.ecParams();
-      byte[] ecPoint = ecP11Key.ecPoint();
-
-      byte[] encodedPoint = null;
-      if (keyType == KeyType.VENDOR_SM2) {
-        if (ecParameters == null) {
-          // some HSM does not return ECParameters
-          // GMObjectIdentifiers.sm2p256v1.getEncoded()
-          ecParameters = Hex.decode("06082a811ccf5501822d");
-        }
-      }
-
-      ASN1ObjectIdentifier curveOid = ASN1ObjectIdentifier.getInstance(ecParameters);
-
-      // some HSM does not return the standard conform ECPoint
-      if (keyType == KeyType.VENDOR_SM2 || keyType == KeyType.EC) {
-        int coordSize;
-        if (GMObjectIdentifiers.sm2p256v1.equals(curveOid)
-                || SECObjectIdentifiers.secp256r1.equals(curveOid)
-                || TeleTrusTObjectIdentifiers.brainpoolP256r1.equals(curveOid)) {
-          coordSize = 32;
-        } else if (SECObjectIdentifiers.secp384r1.equals(curveOid)
-                || TeleTrusTObjectIdentifiers.brainpoolP384r1.equals(curveOid)) {
-          coordSize = 48;
-        } else if (SECObjectIdentifiers.secp521r1.equals(curveOid)) {
-          coordSize = 66;
-        } else if (TeleTrusTObjectIdentifiers.brainpoolP512r1.equals(curveOid)) {
-          coordSize = 64;
-        } else {
-          throw new XiSecurityException("unknown curve " + curveOid.getId());
-        }
-
-        if (ecPoint.length == 2 * coordSize) {
-          // just return x_coord. || y_coord.
-          encodedPoint = new byte[1 + 2 * coordSize];
-          encodedPoint[0] = 4;
-          System.arraycopy(ecPoint, 0, encodedPoint, 1, ecPoint.length);
-        } else if (ecPoint.length == 1 + 2 * coordSize) {
-          encodedPoint = ecPoint;
-        }
-      }
-
-      if (encodedPoint == null) {
-        encodedPoint = DEROctetString.getInstance(ecPoint).getOctets();
-      }
-
-      if (keyType == KeyType.EC_EDWARDS || keyType == KeyType.EC_MONTGOMERY) {
-        if (keyType == KeyType.EC_EDWARDS) {
-          if (!EdECConstants.isEdwardsCurve(curveOid)) {
-            throw new XiSecurityException("unknown Edwards curve OID " + curveOid);
-          }
-        } else {
-          if (!EdECConstants.isMontgomeryCurve(curveOid)) {
-            throw new XiSecurityException("unknown Montgomery curve OID " + curveOid);
-          }
-        }
-        SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(new AlgorithmIdentifier(curveOid), encodedPoint);
+        DSAPublicKeySpec keySpec = new DSAPublicKeySpec(asUnsignedBigInt(attrValues[0]),
+            asUnsignedBigInt(attrValues[1]), asUnsignedBigInt(attrValues[2]), asUnsignedBigInt(attrValues[3]));
         try {
-          return KeyUtil.generatePublicKey(pkInfo);
+          return KeyUtil.generateDSAPublicKey(keySpec);
         } catch (InvalidKeySpecException ex) {
           throw new XiSecurityException(ex.getMessage(), ex);
+        }
+      } else if (keyType == CKK_EC || keyType == CKK_VENDOR_SM2
+          || keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
+        byte[][] attrValues = session.getByteArrayAttributeValues(hP11Key, CKA_EC_PARAMS, CKA_EC_POINT);
+
+        byte[] ecParameters = attrValues[0];
+        byte[] ecPoint = attrValues[1];
+
+        byte[] encodedPoint = null;
+        if (keyType == CKM_VENDOR_SM2) {
+          if (ecParameters == null) {
+            // some HSM does not return ECParameters
+            // GMObjectIdentifiers.sm2p256v1.getEncoded()
+            ecParameters = Hex.decode("06082a811ccf5501822d");
+          }
+        }
+
+        ASN1ObjectIdentifier curveOid = ASN1ObjectIdentifier.getInstance(ecParameters);
+
+        // some HSM does not return the standard conform ECPoint
+        if (keyType == CKK_VENDOR_SM2 || keyType == CKK_EC) {
+          int coordSize;
+          if (GMObjectIdentifiers.sm2p256v1.equals(curveOid)
+              || SECObjectIdentifiers.secp256r1.equals(curveOid)
+              || TeleTrusTObjectIdentifiers.brainpoolP256r1.equals(curveOid)) {
+            coordSize = 32;
+          } else if (SECObjectIdentifiers.secp384r1.equals(curveOid)
+              || TeleTrusTObjectIdentifiers.brainpoolP384r1.equals(curveOid)) {
+            coordSize = 48;
+          } else if (SECObjectIdentifiers.secp521r1.equals(curveOid)) {
+            coordSize = 66;
+          } else if (TeleTrusTObjectIdentifiers.brainpoolP512r1.equals(curveOid)) {
+            coordSize = 64;
+          } else {
+            throw new XiSecurityException("unknown curve " + curveOid.getId());
+          }
+
+          if (ecPoint.length == 2 * coordSize) {
+            // just return x_coord. || y_coord.
+            encodedPoint = new byte[1 + 2 * coordSize];
+            encodedPoint[0] = 4;
+            System.arraycopy(ecPoint, 0, encodedPoint, 1, ecPoint.length);
+          } else if (ecPoint.length == 1 + 2 * coordSize) {
+            encodedPoint = ecPoint;
+          }
+        }
+
+        if (encodedPoint == null) {
+          encodedPoint = DEROctetString.getInstance(ecPoint).getOctets();
+        }
+
+        if (keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
+          if (keyType == CKK_EC_EDWARDS) {
+            if (!EdECConstants.isEdwardsCurve(curveOid)) {
+              throw new XiSecurityException("unknown Edwards curve OID " + curveOid);
+            }
+          } else {
+            if (!EdECConstants.isMontgomeryCurve(curveOid)) {
+              throw new XiSecurityException("unknown Montgomery curve OID " + curveOid);
+            }
+          }
+          SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(new AlgorithmIdentifier(curveOid), encodedPoint);
+          try {
+            return KeyUtil.generatePublicKey(pkInfo);
+          } catch (InvalidKeySpecException ex) {
+            throw new XiSecurityException(ex.getMessage(), ex);
+          }
+        } else {
+          try {
+            return KeyUtil.createECPublicKey(ecParameters, encodedPoint);
+          } catch (InvalidKeySpecException ex) {
+            throw new XiSecurityException(ex.getMessage(), ex);
+          }
         }
       } else {
-        try {
-          return KeyUtil.createECPublicKey(ecParameters, encodedPoint);
-        } catch (InvalidKeySpecException ex) {
-          throw new XiSecurityException(ex.getMessage(), ex);
-        }
+        throw new XiSecurityException("unknown publicKey type " + Functions.getKeyTypeName(keyType));
       }
-    } else {
-      throw new XiSecurityException("unknown publicKey class " + p11Key.getClass().getName());
+    } catch (PKCS11Exception ex) {
+      throw new XiSecurityException("error reading PKCS#11 attribute values", ex);
     }
   } // method generatePublicKey
 
@@ -333,31 +338,23 @@ class IaikP11SlotUtil {
     }
   }
 
-  static X509Cert parseCert(X509PublicKeyCertificate p11Cert) throws P11TokenException {
+  static X509Cert parseCert(byte[] certValue) throws P11TokenException {
     try {
-      return X509Util.parseCert(p11Cert.value());
+      return X509Util.parseCert(certValue);
     } catch (CertificateException ex) {
       throw new P11TokenException("could not parse certificate: " + ex.getMessage(), ex);
     }
   } // method parseCert
 
-  static List<X509PublicKeyCertificate> getAllCertificateObjects(Session session)
-      throws P11TokenException {
-    List<Storage> tmpObjects = getObjects(session, new X509PublicKeyCertificate());
-
-    List<X509PublicKeyCertificate> certs = new ArrayList<>(tmpObjects.size());
-    for (PKCS11Object tmpObject : tmpObjects) {
-      X509PublicKeyCertificate cert = (X509PublicKeyCertificate) tmpObject;
-      certs.add(cert);
-    }
-    return certs;
+  static List<Long> getAllCertificateObjects(Session session) throws P11TokenException {
+    return getObjects(session,
+        Attribute.getInstance(CKA_CLASS, CKO_CERTIFICATE), Attribute.getInstance(CKA_CERTIFICATE_TYPE, CKC_X_509));
   } // method getAllCertificateObjects
 
-  static int removeObjects0(Session session, Storage template, String desc)
-      throws P11TokenException {
+  static int removeObjects0(Session session, AttributeVector template, String desc) throws P11TokenException {
     try {
-      List<Storage> objects = getObjects(session, template);
-      for (Storage obj : objects) {
+      List<Long> objects = getObjects(session, template);
+      for (Long obj : objects) {
         session.destroyObject(obj);
       }
       return objects.size();
@@ -367,90 +364,83 @@ class IaikP11SlotUtil {
     }
   } // method removeObjects
 
-  static void setKeyAttributes(P11NewKeyControl control, SecretKey template, char[] label) {
-    template.token(true);
+  static void setKeyAttributes(P11NewKeyControl control, AttributeVector template, char[] label) {
+    template.attr(CKA_TOKEN, true);
     if (label != null) {
-      template.label(label);
+      template.attr(CKA_LABEL, label);
     }
 
     if (control.getExtractable() != null) {
-      template.extractable(control.getExtractable());
+      template.attr(CKA_EXTRACTABLE, control.getExtractable());
     }
 
     if (control.getSensitive() != null) {
-      template.sensitive(control.getSensitive());
+      template.attr(CKA_SENSITIVE, control.getSensitive());
     }
 
     Set<P11KeyUsage> usages = control.getUsages();
     if (isNotEmpty(usages)) {
       for (P11KeyUsage usage : usages) {
         if (usage == P11KeyUsage.DECRYPT) {
-          template.decrypt(true);
+          template.attr(CKA_DECRYPT, true);
         } else if (usage == P11KeyUsage.DERIVE) {
-          template.derive(true);
+          template.attr(CKA_DERIVE, true);
         } else if (usage == P11KeyUsage.SIGN) {
-          template.sign(true);
+          template.attr(CKA_SIGN, true);
         } else if (usage == P11KeyUsage.UNWRAP) {
-          template.unwrap(true);
+          template.attr(CKA_UNWRAP, true);
         }
       }
     }
   }
 
-  static X509PublicKeyCertificate[] getCertificateObjectsForId(Session session, byte[] keyId)
-      throws P11TokenException {
+  static List<Long> getCertificateObjectsForId(Session session, byte[] keyId) throws P11TokenException {
     return getCertificateObjects0(session, keyId, true, null);
   }
 
-  static X509PublicKeyCertificate[] getCertificateObjects(Session session, byte[] keyId, char[] keyLabel)
-      throws P11TokenException {
+  static List<Long> getCertificateObjects(Session session, byte[] keyId, char[] keyLabel) throws P11TokenException {
     return getCertificateObjects0(session, keyId, false, keyLabel);
   }
 
-  private static X509PublicKeyCertificate[] getCertificateObjects0(
+  private static List<Long> getCertificateObjects0(
       Session session, byte[] keyId, boolean ignoreKeyLabel, char[] keyLabel)
       throws P11TokenException {
-    X509PublicKeyCertificate template = new X509PublicKeyCertificate();
+    AttributeVector template = new AttributeVector()
+        .attr(CKA_CLASS, CKO_CERTIFICATE).attr(CKA_CERTIFICATE_TYPE, CKC_X_509);
     if (keyId != null) {
-      template.id(keyId);
+      template.attr(CKA_ID, keyId);
     }
     if (!ignoreKeyLabel) {
-      template.label(keyLabel);
+      template.attr(CKA_LABEL, keyLabel);
     }
 
-    List<Storage> tmpObjects = getObjects(session, template);
+    List<Long> tmpObjects = getObjects(session, template);
 
     if (isEmpty(tmpObjects)) {
       LOG.info("found no certificate identified by {}", getDescription(keyId, keyLabel));
       return null;
     }
 
-    int size = tmpObjects.size();
-    X509PublicKeyCertificate[] certs = new X509PublicKeyCertificate[size];
-    for (int i = 0; i < size; i++) {
-      certs[i] = (X509PublicKeyCertificate) tmpObjects.get(i);
-    }
-    return certs;
+    return tmpObjects;
   } // method getCertificateObjects
 
-  static void logPkcs11ObjectAttributes(String prefix, PKCS11Object p11Object) {
-    if (!LOG.isDebugEnabled()) {
-      return;
+  static void logPkcs11ObjectAttributes(String prefix, AttributeVector p11Object) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("{}{}", prefix, p11Object);
     }
+  }
 
-    Hashtable<Long, Attribute> table = p11Object.getAttributeTable();
-    StringBuilder sb = new StringBuilder();
-    if (prefix != null) {
-      sb.append(prefix);
+  static String readLabel(Session session, long objectHandle) {
+    try {
+      return session.getCharAttributeStringValue(objectHandle, CKA_LABEL);
+    } catch (Exception e) {
+      LogUtil.warn(LOG, e, "error reading label for object " + objectHandle);
+      return null;
     }
+  }
 
-    Enumeration<Long> keys = table.keys();
-    while (keys.hasMoreElements()) {
-      Attribute attr = p11Object.getAttribute(keys.nextElement());
-      sb.append("\n  ").append(attr.toString(true));
-    }
-
-    LOG.debug(sb.toString());
-  } // method logPkcs11ObjectAttributes
+  private static BigInteger asUnsignedBigInt(byte[] bytes) {
+    return new BigInteger(1, bytes);
+  }
 
 }

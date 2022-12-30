@@ -17,7 +17,6 @@
 
 package org.xipki.security.pkcs11;
 
-import iaik.pkcs.pkcs11.objects.Key;
 import iaik.pkcs.pkcs11.wrapper.Functions;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -1102,12 +1101,6 @@ public abstract class P11Slot implements Closeable {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + keysize);
     }
 
-    if (supportsMechanism(PKCS11Constants.CKM_RSA_X9_31_KEY_PAIR_GEN)
-        || supportsMechanism(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN)) {
-      throw new P11UnsupportedMechanismException(
-          "None of CKM_RSA_X9_31_KEY_PAIR_GEN and CKM_RSA_PKCS_KEY_PAIR_GEN is supported");
-    }
-
     return generateRSAKeypairOtf0(keysize, publicExponent == null ? RSAKeyGenParameterSpec.F4 : publicExponent);
   }
 
@@ -1428,7 +1421,7 @@ public abstract class P11Slot implements Closeable {
           }
         }
       } else {
-        sb.append("\t\tSymmetric key: ").append(Key.getKeyTypeName(identity.getKeyType()))
+        sb.append("\t\tSymmetric key: ").append(Functions.getKeyTypeName(identity.getKeyType()))
             .append("/").append(identity.getSignatureKeyBitLength()).append("\n");
       }
     }
