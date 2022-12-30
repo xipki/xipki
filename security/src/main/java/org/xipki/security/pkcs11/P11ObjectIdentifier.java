@@ -21,7 +21,6 @@ import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.Hex;
 
-import java.math.BigInteger;
 import java.util.Arrays;
 
 import static org.xipki.util.Args.notNull;

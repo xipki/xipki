@@ -17,9 +17,9 @@
 
 package org.xipki.security.pkcs11.iaik;
 
-import iaik.pkcs.pkcs11.Mechanism;
 import iaik.pkcs.pkcs11.*;
-import iaik.pkcs.pkcs11.objects.*;
+import iaik.pkcs.pkcs11.objects.Attribute;
+import iaik.pkcs.pkcs11.objects.AttributeVector;
 import iaik.pkcs.pkcs11.parameters.InitializationVectorParameters;
 import iaik.pkcs.pkcs11.parameters.OpaqueParameters;
 import iaik.pkcs.pkcs11.parameters.Parameters;
@@ -47,15 +47,15 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
-import sun.net.www.content.text.Generic;
-import sun.security.pkcs11.wrapper.CK_AES_CTR_PARAMS;
 
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import static iaik.pkcs.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.security.pkcs11.P11Slot.getDescription;
@@ -79,13 +79,13 @@ class IaikP11SlotUtil {
       tmpPin = new char[]{};
     }
 
-    String userTypeText = getUserTypeText(userType);
+    String userTypeText = Functions.getUserTypeName(userType);
     try {
       session.login(userType, tmpPin);
       LOG.info("login successful as user " + userTypeText);
     } catch (TokenException ex) {
       // 0x100: user already logged in
-      if (ex instanceof PKCS11Exception && ((PKCS11Exception) ex).getErrorCode() == 0x100) {
+      if (ex instanceof PKCS11Exception && ((PKCS11Exception) ex).getErrorCode() == CKR_USER_ALREADY_LOGGED_IN) {
         LOG.info("user already logged in");
       } else {
         LOG.info("login failed as user " + userTypeText);
@@ -93,18 +93,6 @@ class IaikP11SlotUtil {
       }
     }
   } // method singleLogin
-
-  private static String getUserTypeText(long userType) {
-    if (userType == PKCS11Constants.CKU_SO) {
-      return "CKU_SO";
-    } else if (userType == PKCS11Constants.CKU_USER) {
-      return "CKU_USER";
-    } else if (userType == PKCS11Constants.CKU_CONTEXT_SPECIFIC) {
-      return "CKU_CONTEXT_SPECIFIC";
-    } else {
-      return "VENDOR_" + userType;
-    }
-  }
 
   static byte[] digestKey(Session session, int digestLen, Mechanism mechanism, long hKey)
       throws TokenException {
@@ -125,7 +113,7 @@ class IaikP11SlotUtil {
     if (parameters instanceof P11Params.P11RSAPkcsPssParams) {
       P11Params.P11RSAPkcsPssParams param = (P11Params.P11RSAPkcsPssParams) parameters;
       paramObj = new RSAPkcsPssParameters(param.getHashAlgorithm(),
-          param.getMaskGenerationFunction(), param.getSaltLength());
+                    param.getMaskGenerationFunction(), param.getSaltLength());
     } else if (parameters instanceof P11Params.P11ByteArrayParams) {
       paramObj = new OpaqueParameters(((P11Params.P11ByteArrayParams) parameters).getBytes());
     } else if (parameters instanceof P11Params.P11IVParams) {
@@ -347,8 +335,7 @@ class IaikP11SlotUtil {
   } // method parseCert
 
   static List<Long> getAllCertificateObjects(Session session) throws P11TokenException {
-    return getObjects(session,
-        Attribute.getInstance(CKA_CLASS, CKO_CERTIFICATE), Attribute.getInstance(CKA_CERTIFICATE_TYPE, CKC_X_509));
+    return getObjects(session, newX509Cert());
   } // method getAllCertificateObjects
 
   static int removeObjects0(Session session, AttributeVector template, String desc) throws P11TokenException {
@@ -381,15 +368,7 @@ class IaikP11SlotUtil {
     Set<P11KeyUsage> usages = control.getUsages();
     if (isNotEmpty(usages)) {
       for (P11KeyUsage usage : usages) {
-        if (usage == P11KeyUsage.DECRYPT) {
-          template.attr(CKA_DECRYPT, true);
-        } else if (usage == P11KeyUsage.DERIVE) {
-          template.attr(CKA_DERIVE, true);
-        } else if (usage == P11KeyUsage.SIGN) {
-          template.attr(CKA_SIGN, true);
-        } else if (usage == P11KeyUsage.UNWRAP) {
-          template.attr(CKA_UNWRAP, true);
-        }
+        template.attr(usage.getAttributeType(), true);
       }
     }
   }
@@ -405,8 +384,7 @@ class IaikP11SlotUtil {
   private static List<Long> getCertificateObjects0(
       Session session, byte[] keyId, boolean ignoreKeyLabel, char[] keyLabel)
       throws P11TokenException {
-    AttributeVector template = new AttributeVector()
-        .attr(CKA_CLASS, CKO_CERTIFICATE).attr(CKA_CERTIFICATE_TYPE, CKC_X_509);
+    AttributeVector template = newX509Cert();
     if (keyId != null) {
       template.attr(CKA_ID, keyId);
     }
@@ -441,6 +419,22 @@ class IaikP11SlotUtil {
 
   private static BigInteger asUnsignedBigInt(byte[] bytes) {
     return new BigInteger(1, bytes);
+  }
+
+  static AttributeVector newPrivateKey(long keyType) {
+    return new AttributeVector().attr(CKA_CLASS, CKO_PRIVATE_KEY).attr(CKA_KEY_TYPE, keyType);
+  }
+
+  static AttributeVector newPublicKey(long keyType) {
+    return new AttributeVector().attr(CKA_CLASS, CKO_PUBLIC_KEY).attr(CKA_KEY_TYPE, keyType);
+  }
+
+  static AttributeVector newSecretKey(long keyType) {
+    return new AttributeVector().attr(CKA_CLASS, CKO_SECRET_KEY).attr(CKA_KEY_TYPE, keyType);
+  }
+
+  static AttributeVector newX509Cert() {
+    return new AttributeVector().attr(CKA_CLASS, CKO_CERTIFICATE).attr(CKA_CERTIFICATE_TYPE, CKC_X_509);
   }
 
 }

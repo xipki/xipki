@@ -30,7 +30,6 @@ import org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory;
 import org.xipki.security.pkcs12.P12SignerFactory;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.FileOrValue;
-import org.xipki.util.LogUtil;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
 

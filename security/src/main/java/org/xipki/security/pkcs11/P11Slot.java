@@ -18,7 +18,6 @@
 package org.xipki.security.pkcs11;
 
 import iaik.pkcs.pkcs11.wrapper.Functions;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.slf4j.Logger;
@@ -52,6 +51,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static iaik.pkcs.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.util.Args.*;
 import static org.xipki.util.StringUtil.concat;
 import static org.xipki.util.StringUtil.toUtf8Bytes;
@@ -162,11 +162,22 @@ public abstract class P11Slot implements Closeable {
   } // class P11NewObjectControl
 
   public enum P11KeyUsage {
-    DECRYPT,
-    DERIVE,
-    SIGN,
-    SIGN_RECOVER,
-    UNWRAP
+    DECRYPT(CKA_DECRYPT),
+    DERIVE(CKA_DERIVE),
+    SIGN(CKA_SIGN),
+    SIGN_RECOVER(CKA_SIGN_RECOVER),
+    UNWRAP(CKA_UNWRAP);
+
+    private final long attributeType;
+
+    private P11KeyUsage(long attributeType) {
+      this.attributeType = attributeType;
+    }
+
+    public long getAttributeType() {
+      return attributeType;
+    }
+
   } // class P11KeyUsage
 
   public static class P11NewKeyControl extends P11NewObjectControl {
@@ -1101,6 +1112,11 @@ public abstract class P11Slot implements Closeable {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + keysize);
     }
 
+    if (!(supportsMechanism(CKM_RSA_X9_31_KEY_PAIR_GEN) || supportsMechanism(CKM_RSA_PKCS_KEY_PAIR_GEN))) {
+      throw new P11UnsupportedMechanismException(buildOrMechanismsUnsupportedMessage(
+          CKM_RSA_X9_31_KEY_PAIR_GEN, CKM_RSA_PKCS_KEY_PAIR_GEN));
+    }
+
     return generateRSAKeypairOtf0(keysize, publicExponent == null ? RSAKeyGenParameterSpec.F4 : publicExponent);
   }
 
@@ -1126,7 +1142,8 @@ public abstract class P11Slot implements Closeable {
     if (keysize % 1024 != 0) {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + keysize);
     }
-    assertCanGenKeypair("generateRSAKeypair", PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN, control);
+    assertCanGenKeypair("generateRSAKeypair", control, CKK_RSA,
+        CKM_RSA_X9_31_KEY_PAIR_GEN, CKM_RSA_PKCS_KEY_PAIR_GEN);
     P11Identity identity = generateRSAKeypair0(keysize,
         publicExponent == null ? RSAKeyGenParameterSpec.F4 : publicExponent, control);
     addIdentity(identity);
@@ -1153,7 +1170,8 @@ public abstract class P11Slot implements Closeable {
     notNull(p, "p");
     notNull(q, "q");
     notNull(g, "g");
-    assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
+
+    assertMechanismSupported(CKM_DSA_KEY_PAIR_GEN);
     return generateDSAKeypairOtf0(p, q, g);
   } // method generateDSAKeypairOtf
 
@@ -1203,7 +1221,7 @@ public abstract class P11Slot implements Closeable {
     notNull(p, "p");
     notNull(q, "q");
     notNull(g, "g");
-    assertCanGenKeypair("generateDSAKeypair", PKCS11Constants.CKM_DSA_KEY_PAIR_GEN, control);
+    assertCanGenKeypair("generateDSAKeypair", control, CKK_DSA, CKM_DSA_KEY_PAIR_GEN);
     P11Identity identity = generateDSAKeypair0(p, q, g, control);
     addIdentity(identity);
     P11IdentityId id = identity.getId();
@@ -1225,13 +1243,13 @@ public abstract class P11Slot implements Closeable {
     notNull(curveOid, "curveOid");
 
     if (EdECConstants.isEdwardsCurve(curveOid)) {
-      assertMechanismSupported(PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN);
+      assertMechanismSupported(CKM_EC_EDWARDS_KEY_PAIR_GEN);
       return generateECEdwardsKeypairOtf0(curveOid);
     } else if (EdECConstants.isMontgomeryCurve(curveOid)) {
-      assertMechanismSupported(PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN);
+      assertMechanismSupported(CKM_EC_MONTGOMERY_KEY_PAIR_GEN);
       return generateECMontgomeryKeypairOtf0(curveOid);
     } else {
-      assertMechanismSupported(PKCS11Constants.CKM_EC_KEY_PAIR_GEN);
+      assertMechanismSupported(CKM_EC_KEY_PAIR_GEN);
       return generateECKeypairOtf0(curveOid);
     }
   }
@@ -1253,15 +1271,13 @@ public abstract class P11Slot implements Closeable {
 
     P11Identity identity;
     if (EdECConstants.isEdwardsCurve(curveOid)) {
-      assertCanGenKeypair("generateECKeypair", PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN,
-          control);
+      assertCanGenKeypair("generateECKeypair", control, CKK_EC_EDWARDS, CKM_EC_EDWARDS_KEY_PAIR_GEN);
       identity = generateECEdwardsKeypair0(curveOid, control);
     } else if (EdECConstants.isMontgomeryCurve(curveOid)) {
-      assertCanGenKeypair("generateECKeypair", PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN,
-          control);
+      assertCanGenKeypair("generateECKeypair", control, CKK_EC_MONTGOMERY, CKM_EC_MONTGOMERY_KEY_PAIR_GEN);
       identity = generateECMontgomeryKeypair0(curveOid, control);
     } else {
-      assertCanGenKeypair("generateECKeypair", PKCS11Constants.CKM_EC_KEY_PAIR_GEN, control);
+      assertCanGenKeypair("generateECKeypair", control, CKK_EC, CKM_EC_KEY_PAIR_GEN);
       identity = generateECKeypair0(curveOid, control);
     }
 
@@ -1279,7 +1295,7 @@ public abstract class P11Slot implements Closeable {
    *         if PKCS#11 token exception occurs.
    */
   public PrivateKeyInfo generateSM2KeypairOtf() throws P11TokenException {
-    assertMechanismSupported(PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
+    assertMechanismSupported(CKM_VENDOR_SM2_KEY_PAIR_GEN);
     return generateSM2KeypairOtf0();
   }
 
@@ -1293,7 +1309,7 @@ public abstract class P11Slot implements Closeable {
    *         if PKCS#11 token exception occurs.
    */
   public P11IdentityId generateSM2Keypair(P11NewKeyControl control) throws P11TokenException {
-    assertCanGenKeypair("generateSM2Keypair", PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN, control);
+    assertCanGenKeypair("generateSM2Keypair", control, CKK_VENDOR_SM2, CKM_VENDOR_SM2_KEY_PAIR_GEN);
     P11Identity identity = generateSM2Keypair0(control);
     addIdentity(identity);
     P11IdentityId id = identity.getId();
@@ -1301,39 +1317,47 @@ public abstract class P11Slot implements Closeable {
     return id;
   } // method generateSM2Keypair
 
-  private void assertCanGenKeypair(String methodName, long mechanism, P11NewKeyControl control)
+  private void assertCanGenKeypair(String methodName, P11NewKeyControl control, long keyType, long... orMechanisms)
       throws P11UnsupportedMechanismException, P11PermissionException, P11DuplicateEntityException {
     notNull(control, "control");
     assertWritable(methodName);
-    assertMechanismSupported(mechanism);
+    if (orMechanisms.length < 2) {
+      assertMechanismSupported(orMechanisms[0]);
+    } else {
+      boolean mechSupported = false;
+      for (long mechanism : orMechanisms) {
+        if (supportsMechanism(mechanism)) {
+          mechSupported = true;
+          break;
+        }
+      }
+
+      if (!mechSupported) {
+        throw new P11UnsupportedMechanismException(buildOrMechanismsUnsupportedMessage(orMechanisms));
+      }
+    }
+
     assertNoIdentityAndCert(control.getId(), control.getLabel());
 
     if (keyPairTypes == null) {
       return;
     }
 
-    long keyType;
-    if (PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN == mechanism) {
-      keyType = PKCS11Constants.CKK_RSA;
-    } else if (PKCS11Constants.CKM_EC_KEY_PAIR_GEN == mechanism) {
-      keyType = PKCS11Constants.CKK_EC;
-    } else if (PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN == mechanism) {
-      keyType = PKCS11Constants.CKK_EC_EDWARDS;
-    } else if (PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN == mechanism) {
-      keyType = PKCS11Constants.CKK_EC_MONTGOMERY;
-    } else if (PKCS11Constants.CKM_DSA_KEY_PAIR_GEN == mechanism) {
-      keyType = PKCS11Constants.CKK_DSA;
-    } else if (PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN == mechanism) {
-      keyType = PKCS11Constants.CKK_VENDOR_SM2;
-    } else {
-      throw new IllegalStateException("unknown KeyPair generation mechanism " + mechanism);
-    }
-
     if (!keyPairTypes.contains(keyType)) {
       LOG.error("Keypair of key type 0x{} unsupported", Long.toHexString(keyType));
-      throw new P11UnsupportedMechanismException(mechanism, slotId);
+      throw new P11UnsupportedMechanismException(buildOrMechanismsUnsupportedMessage(orMechanisms));
     }
   } // method assertCanGenKeypair
+
+  private String buildOrMechanismsUnsupportedMessage(long... mechanisms) {
+    StringBuilder sb = new StringBuilder("none of mechanisms [");
+    for (long mechanism : mechanisms) {
+      sb.append(Functions.getMechanismDescription(mechanism)).append(", ");
+    }
+    sb.deleteCharAt(sb.length() - 1);
+    sb.append("] is not supported by PKCS11 slot ").append(slotId);
+    return sb.toString();
+  }
 
   /**
    * Updates the certificate associated with the given ID {@code keyId} with the given certificate

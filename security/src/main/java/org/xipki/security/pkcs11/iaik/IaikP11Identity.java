@@ -17,7 +17,6 @@
 
 package org.xipki.security.pkcs11.iaik;
 
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.xipki.security.EdECConstants;
@@ -31,8 +30,6 @@ import java.security.PublicKey;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * {@link P11Identity} based on the IAIK PKCS#11 wrapper.

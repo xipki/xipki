@@ -23,7 +23,6 @@ import org.xipki.util.exception.InvalidConfException;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Configuration of PKCS#11.
