@@ -351,17 +351,17 @@ class IaikP11SlotUtil {
   } // method removeObjects
 
   static void setKeyAttributes(P11NewKeyControl control, AttributeVector template, char[] label) {
-    template.attr(CKA_TOKEN, true);
+    template.token(true);
     if (label != null) {
-      template.attr(CKA_LABEL, label);
+      template.label(label);
     }
 
     if (control.getExtractable() != null) {
-      template.attr(CKA_EXTRACTABLE, control.getExtractable());
+      template.extractable(control.getExtractable());
     }
 
     if (control.getSensitive() != null) {
-      template.attr(CKA_SENSITIVE, control.getSensitive());
+      template.sensitive(control.getSensitive());
     }
 
     Set<P11KeyUsage> usages = control.getUsages();
@@ -375,11 +375,11 @@ class IaikP11SlotUtil {
   static List<Long> getCertificateObjects(Session session, byte[] keyId, char[] keyLabel) throws P11TokenException {
     AttributeVector template = newX509Cert();
     if (keyId != null) {
-      template.attr(CKA_ID, keyId);
+      template.id(keyId);
     }
 
     if (keyLabel != null) {
-      template.attr(CKA_LABEL, keyLabel);
+      template.label(keyLabel);
     }
 
     List<Long> tmpObjects = getObjects(session, template);
@@ -407,19 +407,19 @@ class IaikP11SlotUtil {
   }
 
   static AttributeVector newPrivateKey(long keyType) {
-    return new AttributeVector().attr(CKA_CLASS, CKO_PRIVATE_KEY).attr(CKA_KEY_TYPE, keyType);
+    return new AttributeVector().class_(CKO_PRIVATE_KEY).keyType(keyType);
   }
 
   static AttributeVector newPublicKey(long keyType) {
-    return new AttributeVector().attr(CKA_CLASS, CKO_PUBLIC_KEY).attr(CKA_KEY_TYPE, keyType);
+    return new AttributeVector().class_(CKO_PUBLIC_KEY).keyType(keyType);
   }
 
   static AttributeVector newSecretKey(long keyType) {
-    return new AttributeVector().attr(CKA_CLASS, CKO_SECRET_KEY).attr(CKA_KEY_TYPE, keyType);
+    return new AttributeVector().class_(CKO_SECRET_KEY).keyType(keyType);
   }
 
   static AttributeVector newX509Cert() {
-    return new AttributeVector().attr(CKA_CLASS, CKO_CERTIFICATE).attr(CKA_CERTIFICATE_TYPE, CKC_X_509);
+    return new AttributeVector().class_(CKO_CERTIFICATE).keyType(CKC_X_509);
   }
 
 }
