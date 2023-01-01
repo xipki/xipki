@@ -645,7 +645,7 @@ public abstract class P11Slot implements Closeable {
       List<Long> sortedMechs = new ArrayList<>(mechanisms);
       Collections.sort(sortedMechs);
       for (Long mech : sortedMechs) {
-        sb.append("\t").append(Functions.getMechanismDescription(mech)).append("\n");
+        sb.append("\t").append(Functions.ckmCodeToName(mech)).append("\n");
       }
 
       sb.append("\nsupported by device but ignored mechanisms:\n");
@@ -654,7 +654,7 @@ public abstract class P11Slot implements Closeable {
       } else {
         Collections.sort(ignoreMechs);
         for (Long mech : ignoreMechs) {
-          sb.append("\t").append(Functions.getMechanismDescription(mech)).append("\n");
+          sb.append("\t").append(Functions.ckmCodeToName(mech)).append("\n");
         }
       }
 
@@ -1352,7 +1352,7 @@ public abstract class P11Slot implements Closeable {
   private String buildOrMechanismsUnsupportedMessage(long... mechanisms) {
     StringBuilder sb = new StringBuilder("none of mechanisms [");
     for (long mechanism : mechanisms) {
-      sb.append(Functions.getMechanismDescription(mechanism)).append(", ");
+      sb.append(Functions.ckmCodeToName(mechanism)).append(", ");
     }
     sb.deleteCharAt(sb.length() - 1);
     sb.append("] is not supported by PKCS11 slot ").append(slotId);
@@ -1445,7 +1445,7 @@ public abstract class P11Slot implements Closeable {
           }
         }
       } else {
-        sb.append("\t\tSymmetric key: ").append(Functions.getKeyTypeName(identity.getKeyType()))
+        sb.append("\t\tSymmetric key: ").append(Functions.ckkCodeToName(identity.getKeyType()))
             .append("/").append(identity.getSignatureKeyBitLength()).append("\n");
       }
     }

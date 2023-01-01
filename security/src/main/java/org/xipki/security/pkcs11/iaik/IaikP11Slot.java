@@ -225,7 +225,7 @@ class IaikP11Slot extends P11Slot {
           if (code == CKM_ECDSA_SHA1     || code == CKM_ECDSA_SHA224   || code == CKM_ECDSA_SHA256 ||
               code == CKM_ECDSA_SHA384   || code == CKM_ECDSA_SHA512   || code == CKM_ECDSA_SHA3_224 ||
               code == CKM_ECDSA_SHA3_256 || code == CKM_ECDSA_SHA3_384 || code == CKM_ECDSA_SHA3_512) {
-            ignoreMechs.append(Functions.getMechanismDescription(code)).append(", ");
+            ignoreMechs.append(Functions.ckmCodeToName(code)).append(", ");
           } else {
             ret.addMechanism(code);
           }
@@ -404,7 +404,7 @@ class IaikP11Slot extends P11Slot {
 
     int idLen = id == null ? 0 : id.length;
     String name = "id " + (idLen == 0 ? "" : hex(id)) + " and label " + label;
-    String keyTypeName = Functions.getKeyTypeName(keyType);
+    String keyTypeName = Functions.ckkCodeToName(keyType);
 
     if (idLen == 0) {
       if (keyType == CKK_RSA) {
@@ -613,8 +613,7 @@ class IaikP11Slot extends P11Slot {
   private Session openSession() throws P11TokenException {
     Session session;
     try {
-      boolean rw = !isReadOnly();
-      session = slot.getToken().openSession(rw);
+      session = slot.getToken().openSession(!isReadOnly());
     } catch (TokenException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
@@ -804,9 +803,8 @@ class IaikP11Slot extends P11Slot {
 
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
-      Session session = bagEntry.value();
       String objIdDesc = getDescription(id, label);
-      return removeObjects0(session, template, "objects " + objIdDesc);
+      return removeObjects0(bagEntry.value(), template, "objects " + objIdDesc);
     } finally {
       sessions.requite(bagEntry);
     }
@@ -824,10 +822,8 @@ class IaikP11Slot extends P11Slot {
       }
 
       for (Long certHandle : existingCerts) {
-        session.destroyObject(certHandle);
+        destroyObject(session, certHandle, "");
       }
-    } catch (TokenException ex) {
-      throw new P11TokenException(ex.getMessage(), ex);
     } finally {
       sessions.requite(bagEntry);
     }
@@ -1037,23 +1033,19 @@ class IaikP11Slot extends P11Slot {
       KeyPair keypair = null;
       try {
         keypair = session.generateKeyPair(Mechanism.get(mech), publicKeyTemplate, privateKeyTemplate);
-        byte[][] attrValues = session.getByteArrayAttributeValues(keypair.getPrivateKey(),
+        BigInteger[] attrValues = session.getByteArrayAttributeBigIntValues(keypair.getPrivateKey(),
             CKA_MODULUS, CKA_PUBLIC_EXPONENT, CKA_PRIVATE_EXPONENT,
             CKA_PRIME_1, CKA_PRIME_2, CKA_EXPONENT_1, CKA_EXPONENT_2, CKA_COEFFICIENT);
 
         return new PrivateKeyInfo(ALGID_RSA,
             new org.bouncycastle.asn1.pkcs.RSAPrivateKey(
-                new BigInteger(1, attrValues[0]), new BigInteger(1, attrValues[1]),
-                new BigInteger(1, attrValues[2]), new BigInteger(1, attrValues[3]),
-                new BigInteger(1, attrValues[4]), new BigInteger(1, attrValues[5]),
-                new BigInteger(1, attrValues[6]), new BigInteger(1, attrValues[7])));
+                attrValues[0], attrValues[1], attrValues[2], attrValues[3],
+                attrValues[4], attrValues[5], attrValues[6], attrValues[7]));
 
       } catch (TokenException | IOException ex) {
-        throw new P11TokenException("could not generate keypair " + Functions.mechanismCodeToString(mech), ex);
+        throw new P11TokenException("could not generate keypair " + Functions.ckmCodeToName(mech), ex);
       } finally {
-        if (keypair != null) {
-          destroyObject(session, keypair.getPrivateKey(), keypair.getPublicKey());
-        }
+        destroyKeyPairQuietly(session, keypair);
       }
     } finally {
       sessions.requite(bagEntry);
@@ -1092,19 +1084,16 @@ class IaikP11Slot extends P11Slot {
         long skHandle = keypair.getPrivateKey();
         long pkHandle = keypair.getPublicKey();
 
-        byte[] p11PublicKeyValue = session.getByteArrayAttributeValue(pkHandle, CKA_VALUE);
-        byte[] p11PrivateKeyValue = session.getByteArrayAttributeValue(skHandle, CKA_VALUE);
+        BigInteger p11PublicKeyValue = session.getByteArrayAttributeBigIntValue(pkHandle, CKA_VALUE);
+        BigInteger p11PrivateKeyValue = session.getByteArrayAttributeBigIntValue(skHandle, CKA_VALUE);
 
-        byte[] publicKey = new ASN1Integer(new BigInteger(1, p11PublicKeyValue)).getEncoded(); // y
+        byte[] publicKey = new ASN1Integer(p11PublicKeyValue).getEncoded(); // y
 
-        return new PrivateKeyInfo(algId, new ASN1Integer(new BigInteger(1, p11PrivateKeyValue)),
-            null, publicKey);
+        return new PrivateKeyInfo(algId, new ASN1Integer(p11PrivateKeyValue), null, publicKey);
       } catch (TokenException | IOException ex) {
-        throw new P11TokenException("could not generate keypair " + Functions.mechanismCodeToString(mech), ex);
+        throw new P11TokenException("could not generate keypair " + Functions.ckmCodeToName(mech), ex);
       } finally {
-        if (keypair != null) {
-          destroyObject(session, keypair.getPrivateKey(), keypair.getPublicKey());
-        }
+        destroyKeyPairQuietly(session, keypair);
       }
     } finally {
       sessions.requite(bagEntry);
@@ -1223,11 +1212,9 @@ class IaikP11Slot extends P11Slot {
                   new BigInteger(1, privValue), new DERBitString(encodedPublicPoint), null));
         }
       } catch (TokenException | IOException ex) {
-        throw new P11TokenException("could not generate keypair " + Functions.mechanismCodeToString(mech), ex);
+        throw new P11TokenException("could not generate keypair " + Functions.ckmCodeToName(mech), ex);
       } finally {
-        if (keypair != null) {
-          destroyObject(session, keypair.getPrivateKey(), keypair.getPublicKey());
-        }
+        destroyKeyPairQuietly(session, keypair);
       }
     } finally {
       sessions.requite(bagEntry);
@@ -1287,7 +1274,7 @@ class IaikP11Slot extends P11Slot {
         try {
           keypair = session.generateKeyPair(Mechanism.get(mech), publicKeyTemplate, privateKeyTemplate);
         } catch (TokenException ex) {
-          throw new P11TokenException("could not generate keypair " + Functions.mechanismCodeToString(mech), ex);
+          throw new P11TokenException("could not generate keypair " + Functions.ckmCodeToName(mech), ex);
         }
 
         String pubKeyLabel;
@@ -1435,40 +1422,15 @@ class IaikP11Slot extends P11Slot {
       byte[] id = keyId.getId();
       char[] label = keyId.getLabelChars();
       Long secretKey = getKeyObject(session, CKO_SECRET_KEY, null, id, label);
-      if (secretKey != null) {
-        try {
-          session.destroyObject(secretKey);
-        } catch (TokenException ex) {
-          String msg = "could not delete secret key " + keyId;
-          LogUtil.error(LOG, ex, msg);
-          throw new P11TokenException(msg);
-        }
-      }
+      destroyObject(session, secretKey, "secret key " + keyId);
 
       Long privKey = getKeyObject(session, CKO_PRIVATE_KEY, null, id, label);
-
-      if (privKey != null) {
-        try {
-          session.destroyObject(privKey);
-        } catch (TokenException ex) {
-          String msg = "could not delete private key " + keyId;
-          LogUtil.error(LOG, ex, msg);
-          throw new P11TokenException(msg);
-        }
-      }
+      destroyObject(session, privKey, "private key " + keyId);
 
       P11ObjectIdentifier pubKeyId = identityId.getPublicKeyId();
       if (pubKeyId != null) {
         Long pubKey = getKeyObject(session, CKO_PUBLIC_KEY, null, pubKeyId.getId(), pubKeyId.getLabelChars());
-        if (pubKey != null) {
-          try {
-            session.destroyObject(pubKey);
-          } catch (TokenException ex) {
-            String msg = "could not delete public key " + pubKeyId;
-            LogUtil.error(LOG, ex, msg);
-            throw new P11TokenException(msg);
-          }
-        }
+        destroyObject(session, pubKey, "public key " + keyId);
       }
 
       P11ObjectIdentifier certId = identityId.getCertId();
@@ -1476,13 +1438,7 @@ class IaikP11Slot extends P11Slot {
         List<Long> certs = getCertificateObjects(session, certId.getId(), certId.getLabelChars());
         if (certs != null && !certs.isEmpty()) {
           for (Long cert : certs) {
-            try {
-              session.destroyObject(cert);
-            } catch (TokenException ex) {
-              String msg = "could not delete certificate " + certId;
-              LogUtil.error(LOG, ex, msg);
-              throw new P11TokenException(msg);
-            }
+            destroyObject(session, cert, "certificate " + certId);
           }
         }
       }
@@ -1521,7 +1477,7 @@ class IaikP11Slot extends P11Slot {
     return !isEmpty(getObjects(session, template, 1));
   } // method labelExists
 
-  void setKeyAttributes(P11NewKeyControl control, AttributeVector publicKey,
+  static void setKeyAttributes(P11NewKeyControl control, AttributeVector publicKey,
                         AttributeVector privateKey, P11NewObjectConf newObjectConf) {
     if (privateKey != null) {
       privateKey.attr(CKA_PRIVATE, true).attr(CKA_TOKEN, true);
@@ -1577,12 +1533,31 @@ class IaikP11Slot extends P11Slot {
         .attr(CKA_TOKEN, false);
   }
 
-  private static void destroyObject(Session session, long... hObjects) {
-    for (long hObject : hObjects) {
+  private static void destroyKeyPairQuietly(Session session, KeyPair keypair) {
+    if (keypair != null) {
+      try {
+        session.destroyObject(keypair.getPrivateKey());
+      } catch (TokenException ex) {
+        LogUtil.warn(LOG, ex, "error destroying private key " + keypair.getPrivateKey());
+      }
+
+      try {
+        session.destroyObject(keypair.getPublicKey());
+      } catch (TokenException ex) {
+        LogUtil.warn(LOG, ex, "error destroying public key " + keypair.getPublicKey());
+      }
+    }
+  }
+
+  private static void destroyObject(Session session, Long hObject, String objectDesc)
+      throws P11TokenException {
+    if (hObject != null) {
       try {
         session.destroyObject(hObject);
       } catch (TokenException ex) {
-        LogUtil.warn(LOG, ex, "error destroying object " + hObject);
+        String msg = "could not destroy " + objectDesc;
+        LogUtil.error(LOG, ex, msg);
+        throw new P11TokenException(msg);
       }
     }
   }

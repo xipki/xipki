@@ -29,12 +29,12 @@ import iaik.pkcs.pkcs11.wrapper.Functions;
 public class P11UnsupportedMechanismException extends P11TokenException {
 
   public P11UnsupportedMechanismException(long mechanism, P11SlotIdentifier slotId) {
-    super("mechanism " + Functions.getMechanismDescription(mechanism)
+    super("mechanism " + Functions.ckmCodeToName(mechanism)
         + " is not supported by PKCS11 slot " + slotId);
   }
 
   public P11UnsupportedMechanismException(long mechanism, P11IdentityId identityId) {
-    super("mechanism " + Functions.getMechanismDescription(mechanism)
+    super("mechanism " + Functions.ckmCodeToName(mechanism)
         + " is not supported by PKCS11 identity " + identityId);
   }
 

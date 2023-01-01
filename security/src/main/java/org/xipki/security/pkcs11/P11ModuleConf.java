@@ -395,7 +395,7 @@ public class P11ModuleConf {
 
         Long mech = null;
         if (mechStr.startsWith("CKM_")) {
-          mech = Functions.mechanismStringToCode(mechStr);
+          mech = Functions.ckmNameToCode(mechStr);
         } else {
           int radix = 10;
           if (mechStr.startsWith("0X")) {

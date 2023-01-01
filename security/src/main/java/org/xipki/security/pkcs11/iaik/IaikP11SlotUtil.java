@@ -79,7 +79,7 @@ class IaikP11SlotUtil {
       tmpPin = new char[]{};
     }
 
-    String userTypeText = Functions.getUserTypeName(userType);
+    String userTypeText = Functions.ckuCodeToName(userType);
     try {
       session.login(userType, tmpPin);
       LOG.info("login successful as user " + userTypeText);
@@ -223,14 +223,13 @@ class IaikP11SlotUtil {
       throws XiSecurityException {
     try {
       if (keyType == CKK_RSA) {
-        byte[][] attrValues = session.getByteArrayAttributeValues(hP11Key, CKA_MODULUS, CKA_PUBLIC_EXPONENT);
-        return buildRSAKey(asUnsignedBigInt(attrValues[0]), asUnsignedBigInt(attrValues[1]));
+        BigInteger[] attrValues = session.getByteArrayAttributeBigIntValues(hP11Key, CKA_MODULUS, CKA_PUBLIC_EXPONENT);
+        return buildRSAKey(attrValues[0], attrValues[1]);
       } else if (keyType == CKK_DSA) {
-        byte[][] attrValues = session.getByteArrayAttributeValues(hP11Key,
+        BigInteger[] attrValues = session.getByteArrayAttributeBigIntValues(hP11Key,
             CKA_VALUE, CKA_PRIME, CKA_SUBPRIME, CKA_BASE);
 
-        DSAPublicKeySpec keySpec = new DSAPublicKeySpec(asUnsignedBigInt(attrValues[0]),
-            asUnsignedBigInt(attrValues[1]), asUnsignedBigInt(attrValues[2]), asUnsignedBigInt(attrValues[3]));
+        DSAPublicKeySpec keySpec = new DSAPublicKeySpec(attrValues[0], attrValues[1], attrValues[2], attrValues[3]);
         try {
           return KeyUtil.generateDSAPublicKey(keySpec);
         } catch (InvalidKeySpecException ex) {
@@ -310,7 +309,7 @@ class IaikP11SlotUtil {
           }
         }
       } else {
-        throw new XiSecurityException("unknown publicKey type " + Functions.getKeyTypeName(keyType));
+        throw new XiSecurityException("unknown publicKey type " + Functions.ckkCodeToName(keyType));
       }
     } catch (PKCS11Exception ex) {
       throw new XiSecurityException("error reading PKCS#11 attribute values", ex);
@@ -373,27 +372,17 @@ class IaikP11SlotUtil {
     }
   }
 
-  static List<Long> getCertificateObjectsForId(Session session, byte[] keyId) throws P11TokenException {
-    return getCertificateObjects0(session, keyId, true, null);
-  }
-
   static List<Long> getCertificateObjects(Session session, byte[] keyId, char[] keyLabel) throws P11TokenException {
-    return getCertificateObjects0(session, keyId, false, keyLabel);
-  }
-
-  private static List<Long> getCertificateObjects0(
-      Session session, byte[] keyId, boolean ignoreKeyLabel, char[] keyLabel)
-      throws P11TokenException {
     AttributeVector template = newX509Cert();
     if (keyId != null) {
       template.attr(CKA_ID, keyId);
     }
-    if (!ignoreKeyLabel) {
+
+    if (keyLabel != null) {
       template.attr(CKA_LABEL, keyLabel);
     }
 
     List<Long> tmpObjects = getObjects(session, template);
-
     if (isEmpty(tmpObjects)) {
       LOG.info("found no certificate identified by {}", getDescription(keyId, keyLabel));
       return null;
@@ -415,10 +404,6 @@ class IaikP11SlotUtil {
       LogUtil.warn(LOG, e, "error reading label for object " + objectHandle);
       return null;
     }
-  }
-
-  private static BigInteger asUnsignedBigInt(byte[] bytes) {
-    return new BigInteger(1, bytes);
   }
 
   static AttributeVector newPrivateKey(long keyType) {

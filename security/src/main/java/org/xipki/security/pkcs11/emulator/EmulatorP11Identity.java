@@ -270,7 +270,7 @@ public class EmulatorP11Identity extends P11Identity {
 
     HashAlgo hashAlgo =  mechHashMap.get(mechanism);
     if (hashAlgo == null) {
-      throw new P11TokenException("unknown mechanism " + Functions.mechanismCodeToString(mechanism));
+      throw new P11TokenException("unknown mechanism " + Functions.ckmCodeToName(mechanism));
     }
     return hashAlgo.hash(signingKey.getEncoded());
   }
