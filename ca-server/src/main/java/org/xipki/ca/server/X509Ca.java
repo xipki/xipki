@@ -285,7 +285,6 @@ public class X509Ca extends X509CaModule implements Closeable {
   }
 
   public List<CertificateInfo> regenerateCerts(
-      .
       RequestorInfo requestor, List<CertTemplateData> certTemplates, String transactionId) throws OperationException {
     AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_regen_cert, requestor);
     try {
