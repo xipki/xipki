@@ -61,8 +61,7 @@ public interface SecurityFactory {
    * @throws ObjectCreationException
    *         if could not create the object
    */
-  KeyCertPair createPrivateKeyAndCert(String type, SignerConf conf, X509Cert cert)
-      throws ObjectCreationException;
+  KeyCertPair createPrivateKeyAndCert(String type, SignerConf conf, X509Cert cert) throws ObjectCreationException;
 
   /**
    * Creates signer.
@@ -78,8 +77,7 @@ public interface SecurityFactory {
    * @throws ObjectCreationException
    *         if could not create the signer
    */
-  ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Cert cert)
-      throws ObjectCreationException;
+  ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Cert cert) throws ObjectCreationException;
 
   /**
    * Creates signer.
@@ -115,8 +113,7 @@ public interface SecurityFactory {
    * @throws ObjectCreationException
    *         if could not create the keypair generator
    */
-  KeypairGenerator createKeypairGenerator(String type, String conf)
-      throws ObjectCreationException;
+  KeypairGenerator createKeypairGenerator(String type, String conf) throws ObjectCreationException;
 
   /**
    * Gets the ContentVerifierProvider from the public key.
@@ -127,8 +124,7 @@ public interface SecurityFactory {
    * @throws InvalidKeyException
    *         If the publicKey is invalid or unsupported.
    */
-  ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
-      throws InvalidKeyException;
+  ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey) throws InvalidKeyException;
 
   /**
    * Gets the ContentVerifierProvider from the public key.
@@ -154,8 +150,7 @@ public interface SecurityFactory {
    * @throws InvalidKeyException
    *         If the publicKey contained in the certificate is invalid or unsupported.
    */
-  ContentVerifierProvider getContentVerifierProvider(X509Cert cert)
-      throws InvalidKeyException;
+  ContentVerifierProvider getContentVerifierProvider(X509Cert cert) throws InvalidKeyException;
 
   /**
    * Verifies the signature of CSR.
@@ -219,8 +214,7 @@ public interface SecurityFactory {
    * @throws InvalidKeyException
    *         if could not create public key.
    */
-  PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo)
-      throws InvalidKeyException;
+  PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo) throws InvalidKeyException;
 
   SecureRandom getRandom4Sign();
 

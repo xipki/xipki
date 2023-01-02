@@ -311,8 +311,7 @@ public class XijsonExtensions {
     return false;
   }
 
-  private void initSubjectToSubjectAltNames(List<SubjectToSubjectAltNameType> list)
-      throws CertprofileException {
+  private void initSubjectToSubjectAltNames(List<SubjectToSubjectAltNameType> list) throws CertprofileException {
     if (CollectionUtil.isEmpty(list)) {
       return;
     }
@@ -583,8 +582,7 @@ public class XijsonExtensions {
         }
 
         Iso4217CurrencyCode currency = StringUtil.isNumber(tmpCurrency)
-            ? new Iso4217CurrencyCode(Integer.parseInt(tmpCurrency))
-            : new Iso4217CurrencyCode(tmpCurrency);
+            ? new Iso4217CurrencyCode(Integer.parseInt(tmpCurrency)) : new Iso4217CurrencyCode(tmpCurrency);
 
         Range2Type r1 = euLimitType.getAmount();
         Range2Type r2 = euLimitType.getExponent();
@@ -826,7 +824,6 @@ public class XijsonExtensions {
       X500Name requestedSubject, X500Name grantedSubject, Map<ASN1ObjectIdentifier, Extension> requestedExtensions)
       throws BadCertTemplateException {
     Extension extn = (requestedExtensions == null) ? null : requestedExtensions.get(Extension.subjectAlternativeName);
-
     ASN1Encodable extValue = (extn == null) ? null : extn.getParsedValue();
 
     if (extValue == null && subjectToSubjectAltNameModes == null) {

@@ -154,15 +154,13 @@ public class P11ContentSignerBuilder {
     return concurrentSigner;
   } // method createSigner
 
-  private XiContentSigner createRSAContentSigner(SignAlgo signAlgo)
-      throws XiSecurityException, P11TokenException {
+  private XiContentSigner createRSAContentSigner(SignAlgo signAlgo) throws XiSecurityException, P11TokenException {
     return  signAlgo.isRSAPSSSigAlgo()
       ? new P11ContentSigner.RSAPSS(cryptService, identityId, signAlgo, securityFactory.getRandom4Sign())
       : new P11ContentSigner.RSA(cryptService, identityId, signAlgo);
   }
 
-  private XiContentSigner createECContentSigner(SignAlgo signAlgo)
-      throws XiSecurityException, P11TokenException {
+  private XiContentSigner createECContentSigner(SignAlgo signAlgo) throws XiSecurityException, P11TokenException {
     return new P11ContentSigner.ECDSA(cryptService, identityId, signAlgo);
   }
 
@@ -172,13 +170,11 @@ public class P11ContentSignerBuilder {
     return new P11ContentSigner.SM2(cryptService, identityId, signAlgo, curveOid, pubPointX, pubPointy);
   }
 
-  private XiContentSigner createDSAContentSigner(SignAlgo signAlgo)
-      throws XiSecurityException, P11TokenException {
+  private XiContentSigner createDSAContentSigner(SignAlgo signAlgo) throws XiSecurityException, P11TokenException {
     return new P11ContentSigner.DSA(cryptService, identityId, signAlgo);
   }
 
-  private XiContentSigner createEdDSAContentSigner(SignAlgo signAlgo)
-      throws XiSecurityException, P11TokenException {
+  private XiContentSigner createEdDSAContentSigner(SignAlgo signAlgo) throws XiSecurityException, P11TokenException {
     return new P11ContentSigner.EdDSA(cryptService, identityId, signAlgo);
   }
 

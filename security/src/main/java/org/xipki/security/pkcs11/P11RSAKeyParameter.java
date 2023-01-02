@@ -74,9 +74,7 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
       throw new InvalidKeyException(ex.getMessage(), ex);
     }
 
-    BigInteger modulus = key.getModulus();
-    BigInteger publicExponent = key.getPublicExponent();
-    return new P11RSAKeyParameter(p11CryptService, identityId, modulus, publicExponent);
+    return new P11RSAKeyParameter(p11CryptService, identityId, key.getModulus(), key.getPublicExponent());
   }
 
 }

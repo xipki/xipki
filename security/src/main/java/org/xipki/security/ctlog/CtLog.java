@@ -86,15 +86,13 @@ public class CtLog {
     }
 
     public Object getSignatureObject() {
-      switch (algorithm.signature) {
-        case ecdsa:
-        case dsa:
-          ASN1Sequence seq = ASN1Sequence.getInstance(signature);
-          return new BigInteger[] {
-              ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue(),
-              ASN1Integer.getInstance(seq.getObjectAt(1)).getPositiveValue()};
-        default:
-          return signature;
+      if (algorithm.signature == SignatureAlgorithm.ecdsa || algorithm.signature == SignatureAlgorithm.dsa ) {
+        ASN1Sequence seq = ASN1Sequence.getInstance(signature);
+        return new BigInteger[]{
+            ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue(),
+            ASN1Integer.getInstance(seq.getObjectAt(1)).getPositiveValue()};
+      } else {
+        return signature;
       }
     }
 
@@ -535,8 +533,7 @@ public class CtLog {
     for (int i = 0; i < size; i++) {
       ASN1Encodable extn = extns.getObjectAt(i).toASN1Primitive();
       ASN1Encodable type = ((ASN1Sequence) extn).getObjectAt(0);
-      if (ObjectIdentifiers.Extn.id_precertificate.equals(type)
-          || ObjectIdentifiers.Extn.id_SCTs.equals(type)) {
+      if (ObjectIdentifiers.Extn.id_precertificate.equals(type) || ObjectIdentifiers.Extn.id_SCTs.equals(type)) {
         continue;
       }
 

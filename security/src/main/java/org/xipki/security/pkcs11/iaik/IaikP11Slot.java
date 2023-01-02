@@ -29,6 +29,7 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.DSAParameter;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.bouncycastle.util.BigIntegers;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ import org.xipki.util.concurrent.ConcurrentBagEntry;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.util.Collections;
@@ -207,7 +209,7 @@ class IaikP11Slot extends P11Slot {
 
   @Override
   protected P11SlotRefreshResult refresh0() throws P11TokenException {
-    Mechanism[] mechanisms;
+    long[] mechanisms;
     try {
       mechanisms = slot.getToken().getMechanismList();
     } catch (TokenException ex) {
@@ -219,8 +221,7 @@ class IaikP11Slot extends P11Slot {
     if (mechanisms != null) {
       StringBuilder ignoreMechs = new StringBuilder();
       boolean smartcard = libDesc.toLowerCase().contains("smartcard");
-      for (Mechanism mech : mechanisms) {
-        long code = mech.getMechanismCode();
+      for (long code : mechanisms) {
         if (smartcard) {
           if (code == CKM_ECDSA_SHA1     || code == CKM_ECDSA_SHA224   || code == CKM_ECDSA_SHA256 ||
               code == CKM_ECDSA_SHA384   || code == CKM_ECDSA_SHA512   || code == CKM_ECDSA_SHA3_224 ||
@@ -385,8 +386,7 @@ class IaikP11Slot extends P11Slot {
     return true;
   } // method analyseSingleKey
 
-  private boolean analyseSinglePrivateKey(
-      Session session, long hPrivKey, P11SlotRefreshResult refreshResult) {
+  private boolean analyseSinglePrivateKey(Session session, long hPrivKey, P11SlotRefreshResult refreshResult) {
     ByteArrayAttribute idAttr = new ByteArrayAttribute(CKA_ID);
     CharArrayAttribute labelAttr = new CharArrayAttribute(CKA_LABEL);
     LongAttribute keyTypeAttr = new LongAttribute(CKA_KEY_TYPE);
@@ -427,7 +427,7 @@ class IaikP11Slot extends P11Slot {
       }
 
       String certLabel = null;
-      java.security.PublicKey pubKey = null;
+      PublicKey pubKey = null;
       X509Cert cert = idLen == 0 ? null : refreshResult.getCertForId(id);
 
       if (cert != null) {
@@ -521,20 +521,12 @@ class IaikP11Slot extends P11Slot {
     notNull(content, "content");
     assertMechanismSupported(mech);
 
-    int expectedSignatureLen;
-    if (mech == CKM_SHA_1_HMAC) {
-      expectedSignatureLen = 20;
-    } else if (mech == CKM_SHA224_HMAC || mech == CKM_SHA3_224) {
-      expectedSignatureLen = 28;
-    } else if (mech == CKM_SHA256_HMAC || mech == CKM_SHA3_256) {
-      expectedSignatureLen = 32;
-    } else if (mech == CKM_SHA384_HMAC || mech == CKM_SHA3_384) {
-      expectedSignatureLen = 48;
-    } else if (mech == CKM_SHA512_HMAC || mech == CKM_SHA3_512) {
-      expectedSignatureLen = 64;
-    } else {
-      expectedSignatureLen = identity.getExpectedSignatureLen();
-    }
+    int expectedSignatureLen = (mech == CKM_SHA_1_HMAC) ? 20
+        : (mech == CKM_SHA224_HMAC || mech == CKM_SHA3_224) ? 28
+        : (mech == CKM_SHA256_HMAC || mech == CKM_SHA3_256) ? 32
+        : (mech == CKM_SHA384_HMAC || mech == CKM_SHA3_384) ? 48
+        : (mech == CKM_SHA512_HMAC || mech == CKM_SHA3_512) ? 64
+        : identity.getExpectedSignatureLen();
 
     Mechanism mechanismObj = getMechanism(mech, parameters);
     long signingKeyHandle = identity.getSigningKeyHandle();
@@ -1289,7 +1281,7 @@ class IaikP11Slot extends P11Slot {
         }
 
         P11ObjectIdentifier objId = new P11ObjectIdentifier(id, new String(labelChars));
-        java.security.PublicKey jcePublicKey;
+        PublicKey jcePublicKey;
         try {
           jcePublicKey = generatePublicKey(session, keypair.getPublicKey(), keyType);
         } catch (XiSecurityException ex) {
@@ -1377,7 +1369,7 @@ class IaikP11Slot extends P11Slot {
     }
 
     if (setCertAttributes.contains(CKA_SERIAL_NUMBER)) {
-      newCertTemp.serialNumber(Util.unsignedBigIntergerToByteArray(cert.getSerialNumber()));
+      newCertTemp.serialNumber(BigIntegers.asUnsignedByteArray(cert.getSerialNumber()));
     }
 
     if (!omitDateAttrs) {

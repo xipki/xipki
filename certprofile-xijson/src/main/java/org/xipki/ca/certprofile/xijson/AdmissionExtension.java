@@ -224,11 +224,8 @@ public class AdmissionExtension {
           RegistrationNumberOption regNumOption = pio.getRegistrationNumberOption();
           String registrationNumber = null;
           if (regNumOption != null) {
-            if (regNumOption.getConstant() != null) {
-              registrationNumber = regNumOption.getConstant();
-            } else {
-              registrationNumber = newRegNumbersList.get(i).get(j);
-            }
+            registrationNumber = (regNumOption.getConstant() != null)
+                ? regNumOption.getConstant() : newRegNumbersList.get(i).get(j);
           }
 
           pis[i] = new ProfessionInfo(pio.getNamingAuthority(), professionItems,

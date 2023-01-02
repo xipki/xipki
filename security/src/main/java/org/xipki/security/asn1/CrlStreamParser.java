@@ -110,8 +110,9 @@ public class CrlStreamParser extends Asn1StreamParser {
       this.revocationDate = revocationDate.getTime() / 1000;
       this.reason = reason;
       this.certificateIssuer = certificateIssuer;
-      this.invalidityDate = (invalidityDate == null)
-          ? 0 : revocationDate.equals(invalidityDate) ? 0 : invalidityDate.getTime() / 1000;
+      this.invalidityDate = (invalidityDate == null) ? 0
+          : revocationDate.equals(invalidityDate) ? 0
+          : invalidityDate.getTime() / 1000;
     }
 
     public BigInteger getSerialNumber() {

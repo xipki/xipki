@@ -160,8 +160,7 @@ public class KeyUtil {
     }
   }
 
-  public static DSAPublicKey generateDSAPublicKey(DSAPublicKeySpec keySpec)
-      throws InvalidKeySpecException {
+  public static DSAPublicKey generateDSAPublicKey(DSAPublicKeySpec keySpec) throws InvalidKeySpecException {
     notNull(keySpec, "keySpec");
     KeyFactory kf = getKeyFactory("DSA");
     synchronized (kf) {
@@ -204,8 +203,7 @@ public class KeyUtil {
    * @throws InvalidKeySpecException
    *           If key is invalid.
    */
-  public static PrivateKey convertXDHToDummyEdDSAPrivateKey(PrivateKey key)
-      throws InvalidKeySpecException {
+  public static PrivateKey convertXDHToDummyEdDSAPrivateKey(PrivateKey key) throws InvalidKeySpecException {
     if (key instanceof XDHKey) {
       PrivateKeyInfo xdhPki = PrivateKeyInfo.getInstance(key.getEncoded());
       String xdhAlgo = key.getAlgorithm();
@@ -233,6 +231,19 @@ public class KeyUtil {
       throw new IllegalArgumentException("key is not an XDH private key");
     }
   } // method convertXDHToDummyEdDSAPrivateKey
+
+  private static KeyFactory getKeyFactory(AlgorithmIdentifier algIdentifier) throws InvalidKeySpecException {
+    ASN1ObjectIdentifier oid = algIdentifier.getAlgorithm();
+    String algorithm = PKCSObjectIdentifiers.rsaEncryption.equals(oid) ? "RSA"
+        : X9ObjectIdentifiers.id_dsa.equals(oid) ? "DSA"
+        : X9ObjectIdentifiers.id_ecPublicKey.equals(oid) ? "EC"
+        : EdECConstants.getName(oid);
+
+    if (algorithm == null) {
+      throw new InvalidKeySpecException("unsupported key algorithm: " + oid);
+    }
+    return getKeyFactory(algorithm);
+  }
 
   private static KeyFactory getKeyFactory(String algorithm) throws InvalidKeySpecException {
     String alg = algorithm.toUpperCase();
@@ -274,8 +285,7 @@ public class KeyUtil {
     }
   } // method getKeyPairGenerator
 
-  public static PrivateKey generatePrivateKey(PrivateKeyInfo pkInfo)
-      throws InvalidKeySpecException {
+  public static PrivateKey generatePrivateKey(PrivateKeyInfo pkInfo) throws InvalidKeySpecException {
     notNull(pkInfo, "pkInfo");
 
     PKCS8EncodedKeySpec keyspec;
@@ -284,31 +294,13 @@ public class KeyUtil {
     } catch (IOException ex) {
       throw new InvalidKeySpecException(ex.getMessage(), ex);
     }
-    ASN1ObjectIdentifier oid = pkInfo.getPrivateKeyAlgorithm().getAlgorithm();
-
-    String algorithm;
-    if (PKCSObjectIdentifiers.rsaEncryption.equals(oid)) {
-      algorithm = "RSA";
-    } else if (X9ObjectIdentifiers.id_dsa.equals(oid)) {
-      algorithm = "DSA";
-    } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(oid)) {
-      algorithm = "EC";
-    } else {
-      algorithm = EdECConstants.getName(oid);
-    }
-
-    if (algorithm == null) {
-      throw new InvalidKeySpecException("unsupported key algorithm: " + oid);
-    }
-
-    KeyFactory kf = getKeyFactory(algorithm);
+    KeyFactory kf = getKeyFactory(pkInfo.getPrivateKeyAlgorithm());
     synchronized (kf) {
       return kf.generatePrivate(keyspec);
     }
   } // method generatePublicKey
 
-  public static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)
-      throws InvalidKeySpecException {
+  public static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo) throws InvalidKeySpecException {
     notNull(pkInfo, "pkInfo");
 
     X509EncodedKeySpec keyspec;
@@ -317,31 +309,14 @@ public class KeyUtil {
     } catch (IOException ex) {
       throw new InvalidKeySpecException(ex.getMessage(), ex);
     }
-    ASN1ObjectIdentifier oid = pkInfo.getAlgorithm().getAlgorithm();
 
-    String algorithm;
-    if (PKCSObjectIdentifiers.rsaEncryption.equals(oid)) {
-      algorithm = "RSA";
-    } else if (X9ObjectIdentifiers.id_dsa.equals(oid)) {
-      algorithm = "DSA";
-    } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(oid)) {
-      algorithm = "EC";
-    } else {
-      algorithm = EdECConstants.getName(oid);
-    }
-
-    if (algorithm == null) {
-      throw new InvalidKeySpecException("unsupported key algorithm: " + oid);
-    }
-
-    KeyFactory kf = getKeyFactory(algorithm);
+    KeyFactory kf = getKeyFactory(pkInfo.getAlgorithm());
     synchronized (kf) {
       return kf.generatePublic(keyspec);
     }
   } // method generatePublicKey
 
-  public static RSAPublicKey generateRSAPublicKey(RSAPublicKeySpec keySpec)
-      throws InvalidKeySpecException {
+  public static RSAPublicKey generateRSAPublicKey(RSAPublicKeySpec keySpec) throws InvalidKeySpecException {
     notNull(keySpec, "keySpec");
     KeyFactory kf = getKeyFactory("RSA");
     synchronized (kf) {
@@ -349,16 +324,14 @@ public class KeyUtil {
     }
   }
 
-  public static AsymmetricKeyParameter generatePrivateKeyParameter(PrivateKey key)
-      throws InvalidKeyException {
+  public static AsymmetricKeyParameter generatePrivateKeyParameter(PrivateKey key) throws InvalidKeyException {
     notNull(key, "key");
 
     if (key instanceof RSAPrivateCrtKey) {
       RSAPrivateCrtKey rsaKey = (RSAPrivateCrtKey) key;
-      return new RSAPrivateCrtKeyParameters(rsaKey.getModulus(),
-        rsaKey.getPublicExponent(), rsaKey.getPrivateExponent(),
-        rsaKey.getPrimeP(), rsaKey.getPrimeQ(), rsaKey.getPrimeExponentP(),
-        rsaKey.getPrimeExponentQ(), rsaKey.getCrtCoefficient());
+      return new RSAPrivateCrtKeyParameters(rsaKey.getModulus(), rsaKey.getPublicExponent(),
+          rsaKey.getPrivateExponent(), rsaKey.getPrimeP(), rsaKey.getPrimeQ(), rsaKey.getPrimeExponentP(),
+          rsaKey.getPrimeExponentQ(), rsaKey.getCrtCoefficient());
     } else if (key instanceof RSAPrivateKey) {
       RSAPrivateKey rsaKey = (RSAPrivateKey) key;
       return new RSAKeyParameters(true, rsaKey.getModulus(), rsaKey.getPrivateExponent());
@@ -377,8 +350,7 @@ public class KeyUtil {
     }
   } // method generatePrivateKeyParameter
 
-  public static AsymmetricKeyParameter generatePublicKeyParameter(PublicKey key)
-      throws InvalidKeyException {
+  public static AsymmetricKeyParameter generatePublicKeyParameter(PublicKey key) throws InvalidKeyException {
     notNull(key, "key");
 
     if (key instanceof RSAPublicKey) {
@@ -408,8 +380,7 @@ public class KeyUtil {
     }
   } // method generatePublicKeyParameter
 
-  public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(PublicKey publicKey)
-      throws InvalidKeyException {
+  public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(PublicKey publicKey) throws InvalidKeyException {
     notNull(publicKey, "publicKey");
 
     if (publicKey instanceof DSAPublicKey) {

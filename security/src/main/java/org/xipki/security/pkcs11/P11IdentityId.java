@@ -64,9 +64,8 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
    * @param certLabel
    *          Label of the certificate
    */
-  public P11IdentityId(P11SlotIdentifier slotId, P11ObjectIdentifier keyId,
-                       boolean publicKeyAvailable, String publicKeyLabel,
-                       boolean certAvailable, String certLabel) {
+  public P11IdentityId(P11SlotIdentifier slotId, P11ObjectIdentifier keyId, boolean publicKeyAvailable,
+                       String publicKeyLabel, boolean certAvailable, String certLabel) {
     this.slotId = notNull(slotId, "slotId");
     this.keyId = notNull(keyId, "keyId");
     if (publicKeyAvailable) {
@@ -123,8 +122,7 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
     }
 
     P11IdentityId ei = (P11IdentityId) obj;
-    return this.slotId.equals(ei.slotId)
-        && this.keyId.equals(ei.keyId)
+    return this.slotId.equals(ei.slotId)  && this.keyId.equals(ei.keyId)
         && CompareUtil.equalsObject(publicKeyId, ei.publicKeyId)
         && CompareUtil.equalsObject(certId, ei.certId);
   }

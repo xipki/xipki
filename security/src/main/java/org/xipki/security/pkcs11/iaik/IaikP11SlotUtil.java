@@ -49,7 +49,9 @@ import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
 
 import java.math.BigInteger;
+import java.security.PublicKey;
 import java.security.cert.CertificateException;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
@@ -166,9 +168,9 @@ class IaikP11SlotUtil {
 
     boolean sessionLoggedIn;
     if (userType == PKCS11Constants.CKU_SO) {
-      sessionLoggedIn = state.equals(State.RW_SO_FUNCTIONS);
+      sessionLoggedIn = state.equals(CKS_RW_SO_FUNCTIONS);
     } else {
-      sessionLoggedIn = state.equals(State.RW_USER_FUNCTIONS) || state.equals(State.RO_USER_FUNCTIONS);
+      sessionLoggedIn = state.equals(CKS_RW_USER_FUNCTIONS) || state.equals(CKS_RO_USER_FUNCTIONS);
     }
 
     LOG.debug("sessionLoggedIn: {}", sessionLoggedIn);
@@ -219,7 +221,7 @@ class IaikP11SlotUtil {
     return objList;
   } // method getObjects
 
-  static java.security.PublicKey generatePublicKey(Session session, long hP11Key, long keyType)
+  static PublicKey generatePublicKey(Session session, long hP11Key, long keyType)
       throws XiSecurityException {
     try {
       if (keyType == CKK_RSA) {
@@ -316,7 +318,7 @@ class IaikP11SlotUtil {
     }
   } // method generatePublicKey
 
-  static java.security.interfaces.RSAPublicKey buildRSAKey(BigInteger mod, BigInteger exp)
+  static RSAPublicKey buildRSAKey(BigInteger mod, BigInteger exp)
       throws XiSecurityException {
     try {
       return KeyUtil.generateRSAPublicKey(new RSAPublicKeySpec(mod, exp));

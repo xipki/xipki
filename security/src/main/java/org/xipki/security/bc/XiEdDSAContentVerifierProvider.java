@@ -101,8 +101,7 @@ public class XiEdDSAContentVerifierProvider implements ContentVerifierProvider {
   }
 
   @Override
-  public ContentVerifier get(AlgorithmIdentifier verifierAlgorithmIdentifier)
-      throws OperatorCreationException {
+  public ContentVerifier get(AlgorithmIdentifier verifierAlgorithmIdentifier) throws OperatorCreationException {
     return new EdDSAContentVerifier(verifierAlgorithmIdentifier, verifyKey);
   }
 

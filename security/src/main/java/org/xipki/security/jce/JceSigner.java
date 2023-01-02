@@ -88,13 +88,9 @@ public class JceSigner implements XiContentSigner {
         this.signAlgo = signAlgo;
         String jceName = signAlgo.getJceName();
         try {
-            if (providerName == null && provider == null) {
-                this.signature = Signature.getInstance(jceName);
-            } else if (provider != null) {
-                this.signature = Signature.getInstance(jceName, provider);
-            } else {
-                this.signature = Signature.getInstance(signAlgo.getJceName(), providerName);
-            }
+            this.signature = (providerName == null && provider == null) ? Signature.getInstance(jceName)
+                : (provider != null) ? Signature.getInstance(jceName, provider)
+                : Signature.getInstance(signAlgo.getJceName(), providerName);
         } catch (NoSuchAlgorithmException | NoSuchProviderException exception) {
             throw new XiSecurityException(exception);
         }

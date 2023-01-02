@@ -238,21 +238,16 @@ public class XijsonCertprofile extends BaseCertprofile {
       if (sign == '+' || sign == '-') {
         long digit = Long.parseLong(str.substring(1, str.length() - 1));
         long seconds;
-        switch (suffix) {
-          case 'd':
-            seconds = digit * (24L * 60 * 60);
-            break;
-          case 'h':
-            seconds = digit * (60L * 60);
-            break;
-          case 'm':
-            seconds = digit * 60L;
-            break;
-          case 's':
-            seconds = digit;
-            break;
-          default:
-            throw new CertprofileException("invalid notBefore " + str);
+        if (suffix == 'd') {
+          seconds = digit * (24L * 60 * 60);
+        } else if (suffix == 'h') {
+          seconds = digit * (60L * 60);
+        } else if (suffix == 'm') {
+          seconds = digit * 60L;
+        } else if (suffix == 's') {
+          seconds = digit;
+        } else {
+          throw new CertprofileException("invalid notBefore " + str);
         }
         offsetSeconds = (sign == '+') ? seconds : -1 * seconds;
       } else {
@@ -262,11 +257,8 @@ public class XijsonCertprofile extends BaseCertprofile {
       throw new CertprofileException("invalid notBefore '" + str + "'");
     }
 
-    if (offsetSeconds != null) {
-      this.notBeforeOption = NotBeforeOption.getOffsetOption(offsetSeconds);
-    } else {
-      this.notBeforeOption = NotBeforeOption.getMidNightOption(midnightTimeZone);
-    }
+    notBeforeOption = (offsetSeconds != null) ? NotBeforeOption.getOffsetOption(offsetSeconds)
+        : NotBeforeOption.getMidNightOption(midnightTimeZone);
 
     // KeyAlgorithms
     this.keyAlgorithms = conf.toXiKeyAlgorithms();
@@ -498,8 +490,7 @@ public class XijsonCertprofile extends BaseCertprofile {
           }
         } else if (ObjectIdentifiers.DN.placeOfBirth.equals(attrType)) {
           if (placeOfBirth != null) {
-            ASN1Encodable attrVal = new DERUTF8String(placeOfBirth);
-            attrs.add(new Attribute(attrType, new DERSet(attrVal)));
+            attrs.add(new Attribute(attrType, new DERSet(new DERUTF8String(placeOfBirth))));
             continue;
           }
         } else if (ObjectIdentifiers.DN.gender.equals(attrType)) {
@@ -509,8 +500,7 @@ public class XijsonCertprofile extends BaseCertprofile {
                 && (ch == 'f' || ch == 'F' || ch == 'm' || ch == 'M'))) {
               throw new BadCertTemplateException("invalid gender " + gender);
             }
-            ASN1Encodable attrVal = new DERPrintableString(gender);
-            attrs.add(new Attribute(attrType, new DERSet(attrVal)));
+            attrs.add(new Attribute(attrType, new DERSet(new DERPrintableString(gender))));
             continue;
           }
         } else if (ObjectIdentifiers.DN.countryOfCitizenship.equals(attrType)) {
@@ -519,8 +509,7 @@ public class XijsonCertprofile extends BaseCertprofile {
               if (!SubjectDnSpec.isValidCountryAreaCode(country)) {
                 throw new BadCertTemplateException("invalid countryOfCitizenship code " + country);
               }
-              ASN1Encodable attrVal = new DERPrintableString(country);
-              attrs.add(new Attribute(attrType, new DERSet(attrVal)));
+              attrs.add(new Attribute(attrType, new DERSet(new DERPrintableString(country))));
             }
             continue;
           }
@@ -530,8 +519,7 @@ public class XijsonCertprofile extends BaseCertprofile {
               if (!SubjectDnSpec.isValidCountryAreaCode(country)) {
                 throw new BadCertTemplateException("invalid countryOfResidence code " + country);
               }
-              ASN1Encodable attrVal = new DERPrintableString(country);
-              attrs.add(new Attribute(attrType, new DERSet(attrVal)));
+              attrs.add(new Attribute(attrType, new DERSet(new DERPrintableString(country))));
             }
             continue;
           }
@@ -791,24 +779,17 @@ public class XijsonCertprofile extends BaseCertprofile {
         }
 
         ASN1IA5String sourceDataUri = bd.getSourceDataUriIA5();
-        switch (biometricInfo.getSourceDataUriOccurrence()) {
-          case forbidden:
-            sourceDataUri = null;
-            break;
-          case required:
-            if (sourceDataUri == null) {
-              throw new BadCertTemplateException("biometricInfo[" + i
+        TripleState occurrence = biometricInfo.getSourceDataUriOccurrence();
+        if (occurrence == TripleState.forbidden) {
+          sourceDataUri = null;
+        } else if (occurrence == TripleState.required) {
+          if (sourceDataUri == null) {
+            throw new BadCertTemplateException("biometricInfo[" + i
                 + "].sourceDataUri is not specified in request but is required");
-            }
-            break;
-          case optional:
-            break;
-          default:
-            throw new BadCertTemplateException("could not reach here, unknown tripleState");
+          }
         }
 
-        AlgorithmIdentifier newHashAlg = hashAlgo.getAlgorithmIdentifier();
-        BiometricData newBiometricData = new BiometricData(bdType, newHashAlg,
+        BiometricData newBiometricData = new BiometricData(bdType, hashAlgo.getAlgorithmIdentifier(),
             new DEROctetString(hashValue), sourceDataUri);
         vec.add(newBiometricData);
       }
@@ -911,10 +892,8 @@ public class XijsonCertprofile extends BaseCertprofile {
     // OrganizationCode ::= PrintableString
     // TaxationNumber ::= PrintableString
     ASN1ObjectIdentifier[] gmtOids = new ASN1ObjectIdentifier[] {
-        Extn.id_GMT_0015_InsuranceNumber,
-        Extn.id_GMT_0015_ICRegistrationNumber,
-        Extn.id_GMT_0015_OrganizationCode,
-        Extn.id_GMT_0015_TaxationNumber};
+        Extn.id_GMT_0015_InsuranceNumber,  Extn.id_GMT_0015_ICRegistrationNumber,
+        Extn.id_GMT_0015_OrganizationCode, Extn.id_GMT_0015_TaxationNumber};
     for (ASN1ObjectIdentifier m : gmtOids) {
       if (occurrences.contains(m)) {
         String extnStr = null;

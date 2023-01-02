@@ -60,8 +60,7 @@ public abstract class KeypairGenerator implements Closeable {
    * @throws XiSecurityException
    *         if error during the initialization occurs.
    */
-  public void initialize(String conf, PasswordResolver passwordResolver)
-      throws XiSecurityException {
+  public void initialize(String conf, PasswordResolver passwordResolver) throws XiSecurityException {
     ConfPairs pairs = (conf == null) ? null : new ConfPairs(conf);
     if (pairs != null) {
       String str = pairs.value("RSA.E");

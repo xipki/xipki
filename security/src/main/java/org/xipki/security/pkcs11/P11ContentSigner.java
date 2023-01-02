@@ -220,7 +220,7 @@ abstract class P11ContentSigner implements XiContentSigner {
     private final long mechanism;
 
     static {
-      hashMechMap.put(SHA1, PKCS11Constants.CKM_ECDSA_SHA1);
+      hashMechMap.put(SHA1,   PKCS11Constants.CKM_ECDSA_SHA1);
       hashMechMap.put(SHA224, PKCS11Constants.CKM_ECDSA_SHA224);
       hashMechMap.put(SHA256, PKCS11Constants.CKM_ECDSA_SHA256);
       hashMechMap.put(SHA384, PKCS11Constants.CKM_ECDSA_SHA384);
@@ -342,7 +342,7 @@ abstract class P11ContentSigner implements XiContentSigner {
     private final ByteArrayOutputStream outputStream;
 
     static {
-      hashMechMap.put(SHA1, PKCS11Constants.CKM_SHA_1_HMAC);
+      hashMechMap.put(SHA1,   PKCS11Constants.CKM_SHA_1_HMAC);
       hashMechMap.put(SHA224, PKCS11Constants.CKM_SHA224_HMAC);
       hashMechMap.put(SHA256, PKCS11Constants.CKM_SHA256_HMAC);
       hashMechMap.put(SHA384, PKCS11Constants.CKM_SHA384_HMAC);
@@ -408,7 +408,7 @@ abstract class P11ContentSigner implements XiContentSigner {
     private final int modulusBitLen;
 
     static {
-      hashMechMap.put(SHA1, PKCS11Constants.CKM_SHA1_RSA_PKCS);
+      hashMechMap.put(SHA1,   PKCS11Constants.CKM_SHA1_RSA_PKCS);
       hashMechMap.put(SHA224, PKCS11Constants.CKM_SHA224_RSA_PKCS);
       hashMechMap.put(SHA256, PKCS11Constants.CKM_SHA256_RSA_PKCS);
       hashMechMap.put(SHA384, PKCS11Constants.CKM_SHA384_RSA_PKCS);
@@ -497,7 +497,7 @@ abstract class P11ContentSigner implements XiContentSigner {
     private static final Map<HashAlgo, Long> hashMechMap = new HashMap<>();
 
     static {
-      hashMechMap.put(SHA1, PKCS11Constants.CKM_SHA1_RSA_PKCS_PSS);
+      hashMechMap.put(SHA1,   PKCS11Constants.CKM_SHA1_RSA_PKCS_PSS);
       hashMechMap.put(SHA224, PKCS11Constants.CKM_SHA224_RSA_PKCS_PSS);
       hashMechMap.put(SHA256, PKCS11Constants.CKM_SHA256_RSA_PKCS_PSS);
       hashMechMap.put(SHA384, PKCS11Constants.CKM_SHA384_RSA_PKCS_PSS);
@@ -656,8 +656,7 @@ abstract class P11ContentSigner implements XiContentSigner {
     @Override
     public byte[] getSignature() {
       try {
-        byte[] plainSignature = getPlainSignature();
-        return SignerUtil.dsaSigPlainToX962(plainSignature);
+        return SignerUtil.dsaSigPlainToX962(getPlainSignature());
       } catch (XiSecurityException ex) {
         LogUtil.warn(LOG, ex);
         throw new RuntimeCryptoException("XiSecurityException: " + ex.getMessage());

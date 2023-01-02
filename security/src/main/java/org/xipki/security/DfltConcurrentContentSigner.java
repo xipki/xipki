@@ -84,8 +84,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     }
   } // method static
 
-  public DfltConcurrentContentSigner(boolean mac, List<XiContentSigner> signers)
-      throws NoSuchAlgorithmException {
+  public DfltConcurrentContentSigner(boolean mac, List<XiContentSigner> signers) throws NoSuchAlgorithmException {
     this(mac, signers, null);
   }
 
@@ -165,8 +164,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   }
 
   @Override
-  public void initialize(String conf, PasswordResolver passwordResolver)
-      throws XiSecurityException {
+  public void initialize(String conf, PasswordResolver passwordResolver) throws XiSecurityException {
   }
 
   @Override
@@ -236,8 +234,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
       try {
         signatureStream.write(data);
       } catch (IOException ex) {
-        throw new SignatureException(
-            "could not write data to SignatureStream: " + ex.getMessage(), ex);
+        throw new SignatureException("could not write data to SignatureStream: " + ex.getMessage(), ex);
       }
       return signer.value().getSignature();
     } finally {
@@ -258,8 +255,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
         try {
           signatureStream.write(data[i]);
         } catch (IOException ex) {
-          throw new SignatureException(
-              "could not write data to SignatureStream: " + ex.getMessage(), ex);
+          throw new SignatureException("could not write data to SignatureStream: " + ex.getMessage(), ex);
         }
         signatures[i] = xiSigner.getSignature();
       }

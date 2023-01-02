@@ -62,7 +62,7 @@ import static org.xipki.util.Args.notNull;
 public enum SignAlgo {
 
   // RSA PKCS#1v1.5
-  RSA_SHA1("SHA1WITHRSA", 0x01, sha1WithRSAEncryption, SHA1, true),
+  RSA_SHA1("SHA1WITHRSA",     0x01, sha1WithRSAEncryption,   SHA1,   true),
   RSA_SHA224("SHA224WITHRSA", 0x02, sha224WithRSAEncryption, SHA224, true),
   RSA_SHA256("SHA256WITHRSA", 0x03, sha256WithRSAEncryption, SHA256, true),
   RSA_SHA384("SHA384WITHRSA", 0x04, sha384WithRSAEncryption, SHA384, true),
@@ -74,7 +74,7 @@ public enum SignAlgo {
   RSA_SHA3_512("SHA3-512WITHRSA", 0x09, id_rsassa_pkcs1_v1_5_with_sha3_512, SHA3_512, true),
 
   // RSA PSS with MGF1
-  RSAPSS_SHA1("SHA1WITHRSAANDMGF1", 0x11, SHA1),
+  RSAPSS_SHA1("SHA1WITHRSAANDMGF1",     0x11, SHA1),
   RSAPSS_SHA224("SHA224WITHRSAANDMGF1", 0x12, SHA224),
   RSAPSS_SHA256("SHA256WITHRSAANDMGF1", 0x13, SHA256),
   RSAPSS_SHA384("SHA384WITHRSAANDMGF1", 0x14, SHA384),
@@ -91,7 +91,7 @@ public enum SignAlgo {
   RSAPSS_SHAKE256("SHAKE256WITHRSAPSS", 0x1B, id_RSASSA_PSS_SHAKE256, SHAKE256, false),
 
   // DSA
-  DSA_SHA1("SHA1WITHDSA", 0x21, id_dsa_with_sha1, SHA1, false),
+  DSA_SHA1("SHA1WITHDSA",     0x21, id_dsa_with_sha1, SHA1, false),
   DSA_SHA224("SHA224WITHDSA", 0x22, dsa_with_sha224, SHA224, false),
   DSA_SHA256("SHA256WITHDSA", 0x23, dsa_with_sha256, SHA256, false),
   DSA_SHA384("SHA384WITHDSA", 0x24, dsa_with_sha384, SHA384, false),
@@ -103,16 +103,16 @@ public enum SignAlgo {
   DSA_SHA3_512("SHA3-512WITHDSA", 0x29, id_dsa_with_sha3_512, SHA3_512, false),
 
   // ECDSA
-  ECDSA_SHA1("SHA1WITHECDSA", 0x31, ecdsa_with_SHA1, SHA1, false),
+  ECDSA_SHA1("SHA1WITHECDSA",     0x31, ecdsa_with_SHA1,   SHA1,   false),
   ECDSA_SHA224("SHA224WITHECDSA", 0x32, ecdsa_with_SHA224, SHA224, false),
   ECDSA_SHA256("SHA256WITHECDSA", 0x33, ecdsa_with_SHA256, SHA256, false),
   ECDSA_SHA384("SHA384WITHECDSA", 0x34, ecdsa_with_SHA384, SHA384, false),
-  ECDSA_SHA512("SHA512WITHECDSA", 0x35, ecdsa_with_SHA512,  SHA512, false),
+  ECDSA_SHA512("SHA512WITHECDSA", 0x35, ecdsa_with_SHA512, SHA512, false),
 
   ECDSA_SHA3_224("SHA3-224WITHECDSA", 0x36, id_ecdsa_with_sha3_224, SHA3_224, false),
   ECDSA_SHA3_256("SHA3-256WITHECDSA", 0x37, id_ecdsa_with_sha3_256, SHA3_256, false),
   ECDSA_SHA3_384("SHA3-384WITHECDSA", 0x38, id_ecdsa_with_sha3_384, SHA3_384, false),
-  ECDSA_SHA3_512("SHA3-512WITHECDSA", 0x39, id_ecdsa_with_sha3_512,  SHA3_512, false),
+  ECDSA_SHA3_512("SHA3-512WITHECDSA", 0x39, id_ecdsa_with_sha3_512, SHA3_512, false),
 
   // SM2
   SM2_SM3("SM3WITHSM2", 0x3A, sm2sign_with_sm3, SM3, false),
@@ -122,7 +122,7 @@ public enum SignAlgo {
   ECDSA_SHAKE256("SHAKE256WITHECDSA", 0x3C, id_ecdsa_with_shake256, SHAKE256, false),
 
   // Plain ECDSA
-  PLAINECDSA_SHA1("SHA1WITHPLAINECDSA", 0x41, ecdsa_plain_SHA1, SHA1, false),
+  PLAINECDSA_SHA1("SHA1WITHPLAINECDSA",     0x41, ecdsa_plain_SHA1,   SHA1,   false),
   PLAINECDSA_SHA224("SHA224WITHPLAINECDSA", 0x42, ecdsa_plain_SHA224, SHA224, false),
   PLAINECDSA_SHA256("SHA256WITHPLAINECDSA", 0x43, ecdsa_plain_SHA256, SHA256, false),
   PLAINECDSA_SHA384("SHA384WITHPLAINECDSA", 0x44, ecdsa_plain_SHA384, SHA384, false),
@@ -134,7 +134,7 @@ public enum SignAlgo {
   ED448("ED448", 0x47, id_ED448, null, false),
 
   // HMAC
-  HMAC_SHA1("HMACSHA1", 0x51, id_hmacWithSHA1, SHA1, true),
+  HMAC_SHA1("HMACSHA1",     0x51, id_hmacWithSHA1,   SHA1,   true),
   HMAC_SHA224("HMACSHA224", 0x52, id_hmacWithSHA224, SHA224, true),
   HMAC_SHA256("HMACSHA256", 0x53, id_hmacWithSHA256, SHA256, true),
   HMAC_SHA384("HMACSHA384", 0x54, id_hmacWithSHA384, SHA384, true),
@@ -293,86 +293,36 @@ public enum SignAlgo {
   }
 
   public boolean isDSASigAlgo() {
-    switch (this) {
-      case DSA_SHA1:
-      case DSA_SHA224:
-      case DSA_SHA256:
-      case DSA_SHA384:
-      case DSA_SHA512:
-      case DSA_SHA3_224:
-      case DSA_SHA3_256:
-      case DSA_SHA3_384:
-      case DSA_SHA3_512:
-        return true;
-      default:
-        return false;
-    }
+    return this == DSA_SHA1
+        || this == DSA_SHA224   || this == DSA_SHA256   || this == DSA_SHA384   || this == DSA_SHA512
+        || this == DSA_SHA3_224 || this == DSA_SHA3_256 || this == DSA_SHA3_384 || this == DSA_SHA3_512;
   } // method isDSASigAlg
 
   public boolean isECDSASigAlgo() {
-    switch (this) {
-      case ECDSA_SHA1:
-      case ECDSA_SHA224:
-      case ECDSA_SHA256:
-      case ECDSA_SHA384:
-      case ECDSA_SHA512:
-      case ECDSA_SHA3_224:
-      case ECDSA_SHA3_256:
-      case ECDSA_SHA3_384:
-      case ECDSA_SHA3_512:
-      case ECDSA_SHAKE128:
-      case ECDSA_SHAKE256:
-        return true;
-      default:
-        return false;
-    }
+    return this == ECDSA_SHA1     || this == ECDSA_SHAKE128 || this == ECDSA_SHAKE256
+        || this == ECDSA_SHA224   || this == ECDSA_SHA256   || this == ECDSA_SHA384   || this == ECDSA_SHA512
+        || this == ECDSA_SHA3_224 || this == ECDSA_SHA3_256 || this == ECDSA_SHA3_384 || this == ECDSA_SHA3_512;
   } // method isECDSASigAlg
 
   public boolean isEDDSASigAlgo() {
-    switch (this) {
-      case ED25519:
-      case ED448:
-        return true;
-      default:
-        return false;
-    }
+    return this == ED448 || this == ED25519;
   } // method isEDDSASigAlg
 
   public boolean isPlainECDSASigAlgo() {
-    switch (this) {
-      case PLAINECDSA_SHA1:
-      case PLAINECDSA_SHA224:
-      case PLAINECDSA_SHA256:
-      case PLAINECDSA_SHA384:
-      case PLAINECDSA_SHA512:
-        return true;
-      default:
-        return false;
-    }
+    return this == PLAINECDSA_SHA1   || this == PLAINECDSA_SHA224 || this == PLAINECDSA_SHA256
+        || this == PLAINECDSA_SHA384 || this == PLAINECDSA_SHA512;
   } // method isPlainECDSASigAlg
 
   public boolean isSM2SigAlgo() {
     ASN1ObjectIdentifier oid = notNull(algId, "algId").getAlgorithm();
     return GMObjectIdentifiers.sm2sign_with_sm3.equals(oid);
-
     // other algorithms not supported yet.
   } // method isSM2SigAlg
 
   public boolean isRSAPkcs1SigAlgo() {
-    switch (this) {
-      case RSA_SHA1:
-      case RSA_SHA224:
-      case RSA_SHA256:
-      case RSA_SHA384:
-      case RSA_SHA512:
-      case RSA_SHA3_224:
-      case RSA_SHA3_256:
-      case RSA_SHA3_384:
-      case RSA_SHA3_512:
-        return true;
-      default:
-        return false;
-    }
+    return this == RSA_SHA1
+        || this == RSA_SHA224   || this == RSA_SHA256   || this == RSA_SHA384   || this == RSA_SHA512
+        || this == RSA_SHA3_224 || this == RSA_SHA3_256 || this == RSA_SHA3_384 || this == RSA_SHA3_512;
   } // method isRSASigAlgo
 
   public boolean isRSAPSSSigAlgo() {
@@ -380,57 +330,23 @@ public enum SignAlgo {
       return true;
     }
 
-    switch (this) {
-      case RSAPSS_SHAKE128:
-      case RSAPSS_SHAKE256:
-        return true;
-      default:
-        return false;
-    }
+    return this == RSAPSS_SHAKE128 || this == RSAPSS_SHAKE256;
   } // method isRSAPSSSigAlgo
 
   public boolean isRSAPSSMGF1SigAlgo() {
-    switch (this) {
-      case RSAPSS_SHA1:
-      case RSAPSS_SHA224:
-      case RSAPSS_SHA256:
-      case RSAPSS_SHA384:
-      case RSAPSS_SHA512:
-      case RSAPSS_SHA3_224:
-      case RSAPSS_SHA3_256:
-      case RSAPSS_SHA3_384:
-      case RSAPSS_SHA3_512:
-        return true;
-      default:
-        return false;
-    }
+    return this == RSAPSS_SHA1
+        || this == RSAPSS_SHA224   || this == RSAPSS_SHA256   || this == RSAPSS_SHA384   || this == RSAPSS_SHA512
+        || this == RSAPSS_SHA3_224 || this == RSAPSS_SHA3_256 || this == RSAPSS_SHA3_384 || this == RSAPSS_SHA3_512;
   } // method isRSAPSSMGF1SigAlgo
 
   public boolean isHmac() {
-    switch (this) {
-      case HMAC_SHA1:
-      case HMAC_SHA224:
-      case HMAC_SHA256:
-      case HMAC_SHA384:
-      case HMAC_SHA512:
-      case HMAC_SHA3_224:
-      case HMAC_SHA3_256:
-      case HMAC_SHA3_384:
-        return true;
-      default:
-        return false;
-    }
+    return this == HMAC_SHA1
+        || this == HMAC_SHA224   || this == HMAC_SHA256   || this == HMAC_SHA384   || this == HMAC_SHA512
+        || this == HMAC_SHA3_224 || this == HMAC_SHA3_256 || this == HMAC_SHA3_384 || this == HMAC_SHA3_512;
   }
 
   public boolean isGmac() {
-    switch (this) {
-      case GMAC_AES128:
-      case GMAC_AES192:
-      case GMAC_AES256:
-        return true;
-      default:
-        return false;
-    }
+    return this == GMAC_AES128 || this == GMAC_AES192 || this == GMAC_AES256;
   }
 
   public boolean isMac() {
@@ -469,13 +385,8 @@ public enum SignAlgo {
       return mgf1HashToSigMap.get(hashAlgo);
     } else if (SignAlgo.GMAC_AES128.oid.equals(oid) || SignAlgo.GMAC_AES192.oid.equals(oid)
         || SignAlgo.GMAC_AES256.oid.equals(oid)) {
-      if (SignAlgo.GMAC_AES128.oid.equals(oid)) {
-        return SignAlgo.GMAC_AES128;
-      } else if (SignAlgo.GMAC_AES192.oid.equals(oid)) {
-        return SignAlgo.GMAC_AES192;
-      } else {
-        return SignAlgo.GMAC_AES256;
-      }
+      return SignAlgo.GMAC_AES128.oid.equals(oid) ? SignAlgo.GMAC_AES128
+          : SignAlgo.GMAC_AES192.oid.equals(oid)  ? SignAlgo.GMAC_AES192 : SignAlgo.GMAC_AES256;
     } else {
       if (params != null) {
         if (!DERNull.INSTANCE.equals(params)) {

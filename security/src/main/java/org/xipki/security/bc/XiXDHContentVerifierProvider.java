@@ -178,8 +178,7 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
   }
 
   @Override
-  public ContentVerifier get(AlgorithmIdentifier verifierAlgorithmIdentifier)
-      throws OperatorCreationException {
+  public ContentVerifier get(AlgorithmIdentifier verifierAlgorithmIdentifier) throws OperatorCreationException {
     ASN1ObjectIdentifier oid = verifierAlgorithmIdentifier.getAlgorithm();
     if (!this.sigAlgOid.equals(oid)) {
       throw new OperatorCreationException("given public key is not suitable for the alogithm " + oid.getId());

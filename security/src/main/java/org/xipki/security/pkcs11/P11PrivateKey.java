@@ -48,8 +48,7 @@ public class P11PrivateKey implements PrivateKey {
 
   private final PublicKey publicKey;
 
-  public P11PrivateKey(P11CryptService p11CryptService, P11IdentityId identityId)
-      throws P11TokenException {
+  public P11PrivateKey(P11CryptService p11CryptService, P11IdentityId identityId) throws P11TokenException {
     this.p11CryptService = notNull(p11CryptService, "p11CryptService");
     this.identityId = notNull(identityId, "identityId");
 

@@ -71,11 +71,9 @@ public class BiometricInfoOption {
   } // constructor
 
   public boolean isTypePermitted(TypeOfBiometricData type) {
-    if (notNull(type, "type").isPredefined()) {
-      return predefinedTypes.contains(type.getPredefinedBiometricType());
-    } else {
-      return idTypes.contains(type.getBiometricDataOid());
-    }
+    return notNull(type, "type").isPredefined()
+      ? predefinedTypes.contains(type.getPredefinedBiometricType())
+      : idTypes.contains(type.getBiometricDataOid());
   }
 
   public boolean isHashAlgorithmPermitted(HashAlgo hashAlgorithm) {

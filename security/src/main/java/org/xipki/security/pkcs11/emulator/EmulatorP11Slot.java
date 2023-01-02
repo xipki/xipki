@@ -45,6 +45,7 @@ import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
 import org.xipki.security.pkcs11.P11ModuleConf.P11NewObjectConf;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
@@ -527,25 +528,23 @@ class EmulatorP11Slot extends P11Slot {
   private String savePkcs11PublicKey(byte[] id, String label, long keyType, PublicKey publicKey)
       throws P11TokenException {
     String hexId = hex(id);
-    StringBuilder sb = new StringBuilder(100);
-    sb.append(PROP_ID).append('=').append(hexId).append('\n');
-    sb.append(PROP_LABEL).append('=').append(label).append('\n');
-    sb.append(PROP_KEYTYPE).append('=').append(keyType).append('\n');
+    StringBuilder sb = new StringBuilder(100)
+        .append(propertyToString(PROP_ID, hexId))
+        .append(propertyToString(PROP_LABEL, label))
+        .append(propertyToString(PROP_KEYTYPE, Long.toString(keyType)));
 
     if (publicKey instanceof RSAPublicKey) {
-      sb.append(PROP_ALGORITHM).append('=').append(PKCSObjectIdentifiers.rsaEncryption.getId()).append('\n');
       RSAPublicKey rsaKey = (RSAPublicKey) publicKey;
-      sb.append(PROP_RSA_MODUS).append('=').append(hex(rsaKey.getModulus().toByteArray())).append('\n');
-      sb.append(PROP_RSA_PUBLIC_EXPONENT).append('=')
-          .append(hex(rsaKey.getPublicExponent().toByteArray())).append('\n');
+      sb.append(propertyToString(PROP_ALGORITHM, PKCSObjectIdentifiers.rsaEncryption.getId()))
+          .append(propertyToString(PROP_RSA_MODUS,           rsaKey.getModulus()))
+          .append(propertyToString(PROP_RSA_PUBLIC_EXPONENT, rsaKey.getPublicExponent()));
     } else if (publicKey instanceof DSAPublicKey) {
-      sb.append(PROP_ALGORITHM).append('=').append(X9ObjectIdentifiers.id_dsa.getId()).append('\n');
-
       DSAPublicKey dsaKey = (DSAPublicKey) publicKey;
-      sb.append(PROP_DSA_PRIME).append('=').append(hex(dsaKey.getParams().getP().toByteArray())).append('\n');
-      sb.append(PROP_DSA_SUBPRIME).append('=').append(hex(dsaKey.getParams().getQ().toByteArray())).append('\n');
-      sb.append(PROP_DSA_BASE).append('=').append(hex(dsaKey.getParams().getG().toByteArray())).append('\n');
-      sb.append(PROP_DSA_VALUE).append('=').append(hex(dsaKey.getY().toByteArray())).append('\n');
+      sb.append(propertyToString(PROP_ALGORITHM, X9ObjectIdentifiers.id_dsa.getId()))
+          .append(propertyToString(PROP_DSA_PRIME,    dsaKey.getParams().getP()))
+          .append(propertyToString(PROP_DSA_SUBPRIME, dsaKey.getParams().getQ()))
+          .append(propertyToString(PROP_DSA_BASE,     dsaKey.getParams().getG()))
+          .append(propertyToString(PROP_DSA_VALUE,    dsaKey.getY()));
     } else if (publicKey instanceof ECPublicKey) {
       sb.append(PROP_ALGORITHM).append('=').append(X9ObjectIdentifiers.id_ecPublicKey.getId()).append('\n');
 
@@ -566,7 +565,7 @@ class EmulatorP11Slot extends P11Slot {
         throw new P11TokenException(ex.getMessage(), ex);
       }
 
-      sb.append(PROP_EC_ECDSA_PARAMS).append('=').append(hex(encodedParams)).append('\n');
+      sb.append(propertyToString(PROP_EC_ECDSA_PARAMS, encodedParams));
 
       // EC point
       java.security.spec.ECPoint pointW = ecKey.getW();
@@ -582,14 +581,14 @@ class EmulatorP11Slot extends P11Slot {
       } catch (IOException ex) {
         throw new P11TokenException("could not ASN.1 encode the ECPoint");
       }
-      sb.append(PROP_EC_EC_POINT).append('=').append(hex(encodedEcPoint)).append('\n');
+      sb.append(propertyToString(PROP_EC_EC_POINT, encodedEcPoint));
     } else if (publicKey instanceof EdDSAKey || publicKey instanceof XDHKey) {
       String algorithm = publicKey.getAlgorithm();
       ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(algorithm);
       if (curveOid == null) {
         throw new P11TokenException("Invalid EdDSA key algorithm " + algorithm);
       }
-      sb.append(PROP_ALGORITHM).append('=').append(curveOid.getId()).append('\n');
+      sb.append(propertyToString(PROP_ALGORITHM, curveOid.getId()));
 
       byte[] encodedParams;
       try {
@@ -598,12 +597,12 @@ class EmulatorP11Slot extends P11Slot {
         throw new P11TokenException(ex.getMessage(), ex);
       }
 
-      sb.append(PROP_EC_ECDSA_PARAMS).append('=').append(hex(encodedParams)).append('\n');
+      sb.append(propertyToString(PROP_EC_ECDSA_PARAMS, encodedParams));
 
       // EC point
       SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
       byte[] encodedEcPoint = spki.getPublicKeyData().getOctets();
-      sb.append(PROP_EC_EC_POINT).append('=').append(hex(encodedEcPoint)).append('\n');
+      sb.append(propertyToString(PROP_EC_EC_POINT, encodedEcPoint));
     } else {
       throw new IllegalArgumentException("unsupported public key " + publicKey.getClass().getName());
     }
@@ -616,6 +615,18 @@ class EmulatorP11Slot extends P11Slot {
 
     return label;
   } // method savePkcs11PublicKey
+
+  private static String propertyToString(String propKey, byte[] propValue) {
+    return propKey + "=" + Hex.encode(propValue) + "\n";
+  }
+
+  private static String propertyToString(String propKey, String propValue) {
+    return propKey + "=" + propValue + "\n";
+  }
+
+  private static String propertyToString(String propKey, BigInteger propValue) {
+    return propKey + "=" + hex(propValue.toByteArray()) + "\n";
+  }
 
   private static void bigIntToBytes(String numName, BigInteger num, byte[] dest, int destPos, int length)
       throws P11TokenException {
@@ -647,19 +658,21 @@ class EmulatorP11Slot extends P11Slot {
 
     String hexId = hex(notNull(id, "id"));
 
-    String str = StringUtil.concat(PROP_ID, "=", hexId, "\n", PROP_LABEL, "=", label, "\n");
+    StringBuilder str = new StringBuilder();
+    str.append(propertyToString(PROP_ID, hexId));
+    str.append(propertyToString(PROP_LABEL, label));
     if (keyType != null) {
-      str = StringUtil.concat(str, PROP_KEYTYPE, "=", Long.toString(keyType), "\n");
+      str.append(propertyToString(PROP_KEYTYPE, Long.toString(keyType)));
     }
 
     if (algo != null) {
-      str = StringUtil.concat(str, PROP_ALGO, "=", algo, "\n");
+      str.append(propertyToString(PROP_ALGO, algo));
     }
 
-    str = StringUtil.concat(str, PROP_SHA1SUM, "=", HashAlgo.SHA1.hexHash(value), "\n");
+    str.append(propertyToString(PROP_SHA1SUM, HashAlgo.SHA1.hexHash(value)));
 
     try {
-      save(new File(dir, hexId + INFO_FILE_SUFFIX), StringUtil.toUtf8Bytes(str));
+      save(new File(dir, hexId + INFO_FILE_SUFFIX), StringUtil.toUtf8Bytes(str.toString()));
       save(new File(dir, hexId + VALUE_FILE_SUFFIX), value);
     } catch (IOException ex) {
       throw new P11TokenException("could not save certificate");

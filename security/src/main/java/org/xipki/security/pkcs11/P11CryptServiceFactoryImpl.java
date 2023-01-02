@@ -134,11 +134,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
   }
 
   public void setPkcs11ConfFile(String confFile) {
-    if (StringUtil.isBlank(confFile)) {
-      this.pkcs11ConfFile = null;
-    } else {
-      this.pkcs11ConfFile = IoUtil.expandFilepath(confFile);
-    }
+    this.pkcs11ConfFile = StringUtil.isBlank(confFile) ? null : IoUtil.expandFilepath(confFile);
     this.pkcs11Conf = null;
   }
 

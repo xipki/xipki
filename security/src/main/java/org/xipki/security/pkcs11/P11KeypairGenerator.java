@@ -54,8 +54,7 @@ public class P11KeypairGenerator extends KeypairGenerator {
   }
 
   @Override
-  public void initialize0(ConfPairs conf, PasswordResolver passwordResolver)
-      throws XiSecurityException {
+  public void initialize0(ConfPairs conf, PasswordResolver passwordResolver) throws XiSecurityException {
     notNull(conf, "conf");
 
     String moduleName = conf.value("module");
@@ -65,20 +64,15 @@ public class P11KeypairGenerator extends KeypairGenerator {
     str = conf.value("slot-id");
     Long slotId = (str == null) ? null : Long.parseLong(str);
 
-    if ((slotIndex == null && slotId == null)
-        || (slotIndex != null && slotId != null)) {
+    if ((slotIndex == null && slotId == null) || (slotIndex != null && slotId != null)) {
       throw new XiSecurityException("exactly one of slot (index) and slot-id must be specified");
     }
 
     try {
       P11CryptService p11Service = this.cryptServiceFactory.getP11CryptService(moduleName);
       P11Module module = p11Service.getModule();
-      P11SlotIdentifier p11SlotId;
-      if (slotId != null) {
-        p11SlotId = module.getSlotIdForId(slotId);
-      } else {
-        p11SlotId = module.getSlotIdForIndex(slotIndex);
-      }
+      P11SlotIdentifier p11SlotId = (slotId != null) ? module.getSlotIdForId(slotId)
+          : module.getSlotIdForIndex(slotIndex);
       this.slot = module.getSlot(p11SlotId);
 
       Set<String> set = new HashSet<>();

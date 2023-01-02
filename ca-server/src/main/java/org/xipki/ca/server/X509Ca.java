@@ -285,8 +285,8 @@ public class X509Ca extends X509CaModule implements Closeable {
   }
 
   public List<CertificateInfo> regenerateCerts(
-      RequestorInfo requestor, List<CertTemplateData> certTemplates, String transactionId)
-      throws OperationException {
+      .
+      RequestorInfo requestor, List<CertTemplateData> certTemplates, String transactionId) throws OperationException {
     AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_regen_cert, requestor);
     try {
       List<CertificateInfo>  ret = generateCerts(requestor, certTemplates, true, transactionId, event);
@@ -331,8 +331,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     }
   }
 
-  public CertWithDbId unsuspendCert(RequestorInfo requestor, BigInteger serialNumber)
-      throws OperationException {
+  public CertWithDbId unsuspendCert(RequestorInfo requestor, BigInteger serialNumber) throws OperationException {
     AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_unsuspend_cert, requestor);
     try {
       CertWithDbId ret = revokerModule.unsuspendCert(serialNumber, event);
@@ -347,8 +346,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     }
   }
 
-  public CertWithDbId removeCert(RequestorInfo requestor, BigInteger serialNumber)
-      throws OperationException {
+  public CertWithDbId removeCert(RequestorInfo requestor, BigInteger serialNumber) throws OperationException {
     AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_remove_cert, requestor);
     try {
       CertWithDbId ret = removerModule.removeCert(serialNumber, event);
@@ -372,8 +370,7 @@ public class X509Ca extends X509CaModule implements Closeable {
   }
 
   public List<CertificateInfo> generateCerts(
-      RequestorInfo requestor, List<CertTemplateData> certTemplates, String transactionId)
-      throws OperationException {
+      RequestorInfo requestor, List<CertTemplateData> certTemplates, String transactionId) throws OperationException {
     AuditEvent event = newAuditEvent(TYPE_gen_cert, requestor);
     try {
       List<CertificateInfo> ret = generateCerts(requestor, certTemplates, false, transactionId, event);
@@ -390,8 +387,7 @@ public class X509Ca extends X509CaModule implements Closeable {
 
   private List<CertificateInfo> generateCerts(
       RequestorInfo requestor, List<CertTemplateData> certTemplates, boolean update,
-      String transactionId, AuditEvent event)
-      throws OperationExceptionWithIndex {
+      String transactionId, AuditEvent event) throws OperationExceptionWithIndex {
     notEmpty(certTemplates, "certTemplates");
 
     CmLicense license = caManager.getLicense();
@@ -568,9 +564,8 @@ public class X509Ca extends X509CaModule implements Closeable {
     }
   }
 
-  private CertificateInfo generateCert0(
-      RequestorInfo requestor, GrantedCertTemplate gct, String transactionId, AuditEvent event)
-      throws OperationException {
+  private CertificateInfo generateCert0(RequestorInfo requestor, GrantedCertTemplate gct,
+                                        String transactionId, AuditEvent event) throws OperationException {
     notNull(gct, "gct");
 
     IdentifiedCertprofile certprofile = gct.certprofile;
@@ -580,8 +575,7 @@ public class X509Ca extends X509CaModule implements Closeable {
 
     if (!ctlogEnabled) {
       if (extnSctCtrl != null && extnSctCtrl.isRequired()) {
-        throw new OperationException(SYSTEM_FAILURE,
-            "extension " + ObjectIdentifiers.getName(Extn.id_SCTs)
+        throw new OperationException(SYSTEM_FAILURE, "extension " + ObjectIdentifiers.getName(Extn.id_SCTs)
             + " is required but CTLog of the CA is not activated");
       }
     }
@@ -599,10 +593,9 @@ public class X509Ca extends X509CaModule implements Closeable {
           BigInteger previousSerialNumber = serialNumber;
 
           ConfPairs extraControl = caInfo.getExtraControl();
-          serialNumber = certprofile.generateSerialNumber(
-                  caInfo.getCert().getSubject(), caInfo.getCert().getSubjectPublicKeyInfo(),
-                  gct.requestedSubject, gct.grantedPublicKey,
-                  extraControl == null ? null : extraControl.unmodifiable());
+          serialNumber = certprofile.generateSerialNumber(caInfo.getCert().getSubject(),
+              caInfo.getCert().getSubjectPublicKeyInfo(), gct.requestedSubject, gct.grantedPublicKey,
+              extraControl == null ? null : extraControl.unmodifiable());
 
           // if the CertProfile generates always the serial number for fixed input,
           // do not repeat this process.

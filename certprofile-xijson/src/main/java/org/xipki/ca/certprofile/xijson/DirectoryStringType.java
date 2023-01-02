@@ -37,17 +37,10 @@ public enum DirectoryStringType {
   public ASN1Encodable createDirectoryString(String text) {
     Args.notNull(text, "text");
 
-    if (teletexString == this) {
-      return new DERT61String(text);
-    } else if (printableString == this) {
-      return new DERPrintableString(text);
-    } else if (utf8String == this) {
-      return new DERUTF8String(text);
-    } else if (bmpString == this) {
-      return new DERBMPString(text);
-    } else {
-      throw new IllegalStateException("should not reach here, unknown DirectoryStringType " + this.name());
-    }
+    return (teletexString == this)  ? new DERT61String(text)
+        : (printableString == this) ? new DERPrintableString(text)
+        : (utf8String == this)      ? new DERUTF8String(text)
+        : new DERBMPString(text);
   } // method createDirectoryString
 
 }

@@ -1003,7 +1003,7 @@ public abstract class P11Slot implements Closeable {
 
         if (label.equals(objectId.getLabel())
             || (pubKeyId != null && label.equals(pubKeyId.getLabel())
-            || (certId != null && label.equals(certId.getLabel())))) {
+            ||   (certId != null && label.equals(certId.getLabel())))) {
           duplicated = true;
           break;
         }
@@ -1165,8 +1165,7 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public PrivateKeyInfo generateDSAKeypairOtf(BigInteger p, BigInteger q, BigInteger g)
-      throws P11TokenException {
+  public PrivateKeyInfo generateDSAKeypairOtf(BigInteger p, BigInteger q, BigInteger g) throws P11TokenException {
     notNull(p, "p");
     notNull(q, "q");
     notNull(g, "g");
@@ -1238,8 +1237,7 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public PrivateKeyInfo generateECKeypairOtf(ASN1ObjectIdentifier curveOid)
-      throws P11TokenException {
+  public PrivateKeyInfo generateECKeypairOtf(ASN1ObjectIdentifier curveOid) throws P11TokenException {
     notNull(curveOid, "curveOid");
 
     if (EdECConstants.isEdwardsCurve(curveOid)) {

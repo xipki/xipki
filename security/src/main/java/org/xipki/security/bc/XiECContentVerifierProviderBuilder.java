@@ -60,13 +60,9 @@ public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProvi
 
     HashAlgo hashAlgo = signAlgo.getHashAlgo();
 
-    if (SignAlgo.SM2_SM3 == signAlgo) {
-      return new SM2Signer();
-    } else if (signAlgo.isPlainECDSASigAlgo()) {
-      return new DSAPlainDigestSigner(new ECDSASigner(), hashAlgo.createDigest());
-    } else {
-      return new DSADigestSigner(new ECDSASigner(), hashAlgo.createDigest());
-    }
+    return (SignAlgo.SM2_SM3 == signAlgo) ? new SM2Signer()
+        : signAlgo.isPlainECDSASigAlgo()  ? new DSAPlainDigestSigner(new ECDSASigner(), hashAlgo.createDigest())
+        : new DSADigestSigner(new ECDSASigner(), hashAlgo.createDigest());
   } // method createSigner
 
 }

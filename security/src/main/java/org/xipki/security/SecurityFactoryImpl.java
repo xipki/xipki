@@ -105,8 +105,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   }
 
   @Override
-  public KeypairGenerator createKeypairGenerator(String type, String conf)
-      throws ObjectCreationException {
+  public KeypairGenerator createKeypairGenerator(String type, String conf) throws ObjectCreationException {
     return keypairGeneratorFactoryRegister.newKeypairGenerator(this, type, conf);
   }
 
@@ -117,8 +116,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   }
 
   @Override
-  public PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo)
-      throws InvalidKeyException {
+  public PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo) throws InvalidKeyException {
     try {
       return KeyUtil.generatePublicKey(subjectPublicKeyInfo);
     } catch (InvalidKeySpecException ex) {
@@ -246,9 +244,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
       boolean valid = verifier.verify(signatureValue);
 
       if (!valid) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("private key and public key does not match, ");
-        sb.append("key type='").append(signerType).append("'; ");
+        StringBuilder sb = new StringBuilder()
+            .append("private key and public key does not match, key type='").append(signerType).append("'; ");
         String pwd = signerConf.getConfValue("password");
         if (pwd != null) {
           signerConf.putConfEntry("password", "****");
@@ -262,8 +259,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
         throw new ObjectCreationException(sb.toString());
       }
-    } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException | NoSuchProviderException
-             | NoIdleSignerException ex) {
+    } catch (GeneralSecurityException ex) {
       throw new ObjectCreationException(ex.getMessage(), ex);
     }
   } // method validateSigner

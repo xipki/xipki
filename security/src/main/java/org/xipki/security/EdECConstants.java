@@ -56,60 +56,32 @@ public class EdECConstants {
   }
 
   public static int getKeyBitSize(ASN1ObjectIdentifier curveOid) {
-    if (id_X25519.equals(curveOid)) {
-      return 256;
-    } else if (id_X448.equals(curveOid)) {
-      return 448;
-    } else if (id_ED25519.equals(curveOid)) {
-      return 256;
-    } else if (id_ED448.equals(curveOid)) {
-      return 448;
-    } else {
-      return 0;
-    }
+    return id_X25519.equals(curveOid) ? 256
+        : id_X448.equals(curveOid) ? 448
+        : id_ED25519.equals(curveOid) ? 256
+        : id_ED448.equals(curveOid) ? 448 : 0;
   }
 
   public static int getPublicKeyByteSize(ASN1ObjectIdentifier curveOid) {
-    if (id_X25519.equals(curveOid)) {
-      return 32;
-    } else if (id_X448.equals(curveOid)) {
-      return 56;
-    } else if (id_ED25519.equals(curveOid)) {
-      return 32;
-    } else if (id_ED448.equals(curveOid)) {
-      return 57;
-    } else {
-      return 0;
-    }
+    return id_X25519.equals(curveOid) ? 32
+        : id_X448.equals(curveOid) ? 56
+        : id_ED25519.equals(curveOid) ? 32
+        : id_ED448.equals(curveOid) ? 57 : 0;
   }
 
   public static String getName(ASN1ObjectIdentifier curveOid) {
-    if (id_X25519.equals(curveOid)) {
-      return X25519;
-    } else if (id_X448.equals(curveOid)) {
-      return X448;
-    } else if (id_ED25519.equals(curveOid)) {
-      return ED25519;
-    } else if (id_ED448.equals(curveOid)) {
-      return ED448;
-    } else {
-      return null;
-    }
+    return id_X25519.equals(curveOid) ? X25519
+        : id_X448.equals(curveOid) ? X448
+        : id_ED25519.equals(curveOid) ? ED25519
+        : id_ED448.equals(curveOid) ? ED448 : null;
   }
 
   public static ASN1ObjectIdentifier getCurveOid(String curveName) {
     curveName = curveName.toUpperCase();
-    if (X25519.equals(curveName) || id_X25519.getId().equals(curveName)) {
-      return id_X25519;
-    } else if (X448.equals(curveName) || id_X448.getId().equals(curveName)) {
-      return id_X448;
-    } else if (ED25519.equals(curveName) || id_ED25519.getId().equals(curveName)) {
-      return id_ED25519;
-    } else if (ED448.equals(curveName) || id_ED448.getId().equals(curveName)) {
-      return id_ED448;
-    } else {
-      return null;
-    }
+    return (X25519.equals(curveName) ||  id_X25519.getId().equals(curveName)) ? id_X25519
+        :    (X448.equals(curveName) ||    id_X448.getId().equals(curveName)) ? id_X448
+        : (ED25519.equals(curveName) || id_ED25519.getId().equals(curveName)) ? id_ED25519
+        :   (ED448.equals(curveName) ||   id_ED448.getId().equals(curveName)) ? id_ED448 : null;
   }
 
 }

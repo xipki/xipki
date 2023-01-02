@@ -17,6 +17,8 @@
 
 package org.xipki.security;
 
+import java.security.GeneralSecurityException;
+
 /**
  * Exception that indicates no idle signer is available.
  *
@@ -24,7 +26,7 @@ package org.xipki.security;
  * @since 2.0.0
  */
 
-public class NoIdleSignerException extends Exception {
+public class NoIdleSignerException extends GeneralSecurityException {
 
   public NoIdleSignerException() {
   }

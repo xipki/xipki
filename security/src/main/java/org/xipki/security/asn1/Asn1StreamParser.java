@@ -55,8 +55,7 @@ public class Asn1StreamParser {
 
   public static final int TAG_CONSTRUCTED_SET = BERTags.CONSTRUCTED | BERTags.SET;
 
-  public static byte[] readBlock(int expectedTag, BufferedInputStream instream, String name)
-      throws IOException {
+  public static byte[] readBlock(int expectedTag, BufferedInputStream instream, String name) throws IOException {
     instream.mark(10);
     int tag = instream.read();
     assertTag(expectedTag, tag, name);
@@ -64,8 +63,7 @@ public class Asn1StreamParser {
     return readBlock(instream, name);
   }
 
-  public static byte[] readBlock(BufferedInputStream instream, String name)
-      throws IOException {
+  public static byte[] readBlock(BufferedInputStream instream, String name) throws IOException {
     MyInt lenBytesSize = new MyInt();
     int length = readLength(lenBytesSize, instream);
     instream.reset();
@@ -77,8 +75,7 @@ public class Asn1StreamParser {
     return bytes;
   } // method readBlock
 
-  public static byte[] readValue(int expectedTag, BufferedInputStream instream, String name)
-          throws IOException {
+  public static byte[] readValue(int expectedTag, BufferedInputStream instream, String name) throws IOException {
     instream.mark(10);
     int tag = instream.read();
     assertTag(expectedTag, tag, name);
@@ -98,8 +95,7 @@ public class Asn1StreamParser {
     return instream.read();
   }
 
-  public static int readLength(MyInt lenBytesSize, InputStream instream)
-      throws IOException {
+  public static int readLength(MyInt lenBytesSize, InputStream instream) throws IOException {
     // Length SEQUENCE of CertificateList
     int b = instream.read();
     if ((b & 0x80) == 0) {
@@ -132,17 +128,12 @@ public class Asn1StreamParser {
   }
 
   public static Date readTime(ASN1Encodable  obj) {
-    if (obj instanceof Time) {
-      return ((Time) obj).getDate();
-    } else if (obj instanceof org.bouncycastle.asn1.cms.Time) {
-      return ((org.bouncycastle.asn1.cms.Time) obj).getDate();
-    } else {
-      return Time.getInstance(obj).getDate();
-    }
+    return (obj instanceof Time) ? ((Time) obj).getDate()
+        : (obj instanceof org.bouncycastle.asn1.cms.Time) ? ((org.bouncycastle.asn1.cms.Time) obj).getDate()
+        : Time.getInstance(obj).getDate();
   }
 
-  public static Date readTime(MyInt bytesLen, BufferedInputStream instream, String name)
-      throws IOException {
+  public static Date readTime(MyInt bytesLen, BufferedInputStream instream, String name) throws IOException {
     int tag = markAndReadTag(instream);
     byte[] bytes = readBlock(instream, name);
     bytesLen.set(bytes.length);

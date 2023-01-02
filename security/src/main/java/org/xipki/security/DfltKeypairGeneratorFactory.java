@@ -72,12 +72,10 @@ public class DfltKeypairGeneratorFactory implements KeypairGeneratorFactory {
       throw new ObjectCreationException("unknown keypair generator type " + type);
     }
 
-    KeypairGenerator kpGen;
-    if (TYPE_SOFTWARE.equalsIgnoreCase(type)) {
-      kpGen = new SoftwareKeypairGenerator(securityFactory.getRandom4Key());
-    } else { //if (TYPE_PKCS11.equalsIgnoreCase(type)) {
-      kpGen = new P11KeypairGenerator(p11CryptServiceFactory);
-    }
+    KeypairGenerator kpGen = TYPE_SOFTWARE.equalsIgnoreCase(type)
+        ? new SoftwareKeypairGenerator(securityFactory.getRandom4Key())
+        : new P11KeypairGenerator(p11CryptServiceFactory);
+
     try {
       kpGen.initialize(conf, securityFactory.getPasswordResolver());
     } catch (XiSecurityException ex) {

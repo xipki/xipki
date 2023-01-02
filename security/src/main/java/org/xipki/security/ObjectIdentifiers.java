@@ -559,24 +559,22 @@ public class ObjectIdentifiers {
     // RFC 4262: SMIMECapatibilities
     public static final ASN1ObjectIdentifier id_smimeCapabilities = new ASN1ObjectIdentifier("1.2.840.113549.1.9.15");
 
-    // GMT 0015-2012 SM2-Based Certificate
-    public static final ASN1ObjectIdentifier id_GMT_0015_IdentityCode = new ASN1ObjectIdentifier("1.2.156.10260.4.1.1");
+    private static final ASN1ObjectIdentifier id_GMT_0015 = new ASN1ObjectIdentifier("1.2.156.10260.4.1");
 
     // GMT 0015-2012 SM2-Based Certificate
-    public static final ASN1ObjectIdentifier id_GMT_0015_InsuranceNumber =
-        new ASN1ObjectIdentifier("1.2.156.10260.4.1.2");
+    public static final ASN1ObjectIdentifier id_GMT_0015_IdentityCode = id_GMT_0015.branch("1");
 
     // GMT 0015-2012 SM2-Based Certificate
-    public static final ASN1ObjectIdentifier id_GMT_0015_ICRegistrationNumber =
-        new ASN1ObjectIdentifier("1.2.156.10260.4.1.3");
+    public static final ASN1ObjectIdentifier id_GMT_0015_InsuranceNumber = id_GMT_0015.branch("2");
 
     // GMT 0015-2012 SM2-Based Certificate
-    public static final ASN1ObjectIdentifier id_GMT_0015_OrganizationCode =
-        new ASN1ObjectIdentifier("1.2.156.10260.4.1.4");
+    public static final ASN1ObjectIdentifier id_GMT_0015_ICRegistrationNumber = id_GMT_0015.branch("3");
 
     // GMT 0015-2012 SM2-Based Certificate
-    public static final ASN1ObjectIdentifier id_GMT_0015_TaxationNumber =
-        new ASN1ObjectIdentifier("1.2.156.10260.4.1.5");
+    public static final ASN1ObjectIdentifier id_GMT_0015_OrganizationCode = id_GMT_0015.branch("4");
+
+    // GMT 0015-2012 SM2-Based Certificate
+    public static final ASN1ObjectIdentifier id_GMT_0015_TaxationNumber = id_GMT_0015.branch("5");
 
     // Certificate Transparency (RFC 6962)
     public static final ASN1ObjectIdentifier id_precertificate = new ASN1ObjectIdentifier("1.3.6.1.4.1.11129.2.4.3");

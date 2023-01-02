@@ -406,14 +406,12 @@ public class OcspServerImpl implements OcspServer {
     //-- initializes the responders
     // signers
     for (OcspServerConf.Signer m : conf.getSigners()) {
-      ResponseSigner signer = initSigner(m, securityFactory);
-      signers.put(m.getName(), signer);
+      signers.put(m.getName(), initSigner(m, securityFactory));
     }
 
     // requests
     for (OcspServerConf.RequestOption m : conf.getRequestOptions()) {
-      RequestOption option = new RequestOption(m);
-      requestOptions.put(m.getName(), option);
+      requestOptions.put(m.getName(), new RequestOption(m));
     }
 
     // responses
@@ -492,8 +490,7 @@ public class OcspServerImpl implements OcspServer {
         }
       }
 
-      ResponderImpl responder =
-          new ResponderImpl(option, requestOptions.get(option.getRequestOptionName()),
+      ResponderImpl responder = new ResponderImpl(option, requestOptions.get(option.getRequestOptionName()),
               responseOption, signer, statusStores);
       responders.put(name, responder);
     } // end for
@@ -796,16 +793,10 @@ public class OcspServerImpl implements OcspServer {
         builder.setResponseExtensions(new Extensions(respExtensions));
       }
 
-      TaggedCertSequence certsInResp;
       EmbedCertsMode certsMode = repOpt.getEmbedCertsMode();
-      if (certsMode == EmbedCertsMode.SIGNER) {
-        certsInResp = signer.getSequenceOfCert();
-      } else if (certsMode == EmbedCertsMode.NONE) {
-        certsInResp = null;
-      } else {
-        // certsMode == EmbedCertsMode.SIGNER_AND_CA
-        certsInResp = signer.getSequenceOfCertChain();
-      }
+      TaggedCertSequence certsInResp = (certsMode == EmbedCertsMode.SIGNER) ? signer.getSequenceOfCert()
+          : (certsMode == EmbedCertsMode.NONE) ? null
+          : signer.getSequenceOfCertChain(); // certsMode == EmbedCertsMode.SIGNER_AND_CA
 
       Date producedAt = new Date();
       byte[] encodeOcspResponse;
@@ -983,28 +974,21 @@ public class OcspServerImpl implements OcspServer {
     }
 
     if (LOG.isDebugEnabled()) {
-      String certStatusText;
-      if (Arrays.equals(certStatus, bytes_certstatus_good)) {
-        certStatusText = "good";
-      } else if (Arrays.equals(certStatus, bytes_certstatus_unknown)) {
-        certStatusText = "unknown";
-      } else if (Arrays.equals(certStatus, bytes_certstatus_rfc6960_unknown)) {
-        certStatusText = "RFC6960_unknown";
-      } else  {
-        certStatusText = unknownAsRevoked.get() ? "unknown_as_revoked" : "revoked";
-      }
+      String certStatusText = Arrays.equals(certStatus, bytes_certstatus_good) ? "good"
+          : Arrays.equals(certStatus, bytes_certstatus_unknown) ? "unknown"
+          : Arrays.equals(certStatus, bytes_certstatus_rfc6960_unknown) ? "RFC6960_unknown"
+          : unknownAsRevoked.get() ? "unknown_as_revoked"
+          : "revoked";
 
       String msg = StringUtil.concatObjectsCap(250, "issuer: ", certId.getIssuer(),
           ", serialNumber: ", LogUtil.formatCsn(certId.getSerialNumber()),
           ", certStatus: ", certStatusText, ", thisUpdate: ", thisUpdate,
           ", nextUpdate: ", nextUpdate);
-
-      StringBuilder sb = new StringBuilder(msg.length() + 80);
-      sb.append(msg);
-      if (certHash != null) {
-        sb.append(", certHash: ").append(Hex.encode(certHash));
+      if (certHash == null) {
+        LOG.debug(msg);
+      } else {
+        LOG.debug(msg + ", certHash: " + Hex.encode(certHash));
       }
-      LOG.debug(sb.toString());
     }
 
     if (CollectionUtil.isEmpty(extensions)) {

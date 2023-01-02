@@ -77,13 +77,11 @@ public class P11CryptService {
     return getIdentity(identityId.getSlotId(), identityId.getKeyId());
   }
 
-  public P11Identity getIdentity(P11SlotIdentifier slotId, P11ObjectIdentifier keyId)
-      throws P11TokenException {
+  public P11Identity getIdentity(P11SlotIdentifier slotId, P11ObjectIdentifier keyId) throws P11TokenException {
     return module.getSlot(slotId).getIdentity(keyId);
   }
 
-  public X509Cert getCert(P11SlotIdentifier slotId, P11ObjectIdentifier certId)
-      throws P11TokenException {
+  public X509Cert getCert(P11SlotIdentifier slotId, P11ObjectIdentifier certId) throws P11TokenException {
     return module.getSlot(slotId).getCert(certId);
   }
 

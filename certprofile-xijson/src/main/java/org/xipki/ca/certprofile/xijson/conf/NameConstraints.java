@@ -98,8 +98,7 @@ public class NameConstraints extends ValidatableConf {
     return ret;
   } // method buildGeneralSubtrees
 
-  private static GeneralSubtree buildGeneralSubtree(GeneralSubtreeType type)
-      throws CertprofileException {
+  private static GeneralSubtree buildGeneralSubtree(GeneralSubtreeType type) throws CertprofileException {
     GeneralSubtreeType.Base baseType = Args.notNull(type, "type").getBase();
     GeneralName base;
     if (baseType.getDirectoryName() != null) {
