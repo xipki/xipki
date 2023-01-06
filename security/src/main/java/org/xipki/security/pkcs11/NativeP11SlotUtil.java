@@ -159,8 +159,7 @@ class NativeP11SlotUtil {
     long state = info.getState();
     long deviceError = info.getDeviceError();
 
-    LOG.debug("to be verified PKCS11Module: state = {}, deviceError: {}",
-        Functions.cksCodeToName(state), deviceError);
+    LOG.debug("to be verified PKCS11Module: state = {}, deviceError: {}", Functions.cksCodeToName(state), deviceError);
     if (deviceError != 0) {
       LOG.error("deviceError {}", deviceError);
       return false;
@@ -181,8 +180,7 @@ class NativeP11SlotUtil {
     return getObjects(session, new AttributeVector(attributes), 9999);
   }
 
-  static List<Long> getObjects(Session session, AttributeVector template, int maxNo)
-      throws P11TokenException {
+  static List<Long> getObjects(Session session, AttributeVector template, int maxNo) throws P11TokenException {
     List<Long> objList = new LinkedList<>();
 
     boolean initialized = false;
@@ -221,11 +219,10 @@ class NativeP11SlotUtil {
       throws XiSecurityException {
     try {
       if (keyType == CKK_RSA) {
-        BigInteger[] attrValues = session.getByteArrayAttributeBigIntValues(hP11Key, CKA_MODULUS, CKA_PUBLIC_EXPONENT);
+        BigInteger[] attrValues = session.getBigIntAttrValues(hP11Key, CKA_MODULUS, CKA_PUBLIC_EXPONENT);
         return buildRSAKey(attrValues[0], attrValues[1]);
       } else if (keyType == CKK_DSA) {
-        BigInteger[] attrValues = session.getByteArrayAttributeBigIntValues(hP11Key,
-            CKA_VALUE, CKA_PRIME, CKA_SUBPRIME, CKA_BASE);
+        BigInteger[] attrValues = session.getBigIntAttrValues(hP11Key, CKA_VALUE, CKA_PRIME, CKA_SUBPRIME, CKA_BASE);
 
         DSAPublicKeySpec keySpec = new DSAPublicKeySpec(attrValues[0], attrValues[1], attrValues[2], attrValues[3]);
         try {
@@ -235,7 +232,7 @@ class NativeP11SlotUtil {
         }
       } else if (keyType == CKK_EC || keyType == CKK_VENDOR_SM2
           || keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
-        byte[][] attrValues = session.getByteArrayAttributeValues(hP11Key, CKA_EC_PARAMS, CKA_EC_POINT);
+        byte[][] attrValues = session.getByteArrayAttrValues(hP11Key, CKA_EC_PARAMS, CKA_EC_POINT);
 
         byte[] ecParameters = attrValues[0];
         byte[] ecPoint = attrValues[1];
@@ -314,8 +311,7 @@ class NativeP11SlotUtil {
     }
   } // method generatePublicKey
 
-  static RSAPublicKey buildRSAKey(BigInteger mod, BigInteger exp)
-      throws XiSecurityException {
+  static RSAPublicKey buildRSAKey(BigInteger mod, BigInteger exp) throws XiSecurityException {
     try {
       return KeyUtil.generateRSAPublicKey(new RSAPublicKeySpec(mod, exp));
     } catch (InvalidKeySpecException ex) {
@@ -397,7 +393,7 @@ class NativeP11SlotUtil {
 
   static String readLabel(Session session, long objectHandle) {
     try {
-      return session.getCharAttributeStringValue(objectHandle, CKA_LABEL);
+      return session.getStringAttrValue(objectHandle, CKA_LABEL);
     } catch (Exception e) {
       LogUtil.warn(LOG, e, "error reading label for object " + objectHandle);
       return null;

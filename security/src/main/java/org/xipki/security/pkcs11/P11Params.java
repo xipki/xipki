@@ -63,9 +63,9 @@ public interface P11Params {
 
     private final long maskGenerationFunction;
 
-    private final long saltLength;
+    private final int saltLength;
 
-    public P11RSAPkcsPssParams(long hashAlgorithm, long maskGenerationFunction, long saltLength) {
+    public P11RSAPkcsPssParams(long hashAlgorithm, long maskGenerationFunction, int saltLength) {
       this.hashAlgorithm = hashAlgorithm;
       this.maskGenerationFunction = maskGenerationFunction;
       this.saltLength = saltLength;
@@ -124,7 +124,7 @@ public interface P11Params {
       return maskGenerationFunction;
     }
 
-    public long getSaltLength() {
+    public int getSaltLength() {
       return saltLength;
     }
 

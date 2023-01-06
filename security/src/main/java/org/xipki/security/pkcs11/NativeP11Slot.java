@@ -125,7 +125,7 @@ class NativeP11Slot extends P11Slot {
         libDesc = "";
       }
     } catch (PKCS11Exception ex) {
-      LogUtil.error(LOG, ex, "Module.getInfo()");
+      LogUtil.error(LOG, ex, "PKCS11Module.getInfo()");
       throw new P11TokenException("could not get Module Info: " + ex.getMessage(), ex);
     }
 
@@ -160,12 +160,8 @@ class NativeP11Slot extends P11Slot {
         throw new P11TokenException("could not get tokenInfo: " + ex.getMessage(), ex);
       }
 
-      if (maxSessionCount2 <= 0) {
-        maxSessionCount2 = DEFAULT_MAX_COUNT_SESSION;
-      } else {
-        // 2 sessions as buffer, they may be used elsewhere.
-        maxSessionCount2 = (maxSessionCount2 < 3) ? 1 : maxSessionCount2 - 2;
-      }
+      maxSessionCount2 = (maxSessionCount2 <= 0) ? DEFAULT_MAX_COUNT_SESSION
+          : (maxSessionCount2 < 3) ? 1 : maxSessionCount2 - 2; // 2 sessions as buffer, they may be used elsewhere.
 
       if (numSessions != null) {
         maxSessionCount2 = Math.min(numSessions, maxSessionCount2);
@@ -274,7 +270,7 @@ class NativeP11Slot extends P11Slot {
           ByteArrayAttribute valueAttr = new ByteArrayAttribute(CKA_VALUE);
 
           try {
-            session.getAttributeValues(hP11Cert, idAttr, labelAttr, valueAttr);
+            session.getAttrValues(hP11Cert, idAttr, labelAttr, valueAttr);
           } catch (PKCS11Exception ex) {
             LogUtil.warn(LOG, ex, "Error reading attributes of X.509 certificate with handle " + hP11Cert);
             continue;
@@ -348,7 +344,7 @@ class NativeP11Slot extends P11Slot {
     LongAttribute keyTypeAttr = new LongAttribute(CKA_KEY_TYPE);
 
     try {
-      session.getAttributeValues(hSecretKey, idAttr, labelAttr, keyTypeAttr);
+      session.getAttrValues(hSecretKey, idAttr, labelAttr, keyTypeAttr);
     } catch (PKCS11Exception ex) {
       LOG.warn("error reading attributes of secret key {}", hSecretKey);
       return false;
@@ -369,7 +365,7 @@ class NativeP11Slot extends P11Slot {
       keyBitLen = 192;
     } else {
       try {
-        keyBitLen = 8 * session.getLongAttributeValue(hSecretKey, CKA_VALUE_LEN).intValue();
+        keyBitLen = 8 * session.getIntAttrValue(hSecretKey, CKA_VALUE_LEN);
       } catch (PKCS11Exception ex) {
         LOG.warn("error reading attributes of secret key {}", hSecretKey);
         return false;
@@ -388,7 +384,7 @@ class NativeP11Slot extends P11Slot {
     LongAttribute keyTypeAttr = new LongAttribute(CKA_KEY_TYPE);
 
     try {
-      session.getAttributeValues(hPrivKey, keyTypeAttr, idAttr, labelAttr);
+      session.getAttrValues(hPrivKey, keyTypeAttr, idAttr, labelAttr);
     } catch (PKCS11Exception ex) {
       LOG.warn("error reading attributes of private key {}", hPrivKey);
       return false;
@@ -437,8 +433,7 @@ class NativeP11Slot extends P11Slot {
         }
 
         if (pubKey == null) {
-          LOG.info("neither certificate nor public key for the {} key ({}) is available",
-              keyTypeName, name);
+          LOG.info("neither certificate nor public key for the {} key ({}) is available", keyTypeName, name);
           return false;
         }
       }
@@ -469,20 +464,13 @@ class NativeP11Slot extends P11Slot {
       LOG.debug("digest (init, digestKey, then finish) secret key {}", identity.getId());
     }
 
-    int digestLen;
-    if (CKM_SHA_1 == mech) {
-      digestLen = 20;
-    } else if (CKM_SHA224 == mech || CKM_SHA3_224 == mech) {
-      digestLen = 28;
-    } else if (CKM_SHA256 == mech || CKM_SHA3_256 == mech) {
-      digestLen = 32;
-    } else if (CKM_SHA384 == mech || CKM_SHA3_384 == mech) {
-      digestLen = 48;
-    } else if (CKM_SHA512 == mech || CKM_SHA3_512 == mech) {
-      digestLen = 64;
-    } else {
-      throw new P11TokenException("unsupported mechanism " + mech);
-    }
+    int digestLen = (CKM_SHA_1 == mech) ? 20
+        : (CKM_SHA224 == mech || CKM_SHA3_224 == mech) ? 28
+        : (CKM_SHA256 == mech || CKM_SHA3_256 == mech) ? 32
+        : (CKM_SHA384 == mech || CKM_SHA3_384 == mech) ? 48
+        : (CKM_SHA512 == mech || CKM_SHA3_512 == mech) ? 64 : -1;
+
+    if (digestLen == -1) throw new P11TokenException("unsupported mechanism " + mech);
 
     ConcurrentBagEntry<Session> session0 = borrowSession();
     Mechanism mechanismObj = Mechanism.get(mech);
@@ -510,8 +498,7 @@ class NativeP11Slot extends P11Slot {
     }
   } // method digestKey
 
-  byte[] sign(long mech, P11Params parameters, byte[] content, NativeP11Identity identity)
-      throws P11TokenException {
+  byte[] sign(long mech, P11Params parameters, byte[] content, NativeP11Identity identity) throws P11TokenException {
     notNull(content, "content");
     assertMechanismSupported(mech);
 
@@ -548,8 +535,7 @@ class NativeP11Slot extends P11Slot {
   } // method sign
 
   private byte[] sign0(Session session, int expectedSignatureLen, Mechanism mechanism,
-                       byte[] content, long signingKeyHandle, long keyType)
-      throws PKCS11Exception {
+                       byte[] content, long signingKeyHandle, long keyType) throws PKCS11Exception {
     boolean weierstrausKey = CKK_EC == keyType || CKK_VENDOR_SM2 == keyType;
 
     int len = content.length;
@@ -716,8 +702,7 @@ class NativeP11Slot extends P11Slot {
     }
   } // method forceLogin
 
-  private Long getKeyObjectForId(Session session, long keyClass, Long keyType, byte[] keyId)
-      throws P11TokenException {
+  private Long getKeyObjectForId(Session session, long keyClass, Long keyType, byte[] keyId) throws P11TokenException {
     return getKeyObject(session, keyClass, keyType, keyId, true, null);
   }
 
@@ -813,8 +798,7 @@ class NativeP11Slot extends P11Slot {
   } // method removeCerts0
 
   @Override
-  protected P11ObjectIdentifier addCert0(X509Cert cert, P11NewObjectControl control)
-      throws P11TokenException {
+  protected P11ObjectIdentifier addCert0(X509Cert cert, P11NewObjectControl control) throws P11TokenException {
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
 
     try {
@@ -839,8 +823,8 @@ class NativeP11Slot extends P11Slot {
          }
       }
 
-      byte[] id = newCertTemp.getAttributeByteArrayValue(CKA_ID);
-      String label = newCertTemp.getAttributeStringValue(CKA_LABEL);
+      byte[] id = newCertTemp.getByteArrayAttrValue(CKA_ID);
+      String label = newCertTemp.getStringAttrValue(CKA_LABEL);
       return new P11ObjectIdentifier(id, label);
     } catch (PKCS11Exception ex) {
       throw new P11TokenException(ex.getMessage(), ex);
@@ -916,7 +900,7 @@ class NativeP11Slot extends P11Slot {
 
       String label = null;
       try {
-        label = session.getCharAttributeStringValue(keyHandle, CKA_LABEL);
+        label = session.getStringAttrValue(keyHandle, CKA_LABEL);
       } catch (PKCS11Exception e) {
         throw new P11TokenException(e);
       }
@@ -970,7 +954,7 @@ class NativeP11Slot extends P11Slot {
 
       String label = null;
       try {
-        label = session.getCharAttributeStringValue(keyHandle, CKA_LABEL);
+        label = session.getStringAttrValue(keyHandle, CKA_LABEL);
       } catch (PKCS11Exception e) {
       }
 
@@ -1015,9 +999,8 @@ class NativeP11Slot extends P11Slot {
       KeyPair keypair = null;
       try {
         keypair = session.generateKeyPair(Mechanism.get(mech), publicKeyTemplate, privateKeyTemplate);
-        BigInteger[] attrValues = session.getByteArrayAttributeBigIntValues(keypair.getPrivateKey(),
-            CKA_MODULUS, CKA_PUBLIC_EXPONENT, CKA_PRIVATE_EXPONENT,
-            CKA_PRIME_1, CKA_PRIME_2, CKA_EXPONENT_1, CKA_EXPONENT_2, CKA_COEFFICIENT);
+        BigInteger[] attrValues = session.getBigIntAttrValues(keypair.getPrivateKey(), CKA_MODULUS, CKA_PUBLIC_EXPONENT,
+            CKA_PRIVATE_EXPONENT, CKA_PRIME_1, CKA_PRIME_2, CKA_EXPONENT_1, CKA_EXPONENT_2, CKA_COEFFICIENT);
 
         return new PrivateKeyInfo(ALGID_RSA,
             new org.bouncycastle.asn1.pkcs.RSAPrivateKey(
@@ -1045,8 +1028,7 @@ class NativeP11Slot extends P11Slot {
   } // method generateDSAKeypair0
 
   @Override
-  protected PrivateKeyInfo generateDSAKeypairOtf0(BigInteger p, BigInteger q, BigInteger g)
-      throws P11TokenException {
+  protected PrivateKeyInfo generateDSAKeypairOtf0(BigInteger p, BigInteger q, BigInteger g) throws P11TokenException {
     AttributeVector priKeyTemplate = newPrivateKey(CKK_DSA);
     setPrivateKeyAttrsOtf(priKeyTemplate);
 
@@ -1066,8 +1048,8 @@ class NativeP11Slot extends P11Slot {
         long skHandle = keypair.getPrivateKey();
         long pkHandle = keypair.getPublicKey();
 
-        BigInteger p11PublicKeyValue = session.getByteArrayAttributeBigIntValue(pkHandle, CKA_VALUE);
-        BigInteger p11PrivateKeyValue = session.getByteArrayAttributeBigIntValue(skHandle, CKA_VALUE);
+        BigInteger p11PublicKeyValue = session.getBigIntAttrValue(pkHandle, CKA_VALUE);
+        BigInteger p11PrivateKeyValue = session.getBigIntAttrValue(skHandle, CKA_VALUE);
 
         byte[] publicKey = new ASN1Integer(p11PublicKeyValue).getEncoded(); // y
 
@@ -1099,8 +1081,7 @@ class NativeP11Slot extends P11Slot {
   } // method generateECEdwardsKeypair0
 
   @Override
-  protected PrivateKeyInfo generateECEdwardsKeypairOtf0(ASN1ObjectIdentifier curveId)
-      throws P11TokenException {
+  protected PrivateKeyInfo generateECEdwardsKeypairOtf0(ASN1ObjectIdentifier curveId) throws P11TokenException {
     return generateECKeypairOtf0(CKK_EC_EDWARDS, CKM_EC_EDWARDS_KEY_PAIR_GEN, curveId);
   }
 
@@ -1120,8 +1101,7 @@ class NativeP11Slot extends P11Slot {
   } // method generateECMontgomeryKeypair0
 
   @Override
-  protected PrivateKeyInfo generateECMontgomeryKeypairOtf0(ASN1ObjectIdentifier curveId)
-      throws P11TokenException {
+  protected PrivateKeyInfo generateECMontgomeryKeypairOtf0(ASN1ObjectIdentifier curveId) throws P11TokenException {
     return generateECKeypairOtf0(CKK_EC_MONTGOMERY, CKM_EC_MONTGOMERY_KEY_PAIR_GEN, curveId);
   }
 
@@ -1173,8 +1153,8 @@ class NativeP11Slot extends P11Slot {
       try {
         keypair = session.generateKeyPair(Mechanism.get(mech), publicKeyTemplate, privateKeyTemplate);
 
-        byte[] ecPoint = session.getByteArrayAttributeValue(keypair.getPublicKey(), CKA_EC_POINT);
-        byte[] privValue = session.getByteArrayAttributeValue(keypair.getPrivateKey(), CKA_VALUE);
+        byte[] ecPoint = session.getByteArrayAttrValue(keypair.getPublicKey(), CKA_EC_POINT);
+        byte[] privValue = session.getByteArrayAttrValue(keypair.getPrivateKey(), CKA_VALUE);
 
         if (CKK_EC_EDWARDS == keyType || CKK_EC_MONTGOMERY == keyType) {
           AlgorithmIdentifier algId = new AlgorithmIdentifier(curveId);
@@ -1222,18 +1202,17 @@ class NativeP11Slot extends P11Slot {
   @Override
   protected PrivateKeyInfo generateSM2KeypairOtf0() throws P11TokenException {
     long ckm = CKM_VENDOR_SM2_KEY_PAIR_GEN;
-    if (supportsMechanism(ckm)) {
-      return generateECKeypairOtf0(CKK_VENDOR_SM2, ckm, GMObjectIdentifiers.sm2p256v1);
-    } else {
-      return generateECKeypairOtf0(GMObjectIdentifiers.sm2p256v1);
-    }
+
+    return supportsMechanism(ckm)
+        ? generateECKeypairOtf0(CKK_VENDOR_SM2, ckm, GMObjectIdentifiers.sm2p256v1)
+        : generateECKeypairOtf0(GMObjectIdentifiers.sm2p256v1);
   }
 
   private P11Identity generateKeyPair(
       long mech, byte[] id, AttributeVector privateKeyTemplate, AttributeVector publicKeyTemplate)
       throws P11TokenException {
-    long keyType = privateKeyTemplate.getAttributeLongValue(CKA_KEY_TYPE);
-    char[] labelChars = privateKeyTemplate.getAttributeCharArrayValue(CKA_LABEL);
+    long keyType = privateKeyTemplate.getLongAttrValue(CKA_KEY_TYPE);
+    char[] labelChars = privateKeyTemplate.getCharArrayAttrValue(CKA_LABEL);
 
     boolean succ = false;
 
@@ -1262,12 +1241,10 @@ class NativeP11Slot extends P11Slot {
         String pubKeyLabel;
 
         try {
-          labelChars = session.getCharAttributeValue(keypair.getPrivateKey(), CKA_LABEL);
-          if (labelChars == null) {
-            throw new P11TokenException("Label of the generated PrivateKey is not set");
-          }
+          labelChars = session.getCharArrayAttrValue(keypair.getPrivateKey(), CKA_LABEL);
+          if (labelChars == null) throw new P11TokenException("Label of the generated PrivateKey is not set");
 
-          pubKeyLabel = session.getCharAttributeStringValue(keypair.getPublicKey(), CKA_LABEL);
+          pubKeyLabel = session.getStringAttrValue(keypair.getPublicKey(), CKA_LABEL);
         } catch (PKCS11Exception ex) {
           throw new P11TokenException("error getting attribute CKA_LABEL", ex);
         }
@@ -1295,7 +1272,7 @@ class NativeP11Slot extends P11Slot {
             CharArrayAttribute labelAttr = new CharArrayAttribute(CKA_LABEL);
             ByteArrayAttribute valueAttr = new ByteArrayAttribute(CKA_VALUE);
             try {
-              session.getAttributeValues(cert2, labelAttr, valueAttr);
+              session.getAttrValues(cert2, labelAttr, valueAttr);
             } catch (PKCS11Exception e) {
               throw new P11TokenException("could not get attributes", e);
             }
@@ -1329,8 +1306,7 @@ class NativeP11Slot extends P11Slot {
   } // method generateKeyPair
 
   private AttributeVector createPkcs11Template(
-      Session session, X509Cert cert, P11NewObjectControl control, boolean omitDateAttrs)
-      throws P11TokenException {
+      Session session, X509Cert cert, P11NewObjectControl control, boolean omitDateAttrs) throws P11TokenException {
     byte[] id = control.getId();
     if (id == null) {
       id = generateId(session);
@@ -1378,8 +1354,7 @@ class NativeP11Slot extends P11Slot {
   } // method createPkcs11Template
 
   @Override
-  protected void updateCertificate0(P11ObjectIdentifier keyId, X509Cert newCert)
-      throws P11TokenException {
+  protected void updateCertificate0(P11ObjectIdentifier keyId, X509Cert newCert) throws P11TokenException {
     try {
       removeCerts(keyId);
     } catch (P11UnknownEntityException ex) {
@@ -1484,7 +1459,7 @@ class NativeP11Slot extends P11Slot {
           privateKey.attr(usage.getAttributeType(), true);
         }
       } else {
-        long keyType = privateKey.getAttributeLongValue(CKA_KEY_TYPE);
+        long keyType = privateKey.getLongAttrValue(CKA_KEY_TYPE);
         // if not set
         if (keyType == PKCS11Constants.CKK_EC || keyType == PKCS11Constants.CKK_RSA
             || keyType == PKCS11Constants.CKK_DSA) {
@@ -1529,8 +1504,7 @@ class NativeP11Slot extends P11Slot {
     }
   }
 
-  private static void destroyObject(Session session, Long hObject, String objectDesc)
-      throws P11TokenException {
+  private static void destroyObject(Session session, Long hObject, String objectDesc) throws P11TokenException {
     if (hObject != null) {
       try {
         session.destroyObject(hObject);

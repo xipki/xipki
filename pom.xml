@@ -35,6 +35,7 @@
     <karaf.bc.version>1.70</karaf.bc.version>
     <bc.version>1.72</bc.version>
     <slf4j.version>1.7.32</slf4j.version>
+    <!-- can be one of ipkcs11wrapper and jpkcs11wrapper -->
     <pkcs11wrapper.artifactId>jpkcs11wrapper</pkcs11wrapper.artifactId>
     <pkcs11wrapper.version>1.0.0-SNAPSHOT</pkcs11wrapper.version>
     <hikaricp.version>4.0.3</hikaricp.version>
