@@ -15,18 +15,8 @@
  * limitations under the License.
  */
 
-package org.xipki.security.pkcs11.iaik;
+package org.xipki.security.pkcs11;
 
-import iaik.pkcs.pkcs11.*;
-import iaik.pkcs.pkcs11.objects.Attribute;
-import iaik.pkcs.pkcs11.objects.AttributeVector;
-import iaik.pkcs.pkcs11.parameters.InitializationVectorParameters;
-import iaik.pkcs.pkcs11.parameters.OpaqueParameters;
-import iaik.pkcs.pkcs11.parameters.Parameters;
-import iaik.pkcs.pkcs11.parameters.RSAPkcsPssParameters;
-import iaik.pkcs.pkcs11.wrapper.Functions;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
@@ -36,13 +26,18 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.*;
+import org.xipki.pkcs11.objects.Attribute;
+import org.xipki.pkcs11.objects.AttributeVector;
+import org.xipki.pkcs11.parameters.InitializationVectorParameters;
+import org.xipki.pkcs11.parameters.OpaqueParameters;
+import org.xipki.pkcs11.parameters.Parameters;
+import org.xipki.pkcs11.parameters.RSAPkcsPssParameters;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11Slot.P11KeyUsage;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
-import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Hex;
@@ -59,20 +54,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static iaik.pkcs.pkcs11.wrapper.PKCS11Constants.*;
+import static org.xipki.pkcs11.PKCS11Constants.*;
 import static org.xipki.security.pkcs11.P11Slot.getDescription;
 import static org.xipki.util.CollectionUtil.isEmpty;
 import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**
- * IAIK PKCS#11 wrapper util.
+ * PKCS#11 wrapper util.
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
-class IaikP11SlotUtil {
+class NativeP11SlotUtil {
 
-  private static final Logger LOG = LoggerFactory.getLogger(IaikP11SlotUtil.class);
+  private static final Logger LOG = LoggerFactory.getLogger(NativeP11SlotUtil.class);
 
   static void singleLogin(Session session, long userType, char[] pin) throws P11TokenException {
     char[] tmpPin = pin;
@@ -97,11 +92,15 @@ class IaikP11SlotUtil {
   } // method singleLogin
 
   static byte[] digestKey(Session session, int digestLen, Mechanism mechanism, long hKey)
-      throws TokenException {
+      throws PKCS11Exception {
     session.digestInit(mechanism);
     session.digestKey(hKey);
     byte[] digest = new byte[digestLen];
-    session.digestFinal(digest, 0, digestLen);
+    int len = session.digestFinal(digest, 0, digestLen);
+    if (len != digestLen) {
+      LOG.warn("Token returns digest with unexpected length {}, expected {}", len, digestLen);
+      throw new PKCS11Exception(CKR_FUNCTION_FAILED);
+    }
     return digest;
   } // method digestKey0
 
@@ -157,21 +156,18 @@ class IaikP11SlotUtil {
       LOG.debug("SessionInfo: {}", info);
     }
 
-    State state = info.getState();
+    long state = info.getState();
     long deviceError = info.getDeviceError();
 
-    LOG.debug("to be verified PKCS11Module: state = {}, deviceError: {}", state, deviceError);
+    LOG.debug("to be verified PKCS11Module: state = {}, deviceError: {}",
+        Functions.cksCodeToName(state), deviceError);
     if (deviceError != 0) {
       LOG.error("deviceError {}", deviceError);
       return false;
     }
 
-    boolean sessionLoggedIn;
-    if (userType == PKCS11Constants.CKU_SO) {
-      sessionLoggedIn = state.equals(CKS_RW_SO_FUNCTIONS);
-    } else {
-      sessionLoggedIn = state.equals(CKS_RW_USER_FUNCTIONS) || state.equals(CKS_RO_USER_FUNCTIONS);
-    }
+    boolean sessionLoggedIn = (userType == PKCS11Constants.CKU_SO) ? (state == CKS_RW_SO_FUNCTIONS)
+        : (state == CKS_RW_USER_FUNCTIONS) || (state == CKS_RO_USER_FUNCTIONS);
 
     LOG.debug("sessionLoggedIn: {}", sessionLoggedIn);
     return sessionLoggedIn;

@@ -26,7 +26,6 @@ import org.xipki.password.Passwords;
 import org.xipki.password.Passwords.PasswordConf;
 import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory;
-import org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory;
 import org.xipki.security.pkcs12.P12SignerFactory;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.FileOrValue;
@@ -160,7 +159,7 @@ public class Securities implements Closeable {
 
   private static List<P11ModuleFactory> createDefaultFactories() {
     List<P11ModuleFactory> factories = new ArrayList<>(3);
-    factories.add(new IaikP11ModuleFactory());
+    factories.add(new NativeP11ModuleFactory());
     factories.add(new EmulatorP11ModuleFactory());
     return factories;
   }

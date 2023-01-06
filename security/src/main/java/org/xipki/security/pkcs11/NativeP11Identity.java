@@ -15,16 +15,12 @@
  * limitations under the License.
  */
 
-package org.xipki.security.pkcs11.iaik;
+package org.xipki.security.pkcs11;
 
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.X509Cert;
-import org.xipki.security.pkcs11.P11Identity;
-import org.xipki.security.pkcs11.P11IdentityId;
-import org.xipki.security.pkcs11.P11Params;
-import org.xipki.security.pkcs11.P11TokenException;
 
 import java.security.PublicKey;
 import java.security.interfaces.DSAPublicKey;
@@ -32,13 +28,13 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
 /**
- * {@link P11Identity} based on the IAIK PKCS#11 wrapper.
+ * {@link P11Identity} based on the ipkcs11wrapper or jpkcs11wrapper.
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-class IaikP11Identity extends P11Identity {
+class NativeP11Identity extends P11Identity {
 
   private final long signingKeyHandle;
 
@@ -46,15 +42,15 @@ class IaikP11Identity extends P11Identity {
 
   private final boolean secretKey;
 
-  IaikP11Identity(IaikP11Slot slot, P11IdentityId identityId, long signingKeyHandle, long keyType, int keyBitLen) {
+  NativeP11Identity(NativeP11Slot slot, P11IdentityId identityId, long signingKeyHandle, long keyType, int keyBitLen) {
     super(slot, identityId, keyType, keyBitLen);
     this.secretKey = true;
     this.signingKeyHandle = signingKeyHandle;
     this.expectedSignatureLen = 0;
   }
 
-  IaikP11Identity(IaikP11Slot slot, P11IdentityId identityId, long privateKeyHandle, long keyType,
-                  PublicKey publicKey, X509Cert[] certificateChain) {
+  NativeP11Identity(NativeP11Slot slot, P11IdentityId identityId, long privateKeyHandle, long keyType,
+                    PublicKey publicKey, X509Cert[] certificateChain) {
     super(slot, identityId, keyType, publicKey, certificateChain);
     this.secretKey = false;
     this.signingKeyHandle = privateKeyHandle;
@@ -91,12 +87,12 @@ class IaikP11Identity extends P11Identity {
       throw new P11TokenException("could not digest asymmetric key");
     }
 
-    return ((IaikP11Slot) slot).digestSecretKey(mechanism, this);
+    return ((NativeP11Slot) slot).digestSecretKey(mechanism, this);
   }
 
   @Override
   protected byte[] sign0(long mechanism, P11Params parameters, byte[] content) throws P11TokenException {
-    return ((IaikP11Slot) slot).sign(mechanism, parameters, content, this);
+    return ((NativeP11Slot) slot).sign(mechanism, parameters, content, this);
   }
 
   long getSigningKeyHandle() {

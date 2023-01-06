@@ -17,7 +17,6 @@
 
 package org.xipki.security.pkcs11;
 
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -34,6 +33,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+import static org.xipki.pkcs11.PKCS11Constants.*;
 import static org.xipki.util.Args.notNull;
 
 /**
@@ -80,19 +80,19 @@ public class P11KeypairGenerator extends KeypairGenerator {
         String[] tokens = m.split("/");
         switch (tokens[0]) {
           case "RSA":
-            if (slot.supportsMechanism(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN)) {
+            if (slot.supportsMechanism(CKM_RSA_PKCS_KEY_PAIR_GEN)) {
               set.add(m);
             }
             break;
           case "DSA":
-            if (slot.supportsMechanism(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN)) {
+            if (slot.supportsMechanism(CKM_DSA_KEY_PAIR_GEN)) {
               set.add(m);
             }
             break;
           case "EC":
-            if (slot.supportsMechanism(PKCS11Constants.CKM_EC_KEY_PAIR_GEN)) {
+            if (slot.supportsMechanism(CKM_EC_KEY_PAIR_GEN)) {
               if (GMObjectIdentifiers.sm2p256v1.getId().equals(tokens[1])) {
-                if (slot.supportsMechanism(PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN)) {
+                if (slot.supportsMechanism(CKM_VENDOR_SM2_KEY_PAIR_GEN)) {
                   set.add(m);
                 }
               } else {
@@ -102,13 +102,13 @@ public class P11KeypairGenerator extends KeypairGenerator {
             break;
           case "ED25519":
           case "ED448":
-            if (slot.supportsMechanism(PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN)) {
+            if (slot.supportsMechanism(CKM_EC_EDWARDS_KEY_PAIR_GEN)) {
               set.add(m);
             }
             break;
           case "X25519":
           case "X448":
-            if (slot.supportsMechanism(PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN)) {
+            if (slot.supportsMechanism(CKM_EC_MONTGOMERY_KEY_PAIR_GEN)) {
               set.add(m);
             }
             break;

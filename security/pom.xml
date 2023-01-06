@@ -22,8 +22,8 @@
       <artifactId>bcpkix-jdk18on</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.xipki.iaik</groupId>
-      <artifactId>sunpkcs11-wrapper2</artifactId>
+      <groupId>org.xipki</groupId>
+      <artifactId>${pkcs11wrapper.artifactId}</artifactId>
     </dependency>
     <dependency>
       <groupId>com.alibaba</groupId>

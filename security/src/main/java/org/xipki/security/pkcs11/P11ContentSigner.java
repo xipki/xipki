@@ -17,13 +17,13 @@
 
 package org.xipki.security.pkcs11;
 
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.*;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.PKCS11Constants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.XiContentSigner;
@@ -163,10 +163,10 @@ abstract class P11ContentSigner implements XiContentSigner {
 
       if (mech != null && slot.supportsMechanism(mech)) {
         mechanism = mech;
-        this.outputStream = new ByteArrayOutputStream();
+        outputStream = new ByteArrayOutputStream();
       } else if (slot.supportsMechanism(PKCS11Constants.CKM_DSA)) {
         mechanism = PKCS11Constants.CKM_DSA;
-        this.outputStream = new DigestOutputStream(signAlgo.getHashAlgo().createDigest());
+        outputStream = new DigestOutputStream(signAlgo.getHashAlgo().createDigest());
       } else {
         throw new XiSecurityException("unsupported signature algorithm " + signAlgo);
       }

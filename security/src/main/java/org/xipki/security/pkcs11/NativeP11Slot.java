@@ -15,13 +15,8 @@
  * limitations under the License.
  */
 
-package org.xipki.security.pkcs11.iaik;
+package org.xipki.security.pkcs11;
 
-import iaik.pkcs.pkcs11.*;
-import iaik.pkcs.pkcs11.objects.*;
-import iaik.pkcs.pkcs11.wrapper.Functions;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -33,9 +28,10 @@ import org.bouncycastle.util.BigIntegers;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.*;
+import org.xipki.pkcs11.objects.*;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
 import org.xipki.security.pkcs11.P11ModuleConf.P11NewObjectConf;
 import org.xipki.security.util.SignerUtil;
@@ -57,25 +53,25 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static iaik.pkcs.pkcs11.wrapper.PKCS11Constants.*;
-import static org.xipki.security.pkcs11.iaik.IaikP11SlotUtil.*;
+import static org.xipki.pkcs11.PKCS11Constants.*;
+import static org.xipki.security.pkcs11.NativeP11SlotUtil.*;
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.Args.positive;
 import static org.xipki.util.CollectionUtil.isEmpty;
 import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**
- * {@link P11Slot} based on the IAIK PKCS#11 wrapper.
+ * {@link P11Slot} based on the ipkcs11wrapper or jpkcs11wrapper.
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
-class IaikP11Slot extends P11Slot {
+class NativeP11Slot extends P11Slot {
 
   public static final AlgorithmIdentifier ALGID_RSA = new AlgorithmIdentifier(
       PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
 
-  private static final Logger LOG = LoggerFactory.getLogger(IaikP11Slot.class);
+  private static final Logger LOG = LoggerFactory.getLogger(NativeP11Slot.class);
 
   private static final long DEFAULT_MAX_COUNT_SESSION = 32;
 
@@ -107,9 +103,9 @@ class IaikP11Slot extends P11Slot {
 
   private boolean omitDateAttrsInCertObject;
 
-  IaikP11Slot(String moduleName, P11SlotIdentifier slotId, Slot slot, boolean readOnly, long userType,
-              List<char[]> password, int maxMessageSize, P11MechanismFilter mechanismFilter,
-              P11NewObjectConf newObjectConf, Integer numSessions, List<Long> secretKeyTypes, List<Long> keyPairTypes)
+  NativeP11Slot(String moduleName, P11SlotIdentifier slotId, Slot slot, boolean readOnly, long userType,
+                List<char[]> password, int maxMessageSize, P11MechanismFilter mechanismFilter,
+                P11NewObjectConf newObjectConf, Integer numSessions, List<Long> secretKeyTypes, List<Long> keyPairTypes)
       throws P11TokenException {
     super(moduleName, slotId, readOnly, mechanismFilter, numSessions, secretKeyTypes, keyPairTypes);
 
@@ -123,12 +119,12 @@ class IaikP11Slot extends P11Slot {
     boolean successful = false;
 
     try {
-      Info moduleInfo = slot.getModule().getInfo();
+      ModuleInfo moduleInfo = slot.getModule().getInfo();
       libDesc = moduleInfo.getLibraryDescription();
       if (libDesc == null) {
         libDesc = "";
       }
-    } catch (TokenException ex) {
+    } catch (PKCS11Exception ex) {
       LogUtil.error(LOG, ex, "Module.getInfo()");
       throw new P11TokenException("could not get Module Info: " + ex.getMessage(), ex);
     }
@@ -153,14 +149,14 @@ class IaikP11Slot extends P11Slot {
       Token token;
       try {
         token = this.slot.getToken();
-      } catch (TokenException ex) {
+      } catch (PKCS11Exception ex) {
         throw new P11TokenException("could not getToken: " + ex.getMessage(), ex);
       }
 
       long maxSessionCount2;
       try {
         maxSessionCount2 = token.getTokenInfo().getMaxSessionCount();
-      } catch (TokenException ex) {
+      } catch (PKCS11Exception ex) {
         throw new P11TokenException("could not get tokenInfo: " + ex.getMessage(), ex);
       }
 
@@ -212,7 +208,7 @@ class IaikP11Slot extends P11Slot {
     long[] mechanisms;
     try {
       mechanisms = slot.getToken().getMechanismList();
-    } catch (TokenException ex) {
+    } catch (PKCS11Exception ex) {
       throw new P11TokenException("could not getMechanismList: " + ex.getMessage(), ex);
     }
 
@@ -279,7 +275,7 @@ class IaikP11Slot extends P11Slot {
 
           try {
             session.getAttributeValues(hP11Cert, idAttr, labelAttr, valueAttr);
-          } catch (TokenException ex) {
+          } catch (PKCS11Exception ex) {
             LogUtil.warn(LOG, ex, "Error reading attributes of X.509 certificate with handle " + hP11Cert);
             continue;
           }
@@ -380,7 +376,7 @@ class IaikP11Slot extends P11Slot {
       }
     }
 
-    IaikP11Identity identity = new IaikP11Identity(this,
+    NativeP11Identity identity = new NativeP11Identity(this,
         new P11IdentityId(slotId, new P11ObjectIdentifier(id, label)), hSecretKey, keyType, keyBitLen);
     refreshResult.addIdentity(identity);
     return true;
@@ -450,7 +446,7 @@ class IaikP11Slot extends P11Slot {
       X509Cert[] certs = (cert == null) ? null : new X509Cert[]{cert};
       P11IdentityId p11Id = new P11IdentityId(slotId, new P11ObjectIdentifier(id, label),
           pubKey != null, pubKeyLabel, cert != null, certLabel);
-      refreshResult.addIdentity(new IaikP11Identity(this, p11Id, hPrivKey, keyType, pubKey, certs));
+      refreshResult.addIdentity(new NativeP11Identity(this, p11Id, hPrivKey, keyType, pubKey, certs));
       return true;
     } catch (XiSecurityException ex) {
       LogUtil.error(LOG, ex, "XiSecurityException while initializing private key with " + name);
@@ -461,7 +457,7 @@ class IaikP11Slot extends P11Slot {
     return false;
   } // method analyseSingleKey
 
-  byte[] digestSecretKey(long mech, IaikP11Identity identity) throws P11TokenException {
+  byte[] digestSecretKey(long mech, NativeP11Identity identity) throws P11TokenException {
     if (!identity.isSecretKey()) {
       throw new P11TokenException("digestSecretKey could not be applied to non-SecretKey");
     }
@@ -494,7 +490,7 @@ class IaikP11Slot extends P11Slot {
     try {
       Session session = session0.value();
       try {
-        return IaikP11SlotUtil.digestKey(session, digestLen, mechanismObj, keyHandle);
+        return NativeP11SlotUtil.digestKey(session, digestLen, mechanismObj, keyHandle);
       } catch (PKCS11Exception ex) {
         if (ex.getErrorCode() != CKR_USER_NOT_LOGGED_IN) {
           throw new P11TokenException(ex.getMessage(), ex);
@@ -504,19 +500,17 @@ class IaikP11Slot extends P11Slot {
         // force the login
         forceLogin(session);
         try {
-          return IaikP11SlotUtil.digestKey(session, digestLen, mechanismObj, keyHandle);
-        } catch (TokenException ex2) {
+          return NativeP11SlotUtil.digestKey(session, digestLen, mechanismObj, keyHandle);
+        } catch (PKCS11Exception ex2) {
           throw new P11TokenException(ex2.getMessage(), ex2);
         }
-      } catch (TokenException ex) {
-        throw new P11TokenException(ex.getMessage(), ex);
       }
     } finally {
       sessions.requite(session0);
     }
   } // method digestKey
 
-  byte[] sign(long mech, P11Params parameters, byte[] content, IaikP11Identity identity)
+  byte[] sign(long mech, P11Params parameters, byte[] content, NativeP11Identity identity)
       throws P11TokenException {
     notNull(content, "content");
     assertMechanismSupported(mech);
@@ -548,14 +542,14 @@ class IaikP11Slot extends P11Slot {
       } finally {
         sessions.requite(session0);
       }
-    } catch (TokenException ex) {
+    } catch (PKCS11Exception ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
   } // method sign
 
   private byte[] sign0(Session session, int expectedSignatureLen, Mechanism mechanism,
                        byte[] content, long signingKeyHandle, long keyType)
-      throws TokenException {
+      throws PKCS11Exception {
     boolean weierstrausKey = CKK_EC == keyType || CKK_VENDOR_SM2 == keyType;
 
     int len = content.length;
@@ -584,7 +578,7 @@ class IaikP11Slot extends P11Slot {
           sigvalue = SignerUtil.dsaSigX962ToPlain(sigvalue, expectedSignatureLen * 4);
         } catch (XiSecurityException e) {
           LOG.error(String.format("ERROR: sigvalue (%d): %s", sigvalue.length, Hex.toHexString(sigvalue)), e);
-          throw new TokenException(e);
+          throw new PKCS11Exception(CKR_FUNCTION_FAILED);
         } catch (RuntimeException e) {
           LOG.error(String.format("ERROR: sigvalue (%d): %s", sigvalue.length, Hex.toHexString(sigvalue)), e);
           throw e;
@@ -596,7 +590,7 @@ class IaikP11Slot extends P11Slot {
   } // method sign0
 
   private byte[] singleSign(Session session, Mechanism mechanism, byte[] content, long signingKeyHandle)
-      throws TokenException {
+      throws PKCS11Exception {
     LOG.debug("single sign");
     session.signInit(mechanism, signingKeyHandle);
     return session.sign(content);
@@ -606,7 +600,7 @@ class IaikP11Slot extends P11Slot {
     Session session;
     try {
       session = slot.getToken().openSession(!isReadOnly());
-    } catch (TokenException ex) {
+    } catch (PKCS11Exception ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
     countSessions.incrementAndGet();
@@ -679,8 +673,6 @@ class IaikP11Slot extends P11Slot {
       if (ex.getErrorCode() != PKCS11Constants.CKR_USER_ALREADY_LOGGED_IN) {
         throw new P11TokenException(ex.getMessage(), ex);
       }
-    } catch (TokenException ex) {
-      throw new P11TokenException(ex.getMessage(), ex);
     }
   } // method firstLogin
 
@@ -693,7 +685,7 @@ class IaikP11Slot extends P11Slot {
     boolean loginRequired;
     try {
       loginRequired = session.getToken().getTokenInfo().isLoginRequired();
-    } catch (TokenException ex) {
+    } catch (PKCS11Exception ex) {
       LogUtil.error(LOG, ex, "could not check isLoginRequired of token");
       loginRequired = true;
     }
@@ -850,7 +842,7 @@ class IaikP11Slot extends P11Slot {
       byte[] id = newCertTemp.getAttributeByteArrayValue(CKA_ID);
       String label = newCertTemp.getAttributeStringValue(CKA_LABEL);
       return new P11ObjectIdentifier(id, label);
-    } catch (TokenException ex) {
+    } catch (PKCS11Exception ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     } finally {
       sessions.requite(bagEntry);
@@ -873,12 +865,12 @@ class IaikP11Slot extends P11Slot {
       hasValueLen = false;
     } else if (CKK_GENERIC_SECRET == keyType) {
       mech = CKM_GENERIC_SECRET_KEY_GEN;
-    } else if (CKK_SHA_1_HMAC == keyType || CKK_SHA224_HMAC == keyType   || CKK_SHA256_HMAC == keyType
-        || CKK_SHA384_HMAC == keyType    || CKK_SHA512_HMAC == keyType   || CKK_SHA3_224_HMAC == keyType
+    } else if (CKK_SHA_1_HMAC == keyType || CKK_SHA224_HMAC   == keyType || CKK_SHA256_HMAC == keyType
+        || CKK_SHA384_HMAC   == keyType  || CKK_SHA512_HMAC   == keyType || CKK_SHA3_224_HMAC == keyType
         || CKK_SHA3_256_HMAC == keyType  || CKK_SHA3_384_HMAC == keyType || CKK_SHA3_512_HMAC == keyType) {
       mech = CKM_GENERIC_SECRET_KEY_GEN;
     } else {
-      throw new IllegalArgumentException("unsupported key type 0x" + Functions.toFullHex((int)keyType));
+      throw new IllegalArgumentException("unsupported key type 0x" + Functions.ckkCodeToName(keyType));
     }
 
     assertMechanismSupported(mech);
@@ -896,7 +888,7 @@ class IaikP11Slot extends P11Slot {
     byte[] id = control.getId();
 
     AttributeVector template = newSecretKey(keyType);
-    IaikP11SlotUtil.setKeyAttributes(control, template, labelChars);
+    NativeP11SlotUtil.setKeyAttributes(control, template, labelChars);
     if (hasValueLen) {
       template.valueLen(keysize / 8);
     }
@@ -918,7 +910,7 @@ class IaikP11Slot extends P11Slot {
 
       try {
         keyHandle = session.generateKey(mechanism, template);
-      } catch (TokenException ex) {
+      } catch (PKCS11Exception ex) {
         throw new P11TokenException("could not generate generic secret key using " + mechanism.getName(), ex);
       }
 
@@ -932,7 +924,7 @@ class IaikP11Slot extends P11Slot {
       P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
       P11IdentityId entityId = new P11IdentityId(slotId, objId);
 
-      return new IaikP11Identity(this, entityId, keyHandle, keyType, keysize);
+      return new NativeP11Identity(this, entityId, keyHandle, keyType, keysize);
     } finally {
       sessions.requite(bagEntry);
     }
@@ -952,7 +944,7 @@ class IaikP11Slot extends P11Slot {
       labelChars = control.getLabel().toCharArray();
     }
 
-    IaikP11SlotUtil.setKeyAttributes(control, template, labelChars);
+    NativeP11SlotUtil.setKeyAttributes(control, template, labelChars);
     template.value(keyValue);
 
     long keyHandle;
@@ -972,7 +964,7 @@ class IaikP11Slot extends P11Slot {
 
       try {
         keyHandle = session.createObject(template);
-      } catch (TokenException ex) {
+      } catch (PKCS11Exception ex) {
         throw new P11TokenException("could not create secret key", ex);
       }
 
@@ -985,7 +977,7 @@ class IaikP11Slot extends P11Slot {
       P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
       P11IdentityId entityId = new P11IdentityId(slotId, objId);
 
-      return new IaikP11Identity(this, entityId, keyHandle, keyType, keyValue.length * 8);
+      return new NativeP11Identity(this, entityId, keyHandle, keyType, keyValue.length * 8);
     } finally {
       sessions.requite(bagEntry);
     }
@@ -1032,7 +1024,7 @@ class IaikP11Slot extends P11Slot {
                 attrValues[0], attrValues[1], attrValues[2], attrValues[3],
                 attrValues[4], attrValues[5], attrValues[6], attrValues[7]));
 
-      } catch (TokenException | IOException ex) {
+      } catch (PKCS11Exception | IOException ex) {
         throw new P11TokenException("could not generate keypair " + Functions.ckmCodeToName(mech), ex);
       } finally {
         destroyKeyPairQuietly(session, keypair);
@@ -1080,7 +1072,7 @@ class IaikP11Slot extends P11Slot {
         byte[] publicKey = new ASN1Integer(p11PublicKeyValue).getEncoded(); // y
 
         return new PrivateKeyInfo(algId, new ASN1Integer(p11PrivateKeyValue), null, publicKey);
-      } catch (TokenException | IOException ex) {
+      } catch (PKCS11Exception | IOException ex) {
         throw new P11TokenException("could not generate keypair " + Functions.ckmCodeToName(mech), ex);
       } finally {
         destroyKeyPairQuietly(session, keypair);
@@ -1201,7 +1193,7 @@ class IaikP11Slot extends P11Slot {
               new org.bouncycastle.asn1.sec.ECPrivateKey(orderBigLen,
                   new BigInteger(1, privValue), new DERBitString(encodedPublicPoint), null));
         }
-      } catch (TokenException | IOException ex) {
+      } catch (PKCS11Exception | IOException ex) {
         throw new P11TokenException("could not generate keypair " + Functions.ckmCodeToName(mech), ex);
       } finally {
         destroyKeyPairQuietly(session, keypair);
@@ -1263,7 +1255,7 @@ class IaikP11Slot extends P11Slot {
 
         try {
           keypair = session.generateKeyPair(Mechanism.get(mech), publicKeyTemplate, privateKeyTemplate);
-        } catch (TokenException ex) {
+        } catch (PKCS11Exception ex) {
           throw new P11TokenException("could not generate keypair " + Functions.ckmCodeToName(mech), ex);
         }
 
@@ -1319,7 +1311,7 @@ class IaikP11Slot extends P11Slot {
         }
 
         P11IdentityId entityId = new P11IdentityId(slotId, objId, true, pubKeyLabel, certs != null, certLabel);
-        IaikP11Identity ret = new IaikP11Identity(this, entityId, privKey2, keyType, jcePublicKey, certs);
+        NativeP11Identity ret = new NativeP11Identity(this, entityId, privKey2, keyType, jcePublicKey, certs);
         succ = true;
         return ret;
       } finally {
@@ -1525,13 +1517,13 @@ class IaikP11Slot extends P11Slot {
     if (keypair != null) {
       try {
         session.destroyObject(keypair.getPrivateKey());
-      } catch (TokenException ex) {
+      } catch (PKCS11Exception ex) {
         LogUtil.warn(LOG, ex, "error destroying private key " + keypair.getPrivateKey());
       }
 
       try {
         session.destroyObject(keypair.getPublicKey());
-      } catch (TokenException ex) {
+      } catch (PKCS11Exception ex) {
         LogUtil.warn(LOG, ex, "error destroying public key " + keypair.getPublicKey());
       }
     }
@@ -1542,7 +1534,7 @@ class IaikP11Slot extends P11Slot {
     if (hObject != null) {
       try {
         session.destroyObject(hObject);
-      } catch (TokenException ex) {
+      } catch (PKCS11Exception ex) {
         String msg = "could not destroy " + objectDesc;
         LogUtil.error(LOG, ex, msg);
         throw new P11TokenException(msg);

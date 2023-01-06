@@ -80,12 +80,12 @@
   <service ref="pkcs11SignerFactory"
       interface="org.xipki.security.SignerFactory"/>
 
-  <!-- PKCS#11 Iaik -->
-  <bean id="iaikP11ModuleFactory"
-      class="org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory">
+  <!-- PKCS#11 Native -->
+  <bean id="nativeP11ModuleFactory"
+      class="org.xipki.security.pkcs11.NativeP11ModuleFactory">
   </bean>
 
-  <service ref="iaikP11ModuleFactory"
+  <service ref="nativeP11ModuleFactory"
       interface="org.xipki.security.pkcs11.P11ModuleFactory"/>
 
   <!-- PKCS#11 Emulator -->

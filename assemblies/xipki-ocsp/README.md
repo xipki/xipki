@@ -64,7 +64,7 @@ postgresql-*.jar,\
 scep-client-*.jar,\
 security-*.jar,\
 slf4j-*.jar,\
-sunpkcs11-wrapper2-*.jar,\
+*pkcs11wrapper-*.jar,\
 *-tinylog.jar,\
 tinylog*.jar,\
 util-*.jar

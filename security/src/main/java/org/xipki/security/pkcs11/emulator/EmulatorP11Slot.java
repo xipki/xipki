@@ -17,7 +17,6 @@
 
 package org.xipki.security.pkcs11.emulator;
 
-import iaik.pkcs.pkcs11.wrapper.Functions;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERBitString;
@@ -37,6 +36,7 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.Functions;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
@@ -68,7 +68,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-import static iaik.pkcs.pkcs11.wrapper.PKCS11Constants.*;
+import static org.xipki.pkcs11.PKCS11Constants.*;
 import static org.xipki.util.Args.*;
 import static org.xipki.util.IoUtil.read;
 import static org.xipki.util.IoUtil.save;
@@ -764,7 +764,7 @@ class EmulatorP11Slot extends P11Slot {
         || CKK_SHA3_256_HMAC  == keyType || CKK_SHA3_384_HMAC == keyType || CKK_SHA3_512_HMAC == keyType) {
       mech = CKM_GENERIC_SECRET_KEY_GEN;
     } else {
-      throw new IllegalArgumentException("unsupported key type 0x" + Functions.toFullHex((int)keyType));
+      throw new IllegalArgumentException("unsupported key type " + Functions.ckkCodeToName(keyType));
     }
     assertMechanismSupported(mech);
 
@@ -782,32 +782,22 @@ class EmulatorP11Slot extends P11Slot {
   }
 
   private static String getSecretKeyAlgorithm(long keyType) {
-    String algorithm;
-    if (CKK_GENERIC_SECRET == keyType) {
-      algorithm = "generic";
-    } else if (CKK_AES == keyType) {
-      algorithm = "AES";
-    } else if (CKK_SHA_1_HMAC == keyType) {
-      algorithm = "HMACSHA1";
-    } else if (CKK_SHA224_HMAC == keyType) {
-      algorithm = "HMACSHA224";
-    } else if (CKK_SHA256_HMAC == keyType) {
-      algorithm = "HMACSHA256";
-    } else if (CKK_SHA384_HMAC == keyType) {
-      algorithm = "HMACSHA384";
-    } else if (CKK_SHA512_HMAC == keyType) {
-      algorithm = "HMACSHA512";
-    } else if (CKK_SHA3_224_HMAC == keyType) {
-      algorithm = "HMACSHA3-224";
-    } else if (CKK_SHA3_256_HMAC == keyType) {
-      algorithm = "HMACSHA3-256";
-    } else if (CKK_SHA3_384_HMAC == keyType) {
-      algorithm = "HMACSHA3-384";
-    } else if (CKK_SHA3_512_HMAC == keyType) {
-      algorithm = "HMACSHA3-512";
-    } else {
+    String algorithm = (CKK_GENERIC_SECRET == keyType) ? "generic"
+        : (CKK_AES           == keyType) ? "AES"
+        : (CKK_SHA_1_HMAC    == keyType) ? "HMACSHA1"
+        : (CKK_SHA224_HMAC   == keyType) ? "HMACSHA224"
+        : (CKK_SHA256_HMAC   == keyType) ? "HMACSHA256"
+        : (CKK_SHA384_HMAC   == keyType) ? "HMACSHA384"
+        : (CKK_SHA512_HMAC   == keyType) ? "HMACSHA512"
+        : (CKK_SHA3_224_HMAC == keyType) ? "HMACSHA3-224"
+        : (CKK_SHA3_256_HMAC == keyType) ? "HMACSHA3-256"
+        : (CKK_SHA3_384_HMAC == keyType) ? "HMACSHA3-384"
+        : (CKK_SHA3_512_HMAC == keyType) ? "HMACSHA3-512" : null;
+
+    if (algorithm == null) {
       throw new IllegalArgumentException("unsupported keyType " + keyType);
     }
+
     return algorithm;
   } // method getSecretKeyAlgorithm
 

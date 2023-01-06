@@ -17,9 +17,9 @@
 
 package org.xipki.security.pkcs11;
 
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.PKCS11Constants;
 import org.xipki.security.*;
 import org.xipki.util.LogUtil;
 

@@ -17,12 +17,11 @@
 
 package org.xipki.security.pkcs11;
 
-import iaik.pkcs.pkcs11.wrapper.Functions;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
+import org.xipki.pkcs11.Functions;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.exception.InvalidConfException;
@@ -315,31 +314,20 @@ public class P11ModuleConf {
     this.readOnly = moduleType.isReadonly();
 
     String userTypeStr = moduleType.getUser().toUpperCase();
-    switch (userTypeStr) {
-      case "CKU_USER":
-        this.userType = PKCS11Constants.CKU_USER;
-        break;
-      case "CKU_SO":
-        this.userType = PKCS11Constants.CKU_SO;
-        break;
-      case "CKU_CONTEXT_SPECIFIC":
-        this.userType = PKCS11Constants.CKU_CONTEXT_SPECIFIC;
-        break;
-      case "CKU_CS_GENERIC": // Utimaco Crypto Server's vendor user
-        this.userType = 0x83;
-        break;
-      default:
+    Long userType = Functions.ckuNameToCode(userTypeStr);
+    if (userType == null) {
+      if ("CKU_CS_GENERIC".equalsIgnoreCase(userTypeStr)) { // Utimaco Crypto Server's vendor user
+        userType = 0x83L;
+      } else {
         try {
-          if (userTypeStr.startsWith("0X")) {
-            this.userType = Long.parseLong(userTypeStr.substring(2), 16);
-          } else {
-            this.userType = Long.parseLong(userTypeStr);
-          }
+          userType = userTypeStr.startsWith("0X")
+              ? Long.parseLong(userTypeStr.substring(2), 16) : Long.parseLong(userTypeStr);
         } catch (NumberFormatException ex) {
           throw new InvalidConfException("invalid user " + userTypeStr);
         }
-        break;
+      }
     }
+    this.userType = userType;
 
     this.maxMessageSize = moduleType.getMaxMessageSize();
     this.type = moduleType.getType();
@@ -428,9 +416,9 @@ public class P11ModuleConf {
     // Mechanism filter
     mechanismFilter = new P11MechanismFilter();
 
-    List<Pkcs11conf.MechanimFilter> mechFilters = moduleType.getMechanismFilters();
+    List<Pkcs11conf.MechanismFilter> mechFilters = moduleType.getMechanismFilters();
     if (CollectionUtil.isNotEmpty(mechFilters)) {
-      for (Pkcs11conf.MechanimFilter filterType : mechFilters) {
+      for (Pkcs11conf.MechanismFilter filterType : mechFilters) {
         Set<P11SlotIdFilter> slots = getSlotIdFilters(filterType.getSlots());
         String mechanismSetName = filterType.getMechanismSet();
 
@@ -598,26 +586,7 @@ public class P11ModuleConf {
 
   private static Long toKeyType(String str) {
     if (str.startsWith("CKK_")) {
-      switch (str) {
-        case "CKK_DSA":
-          return PKCS11Constants.CKK_DSA;
-        case "CKK_RSA":
-          return PKCS11Constants.CKK_RSA;
-        case "CKK_EC":
-          return PKCS11Constants.CKK_EC;
-        case "CKK_EC_EDWARDS":
-          return PKCS11Constants.CKK_EC_EDWARDS;
-        case "CKK_EC_MONTGOMERY":
-          return PKCS11Constants.CKK_EC_MONTGOMERY;
-        case "CKK_VENDOR_SM2":
-          return PKCS11Constants.CKK_VENDOR_SM2;
-        case "CKK_AES":
-          return PKCS11Constants.CKK_AES;
-        case "CKK_GENERIC_SECRET":
-          return PKCS11Constants.CKK_GENERIC_SECRET;
-        default:
-          return null;
-      }
+      return Functions.ckkNameToCode(str);
     } else {
       int radix = 10;
       if (str.startsWith("0X")) {

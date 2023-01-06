@@ -15,12 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.security.pkcs11.iaik;
-
-import org.xipki.security.pkcs11.P11Module;
-import org.xipki.security.pkcs11.P11ModuleConf;
-import org.xipki.security.pkcs11.P11ModuleFactory;
-import org.xipki.security.pkcs11.P11TokenException;
+package org.xipki.security.pkcs11;
 
 /**
  * {@link P11ModuleFactory} to create {@link P11Module} of type "native".
@@ -28,19 +23,19 @@ import org.xipki.security.pkcs11.P11TokenException;
  * @author Lijun Liao
  *
  */
-public class IaikP11ModuleFactory implements P11ModuleFactory {
+public class NativeP11ModuleFactory implements P11ModuleFactory {
 
-  public IaikP11ModuleFactory() {
+  public NativeP11ModuleFactory() {
   }
 
   @Override
   public boolean canCreateModule(String type) {
-    return IaikP11Module.TYPE.equalsIgnoreCase(type);
+    return NativeP11Module.TYPE.equalsIgnoreCase(type);
   }
 
   @Override
   public P11Module newModule(P11ModuleConf conf) throws P11TokenException {
-    return IaikP11Module.getInstance(conf);
+    return NativeP11Module.getInstance(conf);
   }
 
 }

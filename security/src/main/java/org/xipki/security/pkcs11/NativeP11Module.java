@@ -15,15 +15,12 @@
  * limitations under the License.
  */
 
-package org.xipki.security.pkcs11.iaik;
+package org.xipki.security.pkcs11;
 
-import iaik.pkcs.pkcs11.*;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.security.pkcs11.*;
+import org.xipki.pkcs11.*;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
@@ -36,33 +33,33 @@ import java.util.Set;
 import static org.xipki.util.Args.notNull;
 
 /**
- * {@link P11Module} based on the IAIK PKCS#11 wrapper.
+ * {@link P11Module} based on the ipkcs11wrapper or jpkcs11wrapper.
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class IaikP11Module extends P11Module {
+public class NativeP11Module extends P11Module {
 
   public static final String TYPE = "native";
 
-  private static final Logger LOG = LoggerFactory.getLogger(IaikP11Module.class);
+  private static final Logger LOG = LoggerFactory.getLogger(NativeP11Module.class);
 
   private final PKCS11Module module;
 
   private String description;
 
-  private IaikP11Module(PKCS11Module module, P11ModuleConf moduleConf) throws P11TokenException {
+  private NativeP11Module(PKCS11Module module, P11ModuleConf moduleConf) throws P11TokenException {
     super(moduleConf);
     this.module = notNull(module, "module");
 
     try {
-      Info info = module.getInfo();
-      this.description = StringUtil.concatObjects("PKCS#11 IAIK", "\n\tPath: ", moduleConf.getNativeLibrary(),
+      ModuleInfo info = module.getInfo();
+      this.description = StringUtil.concatObjects("PKCS#11 wrapper", "\n\tPath: ", moduleConf.getNativeLibrary(),
           "\n\tCryptoki Version: ", info.getCryptokiVersion(), "\n\tManufacturerID: ", info.getManufacturerID(),
           "\n\tLibrary Description: ", info.getLibraryDescription(), "\n\tLibrary Version: ", info.getLibraryVersion());
     } catch (TokenException ex) {
-      this.description = StringUtil.concatObjects("PKCS#11 IAIK", "\n\tPath ", moduleConf.getNativeLibrary());
+      this.description = StringUtil.concatObjects("PKCS#11 wrapper", "\n\tPath ", moduleConf.getNativeLibrary());
     }
     LOG.info("PKCS#11 module\n{}", this.description);
 
@@ -128,7 +125,7 @@ public class IaikP11Module extends P11Module {
       } catch (PasswordResolverException ex) {
         throw new P11TokenException("PasswordResolverException: " + ex.getMessage(), ex);
       }
-      P11Slot p11Slot = new IaikP11Slot(moduleConf.getName(), slotId, slot,
+      P11Slot p11Slot = new NativeP11Slot(moduleConf.getName(), slotId, slot,
           moduleConf.isReadOnly(), moduleConf.getUserType(), pwd, moduleConf.getMaxMessageSize(),
           moduleConf.getP11MechanismFilter(), moduleConf.getP11NewObjectConf(),
           moduleConf.getNumSessions(), moduleConf.getSecretKeyTypes(), moduleConf.getKeyPairTypes());
@@ -159,7 +156,7 @@ public class IaikP11Module extends P11Module {
     }
 
     try {
-      module.initialize(new DefaultInitializeArgs());
+      module.initialize();
     } catch (PKCS11Exception ex) {
       if (ex.getErrorCode() != PKCS11Constants.CKR_CRYPTOKI_ALREADY_INITIALIZED) {
         LogUtil.error(LOG, ex);
@@ -179,7 +176,7 @@ public class IaikP11Module extends P11Module {
       throw new P11TokenException(th.getMessage());
     }
 
-    return new IaikP11Module(module, moduleConf);
+    return new NativeP11Module(module, moduleConf);
   } // method getInstance
 
   @Override

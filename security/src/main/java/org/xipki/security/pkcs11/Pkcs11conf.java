@@ -17,7 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import org.xipki.pkcs11.PKCS11Constants;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
 
@@ -32,7 +32,7 @@ import java.util.List;
 
 public class Pkcs11conf extends ValidatableConf {
 
-  public static class MechanimFilter extends ValidatableConf {
+  public static class MechanismFilter extends ValidatableConf {
 
     /**
      * name of the mechanismSet.
@@ -70,7 +70,7 @@ public class Pkcs11conf extends ValidatableConf {
       validate(slots);
     }
 
-  } // class MechanimFilter
+  } // class MechanismFilter
 
   public static class MechanismSet extends ValidatableConf {
 
@@ -154,7 +154,7 @@ public class Pkcs11conf extends ValidatableConf {
 
     private List<PasswordSet> passwordSets;
 
-    private List<MechanimFilter> mechanismFilters;
+    private List<MechanismFilter> mechanismFilters;
 
     public String getName() {
       return name;
@@ -232,14 +232,14 @@ public class Pkcs11conf extends ValidatableConf {
       this.passwordSets = passwordSets;
     }
 
-    public List<MechanimFilter> getMechanismFilters() {
+    public List<MechanismFilter> getMechanismFilters() {
       if (mechanismFilters == null) {
         mechanismFilters = new LinkedList<>();
       }
       return mechanismFilters;
     }
 
-    public void setMechanismFilters(List<MechanimFilter> mechanismFilters) {
+    public void setMechanismFilters(List<MechanismFilter> mechanismFilters) {
       this.mechanismFilters = mechanismFilters;
     }
 

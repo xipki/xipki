@@ -17,7 +17,6 @@
 
 package org.xipki.security.shell;
 
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -52,6 +51,8 @@ import java.security.Key;
 import java.security.KeyStore;
 import java.util.Enumeration;
 import java.util.List;
+
+import static org.xipki.pkcs11.PKCS11Constants.*;
 
 /**
  * Actions for PKCS#11 security.
@@ -514,11 +515,11 @@ public class P11Actions {
 
       long p11KeyType;
       if ("AES".equalsIgnoreCase(keyType)) {
-        p11KeyType = PKCS11Constants.CKK_AES;
+        p11KeyType = CKK_AES;
       } else if ("DES3".equalsIgnoreCase(keyType)) {
-        p11KeyType = PKCS11Constants.CKK_DES3;
+        p11KeyType = CKK_DES3;
       } else if ("GENERIC".equalsIgnoreCase(keyType)) {
-        p11KeyType = PKCS11Constants.CKK_GENERIC_SECRET;
+        p11KeyType = CKK_GENERIC_SECRET;
       } else {
         throw new IllegalCmdParamException("invalid keyType " + keyType);
       }
@@ -594,12 +595,11 @@ public class P11Actions {
     protected Object execute0() throws Exception {
       long p11KeyType;
       if ("AES".equalsIgnoreCase(keyType)) {
-        p11KeyType = PKCS11Constants.CKK_AES;
-
+        p11KeyType = CKK_AES;
       } else if ("DES3".equalsIgnoreCase(keyType)) {
-        p11KeyType = PKCS11Constants.CKK_DES3;
+        p11KeyType = CKK_DES3;
       } else if ("GENERIC".equalsIgnoreCase(keyType)) {
-        p11KeyType = PKCS11Constants.CKK_GENERIC_SECRET;
+        p11KeyType = CKK_GENERIC_SECRET;
       } else {
         throw new IllegalCmdParamException("invalid keyType " + keyType);
       }
