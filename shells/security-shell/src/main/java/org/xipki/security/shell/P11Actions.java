@@ -187,7 +187,7 @@ public class P11Actions {
   public static class CsrP11 extends CsrGenAction {
 
     @Option(name = "--slot", description = "slot index")
-    private int slotIndex = 0;
+    private String slotIndex = "0"; // use String instead int so that the default value 0 will be shown in the help.
 
     @Option(name = "--id", description = "id (hex) of the private key in the PKCS#11 device\n"
             + "either keyId or keyLabel must be specified")
@@ -210,7 +210,7 @@ public class P11Actions {
         idBytes = Hex.decode(id);
       }
 
-      SignerConf conf = getPkcs11SignerConf(moduleName, slotIndex, label,
+      SignerConf conf = getPkcs11SignerConf(moduleName, Integer.parseInt(slotIndex), label,
           idBytes, 1, HashAlgo.getInstance(hashAlgo), signatureAlgoControl);
       return securityFactory.createSigner("PKCS11", conf, (X509Cert[]) null);
     }
@@ -653,7 +653,7 @@ public class P11Actions {
     protected static final String DEFAULT_P11MODULE_NAME = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
     @Option(name = "--slot", description = "slot index")
-    protected int slotIndex = 0;
+    protected String slotIndex = "0"; // use String instead int so that the default value 0 will be shown in the help.
 
     @Option(name = "--module", description = "name of the PKCS#11 module")
     @Completion(SecurityCompleters.P11ModuleNameCompleter.class)
@@ -664,7 +664,7 @@ public class P11Actions {
 
     protected P11Slot getSlot() throws XiSecurityException, P11TokenException, IllegalCmdParamException {
       P11Module module = getP11Module(moduleName);
-      P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
+      P11SlotIdentifier slotId = module.getSlotIdForIndex(Integer.parseInt(slotIndex));
       return module.getSlot(slotId);
     }
 
