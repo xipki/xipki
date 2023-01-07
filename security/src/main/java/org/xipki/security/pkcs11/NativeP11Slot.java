@@ -29,7 +29,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pkcs11.*;
-import org.xipki.pkcs11.objects.*;
+import org.xipki.pkcs11.objects.Attribute;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
@@ -265,23 +265,21 @@ class NativeP11Slot extends P11Slot {
 
         count = 0;
         for (long hP11Cert : hP11Certs) {
-          ByteArrayAttribute idAttr = new ByteArrayAttribute(CKA_ID);
-          CharArrayAttribute labelAttr = new CharArrayAttribute(CKA_LABEL);
-          ByteArrayAttribute valueAttr = new ByteArrayAttribute(CKA_VALUE);
-
+          Object[] attrValues;
           try {
-            session.getAttrValues(hP11Cert, idAttr, labelAttr, valueAttr);
+            attrValues = session.getAttrValues(hP11Cert, CKA_ID, CKA_LABEL, CKA_VALUE);
           } catch (PKCS11Exception ex) {
             LogUtil.warn(LOG, ex, "Error reading attributes of X.509 certificate with handle " + hP11Cert);
             continue;
           }
 
-          byte[] id = idAttr.getByteArrayValue();
-          String label = labelAttr.getStringValue();
+          byte[] id = (byte[]) attrValues[0];
+          String label = (String) attrValues[1];
           if (id == null || id.length == 0) {
             LOG.warn("ignored X.509 certificate with ID: null and label: " + label);
           } else {
-            ret.addCertificate(new P11ObjectIdentifier(id, label), parseCert(valueAttr.getByteArrayValue()));
+            byte[] value = (byte[]) attrValues[2];
+            ret.addCertificate(new P11ObjectIdentifier(id, label), parseCert(value));
             count++;
           }
         }
@@ -339,26 +337,23 @@ class NativeP11Slot extends P11Slot {
   } // method close
 
   private boolean analyseSingleSecretKey(Session session, long hSecretKey, P11SlotRefreshResult refreshResult) {
-    ByteArrayAttribute idAttr = new ByteArrayAttribute(CKA_ID);
-    CharArrayAttribute labelAttr = new CharArrayAttribute(CKA_LABEL);
-    LongAttribute keyTypeAttr = new LongAttribute(CKA_KEY_TYPE);
-
+    Object[] attrValues;
     try {
-      session.getAttrValues(hSecretKey, idAttr, labelAttr, keyTypeAttr);
+      attrValues = session.getAttrValues(hSecretKey, CKA_ID, CKA_LABEL, CKA_KEY_TYPE);
     } catch (PKCS11Exception ex) {
       LOG.warn("error reading attributes of secret key {}", hSecretKey);
       return false;
     }
 
-    byte[] id = idAttr.getByteArrayValue();
-    String label = labelAttr.getStringValue();
+    byte[] id = (byte[]) attrValues[0];
+    String label = (String) attrValues[1];
 
     if ((id == null || id.length == 0) && StringUtil.isBlank(label)) {
       LOG.warn("ignored secret key with ID: null and label: " + label);
       return false;
     }
 
-    long keyType = keyTypeAttr.getLongValue();
+    long keyType = (long) attrValues[2];
 
     int keyBitLen;
     if (keyType == CKK_DES3) {
@@ -379,20 +374,17 @@ class NativeP11Slot extends P11Slot {
   } // method analyseSingleKey
 
   private boolean analyseSinglePrivateKey(Session session, long hPrivKey, P11SlotRefreshResult refreshResult) {
-    ByteArrayAttribute idAttr = new ByteArrayAttribute(CKA_ID);
-    CharArrayAttribute labelAttr = new CharArrayAttribute(CKA_LABEL);
-    LongAttribute keyTypeAttr = new LongAttribute(CKA_KEY_TYPE);
-
+    Object[] attrValues;
     try {
-      session.getAttrValues(hPrivKey, keyTypeAttr, idAttr, labelAttr);
+      attrValues = session.getAttrValues(hPrivKey, CKA_ID, CKA_LABEL, CKA_KEY_TYPE);
     } catch (PKCS11Exception ex) {
       LOG.warn("error reading attributes of private key {}", hPrivKey);
       return false;
     }
 
-    byte[] id = idAttr.getByteArrayValue();
-    String label = labelAttr.getStringValue();
-    long keyType = keyTypeAttr.getLongValue();
+    byte[] id = (byte[]) attrValues[0];
+    String label = (String) attrValues[1];
+    long keyType = (long) attrValues[2];
 
     int idLen = id == null ? 0 : id.length;
     String name = "id " + (idLen == 0 ? "" : hex(id)) + " and label " + label;
@@ -1267,18 +1259,18 @@ class NativeP11Slot extends P11Slot {
         if (supportCert) {
           Long cert2 = getCertificateObject(session, id, null);
           if (cert2 != null) {
-            CharArrayAttribute labelAttr = new CharArrayAttribute(CKA_LABEL);
-            ByteArrayAttribute valueAttr = new ByteArrayAttribute(CKA_VALUE);
+            Object[] attrValues;
             try {
-              session.getAttrValues(cert2, labelAttr, valueAttr);
-            } catch (PKCS11Exception e) {
-              throw new P11TokenException("could not get attributes", e);
+              attrValues = session.getAttrValues(cert2, CKA_LABEL, CKA_VALUE);
+            } catch (PKCS11Exception ex) {
+              throw new P11TokenException("could not get attributes", ex);
             }
 
-            certLabel = labelAttr.getStringValue();
+            certLabel = (String) attrValues[0];
+            byte[] value = (byte[]) attrValues[1];
             certs = new X509Cert[1];
             try {
-              certs[0] = X509Util.parseCert(valueAttr.getByteArrayValue());
+              certs[0] = X509Util.parseCert(value);
             } catch (CertificateException ex) {
               throw new P11TokenException("could not parse certificate", ex);
             }
