@@ -80,10 +80,6 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
     return label;
   }
 
-  public char[] getLabelChars() {
-    return label == null ? null : label.toCharArray();
-  }
-
   @Override
   public String toString() {
     return String.format("(id = %s, label = %s)", idHex, label);

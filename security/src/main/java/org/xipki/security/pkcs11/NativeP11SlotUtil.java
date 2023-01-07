@@ -128,7 +128,7 @@ class NativeP11SlotUtil {
     return ret;
   } // method getMechanism
 
-  static Long getCertificateObject(Session session, byte[] keyId, char[] keyLabel)
+  static Long getCertificateObject(Session session, byte[] keyId, String keyLabel)
       throws P11TokenException {
     List<Long> certs = getCertificateObjects(session, keyId, keyLabel);
 
@@ -344,7 +344,7 @@ class NativeP11SlotUtil {
     }
   } // method removeObjects
 
-  static void setKeyAttributes(P11NewKeyControl control, AttributeVector template, char[] label) {
+  static void setKeyAttributes(P11NewKeyControl control, AttributeVector template, String label) {
     template.token(true);
     if (label != null) {
       template.label(label);
@@ -366,7 +366,7 @@ class NativeP11SlotUtil {
     }
   }
 
-  static List<Long> getCertificateObjects(Session session, byte[] keyId, char[] keyLabel) throws P11TokenException {
+  static List<Long> getCertificateObjects(Session session, byte[] keyId, String keyLabel) throws P11TokenException {
     AttributeVector template = newX509Cert();
     if (keyId != null) {
       template.id(keyId);

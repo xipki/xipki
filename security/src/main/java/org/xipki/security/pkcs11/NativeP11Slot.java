@@ -706,13 +706,13 @@ class NativeP11Slot extends P11Slot {
     return getKeyObject(session, keyClass, keyType, keyId, true, null);
   }
 
-  private Long getKeyObject(Session session, long keyClass, Long keyType, byte[] keyId, char[] keyLabel)
+  private Long getKeyObject(Session session, long keyClass, Long keyType, byte[] keyId, String keyLabel)
       throws P11TokenException {
     return getKeyObject(session, keyClass, keyType, keyId, false, keyLabel);
   }
 
   private Long getKeyObject(Session session, long keyClass, Long keyType,
-                           byte[] keyId, boolean ignoreLabel, char[] keyLabel)
+                           byte[] keyId, boolean ignoreLabel, String keyLabel)
       throws P11TokenException {
     AttributeVector template = new AttributeVector().class_(keyClass).id(notNull(keyId, "keyId"));
     if (keyType != null) {
@@ -743,19 +743,19 @@ class NativeP11Slot extends P11Slot {
 
   @Override
   public int removeObjectsForLabel(String label) throws P11TokenException {
-    return removeObjects(null, false, notNull(label, "label").toCharArray());
+    return removeObjects(null, false, notNull(label, "label"));
   }
 
   @Override
   public int removeObjects(byte[] id, String label) throws P11TokenException {
-    return removeObjects(id, false, (label == null) ? null : label.toCharArray());
+    return removeObjects(id, false, label);
   }
 
-  private int removeObjects(byte[] id, boolean ignoreLabel, char[] label) throws P11TokenException {
+  private int removeObjects(byte[] id, boolean ignoreLabel, String label) throws P11TokenException {
     if (ignoreLabel) {
       label = null;
     }
-    boolean labelBlank = label == null || label.length == 0;
+    boolean labelBlank = label == null || label.isEmpty();
     if ((id == null || id.length == 0) && labelBlank) {
       throw new IllegalArgumentException("at least one of id and label may not be null");
     }
@@ -783,7 +783,7 @@ class NativeP11Slot extends P11Slot {
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
       Session session = bagEntry.value();
-      List<Long> existingCerts = getCertificateObjects(session, objectId.getId(), objectId.getLabelChars());
+      List<Long> existingCerts = getCertificateObjects(session, objectId.getId(), objectId.getLabel());
       if (existingCerts == null || existingCerts.isEmpty()) {
         LOG.warn("could not find certificates " + objectId);
         return;
@@ -859,20 +859,20 @@ class NativeP11Slot extends P11Slot {
 
     assertMechanismSupported(mech);
 
-    char[] labelChars;
+    String label;
     if (newObjectConf.isIgnoreLabel()) {
       if (control.getLabel() != null) {
         LOG.warn("label is set, but ignored: '{}'", control.getLabel());
       }
-      labelChars = null;
+      label = null;
     } else {
-      labelChars = control.getLabel().toCharArray();
+      label = control.getLabel();
     }
 
     byte[] id = control.getId();
 
     AttributeVector template = newSecretKey(keyType);
-    NativeP11SlotUtil.setKeyAttributes(control, template, labelChars);
+    NativeP11SlotUtil.setKeyAttributes(control, template, label);
     if (hasValueLen) {
       template.valueLen(keysize / 8);
     }
@@ -882,7 +882,7 @@ class NativeP11Slot extends P11Slot {
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
       Session session = bagEntry.value();
-      if (labelChars != null && labelExists(session, labelChars)) {
+      if (label != null && labelExists(session, label)) {
         throw new IllegalArgumentException("label " + control.getLabel() + " exists, please specify another one");
       }
 
@@ -898,7 +898,6 @@ class NativeP11Slot extends P11Slot {
         throw new P11TokenException("could not generate generic secret key using " + mechanism.getName(), ex);
       }
 
-      String label = null;
       try {
         label = session.getStringAttrValue(keyHandle, CKA_LABEL);
       } catch (PKCS11Exception e) {
@@ -918,24 +917,24 @@ class NativeP11Slot extends P11Slot {
   protected P11Identity importSecretKey0(long keyType, byte[] keyValue, P11NewKeyControl control)
       throws P11TokenException {
     AttributeVector template = newSecretKey(keyType);
-    char[] labelChars;
+    String label;
     if (newObjectConf.isIgnoreLabel()) {
       if (control.getLabel() != null) {
         LOG.warn("label is set, but ignored: '{}'", control.getLabel());
       }
-      labelChars = null;
+      label = null;
     } else {
-      labelChars = control.getLabel().toCharArray();
+      label = control.getLabel();
     }
 
-    NativeP11SlotUtil.setKeyAttributes(control, template, labelChars);
+    NativeP11SlotUtil.setKeyAttributes(control, template, label);
     template.value(keyValue);
 
     long keyHandle;
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
       Session session = bagEntry.value();
-      if (labelChars != null && labelExists(session, labelChars)) {
+      if (label != null && labelExists(session, label)) {
         throw new IllegalArgumentException("label " + control.getLabel() + " exists, please specify another one");
       }
 
@@ -952,7 +951,6 @@ class NativeP11Slot extends P11Slot {
         throw new P11TokenException("could not create secret key", ex);
       }
 
-      String label = null;
       try {
         label = session.getStringAttrValue(keyHandle, CKA_LABEL);
       } catch (PKCS11Exception e) {
@@ -1212,7 +1210,7 @@ class NativeP11Slot extends P11Slot {
       long mech, byte[] id, AttributeVector privateKeyTemplate, AttributeVector publicKeyTemplate)
       throws P11TokenException {
     long keyType = privateKeyTemplate.getLongAttrValue(CKA_KEY_TYPE);
-    char[] labelChars = privateKeyTemplate.getCharArrayAttrValue(CKA_LABEL);
+    String label = privateKeyTemplate.getStringAttrValue(CKA_LABEL);
 
     boolean succ = false;
 
@@ -1221,8 +1219,8 @@ class NativeP11Slot extends P11Slot {
       ConcurrentBagEntry<Session> bagEntry = borrowSession();
       try {
         Session session = bagEntry.value();
-        if (labelChars != null && labelExists(session, labelChars)) {
-          throw new IllegalArgumentException("label " + new String(labelChars) + " exists, please specify another one");
+        if (label != null && labelExists(session, label)) {
+          throw new IllegalArgumentException("label " + label + " exists, please specify another one");
         }
 
         if (id == null) {
@@ -1241,15 +1239,15 @@ class NativeP11Slot extends P11Slot {
         String pubKeyLabel;
 
         try {
-          labelChars = session.getCharArrayAttrValue(keypair.getPrivateKey(), CKA_LABEL);
-          if (labelChars == null) throw new P11TokenException("Label of the generated PrivateKey is not set");
+          label = session.getStringAttrValue(keypair.getPrivateKey(), CKA_LABEL);
+          if (label == null) throw new P11TokenException("Label of the generated PrivateKey is not set");
 
           pubKeyLabel = session.getStringAttrValue(keypair.getPublicKey(), CKA_LABEL);
         } catch (PKCS11Exception ex) {
           throw new P11TokenException("error getting attribute CKA_LABEL", ex);
         }
 
-        P11ObjectIdentifier objId = new P11ObjectIdentifier(id, new String(labelChars));
+        P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
         PublicKey jcePublicKey;
         try {
           jcePublicKey = generatePublicKey(session, keypair.getPublicKey(), keyType);
@@ -1257,7 +1255,7 @@ class NativeP11Slot extends P11Slot {
           throw new P11TokenException("could not generate public key " + objId, ex);
         }
 
-        Long privKey2 = getKeyObject(session, CKO_PRIVATE_KEY, null, id, labelChars);
+        Long privKey2 = getKeyObject(session, CKO_PRIVATE_KEY, null, id, label);
         if (privKey2 == null) {
           throw new P11TokenException("could not read the generated private key");
         }
@@ -1297,7 +1295,7 @@ class NativeP11Slot extends P11Slot {
     } finally {
       if (!succ && (id != null)) {
         try {
-          removeObjects(id, false, labelChars);
+          removeObjects(id, false, label);
         } catch (Throwable th) {
           LogUtil.error(LOG, th, "could not remove objects");
         }
@@ -1376,7 +1374,7 @@ class NativeP11Slot extends P11Slot {
       Session session = bagEntry.value();
       P11ObjectIdentifier keyId = identityId.getKeyId();
       byte[] id = keyId.getId();
-      char[] label = keyId.getLabelChars();
+      String label = keyId.getLabel();
       Long secretKey = getKeyObject(session, CKO_SECRET_KEY, null, id, label);
       destroyObject(session, secretKey, "secret key " + keyId);
 
@@ -1385,13 +1383,13 @@ class NativeP11Slot extends P11Slot {
 
       P11ObjectIdentifier pubKeyId = identityId.getPublicKeyId();
       if (pubKeyId != null) {
-        Long pubKey = getKeyObject(session, CKO_PUBLIC_KEY, null, pubKeyId.getId(), pubKeyId.getLabelChars());
+        Long pubKey = getKeyObject(session, CKO_PUBLIC_KEY, null, pubKeyId.getId(), pubKeyId.getLabel());
         destroyObject(session, pubKey, "public key " + keyId);
       }
 
       P11ObjectIdentifier certId = identityId.getCertId();
       if (certId != null) {
-        List<Long> certs = getCertificateObjects(session, certId.getId(), certId.getLabelChars());
+        List<Long> certs = getCertificateObjects(session, certId.getId(), certId.getLabel());
         if (certs != null && !certs.isEmpty()) {
           for (Long cert : certs) {
             destroyObject(session, cert, "certificate " + certId);
@@ -1421,11 +1419,10 @@ class NativeP11Slot extends P11Slot {
     }
   }
 
-  private boolean labelExists(Session session, char[] keyLabel) throws P11TokenException {
+  private boolean labelExists(Session session, String keyLabel) throws P11TokenException {
     notNull(keyLabel, "keyLabel");
 
-    String strLabel = new String(keyLabel);
-    if (existsIdentityForLabel(strLabel) || existsCertForLabel(strLabel)) {
+    if (existsIdentityForLabel(keyLabel) || existsCertForLabel(keyLabel)) {
       return true;
     }
 
