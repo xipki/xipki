@@ -415,7 +415,7 @@ class NativeP11Slot extends P11Slot {
       String pubKeyLabel = null;
       Long hPubKey = idLen == 0 ? null : getKeyObjectForId(session, CKO_PUBLIC_KEY, keyType, id);
       if (hPubKey != null) {
-        pubKeyLabel = readLabel(session, hPubKey);
+        pubKeyLabel = session.getCkaLabel(hPubKey);
       }
 
       String certLabel = null;
@@ -714,7 +714,7 @@ class NativeP11Slot extends P11Slot {
   private Long getKeyObject(Session session, long keyClass, Long keyType,
                            byte[] keyId, boolean ignoreLabel, String keyLabel)
       throws P11TokenException {
-    AttributeVector template = new AttributeVector().class_(keyClass).id(notNull(keyId, "keyId"));
+    AttributesTemplate template = new AttributesTemplate().class_(keyClass).id(notNull(keyId, "keyId"));
     if (keyType != null) {
       template.keyType(keyType);
     }
@@ -760,7 +760,7 @@ class NativeP11Slot extends P11Slot {
       throw new IllegalArgumentException("at least one of id and label may not be null");
     }
 
-    AttributeVector template = new AttributeVector();
+    AttributesTemplate template = new AttributesTemplate();
     if (id != null && id.length > 0) {
       template.id(id);
     }
@@ -805,7 +805,7 @@ class NativeP11Slot extends P11Slot {
       Session session = bagEntry.value();
       // get a local copy
       boolean omit = omitDateAttrsInCertObject;
-      AttributeVector newCertTemp = createPkcs11Template(session, cert, control, omit);
+      AttributesTemplate newCertTemp = createPkcs11Template(session, cert, control, omit);
       long newCertHandle;
       try {
         newCertHandle = session.createObject(newCertTemp);
@@ -871,7 +871,7 @@ class NativeP11Slot extends P11Slot {
 
     byte[] id = control.getId();
 
-    AttributeVector template = newSecretKey(keyType);
+    AttributesTemplate template = newSecretKey(keyType);
     NativeP11SlotUtil.setKeyAttributes(control, template, label);
     if (hasValueLen) {
       template.valueLen(keysize / 8);
@@ -899,7 +899,7 @@ class NativeP11Slot extends P11Slot {
       }
 
       try {
-        label = session.getStringAttrValue(keyHandle, CKA_LABEL);
+        label = session.getCkaLabel(keyHandle);
       } catch (PKCS11Exception e) {
         throw new P11TokenException(e);
       }
@@ -916,7 +916,7 @@ class NativeP11Slot extends P11Slot {
   @Override
   protected P11Identity importSecretKey0(long keyType, byte[] keyValue, P11NewKeyControl control)
       throws P11TokenException {
-    AttributeVector template = newSecretKey(keyType);
+    AttributesTemplate template = newSecretKey(keyType);
     String label;
     if (newObjectConf.isIgnoreLabel()) {
       if (control.getLabel() != null) {
@@ -952,7 +952,7 @@ class NativeP11Slot extends P11Slot {
       }
 
       try {
-        label = session.getStringAttrValue(keyHandle, CKA_LABEL);
+        label = session.getCkaLabel(keyHandle);
       } catch (PKCS11Exception e) {
       }
 
@@ -968,8 +968,8 @@ class NativeP11Slot extends P11Slot {
   @Override
   protected P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent, P11NewKeyControl control)
       throws P11TokenException {
-    AttributeVector privateKey = newPrivateKey(CKK_RSA);
-    AttributeVector publicKey = newPublicKey(CKK_RSA).modulusBits(keysize);
+    AttributesTemplate privateKey = newPrivateKey(CKK_RSA);
+    AttributesTemplate publicKey = newPublicKey(CKK_RSA).modulusBits(keysize);
     if (publicExponent != null) {
       publicKey.publicExponent(publicExponent);
     }
@@ -981,12 +981,12 @@ class NativeP11Slot extends P11Slot {
   @Override
   protected PrivateKeyInfo generateRSAKeypairOtf0(int keysize, BigInteger publicExponent)
       throws P11TokenException {
-    AttributeVector publicKeyTemplate = newPublicKey(CKK_RSA).modulusBits(keysize);
+    AttributesTemplate publicKeyTemplate = newPublicKey(CKK_RSA).modulusBits(keysize);
     if (publicExponent != null) {
       publicKeyTemplate.publicExponent(publicExponent);
     }
 
-    AttributeVector privateKeyTemplate = newPrivateKey(CKK_RSA);
+    AttributesTemplate privateKeyTemplate = newPrivateKey(CKK_RSA);
     setPrivateKeyAttrsOtf(privateKeyTemplate);
 
     long mech = rsaKeyPairGenMech;
@@ -994,7 +994,7 @@ class NativeP11Slot extends P11Slot {
     try {
       Session session = bagEntry.value();
 
-      KeyPair keypair = null;
+      PKCS11KeyPair keypair = null;
       try {
         keypair = session.generateKeyPair(Mechanism.get(mech), publicKeyTemplate, privateKeyTemplate);
         BigInteger[] attrValues = session.getBigIntAttrValues(keypair.getPrivateKey(), CKA_MODULUS, CKA_PUBLIC_EXPONENT,
@@ -1018,8 +1018,8 @@ class NativeP11Slot extends P11Slot {
   @Override
   protected P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g, P11NewKeyControl control)
       throws P11TokenException {
-    AttributeVector privateKey = newPrivateKey(CKK_DSA);
-    AttributeVector publicKey = newPublicKey(CKK_DSA).prime(p).subprime(q).base(g);
+    AttributesTemplate privateKey = newPrivateKey(CKK_DSA);
+    AttributesTemplate publicKey = newPublicKey(CKK_DSA).prime(p).subprime(q).base(g);
     setKeyAttributes(control, publicKey, privateKey, newObjectConf);
 
     return generateKeyPair(CKM_DSA_KEY_PAIR_GEN, control.getId(), privateKey, publicKey);
@@ -1027,17 +1027,17 @@ class NativeP11Slot extends P11Slot {
 
   @Override
   protected PrivateKeyInfo generateDSAKeypairOtf0(BigInteger p, BigInteger q, BigInteger g) throws P11TokenException {
-    AttributeVector priKeyTemplate = newPrivateKey(CKK_DSA);
+    AttributesTemplate priKeyTemplate = newPrivateKey(CKK_DSA);
     setPrivateKeyAttrsOtf(priKeyTemplate);
 
-    AttributeVector pubKeyTemplate = newPublicKey(CKK_DSA).prime(p).subprime(q).base(g);
+    AttributesTemplate pubKeyTemplate = newPublicKey(CKK_DSA).prime(p).subprime(q).base(g);
 
     long mech = CKM_DSA_KEY_PAIR_GEN;
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
       Session session = bagEntry.value();
 
-      KeyPair keypair = null;
+      PKCS11KeyPair keypair = null;
       try {
         DSAParameter parameter = new DSAParameter(p, q, g);
         AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, parameter);
@@ -1065,8 +1065,8 @@ class NativeP11Slot extends P11Slot {
   @Override
   protected P11Identity generateECEdwardsKeypair0(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
       throws P11TokenException {
-    AttributeVector privKeyTemplate = newPrivateKey(CKK_EC_EDWARDS);
-    AttributeVector pubKeyTemplate = newPublicKey(CKK_EC_EDWARDS);
+    AttributesTemplate privKeyTemplate = newPrivateKey(CKK_EC_EDWARDS);
+    AttributesTemplate pubKeyTemplate = newPublicKey(CKK_EC_EDWARDS);
     setKeyAttributes(control, pubKeyTemplate, privKeyTemplate, newObjectConf);
     byte[] encodedCurveId;
     try {
@@ -1086,8 +1086,8 @@ class NativeP11Slot extends P11Slot {
   @Override
   protected P11Identity generateECMontgomeryKeypair0(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
       throws P11TokenException {
-    AttributeVector privateKey = newPrivateKey(CKK_EC_MONTGOMERY);
-    AttributeVector publicKey = newPublicKey(CKK_EC_MONTGOMERY);
+    AttributesTemplate privateKey = newPrivateKey(CKK_EC_MONTGOMERY);
+    AttributesTemplate publicKey = newPublicKey(CKK_EC_MONTGOMERY);
     setKeyAttributes(control, publicKey, privateKey, newObjectConf);
     try {
       publicKey.ecParams(curveId.getEncoded());
@@ -1106,8 +1106,8 @@ class NativeP11Slot extends P11Slot {
   @Override
   protected P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
       throws P11TokenException {
-    AttributeVector privateKey = newPrivateKey(CKK_EC);
-    AttributeVector publicKey = newPublicKey(CKK_EC);
+    AttributesTemplate privateKey = newPrivateKey(CKK_EC);
+    AttributesTemplate publicKey = newPublicKey(CKK_EC);
     setKeyAttributes(control, publicKey, privateKey, newObjectConf);
     byte[] encodedCurveId;
     try {
@@ -1133,10 +1133,10 @@ class NativeP11Slot extends P11Slot {
       }
     }
 
-    AttributeVector privateKeyTemplate = newPrivateKey(keyType);
+    AttributesTemplate privateKeyTemplate = newPrivateKey(keyType);
     setPrivateKeyAttrsOtf(privateKeyTemplate);
 
-    AttributeVector publicKeyTemplate = newPublicKey(keyType);
+    AttributesTemplate publicKeyTemplate = newPublicKey(keyType);
     try {
       publicKeyTemplate.ecParams(curveId.getEncoded());
     } catch (IOException ex) {
@@ -1147,7 +1147,7 @@ class NativeP11Slot extends P11Slot {
     try {
       Session session = bagEntry.value();
 
-      KeyPair keypair = null;
+      PKCS11KeyPair keypair = null;
       try {
         keypair = session.generateKeyPair(Mechanism.get(mech), publicKeyTemplate, privateKeyTemplate);
 
@@ -1186,8 +1186,8 @@ class NativeP11Slot extends P11Slot {
   protected P11Identity generateSM2Keypair0(P11NewKeyControl control) throws P11TokenException {
     long ckm = CKM_VENDOR_SM2_KEY_PAIR_GEN;
     if (supportsMechanism(ckm)) {
-      AttributeVector privateKey = newPrivateKey(CKK_VENDOR_SM2);
-      AttributeVector publicKey = newPublicKey(CKK_VENDOR_SM2);
+      AttributesTemplate privateKey = newPrivateKey(CKK_VENDOR_SM2);
+      AttributesTemplate publicKey = newPublicKey(CKK_VENDOR_SM2);
       publicKey.ecParams(Hex.decode("06082A811CCF5501822D"));
       setKeyAttributes(control, publicKey, privateKey, newObjectConf);
 
@@ -1207,7 +1207,7 @@ class NativeP11Slot extends P11Slot {
   }
 
   private P11Identity generateKeyPair(
-      long mech, byte[] id, AttributeVector privateKeyTemplate, AttributeVector publicKeyTemplate)
+      long mech, byte[] id, AttributesTemplate privateKeyTemplate, AttributesTemplate publicKeyTemplate)
       throws P11TokenException {
     long keyType = privateKeyTemplate.getLongAttrValue(CKA_KEY_TYPE);
     String label = privateKeyTemplate.getStringAttrValue(CKA_LABEL);
@@ -1215,7 +1215,7 @@ class NativeP11Slot extends P11Slot {
     boolean succ = false;
 
     try {
-      KeyPair keypair;
+      PKCS11KeyPair keypair;
       ConcurrentBagEntry<Session> bagEntry = borrowSession();
       try {
         Session session = bagEntry.value();
@@ -1239,10 +1239,10 @@ class NativeP11Slot extends P11Slot {
         String pubKeyLabel;
 
         try {
-          label = session.getStringAttrValue(keypair.getPrivateKey(), CKA_LABEL);
+          label = session.getCkaLabel(keypair.getPrivateKey());
           if (label == null) throw new P11TokenException("Label of the generated PrivateKey is not set");
 
-          pubKeyLabel = session.getStringAttrValue(keypair.getPublicKey(), CKA_LABEL);
+          pubKeyLabel = session.getCkaLabel(keypair.getPublicKey());
         } catch (PKCS11Exception ex) {
           throw new P11TokenException("error getting attribute CKA_LABEL", ex);
         }
@@ -1303,14 +1303,14 @@ class NativeP11Slot extends P11Slot {
     }
   } // method generateKeyPair
 
-  private AttributeVector createPkcs11Template(
+  private AttributesTemplate createPkcs11Template(
       Session session, X509Cert cert, P11NewObjectControl control, boolean omitDateAttrs) throws P11TokenException {
     byte[] id = control.getId();
     if (id == null) {
       id = generateId(session);
     }
 
-    AttributeVector newCertTemp = new AttributeVector().id(id).token(true).certificateType(CKC_X_509);
+    AttributesTemplate newCertTemp = new AttributesTemplate().id(id).token(true).certificateType(CKC_X_509);
 
     if (newObjectConf.isIgnoreLabel()) {
       if (control.getLabel() != null) {
@@ -1412,7 +1412,7 @@ class NativeP11Slot extends P11Slot {
         continue;
       }
 
-      AttributeVector template = new AttributeVector().id(keyId);
+      AttributesTemplate template = new AttributesTemplate().id(keyId);
       if (isEmpty(getObjects(session, template, 1))) {
         return keyId;
       }
@@ -1426,12 +1426,12 @@ class NativeP11Slot extends P11Slot {
       return true;
     }
 
-    AttributeVector template = new AttributeVector().label(keyLabel);
+    AttributesTemplate template = new AttributesTemplate().label(keyLabel);
     return !isEmpty(getObjects(session, template, 1));
   } // method labelExists
 
-  static void setKeyAttributes(P11NewKeyControl control, AttributeVector publicKey,
-                        AttributeVector privateKey, P11NewObjectConf newObjectConf) {
+  static void setKeyAttributes(P11NewKeyControl control, AttributesTemplate publicKey,
+                        AttributesTemplate privateKey, P11NewObjectConf newObjectConf) {
     if (privateKey != null) {
       privateKey.private_(true).token(true);
       if (newObjectConf.isIgnoreLabel()) {
@@ -1481,11 +1481,11 @@ class NativeP11Slot extends P11Slot {
     }
   } // method setKeyAttributes
 
-  private static void setPrivateKeyAttrsOtf(AttributeVector privateKeyTemplate) {
+  private static void setPrivateKeyAttrsOtf(AttributesTemplate privateKeyTemplate) {
     privateKeyTemplate.sensitive(false).extractable(true).token(false);
   }
 
-  private static void destroyKeyPairQuietly(Session session, KeyPair keypair) {
+  private static void destroyKeyPairQuietly(Session session, PKCS11KeyPair keypair) {
     if (keypair != null) {
       try {
         session.destroyObject(keypair.getPrivateKey());

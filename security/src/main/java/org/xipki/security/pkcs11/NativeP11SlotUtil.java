@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pkcs11.*;
 import org.xipki.pkcs11.objects.Attribute;
-import org.xipki.pkcs11.objects.AttributeVector;
 import org.xipki.pkcs11.parameters.InitializationVectorParameters;
 import org.xipki.pkcs11.parameters.OpaqueParameters;
 import org.xipki.pkcs11.parameters.Parameters;
@@ -172,15 +171,15 @@ class NativeP11SlotUtil {
     return sessionLoggedIn;
   } // method checkSessionLoggedIn
 
-  static List<Long> getObjects(Session session, AttributeVector template) throws P11TokenException {
+  static List<Long> getObjects(Session session, AttributesTemplate template) throws P11TokenException {
     return getObjects(session, template, 9999);
   }
 
   static List<Long> getObjects(Session session, Attribute... attributes) throws P11TokenException {
-    return getObjects(session, new AttributeVector(attributes), 9999);
+    return getObjects(session, new AttributesTemplate(attributes), 9999);
   }
 
-  static List<Long> getObjects(Session session, AttributeVector template, int maxNo) throws P11TokenException {
+  static List<Long> getObjects(Session session, AttributesTemplate template, int maxNo) throws P11TokenException {
     List<Long> objList = new LinkedList<>();
 
     boolean initialized = false;
@@ -331,7 +330,7 @@ class NativeP11SlotUtil {
     return getObjects(session, newX509Cert());
   } // method getAllCertificateObjects
 
-  static int removeObjects0(Session session, AttributeVector template, String desc) throws P11TokenException {
+  static int removeObjects0(Session session, AttributesTemplate template, String desc) throws P11TokenException {
     try {
       List<Long> objects = getObjects(session, template);
       for (Long obj : objects) {
@@ -344,7 +343,7 @@ class NativeP11SlotUtil {
     }
   } // method removeObjects
 
-  static void setKeyAttributes(P11NewKeyControl control, AttributeVector template, String label) {
+  static void setKeyAttributes(P11NewKeyControl control, AttributesTemplate template, String label) {
     template.token(true);
     if (label != null) {
       template.label(label);
@@ -367,7 +366,7 @@ class NativeP11SlotUtil {
   }
 
   static List<Long> getCertificateObjects(Session session, byte[] keyId, String keyLabel) throws P11TokenException {
-    AttributeVector template = newX509Cert();
+    AttributesTemplate template = newX509Cert();
     if (keyId != null) {
       template.id(keyId);
     }
@@ -385,35 +384,26 @@ class NativeP11SlotUtil {
     return tmpObjects;
   } // method getCertificateObjects
 
-  static void logPkcs11ObjectAttributes(String prefix, AttributeVector p11Object) {
+  static void logPkcs11ObjectAttributes(String prefix, AttributesTemplate p11Object) {
     if (LOG.isDebugEnabled()) {
       LOG.debug("{}{}", prefix, p11Object);
     }
   }
 
-  static String readLabel(Session session, long objectHandle) {
-    try {
-      return session.getStringAttrValue(objectHandle, CKA_LABEL);
-    } catch (Exception e) {
-      LogUtil.warn(LOG, e, "error reading label for object " + objectHandle);
-      return null;
-    }
+  static AttributesTemplate newPrivateKey(long keyType) {
+    return AttributesTemplate.newPrivateKey(keyType);
   }
 
-  static AttributeVector newPrivateKey(long keyType) {
-    return new AttributeVector().class_(CKO_PRIVATE_KEY).keyType(keyType);
+  static AttributesTemplate newPublicKey(long keyType) {
+    return AttributesTemplate.newPublicKey(keyType);
   }
 
-  static AttributeVector newPublicKey(long keyType) {
-    return new AttributeVector().class_(CKO_PUBLIC_KEY).keyType(keyType);
+  static AttributesTemplate newSecretKey(long keyType) {
+    return AttributesTemplate.newSecretKey(keyType);
   }
 
-  static AttributeVector newSecretKey(long keyType) {
-    return new AttributeVector().class_(CKO_SECRET_KEY).keyType(keyType);
-  }
-
-  static AttributeVector newX509Cert() {
-    return new AttributeVector().class_(CKO_CERTIFICATE).keyType(CKC_X_509);
+  static AttributesTemplate newX509Cert() {
+    return AttributesTemplate.newCertificate(CKC_X_509);
   }
 
 }
