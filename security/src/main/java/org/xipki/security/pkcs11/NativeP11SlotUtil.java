@@ -104,9 +104,8 @@ class NativeP11SlotUtil {
   } // method digestKey0
 
   static Mechanism getMechanism(long mechanism, P11Params parameters) throws P11TokenException {
-    Mechanism ret = Mechanism.get(mechanism);
     if (parameters == null) {
-      return ret;
+      return new Mechanism(mechanism);
     }
 
     Parameters paramObj;
@@ -122,9 +121,7 @@ class NativeP11SlotUtil {
       throw new P11TokenException("unknown P11Parameters " + parameters.getClass().getName());
     }
 
-    ret.setParameters(paramObj);
-
-    return ret;
+    return new Mechanism(mechanism, paramObj);
   } // method getMechanism
 
   static Long getCertificateObject(Session session, byte[] keyId, String keyLabel)
@@ -403,7 +400,7 @@ class NativeP11SlotUtil {
   }
 
   static AttributesTemplate newX509Cert() {
-    return AttributesTemplate.newCertificate(CKC_X_509);
+    return AttributesTemplate.newX509Certificate();
   }
 
 }

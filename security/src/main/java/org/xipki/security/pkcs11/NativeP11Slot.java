@@ -465,7 +465,7 @@ class NativeP11Slot extends P11Slot {
     if (digestLen == -1) throw new P11TokenException("unsupported mechanism " + mech);
 
     ConcurrentBagEntry<Session> session0 = borrowSession();
-    Mechanism mechanismObj = Mechanism.get(mech);
+    Mechanism mechanismObj = new Mechanism(mech);
 
     try {
       Session session = session0.value();
@@ -869,7 +869,7 @@ class NativeP11Slot extends P11Slot {
       template.valueLen(keysize / 8);
     }
 
-    Mechanism mechanism = Mechanism.get(mech);
+    Mechanism mechanism = new Mechanism(mech);
     long keyHandle;
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
@@ -988,7 +988,7 @@ class NativeP11Slot extends P11Slot {
 
       PKCS11KeyPair keypair = null;
       try {
-        keypair = session.generateKeyPair(Mechanism.get(mech), publicKeyTemplate, privateKeyTemplate);
+        keypair = session.generateKeyPair(new Mechanism(mech), publicKeyTemplate, privateKeyTemplate);
         BigInteger[] attrValues = session.getBigIntAttrValues(keypair.getPrivateKey(), CKA_MODULUS, CKA_PUBLIC_EXPONENT,
             CKA_PRIVATE_EXPONENT, CKA_PRIME_1, CKA_PRIME_2, CKA_EXPONENT_1, CKA_EXPONENT_2, CKA_COEFFICIENT);
 
@@ -1034,7 +1034,7 @@ class NativeP11Slot extends P11Slot {
         DSAParameter parameter = new DSAParameter(p, q, g);
         AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, parameter);
 
-        keypair = session.generateKeyPair(Mechanism.get(mech), pubKeyTemplate, priKeyTemplate);
+        keypair = session.generateKeyPair(new Mechanism(mech), pubKeyTemplate, priKeyTemplate);
         long skHandle = keypair.getPrivateKey();
         long pkHandle = keypair.getPublicKey();
 
@@ -1141,7 +1141,7 @@ class NativeP11Slot extends P11Slot {
 
       PKCS11KeyPair keypair = null;
       try {
-        keypair = session.generateKeyPair(Mechanism.get(mech), publicKeyTemplate, privateKeyTemplate);
+        keypair = session.generateKeyPair(new Mechanism(mech), publicKeyTemplate, privateKeyTemplate);
 
         byte[] ecPoint = session.getByteArrayAttrValue(keypair.getPublicKey(), CKA_EC_POINT);
         byte[] privValue = session.getByteArrayAttrValue(keypair.getPrivateKey(), CKA_VALUE);
@@ -1223,7 +1223,7 @@ class NativeP11Slot extends P11Slot {
         publicKeyTemplate.id(id);
 
         try {
-          keypair = session.generateKeyPair(Mechanism.get(mech), publicKeyTemplate, privateKeyTemplate);
+          keypair = session.generateKeyPair(new Mechanism(mech), publicKeyTemplate, privateKeyTemplate);
         } catch (PKCS11Exception ex) {
           throw new P11TokenException("could not generate keypair " + Functions.ckmCodeToName(mech), ex);
         }
