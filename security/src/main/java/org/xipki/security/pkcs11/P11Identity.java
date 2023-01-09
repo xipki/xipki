@@ -21,7 +21,6 @@ import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkcs11.Functions;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.CollectionUtil;
@@ -111,7 +110,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
       throw new P11UnsupportedMechanismException(mechanism, id);
     }
     if (LOG.isDebugEnabled()) {
-      LOG.debug("sign with mechanism {}", Functions.ckmCodeToName(mechanism));
+      LOG.debug("sign with mechanism {}", codeToName(Category.CKM, mechanism));
     }
     return sign0(mechanism, parameters, content);
   }
@@ -135,7 +134,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
   public byte[] digestSecretKey(long mechanism) throws P11TokenException, XiSecurityException {
     slot.assertMechanismSupported(mechanism);
     if (LOG.isDebugEnabled()) {
-      LOG.debug("digest secret with mechanism {}", Functions.ckmCodeToName(mechanism));
+      LOG.debug("digest secret with mechanism {}", codeToName(Category.CKM, mechanism));
     }
     return digestSecretKey0(mechanism);
   }

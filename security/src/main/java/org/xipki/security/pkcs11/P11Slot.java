@@ -21,7 +21,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkcs11.Functions;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
@@ -645,7 +644,7 @@ public abstract class P11Slot implements Closeable {
       List<Long> sortedMechs = new ArrayList<>(mechanisms);
       Collections.sort(sortedMechs);
       for (Long mech : sortedMechs) {
-        sb.append("\t").append(Functions.ckmCodeToName(mech)).append("\n");
+        sb.append("\t").append(codeToName(Category.CKM, mech)).append("\n");
       }
 
       sb.append("\nsupported by device but ignored mechanisms:\n");
@@ -654,7 +653,7 @@ public abstract class P11Slot implements Closeable {
       } else {
         Collections.sort(ignoreMechs);
         for (Long mech : ignoreMechs) {
-          sb.append("\t").append(Functions.ckmCodeToName(mech)).append("\n");
+          sb.append("\t").append(codeToName(Category.CKM, mech)).append("\n");
         }
       }
 
@@ -1350,7 +1349,7 @@ public abstract class P11Slot implements Closeable {
   private String buildOrMechanismsUnsupportedMessage(long... mechanisms) {
     StringBuilder sb = new StringBuilder("none of mechanisms [");
     for (long mechanism : mechanisms) {
-      sb.append(Functions.ckmCodeToName(mechanism)).append(", ");
+      sb.append(codeToName(Category.CKM, mechanism)).append(", ");
     }
     sb.deleteCharAt(sb.length() - 1);
     sb.append("] is not supported by PKCS11 slot ").append(slotId);
@@ -1443,7 +1442,7 @@ public abstract class P11Slot implements Closeable {
           }
         }
       } else {
-        sb.append("\t\tSymmetric key: ").append(Functions.ckkCodeToName(identity.getKeyType()))
+        sb.append("\t\tSymmetric key: ").append(codeToName(Category.CKK, identity.getKeyType()))
             .append("/").append(identity.getSignatureKeyBitLength()).append("\n");
       }
     }

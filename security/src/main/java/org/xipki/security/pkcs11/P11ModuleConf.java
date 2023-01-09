@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.pkcs11.Functions;
+import org.xipki.pkcs11.PKCS11Constants;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.exception.InvalidConfException;
@@ -314,7 +314,7 @@ public class P11ModuleConf {
     this.readOnly = moduleType.isReadonly();
 
     String userTypeStr = moduleType.getUser().toUpperCase();
-    Long userType = Functions.ckuNameToCode(userTypeStr);
+    Long userType = PKCS11Constants.nameToCode(PKCS11Constants.Category.CKU, userTypeStr);
     if (userType == null) {
       if ("CKU_CS_GENERIC".equalsIgnoreCase(userTypeStr)) { // Utimaco Crypto Server's vendor user
         userType = 0x83L;
@@ -383,7 +383,7 @@ public class P11ModuleConf {
 
         Long mech = null;
         if (mechStr.startsWith("CKM_")) {
-          mech = Functions.ckmNameToCode(mechStr);
+          mech = PKCS11Constants.nameToCode(PKCS11Constants.Category.CKU, mechStr);
         } else {
           int radix = 10;
           if (mechStr.startsWith("0X")) {
@@ -586,7 +586,7 @@ public class P11ModuleConf {
 
   private static Long toKeyType(String str) {
     if (str.startsWith("CKK_")) {
-      return Functions.ckkNameToCode(str);
+      return PKCS11Constants.nameToCode(PKCS11Constants.Category.CKK, str);
     } else {
       int radix = 10;
       if (str.startsWith("0X")) {

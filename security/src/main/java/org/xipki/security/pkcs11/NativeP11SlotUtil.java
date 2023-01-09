@@ -75,7 +75,7 @@ class NativeP11SlotUtil {
       tmpPin = new char[]{};
     }
 
-    String userTypeText = Functions.ckuCodeToName(userType);
+    String userTypeText = codeToName(Category.CKU, userType);
     try {
       session.login(userType, tmpPin);
       LOG.info("login successful as user " + userTypeText);
@@ -155,7 +155,7 @@ class NativeP11SlotUtil {
     long state = info.getState();
     long deviceError = info.getDeviceError();
 
-    LOG.debug("to be verified PKCS11Module: state = {}, deviceError: {}", Functions.cksCodeToName(state), deviceError);
+    LOG.debug("to be verified PKCS11Module: state = {}, deviceError: {}", codeToName(Category.CKS, state), deviceError);
     if (deviceError != 0) {
       LOG.error("deviceError {}", deviceError);
       return false;
@@ -215,12 +215,13 @@ class NativeP11SlotUtil {
       throws XiSecurityException {
     try {
       if (keyType == CKK_RSA) {
-        BigInteger[] attrValues = session.getBigIntAttrValues(hP11Key, CKA_MODULUS, CKA_PUBLIC_EXPONENT);
-        return buildRSAKey(attrValues[0], attrValues[1]);
+        AttributeVector attrs = session.getAttrValues(hP11Key, CKA_MODULUS, CKA_PUBLIC_EXPONENT);
+        return buildRSAKey(attrs.modulus(), attrs.publicExponent());
       } else if (keyType == CKK_DSA) {
-        BigInteger[] attrValues = session.getBigIntAttrValues(hP11Key, CKA_VALUE, CKA_PRIME, CKA_SUBPRIME, CKA_BASE);
+        AttributeVector attrs = session.getAttrValues(hP11Key, CKA_VALUE, CKA_PRIME, CKA_SUBPRIME, CKA_BASE);
 
-        DSAPublicKeySpec keySpec = new DSAPublicKeySpec(attrValues[0], attrValues[1], attrValues[2], attrValues[3]);
+        DSAPublicKeySpec keySpec = new DSAPublicKeySpec(
+            new BigInteger(1, attrs.value()), attrs.prime(), attrs.subprime(), attrs.base());
         try {
           return KeyUtil.generateDSAPublicKey(keySpec);
         } catch (InvalidKeySpecException ex) {
@@ -228,10 +229,10 @@ class NativeP11SlotUtil {
         }
       } else if (keyType == CKK_EC || keyType == CKK_VENDOR_SM2
           || keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
-        byte[][] attrValues = session.getByteArrayAttrValues(hP11Key, CKA_EC_PARAMS, CKA_EC_POINT);
+        AttributeVector attrs = session.getAttrValues(hP11Key, CKA_EC_PARAMS, CKA_EC_POINT);
 
-        byte[] ecParameters = attrValues[0];
-        byte[] ecPoint = attrValues[1];
+        byte[] ecParameters = attrs.ecParams();
+        byte[] ecPoint = attrs.ecPoint();
 
         byte[] encodedPoint = null;
         if (keyType == CKM_VENDOR_SM2) {
@@ -300,7 +301,7 @@ class NativeP11SlotUtil {
           }
         }
       } else {
-        throw new XiSecurityException("unknown publicKey type " + Functions.ckkCodeToName(keyType));
+        throw new XiSecurityException("unknown publicKey type " + codeToName(Category.CKK, keyType));
       }
     } catch (PKCS11Exception ex) {
       throw new XiSecurityException("error reading PKCS#11 attribute values", ex);

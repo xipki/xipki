@@ -29,7 +29,6 @@ import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkcs11.Functions;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
@@ -270,7 +269,7 @@ public class EmulatorP11Identity extends P11Identity {
 
     HashAlgo hashAlgo =  mechHashMap.get(mechanism);
     if (hashAlgo == null) {
-      throw new P11TokenException("unknown mechanism " + Functions.ckmCodeToName(mechanism));
+      throw new P11TokenException("unknown mechanism " + codeToName(Category.CKM, mechanism));
     }
     return hashAlgo.hash(signingKey.getEncoded());
   }

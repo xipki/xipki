@@ -36,7 +36,6 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkcs11.Functions;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
@@ -764,7 +763,7 @@ class EmulatorP11Slot extends P11Slot {
         || CKK_SHA3_256_HMAC  == keyType || CKK_SHA3_384_HMAC == keyType || CKK_SHA3_512_HMAC == keyType) {
       mech = CKM_GENERIC_SECRET_KEY_GEN;
     } else {
-      throw new IllegalArgumentException("unsupported key type " + Functions.ckkCodeToName(keyType));
+      throw new IllegalArgumentException("unsupported key type " + codeToName(Category.CKK, keyType));
     }
     assertMechanismSupported(mech);
 
