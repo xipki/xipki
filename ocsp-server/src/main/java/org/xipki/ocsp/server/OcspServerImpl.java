@@ -71,26 +71,6 @@ import static org.xipki.util.Args.notNull;
 
 public class OcspServerImpl implements OcspServer {
 
-  private static class SizeComparableString implements Comparable<SizeComparableString> {
-
-    private final String str;
-
-    public SizeComparableString(String str) {
-      this.str = notNull(str, "str");
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      return obj instanceof SizeComparableString ? str.contentEquals(((SizeComparableString) obj).str) : false;
-    }
-
-    @Override
-    public int compareTo(SizeComparableString obj) {
-      return (str.length() == obj.str.length()) ? 0 : (str.length() > obj.str.length()) ? 1 : -1;
-    }
-
-  } // class SizeComparableString
-
   private static class OcspRespControl {
     boolean canCacheInfo;
     boolean includeExtendedRevokeExtension;
@@ -496,27 +476,23 @@ public class OcspServerImpl implements OcspServer {
     } // end for
 
     // servlet paths
-    List<SizeComparableString> tmpList = new LinkedList<>();
+    List<String> tmpList = new LinkedList<>();
     for (Entry<String, ResponderOption> entry : responderOptions.entrySet()) {
       String name = entry.getKey();
       ResponderImpl responder = responders.get(name);
       ResponderOption option = entry.getValue();
       List<String> strs = option.getServletPaths();
       for (String path : strs) {
-        tmpList.add(new SizeComparableString(path));
+        tmpList.add(path);
         path2responderMap.put(path, responder);
       }
     }
 
     // Sort the servlet paths according to the length of path. The first one is the
     // longest, and the last one is the shortest.
-    Collections.sort(tmpList);
-    List<String> list2 = new ArrayList<>(tmpList.size());
-    for (SizeComparableString m : tmpList) {
-      list2.add(m.str);
-    }
+    Collections.sort(tmpList, (o1, o2) -> o2.length() - o1.length());
     this.servletPaths.clear();
-    this.servletPaths.addAll(list2);
+    this.servletPaths.addAll(tmpList);
   } // method init0
 
   @Override
