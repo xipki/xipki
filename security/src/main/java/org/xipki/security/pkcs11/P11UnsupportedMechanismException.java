@@ -17,9 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
-import org.xipki.pkcs11.PKCS11Constants;
-
-import static org.xipki.pkcs11.PKCS11Constants.*;
+import static org.xipki.pkcs11.PKCS11Constants.ckmCodeToName;
 
 /**
  * Exception indicates unsupported PKCS#11 mechanism.
@@ -31,11 +29,11 @@ import static org.xipki.pkcs11.PKCS11Constants.*;
 public class P11UnsupportedMechanismException extends P11TokenException {
 
   public P11UnsupportedMechanismException(long mechanism, P11SlotIdentifier slotId) {
-    super("mechanism " + codeToName(Category.CKM, mechanism) + " is not supported by PKCS11 slot " + slotId);
+    super("mechanism " + ckmCodeToName(mechanism) + " is not supported by PKCS11 slot " + slotId);
   }
 
   public P11UnsupportedMechanismException(long mechanism, P11IdentityId identityId) {
-    super("mechanism " + codeToName(Category.CKM, mechanism) + " is not supported by PKCS11 identity " + identityId);
+    super("mechanism " + ckmCodeToName(mechanism) + " is not supported by PKCS11 identity " + identityId);
   }
 
   public P11UnsupportedMechanismException(String message) {

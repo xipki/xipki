@@ -644,7 +644,7 @@ public abstract class P11Slot implements Closeable {
       List<Long> sortedMechs = new ArrayList<>(mechanisms);
       Collections.sort(sortedMechs);
       for (Long mech : sortedMechs) {
-        sb.append("\t").append(codeToName(Category.CKM, mech)).append("\n");
+        sb.append("\t").append(ckmCodeToName(mech)).append("\n");
       }
 
       sb.append("\nsupported by device but ignored mechanisms:\n");
@@ -653,7 +653,7 @@ public abstract class P11Slot implements Closeable {
       } else {
         Collections.sort(ignoreMechs);
         for (Long mech : ignoreMechs) {
-          sb.append("\t").append(codeToName(Category.CKM, mech)).append("\n");
+          sb.append("\t").append(ckmCodeToName(mech)).append("\n");
         }
       }
 
@@ -1349,7 +1349,7 @@ public abstract class P11Slot implements Closeable {
   private String buildOrMechanismsUnsupportedMessage(long... mechanisms) {
     StringBuilder sb = new StringBuilder("none of mechanisms [");
     for (long mechanism : mechanisms) {
-      sb.append(codeToName(Category.CKM, mechanism)).append(", ");
+      sb.append(ckmCodeToName(mechanism)).append(", ");
     }
     sb.deleteCharAt(sb.length() - 1);
     sb.append("] is not supported by PKCS11 slot ").append(slotId);

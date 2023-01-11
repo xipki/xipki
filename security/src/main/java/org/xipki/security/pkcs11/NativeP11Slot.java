@@ -29,7 +29,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pkcs11.*;
-import org.xipki.pkcs11.objects.Attribute;
+import org.xipki.pkcs11.attrs.Attribute;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
@@ -217,7 +217,7 @@ class NativeP11Slot extends P11Slot {
           if (code == CKM_ECDSA_SHA1     || code == CKM_ECDSA_SHA224   || code == CKM_ECDSA_SHA256 ||
               code == CKM_ECDSA_SHA384   || code == CKM_ECDSA_SHA512   || code == CKM_ECDSA_SHA3_224 ||
               code == CKM_ECDSA_SHA3_256 || code == CKM_ECDSA_SHA3_384 || code == CKM_ECDSA_SHA3_512) {
-            ignoreMechs.append(codeToName(Category.CKM, code)).append(", ");
+            ignoreMechs.append(ckmCodeToName(code)).append(", ");
           } else {
             ret.addMechanism(code);
           }
@@ -983,7 +983,7 @@ class NativeP11Slot extends P11Slot {
                 attrs.prime1(), attrs.prime2(), attrs.exponent1(), attrs.exponent2(), attrs.coefficient()));
 
       } catch (PKCS11Exception | IOException ex) {
-        throw new P11TokenException("could not generate keypair " + codeToName(Category.CKM, mech), ex);
+        throw new P11TokenException("could not generate keypair " + ckmCodeToName(mech), ex);
       } finally {
         destroyKeyPairQuietly(session, keypair);
       }
@@ -1030,7 +1030,7 @@ class NativeP11Slot extends P11Slot {
 
         return new PrivateKeyInfo(algId, new ASN1Integer(p11PrivateKeyValue), null, publicKey);
       } catch (PKCS11Exception | IOException ex) {
-        throw new P11TokenException("could not generate keypair " + codeToName(Category.CKM, mech), ex);
+        throw new P11TokenException("could not generate keypair " + ckmCodeToName(mech), ex);
       } finally {
         destroyKeyPairQuietly(session, keypair);
       }
@@ -1149,7 +1149,7 @@ class NativeP11Slot extends P11Slot {
                   new BigInteger(1, privValue), new DERBitString(encodedPublicPoint), null));
         }
       } catch (PKCS11Exception | IOException ex) {
-        throw new P11TokenException("could not generate keypair " + codeToName(Category.CKM, mech), ex);
+        throw new P11TokenException("could not generate keypair " + ckmCodeToName(mech), ex);
       } finally {
         destroyKeyPairQuietly(session, keypair);
       }
@@ -1210,7 +1210,7 @@ class NativeP11Slot extends P11Slot {
         try {
           keypair = session.generateKeyPair(new Mechanism(mech), publicKeyTemplate, privateKeyTemplate);
         } catch (PKCS11Exception ex) {
-          throw new P11TokenException("could not generate keypair " + codeToName(Category.CKM, mech), ex);
+          throw new P11TokenException("could not generate keypair " + ckmCodeToName(mech), ex);
         }
 
         String pubKeyLabel;

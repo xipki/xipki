@@ -110,7 +110,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
       throw new P11UnsupportedMechanismException(mechanism, id);
     }
     if (LOG.isDebugEnabled()) {
-      LOG.debug("sign with mechanism {}", codeToName(Category.CKM, mechanism));
+      LOG.debug("sign with mechanism {}", ckmCodeToName(mechanism));
     }
     return sign0(mechanism, parameters, content);
   }
@@ -134,7 +134,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
   public byte[] digestSecretKey(long mechanism) throws P11TokenException, XiSecurityException {
     slot.assertMechanismSupported(mechanism);
     if (LOG.isDebugEnabled()) {
-      LOG.debug("digest secret with mechanism {}", codeToName(Category.CKM, mechanism));
+      LOG.debug("digest secret with mechanism {}", ckmCodeToName(mechanism));
     }
     return digestSecretKey0(mechanism);
   }
