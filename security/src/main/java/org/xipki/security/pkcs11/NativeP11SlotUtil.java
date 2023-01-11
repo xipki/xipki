@@ -161,7 +161,7 @@ class NativeP11SlotUtil {
       return false;
     }
 
-    boolean sessionLoggedIn = (userType == PKCS11Constants.CKU_SO) ? (state == CKS_RW_SO_FUNCTIONS)
+    boolean sessionLoggedIn = (userType == CKU_SO) ? (state == CKS_RW_SO_FUNCTIONS)
         : (state == CKS_RW_USER_FUNCTIONS) || (state == CKS_RO_USER_FUNCTIONS);
 
     LOG.debug("sessionLoggedIn: {}", sessionLoggedIn);

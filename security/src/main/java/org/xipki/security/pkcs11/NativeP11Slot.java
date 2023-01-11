@@ -633,7 +633,7 @@ class NativeP11Slot extends P11Slot {
         this.password = password;
       }
     } catch (PKCS11Exception ex) {
-      if (ex.getErrorCode() != PKCS11Constants.CKR_USER_ALREADY_LOGGED_IN) {
+      if (ex.getErrorCode() != CKR_USER_ALREADY_LOGGED_IN) {
         throw new P11TokenException(ex.getMessage(), ex);
       }
     }
@@ -1435,8 +1435,7 @@ class NativeP11Slot extends P11Slot {
       } else {
         long keyType = privateKey.getLongAttrValue(CKA_KEY_TYPE);
         // if not set
-        if (keyType == PKCS11Constants.CKK_EC || keyType == PKCS11Constants.CKK_RSA
-            || keyType == PKCS11Constants.CKK_DSA) {
+        if (keyType == CKK_EC || keyType == CKK_RSA || keyType == CKK_DSA) {
           privateKey.sign(true);
         }
 
@@ -1444,7 +1443,7 @@ class NativeP11Slot extends P11Slot {
           privateKey.sign(true);
         }
 
-        if (keyType == PKCS11Constants.CKK_RSA) {
+        if (keyType == CKK_RSA) {
           privateKey.unwrap(true).decrypt(true);
         }
       }

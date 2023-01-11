@@ -21,13 +21,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.pkcs11.PKCS11Constants;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.*;
 
+import static org.xipki.pkcs11.PKCS11Constants.*;
 import static org.xipki.util.Args.notEmpty;
 import static org.xipki.util.Args.notNull;
 
@@ -228,18 +228,22 @@ public class P11ModuleConf {
 
     private Set<Long> setCertObjectAttributes;
 
-    public P11NewObjectConf(Pkcs11conf.NewObjectConf conf) {
+    public P11NewObjectConf(Pkcs11conf.NewObjectConf conf) throws InvalidConfException {
       Boolean bb = conf.getIgnoreLabel();
       this.ignoreLabel = bb != null && bb;
 
       Integer ii = conf.getIdLength();
       this.idLength = (ii == null) ? 8 : ii;
 
-      List<Pkcs11conf.NewObjectConf.CertAttribute> attrs = conf.getCertAttributes();
+      List<String> attrs = conf.getCertAttributes();
       Set<Long> set = new HashSet<>();
       if (attrs != null) {
-        for (Pkcs11conf.NewObjectConf.CertAttribute attr : attrs) {
-          set.add(attr.getPkcs11CkaCode());
+        for (String attr : attrs) {
+          long code = ckaNameToCode(attr);
+          if (code == -1) {
+            throw new InvalidConfException("invalid CKA name " + code);
+          }
+          set.add(code);
         }
       }
       this.setCertObjectAttributes = Collections.unmodifiableSet(set);
@@ -314,7 +318,7 @@ public class P11ModuleConf {
     this.readOnly = moduleType.isReadonly();
 
     String userTypeStr = moduleType.getUser().toUpperCase();
-    Long userType = PKCS11Constants.nameToCode(PKCS11Constants.Category.CKU, userTypeStr);
+    Long userType = nameToCode(Category.CKU, userTypeStr);
     if (userType == null) {
       if ("CKU_CS_GENERIC".equalsIgnoreCase(userTypeStr)) { // Utimaco Crypto Server's vendor user
         userType = 0x83L;
@@ -383,7 +387,7 @@ public class P11ModuleConf {
 
         Long mech = null;
         if (mechStr.startsWith("CKM_")) {
-          mech = PKCS11Constants.nameToCode(PKCS11Constants.Category.CKU, mechStr);
+          mech = nameToCode(Category.CKU, mechStr);
         } else {
           int radix = 10;
           if (mechStr.startsWith("0X")) {
@@ -586,7 +590,7 @@ public class P11ModuleConf {
 
   private static Long toKeyType(String str) {
     if (str.startsWith("CKK_")) {
-      return PKCS11Constants.nameToCode(PKCS11Constants.Category.CKK, str);
+      return nameToCode(Category.CKK, str);
     } else {
       int radix = 10;
       if (str.startsWith("0X")) {

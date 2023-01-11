@@ -17,7 +17,6 @@
 
 package org.xipki.security.pkcs11;
 
-import org.xipki.pkcs11.PKCS11Constants;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
 
@@ -330,25 +329,6 @@ public class Pkcs11conf extends ValidatableConf {
 
   public static class NewObjectConf extends ValidatableConf {
 
-    public enum CertAttribute {
-      CKA_START_DATE(PKCS11Constants.CKA_START_DATE),
-      CKA_END_DATE(PKCS11Constants.CKA_END_DATE),
-      CKA_SUBJECT(PKCS11Constants.CKA_SUBJECT),
-      CKA_ISSUER(PKCS11Constants.CKA_ISSUER),
-      CKA_SERIAL_NUMBER(PKCS11Constants.CKA_SERIAL_NUMBER);
-
-      private final long pkcs11CkaCode;
-
-      CertAttribute(long pkcs11CkaCode) {
-        this.pkcs11CkaCode = pkcs11CkaCode;
-      }
-
-      public long getPkcs11CkaCode() {
-        return pkcs11CkaCode;
-      }
-
-    }
-
     private Boolean ignoreLabel;
 
     /**
@@ -356,7 +336,7 @@ public class Pkcs11conf extends ValidatableConf {
      */
     private Integer idLength;
 
-    private List<CertAttribute> certAttributes = new LinkedList<>();
+    private List<String> certAttributes = new LinkedList<>();
 
     public Boolean getIgnoreLabel() {
       return ignoreLabel;
@@ -374,14 +354,14 @@ public class Pkcs11conf extends ValidatableConf {
       this.idLength = idLength;
     }
 
-    public List<CertAttribute> getCertAttributes() {
+    public List<String> getCertAttributes() {
       if (certAttributes == null) {
         certAttributes = new LinkedList<>();
       }
       return certAttributes;
     }
 
-    public void setCertAttributes(List<CertAttribute> certAttributes) {
+    public void setCertAttributes(List<String> certAttributes) {
       this.certAttributes = certAttributes;
     }
 
