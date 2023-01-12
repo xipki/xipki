@@ -27,7 +27,6 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pkcs11.*;
-import org.xipki.pkcs11.attrs.Attribute;
 import org.xipki.pkcs11.params.InitializationVectorParameters;
 import org.xipki.pkcs11.params.OpaqueParameters;
 import org.xipki.pkcs11.params.Parameters;
@@ -170,10 +169,6 @@ class NativeP11SlotUtil {
 
   static List<Long> getObjects(Session session, AttributeVector template) throws P11TokenException {
     return getObjects(session, template, 9999);
-  }
-
-  static List<Long> getObjects(Session session, Attribute... attributes) throws P11TokenException {
-    return getObjects(session, new AttributeVector(attributes), 9999);
   }
 
   static List<Long> getObjects(Session session, AttributeVector template, int maxNo) throws P11TokenException {

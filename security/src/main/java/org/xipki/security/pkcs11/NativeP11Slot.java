@@ -29,7 +29,6 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pkcs11.*;
-import org.xipki.pkcs11.attrs.Attribute;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
@@ -238,7 +237,7 @@ class NativeP11Slot extends P11Slot {
       // secret keys
       List<Long> hSecretKeys;
       if (secretKeyTypes == null) {
-        hSecretKeys = getObjects(session, Attribute.getInstance(CKA_CLASS, CKO_SECRET_KEY));
+        hSecretKeys = getObjects(session, new AttributeVector().class_(CKO_SECRET_KEY));
       } else if (secretKeyTypes.isEmpty()) {
         hSecretKeys = Collections.emptyList();
       } else {
@@ -288,7 +287,7 @@ class NativeP11Slot extends P11Slot {
 
       List<Long> hPrivKeys;
       if (keyPairTypes == null) {
-        hPrivKeys = getObjects(session, Attribute.getInstance(CKA_CLASS, CKO_PRIVATE_KEY));
+        hPrivKeys = getObjects(session, new AttributeVector().class_(CKO_PRIVATE_KEY));
       } else if (keyPairTypes.isEmpty()) {
         hPrivKeys = Collections.emptyList();
       } else {
