@@ -320,7 +320,7 @@ class NativeP11SlotUtil {
   } // method parseCert
 
   static List<Long> getAllCertificateObjects(Session session) throws P11TokenException {
-    return getObjects(session, newX509Cert());
+    return getObjects(session, AttributeVector.newX509Certificate());
   } // method getAllCertificateObjects
 
   static int removeObjects0(Session session, AttributeVector template, String desc) throws P11TokenException {
@@ -359,7 +359,7 @@ class NativeP11SlotUtil {
   }
 
   static List<Long> getCertificateObjects(Session session, byte[] keyId, String keyLabel) throws P11TokenException {
-    AttributeVector template = newX509Cert();
+    AttributeVector template = AttributeVector.newX509Certificate();
     if (keyId != null) {
       template.id(keyId);
     }
@@ -381,22 +381,6 @@ class NativeP11SlotUtil {
     if (LOG.isDebugEnabled()) {
       LOG.debug("{}{}", prefix, p11Object);
     }
-  }
-
-  static AttributeVector newPrivateKey(long keyType) {
-    return AttributeVector.newPrivateKey(keyType);
-  }
-
-  static AttributeVector newPublicKey(long keyType) {
-    return AttributeVector.newPublicKey(keyType);
-  }
-
-  static AttributeVector newSecretKey(long keyType) {
-    return AttributeVector.newSecretKey(keyType);
-  }
-
-  static AttributeVector newX509Cert() {
-    return AttributeVector.newX509Certificate();
   }
 
 }

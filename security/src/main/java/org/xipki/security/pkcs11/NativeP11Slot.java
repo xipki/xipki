@@ -57,6 +57,7 @@ import static org.xipki.util.Args.notNull;
 import static org.xipki.util.Args.positive;
 import static org.xipki.util.CollectionUtil.isEmpty;
 import static org.xipki.util.CollectionUtil.isNotEmpty;
+import static org.xipki.pkcs11.AttributeVector.*;
 
 /**
  * {@link P11Slot} based on the ipkcs11wrapper or jpkcs11wrapper.
@@ -171,7 +172,7 @@ class NativeP11Slot extends P11Slot {
       // test whether supports X.509 certificates
       boolean supports = true;
       try {
-        session.findObjectsInit(newX509Cert());
+        session.findObjectsInit(newX509Certificate());
         session.findObjectsFinal();
       } catch (Exception ex) {
         supports = false;
@@ -237,7 +238,7 @@ class NativeP11Slot extends P11Slot {
       // secret keys
       List<Long> hSecretKeys;
       if (secretKeyTypes == null) {
-        hSecretKeys = getObjects(session, new AttributeVector().class_(CKO_SECRET_KEY));
+        hSecretKeys = getObjects(session, newSecretKey());
       } else if (secretKeyTypes.isEmpty()) {
         hSecretKeys = Collections.emptyList();
       } else {
@@ -287,7 +288,7 @@ class NativeP11Slot extends P11Slot {
 
       List<Long> hPrivKeys;
       if (keyPairTypes == null) {
-        hPrivKeys = getObjects(session, new AttributeVector().class_(CKO_PRIVATE_KEY));
+        hPrivKeys = getObjects(session, newPrivateKey());
       } else if (keyPairTypes.isEmpty()) {
         hPrivKeys = Collections.emptyList();
       } else {
@@ -994,8 +995,8 @@ class NativeP11Slot extends P11Slot {
   @Override
   protected P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g, P11NewKeyControl control)
       throws P11TokenException {
-    AttributeVector privateKey = newPrivateKey(CKK_DSA);
-    AttributeVector publicKey = newPublicKey(CKK_DSA).prime(p).subprime(q).base(g);
+    AttributeVector privateKey = newDSAPrivateKey();
+    AttributeVector publicKey = newDSAPublicKey().prime(p).subprime(q).base(g);
     setKeyAttributes(control, publicKey, privateKey, newObjectConf);
 
     return generateKeyPair(CKM_DSA_KEY_PAIR_GEN, control.getId(), privateKey, publicKey);
@@ -1003,10 +1004,10 @@ class NativeP11Slot extends P11Slot {
 
   @Override
   protected PrivateKeyInfo generateDSAKeypairOtf0(BigInteger p, BigInteger q, BigInteger g) throws P11TokenException {
-    AttributeVector priKeyTemplate = newPrivateKey(CKK_DSA);
+    AttributeVector priKeyTemplate = newDSAPrivateKey();
     setPrivateKeyAttrsOtf(priKeyTemplate);
 
-    AttributeVector pubKeyTemplate = newPublicKey(CKK_DSA).prime(p).subprime(q).base(g);
+    AttributeVector pubKeyTemplate = newDSAPublicKey().prime(p).subprime(q).base(g);
 
     long mech = CKM_DSA_KEY_PAIR_GEN;
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
