@@ -1129,16 +1129,16 @@ class NativeP11Slot extends P11Slot {
         keypair = session.generateKeyPair(new Mechanism(mech), publicKeyTemplate, privateKeyTemplate);
 
         byte[] ecPoint = session.getByteArrayAttrValue(keypair.getPublicKey(), CKA_EC_POINT);
+        byte[] encodedPublicPoint = extractEncodedEcPoint(ecPoint, keyType, curveId);
+
         byte[] privValue = session.getByteArrayAttrValue(keypair.getPrivateKey(), CKA_VALUE);
 
         if (CKK_EC_EDWARDS == keyType || CKK_EC_MONTGOMERY == keyType) {
           AlgorithmIdentifier algId = new AlgorithmIdentifier(curveId);
-          byte[] encodedPublicPoint = ASN1OctetString.getInstance(ecPoint).getOctets();
           return new PrivateKeyInfo(algId, new DEROctetString(privValue), null, encodedPublicPoint);
         } else {
           AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveId);
 
-          byte[] encodedPublicPoint = ASN1OctetString.getInstance(ecPoint).getOctets();
           if (encodedPublicPoint[0] != 4) {
             throw new P11TokenException("EcPoint does not start with 0x04");
           }
@@ -1148,7 +1148,7 @@ class NativeP11Slot extends P11Slot {
               new org.bouncycastle.asn1.sec.ECPrivateKey(orderBigLen,
                   new BigInteger(1, privValue), new DERBitString(encodedPublicPoint), null));
         }
-      } catch (PKCS11Exception | IOException ex) {
+      } catch (XiSecurityException | PKCS11Exception | IOException ex) {
         throw new P11TokenException("could not generate keypair " + ckmCodeToName(mech), ex);
       } finally {
         destroyKeyPairQuietly(session, keypair);
