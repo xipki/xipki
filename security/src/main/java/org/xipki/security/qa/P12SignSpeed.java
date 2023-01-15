@@ -220,13 +220,13 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
 
   } // class SM2
 
-  private class Testor implements Runnable {
+  private class Tester implements Runnable {
 
     private static final int batch = 16;
 
     private final byte[][] data = new byte[batch][16];
 
-    public Testor() {
+    public Tester() {
       for (int i = 0; i < data.length; i++) {
         data[i] = RandomUtil.nextBytes(data[i].length);
       }
@@ -239,13 +239,13 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
           signer.sign(data);
           account(batch, 0);
         } catch (Exception ex) {
-          LOG.error("P12SignSpeed.Testor.run()", ex);
+          LOG.error("P12SignSpeed.Tester.run()", ex);
           account(batch, batch);
         }
       }
     }
 
-  } // class Testor
+  } // class Tester
 
   protected static final String PASSWORD = "1234";
 
@@ -274,8 +274,8 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
   }
 
   @Override
-  protected Runnable getTestor() throws Exception {
-    return new Testor();
+  protected Runnable getTester() throws Exception {
+    return new Tester();
   }
 
   protected static byte[] getPrecomputedRSAKeystore(int keysize, BigInteger publicExponent) throws IOException {

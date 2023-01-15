@@ -218,13 +218,13 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
   } // class SM2
 
-  private class Testor implements Runnable {
+  private class Tester implements Runnable {
 
     private static final int batch = 10;
 
     private final byte[][] data = new byte[batch][16];
 
-    public Testor() {
+    public Tester() {
       for (int i = 0; i < data.length; i++) {
         data[i] = RandomUtil.nextBytes(data[i].length);
       }
@@ -237,13 +237,13 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
           signer.sign(data);
           account(batch, 0);
         } catch (Exception ex) {
-          LOG.error("P11SignSpeed.Testor.run()", ex);
+          LOG.error("P11SignSpeed.Tester.run()", ex);
           account(batch, batch);
         }
       }
     }
 
-  } // class Testor
+  } // class Tester
 
   private static final Logger LOG = LoggerFactory.getLogger(P11SignSpeed.class);
 
@@ -306,8 +306,8 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
   }
 
   @Override
-  protected Runnable getTestor() throws Exception {
-    return new Testor();
+  protected Runnable getTester() throws Exception {
+    return new Tester();
   }
 
   private static SignerConf getPkcs11SignerConf(

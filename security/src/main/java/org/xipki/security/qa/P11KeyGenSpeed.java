@@ -107,7 +107,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
   } // class SM2
 
-  class Testor implements Runnable {
+  class Tester implements Runnable {
 
     @Override
     public void run() {
@@ -116,13 +116,13 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
           genKeypair();
           account(1, 0);
         } catch (Exception ex) {
-          LOG.error("P11KeyGenSpeed.Testor.run()", ex);
+          LOG.error("P11KeyGenSpeed.Tester.run()", ex);
           account(1, 1);
         }
       }
     }
 
-  } // class Testor
+  } // class Tester
 
   protected final P11Slot slot;
 
@@ -141,8 +141,8 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
   protected abstract void genKeypair() throws Exception;
 
   @Override
-  protected Runnable getTestor() throws Exception {
-    return new Testor();
+  protected Runnable getTester() throws Exception {
+    return new Tester();
   }
 
 }

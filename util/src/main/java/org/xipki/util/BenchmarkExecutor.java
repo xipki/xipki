@@ -63,7 +63,7 @@ public abstract class BenchmarkExecutor {
     this.processLog = new ProcessLog(total);
   }
 
-  protected abstract Runnable getTestor() throws Exception;
+  protected abstract Runnable getTester() throws Exception;
 
   protected long getRealAccount(long account) {
     return account;
@@ -78,9 +78,9 @@ public abstract class BenchmarkExecutor {
     for (int i = 0; i < threads; i++) {
       Runnable runnable;
       try {
-        runnable = getTestor();
+        runnable = getTester();
       } catch (Exception ex) {
-        System.err.println("could not initialize Testor: " + ex.getMessage());
+        System.err.println("could not initialize Tester: " + ex.getMessage());
         return;
       }
 

@@ -42,9 +42,9 @@ import static org.xipki.util.Args.positive;
 
 public class CaEnrollBenchmark extends BenchmarkExecutor {
 
-  class Testor implements Runnable {
+  class Tester implements Runnable {
 
-    public Testor() {
+    public Tester() {
     }
 
     @Override
@@ -73,7 +73,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
       parseEnrollCertResult(sdkResponse, num);
     } // method testNext
 
-  } // class Testor
+  } // class Tester
 
   private static final String CONf_FILE = "xipki/ca-qa/qa-benchmark-conf.json";
 
@@ -111,8 +111,8 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
   } // constructor
 
   @Override
-  protected Runnable getTestor() throws Exception {
-    return new Testor();
+  protected Runnable getTester() throws Exception {
+    return new Tester();
   }
 
   @Override

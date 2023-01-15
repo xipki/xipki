@@ -97,7 +97,7 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
 
   } // class RSA
 
-  private class Testor implements Runnable {
+  private class Tester implements Runnable {
 
     @Override
     public void run() {
@@ -106,13 +106,13 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
           generateKeypair(securityFactory.getRandom4Key());
           account(1, 0);
         } catch (Exception ex) {
-          LOG.error("P12KeyGenSpeed.Testor.run()", ex);
+          LOG.error("P12KeyGenSpeed.Tester.run()", ex);
           account(1, 1);
         }
       }
     }
 
-  } // class Testor
+  } // class Tester
 
   private static final Logger LOG = LoggerFactory.getLogger(P12KeyGenSpeed.class);
 
@@ -126,8 +126,8 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
   protected abstract void generateKeypair(SecureRandom random) throws Exception;
 
   @Override
-  protected Runnable getTestor() throws Exception {
-    return new Testor();
+  protected Runnable getTester() throws Exception {
+    return new Tester();
   }
 
 }

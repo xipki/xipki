@@ -46,9 +46,9 @@ import static org.xipki.util.Args.notNull;
 
 public class OcspBenchmark extends BenchmarkExecutor {
 
-  final class Testor implements Runnable {
+  final class Tester implements Runnable {
 
-    Testor() throws Exception {
+    Tester() throws Exception {
     }
 
     @Override
@@ -69,7 +69,7 @@ public class OcspBenchmark extends BenchmarkExecutor {
       }
     }
 
-  } // class Testor
+  } // class Tester
 
   private static final Logger LOG = LoggerFactory.getLogger(OcspBenchmark.class);
 
@@ -101,8 +101,8 @@ public class OcspBenchmark extends BenchmarkExecutor {
   }
 
   @Override
-  protected Runnable getTestor() throws Exception {
-    return new Testor();
+  protected Runnable getTester() throws Exception {
+    return new Tester();
   }
 
   private BigInteger nextSerialNumber() {
