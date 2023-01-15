@@ -112,7 +112,7 @@ public class P11ModuleConf {
     }
 
     void addEntry(Set<P11SlotIdFilter> slots, Collection<Long> mechanisms) {
-      notNull(mechanisms, "mechanismis");
+      notNull(mechanisms, "mechanisms");
       singleFilters.add(new P11SingleMechanismFilter(slots, mechanisms));
     }
 

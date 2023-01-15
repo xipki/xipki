@@ -231,7 +231,7 @@ class NativeP11SlotUtil {
 
         ASN1ObjectIdentifier curveOid = ASN1ObjectIdentifier.getInstance(ecParameters);
 
-        byte[] encodedPoint = extractEncodedEcPoint(attrs.ecPoint(), keyType, curveOid);
+        byte[] encodedPoint = DEROctetString.getInstance(attrs.ecPoint()).getOctets();
 
         if (keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
           if (keyType == CKK_EC_EDWARDS) {
@@ -263,43 +263,6 @@ class NativeP11SlotUtil {
       throw new XiSecurityException("error reading PKCS#11 attribute values", ex);
     }
   } // method generatePublicKey
-
-  static byte[] extractEncodedEcPoint(byte[] ecPoint, long keyType, ASN1ObjectIdentifier curveOid)
-      throws XiSecurityException {
-    byte[] encodedPoint = null;
-    // some HSM does not return the standard conform ECPoint
-    if (keyType == CKK_VENDOR_SM2 || keyType == CKK_EC) {
-      int coordSize;
-      if (GMObjectIdentifiers.sm2p256v1.equals(curveOid)
-          || SECObjectIdentifiers.secp256r1.equals(curveOid)
-          || TeleTrusTObjectIdentifiers.brainpoolP256r1.equals(curveOid)) {
-        coordSize = 32;
-      } else if (SECObjectIdentifiers.secp384r1.equals(curveOid)
-          || TeleTrusTObjectIdentifiers.brainpoolP384r1.equals(curveOid)) {
-        coordSize = 48;
-      } else if (SECObjectIdentifiers.secp521r1.equals(curveOid)) {
-        coordSize = 66;
-      } else if (TeleTrusTObjectIdentifiers.brainpoolP512r1.equals(curveOid)) {
-        coordSize = 64;
-      } else {
-        throw new XiSecurityException("unknown curve " + curveOid.getId());
-      }
-
-      if (ecPoint.length == 2 * coordSize) {
-        // just return x_coord. || y_coord.
-        encodedPoint = new byte[1 + 2 * coordSize];
-        encodedPoint[0] = 4;
-        System.arraycopy(ecPoint, 0, encodedPoint, 1, ecPoint.length);
-      } else if (ecPoint.length == 1 + 2 * coordSize) {
-        encodedPoint = ecPoint;
-      }
-    }
-
-    if (encodedPoint == null) {
-      encodedPoint = DEROctetString.getInstance(ecPoint).getOctets();
-    }
-    return encodedPoint;
-  }
 
   static RSAPublicKey buildRSAKey(BigInteger mod, BigInteger exp) throws XiSecurityException {
     try {

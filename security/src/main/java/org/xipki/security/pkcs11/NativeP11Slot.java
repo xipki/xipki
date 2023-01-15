@@ -361,7 +361,7 @@ class NativeP11Slot extends P11Slot {
       try {
         keyBitLen = 8 * session.getIntAttrValue(hSecretKey, CKA_VALUE_LEN);
       } catch (PKCS11Exception ex) {
-        LOG.warn("error reading attributes of secret key {}", hSecretKey);
+        LOG.warn("error reading attribute CKA_VALUE_LEN of secret key {}", hSecretKey);
         return false;
       }
     }
@@ -396,7 +396,7 @@ class NativeP11Slot extends P11Slot {
           // The public key can be constructed from the private key
           LOG.warn("ignored {} private key with ID: null and label: {}", keyTypeName, label);
         }
-      } else{
+      } else {
         LOG.warn("ignored {] private key with ID: null and label: {}", keyTypeName, label);
         return false;
       }
@@ -543,9 +543,6 @@ class NativeP11Slot extends P11Slot {
         session.signUpdate(content, i, blockLen);
       }
 
-      // Some HSM vendor return not the EC plain signature (r || s), but the X.962 encoded one.
-      // So we need to increase the expectedSignatureLen
-      //int maxSignatureLen = weierstrausKey ? expectedSignatureLen + 20 : expectedSignatureLen;
       sigvalue = session.signFinal();
     }
 
@@ -707,7 +704,7 @@ class NativeP11Slot extends P11Slot {
 
     int size = tmpObjects.size();
     if (size > 1) {
-      LOG.warn("found {} public key identified by {}, use the first one", size, getDescription(keyId, keyLabel));
+      LOG.warn("found {} public keys identified by {}, use the first one", size, getDescription(keyId, keyLabel));
     }
 
     return tmpObjects.get(0);
@@ -1129,7 +1126,7 @@ class NativeP11Slot extends P11Slot {
         keypair = session.generateKeyPair(new Mechanism(mech), publicKeyTemplate, privateKeyTemplate);
 
         byte[] ecPoint = session.getByteArrayAttrValue(keypair.getPublicKey(), CKA_EC_POINT);
-        byte[] encodedPublicPoint = extractEncodedEcPoint(ecPoint, keyType, curveId);
+        byte[] encodedPublicPoint = DEROctetString.getInstance(ecPoint).getOctets();
 
         byte[] privValue = session.getByteArrayAttrValue(keypair.getPrivateKey(), CKA_VALUE);
 
@@ -1148,7 +1145,7 @@ class NativeP11Slot extends P11Slot {
               new org.bouncycastle.asn1.sec.ECPrivateKey(orderBigLen,
                   new BigInteger(1, privValue), new DERBitString(encodedPublicPoint), null));
         }
-      } catch (XiSecurityException | PKCS11Exception | IOException ex) {
+      } catch (PKCS11Exception | IOException ex) {
         throw new P11TokenException("could not generate keypair " + ckmCodeToName(mech), ex);
       } finally {
         destroyKeyPairQuietly(session, keypair);
