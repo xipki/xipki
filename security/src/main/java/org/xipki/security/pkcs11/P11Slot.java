@@ -1442,7 +1442,7 @@ public abstract class P11Slot implements Closeable {
           }
         }
       } else {
-        sb.append("\t\tSymmetric key: ").append(codeToName(Category.CKK, identity.getKeyType()))
+        sb.append("\t\tSymmetric key: ").append(codeToName(Category.CKK, identity.getKeyType()).substring(4))
             .append("/").append(identity.getSignatureKeyBitLength()).append("\n");
       }
     }
