@@ -43,20 +43,6 @@ public interface P11Params {
 
   }
 
-  class P11IVParams implements P11Params {
-
-    private final byte[] iv;
-
-    public P11IVParams(byte[] iv) {
-      this.iv = iv;
-    }
-
-    public byte[] getIV() {
-      return iv;
-    }
-
-  }
-
   class P11RSAPkcsPssParams implements P11Params {
 
     private final long hashAlgorithm;

@@ -343,10 +343,10 @@ public class EmulatorP11Identity extends P11Identity {
     }
 
     byte[] iv;
-    if (params instanceof P11Params.P11IVParams) {
-      iv = ((P11Params.P11IVParams) params).getIV();
+    if (params instanceof P11Params.P11ByteArrayParams) {
+      iv = ((P11Params.P11ByteArrayParams) params).getBytes();
     } else {
-      throw new P11TokenException("params must be instanceof P11IVParams");
+      throw new P11TokenException("params must be instanceof P11ByteArrayParams");
     }
 
     GMac gmac = new GMac(new GCMBlockCipher(new AESEngine()));

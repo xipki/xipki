@@ -27,10 +27,9 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pkcs11.*;
-import org.xipki.pkcs11.params.InitializationVectorParameters;
-import org.xipki.pkcs11.params.OpaqueParameters;
-import org.xipki.pkcs11.params.Parameters;
-import org.xipki.pkcs11.params.RSAPkcsPssParameters;
+import org.xipki.pkcs11.params.ByteArrayParams;
+import org.xipki.pkcs11.params.CkParams;
+import org.xipki.pkcs11.params.RSA_PKCS_PSS_PARAMS;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
@@ -107,15 +106,13 @@ class NativeP11SlotUtil {
       return new Mechanism(mechanism);
     }
 
-    Parameters paramObj;
+    CkParams paramObj;
     if (parameters instanceof P11Params.P11RSAPkcsPssParams) {
       P11Params.P11RSAPkcsPssParams param = (P11Params.P11RSAPkcsPssParams) parameters;
-      paramObj = new RSAPkcsPssParameters(param.getHashAlgorithm(),
+      paramObj = new RSA_PKCS_PSS_PARAMS(param.getHashAlgorithm(),
                     param.getMaskGenerationFunction(), param.getSaltLength());
     } else if (parameters instanceof P11Params.P11ByteArrayParams) {
-      paramObj = new OpaqueParameters(((P11Params.P11ByteArrayParams) parameters).getBytes());
-    } else if (parameters instanceof P11Params.P11IVParams) {
-      paramObj = new InitializationVectorParameters(((P11Params.P11IVParams) parameters).getIV());
+      paramObj = new ByteArrayParams(((P11Params.P11ByteArrayParams) parameters).getBytes());
     } else {
       throw new P11TokenException("unknown P11Parameters " + parameters.getClass().getName());
     }
