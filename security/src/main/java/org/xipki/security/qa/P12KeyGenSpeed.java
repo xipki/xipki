@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.BenchmarkExecutor;
 
@@ -62,7 +63,7 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
     private final ASN1ObjectIdentifier curveOid;
 
     public EC(ASN1ObjectIdentifier curveOid, SecurityFactory securityFactory) {
-      super("PKCS#12 EC key generation\ncurve: " + curveOid.getId(), securityFactory);
+      super("PKCS#12 EC key generation\ncurve: " + AlgorithmUtil.getCurveName(curveOid), securityFactory);
       this.curveOid = curveOid;
     }
 

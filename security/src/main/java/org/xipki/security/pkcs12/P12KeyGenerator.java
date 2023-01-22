@@ -126,8 +126,8 @@ public class P12KeyGenerator {
     AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveOid);
 
     ECPublicKey pub = (ECPublicKey) keypair.getPublic();
-    int orderBitLength = pub.getParams().getOrder().bitLength();
-    byte[] keyData = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), orderBitLength);
+    int fieldBitSize = pub.getParams().getCurve().getField().getFieldSize();
+    byte[] keyData = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), fieldBitSize);
     SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo(algId, keyData);
 
     return generateIdentity(new KeyPairWithSubjectPublicKeyInfo(keypair, subjectPublicKeyInfo),
@@ -265,12 +265,12 @@ public class P12KeyGenerator {
       if (GMUtil.isSm2primev2Curve(((ECPublicKey) publicKey).getParams().getCurve())) {
         algo = SignAlgo.SM2_SM3;
       } else {
-        int keysize = ((ECPrivateKey) key).getParams().getOrder().bitLength();
-        if (keysize > 384) {
+        int orderBitLength = ((ECPrivateKey) key).getParams().getOrder().bitLength();
+        if (orderBitLength > 384) {
           algo = SignAlgo.ECDSA_SHA512;
-        } else if (keysize > 256) {
+        } else if (orderBitLength > 256) {
           algo = SignAlgo.ECDSA_SHA384;
-        } else if (keysize > 160) {
+        } else if (orderBitLength > 160) {
           algo = SignAlgo.ECDSA_SHA256;
         } else {
           algo = SignAlgo.ECDSA_SHA1;

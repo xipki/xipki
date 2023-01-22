@@ -91,9 +91,9 @@ public class SoftwareKeypairGenerator extends KeypairGenerator {
 
         KeyPair kp = KeyUtil.generateECKeypair(curveOid, random);
         ECPublicKey pub = (ECPublicKey) kp.getPublic();
-        int orderBitLength = pub.getParams().getOrder().bitLength();
+        int fieldBitLength = pub.getParams().getCurve().getField().getFieldSize();
 
-        byte[] publicKey = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), orderBitLength);
+        byte[] publicKey = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), fieldBitLength);
 
         /*
          * ECPrivateKey ::= SEQUENCE {
@@ -110,11 +110,12 @@ public class SoftwareKeypairGenerator extends KeypairGenerator {
          * field; however, what is done with this publicKey field is outside the scope of
          * Cryptoki.
          */
-         ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
-         return new PrivateKeyInfo(
-             new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveOid),
-             new org.bouncycastle.asn1.sec.ECPrivateKey(
-                 orderBitLength, priv.getS(), new DERBitString(publicKey), null));
+        int orderBitLength = pub.getParams().getOrder().bitLength();
+        ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
+        return new PrivateKeyInfo(
+            new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveOid),
+            new org.bouncycastle.asn1.sec.ECPrivateKey(
+                orderBitLength, priv.getS(), new DERBitString(publicKey), null));
       }
       case "DSA": {
         int pLength = Integer.parseInt(tokens[1]);

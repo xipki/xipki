@@ -199,6 +199,13 @@ public abstract class P11Slot implements Closeable {
   public abstract P11Identity getIdentity(P11IdentityId identityId) throws P11TokenException;
 
   /**
+   * Destroys objects.
+   * @param handles handles of objects to be destroyed.
+   * @@return handles of objects which could not been destroyed.
+   */
+  public abstract long[] removeObjects(long[] handles);
+
+  /**
    * Remove objects.
    *
    * @param id    Id of the objects to be deleted. At least one of id and label may not be {@code null}.
@@ -352,7 +359,16 @@ public abstract class P11Slot implements Closeable {
       int keysize, BigInteger publicExponent, P11NewKeyControl control)
       throws P11TokenException;
 
-  protected abstract void printObjects(OutputStream stream, boolean verbose) throws IOException;
+  /**
+   * Writes the token details to the given {@code stream}.
+   * @param stream
+   *          Output stream. Must not be {@code null}.
+   * @param verbose
+   *          Whether to show the details verbosely.
+   * @throws IOException
+   *         if IO error occurs.
+   */
+  public abstract void showDetails(OutputStream stream, boolean verbose) throws IOException;
 
   @Override
   public abstract void close();
@@ -773,33 +789,19 @@ public abstract class P11Slot implements Closeable {
     return sb.toString();
   }
 
-  /**
-   * Writes the token details to the given {@code stream}.
-   * @param stream
-   *          Output stream. Must not be {@code null}.
-   * @param verbose
-   *          Whether to show the details verbosely.
-   * @throws IOException
-   *         if IO error occurs.
-   */
-  public void showDetails(OutputStream stream, boolean verbose) throws IOException {
+  protected void printSupportedMechanism(OutputStream stream) throws IOException {
     notNull(stream, "stream");
 
     StringBuilder sb = new StringBuilder();
-    if (verbose) {
-      sb.append("\nSupported mechanisms:\n");
-      List<Long> sortedMechs = new ArrayList<>(mechanisms);
-      int no = 0;
-      Collections.sort(sortedMechs);
-      for (Long mech : sortedMechs) {
-        sb.append("  ").append(++no).append(". ").append(ckmCodeToName(mech)).append("\n");
-      }
+    sb.append("\nSupported mechanisms:\n");
+    List<Long> sortedMechs = new ArrayList<>(mechanisms);
+    int no = 0;
+    Collections.sort(sortedMechs);
+    for (Long mech : sortedMechs) {
+      sb.append("  ").append(++no).append(". ").append(ckmCodeToName(mech)).append("\n");
     }
-    sb.append("List of objects:\n");
 
     stream.write(sb.toString().getBytes(StandardCharsets.UTF_8));
-
-    printObjects(stream, verbose);
   }
 
   protected void assertWritable(String operationName) throws P11PermissionException {

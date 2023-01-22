@@ -21,6 +21,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.DSAParameterCache;
 import org.xipki.util.BenchmarkExecutor;
 
@@ -64,7 +65,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
     private final ASN1ObjectIdentifier curveOid;
 
     public EC(P11Slot slot, byte[] id, ASN1ObjectIdentifier curveOid) throws Exception {
-      super(slot, id, "PKCS#11 EC key generation\ncurve: " + curveOid.getId());
+      super(slot, id, "PKCS#11 EC key generation\ncurve: " + AlgorithmUtil.getCurveName(curveOid));
       this.curveOid = notNull(curveOid, "curveOid");
     }
 

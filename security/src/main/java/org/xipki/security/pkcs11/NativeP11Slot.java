@@ -546,7 +546,13 @@ class NativeP11Slot extends P11Slot {
         }
         return new NativeP11Identity(this, identityId, keyType, valueLen * 8);
       } else if (objClass == CKO_PRIVATE_KEY) {
-        PublicKey jcePublicKey = generatePublicKey(session, identityId.getPublicKeyId().getHandle(), keyType);
+        PublicKey jcePublicKey = null;
+        if (identityId.getPublicKeyId() != null) {
+          jcePublicKey = generatePublicKey(session, identityId.getPublicKeyId().getHandle(), keyType);
+        } else if (keyType == CKK_RSA) {
+          attrs = session.getAttrValues(identityId.getKeyId().getHandle(), CKA_MODULUS, CKA_PUBLIC_EXPONENT);
+          jcePublicKey = buildRSAKey(attrs.modulus(), attrs.publicExponent());
+        }
         return new NativeP11Identity(this, identityId, keyType, jcePublicKey);
       } else {
         // should not reach here
@@ -581,6 +587,42 @@ class NativeP11Slot extends P11Slot {
     } finally {
       sessions.requite(bagEntry);
     }
+  }
+
+  @Override
+  public long[] removeObjects(long[] handles) {
+    ConcurrentBagEntry<Session> bagEntry = null;
+    List<Long> destroyedHandles = new ArrayList<>(handles.length);
+    try {
+      bagEntry = borrowSession();
+      for (long handle : handles) {
+        try {
+          bagEntry.value().destroyObject(handle);
+          destroyedHandles.add(handle);
+        } catch (PKCS11Exception e) {
+          LOG.warn("error destroying object with handle " + handle + ": " + e.getMessage());
+        }
+      }
+    } catch (P11TokenException e) {
+      LogUtil.warn(LOG, e, "error borrowSession()");
+    } finally {
+      if (bagEntry != null) {
+        sessions.requite(bagEntry);
+      }
+    }
+
+    if (handles.length == destroyedHandles.size()) {
+      return new long[0];
+    }
+
+    long[] failedHandles = new long[handles.length - destroyedHandles.size()];
+    int index = 0;
+    for (long handle : handles) {
+      if (!destroyedHandles.contains(handle)) {
+        failedHandles[index++] = handle;
+      }
+    }
+    return failedHandles;
   }
 
   private int removeObjects(byte[] id, boolean ignoreLabel, String label) throws P11TokenException {
@@ -1166,7 +1208,32 @@ class NativeP11Slot extends P11Slot {
   }
 
   @Override
-  protected void printObjects(OutputStream stream, boolean verbose) throws IOException {
+  public void showDetails(OutputStream stream, boolean verbose) throws IOException {
+    String tokenInfo;
+    try {
+      tokenInfo = slot.getToken().getTokenInfo().toString("  ");
+    } catch (PKCS11Exception ex) {
+      tokenInfo = "  ERROR";
+    }
+
+    String slotInfo;
+    try {
+      slotInfo = slot.getSlotInfo().toString("  ");
+    } catch (PKCS11Exception ex) {
+      slotInfo = "  ERROR";
+    }
+
+    stream.write(("\nToken information:\n" + tokenInfo).getBytes(StandardCharsets.UTF_8));
+
+    stream.write(("\n\nSlot information:\n" + slotInfo).getBytes(StandardCharsets.UTF_8));
+    stream.write('\n');
+
+    if (verbose) {
+      printSupportedMechanism(stream);
+    }
+
+    stream.write("\nList of objects:\n".getBytes(StandardCharsets.UTF_8));
+
     ConcurrentBagEntry<Session> session0 = null;
     try {
       session0 = borrowSession();
@@ -1192,13 +1259,9 @@ class NativeP11Slot extends P11Slot {
         session.findObjectsFinal();
       }
 
-      boolean ignoreObjectWithoutIdAndLabel = !verbose;
       int no = 0;
       for (long handle : allHandles) {
-        String objectText = objectToString(session, handle, ignoreObjectWithoutIdAndLabel);
-        if (objectText == null) {
-          continue;
-        }
+        String objectText = objectToString(session, handle);
 
         String text;
         try {
@@ -1224,15 +1287,12 @@ class NativeP11Slot extends P11Slot {
     stream.flush();
   }
 
-  private String objectToString(Session session, long handle, boolean ignoreObjectWithoutIdAndLabel)
+  private String objectToString(Session session, long handle)
       throws PKCS11Exception {
     AttributeVector attrs = session.getAttrValues(handle, CKA_ID, CKA_LABEL, CKA_CLASS);
     long objClass = attrs.class_();
     byte[] id = attrs.id();
     String label = attrs.label();
-    if (ignoreObjectWithoutIdAndLabel && (id == null || id.length == 0) && StringUtil.isBlank(label)) {
-      return null;
-    }
 
     String keySpec = null;
     if (objClass == CKO_PRIVATE_KEY || objClass == CKO_PUBLIC_KEY || objClass == CKO_SECRET_KEY) {

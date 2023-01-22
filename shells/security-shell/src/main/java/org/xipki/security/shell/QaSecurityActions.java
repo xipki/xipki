@@ -38,6 +38,7 @@ import org.xipki.shell.XiAction;
 import org.xipki.util.*;
 
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Queue;
 
 /**
@@ -285,8 +286,20 @@ public class QaSecurityActions {
     private final Queue<KeyControl.EC> queue = getKeyControlEC();
 
     @Override
-    protected BenchmarkExecutor nextTester() throws Exception {
+    protected synchronized BenchmarkExecutor nextTester() throws Exception {
       KeyControl.EC control = queue.poll();
+
+      boolean isSm2SignAlgo = signAlgo.toUpperCase(Locale.ROOT).contains("SM2");
+      while (control != null) {
+        boolean match = control.curveName.toUpperCase(Locale.ROOT).contains("SM2")
+                          ? isSm2SignAlgo : !isSm2SignAlgo;
+        if (match) {
+          break;
+        } else {
+          control = queue.poll();
+        }
+      }
+
       if (control == null) {
         return null;
       }
@@ -667,8 +680,20 @@ public class QaSecurityActions {
     private final Queue<KeyControl.EC> queue = getKeyControlEC();
 
     @Override
-    protected BenchmarkExecutor nextTester() throws Exception {
+    protected synchronized BenchmarkExecutor nextTester() throws Exception {
       KeyControl.EC control = queue.poll();
+
+      boolean isSm2SignAlgo = signAlgo.toUpperCase(Locale.ROOT).contains("SM2");
+      while (control != null) {
+        boolean match = control.curveName.toUpperCase(Locale.ROOT).contains("SM2")
+            ? isSm2SignAlgo : !isSm2SignAlgo;
+        if (match) {
+          break;
+        } else {
+          control = queue.poll();
+        }
+      }
+
       return (control == null) ? null
           : new P12SignSpeed.EC(securityFactory, signAlgo, getNumThreads(), getCurveOid(control.curveName()));
     }

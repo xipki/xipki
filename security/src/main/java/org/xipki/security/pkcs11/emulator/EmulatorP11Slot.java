@@ -477,7 +477,7 @@ class EmulatorP11Slot extends P11Slot {
 
       // EC point
       java.security.spec.ECPoint pointW = ecKey.getW();
-      int keysize = (paramSpec.getOrder().bitLength() + 7) / 8;
+      int keysize = (paramSpec.getCurve().getField().getFieldSize() + 7) / 8;
       byte[] ecPoint = new byte[1 + keysize * 2];
       ecPoint[0] = 4; // uncompressed
       bigIntToBytes("Wx", pointW.getAffineX(), ecPoint, 1, keysize);
@@ -550,7 +550,7 @@ class EmulatorP11Slot extends P11Slot {
       if (bytes.length == length + 1 && bytes[0] == 0) {
         System.arraycopy(bytes, 1, dest, destPos, length);
       } else {
-        throw new P11TokenException("should not happen, num is too large");
+        throw new P11TokenException("num is too large");
       }
     }
   }
@@ -591,6 +591,11 @@ class EmulatorP11Slot extends P11Slot {
 
     return new P11ObjectId(handle, id, label);
   } // method savePkcs11Entry
+
+  @Override
+  public long[] removeObjects(long[] handles) {
+    throw new UnsupportedOperationException("removeObjects(long[] handle) is not supported yet.");
+  }
 
   @Override
   public int removeObjects(byte[] id, String label) throws P11TokenException {
@@ -975,9 +980,11 @@ class EmulatorP11Slot extends P11Slot {
 
       KeyPair kp = KeyUtil.generateECKeypair(curveId, random);
       ECPublicKey pub = (ECPublicKey) kp.getPublic();
-      int orderBitLength = pub.getParams().getOrder().bitLength();
 
-      byte[] publicKey = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), orderBitLength);
+      int fieldBitSize = pub.getParams().getCurve().getField().getFieldSize();
+      byte[] publicKey = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), fieldBitSize);
+
+      int orderBitLength = pub.getParams().getOrder().bitLength();
 
       ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
       return new PrivateKeyInfo(keyAlgId,
@@ -1014,7 +1021,13 @@ class EmulatorP11Slot extends P11Slot {
   }
 
   @Override
-  protected void printObjects(OutputStream stream, boolean verbose) throws IOException {
+  public void showDetails(OutputStream stream, boolean verbose) throws IOException {
+    if (verbose) {
+      printSupportedMechanism(stream);
+    }
+
+    stream.write("\nList of objects:\n".getBytes(StandardCharsets.UTF_8));
+
     // Secret Keys
     File[] keyInfoFiles = secKeyDir.listFiles(INFO_FILENAME_FILTER);
 

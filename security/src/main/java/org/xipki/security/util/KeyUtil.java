@@ -426,7 +426,7 @@ public class KeyUtil {
         throw new InvalidKeyException("Wy is not positive");
       }
 
-      int keysize = (paramSpec.getOrder().bitLength() + 7) / 8;
+      int keysize = (paramSpec.getCurve().getField().getFieldSize() + 7) / 8;
       byte[] wxBytes = BigIntegers.asUnsignedByteArray(keysize, wx);
       byte[] wyBytes = BigIntegers.asUnsignedByteArray(keysize, wy);
       byte[] pubKey = new byte[1 + keysize * 2];
@@ -516,12 +516,12 @@ public class KeyUtil {
     return ECUtil.getNamedCurveOid(EC5Util.convertSpec(paramSpec));
   }
 
-  public static byte[] getUncompressedEncodedECPoint(ECPoint point, int orderBitLength) {
-    int orderByteLength = (orderBitLength + 7) / 8;
-    byte[] keyData = new byte[1 + orderByteLength * 2];
+  public static byte[] getUncompressedEncodedECPoint(ECPoint point, int fieldBitSize) {
+    int fieldByteSize = (fieldBitSize + 7) / 8;
+    byte[] keyData = new byte[1 + fieldByteSize * 2];
     keyData[0] = 4;
-    unsignedByteArrayCopy(keyData, 1, orderByteLength, point.getAffineX());
-    unsignedByteArrayCopy(keyData, 1 + orderByteLength, orderByteLength, point.getAffineY());
+    unsignedByteArrayCopy(keyData, 1, fieldByteSize, point.getAffineX());
+    unsignedByteArrayCopy(keyData, 1 + fieldByteSize, fieldByteSize, point.getAffineY());
     return keyData;
   } // method getUncompressedEncodedECPoint
 

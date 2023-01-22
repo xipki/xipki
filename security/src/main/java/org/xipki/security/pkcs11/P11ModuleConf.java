@@ -296,15 +296,11 @@ public class P11ModuleConf {
     String userTypeStr = moduleType.getUser().toUpperCase();
     Long userType = nameToCode(Category.CKU, userTypeStr);
     if (userType == null) {
-      if ("CKU_CS_GENERIC".equalsIgnoreCase(userTypeStr)) { // Utimaco Crypto Server's vendor user
-        userType = 0x83L;
-      } else {
-        try {
-          userType = userTypeStr.startsWith("0X")
-              ? Long.parseLong(userTypeStr.substring(2), 16) : Long.parseLong(userTypeStr);
-        } catch (NumberFormatException ex) {
-          throw new InvalidConfException("invalid user " + userTypeStr);
-        }
+      try {
+        userType = userTypeStr.startsWith("0X")
+            ? Long.parseLong(userTypeStr.substring(2), 16) : Long.parseLong(userTypeStr);
+      } catch (NumberFormatException ex) {
+        throw new InvalidConfException("invalid user " + userTypeStr);
       }
     }
     this.userType = userType;

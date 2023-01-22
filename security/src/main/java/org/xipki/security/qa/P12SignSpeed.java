@@ -25,6 +25,7 @@ import org.xipki.security.*;
 import org.xipki.security.pkcs12.KeyStoreWrapper;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
 import org.xipki.security.pkcs12.P12KeyGenerator;
+import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.*;
 
 import java.io.ByteArrayInputStream;
@@ -110,7 +111,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
     public EC(SecurityFactory securityFactory, String signatureAlgorithm, int threads, ASN1ObjectIdentifier curveOid)
         throws Exception {
       super(securityFactory, signatureAlgorithm, generateKeystore(curveOid),
-          "PKCS#12 EC signature creation\ncurve: " + curveOid.getId(), threads);
+          "PKCS#12 EC signature creation\ncurve: " + AlgorithmUtil.getCurveName(curveOid), threads);
     }
 
     private static byte[] generateKeystore(ASN1ObjectIdentifier curveOid) throws Exception {

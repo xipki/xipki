@@ -182,8 +182,8 @@ public abstract class CaEnrollBenchKeyEntry {
         KeyPair kp = kpgen.generateKeyPair();
 
         ECPublicKey pub = (ECPublicKey) kp.getPublic();
-        int orderBitLength = pub.getParams().getOrder().bitLength();
-        byte[] keyData = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), orderBitLength);
+        int fieldBitSize = pub.getParams().getCurve().getField().getFieldSize();
+        byte[] keyData = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), fieldBitSize);
         return new SubjectPublicKeyInfo(algId, keyData);
       }
     }

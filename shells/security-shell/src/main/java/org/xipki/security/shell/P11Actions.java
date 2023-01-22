@@ -24,7 +24,6 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.*;
@@ -45,6 +44,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Key;
 import java.security.KeyStore;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -276,12 +276,16 @@ public class P11Actions {
   @Service
   public static class DeleteObjectsP11 extends P11SecurityAction {
 
+    @Option(name = "--handle", aliases = "-h", multiValued = true,
+        description = "Object handle, if specified, id and label must not be set")
+    private long[] handles;
+
     @Option(name = "--id", description = "id (hex) of the objects in the PKCS#11 device\n"
-            + "at least one of id and label must be specified")
+            + "at least one of id and label must be specified (if handle is not set).")
     private String id;
 
     @Option(name = "--label", description = "label of the objects in the PKCS#11 device\n"
-            + "at least one of id and label must be specified. Use NULL to specify that label is not set.")
+            + "at least one of id and label must be specified (if handle is not set).")
     private String label;
 
     @Option(name = "--force", aliases = "-f", description = "remove identifies without prompt")
@@ -289,23 +293,45 @@ public class P11Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      if (force || confirm("Do you want to remove the PKCS#11 objects (id = " + id
-          + ", label = " + label + ")", 3)) {
-        P11Slot slot = getSlot();
-        byte[] idBytes = null;
-
-        int num;
-        if (id != null) {
-          idBytes = Hex.decode(id);
-          if (label == null) {
-            num = slot.removeObjectsForId(idBytes);
-          } else {
-            num = slot.removeObjects(idBytes, "NULL".equals(label) ? null : label);
-          }
-        } else {
-          num = slot.removeObjectsForLabel(label);
+      if (handles != null && handles.length > 0) {
+        if (id != null || label != null) {
+          throw new IllegalCmdParamException("If handle is set, id an label must not be set.");
         }
-        println("deleted " + num + " objects");
+
+        if (force || confirm("Do you want to remove the PKCS#11 objects " + Arrays.toString(handles), 3)) {
+          P11Slot slot = getSlot();
+          long[] failedHandles = slot.removeObjects(handles);
+          if (failedHandles.length == 0) {
+            println("deleted all " + handles.length + " objects");
+          } else {
+            println("deleted " + (handles.length - failedHandles.length) + " objects except " +
+                failedHandles.length + " objects: " + Arrays.toString(failedHandles));
+          }
+        }
+
+      } else {
+        if (id == null && label == null) {
+          throw new IllegalCmdParamException("If handle is not set, at least one of id and label must be set.");
+        }
+
+        if (force || confirm("Do you want to remove the PKCS#11 objects (id = " + id
+            + ", label = " + label + ")", 3)) {
+          P11Slot slot = getSlot();
+          byte[] idBytes = null;
+
+          int num;
+          if (id != null) {
+            idBytes = Hex.decode(id);
+            if (label == null) {
+              num = slot.removeObjectsForId(idBytes);
+            } else {
+              num = slot.removeObjects(idBytes, label);
+            }
+          } else {
+            num = slot.removeObjectsForLabel(label);
+          }
+          println("deleted " + num + " objects");
+        }
       }
       return null;
     }
@@ -356,7 +382,7 @@ public class P11Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      if (keysize % 8 != 0) {
+      if (keysize != null && keysize % 8 != 0) {
         throw new IllegalCmdParamException("keysize is not multiple of 8: " + keysize);
       }
 
@@ -365,10 +391,15 @@ public class P11Actions {
         p11KeyType = CKK_AES;
       } else if ("DES3".equalsIgnoreCase(keyType)) {
         p11KeyType = CKK_DES3;
+        keysize = 192;
       } else if ("GENERIC".equalsIgnoreCase(keyType)) {
         p11KeyType = CKK_GENERIC_SECRET;
       } else {
         throw new IllegalCmdParamException("invalid keyType " + keyType);
+      }
+
+      if (keysize == null) {
+        throw new IllegalCmdParamException("key-size is not specified");
       }
 
       P11Slot slot = getSlot();

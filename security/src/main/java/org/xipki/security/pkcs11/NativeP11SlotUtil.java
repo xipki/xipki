@@ -193,7 +193,6 @@ class NativeP11SlotUtil {
         return buildRSAKey(attrs.modulus(), attrs.publicExponent());
       } else if (keyType == CKK_DSA) {
         AttributeVector attrs = session.getAttrValues(hP11Key, CKA_VALUE, CKA_PRIME, CKA_SUBPRIME, CKA_BASE);
-
         DSAPublicKeySpec keySpec = new DSAPublicKeySpec(
             new BigInteger(1, attrs.value()), attrs.prime(), attrs.subprime(), attrs.base());
         try {
@@ -204,12 +203,9 @@ class NativeP11SlotUtil {
       } else if (keyType == CKK_EC || keyType == CKK_VENDOR_SM2
           || keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
         AttributeVector attrs = session.getAttrValues(hP11Key, CKA_EC_PARAMS, CKA_EC_POINT);
-
         byte[] ecParameters = attrs.ecParams();
         byte[] ecPoint = attrs.ecPoint();
-
         ASN1ObjectIdentifier curveOid = ASN1ObjectIdentifier.getInstance(ecParameters);
-
         byte[] encodedPoint = DEROctetString.getInstance(attrs.ecPoint()).getOctets();
 
         if (keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
