@@ -61,21 +61,4 @@ public class Actions {
 
   } // class OcspSystemRestartAction
 
-  @Command(scope = "ocsp", name = "refresh-token", description = "refresh token for signers")
-  @Service
-  public static class RefreshTokenAction extends OcspAction {
-
-    @Option(name = "--type", required = true, description = "type of the signer")
-    @Completion(Completers.SignerTypeCompleter.class)
-    protected String type;
-
-    @Override
-    protected Object execute0() throws Exception {
-      ocspManager.refreshTokenForSignerType(type);
-      println("refreshed token for signer type " + type);
-      return null;
-    } // method execute0
-
-  } // class RefreshTokenAction
-
 }

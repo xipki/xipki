@@ -32,7 +32,9 @@ import static org.xipki.util.Args.notNull;
  * @since 2.0.0
  */
 
-public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
+public class P11ObjectId implements Comparable<P11ObjectId> {
+
+  private final long handle;
 
   private final byte[] id;
 
@@ -48,7 +50,8 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
    * @param label
    *          Label. Cannot be {@code null} and blank if id is null or zero-length.
    */
-  public P11ObjectIdentifier(byte[] id, String label) {
+  public P11ObjectId(long handle, byte[] id, String label) {
+    this.handle = handle;
     if (id == null || id.length == 0) {
       this.id = null;
       this.idHex = null;
@@ -58,6 +61,10 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
       this.idHex = Hex.encode(id);
       this.label = label;
     }
+  }
+
+  public long getHandle() {
+    return handle;
   }
 
   public byte[] getId() {
@@ -82,32 +89,25 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
 
   @Override
   public String toString() {
-    return String.format("(id = %s, label = %s)", idHex, label);
+    return String.format("(handle = %d, id = %s, label = %s)", handle, idHex, label);
   }
 
   @Override
   public int hashCode() {
-    int hashCode = id == null ? 0 : Arrays.hashCode(id);
-    if (label != null) {
-      hashCode += 31 * label.hashCode();
-    }
-    return hashCode;
+    return (int) handle;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    } else if (!(obj instanceof P11ObjectIdentifier)) {
-      return false;
-    }
+    if (this == obj) return true;
+    else if (!(obj instanceof P11ObjectId)) return false;
 
-    P11ObjectIdentifier another = (P11ObjectIdentifier) obj;
-    return Arrays.equals(id, another.id) && CompareUtil.equalsObject(label, another.label);
+    P11ObjectId other = (P11ObjectId) obj;
+    return handle == other.handle && Arrays.equals(id, other.id) && CompareUtil.equalsObject(label, other.label);
   }
 
   @Override
-  public int compareTo(P11ObjectIdentifier obj) {
+  public int compareTo(P11ObjectId obj) {
     notNull(obj, "obj");
     if (this == obj) {
       return 0;

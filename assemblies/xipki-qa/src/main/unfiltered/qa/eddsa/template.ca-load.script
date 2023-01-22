@@ -10,8 +10,6 @@ echo "#                        Load rootca.json                       #"
 echo "#################################################################"
 
 if { $TOKEN_TYPE equals "pkcs11" } then {
-  ca:refresh-token --type pkcs11
-
   CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rootca1"
 } else {
   CA_SIGNER_CONF = "algo=$SIGALGO,password=1234,keystore=file:output/rootca1.p12"
@@ -27,10 +25,6 @@ xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
 
 xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
   qa/eddsa/rootca.json
-
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  ca:refresh-token --type pkcs11
-}
 
 ca:load-conf --conf-file qa/eddsa/rootca.json \
   --out-dir output
@@ -61,10 +55,6 @@ ca:enroll-cert --ca rootca1 --csr output/subca1.csr \
 if { $TOKEN_TYPE equals "pkcs12" } then {
   xi:update-cert-p12 --p12 output/subca1.p12 --password 1234 \
     --cert output/subca1.crt --ca-cert output/rootca1.crt
-}
-
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  ca:refresh-token --type pkcs11
 }
 
 echo "#################################################################"

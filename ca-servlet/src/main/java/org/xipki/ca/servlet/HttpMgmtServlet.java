@@ -428,10 +428,6 @@ public class HttpMgmtServlet extends HttpServlet {
           caManager.notifyCaChange();
           break;
         }
-        case refreshTokenForSignerType: {
-          caManager.refreshTokenForSignerType(getNameFromRequest(in));
-          break;
-        }
         case removeCa: {
           caManager.removeCa(getNameFromRequest(in));
           break;

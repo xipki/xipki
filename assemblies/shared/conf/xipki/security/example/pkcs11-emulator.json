@@ -22,17 +22,10 @@
 		],
 		"nativeLibraries":[
 			{
-				"path":"~/.xipki/pkcs11-emulator?supportcert=false"
+				"path":"~/.xipki/pkcs11-emulator"
 			}
 		],
 		"newObjectConf":{
-			"certAttributes":[
-				"CKA_START_DATE",
-				"CKA_END_DATE",
-				"CKA_SUBJECT",
-				"CKA_ISSUER",
-				"CKA_SERIAL_NUMBER"
-			],
 			"idLength":8,
 			"ignoreLabel":false
 		},

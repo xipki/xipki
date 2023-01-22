@@ -28,5 +28,4 @@ public interface OcspManager {
 
   void restartOcspServer() throws OcspMgmtException;
 
-  void refreshTokenForSignerType(String signerType) throws OcspMgmtException;
 }

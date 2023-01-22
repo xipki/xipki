@@ -177,9 +177,9 @@ public class EmulatorP11Identity extends P11Identity {
 
   public EmulatorP11Identity(
       P11Slot slot, P11IdentityId identityId, long keyType, PrivateKey privateKey, PublicKey publicKey,
-      X509Cert[] certificateChain, int maxSessions, SecureRandom random)
+      int maxSessions, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
-    super(slot, identityId, keyType, publicKey, certificateChain);
+    super(slot, identityId, keyType, publicKey);
     this.signingKey = notNull(privateKey, "privateKey");
     this.random = notNull(random, "random");
     this.maxSessions = maxSessions;

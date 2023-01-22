@@ -336,8 +336,6 @@ public class Pkcs11conf extends ValidatableConf {
      */
     private Integer idLength;
 
-    private List<String> certAttributes = new LinkedList<>();
-
     public Boolean getIgnoreLabel() {
       return ignoreLabel;
     }
@@ -352,17 +350,6 @@ public class Pkcs11conf extends ValidatableConf {
 
     public void setIdLength(Integer idLength) {
       this.idLength = idLength;
-    }
-
-    public List<String> getCertAttributes() {
-      if (certAttributes == null) {
-        certAttributes = new LinkedList<>();
-      }
-      return certAttributes;
-    }
-
-    public void setCertAttributes(List<String> certAttributes) {
-      this.certAttributes = certAttributes;
     }
 
     @Override

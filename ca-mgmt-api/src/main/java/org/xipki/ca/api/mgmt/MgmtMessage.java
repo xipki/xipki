@@ -101,7 +101,6 @@ public abstract class MgmtMessage {
     listCertificates,
     loadConf,
     notifyCaChange,
-    refreshTokenForSignerType,
     removeCa,
     removeCaAlias,
     removeCertificate,

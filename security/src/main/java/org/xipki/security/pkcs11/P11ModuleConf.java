@@ -226,31 +226,15 @@ public class P11ModuleConf {
 
     private int idLength = 8;
 
-    private Set<Long> setCertObjectAttributes;
-
     public P11NewObjectConf(Pkcs11conf.NewObjectConf conf) throws InvalidConfException {
       Boolean bb = conf.getIgnoreLabel();
       this.ignoreLabel = bb != null && bb;
 
       Integer ii = conf.getIdLength();
       this.idLength = (ii == null) ? 8 : ii;
-
-      List<String> attrs = conf.getCertAttributes();
-      Set<Long> set = new HashSet<>();
-      if (attrs != null) {
-        for (String attr : attrs) {
-          long code = ckaNameToCode(attr);
-          if (code == -1) {
-            throw new InvalidConfException("invalid CKA name " + code);
-          }
-          set.add(code);
-        }
-      }
-      this.setCertObjectAttributes = Collections.unmodifiableSet(set);
     }
 
     public P11NewObjectConf() {
-      this.setCertObjectAttributes = Collections.emptySet();
     }
 
     public boolean isIgnoreLabel() {
@@ -267,14 +251,6 @@ public class P11ModuleConf {
 
     public void setIdLength(int idLength) {
       this.idLength = idLength;
-    }
-
-    public Set<Long> getSetCertObjectAttributes() {
-      return setCertObjectAttributes;
-    }
-
-    public void setSetCertObjectAttributes(Set<Long> setCertObjectAttributes) {
-      this.setCertObjectAttributes = notNull(setCertObjectAttributes, "setCertObjectAttributes");
     }
 
   } // class P11NewObjectConf
@@ -387,7 +363,7 @@ public class P11ModuleConf {
 
         Long mech = null;
         if (mechStr.startsWith("CKM_")) {
-          mech = nameToCode(Category.CKU, mechStr);
+          mech = ckmNameToCode(mechStr);
         } else {
           int radix = 10;
           if (mechStr.startsWith("0X")) {

@@ -32,11 +32,9 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
 
   private final P11SlotIdentifier slotId;
 
-  private final P11ObjectIdentifier keyId;
+  private final P11ObjectId keyId;
 
-  private final P11ObjectIdentifier publicKeyId;
-
-  private P11ObjectIdentifier certId;
+  private final P11ObjectId publicKeyId;
 
   /**
    * Constructor.
@@ -46,7 +44,7 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
    * @param keyId
    *          Object identifier. Must not be {@code null}.
    */
-  public P11IdentityId(P11SlotIdentifier slotId, P11ObjectIdentifier keyId) {
+  public P11IdentityId(P11SlotIdentifier slotId, P11ObjectId keyId) {
     this.slotId = notNull(slotId, "slotId");
     this.keyId = notNull(keyId, "keyId");
     this.publicKeyId = null;
@@ -57,51 +55,27 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
    *
    * @param slotId
    *          Slot identifier. Must not be {@code null}.
-   * @param keyId
-   *          Object identifier. Must not be {@code null}.
-   * @param publicKeyLabel
-   *          Label of the public key
-   * @param certLabel
-   *          Label of the certificate
+   * @param privateKeyId
+   *          Object identifier of secret or private key. Must not be {@code null}.
+   * @param publicKeyId
+   *          Object identifier of public key. May be {@code null}.
    */
-  public P11IdentityId(P11SlotIdentifier slotId, P11ObjectIdentifier keyId, boolean publicKeyAvailable,
-                       String publicKeyLabel, boolean certAvailable, String certLabel) {
+  public P11IdentityId(P11SlotIdentifier slotId, P11ObjectId privateKeyId, P11ObjectId publicKeyId) {
     this.slotId = notNull(slotId, "slotId");
-    this.keyId = notNull(keyId, "keyId");
-    if (publicKeyAvailable) {
-      this.publicKeyId = CompareUtil.equalsObject(publicKeyLabel, keyId.getLabel())
-          ? keyId : new P11ObjectIdentifier(keyId.getId(), publicKeyLabel);
-    } else {
-      this.publicKeyId = null;
-    }
-
-    if (certAvailable) {
-      this.certId = CompareUtil.equalsObject(certLabel, keyId.getLabel())
-          ? keyId : new P11ObjectIdentifier(keyId.getId(), certLabel);
-    } else {
-      this.certId = null;
-    }
+    this.keyId = notNull(privateKeyId, "privateKeyId");
+    this.publicKeyId = publicKeyId;
   }
 
   public P11SlotIdentifier getSlotId() {
     return slotId;
   }
 
-  public P11ObjectIdentifier getKeyId() {
+  public P11ObjectId getKeyId() {
     return keyId;
   }
 
-  public P11ObjectIdentifier getPublicKeyId() {
+  public P11ObjectId getPublicKeyId() {
     return publicKeyId;
-  }
-
-  public void addCertLabel(String certLabel) {
-    this.certId = CompareUtil.equalsObject(certLabel, keyId.getLabel())
-        ? keyId : new P11ObjectIdentifier(keyId.getId(), certLabel);
-  }
-
-  public P11ObjectIdentifier getCertId() {
-    return certId;
   }
 
   @Override
@@ -123,8 +97,7 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
 
     P11IdentityId ei = (P11IdentityId) obj;
     return this.slotId.equals(ei.slotId)  && this.keyId.equals(ei.keyId)
-        && CompareUtil.equalsObject(publicKeyId, ei.publicKeyId)
-        && CompareUtil.equalsObject(certId, ei.certId);
+        && CompareUtil.equalsObject(publicKeyId, ei.publicKeyId);
   }
 
   public boolean match(P11SlotIdentifier slotId, String keyLabel) {
@@ -139,10 +112,6 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
     if (publicKeyId != null && publicKeyId != keyId) {
       sb.append(", public key ").append(publicKeyId);
     }
-    if (certId != null && certId != keyId) {
-      sb.append(", certificate ").append(certId);
-    }
-
     return sb.toString();
   }
 
@@ -151,9 +120,6 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
     int hashCode = slotId.hashCode() + 31 * keyId.hashCode();
     if (publicKeyId != null) {
       hashCode += 31 * 31 * publicKeyId.hashCode();
-    }
-    if (certId != null) {
-      hashCode += 31 * 31 * 31 * certId.hashCode();
     }
     return hashCode;
   }

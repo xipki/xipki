@@ -290,9 +290,6 @@ if { $printUsage equals "true" } then {
   xi:copy-file -f qa/qa.d/rootca.crl.download \
     ${OCSP_XIPKI_DIR}/crls/example-crls/crl-download-mycrl2/crl.download
 
-  if { $TOKEN_TYPE equals "pkcs11" } then {
-    ocsp:refresh-token --type pkcs11
-  }
 
   # Restart OCSP server
   ocsp:restart-server

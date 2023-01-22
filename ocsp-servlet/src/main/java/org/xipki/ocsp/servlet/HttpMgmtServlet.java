@@ -119,13 +119,6 @@ public class HttpMgmtServlet extends HttpServlet {
           throw new MyException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
               "could not build the CaEntry: " + ex.getMessage());
         }
-      } else if (action == MgmtAction.refreshTokenForSignerType) {
-        String type = getNameFromRequest(in);
-        try {
-          ocspServer.refreshTokenForSignerType(type);
-        } catch (XiSecurityException ex) {
-          throw new OcspMgmtException("could not refresh token for signer type " + type + ": " + ex.getMessage(), ex);
-        }
       } else {
           throw new MyException(HttpServletResponse.SC_NOT_FOUND, "unsupported action " + action);
       }

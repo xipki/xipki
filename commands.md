@@ -92,10 +92,6 @@ Database Commands
 Security Commands
 -----
 
-   * `xi:add-cert-p11`
-
-     add certificate to PKCS#11 device
-
    * `xi:cert-info`
 
      print certificate information
@@ -115,10 +111,6 @@ Security Commands
    * `xi:csr-p12`
 
      generate CSR with PKCS#12 keystore
-
-   * `xi:delete-cert-p11`
-
-     remove certificate from PKCS#11 device
 
    * `xi:delete-key-p11`
 
@@ -147,10 +139,6 @@ Security Commands
    * `xi:ec-p12`
 
      generate EC keypair in PKCS#12 keystore
-
-   * `xi:export-cert-p11`
-
-     export certificate from PKCS#11 device
 
    * `xi:export-cert-p12`
 
@@ -192,10 +180,6 @@ Security Commands
 
      export PKCS#12 key store, like the 'openssl pkcs12' command
 
-   * `xi:refresh-p11`
-
-     refresh PKCS#11 module
-
    * `xi:rsa-p11`
 
      generate RSA keypair in PKCS#11 device
@@ -224,10 +208,6 @@ Security Commands
 
      list objects in PKCS#11 device
 
-   * `xi:update-cert-p11`
-
-     update certificate in PKCS#11 device
-
    * `xi:update-cert-p12`
 
      update certificate in PKCS#12 keystore
@@ -238,10 +218,6 @@ Security Commands
 
 OCSP Management Commands
 -----
-
-   * `ocsp:refresh-token`
-
-     refresh token for signers
 
    * `ocsp:restart-server`
 
@@ -405,10 +381,6 @@ CA Management Commands
    * `ca:notify-change`
 
      notify the change of CA system
-
-   * `ca:refresh-token`
-
-     refresh token for signers
 
    * `ca:restart`
 

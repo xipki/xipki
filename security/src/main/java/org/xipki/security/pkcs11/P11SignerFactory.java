@@ -130,9 +130,15 @@ public class P11SignerFactory implements SignerFactory {
       throw new ObjectCreationException(ex.getMessage(), ex);
     }
 
-    P11IdentityId identityId = slot.getIdentityId(keyId, keyLabel);
+    String str2 = (keyId != null) ? "id " + Hex.encode(keyId) : "label " + keyLabel;
+    P11IdentityId identityId = null;
+    try {
+      identityId = slot.getIdentityId(keyId, keyLabel);
+    } catch (P11TokenException e) {
+      throw new ObjectCreationException("could not find identity with " + str2);
+    }
+
     if (identityId == null) {
-      String str2 = (keyId != null) ? "id " + Hex.encode(keyId) : "label " + keyLabel;
       throw new ObjectCreationException("could not find identity with " + str2);
     }
 
@@ -148,7 +154,7 @@ public class P11SignerFactory implements SignerFactory {
         return signerBuilder.createSigner(algo, parallelism);
       } else {
         if (algo == null) {
-          PublicKey pubKey = slot.getIdentity(identityId.getKeyId()).getPublicKey();
+          PublicKey pubKey = slot.getIdentity(identityId).getPublicKey();
           algo = SignAlgo.getInstance(pubKey, conf);
         }
 
@@ -160,27 +166,5 @@ public class P11SignerFactory implements SignerFactory {
       throw new ObjectCreationException(ex.getMessage(), ex);
     }
   } // method newSigner
-
-  @Override
-  public void refreshToken(String type) throws XiSecurityException {
-    if (!TYPE.equalsIgnoreCase(type)) {
-      // Nothing to do
-      return;
-    }
-
-    Set<String> errorModules = new HashSet<>(2);
-    for (String name : p11CryptServiceFactory.getModuleNames()) {
-      try {
-        p11CryptServiceFactory.getP11CryptService(name).refresh();
-      } catch (P11TokenException ex) {
-        LogUtil.error(LOG, ex, "could not refresh PKCS#11 module " + name);
-        errorModules.add(name);
-      }
-    }
-
-    if (!errorModules.isEmpty()) {
-      throw new XiSecurityException("could not refreshed modules " + errorModules);
-    }
-  } // method refreshToken
 
 }

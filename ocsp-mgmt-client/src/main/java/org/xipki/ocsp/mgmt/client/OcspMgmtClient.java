@@ -108,12 +108,6 @@ public class OcspMgmtClient implements OcspManager {
     voidTransmit(MgmtAction.restartServer, null);
   }
 
-  @Override
-  public void refreshTokenForSignerType(String signerType) throws OcspMgmtException {
-    MgmtRequest.Name req = new MgmtRequest.Name(signerType);
-    voidTransmit(MgmtAction.refreshTokenForSignerType, req);
-  }
-
   private void voidTransmit(MgmtAction action, MgmtRequest req) throws OcspMgmtException {
     transmit(action, req, true);
   }

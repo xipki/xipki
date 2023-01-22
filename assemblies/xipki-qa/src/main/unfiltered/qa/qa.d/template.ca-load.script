@@ -35,10 +35,6 @@ xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
 xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
   qa/qa.d/rootca.json
 
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  ca:refresh-token --type pkcs11
-}
-
 ca:load-conf --conf-file qa/qa.d/rootca.json \
   --outform $OUTFORM \
   --out-dir output
@@ -145,10 +141,6 @@ if { $TOKEN_TYPE equals "pkcs12" } then {
 }
 
 ca:caprofile-rm -f --ca rootca1 --profile ocsp
-
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  ca:refresh-token --type pkcs11
-}
 
 echo "#################################################################"
 echo "#                        Add subca with OCSP                    #"

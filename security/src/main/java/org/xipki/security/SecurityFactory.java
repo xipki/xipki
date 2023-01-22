@@ -222,6 +222,4 @@ public interface SecurityFactory {
 
   int getDfltSignerParallelism();
 
-  void refreshTokenForSignerType(String signerType) throws XiSecurityException;
-
 }

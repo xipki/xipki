@@ -754,11 +754,6 @@ public class CaMgmtClient implements CaManager {
     return ((MgmtResponse.StringResponse) parse(respBytes, MgmtResponse.StringResponse.class)).getResult();
   }
 
-  @Override
-  public void refreshTokenForSignerType(String signerType) throws CaMgmtException {
-    voidTransmit(MgmtAction.refreshTokenForSignerType, new MgmtRequest.Name(signerType));
-  } // method refreshTokenForSignerType
-
   private X509Cert parseCert(byte[] certBytes) throws CaMgmtException {
     try {
       return X509Util.parseCert(certBytes);

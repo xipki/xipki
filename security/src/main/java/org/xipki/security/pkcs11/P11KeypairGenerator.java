@@ -157,12 +157,12 @@ public class P11KeypairGenerator extends KeypairGenerator {
         case "ED25519":
         case "ED448": {
           ASN1ObjectIdentifier curveId = EdECConstants.getCurveOid(keyspec);
-          return slot.generateECEdwardsKeypairOtf0(curveId);
+          return slot.doGenerateECEdwardsKeypairOtf(curveId);
         }
         case "X25519":
         case "X448": {
           ASN1ObjectIdentifier curveId = EdECConstants.getCurveOid(keyspec);
-          return slot.generateECMontgomeryKeypairOtf0(curveId);
+          return slot.doGenerateECMontgomeryKeypairOtf(curveId);
         }
         default: {
           throw new IllegalArgumentException("unknown keyspec " + keyspec);

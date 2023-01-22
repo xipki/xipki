@@ -22,24 +22,21 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.EdECConstants;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
+import org.xipki.security.pkcs11.P11ModuleConf.P11NewObjectConf;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.DSAParameterCache;
 import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.CompareUtil;
 import org.xipki.util.Hex;
+import org.xipki.util.StringUtil;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -47,13 +44,10 @@ import java.security.spec.DSAParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.xipki.pkcs11.PKCS11Constants.*;
 import static org.xipki.util.Args.*;
 import static org.xipki.util.StringUtil.concat;
-import static org.xipki.util.StringUtil.toUtf8Bytes;
 
 /**
  * PKCS#11 slot.
@@ -63,81 +57,6 @@ import static org.xipki.util.StringUtil.toUtf8Bytes;
  */
 
 public abstract class P11Slot implements Closeable {
-
-  public static class P11SlotRefreshResult {
-
-    private final Map<P11ObjectIdentifier, P11Identity> identities = new HashMap<>();
-
-    private final Map<P11ObjectIdentifier, X509Cert> certificates = new HashMap<>();
-
-    private final Set<Long> mechanisms = new HashSet<>();
-
-    public P11SlotRefreshResult() {
-    }
-
-    public Map<P11ObjectIdentifier, P11Identity> getIdentities() {
-      return identities;
-    }
-
-    public Map<P11ObjectIdentifier, X509Cert> getCertificates() {
-      return certificates;
-    }
-
-    public Set<Long> getMechanisms() {
-      return mechanisms;
-    }
-
-    public void addIdentity(P11Identity identity) {
-      notNull(identity, "identity");
-      P11Identity old = this.identities.put(identity.getId().getKeyId(), identity);
-      if (old != null) {
-        LOG.warn("duplicated P11Identity {}", identity.getId().getKeyId());
-      }
-    }
-
-    public void addMechanism(long mechanism) {
-      this.mechanisms.add(mechanism);
-    }
-
-    public void addCertificate(P11ObjectIdentifier objectId, X509Cert certificate) {
-      X509Cert old = this.certificates.put(notNull(objectId, "objectId"), notNull(certificate, "certificate"));
-      if (old != null) {
-        LOG.warn("duplicated P11 certificate {}", objectId);
-      }
-    }
-
-    /**
-     * Returns the certificate of the given identifier {@code id}.
-     * @param id
-     *          Identifier. Must not be {@code null}.
-     * @return the certificate of the given identifier.
-     */
-    public X509Cert getCertForId(byte[] id) {
-      for (Entry<P11ObjectIdentifier, X509Cert> entry : certificates.entrySet()) {
-        P11ObjectIdentifier objId = entry.getKey();
-        if (objId.matchesId(id)) {
-          return entry.getValue();
-        }
-      }
-      return null;
-    }
-
-    /**
-     * Returns the PKCS#11 label for certificate of the given {@code id}.
-     * @param id
-     *          Identifier. Must not be {@code null}.
-     * @return the label.
-     */
-    public String getCertLabelForId(byte[] id) {
-      for (P11ObjectIdentifier objId : certificates.keySet()) {
-        if (objId.matchesId(id)) {
-          return objId.getLabel();
-        }
-      }
-      return null;
-    }
-
-  } // class P11SlotRefreshResult
 
   public static class P11NewObjectControl {
 
@@ -230,23 +149,19 @@ public abstract class P11Slot implements Closeable {
 
   private final SecureRandom random = new SecureRandom();
 
-  private final ConcurrentHashMap<P11ObjectIdentifier, P11Identity> identities = new ConcurrentHashMap<>();
-
-  private final ConcurrentHashMap<P11ObjectIdentifier, X509Cert> certificates = new ConcurrentHashMap<>();
-
   private final Set<Long> mechanisms = new HashSet<>();
-
-  private final P11MechanismFilter mechanismFilter;
 
   protected final Integer numSessions;
   protected final List<Long> secretKeyTypes;
   protected final List<Long> keyPairTypes;
 
+  protected final P11NewObjectConf newObjectConf;
+
   protected P11Slot(
-      String moduleName, P11SlotIdentifier slotId, boolean readOnly, P11MechanismFilter mechanismFilter,
-      Integer numSessions, List<Long> secretKeyTypes, List<Long> keyPairTypes)
+      String moduleName, P11SlotIdentifier slotId, boolean readOnly,
+      Integer numSessions, List<Long> secretKeyTypes, List<Long> keyPairTypes, P11NewObjectConf newObjectConf)
       throws P11TokenException {
-    this.mechanismFilter = notNull(mechanismFilter, "mechanismFilter");
+    this.newObjectConf = notNull(newObjectConf, "newObjectConf");
     this.moduleName = notBlank(moduleName, "moduleName");
     this.slotId = notNull(slotId, "slotId");
     this.readOnly = readOnly;
@@ -258,8 +173,7 @@ public abstract class P11Slot implements Closeable {
   /**
    * Returns the hex representation of the bytes.
    *
-   * @param bytes
-   *          Data to be encoded. Must not be {@code null}.
+   * @param bytes Data to be encoded. Must not be {@code null}.
    * @return the hex representation of the bytes.
    */
   protected static String hex(byte[] bytes) {
@@ -269,372 +183,193 @@ public abstract class P11Slot implements Closeable {
   /**
    * Returns the hex representation of the bytes.
    *
-   * @param hex
-   *          Data to be decoded. Must not be {@code null}.
+   * @param hex Data to be decoded. Must not be {@code null}.
    * @return the hex representation of the bytes.
    */
   protected static byte[] decodeHex(String hex) {
     return Hex.decode(hex);
   }
 
-  public static String getDescription(byte[] keyId, char[] keyLabel) {
-    return concat("id ", (keyId == null ? "null" : hex(keyId)), " and label ",
-        (keyLabel == null ? "null" : new String(keyLabel)));
-  }
-
   public static String getDescription(byte[] keyId, String keyLabel) {
     return concat("id ", (keyId == null ? "null" : hex(keyId)), " and label ", keyLabel);
   }
 
-  /**
-   * Updates the certificate associated with the given {@code objectId} with the given certificate
-   * {@code newCert}.
-   *
-   * @param keyId
-   *          Object identifier of the private key. Must not be {@code null}.
-   * @param newCert
-   *          Certificate to be added. Must not be {@code null}.
-   * @throws CertificateException
-   *         if process with certificate fails.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
-   */
-  protected abstract void updateCertificate0(P11ObjectIdentifier keyId, X509Cert newCert)
-      throws P11TokenException, CertificateException;
+  public abstract P11IdentityId getIdentityId(byte[] keyId, String keyLabel) throws P11TokenException;
+
+  public abstract P11Identity getIdentity(P11IdentityId identityId) throws P11TokenException;
 
   /**
-   * Removes the key (private key, public key, secret key, and certificates) associated with
+   * Remove objects.
+   *
+   * @param id    Id of the objects to be deleted. At least one of id and label may not be {@code null}.
+   * @param label Label of the objects to be deleted
+   * @return how many objects have been deleted
+   * @throws P11TokenException If PKCS#11 error happens.
+   */
+  public abstract int removeObjects(byte[] id, String label) throws P11TokenException;
+
+  protected abstract boolean objectExistsForIdOrLabel(byte[] id, String label) throws P11TokenException;
+
+  /**
+   * Removes the key (private key, public key, and secret key) associated with
    * the given identifier {@code objectId}.
    *
-   * @param identityId
-   *          Identity identifier. Must not be {@code null}.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
+   * @param identityId Identity identifier. Must not be {@code null}.
+   * @throws P11TokenException if PKCS#11 token exception occurs.
    */
-  protected abstract void removeIdentity0(P11IdentityId identityId) throws P11TokenException;
-
-  /**
-   * Adds the certificate to the PKCS#11 token under the given identifier {@code objectId}.
-   *
-   * @param cert
-   *          Certificate to be added. Must not be {@code null}.
-   * @param control
-   *          Control of the object creation process. Must not be {@code null}.
-   * @return the PKCS#11 identifier of the added certificate.
-   * @throws CertificateException
-   *         if process with certificate fails.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
-   */
-  protected abstract P11ObjectIdentifier addCert0(X509Cert cert, P11NewObjectControl control)
-      throws P11TokenException, CertificateException;
+  public abstract void removeIdentity(P11IdentityId identityId) throws P11TokenException;
 
   /**
    * Generates a secret key in the PKCS#11 token.
    *
-   * @param keyType
-   *          key type
-   * @param keysize
-   *          key size
-   * @param control
-   *          Control of the key generation process. Must not be {@code null}.
+   * @param keyType key type
+   * @param keysize key size
+   * @param control Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#11 token.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
+   * @throws P11TokenException if PKCS#11 token exception occurs.
    */
-  protected abstract P11Identity generateSecretKey0(long keyType, int keysize, P11NewKeyControl control)
+  protected abstract P11IdentityId doGenerateSecretKey(long keyType, Integer keysize, P11NewKeyControl control)
       throws P11TokenException;
 
   /**
    * Imports secret key object in the PKCS#11 token. The key itself will not be generated
    * within the PKCS#11 token.
    *
-   * @param keyType
-   *          key type.
-   * @param keyValue
-   *          Key value. Must not be {@code null}.
-   * @param control
-   *          Control of the key generation process. Must not be {@code null}.
+   * @param keyType  key type.
+   * @param keyValue Key value. Must not be {@code null}.
+   * @param control  Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
+   * @throws P11TokenException if PKCS#11 token exception occurs.
    */
-  protected abstract P11Identity importSecretKey0(long keyType, byte[] keyValue, P11NewKeyControl control)
+  protected abstract P11IdentityId doImportSecretKey(long keyType, byte[] keyValue, P11NewKeyControl control)
       throws P11TokenException;
 
   /**
    * Generates a DSA keypair on-the-fly.
    *
-   * @param p
-   *          p of DSA. Must not be {@code null}.
-   * @param q
-   *          q of DSA. Must not be {@code null}.
-   * @param g
-   *          g of DSA. Must not be {@code null}.
-   * @param control
-   *          Control of the key generation process. Must not be {@code null}.
+   * @param p       p of DSA. Must not be {@code null}.
+   * @param q       q of DSA. Must not be {@code null}.
+   * @param g       g of DSA. Must not be {@code null}.
+   * @param control Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
+   * @throws P11TokenException if PKCS#11 token exception occurs.
    */
-  protected abstract P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g, P11NewKeyControl control)
+  protected abstract P11IdentityId doGenerateDSAKeypair(
+      BigInteger p, BigInteger q, BigInteger g, P11NewKeyControl control)
       throws P11TokenException;
 
   /**
    * Generates an EC Edwards keypair.
    *
-   * @param curveId
-   *         Object Identifier of the curve. Must not be {@code null}.
-   * @param control
-   *          Control of the key generation process. Must not be {@code null}.
+   * @param curveId Object Identifier of the curve. Must not be {@code null}.
+   * @param control Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
+   * @throws P11TokenException if PKCS#11 token exception occurs.
    */
-  protected abstract P11Identity generateECEdwardsKeypair0(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
+  protected abstract P11IdentityId doGenerateECEdwardsKeypair(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
       throws P11TokenException;
 
   /**
    * Generates an EC Edwards keypair on-the-fly.
    *
-   * @param curveId
-   *         Object Identifier of the curve. Must not be {@code null}.
+   * @param curveId Object Identifier of the curve. Must not be {@code null}.
    * @return the ASN.1 keypair.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
+   * @throws P11TokenException if PKCS#11 token exception occurs.
    */
-  protected abstract PrivateKeyInfo generateECEdwardsKeypairOtf0(ASN1ObjectIdentifier curveId)
+  protected abstract PrivateKeyInfo doGenerateECEdwardsKeypairOtf(ASN1ObjectIdentifier curveId)
       throws P11TokenException;
 
   /**
    * Generates an EC Montgomery keypair.
    *
-   * @param curveId
-   *         Object Identifier of the curve. Must not be {@code null}.
-   * @param control
-   *          Control of the key generation process. Must not be {@code null}.
+   * @param curveId Object Identifier of the curve. Must not be {@code null}.
+   * @param control Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
+   * @throws P11TokenException if PKCS#11 token exception occurs.
    */
-  protected abstract P11Identity generateECMontgomeryKeypair0(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
+  protected abstract P11IdentityId doGenerateECMontgomeryKeypair(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
       throws P11TokenException;
 
   /**
    * Generates an EC Montgomery keypair on-the-fly.
    *
-   * @param curveId
-   *         Object Identifier of the curve. Must not be {@code null}.
+   * @param curveId Object Identifier of the curve. Must not be {@code null}.
    * @return the ASN.1 keypair.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
+   * @throws P11TokenException if PKCS#11 token exception occurs.
    */
-  protected abstract PrivateKeyInfo generateECMontgomeryKeypairOtf0(ASN1ObjectIdentifier curveId)
+  protected abstract PrivateKeyInfo doGenerateECMontgomeryKeypairOtf(ASN1ObjectIdentifier curveId)
       throws P11TokenException;
 
   /**
    * Generates an EC keypair.
    *
-   * @param curveId
-   *         Object identifier of the EC curve. Must not be {@code null}.
-   * @param control
-   *          Control of the key generation process. Must not be {@code null}.
+   * @param curveId Object identifier of the EC curve. Must not be {@code null}.
+   * @param control Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
+   * @throws P11TokenException if PKCS#11 token exception occurs.
    */
-  protected abstract P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
+  protected abstract P11IdentityId doGenerateECKeypair(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
       throws P11TokenException;
 
   /**
    * Generates an EC keypair over-the-air.
    *
-   * @param curveId
-   *         Object identifier of the EC curve. Must not be {@code null}.
+   * @param curveId Object identifier of the EC curve. Must not be {@code null}.
    * @return the ASN.1 encoded keypair.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
+   * @throws P11TokenException if PKCS#11 token exception occurs.
    */
-  protected abstract PrivateKeyInfo generateECKeypairOtf0(ASN1ObjectIdentifier curveId)
+  protected abstract PrivateKeyInfo doGenerateECKeypairOtf(ASN1ObjectIdentifier curveId)
       throws P11TokenException;
 
   /**
    * Generates an SM2p256v1 keypair.
    *
-   * @param control
-   *          Control of the key generation process. Must not be {@code null}.
+   * @param control Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
+   * @throws P11TokenException if PKCS#11 token exception occurs.
    */
-  protected abstract P11Identity generateSM2Keypair0(P11NewKeyControl control)
+  protected abstract P11IdentityId doGenerateSM2Keypair(P11NewKeyControl control)
       throws P11TokenException;
 
   /**
    * Generates an SM2p256v1 keypair on-the-fly.
    *
    * @return the ASN.1 encoded keypair.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
+   * @throws P11TokenException if PKCS#11 token exception occurs.
    */
-  protected abstract PrivateKeyInfo generateSM2KeypairOtf0() throws P11TokenException;
+  protected abstract PrivateKeyInfo doGenerateSM2KeypairOtf() throws P11TokenException;
 
   /**
    * Generates an RSA keypair.
    *
-   * @param keysize
-   *          key size in bit
-   * @param publicExponent
-   *          RSA public exponent. Could be {@code null}.
-   * @param control
-   *          Control of the key generation process. Must not be {@code null}.
+   * @param keysize        key size in bit
+   * @param publicExponent RSA public exponent. Could be {@code null}.
+   * @param control        Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
+   * @throws P11TokenException if PKCS#11 token exception occurs.
    */
-  protected abstract P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent, P11NewKeyControl control)
+  protected abstract P11IdentityId doGenerateRSAKeypair(
+      int keysize, BigInteger publicExponent, P11NewKeyControl control)
       throws P11TokenException;
 
-  protected abstract P11SlotRefreshResult refresh0() throws P11TokenException;
-
-  protected abstract void removeCerts0(P11ObjectIdentifier objectId) throws P11TokenException;
+  protected abstract void printObjects(OutputStream stream, boolean verbose) throws IOException;
 
   @Override
   public abstract void close();
 
-  /**
-   * Remove objects.
-   *
-   * @param id
-   *         Id of the objects to be deleted.
-   * @return how many objects have been deleted
-   * @throws P11TokenException
-   *           If PKCS#11 error happens.
-   */
-  public abstract int removeObjectsForId(byte[] id) throws P11TokenException;
-
-  /**
-   * Remove objects.
-   *
-   * @param label
-   *         Label of the objects to be deleted
-   * @return how many objects have been deleted
-   * @throws P11TokenException
-   *           If PKCS#11 error happens.
-   */
-  public abstract int removeObjectsForLabel(String label) throws P11TokenException;
-
-  /**
-   * Remove objects.
-   *
-   * @param id
-   *         Id of the objects to be deleted. At least one of id and label may not be {@code null}.
-   * @param label
-   *         Label of the objects to be deleted
-   * @return how many objects have been deleted
-   * @throws P11TokenException
-   *           If PKCS#11 error happens.
-   */
-  public abstract int removeObjects(byte[] id, String label) throws P11TokenException;
-
-  /**
-   * Gets certificate with the given identifier {@code id}.
-   * @param id
-   *          Identifier of the certificate. Must not be {@code null}.
-   * @return certificate with the given identifier.
-   */
-  public X509Cert getCertForId(byte[] id) {
-    for (P11ObjectIdentifier objId : certificates.keySet()) {
-      if (objId.matchesId(id)) {
-        return certificates.get(objId);
-      }
-    }
-    return null;
-  } // method getCertForId
-
-  /**
-   * Gets certificate with the given identifier {@code id}.
-   * @param objectId
-   *          Identifier of the certificate. Must not be {@code null}.
-   * @return certificate with the given identifier.
-   */
-  public X509Cert getCert(P11ObjectIdentifier objectId) {
-    return certificates.get(objectId);
-  }
-
-  private void updateCaCertsOfIdentities() {
-    for (P11Identity identity : identities.values()) {
-      updateCaCertsOfIdentity(identity);
-    }
-  }
-
-  private void updateCaCertsOfIdentity(P11Identity identity) {
-    X509Cert[] certchain = identity.certificateChain();
-    if (certchain == null || certchain.length == 0) {
-      return;
-    }
-
-    X509Cert[] newCertchain = buildCertPath(certchain[0]);
-    if (!Arrays.equals(certchain, newCertchain)) {
-      try {
-        identity.setCertificates(newCertchain);
-      } catch (P11TokenException ex) {
-        LOG.warn("could not set certificates for identity {}", identity.getId());
-      }
-    }
-  } // method updateCaCertsOfIdentity
-
-  private X509Cert[] buildCertPath(X509Cert cert) {
-    List<X509Cert> certs = new LinkedList<>();
-    X509Cert cur = cert;
-    while (cur != null) {
-      certs.add(cur);
-      cur = getIssuerForCert(cur);
-    }
-    return certs.toArray(new X509Cert[0]);
-  } // method buildCertPath
-
-  private X509Cert getIssuerForCert(X509Cert cert) {
-    try {
-      if (cert.isSelfSigned()) {
-        return null;
-      }
-
-      for (X509Cert cert2 : certificates.values()) {
-        if (cert2 == cert) {
-          continue;
-        }
-
-        if (X509Util.issues(cert2, cert)) {
-          return cert2;
-        }
-      }
-    } catch (CertificateEncodingException ex) {
-      LOG.warn("invalid encoding of certificate {}", ex.getMessage());
-    }
-    return null;
-  } // method getIssuerForCert
-
-  public void refresh() throws P11TokenException {
-    P11SlotRefreshResult res = refresh0();
-
+  protected void initMechanisms(long[] supportedMechanisms, P11MechanismFilter mechanismFilter)
+      throws P11TokenException {
     mechanisms.clear();
-    certificates.clear();
-    identities.clear();
 
     List<Long> ignoreMechs = new ArrayList<>();
 
-    for (Long mech : res.getMechanisms()) {
+    for (long mech : supportedMechanisms) {
       if (mechanismFilter.isMechanismPermitted(slotId, mech)) {
         mechanisms.add(mech);
       } else {
         ignoreMechs.add(mech);
       }
     }
-    certificates.putAll(res.getCertificates());
-    identities.putAll(res.getIdentities());
-
-    updateCaCertsOfIdentities();
 
     if (LOG.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
@@ -656,55 +391,8 @@ public abstract class P11Slot implements Closeable {
           sb.append("\t").append(ckmCodeToName(mech)).append("\n");
         }
       }
-
-      List<P11ObjectIdentifier> ids = getSortedObjectIds(certificates.keySet());
-      sb.append(ids.size()).append(" certificates:\n");
-      for (P11ObjectIdentifier objectId : ids) {
-        X509Cert entity = certificates.get(objectId);
-        sb.append("\t").append(objectId);
-        sb.append(", subject='").append(entity.getSubjectText()).append("'\n");
-      }
-
-      ids = getSortedObjectIds(identities.keySet());
-      sb.append(ids.size()).append(" identities:\n");
-      for (P11ObjectIdentifier objectId : ids) {
-        P11Identity identity = identities.get(objectId);
-        sb.append("\t").append(objectId);
-
-        PublicKey publicKey = identity.getPublicKey();
-        if (publicKey != null) {
-          String algo = getAlgorithmDesc(publicKey);
-          sb.append(", algo=").append(algo);
-          if (identity.getCertificate() != null) {
-            String subject = identity.getCertificate().getSubjectText();
-            sb.append(", subject='").append(subject).append("'");
-          }
-        } else {
-          sb.append(", algo=<symmetric>");
-        }
-        sb.append("\n");
-      }
-
       LOG.info(sb.toString());
     }
-  } // method refresh
-
-  protected void addIdentity(P11Identity identity) throws P11DuplicateEntityException {
-    if (!slotId.equals(identity.getId().getSlotId())) {
-      throw new IllegalArgumentException("invalid identity");
-    }
-
-    P11ObjectIdentifier keyId = identity.getId().getKeyId();
-    if (hasIdentity(keyId)) {
-      throw new P11DuplicateEntityException(slotId, keyId);
-    }
-
-    identities.put(keyId, identity);
-    updateCaCertsOfIdentity(identity);
-  } // method addIdentity
-
-  public boolean hasIdentity(P11ObjectIdentifier keyId) {
-    return identities.containsKey(keyId);
   }
 
   public Set<Long> getMechanisms() {
@@ -721,14 +409,6 @@ public abstract class P11Slot implements Closeable {
     }
   }
 
-  public Set<P11ObjectIdentifier> getIdentityKeyIds() {
-    return Collections.unmodifiableSet(identities.keySet());
-  }
-
-  public Set<P11ObjectIdentifier> getCertIds() {
-    return Collections.unmodifiableSet(certificates.keySet());
-  }
-
   public String getModuleName() {
     return moduleName;
   }
@@ -741,290 +421,37 @@ public abstract class P11Slot implements Closeable {
     return readOnly;
   }
 
-  public P11Identity getIdentity(P11ObjectIdentifier keyId) throws P11UnknownEntityException {
-    P11Identity ident = identities.get(keyId);
-    if (ident == null) {
-      throw new P11UnknownEntityException(slotId, keyId);
-    }
-    return ident;
-  }
-
-  protected void assertNoIdentityAndCert(byte[] id, String label) throws P11DuplicateEntityException {
+  protected void assertNoObjects(byte[] id, String label) throws P11TokenException {
     if (id == null && label == null) {
       return;
     }
 
-    Set<P11ObjectIdentifier> objectIds = new HashSet<>(identities.keySet());
-    objectIds.addAll(certificates.keySet());
-
-    for (P11ObjectIdentifier objectId : objectIds) {
-      boolean matchId = id != null && objectId.matchesId(id);
-      boolean matchLabel = CompareUtil.equalsObject(label, objectId.getLabel());
-
-      if (matchId || matchLabel) {
-        StringBuilder sb = new StringBuilder("Identity or Certificate with ");
-        if (matchId) {
-          sb.append("id=0x").append(Hex.encodeUpper(id));
-          if (matchLabel) {
-            sb.append(" and ");
-          }
-        }
-
-        if (matchLabel) {
-          sb.append("label=").append(label);
-        }
-
-        sb.append(" already exists");
-        throw new P11DuplicateEntityException(sb.toString());
-      }
+    if (objectExistsForIdOrLabel(id, label)) {
+      throw new P11DuplicateEntityException("Objects with " + getDescription(id, label) + " already exists");
     }
-  } // method assertNoIdentityAndCert
-
-  public P11ObjectIdentifier getObjectIdForId(byte[] id) {
-    return getObjectId(id, null);
   }
 
-  public P11ObjectIdentifier getObjectIdForLabel(String label) {
-    return getObjectId(null, label);
+  /**
+   * Remove objects.
+   *
+   * @param id Id of the objects to be deleted.
+   * @return how many objects have been deleted
+   * @throws P11TokenException If PKCS#11 error happens.
+   */
+  public int removeObjectsForId(byte[] id) throws P11TokenException {
+    return removeObjects(id, null);
   }
 
-  private P11ObjectIdentifier getObjectId(byte[] id, String label) {
-    if (id == null && label == null) {
-      return null;
-    }
-
-    for (P11ObjectIdentifier objectId : identities.keySet()) {
-      boolean match = true;
-      if (id != null) {
-        match = objectId.matchesId(id);
-      }
-
-      if (label != null) {
-        match = objectId.matchesLabel(label);
-      }
-
-      if (match) {
-        return objectId;
-      }
-    }
-
-    for (P11ObjectIdentifier objectId : certificates.keySet()) {
-      boolean match = true;
-      if (id != null) {
-        match = objectId.matchesId(id);
-      }
-
-      if (label != null) {
-        match = label.equals(objectId.getLabel());
-      }
-
-      if (match) {
-        return objectId;
-      }
-    }
-
-    return null;
-  } // method getObjectId
-
-  public P11IdentityId getIdentityId(byte[] keyId, String keyLabel) {
-    if (keyId == null && keyLabel == null) {
-      return null;
-    }
-
-    for (P11ObjectIdentifier objectId : identities.keySet()) {
-      boolean match = true;
-      if (keyId != null) {
-        match = objectId.matchesId(keyId);
-      }
-
-      if (keyLabel != null) {
-        match = keyLabel.equals(objectId.getLabel());
-      }
-
-      if (match) {
-        return identities.get(objectId).getId();
-      }
-    }
-
-    return null;
-  } // method getIdentityId
-
   /**
-   * Exports the certificate of the given identifier {@code objectId}.
+   * Remove objects.
    *
-   * @param objectId
-   *          Object identifier. Must not be {@code null}.
-   * @return the exported certificate
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
+   * @param label Label of the objects to be deleted
+   * @return how many objects have been deleted
+   * @throws P11TokenException If PKCS#11 error happens.
    */
-  public X509Cert exportCert(P11ObjectIdentifier objectId) throws P11TokenException {
-    notNull(objectId, "objectId");
-    try {
-      return getIdentity(objectId).getCertificate();
-    } catch (P11UnknownEntityException ex) {
-    }
-
-    X509Cert cert = certificates.get(objectId);
-    if (cert == null) {
-      throw new P11UnknownEntityException(slotId, objectId);
-    }
-    return cert;
-  } // method exportCert
-
-  /**
-   * Remove certificates.
-   *
-   * @param objectId
-   *          Object identifier. Must not be {@code null}.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
-   */
-  public void removeCerts(P11ObjectIdentifier objectId) throws P11TokenException {
-    notNull(objectId, "objectId");
-    assertWritable("removeCerts");
-
-    P11ObjectIdentifier keyId = null;
-    for (P11ObjectIdentifier m : identities.keySet()) {
-      P11Identity identity = identities.get(m);
-      if (objectId.equals(identity.getId().getCertId())) {
-        keyId = m;
-        break;
-      }
-    }
-
-    if (keyId != null) {
-      certificates.remove(objectId);
-      identities.get(keyId).setCertificates(null);
-    } else if (certificates.containsKey(objectId)) {
-      certificates.remove(objectId);
-    } else {
-      throw new P11UnknownEntityException(slotId, objectId);
-    }
-
-    updateCaCertsOfIdentities();
-    removeCerts0(objectId);
-  } // method removeCerts
-
-  /**
-   * Removes the key (private key, public key, secret key, and certificates) associated with
-   * the given identifier {@code objectId}.
-   *
-   * @param identityId
-   *          Identity identifier. Must not be {@code null}.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
-   */
-  public void removeIdentity(P11IdentityId identityId) throws P11TokenException {
-    notNull(identityId, "identityId");
-    assertWritable("removeIdentity");
-    P11ObjectIdentifier keyId = identityId.getKeyId();
-    if (identities.containsKey(keyId)) {
-      if (identityId.getCertId() != null) {
-        certificates.remove(identityId.getCertId());
-      }
-      identities.get(keyId).setCertificates(null);
-      identities.remove(keyId);
-      updateCaCertsOfIdentities();
-    }
-
-    removeIdentity0(identityId);
-  } // method removeIdentity
-
-  /**
-   * Removes the key (private key, public key, secret key, and certificates) associated with
-   * the given identifier {@code objectId}.
-   *
-   * @param keyId
-   *          Key identifier. Must not be {@code null}.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
-   */
-  public void removeIdentityByKeyId(P11ObjectIdentifier keyId) throws P11TokenException {
-    notNull(keyId, "keyId");
-    assertWritable("removeIdentityByKeyId");
-
-    P11IdentityId entityId;
-    if (identities.containsKey(keyId)) {
-      entityId = identities.get(keyId).getId();
-      if (entityId.getCertId() != null) {
-        certificates.remove(entityId.getCertId());
-      }
-      identities.get(keyId).setCertificates(null);
-      identities.remove(keyId);
-      updateCaCertsOfIdentities();
-
-      removeIdentity0(entityId);
-    }
-
-  } // method removeIdentityByKeyId
-
-  /**
-   * Adds the certificate to the PKCS#11 token under the given identifier {@code objectId}.
-   *
-   * @param cert
-   *          Certificate to be added. Must not be {@code null}.
-   * @param control
-   *          Control of the object creation process. Must not be {@code null}.
-   * @return the identifier of the newly added certificate.
-   * @throws CertificateException
-   *         if process with certificate fails.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
-   */
-  public P11ObjectIdentifier addCert(X509Cert cert, P11NewObjectControl control)
-      throws P11TokenException, CertificateException {
-    notNull(cert, "cert");
-    notNull(control, "control");
-    assertWritable("addCert");
-
-    if (control.getLabel() == null) {
-      String cn = cert.getCommonName();
-      control = new P11NewObjectControl(control.getId(), generateLabel(cn));
-    }
-
-    P11ObjectIdentifier objectId = addCert0(cert, control);
-    certificates.put(objectId, cert);
-    updateCaCertsOfIdentities();
-    LOG.info("added certificate {}", objectId);
-    return objectId;
-  } // method addCert
-
-  protected String generateLabel(String label) {
-    String tmpLabel = label;
-    int idx = 0;
-    while (true) {
-      boolean duplicated = false;
-      for (P11ObjectIdentifier objectId : identities.keySet()) {
-        P11IdentityId identityId = identities.get(objectId).getId();
-        P11ObjectIdentifier pubKeyId = identityId.getPublicKeyId();
-        P11ObjectIdentifier certId = identityId.getCertId();
-
-        if (label.equals(objectId.getLabel())
-            || (pubKeyId != null && label.equals(pubKeyId.getLabel())
-            ||   (certId != null && label.equals(certId.getLabel())))) {
-          duplicated = true;
-          break;
-        }
-      }
-
-      if (!duplicated) {
-        for (P11ObjectIdentifier objectId : certificates.keySet()) {
-          if (objectId.getLabel().equals(label)) {
-            duplicated = true;
-            break;
-          }
-        }
-      }
-
-      if (!duplicated) {
-        return tmpLabel;
-      }
-
-      idx++;
-      tmpLabel = label + "-" + idx;
-    }
-  } // method generateLabel
+  public int removeObjectsForLabel(String label) throws P11TokenException {
+    return removeObjects(null, label);
+  }
 
   /**
    * Generates a secret key in the PKCS#11 token.
@@ -1039,20 +466,24 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public P11IdentityId generateSecretKey(long keyType, int keysize, P11NewKeyControl control)
+  public P11IdentityId generateSecretKey(long keyType, Integer keysize, P11NewKeyControl control)
       throws P11TokenException {
     assertWritable("generateSecretKey");
     notNull(control, "control");
-    assertNoIdentityAndCert(control.getId(), control.getLabel());
+    assertNoObjects(control.getId(), control.getLabel());
     assertSecretKeyAllowed(keyType);
 
-    P11Identity identity = generateSecretKey0(keyType, keysize, control);
-    addIdentity(identity);
+    if (keysize == null) {
+      if (keyType != CKK_DES3) {
+        throw new IllegalArgumentException(
+            "keysize is required for key " + ckkCodeToName(keyType) + " but is not specified");
+      }
+    }
 
-    P11IdentityId id = identity.getId();
-    LOG.info("generated secret key {}", id);
-    return id;
-  } // method generateSecretKey
+    P11IdentityId keyId = doGenerateSecretKey(keyType, keysize, control);
+    LOG.info("generated secret key {}", keyId);
+    return keyId;
+  }
 
   /**
    * Imports secret key object in the PKCS#11 token. The key itself will not be generated
@@ -1068,20 +499,17 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public P11ObjectIdentifier importSecretKey(long keyType, byte[] keyValue, P11NewKeyControl control)
+  public P11IdentityId importSecretKey(long keyType, byte[] keyValue, P11NewKeyControl control)
       throws P11TokenException {
     notNull(control, "control");
     assertWritable("createSecretKey");
-    assertNoIdentityAndCert(control.getId(), control.getLabel());
+    assertNoObjects(control.getId(), control.getLabel());
     assertSecretKeyAllowed(keyType);
 
-    P11Identity identity = importSecretKey0(keyType, keyValue, control);
-    addIdentity(identity);
-
-    P11ObjectIdentifier objId = identity.getId().getKeyId();
-    LOG.info("created secret key {}", objId);
-    return objId;
-  } // method importSecretKey
+    P11IdentityId keyId = doImportSecretKey(keyType, keyValue, control);
+    LOG.info("created secret key {}", keyId);
+    return keyId;
+  }
 
   private void assertSecretKeyAllowed(long keyType) throws P11TokenException {
     if (secretKeyTypes == null) {
@@ -1116,10 +544,10 @@ public abstract class P11Slot implements Closeable {
           CKM_RSA_X9_31_KEY_PAIR_GEN, CKM_RSA_PKCS_KEY_PAIR_GEN));
     }
 
-    return generateRSAKeypairOtf0(keysize, publicExponent == null ? RSAKeyGenParameterSpec.F4 : publicExponent);
+    return doGenerateRSAKeypairOtf(keysize, publicExponent == null ? RSAKeyGenParameterSpec.F4 : publicExponent);
   }
 
-  protected abstract PrivateKeyInfo generateRSAKeypairOtf0(int keysize, BigInteger publicExponent)
+  protected abstract PrivateKeyInfo doGenerateRSAKeypairOtf(int keysize, BigInteger publicExponent)
       throws P11TokenException;
 
   /**
@@ -1143,13 +571,11 @@ public abstract class P11Slot implements Closeable {
     }
     assertCanGenKeypair("generateRSAKeypair", control, CKK_RSA,
         CKM_RSA_X9_31_KEY_PAIR_GEN, CKM_RSA_PKCS_KEY_PAIR_GEN);
-    P11Identity identity = generateRSAKeypair0(keysize,
+    P11IdentityId keyId = doGenerateRSAKeypair(keysize,
         publicExponent == null ? RSAKeyGenParameterSpec.F4 : publicExponent, control);
-    addIdentity(identity);
-    P11IdentityId id = identity.getId();
-    LOG.info("generated RSA keypair {}", id);
-    return id;
-  } // method generateRSAKeypair
+    LOG.info("generated RSA keypair {}", keyId);
+    return keyId;
+  }
 
   /**
    * Generates a DSA keypair on-the-fly.
@@ -1171,7 +597,7 @@ public abstract class P11Slot implements Closeable {
 
     assertMechanismSupported(CKM_DSA_KEY_PAIR_GEN);
     return generateDSAKeypairOtf0(p, q, g);
-  } // method generateDSAKeypairOtf
+  }
 
   protected abstract PrivateKeyInfo generateDSAKeypairOtf0(BigInteger p, BigInteger q, BigInteger g)
       throws P11TokenException;
@@ -1197,7 +623,7 @@ public abstract class P11Slot implements Closeable {
     }
     DSAParameterSpec dsaParams = DSAParameterCache.getDSAParameterSpec(plength, qlength, random);
     return generateDSAKeypair(dsaParams.getP(), dsaParams.getQ(), dsaParams.getG(), control);
-  } // method generateDSAKeypair
+  }
 
   /**
    * Generates a DSA keypair.
@@ -1216,16 +642,11 @@ public abstract class P11Slot implements Closeable {
    */
   public P11IdentityId generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g, P11NewKeyControl control)
       throws P11TokenException {
-    notNull(p, "p");
-    notNull(q, "q");
-    notNull(g, "g");
     assertCanGenKeypair("generateDSAKeypair", control, CKK_DSA, CKM_DSA_KEY_PAIR_GEN);
-    P11Identity identity = generateDSAKeypair0(p, q, g, control);
-    addIdentity(identity);
-    P11IdentityId id = identity.getId();
-    LOG.info("generated DSA keypair {}", id);
-    return id;
-  } // method generateDSAKeypair
+    P11IdentityId keyId = doGenerateDSAKeypair(notNull(p, "p"), notNull(q, "q"), notNull(g, "g"), control);
+    LOG.info("generated DSA keypair {}", keyId);
+    return keyId;
+  }
 
   /**
    * Generates an EC keypair on-the-fly.
@@ -1241,13 +662,13 @@ public abstract class P11Slot implements Closeable {
 
     if (EdECConstants.isEdwardsCurve(curveOid)) {
       assertMechanismSupported(CKM_EC_EDWARDS_KEY_PAIR_GEN);
-      return generateECEdwardsKeypairOtf0(curveOid);
+      return doGenerateECEdwardsKeypairOtf(curveOid);
     } else if (EdECConstants.isMontgomeryCurve(curveOid)) {
       assertMechanismSupported(CKM_EC_MONTGOMERY_KEY_PAIR_GEN);
-      return generateECMontgomeryKeypairOtf0(curveOid);
+      return doGenerateECMontgomeryKeypairOtf(curveOid);
     } else {
       assertMechanismSupported(CKM_EC_KEY_PAIR_GEN);
-      return generateECKeypairOtf0(curveOid);
+      return doGenerateECKeypairOtf(curveOid);
     }
   }
 
@@ -1266,23 +687,21 @@ public abstract class P11Slot implements Closeable {
       throws P11TokenException {
     notNull(curveOid, "curveOid");
 
-    P11Identity identity;
+    P11IdentityId keyId;
     if (EdECConstants.isEdwardsCurve(curveOid)) {
       assertCanGenKeypair("generateECKeypair", control, CKK_EC_EDWARDS, CKM_EC_EDWARDS_KEY_PAIR_GEN);
-      identity = generateECEdwardsKeypair0(curveOid, control);
+      keyId = doGenerateECEdwardsKeypair(curveOid, control);
     } else if (EdECConstants.isMontgomeryCurve(curveOid)) {
       assertCanGenKeypair("generateECKeypair", control, CKK_EC_MONTGOMERY, CKM_EC_MONTGOMERY_KEY_PAIR_GEN);
-      identity = generateECMontgomeryKeypair0(curveOid, control);
+      keyId = doGenerateECMontgomeryKeypair(curveOid, control);
     } else {
       assertCanGenKeypair("generateECKeypair", control, CKK_EC, CKM_EC_KEY_PAIR_GEN);
-      identity = generateECKeypair0(curveOid, control);
+      keyId = doGenerateECKeypair(curveOid, control);
     }
 
-    addIdentity(identity);
-    P11IdentityId id = identity.getId();
-    LOG.info("generated EC keypair {}", id);
-    return id;
-  } // method generateECKeypair
+    LOG.info("generated EC keypair {} {}", keyId);
+    return keyId;
+  }
 
   /**
    * Generates an SM2 keypair on the fly.
@@ -1293,7 +712,7 @@ public abstract class P11Slot implements Closeable {
    */
   public PrivateKeyInfo generateSM2KeypairOtf() throws P11TokenException {
     assertMechanismSupported(CKM_VENDOR_SM2_KEY_PAIR_GEN);
-    return generateSM2KeypairOtf0();
+    return doGenerateSM2KeypairOtf();
   }
 
   /**
@@ -1307,15 +726,13 @@ public abstract class P11Slot implements Closeable {
    */
   public P11IdentityId generateSM2Keypair(P11NewKeyControl control) throws P11TokenException {
     assertCanGenKeypair("generateSM2Keypair", control, CKK_VENDOR_SM2, CKM_VENDOR_SM2_KEY_PAIR_GEN);
-    P11Identity identity = generateSM2Keypair0(control);
-    addIdentity(identity);
-    P11IdentityId id = identity.getId();
-    LOG.info("generated SM2 keypair {}", id);
-    return id;
-  } // method generateSM2Keypair
+    P11IdentityId keyId = doGenerateSM2Keypair(control);
+    LOG.info("generated SM2 keypair {}", keyId);
+    return keyId;
+  }
 
   private void assertCanGenKeypair(String methodName, P11NewKeyControl control, long keyType, long... orMechanisms)
-      throws P11UnsupportedMechanismException, P11PermissionException, P11DuplicateEntityException {
+      throws P11TokenException {
     notNull(control, "control");
     assertWritable(methodName);
     if (orMechanisms.length < 2) {
@@ -1334,7 +751,7 @@ public abstract class P11Slot implements Closeable {
       }
     }
 
-    assertNoIdentityAndCert(control.getId(), control.getLabel());
+    assertNoObjects(control.getId(), control.getLabel());
 
     if (keyPairTypes == null) {
       return;
@@ -1344,7 +761,7 @@ public abstract class P11Slot implements Closeable {
       LOG.error("Keypair of key type 0x{} unsupported", Long.toHexString(keyType));
       throw new P11UnsupportedMechanismException(buildOrMechanismsUnsupportedMessage(orMechanisms));
     }
-  } // method assertCanGenKeypair
+  }
 
   private String buildOrMechanismsUnsupportedMessage(long... mechanisms) {
     StringBuilder sb = new StringBuilder("none of mechanisms [");
@@ -1355,46 +772,6 @@ public abstract class P11Slot implements Closeable {
     sb.append("] is not supported by PKCS11 slot ").append(slotId);
     return sb.toString();
   }
-
-  /**
-   * Updates the certificate associated with the given ID {@code keyId} with the given certificate
-   * {@code newCert}.
-   *
-   * @param keyId
-   *          Object identifier of the private key. Must not be {@code null}.
-   * @param newCert
-   *          Certificate to be added. Must not be {@code null}.
-   * @throws CertificateException
-   *         if process with certificate fails.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
-   */
-  public void updateCertificate(P11ObjectIdentifier keyId, X509Cert newCert)
-      throws P11TokenException, CertificateException {
-    notNull(keyId, "keyId");
-    notNull(newCert, "newCert");
-    assertWritable("updateCertificate");
-
-    P11Identity identity = identities.get(keyId);
-    if (identity == null) {
-      throw new P11UnknownEntityException("could not find private key " + keyId);
-    }
-
-    java.security.PublicKey pk = identity.getPublicKey();
-    java.security.PublicKey newPk = newCert.getPublicKey();
-    if (!pk.equals(newPk)) {
-      throw new P11TokenException("the given certificate is not for key " + keyId);
-    }
-
-    updateCertificate0(keyId, newCert);
-
-    certificates.put(keyId, newCert);
-
-    identity.setCertificates(new X509Cert[]{newCert});
-    identity.getId().addCertLabel(keyId.getLabel());
-    updateCaCertsOfIdentities();
-    LOG.info("updated certificate for key {}", keyId);
-  } // method updateCertificate
 
   /**
    * Writes the token details to the given {@code stream}.
@@ -1408,123 +785,28 @@ public abstract class P11Slot implements Closeable {
   public void showDetails(OutputStream stream, boolean verbose) throws IOException {
     notNull(stream, "stream");
 
-    List<P11ObjectIdentifier> sortedKeyIds = getSortedObjectIds(identities.keySet());
-    int size = sortedKeyIds.size();
-
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < size; i++) {
-      P11ObjectIdentifier keyId = sortedKeyIds.get(i);
-      P11Identity identity = identities.get(keyId);
-
-      String label = keyId.getLabel();
-      sb.append("\t").append(i + 1).append(". ").append(label);
-      sb.append(" (").append("id: ").append(keyId.getIdHex());
-      P11IdentityId identityId = identity.getId();
-      P11ObjectIdentifier certId = identityId.getCertId();
-      if (certId != null && !certId.equals(keyId)) {
-        sb.append(", certificate label: ").append(identityId.getCertId().getLabel());
-      }
-
-      P11ObjectIdentifier pubKeyId = identityId.getPublicKeyId();
-      if (pubKeyId != null && !pubKeyId.equals(keyId)) {
-        sb.append(", publicKey label: ").append(pubKeyId.getLabel());
-      }
-
-      sb.append(")\n");
-
-      if (identity.getPublicKey() != null) {
-        String algo = getAlgorithmDesc(identity.getPublicKey());
-        sb.append("\t\tAsymmetric key: ").append(algo).append("\n");
-        X509Cert[] certs = identity.certificateChain();
-        if (certs != null && certs.length > 0) {
-          for (int j = 0; j < certs.length; j++) {
-            formatString(j, verbose, sb, certs[j]);
-          }
-        }
-      } else {
-        sb.append("\t\tSymmetric key: ").append(codeToName(Category.CKK, identity.getKeyType()).substring(4))
-            .append("/").append(identity.getSignatureKeyBitLength()).append("\n");
+    if (verbose) {
+      sb.append("\nSupported mechanisms:\n");
+      List<Long> sortedMechs = new ArrayList<>(mechanisms);
+      int no = 0;
+      Collections.sort(sortedMechs);
+      for (Long mech : sortedMechs) {
+        sb.append("  ").append(++no).append(". ").append(ckmCodeToName(mech)).append("\n");
       }
     }
+    sb.append("List of objects:\n");
 
-    Set<P11ObjectIdentifier> certIdsWithIdentities = new HashSet<>();
-    for (P11Identity identity : identities.values()) {
-      P11ObjectIdentifier certId = identity.getId().getCertId();
-      if (certId != null) {
-        certIdsWithIdentities.add(certId);
-      }
-    }
+    stream.write(sb.toString().getBytes(StandardCharsets.UTF_8));
 
-    sortedKeyIds.clear();
-    for (P11ObjectIdentifier objectId : certificates.keySet()) {
-      if (!certIdsWithIdentities.contains(objectId)) {
-        sortedKeyIds.add(objectId);
-      }
-    }
-
-    Collections.sort(sortedKeyIds);
-
-    if (!sortedKeyIds.isEmpty()) {
-      size = sortedKeyIds.size();
-      for (int i = 0; i < size; i++) {
-        P11ObjectIdentifier objectId = sortedKeyIds.get(i);
-        sb.append("\tCert-").append(i + 1).append(". ").append(objectId.getLabel());
-        sb.append(" (").append("id: ").append(objectId.getIdHex())
-          .append(", label: ").append(objectId.getLabel()).append(")\n");
-        formatString(null, verbose, sb, certificates.get(objectId));
-      }
-    }
-
-    if (sb.length() > 0) {
-      stream.write(toUtf8Bytes(sb.toString()));
-    }
-  } // method showDetails
+    printObjects(stream, verbose);
+  }
 
   protected void assertWritable(String operationName) throws P11PermissionException {
     if (readOnly) {
       throw new P11PermissionException("Writable operation " + operationName + " is not permitted");
     }
-  } // method assertWritable
-
-  protected boolean existsIdentityForId(byte[] id) {
-    for (P11ObjectIdentifier objectId : identities.keySet()) {
-      if (objectId.matchesId(id)) {
-        return true;
-      }
-    }
-
-    return false;
-  } // method existsIdentityForId
-
-  protected boolean existsIdentityForLabel(String label) {
-    for (P11ObjectIdentifier objectId : identities.keySet()) {
-      if (objectId.matchesLabel(label)) {
-        return true;
-      }
-    }
-
-    return false;
-  } // method existsIdentityForLabel
-
-  protected boolean existsCertForId(byte[] id) {
-    for (P11ObjectIdentifier objectId : certificates.keySet()) {
-      if (objectId.matchesId(id)) {
-        return true;
-      }
-    }
-
-    return false;
-  } // method existsCertForId
-
-  protected boolean existsCertForLabel(String label) {
-    for (P11ObjectIdentifier objectId : certificates.keySet()) {
-      if (objectId.matchesLabel(label)) {
-        return true;
-      }
-    }
-
-    return false;
-  } // method existsCertForLabel
+  }
 
   private static String getAlgorithmDesc(PublicKey publicKey) {
     String algo = publicKey.getAlgorithm();
@@ -1549,34 +831,10 @@ public abstract class P11Slot implements Closeable {
     return algo;
   }
 
-  private static void formatString(Integer index, boolean verbose, StringBuilder sb, X509Cert cert) {
-    String subject = cert.getSubjectText();
-    sb.append("\t\tCertificate");
-    if (index != null) {
-      sb.append("[").append(index).append("]");
-    }
-    sb.append(": ");
-
-    if (!verbose) {
-      sb.append(subject).append("\n");
-      return;
-    }
-
-    sb.append("\n\t\t\tSubject: ").append(subject);
-
-    sb.append("\n\t\t\tIssuer: ").append(cert.getIssuerText());
-    sb.append("\n\t\t\tSerial: ").append(cert.getSerialNumberHex());
-    sb.append("\n\t\t\tStart time: ").append(cert.getNotBefore());
-    sb.append("\n\t\t\tEnd time: ").append(cert.getNotAfter());
-    sb.append("\n\t\t\tSHA1 Sum: ");
-    sb.append(HashAlgo.SHA1.hexHash(cert.getEncoded()));
-    sb.append("\n");
-  } // method formatString
-
-  private List<P11ObjectIdentifier> getSortedObjectIds(Set<P11ObjectIdentifier> sets) {
-    List<P11ObjectIdentifier> ids = new ArrayList<>(sets);
+  private List<P11ObjectId> getSortedObjectIds(Set<P11ObjectId> sets) {
+    List<P11ObjectId> ids = new ArrayList<>(sets);
     Collections.sort(ids);
     return ids;
-  } // method getSortedObjectIds
+  }
 
 }

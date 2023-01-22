@@ -95,14 +95,4 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
     throw new ObjectCreationException("could not find Factory to create Signer of type " + type);
   }
 
-  @Override
-  public void refreshTokenForSignerType(String signerType) throws XiSecurityException {
-    for (SignerFactory service : factories) {
-      if (service.canCreateSigner(signerType)) {
-        service.refreshToken(signerType);
-        break;
-      }
-    }
-  }
-
 }

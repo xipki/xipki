@@ -100,10 +100,6 @@ if { $printUsage equals "true" } then {
   #    ${XIPKI_DIR}/keycerts/ocsp99.p12
   #}
 
-  #if { $TOKEN_TYPE equals "pkcs11" } then {
-  #  ocsp:refresh-token --type pkcs11
-  #}
-
   ## Restart OCSP server
   #ocsp:restart-server
 

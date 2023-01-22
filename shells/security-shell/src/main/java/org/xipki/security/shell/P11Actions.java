@@ -30,19 +30,15 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.*;
 import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
-import org.xipki.security.pkcs11.P11Slot.P11NewObjectControl;
 import org.xipki.security.shell.Actions.CsrGenAction;
 import org.xipki.security.shell.Actions.SecurityAction;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.X509Util;
-import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.*;
 
 import javax.crypto.SecretKey;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -61,126 +57,6 @@ import static org.xipki.pkcs11.PKCS11Constants.*;
  */
 
 public class P11Actions {
-
-  @Command(scope = "xi", name = "add-cert-p11", description = "add certificate to PKCS#11 device")
-  @Service
-  public static class AddCertP11 extends P11SecurityAction {
-
-    @Option(name = "--id", description = "id (hex) of the PKCS#11 objects")
-    private String id;
-
-    @Option(name = "--label", description = "label of the PKCS#11 objects.")
-    protected String label;
-
-    @Option(name = "--cert", required = true, description = "certificate file")
-    @Completion(FileCompleter.class)
-    private String certFile;
-
-    @Override
-    protected Object execute0() throws Exception {
-      byte[] id0 = (id == null) ? null : Hex.decode(id);
-      X509Cert cert = X509Util.parseCert(new File(certFile));
-      if (label == null) {
-        label = X509Util.getCommonName(cert.getSubject());
-      }
-      P11NewObjectControl control = new P11NewObjectControl(id0, label);
-      P11Slot slot = getSlot();
-      P11ObjectIdentifier objectId = slot.addCert(cert, control);
-      println("added certificate under " + objectId);
-      return null;
-    }
-
-  } // class AddCertP11
-
-  @Command(scope = "xi", name = "delete-cert-p11", description = "remove certificate from PKCS#11 device")
-  @Service
-  public static class DeleteCertP11 extends P11SecurityAction {
-
-    @Option(name = "--id", required = true, description = "id (hex) of the certificate in the PKCS#11 device")
-    private String id;
-
-    @Option(name = "--force", aliases = "-f", description = "without prompt")
-    private Boolean force = Boolean.FALSE;
-
-    @Override
-    protected Object execute0() throws Exception {
-      if (force || confirm("Do you want to remove PKCS#11 certificate object with id 0x" + id, 3)) {
-        P11Slot slot = getSlot();
-        P11ObjectIdentifier objectId = slot.getObjectIdForId(Hex.decode(id));
-        if (objectId == null) {
-          println("unknown certificates");
-        } else {
-          slot.removeCerts(objectId);
-          println("deleted certificates");
-        }
-      }
-
-      return null;
-    }
-
-  } // class DeleteCertP11
-
-  @Command(scope = "xi", name = "export-cert-p11", description = "export certificate from PKCS#11 device")
-  @Service
-  public static class ExportCertP11 extends P11SecurityAction {
-
-    @Option(name = "--id", description = "id (hex) of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    protected String id;
-
-    @Option(name = "--label", description = "label of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    protected String label;
-
-    @Option(name = "--outform", description = "output format of the certificate")
-    @Completion(Completers.DerPemCompleter.class)
-    protected String outform = "der";
-
-    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the certificate")
-    @Completion(FileCompleter.class)
-    private String outFile;
-
-    @Override
-    protected Object execute0() throws Exception {
-      P11Slot slot = getSlot();
-      P11ObjectIdentifier objIdentifier = getObjectIdentifier(id, label);
-      X509Cert cert = slot.exportCert(objIdentifier);
-      if (cert == null) {
-        throw new CmdFailure("could not export certificate " + objIdentifier);
-      }
-      saveVerbose("saved certificate to file", outFile, encodeCert(cert.getEncoded(), outform));
-      return null;
-    }
-
-  } // class ExportCertP11
-
-  @Command(scope = "xi", name = "update-cert-p11", description = "update certificate in PKCS#11 device")
-  @Service
-  public static class UpdateCertP11 extends P11SecurityAction {
-
-    @Option(name = "--id", description = "id (hex) of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    protected String id;
-
-    @Option(name = "--label", description = "label of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    protected String label;
-
-    @Option(name = "--cert", required = true, description = "certificate file")
-    @Completion(FileCompleter.class)
-    private String certFile;
-
-    @Override
-    protected Object execute0() throws Exception {
-      P11Slot slot = getSlot();
-      P11ObjectIdentifier objIdentifier = getObjectIdentifier(id, label);
-      X509Cert newCert = X509Util.parseCert(new File(certFile));
-      slot.updateCertificate(objIdentifier, newCert);
-      println("updated certificate");
-      return null;
-    }
-
-  } // class UpdateCertP11
 
   @Command(scope = "xi", name = "csr-p11", description = "generate CSR request with PKCS#11 device")
   @Service
@@ -268,8 +144,7 @@ public class P11Actions {
       }
 
       P11Slot slot = getSlot();
-      P11IdentityId identityId = slot.generateDSAKeypair(plen, qlen, getControl());
-      finalize("DSA", identityId);
+      finalize("DSA", slot.generateDSAKeypair(plen, qlen, getControl()));
       return null;
     }
 
@@ -288,8 +163,6 @@ public class P11Actions {
       P11Slot slot = getSlot();
       P11NewKeyControl control = getControl();
 
-      P11IdentityId identityId;
-
       ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(curveName);
       if (curveOid == null) {
         curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
@@ -299,14 +172,13 @@ public class P11Actions {
         throw new Exception("unknown curve " + curveName);
       }
 
-      identityId = slot.generateECKeypair(curveOid, control);
-      finalize("EC", identityId);
+      finalize("EC", slot.generateECKeypair(curveOid, control));
       return null;
     }
 
   } // class EcP11
 
-  @Command(scope = "xi", name = "delete-key-p11", description = "delete key and cert in PKCS#11 device")
+  @Command(scope = "xi", name = "delete-key-p11", description = "delete key in PKCS#11 device")
   @Service
   public static class DeleteKeyP11 extends P11SecurityAction {
 
@@ -324,14 +196,14 @@ public class P11Actions {
     @Override
     protected Object execute0() throws Exception {
       P11Slot slot = getSlot();
-      P11ObjectIdentifier keyId = getObjectIdentifier(id, label);
+      P11IdentityId keyId = getIdentityId(id, label);
       if (keyId == null) {
         println("unknown identity");
         return null;
       }
 
       if (force || confirm("Do you want to remove the identity " + keyId, 3)) {
-        slot.removeIdentityByKeyId(keyId);
+        slot.removeIdentity(keyId);
         println("deleted identity " + keyId);
       }
       return null;
@@ -339,7 +211,7 @@ public class P11Actions {
 
   } // class DeleteKeyP11
 
-  @Command(scope = "xi", name = "key-exists-p11", description = "return whether key and certs exist in PKCS#11 device")
+  @Command(scope = "xi", name = "key-exists-p11", description = "return whether keys exist in PKCS#11 device")
   @Service
   public static class KeyExistsP11 extends P11SecurityAction {
 
@@ -353,7 +225,7 @@ public class P11Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      return null != getObjectIdentifier(id, label);
+      return null != getIdentityId(id, label);
     }
 
   } // class KeyExistsP11
@@ -377,9 +249,9 @@ public class P11Actions {
     @Completion(SecurityCompleters.P11KeyUsageCompleter.class)
     private List<String> keyusages;
 
-    protected void finalize(String keyType, P11IdentityId identityId) {
-      Args.notNull(identityId, "identityId");
-      println("generated " + keyType + " key \"" + identityId + "\"");
+    protected void finalize(String keyType, P11IdentityId keyId) {
+      Args.notNull(keyId, "keyId");
+      println("generated " + keyType + " key " + keyId + " on slot " + slotIndex);
     }
 
     protected P11NewKeyControl getControl() throws IllegalCmdParamException {
@@ -440,30 +312,6 @@ public class P11Actions {
 
   } // class DeleteObjectsP11
 
-  @Command(scope = "xi", name = "refresh-p11", description = "refresh PKCS#11 module")
-  @Service
-  public static class RefreshP11 extends SecurityAction {
-
-    @Option(name = "--module",  description = "name of the PKCS#11 module.")
-    @Completion(SecurityCompleters.P11ModuleNameCompleter.class)
-    private String moduleName = P11SecurityAction.DEFAULT_P11MODULE_NAME;
-
-    @Reference
-    P11CryptServiceFactory p11CryptServiceFactory;
-
-    @Override
-    protected Object execute0() throws Exception {
-      P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
-      if (p11Service == null) {
-        throw new IllegalCmdParamException("undefined module " + moduleName);
-      }
-      p11Service.refresh();
-      println("refreshed module " + moduleName);
-      return null;
-    }
-
-  } // class RefreshP11
-
   @Command(scope = "xi", name = "rsa-p11", description = "generate RSA keypair in PKCS#11 device")
   @Service
   public static class RsaP11 extends P11KeyGenAction {
@@ -481,8 +329,7 @@ public class P11Actions {
       }
 
       P11Slot slot = getSlot();
-      P11IdentityId identityId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent), getControl());
-      finalize("RSA", identityId);
+      finalize("RSA", slot.generateRSAKeypair(keysize, toBigInt(publicExponent), getControl()));
       return null;
     }
 
@@ -499,7 +346,7 @@ public class P11Actions {
     @Completion(SecurityCompleters.SecretKeyTypeCompleter.class)
     private String keyType;
 
-    @Option(name = "--key-size", required = true, description = "keysize in bit")
+    @Option(name = "--key-size", description = "keysize in bit")
     private Integer keysize;
 
     @Option(name = "--extern-if-gen-unsupported",
@@ -527,10 +374,8 @@ public class P11Actions {
       P11Slot slot = getSlot();
       P11NewKeyControl control = getControl();
 
-      P11IdentityId identityId;
       try {
-        identityId = slot.generateSecretKey(p11KeyType, keysize, control);
-        finalize(keyType, identityId);
+        finalize(keyType, slot.generateSecretKey(p11KeyType, keysize, control));
       } catch (P11UnsupportedMechanismException ex) {
         if (!createExternIfGenUnsupported) {
           throw ex;
@@ -560,7 +405,7 @@ public class P11Actions {
         byte[] keyValue = new byte[keysize / 8];
         securityFactory.getRandom4Key().nextBytes(keyValue);
 
-        P11ObjectIdentifier objId = slot.importSecretKey(p11KeyType, keyValue, control);
+        P11IdentityId objId = slot.importSecretKey(p11KeyType, keyValue, control);
         Arrays.fill(keyValue, (byte) 0); // clear the memory
         String msg = "generated in memory and imported " + keyType + " key " + objId;
         if (LOG.isInfoEnabled()) {
@@ -633,7 +478,7 @@ public class P11Actions {
       }
 
       P11Slot slot = getSlot();
-      P11ObjectIdentifier objId = slot.importSecretKey(p11KeyType, keyValue, getControl());
+      P11IdentityId objId = slot.importSecretKey(p11KeyType, keyValue, getControl());
       println("imported " + keyType + " key " + objId);
       return null;
     } // method execute0
@@ -677,18 +522,11 @@ public class P11Actions {
       return p11Service.getModule();
     }
 
-    public P11ObjectIdentifier getObjectIdentifier(String hexId, String label)
+    public P11IdentityId getIdentityId(String hexId, String label)
         throws IllegalCmdParamException, XiSecurityException, P11TokenException {
       P11Slot slot = getSlot();
-      P11ObjectIdentifier objIdentifier;
-      if (hexId != null && label == null) {
-        objIdentifier = slot.getObjectIdForId(Hex.decode(hexId));
-      } else if (hexId == null && label != null) {
-        objIdentifier = slot.getObjectIdForLabel(label);
-      } else {
-        throw new IllegalCmdParamException("exactly one of keyId or keyLabel should be specified");
-      }
-      return objIdentifier;
+      byte[] id = hexId == null ? null : Hex.decode(hexId);
+      return slot.getIdentityId(id, label);
     }
 
   } // class P11SecurityAction
@@ -700,8 +538,7 @@ public class P11Actions {
     @Override
     protected Object execute0() throws Exception {
       P11Slot slot = getSlot();
-      P11IdentityId identityId = slot.generateSM2Keypair(getControl());
-      finalize("SM2", identityId);
+      finalize("SM2", slot.generateSM2Keypair(getControl()));
       return null;
     }
 
@@ -743,7 +580,7 @@ public class P11Actions {
 
       P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
       P11Slot slot = module.getSlot(slotId);
-      println("Details of slot");
+      println("Details of slot " + slotId + ":");
       slot.showDetails(System.out, verbose);
       System.out.flush();
       System.out.println();

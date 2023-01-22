@@ -56,6 +56,4 @@ public interface SignerFactoryRegister {
       SecurityFactory securityFactory, String type, SignerConf conf, X509Cert[] certificateChain)
       throws ObjectCreationException;
 
-  void refreshTokenForSignerType(String signerType) throws XiSecurityException;
-
 }

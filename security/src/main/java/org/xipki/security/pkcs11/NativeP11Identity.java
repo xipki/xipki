@@ -36,24 +36,19 @@ import java.security.interfaces.RSAPublicKey;
 
 class NativeP11Identity extends P11Identity {
 
-  private final long signingKeyHandle;
-
   private final int expectedSignatureLen;
 
   private final boolean secretKey;
 
-  NativeP11Identity(NativeP11Slot slot, P11IdentityId identityId, long signingKeyHandle, long keyType, int keyBitLen) {
+  NativeP11Identity(NativeP11Slot slot, P11IdentityId identityId, long keyType, int keyBitLen) {
     super(slot, identityId, keyType, keyBitLen);
     this.secretKey = true;
-    this.signingKeyHandle = signingKeyHandle;
     this.expectedSignatureLen = 0;
   }
 
-  NativeP11Identity(NativeP11Slot slot, P11IdentityId identityId, long privateKeyHandle, long keyType,
-                    PublicKey publicKey, X509Cert[] certificateChain) {
-    super(slot, identityId, keyType, publicKey, certificateChain);
+  NativeP11Identity(NativeP11Slot slot, P11IdentityId identityId, long keyType, PublicKey publicKey) {
+    super(slot, identityId, keyType, publicKey);
     this.secretKey = false;
-    this.signingKeyHandle = privateKeyHandle;
 
     int keyBitLen = getSignatureKeyBitLength();
     if (publicKey instanceof RSAPublicKey) {
@@ -96,7 +91,7 @@ class NativeP11Identity extends P11Identity {
   }
 
   long getSigningKeyHandle() {
-    return signingKeyHandle;
+    return id.getKeyId().getHandle();
   }
 
   boolean isSecretKey() {

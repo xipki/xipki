@@ -47,8 +47,6 @@ public class EmulatorP11Module extends P11Module {
 
   private final String description;
 
-  private final boolean supportCert;
-
   private EmulatorP11Module(P11ModuleConf moduleConf) throws P11TokenException {
     super(moduleConf);
 
@@ -84,24 +82,6 @@ public class EmulatorP11Module extends P11Module {
     this.description = StringUtil.concat("PKCS#11 emulator", "\nPath: ",
         baseDir.getAbsolutePath() + parametersStr);
     LOG.info("PKCS#11 module\n{}", this.description);
-
-    boolean support = true;
-    if (parametersStr != null) {
-      Map<String, String> parameters = new HashMap<>();
-      StringTokenizer st = new StringTokenizer(parametersStr, "?");
-      int idx;
-      while (st.hasMoreTokens()) {
-        String token = st.nextToken();
-          String[] nv = token.split("=");
-          if (nv.length == 2 && "supportcert".equalsIgnoreCase(nv[0])) {
-            support = parseBoolean(nv[1], "parameter " + nv[0]);
-            break;
-          }
-      }
-    }
-    this.supportCert = support;
-
-    LOG.info("support certificates: {}", this.supportCert);
 
     File[] children = baseDir.listFiles();
 
@@ -183,7 +163,7 @@ public class EmulatorP11Module extends P11Module {
       char[] firstPwd = pwd.get(0);
 
       slots.add(new EmulatorP11Slot(moduleConf.getName(), slotDir, slotId,
-          moduleConf.isReadOnly(), supportCert, new KeyCryptor(firstPwd), moduleConf.getP11MechanismFilter(),
+          moduleConf.isReadOnly(), new KeyCryptor(firstPwd), moduleConf.getP11MechanismFilter(),
           moduleConf.getP11NewObjectConf(), moduleConf.getNumSessions(),
           moduleConf.getSecretKeyTypes(), moduleConf.getKeyPairTypes()));
     }

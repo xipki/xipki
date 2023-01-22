@@ -994,10 +994,6 @@ public class OcspServerImpl implements OcspServer {
     return responder.getSigner().isHealthy();
   } // method healthCheck
 
-  public void refreshTokenForSignerType(String signerType) throws XiSecurityException {
-    securityFactory.refreshTokenForSignerType(signerType);
-  }
-
   private Object checkSignature(byte[] request, RequestOption requestOption)
       throws OCSPException {
     OCSPRequest req;

@@ -35,10 +35,6 @@ xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
 xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
   qa/cab/rootca.json
 
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  ca:refresh-token --type pkcs11
-}
-
 ca:load-conf --conf-file qa/cab/rootca.json \
   --out-dir output
 
@@ -68,10 +64,6 @@ ca:enroll-cert --ca rootca1 --csr output/subca1.csr \
 if { $TOKEN_TYPE equals "pkcs12" } then {
   xi:update-cert-p12 --p12 output/subca1.p12 --password 1234 \
     --cert output/subca1.crt --ca-cert output/rootca1.crt
-}
-
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  ca:refresh-token --type pkcs11
 }
 
 echo "#################################################################"

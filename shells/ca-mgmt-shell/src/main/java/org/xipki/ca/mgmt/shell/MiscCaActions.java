@@ -183,23 +183,6 @@ public class MiscCaActions {
 
   } // class NotifyChange
 
-  @Command(scope = "ca", name = "refresh-token", description = "refresh token for signers")
-  @Service
-  public static class RefreshToken extends CaAction {
-
-    @Option(name = "--type", required = true, description = "type of the signer")
-    @Completion(CaCompleters.SignerTypeCompleter.class)
-    protected String type;
-
-    @Override
-    protected Object execute0() throws Exception {
-      caManager.refreshTokenForSignerType(type);
-      println("refreshed token for signer type " + type);
-      return null;
-    } // method execute0
-
-  } // class RefreshToken
-
   @Command(scope = "ca", name = "republish", description = "republish certificates")
   @Service
   public static class Republish extends CaAction {

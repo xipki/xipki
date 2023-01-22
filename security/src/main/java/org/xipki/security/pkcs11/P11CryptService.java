@@ -19,10 +19,6 @@ package org.xipki.security.pkcs11;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.X509Cert;
-import org.xipki.util.LogUtil;
-
-import java.util.List;
 
 import static org.xipki.util.Args.notNull;
 
@@ -43,28 +39,6 @@ public class P11CryptService {
     this.module = notNull(module, "module");
   }
 
-  public synchronized void refresh() throws P11TokenException {
-    LOG.info("refreshing PKCS#11 module {}", module.getName());
-
-    List<P11SlotIdentifier> slotIds = module.getSlotIds();
-    for (P11SlotIdentifier slotId : slotIds) {
-      P11Slot slot;
-      try {
-        slot = module.getSlot(slotId);
-      } catch (P11TokenException ex) {
-        LogUtil.warn(LOG, ex, "P11TokenException while initializing slot " + slotId);
-        continue;
-      } catch (Throwable th) {
-        LOG.error("unexpected error while initializing slot " + slotId, th);
-        continue;
-      }
-
-      slot.refresh();
-    }
-
-    LOG.info("refreshed PKCS#11 module {}", module.getName());
-  } // method refresh
-
   public P11Module getModule() {
     return module;
   }
@@ -74,15 +48,7 @@ public class P11CryptService {
   }
 
   public P11Identity getIdentity(P11IdentityId identityId) throws P11TokenException {
-    return getIdentity(identityId.getSlotId(), identityId.getKeyId());
-  }
-
-  public P11Identity getIdentity(P11SlotIdentifier slotId, P11ObjectIdentifier keyId) throws P11TokenException {
-    return module.getSlot(slotId).getIdentity(keyId);
-  }
-
-  public X509Cert getCert(P11SlotIdentifier slotId, P11ObjectIdentifier certId) throws P11TokenException {
-    return module.getSlot(slotId).getCert(certId);
+    return module.getSlot(identityId.getSlotId()).getIdentity(identityId);
   }
 
   @Override

@@ -27,7 +27,6 @@ public abstract class MgmtMessage {
 
   public enum MgmtAction {
 
-    refreshTokenForSignerType,
     restartServer;
 
     public static MgmtAction ofName(String str) {

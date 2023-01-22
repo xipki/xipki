@@ -55,8 +55,6 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
   private final int signatureKeyBitLength;
 
-  protected X509Cert[] certificateChain;
-
   protected P11Identity(P11Slot slot, P11IdentityId id, long keyType, int signatureKeyBitLength) {
     this.slot = notNull(slot, "slot");
     this.id = notNull(id, "id");
@@ -65,21 +63,11 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     this.signatureKeyBitLength = signatureKeyBitLength;
   } // constructor
 
-  protected P11Identity(P11Slot slot, P11IdentityId id, long keyType,
-                        PublicKey publicKey, X509Cert[] certificateChain) {
+  protected P11Identity(P11Slot slot, P11IdentityId id, long keyType, PublicKey publicKey) {
     this.slot = notNull(slot, "slot");
     this.id = notNull(id, "id");
     this.keyType = keyType;
-
-    if (certificateChain != null && certificateChain.length > 0 && certificateChain[0] != null) {
-      this.publicKey = certificateChain[0].getPublicKey();
-      this.certificateChain = certificateChain;
-    } else if (publicKey != null) {
-      this.publicKey = publicKey;
-      this.certificateChain = null;
-    } else {
-      throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
-    }
+    this.publicKey = notNull(publicKey, "publicKey");
 
     if (this.publicKey instanceof RSAPublicKey) {
       signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();
@@ -149,28 +137,8 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     return keyType;
   }
 
-  public X509Cert getCertificate() {
-    return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0] : null;
-  }
-
-  public X509Cert[] certificateChain() {
-    return (certificateChain == null) ? null : Arrays.copyOf(certificateChain, certificateChain.length);
-  }
-
   public PublicKey getPublicKey() {
     return publicKey;
-  }
-
-  public void setCertificates(X509Cert[] certificateChain) throws P11TokenException {
-    if (CollectionUtil.isEmpty(certificateChain)) {
-      this.certificateChain = null;
-    } else {
-      PublicKey pk = certificateChain[0].getPublicKey();
-      if (!this.publicKey.equals(pk)) {
-        throw new P11TokenException("certificateChain is not for the key");
-      }
-      this.certificateChain = certificateChain;
-    }
   }
 
   public boolean match(P11IdentityId id) {
