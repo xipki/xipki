@@ -129,6 +129,25 @@
               <includes>server/tls-server-cert.der,server/tls-server.p12,client/*,client2/*,client3/*</includes>
             </configuration>
           </execution>
+          <execution>
+            <!-- Patch Karaf -->
+            <id>patch-karaf</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <stripVersion>false</stripVersion>
+              <outputDirectory>${project.build.directory}/jdk11on/system/org/osgi/org.osgi.service.metatype/1.4.1</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.osgi</groupId>
+                  <artifactId>org.osgi.service.metatype</artifactId>
+                  <version>1.4.1</version>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -169,6 +188,16 @@
             <phase>prepare-package</phase>
             <configuration>
               <target>
+                <!-- Fix bug introduced from karaf 4.3.8 and 4.4.2: remove this block if no exception
+                  presented in the log file-->
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchAppend">
+                  <arg value="--backup"/>
+                  <arg value="no"/>
+                  <arg value="--file"/>
+                  <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/startup.properties"/>
+                  <arg value="--value"/>
+                  <arg value="mvn\:org.osgi/org.osgi.service.metatype/1.4.1 = 9"/>
+                </java>
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
                   <arg value="--backup"/>
                   <arg value="no"/>
