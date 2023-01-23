@@ -17,17 +17,12 @@
 
 package org.xipki.security.shell;
 
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.security.EdECConstants;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.pkcs11.P11CryptServiceFactory;
-import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.EnumCompleter;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.TripleState;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Completers for QA shells.
@@ -108,7 +103,7 @@ public class QaCompleters {
       List<String> enums = new LinkedList<>();
       for (String hashAlg : hashAlgs) {
         enums.add(hashAlg + "withRSA");
-        enums.add(hashAlg + "RSAandMGF1");
+        enums.add(hashAlg + "withRSAandMGF1");
       }
       setTokens(enums);
     }

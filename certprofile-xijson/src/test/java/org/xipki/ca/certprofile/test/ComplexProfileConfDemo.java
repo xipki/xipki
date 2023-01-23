@@ -29,10 +29,6 @@ import org.xipki.ca.certprofile.xijson.conf.AdmissionSyntax.AdmissionsType;
 import org.xipki.ca.certprofile.xijson.conf.AdmissionSyntax.NamingAuthorityType;
 import org.xipki.ca.certprofile.xijson.conf.AdmissionSyntax.ProfessionInfoType;
 import org.xipki.ca.certprofile.xijson.conf.AdmissionSyntax.RegistrationNumber;
-import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.CertificatePolicyInformationType;
-import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.PolicyQualfierType;
-import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.PolicyQualifier;
-import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.ca.certprofile.xijson.conf.Subject.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.Subject.ValueType;
 import org.xipki.security.KeyUsage;
@@ -40,7 +36,6 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.TlsExtensionType;
-import org.xipki.util.TripleState;
 
 import java.util.*;
 

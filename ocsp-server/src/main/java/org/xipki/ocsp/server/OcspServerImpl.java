@@ -60,7 +60,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.xipki.ocsp.server.OcspServerUtil.*;
 import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
 
 /**
  * Implementation of {@link OcspServer}.

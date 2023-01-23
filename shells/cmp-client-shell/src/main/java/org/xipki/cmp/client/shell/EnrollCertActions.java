@@ -17,7 +17,6 @@
 
 package org.xipki.cmp.client.shell;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;

@@ -38,7 +38,6 @@ import org.xipki.qa.ca.IssuerInfo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.X509Cert;
-import org.xipki.util.exception.BadCertTemplateException;
 
 import java.io.IOException;
 import java.util.*;

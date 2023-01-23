@@ -38,7 +38,6 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.TlsExtensionType;
 import org.xipki.util.Args;
-import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.TripleState;
 

@@ -26,7 +26,6 @@ import org.xipki.ocsp.api.mgmt.OcspMgmtException;
 import org.xipki.ocsp.server.OcspServerImpl;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.exception.InvalidConfException;
 

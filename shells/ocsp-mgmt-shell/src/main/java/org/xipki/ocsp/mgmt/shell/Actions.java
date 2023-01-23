@@ -18,14 +18,11 @@
 package org.xipki.ocsp.mgmt.shell;
 
 import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Completion;
-import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ocsp.api.mgmt.OcspManager;
 import org.xipki.ocsp.api.mgmt.OcspMgmtException;
 import org.xipki.shell.CmdFailure;
-import org.xipki.shell.Completers;
 import org.xipki.shell.XiAction;
 
 /**
