@@ -24,8 +24,6 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.DSAParameter;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x9.ECNamedCurveTable;
-import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
@@ -49,7 +47,10 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -100,7 +101,7 @@ class NativeP11Slot extends P11Slot {
 
   private boolean omitDateAttrsInCertObject;
 
-  NativeP11Slot(String moduleName, P11SlotIdentifier slotId, Slot slot, boolean readOnly, long userType,
+  NativeP11Slot(String moduleName, P11SlotId slotId, Slot slot, boolean readOnly, long userType,
                 List<char[]> password, int maxMessageSize, P11MechanismFilter mechanismFilter,
                 P11NewObjectConf newObjectConf, Integer numSessions, List<Long> secretKeyTypes, List<Long> keyPairTypes)
       throws P11TokenException {

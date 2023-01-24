@@ -34,9 +34,9 @@ public abstract class P11Module {
 
   protected final P11ModuleConf conf;
 
-  private final Map<P11SlotIdentifier, P11Slot> slots = new HashMap<>();
+  private final Map<P11SlotId, P11Slot> slots = new HashMap<>();
 
-  private final List<P11SlotIdentifier> slotIds = new ArrayList<>();
+  private final List<P11SlotId> slotIds = new ArrayList<>();
 
   public P11Module(P11ModuleConf conf) {
     this.conf = notNull(conf, "conf");
@@ -78,7 +78,7 @@ public abstract class P11Module {
    * @throws P11TokenException
    *         if PKCS#11 token error occurs
    */
-  public P11Slot getSlot(P11SlotIdentifier slotId) throws P11UnknownEntityException {
+  public P11Slot getSlot(P11SlotId slotId) throws P11UnknownEntityException {
     notNull(slotId, "slotId");
     P11Slot slot = slots.get(slotId);
     if (slot == null) {
@@ -88,8 +88,8 @@ public abstract class P11Module {
   } // method getSlot
 
   void destroySlot(long slotId) {
-    P11SlotIdentifier p11SlotId = null;
-    for (P11SlotIdentifier si : slots.keySet()) {
+    P11SlotId p11SlotId = null;
+    for (P11SlotId si : slots.keySet()) {
       if (CompareUtil.equalsObject(si.getId(), slotId)) {
         p11SlotId = si;
         break;
@@ -100,12 +100,12 @@ public abstract class P11Module {
     }
   }
 
-  public List<P11SlotIdentifier> getSlotIds() {
+  public List<P11SlotId> getSlotIds() {
     return slotIds;
   }
 
-  public P11SlotIdentifier getSlotIdForIndex(int index) throws P11UnknownEntityException {
-    for (P11SlotIdentifier id : slotIds) {
+  public P11SlotId getSlotIdForIndex(int index) throws P11UnknownEntityException {
+    for (P11SlotId id : slotIds) {
       if (id.getIndex() == index) {
         return id;
       }
@@ -113,8 +113,8 @@ public abstract class P11Module {
     throw new P11UnknownEntityException("could not find slot with index " + index);
   }
 
-  public P11SlotIdentifier getSlotIdForId(long id) throws P11UnknownEntityException {
-    for (P11SlotIdentifier slotId : slotIds) {
+  public P11SlotId getSlotIdForId(long id) throws P11UnknownEntityException {
+    for (P11SlotId slotId : slotIds) {
       if (slotId.getId() == id) {
         return slotId;
       }

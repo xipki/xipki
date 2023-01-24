@@ -28,13 +28,13 @@ import static org.xipki.util.Args.notNull;
  * @since 2.0.0
  */
 
-public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
+public class P11SlotId implements Comparable<P11SlotId> {
 
   private final int index;
 
   private final long id;
 
-  public P11SlotIdentifier(int index, long id) {
+  public P11SlotId(int index, long id) {
     this.index = notNegative(index, "index");
     this.id = notNegative(id, "id");
   }
@@ -51,11 +51,11 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
-    } else if (!(obj instanceof P11SlotIdentifier)) {
+    } else if (!(obj instanceof P11SlotId)) {
       return false;
     }
 
-    P11SlotIdentifier another = (P11SlotIdentifier) obj;
+    P11SlotId another = (P11SlotId) obj;
     return this.id == another.id && this.index == another.index;
   }
 
@@ -72,7 +72,7 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
   }
 
   @Override
-  public int compareTo(P11SlotIdentifier obj) {
+  public int compareTo(P11SlotId obj) {
     notNull(obj, "obj");
     return (this == obj)  ? 0 : Integer.signum(index - obj.index);
   }

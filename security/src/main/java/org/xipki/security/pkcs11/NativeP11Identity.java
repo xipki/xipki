@@ -17,13 +17,6 @@
 
 package org.xipki.security.pkcs11;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
-import org.bouncycastle.math.ec.ECCurve;
-import org.xipki.security.EdECConstants;
-
-import java.math.BigInteger;
-
 /**
  * {@link P11Identity} based on the ipkcs11wrapper or jpkcs11wrapper.
  *

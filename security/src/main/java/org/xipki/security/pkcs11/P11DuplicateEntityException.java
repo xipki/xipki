@@ -30,7 +30,7 @@ public class P11DuplicateEntityException extends P11TokenException {
     super("duplicate identity '" + identityId + "'");
   }
 
-  public P11DuplicateEntityException(P11SlotIdentifier slotId, P11ObjectId objectId) {
+  public P11DuplicateEntityException(P11SlotId slotId, P11ObjectId objectId) {
     super("duplicate entity 'slot " + slotId + ", object " + objectId + "'");
   }
 

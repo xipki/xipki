@@ -103,7 +103,7 @@ public class NativeP11Module extends P11Module {
         continue;
       }
 
-      P11SlotIdentifier slotId = new P11SlotIdentifier(i, slot.getSlotID());
+      P11SlotId slotId = new P11SlotId(i, slot.getSlotID());
       if (!moduleConf.isSlotIncluded(slotId)) {
         LOG.info("skipped slot {}", slotId);
         continue;
@@ -186,7 +186,7 @@ public class NativeP11Module extends P11Module {
 
   @Override
   public void close() {
-    for (P11SlotIdentifier slotId : getSlotIds()) {
+    for (P11SlotId slotId : getSlotIds()) {
       try {
         getSlot(slotId).close();
       } catch (Throwable th) {

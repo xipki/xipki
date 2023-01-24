@@ -94,7 +94,7 @@ class EmulatorP11Module extends P11Module {
     Set<Integer> allSlotIndexes = new HashSet<>();
     Set<Long> allSlotIdentifiers = new HashSet<>();
 
-    List<P11SlotIdentifier> slotIds = new LinkedList<>();
+    List<P11SlotId> slotIds = new LinkedList<>();
 
     for (File child : children) {
       if ((child.isDirectory() && child.canRead() && !child.exists())) {
@@ -132,7 +132,7 @@ class EmulatorP11Module extends P11Module {
       allSlotIndexes.add(slotIndex);
       allSlotIdentifiers.add(slotId);
 
-      P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, slotId);
+      P11SlotId slotIdentifier = new P11SlotId(slotIndex, slotId);
       if (!moduleConf.isSlotIncluded(slotIdentifier)) {
         LOG.info("skipped slot {}", slotId);
         continue;
@@ -142,7 +142,7 @@ class EmulatorP11Module extends P11Module {
     } // end for
 
     Set<P11Slot> slots = new HashSet<>();
-    for (P11SlotIdentifier slotId : slotIds) {
+    for (P11SlotId slotId : slotIds) {
       List<char[]> pwd;
       try {
         pwd = moduleConf.getPasswordRetriever().getPassword(slotId);

@@ -43,7 +43,7 @@ public class P11CryptService {
     return module;
   }
 
-  public P11Slot getSlot(P11SlotIdentifier slotId) throws P11UnknownEntityException {
+  public P11Slot getSlot(P11SlotId slotId) throws P11UnknownEntityException {
     return module.getSlot(slotId);
   }
 

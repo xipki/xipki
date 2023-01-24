@@ -53,7 +53,7 @@ public class P11ModuleConf {
       this.id = id;
     }
 
-    boolean match(P11SlotIdentifier slotId) {
+    boolean match(P11SlotId slotId) {
       if (index != null) {
         if (index != slotId.getIndex()) {
           return false;
@@ -80,7 +80,7 @@ public class P11ModuleConf {
       this.mechanisms = CollectionUtil.isEmpty(mechanisms) ? null : mechanisms;
     }
 
-    public boolean match(P11SlotIdentifier slot) {
+    public boolean match(P11SlotId slot) {
       if (slots == null) {
         return true;
       }
@@ -120,7 +120,7 @@ public class P11ModuleConf {
       singleFilters.add(new P11SingleMechanismFilter(slots, null));
     }
 
-    public boolean isMechanismPermitted(P11SlotIdentifier slotId, long mechanism) {
+    public boolean isMechanismPermitted(P11SlotId slotId, long mechanism) {
       notNull(slotId, "slotId");
       if (CollectionUtil.isEmpty(singleFilters)) {
         return true;
@@ -150,7 +150,7 @@ public class P11ModuleConf {
         this.passwords = CollectionUtil.isEmpty(passwords) ? null : passwords;
       }
 
-      public boolean match(P11SlotIdentifier slot) {
+      public boolean match(P11SlotId slot) {
         if (slots == null) {
           return true;
         }
@@ -194,7 +194,7 @@ public class P11ModuleConf {
       singleRetrievers.add(new P11SinglePasswordRetriever(slots, passwords));
     }
 
-    public List<char[]> getPassword(P11SlotIdentifier slotId)
+    public List<char[]> getPassword(P11SlotId slotId)
         throws PasswordResolverException {
       notNull(slotId, "slotId");
       if (CollectionUtil.isEmpty(singleRetrievers)) {
@@ -494,7 +494,7 @@ public class P11ModuleConf {
     return keyPairTypes;
   }
 
-  public boolean isSlotIncluded(P11SlotIdentifier slotId) {
+  public boolean isSlotIncluded(P11SlotId slotId) {
     notNull(slotId, "slotId");
     boolean included;
     if (CollectionUtil.isEmpty(includeSlots)) {

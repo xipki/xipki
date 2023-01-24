@@ -71,7 +71,7 @@ public class P11KeypairGenerator extends KeypairGenerator {
     try {
       P11CryptService p11Service = this.cryptServiceFactory.getP11CryptService(moduleName);
       P11Module module = p11Service.getModule();
-      P11SlotIdentifier p11SlotId = (slotId != null) ? module.getSlotIdForId(slotId)
+      P11SlotId p11SlotId = (slotId != null) ? module.getSlotIdForId(slotId)
           : module.getSlotIdForIndex(slotIndex);
       this.slot = module.getSlot(p11SlotId);
 

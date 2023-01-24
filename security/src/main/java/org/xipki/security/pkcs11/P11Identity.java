@@ -20,7 +20,6 @@ package org.xipki.security.pkcs11;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
-import org.bouncycastle.math.ec.ECCurve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.EdECConstants;
@@ -173,7 +172,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     return this.id.equals(id);
   }
 
-  public boolean match(P11SlotIdentifier slotId, String keyLabel) {
+  public boolean match(P11SlotId slotId, String keyLabel) {
     return id.match(slotId, keyLabel);
   }
 

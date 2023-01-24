@@ -30,11 +30,11 @@ public class P11UnknownEntityException extends P11TokenException {
     super("unknown identity '" + identityId + "'");
   }
 
-  public P11UnknownEntityException(P11SlotIdentifier slotId) {
+  public P11UnknownEntityException(P11SlotId slotId) {
     super("unknown slot '" + slotId + "'");
   }
 
-  public P11UnknownEntityException(P11SlotIdentifier slotId, P11ObjectId objectId) {
+  public P11UnknownEntityException(P11SlotId slotId, P11ObjectId objectId) {
     super("unknown entity 'slot " + slotId + ", object " + objectId + "'");
   }
 

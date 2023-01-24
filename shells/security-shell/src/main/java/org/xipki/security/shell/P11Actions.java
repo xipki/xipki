@@ -540,7 +540,7 @@ public class P11Actions {
 
     protected P11Slot getSlot() throws XiSecurityException, P11TokenException, IllegalCmdParamException {
       P11Module module = getP11Module(moduleName);
-      P11SlotIdentifier slotId = module.getSlotIdForIndex(Integer.parseInt(slotIndex));
+      P11SlotId slotId = module.getSlotIdForIndex(Integer.parseInt(slotIndex));
       return module.getSlot(slotId);
     }
 
@@ -603,13 +603,13 @@ public class P11Actions {
       println("module: " + moduleName);
       println(module.getDescription());
 
-      List<P11SlotIdentifier> slots = module.getSlotIds();
+      List<P11SlotId> slots = module.getSlotIds();
       if (slotIndex == null) {
         output(slots);
         return null;
       }
 
-      P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
+      P11SlotId slotId = module.getSlotIdForIndex(slotIndex);
       P11Slot slot = module.getSlot(slotId);
       println("Details of slot " + slotId + ":");
       slot.showDetails(System.out, verbose);
@@ -618,7 +618,7 @@ public class P11Actions {
       return null;
     }
 
-    private void output(List<P11SlotIdentifier> slots) {
+    private void output(List<P11SlotId> slots) {
       // list all slots
       final int n = slots.size();
 
@@ -629,7 +629,7 @@ public class P11Actions {
         println(n + " slots are configured");
       }
 
-      for (P11SlotIdentifier slotId : slots) {
+      for (P11SlotId slotId : slots) {
         println("\tslot[" + slotId.getIndex() + "]: " + slotId.getId());
       }
     }

@@ -28,7 +28,7 @@ import static org.xipki.pkcs11.PKCS11Constants.ckmCodeToName;
 
 public class P11UnsupportedMechanismException extends P11TokenException {
 
-  public P11UnsupportedMechanismException(long mechanism, P11SlotIdentifier slotId) {
+  public P11UnsupportedMechanismException(long mechanism, P11SlotId slotId) {
     super("mechanism " + ckmCodeToName(mechanism) + " is not supported by PKCS11 slot " + slotId);
   }
 

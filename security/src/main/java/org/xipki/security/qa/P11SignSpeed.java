@@ -28,7 +28,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
-import org.xipki.security.pkcs11.P11SlotIdentifier;
+import org.xipki.security.pkcs11.P11SlotId;
 import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.*;
@@ -271,7 +271,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
     this.deleteKeyAfterTest = deleteKeyAfterTest;
 
-    P11SlotIdentifier slotId = slot.getSlotId();
+    P11SlotId slotId = slot.getSlotId();
     SignerConf signerConf = getPkcs11SignerConf(slot.getModuleName(),
         slotId.getId(), identityId.getKeyId().getId(), signatureAlgorithm, threads + Math.max(2, threads * 5 / 4));
     try {

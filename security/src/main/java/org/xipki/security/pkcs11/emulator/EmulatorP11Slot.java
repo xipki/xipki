@@ -174,7 +174,7 @@ class EmulatorP11Slot extends P11Slot {
   private final int maxSessions;
 
   EmulatorP11Slot(
-      String moduleName, File slotDir, P11SlotIdentifier slotId, boolean readOnly,
+      String moduleName, File slotDir, P11SlotId slotId, boolean readOnly,
       EmulatorKeyCryptor keyCryptor, P11MechanismFilter mechanismFilter, P11NewObjectConf newObjectConf,
       Integer numSessions, List<Long> secretKeyTypes, List<Long> keypairTypes)
       throws P11TokenException {

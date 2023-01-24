@@ -120,7 +120,7 @@ public class P11SignerFactory implements SignerFactory {
     try {
       P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
       P11Module module = p11Service.getModule();
-      P11SlotIdentifier p11SlotId = (slotId != null) ? module.getSlotIdForId(slotId)
+      P11SlotId p11SlotId = (slotId != null) ? module.getSlotIdForId(slotId)
           : module.getSlotIdForIndex(slotIndex);
       slot = module.getSlot(p11SlotId);
     } catch (P11TokenException | XiSecurityException ex) {

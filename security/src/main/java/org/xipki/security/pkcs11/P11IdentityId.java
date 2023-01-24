@@ -31,7 +31,7 @@ import static org.xipki.util.Args.notNull;
 
 public class P11IdentityId implements Comparable<P11IdentityId> {
 
-  private final P11SlotIdentifier slotId;
+  private final P11SlotId slotId;
 
   private final P11ObjectId keyId;
 
@@ -45,7 +45,7 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
    * @param publicKeyHandle Object handle of the public key, may be {@code null}.
    *
    */
-  public P11IdentityId(P11SlotIdentifier slotId, P11ObjectId keyId, Long publicKeyHandle) {
+  public P11IdentityId(P11SlotId slotId, P11ObjectId keyId, Long publicKeyHandle) {
     this.slotId = notNull(slotId, "slotId");
     this.keyId = notNull(keyId, "keyId");
     this.publicKeyHandle = (keyId.getObjectCLass() == PKCS11Constants.CKO_SECRET_KEY) ? null : publicKeyHandle;
@@ -55,7 +55,7 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
     return publicKeyHandle;
   }
 
-  public P11SlotIdentifier getSlotId() {
+  public P11SlotId getSlotId() {
     return slotId;
   }
 
@@ -84,7 +84,7 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
     return this.slotId.equals(ei.slotId)  && this.keyId.equals(ei.keyId);
   }
 
-  public boolean match(P11SlotIdentifier slotId, String keyLabel) {
+  public boolean match(P11SlotId slotId, String keyLabel) {
     notNull(keyLabel, "objectLabel");
     return this.slotId.equals(slotId) && CompareUtil.equalsObject(keyLabel, this.keyId.getLabel());
   }

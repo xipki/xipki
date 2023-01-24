@@ -142,7 +142,7 @@ public abstract class P11Slot implements Closeable {
 
   protected final String moduleName;
 
-  protected final P11SlotIdentifier slotId;
+  protected final P11SlotId slotId;
 
   private final boolean readOnly;
 
@@ -157,7 +157,7 @@ public abstract class P11Slot implements Closeable {
   protected final P11NewObjectConf newObjectConf;
 
   protected P11Slot(
-      String moduleName, P11SlotIdentifier slotId, boolean readOnly,
+      String moduleName, P11SlotId slotId, boolean readOnly,
       Integer numSessions, List<Long> secretKeyTypes, List<Long> keyPairTypes, P11NewObjectConf newObjectConf)
       throws P11TokenException {
     this.newObjectConf = notNull(newObjectConf, "newObjectConf");
@@ -214,7 +214,7 @@ public abstract class P11Slot implements Closeable {
   /**
    * Remove objects.
    *
-   * @param id    Id of the objects to be deleted. At least one of id and label may not be {@code null}.
+   * @param id    ID of the objects to be deleted. At least one of id and label may not be {@code null}.
    * @param label Label of the objects to be deleted
    * @return how many objects have been deleted
    * @throws P11TokenException If PKCS#11 error happens.
@@ -426,7 +426,7 @@ public abstract class P11Slot implements Closeable {
     return moduleName;
   }
 
-  public P11SlotIdentifier getSlotId() {
+  public P11SlotId getSlotId() {
     return slotId;
   }
 
@@ -447,7 +447,7 @@ public abstract class P11Slot implements Closeable {
   /**
    * Remove objects.
    *
-   * @param id Id of the objects to be deleted.
+   * @param id ID of the objects to be deleted.
    * @return how many objects have been deleted
    * @throws P11TokenException If PKCS#11 error happens.
    */

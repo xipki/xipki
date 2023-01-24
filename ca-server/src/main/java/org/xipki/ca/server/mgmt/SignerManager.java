@@ -174,11 +174,11 @@ class SignerManager {
       sb.append("module: ").append(moduleName).append(NL);
       sb.append(module.getDescription()).append(NL);
 
-      List<P11SlotIdentifier> slots = module.getSlotIds();
+      List<P11SlotId> slots = module.getSlotIds();
       if (slotIndex == null) {
         output(sb, slots);
       } else {
-        P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
+        P11SlotId slotId = module.getSlotIdForIndex(slotIndex);
         P11Slot slot = module.getSlot(slotId);
         sb.append("Details of slot\n");
 
@@ -194,7 +194,7 @@ class SignerManager {
     return sb.toString();
   }
 
-  private void output(StringBuilder sb, List<P11SlotIdentifier> slots) {
+  private void output(StringBuilder sb, List<P11SlotId> slots) {
     // list all slots
     final int n = slots.size();
 
@@ -205,7 +205,7 @@ class SignerManager {
       sb.append(n).append(" slots are configured\n");
     }
 
-    for (P11SlotIdentifier slotId : slots) {
+    for (P11SlotId slotId : slots) {
       sb.append("\tslot[").append(slotId.getIndex()).append("]: ").append(slotId.getId()).append("\n");
     }
   }
