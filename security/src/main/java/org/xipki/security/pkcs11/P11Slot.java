@@ -150,7 +150,6 @@ public abstract class P11Slot implements Closeable {
 
   private final Set<Long> mechanisms = new HashSet<>();
 
-  protected final Integer numSessions;
   protected final List<Long> secretKeyTypes;
   protected final List<Long> keyPairTypes;
 
@@ -158,13 +157,12 @@ public abstract class P11Slot implements Closeable {
 
   protected P11Slot(
       String moduleName, P11SlotId slotId, boolean readOnly,
-      Integer numSessions, List<Long> secretKeyTypes, List<Long> keyPairTypes, P11NewObjectConf newObjectConf)
+      List<Long> secretKeyTypes, List<Long> keyPairTypes, P11NewObjectConf newObjectConf)
       throws P11TokenException {
     this.newObjectConf = notNull(newObjectConf, "newObjectConf");
     this.moduleName = notBlank(moduleName, "moduleName");
     this.slotId = notNull(slotId, "slotId");
     this.readOnly = readOnly;
-    this.numSessions = numSessions;
     this.secretKeyTypes = secretKeyTypes;
     this.keyPairTypes = keyPairTypes;
   }

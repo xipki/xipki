@@ -178,7 +178,7 @@ class EmulatorP11Slot extends P11Slot {
       EmulatorKeyCryptor keyCryptor, P11MechanismFilter mechanismFilter, P11NewObjectConf newObjectConf,
       Integer numSessions, List<Long> secretKeyTypes, List<Long> keypairTypes)
       throws P11TokenException {
-    super(moduleName, slotId, readOnly, numSessions, secretKeyTypes, keypairTypes, newObjectConf);
+    super(moduleName, slotId, readOnly, secretKeyTypes, keypairTypes, newObjectConf);
 
     this.slotDir = notNull(slotDir, "slotDir");
     this.keyCryptor = notNull(keyCryptor, "privateKeyCryptor");

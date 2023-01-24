@@ -105,7 +105,7 @@ class NativeP11Slot extends P11Slot {
                 List<char[]> password, int maxMessageSize, P11MechanismFilter mechanismFilter,
                 P11NewObjectConf newObjectConf, Integer numSessions, List<Long> secretKeyTypes, List<Long> keyPairTypes)
       throws P11TokenException {
-    super(moduleName, slotId, readOnly, numSessions, secretKeyTypes, keyPairTypes, newObjectConf);
+    super(moduleName, slotId, readOnly, secretKeyTypes, keyPairTypes, newObjectConf);
 
     this.slot = notNull(slot, "slot");
     this.maxMessageSize = positive(maxMessageSize, "maxMessageSize");
@@ -374,23 +374,6 @@ class NativeP11Slot extends P11Slot {
   } // method openSession
 
   private ConcurrentBagEntry<Session> borrowSession() throws P11TokenException {
-    for (int i = 0; i < Math.min(DEFAULT_MAX_COUNT_SESSION, maxSessionCount); i++) {
-      try {
-        return borrowSession0();
-      } catch (P11TokenException ex) {
-        Throwable cause = ex.getCause();
-        if (cause instanceof PKCS11Exception) {
-          long ckr = ((PKCS11Exception) cause).getErrorCode();
-          if (ckr == CKR_SESSION_HANDLE_INVALID || ckr == CKR_SESSION_CLOSED) {
-            break;
-          }
-        }
-      }
-    }
-    throw new P11TokenException("could not borrow valid session");
-  } // method borrowSession
-
-  private ConcurrentBagEntry<Session> borrowSession0() throws P11TokenException {
     ConcurrentBagEntry<Session> session = null;
     synchronized (sessions) {
       if (countSessions.get() < maxSessionCount) {
