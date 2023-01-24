@@ -28,7 +28,9 @@ import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.operator.OperatorCreationException;
+import org.xipki.pkcs11.PKCS11Constants;
 import org.xipki.security.ObjectIdentifiers.Xipki;
+import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.util.Args;
 
 import java.security.Key;
@@ -410,6 +412,38 @@ public enum SignAlgo {
     }
     return alg;
   }
+
+  public static SignAlgo getInstance(P11Identity p11Key, SignerConf signerConf) throws NoSuchAlgorithmException {
+    if (notNull(signerConf, "signerConf").getHashAlgo() == null) {
+      return getInstance(signerConf.getConfValue("algo"));
+    }
+
+    SignatureAlgoControl algoControl = signerConf.getSignatureAlgoControl();
+    HashAlgo hashAlgo = signerConf.getHashAlgo();
+
+    long keyType = p11Key.getKeyType();
+    if (keyType == PKCS11Constants.CKK_RSA) {
+      boolean rsaPss = algoControl != null && algoControl.isRsaPss();
+      return getRSAInstance(hashAlgo, rsaPss);
+    } else if (keyType == PKCS11Constants.CKK_EC || keyType == PKCS11Constants.CKK_VENDOR_SM2) {
+      boolean dsaPlain = algoControl != null && algoControl.isDsaPlain();
+      boolean gm = algoControl != null && algoControl.isGm();
+      return getECSigAlgo(hashAlgo, dsaPlain, gm);
+    } else if (keyType == PKCS11Constants.CKK_DSA) {
+      return getDSASigAlgo(hashAlgo);
+    } else if (keyType == PKCS11Constants.CKK_EC_EDWARDS) {
+      String keyAlgo = EdECConstants.getName(p11Key.getEcParams());
+      if (keyAlgo.equalsIgnoreCase(EdECConstants.ED25519)) {
+        return ED25519;
+      } else if (keyAlgo.equalsIgnoreCase(EdECConstants.ED448)) {
+        return ED448;
+      } else {
+        throw new NoSuchAlgorithmException("Unknown Edwards public key " + keyAlgo);
+      }
+    } else {
+      throw new NoSuchAlgorithmException("Unknown key type " + PKCS11Constants.ckkCodeToName(keyType));
+    }
+  } // method getInstance
 
   public static SignAlgo getInstance(Key key, SignerConf signerConf) throws NoSuchAlgorithmException {
     if (notNull(signerConf, "signerConf").getHashAlgo() == null) {

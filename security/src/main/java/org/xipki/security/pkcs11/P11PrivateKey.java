@@ -17,15 +17,12 @@
 
 package org.xipki.security.pkcs11;
 
-import org.bouncycastle.jcajce.interfaces.EdDSAKey;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.pkcs11.PKCS11Constants;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.XiSecurityException;
 
 import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPublicKey;
 
 import static org.xipki.util.Args.notNull;
 
@@ -38,45 +35,31 @@ import static org.xipki.util.Args.notNull;
 
 public class P11PrivateKey implements PrivateKey {
 
-  private final P11CryptService p11CryptService;
-
-  private final P11IdentityId identityId;
+  private final P11Identity identity;
 
   private final String algorithm;
 
-  private final int keysize;
+  public P11PrivateKey(P11Identity identity) throws P11TokenException {
+    this.identity = notNull(identity, "identity");
 
-  private final PublicKey publicKey;
-
-  public P11PrivateKey(P11CryptService p11CryptService, P11IdentityId identityId) throws P11TokenException {
-    this.p11CryptService = notNull(p11CryptService, "p11CryptService");
-    this.identityId = notNull(identityId, "identityId");
-
-    this.publicKey = p11CryptService.getIdentity(identityId).getPublicKey();
-
-    if (publicKey instanceof RSAPublicKey) {
+    long keyType = identity.getKeyType();
+    if (keyType == PKCS11Constants.CKK_RSA) {
       algorithm = "RSA";
-      keysize = ((RSAPublicKey) publicKey).getModulus().bitLength();
-    } else if (publicKey instanceof DSAPublicKey) {
+    } else if (keyType == PKCS11Constants.CKK_DSA) {
       algorithm = "DSA";
-      keysize = ((DSAPublicKey) publicKey).getParams().getP().bitLength();
-    } else if (publicKey instanceof ECPublicKey) {
+    } else if (keyType == PKCS11Constants.CKK_EC || keyType == PKCS11Constants.CKK_VENDOR_SM2) {
       algorithm = "EC";
-      keysize = ((ECPublicKey) publicKey).getParams().getCurve().getField().getFieldSize();
-    } else if (publicKey instanceof EdDSAKey) {
-      algorithm = publicKey.getAlgorithm();
-      keysize = EdECConstants.getKeyBitSize(EdECConstants.getCurveOid(algorithm));
+    } else if (keyType == PKCS11Constants.CKK_EC_EDWARDS) {
+      ASN1ObjectIdentifier curveId = identity.getEcParams();
+      algorithm = EdECConstants.getName(curveId);
+      // keysize = EdECConstants.getKeyBitSize(EdECConstants.getCurveOid(algorithm));
     } else {
-      throw new P11TokenException("unknown public key: " + publicKey);
+      throw new P11TokenException("unknown key type: " + PKCS11Constants.ckkCodeToName(keyType));
     }
   } // constructor
 
   public boolean supportsMechanism(long mechanism) {
-    try {
-      return p11CryptService.getSlot(identityId.getSlotId()).supportsMechanism(mechanism);
-    } catch (P11TokenException ex) {
-      return false;
-    }
+    return identity.supportsMechanism(mechanism);
   }
 
   @Override
@@ -92,14 +75,6 @@ public class P11PrivateKey implements PrivateKey {
   @Override
   public String getAlgorithm() {
     return algorithm;
-  }
-
-  public int getKeysize() {
-    return keysize;
-  }
-
-  public PublicKey getPublicKey() {
-    return publicKey;
   }
 
   /**
@@ -118,15 +93,7 @@ public class P11PrivateKey implements PrivateKey {
    */
   public byte[] sign(long mechanism, P11Params parameters, byte[] content)
       throws XiSecurityException, P11TokenException {
-    return p11CryptService.getIdentity(identityId).sign(mechanism, parameters, content);
-  }
-
-  public P11CryptService getP11CryptService() {
-    return p11CryptService;
-  }
-
-  public P11IdentityId getIdentityId() {
-    return identityId;
+    return identity.sign(mechanism, parameters, content);
   }
 
 }

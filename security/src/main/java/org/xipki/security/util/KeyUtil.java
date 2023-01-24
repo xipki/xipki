@@ -489,10 +489,21 @@ public class KeyUtil {
     notNull(encodedAlgorithmIdParameters, "encodedAlgorithmIdParameters");
     notNull(encodedPoint, "encodedPoint");
 
-    ASN1Encodable algParams =(encodedAlgorithmIdParameters[0] == 6)
+    ASN1Encodable algParams = (encodedAlgorithmIdParameters[0] == 6)
         ? ASN1ObjectIdentifier.getInstance(encodedAlgorithmIdParameters)
         : X962Parameters.getInstance(encodedAlgorithmIdParameters);
+    return doCreateECPublicKey(algParams, encodedPoint);
+  }
 
+  public static ECPublicKey createECPublicKey(ASN1ObjectIdentifier curveOid, byte[] encodedPoint)
+      throws InvalidKeySpecException {
+    notNull(curveOid, "curveOid");
+    notNull(encodedPoint, "encodedPoint");
+    return doCreateECPublicKey(curveOid, encodedPoint);
+  }
+
+  private static ECPublicKey doCreateECPublicKey(ASN1Encodable algParams, byte[] encodedPoint)
+      throws InvalidKeySpecException {
     AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, algParams);
 
     SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo(algId, encodedPoint);

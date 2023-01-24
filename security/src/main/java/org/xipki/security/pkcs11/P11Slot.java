@@ -28,7 +28,6 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.DSAParameterCache;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Hex;
-import org.xipki.util.StringUtil;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -198,12 +197,19 @@ public abstract class P11Slot implements Closeable {
 
   public abstract P11Identity getIdentity(P11IdentityId identityId) throws P11TokenException;
 
+  public P11Identity getIdentity(byte[] keyId, String keyLabel) throws P11TokenException {
+    P11IdentityId identityId = getIdentityId(keyId, keyLabel);
+    return identityId == null ? null : getIdentity(identityId);
+  }
+
+  protected abstract PublicKey getPublicKey(P11Identity identity) throws P11TokenException;
+
   /**
    * Destroys objects.
    * @param handles handles of objects to be destroyed.
    * @@return handles of objects which could not been destroyed.
    */
-  public abstract long[] removeObjects(long[] handles);
+  public abstract long[] destroyObjects(long... handles);
 
   /**
    * Remove objects.
@@ -213,18 +219,9 @@ public abstract class P11Slot implements Closeable {
    * @return how many objects have been deleted
    * @throws P11TokenException If PKCS#11 error happens.
    */
-  public abstract int removeObjects(byte[] id, String label) throws P11TokenException;
+  public abstract int destroyObjects(byte[] id, String label) throws P11TokenException;
 
   protected abstract boolean objectExistsForIdOrLabel(byte[] id, String label) throws P11TokenException;
-
-  /**
-   * Removes the key (private key, public key, and secret key) associated with
-   * the given identifier {@code objectId}.
-   *
-   * @param identityId Identity identifier. Must not be {@code null}.
-   * @throws P11TokenException if PKCS#11 token exception occurs.
-   */
-  public abstract void removeIdentity(P11IdentityId identityId) throws P11TokenException;
 
   /**
    * Generates a secret key in the PKCS#11 token.
@@ -454,8 +451,8 @@ public abstract class P11Slot implements Closeable {
    * @return how many objects have been deleted
    * @throws P11TokenException If PKCS#11 error happens.
    */
-  public int removeObjectsForId(byte[] id) throws P11TokenException {
-    return removeObjects(id, null);
+  public int destroyObjectsForId(byte[] id) throws P11TokenException {
+    return destroyObjects(id, null);
   }
 
   /**
@@ -465,8 +462,8 @@ public abstract class P11Slot implements Closeable {
    * @return how many objects have been deleted
    * @throws P11TokenException If PKCS#11 error happens.
    */
-  public int removeObjectsForLabel(String label) throws P11TokenException {
-    return removeObjects(null, label);
+  public int destroyObjectsForLabel(String label) throws P11TokenException {
+    return destroyObjects(null, label);
   }
 
   /**
@@ -798,7 +795,7 @@ public abstract class P11Slot implements Closeable {
     int no = 0;
     Collections.sort(sortedMechs);
     for (Long mech : sortedMechs) {
-      sb.append("  ").append(++no).append(". ").append(ckmCodeToName(mech)).append("\n");
+      sb.append("  ").append(formatNumber(++no, 3)).append(". ").append(ckmCodeToName(mech)).append("\n");
     }
 
     stream.write(sb.toString().getBytes(StandardCharsets.UTF_8));
@@ -837,6 +834,18 @@ public abstract class P11Slot implements Closeable {
     List<P11ObjectId> ids = new ArrayList<>(sets);
     Collections.sort(ids);
     return ids;
+  }
+
+  protected static String formatNumber(int value, int numChars) {
+    String str = Integer.toString(value);
+    if (str.length() >= numChars) {
+      return str;
+    }
+
+    while (str.length() < numChars) {
+      str = " " + str;
+    }
+    return str;
   }
 
 }

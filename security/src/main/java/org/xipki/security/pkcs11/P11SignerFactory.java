@@ -21,11 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.*;
 import org.xipki.util.Hex;
-import org.xipki.util.LogUtil;
 import org.xipki.util.exception.ObjectCreationException;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -118,10 +116,9 @@ public class P11SignerFactory implements SignerFactory {
       throw new ObjectCreationException("exactly one of key-id and key-label must be specified");
     }
 
-    P11CryptService p11Service;
     P11Slot slot;
     try {
-      p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
+      P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
       P11Module module = p11Service.getModule();
       P11SlotIdentifier p11SlotId = (slotId != null) ? module.getSlotIdForId(slotId)
           : module.getSlotIdForIndex(slotIndex);
@@ -131,15 +128,15 @@ public class P11SignerFactory implements SignerFactory {
     }
 
     String str2 = (keyId != null) ? "id " + Hex.encode(keyId) : "label " + keyLabel;
-    P11IdentityId identityId = null;
+    P11Identity identity = null;
     try {
-      identityId = slot.getIdentityId(keyId, keyLabel);
+      identity = slot.getIdentity(keyId, keyLabel);
     } catch (P11TokenException e) {
-      throw new ObjectCreationException("could not find identity with " + str2);
+      throw new ObjectCreationException("error finding identity with " + str2 + ": " + e.getMessage());
     }
 
-    if (identityId == null) {
-      throw new ObjectCreationException("could not find identity with " + str2);
+    if (identity == null) {
+      throw new ObjectCreationException("unknown identity with " + str2);
     }
 
     try {
@@ -150,16 +147,15 @@ public class P11SignerFactory implements SignerFactory {
       }
 
       if (algo != null && algo.isMac()) {
-        P11MacContentSignerBuilder signerBuilder = new P11MacContentSignerBuilder(p11Service, identityId);
+        P11MacContentSignerBuilder signerBuilder = new P11MacContentSignerBuilder(identity);
         return signerBuilder.createSigner(algo, parallelism);
       } else {
         if (algo == null) {
-          PublicKey pubKey = slot.getIdentity(identityId).getPublicKey();
-          algo = SignAlgo.getInstance(pubKey, conf);
+          algo = SignAlgo.getInstance(identity, conf);
         }
 
-        P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(p11Service,
-            securityFactory, identityId, certificateChain);
+        P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(
+            securityFactory, identity, certificateChain);
         return signerBuilder.createSigner(algo, parallelism);
       }
     } catch (P11TokenException | NoSuchAlgorithmException | XiSecurityException ex) {

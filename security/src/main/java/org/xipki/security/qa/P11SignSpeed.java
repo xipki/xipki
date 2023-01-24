@@ -25,8 +25,11 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
-import org.xipki.security.pkcs11.*;
+import org.xipki.security.pkcs11.P11IdentityId;
+import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
+import org.xipki.security.pkcs11.P11SlotIdentifier;
+import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.*;
 import org.xipki.util.exception.ObjectCreationException;
@@ -96,7 +99,11 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
         return getNonNullKeyId(slot, keyId, keyLabel);
       }
 
-      return slot.generateECKeypair(curveOid, getNewKeyControl(keyId, keyLabel));
+      try {
+        return slot.generateECKeypair(curveOid, getNewKeyControl(keyId, keyLabel));
+      } catch (Exception ex) {
+        throw new Exception("error generating EC keypair for curve " + AlgorithmUtil.getCurveName(curveOid), ex);
+      }
     }
 
   } // class EC
@@ -280,7 +287,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
     if (deleteKeyAfterTest) {
       try {
         LOG.info("delete key {}", identityId);
-        slot.removeIdentity(identityId);
+        slot.getIdentity(identityId).destroy();
       } catch (Exception ex) {
         LogUtil.error(LOG, ex, "could not delete PKCS#11 key " + identityId);
       }

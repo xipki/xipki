@@ -17,15 +17,12 @@
 
 package org.xipki.security.pkcs11;
 
-import org.bouncycastle.jcajce.interfaces.EdDSAKey;
-import org.bouncycastle.jcajce.interfaces.XDHKey;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
+import org.bouncycastle.math.ec.ECCurve;
 import org.xipki.security.EdECConstants;
-import org.xipki.security.X509Cert;
 
-import java.security.PublicKey;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPublicKey;
+import java.math.BigInteger;
 
 /**
  * {@link P11Identity} based on the ipkcs11wrapper or jpkcs11wrapper.
@@ -36,70 +33,27 @@ import java.security.interfaces.RSAPublicKey;
 
 class NativeP11Identity extends P11Identity {
 
-  private final int expectedSignatureLen;
-
-  private final boolean secretKey;
-
-  NativeP11Identity(NativeP11Slot slot, P11IdentityId identityId, long keyType, int keyBitLen) {
-    super(slot, identityId, keyType, keyBitLen);
-    this.secretKey = true;
-    this.expectedSignatureLen = 0;
+  NativeP11Identity(NativeP11Slot slot, P11IdentityId identityId) {
+    super(slot, identityId);
   }
-
-  NativeP11Identity(NativeP11Slot slot, P11IdentityId identityId, long keyType, PublicKey publicKey) {
-    super(slot, identityId, keyType, publicKey);
-    this.secretKey = false;
-
-    int keyBitLen = getSignatureKeyBitLength();
-    if (publicKey instanceof RSAPublicKey) {
-      expectedSignatureLen = (keyBitLen + 7) / 8;
-    } else if (publicKey instanceof ECPublicKey) {
-      expectedSignatureLen = (keyBitLen + 7) / 8 * 2;
-    } else if (publicKey instanceof DSAPublicKey) {
-      expectedSignatureLen = (keyBitLen + 7) / 8 * 2;
-    } else if (publicKey instanceof EdDSAKey) {
-      String algName = publicKey.getAlgorithm();
-      if (EdECConstants.ED25519.equalsIgnoreCase(algName)) {
-        expectedSignatureLen = 64;
-      } else if (EdECConstants.ED448.equalsIgnoreCase(algName)) {
-        expectedSignatureLen = 114;
-      } else {
-        throw new IllegalArgumentException("unknown EdDSA algorithm " + algName);
-      }
-    } else if (publicKey instanceof XDHKey) {
-      // no signature is supported
-      expectedSignatureLen = 0;
-    } else {
-      throw new IllegalArgumentException(
-          "currently only RSA, DSA, EC, EdDSA and XDH public key are supported, but not "
-          + this.publicKey.getAlgorithm() + " (class: " + publicKey.getClass().getName() + ")");
-    }
-  } // constructor
 
   @Override
   protected byte[] digestSecretKey0(long mechanism) throws P11TokenException {
-    if (!secretKey) {
-      throw new P11TokenException("could not digest asymmetric key");
-    }
-
     return ((NativeP11Slot) slot).digestSecretKey(mechanism, this);
+  }
+
+  @Override
+  public void destroy() throws P11TokenException {
+    if (id.getPublicKeyHandle() == null) {
+      slot.destroyObjects(id.getKeyId().getHandle());
+    } else {
+      slot.destroyObjects(id.getKeyId().getHandle(), id.getPublicKeyHandle());
+    }
   }
 
   @Override
   protected byte[] sign0(long mechanism, P11Params parameters, byte[] content) throws P11TokenException {
     return ((NativeP11Slot) slot).sign(mechanism, parameters, content, this);
-  }
-
-  long getSigningKeyHandle() {
-    return id.getKeyId().getHandle();
-  }
-
-  boolean isSecretKey() {
-    return secretKey;
-  }
-
-  int getExpectedSignatureLen() {
-    return expectedSignatureLen;
   }
 
 }

@@ -17,6 +17,7 @@
 
 package org.xipki.security.pkcs11.emulator;
 
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.macs.GMac;
@@ -25,15 +26,13 @@ import org.bouncycastle.crypto.modes.GCMBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
-import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.*;
-import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.PKCS1Util;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.util.concurrent.ConcurrentBag;
@@ -41,9 +40,6 @@ import org.xipki.util.concurrent.ConcurrentBagEntry;
 
 import javax.crypto.*;
 import java.security.*;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -59,7 +55,7 @@ import static org.xipki.util.Args.notNull;
  * @since 2.0.0
  */
 
-public class EmulatorP11Identity extends P11Identity {
+class EmulatorP11Identity extends P11Identity {
 
   private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Identity.class);
 
@@ -75,7 +71,7 @@ public class EmulatorP11Identity extends P11Identity {
 
   private final ConcurrentBag<ConcurrentBagEntry<Signature>> eddsaSignatures = new ConcurrentBag<>();
 
-  private final ConcurrentBag<ConcurrentBagEntry<SM2Signer>> sm2Signers = new ConcurrentBag<>();
+  private final ConcurrentBag<ConcurrentBagEntry<EmulatorSM2Signer>> sm2Signers = new ConcurrentBag<>();
 
   private final SecureRandom random;
 
@@ -167,31 +163,21 @@ public class EmulatorP11Identity extends P11Identity {
   }
 
   public EmulatorP11Identity(
-      P11Slot slot, P11IdentityId identityId, long keyType, SecretKey signingKey,
-      int maxSessions, SecureRandom random) {
-    super(slot, identityId, keyType, signingKey.getEncoded().length * 8);
+      P11Slot slot, P11IdentityId identityId, Key signingKey, int maxSessions, SecureRandom random) {
+    super(slot, identityId);
     this.signingKey = notNull(signingKey, "signingKey");
     this.random = notNull(random, "random");
     this.maxSessions = maxSessions;
   } // constructor
-
-  public EmulatorP11Identity(
-      P11Slot slot, P11IdentityId identityId, long keyType, PrivateKey privateKey, PublicKey publicKey,
-      int maxSessions, SecureRandom random)
-      throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
-    super(slot, identityId, keyType, publicKey);
-    this.signingKey = notNull(privateKey, "privateKey");
-    this.random = notNull(random, "random");
-    this.maxSessions = maxSessions;
-  }
 
   private synchronized void init() throws P11TokenException {
     if (initialized) {
       return;
     }
 
+    long keyType = getKeyType();
     try {
-      if (this.publicKey instanceof RSAPublicKey) {
+      if (keyType == CKK_RSA) {
         String providerName = "BC";
         LOG.info("use provider {}", providerName);
 
@@ -217,19 +203,18 @@ public class EmulatorP11Identity extends P11Identity {
         }
       } else {
         String algorithm;
-        if (this.publicKey instanceof ECPublicKey) {
-          boolean sm2curve = GMUtil.isSm2primev2Curve(((ECPublicKey) this.publicKey).getParams().getCurve());
+        if (keyType == CKK_EC || keyType == CKK_VENDOR_SM2) {
+          boolean sm2curve = GMObjectIdentifiers.sm2p256v1.equals(getEcParams());
           algorithm = sm2curve ? null : "NONEwithECDSA";
-        } else if (this.publicKey instanceof DSAPublicKey) {
+        } else if (keyType == CKK_DSA) {
           algorithm = "NONEwithDSA";
-        } else if (this.publicKey instanceof EdDSAKey) {
+        } else if (keyType == CKK_EC_EDWARDS) {
           algorithm = null;
-        } else if (this.publicKey instanceof XDHKey) {
+        } else if (keyType == CKK_EC_MONTGOMERY) {
           algorithm = null;
         } else {
           throw new P11TokenException("Currently only RSA, DSA, EC, EC Edwards and EC "
-                  + "Montgomery public key are supported, but not " + this.publicKey.getAlgorithm()
-                  + " (class: " + this.publicKey.getClass().getName() + ")");
+                  + "Montgomery public key are supported, but not " + ckkCodeToName(keyType));
         }
 
         if (algorithm != null) {
@@ -238,18 +223,19 @@ public class EmulatorP11Identity extends P11Identity {
             dsaSignature.initSign((PrivateKey) signingKey, random);
             dsaSignatures.add(new ConcurrentBagEntry<>(dsaSignature));
           }
-        } else if (this.publicKey instanceof EdDSAKey) {
-          algorithm = this.publicKey.getAlgorithm();
+        } else if (keyType == CKK_EC_EDWARDS) {
+          algorithm = EdECConstants.getName(getEcParams());
           for (int i = 0; i < maxSessions; i++) {
             Signature signature = Signature.getInstance(algorithm, "BC");
             signature.initSign((PrivateKey) signingKey);
             eddsaSignatures.add(new ConcurrentBagEntry<>(signature));
           }
-        } else if (this.publicKey instanceof XDHKey) {
+        } else if (keyType == CKK_EC_MONTGOMERY) {
           // do nothing. not suitable for sign.
         } else {
           for (int i = 0; i < maxSessions; i++) {
-            SM2Signer sm2signer = new SM2Signer(ECUtil.generatePrivateKeyParameter((PrivateKey) signingKey));
+            EmulatorSM2Signer sm2signer =
+                new EmulatorSM2Signer(ECUtil.generatePrivateKeyParameter((PrivateKey) signingKey));
             sm2Signers.add(new ConcurrentBagEntry<>(sm2signer));
           }
         }
@@ -272,6 +258,11 @@ public class EmulatorP11Identity extends P11Identity {
       throw new P11TokenException("unknown mechanism " + ckmCodeToName(mechanism));
     }
     return hashAlgo.hash(signingKey.getEncoded());
+  }
+
+  @Override
+  public void destroy() throws P11TokenException {
+    slot.destroyObjectsForId(id.getKeyId().getId());
   }
 
   @Override
@@ -380,7 +371,7 @@ public class EmulatorP11Identity extends P11Identity {
     byte[] encodedHashValue;
     try {
       encodedHashValue = PKCS1Util.EMSA_PSS_ENCODE(contentHash, hashValue, mgfHash,
-          (int) pssParam.getSaltLength(), getSignatureKeyBitLength(), random);
+          (int) pssParam.getSaltLength(), getExpectedSignatureLen() * 8, random);
     } catch (XiSecurityException ex) {
       throw new P11TokenException("XiSecurityException: " + ex.getMessage(), ex);
     }
@@ -388,7 +379,7 @@ public class EmulatorP11Identity extends P11Identity {
   } // method rsaPkcsPssSign
 
   private byte[] rsaPkcsSign(byte[] contentToSign, HashAlgo hashAlgo) throws P11TokenException {
-    int modulusBitLen = getSignatureKeyBitLength();
+    int modulusBitLen = getExpectedSignatureLen() * 8;
     byte[] paddedHash;
     try {
       paddedHash = (hashAlgo == null) ? PKCS1Util.EMSA_PKCS1_v1_5_encoding(contentToSign, modulusBitLen)
@@ -441,7 +432,7 @@ public class EmulatorP11Identity extends P11Identity {
       Signature sig = sig0.value();
       sig.update(hash);
       byte[] x962Signature = sig.sign();
-      return SignerUtil.dsaSigX962ToPlain(x962Signature, getSignatureKeyBitLength());
+      return SignerUtil.dsaSigX962ToPlain(x962Signature, getExpectedSignatureLen() * 8);
     } catch (SignatureException ex) {
       throw new P11TokenException("SignatureException: " + ex.getMessage(), ex);
     } catch (XiSecurityException ex) {
@@ -479,7 +470,7 @@ public class EmulatorP11Identity extends P11Identity {
   } // method eddsaSign
 
   private byte[] sm2SignHash(byte[] hash) throws P11TokenException {
-    ConcurrentBagEntry<SM2Signer> sig0;
+    ConcurrentBagEntry<EmulatorSM2Signer> sig0;
     try {
       sig0 = sm2Signers.borrow(5000, TimeUnit.MILLISECONDS);
     } catch (InterruptedException ex) {
@@ -491,9 +482,9 @@ public class EmulatorP11Identity extends P11Identity {
     }
 
     try {
-      SM2Signer sig = sig0.value();
+      EmulatorSM2Signer sig = sig0.value();
       byte[] x962Signature = sig.generateSignatureForHash(hash);
-      return SignerUtil.dsaSigX962ToPlain(x962Signature, getSignatureKeyBitLength());
+      return SignerUtil.dsaSigX962ToPlain(x962Signature, getExpectedSignatureLen() * 8);
     } catch (CryptoException ex) {
       throw new P11TokenException("CryptoException: " + ex.getMessage(), ex);
     } catch (XiSecurityException ex) {
@@ -515,7 +506,7 @@ public class EmulatorP11Identity extends P11Identity {
       throw new P11TokenException("params must be instanceof P11ByteArrayParams");
     }
 
-    ConcurrentBagEntry<SM2Signer> sig0;
+    ConcurrentBagEntry<EmulatorSM2Signer> sig0;
     try {
       sig0 = sm2Signers.borrow(5000, TimeUnit.MILLISECONDS);
     } catch (InterruptedException ex) {
@@ -527,10 +518,10 @@ public class EmulatorP11Identity extends P11Identity {
     }
 
     try {
-      SM2Signer sig = sig0.value();
+      EmulatorSM2Signer sig = sig0.value();
 
       byte[] x962Signature = sig.generateSignatureForMessage(userId, dataToSign);
-      return SignerUtil.dsaSigX962ToPlain(x962Signature, getSignatureKeyBitLength());
+      return SignerUtil.dsaSigX962ToPlain(x962Signature, getExpectedSignatureLen() * 8);
     } catch (CryptoException ex) {
       throw new P11TokenException("CryptoException: " + ex.getMessage(), ex);
     } catch (XiSecurityException ex) {

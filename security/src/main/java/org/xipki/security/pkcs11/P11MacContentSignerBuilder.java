@@ -41,13 +41,10 @@ public class P11MacContentSignerBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(P11MacContentSignerBuilder.class);
 
-  private final P11CryptService cryptService;
+  private final P11Identity identity;
 
-  private final P11IdentityId identityId;
-
-  public P11MacContentSignerBuilder(P11CryptService cryptService, P11IdentityId identityId) {
-    this.cryptService = notNull(cryptService, "cryptService");
-    this.identityId = notNull(identityId, "identityId");
+  public P11MacContentSignerBuilder(P11Identity identity) {
+    this.identity = notNull(identity, "identity");
   } // constructor
 
   public ConcurrentContentSigner createSigner(SignAlgo signAlgo, int parallelism)
@@ -56,7 +53,7 @@ public class P11MacContentSignerBuilder {
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);
     for (int i = 0; i < parallelism; i++) {
-      signers.add(new P11ContentSigner.Mac(cryptService, identityId, signAlgo));
+      signers.add(new P11ContentSigner.Mac(identity, signAlgo));
     } // end for
 
     final boolean mac = true;
@@ -68,10 +65,10 @@ public class P11MacContentSignerBuilder {
     }
 
     try {
-      byte[] sha1HashOfKey = cryptService.getIdentity(identityId).digestSecretKey(PKCS11Constants.CKM_SHA_1);
+      byte[] sha1HashOfKey = identity.digestSecretKey(PKCS11Constants.CKM_SHA_1);
       concurrentSigner.setSha1DigestOfMacKey(sha1HashOfKey);
     } catch (P11TokenException | XiSecurityException ex) {
-      LogUtil.warn(LOG, ex, "could not compute the digest of secret key " + identityId);
+      LogUtil.warn(LOG, ex, "could not compute the digest of secret key " + identity.getId());
     }
 
     return concurrentSigner;

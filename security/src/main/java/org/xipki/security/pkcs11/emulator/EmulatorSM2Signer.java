@@ -47,7 +47,7 @@ import java.security.SecureRandom;
  * @author Lijun Liao
  *
  */
-class SM2Signer {
+class EmulatorSM2Signer {
   private final DSAKCalculator kCalculator = new RandomDSAKCalculator();
 
   private final Digest digest;
@@ -58,7 +58,7 @@ class SM2Signer {
 
   private final ECPoint pubPoint;
 
-  public SM2Signer(CipherParameters param) {
+  public EmulatorSM2Signer(CipherParameters param) {
     if (param instanceof ParametersWithRandom) {
       ParametersWithRandom rdmParam = (ParametersWithRandom) param;
 

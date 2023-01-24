@@ -43,12 +43,8 @@ public class P11CryptService {
     return module;
   }
 
-  public P11Slot getSlot(P11SlotIdentifier slotId) throws P11TokenException {
+  public P11Slot getSlot(P11SlotIdentifier slotId) throws P11UnknownEntityException {
     return module.getSlot(slotId);
-  }
-
-  public P11Identity getIdentity(P11IdentityId identityId) throws P11TokenException {
-    return module.getSlot(identityId.getSlotId()).getIdentity(identityId);
   }
 
   @Override

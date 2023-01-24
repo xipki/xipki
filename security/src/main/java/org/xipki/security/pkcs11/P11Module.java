@@ -78,7 +78,7 @@ public abstract class P11Module {
    * @throws P11TokenException
    *         if PKCS#11 token error occurs
    */
-  public P11Slot getSlot(P11SlotIdentifier slotId) throws P11TokenException {
+  public P11Slot getSlot(P11SlotIdentifier slotId) throws P11UnknownEntityException {
     notNull(slotId, "slotId");
     P11Slot slot = slots.get(slotId);
     if (slot == null) {

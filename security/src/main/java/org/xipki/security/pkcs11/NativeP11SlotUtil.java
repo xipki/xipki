@@ -19,9 +19,6 @@ package org.xipki.security.pkcs11;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
-import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
-import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
@@ -31,13 +28,9 @@ import org.xipki.pkcs11.params.ByteArrayParams;
 import org.xipki.pkcs11.params.CkParams;
 import org.xipki.pkcs11.params.RSA_PKCS_PSS_PARAMS;
 import org.xipki.security.EdECConstants;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11Slot.P11KeyUsage;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
 import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
 
 import java.math.BigInteger;
@@ -51,8 +44,6 @@ import java.util.List;
 import java.util.Set;
 
 import static org.xipki.pkcs11.PKCS11Constants.*;
-import static org.xipki.security.pkcs11.P11Slot.getDescription;
-import static org.xipki.util.CollectionUtil.isEmpty;
 import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**

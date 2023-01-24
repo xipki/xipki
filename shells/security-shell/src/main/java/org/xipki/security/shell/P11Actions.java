@@ -196,15 +196,15 @@ public class P11Actions {
     @Override
     protected Object execute0() throws Exception {
       P11Slot slot = getSlot();
-      P11IdentityId keyId = getIdentityId(id, label);
-      if (keyId == null) {
+      P11Identity identity = getIdentity(id, label);
+      if (identity == null) {
         println("unknown identity");
         return null;
       }
 
-      if (force || confirm("Do you want to remove the identity " + keyId, 3)) {
-        slot.removeIdentity(keyId);
-        println("deleted identity " + keyId);
+      if (force || confirm("Do you want to remove the identity " + identity.getId(), 3)) {
+        identity.destroy();
+        println("deleted identity " + identity.getId());
       }
       return null;
     }
@@ -225,7 +225,7 @@ public class P11Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      return null != getIdentityId(id, label);
+      return null != getIdentity(id, label);
     }
 
   } // class KeyExistsP11
@@ -300,7 +300,7 @@ public class P11Actions {
 
         if (force || confirm("Do you want to remove the PKCS#11 objects " + Arrays.toString(handles), 3)) {
           P11Slot slot = getSlot();
-          long[] failedHandles = slot.removeObjects(handles);
+          long[] failedHandles = slot.destroyObjects(handles);
           if (failedHandles.length == 0) {
             println("deleted all " + handles.length + " objects");
           } else {
@@ -323,12 +323,12 @@ public class P11Actions {
           if (id != null) {
             idBytes = Hex.decode(id);
             if (label == null) {
-              num = slot.removeObjectsForId(idBytes);
+              num = slot.destroyObjectsForId(idBytes);
             } else {
-              num = slot.removeObjects(idBytes, label);
+              num = slot.destroyObjects(idBytes, label);
             }
           } else {
-            num = slot.removeObjectsForLabel(label);
+            num = slot.destroyObjectsForLabel(label);
           }
           println("deleted " + num + " objects");
         }
@@ -553,11 +553,11 @@ public class P11Actions {
       return p11Service.getModule();
     }
 
-    public P11IdentityId getIdentityId(String hexId, String label)
+    public P11Identity getIdentity(String hexId, String label)
         throws IllegalCmdParamException, XiSecurityException, P11TokenException {
       P11Slot slot = getSlot();
       byte[] id = hexId == null ? null : Hex.decode(hexId);
-      return slot.getIdentityId(id, label);
+      return slot.getIdentity(id, label);
     }
 
   } // class P11SecurityAction

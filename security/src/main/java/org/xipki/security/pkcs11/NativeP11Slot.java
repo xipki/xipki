@@ -19,23 +19,17 @@ package org.xipki.security.pkcs11;
 
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.sec.SECNamedCurves;
-import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
-import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.DSAParameter;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
-import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.bouncycastle.jce.ECKeyUtil;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Attr;
 import org.xipki.pkcs11.*;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
@@ -46,7 +40,6 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
-import sun.security.pkcs11.wrapper.PKCS11;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -54,17 +47,19 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.spec.DSAPublicKeySpec;
+import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static org.xipki.pkcs11.AttributeVector.*;
 import static org.xipki.pkcs11.PKCS11Constants.*;
 import static org.xipki.security.pkcs11.NativeP11SlotUtil.*;
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.Args.positive;
 import static org.xipki.util.CollectionUtil.isEmpty;
 import static org.xipki.util.CollectionUtil.isNotEmpty;
-import static org.xipki.pkcs11.AttributeVector.*;
 
 /**
  * {@link P11Slot} based on the ipkcs11wrapper or jpkcs11wrapper.
@@ -258,7 +253,7 @@ class NativeP11Slot extends P11Slot {
       throw new P11TokenException("digestSecretKey could not be applied to non-SecretKey");
     }
 
-    long keyHandle = notNull(identity, "identity").getSigningKeyHandle();
+    long keyHandle = notNull(identity, "identity").getId().getKeyId().getHandle();
     assertMechanismSupported(mech);
 
     if (LOG.isTraceEnabled()) {
@@ -311,7 +306,7 @@ class NativeP11Slot extends P11Slot {
         : identity.getExpectedSignatureLen();
 
     Mechanism mechanismObj = getMechanism(mech, parameters);
-    long signingKeyHandle = identity.getSigningKeyHandle();
+    long signingKeyHandle = identity.getId().getKeyId().getHandle();
 
     ConcurrentBagEntry<Session> session0 = borrowSession();
     try {
@@ -514,15 +509,17 @@ class NativeP11Slot extends P11Slot {
 
     int size = tmpObjects.size();
     if (size > 1) {
-      LOG.warn("found {} public keys identified by {}, use the first one", size, getDescription(keyId, keyLabel));
+      LOG.warn("found {} {}s identified by {}, ignore them", size, ckoCodeToName(keyClass).substring(4),
+          getDescription(keyId, keyLabel));
+      return null;
+    } else {
+      return tmpObjects.get(0);
     }
-
-    return tmpObjects.get(0);
   } // method getKeyObject
 
   @Override
-  public int removeObjects(byte[] id, String label) throws P11TokenException {
-    return removeObjects(id, false, label);
+  public int destroyObjects(byte[] id, String label) throws P11TokenException {
+    return destroyObjects(id, false, label);
   }
 
   @Override
@@ -530,36 +527,105 @@ class NativeP11Slot extends P11Slot {
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
       Session session = bagEntry.value();
-      AttributeVector attrs = session.getAttrValues(identityId.getKeyId().getHandle(), CKA_CLASS, CKA_KEY_TYPE);
+      long handle = identityId.getKeyId().getHandle();
+
+      AttributeVector attrs = session.getAttrValues(handle, CKA_CLASS, CKA_KEY_TYPE);
       long keyType = attrs.keyType();
       long objClass = attrs.class_();
-      if (objClass == CKO_SECRET_KEY) {
-        int valueLen;
-        if (keyType == CKK_DES3) {
-          valueLen = 24;
-        } else {
-          Integer len = session.getIntAttrValue(identityId.getKeyId().getHandle(), CKA_VALUE_LEN);
-          if (len == null) {
-            throw new P11TokenException("CKA_VALUE_LEN is not set");
+      NativeP11Identity p11Identity = new NativeP11Identity(this, identityId);
+      if (objClass == CKO_PRIVATE_KEY) {
+        if (keyType == CKK_RSA) {
+          attrs = session.getAttrValues(handle, CKA_MODULUS, CKA_PUBLIC_EXPONENT);
+          p11Identity.setRsaMParameters(attrs.modulus(), attrs.publicExponent());
+        } else if (keyType == CKK_DSA) {
+          p11Identity.setDsaQ(session.getBigIntAttrValue(handle, CKA_SUBPRIME));
+        } else if (keyType == CKK_EC || keyType == CKK_VENDOR_SM2
+            || keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
+          byte[] ecParams = session.getByteArrayAttrValue(handle, CKA_EC_PARAMS);
+          ASN1ObjectIdentifier curveId = detectCurveOid(keyType, ecParams);
+
+          // try the public key
+          if (curveId == null && identityId.getPublicKeyHandle() != null) {
+            ecParams = session.getByteArrayAttrValue(identityId.getPublicKeyHandle(), CKA_EC_PARAMS);
+            curveId = detectCurveOid(keyType, ecParams);
           }
-          valueLen = len;
+
+          if (curveId != null) {
+            p11Identity.setEcParams(curveId);
+          }
+        } else {
+          throw new IllegalStateException("unknown key type " + ckkCodeToName(keyType));
         }
-        return new NativeP11Identity(this, identityId, keyType, valueLen * 8);
-      } else if (objClass == CKO_PRIVATE_KEY) {
-        PublicKey jcePublicKey = null;
-        if (identityId.getPublicKeyId() != null) {
-          jcePublicKey = generatePublicKey(session, identityId.getPublicKeyId().getHandle(), keyType);
-        } else if (keyType == CKK_RSA) {
-          attrs = session.getAttrValues(identityId.getKeyId().getHandle(), CKA_MODULUS, CKA_PUBLIC_EXPONENT);
-          jcePublicKey = buildRSAKey(attrs.modulus(), attrs.publicExponent());
-        }
-        return new NativeP11Identity(this, identityId, keyType, jcePublicKey);
       } else {
         // should not reach here
         throw new IllegalStateException("unknown object class " + ckoCodeToName(objClass));
       }
+
+      return p11Identity;
     } catch (PKCS11Exception e) {
       throw new P11TokenException(e);
+    } finally {
+      sessions.requite(bagEntry);
+    }
+  }
+
+  @Override
+  protected PublicKey getPublicKey(P11Identity identity) throws P11TokenException {
+    Long publicKeyHandle = identity.getId().getPublicKeyHandle();
+    if (publicKeyHandle == null) {
+      return null;
+    }
+
+    ConcurrentBagEntry<Session> bagEntry = borrowSession();
+    try {
+      long keyType = identity.getKeyType();
+      Session session = bagEntry.value();
+      if (keyType == CKK_RSA) {
+        return buildRSAKey(identity.getRsaModulus(), identity.getRsaPublicExponent());
+      } else if (keyType == CKK_DSA) {
+        BigInteger q = identity.getDsaQ();
+        AttributeVector attrs = session.getAttrValues(publicKeyHandle, CKA_PRIME, CKA_VALUE, CKA_BASE);
+        DSAPublicKeySpec keySpec = new DSAPublicKeySpec(
+            new BigInteger(1, attrs.value()), attrs.prime(), q, attrs.base());
+        try {
+          return KeyUtil.generateDSAPublicKey(keySpec);
+        } catch (InvalidKeySpecException ex) {
+          throw new P11TokenException(ex.getMessage(), ex);
+        }
+      } else if (keyType == CKK_EC || keyType == CKK_VENDOR_SM2
+          || keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
+        byte[] ecPoint = session.getByteArrayAttrValue(publicKeyHandle, CKA_EC_POINT);
+        ASN1ObjectIdentifier curveOid = identity.getEcParams();
+        byte[] encodedPoint = DEROctetString.getInstance(ecPoint).getOctets();
+
+        if (keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
+          if (keyType == CKK_EC_EDWARDS) {
+            if (!EdECConstants.isEdwardsCurve(curveOid)) {
+              throw new P11TokenException("unknown Edwards curve OID " + curveOid);
+            }
+          } else {
+            if (!EdECConstants.isMontgomeryCurve(curveOid)) {
+              throw new P11TokenException("unknown Montgomery curve OID " + curveOid);
+            }
+          }
+          SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(new AlgorithmIdentifier(curveOid), encodedPoint);
+          try {
+            return KeyUtil.generatePublicKey(pkInfo);
+          } catch (InvalidKeySpecException ex) {
+            throw new P11TokenException(ex.getMessage(), ex);
+          }
+        } else {
+          try {
+            return KeyUtil.createECPublicKey(curveOid, encodedPoint);
+          } catch (InvalidKeySpecException ex) {
+            throw new P11TokenException(ex.getMessage(), ex);
+          }
+        }
+      } else {
+        throw new P11TokenException("unknown key type " + ckkCodeToName(keyType));
+      }
+    } catch (PKCS11Exception ex) {
+      throw new P11TokenException(ex.getMessage(), ex);
     } finally {
       sessions.requite(bagEntry);
     }
@@ -590,7 +656,7 @@ class NativeP11Slot extends P11Slot {
   }
 
   @Override
-  public long[] removeObjects(long[] handles) {
+  public long[] destroyObjects(long[] handles) {
     ConcurrentBagEntry<Session> bagEntry = null;
     List<Long> destroyedHandles = new ArrayList<>(handles.length);
     try {
@@ -625,7 +691,7 @@ class NativeP11Slot extends P11Slot {
     return failedHandles;
   }
 
-  private int removeObjects(byte[] id, boolean ignoreLabel, String label) throws P11TokenException {
+  private int destroyObjects(byte[] id, boolean ignoreLabel, String label) throws P11TokenException {
     if (ignoreLabel) {
       label = null;
     }
@@ -723,7 +789,7 @@ class NativeP11Slot extends P11Slot {
         throw new P11TokenException(e);
       }
 
-      return new P11IdentityId(slotId, new P11ObjectId(keyHandle, id, label));
+      return new P11IdentityId(slotId, new P11ObjectId(keyHandle, CKO_SECRET_KEY, keyType, id, label), null);
     } finally {
       sessions.requite(bagEntry);
     }
@@ -772,7 +838,7 @@ class NativeP11Slot extends P11Slot {
       } catch (PKCS11Exception e) {
       }
 
-      return new P11IdentityId(slotId, new P11ObjectId(keyHandle, id, label));
+      return new P11IdentityId(slotId, new P11ObjectId(keyHandle, CKO_SECRET_KEY, keyType, id, label), null);
     } finally {
       sessions.requite(bagEntry);
     }
@@ -1049,21 +1115,8 @@ class NativeP11Slot extends P11Slot {
           throw new P11TokenException("could not generate keypair " + ckmCodeToName(mech), ex);
         }
 
-        String pubKeyLabel;
-
-        try {
-          label = session.getCkaLabel(keypair.getPrivateKey());
-          if (label == null) {
-            throw new P11TokenException("Label of the generated PrivateKey is not set");
-          }
-
-          pubKeyLabel = session.getCkaLabel(keypair.getPublicKey());
-        } catch (PKCS11Exception ex) {
-          throw new P11TokenException("error getting attribute CKA_LABEL", ex);
-        }
-
-        P11IdentityId ret = new P11IdentityId(slotId, new P11ObjectId(keypair.getPrivateKey(), id, label),
-            new P11ObjectId(keypair.getPublicKey(), id, pubKeyLabel));
+        P11IdentityId ret = new P11IdentityId(slotId,
+            new P11ObjectId(keypair.getPrivateKey(), CKO_PRIVATE_KEY, keyType, id, label), keypair.getPublicKey());
         succ = true;
         return ret;
       } finally {
@@ -1072,7 +1125,7 @@ class NativeP11Slot extends P11Slot {
     } finally {
       if (!succ && (id != null)) {
         try {
-          removeObjects(id, false, label);
+          destroyObjects(id, false, label);
         } catch (Throwable th) {
           LogUtil.error(LOG, th, "could not remove objects");
         }
@@ -1092,50 +1145,48 @@ class NativeP11Slot extends P11Slot {
 
       if (keyId == null) {
         AttributeVector template = new AttributeVector().label(keyLabel);
-        List<Long> objHandles = getObjects(session, template.class_(CKO_PRIVATE_KEY), 2);
-        boolean isSecretKey = objHandles.isEmpty();
-        if (isSecretKey) {
-          objHandles = getObjects(session, template.class_(CKO_SECRET_KEY), 2);
+
+        long objClass = CKO_PRIVATE_KEY;
+        List<Long> objHandles = getObjects(session, template.class_(objClass), 2);
+        if (objHandles.isEmpty()) {
+          objClass = CKO_SECRET_KEY;
+          objHandles = getObjects(session, template.class_(objClass), 2);
         }
 
         if (objHandles.isEmpty()) {
           return null;
         } else if (objHandles.size() > 1) {
-          throw new P11TokenException("found more than 1 " + (isSecretKey ? "secret" : "private") +
-              " key with label=" + keyLabel);
+          throw new P11TokenException("found more than 1 " + ckkCodeToName(objClass).substring(4) +
+              " with label=" + keyLabel);
         }
 
         long keyHandle = objHandles.get(0);
-        keyId = session.getCkaId(keyHandle);
+        AttributeVector attrs = session.getAttrValues(keyHandle, CKA_ID, CKA_KEY_TYPE);
+        long keyType = attrs.keyType();
+        keyId = attrs.id();
 
-        P11ObjectId keyObjectId = new P11ObjectId(keyHandle, keyId, keyLabel);
-        if (isSecretKey) {
-          return new P11IdentityId(slotId, keyObjectId);
-        } else {
-          P11ObjectId publicKeyObjectId = null;
+        P11ObjectId secretOrPrivKeyId = new P11ObjectId(keyHandle, objClass, keyType, keyId, keyLabel);
 
+        Long publicKeyHandle = null;
+        if (objClass == CKO_PRIVATE_KEY) {
           if (keyId == null) {
             List<Long> handles = getObjects(session, AttributeVector.newPublicKey().label(keyLabel), 2);
             if (handles.size() > 1) {
               LOG.warn("found more than 1 public key with label={}, ignore them", keyLabel);
             } else if (handles.size() == 1){
-              long publicKeyHandle = handles.get(0);
-              byte[] publicKeyId = session.getCkaId(publicKeyHandle);
-              publicKeyObjectId = new P11ObjectId(publicKeyHandle, publicKeyId, keyLabel);
+              publicKeyHandle = handles.get(0);
             }
           } else {
             List<Long> handles = getObjects(session, AttributeVector.newPublicKey().id(keyId), 2);
             if (handles.size() > 1) {
               LOG.warn("found more than 1 public key with id={}, ignore them", Hex.encode(keyId));
             } else if (handles.size() == 1){
-              long publicKeyHandle = handles.get(0);
-              String publicKeyLabel = session.getCkaLabel(publicKeyHandle);
-              publicKeyObjectId = new P11ObjectId(publicKeyHandle, keyId, publicKeyLabel);
+              publicKeyHandle = handles.get(0);
             }
           }
-
-          return new P11IdentityId(slotId, keyObjectId, publicKeyObjectId);
         }
+
+        return new P11IdentityId(slotId, secretOrPrivKeyId, publicKeyHandle);
       } else {
         // keyId != null
         AttributeVector template = new AttributeVector().id(keyId);
@@ -1143,65 +1194,48 @@ class NativeP11Slot extends P11Slot {
           template.label(keyLabel);
         }
 
-        List<Long> objHandles = getObjects(session, template.class_(CKO_PRIVATE_KEY), 2);
-        boolean isSecretKey = objHandles.isEmpty();
-        if (isSecretKey) {
-          objHandles = getObjects(session, template.class_(CKO_SECRET_KEY), 2);
+        long objClass = CKO_PRIVATE_KEY;
+        List<Long> objHandles = getObjects(session, template.class_(objClass), 2);
+        if (objHandles.isEmpty()) {
+          objClass = CKO_SECRET_KEY;
+          objHandles = getObjects(session, template.class_(objClass), 2);
         }
 
         if (objHandles.isEmpty()) {
           return null;
         } else if (objHandles.size() > 1) {
-          throw new P11TokenException("found more than 1 " + (isSecretKey ? "secret" : "private") +
-              " key with " + getDescription(keyId, keyLabel));
+          throw new P11TokenException("found more than 1 " + ckoCodeToName(objClass).substring(4) +
+              " with " + getDescription(keyId, keyLabel));
         }
 
         long keyHandle = objHandles.get(0);
+        AttributeVector attrs;
         if (keyLabel == null) {
-          keyLabel = session.getCkaLabel(keyHandle);
+          attrs = session.getAttrValues(keyHandle, CKA_KEY_TYPE, CKA_LABEL);
+          keyLabel = attrs.label();
+        } else {
+          attrs = session.getAttrValues(keyHandle, CKA_KEY_TYPE);
         }
 
-        if (isSecretKey) {
-          return new P11IdentityId(slotId, new P11ObjectId(keyHandle, keyId, keyLabel));
-        } else {
+        P11ObjectId secretOrPrivKeyId = new P11ObjectId(keyHandle, objClass, attrs.keyType(), keyId, keyLabel);
+
+        Long publicKeyHandle = null;
+        if (objClass == CKO_PRIVATE_KEY) {
           objHandles = getObjects(session, AttributeVector.newPublicKey().id(keyId), 2);
 
-          P11ObjectId publicKeyId;
           if (objHandles.isEmpty()) {
             LOG.warn("found no public key with ID {}.", hex(keyId));
-            publicKeyId = null;
           } else if (objHandles.size() > 1) {
             LOG.warn("found more than 1 public key with ID {}, ignore them", hex(keyId));
-            publicKeyId = null;
           } else {
-            long publicKeyHandle = objHandles.get(0);
-            String publicKeyLabel = session.getCkaLabel(publicKeyHandle);
-            publicKeyId = new P11ObjectId(publicKeyHandle, keyId, publicKeyLabel);
+            publicKeyHandle = objHandles.get(0);
           }
-          return new P11IdentityId(slotId, new P11ObjectId(keyHandle, keyId, keyLabel), publicKeyId);
         }
+
+        return new P11IdentityId(slotId, secretOrPrivKeyId, publicKeyHandle);
       }
     } catch (PKCS11Exception ex) {
       throw new P11TokenException(ex);
-    } finally {
-      sessions.requite(bagEntry);
-    }
-  }
-
-  @Override
-  public void removeIdentity(P11IdentityId identityId) throws P11TokenException {
-    ConcurrentBagEntry<Session> bagEntry = borrowSession();
-    try {
-      Session session = bagEntry.value();
-      P11ObjectId keyId = identityId.getKeyId();
-      byte[] id = keyId.getId();
-      String label = keyId.getLabel();
-      destroyObject(session, keyId.getHandle(), "secret/private key " + keyId);
-
-      P11ObjectId pubKeyId = identityId.getPublicKeyId();
-      if (pubKeyId != null) {
-        destroyObject(session, pubKeyId.getHandle(), "public key " + keyId);
-      }
     } finally {
       sessions.requite(bagEntry);
     }
@@ -1265,9 +1299,9 @@ class NativeP11Slot extends P11Slot {
 
         String text;
         try {
-          text = (++no) + ". " + objectText;
+          text = formatNumber(++no, 3) + ". " + objectText;
         } catch (Exception ex) {
-          text = no + ". " + "Error reading object with handle " + handle;
+          text = formatNumber(no, 3) + ". " + "Error reading object with handle " + handle;
           LOG.debug(text, ex);
         }
 
@@ -1318,34 +1352,11 @@ class NativeP11Slot extends P11Slot {
           if (ecParams == null) {
             curveName = "<N/A>";
           } else  {
-            int tag = 0xff & ecParams[0];
-            if (tag == 6 && (0xff & ecParams[1]) == ecParams.length - 2) {
-              ASN1ObjectIdentifier curveOid = ASN1ObjectIdentifier.getInstance(ecParams);
-              String name = keyType == CKK_EC ? AlgorithmUtil.getCurveName(curveOid) : EdECConstants.getName(curveOid);
-              curveName = (name == null) ? curveOid.getId() : name;
-            } else if ((tag == BERTags.UTF8_STRING || tag == BERTags.PRINTABLE_STRING)
-                && (0xff & ecParams[1]) == ecParams.length -2) {
-              try {
-                ASN1StreamParser parser = new ASN1StreamParser(ecParams);
-                ASN1Encodable obj = parser.readObject();
-                if (obj instanceof ASN1String) {
-                  curveName = ((ASN1String) obj).getString();
-                }
-              } catch (Exception e) {
-              }
-            } else if (ecParams[0] == 0x30) {
-              for (String ecCurveName : AlgorithmUtil.getECCurveNames()) {
-                try {
-                  X9ECParameters x962Params = ECNamedCurveTable.getByName(ecCurveName);
-                  if (x962Params != null) {
-                    if (Arrays.equals(ecParams, x962Params.getEncoded())) {
-                      curveName = ecCurveName;
-                      break;
-                    }
-                  }
-                } catch (Exception e) {
-                  e.printStackTrace();
-                }
+            ASN1ObjectIdentifier curveOid = detectCurveOid(keyType, ecParams);
+            if (curveOid != null) {
+              curveName = AlgorithmUtil.getCurveName(curveOid);
+              if (curveName == null) {
+                curveName = curveOid.getId();
               }
             }
 
@@ -1471,6 +1482,18 @@ class NativeP11Slot extends P11Slot {
       String msg = "could not destroy " + objectDesc;
       LogUtil.error(LOG, ex, msg);
       throw new P11TokenException(msg);
+    }
+  }
+
+  private static ASN1ObjectIdentifier detectCurveOid(long keyType, byte[] ecParams) {
+    if (ecParams[0] == 0x06 && (0xFF & ecParams[1]) == ecParams.length - 2) {
+      try {
+        return ASN1ObjectIdentifier.getInstance(ecParams);
+      } catch (Exception e) {
+        return null;
+      }
+    } else {
+      return null;
     }
   }
 

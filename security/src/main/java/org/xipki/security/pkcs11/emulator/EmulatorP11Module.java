@@ -37,7 +37,7 @@ import static org.xipki.util.Args.notNull;
  * @since 2.0.0
  */
 
-public class EmulatorP11Module extends P11Module {
+class EmulatorP11Module extends P11Module {
 
   public static final String TYPE = "emulator";
 
@@ -163,7 +163,7 @@ public class EmulatorP11Module extends P11Module {
       char[] firstPwd = pwd.get(0);
 
       slots.add(new EmulatorP11Slot(moduleConf.getName(), slotDir, slotId,
-          moduleConf.isReadOnly(), new KeyCryptor(firstPwd), moduleConf.getP11MechanismFilter(),
+          moduleConf.isReadOnly(), new EmulatorKeyCryptor(firstPwd), moduleConf.getP11MechanismFilter(),
           moduleConf.getP11NewObjectConf(), moduleConf.getNumSessions(),
           moduleConf.getSecretKeyTypes(), moduleConf.getKeyPairTypes()));
     }

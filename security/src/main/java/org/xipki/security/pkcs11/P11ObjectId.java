@@ -36,6 +36,10 @@ public class P11ObjectId implements Comparable<P11ObjectId> {
 
   private final long handle;
 
+  private final long keyType;
+
+  private final long objectCLass;
+
   private final byte[] id;
 
   private final String idHex;
@@ -50,8 +54,10 @@ public class P11ObjectId implements Comparable<P11ObjectId> {
    * @param label
    *          Label. Cannot be {@code null} and blank if id is null or zero-length.
    */
-  public P11ObjectId(long handle, byte[] id, String label) {
+  public P11ObjectId(long handle, long objectClass, long keyType, byte[] id, String label) {
     this.handle = handle;
+    this.objectCLass = objectClass;
+    this.keyType = keyType;
     if (id == null || id.length == 0) {
       this.id = null;
       this.idHex = null;
@@ -61,6 +67,14 @@ public class P11ObjectId implements Comparable<P11ObjectId> {
       this.idHex = Hex.encode(id);
       this.label = label;
     }
+  }
+
+  public long getKeyType() {
+    return keyType;
+  }
+
+  public long getObjectCLass() {
+    return objectCLass;
   }
 
   public long getHandle() {

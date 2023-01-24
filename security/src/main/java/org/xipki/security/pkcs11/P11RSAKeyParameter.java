@@ -19,10 +19,6 @@ package org.xipki.security.pkcs11;
 
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 
-import java.math.BigInteger;
-import java.security.InvalidKeyException;
-import java.security.interfaces.RSAPublicKey;
-
 import static org.xipki.util.Args.notNull;
 
 /**
@@ -33,48 +29,23 @@ import static org.xipki.util.Args.notNull;
  */
 public class P11RSAKeyParameter extends RSAKeyParameters {
 
-  private final P11CryptService p11CryptService;
-
-  private final P11IdentityId identityId;
+  private final P11Identity identity;
 
   private final int keysize;
 
-  private P11RSAKeyParameter(
-      P11CryptService p11CryptService, P11IdentityId identityId, BigInteger modulus, BigInteger publicExponent) {
-    super(true, modulus, publicExponent);
+  public P11RSAKeyParameter(P11Identity identity) {
+    super(true, identity.getRsaModulus(), identity.getRsaPublicExponent());
 
-    notNull(modulus,"modulus");
-    notNull(publicExponent, "publicExponent");
-    this.p11CryptService = notNull(p11CryptService, "p11CryptService");
-    this.identityId = notNull(identityId, "identityId");
-    this.keysize = modulus.bitLength();
+    this.identity = notNull(identity, "identity");
+    this.keysize = identity.getRsaModulus().bitLength();
   }
 
   int getKeysize() {
     return keysize;
   }
 
-  P11CryptService getP11CryptService() {
-    return p11CryptService;
-  }
-
-  P11IdentityId getIdentityId() {
-    return identityId;
-  }
-
-  public static P11RSAKeyParameter getInstance(P11CryptService p11CryptService, P11IdentityId identityId)
-      throws InvalidKeyException {
-    notNull(p11CryptService, "p11CryptService");
-    notNull(identityId, "identityId");
-
-    RSAPublicKey key;
-    try {
-      key = (RSAPublicKey) p11CryptService.getIdentity(identityId).getPublicKey();
-    } catch (P11TokenException ex) {
-      throw new InvalidKeyException(ex.getMessage(), ex);
-    }
-
-    return new P11RSAKeyParameter(p11CryptService, identityId, key.getModulus(), key.getPublicExponent());
+  P11Identity getIdentity() {
+    return identity;
   }
 
 }

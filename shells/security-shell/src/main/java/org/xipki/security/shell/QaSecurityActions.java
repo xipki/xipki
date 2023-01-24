@@ -974,11 +974,7 @@ public class QaSecurityActions {
   } // class SpeedEcSignP11
 
   private static ASN1ObjectIdentifier getCurveOid(String curveName) {
-    ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(curveName);
-    if (curveOid == null) {
-      curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
-    }
-
+    ASN1ObjectIdentifier curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
     if (curveOid == null) {
       throw new IllegalArgumentException("unknown curveName " + curveName);
     }

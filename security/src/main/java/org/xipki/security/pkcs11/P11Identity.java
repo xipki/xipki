@@ -17,19 +17,18 @@
 
 package org.xipki.security.pkcs11;
 
-import org.bouncycastle.jcajce.interfaces.EdDSAKey;
-import org.bouncycastle.jcajce.interfaces.XDHKey;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
+import org.bouncycastle.math.ec.ECCurve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.X509Cert;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.XiSecurityException;
-import org.xipki.util.CollectionUtil;
+import org.xipki.util.LogUtil;
 
+import java.math.BigInteger;
 import java.security.PublicKey;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPublicKey;
-import java.util.Arrays;
 
 import static org.xipki.pkcs11.PKCS11Constants.*;
 import static org.xipki.util.Args.notNull;
@@ -49,46 +48,71 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
   protected final P11IdentityId id;
 
-  private final long keyType;
+  private int expectedSignatureLen;
 
-  protected final PublicKey publicKey;
+  private ASN1ObjectIdentifier ecParams;
 
-  private final int signatureKeyBitLength;
+  private BigInteger rsaModulus;
 
-  protected P11Identity(P11Slot slot, P11IdentityId id, long keyType, int signatureKeyBitLength) {
+  private BigInteger rsaPublicExponent;
+
+  private BigInteger dsaQ;
+
+  private boolean publicKeyInitialized;
+
+  private PublicKey publicKey;
+
+  protected P11Identity(P11Slot slot, P11IdentityId id) {
     this.slot = notNull(slot, "slot");
     this.id = notNull(id, "id");
-    this.keyType = keyType;
-    this.publicKey = null;
-    this.signatureKeyBitLength = signatureKeyBitLength;
-  } // constructor
+  }
 
-  protected P11Identity(P11Slot slot, P11IdentityId id, long keyType, PublicKey publicKey) {
-    this.slot = notNull(slot, "slot");
-    this.id = notNull(id, "id");
-    this.keyType = keyType;
-    this.publicKey = notNull(publicKey, "publicKey");
+  public abstract void destroy() throws P11TokenException;
 
-    if (this.publicKey instanceof RSAPublicKey) {
-      signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();
-    } else if (this.publicKey instanceof ECPublicKey) {
-      signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getOrder().bitLength();
-    } else if (this.publicKey instanceof DSAPublicKey) {
-      signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getQ().bitLength();
-    } else if (this.publicKey instanceof EdDSAKey) {
-      // will not be used
-      signatureKeyBitLength = 0;
-    } else if (this.publicKey instanceof XDHKey) {
-      // no signature is supported
-      signatureKeyBitLength = 0;
+  public ASN1ObjectIdentifier getEcParams() {
+    return ecParams;
+  }
+
+  public void setEcParams(ASN1ObjectIdentifier ecParams) {
+    if (EdECConstants.id_ED25519.equals(ecParams)) {
+      expectedSignatureLen = 64;
+    } else if (EdECConstants.id_ED448.equals(ecParams)) {
+      expectedSignatureLen = 114;
     } else {
-      throw new IllegalArgumentException("currently only RSA, DSA, EC and Edwards public key are supported, but not "
-          + this.publicKey.getAlgorithm() + " (class: " + this.publicKey.getClass().getName() + ")");
+      X9ECParameters x9params = ECUtil.getNamedCurveByOid(ecParams);
+      if (x9params != null) {
+        expectedSignatureLen = (x9params.getCurve().getOrder().bitLength() + 7) / 8 * 2;
+      }
     }
-  } // constructor
+
+    this.ecParams = ecParams;
+  }
+
+  public BigInteger getRsaModulus() {
+    return rsaModulus;
+  }
+
+  public BigInteger getRsaPublicExponent() {
+    return rsaPublicExponent;
+  }
+
+  public void setRsaMParameters(BigInteger modulus, BigInteger publicExponent) {
+    this.rsaModulus = modulus;
+    this.rsaPublicExponent = publicExponent;
+    expectedSignatureLen = (modulus.bitLength() + 7) / 8;
+  }
+
+  public BigInteger getDsaQ() {
+    return dsaQ;
+  }
+
+  public void setDsaQ(BigInteger q) {
+    this.dsaQ = q;
+    expectedSignatureLen = (q.bitLength() + 7) / 8 * 2;
+  }
 
   public byte[] sign(long mechanism, P11Params parameters, byte[] content) throws P11TokenException {
-    if (publicKey instanceof XDHKey) {
+    if (id.getKeyId().getKeyType() == CKK_EC_MONTGOMERY) {
       throw new P11TokenException("this identity is not suitable for sign");
     }
 
@@ -134,11 +158,15 @@ public abstract class P11Identity implements Comparable<P11Identity> {
   }
 
   public long getKeyType() {
-    return keyType;
+    return id.getKeyId().getKeyType();
   }
 
-  public PublicKey getPublicKey() {
-    return publicKey;
+  public int getExpectedSignatureLen() {
+    return expectedSignatureLen;
+  }
+
+  public void setExpectedSignatureLen(int numBytes) {
+    this.expectedSignatureLen = numBytes;
   }
 
   public boolean match(P11IdentityId id) {
@@ -149,17 +177,44 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     return id.match(slotId, keyLabel);
   }
 
-  public int getSignatureKeyBitLength() {
-    return signatureKeyBitLength;
-  }
-
   @Override
   public int compareTo(P11Identity obj) {
     return id.compareTo(obj.id);
   }
 
+  public boolean isSecretKey() {
+    return id.getKeyId().getObjectCLass() == CKO_SECRET_KEY;
+  }
+
+  public final synchronized PublicKey getPublicKey() {
+    if (isSecretKey()) {
+      return null;
+    }
+
+    if (publicKeyInitialized) {
+      return publicKey;
+    } else {
+      try {
+        publicKey = slot.getPublicKey(this);
+      } catch (Exception e) {
+        LogUtil.error(LOG, e, "could not initialize public key for (private) key " + id);
+      } finally {
+        publicKeyInitialized = true;
+      }
+      return publicKey;
+    }
+  }
+
+  public boolean supportsMechanism(long mechanism) {
+    return slot.supportsMechanism(mechanism);
+  }
+
   public boolean supportsMechanism(long mechanism, P11Params parameters) {
-    if (publicKey == null) {
+    if (!supportsMechanism(mechanism)) {
+      return false;
+    }
+
+    if (isSecretKey()) {
       if (CKM_SHA_1_HMAC == mechanism
           || CKM_SHA224_HMAC == mechanism   || CKM_SHA256_HMAC == mechanism
           || CKM_SHA384_HMAC == mechanism   || CKM_SHA512_HMAC == mechanism
@@ -169,7 +224,8 @@ public abstract class P11Identity implements Comparable<P11Identity> {
       }
     }
 
-    if (publicKey instanceof RSAPublicKey) {
+    long keyType = getKeyType();
+    if (keyType == CKK_RSA) {
       if (CKM_RSA_9796 == mechanism || CKM_RSA_PKCS == mechanism
           || CKM_SHA1_RSA_PKCS == mechanism   || CKM_SHA224_RSA_PKCS == mechanism
           || CKM_SHA256_RSA_PKCS == mechanism || CKM_SHA384_RSA_PKCS == mechanism
@@ -183,14 +239,14 @@ public abstract class P11Identity implements Comparable<P11Identity> {
       } else if (CKM_RSA_X_509 == mechanism) {
         return parameters == null;
       }
-    } else if (publicKey instanceof DSAPublicKey) {
+    } else if (keyType == CKK_DSA) {
       if (parameters != null) {
         return false;
       }
       return CKM_DSA == mechanism || CKM_DSA_SHA1 == mechanism
           || CKM_DSA_SHA224 == mechanism || CKM_DSA_SHA256 == mechanism
           || CKM_DSA_SHA384 == mechanism || CKM_DSA_SHA512 == mechanism;
-    } else if (publicKey instanceof ECPublicKey) {
+    } else if (keyType == CKK_EC || keyType == CKK_VENDOR_SM2) {
       if (CKM_ECDSA == mechanism || CKM_ECDSA_SHA1 == mechanism
           || CKM_ECDSA_SHA224 == mechanism || CKM_ECDSA_SHA256 == mechanism
           || CKM_ECDSA_SHA384 == mechanism || CKM_ECDSA_SHA512 == mechanism
@@ -199,7 +255,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
       } else if (CKM_VENDOR_SM2_SM3 == mechanism) {
         return parameters instanceof P11Params.P11ByteArrayParams;
       }
-    } else if (publicKey instanceof EdDSAKey) {
+    } else if (keyType == CKK_EC_EDWARDS) {
       return CKM_EDDSA == mechanism;
     }
 

@@ -47,7 +47,7 @@ import static org.xipki.util.Args.notNull;
  * @since 2.0.0
  */
 
-class KeyCryptor {
+class EmulatorKeyCryptor {
 
   /**
    * KeyDerive: SCRYPT (S = 0x0000000000000000 (8 bytes), N = 16384, r = 8, p = 1) and
@@ -63,7 +63,7 @@ class KeyCryptor {
 
   private final SecureRandom rnd;
 
-  KeyCryptor(char[] password) {
+  EmulatorKeyCryptor(char[] password) {
     notNull(password, "password");
 
     /*

@@ -17,6 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
+import org.xipki.pkcs11.PKCS11Constants;
 import org.xipki.util.CompareUtil;
 
 import static org.xipki.util.Args.notNull;
@@ -34,36 +35,24 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
 
   private final P11ObjectId keyId;
 
-  private final P11ObjectId publicKeyId;
+  private final Long publicKeyHandle;
 
   /**
    * Constructor.
    *
-   * @param slotId
-   *          Slot identifier. Must not be {@code null}.
-   * @param keyId
-   *          Object identifier. Must not be {@code null}.
+   * @param slotId Slot identifier. Must not be {@code null}.
+   * @param keyId  Object identifier. Must not be {@code null}.
+   * @param publicKeyHandle Object handle of the public key, may be {@code null}.
+   *
    */
-  public P11IdentityId(P11SlotIdentifier slotId, P11ObjectId keyId) {
+  public P11IdentityId(P11SlotIdentifier slotId, P11ObjectId keyId, Long publicKeyHandle) {
     this.slotId = notNull(slotId, "slotId");
     this.keyId = notNull(keyId, "keyId");
-    this.publicKeyId = null;
+    this.publicKeyHandle = (keyId.getObjectCLass() == PKCS11Constants.CKO_SECRET_KEY) ? null : publicKeyHandle;
   }
 
-  /**
-   * Constructor.
-   *
-   * @param slotId
-   *          Slot identifier. Must not be {@code null}.
-   * @param privateKeyId
-   *          Object identifier of secret or private key. Must not be {@code null}.
-   * @param publicKeyId
-   *          Object identifier of public key. May be {@code null}.
-   */
-  public P11IdentityId(P11SlotIdentifier slotId, P11ObjectId privateKeyId, P11ObjectId publicKeyId) {
-    this.slotId = notNull(slotId, "slotId");
-    this.keyId = notNull(privateKeyId, "privateKeyId");
-    this.publicKeyId = publicKeyId;
+  public Long getPublicKeyHandle() {
+    return publicKeyHandle;
   }
 
   public P11SlotIdentifier getSlotId() {
@@ -72,10 +61,6 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
 
   public P11ObjectId getKeyId() {
     return keyId;
-  }
-
-  public P11ObjectId getPublicKeyId() {
-    return publicKeyId;
   }
 
   @Override
@@ -96,8 +81,7 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
     }
 
     P11IdentityId ei = (P11IdentityId) obj;
-    return this.slotId.equals(ei.slotId)  && this.keyId.equals(ei.keyId)
-        && CompareUtil.equalsObject(publicKeyId, ei.publicKeyId);
+    return this.slotId.equals(ei.slotId)  && this.keyId.equals(ei.keyId);
   }
 
   public boolean match(P11SlotIdentifier slotId, String keyLabel) {
@@ -107,21 +91,12 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("slot ").append(slotId).append(", key ").append(keyId);
-    if (publicKeyId != null && publicKeyId != keyId) {
-      sb.append(", public key ").append(publicKeyId);
-    }
-    return sb.toString();
+    return "slot " + slotId + ", key " + keyId;
   }
 
   @Override
   public int hashCode() {
-    int hashCode = slotId.hashCode() + 31 * keyId.hashCode();
-    if (publicKeyId != null) {
-      hashCode += 31 * 31 * publicKeyId.hashCode();
-    }
-    return hashCode;
+    return slotId.hashCode() + 31 * keyId.hashCode();
   }
 
 }

@@ -20,6 +20,7 @@ package org.xipki.security.util;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.jce.ECNamedCurveTable;
+import org.xipki.security.EdECConstants;
 import org.xipki.util.StringUtil;
 
 import java.util.*;
@@ -36,6 +37,8 @@ import static org.xipki.util.Args.*;
 public class AlgorithmUtil {
 
   private static final List<String> curveNames;
+
+  private static final List<ASN1ObjectIdentifier> curveOIDs;
 
   private static final Map<String, ASN1ObjectIdentifier> curveNameToOidMap;
 
@@ -80,6 +83,7 @@ public class AlgorithmUtil {
 
     Collections.sort(nameList);
     curveNames = Collections.unmodifiableList(nameList);
+    curveOIDs = Collections.unmodifiableList(new ArrayList<>(oidNameMap.keySet()));
     curveNameToOidMap = Collections.unmodifiableMap(nameOidMap);
     curveOidToNameMap = Collections.unmodifiableMap(oidNameMap);
   } // method static
@@ -148,9 +152,17 @@ public class AlgorithmUtil {
     return curveNames;
   }
 
+  public static List<ASN1ObjectIdentifier> getECCurveOIDs() {
+    return curveOIDs;
+  }
+
   public static String getCurveName(ASN1ObjectIdentifier curveOid) {
     notNull(curveOid, "curveOid");
-    return curveOidToNameMap.get(curveOid);
+    String curveName = curveOidToNameMap.get(curveOid);
+    if (curveName == null) {
+      curveName = EdECConstants.getName(curveOid);
+    }
+    return curveName;
   }
 
   public static ASN1ObjectIdentifier getCurveOidForCurveNameOrOid(String curveNameOrOid) {
@@ -160,6 +172,9 @@ public class AlgorithmUtil {
       oid = new ASN1ObjectIdentifier(curveNameOrOid);
     } catch (Exception ex) {
       oid = getCurveOidForName(curveNameOrOid);
+      if (oid == null) {
+        oid = EdECConstants.getCurveOid(curveNameOrOid);
+      }
     }
     return oid;
   } // method getCurveOidForCurveNameOrOid
