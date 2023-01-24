@@ -122,10 +122,9 @@ public class P11ContentSignerBuilder {
     } // end for
 
     final boolean mac = false;
-    PrivateKey privateKey = new P11PrivateKey(identity);
     DfltConcurrentContentSigner concurrentSigner;
     try {
-      concurrentSigner = new DfltConcurrentContentSigner(mac, signers, privateKey);
+      concurrentSigner = new DfltConcurrentContentSigner(mac, signers);
     } catch (NoSuchAlgorithmException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }

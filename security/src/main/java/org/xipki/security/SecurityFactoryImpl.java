@@ -184,21 +184,6 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   }
 
   @Override
-  public KeyCertPair createPrivateKeyAndCert(String type, SignerConf conf, X509Cert cert)
-      throws ObjectCreationException {
-    conf.putConfEntry("parallelism", Integer.toString(1));
-
-    X509Cert[] certs = null;
-    if (cert != null) {
-      certs = new X509Cert[]{cert};
-    }
-
-    ConcurrentContentSigner signer = signerFactoryRegister.newSigner(this, type, conf, certs);
-    PrivateKey privateKey = (PrivateKey) signer.getSigningKey();
-    return new KeyCertPair(privateKey, signer.getCertificate());
-  } // method createPrivateKeyAndCert
-
-  @Override
   public SecureRandom getRandom4Key() {
     return getSecureRandom(strongRandom4KeyEnabled);
   }

@@ -49,21 +49,6 @@ public interface SecurityFactory {
   Set<String> getSupportedSignerTypes();
 
   /**
-   * Create secret key and certificate pair.
-   * @param type
-   *          Type of the signer. Must not be {@code null}.
-   * @param conf
-   *          Configuration of the signer. Could be {@code null}.
-   * @param cert
-   *          Certificate of the signer. If not {@code null}, it will be used; otherwise
-   *          the certificates contained in the token will be used.
-   * @return the new pair of key and certificate
-   * @throws ObjectCreationException
-   *         if could not create the object
-   */
-  KeyCertPair createPrivateKeyAndCert(String type, SignerConf conf, X509Cert cert) throws ObjectCreationException;
-
-  /**
    * Creates signer.
    *
    * @param type

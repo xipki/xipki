@@ -59,7 +59,7 @@ public class P11MacContentSignerBuilder {
     final boolean mac = true;
     DfltConcurrentContentSigner concurrentSigner;
     try {
-      concurrentSigner = new DfltConcurrentContentSigner(mac, signers, null);
+      concurrentSigner = new DfltConcurrentContentSigner(mac, signers);
     } catch (NoSuchAlgorithmException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
