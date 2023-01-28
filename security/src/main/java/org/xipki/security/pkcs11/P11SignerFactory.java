@@ -19,6 +19,7 @@ package org.xipki.security.pkcs11;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.TokenException;
 import org.xipki.security.*;
 import org.xipki.util.Hex;
 import org.xipki.util.exception.ObjectCreationException;
@@ -123,7 +124,7 @@ public class P11SignerFactory implements SignerFactory {
       P11SlotId p11SlotId = (slotId != null) ? module.getSlotIdForId(slotId)
           : module.getSlotIdForIndex(slotIndex);
       slot = module.getSlot(p11SlotId);
-    } catch (P11TokenException | XiSecurityException ex) {
+    } catch (TokenException | XiSecurityException ex) {
       throw new ObjectCreationException(ex.getMessage(), ex);
     }
 
@@ -131,7 +132,7 @@ public class P11SignerFactory implements SignerFactory {
     P11Identity identity = null;
     try {
       identity = slot.getIdentity(keyId, keyLabel);
-    } catch (P11TokenException e) {
+    } catch (TokenException e) {
       throw new ObjectCreationException("error finding identity with " + str2 + ": " + e.getMessage());
     }
 
@@ -158,7 +159,7 @@ public class P11SignerFactory implements SignerFactory {
             securityFactory, identity, certificateChain);
         return signerBuilder.createSigner(algo, parallelism);
       }
-    } catch (P11TokenException | NoSuchAlgorithmException | XiSecurityException ex) {
+    } catch (TokenException | NoSuchAlgorithmException | XiSecurityException ex) {
       throw new ObjectCreationException(ex.getMessage(), ex);
     }
   } // method newSigner

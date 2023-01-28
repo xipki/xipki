@@ -19,8 +19,6 @@ package org.xipki.ca.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.AuditService;
-import org.xipki.audit.Audits;
 import org.xipki.ca.sdk.ErrorResponse;
 import org.xipki.ca.sdk.SdkResponse;
 import org.xipki.ca.server.SdkResponder;
@@ -30,7 +28,6 @@ import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.exception.ErrorCode;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,20 +57,17 @@ public class HttpRaServlet extends HttpServlet {
   }
 
   @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException {
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     service0(req, resp, false);
   }
 
   @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException {
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     service0(req, resp, true);
   }
 
   private void service0(HttpServletRequest req, HttpServletResponse resp, boolean viaPost)
       throws IOException {
-    AuditService auditService = Audits.getAuditService();
     try {
       String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
       HttpRequestMetadataRetriever httpRetriever = new HttpRequestMetadataRetrieverImpl(req);
@@ -117,11 +111,12 @@ public class HttpRaServlet extends HttpServlet {
       resp.setContentType("application/json");
 
       if (logReqResp && LOG.isDebugEnabled()) {
+        String respBodyStr = respBody == null ? null : new String(respBody);
         if (viaPost) {
           LOG.debug("HTTP POST CA REST path: {}\nRequest:\n{}\nResponse:\n{}", req.getRequestURI(),
-              new String(requestBytes), new String(respBody));
+              new String(requestBytes), respBodyStr);
         } else {
-          LOG.debug("HTTP GET CA REST path: {}\nResponse:\n{}", req.getRequestURI(), new String(respBody));
+          LOG.debug("HTTP GET CA REST path: {}\nResponse:\n{}", req.getRequestURI(), respBodyStr);
         }
       }
 

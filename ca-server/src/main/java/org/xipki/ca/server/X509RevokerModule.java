@@ -23,6 +23,7 @@ import org.xipki.audit.AuditEvent;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.RequestorInfo;
+import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.db.CertStore.SerialWithId;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
@@ -32,6 +33,7 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.DateUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.Validity;
+import org.xipki.util.Validity.Unit;
 import org.xipki.util.exception.OperationException;
 
 import java.io.Closeable;
@@ -62,7 +64,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
 
     @Override
     public void run() {
-      if (caInfo.revokeSuspendedCertsControl() == null) {
+      if (caInfo.revokeSuspendedCertsControl() == null || !caInfo.revokeSuspendedCertsControl().isEnabled()) {
         return;
       }
 
@@ -329,29 +331,24 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
 
     final int numEntries = 100;
 
-    Validity val = caInfo.revokeSuspendedCertsControl().getUnchangedSince();
-    long ms;
-    switch (val.getUnit()) {
-      case MINUTE:
-        ms = val.getValidity() * MS_PER_MINUTE;
-        break;
-      case HOUR:
-        ms = val.getValidity() * MS_PER_HOUR;
-        break;
-      case DAY:
-        ms = val.getValidity() * MS_PER_DAY;
-        break;
-      case WEEK:
-        ms = val.getValidity() * MS_PER_WEEK;
-        break;
-      case YEAR:
-        ms = val.getValidity() * 365 * MS_PER_DAY;
-        break;
-      default:
+    RevokeSuspendedControl control = caInfo.revokeSuspendedCertsControl();
+
+    Validity val = control.getUnchangedSince();
+    int validity = val.getValidity();
+    Unit unit = val.getUnit();
+    long ms = (unit == Unit.MINUTE) ? validity * MS_PER_MINUTE
+        : (unit == Unit.HOUR) ? validity * MS_PER_HOUR
+        : (unit == Unit.DAY)  ? validity * MS_PER_DAY
+        : (unit == Unit.WEEK) ? validity * MS_PER_WEEK
+        : (unit == Unit.YEAR) ? validity * 365 * MS_PER_DAY
+        : -1;
+
+    if (ms == -1) {
         throw new IllegalStateException("should not reach here, unknown Validity Unit " + val.getUnit());
     }
+
     final long latestLastUpdatedAt = (System.currentTimeMillis() - ms) / 1000; // seconds
-    final CrlReason reason = caInfo.revokeSuspendedCertsControl().getTargetReason();
+    final CrlReason reason = control.getTargetReason();
 
     int sum = 0;
     while (true) {
@@ -374,7 +371,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
         } // end try
       } // end for
     } // end while (true)
-  } // method removeExpirtedCerts
+  } // method revokeSuspendedCerts0
 
   @Override
   public void close() {

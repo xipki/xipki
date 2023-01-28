@@ -34,7 +34,7 @@ public class CaNameSigners {
 
   private final ConcurrentContentSigner defaultSigner;
 
-  private Map<String, ConcurrentContentSigner> signers;
+  private final Map<String, ConcurrentContentSigner> signers;
 
   public CaNameSigners(ConcurrentContentSigner defaultSigner, Map<String, ConcurrentContentSigner> signers)
       throws InvalidConfException {

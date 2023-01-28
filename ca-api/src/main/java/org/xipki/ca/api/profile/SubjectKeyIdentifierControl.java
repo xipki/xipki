@@ -43,7 +43,7 @@ public class SubjectKeyIdentifierControl extends ValidatableConf {
    * Format
    *   - 'L':'&lt;size&gt: Use the left most size bytes.
    *   - 'R':'&lt;size&gt: Use the right most size bytes.
-   *
+   * <p/>
    * Method to truncate the output of {{@link #getMethod()}} is longer than the expected size,
    */
   private String truncateMethod;

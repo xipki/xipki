@@ -396,6 +396,9 @@ public class X509Cert {
       jceInstance.verify(key, "BC");
     } else {
       SignAlgo signAlgo = SignAlgo.getInstance(bcInstance.getSignatureAlgorithm());
+      if (signAlgo == null) {
+        throw new NoSuchAlgorithmException("could not detect SignAlgo");
+      }
       Signature signature = signAlgo.newSignature("BC");
       checkBcSignature(key, signature);
     }
@@ -411,6 +414,9 @@ public class X509Cert {
         jceInstance.verify(key, sigProvider);
       } else {
         SignAlgo signAlgo = SignAlgo.getInstance(bcInstance.getSignatureAlgorithm());
+        if (signAlgo == null) {
+          throw new NoSuchAlgorithmException("could not detect SignAlgo");
+        }
         Signature signature = signAlgo.newSignature(sigProvider);
         checkBcSignature(key, signature);
       }

@@ -15,19 +15,32 @@
  * limitations under the License.
  */
 
-package org.xipki.security.pkcs11;
+package org.xipki.ca.mgmt.db.port;
+
+import org.xipki.util.ValidatableConf;
+import org.xipki.util.exception.InvalidConfException;
 
 /**
- * Exception indicates permission error.
+ * CA configuration entry with database table id.
  *
  * @author Lijun Liao
- * @since 2.0.0
  */
 
-public class P11PermissionException extends P11TokenException {
+public abstract class IdentifiedDbObject extends ValidatableConf {
 
-  public P11PermissionException(String message) {
-    super(message);
+  private Long id;
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  @Override
+  public void validate() throws InvalidConfException {
+    notNull(id, "id");
   }
 
 }

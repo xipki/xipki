@@ -958,7 +958,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public KeypairGenEntry getKeypairGen(String name) throws CaMgmtException {
+  public KeypairGenEntry getKeypairGen(String name) {
     return keypairGenDbEntries.get(name);
   }
 

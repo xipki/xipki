@@ -137,7 +137,7 @@ public class PopControl {
   } // method getCertificates
 
   public DHSigStaticKeyCertPair getDhKeyCertPair(X500Name issuer, BigInteger serial, String keyAlgorithm) {
-    if (dhKeyAndCerts == null) {
+    if (dhKeyAndCerts.isEmpty()) {
       return null;
     }
 

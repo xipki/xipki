@@ -27,7 +27,6 @@ import org.xipki.util.BenchmarkExecutor;
 
 import java.math.BigInteger;
 import java.security.spec.DSAParameterSpec;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static org.xipki.util.Args.notNull;
 
@@ -46,8 +45,8 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
     private final int qlength;
 
-    public DSA(P11Slot slot, byte[] id, int plength, int qlength) {
-      super(slot, id, "PKCS#11 DSA key generation\nplength: " + plength + "\nqlength: " + qlength);
+    public DSA(P11Slot slot, int plength, int qlength) {
+      super(slot, "PKCS#11 DSA key generation\nplength: " + plength + "\nqlength: " + qlength);
       this.plength = plength;
       this.qlength = qlength;
     }
@@ -64,8 +63,8 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
     private final ASN1ObjectIdentifier curveOid;
 
-    public EC(P11Slot slot, byte[] id, ASN1ObjectIdentifier curveOid) throws Exception {
-      super(slot, id, "PKCS#11 EC key generation\ncurve: " + AlgorithmUtil.getCurveName(curveOid));
+    public EC(P11Slot slot, ASN1ObjectIdentifier curveOid) throws Exception {
+      super(slot, "PKCS#11 EC key generation\ncurve: " + AlgorithmUtil.getCurveName(curveOid));
       this.curveOid = notNull(curveOid, "curveOid");
     }
 
@@ -82,8 +81,8 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
     private final BigInteger publicExponent;
 
-    public RSA(P11Slot slot, byte[] id, int keysize, BigInteger publicExponent) {
-      super(slot, id, "PKCS#11 RSA key generation\nkeysize: " + keysize
+    public RSA(P11Slot slot, int keysize, BigInteger publicExponent) {
+      super(slot, "PKCS#11 RSA key generation\nkeysize: " + keysize
           + "\npublic exponent: " + publicExponent);
       this.keysize = keysize;
       this.publicExponent = publicExponent;
@@ -97,8 +96,8 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
   } // class RSA
 
   public static class SM2 extends P11KeyGenSpeed {
-    public SM2(P11Slot slot, byte[] id) {
-      super(slot, id, "PKCS#11 SM2 key generation");
+    public SM2(P11Slot slot) {
+      super(slot, "PKCS#11 SM2 key generation");
     }
 
     @Override
@@ -129,14 +128,9 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
   private static final Logger LOG = LoggerFactory.getLogger(P11KeyGenSpeed.class);
 
-  private byte[] id;
-
-  private AtomicLong idx = new AtomicLong(System.currentTimeMillis());
-
-  public P11KeyGenSpeed(P11Slot slot, byte[] id, String description) {
+  public P11KeyGenSpeed(P11Slot slot, String description) {
     super(description);
     this.slot = notNull(slot, "slot");
-    this.id = id;
   }
 
   protected abstract void genKeypair() throws Exception;

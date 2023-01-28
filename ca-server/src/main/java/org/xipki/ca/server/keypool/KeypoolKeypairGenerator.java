@@ -78,7 +78,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
 
   private Map<String, FileOrValue> datasourceConfs;
 
-  private Map<String, Integer> keyspecToId = new HashMap<>();
+  private final Map<String, Integer> keyspecToId = new HashMap<>();
 
   public void setShardId(int shardId) {
     this.shardId = shardId;

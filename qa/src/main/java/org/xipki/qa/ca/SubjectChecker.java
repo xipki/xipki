@@ -168,10 +168,7 @@ public class SubjectChecker {
     StringBuilder failureMsg = new StringBuilder();
 
     // check the encoding
-    StringType stringType = null;
-    if (rdnControl != null) {
-      stringType = rdnControl.getStringType();
-    }
+    StringType stringType = (rdnControl != null) ? null : rdnControl.getStringType();
 
     for (int i = 0; i < rdns.length; i++) {
       RDN rdn = rdns[i];

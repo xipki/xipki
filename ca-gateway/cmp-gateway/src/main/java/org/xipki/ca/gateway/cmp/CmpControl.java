@@ -63,13 +63,13 @@ public class CmpControl {
 
   private HashAlgo responsePbmOwf;
 
-  private List<HashAlgo> requestPbmOwfs;
+  private final List<HashAlgo> requestPbmOwfs;
 
   private SignAlgo responsePbmMac;
 
-  private List<SignAlgo> requestPbmMacs;
+  private final List<SignAlgo> requestPbmMacs;
 
-  private int responsePbmIterationCount;
+  private final int responsePbmIterationCount;
 
   private final CollectionAlgorithmValidator sigAlgoValidator;
 
@@ -133,7 +133,6 @@ public class CmpControl {
     }
 
     this.requestPbmOwfs = new ArrayList<>(pbmOwfs.size());
-    List<String> canonicalizedAlgos = new ArrayList<>(pbmOwfs.size());
     for (int i = 0; i < pbmOwfs.size(); i++) {
       String algo = pbmOwfs.get(i);
       HashAlgo ha;
@@ -142,7 +141,6 @@ public class CmpControl {
       } catch (Exception ex) {
         throw new InvalidConfException("invalid pbmPwf " + algo, ex);
       }
-      canonicalizedAlgos.add(ha.getJceName());
       requestPbmOwfs.add(ha);
 
       if (i == 0 && responsePbmOwf == null) {
@@ -151,7 +149,6 @@ public class CmpControl {
     }
 
     // PasswordBasedMac.mac
-    canonicalizedAlgos.clear();
     this.requestPbmMacs = new ArrayList<>(pbmMacs.size());
     for (int i = 0; i < pbmMacs.size(); i++) {
       String algo = pbmMacs.get(i);
@@ -161,7 +158,6 @@ public class CmpControl {
       } catch (NoSuchAlgorithmException ex) {
         throw new InvalidConfException("invalid pbmMac " + algo, ex);
       }
-      canonicalizedAlgos.add(signAlgo.getJceName());
       requestPbmMacs.add(signAlgo);
 
       if (i == 0 && responsePbmMac == null) {

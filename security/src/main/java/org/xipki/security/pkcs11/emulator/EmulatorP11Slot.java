@@ -36,6 +36,7 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.TokenException;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.pkcs11.*;
@@ -177,7 +178,7 @@ class EmulatorP11Slot extends P11Slot {
       String moduleName, File slotDir, P11SlotId slotId, boolean readOnly,
       EmulatorKeyCryptor keyCryptor, P11MechanismFilter mechanismFilter, P11NewObjectConf newObjectConf,
       Integer numSessions, List<Long> secretKeyTypes, List<Long> keypairTypes)
-      throws P11TokenException {
+      throws TokenException {
     super(moduleName, slotId, readOnly, secretKeyTypes, keypairTypes, newObjectConf);
 
     this.slotDir = notNull(slotDir, "slotDir");
@@ -214,7 +215,7 @@ class EmulatorP11Slot extends P11Slot {
     return slotDir;
   }
 
-  private List<File> getFilesForLabel(File dir, String label) throws P11TokenException {
+  private List<File> getFilesForLabel(File dir, String label) throws TokenException {
     List<File> ret = new LinkedList<>();
     File[] infoFiles = dir.listFiles(INFO_FILENAME_FILTER);
     if (infoFiles != null) {
@@ -233,7 +234,7 @@ class EmulatorP11Slot extends P11Slot {
     return ret;
   }
 
-  private PublicKey readPublicKey(byte[] keyId) throws P11TokenException {
+  private PublicKey readPublicKey(byte[] keyId) throws TokenException {
     File pubKeyFile = getInfoFile(pubKeyDir, hex(keyId));
     Properties props = loadProperties(pubKeyFile);
 
@@ -246,7 +247,7 @@ class EmulatorP11Slot extends P11Slot {
       try {
         return KeyUtil.generateRSAPublicKey(keySpec);
       } catch (InvalidKeySpecException ex) {
-        throw new P11TokenException(ex.getMessage(), ex);
+        throw new TokenException(ex.getMessage(), ex);
       }
     } else if (X9ObjectIdentifiers.id_dsa.getId().equals(algorithm)) {
       BigInteger prime = new BigInteger(props.getProperty(PROP_DSA_PRIME), 16); // p
@@ -258,7 +259,7 @@ class EmulatorP11Slot extends P11Slot {
       try {
         return KeyUtil.generateDSAPublicKey(keySpec);
       } catch (InvalidKeySpecException ex) {
-        throw new P11TokenException(ex.getMessage(), ex);
+        throw new TokenException(ex.getMessage(), ex);
       }
     } else if (X9ObjectIdentifiers.id_ecPublicKey.getId().equals(algorithm)) {
       byte[] ecParams = decodeHex(props.getProperty(PROP_EC_PARAMS));
@@ -267,7 +268,7 @@ class EmulatorP11Slot extends P11Slot {
       try {
         return KeyUtil.createECPublicKey(ecParams, ecPoint);
       } catch (InvalidKeySpecException ex) {
-        throw new P11TokenException(ex.getMessage(), ex);
+        throw new TokenException(ex.getMessage(), ex);
       }
     } else if (EdECConstants.id_X25519.getId().equals(algorithm) || EdECConstants.id_ED25519.getId().equals(algorithm)
         || EdECConstants.id_X448.getId().equals(algorithm)       || EdECConstants.id_ED448.getId().equals(algorithm)) {
@@ -277,14 +278,14 @@ class EmulatorP11Slot extends P11Slot {
       try {
         return KeyUtil.generatePublicKey(pkInfo);
       } catch (InvalidKeySpecException ex) {
-        throw new P11TokenException("error  key algorithm " + algorithm);
+        throw new TokenException("error  key algorithm " + algorithm);
       }
     } else {
-      throw new P11TokenException("unknown key algorithm " + algorithm);
+      throw new TokenException("unknown key algorithm " + algorithm);
     }
   } // method readPublicKey
 
-  private Properties loadProperties(File file) throws P11TokenException {
+  private Properties loadProperties(File file) throws TokenException {
     try {
       try (InputStream stream = Files.newInputStream(file.toPath())) {
         Properties props = new Properties();
@@ -292,7 +293,7 @@ class EmulatorP11Slot extends P11Slot {
         return props;
       }
     } catch (IOException ex) {
-      throw new P11TokenException("could not load properties from the file " + file.getPath(), ex);
+      throw new TokenException("could not load properties from the file " + file.getPath(), ex);
     }
   }
 
@@ -313,7 +314,7 @@ class EmulatorP11Slot extends P11Slot {
     LOG.info("close slot " + slotId);
   }
 
-  private boolean removePkcs11Entry(File dir, P11ObjectId objectId) throws P11TokenException {
+  private boolean removePkcs11Entry(File dir, P11ObjectId objectId) throws TokenException {
     byte[] id = objectId.getId();
     String label = objectId.getLabel();
     if (id != null) {
@@ -363,7 +364,7 @@ class EmulatorP11Slot extends P11Slot {
     return b1 || b2;
   } // method deletePkcs11Entry
 
-  private int deletePkcs11Entry(File dir, byte[] id, String label) throws P11TokenException {
+  private int deletePkcs11Entry(File dir, byte[] id, String label) throws TokenException {
     if (StringUtil.isBlank(label)) {
       return deletePkcs11Entry(dir, id) ? 1 : 0;
     }
@@ -408,7 +409,7 @@ class EmulatorP11Slot extends P11Slot {
   } // method deletePkcs11Entry
 
   private P11ObjectId savePkcs11SecretKey(byte[] id, String label, long keyType, SecretKey secretKey)
-      throws P11TokenException {
+      throws TokenException {
     long handle = random.nextLong() & 0x7FFFFFFFFFFFFFFFL;
     byte[] encryptedValue = keyCryptor.encrypt(secretKey);
     return savePkcs11Entry(CKO_SECRET_KEY, handle, id, label, keyType, secretKey.getAlgorithm(), encryptedValue,
@@ -416,7 +417,7 @@ class EmulatorP11Slot extends P11Slot {
   }
 
   private P11ObjectId savePkcs11PrivateKey(byte[] id, String label, long keyType, PrivateKey privateKey, String keyspec)
-      throws P11TokenException {
+      throws TokenException {
     long handle = random.nextLong() & 0x7FFFFFFFFFFFFFFFL;
     byte[] encryptedPrivKeyInfo = keyCryptor.encrypt(privateKey);
     return savePkcs11Entry(CKO_PRIVATE_KEY, handle, id, label, keyType, privateKey.getAlgorithm(), encryptedPrivKeyInfo,
@@ -424,7 +425,7 @@ class EmulatorP11Slot extends P11Slot {
   }
 
   private long savePkcs11PublicKey(byte[] id, String label, long keyType, PublicKey publicKey, String keyspec)
-      throws P11TokenException {
+      throws TokenException {
     long handle = random.nextLong() & 0x7FFFFFFFFFFFFFFFL;
     String hexId = hex(id);
     StringBuilder sb = new StringBuilder(100)
@@ -459,14 +460,14 @@ class EmulatorP11Slot extends P11Slot {
       org.bouncycastle.jce.spec.ECParameterSpec bcParamSpec = EC5Util.convertSpec(paramSpec);
       ASN1ObjectIdentifier curveOid = ECUtil.getNamedCurveOid(bcParamSpec);
       if (curveOid == null) {
-        throw new P11TokenException("EC public key is not of namedCurve");
+        throw new TokenException("EC public key is not of namedCurve");
       }
 
       byte[] encodedParams;
       try {
         encodedParams = namedCurveSupported ? curveOid.getEncoded() : ECNamedCurveTable.getByOID(curveOid).getEncoded();
       } catch (IOException | NullPointerException ex) {
-        throw new P11TokenException(ex.getMessage(), ex);
+        throw new TokenException(ex.getMessage(), ex);
       }
 
       sb.append(propertyToString(PROP_EC_PARAMS, encodedParams));
@@ -483,14 +484,14 @@ class EmulatorP11Slot extends P11Slot {
       try {
         encodedEcPoint = new DEROctetString(ecPoint).getEncoded();
       } catch (IOException ex) {
-        throw new P11TokenException("could not ASN.1 encode the ECPoint");
+        throw new TokenException("could not ASN.1 encode the ECPoint");
       }
       sb.append(propertyToString(PROP_EC_POINT, encodedEcPoint));
     } else if (publicKey instanceof EdDSAKey || publicKey instanceof XDHKey) {
       String algorithm = publicKey.getAlgorithm();
       ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(algorithm);
       if (curveOid == null) {
-        throw new P11TokenException("Invalid EdDSA key algorithm " + algorithm);
+        throw new TokenException("Invalid EdDSA key algorithm " + algorithm);
       }
       sb.append(propertyToString(PROP_ALGORITHM, curveOid.getId()));
 
@@ -498,7 +499,7 @@ class EmulatorP11Slot extends P11Slot {
       try {
         encodedParams = curveOid.getEncoded();
       } catch (IOException | NullPointerException ex) {
-        throw new P11TokenException(ex.getMessage(), ex);
+        throw new TokenException(ex.getMessage(), ex);
       }
 
       sb.append(propertyToString(PROP_EC_PARAMS, encodedParams));
@@ -514,7 +515,7 @@ class EmulatorP11Slot extends P11Slot {
     try {
       save(getInfoFile(pubKeyDir, hexId), StringUtil.toUtf8Bytes(sb.toString()));
     } catch (IOException ex) {
-      throw new P11TokenException(ex.getMessage(), ex);
+      throw new TokenException(ex.getMessage(), ex);
     }
 
     return handle;
@@ -533,9 +534,9 @@ class EmulatorP11Slot extends P11Slot {
   }
 
   private static void bigIntToBytes(String numName, BigInteger num, byte[] dest, int destPos, int length)
-      throws P11TokenException {
+      throws TokenException {
     if (num.signum() != 1) {
-      throw new P11TokenException(numName + " is not positive");
+      throw new TokenException(numName + " is not positive");
     }
     byte[] bytes = num.toByteArray();
     if (bytes.length == length) {
@@ -546,14 +547,14 @@ class EmulatorP11Slot extends P11Slot {
       if (bytes.length == length + 1 && bytes[0] == 0) {
         System.arraycopy(bytes, 1, dest, destPos, length);
       } else {
-        throw new P11TokenException("num is too large");
+        throw new TokenException("num is too large");
       }
     }
   }
 
   private P11ObjectId savePkcs11Entry(
       long objectClass, long handle, byte[] id, String label, long keyType, String algo, byte[] value, String keyspec)
-      throws P11TokenException {
+      throws TokenException {
     notBlank(label, "label");
     notNull(value, "value");
 
@@ -581,19 +582,19 @@ class EmulatorP11Slot extends P11Slot {
       save(getInfoFile(dir, hexId), StringUtil.toUtf8Bytes(str.toString()));
       save(getValueFile(dir, hexId), value);
     } catch (IOException ex) {
-      throw new P11TokenException("could not save " + ckoCodeToName(objectClass).substring(4));
+      throw new TokenException("could not save " + ckoCodeToName(objectClass).substring(4));
     }
 
     return new P11ObjectId(handle, objectClass, keyType, id, label);
   } // method savePkcs11Entry
 
   @Override
-  public long[] destroyObjects(long[] handles) {
+  public long[] destroyObjectsByHandle(long[] handles) {
     throw new UnsupportedOperationException("removeObjects(long[] handle) is not supported yet.");
   }
 
   @Override
-  public int destroyObjects(byte[] id, String label) throws P11TokenException {
+  public int destroyObjectsByIdLabel(byte[] id, String label) throws TokenException {
     if ((id == null || id.length == 0) && StringUtil.isBlank(label)) {
       throw new IllegalArgumentException("at least one of id and label may not be null");
     }
@@ -604,7 +605,7 @@ class EmulatorP11Slot extends P11Slot {
   } // method removeObjects
 
   @Override
-  public P11Identity getIdentity(P11IdentityId identityId) throws P11TokenException {
+  public P11Identity getIdentity(P11IdentityId identityId) throws TokenException {
     P11ObjectId keyId = identityId.getKeyId();
     String hexId = hex(keyId.getId());
     long keyType = keyId.getKeyType();
@@ -624,7 +625,6 @@ class EmulatorP11Slot extends P11Slot {
         byte[] keyValue = keyCryptor.decrypt(encodedValue);
         SecretKey key = new SecretKeySpec(keyValue, keyAlgo);
         EmulatorP11Identity ret = new EmulatorP11Identity(this, identityId, key, maxSessions, random);
-        ret.setExpectedSignatureLen(16);
         return ret;
       } else {
         // keypair
@@ -651,20 +651,21 @@ class EmulatorP11Slot extends P11Slot {
           ret.setEcParams(curveId);
           return ret;
         } else {
-          throw new P11TokenException("unknown key type " + ckkCodeToName(keyType));
+          throw new TokenException("unknown key type " + ckkCodeToName(keyType));
         }
       }
     } catch (Exception e) {
-      throw new P11TokenException(e);
+      throw new TokenException(e);
     }
   }
 
   @Override
-  protected PublicKey getPublicKey(P11Identity identity) throws P11TokenException {
+  protected PublicKey getPublicKey(P11Identity identity) throws TokenException {
     return readPublicKey(identity.getId().getKeyId().getId());
   }
 
-  protected boolean objectExistsForIdOrLabel(byte[] id, String label) throws P11TokenException {
+  @Override
+  public boolean objectExistsByIdLabel(byte[] id, String label) throws TokenException {
     if (id == null) {
       List<File> files = getFilesForLabel(privKeyDir, label);
       if (files.isEmpty()) {
@@ -693,7 +694,7 @@ class EmulatorP11Slot extends P11Slot {
   }
 
   @Override
-  public P11IdentityId getIdentityId(byte[] keyId, String keyLabel) throws P11TokenException {
+  public P11IdentityId getIdentityId(byte[] keyId, String keyLabel) throws TokenException {
     if ((keyId == null || keyId.length == 0) && StringUtil.isBlank(keyLabel)) {
       return null;
     }
@@ -712,7 +713,7 @@ class EmulatorP11Slot extends P11Slot {
       if (infoFiles.isEmpty()) {
         return null;
       } else if (infoFiles.size() > 1) {
-        throw new P11TokenException("found more than 1 " + ckoCodeToName(objClass) + " with label=" + keyLabel);
+        throw new TokenException("found more than 1 " + ckoCodeToName(objClass) + " with label=" + keyLabel);
       }
 
       File infoFile = infoFiles.get(0);
@@ -775,7 +776,7 @@ class EmulatorP11Slot extends P11Slot {
 
   @Override
   protected P11IdentityId doGenerateSecretKey(long keyType, Integer keysize, P11NewKeyControl control)
-      throws P11TokenException {
+      throws TokenException {
     if (keysize != null && keysize % 8 != 0) {
       throw new IllegalArgumentException("keysize is not multiple of 8: " + keysize);
     }
@@ -805,7 +806,7 @@ class EmulatorP11Slot extends P11Slot {
 
   @Override
   protected P11IdentityId doImportSecretKey(long keyType, byte[] keyValue, P11NewKeyControl control)
-      throws P11TokenException {
+      throws TokenException {
     SecretKey key = new SecretKeySpec(keyValue, getSecretKeyAlgorithm(keyType));
     return new P11IdentityId(slotId, saveSecretP11Entity(keyType, key, control), null);
   }
@@ -832,43 +833,43 @@ class EmulatorP11Slot extends P11Slot {
 
   @Override
   protected P11IdentityId doGenerateRSAKeypair(int keysize, BigInteger publicExponent, P11NewKeyControl control)
-      throws P11TokenException {
+      throws TokenException {
     KeyPair keypair;
     try {
       keypair = KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
     } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException ex) {
-      throw new P11TokenException(ex.getMessage(), ex);
+      throw new TokenException(ex.getMessage(), ex);
     }
     return saveKeyPairP11Entity(CKK_RSA, keypair, control, Integer.toString(keysize));
   }
 
   @Override
   protected PrivateKeyInfo doGenerateRSAKeypairOtf(int keysize, BigInteger publicExponent)
-      throws P11TokenException {
+      throws TokenException {
     try {
       KeyPair kp = KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
       return KeyUtil.toPrivateKeyInfo((RSAPrivateCrtKey) kp.getPrivate());
     } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException | IOException ex) {
-      throw new P11TokenException(ex.getMessage(), ex);
+      throw new TokenException(ex.getMessage(), ex);
     }
   }
 
   @Override
   protected P11IdentityId doGenerateDSAKeypair(BigInteger p, BigInteger q, BigInteger g, P11NewKeyControl control)
-      throws P11TokenException {
+      throws TokenException {
     DSAParameters dsaParams = new DSAParameters(p, q, g);
     KeyPair keypair;
     try {
       keypair = KeyUtil.generateDSAKeypair(dsaParams, random);
     } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException ex) {
-      throw new P11TokenException(ex.getMessage(), ex);
+      throw new TokenException(ex.getMessage(), ex);
     }
     return saveKeyPairP11Entity(CKK_DSA, keypair, control, Integer.toString(p.bitLength()));
   }
 
   @Override
   protected PrivateKeyInfo generateDSAKeypairOtf0(BigInteger p, BigInteger q, BigInteger g)
-      throws P11TokenException {
+      throws TokenException {
     DSAParameters spec = new DSAParameters(p, q, g);
     try {
       KeyPair kp = KeyUtil.generateDSAKeypair(spec, random);
@@ -881,82 +882,82 @@ class EmulatorP11Slot extends P11Slot {
       DSAPrivateKey priv = (DSAPrivateKey) kp.getPrivate();
       return new PrivateKeyInfo(algId, new ASN1Integer(priv.getX()), null, publicKey);
     } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException | IOException ex) {
-      throw new P11TokenException(ex.getMessage(), ex);
+      throw new TokenException(ex.getMessage(), ex);
     }
   }
 
   @Override
-  protected P11IdentityId doGenerateSM2Keypair(P11NewKeyControl control) throws P11TokenException {
+  protected P11IdentityId doGenerateSM2Keypair(P11NewKeyControl control) throws TokenException {
     return doGenerateECKeypair(GMObjectIdentifiers.sm2p256v1, control);
   }
 
   @Override
-  protected PrivateKeyInfo doGenerateSM2KeypairOtf() throws P11TokenException {
+  protected PrivateKeyInfo doGenerateSM2KeypairOtf() throws TokenException {
     return doGenerateECKeypairOtf(GMObjectIdentifiers.sm2p256v1);
   }
 
   @Override
   protected P11IdentityId doGenerateECEdwardsKeypair(ASN1ObjectIdentifier curveOid, P11NewKeyControl control)
-      throws P11TokenException {
+      throws TokenException {
     KeyPair keypair;
     try {
       if (!EdECConstants.isEdwardsCurve(curveOid)) {
-        throw new P11TokenException("unknown curve  " + curveOid.getId());
+        throw new TokenException("unknown curve  " + curveOid.getId());
       }
 
       keypair = KeyUtil.generateEdECKeypair(curveOid, random);
     } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException ex) {
-      throw new P11TokenException(ex.getMessage(), ex);
+      throw new TokenException(ex.getMessage(), ex);
     }
     return saveKeyPairP11Entity(CKK_EC_EDWARDS, keypair, control, EdECConstants.getName(curveOid));
   }
 
   @Override
   protected PrivateKeyInfo doGenerateECEdwardsKeypairOtf(ASN1ObjectIdentifier curveId)
-      throws P11TokenException {
+      throws TokenException {
     try {
       KeyPair kp = KeyUtil.generateEdECKeypair(curveId, random);
       return PrivateKeyInfo.getInstance(kp.getPrivate().getEncoded());
     } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException ex) {
-      throw new P11TokenException(ex.getMessage(), ex);
+      throw new TokenException(ex.getMessage(), ex);
     }
   }
 
   @Override
   protected P11IdentityId doGenerateECMontgomeryKeypair(ASN1ObjectIdentifier curveOid, P11NewKeyControl control)
-      throws P11TokenException {
+      throws TokenException {
     KeyPair keypair;
     try {
       if (!EdECConstants.isMontgomeryCurve(curveOid)) {
-        throw new P11TokenException("unknown curve  " + curveOid.getId());
+        throw new TokenException("unknown curve  " + curveOid.getId());
       }
 
       keypair = KeyUtil.generateEdECKeypair(curveOid, random);
     } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException ex) {
-      throw new P11TokenException(ex.getMessage(), ex);
+      throw new TokenException(ex.getMessage(), ex);
     }
     return saveKeyPairP11Entity(CKK_EC_MONTGOMERY, keypair, control, EdECConstants.getName(curveOid));
   }
 
   @Override
   protected PrivateKeyInfo doGenerateECMontgomeryKeypairOtf(ASN1ObjectIdentifier curveId)
-      throws P11TokenException {
+      throws TokenException {
     try {
       KeyPair kp = KeyUtil.generateEdECKeypair(curveId, random);
       return PrivateKeyInfo.getInstance(kp.getPrivate().getEncoded());
     } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException ex) {
-      throw new P11TokenException(ex.getMessage(), ex);
+      throw new TokenException(ex.getMessage(), ex);
     }
   }
 
   @Override
   protected P11IdentityId doGenerateECKeypair(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
-      throws P11TokenException {
+      throws TokenException {
     KeyPair keypair;
     try {
       keypair = KeyUtil.generateECKeypair(curveId, random);
     } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException ex) {
-      throw new P11TokenException(ex.getMessage(), ex);
+      throw new TokenException(ex.getMessage(), ex);
     }
 
     String curveName = AlgorithmUtil.getCurveName(curveId);
@@ -968,7 +969,7 @@ class EmulatorP11Slot extends P11Slot {
   }
 
   @Override
-  protected PrivateKeyInfo doGenerateECKeypairOtf(ASN1ObjectIdentifier curveId) throws P11TokenException {
+  protected PrivateKeyInfo doGenerateECKeypairOtf(ASN1ObjectIdentifier curveId) throws TokenException {
     try {
       AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveId);
 
@@ -985,12 +986,12 @@ class EmulatorP11Slot extends P11Slot {
           new org.bouncycastle.asn1.sec.ECPrivateKey(
               orderBitLength, priv.getS(), new DERBitString(publicKey), null));
     } catch (IOException | NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException ex) {
-      throw new P11TokenException(ex.getMessage(), ex);
+      throw new TokenException(ex.getMessage(), ex);
     }
   }
 
   private P11IdentityId saveKeyPairP11Entity(long keyType, KeyPair keypair, P11NewObjectControl control, String keySpec)
-      throws P11TokenException {
+      throws TokenException {
     byte[] id = control.getId();
     if (id == null) {
       id = generateId();
@@ -1004,7 +1005,7 @@ class EmulatorP11Slot extends P11Slot {
   }
 
   private P11ObjectId saveSecretP11Entity(long keyType, SecretKey key, P11NewObjectControl control)
-      throws P11TokenException {
+      throws TokenException {
     byte[] id = control.getId();
     if (id == null) {
       id = generateId();
@@ -1074,20 +1075,20 @@ class EmulatorP11Slot extends P11Slot {
     }
   }
 
-  private byte[] generateId() throws P11TokenException {
+  private byte[] generateId() throws TokenException {
     while (true) {
       byte[] id = new byte[newObjectConf.getIdLength()];
       random.nextBytes(id);
-      if (!(objectExistsForIdOrLabel(id, null))) {// not duplicated
+      if (!(objectExistsByIdLabel(id, null))) {// not duplicated
         return id;
       }
     }
   }
 
-  private String generateLabel(String label) throws P11TokenException {
+  private String generateLabel(String label) throws TokenException {
     String tmpLabel = label;
     int idx = 0;
-    while (objectExistsForIdOrLabel(null, tmpLabel)) {
+    while (objectExistsByIdLabel(null, tmpLabel)) {
       idx++;
       tmpLabel = label + "-" + idx;
     }

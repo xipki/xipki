@@ -17,10 +17,10 @@
 
 package org.xipki.security.pkcs11.emulator;
 
+import org.xipki.pkcs11.TokenException;
 import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11ModuleConf;
 import org.xipki.security.pkcs11.P11ModuleFactory;
-import org.xipki.security.pkcs11.P11TokenException;
 
 /**
  * {@link P11ModuleFactory} to create {@link P11Module} of type "emulator".
@@ -39,7 +39,7 @@ public class EmulatorP11ModuleFactory implements P11ModuleFactory {
   }
 
   @Override
-  public P11Module newModule(P11ModuleConf conf) throws P11TokenException {
+  public P11Module newModule(P11ModuleConf conf) throws TokenException {
     return EmulatorP11Module.getInstance(conf);
   }
 

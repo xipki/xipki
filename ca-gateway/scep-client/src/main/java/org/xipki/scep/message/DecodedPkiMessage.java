@@ -273,7 +273,7 @@ public class DecodedPkiMessage extends PkiMessage {
         if (value != null) {
           if (value instanceof ASN1UTF8String) {
             ret.setFailInfoText(((ASN1UTF8String) value).getString());
-          } else if (value != null) {
+          } else {
             throw new MessageDecodingException("the value of attribute failInfoText is not UTF8String");
           }
         }

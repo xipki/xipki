@@ -547,7 +547,6 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         throw new OperationException(INVALID_EXTENSION, ex);
       }
 
-      @SuppressWarnings("resource")
       ConcurrentContentSigner concurrentSigner = (crlSigner == null)
           ? caInfo.getSigner(null) : crlSigner.getSigner();
 
@@ -598,7 +597,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     // time less than one day
     long minutesInDay = (time - epochDaysInMillis) / MS_PER_MINUTE;
 
-    int intervalMinutes = caInfo.getCrlControl().getIntervalHours() * 60;
+    long intervalMinutes = caInfo.getCrlControl().getIntervalHours() * 60L;
 
     HourMinute hm = caInfo.getCrlControl().getIntervalDayTime();
     int hmInMinutes = hm.getHour() * 60 + hm.getMinute();

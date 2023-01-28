@@ -418,9 +418,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
         writeLine(filenameListOs, currentEntriesFilename);
         setCount(type, certstore, numProcessedBefore + sum);
-        if (id != null) {
-          echoToFile(Long.toString(id), processLogFile);
-        }
+        echoToFile(Long.toString(id), processLogFile);
 
         processLog.addNumProcessed(numEntriesInCurrentFile);
       } else {

@@ -31,7 +31,6 @@ import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -70,8 +69,7 @@ public class HttpCmpServlet extends HttpServlet {
   }
 
   @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException {
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     X509Cert clientCert = ServletHelper.getTlsClientCert(req);
     AuditService auditService = Audits.getAuditService();
     AuditEvent event = new AuditEvent(new Date());

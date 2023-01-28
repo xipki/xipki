@@ -93,25 +93,6 @@ public abstract class Describable extends ValidatableConf {
     }
   } // class DescribableInt
 
-  public static class DescribableString extends Describable {
-
-    @JSONField(ordinal = 1)
-    private String value;
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notNull(value, "value");
-    }
-
-    public String getValue() {
-      return value;
-    }
-
-    public void setValue(String value) {
-      this.value = value;
-    }
-  } // class DescribableString
-
   public static class DescribableBinary extends Describable {
 
     @JSONField(ordinal = 1)

@@ -49,7 +49,7 @@ public class KeyParametersOption {
     }
 
     public boolean allowsModulusLength(int modulusLength) {
-      return modulusLengths == null ? true : modulusLengths.contains(modulusLength);
+      return modulusLengths == null || modulusLengths.contains(modulusLength);
     }
 
   } // class RSAParametersOption
@@ -72,11 +72,11 @@ public class KeyParametersOption {
     }
 
     public boolean allowsPlength(int plength) {
-      return plengths == null ? true : plengths.contains(plength);
+      return plengths == null || plengths.contains(plength);
     }
 
     public boolean allowsQlength(int qlength) {
-      return qlengths == null ? true : qlengths.contains(qlength);
+      return qlengths == null || qlengths.contains(qlength);
     }
 
   } // class DSAParametersOption

@@ -21,12 +21,11 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.TokenException;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
 import org.xipki.security.pkcs11.P11ModuleConf.P11NewObjectConf;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.DSAParameterCache;
-import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Hex;
 
 import java.io.Closeable;
@@ -36,17 +35,14 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAParameterSpec;
-import java.security.spec.ECParameterSpec;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.*;
 
 import static org.xipki.pkcs11.PKCS11Constants.*;
 import static org.xipki.util.Args.*;
 import static org.xipki.util.StringUtil.concat;
+import static org.xipki.util.StringUtil.toUtf8String;
 
 /**
  * PKCS#11 slot.
@@ -87,7 +83,7 @@ public abstract class P11Slot implements Closeable {
 
     private final long attributeType;
 
-    private P11KeyUsage(long attributeType) {
+    P11KeyUsage(long attributeType) {
       this.attributeType = attributeType;
     }
 
@@ -158,7 +154,7 @@ public abstract class P11Slot implements Closeable {
   protected P11Slot(
       String moduleName, P11SlotId slotId, boolean readOnly,
       List<Long> secretKeyTypes, List<Long> keyPairTypes, P11NewObjectConf newObjectConf)
-      throws P11TokenException {
+      throws TokenException {
     this.newObjectConf = notNull(newObjectConf, "newObjectConf");
     this.moduleName = notBlank(moduleName, "moduleName");
     this.slotId = notNull(slotId, "slotId");
@@ -187,27 +183,27 @@ public abstract class P11Slot implements Closeable {
     return Hex.decode(hex);
   }
 
-  public static String getDescription(byte[] keyId, String keyLabel) {
+  protected static String getDescription(byte[] keyId, String keyLabel) {
     return concat("id ", (keyId == null ? "null" : hex(keyId)), " and label ", keyLabel);
   }
 
-  public abstract P11IdentityId getIdentityId(byte[] keyId, String keyLabel) throws P11TokenException;
+  public abstract P11IdentityId getIdentityId(byte[] keyId, String keyLabel) throws TokenException;
 
-  public abstract P11Identity getIdentity(P11IdentityId identityId) throws P11TokenException;
+  public abstract P11Identity getIdentity(P11IdentityId identityId) throws TokenException;
 
-  public P11Identity getIdentity(byte[] keyId, String keyLabel) throws P11TokenException {
+  public P11Identity getIdentity(byte[] keyId, String keyLabel) throws TokenException {
     P11IdentityId identityId = getIdentityId(keyId, keyLabel);
     return identityId == null ? null : getIdentity(identityId);
   }
 
-  protected abstract PublicKey getPublicKey(P11Identity identity) throws P11TokenException;
+  protected abstract PublicKey getPublicKey(P11Identity identity) throws TokenException;
 
   /**
    * Destroys objects.
    * @param handles handles of objects to be destroyed.
-   * @@return handles of objects which could not been destroyed.
+   * @return handles of objects which could not been destroyed.
    */
-  public abstract long[] destroyObjects(long... handles);
+  public abstract long[] destroyObjectsByHandle(long... handles);
 
   /**
    * Remove objects.
@@ -215,11 +211,11 @@ public abstract class P11Slot implements Closeable {
    * @param id    ID of the objects to be deleted. At least one of id and label may not be {@code null}.
    * @param label Label of the objects to be deleted
    * @return how many objects have been deleted
-   * @throws P11TokenException If PKCS#11 error happens.
+   * @throws TokenException If PKCS#11 error happens.
    */
-  public abstract int destroyObjects(byte[] id, String label) throws P11TokenException;
+  public abstract int destroyObjectsByIdLabel(byte[] id, String label) throws TokenException;
 
-  protected abstract boolean objectExistsForIdOrLabel(byte[] id, String label) throws P11TokenException;
+  public abstract boolean objectExistsByIdLabel(byte[] id, String label) throws TokenException;
 
   /**
    * Generates a secret key in the PKCS#11 token.
@@ -228,10 +224,10 @@ public abstract class P11Slot implements Closeable {
    * @param keysize key size
    * @param control Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#11 token.
-   * @throws P11TokenException if PKCS#11 token exception occurs.
+   * @throws TokenException if PKCS#11 token exception occurs.
    */
   protected abstract P11IdentityId doGenerateSecretKey(long keyType, Integer keysize, P11NewKeyControl control)
-      throws P11TokenException;
+      throws TokenException;
 
   /**
    * Imports secret key object in the PKCS#11 token. The key itself will not be generated
@@ -241,10 +237,10 @@ public abstract class P11Slot implements Closeable {
    * @param keyValue Key value. Must not be {@code null}.
    * @param control  Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
-   * @throws P11TokenException if PKCS#11 token exception occurs.
+   * @throws TokenException if PKCS#11 token exception occurs.
    */
   protected abstract P11IdentityId doImportSecretKey(long keyType, byte[] keyValue, P11NewKeyControl control)
-      throws P11TokenException;
+      throws TokenException;
 
   /**
    * Generates a DSA keypair on-the-fly.
@@ -254,11 +250,11 @@ public abstract class P11Slot implements Closeable {
    * @param g       g of DSA. Must not be {@code null}.
    * @param control Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
-   * @throws P11TokenException if PKCS#11 token exception occurs.
+   * @throws TokenException if PKCS#11 token exception occurs.
    */
   protected abstract P11IdentityId doGenerateDSAKeypair(
       BigInteger p, BigInteger q, BigInteger g, P11NewKeyControl control)
-      throws P11TokenException;
+      throws TokenException;
 
   /**
    * Generates an EC Edwards keypair.
@@ -266,20 +262,20 @@ public abstract class P11Slot implements Closeable {
    * @param curveId Object Identifier of the curve. Must not be {@code null}.
    * @param control Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
-   * @throws P11TokenException if PKCS#11 token exception occurs.
+   * @throws TokenException if PKCS#11 token exception occurs.
    */
   protected abstract P11IdentityId doGenerateECEdwardsKeypair(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
-      throws P11TokenException;
+      throws TokenException;
 
   /**
    * Generates an EC Edwards keypair on-the-fly.
    *
    * @param curveId Object Identifier of the curve. Must not be {@code null}.
    * @return the ASN.1 keypair.
-   * @throws P11TokenException if PKCS#11 token exception occurs.
+   * @throws TokenException if PKCS#11 token exception occurs.
    */
   protected abstract PrivateKeyInfo doGenerateECEdwardsKeypairOtf(ASN1ObjectIdentifier curveId)
-      throws P11TokenException;
+      throws TokenException;
 
   /**
    * Generates an EC Montgomery keypair.
@@ -287,20 +283,20 @@ public abstract class P11Slot implements Closeable {
    * @param curveId Object Identifier of the curve. Must not be {@code null}.
    * @param control Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
-   * @throws P11TokenException if PKCS#11 token exception occurs.
+   * @throws TokenException if PKCS#11 token exception occurs.
    */
   protected abstract P11IdentityId doGenerateECMontgomeryKeypair(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
-      throws P11TokenException;
+      throws TokenException;
 
   /**
    * Generates an EC Montgomery keypair on-the-fly.
    *
    * @param curveId Object Identifier of the curve. Must not be {@code null}.
    * @return the ASN.1 keypair.
-   * @throws P11TokenException if PKCS#11 token exception occurs.
+   * @throws TokenException if PKCS#11 token exception occurs.
    */
   protected abstract PrivateKeyInfo doGenerateECMontgomeryKeypairOtf(ASN1ObjectIdentifier curveId)
-      throws P11TokenException;
+      throws TokenException;
 
   /**
    * Generates an EC keypair.
@@ -308,38 +304,38 @@ public abstract class P11Slot implements Closeable {
    * @param curveId Object identifier of the EC curve. Must not be {@code null}.
    * @param control Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
-   * @throws P11TokenException if PKCS#11 token exception occurs.
+   * @throws TokenException if PKCS#11 token exception occurs.
    */
   protected abstract P11IdentityId doGenerateECKeypair(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
-      throws P11TokenException;
+      throws TokenException;
 
   /**
    * Generates an EC keypair over-the-air.
    *
    * @param curveId Object identifier of the EC curve. Must not be {@code null}.
    * @return the ASN.1 encoded keypair.
-   * @throws P11TokenException if PKCS#11 token exception occurs.
+   * @throws TokenException if PKCS#11 token exception occurs.
    */
   protected abstract PrivateKeyInfo doGenerateECKeypairOtf(ASN1ObjectIdentifier curveId)
-      throws P11TokenException;
+      throws TokenException;
 
   /**
    * Generates an SM2p256v1 keypair.
    *
    * @param control Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
-   * @throws P11TokenException if PKCS#11 token exception occurs.
+   * @throws TokenException if PKCS#11 token exception occurs.
    */
   protected abstract P11IdentityId doGenerateSM2Keypair(P11NewKeyControl control)
-      throws P11TokenException;
+      throws TokenException;
 
   /**
    * Generates an SM2p256v1 keypair on-the-fly.
    *
    * @return the ASN.1 encoded keypair.
-   * @throws P11TokenException if PKCS#11 token exception occurs.
+   * @throws TokenException if PKCS#11 token exception occurs.
    */
-  protected abstract PrivateKeyInfo doGenerateSM2KeypairOtf() throws P11TokenException;
+  protected abstract PrivateKeyInfo doGenerateSM2KeypairOtf() throws TokenException;
 
   /**
    * Generates an RSA keypair.
@@ -348,11 +344,11 @@ public abstract class P11Slot implements Closeable {
    * @param publicExponent RSA public exponent. Could be {@code null}.
    * @param control        Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
-   * @throws P11TokenException if PKCS#11 token exception occurs.
+   * @throws TokenException if PKCS#11 token exception occurs.
    */
   protected abstract P11IdentityId doGenerateRSAKeypair(
       int keysize, BigInteger publicExponent, P11NewKeyControl control)
-      throws P11TokenException;
+      throws TokenException;
 
   /**
    * Writes the token details to the given {@code stream}.
@@ -368,8 +364,7 @@ public abstract class P11Slot implements Closeable {
   @Override
   public abstract void close();
 
-  protected void initMechanisms(long[] supportedMechanisms, P11MechanismFilter mechanismFilter)
-      throws P11TokenException {
+  protected void initMechanisms(long[] supportedMechanisms, P11MechanismFilter mechanismFilter) {
     mechanisms.clear();
 
     List<Long> ignoreMechs = new ArrayList<>();
@@ -387,22 +382,49 @@ public abstract class P11Slot implements Closeable {
       sb.append("initialized module ").append(moduleName).append(", slot ").append(slotId);
 
       sb.append("\nsupported mechanisms:\n");
-      List<Long> sortedMechs = new ArrayList<>(mechanisms);
-      Collections.sort(sortedMechs);
-      for (Long mech : sortedMechs) {
-        sb.append("\t").append(ckmCodeToName(mech)).append("\n");
+      if (mechanisms.isEmpty()) {
+        sb.append("  NONE\n");
+      } else {
+        printMechanisms(sb, mechanisms);
       }
 
       sb.append("\nsupported by device but ignored mechanisms:\n");
       if (ignoreMechs.isEmpty()) {
-        sb.append("\tNONE\n");
+        sb.append("  NONE\n");
       } else {
-        Collections.sort(ignoreMechs);
-        for (Long mech : ignoreMechs) {
-          sb.append("\t").append(ckmCodeToName(mech)).append("\n");
-        }
+        printMechanisms(sb, ignoreMechs);
       }
       LOG.info(sb.toString());
+    }
+  }
+
+  private static void printMechanisms(StringBuilder sb, Collection<Long> mechanisms) {
+    List<Long> sortedMechs = new ArrayList<>(mechanisms);
+    Collections.sort(sortedMechs);
+
+    List<String> mechNames = new ArrayList<>(mechanisms.size());
+    int maxNameLen = 0;
+    for (Long mech : sortedMechs) {
+      String name = ckmCodeToName(mech);
+      maxNameLen = Math.max(maxNameLen, name.length());
+      mechNames.add(name);
+    }
+
+    int numNamesPerLine = Math.max(1, 100 / (maxNameLen + 2));
+    String line = "";
+    int numNamesInThisLine = 0;
+    for (String name : mechNames) {
+      line += "  " + formatString(name, maxNameLen, false);
+      numNamesInThisLine++;
+      if (numNamesInThisLine == numNamesPerLine) {
+        sb.append(line).append("\n");
+        numNamesInThisLine = 0;
+        line = "";
+      }
+    }
+
+    if (line.length() > 0) {
+      sb.append(line);
     }
   }
 
@@ -414,9 +436,9 @@ public abstract class P11Slot implements Closeable {
     return mechanisms.contains(mechanism);
   }
 
-  public void assertMechanismSupported(long mechanism) throws P11UnsupportedMechanismException {
+  public void assertMechanismSupported(long mechanism) throws TokenException {
     if (!mechanisms.contains(mechanism)) {
-      throw new P11UnsupportedMechanismException(mechanism, slotId);
+      throw new TokenException("mechanism " + ckmCodeToName(mechanism) + " is not supported by PKCS11 slot " + slotId);
     }
   }
 
@@ -432,13 +454,13 @@ public abstract class P11Slot implements Closeable {
     return readOnly;
   }
 
-  protected void assertNoObjects(byte[] id, String label) throws P11TokenException {
+  protected void assertNoObjects(byte[] id, String label) throws TokenException {
     if (id == null && label == null) {
       return;
     }
 
-    if (objectExistsForIdOrLabel(id, label)) {
-      throw new P11DuplicateEntityException("Objects with " + getDescription(id, label) + " already exists");
+    if (objectExistsByIdLabel(id, label)) {
+      throw new TokenException("Objects with " + getDescription(id, label) + " already exists");
     }
   }
 
@@ -447,10 +469,10 @@ public abstract class P11Slot implements Closeable {
    *
    * @param id ID of the objects to be deleted.
    * @return how many objects have been deleted
-   * @throws P11TokenException If PKCS#11 error happens.
+   * @throws TokenException If PKCS#11 error happens.
    */
-  public int destroyObjectsForId(byte[] id) throws P11TokenException {
-    return destroyObjects(id, null);
+  public int destroyObjectsById(byte[] id) throws TokenException {
+    return destroyObjectsByIdLabel(id, null);
   }
 
   /**
@@ -458,10 +480,10 @@ public abstract class P11Slot implements Closeable {
    *
    * @param label Label of the objects to be deleted
    * @return how many objects have been deleted
-   * @throws P11TokenException If PKCS#11 error happens.
+   * @throws TokenException If PKCS#11 error happens.
    */
-  public int destroyObjectsForLabel(String label) throws P11TokenException {
-    return destroyObjects(null, label);
+  public int destroyObjectsByLabel(String label) throws TokenException {
+    return destroyObjectsByIdLabel(null, label);
   }
 
   /**
@@ -474,11 +496,11 @@ public abstract class P11Slot implements Closeable {
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the identity within the PKCS#11 token.
-   * @throws P11TokenException
+   * @throws TokenException
    *         if PKCS#11 token exception occurs.
    */
   public P11IdentityId generateSecretKey(long keyType, Integer keysize, P11NewKeyControl control)
-      throws P11TokenException {
+      throws TokenException {
     assertWritable("generateSecretKey");
     notNull(control, "control");
     assertNoObjects(control.getId(), control.getLabel());
@@ -507,11 +529,11 @@ public abstract class P11Slot implements Closeable {
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#11 token.
-   * @throws P11TokenException
+   * @throws TokenException
    *         if PKCS#11 token exception occurs.
    */
   public P11IdentityId importSecretKey(long keyType, byte[] keyValue, P11NewKeyControl control)
-      throws P11TokenException {
+      throws TokenException {
     notNull(control, "control");
     assertWritable("createSecretKey");
     assertNoObjects(control.getId(), control.getLabel());
@@ -522,13 +544,13 @@ public abstract class P11Slot implements Closeable {
     return keyId;
   }
 
-  private void assertSecretKeyAllowed(long keyType) throws P11TokenException {
+  private void assertSecretKeyAllowed(long keyType) throws TokenException {
     if (secretKeyTypes == null) {
       return;
     }
 
     if (!secretKeyTypes.contains(keyType)) {
-      throw new P11TokenException("secret key type 0x" + Long.toHexString(keyType) + "unsupported");
+      throw new TokenException("secret key type 0x" + Long.toHexString(keyType) + "unsupported");
     }
   }
 
@@ -540,18 +562,18 @@ public abstract class P11Slot implements Closeable {
    * @param publicExponent
    *          RSA public exponent. Could be {@code null}.
    * @return the ASN.1 keypair.
-   * @throws P11TokenException
+   * @throws TokenException
    *         if PKCS#11 token exception occurs.
    */
   public PrivateKeyInfo generateRSAKeypairOtf(int keysize, BigInteger publicExponent)
-      throws P11TokenException {
+      throws TokenException {
     min(keysize, "keysize", 1024);
     if (keysize % 1024 != 0) {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + keysize);
     }
 
     if (!(supportsMechanism(CKM_RSA_X9_31_KEY_PAIR_GEN) || supportsMechanism(CKM_RSA_PKCS_KEY_PAIR_GEN))) {
-      throw new P11UnsupportedMechanismException(buildOrMechanismsUnsupportedMessage(
+      throw new TokenException(buildOrMechanismsUnsupportedMessage(
           CKM_RSA_X9_31_KEY_PAIR_GEN, CKM_RSA_PKCS_KEY_PAIR_GEN));
     }
 
@@ -559,7 +581,7 @@ public abstract class P11Slot implements Closeable {
   }
 
   protected abstract PrivateKeyInfo doGenerateRSAKeypairOtf(int keysize, BigInteger publicExponent)
-      throws P11TokenException;
+      throws TokenException;
 
   /**
    * Generates an RSA keypair.
@@ -571,11 +593,11 @@ public abstract class P11Slot implements Closeable {
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the identity within the PKCS#P11 token.
-   * @throws P11TokenException
+   * @throws TokenException
    *         if PKCS#11 token exception occurs.
    */
   public P11IdentityId generateRSAKeypair(int keysize, BigInteger publicExponent, P11NewKeyControl control)
-      throws P11TokenException {
+      throws TokenException {
     min(keysize, "keysize", 1024);
     if (keysize % 1024 != 0) {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + keysize);
@@ -598,10 +620,10 @@ public abstract class P11Slot implements Closeable {
    * @param g
    *          g of DSA. Must not be {@code null}.
    * @return the ASN.1 keypair.
-   * @throws P11TokenException
+   * @throws TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public PrivateKeyInfo generateDSAKeypairOtf(BigInteger p, BigInteger q, BigInteger g) throws P11TokenException {
+  public PrivateKeyInfo generateDSAKeypairOtf(BigInteger p, BigInteger q, BigInteger g) throws TokenException {
     notNull(p, "p");
     notNull(q, "q");
     notNull(g, "g");
@@ -611,7 +633,7 @@ public abstract class P11Slot implements Closeable {
   }
 
   protected abstract PrivateKeyInfo generateDSAKeypairOtf0(BigInteger p, BigInteger q, BigInteger g)
-      throws P11TokenException;
+      throws TokenException;
 
   /**
    * Generates a DSA keypair.
@@ -623,11 +645,11 @@ public abstract class P11Slot implements Closeable {
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the identity within the PKCS#P11 token.
-   * @throws P11TokenException
+   * @throws TokenException
    *         if PKCS#11 token exception occurs.
    */
   public P11IdentityId generateDSAKeypair(int plength, int qlength, P11NewKeyControl control)
-      throws P11TokenException {
+      throws TokenException {
     min(plength, "plength", 1024);
     if (plength % 1024 != 0) {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + plength);
@@ -648,11 +670,11 @@ public abstract class P11Slot implements Closeable {
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the identity within the PKCS#P11 token.
-   * @throws P11TokenException
+   * @throws TokenException
    *         if PKCS#11 token exception occurs.
    */
   public P11IdentityId generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g, P11NewKeyControl control)
-      throws P11TokenException {
+      throws TokenException {
     assertCanGenKeypair("generateDSAKeypair", control, CKK_DSA, CKM_DSA_KEY_PAIR_GEN);
     P11IdentityId keyId = doGenerateDSAKeypair(notNull(p, "p"), notNull(q, "q"), notNull(g, "g"), control);
     LOG.info("generated DSA keypair {}", keyId);
@@ -665,10 +687,10 @@ public abstract class P11Slot implements Closeable {
    * @param curveOid
    *         Object identifier of the EC curve. Must not be {@code null}.
    * @return the ASN.1 keypair.
-   * @throws P11TokenException
+   * @throws TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public PrivateKeyInfo generateECKeypairOtf(ASN1ObjectIdentifier curveOid) throws P11TokenException {
+  public PrivateKeyInfo generateECKeypairOtf(ASN1ObjectIdentifier curveOid) throws TokenException {
     notNull(curveOid, "curveOid");
 
     if (EdECConstants.isEdwardsCurve(curveOid)) {
@@ -691,11 +713,11 @@ public abstract class P11Slot implements Closeable {
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the identity within the PKCS#P11 token.
-   * @throws P11TokenException
+   * @throws TokenException
    *         if PKCS#11 token exception occurs.
    */
   public P11IdentityId generateECKeypair(ASN1ObjectIdentifier curveOid, P11NewKeyControl control)
-      throws P11TokenException {
+      throws TokenException {
     notNull(curveOid, "curveOid");
 
     P11IdentityId keyId;
@@ -710,7 +732,7 @@ public abstract class P11Slot implements Closeable {
       keyId = doGenerateECKeypair(curveOid, control);
     }
 
-    LOG.info("generated EC keypair {} {}", keyId);
+    LOG.info("generated EC keypair {}", keyId);
     return keyId;
   }
 
@@ -718,10 +740,10 @@ public abstract class P11Slot implements Closeable {
    * Generates an SM2 keypair on the fly.
    *
    * @return the ASN.1 keypair.
-   * @throws P11TokenException
+   * @throws TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public PrivateKeyInfo generateSM2KeypairOtf() throws P11TokenException {
+  public PrivateKeyInfo generateSM2KeypairOtf() throws TokenException {
     assertMechanismSupported(CKM_VENDOR_SM2_KEY_PAIR_GEN);
     return doGenerateSM2KeypairOtf();
   }
@@ -732,10 +754,10 @@ public abstract class P11Slot implements Closeable {
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the identity within the PKCS#P11 token.
-   * @throws P11TokenException
+   * @throws TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public P11IdentityId generateSM2Keypair(P11NewKeyControl control) throws P11TokenException {
+  public P11IdentityId generateSM2Keypair(P11NewKeyControl control) throws TokenException {
     assertCanGenKeypair("generateSM2Keypair", control, CKK_VENDOR_SM2, CKM_VENDOR_SM2_KEY_PAIR_GEN);
     P11IdentityId keyId = doGenerateSM2Keypair(control);
     LOG.info("generated SM2 keypair {}", keyId);
@@ -743,7 +765,7 @@ public abstract class P11Slot implements Closeable {
   }
 
   private void assertCanGenKeypair(String methodName, P11NewKeyControl control, long keyType, long... orMechanisms)
-      throws P11TokenException {
+      throws TokenException {
     notNull(control, "control");
     assertWritable(methodName);
     if (orMechanisms.length < 2) {
@@ -758,7 +780,7 @@ public abstract class P11Slot implements Closeable {
       }
 
       if (!mechSupported) {
-        throw new P11UnsupportedMechanismException(buildOrMechanismsUnsupportedMessage(orMechanisms));
+        throw new TokenException(buildOrMechanismsUnsupportedMessage(orMechanisms));
       }
     }
 
@@ -770,7 +792,7 @@ public abstract class P11Slot implements Closeable {
 
     if (!keyPairTypes.contains(keyType)) {
       LOG.error("Keypair of key type 0x{} unsupported", Long.toHexString(keyType));
-      throw new P11UnsupportedMechanismException(buildOrMechanismsUnsupportedMessage(orMechanisms));
+      throw new TokenException(buildOrMechanismsUnsupportedMessage(orMechanisms));
     }
   }
 
@@ -780,7 +802,7 @@ public abstract class P11Slot implements Closeable {
       sb.append(ckmCodeToName(mechanism)).append(", ");
     }
     sb.deleteCharAt(sb.length() - 1);
-    sb.append("] is not supported by PKCS11 slot ").append(slotId);
+    sb.append("] is supported by PKCS11 slot ").append(slotId);
     return sb.toString();
   }
 
@@ -799,51 +821,31 @@ public abstract class P11Slot implements Closeable {
     stream.write(sb.toString().getBytes(StandardCharsets.UTF_8));
   }
 
-  protected void assertWritable(String operationName) throws P11PermissionException {
+  protected void assertWritable(String operationName) throws TokenException {
     if (readOnly) {
-      throw new P11PermissionException("Writable operation " + operationName + " is not permitted");
+      throw new TokenException("Writable operation " + operationName + " is not permitted");
     }
-  }
-
-  private static String getAlgorithmDesc(PublicKey publicKey) {
-    String algo = publicKey.getAlgorithm();
-
-    if (publicKey instanceof ECPublicKey) {
-      String curveName = "UNKNOWN";
-      ECParameterSpec paramSpec = ((ECPublicKey) publicKey).getParams();
-      ASN1ObjectIdentifier curveOid = KeyUtil.detectCurveOid(paramSpec);
-      if (curveOid != null) {
-        String name = AlgorithmUtil.getCurveName(curveOid);
-        curveName = name == null ? curveOid.getId() : name;
-      }
-      algo += "/" + curveName;
-    } else if (publicKey instanceof RSAPublicKey) {
-      int keylen = ((RSAPublicKey) publicKey).getModulus().bitLength();
-      algo += "/" + keylen;
-    } else if (publicKey instanceof DSAPublicKey) {
-      int keylen = ((DSAPublicKey) publicKey).getParams().getP().bitLength();
-      algo += "/" + keylen;
-    }
-
-    return algo;
-  }
-
-  private List<P11ObjectId> getSortedObjectIds(Set<P11ObjectId> sets) {
-    List<P11ObjectId> ids = new ArrayList<>(sets);
-    Collections.sort(ids);
-    return ids;
   }
 
   protected static String formatNumber(int value, int numChars) {
-    String str = Integer.toString(value);
+    return formatString(Integer.toString(value), numChars, true);
+  }
+
+  private static String formatString(String str, int numChars, boolean prepend) {
     if (str.length() >= numChars) {
       return str;
     }
 
-    while (str.length() < numChars) {
-      str = " " + str;
+    char[] chars = str.toCharArray();
+    char[] ret = new char[numChars];
+    if (prepend) {
+      System.arraycopy(chars, 0, ret, numChars - chars.length, chars.length);
+      Arrays.fill(ret, 0, numChars - chars.length, ' ');
+    } else {
+      System.arraycopy(chars, 0, ret, 0, chars.length);
+      Arrays.fill(ret, chars.length, numChars, ' ');
     }
-    return str;
+    return new String(ret);
   }
 
 }

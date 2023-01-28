@@ -27,7 +27,6 @@ import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -59,19 +58,16 @@ public class HttpScepServlet extends HttpServlet {
   }
 
   @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException {
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     service0(req, resp, false);
   }
 
   @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException {
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     service0(req, resp, true);
   }
 
-  private void service0(HttpServletRequest req, HttpServletResponse resp, boolean viaPost)
-      throws IOException {
+  private void service0(HttpServletRequest req, HttpServletResponse resp, boolean viaPost) throws IOException {
     String path = req.getServletPath();
 
     byte[] requestBytes = viaPost ? IoUtil.read(req.getInputStream())

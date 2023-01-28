@@ -108,7 +108,7 @@ public class OcspServerImpl implements OcspServer {
 
   private boolean master;
 
-  private OcspLicense license;
+  private final OcspLicense license;
 
   private UnknownIssuerBehaviour unknownIssuerBehaviour = UnknownIssuerBehaviour.unknown;
 
@@ -489,7 +489,7 @@ public class OcspServerImpl implements OcspServer {
 
     // Sort the servlet paths according to the length of path. The first one is the
     // longest, and the last one is the shortest.
-    Collections.sort(tmpList, (o1, o2) -> o2.length() - o1.length());
+    tmpList.sort((o1, o2) -> o2.length() - o1.length());
     this.servletPaths.clear();
     this.servletPaths.addAll(tmpList);
   } // method init0

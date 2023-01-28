@@ -56,7 +56,7 @@ public class EmbedAuditService implements AuditService {
 
   private static final String DELIM = " | ";
 
-  private static Logger LOG = LoggerFactory.getLogger(EmbedAuditService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(EmbedAuditService.class);
 
   private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy.MM.dd-HH:mm:ss.SSS");
 

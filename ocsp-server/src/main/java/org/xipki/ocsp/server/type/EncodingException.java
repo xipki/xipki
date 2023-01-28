@@ -26,9 +26,6 @@ package org.xipki.ocsp.server.type;
 
 public class EncodingException extends Exception {
 
-  public EncodingException() {
-  }
-
   public EncodingException(String message) {
     super(message);
   }

@@ -235,7 +235,6 @@ class CertRepublisher {
 
     ExecutorService executor = Executors.newFixedThreadPool(numThreads + 1);
     List<CertRepublishConsumer> consumers = new ArrayList<>(numThreads);
-    AtomicBoolean stopMe = new AtomicBoolean(false);
     for (int i = 0; i < numThreads; i++) {
       CertRepublishConsumer consumer = new CertRepublishConsumer();
       consumers.add(consumer);

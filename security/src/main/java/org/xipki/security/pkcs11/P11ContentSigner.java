@@ -23,6 +23,7 @@ import org.bouncycastle.crypto.*;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.TokenException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.XiContentSigner;
@@ -61,8 +62,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
   protected final byte[] encodedAlgorithmIdentifier;
 
-  P11ContentSigner(P11Identity identity, SignAlgo signAlgo)
-      throws XiSecurityException {
+  P11ContentSigner(P11Identity identity, SignAlgo signAlgo) throws XiSecurityException {
     this.identity = notNull(identity, "identity");
     this.signAlgo = notNull(signAlgo, "signAlgo");
     try {
@@ -145,7 +145,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       hashMechMap.put(SHA3_512, CKM_DSA_SHA3_512);
     } // method static
 
-    DSA(P11Identity identity, SignAlgo signAlgo) throws XiSecurityException, P11TokenException {
+    DSA(P11Identity identity, SignAlgo signAlgo) throws XiSecurityException {
       super(identity, signAlgo);
 
       if (!signAlgo.isDSASigAlgo()) {
@@ -189,7 +189,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       }
     }
 
-    private byte[] getPlainSignature() throws XiSecurityException, P11TokenException {
+    private byte[] getPlainSignature() throws XiSecurityException, TokenException {
       byte[] dataToSign;
       if (outputStream instanceof ByteArrayOutputStream) {
         dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
@@ -224,7 +224,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       hashMechMap.put(SHA3_512, CKM_ECDSA_SHA3_512);
     } // method static
 
-    ECDSA(P11Identity identity, SignAlgo signAlgo) throws XiSecurityException, P11TokenException {
+    ECDSA(P11Identity identity, SignAlgo signAlgo) throws XiSecurityException {
       super(identity, signAlgo);
       if (!signAlgo.isECDSASigAlgo()) {
         throw new XiSecurityException("not an ECDSA algorithm: " + signAlgo);
@@ -267,7 +267,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       }
     }
 
-    private byte[] getPlainSignature() throws XiSecurityException, P11TokenException {
+    private byte[] getPlainSignature() throws XiSecurityException, TokenException {
       byte[] dataToSign;
       if (outputStream instanceof ByteArrayOutputStream) {
         dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
@@ -287,8 +287,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
     private final long mechanism;
 
-    EdDSA(P11Identity identity, SignAlgo signAlgo)
-        throws XiSecurityException, P11TokenException {
+    EdDSA(P11Identity identity, SignAlgo signAlgo) throws XiSecurityException {
       super(identity, signAlgo);
 
       if (SignAlgo.ED25519 != signAlgo) {
@@ -343,8 +342,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       hashMechMap.put(SHA3_512, CKM_SHA3_512_HMAC);
     } // method static
 
-    Mac(P11Identity identity, SignAlgo signAlgo)
-            throws XiSecurityException, P11TokenException {
+    Mac(P11Identity identity, SignAlgo signAlgo) throws XiSecurityException {
       super(identity, signAlgo);
 
       HashAlgo hashAlgo = signAlgo.getHashAlgo();
@@ -373,9 +371,9 @@ abstract class P11ContentSigner implements XiContentSigner {
         byte[] dataToSign = outputStream.toByteArray();
         outputStream.reset();
         return identity.sign(mechanism, null, dataToSign);
-      } catch (P11TokenException ex) {
+      } catch (TokenException ex) {
         LogUtil.warn(LOG, ex);
-        throw new RuntimeCryptoException("P11TokenException: " + ex.getMessage());
+        throw new RuntimeCryptoException("TokenException: " + ex.getMessage());
       } catch (Throwable th) {
         LogUtil.warn(LOG, th);
         throw new RuntimeCryptoException(th.getClass().getName() + ": " + th.getMessage());
@@ -408,8 +406,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       hashMechMap.put(SHA3_512, CKM_SHA3_512_RSA_PKCS);
     } // method static
 
-    RSA(P11Identity identity, SignAlgo signAlgo)
-        throws XiSecurityException, P11TokenException {
+    RSA(P11Identity identity, SignAlgo signAlgo) throws XiSecurityException {
       super(identity, signAlgo);
 
       if (!signAlgo.isRSAPkcs1SigAlgo()) {
@@ -437,7 +434,7 @@ abstract class P11ContentSigner implements XiContentSigner {
         this.outputStream = new ByteArrayOutputStream();
       }
 
-      this.modulusBitLen = identity.getExpectedSignatureLen() * 8;
+      this.modulusBitLen = identity.getRsaModulus().bitLength();
     } // constructor
 
     @Override
@@ -470,7 +467,7 @@ abstract class P11ContentSigner implements XiContentSigner {
         }
 
         return identity.sign(mechanism, null, dataToSign);
-      } catch (XiSecurityException | P11TokenException ex) {
+      } catch (XiSecurityException | TokenException ex) {
         LogUtil.error(LOG, ex, "could not sign");
         throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
       }
@@ -500,8 +497,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
     private final OutputStream outputStream;
 
-    RSAPSS(P11Identity identity, SignAlgo signAlgo, SecureRandom random)
-        throws XiSecurityException, P11TokenException {
+    RSAPSS(P11Identity identity, SignAlgo signAlgo, SecureRandom random) throws XiSecurityException {
       super(identity, signAlgo);
       if (!signAlgo.isRSAPSSSigAlgo()) {
         throw new XiSecurityException("not an RSA PSS algorithm: " + signAlgo);
@@ -565,7 +561,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
       try {
         return identity.sign(mechanism, parameters, dataToSign);
-      } catch (P11TokenException ex) {
+      } catch (TokenException ex) {
         LogUtil.warn(LOG, ex, "could not sign");
         throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
       }
@@ -588,9 +584,8 @@ abstract class P11ContentSigner implements XiContentSigner {
       hashMechMap.put(SM3, CKM_VENDOR_SM2_SM3);
     }
 
-    SM2(P11Identity identity, SignAlgo signAlgo,
-        ASN1ObjectIdentifier curveOid, BigInteger pubPointX, BigInteger pubPointY)
-        throws XiSecurityException, P11TokenException {
+    SM2(P11Identity identity, SignAlgo signAlgo, ASN1ObjectIdentifier curveOid,
+        BigInteger pubPointX, BigInteger pubPointY) throws XiSecurityException {
       super(identity, signAlgo);
       if (!signAlgo.isSM2SigAlgo()) {
         throw new XiSecurityException("not an SM2 algorithm: " + signAlgo);
@@ -643,7 +638,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       }
     }
 
-    private byte[] getPlainSignature() throws XiSecurityException, P11TokenException {
+    private byte[] getPlainSignature() throws XiSecurityException, TokenException {
       byte[] dataToSign;
       P11Params.P11ByteArrayParams params;
       if (outputStream instanceof ByteArrayOutputStream) {

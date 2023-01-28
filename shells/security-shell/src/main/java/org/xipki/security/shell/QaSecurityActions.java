@@ -211,7 +211,7 @@ public class QaSecurityActions {
     @Override
     protected BenchmarkExecutor nextTester() throws Exception {
       KeyControl.DSA control = queue.poll();
-      return (control == null) ? null : new P11KeyGenSpeed.DSA(getSlot(), getKeyId(), control.plen(), control.qlen());
+      return (control == null) ? null : new P11KeyGenSpeed.DSA(getSlot(), control.plen(), control.qlen());
     }
 
     @Override
@@ -265,7 +265,7 @@ public class QaSecurityActions {
         return null;
       }
 
-      return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), getCurveOid(control.curveName()));
+      return new P11KeyGenSpeed.EC(getSlot(), getCurveOid(control.curveName()));
     }
 
     protected int getNumThreads(int numThreads) {
@@ -321,7 +321,7 @@ public class QaSecurityActions {
     protected BenchmarkExecutor nextTester() throws Exception {
       KeyControl.RSA control = queue.poll();
       return (control == null) ? null
-          : new P11KeyGenSpeed.RSA(getSlot(), getKeyId(), control.modulusLen(), toBigInt("0x10001"));
+          : new P11KeyGenSpeed.RSA(getSlot(), control.modulusLen(), toBigInt("0x10001"));
     }
 
   } // class BspeedRsaGenP11
@@ -394,7 +394,7 @@ public class QaSecurityActions {
       if (qlen == null) {
         qlen = (plen >= 2048) ? 256 : 160;
       }
-      return new P11KeyGenSpeed.DSA(getSlot(), getKeyId(), plen, qlen);
+      return new P11KeyGenSpeed.DSA(getSlot(), plen, qlen);
     }
 
     @Override
@@ -447,7 +447,7 @@ public class QaSecurityActions {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
-      return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), getCurveOid(curveName));
+      return new P11KeyGenSpeed.EC(getSlot(), getCurveOid(curveName));
     }
 
     @Override
@@ -488,7 +488,7 @@ public class QaSecurityActions {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
-      return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), getCurveOid(curveName));
+      return new P11KeyGenSpeed.EC(getSlot(), getCurveOid(curveName));
     }
 
     @Override
@@ -549,7 +549,7 @@ public class QaSecurityActions {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
-      return new P11KeyGenSpeed.RSA(getSlot(), getKeyId(), keysize, toBigInt(publicExponent));
+      return new P11KeyGenSpeed.RSA(getSlot(), keysize, toBigInt(publicExponent));
     }
 
     @Override
@@ -598,7 +598,7 @@ public class QaSecurityActions {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
-      return new P11KeyGenSpeed.SM2(getSlot(), getKeyId());
+      return new P11KeyGenSpeed.SM2(getSlot());
     }
 
     @Override

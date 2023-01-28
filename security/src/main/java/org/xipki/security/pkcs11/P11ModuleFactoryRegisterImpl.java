@@ -19,6 +19,7 @@ package org.xipki.security.pkcs11;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.TokenException;
 import org.xipki.util.LogUtil;
 
 import java.util.HashMap;
@@ -70,7 +71,7 @@ public class P11ModuleFactoryRegisterImpl implements P11ModuleFactoryRegister {
   }
 
   @Override
-  public P11Module getP11Module(P11ModuleConf conf) throws P11TokenException {
+  public P11Module getP11Module(P11ModuleConf conf) throws TokenException {
     String type = conf.getType().toLowerCase();
 
     String nativeLib = conf.getNativeLibrary();
@@ -87,7 +88,7 @@ public class P11ModuleFactoryRegisterImpl implements P11ModuleFactoryRegister {
       }
 
       if (p11Module == null) {
-        throw new P11TokenException("could not find Factory to create PKCS#11 module of type '" + type + "'");
+        throw new TokenException("could not find Factory to create PKCS#11 module of type '" + type + "'");
       }
       modules.put(key, p11Module);
     }

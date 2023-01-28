@@ -36,7 +36,7 @@ public class CaNameScepSigners {
 
   private final ScepSigner defaultSigner;
 
-  private Map<String, ScepSigner> signers;
+  private final Map<String, ScepSigner> signers;
 
   public CaNameScepSigners(CaNameSigners signers) {
     ConcurrentContentSigner signer = signers.getDefaultSigner();

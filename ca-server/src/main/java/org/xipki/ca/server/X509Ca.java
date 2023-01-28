@@ -267,39 +267,6 @@ public class X509Ca extends X509CaModule implements Closeable {
     return crlModule.generateCrlOnDemand(requestor);
   }
 
-  public CertificateInfo regenerateCert(RequestorInfo requestor, CertTemplateData certTemplate, String transactionId)
-      throws OperationException {
-    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_regen_cert, requestor);
-    try {
-      CertificateInfo ret =
-          generateCerts(requestor, Collections.singletonList(certTemplate), true, transactionId, event).get(0);
-      finish(event, true);
-      return ret;
-    } catch (OperationException ex) {
-      if (!(ex instanceof OperationExceptionWithIndex)) {
-        event.addEventData(NAME_message, ex.getErrorMessage());
-      }
-      finish(event, false);
-      throw ex;
-    }
-  }
-
-  public List<CertificateInfo> regenerateCerts(
-      RequestorInfo requestor, List<CertTemplateData> certTemplates, String transactionId) throws OperationException {
-    AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_regen_cert, requestor);
-    try {
-      List<CertificateInfo>  ret = generateCerts(requestor, certTemplates, true, transactionId, event);
-      finish(event, true);
-      return ret;
-    } catch (OperationException ex) {
-      if (!(ex instanceof OperationExceptionWithIndex)) {
-        event.addEventData(NAME_message, ex.getErrorMessage());
-      }
-      finish(event, false);
-      throw ex;
-    }
-  }
-
   public boolean republishCerts(List<String> publisherNames, int numThreads) {
     return publisherModule.republishCerts(publisherNames, numThreads);
   }
@@ -372,21 +339,18 @@ public class X509Ca extends X509CaModule implements Closeable {
       RequestorInfo requestor, List<CertTemplateData> certTemplates, String transactionId) throws OperationException {
     AuditEvent event = newAuditEvent(TYPE_gen_cert, requestor);
     try {
-      List<CertificateInfo> ret = generateCerts(requestor, certTemplates, false, transactionId, event);
+      List<CertificateInfo> ret = generateCerts(requestor, certTemplates, transactionId, event);
       finish(event, true);
       return ret;
-    } catch (OperationException ex) {
-      if (!(ex instanceof OperationExceptionWithIndex)) {
-        event.addEventData(NAME_message, ex.getErrorMessage());
-      }
+    } catch (OperationExceptionWithIndex ex) {
       finish(event, false);
       throw ex;
     }
   }
 
   private List<CertificateInfo> generateCerts(
-      RequestorInfo requestor, List<CertTemplateData> certTemplates, boolean update,
-      String transactionId, AuditEvent event) throws OperationExceptionWithIndex {
+      RequestorInfo requestor, List<CertTemplateData> certTemplates, String transactionId, AuditEvent event)
+      throws OperationExceptionWithIndex {
     notEmpty(certTemplates, "certTemplates");
 
     CmLicense license = caManager.getLicense();
@@ -432,8 +396,7 @@ public class X509Ca extends X509CaModule implements Closeable {
               "unknown cert profile " + certTemplate.getCertprofileName());
         }
 
-        GrantedCertTemplate gct = grandCertTemplateBuilder.create(
-            batch, certprofile, certTemplate, keypairGenerators, update);
+        GrantedCertTemplate gct = grandCertTemplateBuilder.create(batch, certprofile, certTemplate, keypairGenerators);
         gct.audit(event);
         gcts.add(gct);
       } catch (OperationException ex) {
@@ -532,7 +495,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_gen_cert, requestor);
     try {
       CertificateInfo ret = generateCerts(requestor, Collections.singletonList(certTemplate),
-          false, transactionId, event).get(0);
+          transactionId, event).get(0);
       finish(event, true);
       return ret;
     } catch (OperationException ex) {

@@ -17,7 +17,9 @@
 
 package org.xipki.security.pkcs11;
 
+import org.xipki.pkcs11.TokenException;
 import org.xipki.util.CompareUtil;
+import sun.tools.jstat.Token;
 
 import java.util.*;
 
@@ -65,8 +67,6 @@ public abstract class P11Module {
       this.slots.put(slot.getSlotId(), slot);
       this.slotIds.add(slot.getSlotId());
     }
-
-    Collections.sort(this.slotIds);
   }
 
   /**
@@ -75,14 +75,14 @@ public abstract class P11Module {
    * @param slotId
    *          slot identifier. Must not be {@code null}.
    * @return the slot
-   * @throws P11TokenException
+   * @throws P11UnknownEntityException
    *         if PKCS#11 token error occurs
    */
-  public P11Slot getSlot(P11SlotId slotId) throws P11UnknownEntityException {
+  public P11Slot getSlot(P11SlotId slotId) throws TokenException {
     notNull(slotId, "slotId");
     P11Slot slot = slots.get(slotId);
     if (slot == null) {
-      throw new P11UnknownEntityException(slotId);
+      throw new TokenException("unknown slot " + slotId);
     }
     return slot;
   } // method getSlot
@@ -96,7 +96,10 @@ public abstract class P11Module {
       }
     }
     if (p11SlotId != null) {
-      slots.remove(p11SlotId);
+      P11Slot slot = slots.remove(p11SlotId);
+      if (slot != null) {
+        slot.close();
+      }
     }
   }
 
@@ -104,22 +107,22 @@ public abstract class P11Module {
     return slotIds;
   }
 
-  public P11SlotId getSlotIdForIndex(int index) throws P11UnknownEntityException {
+  public P11SlotId getSlotIdForIndex(int index) throws TokenException {
     for (P11SlotId id : slotIds) {
       if (id.getIndex() == index) {
         return id;
       }
     }
-    throw new P11UnknownEntityException("could not find slot with index " + index);
+    throw new TokenException("could not find slot with index " + index);
   }
 
-  public P11SlotId getSlotIdForId(long id) throws P11UnknownEntityException {
+  public P11SlotId getSlotIdForId(long id) throws TokenException {
     for (P11SlotId slotId : slotIds) {
       if (slotId.getId() == id) {
         return slotId;
       }
     }
-    throw new P11UnknownEntityException("could not find slot with id " + id);
+    throw new TokenException("could not find slot with id " + id);
   }
 
 }

@@ -404,8 +404,8 @@ public class ScepResponder {
     Date signingTime = req.getSigningTime();
     long maxSigningTimeBiasInMs = 1000L * control.getMaxSigningTimeBias();
     if (maxSigningTimeBiasInMs > 0) {
-      boolean isTimeBad = signingTime == null ? true
-          : Math.abs(System.currentTimeMillis() - signingTime.getTime()) > maxSigningTimeBiasInMs;
+      boolean isTimeBad = signingTime == null ||
+          Math.abs(System.currentTimeMillis() - signingTime.getTime()) > maxSigningTimeBiasInMs;
 
       if (isTimeBad) {
         return fail(rep, FailInfo.badTime);
@@ -761,7 +761,7 @@ public class ScepResponder {
   }
 
   private static boolean dfltTrue(Boolean b) {
-    return b == null ? true : b;
+    return b == null || b;
   }
 
 }

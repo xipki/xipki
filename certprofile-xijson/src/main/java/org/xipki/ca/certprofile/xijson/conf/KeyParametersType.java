@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
@@ -28,7 +27,6 @@ import org.xipki.util.exception.InvalidConfException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * KeyPrameters.

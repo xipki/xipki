@@ -427,7 +427,7 @@ class O2tChecker extends ExtensionChecker {
       return null;
     }
 
-    GeneralNames reqNames = (extValue == null) ? null : GeneralNames.getInstance(extValue);
+    GeneralNames reqNames = GeneralNames.getInstance(extValue);
 
     Set<GeneralNameMode> subjectAltNameModes = certprofile.getSubjectAltNameModes();
     if (subjectAltNameModes == null && subjectToSubjectAltNameModes == null) {
@@ -508,7 +508,6 @@ class O2tChecker extends ExtensionChecker {
     Set<String> expCountryOfResidenceList = new HashSet<>();
     Map<ASN1ObjectIdentifier, Set<ASN1Encodable>> expOtherAttrs = new HashMap<>();
 
-    final int expN = reqSubDirAttrs.size();
     for (Object reqSubDirAttr : reqSubDirAttrs) {
       Attribute attr = Attribute.getInstance(reqSubDirAttr);
       ASN1ObjectIdentifier attrType = attr.getAttrType();
@@ -542,7 +541,6 @@ class O2tChecker extends ExtensionChecker {
     Map<ASN1ObjectIdentifier, Set<ASN1Encodable>> otherAttrs = new HashMap<>();
 
     List<ASN1ObjectIdentifier> attrTypes = new LinkedList<>(conf.getTypes());
-    final int n = subDirAttrs.size();
     for (Object subDirAttr : subDirAttrs) {
       Attribute attr = Attribute.getInstance(subDirAttr);
       ASN1ObjectIdentifier attrType = attr.getAttrType();

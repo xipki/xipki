@@ -53,8 +53,7 @@ public class SoftwareKeypairGenerator extends KeypairGenerator {
   }
 
   @Override
-  public void initialize0(ConfPairs conf, PasswordResolver passwordResolver)
-      throws XiSecurityException {
+  public void initialize0(ConfPairs conf, PasswordResolver passwordResolver) {
   }
 
   @Override

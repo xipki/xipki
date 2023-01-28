@@ -38,11 +38,11 @@ public class CertRevInfoWithSerial implements Comparable<CertRevInfoWithSerial> 
 
   private final BigInteger serial;
 
-  private CrlReason reason;
+  private final CrlReason reason;
 
   private Date revocationTime;
 
-  private Date invalidityTime;
+  private final Date invalidityTime;
 
   public CertRevInfoWithSerial(long id, BigInteger serial, CrlReason reason, Date revocationTime, Date invalidityTime) {
     this.reason = notNull(reason, "reason");

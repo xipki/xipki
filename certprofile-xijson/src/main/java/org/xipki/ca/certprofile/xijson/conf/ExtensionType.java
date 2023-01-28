@@ -164,7 +164,7 @@ public class ExtensionType extends ValidatableConf {
   }
 
   public boolean critical() {
-    return critical == null ? false : critical;
+    return critical != null && critical;
   }
 
   // do not encode the default value.
@@ -177,7 +177,7 @@ public class ExtensionType extends ValidatableConf {
   }
 
   public boolean required() {
-    return required == null ? false : required;
+    return required != null && required;
   }
 
   @Deprecated

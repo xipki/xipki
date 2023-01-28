@@ -207,7 +207,7 @@ public abstract class MacAuditService implements AuditService {
     } else if (integrityId > id) {
       throw new IllegalStateException(String.format(
               "audit entries deleted unexpectedly, id in the latest entry is %d, but expected %d", id, integrityId));
-    } else if (integrityId < id) {
+    } else {
       LOG.warn("id in the last entry is{}, but in the integrityText is {}", id, integrityId);
     }
   }

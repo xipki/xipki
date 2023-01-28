@@ -17,6 +17,8 @@
 
 package org.xipki.security.pkcs11;
 
+import org.xipki.pkcs11.TokenException;
+
 import java.io.Closeable;
 
 /**
@@ -28,6 +30,6 @@ import java.io.Closeable;
 
 public interface P11ModuleFactoryRegister extends Closeable {
 
-  P11Module getP11Module(P11ModuleConf conf) throws P11TokenException;
+  P11Module getP11Module(P11ModuleConf conf) throws TokenException;
 
 }

@@ -121,11 +121,6 @@ public class CaUtil {
     return list;
   }
 
-  @SafeVarargs
-  public static <T> void addAll(List<T> list, T... a) {
-    list.addAll(Arrays.asList(a));
-  }
-
   public static BasicConstraints createBasicConstraints(CertLevel level, Integer pathLen) {
     return (level == CertLevel.EndEntity) ? new BasicConstraints(false)
         : (pathLen != null) ? new BasicConstraints(pathLen) : new BasicConstraints(true);

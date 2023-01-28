@@ -17,9 +17,6 @@
 
 package org.xipki.security.pkcs11;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static org.xipki.util.Args.notNull;
 
 /**
@@ -31,20 +28,14 @@ import static org.xipki.util.Args.notNull;
 
 public class P11CryptService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(P11CryptService.class);
-
   private final P11Module module;
 
-  public P11CryptService(P11Module module) throws P11TokenException {
+  public P11CryptService(P11Module module) {
     this.module = notNull(module, "module");
   }
 
   public P11Module getModule() {
     return module;
-  }
-
-  public P11Slot getSlot(P11SlotId slotId) throws P11UnknownEntityException {
-    return module.getSlot(slotId);
   }
 
   @Override

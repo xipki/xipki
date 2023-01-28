@@ -287,18 +287,19 @@ class Ca2Manager {
 
     try {
       List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(caEntry.getSignerConf());
-      ConcurrentContentSigner signer;
       for (CaSignerConf m : signerConfs) {
         SignerConf signerConf = new SignerConf(m.getConf());
-        signer = securityFactory.createSigner(caEntry.getSignerType(), signerConf, caEntry.getCert());
-        if (caEntry.getCert() == null) {
-          if (signer.getCertificate() == null) {
-            throw new CaMgmtException("CA signer without certificate is not allowed");
+        try (ConcurrentContentSigner signer =
+                 securityFactory.createSigner(caEntry.getSignerType(), signerConf, caEntry.getCert())) {
+          if (caEntry.getCert() == null) {
+            if (signer.getCertificate() == null) {
+              throw new CaMgmtException("CA signer without certificate is not allowed");
+            }
+            caEntry.setCert(signer.getCertificate());
           }
-          caEntry.setCert(signer.getCertificate());
         }
       }
-    } catch (XiSecurityException | ObjectCreationException ex) {
+    } catch (IOException | XiSecurityException | ObjectCreationException ex) {
       throw new CaMgmtException(concat("could not create signer for new CA ", name, ": ", ex.getMessage()), ex);
     }
 

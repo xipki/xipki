@@ -18,11 +18,9 @@
 package org.xipki.security.pkcs11;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x9.X9ECParameters;
-import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.EdECConstants;
+import org.xipki.pkcs11.TokenException;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.LogUtil;
 
@@ -39,15 +37,13 @@ import static org.xipki.util.Args.notNull;
  * @since 2.0.0
  */
 
-public abstract class P11Identity implements Comparable<P11Identity> {
+public abstract class P11Identity {
 
   private static final Logger LOG = LoggerFactory.getLogger(P11Identity.class);
 
   protected final P11Slot slot;
 
   protected final P11IdentityId id;
-
-  private int expectedSignatureLen;
 
   private ASN1ObjectIdentifier ecParams;
 
@@ -66,24 +62,13 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     this.id = notNull(id, "id");
   }
 
-  public abstract void destroy() throws P11TokenException;
+  public abstract void destroy() throws TokenException;
 
   public ASN1ObjectIdentifier getEcParams() {
     return ecParams;
   }
 
   public void setEcParams(ASN1ObjectIdentifier ecParams) {
-    if (EdECConstants.id_ED25519.equals(ecParams)) {
-      expectedSignatureLen = 64;
-    } else if (EdECConstants.id_ED448.equals(ecParams)) {
-      expectedSignatureLen = 114;
-    } else {
-      X9ECParameters x9params = ECUtil.getNamedCurveByOid(ecParams);
-      if (x9params != null) {
-        expectedSignatureLen = (x9params.getCurve().getOrder().bitLength() + 7) / 8 * 2;
-      }
-    }
-
     this.ecParams = ecParams;
   }
 
@@ -98,7 +83,6 @@ public abstract class P11Identity implements Comparable<P11Identity> {
   public void setRsaMParameters(BigInteger modulus, BigInteger publicExponent) {
     this.rsaModulus = modulus;
     this.rsaPublicExponent = publicExponent;
-    expectedSignatureLen = (modulus.bitLength() + 7) / 8;
   }
 
   public BigInteger getDsaQ() {
@@ -107,18 +91,17 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
   public void setDsaQ(BigInteger q) {
     this.dsaQ = q;
-    expectedSignatureLen = (q.bitLength() + 7) / 8 * 2;
   }
 
-  public byte[] sign(long mechanism, P11Params parameters, byte[] content) throws P11TokenException {
+  public byte[] sign(long mechanism, P11Params parameters, byte[] content) throws TokenException {
     if (id.getKeyId().getKeyType() == CKK_EC_MONTGOMERY) {
-      throw new P11TokenException("this identity is not suitable for sign");
+      throw new TokenException("this identity is not suitable for sign");
     }
 
     notNull(content, "content");
     slot.assertMechanismSupported(mechanism);
     if (!supportsMechanism(mechanism, parameters)) {
-      throw new P11UnsupportedMechanismException(mechanism, id);
+      throw new TokenException("unsupported mechanism " + ckmCodeToName(mechanism));
     }
     if (LOG.isDebugEnabled()) {
       LOG.debug("sign with mechanism {}", ckmCodeToName(mechanism));
@@ -136,13 +119,13 @@ public abstract class P11Identity implements Comparable<P11Identity> {
    * @param content
    *          Content to be signed. Must not be {@code null}.
    * @return signature.
-   * @throws P11TokenException
+   * @throws TokenException
    *         if PKCS#11 token error occurs.
    */
   protected abstract byte[] sign0(long mechanism, P11Params parameters, byte[] content)
-      throws P11TokenException;
+      throws TokenException;
 
-  public byte[] digestSecretKey(long mechanism) throws P11TokenException, XiSecurityException {
+  public byte[] digestSecretKey(long mechanism) throws TokenException, XiSecurityException {
     slot.assertMechanismSupported(mechanism);
     if (LOG.isDebugEnabled()) {
       LOG.debug("digest secret with mechanism {}", ckmCodeToName(mechanism));
@@ -150,7 +133,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     return digestSecretKey0(mechanism);
   }
 
-  protected abstract byte[] digestSecretKey0(long mechanism) throws P11TokenException;
+  protected abstract byte[] digestSecretKey0(long mechanism) throws TokenException;
 
   public P11IdentityId getId() {
     return id;
@@ -158,27 +141,6 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
   public long getKeyType() {
     return id.getKeyId().getKeyType();
-  }
-
-  public int getExpectedSignatureLen() {
-    return expectedSignatureLen;
-  }
-
-  public void setExpectedSignatureLen(int numBytes) {
-    this.expectedSignatureLen = numBytes;
-  }
-
-  public boolean match(P11IdentityId id) {
-    return this.id.equals(id);
-  }
-
-  public boolean match(P11SlotId slotId, String keyLabel) {
-    return id.match(slotId, keyLabel);
-  }
-
-  @Override
-  public int compareTo(P11Identity obj) {
-    return id.compareTo(obj.id);
   }
 
   public boolean isSecretKey() {

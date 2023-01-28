@@ -226,7 +226,7 @@ public class P11ModuleConf {
 
     private int idLength = 8;
 
-    public P11NewObjectConf(Pkcs11conf.NewObjectConf conf) throws InvalidConfException {
+    public P11NewObjectConf(Pkcs11conf.NewObjectConf conf) {
       Boolean bb = conf.getIgnoreLabel();
       this.ignoreLabel = bb != null && bb;
 

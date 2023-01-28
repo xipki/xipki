@@ -149,7 +149,7 @@ public class SecurePasswordInputPanel extends Panel {
         tmpPrompt = "Password required";
       }
 
-      int option = JOptionPane.showOptionDialog(null, gui, tmpPrompt, JOptionPane.NO_OPTION,
+      int option = JOptionPane.showOptionDialog(null, gui, tmpPrompt, JOptionPane.OK_OPTION,
           JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 
       if (option == 0) { // pressing OK button

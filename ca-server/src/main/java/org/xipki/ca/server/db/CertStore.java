@@ -139,8 +139,6 @@ public class CertStore extends CertStoreBase {
 
   private final String sqlCertInfo;
 
-  private final String sqlKnowsCertForSerial;
-
   private final String sqlCertStatusForSubjectFp;
 
   private final String sqlCrl;
@@ -167,7 +165,7 @@ public class CertStore extends CertStoreBase {
 
   private final AtomicInteger cachedCrlId = new AtomicInteger(0);
 
-  private long earliestNotBefore;
+  private final long earliestNotBefore;
 
   public CertStore(DataSourceWrapper datasource, UniqueIdGenerator idGenerator, PasswordResolver passwordResolver)
       throws DataAccessException, CaMgmtException {
@@ -181,7 +179,6 @@ public class CertStore extends CertStoreBase {
         "ID,NBEFORE,REV,RR,RT,RIT,PID,CERT FROM CERT WHERE CA_ID=? AND FP_S=? AND FP_SAN=?");
 
     this.sqlCertInfo = buildSelectFirstSql("PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE CA_ID=? AND SN=?");
-    this.sqlKnowsCertForSerial = buildSelectFirstSql("ID FROM CERT WHERE SN=? AND CA_ID=?");
     this.sqlCertStatusForSubjectFp = buildSelectFirstSql("REV FROM CERT WHERE FP_S=? AND CA_ID=?");
     this.sqlCrl = buildSelectFirstSql("THISUPDATE DESC", "THISUPDATE,CRL FROM CRL WHERE CA_ID=?");
     this.sqlCrlWithNo = buildSelectFirstSql("THISUPDATE DESC",

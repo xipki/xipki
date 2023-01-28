@@ -250,7 +250,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
 
   protected static final String PASSWORD = "1234";
 
-  private static Logger LOG = LoggerFactory.getLogger(P12SignSpeed.class);
+  private static final Logger LOG = LoggerFactory.getLogger(P12SignSpeed.class);
 
   private final ConcurrentContentSigner signer;
 

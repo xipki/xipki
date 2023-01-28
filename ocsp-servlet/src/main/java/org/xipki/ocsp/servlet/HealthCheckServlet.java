@@ -22,13 +22,10 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.api.OcspServer;
 import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.util.HttpConstants;
-import org.xipki.util.LogUtil;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.EOFException;
 import java.io.IOException;
 
 import static org.xipki.util.Args.notNull;
@@ -51,8 +48,7 @@ public class HealthCheckServlet extends HttpServlet {
   }
 
   @Override
-  protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
-      throws ServletException, IOException {
+  protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
     resp.setHeader("Access-Control-Allow-Origin", "*");
 
     try {
@@ -70,11 +66,7 @@ public class HealthCheckServlet extends HttpServlet {
 
       resp.setStatus(status);
     } catch (Throwable th) {
-      if (th instanceof EOFException) {
-        LogUtil.warn(LOG, th, "connection reset by peer");
-      } else {
-        LOG.error("Throwable thrown, this should not happen", th);
-      }
+      LOG.error("Throwable thrown, this should not happen", th);
       resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       resp.setContentLength(0);
     } finally {

@@ -142,7 +142,7 @@ public final class CmpClientImpl implements CmpClient {
 
     Responder pbmMacResponder = null;
     CmpClientConf.Responder.PbmMac pbmMacResponderConf = responderConf.getPbmMac();
-    if (pbmMacResponderConf == null) {
+    if (pbmMacResponderConf != null) {
       pbmMacResponder = new Responder.PbmMacCmpResponder(pbmMacResponderConf.getOwfAlgos(),
           pbmMacResponderConf.getMacAlgos());
     }

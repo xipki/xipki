@@ -46,12 +46,12 @@ public interface SinglePasswordResolver {
     }
 
     @Override
-    public char[] resolvePassword(String passwordHint) throws PasswordResolverException {
+    public char[] resolvePassword(String passwordHint) {
       return OBFPasswordService.deobfuscate(passwordHint).toCharArray();
     }
 
     @Override
-    public String protectPassword(char[] password) throws PasswordResolverException {
+    public String protectPassword(char[] password) {
       return OBFPasswordService.obfuscate(new String(password));
     }
 

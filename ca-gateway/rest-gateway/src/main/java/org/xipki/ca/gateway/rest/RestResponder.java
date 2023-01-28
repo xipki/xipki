@@ -410,7 +410,7 @@ public class RestResponder {
       event.addEventData(CaAuditConstants.NAME_message, code.name());
 
       auditMessage = code.name();
-      if (code != DATABASE_FAILURE && code == SYSTEM_FAILURE) {
+      if (code != DATABASE_FAILURE && code != SYSTEM_FAILURE) {
         auditMessage += ": " + ex.getErrorMessage();
       }
 

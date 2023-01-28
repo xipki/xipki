@@ -19,7 +19,6 @@ package org.xipki.ca.certprofile.xijson.conf;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1StreamParser;
-import org.xipki.util.Base64;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
 

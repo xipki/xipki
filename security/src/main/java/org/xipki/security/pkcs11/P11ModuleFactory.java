@@ -17,6 +17,8 @@
 
 package org.xipki.security.pkcs11;
 
+import org.xipki.pkcs11.TokenException;
+
 /**
  * Factory to create {@link P11Module}.
  *
@@ -41,9 +43,9 @@ public interface P11ModuleFactory {
    *          Configuration of the PKCS#11 module. Must not be {@code null}.
    *
    * @return new PKCS#11 module.
-   * @throws P11TokenException
+   * @throws TokenException
    *         if PKCS#11 module could not be created.
    */
-  P11Module newModule(P11ModuleConf conf) throws P11TokenException;
+  P11Module newModule(P11ModuleConf conf) throws TokenException;
 
 }

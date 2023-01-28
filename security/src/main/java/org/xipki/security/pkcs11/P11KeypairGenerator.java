@@ -21,6 +21,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.xipki.password.PasswordResolver;
+import org.xipki.pkcs11.TokenException;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.KeypairGenerator;
 import org.xipki.security.XiSecurityException;
@@ -116,7 +117,7 @@ public class P11KeypairGenerator extends KeypairGenerator {
       }
       super.keyspecs.clear();
       super.keyspecs.addAll(set);
-    } catch (P11TokenException ex) {
+    } catch (TokenException ex) {
       throw new XiSecurityException("cannot get the slot", ex);
     }
   }
@@ -168,7 +169,7 @@ public class P11KeypairGenerator extends KeypairGenerator {
           throw new IllegalArgumentException("unknown keyspec " + keyspec);
         }
       }
-    } catch (P11TokenException ex) {
+    } catch (TokenException ex) {
       throw new XiSecurityException("error generateKeypair for keyspec " + keyspec, ex);
     }
   }

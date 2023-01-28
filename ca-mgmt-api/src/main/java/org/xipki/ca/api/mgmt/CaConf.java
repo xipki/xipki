@@ -164,7 +164,7 @@ public class CaConf {
 
   private final Map<String, String> properties = new HashMap<>();
 
-  private Map<String, String> dbSchemas = new HashMap<>();
+  private final Map<String, String> dbSchemas = new HashMap<>();
 
   private final Map<String, SignerEntry> signers = new HashMap<>();
 
@@ -369,16 +369,17 @@ public class CaConf {
               }
             } else {
               // extract from the signer configuration
-              ConcurrentContentSigner signer;
               try {
                 List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(getValue(ci.getSignerConf(), zipEntries));
                 SignerConf signerConf = new SignerConf(signerConfs.get(0).getConf());
 
-                signer = securityFactory.createSigner(expandConf(ci.getSignerType()), signerConf, (X509Cert) null);
-              } catch (ObjectCreationException | XiSecurityException ex) {
+                try (ConcurrentContentSigner signer = securityFactory.createSigner(
+                    expandConf(ci.getSignerType()), signerConf, (X509Cert) null)) {
+                  caCert = signer.getCertificate();
+                }
+              } catch (IOException | ObjectCreationException | XiSecurityException ex) {
                 throw new InvalidConfException("could not create CA signer for CA " + name, ex);
               }
-              caCert = signer.getCertificate();
             }
 
             caEntry.setCert(caCert);

@@ -281,8 +281,8 @@ class CmpAgent {
     return response;
   } // method send
 
-  private PKIHeader buildPkiHeader(Requestor requestor, Responder responder, ASN1OctetString tid) {
-    return buildPkiHeader(requestor, responder,  false, tid, null, (InfoTypeAndValue[]) null);
+  private PKIHeader buildPkiHeader(Requestor requestor, Responder responder) {
+    return buildPkiHeader(requestor, responder,  false, null, null, (InfoTypeAndValue[]) null);
   }
 
   private PKIHeader buildPkiHeader(
@@ -445,18 +445,18 @@ class CmpAgent {
     }
   } // method verifyProtection
 
-  private PKIMessage buildMessageWithGeneralMsgContent(ASN1ObjectIdentifier type, ASN1Encodable value) {
+  private PKIMessage buildMessageWithGeneralMsgContent(ASN1ObjectIdentifier type) {
     notNull(type, "type");
 
-    PKIHeader header = buildPkiHeader(null, null, null);
-    InfoTypeAndValue itv = (value != null) ? new InfoTypeAndValue(type, value) : new InfoTypeAndValue(type);
+    PKIHeader header = buildPkiHeader(null, null);
+    InfoTypeAndValue itv = new InfoTypeAndValue(type);
     return new PKIMessage(header, new PKIBody(PKIBody.TYPE_GEN_MSG, new GenMsgContent(itv)));
   } // method buildMessageWithGeneralMsgContent
 
   X509CRLHolder downloadCurrentCrl(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     ASN1ObjectIdentifier type = CMPObjectIdentifiers.it_currentCRL;
-    PKIMessage request = buildMessageWithGeneralMsgContent(type, null);
+    PKIMessage request = buildMessageWithGeneralMsgContent(type);
 
     GeneralPKIMessage response = send(caName, request, debug);
     ASN1Encodable itvValue = parseGenRep(response, type);
@@ -466,7 +466,7 @@ class CmpAgent {
   List<X509Cert> caCerts(String caName, int maxNumCerts, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     ASN1ObjectIdentifier type = CMPObjectIdentifiers.id_it_caCerts;
-    PKIMessage request = buildMessageWithGeneralMsgContent(type, null);
+    PKIMessage request = buildMessageWithGeneralMsgContent(type);
 
     GeneralPKIMessage response = send(caName, request, debug);
     ASN1Encodable itvValue = parseGenRep(response, type);
@@ -690,7 +690,7 @@ class CmpAgent {
 
   private PKIMessage buildRevokeCertRequest(Requestor requestor, Responder responder, RevokeCertRequest request)
       throws CmpClientException {
-    PKIHeader header = buildPkiHeader(requestor, responder, null);
+    PKIHeader header = buildPkiHeader(requestor, responder);
 
     List<RevokeCertRequest.Entry> requestEntries = request.getRequestEntries();
     List<RevDetails> revDetailsArray = new ArrayList<>(requestEntries.size());
@@ -732,7 +732,7 @@ class CmpAgent {
   private PKIMessage buildUnrevokeCertRequest(
       Requestor requestor, Responder responder, UnrevokeCertRequest request, int reasonCode)
       throws CmpClientException {
-    PKIHeader header = buildPkiHeader(requestor, responder, null);
+    PKIHeader header = buildPkiHeader(requestor, responder);
 
     List<UnrevokeCertRequest.Entry> requestEntries = request.getRequestEntries();
     List<RevDetails> revDetailsArray = new ArrayList<>(requestEntries.size());

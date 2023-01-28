@@ -23,8 +23,8 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.crypto.generators.SCrypt;
+import org.xipki.pkcs11.TokenException;
 import org.xipki.security.EdECConstants;
-import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.util.StringUtil;
 
 import javax.crypto.Cipher;
@@ -84,7 +84,7 @@ class EmulatorKeyCryptor {
     this.rnd = new SecureRandom();
   } // constructor
 
-  PrivateKey decryptPrivateKey(byte[] encryptedPrivateKeyInfo) throws P11TokenException {
+  PrivateKey decryptPrivateKey(byte[] encryptedPrivateKeyInfo) throws TokenException {
     notNull(encryptedPrivateKeyInfo, "encryptedPrivateKeyInfo");
     byte[] plain = decrypt(encryptedPrivateKeyInfo);
 
@@ -104,7 +104,7 @@ class EmulatorKeyCryptor {
     }
 
     if (algoName == null) {
-      throw new P11TokenException("unknown private key algorithm " + keyAlgOid.getId());
+      throw new TokenException("unknown private key algorithm " + keyAlgOid.getId());
     }
 
     try {
@@ -112,15 +112,15 @@ class EmulatorKeyCryptor {
       KeyFactory keyFactory = KeyFactory.getInstance(algoName, "BC");
       return keyFactory.generatePrivate(keySpec);
     } catch (IOException | NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException ex) {
-      throw new P11TokenException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+      throw new TokenException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
     }
   } // method decryptPrivateKey
 
-  byte[] decrypt(byte[] cipherBlob) throws P11TokenException {
+  byte[] decrypt(byte[] cipherBlob) throws TokenException {
     notNull(cipherBlob, "cipherBlob");
 
     if (cipherBlob[0] != ALG_SCRYPT1_AESGCMNopadding_128) {
-      throw new P11TokenException("unknown encryption algorithm");
+      throw new TokenException("unknown encryption algorithm");
     }
 
     GCMParameterSpec spec = new GCMParameterSpec(AES_GCM_TAG_BIT_SIZE, cipherBlob, 1, AES_GCM_NONCE_BYTE_SIZE);
@@ -140,19 +140,19 @@ class EmulatorKeyCryptor {
 
       return plain;
     } catch (GeneralSecurityException ex) {
-      throw new P11TokenException(ex);
+      throw new TokenException(ex);
     }
   } // method decrypt
 
-  byte[] encrypt(PrivateKey privateKey) throws P11TokenException {
+  byte[] encrypt(PrivateKey privateKey) throws TokenException {
     return encrypt(notNull(privateKey, "privateKey").getEncoded());
   }
 
-  byte[] encrypt(SecretKey secretKey) throws P11TokenException {
+  byte[] encrypt(SecretKey secretKey) throws TokenException {
     return encrypt(secretKey.getEncoded());
   }
 
-  byte[] encrypt(byte[] data) throws P11TokenException {
+  byte[] encrypt(byte[] data) throws TokenException {
     byte[] nonce = new byte[AES_GCM_NONCE_BYTE_SIZE];
     rnd.nextBytes(nonce);
     GCMParameterSpec spec = new GCMParameterSpec(AES_GCM_TAG_BIT_SIZE, nonce);
@@ -170,7 +170,7 @@ class EmulatorKeyCryptor {
       int realCipherLen = cipher.doFinal(data, 0, data.length, cipherBlob, offset);
       return (cipherLen == realCipherLen) ? cipherBlob : Arrays.copyOf(cipherBlob, offset + realCipherLen);
     } catch (GeneralSecurityException ex) {
-      throw new P11TokenException(ex);
+      throw new TokenException(ex);
     }
   }
 

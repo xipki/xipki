@@ -300,7 +300,7 @@ public class P11Actions {
 
         if (force || confirm("Do you want to remove the PKCS#11 objects " + Arrays.toString(handles), 3)) {
           P11Slot slot = getSlot();
-          long[] failedHandles = slot.destroyObjects(handles);
+          long[] failedHandles = slot.destroyObjectsByHandle(handles);
           if (failedHandles.length == 0) {
             println("deleted all " + handles.length + " objects");
           } else {
@@ -323,12 +323,12 @@ public class P11Actions {
           if (id != null) {
             idBytes = Hex.decode(id);
             if (label == null) {
-              num = slot.destroyObjectsForId(idBytes);
+              num = slot.destroyObjectsById(idBytes);
             } else {
-              num = slot.destroyObjects(idBytes, label);
+              num = slot.destroyObjectsByIdLabel(idBytes, label);
             }
           } else {
-            num = slot.destroyObjectsForLabel(label);
+            num = slot.destroyObjectsByLabel(label);
           }
           println("deleted " + num + " objects");
         }

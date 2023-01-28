@@ -66,7 +66,7 @@ public class ErrorEntry {
     try {
       sb.append(ErrorCode.ofCode(code).name());
     } catch (Exception e) {
-      sb.append("Unknown code " + code);
+      sb.append("Unknown code ").append(code);
     }
 
     if (message != null) {

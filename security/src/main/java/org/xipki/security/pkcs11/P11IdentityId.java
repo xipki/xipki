@@ -29,7 +29,7 @@ import static org.xipki.util.Args.notNull;
  * @since 2.0.0
  */
 
-public class P11IdentityId implements Comparable<P11IdentityId> {
+public class P11IdentityId {
 
   private final P11SlotId slotId;
 
@@ -64,15 +64,6 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
   }
 
   @Override
-  public int compareTo(P11IdentityId obj) {
-    int ct = slotId.compareTo(obj.slotId);
-    if (ct != 0) {
-      return ct;
-    }
-    return keyId.compareTo(obj.keyId);
-  }
-
-  @Override
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
@@ -82,11 +73,6 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
 
     P11IdentityId ei = (P11IdentityId) obj;
     return this.slotId.equals(ei.slotId)  && this.keyId.equals(ei.keyId);
-  }
-
-  public boolean match(P11SlotId slotId, String keyLabel) {
-    notNull(keyLabel, "objectLabel");
-    return this.slotId.equals(slotId) && CompareUtil.equalsObject(keyLabel, this.keyId.getLabel());
   }
 
   @Override

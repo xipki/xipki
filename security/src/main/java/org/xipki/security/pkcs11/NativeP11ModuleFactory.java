@@ -17,6 +17,8 @@
 
 package org.xipki.security.pkcs11;
 
+import org.xipki.pkcs11.TokenException;
+
 /**
  * {@link P11ModuleFactory} to create {@link P11Module} of type "native".
  *
@@ -34,7 +36,7 @@ public class NativeP11ModuleFactory implements P11ModuleFactory {
   }
 
   @Override
-  public P11Module newModule(P11ModuleConf conf) throws P11TokenException {
+  public P11Module newModule(P11ModuleConf conf) throws TokenException {
     return NativeP11Module.getInstance(conf);
   }
 

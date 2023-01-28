@@ -19,12 +19,12 @@ package org.xipki.security.pkcs11;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
+import org.xipki.pkcs11.TokenException;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertPathBuilderException;
 import java.security.interfaces.ECPublicKey;
@@ -50,7 +50,7 @@ public class P11ContentSignerBuilder {
   private final P11Identity identity;
 
   public P11ContentSignerBuilder(SecurityFactory securityFactory, P11Identity identity, X509Cert[] certificateChain)
-      throws XiSecurityException, P11TokenException {
+      throws XiSecurityException, TokenException {
     this.securityFactory = notNull(securityFactory, "securityFactory");
     this.identity = notNull(identity, "identity");
 
@@ -79,12 +79,12 @@ public class P11ContentSignerBuilder {
   } // constructor
 
   public ConcurrentContentSigner createSigner(SignAlgo signAlgo, int parallelism)
-      throws XiSecurityException, P11TokenException {
+      throws XiSecurityException, TokenException {
     positive(parallelism, "parallelism");
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);
 
-    long keyType = identity.getKeyType();;
+    long keyType = identity.getKeyType();
 
     Boolean isSm2p256v1 = null;
     BigInteger wx = null;
@@ -96,7 +96,7 @@ public class P11ContentSignerBuilder {
         signer = createRSAContentSigner(signAlgo);
       } else if (keyType == CKK_EC || keyType == CKK_VENDOR_SM2) {
         if (i == 0) {
-          isSm2p256v1 = (keyType == CKM_VENDOR_SM2) || GMObjectIdentifiers.sm2p256v1.equals(identity.getEcParams());
+          isSm2p256v1 = (keyType == CKK_VENDOR_SM2) || GMObjectIdentifiers.sm2p256v1.equals(identity.getEcParams());
 
           if (isSm2p256v1) {
             PublicKey publicKey = (certificateChain != null)
@@ -138,27 +138,27 @@ public class P11ContentSignerBuilder {
     return concurrentSigner;
   } // method createSigner
 
-  private XiContentSigner createRSAContentSigner(SignAlgo signAlgo) throws XiSecurityException, P11TokenException {
+  private XiContentSigner createRSAContentSigner(SignAlgo signAlgo) throws XiSecurityException {
     return  signAlgo.isRSAPSSSigAlgo()
       ? new P11ContentSigner.RSAPSS(identity, signAlgo, securityFactory.getRandom4Sign())
       : new P11ContentSigner.RSA(identity, signAlgo);
   }
 
-  private XiContentSigner createECContentSigner(SignAlgo signAlgo) throws XiSecurityException, P11TokenException {
+  private XiContentSigner createECContentSigner(SignAlgo signAlgo) throws XiSecurityException {
     return new P11ContentSigner.ECDSA(identity, signAlgo);
   }
 
   private XiContentSigner createSM2ContentSigner(
       SignAlgo signAlgo, ASN1ObjectIdentifier curveOid, BigInteger pubPointX, BigInteger pubPointy)
-      throws XiSecurityException, P11TokenException {
+      throws XiSecurityException {
     return new P11ContentSigner.SM2(identity, signAlgo, curveOid, pubPointX, pubPointy);
   }
 
-  private XiContentSigner createDSAContentSigner(SignAlgo signAlgo) throws XiSecurityException, P11TokenException {
+  private XiContentSigner createDSAContentSigner(SignAlgo signAlgo) throws XiSecurityException {
     return new P11ContentSigner.DSA(identity, signAlgo);
   }
 
-  private XiContentSigner createEdDSAContentSigner(SignAlgo signAlgo) throws XiSecurityException, P11TokenException {
+  private XiContentSigner createEdDSAContentSigner(SignAlgo signAlgo) throws XiSecurityException {
     return new P11ContentSigner.EdDSA(identity, signAlgo);
   }
 

@@ -31,7 +31,7 @@ import java.util.List;
 
 public class OcspCertstore extends ValidatableConf {
 
-  public static class Cert extends IdentifidDbObject {
+  public static class Cert extends IdentifiedDbObject {
 
     private String hash;
 

@@ -438,7 +438,7 @@ public class CaCertstore extends ValidatableConf {
 
   } // class CaHasRequestor
 
-  public static class Cert extends IdentifidDbObject {
+  public static class Cert extends IdentifiedDbObject {
 
     private String file;
 
@@ -678,7 +678,7 @@ public class CaCertstore extends ValidatableConf {
 
   } // class Certs
 
-  public static class Crl extends IdentifidDbObject {
+  public static class Crl extends IdentifiedDbObject {
 
     private Integer caId;
 

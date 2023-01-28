@@ -634,7 +634,7 @@ public abstract class Certprofile implements Closeable {
 
   /**
    * As in RFC5280:
-   *
+   * <p/>
    *    To indicate that a certificate has no well-defined expiration date,
    *    the notAfter SHOULD be assigned the GeneralizedTime value of
    *    99991231235959Z.

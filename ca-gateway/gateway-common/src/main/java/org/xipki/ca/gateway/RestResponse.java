@@ -38,7 +38,7 @@ public class RestResponse {
 
   private final Map<String, String> headers;
 
-  private boolean base64;
+  private final boolean base64;
 
   private final byte[] body;
 

@@ -171,6 +171,10 @@ public class KeyUtil {
   public static KeyPair generateEdECKeypair(ASN1ObjectIdentifier curveId, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
     String algorithm = EdECConstants.getName(notNull(curveId, "curveId"));
+    if (algorithm == null) {
+      throw new IllegalArgumentException("unknown curve " + curveId);
+    }
+
     KeyPairGenerator kpGen = getKeyPairGenerator(algorithm);
     synchronized (kpGen) {
       if (random != null) {

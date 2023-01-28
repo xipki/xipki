@@ -25,7 +25,7 @@ import org.xipki.util.exception.ErrorCode;
  */
 public class SdkErrorResponseException extends Exception {
 
-  private ErrorResponse errorResponse;
+  private final ErrorResponse errorResponse;
 
   public SdkErrorResponseException(ErrorCode errorCode, String message) {
     this(new ErrorResponse(null, errorCode, message));

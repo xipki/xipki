@@ -99,7 +99,7 @@ public abstract class BenchmarkExecutor {
     sb.append("duration: ").append(StringUtil.formatTime(duration, false)).append("\n");
     sb.append("unit: ").append(unit);
 
-    System.out.println(sb.toString());
+    System.out.println(sb);
 
     resetStartTime();
 
@@ -159,10 +159,8 @@ public abstract class BenchmarkExecutor {
       this.duration = num;
     } else if (unit == 'm') {
       this.duration = num * 60;
-    } else if (unit == 'h') {
+    } else { // if (unit == 'h') {
       this.duration = num * 3600; // 3600 = 60 * 60
-    } else {
-      throw new IllegalStateException("invalid duration unit " + unit);
     }
 
     return this;

@@ -215,13 +215,12 @@ class ConfLoader {
           CaEntry entryB = manager.caInfos.get(caName).getCaEntry();
           if (caEntry.getCert() == null && genSelfIssued != null) {
             SignerConf signerConf = new SignerConf(caEntry.getSignerConf());
-            ConcurrentContentSigner signer;
-            try {
-              signer = securityFactory.createSigner(caEntry.getSignerType(), signerConf, (X509Cert) null);
-            } catch (ObjectCreationException ex) {
+            try (ConcurrentContentSigner signer
+                     = securityFactory.createSigner(caEntry.getSignerType(), signerConf, (X509Cert) null)) {
+              caEntry.setCert(signer.getCertificate());
+            } catch (IOException | ObjectCreationException ex) {
               throw new CaMgmtException(concat("could not create signer for CA ", caName), ex);
             }
-            caEntry.setCert(signer.getCertificate());
           }
 
           if (caEntry.equals(entryB, true, true)) {

@@ -26,15 +26,8 @@ package org.xipki.ca.api.publisher;
 
 public class CertPublisherException extends Exception {
 
-  public CertPublisherException() {
-  }
-
   public CertPublisherException(String message) {
     super(message);
-  }
-
-  public CertPublisherException(Throwable cause) {
-    super(cause);
   }
 
   public CertPublisherException(String message, Throwable cause) {

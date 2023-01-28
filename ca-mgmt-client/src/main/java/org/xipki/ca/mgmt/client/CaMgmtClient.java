@@ -68,8 +68,6 @@ public class CaMgmtClient implements CaManager {
 
   private final Map<MgmtAction, URL> actionUrlMap = new HashMap<>(50);
 
-  private String serverUrl;
-
   private SSLSocketFactory sslSocketFactory;
 
   private HostnameVerifier hostnameVerifier;
@@ -84,8 +82,7 @@ public class CaMgmtClient implements CaManager {
     this.sslContextConf = sslContextConf;
   }
 
-  public synchronized void initIfNotDone()
-      throws CaMgmtException {
+  public synchronized void initIfNotDone() throws CaMgmtException {
     if (initException != null) {
       throw initException;
     }
@@ -109,10 +106,12 @@ public class CaMgmtClient implements CaManager {
 
   public void setServerUrl(String serverUrl) throws MalformedURLException {
     Args.notBlank(serverUrl, "serverUrl");
-    this.serverUrl = serverUrl.endsWith("/") ? serverUrl : serverUrl + "/";
+    if (!serverUrl.endsWith("/") ) {
+      serverUrl += "/";
+    }
 
     for (MgmtAction action : MgmtAction.values()) {
-      actionUrlMap.put(action, new URL(this.serverUrl + action));
+      actionUrlMap.put(action, new URL(serverUrl + action));
     }
   } // method setServerUrl
 
@@ -169,8 +168,7 @@ public class CaMgmtClient implements CaManager {
   } // method republishCertificates
 
   @Override
-  public void clearPublishQueue(String caName, List<String> publisherNames)
-      throws CaMgmtException {
+  public void clearPublishQueue(String caName, List<String> publisherNames) throws CaMgmtException {
     MgmtRequest.ClearPublishQueue req = new MgmtRequest.ClearPublishQueue();
     req.setCaName(caName);
     req.setPublisherNames(publisherNames);

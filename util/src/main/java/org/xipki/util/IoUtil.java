@@ -295,7 +295,7 @@ public class IoUtil {
     if (conn instanceof HttpURLConnection) {
       return (HttpURLConnection) conn;
     }
-    throw new IOException(url.toString() + " is not of protocol HTTP: " + url.getProtocol());
+    throw new IOException(url + " is not of protocol HTTP: " + url.getProtocol());
   }
 
   public static char[] readPasswordFromConsole(String prompt) {

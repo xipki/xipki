@@ -141,7 +141,7 @@ public class XiHttpClient {
     Args.notNull(url, "url");
     URLConnection conn = url.openConnection();
     if (!(conn instanceof HttpURLConnection)) {
-      throw new IOException(url.toString() + " is not of protocol HTTP: " + url.getProtocol());
+      throw new IOException(url + " is not of protocol HTTP: " + url.getProtocol());
     }
 
     if (conn instanceof HttpsURLConnection) {

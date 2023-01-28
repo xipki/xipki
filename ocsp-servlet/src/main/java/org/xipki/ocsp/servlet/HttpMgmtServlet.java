@@ -17,12 +17,9 @@
 
 package org.xipki.ocsp.servlet;
 
-import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.api.mgmt.MgmtMessage.MgmtAction;
-import org.xipki.ocsp.api.mgmt.MgmtRequest;
-import org.xipki.ocsp.api.mgmt.OcspMgmtException;
 import org.xipki.ocsp.server.OcspServerImpl;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.X509Cert;
@@ -34,7 +31,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -108,8 +104,6 @@ public class HttpMgmtServlet extends HttpServlet {
         throw new MyException(HttpServletResponse.SC_NOT_FOUND, "unknown action '" + actionStr + "'");
       }
 
-      InputStream in = request.getInputStream();
-
       if (action == MgmtAction.restartServer) {
         try {
           ocspServer.init(true);
@@ -135,19 +129,5 @@ public class HttpMgmtServlet extends HttpServlet {
       response.flushBuffer();
     }
   } // method doPost
-
-  private static String getNameFromRequest(InputStream in) throws OcspMgmtException {
-    MgmtRequest.Name req = parse(in, MgmtRequest.Name.class);
-    return req.getName();
-  }
-
-  private static <T extends MgmtRequest> T parse(InputStream in, Class<?> clazz)
-      throws OcspMgmtException {
-    try {
-      return JSON.parseObject(in, clazz);
-    } catch (RuntimeException | IOException ex) {
-      throw new OcspMgmtException("cannot parse request " + clazz + " from InputStream");
-    }
-  } // method parse
 
 }

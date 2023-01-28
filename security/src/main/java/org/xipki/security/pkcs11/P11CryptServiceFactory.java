@@ -17,6 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
+import org.xipki.pkcs11.TokenException;
 import org.xipki.security.XiSecurityException;
 
 import java.io.Closeable;
@@ -38,12 +39,12 @@ public interface P11CryptServiceFactory extends Closeable {
    * @param moduleName
    *          Module name. {@code null} for default module name.
    * @return the {@link P11CryptService} of the given module.
-   * @throws P11TokenException
+   * @throws TokenException
    *         if PKCS#11 token error occurs.
    * @throws XiSecurityException
    *         if security error occurs.
    */
-  P11CryptService getP11CryptService(String moduleName) throws P11TokenException, XiSecurityException;
+  P11CryptService getP11CryptService(String moduleName) throws TokenException, XiSecurityException;
 
   Set<String> getModuleNames();
 

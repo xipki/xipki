@@ -41,7 +41,7 @@ import java.util.TimeZone;
 
 public class FileMacAuditService extends MacAuditService {
 
-  private static Logger LOG = LoggerFactory.getLogger(FileMacAuditService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FileMacAuditService.class);
 
   public static final String KEY_FILE = "file";
 

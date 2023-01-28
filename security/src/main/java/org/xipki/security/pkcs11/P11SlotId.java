@@ -28,7 +28,7 @@ import static org.xipki.util.Args.notNull;
  * @since 2.0.0
  */
 
-public class P11SlotId implements Comparable<P11SlotId> {
+public class P11SlotId {
 
   private final int index;
 
@@ -69,12 +69,6 @@ public class P11SlotId implements Comparable<P11SlotId> {
     int hashCode = Long.hashCode(id);
     hashCode += 31 * index;
     return hashCode;
-  }
-
-  @Override
-  public int compareTo(P11SlotId obj) {
-    notNull(obj, "obj");
-    return (this == obj)  ? 0 : Integer.signum(index - obj.index);
   }
 
 }

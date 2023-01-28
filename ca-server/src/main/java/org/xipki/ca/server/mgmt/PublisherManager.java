@@ -30,7 +30,6 @@ import org.xipki.ca.server.X509Ca;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.exception.ObjectCreationException;
-import org.xipki.util.exception.OperationException;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -63,11 +62,9 @@ class PublisherManager {
 
   void close() {
     Map<String, IdentifiedCertPublisher> publishers = manager.publishers;
-    if (publishers != null) {
-      for (Entry<String, IdentifiedCertPublisher> entry : publishers.entrySet()) {
-        IdentifiedCertPublisher publisher = entry.getValue();
-        shutdownPublisher(publisher);
-      }
+    for (Entry<String, IdentifiedCertPublisher> entry : publishers.entrySet()) {
+      IdentifiedCertPublisher publisher = entry.getValue();
+      shutdownPublisher(publisher);
     }
   }
 
@@ -193,11 +190,6 @@ class PublisherManager {
     return ret;
   } // method getPublishersForCa
 
-  PublisherEntry getPublisher(String name) {
-    name = toNonBlankLower(name, "name");
-    return manager.publisherDbEntries.get(name);
-  }
-
   void removePublisher(String name) throws CaMgmtException {
     manager.assertMasterMode();
 
@@ -258,31 +250,6 @@ class PublisherManager {
       throw new CaMgmtException(concat("republishing certificates of CA ", caName, " failed"));
     }
   } // method republishCertificates
-
-  void clearPublishQueue(String caName, List<String> publisherNames) throws CaMgmtException {
-    publisherNames = CollectionUtil.toLowerCaseList(publisherNames);
-
-    if (caName == null) {
-      if (CollectionUtil.isNotEmpty(publisherNames)) {
-        throw new IllegalArgumentException("non-empty publisherNames is not allowed");
-      }
-
-      try {
-        manager.certstore.clearPublishQueue(null, null);
-      } catch (OperationException ex) {
-        throw new CaMgmtException(ex.getMessage(), ex);
-      }
-      return;
-    }
-
-    caName = caName.toLowerCase();
-    X509Ca ca = manager.x509cas.get(caName);
-    if (ca == null) {
-      throw new CaMgmtException(concat("could not find CA named ", caName));
-    }
-
-    ca.clearPublishQueue(publisherNames);
-  } // method clearPublishQueue
 
   List<IdentifiedCertPublisher> getIdentifiedPublishersForCa(String caName) {
     caName = toNonBlankLower(caName, "caName");

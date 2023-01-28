@@ -32,7 +32,7 @@ import static org.xipki.util.Args.notNull;
  * @since 2.0.0
  */
 
-public class P11ObjectId implements Comparable<P11ObjectId> {
+public class P11ObjectId {
 
   private final long handle;
 
@@ -85,14 +85,6 @@ public class P11ObjectId implements Comparable<P11ObjectId> {
     return id;
   }
 
-  public boolean matchesId(byte[] id) {
-    return Arrays.equals(id, this.id);
-  }
-
-  public boolean matchesLabel(String label) {
-    return CompareUtil.equalsObject(label, this.label);
-  }
-
   public String getIdHex() {
     return idHex;
   }
@@ -118,20 +110,6 @@ public class P11ObjectId implements Comparable<P11ObjectId> {
 
     P11ObjectId other = (P11ObjectId) obj;
     return handle == other.handle && Arrays.equals(id, other.id) && CompareUtil.equalsObject(label, other.label);
-  }
-
-  @Override
-  public int compareTo(P11ObjectId obj) {
-    notNull(obj, "obj");
-    if (this == obj) {
-      return 0;
-    }
-
-    if (label == null) {
-      return obj.label == null ? 0 : 1;
-    } else {
-      return obj.label == null ? -1 : label.compareTo(obj.label);
-    }
   }
 
 }

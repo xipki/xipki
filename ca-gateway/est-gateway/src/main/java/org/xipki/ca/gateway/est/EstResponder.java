@@ -214,9 +214,9 @@ public class EstResponder {
     String auditMessage = null;
 
     try {
-      String caName = null;
-      String profile = null;
-      String command = null;
+      String caName;
+      String profile;
+      String command;
 
       if (!path.startsWith("/est/")) {
         String message = "invalid path " + path;
@@ -580,9 +580,7 @@ public class EstResponder {
     Extensions csrExtns = X509Util.getExtensions(certTemp);
     byte[] extnValue = X509Util.getCoreExtValue(csrExtns, Extension.subjectAlternativeName);
 
-    GeneralNames oldSubjectAlt = null;
     if (extnValue != null) {
-      oldSubjectAlt = GeneralNames.getInstance(extnValue);
       oldCertInfo.setSan(extnValue);
     }
     template.setOldCertSubject(oldCertInfo);
@@ -654,7 +652,7 @@ public class EstResponder {
         }
 
         // set the extension SAN
-        boolean critical = sanExtn == null ? false : sanExtn.isCritical();
+        boolean critical = sanExtn != null && sanExtn.isCritical();
         v.add(new Extension(sanOid, critical, newSubjectAlt.getEncoded()));
 
         requestedExtns = new Extensions(v.toArray(new Extension[0]));

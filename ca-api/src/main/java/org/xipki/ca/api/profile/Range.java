@@ -63,13 +63,6 @@ public class Range {
     setMax(max);
   }
 
-  public boolean match(int val) {
-    if (min != null && val < min) {
-      return false;
-    }
-    return max == null || val <= max;
-  }
-
   public void validate() {
     validate(min, max);
   }

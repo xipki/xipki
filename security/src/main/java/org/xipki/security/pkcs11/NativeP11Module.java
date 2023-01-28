@@ -49,7 +49,7 @@ public class NativeP11Module extends P11Module {
 
   private String description;
 
-  private NativeP11Module(PKCS11Module module, P11ModuleConf moduleConf) throws P11TokenException {
+  private NativeP11Module(PKCS11Module module, P11ModuleConf moduleConf) throws TokenException {
     super(moduleConf);
     this.module = notNull(module, "module");
 
@@ -69,12 +69,12 @@ public class NativeP11Module extends P11Module {
     } catch (Throwable th) {
       final String msg = "could not getSlotList of module " + moduleConf.getName();
       LogUtil.error(LOG, th, msg);
-      throw new P11TokenException(msg);
+      throw new TokenException(msg);
     }
 
     final int size = (slotList == null) ? 0 : slotList.length;
     if (size == 0) {
-      throw new P11TokenException("no slot could be found");
+      throw new TokenException("no slot could be found");
     }
 
     for (int i = 0; i < size; i++) {
@@ -123,7 +123,7 @@ public class NativeP11Module extends P11Module {
       try {
         pwd = moduleConf.getPasswordRetriever().getPassword(slotId);
       } catch (PasswordResolverException ex) {
-        throw new P11TokenException("PasswordResolverException: " + ex.getMessage(), ex);
+        throw new TokenException("PasswordResolverException: " + ex.getMessage(), ex);
       }
       P11Slot p11Slot = new NativeP11Slot(moduleConf.getName(), slotId, slot,
           moduleConf.isReadOnly(), moduleConf.getUserType(), pwd, moduleConf.getMaxMessageSize(),
@@ -140,7 +140,7 @@ public class NativeP11Module extends P11Module {
     setSlots(slots);
   } // constructor
 
-  public static P11Module getInstance(P11ModuleConf moduleConf) throws P11TokenException {
+  public static P11Module getInstance(P11ModuleConf moduleConf) throws TokenException {
     notNull(moduleConf, "moduleConf");
 
     String path = moduleConf.getNativeLibrary();
@@ -152,7 +152,7 @@ public class NativeP11Module extends P11Module {
     } catch (IOException ex) {
       final String msg = "could not load the PKCS#11 module " + moduleConf.getName() + ": " + path;
       LogUtil.error(LOG, ex, msg);
-      throw new P11TokenException(msg, ex);
+      throw new TokenException(msg, ex);
     }
 
     try {
@@ -161,7 +161,7 @@ public class NativeP11Module extends P11Module {
       if (ex.getErrorCode() != PKCS11Constants.CKR_CRYPTOKI_ALREADY_INITIALIZED) {
         LogUtil.error(LOG, ex);
         close(moduleConf.getName(), module);
-        throw new P11TokenException(ex.getMessage(), ex);
+        throw ex;
       } else {
         LOG.info("PKCS#11 module already initialized");
         try {
@@ -173,7 +173,7 @@ public class NativeP11Module extends P11Module {
     } catch (Throwable th) {
       LOG.error("unexpected Exception", th);
       close(moduleConf.getName(), module);
-      throw new P11TokenException(th.getMessage());
+      throw new TokenException(th.getMessage());
     }
 
     return new NativeP11Module(module, moduleConf);

@@ -174,11 +174,7 @@ public class AuditEvent {
 
   public void setStatus(AuditStatus status) {
     Args.notNull(status, "status");
-    if (this.status == status) {
-      return;
-    } else if (this.status == AuditStatus.FAILED) {
-      return;
-    } else {
+    if (this.status != status && this.status != AuditStatus.FAILED) {
       this.status = status;
     }
   }

@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
+import org.xipki.pkcs11.TokenException;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
@@ -101,7 +102,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
   } // method init
 
   public synchronized P11CryptService getP11CryptService(String moduleName)
-      throws XiSecurityException, P11TokenException {
+      throws XiSecurityException, TokenException {
     try {
       init();
     } catch (InvalidConfException ex) {

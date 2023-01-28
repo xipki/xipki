@@ -81,29 +81,30 @@ public abstract class DbPortWorker extends DbWorker {
     }
     zipDir.mkdirs();
 
-    ZipFile zipFile = new ZipFile(new File(zipDir, "main.zip"), password);
-    // split length: 64M Byte
-    zipFile.createSplitZipFileFromFolder(dir, getZipParameters(), true, 64L * 1024 * 1024);
+    try (ZipFile zipFile = new ZipFile(new File(zipDir, "main.zip"), password)) {
+      // split length: 64M Byte
+      zipFile.createSplitZipFileFromFolder(dir, getZipParameters(), true, 64L * 1024 * 1024);
+    }
 
     deleteDecryptedFiles(dir.getPath());
   }
 
   protected void decrypt(String dir) throws IOException {
     File mainFile = new File(dir, "encrypted/main.zip");
-    ZipFile zipFile = new ZipFile(mainFile, password);
+    try (ZipFile zipFile = new ZipFile(mainFile, password)) {
+      boolean alreadyUnzipped = false;
+      for (FileHeader fh : zipFile.getFileHeaders()) {
+        if (fh.isDirectory()) {
+          continue;
+        }
 
-    boolean alreadyUnzipped = false;
-    for (FileHeader fh : zipFile.getFileHeaders()) {
-      if (fh.isDirectory()) {
-        continue;
+        alreadyUnzipped = new File(dir, fh.getFileName()).exists();
+        break;
       }
 
-      alreadyUnzipped = new File(dir, fh.getFileName()).exists();
-      break;
-    }
-
-    if (!alreadyUnzipped) {
-      zipFile.extractAll(dir);
+      if (!alreadyUnzipped) {
+        zipFile.extractAll(dir);
+      }
     }
   }
 

@@ -26,7 +26,6 @@ import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.*;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -65,8 +64,7 @@ public class OcspServlet extends HttpServlet {
   }
 
   @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException {
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     try {
       String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
       ResponderAndPath responderAndPath = server.getResponderForPath(path);
@@ -121,8 +119,7 @@ public class OcspServlet extends HttpServlet {
   } // method doPost
 
   @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException {
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
     ResponderAndPath responderAndPath = server.getResponderForPath(path);
     if (responderAndPath == null) {

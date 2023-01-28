@@ -20,6 +20,7 @@ package org.xipki.security.pkcs11.emulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolverException;
+import org.xipki.pkcs11.TokenException;
 import org.xipki.security.pkcs11.*;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
@@ -47,7 +48,7 @@ class EmulatorP11Module extends P11Module {
 
   private final String description;
 
-  private EmulatorP11Module(P11ModuleConf moduleConf) throws P11TokenException {
+  private EmulatorP11Module(P11ModuleConf moduleConf) throws TokenException {
     super(moduleConf);
 
     File baseDir;
@@ -73,7 +74,7 @@ class EmulatorP11Module extends P11Module {
       try {
         createExampleRepository(baseDir, 2);
       } catch (IOException ex) {
-        throw new P11TokenException("could not initialize the base direcotry: " + baseDir.getPath(), ex);
+        throw new TokenException("could not initialize the base direcotry: " + baseDir.getPath(), ex);
       }
 
       LOG.info("create and initialize the base directory: " + baseDir.getPath());
@@ -147,17 +148,17 @@ class EmulatorP11Module extends P11Module {
       try {
         pwd = moduleConf.getPasswordRetriever().getPassword(slotId);
       } catch (PasswordResolverException ex) {
-        throw new P11TokenException("PasswordResolverException: " + ex.getMessage(), ex);
+        throw new TokenException("PasswordResolverException: " + ex.getMessage(), ex);
       }
 
       File slotDir = new File(baseDir, slotId.getIndex() + "-" + slotId.getId());
 
       if (pwd == null) {
-        throw new P11TokenException("no password is configured");
+        throw new TokenException("no password is configured");
       }
 
       if (pwd.size() != 1) {
-        throw new P11TokenException(pwd.size() + " passwords are configured, but 1 is permitted");
+        throw new TokenException(pwd.size() + " passwords are configured, but 1 is permitted");
       }
 
       char[] firstPwd = pwd.get(0);
@@ -171,17 +172,17 @@ class EmulatorP11Module extends P11Module {
     setSlots(slots);
   } // constructor
 
-  private static boolean parseBoolean(String value, String name) throws P11TokenException {
+  private static boolean parseBoolean(String value, String name) throws TokenException {
       if ("true".equalsIgnoreCase(value)) {
         return true;
       } else if ("false".equalsIgnoreCase(value)) {
         return false;
       } else {
-        throw new P11TokenException("invalid " + name + ": " + value);
+        throw new TokenException("invalid " + name + ": " + value);
       }
   }
 
-  public static P11Module getInstance(P11ModuleConf moduleConf) throws P11TokenException {
+  public static P11Module getInstance(P11ModuleConf moduleConf) throws TokenException {
     notNull(moduleConf, "moduleConf");
     return new EmulatorP11Module(moduleConf);
   }

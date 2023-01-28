@@ -48,7 +48,7 @@ public class OcspBenchmark extends BenchmarkExecutor {
 
   final class Tester implements Runnable {
 
-    Tester() throws Exception {
+    Tester() {
     }
 
     @Override
@@ -73,7 +73,7 @@ public class OcspBenchmark extends BenchmarkExecutor {
 
   private static final Logger LOG = LoggerFactory.getLogger(OcspBenchmark.class);
 
-  private OcspRequestor client;
+  private final OcspRequestor client;
 
   private final X509Cert issuerCert;
 
@@ -101,7 +101,7 @@ public class OcspBenchmark extends BenchmarkExecutor {
   }
 
   @Override
-  protected Runnable getTester() throws Exception {
+  protected Runnable getTester() {
     return new Tester();
   }
 
@@ -121,7 +121,7 @@ public class OcspBenchmark extends BenchmarkExecutor {
   }
 
   public boolean ask(BigInteger[] serialNumbers) {
-    OCSPResp ocspResp = null;
+    OCSPResp ocspResp;
     try {
       ocspResp = client.ask(issuerCert, serialNumbers, responderUrl, requestOptions, null);
     } catch (Exception e) {
@@ -143,7 +143,7 @@ public class OcspBenchmark extends BenchmarkExecutor {
     }
 
     if (!(respObject instanceof BasicOCSPResp)) {
-      LOG.warn("bad response: response is not BasiOCSPResp");
+      LOG.warn("bad response: response is not BasicOCSPResp");
       return false;
     }
 

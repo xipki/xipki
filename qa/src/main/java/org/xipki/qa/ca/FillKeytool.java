@@ -81,11 +81,8 @@ public class FillKeytool implements AutoCloseable {
 
   protected final DataSourceWrapper datasource;
 
-  private final PasswordResolver passwordResolver;
-
   public FillKeytool(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String dbConfFile)
       throws PasswordResolverException, IOException {
-    this.passwordResolver = passwordResolver;
     try (InputStream dbConfStream = Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile)))) {
       this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, dbConfStream, passwordResolver);
     }
@@ -264,7 +261,6 @@ public class FillKeytool implements AutoCloseable {
         }
 
         KeyPair kp = KeyUtil.generateRSAKeypair(keysize, null, random);
-        RSAPublicKey rsaPubKey = (RSAPublicKey) kp.getPublic();
         return KeyUtil.toPrivateKeyInfo((RSAPrivateCrtKey) kp.getPrivate());
       }
       case "EC": {

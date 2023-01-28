@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * Certificate Transparency Log control.
- * Currently it is only a placeholder. Need to be implemented in a later version.
+ * Currently, it is only a placeholder. Need to be implemented in a later version.
  * @author Lijun Liao
  */
 

@@ -44,7 +44,7 @@ import java.time.Instant;
 
 public class DatabaseMacAuditService extends MacAuditService {
 
-  private static Logger LOG = LoggerFactory.getLogger(FileMacAuditService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FileMacAuditService.class);
 
   public static final String KEY_DATASOURCE = "datasource";
 
@@ -77,7 +77,7 @@ public class DatabaseMacAuditService extends MacAuditService {
   }
 
   @Override
-  protected void doClose() throws Exception {
+  protected void doClose() {
   }
 
   @Override

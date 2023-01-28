@@ -776,16 +776,6 @@ abstract class BaseCmpResponder {
     return false;
   } // method verifyPop
 
-  protected static CertResponse postProcessException(ASN1Integer certReqId, OperationException ex) {
-    ErrorCode code = ex.getErrorCode();
-    LOG.warn("generate certificate, OperationException: code={}, message={}", code.name(), ex.getErrorMessage());
-
-    String errorMessage = (code == ErrorCode.DATABASE_FAILURE || code == ErrorCode.SYSTEM_FAILURE)
-        ? code.name() : code.name() + ": " + ex.getErrorMessage();
-
-    return new CertResponse(certReqId, generateRejectionStatus(getPKiFailureInfo(ex), errorMessage));
-  }
-
   protected CertResponse postProcessCertInfo(
       ASN1Integer certReqId, Requestor requestor, byte[] cert, byte[] privateKeyinfo) {
     PKIStatusInfo statusInfo = new PKIStatusInfo(PKIStatus.granted);

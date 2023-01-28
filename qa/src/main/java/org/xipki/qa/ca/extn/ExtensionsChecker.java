@@ -84,9 +84,9 @@ public class ExtensionsChecker {
 
   private byte[] cccExtensionSchemaValue;
 
-  private Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
+  private final Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
 
-  private XijsonCertprofile certprofile;
+  private final XijsonCertprofile certprofile;
 
   private final A2gChecker a2gChecker;
   private final H2nChecker h2nChecker;

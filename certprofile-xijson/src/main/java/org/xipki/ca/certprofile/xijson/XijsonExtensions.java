@@ -1036,8 +1036,4 @@ public class XijsonExtensions {
     return extensionControls.get(type).isCritical();
   }
 
-  private boolean permittedInReq(ASN1ObjectIdentifier type) {
-    return extensionControls.get(type).isPermittedInRequest();
-  }
-
 }

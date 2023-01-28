@@ -58,6 +58,10 @@ public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProvi
       throw new OperatorCreationException(ex.getMessage(), ex);
     }
 
+    if (signAlgo == null) {
+      throw new OperatorCreationException("could not detect SignAlgo from sigAlgId");
+    }
+
     HashAlgo hashAlgo = signAlgo.getHashAlgo();
 
     return (SignAlgo.SM2_SM3 == signAlgo) ? new SM2Signer()

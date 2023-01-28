@@ -36,8 +36,6 @@ public class SdkConstants {
 
   public static final String CMD_revoke_cert = "revoke_cert";
 
-  public static final String CMD_suspend_cert = "suspend_cert";
-
   public static final String CMD_unsuspend_cert = "unsuspend_cert";
 
   public static final String CMD_remove_cert = "remove_cert";

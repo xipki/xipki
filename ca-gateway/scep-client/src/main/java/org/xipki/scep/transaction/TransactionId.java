@@ -27,7 +27,7 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 
 /**
- * Transaction Id.
+ * Transaction ID.
  *
  * @author Lijun Liao
  */

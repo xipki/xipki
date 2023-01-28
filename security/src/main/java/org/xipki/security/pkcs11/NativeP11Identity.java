@@ -17,6 +17,8 @@
 
 package org.xipki.security.pkcs11;
 
+import org.xipki.pkcs11.TokenException;
+
 /**
  * {@link P11Identity} based on the ipkcs11wrapper or jpkcs11wrapper.
  *
@@ -31,21 +33,21 @@ class NativeP11Identity extends P11Identity {
   }
 
   @Override
-  protected byte[] digestSecretKey0(long mechanism) throws P11TokenException {
+  protected byte[] digestSecretKey0(long mechanism) throws TokenException {
     return ((NativeP11Slot) slot).digestSecretKey(mechanism, this);
   }
 
   @Override
-  public void destroy() throws P11TokenException {
+  public void destroy() throws TokenException {
     if (id.getPublicKeyHandle() == null) {
-      slot.destroyObjects(id.getKeyId().getHandle());
+      slot.destroyObjectsByHandle(id.getKeyId().getHandle());
     } else {
-      slot.destroyObjects(id.getKeyId().getHandle(), id.getPublicKeyHandle());
+      slot.destroyObjectsByHandle(id.getKeyId().getHandle(), id.getPublicKeyHandle());
     }
   }
 
   @Override
-  protected byte[] sign0(long mechanism, P11Params parameters, byte[] content) throws P11TokenException {
+  protected byte[] sign0(long mechanism, P11Params parameters, byte[] content) throws TokenException {
     return ((NativeP11Slot) slot).sign(mechanism, parameters, content, this);
   }
 

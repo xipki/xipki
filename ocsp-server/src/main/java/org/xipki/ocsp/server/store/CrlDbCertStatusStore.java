@@ -213,7 +213,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     value = getStrValue(sourceConf, "startupDelay", false);
     int startupDelaySeconds = value == null ? 5 : Integer.parseInt(value);
     // so that the ocsp service (tomcat) can start without blocking.
-    Runnable runnable = () -> updateStore();
+    Runnable runnable = this :: updateStore;
     ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
     executor.schedule(runnable, startupDelaySeconds, TimeUnit.SECONDS);
     executor.shutdown();

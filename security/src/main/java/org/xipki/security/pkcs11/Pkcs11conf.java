@@ -289,7 +289,6 @@ public class Pkcs11conf extends ValidatableConf {
       notEmpty(nativeLibraries, "nativeLibraries");
       notEmpty(mechanismFilters, "mechanismFilters");
 
-      validate(newObjectConf);
       validate(nativeLibraries, includeSlots, excludeSlots, passwordSets, mechanismFilters);
     }
 

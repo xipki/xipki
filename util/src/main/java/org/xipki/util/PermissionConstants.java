@@ -44,7 +44,7 @@ public class PermissionConstants {
   public static final int ENROLL_CROSS = 128;
   public static final int GEN_KEYPAIR = 256;
 
-  public static final int GET_CERT = 256;
+  public static final int GET_CERT = 512;
 
   public static final int ALL =
       ENROLL_CERT | REVOKE_CERT | UNSUSPEND_CERT | REMOVE_CERT | REENROLL_CERT

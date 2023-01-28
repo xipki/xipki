@@ -224,7 +224,7 @@ public class CertprofileQa {
         }
 
         if (Math.abs(expectedNotAfter.getTime() - cert.getNotAfter().getTime()) > 60 * SECOND) {
-          issue.setFailureMessage("cert validity is not within " + validity.toString());
+          issue.setFailureMessage("cert validity is not within " + validity);
         }
       }
     }

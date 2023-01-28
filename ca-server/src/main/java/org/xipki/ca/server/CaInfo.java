@@ -90,7 +90,7 @@ public class CaInfo {
 
   private ConcurrentContentSigner dfltSigner;
 
-  private ConfPairs extraControl;
+  private final ConfPairs extraControl;
 
   public CaInfo(CaEntry caEntry, CaConfColumn caConfColumn, CertStore certStore)
       throws OperationException {

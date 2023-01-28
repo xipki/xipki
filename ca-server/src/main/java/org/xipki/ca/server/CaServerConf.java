@@ -107,7 +107,7 @@ public class CaServerConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate() {
     }
 
   } // class RemoteMgmt
@@ -168,7 +168,7 @@ public class CaServerConf extends ValidatableConf {
   private List<String> certprofileFactories;
 
   @JSONField(serialize = false, deserialize = false)
-  private Map<String, SslContextConf> sslContextConfMap = new HashMap<>();
+  private final Map<String, SslContextConf> sslContextConfMap = new HashMap<>();
 
   public static CaServerConf readConfFromFile(String fileName) throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");

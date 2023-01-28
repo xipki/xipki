@@ -157,14 +157,6 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     }
   }
 
-  protected PreparedStatement buildPrepStmt0(String sql, SqlColumn2... columns) throws CaMgmtException {
-    try {
-      return buildPrepStmt(sql, columns);
-    } catch (DataAccessException ex) {
-      throw new CaMgmtException(ex);
-    }
-  }
-
   protected void changeIfNotNull(String tableName, SqlColumn whereColumn, SqlColumn... columns)
       throws CaMgmtException {
     StringBuilder buf = new StringBuilder("UPDATE ");

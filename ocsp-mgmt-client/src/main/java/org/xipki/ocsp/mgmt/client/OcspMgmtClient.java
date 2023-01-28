@@ -56,8 +56,6 @@ public class OcspMgmtClient implements OcspManager {
 
   private final Map<MgmtAction, URL> actionUrlMap = new HashMap<>(50);
 
-  private String serverUrl;
-
   private final SslContextConf sslContextConf;
 
   private SSLSocketFactory sslSocketFactory;
@@ -74,10 +72,12 @@ public class OcspMgmtClient implements OcspManager {
 
   public void setServerUrl(String serverUrl) throws MalformedURLException {
     Args.notBlank(serverUrl, "serverUrl");
-    this.serverUrl = serverUrl.endsWith("/") ? serverUrl : serverUrl + "/";
+    if (!serverUrl.endsWith("/")) {
+      serverUrl += "/";
+    }
 
     for (MgmtAction action : MgmtAction.values()) {
-      actionUrlMap.put(action, new URL(this.serverUrl + action));
+      actionUrlMap.put(action, new URL(serverUrl + action));
     }
   }
 

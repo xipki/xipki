@@ -132,7 +132,7 @@ public class SignerUtil {
     }
   } // method dsaSigPlainToX962
 
-  public static byte[] dsaSigX962ToPlain(byte[] x962Signature, int keyBitLen)
+  public static byte[] dsaSigX962ToPlain(byte[] x962Signature, int orderBitLen)
       throws XiSecurityException {
     notNull(x962Signature, "x962Signature");
     try {
@@ -150,18 +150,18 @@ public class SignerUtil {
 
       // s
       byte[] s = Asn1StreamParser.readValue(0x02, is, "s");
-      return dsaSigToPlain(new BigInteger(1, r), new BigInteger(1, s), keyBitLen);
+      return dsaSigToPlain(new BigInteger(1, r), new BigInteger(1, s), orderBitLen);
     } catch (IOException ex) {
       throw new XiSecurityException("error parsing X509Signature", ex);
     }
   } // method dsaSigX962ToPlain
 
-  public static byte[] dsaSigToPlain(BigInteger sigR, BigInteger sigS, int keyBitLen)
+  public static byte[] dsaSigToPlain(BigInteger sigR, BigInteger sigS, int orderBitLen)
       throws XiSecurityException {
     notNull(sigR, "sigR");
     notNull(sigS, "sigS");
 
-    final int blockSize = (keyBitLen + 7) / 8;
+    final int blockSize = (orderBitLen + 7) / 8;
     int bitLenOfR = sigR.bitLength();
     int bitLenOfS = sigS.bitLength();
     int bitLen = Math.max(bitLenOfR, bitLenOfS);

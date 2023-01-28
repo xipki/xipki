@@ -20,6 +20,7 @@ package org.xipki.security.pkcs11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pkcs11.PKCS11Constants;
+import org.xipki.pkcs11.TokenException;
 import org.xipki.security.*;
 import org.xipki.util.LogUtil;
 
@@ -48,7 +49,7 @@ public class P11MacContentSignerBuilder {
   } // constructor
 
   public ConcurrentContentSigner createSigner(SignAlgo signAlgo, int parallelism)
-      throws XiSecurityException, P11TokenException {
+      throws XiSecurityException, TokenException {
     positive(parallelism, "parallelism");
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);
@@ -67,7 +68,7 @@ public class P11MacContentSignerBuilder {
     try {
       byte[] sha1HashOfKey = identity.digestSecretKey(PKCS11Constants.CKM_SHA_1);
       concurrentSigner.setSha1DigestOfMacKey(sha1HashOfKey);
-    } catch (P11TokenException | XiSecurityException ex) {
+    } catch (TokenException | XiSecurityException ex) {
       LogUtil.warn(LOG, ex, "could not compute the digest of secret key " + identity.getId());
     }
 

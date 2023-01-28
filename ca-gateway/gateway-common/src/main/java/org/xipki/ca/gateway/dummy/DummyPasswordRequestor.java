@@ -33,13 +33,13 @@ import java.util.Map;
 
 public class DummyPasswordRequestor implements Requestor {
 
-  private String user;
+  private final String user;
 
-  private byte[] keyId;
+  private final byte[] keyId;
 
-  private char[] password;
+  private final char[] password;
 
-  private static Map<String, char[]> passwordMap = new HashMap<>();
+  private final static Map<String, char[]> passwordMap = new HashMap<>();
 
   static {
     System.err.println("DO NOT USE " + DummyPasswordRequestor.class.getName() + " IN THE PRODUCT ENVIRONMENT");

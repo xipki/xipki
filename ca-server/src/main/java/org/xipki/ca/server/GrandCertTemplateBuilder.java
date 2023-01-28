@@ -91,7 +91,7 @@ class GrandCertTemplateBuilder {
 
   GrantedCertTemplate create(
       boolean batch, IdentifiedCertprofile certprofile, CertTemplateData certTemplate,
-      List<KeypairGenerator> keypairGenerators, boolean update)
+      List<KeypairGenerator> keypairGenerators)
       throws OperationException {
     if (caInfo.getRevocationInfo() != null) {
       throw new OperationException(NOT_PERMITTED, "CA is revoked");
@@ -325,15 +325,6 @@ class GrandCertTemplateBuilder {
         caInfo.getPublicCaInfo().getC14nSubject())) {
       throw new OperationException(ALREADY_ISSUED, "certificate with the same subject as CA is not allowed");
     }
-
-    if (update) {
-      CertStore.CertStatus certStatus = certstore.getCertStatusForSubject(caInfo.getIdent(), grantedSubject);
-      if (certStatus == CertStore.CertStatus.REVOKED) {
-        throw new OperationException(CERT_REVOKED);
-      } else if (certStatus == CertStore.CertStatus.UNKNOWN) {
-        throw new OperationException(UNKNOWN_CERT);
-      }
-    } // end if(update)
 
     Date grantedNotAfter;
 

@@ -54,7 +54,7 @@ public class Subject extends ValidatableConf {
   }
 
   public boolean keepRdnOrder() {
-    return keepRdnOrder == null ? false: keepRdnOrder;
+    return keepRdnOrder != null && keepRdnOrder;
   }
 
   public List<RdnType> getRdns() {

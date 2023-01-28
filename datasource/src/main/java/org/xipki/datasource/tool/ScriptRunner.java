@@ -110,7 +110,7 @@ public class ScriptRunner {
         } catch(IOException e){
             System.err.println("Unable to access or create the db_create error log");
         }
-        String timeStamp = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss").format(new java.util.Date());
+        String timeStamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date());
         println("\n-------\n" + timeStamp + "\n-------\n");
         printlnError("\n-------\n" + timeStamp + "\n-------\n");
     }
@@ -205,11 +205,9 @@ public class ScriptRunner {
                         ignoreSqlError = true;
                     }
                     println(trimmedLine);
-                } else if (trimmedLine.length() < 1) {
-                    // Do nothing
                 } else if (!fullLineDelimiter && trimmedLine.endsWith(getDelimiter())
                         ||  fullLineDelimiter && trimmedLine.equals(getDelimiter())) {
-                    command.append(line.substring(0, line.lastIndexOf(getDelimiter())));
+                    command.append(line, 0, line.lastIndexOf(getDelimiter()));
                     command.append(" ");
                     this.execCommand(conn, command, lineReader, ignoreSqlError);
                     ignoreSqlError = false;

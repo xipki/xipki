@@ -49,8 +49,6 @@ class KeypoolQueryExecutor {
 
   private final String sqlGetKeyData;
 
-  private final String sqlDeleteKeyData = "DELETE FROM KEYPOOL WHERE ID=?";
-
   KeypoolQueryExecutor(DataSourceWrapper datasource, int shardId) throws DataAccessException {
     this.datasource = notNull(datasource, "datasource");
     this.sqlGetKeyData = datasource.buildSelectFirstSql(1,
@@ -105,6 +103,7 @@ class KeypoolQueryExecutor {
       ps = null;
       rs = null;
 
+      final String sqlDeleteKeyData = "DELETE FROM KEYPOOL WHERE ID=?";
       ps = datasource.prepareStatement(sqlDeleteKeyData);
       ps.setInt(1, id);
       ps.executeUpdate();
@@ -134,9 +133,5 @@ class KeypoolQueryExecutor {
       return false;
     }
   } // method isHealthy
-
-  private static void setBoolean(PreparedStatement ps, int index, boolean value) throws SQLException {
-    ps.setInt(index, value ? 1 : 0);
-  }
 
 }

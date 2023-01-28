@@ -568,9 +568,11 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         try {
           List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(signerConf);
           for (CaSignerConf m : signerConfs) {
-            securityFactory.createSigner(signerType, new SignerConf(m.getConf()), caCert);
+            try (ConcurrentContentSigner ignored =
+                     securityFactory.createSigner(signerType, new SignerConf(m.getConf()), caCert)) {
+            }
           }
-        } catch (XiSecurityException | ObjectCreationException ex) {
+        } catch (IOException | XiSecurityException | ObjectCreationException ex) {
           throw new CaMgmtException("could not create signer for CA '"
               + changeCaEntry.getIdent() + "'" + ex.getMessage(), ex);
         }
@@ -612,14 +614,14 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         colStr("SIGNER_CONF", signerConf, false, true),
         colStr("CERT", base64Cert),  colStr("CERTCHAIN", certchainStr));
 
-    cols.add(buildChangeCaConfColumn(changeCaEntry, currentCaEntry, currentCaConfColumn));
+    cols.add(buildChangeCaConfColumn(changeCaEntry, currentCaConfColumn));
 
     changeIfNotNull("CA", colInt("ID", changeCaEntry.getIdent().getId()),
         cols.toArray(new SqlColumn[0]));
   } // method changeCa
 
   private SqlColumn buildChangeCaConfColumn(
-      ChangeCaEntry changeCaEntry, CaEntry currentCaEntry, CaConfColumn currentCaConfColumn) {
+      ChangeCaEntry changeCaEntry, CaConfColumn currentCaConfColumn) {
     CaConfColumn newCC = currentCaConfColumn.clone();
 
     if (changeCaEntry.getMaxValidity() != null) {

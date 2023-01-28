@@ -110,8 +110,7 @@ public abstract class DataSourceWrapper implements Closeable {
     } // method nextSeqValue
 
     @Override
-    protected String getSqlToDropForeignKeyConstraint(String constraintName, String baseTable)
-        throws DataAccessException {
+    protected String getSqlToDropForeignKeyConstraint(String constraintName, String baseTable) {
       return concat("ALTER TABLE ", baseTable, " DROP FOREIGN KEY ", constraintName);
     }
 

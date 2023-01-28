@@ -119,22 +119,14 @@ public class CollectionUtil {
     if (list == null) {
       return Collections.emptySet();
     }
-
-    Set<T> ret = new HashSet<>();
-    for (T t : list) {
-      ret.add(t);
-    }
-    return ret;
+    return new HashSet<>(Arrays.asList(list));
   }
 
   public static <T> Set<T> listToSet(List<? extends T> list) {
     if (list == null) {
       return Collections.emptySet();
     }
-
-    Set<T> ret = new HashSet<>();
-    ret.addAll(list);
-    return ret;
+    return new HashSet<>(list);
   }
 
   public static <T extends Comparable<? super T>> List<T> sort(Collection<T> col) {

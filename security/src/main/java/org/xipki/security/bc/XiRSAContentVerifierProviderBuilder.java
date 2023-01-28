@@ -56,6 +56,10 @@ public class XiRSAContentVerifierProviderBuilder extends BcRSAContentVerifierPro
       throw new OperatorCreationException(ex.getMessage(), ex);
     }
 
+    if (signAlgo == null) {
+      throw new OperatorCreationException("could not detect SignAlgo from sigAlgId");
+    }
+
     if (signAlgo.isRSAPSSSigAlgo()) {
       try {
         return SignerUtil.createPSSRSASigner(signAlgo);

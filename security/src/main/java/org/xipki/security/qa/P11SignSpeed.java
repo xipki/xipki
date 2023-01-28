@@ -21,6 +21,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pkcs11.PKCS11Constants;
+import org.xipki.pkcs11.TokenException;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
@@ -29,7 +30,6 @@ import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11SlotId;
-import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.*;
 import org.xipki.util.exception.ObjectCreationException;
@@ -301,7 +301,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
     return new P11NewKeyControl(id, label);
   }
 
-  protected static P11IdentityId getNonNullKeyId(P11Slot slot, byte[] keyId, String keyLabel) throws P11TokenException {
+  protected static P11IdentityId getNonNullKeyId(P11Slot slot, byte[] keyId, String keyLabel) throws TokenException {
     P11IdentityId p11Id = slot.getIdentityId(keyId, keyLabel);
     if (p11Id == null) {
       throw new IllegalArgumentException("unknown key");

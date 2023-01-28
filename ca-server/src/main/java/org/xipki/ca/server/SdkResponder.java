@@ -467,7 +467,7 @@ public class SdkResponder {
     }
 
     List<EnrollOrPullCertResponseEntry> rentries =
-        generateCertificates(requestor, ca, certTemplates, req, request, waitForConfirmUtil);
+        generateCertificates(requestor, ca, certTemplates, req, waitForConfirmUtil);
     if (rentries == null) {
       return new ErrorResponse(req.getTransactionId(), SYSTEM_FAILURE, null);
     } else {
@@ -616,10 +616,6 @@ public class SdkResponder {
     }
 
     if (authorityKeyId != null) {
-      if (authorityKeyId == null) {
-        throw new OperationException(BAD_REQUEST, "authorityKeyIdentifier not specified");
-      }
-
       byte[] caSki = ca.getCaCert().getSubjectKeyId();
       if (!Arrays.equals(caSki, authorityKeyId)) {
         throw new OperationException(BAD_CERT_TEMPLATE, "AuthorityKeyIdentifier does not target at the CA");
@@ -707,7 +703,7 @@ public class SdkResponder {
 
   private List<EnrollOrPullCertResponseEntry> generateCertificates(
       RequestorInfo requestor, X509Ca ca, List<CertTemplateData> certTemplates,
-      EnrollCertsRequest req, byte[] request, long waitForConfirmUtil) {
+      EnrollCertsRequest req, long waitForConfirmUtil) {
     String caName = ca.getCaInfo().getIdent().getName();
     final int n = certTemplates.size();
     String tid = req.getTransactionId();
