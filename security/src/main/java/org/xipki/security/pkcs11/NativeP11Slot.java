@@ -543,19 +543,13 @@ class NativeP11Slot extends P11Slot {
       bagEntry = borrowSession();
       Session session = bagEntry.value();
 
-      while (true) {
-        List<Long> handles = getObjects(session, null, 100);
-        if (handles.isEmpty()) {
-          break;
-        }
-
-        for (long handle : handles) {
-          try {
-            session.destroyObject(handle);
-            num++;
-          } catch (PKCS11Exception e) {
-            LOG.warn("error destroying object with handle " + handle + ": " + e.getMessage());
-          }
+      List<Long> allHandles = getObjects(session, null, 9999);
+      for (long handle : allHandles) {
+        try {
+          session.destroyObject(handle);
+          num++;
+        } catch (PKCS11Exception e) {
+          LOG.warn("error destroying object with handle " + handle + ": " + e.getMessage());
         }
       }
     } catch (TokenException e) {
