@@ -333,7 +333,7 @@ public abstract class XiAction implements Action {
 
     int tries = 1;
 
-    while (tries < maxTries) {
+    while (tries <= maxTries) {
       if (StringUtil.orEqualsIgnoreCase(answer, "yes", "y")) {
         return true;
       } else if (StringUtil.orEqualsIgnoreCase(answer, "no", "n")) {
