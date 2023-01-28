@@ -23,6 +23,7 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.SignerEntryWrapper;
+import org.xipki.pkcs11.TokenException;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.*;
 import org.xipki.util.StringUtil;
@@ -187,7 +188,7 @@ class SignerManager {
         bout.flush();
         sb.append(StringUtil.toUtf8String(bout.toByteArray())).append(NL);
       }
-    } catch (P11TokenException | IOException | XiSecurityException ex) {
+    } catch (TokenException | IOException | XiSecurityException ex) {
       throw new CaMgmtException(ex);
     }
 

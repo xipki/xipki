@@ -26,6 +26,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.TokenException;
 import org.xipki.security.*;
 import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
@@ -407,7 +408,7 @@ public class P11Actions {
 
       try {
         finalize(keyType, slot.generateSecretKey(p11KeyType, keysize, control));
-      } catch (P11UnsupportedMechanismException ex) {
+      } catch (TokenException ex) {
         if (!createExternIfGenUnsupported) {
           throw ex;
         }
@@ -538,14 +539,14 @@ public class P11Actions {
     @Reference (optional = true)
     protected P11CryptServiceFactory p11CryptServiceFactory;
 
-    protected P11Slot getSlot() throws XiSecurityException, P11TokenException, IllegalCmdParamException {
+    protected P11Slot getSlot() throws XiSecurityException, TokenException, IllegalCmdParamException {
       P11Module module = getP11Module(moduleName);
       P11SlotId slotId = module.getSlotIdForIndex(Integer.parseInt(slotIndex));
       return module.getSlot(slotId);
     }
 
     protected P11Module getP11Module(String moduleName)
-        throws XiSecurityException, P11TokenException, IllegalCmdParamException {
+        throws XiSecurityException, TokenException, IllegalCmdParamException {
       P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
       if (p11Service == null) {
         throw new IllegalCmdParamException("undefined module " + moduleName);
@@ -554,7 +555,7 @@ public class P11Actions {
     }
 
     public P11Identity getIdentity(String hexId, String label)
-        throws IllegalCmdParamException, XiSecurityException, P11TokenException {
+        throws IllegalCmdParamException, XiSecurityException, TokenException {
       P11Slot slot = getSlot();
       byte[] id = hexId == null ? null : Hex.decode(hexId);
       return slot.getIdentity(id, label);

@@ -26,6 +26,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.TokenException;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.XiSecurityException;
@@ -186,7 +187,7 @@ public class QaSecurityActions {
     @Completion(SecurityCompleters.P11ModuleNameCompleter.class)
     protected String moduleName = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
-    protected P11Slot getSlot() throws XiSecurityException, P11TokenException, IllegalCmdParamException {
+    protected P11Slot getSlot() throws XiSecurityException, TokenException, IllegalCmdParamException {
       P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
       if (p11Service == null) {
         throw new IllegalCmdParamException("undefined module " + moduleName);
@@ -363,7 +364,7 @@ public class QaSecurityActions {
     protected String moduleName = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
     protected P11Slot getSlot()
-        throws XiSecurityException, P11TokenException, IllegalCmdParamException {
+        throws XiSecurityException, TokenException, IllegalCmdParamException {
       P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
       if (p11Service == null) {
         throw new IllegalCmdParamException("undefined module " + moduleName);
