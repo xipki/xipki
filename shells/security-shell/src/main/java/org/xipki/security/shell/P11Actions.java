@@ -339,6 +339,28 @@ public class P11Actions {
 
   } // class DeleteObjectsP11
 
+  @Command(scope = "xi", name = "delete-all-objects-p11", description = "delete all objects in PKCS#11 device")
+  @Service
+  public static class DeleteAllObjectsP11 extends P11SecurityAction {
+
+    @Override
+    protected Object execute0() throws Exception {
+      String prompt = "!!!DANGEROUS OPERATION!!!, do you want to remove ALL PKCS#11 objects";
+      // this is not a bug to require 3 confirmations.
+      if (confirm(prompt, 1)) {
+        if (confirm(prompt, 1)) {
+          if (confirm(prompt, 1)) {
+            P11Slot slot = getSlot();
+            int num = slot.destroyAllObjects();
+            System.out.println("Destroyed " + num + " objects!");
+          }
+        }
+      }
+      return null;
+    }
+
+  } // class DeleteAllObjectsP11
+
   @Command(scope = "xi", name = "rsa-p11", description = "generate RSA keypair in PKCS#11 device")
   @Service
   public static class RsaP11 extends P11KeyGenAction {

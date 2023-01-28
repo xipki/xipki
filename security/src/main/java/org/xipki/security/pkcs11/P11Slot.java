@@ -206,6 +206,12 @@ public abstract class P11Slot implements Closeable {
   public abstract long[] destroyObjectsByHandle(long... handles);
 
   /**
+   * !!!DANGEROUS OPERATION!!! Destroys all objects.
+   * @return number of destroyed objects.
+   */
+  public abstract int destroyAllObjects();
+
+  /**
    * Remove objects.
    *
    * @param id    ID of the objects to be deleted. At least one of id and label may not be {@code null}.

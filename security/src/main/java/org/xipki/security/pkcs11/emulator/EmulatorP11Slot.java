@@ -588,6 +588,12 @@ class EmulatorP11Slot extends P11Slot {
     return new P11ObjectId(handle, objectClass, keyType, id, label);
   } // method savePkcs11Entry
 
+
+  @Override
+  public int destroyAllObjects() {
+    throw new UnsupportedOperationException("destroyAllObjects() is not supported yet.");
+  }
+
   @Override
   public long[] destroyObjectsByHandle(long[] handles) {
     throw new UnsupportedOperationException("removeObjects(long[] handle) is not supported yet.");

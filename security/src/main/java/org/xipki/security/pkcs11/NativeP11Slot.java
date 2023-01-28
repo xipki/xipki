@@ -535,6 +535,41 @@ class NativeP11Slot extends P11Slot {
   }
 
   @Override
+  public int destroyAllObjects() {
+    int num = 0;
+
+    ConcurrentBagEntry<Session> bagEntry = null;
+    try {
+      bagEntry = borrowSession();
+      Session session = bagEntry.value();
+
+      while (true) {
+        List<Long> handles = getObjects(session, null, 100);
+        if (handles.isEmpty()) {
+          break;
+        }
+
+        for (long handle : handles) {
+          try {
+            session.destroyObject(handle);
+            num++;
+          } catch (PKCS11Exception e) {
+            LOG.warn("error destroying object with handle " + handle + ": " + e.getMessage());
+          }
+        }
+      }
+    } catch (TokenException e) {
+      LogUtil.warn(LOG, e, "error destroyAllObjects()");
+    } finally {
+      if (bagEntry != null) {
+        sessions.requite(bagEntry);
+      }
+    }
+
+    return num;
+  }
+
+  @Override
   public long[] destroyObjectsByHandle(long[] handles) {
     ConcurrentBagEntry<Session> bagEntry = null;
     List<Long> destroyedHandles = new ArrayList<>(handles.length);
