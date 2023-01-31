@@ -19,7 +19,6 @@ package org.xipki.security.pkcs11;
 
 import org.xipki.pkcs11.TokenException;
 import org.xipki.util.CompareUtil;
-import sun.tools.jstat.Token;
 
 import java.util.*;
 

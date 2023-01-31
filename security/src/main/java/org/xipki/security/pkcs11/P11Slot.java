@@ -75,22 +75,11 @@ public abstract class P11Slot implements Closeable {
   } // class P11NewObjectControl
 
   public enum P11KeyUsage {
-    DECRYPT(CKA_DECRYPT),
-    DERIVE(CKA_DERIVE),
-    SIGN(CKA_SIGN),
-    SIGN_RECOVER(CKA_SIGN_RECOVER),
-    UNWRAP(CKA_UNWRAP);
-
-    private final long attributeType;
-
-    P11KeyUsage(long attributeType) {
-      this.attributeType = attributeType;
-    }
-
-    public long getAttributeType() {
-      return attributeType;
-    }
-
+    DECRYPT,
+    DERIVE,
+    SIGN,
+    SIGN_RECOVER,
+    UNWRAP
   } // class P11KeyUsage
 
   public static class P11NewKeyControl extends P11NewObjectControl {

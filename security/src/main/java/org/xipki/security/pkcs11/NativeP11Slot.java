@@ -740,26 +740,26 @@ class NativeP11Slot extends P11Slot {
   @Override
   protected P11IdentityId doGenerateRSAKeypair(int keysize, BigInteger publicExponent, P11NewKeyControl control)
       throws TokenException {
-    AttributeVector privateKey = newPrivateKey(CKK_RSA);
-    AttributeVector publicKey = newPublicKey(CKK_RSA).modulusBits(keysize);
+    KeyPairTemplate template = new KeyPairTemplate(CKK_RSA);
+    template.publicKey().modulusBits(keysize);
     if (publicExponent != null) {
-      publicKey.publicExponent(publicExponent);
+      template.publicKey().publicExponent(publicExponent);
     }
-    setKeyAttributes(control, publicKey, privateKey, newObjectConf);
+    setKeyPairAttributes(control, template, newObjectConf);
 
-    return doGenerateKeyPair(rsaKeyPairGenMech, control.getId(), privateKey, publicKey);
+    return doGenerateKeyPair(rsaKeyPairGenMech, control.getId(), template);
   } // method generateRSAKeypair0
 
   @Override
   protected PrivateKeyInfo doGenerateRSAKeypairOtf(int keysize, BigInteger publicExponent)
       throws TokenException {
-    AttributeVector publicKeyTemplate = newPublicKey(CKK_RSA).modulusBits(keysize);
+    KeyPairTemplate template = new KeyPairTemplate(CKK_RSA);
+    template.publicKey().modulusBits(keysize);
     if (publicExponent != null) {
-      publicKeyTemplate.publicExponent(publicExponent);
+      template.publicKey().publicExponent(publicExponent);
     }
 
-    AttributeVector privateKeyTemplate = newPrivateKey(CKK_RSA);
-    setPrivateKeyAttrsOtf(privateKeyTemplate);
+    setPrivateKeyAttrsOtf(template.privateKey());
 
     long mech = rsaKeyPairGenMech;
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
@@ -768,7 +768,7 @@ class NativeP11Slot extends P11Slot {
 
       PKCS11KeyPair keypair = null;
       try {
-        keypair = session.generateKeyPair(new Mechanism(mech), publicKeyTemplate, privateKeyTemplate);
+        keypair = session.generateKeyPair(new Mechanism(mech), template);
         AttributeVector attrs = session.getAttrValues(keypair.getPrivateKey(), CKA_MODULUS, CKA_PUBLIC_EXPONENT,
             CKA_PRIVATE_EXPONENT, CKA_PRIME_1, CKA_PRIME_2, CKA_EXPONENT_1, CKA_EXPONENT_2, CKA_COEFFICIENT);
 
@@ -790,19 +790,19 @@ class NativeP11Slot extends P11Slot {
   @Override
   protected P11IdentityId doGenerateDSAKeypair(BigInteger p, BigInteger q, BigInteger g, P11NewKeyControl control)
       throws TokenException {
-    AttributeVector privateKey = newDSAPrivateKey();
-    AttributeVector publicKey = newDSAPublicKey().prime(p).subprime(q).base(g);
-    setKeyAttributes(control, publicKey, privateKey, newObjectConf);
+    KeyPairTemplate template = new KeyPairTemplate(CKK_DSA);
+    template.publicKey().prime(p).subprime(q).base(g);
+    setKeyPairAttributes(control, template, newObjectConf);
 
-    return doGenerateKeyPair(CKM_DSA_KEY_PAIR_GEN, control.getId(), privateKey, publicKey);
+    return doGenerateKeyPair(CKM_DSA_KEY_PAIR_GEN, control.getId(), template);
   }
 
   @Override
   protected PrivateKeyInfo generateDSAKeypairOtf0(BigInteger p, BigInteger q, BigInteger g) throws TokenException {
-    AttributeVector priKeyTemplate = newDSAPrivateKey();
-    setPrivateKeyAttrsOtf(priKeyTemplate);
+    KeyPairTemplate template = new KeyPairTemplate(CKK_DSA);
+    setPrivateKeyAttrsOtf(template.privateKey());
 
-    AttributeVector pubKeyTemplate = newDSAPublicKey().prime(p).subprime(q).base(g);
+    template.publicKey().prime(p).subprime(q).base(g);
 
     long mech = CKM_DSA_KEY_PAIR_GEN;
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
@@ -814,7 +814,7 @@ class NativeP11Slot extends P11Slot {
         DSAParameter parameter = new DSAParameter(p, q, g);
         AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, parameter);
 
-        keypair = session.generateKeyPair(new Mechanism(mech), pubKeyTemplate, priKeyTemplate);
+        keypair = session.generateKeyPair(new Mechanism(mech), template);
         long skHandle = keypair.getPrivateKey();
         long pkHandle = keypair.getPublicKey();
 
@@ -837,17 +837,16 @@ class NativeP11Slot extends P11Slot {
   @Override
   protected P11IdentityId doGenerateECEdwardsKeypair(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
       throws TokenException {
-    AttributeVector privKeyTemplate = newPrivateKey(CKK_EC_EDWARDS);
-    AttributeVector pubKeyTemplate = newPublicKey(CKK_EC_EDWARDS);
-    setKeyAttributes(control, pubKeyTemplate, privKeyTemplate, newObjectConf);
+    KeyPairTemplate template = new KeyPairTemplate(CKK_EC_EDWARDS);
+    setKeyPairAttributes(control, template, newObjectConf);
     byte[] encodedCurveId;
     try {
       encodedCurveId = curveId.getEncoded();
     } catch (IOException ex) {
       throw new TokenException(ex.getMessage(), ex);
     }
-    pubKeyTemplate.ecParams(encodedCurveId);
-    return doGenerateKeyPair(CKM_EC_EDWARDS_KEY_PAIR_GEN, control.getId(), privKeyTemplate, pubKeyTemplate);
+    template.publicKey().ecParams(encodedCurveId);
+    return doGenerateKeyPair(CKM_EC_EDWARDS_KEY_PAIR_GEN, control.getId(), template);
   } // method generateECEdwardsKeypair0
 
   @Override
@@ -858,16 +857,15 @@ class NativeP11Slot extends P11Slot {
   @Override
   protected P11IdentityId doGenerateECMontgomeryKeypair(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
       throws TokenException {
-    AttributeVector privateKey = newPrivateKey(CKK_EC_MONTGOMERY);
-    AttributeVector publicKey = newPublicKey(CKK_EC_MONTGOMERY);
-    setKeyAttributes(control, publicKey, privateKey, newObjectConf);
+    KeyPairTemplate template = new KeyPairTemplate(CKK_EC_MONTGOMERY);
+    setKeyPairAttributes(control, template, newObjectConf);
     try {
-      publicKey.ecParams(curveId.getEncoded());
+      template.publicKey().ecParams(curveId.getEncoded());
     } catch (IOException ex) {
       throw new TokenException(ex.getMessage(), ex);
     }
 
-    return doGenerateKeyPair(CKM_EC_MONTGOMERY_KEY_PAIR_GEN, control.getId(), privateKey, publicKey);
+    return doGenerateKeyPair(CKM_EC_MONTGOMERY_KEY_PAIR_GEN, control.getId(), template);
   } // method generateECMontgomeryKeypair0
 
   @Override
@@ -878,9 +876,8 @@ class NativeP11Slot extends P11Slot {
   @Override
   protected P11IdentityId doGenerateECKeypair(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
       throws TokenException {
-    AttributeVector privateKey = newPrivateKey(CKK_EC);
-    AttributeVector publicKey = newPublicKey(CKK_EC);
-    setKeyAttributes(control, publicKey, privateKey, newObjectConf);
+    KeyPairTemplate template = new KeyPairTemplate(CKK_EC);
+    setKeyPairAttributes(control, template, newObjectConf);
     byte[] encodedCurveId;
     try {
       encodedCurveId = curveId.getEncoded();
@@ -888,8 +885,8 @@ class NativeP11Slot extends P11Slot {
       throw new TokenException(ex.getMessage(), ex);
     }
 
-    publicKey.ecParams(encodedCurveId);
-    return doGenerateKeyPair(CKM_EC_KEY_PAIR_GEN, control.getId(), privateKey, publicKey);
+    template.publicKey().ecParams(encodedCurveId);
+    return doGenerateKeyPair(CKM_EC_KEY_PAIR_GEN, control.getId(), template);
   } // method generateECKeypair0
 
   @Override
@@ -905,12 +902,11 @@ class NativeP11Slot extends P11Slot {
       }
     }
 
-    AttributeVector privateKeyTemplate = newPrivateKey(keyType);
-    setPrivateKeyAttrsOtf(privateKeyTemplate);
+    KeyPairTemplate template = new KeyPairTemplate(keyType);
+    setPrivateKeyAttrsOtf(template.privateKey());
 
-    AttributeVector publicKeyTemplate = newPublicKey(keyType);
     try {
-      publicKeyTemplate.ecParams(curveId.getEncoded());
+      template.publicKey().ecParams(curveId.getEncoded());
     } catch (IOException ex) {
       throw new TokenException(ex.getMessage(), ex);
     }
@@ -921,7 +917,7 @@ class NativeP11Slot extends P11Slot {
 
       PKCS11KeyPair keypair = null;
       try {
-        keypair = session.generateKeyPair(new Mechanism(mech), publicKeyTemplate, privateKeyTemplate);
+        keypair = session.generateKeyPair(new Mechanism(mech), template);
 
         byte[] ecPoint = session.getByteArrayAttrValue(keypair.getPublicKey(), CKA_EC_POINT);
         byte[] encodedPublicPoint = DEROctetString.getInstance(ecPoint).getOctets();
@@ -958,12 +954,11 @@ class NativeP11Slot extends P11Slot {
   protected P11IdentityId doGenerateSM2Keypair(P11NewKeyControl control) throws TokenException {
     long ckm = CKM_VENDOR_SM2_KEY_PAIR_GEN;
     if (supportsMechanism(ckm)) {
-      AttributeVector privateKey = newPrivateKey(CKK_VENDOR_SM2);
-      AttributeVector publicKey = newPublicKey(CKK_VENDOR_SM2);
-      publicKey.ecParams(Hex.decode("06082A811CCF5501822D"));
-      setKeyAttributes(control, publicKey, privateKey, newObjectConf);
+      KeyPairTemplate template = new KeyPairTemplate(CKK_VENDOR_SM2);
+      template.publicKey().ecParams(Hex.decode("06082A811CCF5501822D"));
+      setKeyPairAttributes(control, template, newObjectConf);
 
-      return doGenerateKeyPair(ckm, control.getId(), privateKey, publicKey);
+      return doGenerateKeyPair(ckm, control.getId(), template);
     } else {
       return doGenerateECKeypair(GMObjectIdentifiers.sm2p256v1, control);
     }
@@ -979,10 +974,10 @@ class NativeP11Slot extends P11Slot {
   }
 
   private P11IdentityId doGenerateKeyPair(
-      long mech, byte[] id, AttributeVector privateKeyTemplate, AttributeVector publicKeyTemplate)
+      long mech, byte[] id, KeyPairTemplate template)
       throws TokenException {
-    long keyType = privateKeyTemplate.keyType();
-    String label = privateKeyTemplate.label();
+    long keyType = template.privateKey().keyType();
+    String label = template.privateKey().label();
 
     boolean succ = false;
 
@@ -999,11 +994,10 @@ class NativeP11Slot extends P11Slot {
           id = generateId(session);
         }
 
-        privateKeyTemplate.id(id);
-        publicKeyTemplate.id(id);
+        template.id(id);
 
         try {
-          keypair = session.generateKeyPair(new Mechanism(mech), publicKeyTemplate, privateKeyTemplate);
+          keypair = session.generateKeyPair(new Mechanism(mech), template);
         } catch (PKCS11Exception ex) {
           throw new TokenException("could not generate keypair " + ckmCodeToName(mech), ex);
         }
@@ -1295,56 +1289,6 @@ class NativeP11Slot extends P11Slot {
     AttributeVector template = new AttributeVector().label(keyLabel);
     return !isEmpty(getObjects(session, template, 1));
   } // method labelExists
-
-  static void setKeyAttributes(P11NewKeyControl control, AttributeVector publicKey,
-                        AttributeVector privateKey, P11NewObjectConf newObjectConf) {
-    if (privateKey != null) {
-      privateKey.private_(true).token(true);
-      if (newObjectConf.isIgnoreLabel()) {
-        if (control.getLabel() != null) {
-          LOG.warn("label is set, but ignored: '{}'", control.getLabel());
-        }
-      } else {
-        privateKey.label(control.getLabel());
-      }
-
-      if (control.getExtractable() != null) {
-        privateKey.extractable(control.getExtractable());
-      }
-
-      if (control.getSensitive() != null) {
-        privateKey.sensitive(control.getSensitive());
-      }
-
-      Set<P11KeyUsage> usages = control.getUsages();
-      if (isNotEmpty(usages)) {
-        for (P11KeyUsage usage : usages) {
-          privateKey.attr(usage.getAttributeType(), true);
-        }
-      } else {
-        long keyType = privateKey.keyType();
-        // if not set
-        if (keyType == CKK_EC || keyType == CKK_RSA || keyType == CKK_DSA) {
-          privateKey.sign(true);
-        }
-
-        if (keyType == CKK_VENDOR_SM2) {
-          privateKey.sign(true);
-        }
-
-        if (keyType == CKK_RSA) {
-          privateKey.unwrap(true).decrypt(true);
-        }
-      }
-    }
-
-    if (publicKey != null) {
-      publicKey.verify(true).token(true);
-      if (!newObjectConf.isIgnoreLabel()) {
-        publicKey.label(control.getLabel());
-      }
-    }
-  } // method setKeyAttributes
 
   private static void setPrivateKeyAttrsOtf(AttributeVector privateKeyTemplate) {
     privateKeyTemplate.sensitive(false).extractable(true).token(false);

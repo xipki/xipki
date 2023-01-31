@@ -182,6 +182,63 @@ class NativeP11SlotUtil {
     }
   } // method removeObjects
 
+  static void setKeyPairAttributes(P11NewKeyControl control, KeyPairTemplate template,
+                                   P11ModuleConf.P11NewObjectConf newObjectConf) {
+    template.token(true);
+
+    template.privateKey().private_(true);
+    if (newObjectConf.isIgnoreLabel()) {
+      if (control.getLabel() != null) {
+        LOG.warn("label is set, but ignored: '{}'", control.getLabel());
+      }
+    } else {
+      template.label(control.getLabel());
+    }
+
+    if (control.getExtractable() != null) {
+      template.privateKey().extractable(control.getExtractable());
+    }
+
+    if (control.getSensitive() != null) {
+      template.privateKey().sensitive(control.getSensitive());
+    }
+
+    Set<P11KeyUsage> usages = control.getUsages();
+    if (isNotEmpty(usages)) {
+      for (P11KeyUsage usage : usages) {
+        switch (usage) {
+          case DECRYPT:
+            template.decryptEncrypt(true);
+            break;
+          case DERIVE:
+            template.derive(true);
+            break;
+          case SIGN:
+            template.signVerify(true);
+            break;
+          case SIGN_RECOVER:
+            template.signVerifyRecover(true);
+            break;
+          case UNWRAP:
+            template.unwrapWrap(true);
+            break;
+          default:
+            throw new IllegalStateException("unknown P11KeyUsage");
+        }
+      }
+    } else {
+      long keyType = template.privateKey().keyType();
+      // if not set
+      if (keyType == CKK_EC || keyType == CKK_RSA || keyType == CKK_DSA || keyType == CKK_VENDOR_SM2) {
+        template.signVerify(true);
+      }
+
+      if (keyType == CKK_RSA) {
+        template.unwrapWrap(true).decryptEncrypt(true);
+      }
+    }
+  } // method setKeyAttributes
+
   static void setKeyAttributes(P11NewKeyControl control, AttributeVector template, String label) {
     template.token(true);
     if (label != null) {
@@ -199,7 +256,25 @@ class NativeP11SlotUtil {
     Set<P11KeyUsage> usages = control.getUsages();
     if (isNotEmpty(usages)) {
       for (P11KeyUsage usage : usages) {
-        template.attr(usage.getAttributeType(), true);
+        switch (usage) {
+          case DECRYPT:
+            template.decrypt(true).encrypt(true);
+            break;
+          case DERIVE:
+            template.derive(true);
+            break;
+          case SIGN:
+            template.sign(true).verify(true);
+            break;
+          case SIGN_RECOVER:
+            template.signRecover(true).verifyRecover(true);
+            break;
+          case UNWRAP:
+            template.unwrap(true).wrap(true);
+            break;
+          default:
+            throw new IllegalStateException("unknown P11KeyUsage");
+        }
       }
     }
   }
