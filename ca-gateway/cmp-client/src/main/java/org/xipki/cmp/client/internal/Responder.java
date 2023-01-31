@@ -17,6 +17,7 @@
 
 package org.xipki.cmp.client.internal;
 
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.security.AlgorithmValidator;
@@ -56,7 +57,7 @@ abstract class Responder {
     private final List<SignAlgo> macAlgos;
 
     PbmMacCmpResponder(List<String> owfs, List<String> macs) throws NoSuchAlgorithmException {
-      super(new X500Name(""));
+      super(new X500Name(new RDN[0]));
 
       this.owfAlgos = new ArrayList<>(owfs.size());
 
