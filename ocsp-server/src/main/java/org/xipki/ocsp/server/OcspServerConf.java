@@ -17,7 +17,7 @@
 
 package org.xipki.ocsp.server;
 
-import com.alibaba.fastjson.JSON;
+import org.xipki.security.util.JSON;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;

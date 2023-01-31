@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
 
@@ -111,13 +110,10 @@ public class GeneralSubtreeType extends ValidatableConf {
     } // method validate
   } // class Base
 
-  @JSONField(ordinal = 1)
   private Base base;
 
-  @JSONField(ordinal = 2)
   private Integer minimum;
 
-  @JSONField(ordinal = 3)
   private Integer maximum;
 
   public Integer getMinimum() {

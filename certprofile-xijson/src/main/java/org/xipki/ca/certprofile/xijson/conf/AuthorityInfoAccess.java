@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
 
@@ -31,16 +30,12 @@ import java.util.Set;
 
 public class AuthorityInfoAccess extends ValidatableConf {
 
-  @JSONField(ordinal = 1)
   private boolean includeCaIssuers;
 
-  @JSONField(ordinal = 2)
   private boolean includeOcsp;
 
-  @JSONField(ordinal = 3)
   private Set<String> ocspProtocols;
 
-  @JSONField(ordinal = 3)
   private Set<String> caIssuersProtocols;
 
   public boolean isIncludeCaIssuers() {

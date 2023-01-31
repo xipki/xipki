@@ -17,8 +17,7 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.annotation.JSONField;
+import org.xipki.security.util.JSON;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
@@ -55,19 +54,14 @@ public class X509ProfileType extends ValidatableConf {
 
   private static final Logger LOG = LoggerFactory.getLogger(X509ProfileType.class);
 
-  @JSONField(ordinal = 1)
   private Map<String, String> metadata;
 
-  @JSONField(ordinal = 2)
   private X509CertVersion version;
 
-  @JSONField(ordinal = 3)
   private CertLevel certLevel;
 
-  @JSONField(ordinal = 3)
   private CertDomain certDomain = CertDomain.RFC5280;
 
-  @JSONField(ordinal = 5)
   private Integer maxSize;
 
   /**
@@ -81,14 +75,12 @@ public class X509ProfileType extends ValidatableConf {
    *   <li>99991231235959Z: certificate has this UNDEFINED notAfter</li>
    * </ul>
    */
-  @JSONField(ordinal = 6)
   private String validity;
 
   /**
    * How CA assigns the notAfter field in the certificate if the requested notAfter is
    * after CA's validity.
    */
-  @JSONField(ordinal = 6)
   private NotAfterMode notAfterMode;
 
   /**
@@ -110,20 +102,17 @@ public class X509ProfileType extends ValidatableConf {
    *   </li>
    * </ul>
    */
-  @JSONField(ordinal = 7)
   private String notBeforeTime;
 
   /**
    * Control how CA will generate the keypair for the certificate.
    * Defaults to forbidden.
    */
-  @JSONField(ordinal = 9)
   private KeypairGenerationType keypairGeneration;
 
   /**
    * Control how to generate the serial number of certificate
    */
-  @JSONField(ordinal = 10)
   private String serialNumberMode;
 
   /**
@@ -133,19 +122,14 @@ public class X509ProfileType extends ValidatableConf {
    * and SHA3-*withECDSA, SHA3-*withDSA, SHA3-*withRSA, SHA3-*withRSAandMGF1
    * where * is for 224, 256, 384 and 512.
    */
-  @JSONField(ordinal = 11)
   private List<String> signatureAlgorithms;
 
-  @JSONField(ordinal = 12)
   private List<AlgorithmType> keyAlgorithms;
 
-  @JSONField(ordinal = 13)
   private Subject subject;
 
-  @JSONField(ordinal = 14)
   private List<SubjectToSubjectAltNameType> subjectToSubjectAltNames;
 
-  @JSONField(ordinal = 15)
   private List<ExtensionType> extensions;
 
   public static X509ProfileType parse(InputStream confStream) throws CertprofileException {
@@ -154,7 +138,7 @@ public class X509ProfileType extends ValidatableConf {
       X509ProfileType root = JSON.parseObject(confStream, X509ProfileType.class);
       root.validate();
       return root;
-    } catch (IOException | InvalidConfException | RuntimeException ex) {
+    } catch (InvalidConfException | RuntimeException ex) {
       throw new CertprofileException("parse profile failed, message: " + ex.getMessage(), ex);
     } finally {
       try {

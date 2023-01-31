@@ -17,7 +17,7 @@
 
 package org.xipki.ca.server;
 
-import com.alibaba.fastjson.JSON;
+import org.xipki.security.util.JSON;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

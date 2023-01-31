@@ -17,7 +17,7 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import com.alibaba.fastjson.JSON;
+import org.xipki.security.util.JSON;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.X509CRLHolder;
@@ -134,7 +134,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
       certstore.validate();
       try (OutputStream os = Files.newOutputStream(Paths.get(baseDir, FILENAME_CA_CERTSTORE))) {
-        JSON.writeJSONString(os, StandardCharsets.UTF_8, certstore);
+        JSON.writeJSON(certstore, os);
       }
     } catch (Exception ex) {
       System.err.println("could not export CA certstore from database");
@@ -487,7 +487,7 @@ class CaCertstoreDbExporter extends DbPorter {
     ZipEntry certZipEntry = new ZipEntry(filename);
     zipOutStream.putNextEntry(certZipEntry);
     try {
-      JSON.writeJSONString(zipOutStream, StandardCharsets.UTF_8, container);
+      JSON.writeJSON(container, zipOutStream);
     } finally {
       zipOutStream.closeEntry();
     }

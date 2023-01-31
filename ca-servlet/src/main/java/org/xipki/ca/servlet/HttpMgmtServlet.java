@@ -17,7 +17,7 @@
 
 package org.xipki.ca.servlet;
 
-import com.alibaba.fastjson.JSON;
+import org.xipki.security.util.JSON;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
@@ -618,11 +618,11 @@ public class HttpMgmtServlet extends HttpServlet {
     return req.getName();
   } // method getNameFromRequest
 
-  private static <T extends MgmtRequest> T parse(InputStream in, Class<?> clazz)
+  private static <T extends MgmtRequest> T parse(InputStream in, Class<T> clazz)
       throws CaMgmtException {
     try {
       return JSON.parseObject(in, clazz);
-    } catch (RuntimeException | IOException ex) {
+    } catch (RuntimeException ex) {
       throw new CaMgmtException("cannot parse request " + clazz + " from InputStream");
     }
   } // method parse

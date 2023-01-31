@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.ca.api.profile.Certprofile.StringType;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.util.ValidatableConf;
@@ -38,10 +37,8 @@ public class Subject extends ValidatableConf {
   /**
    * whether the RDNs occurs as in the defined ASN.1 order.
    */
-  @JSONField(ordinal = 2)
   private Boolean keepRdnOrder;
 
-  @JSONField(ordinal = 3)
   private List<RdnType> rdns;
 
   // do not encode the default value.
@@ -108,43 +105,31 @@ public class Subject extends ValidatableConf {
 
   public static class RdnType extends ValidatableConf {
 
-    @JSONField(ordinal = 1)
     private DescribableOid type;
 
-    @JSONField(ordinal = 2)
     private Integer minLen;
 
-    @JSONField(ordinal = 3)
     private Integer maxLen;
 
-    @JSONField(ordinal = 4)
     private StringType stringType;
 
-    @JSONField(ordinal = 5)
     private String regex;
 
-    @JSONField(ordinal = 6)
     private String prefix;
 
-    @JSONField(ordinal = 7)
     private String suffix;
 
-    @JSONField(ordinal = 8)
     private Integer minOccurs;
 
-    @JSONField(ordinal = 9)
     private Integer maxOccurs;
 
-    @JSONField(ordinal = 10)
     private String group;
 
     /**
      * This RDN is for other purpose, will not be contained in the Subject field of certificate.
      */
-    @JSONField(ordinal = 11)
     private Boolean notInSubject;
 
-    @JSONField(ordinal = 11)
     private ValueType value;
 
     public DescribableOid getType() {

@@ -17,7 +17,7 @@
 
 package org.xipki.ca.sdk;
 
-import com.alibaba.fastjson.JSON;
+import org.xipki.security.util.JSON;
 import org.xipki.util.exception.ErrorCode;
 
 /**

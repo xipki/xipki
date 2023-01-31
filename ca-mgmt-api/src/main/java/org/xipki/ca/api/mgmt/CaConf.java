@@ -17,7 +17,7 @@
 
 package org.xipki.ca.api.mgmt;
 
-import com.alibaba.fastjson.JSON;
+import org.xipki.security.util.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CaUris;
@@ -312,7 +312,7 @@ public class CaConf {
             caUris = CaUris.EMPTY_INSTANCE;
           } else {
             CaConfType.CaUris uris = ci.getCaUris();
-            caUris = new CaUris(uris.getCacertUris(), uris.getOcspUris(), uris.getCrlUris(), uris.getDeltacrlUris());
+            caUris = new CaUris(uris.getCacertUris(), uris.getOcspUris(), uris.getCrlUris(), uris.getDeltaCrlUris());
           }
 
           int exprirationPeriod = (ci.getExpirationPeriod() == null) ? 365 : ci.getExpirationPeriod();

@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.CertPolicyId;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
@@ -38,10 +37,8 @@ public class PolicyMappings extends ValidatableConf {
 
   public static class PolicyIdMappingType extends ValidatableConf {
 
-    @JSONField(ordinal = 1)
     private DescribableOid issuerDomainPolicy;
 
-    @JSONField(ordinal = 2)
     private DescribableOid subjectDomainPolicy;
 
     public DescribableOid getIssuerDomainPolicy() {

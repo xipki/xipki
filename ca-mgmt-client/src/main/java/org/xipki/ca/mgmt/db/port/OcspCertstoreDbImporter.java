@@ -17,7 +17,7 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import com.alibaba.fastjson.JSON;
+import org.xipki.security.util.JSON;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -277,7 +277,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
     OcspCertstore.Certs certs;
     try {
-      certs = JSON.parseObject(zipFile.getInputStream(certsEntry), StandardCharsets.UTF_8, OcspCertstore.Certs.class);
+      certs = JSON.parseObject(zipFile.getInputStream(certsEntry), OcspCertstore.Certs.class);
     } catch (Exception ex) {
       try {
         zipFile.close();

@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
@@ -54,10 +53,8 @@ public class SubjectInfoAccess extends ValidatableConf {
 
   public static class Access extends ValidatableConf {
 
-    @JSONField(ordinal = 1)
     private DescribableOid accessMethod;
 
-    @JSONField(ordinal = 2)
     private GeneralNameType accessLocation;
 
     public DescribableOid getAccessMethod() {

@@ -17,8 +17,7 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import org.xipki.security.util.JSON;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.mgmt.entry.CaConfColumn;
 import org.xipki.datasource.DataAccessException;
@@ -75,7 +74,7 @@ class CaconfDbExporter extends DbPorter {
 
     caconf.validate();
     try (OutputStream os = Files.newOutputStream(Paths.get(baseDir, FILENAME_CA_CONFIGURATION))) {
-      JSON.writeJSONString(os, caconf, SerializerFeature.PrettyFormat);
+      JSON.writePrettyJSON(caconf, os);
     }
     System.out.println(" exported CA configuration from database");
   } // method export

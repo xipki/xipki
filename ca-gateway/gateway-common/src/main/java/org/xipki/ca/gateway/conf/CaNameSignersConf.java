@@ -25,6 +25,7 @@ package org.xipki.ca.gateway.conf;
 
 public class CaNameSignersConf {
 
+  @com.google.gson.annotations.SerializedName("default")
   private SignerConf default_;
 
   private CaNameSignerConf[] signers;

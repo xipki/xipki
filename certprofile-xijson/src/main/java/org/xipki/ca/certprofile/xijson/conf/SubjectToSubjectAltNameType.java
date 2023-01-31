@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.util.ValidatableConf;
@@ -39,10 +38,8 @@ public class SubjectToSubjectAltNameType extends ValidatableConf {
       GeneralNameTag.rfc822Name,                GeneralNameTag.DNSName,   GeneralNameTag.directoryName,
       GeneralNameTag.uniformResourceIdentifier, GeneralNameTag.IPAddress, GeneralNameTag.registeredID);
 
-  @JSONField(ordinal = 1)
   private DescribableOid source;
 
-  @JSONField(ordinal = 2)
   private GeneralNameTag target;
 
   public DescribableOid getSource() {

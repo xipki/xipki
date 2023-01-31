@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -83,10 +82,8 @@ public class CertificatePolicies extends ValidatableConf {
 
   public static class CertificatePolicyInformationType extends ValidatableConf {
 
-    @JSONField(ordinal = 1)
     private DescribableOid policyIdentifier;
 
-    @JSONField(ordinal = 2)
     private List<PolicyQualifier> policyQualifiers;
 
     public DescribableOid getPolicyIdentifier() {

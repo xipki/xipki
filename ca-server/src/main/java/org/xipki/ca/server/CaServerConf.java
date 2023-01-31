@@ -17,8 +17,7 @@
 
 package org.xipki.ca.server;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.annotation.JSONField;
+import org.xipki.security.util.JSON;
 import org.xipki.audit.Audits.AuditConf;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.datasource.DataSourceConf;
@@ -167,7 +166,6 @@ public class CaServerConf extends ValidatableConf {
    */
   private List<String> certprofileFactories;
 
-  @JSONField(serialize = false, deserialize = false)
   private final Map<String, SslContextConf> sslContextConfMap = new HashMap<>();
 
   public static CaServerConf readConfFromFile(String fileName) throws IOException, InvalidConfException {

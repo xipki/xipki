@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableBinary;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.util.CollectionUtil;
@@ -37,10 +36,8 @@ public class QcStatements extends ValidatableConf {
 
   public static class Range2Type extends ValidatableConf {
 
-    @JSONField(ordinal = 1)
     private int min;
 
-    @JSONField(ordinal = 2)
     private int max;
 
     public int getMin() {
@@ -67,13 +64,10 @@ public class QcStatements extends ValidatableConf {
 
   public static class QcEuLimitValueType extends ValidatableConf {
 
-    @JSONField(ordinal = 1)
     private String currency;
 
-    @JSONField(ordinal = 2)
     private Range2Type amount;
 
-    @JSONField(ordinal = 3)
     private Range2Type exponent;
 
     public String getCurrency() {
@@ -112,10 +106,8 @@ public class QcStatements extends ValidatableConf {
 
   public static class PdsLocationType extends ValidatableConf {
 
-    @JSONField(ordinal = 1)
     private String url;
 
-    @JSONField(ordinal = 2)
     private String language;
 
     public String getUrl() {
@@ -144,16 +136,12 @@ public class QcStatements extends ValidatableConf {
 
   public static class QcStatementValueType extends ValidatableConf {
 
-    @JSONField(ordinal = 1)
     private DescribableBinary constant;
 
-    @JSONField(ordinal = 1)
     private Integer qcRetentionPeriod;
 
-    @JSONField(ordinal = 1)
     private QcEuLimitValueType qcEuLimitValue;
 
-    @JSONField(ordinal = 1)
     private List<PdsLocationType> pdsLocations;
 
     public DescribableBinary getConstant() {
@@ -220,10 +208,8 @@ public class QcStatements extends ValidatableConf {
 
   public static class QcStatementType extends ValidatableConf {
 
-    @JSONField(ordinal = 1)
     private DescribableOid statementId;
 
-    @JSONField(ordinal = 2)
     private QcStatementValueType statementValue;
 
     public DescribableOid getStatementId() {

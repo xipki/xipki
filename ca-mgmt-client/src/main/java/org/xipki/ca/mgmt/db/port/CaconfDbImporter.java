@@ -17,7 +17,7 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import com.alibaba.fastjson.JSON;
+import org.xipki.security.util.JSON;
 import org.xipki.ca.mgmt.db.DbSchemaInfo;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;

@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.isismtt.x509.NamingAuthority;
@@ -45,10 +44,8 @@ public class AdmissionSyntax extends ValidatableConf {
 
   public static class RegistrationNumber extends ValidatableConf {
 
-    @JSONField(ordinal = 1)
     private String regex;
 
-    @JSONField(ordinal = 2)
     private String constant;
 
     public String getRegex() {
@@ -76,13 +73,10 @@ public class AdmissionSyntax extends ValidatableConf {
 
   public static class NamingAuthorityType extends ValidatableConf {
 
-    @JSONField(ordinal = 1)
     private DescribableOid oid;
 
-    @JSONField(ordinal = 2)
     private String url;
 
-    @JSONField(ordinal = 3)
     private String text;
 
     public DescribableOid getOid() {
@@ -121,19 +115,14 @@ public class AdmissionSyntax extends ValidatableConf {
 
   public static class ProfessionInfoType extends ValidatableConf {
 
-    @JSONField(ordinal = 1)
     private NamingAuthorityType namingAuthority;
 
-    @JSONField(ordinal = 2)
     private List<DescribableOid> professionOids;
 
-    @JSONField(ordinal = 3)
     private List<String> professionItems;
 
-    @JSONField(ordinal = 4)
     private RegistrationNumber registrationNumber;
 
-    @JSONField(ordinal = 5)
     private byte[] addProfessionInfo;
 
     public NamingAuthorityType getNamingAuthority() {
@@ -192,13 +181,10 @@ public class AdmissionSyntax extends ValidatableConf {
 
   public static class AdmissionsType extends ValidatableConf {
 
-    @JSONField(ordinal = 1)
     private byte[] admissionAuthority;
 
-    @JSONField(ordinal = 2)
     private NamingAuthorityType namingAuthority;
 
-    @JSONField(ordinal = 3)
     private List<ProfessionInfoType> professionInfos;
 
     public byte[] getAdmissionAuthority() {
@@ -237,10 +223,8 @@ public class AdmissionSyntax extends ValidatableConf {
 
   } // class AdmissionsType
 
-  @JSONField(ordinal = 1)
   private byte[] admissionAuthority;
 
-  @JSONField(ordinal = 2)
   private List<AdmissionsType> contentsOfAdmissions;
 
   public byte[] getAdmissionAuthority() {

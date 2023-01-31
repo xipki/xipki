@@ -17,7 +17,7 @@
 
 package org.xipki.cmp.client.internal;
 
-import com.alibaba.fastjson.JSON;
+import org.xipki.security.util.JSON;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.PKIFailureInfo;
 import org.bouncycastle.asn1.cmp.PKIStatus;
@@ -163,7 +163,7 @@ public final class CmpClientImpl implements CmpClient {
     try {
       conf = JSON.parseObject(configStream, CmpClientConf.class);
       conf.validate();
-    } catch (IOException | InvalidConfException | RuntimeException ex) {
+    } catch (InvalidConfException | RuntimeException ex) {
       throw new CmpClientException("parsing profile failed, message: " + ex.getMessage(), ex);
     } finally {
       try {

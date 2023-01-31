@@ -169,6 +169,8 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
    * @param datasource DataSource.
    */
   public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource) throws OcspStoreException {
+    // we need to canonicalize the configuration first
+    new ConfPairs(sourceConf);
     this.sourceConf = notNull(sourceConf, "sourceConf");
 
     // check the dir
@@ -203,7 +205,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     }
 
     String value = getStrValue(sourceConf, "sqlBatchCommit", false);
-    this.sqlBatchCommit = StringUtil.isBlank(value) ? 1000 : Integer.parseInt(value);
+    this.sqlBatchCommit = StringUtil.isBlank(value) ? 1000 : (int) Double.parseDouble(value);
 
     value = getStrValue(sourceConf, "ignoreExpiredCrls", false);
     this.ignoreExpiredCrls = StringUtil.isBlank(value) || Boolean.parseBoolean(value);
@@ -211,7 +213,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     super.datasource = datasource;
 
     value = getStrValue(sourceConf, "startupDelay", false);
-    int startupDelaySeconds = value == null ? 5 : Integer.parseInt(value);
+    int startupDelaySeconds = value == null ? 5 : (int) Double.parseDouble(value);
     // so that the ocsp service (tomcat) can start without blocking.
     Runnable runnable = this :: updateStore;
     ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);

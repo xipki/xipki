@@ -17,9 +17,7 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.annotation.JSONField;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import org.xipki.security.util.JSON;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.util.ConfPairs;
@@ -39,83 +37,64 @@ public class CaConfColumn {
   /**
    * Syntax version.
    */
-  @JSONField(ordinal = 1)
   private int version = 1;
 
   /**
    * number of octets of the serial number.
    */
-  @JSONField(ordinal = 3)
   private int snSize;
 
-  @JSONField(ordinal = 5)
   private List<String> cacertUris;
 
-  @JSONField(ordinal = 7)
   private List<String> ocspUris;
 
-  @JSONField(ordinal = 9)
   private List<String> crlUris;
 
-  @JSONField(ordinal = 11)
   private List<String> deltaCrlUris;
 
   /**
    * Not nullable. Maximal validity of the generated certificates.
    */
-  @JSONField(ordinal = 13)
   private String maxValidity;
 
-  @JSONField(ordinal = 15)
   private Map<String,String> crlControl;
 
   /**
    * Certificate Transparency Log Control.
    */
-  @JSONField(ordinal = 25)
   private Map<String,String> ctlogControl;
 
-  @JSONField(ordinal = 27)
   private Map<String,String> revokeSuspendedControl;
 
-  @JSONField(ordinal = 29)
   private List<String> keypairGenNames;
 
   /**
    * Whether to save the certificate, default is true.
    */
-  @JSONField(ordinal = 33)
   private boolean saveCert;
 
   /**
    * Whether the generated keypair should be saved, default is false.
    */
-  @JSONField(ordinal = 35)
   private boolean saveKeypair;
 
-  @JSONField(ordinal = 39)
   private String validityMode;
 
-  @JSONField(ordinal = 41)
   private int permission;
 
-  @JSONField(ordinal = 43)
   private int numCrls = 30;
 
-  @JSONField(ordinal = 45)
   private int expirationPeriod = 365;
 
   /**
    * How long in days should certificates be kept after the expiration.
    * Negative value for kept-for-ever.
    */
-  @JSONField(ordinal = 47)
   private int keepExpiredCertDays = -1;
 
   /**
    * Extra control.
    */
-  @JSONField(ordinal = 99)
   private Map<String, String> extraControl;
 
   public int getVersion() {
@@ -294,8 +273,7 @@ public class CaConfColumn {
   }
 
   public String encode() {
-    return JSON.toJSONString(this, SerializerFeature.MapSortField,
-            SerializerFeature.QuoteFieldNames, SerializerFeature.IgnoreNonFieldGetter);
+    return JSON.toPrettyJson(this);
   }
 
   public CaUris caUris() {

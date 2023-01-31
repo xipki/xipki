@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.security.EdECConstants;
 import org.xipki.util.ValidatableConf;
@@ -42,16 +41,12 @@ public class KeypairGenerationType extends ValidatableConf {
 
   public static final String PARAM_qlength = "qlength";
 
-  @JSONField(ordinal = 1)
   private boolean inheritCA;
 
-  @JSONField(ordinal = 2)
   private boolean forbidden;
 
-  @JSONField(ordinal = 3)
   private DescribableOid algorithm;
 
-  @JSONField(ordinal = 4)
   private KeyType keyType;
 
   /**
@@ -81,7 +76,6 @@ public class KeypairGenerationType extends ValidatableConf {
    *   </li>
    * </ul>
    */
-  @JSONField(ordinal = 5)
   private Map<String, String> parameters;
 
   public boolean isInheritCA() {

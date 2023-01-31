@@ -168,7 +168,7 @@ public class SubjectChecker {
     StringBuilder failureMsg = new StringBuilder();
 
     // check the encoding
-    StringType stringType = (rdnControl != null) ? null : rdnControl.getStringType();
+    StringType stringType = (rdnControl == null) ? null : rdnControl.getStringType();
 
     for (int i = 0; i < rdns.length; i++) {
       RDN rdn = rdns[i];
@@ -455,7 +455,8 @@ public class SubjectChecker {
       return sb.toString();
     } else {
       if (!matchStringType(atvValue, stringType)) {
-        failureMsg.append(name).append(" is not of type ").append(stringType.name()).append("; ");
+        failureMsg.append(name).append(" is not of type ").append(
+            (stringType == null ? null : stringType.name())).append("; ");
         return null;
       }
 

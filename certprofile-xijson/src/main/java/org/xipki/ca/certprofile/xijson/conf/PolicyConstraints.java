@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.bouncycastle.asn1.*;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.util.ValidatableConf;
@@ -33,10 +32,8 @@ import java.math.BigInteger;
 
 public class PolicyConstraints extends ValidatableConf {
 
-  @JSONField(ordinal = 1)
   private Integer requireExplicitPolicy;
 
-  @JSONField(ordinal = 2)
   private Integer inhibitPolicyMapping;
 
   public Integer getRequireExplicitPolicy() {

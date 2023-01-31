@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
@@ -31,7 +30,6 @@ import org.xipki.util.exception.InvalidConfException;
 
 public abstract class Describable extends ValidatableConf {
 
-  @JSONField(ordinal = 2)
   private String description;
 
   public String getDescription() {
@@ -44,7 +42,6 @@ public abstract class Describable extends ValidatableConf {
 
   public static class DescribableOid extends Describable {
 
-    @JSONField(ordinal = 1)
     private String oid;
 
     public String getOid() {
@@ -73,7 +70,6 @@ public abstract class Describable extends ValidatableConf {
 
   public static class DescribableInt extends Describable {
 
-    @JSONField(ordinal = 1)
     private int value;
 
     /**
@@ -95,7 +91,6 @@ public abstract class Describable extends ValidatableConf {
 
   public static class DescribableBinary extends Describable {
 
-    @JSONField(ordinal = 1)
     private byte[] value;
 
     public byte[] getValue() {

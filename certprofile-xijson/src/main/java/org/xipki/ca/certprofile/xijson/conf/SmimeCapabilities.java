@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableBinary;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.util.ValidatableConf;
@@ -37,10 +36,8 @@ public class SmimeCapabilities extends ValidatableConf {
 
   public static class SmimeCapability extends ValidatableConf {
 
-    @JSONField(ordinal = 1)
     private DescribableOid capabilityId;
 
-    @JSONField(ordinal = 2)
     private SmimeCapabilityParameter parameter;
 
     public DescribableOid getCapabilityId() {
@@ -69,10 +66,8 @@ public class SmimeCapabilities extends ValidatableConf {
 
   public static class SmimeCapabilityParameter extends ValidatableConf {
 
-    @JSONField(ordinal = 1)
     private BigInteger integer;
 
-    @JSONField(ordinal = 2)
     private DescribableBinary binary;
 
     public BigInteger getInteger() {

@@ -573,7 +573,7 @@ public class CaConfType {
 
     private List<String> crlUris;
 
-    private List<String> deltacrlUris;
+    private List<String> deltaCrlUris;
 
     private List<String> ocspUris;
 
@@ -599,15 +599,15 @@ public class CaConfType {
       this.crlUris = crlUris;
     }
 
-    public List<String> getDeltacrlUris() {
-      if (deltacrlUris == null) {
-        deltacrlUris = new LinkedList<>();
+    public List<String> getDeltaCrlUris() {
+      if (deltaCrlUris == null) {
+        deltaCrlUris = new LinkedList<>();
       }
-      return deltacrlUris;
+      return deltaCrlUris;
     }
 
-    public void setDeltacrlUris(List<String> deltacrlUris) {
-      this.deltacrlUris = deltacrlUris;
+    public void setDeltaCrlUris(List<String> deltaCrlUris) {
+      this.deltaCrlUris = deltaCrlUris;
     }
 
     public List<String> getOcspUris() {

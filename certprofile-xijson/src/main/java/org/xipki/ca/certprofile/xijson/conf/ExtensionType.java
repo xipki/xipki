@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.util.TripleState;
@@ -33,117 +32,84 @@ import org.xipki.util.exception.InvalidConfException;
 
 public class ExtensionType extends ValidatableConf {
 
-  @JSONField(ordinal = 1)
   private DescribableOid type;
 
   /**
    * Critical will be considered if both values (true and false) are allowed,
    * otherwise it will be ignored.
    */
-  @JSONField(ordinal = 2)
   private Boolean critical;
 
-  @JSONField(ordinal = 3)
   private Boolean required;
 
-  @JSONField(ordinal = 4)
   @Deprecated
   private Boolean permittedInRequest;
 
-  @JSONField(ordinal = 4)
   private TripleState inRequest;
 
-  @JSONField(ordinal = 5)
   private AdditionalInformation additionalInformation;
 
-  @JSONField(ordinal = 5)
   private AdmissionSyntax admissionSyntax;
 
-  @JSONField(ordinal = 5)
   private AuthorityInfoAccess authorityInfoAccess;
 
-  @JSONField(ordinal = 5)
   private AuthorityKeyIdentifier authorityKeyIdentifier;
 
-  @JSONField(ordinal = 5)
   private SubjectKeyIdentifierControl subjectKeyIdentifier;
 
-  @JSONField(ordinal = 5)
   private BasicConstraints basicConstraints;
 
-  @JSONField(ordinal = 5)
   private BiometricInfo biometricInfo;
 
-  @JSONField(ordinal = 5)
   private CertificatePolicies certificatePolicies;
 
-  @JSONField(ordinal = 5)
   private CrlDistributionPoints crlDistributionPoints;
 
   /**
    * For constant encoded Extension.
    */
-  @JSONField(ordinal = 5)
   private ConstantExtnValue constant;
 
-  @JSONField(ordinal = 5)
   private ExtendedKeyUsage extendedKeyUsage;
 
-  @JSONField(ordinal = 5)
   private CrlDistributionPoints freshestCrl;
 
-  @JSONField(ordinal = 5)
   private InhibitAnyPolicy inhibitAnyPolicy;
 
-  @JSONField(ordinal = 5)
   private KeyUsage keyUsage;
 
   /**
    * Only for CA, at least one of permittedSubtrees and excludedSubtrees must be present.
    */
-  @JSONField(ordinal = 5)
   private NameConstraints nameConstraints;
 
   /**
    * Only for CA.
    */
-  @JSONField(ordinal = 5)
   private PolicyMappings policyMappings;
 
-  @JSONField(ordinal = 5)
   private PrivateKeyUsagePeriod privateKeyUsagePeriod;
 
-  @JSONField(ordinal = 5)
   private PolicyConstraints policyConstraints;
 
-  @JSONField(ordinal = 5)
   private QcStatements qcStatements;
 
-  @JSONField(ordinal = 5)
   private Restriction restriction;
 
-  @JSONField(ordinal = 5)
   private SmimeCapabilities smimeCapabilities;
 
-  @JSONField(ordinal = 5)
   private GeneralNameType subjectAltName;
 
-  @JSONField(ordinal = 5)
   private SubjectDirectoryAttributs subjectDirectoryAttributs;
 
-  @JSONField(ordinal = 5)
   private SubjectInfoAccess subjectInfoAccess;
 
-  @JSONField(ordinal = 5)
   private TlsFeature tlsFeature;
 
-  @JSONField(ordinal = 5)
   private ValidityModel validityModel;
 
-  @JSONField(ordinal = 5)
   private CCCSimpleExtensionSchema cccExtensionSchema;
 
-  @JSONField(ordinal = 5)
   private Object custom;
 
   public DescribableOid getType() {

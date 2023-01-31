@@ -17,7 +17,7 @@
 
 package org.xipki.qa.ca;
 
-import com.alibaba.fastjson.JSON;
+import org.xipki.security.util.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.profile.CertprofileException;

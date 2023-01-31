@@ -17,7 +17,7 @@
 
 package org.xipki.ocsp.mgmt.client;
 
-import com.alibaba.fastjson.JSON;
+import org.xipki.security.util.JSON;
 import org.xipki.ocsp.api.mgmt.MgmtMessage.MgmtAction;
 import org.xipki.ocsp.api.mgmt.MgmtRequest;
 import org.xipki.ocsp.api.mgmt.MgmtResponse;
@@ -188,15 +188,5 @@ public class OcspMgmtClient implements OcspManager {
       throw new OcspMgmtException("IOException while sending message to the server: " + ex.getMessage(), ex);
     }
   } // method transmit
-
-  @SuppressWarnings("unused")
-  private static <T extends MgmtResponse> T parse(byte[] bytes, Class<?> clazz)
-      throws OcspMgmtException {
-    try {
-      return JSON.parseObject(bytes, clazz);
-    } catch (RuntimeException ex) {
-      throw new OcspMgmtException("cannot parse response " + clazz + " from byte[]", ex);
-    }
-  }
 
 }

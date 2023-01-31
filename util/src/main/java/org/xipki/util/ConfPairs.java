@@ -121,7 +121,26 @@ public class ConfPairs {
 
     for (Entry<String, ?> entry : pairs.entrySet()) {
       Object value = entry.getValue();
-      putPair(entry.getKey(), value == null ? null : value.toString());
+      String str = null;
+      if (value instanceof String) {
+        str = (String) value;
+      } else if (value instanceof Double) {
+        double d = (double) value;
+        if (d == (long) d) {
+          str = Long.toString((long) d);
+        }
+      } else if (value instanceof Float) {
+        float d = (float) value;
+        if (d == (int) d) {
+          str = Integer.toString((int) d);
+        }
+      }
+
+      if (str == null && value != null) {
+        str = value.toString();
+      }
+
+      putPair(entry.getKey(), str);
     }
   }
 

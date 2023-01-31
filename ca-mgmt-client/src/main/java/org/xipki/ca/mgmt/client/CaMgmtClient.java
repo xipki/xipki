@@ -17,7 +17,7 @@
 
 package org.xipki.ca.mgmt.client;
 
-import com.alibaba.fastjson.JSON;
+import org.xipki.security.util.JSON;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.mgmt.*;
@@ -855,7 +855,7 @@ public class CaMgmtClient implements CaManager {
     }
   } // method transmit
 
-  private static <T extends MgmtResponse> T parse(byte[] bytes, Class<?> clazz)
+  private static <T extends MgmtResponse> T parse(byte[] bytes, Class<T> clazz)
       throws CaMgmtException {
     try {
       return JSON.parseObject(bytes, clazz);

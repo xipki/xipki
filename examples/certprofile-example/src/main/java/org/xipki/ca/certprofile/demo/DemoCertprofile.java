@@ -17,8 +17,8 @@
 
 package org.xipki.ca.certprofile.demo;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.google.gson.internal.LinkedTreeMap;
+import org.xipki.security.util.JSON;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
@@ -86,10 +86,6 @@ public class DemoCertprofile extends XijsonCertprofile {
       Object customObj = extn.getCustom();
       if (customObj == null) {
         throw new CertprofileException("ExtensionType.custom is not specified");
-      }
-
-      if (!(customObj instanceof JSONObject)) {
-        throw new CertprofileException("ExtensionType.custom is not configured correctly");
       }
 
       // we need to first serialize the configuration

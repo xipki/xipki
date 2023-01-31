@@ -17,8 +17,7 @@
 
 package org.xipki.ca.server.mgmt;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import org.xipki.security.util.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CaUris;
@@ -420,7 +419,7 @@ class ConfLoader {
             caUrisType.setCacertUris(caUris.getCacertUris());
             caUrisType.setOcspUris(caUris.getOcspUris());
             caUrisType.setCrlUris(caUris.getCrlUris());
-            caUrisType.setDeltacrlUris(caUris.getDeltaCrlUris());
+            caUrisType.setDeltaCrlUris(caUris.getDeltaCrlUris());
             caInfoType.setCaUris(caUrisType);
           }
 
@@ -601,7 +600,7 @@ class ConfLoader {
       ByteArrayOutputStream bout = new ByteArrayOutputStream();
       try {
         root.validate();
-        JSON.writeJSONString(bout, root, SerializerFeature.PrettyFormat);
+        JSON.writePrettyJSON(root, bout);
       } catch (InvalidConfException ex) {
         LogUtil.error(LOG, ex, "could not marshal CAConf");
         throw new CaMgmtException(concat("could not marshal CAConf: ", ex.getMessage()), ex);

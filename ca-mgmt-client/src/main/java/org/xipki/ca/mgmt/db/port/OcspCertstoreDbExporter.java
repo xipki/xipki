@@ -17,7 +17,7 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import com.alibaba.fastjson.JSON;
+import org.xipki.security.util.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
@@ -109,7 +109,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     Exception exception = exportCert(certstore, processLogFile);
 
     try (OutputStream os = Files.newOutputStream(Paths.get(baseDir, FILENAME_OCSP_CERTSTORE))) {
-      JSON.writeJSONString(os, certstore);
+      JSON.writeJSON(certstore, os);
     }
 
     if (exception == null) {
@@ -416,7 +416,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     ZipEntry certZipEntry = new ZipEntry("certs.json");
     zipOutStream.putNextEntry(certZipEntry);
     try {
-      JSON.writeJSONString(zipOutStream, StandardCharsets.UTF_8, certs);
+      JSON.writeJSON(certs, zipOutStream);
     } finally {
       zipOutStream.closeEntry();
     }

@@ -9,7 +9,7 @@
     <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.xipki/${pkcs11wrapper.artifactId}/${pkcs11wrapper.version}</bundle>
-    <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
+    <bundle>mvn:com.google.code.gson/gson/${gson.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
     <bundle>mvn:org.xipki.gateway/cmp-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
@@ -24,7 +24,7 @@
     <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.xipki/${pkcs11wrapper.artifactId}/${pkcs11wrapper.version}</bundle>
-    <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
+    <bundle>mvn:com.google.code.gson/gson/${gson.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
     <bundle>mvn:org.xipki.gateway/scep-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
@@ -38,7 +38,7 @@
     <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.xipki/${pkcs11wrapper.artifactId}/${pkcs11wrapper.version}</bundle>
-    <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
+    <bundle>mvn:com.google.code.gson/gson/${gson.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>

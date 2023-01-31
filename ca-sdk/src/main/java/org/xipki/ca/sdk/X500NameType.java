@@ -30,7 +30,7 @@ import java.io.IOException;
 
 public class X500NameType {
 
-  private X500Name name;
+  private transient X500Name name;
 
   private String text;
 

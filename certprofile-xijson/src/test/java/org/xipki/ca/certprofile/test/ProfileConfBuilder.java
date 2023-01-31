@@ -17,8 +17,7 @@
 
 package org.xipki.ca.certprofile.test;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import org.xipki.security.util.JSON;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -80,9 +79,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
       Path path = Paths.get("tmp", filename);
       IoUtil.mkdirsParent(path);
       try (OutputStream out = Files.newOutputStream(path)) {
-        JSON.writeJSONString(out, profile,
-            SerializerFeature.PrettyFormat, SerializerFeature.SortField,
-            SerializerFeature.DisableCircularReferenceDetect);
+        JSON.writeJSON(profile, out);
       }
 
       if (validate) {

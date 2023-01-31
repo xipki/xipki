@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralSubtree;
@@ -39,10 +38,8 @@ import java.util.List;
  */
 public class NameConstraints extends ValidatableConf {
 
-  @JSONField(ordinal = 1)
   private List<GeneralSubtreeType> permittedSubtrees;
 
-  @JSONField(ordinal = 2)
   private List<GeneralSubtreeType> excludedSubtrees;
 
   public List<GeneralSubtreeType> getPermittedSubtrees() {

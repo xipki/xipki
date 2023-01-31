@@ -17,7 +17,7 @@
 
 package org.xipki.ocsp.servlet;
 
-import com.alibaba.fastjson.JSON;
+import org.xipki.security.util.JSON;
 import org.xipki.security.Securities.SecurityConf;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.IoUtil;

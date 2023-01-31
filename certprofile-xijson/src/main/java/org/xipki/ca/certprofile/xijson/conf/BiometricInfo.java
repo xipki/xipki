@@ -17,7 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.util.TripleState;
@@ -37,10 +36,8 @@ public class BiometricInfo extends ValidatableConf {
 
   public static class BiometricTypeType extends ValidatableConf {
 
-    @JSONField(ordinal = 1)
     private DescribableInt predefined;
 
-    @JSONField(ordinal = 2)
     private DescribableOid oid;
 
     public DescribableInt getPredefined() {
@@ -67,13 +64,10 @@ public class BiometricInfo extends ValidatableConf {
 
   } // class BiometricTypeType
 
-  @JSONField(ordinal = 1)
   private List<BiometricTypeType> types;
 
-  @JSONField(ordinal = 2)
   private List<DescribableOid> hashAlgorithms;
 
-  @JSONField(ordinal = 3)
   private TripleState includeSourceDataUri;
 
   public List<BiometricTypeType> getTypes() {
