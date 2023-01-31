@@ -304,7 +304,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     this.subjectControl = new SubjectControl(subjectDnControls, subject.keepRdnOrder());
 
     // Extensions
-    this.extensions = new XijsonExtensions(conf, subjectControl);
+    this.extensions = new XijsonExtensions(this, conf, subjectControl);
   } // method initialize0
 
   /**

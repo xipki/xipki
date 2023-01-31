@@ -124,7 +124,8 @@ public class XijsonExtensions {
 
   private ExtensionValue cccExtensionSchemaValue;
 
-  XijsonExtensions(X509ProfileType conf, SubjectControl subjectControl) throws CertprofileException {
+  XijsonExtensions(XijsonCertprofile certProfile, X509ProfileType conf, SubjectControl subjectControl)
+      throws CertprofileException {
     notNull(subjectControl, "subjectControl");
 
     // Extensions
@@ -289,7 +290,7 @@ public class XijsonExtensions {
     Set<ASN1ObjectIdentifier> copyOfExtnIds = new HashSet<>(extnIds);
     for (ASN1ObjectIdentifier extnId : copyOfExtnIds) {
       ExtensionType extn = getExtension(extnId, extensions);
-      boolean processed = initExtraExtension(extn);
+      boolean processed = certProfile.initExtraExtension(extn);
       if (processed) {
         extnIds.remove(extnId);
       }
@@ -299,17 +300,6 @@ public class XijsonExtensions {
       throw new CertprofileException("Cannot process the extensions: " + extnIds);
     }
   } // method initialize0
-
-  /**
-   * Process the extension.
-   *
-   * @param extn
-   *          Configuration of the extension
-   * @return whether the extension is processed
-   */
-  protected boolean initExtraExtension(ExtensionType extn) {
-    return false;
-  }
 
   private void initSubjectToSubjectAltNames(List<SubjectToSubjectAltNameType> list) throws CertprofileException {
     if (CollectionUtil.isEmpty(list)) {
