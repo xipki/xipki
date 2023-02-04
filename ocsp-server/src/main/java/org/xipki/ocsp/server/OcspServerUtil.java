@@ -17,7 +17,6 @@
 
 package org.xipki.ocsp.server;
 
-import org.xipki.security.util.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataSourceWrapper;
@@ -31,6 +30,7 @@ import org.xipki.ocsp.server.store.ejbca.EjbcaCertStatusStore;
 import org.xipki.ocsp.server.type.ExtendedExtension;
 import org.xipki.ocsp.server.type.OID;
 import org.xipki.security.*;
+import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
@@ -87,7 +87,7 @@ public class OcspServerUtil {
       try {
         explicitCertificateChain = X509Util.buildCertPath(explicitResponderCert, caCerts);
       } catch (CertPathBuilderException ex) {
-        throw new InvalidConfException(ex);
+        throw new InvalidConfException(ex.getMessage(), ex);
       }
     }
 

@@ -182,11 +182,7 @@ public interface ClockSource {
   class Factory {
     private static ClockSource create() {
       String os = System.getProperty("os.name");
-      if ("Mac OS X".equals(os)) {
-        return new MillisecondClockSource();
-      }
-
-      return new NanosecondClockSource();
+      return "Mac OS X".equalsIgnoreCase(os) ? new MillisecondClockSource() : new NanosecondClockSource();
     }
   }
 

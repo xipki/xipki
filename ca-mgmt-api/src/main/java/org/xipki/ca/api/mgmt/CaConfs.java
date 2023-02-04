@@ -17,14 +17,13 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.xipki.security.util.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.util.JSON;
 import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;

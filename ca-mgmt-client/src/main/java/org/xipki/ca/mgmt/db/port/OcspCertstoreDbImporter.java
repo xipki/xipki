@@ -17,19 +17,18 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import org.xipki.security.util.JSON;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.cert.CertificateException;

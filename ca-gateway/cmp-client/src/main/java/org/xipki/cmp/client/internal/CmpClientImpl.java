@@ -17,7 +17,6 @@
 
 package org.xipki.cmp.client.internal;
 
-import org.xipki.security.util.JSON;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.PKIFailureInfo;
 import org.bouncycastle.asn1.cmp.PKIStatus;
@@ -32,6 +31,7 @@ import org.xipki.security.CollectionAlgorithmValidator;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
+import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.IoUtil;

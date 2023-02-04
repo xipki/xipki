@@ -26,7 +26,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkcs11.TokenException;
+import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.*;
 import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
@@ -49,7 +49,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 
-import static org.xipki.pkcs11.PKCS11Constants.*;
+import static org.xipki.pkcs11.wrapper.PKCS11Constants.*;
 
 /**
  * Actions for PKCS#11 security.

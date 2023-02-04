@@ -17,11 +17,11 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import org.xipki.security.util.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.security.util.JSON;
 import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ProcessLog;
@@ -31,7 +31,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;

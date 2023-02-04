@@ -23,9 +23,12 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.SignerEntryWrapper;
-import org.xipki.pkcs11.TokenException;
+import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.pkcs11.*;
+import org.xipki.security.pkcs11.P11CryptService;
+import org.xipki.security.pkcs11.P11Module;
+import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.security.pkcs11.P11SlotId;
 import org.xipki.util.StringUtil;
 import org.xipki.util.exception.ObjectCreationException;
 

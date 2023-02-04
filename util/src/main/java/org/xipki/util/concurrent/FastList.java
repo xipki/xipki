@@ -299,4 +299,5 @@ public final class FastList<T> implements List<T>, RandomAccess, Serializable {
   public void sort(Comparator<? super T> co) {
     throw new UnsupportedOperationException();
   }
+
 }

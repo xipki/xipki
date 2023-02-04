@@ -17,7 +17,6 @@
 
 package org.xipki.ca.mgmt.client;
 
-import org.xipki.security.util.JSON;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.mgmt.*;
@@ -29,6 +28,7 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.KeyCertBytesPair;
 import org.xipki.security.X509Cert;
+import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;

@@ -26,15 +26,8 @@ package org.xipki.util.exception;
 
 public class BadCertTemplateException extends Exception {
 
-  public BadCertTemplateException() {
-  }
-
   public BadCertTemplateException(String message) {
     super(message);
-  }
-
-  public BadCertTemplateException(Throwable cause) {
-    super(cause);
   }
 
   public BadCertTemplateException(String message, Throwable cause) {

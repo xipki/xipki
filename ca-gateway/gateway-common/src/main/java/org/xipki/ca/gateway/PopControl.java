@@ -97,7 +97,7 @@ public class PopControl {
       try {
         is = new FileInputStream(keystoreStr);
       } catch (FileNotFoundException e) {
-        throw new InvalidConfException(e);
+        throw new InvalidConfException(e.getMessage(), e);
       }
     }
 

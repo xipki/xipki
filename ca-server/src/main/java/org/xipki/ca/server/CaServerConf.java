@@ -17,11 +17,11 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.security.util.JSON;
 import org.xipki.audit.Audits.AuditConf;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.security.Securities.SecurityConf;
+import org.xipki.security.util.JSON;
 import org.xipki.util.Args;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.ValidatableConf;

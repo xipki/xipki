@@ -17,7 +17,6 @@
 
 package org.xipki.ca.servlet;
 
-import org.xipki.security.util.JSON;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
@@ -29,6 +28,7 @@ import org.xipki.ca.api.mgmt.MgmtMessage.SignerEntryWrapper;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.security.KeyCertBytesPair;
 import org.xipki.security.X509Cert;
+import org.xipki.security.util.JSON;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.exception.InvalidConfException;

@@ -20,7 +20,6 @@ package org.xipki.util.concurrent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.concurrent.ConcurrentBag.IConcurrentBagEntry;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -35,7 +34,6 @@ import java.util.stream.Collectors;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.locks.LockSupport.parkNanos;
-import static org.xipki.util.concurrent.ConcurrentBag.IConcurrentBagEntry.*;
 
 /**
  * This is a specialized concurrent bag that achieves superior performance
@@ -57,57 +55,28 @@ import static org.xipki.util.concurrent.ConcurrentBag.IConcurrentBagEntry.*;
  *
  * @param <T> the templated type to store in the bag
  */
-public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseable {
+public class ConcurrentBag<T extends ConcurrentBagEntry> implements AutoCloseable {
   private static final Logger LOG = LoggerFactory.getLogger(ConcurrentBag.class);
 
   private final CopyOnWriteArrayList<T> sharedList;
   private final boolean weakThreadLocals;
 
   private final ThreadLocal<List<Object>> threadList;
-  private final IBagStateListener listener;
   private final AtomicInteger waiters;
   private volatile boolean closed;
 
   private final SynchronousQueue<T> handoffQueue;
 
-  public interface IConcurrentBagEntry {
-    int STATE_NOT_IN_USE = 0;
-    int STATE_IN_USE = 1;
-    int STATE_REMOVED = -1;
-    int STATE_RESERVED = -2;
-
-    boolean compareAndSet(int expectState, int newState);
-
-    void setState(int newState);
-
-    int getState();
-  }
-
-  public interface IBagStateListener {
-    void addBagItem(int waiting);
-  }
-
-  public static class NopBagStateListener implements IBagStateListener {
-    @Override
-    public void addBagItem(int waiting) {
-    }
-  }
+  private static int STATE_NOT_IN_USE = 0;
+  private static int STATE_IN_USE = 1;
+  private static int STATE_REMOVED = -1;
+  private static int STATE_RESERVED = -2;
 
   /**
    * Construct a ConcurrentBag with the NOP listener.
    *
    */
   public ConcurrentBag() {
-    this(new NopBagStateListener());
-  }
-
-  /**
-   * Construct a ConcurrentBag with the specified listener.
-   *
-   * @param listener the IBagStateListener to attach to this bag
-   */
-  public ConcurrentBag(IBagStateListener listener) {
-    this.listener = listener;
     this.weakThreadLocals = useWeakThreadLocals();
 
     this.handoffQueue = new SynchronousQueue<>(true);
@@ -116,7 +85,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
     if (weakThreadLocals) {
       this.threadList = ThreadLocal.withInitial(() -> new ArrayList<>(16));
     } else {
-      this.threadList = ThreadLocal.withInitial(() -> new FastList<>(IConcurrentBagEntry.class, 16));
+      this.threadList = ThreadLocal.withInitial(() -> new FastList<>(ConcurrentBagEntry.class, 16));
     }
   }
 
@@ -147,15 +116,9 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
     try {
       for (T bagEntry : sharedList) {
         if (bagEntry.compareAndSet(STATE_NOT_IN_USE, STATE_IN_USE)) {
-          // If we may have stolen another waiter's connection, request another bag add.
-          if (waiting > 1) {
-            listener.addBagItem(waiting - 1);
-          }
           return bagEntry;
         }
       }
-
-      listener.addBagItem(waiting);
 
       timeout = timeUnit.toNanos(timeout);
       do {
@@ -331,7 +294,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
    */
   public int getCount(int state) {
     int count = 0;
-    for (IConcurrentBagEntry e : sharedList) {
+    for (ConcurrentBagEntry e : sharedList) {
       if (e.getState() == state) {
         count++;
       }
@@ -341,7 +304,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
 
   public int[] getStateCounts() {
     final int[] states = new int[6];
-    for (IConcurrentBagEntry e : sharedList) {
+    for (ConcurrentBagEntry e : sharedList) {
       ++states[e.getState()];
     }
     states[4] = sharedList.size();

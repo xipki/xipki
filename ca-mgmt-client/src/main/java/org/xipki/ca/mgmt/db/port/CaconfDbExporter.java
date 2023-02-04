@@ -17,11 +17,11 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import org.xipki.security.util.JSON;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.mgmt.entry.CaConfColumn;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.security.util.JSON;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.StringUtil;
 import org.xipki.util.exception.InvalidConfException;

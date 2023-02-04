@@ -17,12 +17,11 @@
 
 package org.xipki.ocsp.mgmt.client;
 
-import org.xipki.security.util.JSON;
 import org.xipki.ocsp.api.mgmt.MgmtMessage.MgmtAction;
 import org.xipki.ocsp.api.mgmt.MgmtRequest;
-import org.xipki.ocsp.api.mgmt.MgmtResponse;
 import org.xipki.ocsp.api.mgmt.OcspManager;
 import org.xipki.ocsp.api.mgmt.OcspMgmtException;
+import org.xipki.security.util.JSON;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;

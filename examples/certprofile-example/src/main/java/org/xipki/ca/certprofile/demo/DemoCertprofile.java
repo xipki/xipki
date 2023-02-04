@@ -17,8 +17,6 @@
 
 package org.xipki.ca.certprofile.demo;
 
-import com.google.gson.internal.LinkedTreeMap;
-import org.xipki.security.util.JSON;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
@@ -31,6 +29,7 @@ import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
+import org.xipki.security.util.JSON;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.exception.BadCertTemplateException;
 

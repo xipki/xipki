@@ -17,7 +17,6 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import org.xipki.security.util.JSON;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x509.*;
@@ -28,6 +27,7 @@ import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.FpIdCalculator;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 

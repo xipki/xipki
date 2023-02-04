@@ -107,7 +107,7 @@ public class CmpControl {
         this.responsePbmOwf = HashAlgo.getInstance(conf.getResponsePbmOwf());
       }
     } catch (NoSuchAlgorithmException ex) {
-      throw new InvalidConfException(ex);
+      throw new InvalidConfException(ex.getMessage(), ex);
     }
 
     // PasswordBasedMac

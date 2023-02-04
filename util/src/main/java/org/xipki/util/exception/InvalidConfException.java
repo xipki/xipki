@@ -26,15 +26,8 @@ package org.xipki.util.exception;
 
 public class InvalidConfException extends Exception {
 
-  public InvalidConfException() {
-  }
-
   public InvalidConfException(String message) {
     super(message);
-  }
-
-  public InvalidConfException(Throwable cause) {
-    super(cause);
   }
 
   public InvalidConfException(String message, Throwable cause) {

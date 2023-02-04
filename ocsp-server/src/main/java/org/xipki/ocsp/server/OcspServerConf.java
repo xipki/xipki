@@ -17,11 +17,11 @@
 
 package org.xipki.ocsp.server;
 
-import org.xipki.security.util.JSON;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
 import org.xipki.security.CertpathValidationModel;
+import org.xipki.security.util.JSON;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.Validity;

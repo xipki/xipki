@@ -17,7 +17,6 @@
 
 package org.xipki.example.ctlog;
 
-import org.xipki.security.util.JSON;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -33,6 +32,7 @@ import org.xipki.security.ctlog.CtLog.SignatureAlgorithm;
 import org.xipki.security.ctlog.CtLog.SignatureAndHashAlgorithm;
 import org.xipki.security.ctlog.CtLogMessages.AddPreChainRequest;
 import org.xipki.security.ctlog.CtLogMessages.AddPreChainResponse;
+import org.xipki.security.util.JSON;
 import org.xipki.util.LogUtil;
 
 import javax.servlet.ServletException;

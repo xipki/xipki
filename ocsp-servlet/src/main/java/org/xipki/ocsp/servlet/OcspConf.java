@@ -17,8 +17,8 @@
 
 package org.xipki.ocsp.servlet;
 
-import org.xipki.security.util.JSON;
 import org.xipki.security.Securities.SecurityConf;
+import org.xipki.security.util.JSON;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ValidatableConf;

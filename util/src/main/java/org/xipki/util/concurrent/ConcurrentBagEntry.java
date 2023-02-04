@@ -17,8 +17,6 @@
 
 package org.xipki.util.concurrent;
 
-import org.xipki.util.concurrent.ConcurrentBag.IConcurrentBagEntry;
-
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 /**
@@ -28,12 +26,11 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
  * @since 2.2.0
  */
 
-public class ConcurrentBagEntry<T> implements IConcurrentBagEntry {
+public class ConcurrentBagEntry<T> {
 
   @SuppressWarnings({ "unused" })
   private volatile int state = 0; // Don't delete me, will be used by the stateUpdater
 
-  @SuppressWarnings("rawtypes")
   private static final AtomicIntegerFieldUpdater<ConcurrentBagEntry> stateUpdater;
 
   private final T value;
@@ -50,17 +47,14 @@ public class ConcurrentBagEntry<T> implements IConcurrentBagEntry {
     return value;
   }
 
-  @Override
   public int getState() {
     return stateUpdater.get(this);
   }
 
-  @Override
   public boolean compareAndSet(int expect, int update) {
     return stateUpdater.compareAndSet(this, expect, update);
   }
 
-  @Override
   public void setState(int update) {
     stateUpdater.set(this, update);
   }
