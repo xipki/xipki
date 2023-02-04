@@ -21,8 +21,8 @@ import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.RuntimeCryptoException;
-import org.xipki.pkcs11.PKCS11Constants;
-import org.xipki.pkcs11.TokenException;
+import org.xipki.pkcs11.wrapper.PKCS11Constants;
+import org.xipki.pkcs11.wrapper.TokenException;
 
 /**
  * Plain-RSA signer for PKCS#11 token.

@@ -20,7 +20,7 @@ package org.xipki.security.pkcs11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.pkcs11.*;
+import org.xipki.pkcs11.wrapper.*;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;

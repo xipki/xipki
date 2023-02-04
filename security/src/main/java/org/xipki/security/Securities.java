@@ -17,7 +17,6 @@
 
 package org.xipki.security;
 
-import org.xipki.security.util.JSON;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +26,7 @@ import org.xipki.password.Passwords.PasswordConf;
 import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory;
 import org.xipki.security.pkcs12.P12SignerFactory;
+import org.xipki.security.util.JSON;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.FileOrValue;
 import org.xipki.util.ValidatableConf;

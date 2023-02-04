@@ -19,7 +19,7 @@ package org.xipki.security.pkcs11;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
-import org.xipki.pkcs11.TokenException;
+import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 
@@ -30,7 +30,7 @@ import java.security.cert.CertPathBuilderException;
 import java.security.interfaces.ECPublicKey;
 import java.util.*;
 
-import static org.xipki.pkcs11.PKCS11Constants.*;
+import static org.xipki.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.Args.positive;
 

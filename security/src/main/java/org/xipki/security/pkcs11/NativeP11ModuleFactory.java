@@ -17,7 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
-import org.xipki.pkcs11.TokenException;
+import org.xipki.pkcs11.wrapper.TokenException;
 
 /**
  * {@link P11ModuleFactory} to create {@link P11Module} of type "native".

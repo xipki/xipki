@@ -28,7 +28,7 @@ import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.operator.OperatorCreationException;
-import org.xipki.pkcs11.PKCS11Constants;
+import org.xipki.pkcs11.wrapper.PKCS11Constants;
 import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.util.Args;

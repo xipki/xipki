@@ -19,10 +19,10 @@ package org.xipki.security.pkcs11;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkcs11.*;
-import org.xipki.pkcs11.params.ByteArrayParams;
-import org.xipki.pkcs11.params.CkParams;
-import org.xipki.pkcs11.params.RSA_PKCS_PSS_PARAMS;
+import org.xipki.pkcs11.wrapper.*;
+import org.xipki.pkcs11.wrapper.params.ByteArrayParams;
+import org.xipki.pkcs11.wrapper.params.CkParams;
+import org.xipki.pkcs11.wrapper.params.RSA_PKCS_PSS_PARAMS;
 import org.xipki.security.pkcs11.P11Slot.P11KeyUsage;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
 import org.xipki.security.util.KeyUtil;
@@ -36,7 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static org.xipki.pkcs11.PKCS11Constants.*;
+import static org.xipki.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**

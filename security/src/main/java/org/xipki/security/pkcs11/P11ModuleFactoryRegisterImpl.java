@@ -19,7 +19,7 @@ package org.xipki.security.pkcs11;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkcs11.TokenException;
+import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.util.LogUtil;
 
 import java.util.HashMap;

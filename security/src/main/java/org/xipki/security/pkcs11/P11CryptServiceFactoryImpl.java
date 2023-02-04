@@ -17,12 +17,12 @@
 
 package org.xipki.security.pkcs11;
 
-import org.xipki.security.util.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
-import org.xipki.pkcs11.TokenException;
+import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.XiSecurityException;
+import org.xipki.security.util.JSON;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.exception.InvalidConfException;

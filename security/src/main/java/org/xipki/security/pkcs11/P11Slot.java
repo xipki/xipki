@@ -21,7 +21,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkcs11.TokenException;
+import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
 import org.xipki.security.pkcs11.P11ModuleConf.P11NewObjectConf;
@@ -39,10 +39,9 @@ import java.security.spec.DSAParameterSpec;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.*;
 
-import static org.xipki.pkcs11.PKCS11Constants.*;
+import static org.xipki.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.util.Args.*;
 import static org.xipki.util.StringUtil.concat;
-import static org.xipki.util.StringUtil.toUtf8String;
 
 /**
  * PKCS#11 slot.

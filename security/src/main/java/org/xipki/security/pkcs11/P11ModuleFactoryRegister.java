@@ -17,7 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
-import org.xipki.pkcs11.TokenException;
+import org.xipki.pkcs11.wrapper.TokenException;
 
 import java.io.Closeable;
 

@@ -31,11 +31,14 @@ import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkcs11.TokenException;
+import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.pkcs11.*;
+import org.xipki.security.pkcs11.P11Identity;
+import org.xipki.security.pkcs11.P11IdentityId;
+import org.xipki.security.pkcs11.P11Params;
+import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.util.PKCS1Util;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.util.concurrent.ConcurrentBag;
@@ -48,7 +51,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static org.xipki.pkcs11.PKCS11Constants.*;
+import static org.xipki.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.security.HashAlgo.*;
 import static org.xipki.util.Args.notNull;
 

@@ -23,7 +23,7 @@ import org.bouncycastle.crypto.*;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkcs11.TokenException;
+import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.XiContentSigner;
@@ -42,7 +42,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.xipki.pkcs11.PKCS11Constants.*;
+import static org.xipki.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.security.HashAlgo.*;
 import static org.xipki.util.Args.notNull;
 

@@ -36,7 +36,7 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkcs11.TokenException;
+import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.pkcs11.*;
@@ -64,7 +64,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-import static org.xipki.pkcs11.PKCS11Constants.*;
+import static org.xipki.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.util.Args.*;
 import static org.xipki.util.IoUtil.read;
 import static org.xipki.util.IoUtil.save;

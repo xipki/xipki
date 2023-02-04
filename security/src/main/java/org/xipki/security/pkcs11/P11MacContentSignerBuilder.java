@@ -19,8 +19,8 @@ package org.xipki.security.pkcs11;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkcs11.PKCS11Constants;
-import org.xipki.pkcs11.TokenException;
+import org.xipki.pkcs11.wrapper.PKCS11Constants;
+import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.*;
 import org.xipki.util.LogUtil;
 

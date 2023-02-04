@@ -20,8 +20,11 @@ package org.xipki.security.pkcs11.emulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.pkcs11.TokenException;
-import org.xipki.security.pkcs11.*;
+import org.xipki.pkcs11.wrapper.TokenException;
+import org.xipki.security.pkcs11.P11Module;
+import org.xipki.security.pkcs11.P11ModuleConf;
+import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.security.pkcs11.P11SlotId;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 

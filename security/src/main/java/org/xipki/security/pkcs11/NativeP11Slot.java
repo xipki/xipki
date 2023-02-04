@@ -28,7 +28,7 @@ import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkcs11.*;
+import org.xipki.pkcs11.wrapper.*;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
 import org.xipki.security.pkcs11.P11ModuleConf.P11NewObjectConf;
@@ -50,17 +50,15 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.xipki.pkcs11.AttributeVector.*;
-import static org.xipki.pkcs11.PKCS11Constants.*;
+import static org.xipki.pkcs11.wrapper.AttributeVector.newSecretKey;
+import static org.xipki.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.security.pkcs11.NativeP11SlotUtil.*;
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.Args.positive;
 import static org.xipki.util.CollectionUtil.isEmpty;
-import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**
  * {@link P11Slot} based on the ipkcs11wrapper or jpkcs11wrapper.

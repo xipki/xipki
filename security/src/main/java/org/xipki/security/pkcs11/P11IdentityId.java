@@ -17,8 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
-import org.xipki.pkcs11.PKCS11Constants;
-import org.xipki.util.CompareUtil;
+import org.xipki.pkcs11.wrapper.PKCS11Constants;
 
 import static org.xipki.util.Args.notNull;
 

@@ -17,7 +17,7 @@
 
 package org.xipki.security.pkcs11.emulator;
 
-import org.xipki.pkcs11.TokenException;
+import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11ModuleConf;
 import org.xipki.security.pkcs11.P11ModuleFactory;

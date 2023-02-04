@@ -27,7 +27,7 @@ import org.xipki.util.exception.InvalidConfException;
 
 import java.util.*;
 
-import static org.xipki.pkcs11.PKCS11Constants.*;
+import static org.xipki.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.util.Args.notEmpty;
 import static org.xipki.util.Args.notNull;
 

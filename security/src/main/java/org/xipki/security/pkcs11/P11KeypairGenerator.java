@@ -21,7 +21,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.xipki.password.PasswordResolver;
-import org.xipki.pkcs11.TokenException;
+import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.KeypairGenerator;
 import org.xipki.security.XiSecurityException;
@@ -34,7 +34,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import static org.xipki.pkcs11.PKCS11Constants.*;
+import static org.xipki.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.util.Args.notNull;
 
 /**

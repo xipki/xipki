@@ -23,8 +23,6 @@ import org.xipki.util.Hex;
 
 import java.util.Arrays;
 
-import static org.xipki.util.Args.notNull;
-
 /**
  * Identifier of a PKCS#11 Object.
  *
