@@ -2,20 +2,43 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 6.0.1
-- Release date: -
+## 6.1.1
+- Release date: xxx
 - CA
-    - Use SQL scripts instead the Liquibase XML file to initialize the database
+    - N/A
 - OCSP
-    - Use SQL scripts instead the Liquibase XML file to initialize the database
+    - N/A
 - CLI
     - N/A
+- MGMT-CLI (Management Client)
+    - N/A
+- DB Tool
+    - N/A
+- Dependencies
+    - N/A
+
+## 6.1.0
+- Release date: February 5, 2023
+- CA
+    - Use SQL scripts instead the Liquibase XML file to initialize the database
+    - Rewritten the PKCS#11 code
+- OCSP
+    - Use SQL scripts instead the Liquibase XML file to initialize the database
+    - Rewritten the PKCS#11 code
+- CLI
+    - Rewritten the PKCS#11 code
 - MGMT-CLI (Management Client)
     - Add command ca:sql to execute SQL scripts.
 - DB Tool
     - Removed. Merged to MGMT-CLI.
 - Dependencies
     - Removed dependency liquibase.
+    - Replace fastjson by gson
+    - Replace sunpkcs11-wrapper by jpkcs11wrapper
+    - apache-karaf: 4.3.7 --> 4.4.3
+    - tinylog: 2.5.0 --> 2.6.0
+    - JDBC driver mariadb-java-client:  2.7.6 --> 3.1.2
+    - JDBC driver postgresql: 42.4.2 --> 42.5.3
 
 ## 6.0.0
 - Release date: October 15, 2022
