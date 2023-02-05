@@ -28,8 +28,9 @@ import org.xipki.ca.mgmt.db.DbWorker;
 import org.xipki.ca.mgmt.db.diffdb.DigestDiffWorker;
 import org.xipki.ca.mgmt.db.port.DbPortWorker;
 import org.xipki.datasource.DataSourceFactory;
-import org.xipki.datasource.tool.DatabaseConf;
-import org.xipki.datasource.tool.ScriptRunner;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.datasource.DatabaseType;
+import org.xipki.datasource.ScriptRunner;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.Completers;
@@ -46,10 +47,7 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -223,38 +221,68 @@ public class DbActions {
         props.load(is);
       }
 
-      DatabaseConf dbConf = DatabaseConf.getInstance(props, passwordResolver);
-      scriptFile = expandFilepath(scriptFile);
-      Path p = Paths.get(scriptFile);
-      String derivedScriptFile = null;
-      if (!Files.exists(p,  new LinkOption[0])) {
-        if (!scriptFile.contains("." + dbConf.getType() + ".")) {
-          // script file does not exist, try script file with database type identifier
-          String fn = p.getFileName().toString();
-          int idx = fn.lastIndexOf('.');
-          fn = fn.substring(0, idx) + "." + dbConf.getType() + fn.substring(idx);
-          p = Paths.get(p.getParent().toString(), fn);
-          derivedScriptFile = p.toString();
-        }
-      }
+      // only one connection is needed.
+      props.setProperty("minimumIdle", "1");
+      try (DataSourceWrapper dataSource =
+               new DataSourceFactory().createDataSource("default", props, passwordResolver)) {
 
-      if (!Files.exists(p, new LinkOption[0])) {
-        if (derivedScriptFile != null) {
-          throw new IllegalCmdParamException("Could not find script files " + scriptFile
-              + " and " + derivedScriptFile);
-        } else {
-          throw new IllegalCmdParamException("Could not find script file " + scriptFile);
+        DatabaseType dbType = dataSource.getDatabaseType();
+        String type;
+        switch (dbType) {
+          case H2:
+            type = "h2";
+            break;
+          case POSTGRES:
+            type = "postgresql";
+            break;
+          case DB2:
+            type = "db2";
+            break;
+          case ORACLE:
+            type = "oracle";
+            break;
+          case MYSQL:
+          case MARIADB:
+            type = "mysql";
+            break;
+          case HSQL:
+            type = "hsqldb";
+            break;
+          default:
+            throw new IllegalArgumentException("unknown database type " + dbType);
         }
-      }
 
-      if (force || confirm("Do you want to execute the SQL script?", 3)) {
-        System.out.println("Start executing script " + p.toString()) ;
-        ScriptRunner.runScript(dbConf, p.toString());
-        System.out.println("  End executing script " + p.toString()) ;
+        scriptFile = expandFilepath(scriptFile);
+        Path p = Paths.get(scriptFile);
+        String derivedScriptFile = null;
+        if (!Files.exists(p, new LinkOption[0])) {
+          if (!scriptFile.contains("." + type + ".")) {
+            // script file does not exist, try script file with database type identifier
+            String fn = p.getFileName().toString();
+            int idx = fn.lastIndexOf('.');
+            fn = fn.substring(0, idx) + "." + type + fn.substring(idx);
+            p = Paths.get(p.getParent().toString(), fn);
+            derivedScriptFile = p.toString();
+          }
+        }
+
+        if (!Files.exists(p, new LinkOption[0])) {
+          if (derivedScriptFile != null) {
+            throw new IllegalCmdParamException("Could not find script files " + scriptFile
+                + " and " + derivedScriptFile);
+          } else {
+            throw new IllegalCmdParamException("Could not find script file " + scriptFile);
+          }
+        }
+
+        if (force || confirm("Do you want to execute the SQL script?", 3)) {
+          System.out.println("Start executing script " + p.toString());
+          ScriptRunner.runScript(dataSource, p.toString(), passwordResolver);
+          System.out.println("  End executing script " + p.toString());
+        }
+        return null;
       }
-      return null;
     }
-
   } // class Sql
 
   @Command(scope = "ca", name = "export-ocsp", description = "export OCSP database")
