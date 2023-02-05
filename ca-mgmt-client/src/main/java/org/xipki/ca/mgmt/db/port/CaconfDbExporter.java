@@ -80,12 +80,13 @@ class CaconfDbExporter extends DbPorter {
   } // method export
 
   private void exportCaalias(CaCertstore.Caconf caconf) throws DataAccessException, InvalidConfException {
-    System.out.println("exporting table CAALIAS");
+    System.out.print("    exporting table CAALIAS ... ");
     List<CaCertstore.Caalias> caaliases = new LinkedList<>();
     final String sql = "SELECT NAME,CA_ID FROM CAALIAS";
 
     Statement stmt = null;
     ResultSet rs = null;
+    boolean succ = false;
     try {
       stmt = createStatement();
       rs = stmt.executeQuery(sql);
@@ -98,19 +99,22 @@ class CaconfDbExporter extends DbPorter {
         caalias.validate();
         caaliases.add(caalias);
       }
+
+      caconf.setCaaliases(caaliases);
+      succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
       releaseResources(stmt, rs);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
 
-    caconf.setCaaliases(caaliases);
-    System.out.println(" exported table CAALIAS");
   } // method exportCaalias
 
   private void exportRequestor(CaCertstore.Caconf caconf)
       throws DataAccessException, IOException, InvalidConfException {
-    System.out.println("exporting table REQUESTOR");
+    System.out.print("    exporting table REQUESTOR ... ");
+    boolean succ = true;
     List<CaCertstore.IdNameTypeConf> requestors = new LinkedList<>();
     final String sql = "SELECT ID,NAME,TYPE,CONF FROM REQUESTOR";
 
@@ -132,18 +136,20 @@ class CaconfDbExporter extends DbPorter {
         requestor.validate();
         requestors.add(requestor);
       }
+
+      caconf.setRequestors(requestors);
+      succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
       releaseResources(stmt, rs);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-
-    caconf.setRequestors(requestors);
-    System.out.println(" exported table REQUESTOR");
   } // method exportRequestor
 
   private void exportDbSchema(CaCertstore.Caconf caconf) throws DataAccessException, InvalidConfException {
-    System.out.println("exporting table DBSCHEMA");
+    System.out.print("    exporting table DBSCHEMA ... ");
+    boolean succ = false;
     List<CaCertstore.DbSchemaEntry> entries = new LinkedList<>();
     final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
 
@@ -160,19 +166,21 @@ class CaconfDbExporter extends DbPorter {
         entry.validate();
         entries.add(entry);
       }
+
+      caconf.setDbSchemas(entries);
+      succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
       releaseResources(stmt, rs);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-
-    caconf.setDbSchemas(entries);
-    System.out.println(" exported table DBSCHEMA");
   } // method exportDbSchema
 
   private void exportSigner(CaCertstore.Caconf caconf)
       throws DataAccessException, IOException, InvalidConfException {
-    System.out.println("exporting table SIGNER");
+    System.out.print("    exporting table SIGNER ... ");
+    boolean succ = false;
     List<CaCertstore.Signer> signers = new LinkedList<>();
     final String sql = "SELECT NAME,TYPE,CONF,CERT FROM SIGNER";
 
@@ -194,19 +202,22 @@ class CaconfDbExporter extends DbPorter {
         signer.validate();
         signers.add(signer);
       }
+
+      caconf.setSigners(signers);
+      succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
       releaseResources(stmt, rs);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-
-    caconf.setSigners(signers);
-    System.out.println(" exported table SIGNER");
   } // method exportSigner
 
   private void exportKeypairGen(CaCertstore.Caconf caconf)
       throws DataAccessException, IOException, InvalidConfException {
-    System.out.println("exporting table KEYPAIR_GEN");
+    System.out.print("    exporting table KEYPAIR_GEN ... ");
+    boolean succ = false;
+
     List<CaCertstore.NameTypeConf> keypairGens = new LinkedList<>();
     final String sql = "SELECT NAME,TYPE,CONF FROM KEYPAIR_GEN";
 
@@ -226,19 +237,21 @@ class CaconfDbExporter extends DbPorter {
         entry.validate();
         keypairGens.add(entry);
       }
+
+      caconf.setKeypairGens(keypairGens);
+      succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
       releaseResources(stmt, rs);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-
-    caconf.setKeypairGens(keypairGens);
-    System.out.println(" exported table KEYPAIR_GEN");
   } // method exportKeypairGen
 
   private void exportPublisher(CaCertstore.Caconf caconf)
       throws DataAccessException, IOException, InvalidConfException {
-    System.out.println("exporting table PUBLISHER");
+    System.out.print("    exporting table PUBLISHER ... ");
+    boolean succ = false;
     List<CaCertstore.IdNameTypeConf> publishers = new LinkedList<>();
     final String sql = "SELECT ID,NAME,TYPE,CONF FROM PUBLISHER";
 
@@ -260,19 +273,22 @@ class CaconfDbExporter extends DbPorter {
         publisher.validate();
         publishers.add(publisher);
       }
+
+      caconf.setPublishers(publishers);
+      succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
       releaseResources(stmt, rs);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-
-    caconf.setPublishers(publishers);
-    System.out.println(" exported table PUBLISHER");
   } // method exportPublisher
 
   private void exportProfile(CaCertstore.Caconf caconf)
       throws DataAccessException, IOException, InvalidConfException {
-    System.out.println("exporting table PROFILE");
+    System.out.print("    exporting table PROFILE ... ");
+    boolean succ = false;
+
     List<CaCertstore.IdNameTypeConf> profiles = new LinkedList<>();
     final String sql = "SELECT ID,NAME,TYPE,CONF FROM PROFILE";
 
@@ -294,19 +310,22 @@ class CaconfDbExporter extends DbPorter {
         profile.validate();
         profiles.add(profile);
       }
+
+      caconf.setProfiles(profiles);
+      succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
       releaseResources(stmt, rs);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-
-    caconf.setProfiles(profiles);
-    System.out.println(" exported table PROFILE");
   } // method exportProfile
 
   private void exportCa(CaCertstore.Caconf caconf)
       throws DataAccessException, IOException, InvalidConfException {
-    System.out.println("exporting table CA");
+    System.out.print("    exporting table CA ... ");
+    boolean succ = false;
+
     List<CaCertstore.Ca> cas = new LinkedList<>();
 
     //String columns =
@@ -400,19 +419,22 @@ class CaconfDbExporter extends DbPorter {
         ca.setConfColumn(buildFileOrValue(confColumn, "ca-conf/" + name + ".conf"));
         cas.add(ca);
       }
+
+      caconf.setCas(cas);
+      succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
       releaseResources(stmt, rs);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-
-    caconf.setCas(cas);
-    System.out.println(" exported table CA");
   } // method exportCa
 
   private void exportCaHasRequestor(CaCertstore.Caconf caconf)
       throws DataAccessException, InvalidConfException {
-    System.out.println("exporting table CA_HAS_REQUESTOR");
+    System.out.print("    exporting table CA_HAS_REQUESTOR ... ");
+    boolean succ = false;
+
     List<CaCertstore.CaHasRequestor> caHasRequestors = new LinkedList<>();
     final String sql = "SELECT CA_ID,REQUESTOR_ID,PERMISSION,PROFILES FROM CA_HAS_REQUESTOR";
 
@@ -432,19 +454,21 @@ class CaconfDbExporter extends DbPorter {
         caHasRequestor.validate();
         caHasRequestors.add(caHasRequestor);
       }
+
+      caconf.setCaHasRequestors(caHasRequestors);
+      succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
       releaseResources(stmt, rs);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-
-    caconf.setCaHasRequestors(caHasRequestors);
-    System.out.println(" exported table CA_HAS_REQUESTOR");
   } // method exportCaHasRequestor
 
   private void exportCaHasPublisher(CaCertstore.Caconf caconf)
       throws DataAccessException, InvalidConfException {
-    System.out.println("exporting table CA_HAS_PUBLISHER");
+    System.out.print("    exporting table CA_HAS_PUBLISHER ... ");
+    boolean succ = false;
     List<CaCertstore.CaHasPublisher> caHasPublishers = new LinkedList<>();
     final String sql = "SELECT CA_ID,PUBLISHER_ID FROM CA_HAS_PUBLISHER";
 
@@ -462,19 +486,21 @@ class CaconfDbExporter extends DbPorter {
         caHasPublisher.validate();
         caHasPublishers.add(caHasPublisher);
       }
+      caconf.setCaHasPublishers(caHasPublishers);
+      succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
       releaseResources(stmt, rs);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-
-    caconf.setCaHasPublishers(caHasPublishers);
-    System.out.println(" exported table CA_HAS_PUBLISHER");
   } // method exportCaHasPublisher
 
   private void exportCaHasProfile(CaCertstore.Caconf caconf)
       throws DataAccessException, InvalidConfException {
-    System.out.println("exporting table CA_HAS_PROFILE");
+    System.out.print("    exporting table CA_HAS_PROFILE ... ");
+    boolean succ = false;
+
     List<CaCertstore.CaHasProfile> caHasProfiles = new LinkedList<>();
     final String sql = "SELECT CA_ID,PROFILE_ID FROM CA_HAS_PROFILE";
 
@@ -492,14 +518,14 @@ class CaconfDbExporter extends DbPorter {
         caHasProfile.validate();
         caHasProfiles.add(caHasProfile);
       }
+      caconf.setCaHasProfiles(caHasProfiles);
+      succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
       releaseResources(stmt, rs);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-
-    caconf.setCaHasProfiles(caHasProfiles);
-    System.out.println(" exported table CA_HAS_PROFILE");
   } // method exportCaHasProfile
 
 }

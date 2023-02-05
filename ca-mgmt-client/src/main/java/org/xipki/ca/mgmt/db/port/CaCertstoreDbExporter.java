@@ -439,7 +439,7 @@ class CaCertstoreDbExporter extends DbPorter {
   } // method exportEntries
 
   private void exportPublishQueue(CaCertstore certstore) throws DataAccessException, InvalidConfException {
-    System.out.println("exporting table PUBLISHQUEUE");
+    System.out.print("    exporting table PUBLISHQUEUE ... ");
 
     String sql = "SELECT CID,PID,CA_ID FROM PUBLISHQUEUE WHERE CID>=? AND CID<? ORDER BY CID ASC";
     final int minId = (int) min("PUBLISHQUEUE", "CID");
@@ -448,7 +448,7 @@ class CaCertstoreDbExporter extends DbPorter {
     List<CaCertstore.ToPublish> queue = new LinkedList<>();
     certstore.setPublishQueue(queue);
     if (maxId == 0) {
-      System.out.println(" exported table PUBLISHQUEUE");
+      System.out.println("SUCCESSFUL");
       return;
     }
 
@@ -456,6 +456,7 @@ class CaCertstoreDbExporter extends DbPorter {
     ResultSet rs = null;
 
     final int n = 500;
+    boolean succ = false;
 
     try {
       for (int i = minId; i <= maxId; i += n) {
@@ -474,12 +475,13 @@ class CaCertstoreDbExporter extends DbPorter {
           queue.add(toPub);
         }
       }
+      succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
       releaseResources(ps, rs);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-    System.out.println(" exported table PUBLISHQUEUE");
   } // method exportPublishQueue
 
   private void finalizeZip(ZipOutputStream zipOutStream, String filename, Object container)

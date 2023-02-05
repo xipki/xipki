@@ -168,9 +168,10 @@ class CaCertstoreDbImporter extends DbPorter {
 
   private void importPublishQueue(List<CaCertstore.ToPublish> publishQueue) throws DataAccessException {
     final String sql = buildInsertSql("PUBLISHQUEUE", "CID,PID,CA_ID");
-    System.out.println("importing table PUBLISHQUEUE");
+    System.out.print("    importing table PUBLISHQUEUE ... s");
     PreparedStatement ps = prepareStatement(sql);
 
+    boolean succ = false;
     try {
       for (CaCertstore.ToPublish tbp : publishQueue) {
         try {
@@ -184,11 +185,11 @@ class CaCertstoreDbImporter extends DbPorter {
           throw translate(sql, ex);
         }
       }
+      succ = true;
     } finally {
       releaseResources(ps, null);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-
-    System.out.println(" imported table PUBLISHQUEUE");
   } // method importPublishQueue
 
   private Exception importEntries(CaDbEntryType type, CaCertstore certstore,

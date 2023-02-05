@@ -128,7 +128,8 @@ class OcspCertstoreDbExporter extends DbPorter {
   } // method exportHashAlgo
 
   private void exportIssuer(OcspCertstore certstore) throws DataAccessException, IOException {
-    System.out.println("exporting table ISSUER");
+    System.out.print("    exporting table ISSUER ... ");
+    boolean succ = false;
     List<OcspCertstore.Issuer> issuers = new LinkedList<>();
     certstore.setIssuers(issuers);
     final String sql = "SELECT ID,CERT,REV_INFO,CRL_ID FROM ISSUER";
@@ -158,17 +159,18 @@ class OcspCertstoreDbExporter extends DbPorter {
 
         issuers.add(issuer);
       }
+      succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
       releaseResources(stmt, rs);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-
-    System.out.println(" exported table ISSUER");
   } // method exportIssuer
 
   private void exportCrlInfo(OcspCertstore certstore) throws DataAccessException {
-    System.out.println("exporting table CRL_INFO");
+    System.out.print("    exporting table CRL_INFO ... ");
+    boolean succ = false;
     List<OcspCertstore.CrlInfo> crlInfos = new LinkedList<>();
     certstore.setCrlInfos(crlInfos);
     final String sql = "SELECT ID,NAME,INFO FROM CRL_INFO";
@@ -188,13 +190,13 @@ class OcspCertstoreDbExporter extends DbPorter {
 
         crlInfos.add(crlInfo);
       }
+      succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
       releaseResources(stmt, rs);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-
-    System.out.println(" exported table CRL_INFO");
   } // method exportCrlInfo
 
   private Exception exportCert(OcspCertstore certstore, File processLogFile) {

@@ -125,7 +125,8 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
       return;
     }
 
-    System.out.println("importing table ISSUER");
+    System.out.print("    importing table ISSUER ... ");
+    boolean succ = false;
     PreparedStatement ps = prepareStatement(SQL_ADD_ISSUER);
 
     try {
@@ -166,10 +167,11 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
           throw ex;
         }
       }
+      succ = true;
     } finally {
       releaseResources(ps, null);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-    System.out.println(" imported table ISSUER");
   }
 
   private void importCrlInfo(List<OcspCertstore.CrlInfo> crlInfos) throws DataAccessException {
@@ -177,7 +179,8 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
       return;
     }
 
-    System.out.println("importing table CRL_INFO");
+    System.out.print("    importing table CRL_INFO ... ");
+    boolean succ = false;
     PreparedStatement ps = prepareStatement(SQL_ADD_CRLINFO);
 
     try {
@@ -193,10 +196,11 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
           throw translate(SQL_ADD_CRLINFO, ex);
         }
       }
+      succ = true;
     } finally {
       releaseResources(ps, null);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-    System.out.println(" imported table CRL_INFO");
   }
 
   private void importCert(OcspCertstore certstore, File processLogFile) throws Exception {

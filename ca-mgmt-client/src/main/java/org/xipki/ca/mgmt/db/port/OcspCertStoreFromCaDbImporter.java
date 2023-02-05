@@ -187,7 +187,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
   private List<Integer> importIssuer(List<CaCertstore.Ca> cas)
       throws DataAccessException, CertificateException, IOException {
-    System.out.println("importing table ISSUER");
+    System.out.print("    importing table ISSUER ... ");
+    boolean succ = false;
     final String sql = SQL_ADD_ISSUER;
     PreparedStatement ps = prepareStatement(sql);
 
@@ -197,11 +198,12 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
       for (CaCertstore.Ca issuer : cas) {
         importIssuer0(issuer, sql, ps, relatedCaIds);
       }
+      succ = true;
     } finally {
       releaseResources(ps, null);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
 
-    System.out.println(" imported table ISSUER");
     return relatedCaIds;
   } // method importIssuer
 
