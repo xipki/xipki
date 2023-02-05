@@ -1,9 +1,3 @@
-Migration
-----
-- From v5.3.0 - v5.3.6 to v5.3.7+
-  - Remove the path prefix `xipki/` in all configuration files (`*.json`, `*.properties`, `*.cfg`)
-    in the folder `xipki/`.
-
 Prepare
 -----
 - The `xipki/etc/ocsp/ocsp-responder.json` is for the OCSP store type `xipki-ca-db`. If you use
@@ -53,7 +47,7 @@ bcutil-*.jar,\
 ca-*.jar,\
 certprofile-*.jar,\
 datasource-*.jar,\
-fastjson-*.jar,\
+gson-*.jar,\
 HikariCP-*.jar,\
 license-*,jar,\
 log4j-*.jar,\

@@ -1,9 +1,3 @@
-Migration
-----
-- From v5.3.0 - v5.3.6 to v5.3.7+
-  - Remove the path prefix `xipki/` in all configuration files (`*.json`, `*.properties`, `*.cfg`)
-    in the folder `xipki/`.
-
 Deployment in Tomcat 8 and 9
 ----
 1. Copy the sub-folders `bin`, `webapps`, `xipki` and `lib ` to the tomcat root folder `${CATALINA_HOME}`.
@@ -66,7 +60,7 @@ bcutil-*.jar,\
 ca-*.jar,\
 certprofile-*.jar,\
 datasource-*.jar,\
-fastjson-*.jar,\
+gson-*.jar,\
 HikariCP-*.jar,\
 license-*,jar,\
 log4j-*.jar,\

@@ -53,7 +53,7 @@ animal-sniffer-annotations*.jar,\
 bcpkix-*.jar,\
 bcprov-*.jar,\
 bcutil-*.jar,\
-fastjson-*.jar,\
+gson-*.jar,\
 log4j-*.jar,\
 password-*.jar,\
 security-*.jar,\
