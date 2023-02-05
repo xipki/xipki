@@ -123,6 +123,25 @@ public class DatabaseConf {
     String url = dbProps.getProperty("jdbcUrl");
     if (url != null) {
       String driverClassName = dbProps.getProperty("driverClassName");
+      if (driverClassName == null) {
+        if (url.startsWith("jdbc:h2:")) {
+          driverClassName = "org.h2.Driver";
+        } else if (url.startsWith("jdbc:mysql:")) {
+          driverClassName = "com.mysql.jdbc.Driver";
+        } else if (url.startsWith("jdbc:mariadb:")) {
+          driverClassName = "org.mariadb.jdbc.Driver";
+        } else if (url.startsWith("jdbc:oracle:")) {
+          driverClassName = "oracle.jdbc.driver.OracleDriver";
+        } else if (url.startsWith("jdbc:db2:")) {
+          driverClassName = "com.ibm.db2.jcc.DB2Driver";
+        } else if (url.startsWith("jdbc:postgresql:") || url.startsWith("jdbc:pgsql:")) {
+          driverClassName = "org.postgresql.Driver";
+        } else if (url.startsWith("jdbc:hsqldb:")) {
+          driverClassName = "org.hsqldb.jdbc.JDBCDriver";
+        } else {
+          throw new IllegalArgumentException("unknown jdbc database URL " + url + ", please specify driverClassName");
+        }
+      }
       return new DatabaseConf(driverClassName, user, password, url, schema);
     }
 

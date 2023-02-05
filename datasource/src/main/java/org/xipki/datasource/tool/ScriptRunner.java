@@ -77,6 +77,7 @@ public class ScriptRunner {
             }
 
             ScriptRunner runner = new ScriptRunner(conn, false, true);
+            conn.setAutoCommit(false);
             runner.runScript(IoUtil.expandFilepath(scriptFile));
             conn.commit();
         }
