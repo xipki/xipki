@@ -74,7 +74,7 @@ public abstract class P11Module {
    * @param slotId
    *          slot identifier. Must not be {@code null}.
    * @return the slot
-   * @throws P11UnknownEntityException
+   * @throws TokenException
    *         if PKCS#11 token error occurs
    */
   public P11Slot getSlot(P11SlotId slotId) throws TokenException {

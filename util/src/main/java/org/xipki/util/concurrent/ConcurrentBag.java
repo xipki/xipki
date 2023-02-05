@@ -221,7 +221,7 @@ public class ConcurrentBag<T extends ConcurrentBagEntry> implements AutoCloseabl
    * or reserve items in any way.  Call <code>reserve(T)</code>
    * on items in list before performing any action on them.
    *
-   * @param state one of the {@link IConcurrentBagEntry} states
+   * @param state one of the {@link ConcurrentBagEntry} states
    * @return a possibly empty list of objects having the state specified
    */
   public List<T> values(int state) {

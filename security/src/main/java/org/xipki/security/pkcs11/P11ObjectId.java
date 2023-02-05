@@ -47,10 +47,11 @@ public class P11ObjectId {
   /**
    * Constructor.
    *
-   * @param id
-   *          Identifier. Cannot be null or zero-length if label is {@code null} or blank.
-   * @param label
-   *          Label. Cannot be {@code null} and blank if id is null or zero-length.
+   * @param handle The object handle.
+   * @param objectClass The object handle.
+   * @param keyType The key type.
+   * @param id Identifier. Cannot be null or zero-length if label is {@code null} or blank.
+   * @param label Label. Cannot be {@code null} and blank if id is null or zero-length.
    */
   public P11ObjectId(long handle, long objectClass, long keyType, byte[] id, String label) {
     this.handle = handle;
