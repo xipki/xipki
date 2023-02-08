@@ -81,19 +81,19 @@ public class P11KeypairGenerator extends KeypairGenerator {
         String[] tokens = m.split("/");
         switch (tokens[0]) {
           case "RSA":
-            if (slot.supportsMechanism(CKM_RSA_PKCS_KEY_PAIR_GEN)) {
+            if (slot.supportsMechanism(CKM_RSA_PKCS_KEY_PAIR_GEN, CKF_GENERATE_KEY_PAIR)) {
               set.add(m);
             }
             break;
           case "DSA":
-            if (slot.supportsMechanism(CKM_DSA_KEY_PAIR_GEN)) {
+            if (slot.supportsMechanism(CKM_DSA_KEY_PAIR_GEN, CKF_GENERATE_KEY_PAIR)) {
               set.add(m);
             }
             break;
           case "EC":
-            if (slot.supportsMechanism(CKM_EC_KEY_PAIR_GEN)) {
+            if (slot.supportsMechanism(CKM_EC_KEY_PAIR_GEN, CKF_GENERATE_KEY_PAIR)) {
               if (GMObjectIdentifiers.sm2p256v1.getId().equals(tokens[1])) {
-                if (slot.supportsMechanism(CKM_VENDOR_SM2_KEY_PAIR_GEN)) {
+                if (slot.supportsMechanism(CKM_VENDOR_SM2_KEY_PAIR_GEN, CKF_GENERATE_KEY_PAIR)) {
                   set.add(m);
                 }
               } else {
@@ -103,13 +103,13 @@ public class P11KeypairGenerator extends KeypairGenerator {
             break;
           case "ED25519":
           case "ED448":
-            if (slot.supportsMechanism(CKM_EC_EDWARDS_KEY_PAIR_GEN)) {
+            if (slot.supportsMechanism(CKM_EC_EDWARDS_KEY_PAIR_GEN, CKF_GENERATE_KEY_PAIR)) {
               set.add(m);
             }
             break;
           case "X25519":
           case "X448":
-            if (slot.supportsMechanism(CKM_EC_MONTGOMERY_KEY_PAIR_GEN)) {
+            if (slot.supportsMechanism(CKM_EC_MONTGOMERY_KEY_PAIR_GEN, CKF_GENERATE_KEY_PAIR)) {
               set.add(m);
             }
             break;

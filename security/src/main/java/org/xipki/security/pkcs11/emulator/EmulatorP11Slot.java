@@ -36,6 +36,7 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.wrapper.MechanismInfo;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
@@ -60,9 +61,7 @@ import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static org.xipki.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.util.Args.*;
@@ -124,37 +123,7 @@ class EmulatorP11Slot extends P11Slot {
   private static final String PROP_EC_PARAMS = "ecParams";
   private static final String PROP_EC_POINT = "ecPoint";
 
-  private static final long[] supportedMechs = new long[] {
-    CKM_DSA_KEY_PAIR_GEN, CKM_RSA_X9_31_KEY_PAIR_GEN, CKM_RSA_PKCS_KEY_PAIR_GEN, CKM_EC_KEY_PAIR_GEN,
-    CKM_EC_EDWARDS_KEY_PAIR_GEN, CKM_EC_MONTGOMERY_KEY_PAIR_GEN, CKM_GENERIC_SECRET_KEY_GEN,
-    CKM_AES_KEY_GEN, CKM_DES3_KEY_GEN, CKM_GENERIC_SECRET_KEY_GEN,
-
-    // Digest
-    CKM_SHA_1, CKM_SHA224, CKM_SHA256, CKM_SHA384, CKM_SHA512, CKM_SHA3_224, CKM_SHA3_256, CKM_SHA3_384, CKM_SHA3_512,
-
-    // HMAC
-    CKM_SHA_1_HMAC,    CKM_SHA224_HMAC,   CKM_SHA256_HMAC,   CKM_SHA384_HMAC,   CKM_SHA512_HMAC,
-    CKM_SHA3_224_HMAC, CKM_SHA3_256_HMAC, CKM_SHA3_384_HMAC, CKM_SHA3_512_HMAC,
-
-    // RSA
-    CKM_RSA_X_509,
-    CKM_RSA_PKCS,        CKM_SHA1_RSA_PKCS,     CKM_SHA224_RSA_PKCS,   CKM_SHA256_RSA_PKCS,   CKM_SHA384_RSA_PKCS,
-    CKM_SHA512_RSA_PKCS, CKM_SHA3_224_RSA_PKCS, CKM_SHA3_256_RSA_PKCS, CKM_SHA3_384_RSA_PKCS, CKM_SHA3_512_RSA_PKCS,
-
-    CKM_RSA_PKCS_PSS,          CKM_SHA1_RSA_PKCS_PSS,   CKM_SHA224_RSA_PKCS_PSS,   CKM_SHA256_RSA_PKCS_PSS,
-    CKM_SHA384_RSA_PKCS_PSS,   CKM_SHA512_RSA_PKCS_PSS, CKM_SHA3_224_RSA_PKCS_PSS, CKM_SHA3_256_RSA_PKCS_PSS,
-    CKM_SHA3_384_RSA_PKCS_PSS, CKM_SHA3_512_RSA_PKCS_PSS,
-
-    CKM_DSA,        CKM_DSA_SHA1,     CKM_DSA_SHA224,   CKM_DSA_SHA256,   CKM_DSA_SHA384,
-    CKM_DSA_SHA512, CKM_DSA_SHA3_224, CKM_DSA_SHA3_256, CKM_DSA_SHA3_384, CKM_DSA_SHA3_512,
-
-    CKM_ECDSA,        CKM_ECDSA_SHA1,     CKM_ECDSA_SHA224,   CKM_ECDSA_SHA256,   CKM_ECDSA_SHA384,
-    CKM_ECDSA_SHA512, CKM_ECDSA_SHA3_224, CKM_ECDSA_SHA3_256, CKM_ECDSA_SHA3_384, CKM_ECDSA_SHA3_512,
-
-    CKM_EDDSA,
-
-    // SM2
-    CKM_VENDOR_SM2_KEY_PAIR_GEN, CKM_VENDOR_SM2_SM3, CKM_VENDOR_SM2}; // method static
+  private static final Map<Long, MechanismInfo> supportedMechs = new HashMap<>();
 
   private static final FilenameFilter INFO_FILENAME_FILTER = new InfoFilenameFilter();
 
@@ -173,6 +142,68 @@ class EmulatorP11Slot extends P11Slot {
   private final SecureRandom random = new SecureRandom();
 
   private final int maxSessions;
+
+  static {
+    // keypair generation
+    long[] mechs = {CKM_DSA_KEY_PAIR_GEN, CKM_RSA_X9_31_KEY_PAIR_GEN,  CKM_RSA_PKCS_KEY_PAIR_GEN,
+                    CKM_EC_KEY_PAIR_GEN,  CKM_EC_EDWARDS_KEY_PAIR_GEN, CKM_EC_MONTGOMERY_KEY_PAIR_GEN};
+    for (long mech : mechs) {
+      supportedMechs.put(mech, new MechanismInfo(0, Integer.MAX_VALUE, CKF_GENERATE_KEY_PAIR));
+    }
+
+    // secret key generation
+    mechs = new long[]{CKM_GENERIC_SECRET_KEY_GEN, CKM_AES_KEY_GEN, CKM_DES3_KEY_GEN, CKM_GENERIC_SECRET_KEY_GEN};
+    for (long mech : mechs) {
+      supportedMechs.put(mech, new MechanismInfo(0, Integer.MAX_VALUE, CKF_GENERATE));
+    }
+
+    // Digest
+    mechs = new long[]{CKM_SHA_1, CKM_SHA224, CKM_SHA256, CKM_SHA384, CKM_SHA512,
+        CKM_SHA3_224, CKM_SHA3_256, CKM_SHA3_384, CKM_SHA3_512};
+    for (long mech : mechs) {
+      supportedMechs.put(mech, new MechanismInfo(0, Integer.MAX_VALUE, CKF_DIGEST));
+    }
+
+    // HMAC
+    mechs = new long[]{CKM_SHA_1_HMAC,    CKM_SHA224_HMAC,   CKM_SHA256_HMAC,   CKM_SHA384_HMAC,   CKM_SHA512_HMAC,
+        CKM_SHA3_224_HMAC, CKM_SHA3_256_HMAC, CKM_SHA3_384_HMAC, CKM_SHA3_512_HMAC};
+    for (long mech : mechs) {
+      supportedMechs.put(mech, new MechanismInfo(0, Integer.MAX_VALUE, CKF_SIGN | CKF_VERIFY));
+    }
+
+    // RSA
+    supportedMechs.put(CKM_RSA_X_509, new MechanismInfo(0, Integer.MAX_VALUE,
+        CKF_DECRYPT | CKF_ENCRYPT | CKF_SIGN | CKF_VERIFY));
+    mechs = new long[]{CKM_RSA_PKCS, CKM_SHA1_RSA_PKCS,     CKM_SHA224_RSA_PKCS,
+        CKM_SHA256_RSA_PKCS,       CKM_SHA384_RSA_PKCS,
+        CKM_SHA512_RSA_PKCS,       CKM_SHA3_224_RSA_PKCS,   CKM_SHA3_256_RSA_PKCS,
+        CKM_SHA3_384_RSA_PKCS,     CKM_SHA3_512_RSA_PKCS,
+        CKM_RSA_PKCS_PSS,          CKM_SHA1_RSA_PKCS_PSS,   CKM_SHA224_RSA_PKCS_PSS,   CKM_SHA256_RSA_PKCS_PSS,
+        CKM_SHA384_RSA_PKCS_PSS,   CKM_SHA512_RSA_PKCS_PSS, CKM_SHA3_224_RSA_PKCS_PSS, CKM_SHA3_256_RSA_PKCS_PSS,
+        CKM_SHA3_384_RSA_PKCS_PSS, CKM_SHA3_512_RSA_PKCS_PSS};
+
+    for (long mech : mechs) {
+      supportedMechs.put(mech, new MechanismInfo(0, Integer.MAX_VALUE, CKF_SIGN | CKF_VERIFY));
+    }
+
+    // DSA
+    mechs = new long[]{CKM_DSA, CKM_DSA_SHA1, CKM_DSA_SHA224,     CKM_DSA_SHA256,     CKM_DSA_SHA384,
+        CKM_DSA_SHA512,   CKM_DSA_SHA3_224,   CKM_DSA_SHA3_256,   CKM_DSA_SHA3_384,   CKM_DSA_SHA3_512,
+        CKM_ECDSA,        CKM_ECDSA_SHA1,     CKM_ECDSA_SHA224,   CKM_ECDSA_SHA256,   CKM_ECDSA_SHA384,
+        CKM_ECDSA_SHA512, CKM_ECDSA_SHA3_224, CKM_ECDSA_SHA3_256, CKM_ECDSA_SHA3_384, CKM_ECDSA_SHA3_512};
+    for (long mech : mechs) {
+      supportedMechs.put(mech, new MechanismInfo(0, Integer.MAX_VALUE, CKF_SIGN | CKF_VERIFY));
+    }
+
+    // EDDSA
+    supportedMechs.put(CKM_EDDSA, new MechanismInfo(0, Integer.MAX_VALUE, CKF_SIGN | CKF_VERIFY));
+
+    // SM2
+    mechs = new long[]{CKM_VENDOR_SM2_KEY_PAIR_GEN, CKM_VENDOR_SM2_SM3, CKM_VENDOR_SM2};
+    for (long mech : mechs) {
+      supportedMechs.put(mech, new MechanismInfo(0, Integer.MAX_VALUE, CKF_SIGN | CKF_VERIFY));
+    }
+  }
 
   EmulatorP11Slot(
       String moduleName, File slotDir, P11SlotId slotId, boolean readOnly,
@@ -616,6 +647,7 @@ class EmulatorP11Slot extends P11Slot {
     long keyType = keyId.getKeyType();
 
     try {
+      EmulatorP11Identity ret;
       if (keyId.getObjectCLass() == CKO_SECRET_KEY) {
         File infoFile = getInfoFile(secKeyDir, hexId);
         if (!infoFile.exists()) {
@@ -629,8 +661,7 @@ class EmulatorP11Slot extends P11Slot {
 
         byte[] keyValue = keyCryptor.decrypt(encodedValue);
         SecretKey key = new SecretKeySpec(keyValue, keyAlgo);
-        EmulatorP11Identity ret = new EmulatorP11Identity(this, identityId, key, maxSessions, random);
-        return ret;
+        ret = new EmulatorP11Identity(this, identityId, key, maxSessions, random);
       } else {
         // keypair
         byte[] encodedValue = read(getValueFile(privKeyDir, hexId));
@@ -641,24 +672,24 @@ class EmulatorP11Slot extends P11Slot {
         if (keyType == CKK_RSA) {
           BigInteger mod = new BigInteger(props.getProperty(PROP_RSA_MODUS), 16);
           BigInteger e = new BigInteger(props.getProperty(PROP_RSA_PUBLIC_EXPONENT), 16);
-          EmulatorP11Identity ret = new EmulatorP11Identity(this, identityId, privateKey, maxSessions, random);
+          ret = new EmulatorP11Identity(this, identityId, privateKey, maxSessions, random);
           ret.setRsaMParameters(mod, e);
-          return ret;
         } else if (keyType == CKK_DSA) {
           BigInteger q = new BigInteger(props.getProperty(PROP_DSA_SUBPRIME), 16); // q
-          EmulatorP11Identity ret = new EmulatorP11Identity(this, identityId, privateKey, maxSessions, random);
+          ret = new EmulatorP11Identity(this, identityId, privateKey, maxSessions, random);
           ret.setDsaQ(q);
-          return ret;
         } else if (keyType == CKK_EC || keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
           byte[] ecParams = decodeHex(props.getProperty(PROP_EC_PARAMS));
           ASN1ObjectIdentifier curveId = ASN1ObjectIdentifier.getInstance(ecParams);
-          EmulatorP11Identity ret = new EmulatorP11Identity(this, identityId, privateKey, maxSessions, random);
+          ret = new EmulatorP11Identity(this, identityId, privateKey, maxSessions, random);
           ret.setEcParams(curveId);
-          return ret;
         } else {
           throw new TokenException("unknown key type " + ckkCodeToName(keyType));
         }
       }
+
+      ret.sign(true);
+      return ret;
     } catch (Exception e) {
       throw new TokenException(e);
     }
@@ -801,7 +832,7 @@ class EmulatorP11Slot extends P11Slot {
     } else {
       throw new IllegalArgumentException("unsupported key type " + codeToName(Category.CKK, keyType));
     }
-    assertMechanismSupported(mech);
+    assertMechanismSupported(mech, CKF_GENERATE_KEY_PAIR);
 
     byte[] keyBytes = new byte[keysize / 8];
     random.nextBytes(keyBytes);

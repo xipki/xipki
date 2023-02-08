@@ -20,6 +20,7 @@ package org.xipki.security.pkcs11;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.wrapper.PKCS11Constants;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.LogUtil;
@@ -45,6 +46,8 @@ public abstract class P11Identity {
 
   protected final P11IdentityId id;
 
+  private boolean sign;
+
   private ASN1ObjectIdentifier ecParams;
 
   private BigInteger rsaModulus;
@@ -60,6 +63,11 @@ public abstract class P11Identity {
   protected P11Identity(P11Slot slot, P11IdentityId id) {
     this.slot = notNull(slot, "slot");
     this.id = notNull(id, "id");
+  }
+
+  public P11Identity sign(Boolean sign) {
+    this.sign = (sign == null) ? true : sign;
+    return this;
   }
 
   public abstract void destroy() throws TokenException;
@@ -94,19 +102,33 @@ public abstract class P11Identity {
   }
 
   public byte[] sign(long mechanism, P11Params parameters, byte[] content) throws TokenException {
-    if (id.getKeyId().getKeyType() == CKK_EC_MONTGOMERY) {
-      throw new TokenException("this identity is not suitable for sign");
+    notNull(content, "content");
+
+    if (!supportsSign(mechanism)) {
+      throw new TokenException("this identity is not suitable for sign with " + ckmCodeToName(mechanism));
     }
 
-    notNull(content, "content");
-    slot.assertMechanismSupported(mechanism);
-    if (!supportsMechanism(mechanism, parameters)) {
-      throw new TokenException("unsupported mechanism " + ckmCodeToName(mechanism));
-    }
     if (LOG.isDebugEnabled()) {
       LOG.debug("sign with mechanism {}", ckmCodeToName(mechanism));
     }
     return sign0(mechanism, parameters, content);
+  }
+
+  public boolean supportsSign(long mechanism) {
+    if (!sign) {
+      return false;
+    }
+
+    long objClass = id.getKeyId().getObjectCLass();
+    if (objClass == CKO_PUBLIC_KEY) {
+      return false;
+    }
+
+    if (id.getKeyId().getKeyType() == CKK_EC_MONTGOMERY) {
+      return false;
+    }
+
+    return slot.supportsMechanism(mechanism, CKF_SIGN);
   }
 
   /**
@@ -126,11 +148,21 @@ public abstract class P11Identity {
       throws TokenException;
 
   public byte[] digestSecretKey(long mechanism) throws TokenException, XiSecurityException {
-    slot.assertMechanismSupported(mechanism);
+    if (!supportsDigest(mechanism)) {
+      throw new TokenException("cannot digest this identity with " + ckmCodeToName(mechanism));
+    }
     if (LOG.isDebugEnabled()) {
-      LOG.debug("digest secret with mechanism {}", ckmCodeToName(mechanism));
+      LOG.debug("digest secret key with mechanism {}", ckmCodeToName(mechanism));
     }
     return digestSecretKey0(mechanism);
+  }
+
+  public boolean supportsDigest(long mechanism) throws TokenException, XiSecurityException {
+    long objClass = id.getKeyId().getObjectCLass();
+    if (objClass != CKO_SECRET_KEY) {
+      return false;
+    }
+    return slot.supportsMechanism(mechanism, CKF_DIGEST);
   }
 
   protected abstract byte[] digestSecretKey0(long mechanism) throws TokenException;
@@ -165,62 +197,5 @@ public abstract class P11Identity {
       return publicKey;
     }
   }
-
-  public boolean supportsMechanism(long mechanism) {
-    return slot.supportsMechanism(mechanism);
-  }
-
-  public boolean supportsMechanism(long mechanism, P11Params parameters) {
-    if (!supportsMechanism(mechanism)) {
-      return false;
-    }
-
-    if (isSecretKey()) {
-      if (CKM_SHA_1_HMAC == mechanism
-          || CKM_SHA224_HMAC == mechanism   || CKM_SHA256_HMAC == mechanism
-          || CKM_SHA384_HMAC == mechanism   || CKM_SHA512_HMAC == mechanism
-          || CKM_SHA3_224_HMAC == mechanism || CKM_SHA3_256_HMAC == mechanism
-          || CKM_SHA3_384_HMAC == mechanism || CKM_SHA3_512_HMAC == mechanism) {
-        return parameters == null;
-      }
-    }
-
-    long keyType = getKeyType();
-    if (keyType == CKK_RSA) {
-      if (CKM_RSA_9796 == mechanism || CKM_RSA_PKCS == mechanism
-          || CKM_SHA1_RSA_PKCS == mechanism   || CKM_SHA224_RSA_PKCS == mechanism
-          || CKM_SHA256_RSA_PKCS == mechanism || CKM_SHA384_RSA_PKCS == mechanism
-          || CKM_SHA512_RSA_PKCS == mechanism) {
-        return parameters == null;
-      } else if (CKM_RSA_PKCS_PSS == mechanism
-          || CKM_SHA1_RSA_PKCS_PSS == mechanism   || CKM_SHA224_RSA_PKCS_PSS == mechanism
-          || CKM_SHA256_RSA_PKCS_PSS == mechanism || CKM_SHA384_RSA_PKCS_PSS == mechanism
-          || CKM_SHA512_RSA_PKCS_PSS == mechanism) {
-        return parameters instanceof P11Params.P11RSAPkcsPssParams;
-      } else if (CKM_RSA_X_509 == mechanism) {
-        return parameters == null;
-      }
-    } else if (keyType == CKK_DSA) {
-      if (parameters != null) {
-        return false;
-      }
-      return CKM_DSA == mechanism || CKM_DSA_SHA1 == mechanism
-          || CKM_DSA_SHA224 == mechanism || CKM_DSA_SHA256 == mechanism
-          || CKM_DSA_SHA384 == mechanism || CKM_DSA_SHA512 == mechanism;
-    } else if (keyType == CKK_EC || keyType == CKK_VENDOR_SM2) {
-      if (CKM_ECDSA == mechanism || CKM_ECDSA_SHA1 == mechanism
-          || CKM_ECDSA_SHA224 == mechanism || CKM_ECDSA_SHA256 == mechanism
-          || CKM_ECDSA_SHA384 == mechanism || CKM_ECDSA_SHA512 == mechanism
-          || CKM_VENDOR_SM2 == mechanism) {
-        return parameters == null;
-      } else if (CKM_VENDOR_SM2_SM3 == mechanism) {
-        return parameters instanceof P11Params.P11ByteArrayParams;
-      }
-    } else if (keyType == CKK_EC_EDWARDS) {
-      return CKM_EDDSA == mechanism;
-    }
-
-    return false;
-  } // method supportsMechanism
 
 }

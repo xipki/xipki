@@ -23,6 +23,7 @@ import org.bouncycastle.crypto.*;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.wrapper.PKCS11Constants;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
@@ -154,10 +155,10 @@ abstract class P11ContentSigner implements XiContentSigner {
 
       Long mech = hashMechMap.get(signAlgo.getHashAlgo());
 
-      if (mech != null && identity.supportsMechanism(mech)) {
+      if (mech != null && identity.supportsSign(mech)) {
         mechanism = mech;
         outputStream = new ByteArrayOutputStream();
-      } else if (identity.supportsMechanism(CKM_DSA)) {
+      } else if (identity.supportsSign(CKM_DSA)) {
         mechanism = CKM_DSA;
         outputStream = new DigestOutputStream(signAlgo.getHashAlgo().createDigest());
       } else {
@@ -232,10 +233,10 @@ abstract class P11ContentSigner implements XiContentSigner {
 
       Long mech = hashMechMap.get(signAlgo.getHashAlgo());
 
-      if (mech != null && identity.supportsMechanism(mech)) {
+      if (mech != null && identity.supportsSign(mech)) {
         mechanism = mech;
         this.outputStream = new ByteArrayOutputStream();
-      } else if (identity.supportsMechanism(CKM_ECDSA)) {
+      } else if (identity.supportsSign(CKM_ECDSA)) {
         mechanism = CKM_ECDSA;
         this.outputStream = new DigestOutputStream(signAlgo.getHashAlgo().createDigest());
       } else {
@@ -295,7 +296,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       }
 
       mechanism = CKM_EDDSA;
-      if (!identity.supportsMechanism(mechanism)) {
+      if (!identity.supportsSign(mechanism)) {
         throw new XiSecurityException("unsupported signature algorithm " + signAlgo);
       }
 
@@ -352,7 +353,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       }
 
       this.mechanism = mech;
-      if (identity.supportsMechanism(mechanism)) {
+      if (identity.supportsSign(mechanism)) {
         throw new XiSecurityException("unsupported MAC algorithm " + signAlgo);
       }
 
@@ -416,11 +417,11 @@ abstract class P11ContentSigner implements XiContentSigner {
       HashAlgo hashAlgo = signAlgo.getHashAlgo();
       Long mech = hashMechMap.get(hashAlgo);
 
-      if (mech != null && identity.supportsMechanism(mech)) {
+      if (mech != null && identity.supportsSign(mech)) {
         mechanism = mech;
-      } else if (identity.supportsMechanism(CKM_RSA_PKCS)) {
+      } else if (identity.supportsSign(CKM_RSA_PKCS)) {
         mechanism = CKM_RSA_PKCS;
-      } else if (identity.supportsMechanism(CKM_RSA_X_509)) {
+      } else if (identity.supportsSign(CKM_RSA_X_509)) {
         mechanism = CKM_RSA_X_509;
       } else {
         throw new XiSecurityException("unsupported signature algorithm " + signAlgo);
@@ -507,15 +508,15 @@ abstract class P11ContentSigner implements XiContentSigner {
       HashAlgo hashAlgo = signAlgo.getHashAlgo();
 
       Long mech = hashMechMap.get(hashAlgo);
-      if (mech != null && identity.supportsMechanism(mech)) {
+      if (mech != null && identity.supportsSign(mech)) {
         this.mechanism = mech;
         this.parameters = new P11Params.P11RSAPkcsPssParams(hashAlgo);
         this.outputStream = new ByteArrayOutputStream();
-      } else if (!signAlgo.getHashAlgo().isShake() && identity.supportsMechanism(CKM_RSA_PKCS_PSS)) {
+      } else if (!signAlgo.getHashAlgo().isShake() && identity.supportsSign(CKM_RSA_PKCS_PSS)) {
         this.mechanism = CKM_RSA_PKCS_PSS;
         this.parameters = new P11Params.P11RSAPkcsPssParams(hashAlgo);
         this.outputStream = new DigestOutputStream(hashAlgo.createDigest());
-      } else if (identity.supportsMechanism(CKM_RSA_X_509)) {
+      } else if (identity.supportsSign(CKM_RSA_X_509)) {
         this.mechanism = CKM_RSA_X_509;
         this.parameters = null;
         AsymmetricBlockCipher cipher = new P11PlainRSASigner();
@@ -593,11 +594,11 @@ abstract class P11ContentSigner implements XiContentSigner {
 
       HashAlgo hashAlgo = signAlgo.getHashAlgo();
       Long mech = hashMechMap.get(hashAlgo);
-      if (mech != null && identity.supportsMechanism(mech)) {
+      if (mech != null && identity.supportsSign(mech)) {
         this.mechanism = mech;
         this.z = null; // not required
         this.outputStream = new ByteArrayOutputStream();
-      } else if (identity.supportsMechanism(CKM_VENDOR_SM2)) {
+      } else if (identity.supportsSign(CKM_VENDOR_SM2)) {
         this.mechanism = CKM_VENDOR_SM2;
         this.z = GMUtil.getSM2Z(curveOid, pubPointX, pubPointY);
         this.outputStream = new DigestOutputStream(hashAlgo.createDigest());

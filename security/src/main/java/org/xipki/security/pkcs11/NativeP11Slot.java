@@ -24,6 +24,8 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.DSAParameter;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x9.ECNamedCurveTable;
+import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
@@ -47,9 +49,7 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -140,7 +140,7 @@ class NativeP11Slot extends P11Slot {
 
       sessions.add(new ConcurrentBagEntry<>(session));
 
-      rsaKeyPairGenMech = supportsMechanism(CKM_RSA_X9_31_KEY_PAIR_GEN)
+      rsaKeyPairGenMech = supportsMechanism(CKM_RSA_X9_31_KEY_PAIR_GEN, CKF_GENERATE_KEY_PAIR)
           ? CKM_RSA_X9_31_KEY_PAIR_GEN : CKM_RSA_PKCS_KEY_PAIR_GEN;
 
       successful = true;
@@ -151,7 +151,7 @@ class NativeP11Slot extends P11Slot {
     }
   } // constructor
 
-  private long[] getSupportedMechanisms() throws TokenException {
+  private Map<Long, MechanismInfo> getSupportedMechanisms() throws TokenException {
     long[] mechanisms = slot.getToken().getMechanismList();
 
     List<Long> newList = new ArrayList<>(mechanisms.length);
@@ -176,16 +176,16 @@ class NativeP11Slot extends P11Slot {
       LOG.info("Ignore mechanisms in smartcard-based HSM: {}", ignoreMechs.substring(0, ignoreMechs.length() - 2));
     }
 
-    if (ignoreMechs.length() == 0) {
-      return mechanisms;
-    } else {
-      long[] ret = new long[newList.size()];
-      int i = 0;
-      for (Long mech : newList) {
-        ret[i++] = mech;
+    Map<Long, MechanismInfo> ret = new HashMap<>(newList.size() * 5 / 4);
+    for (Long mech : newList) {
+      MechanismInfo info = slot.getToken().getMechanismInfo(mech);
+      if (info == null) {
+        LOG.warn("found not MechanismInfo for " + ckmCodeToName(mech) + ", ignore it");
+      } else {
+        ret.put(mech, info);
       }
-      return ret;
     }
+    return ret;
   } // method getSupportedMechanisms()
 
   @Override
@@ -215,7 +215,7 @@ class NativeP11Slot extends P11Slot {
     }
 
     long keyHandle = notNull(identity, "identity").getId().getKeyId().getHandle();
-    assertMechanismSupported(mech);
+    assertMechanismSupported(mech, CKF_DIGEST);
 
     if (LOG.isTraceEnabled()) {
       LOG.debug("digest (init, digestKey, then finish) secret key {}", identity.getId());
@@ -253,7 +253,7 @@ class NativeP11Slot extends P11Slot {
 
   byte[] sign(long mech, P11Params parameters, byte[] content, NativeP11Identity identity) throws TokenException {
     notNull(content, "content");
-    assertMechanismSupported(mech);
+    assertMechanismSupported(mech, CKF_SIGN);
 
     Mechanism mechanismObj = getMechanism(mech, parameters);
     long signingKeyHandle = identity.getId().getKeyId().getHandle();
@@ -437,12 +437,14 @@ class NativeP11Slot extends P11Slot {
         } else {
           throw new IllegalStateException("unknown key type " + ckkCodeToName(keyType));
         }
+      } else if (objClass == CKO_SECRET_KEY) {
+        // do nothing
       } else {
         // should not reach here
         throw new IllegalStateException("unknown object class " + ckoCodeToName(objClass));
       }
 
-      return p11Identity;
+      return p11Identity.sign(session.getBooleanAttrValue(handle, CKA_SIGN));
     } finally {
       sessions.requite(bagEntry);
     }
@@ -645,7 +647,7 @@ class NativeP11Slot extends P11Slot {
       throw new IllegalArgumentException("unsupported key type 0x" + codeToName(Category.CKK, keyType));
     }
 
-    assertMechanismSupported(mech);
+    assertMechanismSupported(mech, CKF_GENERATE);
 
     String label;
     if (newObjectConf.isIgnoreLabel()) {
@@ -951,7 +953,7 @@ class NativeP11Slot extends P11Slot {
   @Override
   protected P11IdentityId doGenerateSM2Keypair(P11NewKeyControl control) throws TokenException {
     long ckm = CKM_VENDOR_SM2_KEY_PAIR_GEN;
-    if (supportsMechanism(ckm)) {
+    if (supportsMechanism(ckm, CKF_GENERATE_KEY_PAIR)) {
       KeyPairTemplate template = new KeyPairTemplate(CKK_VENDOR_SM2);
       template.publicKey().ecParams(Hex.decode("06082A811CCF5501822D"));
       setKeyPairAttributes(control, template, newObjectConf);
@@ -966,7 +968,7 @@ class NativeP11Slot extends P11Slot {
   protected PrivateKeyInfo doGenerateSM2KeypairOtf() throws TokenException {
     long ckm = CKM_VENDOR_SM2_KEY_PAIR_GEN;
 
-    return supportsMechanism(ckm)
+    return supportsMechanism(ckm, CKF_GENERATE_KEY_PAIR)
         ? doGenerateECKeypairOtf(CKK_VENDOR_SM2, ckm, GMObjectIdentifiers.sm2p256v1)
         : doGenerateECKeypairOtf(GMObjectIdentifiers.sm2p256v1);
   }
@@ -997,7 +999,22 @@ class NativeP11Slot extends P11Slot {
         try {
           keypair = session.generateKeyPair(new Mechanism(mech), template);
         } catch (PKCS11Exception ex) {
-          throw new TokenException("could not generate keypair " + ckmCodeToName(mech), ex);
+          if (mech == CKM_EC_KEY_PAIR_GEN) {
+            ASN1ObjectIdentifier curveId = ASN1ObjectIdentifier.getInstance(template.publicKey().ecParams());
+            X9ECParameters ecParams = ECNamedCurveTable.getByOID(curveId);
+            if (ecParams == null) {
+              throw ex;
+            }
+
+            try {
+              template.publicKey().ecParams(ecParams.getEncoded());
+            } catch (IOException ex2) {
+              throw ex;
+            }
+            keypair = session.generateKeyPair(new Mechanism(mech), template);
+          } else {
+            throw new TokenException("could not generate keypair " + ckmCodeToName(mech), ex);
+          }
         }
 
         P11IdentityId ret = new P11IdentityId(slotId,
@@ -1235,14 +1252,7 @@ class NativeP11Slot extends P11Slot {
           if (ecParams == null) {
             curveName = "<N/A>";
           } else  {
-            ASN1ObjectIdentifier curveOid = detectCurveOid(ecParams);
-            if (curveOid != null) {
-              curveName = AlgorithmUtil.getCurveName(curveOid);
-              if (curveName == null) {
-                curveName = curveOid.getId();
-              }
-            }
-
+            curveName = Functions.getCurveName(ecParams);
             if (curveName == null) {
               curveName = "0x" + hex(ecParams);
             }

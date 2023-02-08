@@ -24,6 +24,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
+import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pkcs11.wrapper.TokenException;
@@ -41,6 +42,7 @@ import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
 import org.xipki.util.*;
 
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Queue;
@@ -976,6 +978,44 @@ public class QaSecurityActions {
     }
 
   } // class SpeedEcSignP11
+
+  @Command(scope = "xi", name = "qa-batch-ec-p11",
+      description = "(QA) generate EC keypairs for all known curves in PKCS#11 device")
+  @Service
+  public static class BECGenP11 extends P11Actions.P11KeyGenAction {
+    @Override
+    protected Object execute0() throws Exception {
+      P11Slot slot = getSlot();
+
+      String labelPrefix = label + "-";
+
+      Enumeration allNames = ECNamedCurveTable.getNames();
+      while (allNames.hasMoreElements()) {
+        String curveName = (String) allNames.nextElement();
+
+        ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(curveName);
+        if (curveOid == null) {
+          curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
+        }
+
+        if (curveOid == null) {
+          System.out.println("!!! ignore unknown curve " + curveName);
+          continue;
+        }
+
+        label = labelPrefix + curveName;
+        finalize("EC", slot.generateECKeypair(curveOid, getControl()));
+      }
+
+      String[] edeccurves = new String[]{EdECConstants.ED25519, EdECConstants.ED448,
+          EdECConstants.X25519, EdECConstants.X448};
+      for (String curveName : edeccurves) {
+        label = labelPrefix + curveName;
+        finalize("EC", slot.generateECKeypair(EdECConstants.getCurveOid(curveName), getControl()));
+      }
+      return null;
+    }
+  }
 
   private static ASN1ObjectIdentifier getCurveOid(String curveName) {
     ASN1ObjectIdentifier curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);

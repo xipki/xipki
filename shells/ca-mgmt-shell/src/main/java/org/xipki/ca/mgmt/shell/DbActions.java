@@ -225,7 +225,6 @@ public class DbActions {
       props.setProperty("minimumIdle", "1");
       try (DataSourceWrapper dataSource =
                new DataSourceFactory().createDataSource("default", props, passwordResolver)) {
-
         DatabaseType dbType = dataSource.getDatabaseType();
         String type;
         switch (dbType) {

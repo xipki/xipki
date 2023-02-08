@@ -21,6 +21,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.wrapper.MechanismInfo;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
@@ -132,7 +133,7 @@ public abstract class P11Slot implements Closeable {
 
   private final SecureRandom random = new SecureRandom();
 
-  private final Set<Long> mechanisms = new HashSet<>();
+  private final Map<Long, MechanismInfo> mechanisms = new HashMap<>();
 
   protected final List<Long> secretKeyTypes;
   protected final List<Long> keyPairTypes;
@@ -358,18 +359,20 @@ public abstract class P11Slot implements Closeable {
   @Override
   public abstract void close();
 
-  protected void initMechanisms(long[] supportedMechanisms, P11MechanismFilter mechanismFilter) {
+  protected void initMechanisms(Map<Long, MechanismInfo> supportedMechanisms, P11MechanismFilter mechanismFilter) {
     mechanisms.clear();
 
     List<Long> ignoreMechs = new ArrayList<>();
 
-    for (long mech : supportedMechanisms) {
+    for (Map.Entry<Long, MechanismInfo> entry : supportedMechanisms.entrySet()) {
+      long mech = entry.getKey();
       if (mechanismFilter.isMechanismPermitted(slotId, mech)) {
-        mechanisms.add(mech);
+        mechanisms.put(mech, entry.getValue());
       } else {
         ignoreMechs.add(mech);
       }
     }
+    Collections.sort(ignoreMechs);
 
     if (LOG.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
@@ -386,53 +389,39 @@ public abstract class P11Slot implements Closeable {
       if (ignoreMechs.isEmpty()) {
         sb.append("  NONE\n");
       } else {
-        printMechanisms(sb, ignoreMechs);
+        for (Long mech : ignoreMechs) {
+          sb.append("\n  ").append(ckmCodeToName(mech));
+        }
       }
       LOG.info(sb.toString());
     }
   }
 
-  private static void printMechanisms(StringBuilder sb, Collection<Long> mechanisms) {
-    List<Long> sortedMechs = new ArrayList<>(mechanisms);
+  private static void printMechanisms(StringBuilder sb, Map<Long, MechanismInfo> mechanisms) {
+    List<Long> sortedMechs = new ArrayList<>(mechanisms.keySet());
     Collections.sort(sortedMechs);
 
     List<String> mechNames = new ArrayList<>(mechanisms.size());
     int maxNameLen = 0;
     for (Long mech : sortedMechs) {
-      String name = ckmCodeToName(mech);
-      maxNameLen = Math.max(maxNameLen, name.length());
-      mechNames.add(name);
-    }
-
-    int numNamesPerLine = Math.max(1, 100 / (maxNameLen + 2));
-    String line = "";
-    int numNamesInThisLine = 0;
-    for (String name : mechNames) {
-      line += "  " + formatString(name, maxNameLen, false);
-      numNamesInThisLine++;
-      if (numNamesInThisLine == numNamesPerLine) {
-        sb.append(line).append("\n");
-        numNamesInThisLine = 0;
-        line = "";
-      }
-    }
-
-    if (line.length() > 0) {
-      sb.append(line);
+      sb.append("  ").append(ckmCodeToName(mech)).append("\n")
+          .append(mechanisms.get(mech).toString("  ")).append("\n");
     }
   }
 
-  public Set<Long> getMechanisms() {
-    return Collections.unmodifiableSet(mechanisms);
+  public Map<Long, MechanismInfo> getMechanisms() {
+    return Collections.unmodifiableMap(mechanisms);
   }
 
-  public boolean supportsMechanism(long mechanism) {
-    return mechanisms.contains(mechanism);
+  public boolean supportsMechanism(long mechanism, long flagBit) {
+    MechanismInfo info = mechanisms.get(mechanism);
+    return info == null ? false : info.hasFlagBit(flagBit);
   }
 
-  public void assertMechanismSupported(long mechanism) throws TokenException {
-    if (!mechanisms.contains(mechanism)) {
-      throw new TokenException("mechanism " + ckmCodeToName(mechanism) + " is not supported by PKCS11 slot " + slotId);
+  public void assertMechanismSupported(long mechanism, long flagBit) throws TokenException {
+    if (!supportsMechanism(mechanism, flagBit)) {
+      throw new TokenException("mechanism " + ckmCodeToName(mechanism) + " for "
+          + codeToName(Category.CKF_MECHANISM, flagBit) + " is not supported by PKCS11 slot " + slotId);
     }
   }
 
@@ -566,7 +555,8 @@ public abstract class P11Slot implements Closeable {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + keysize);
     }
 
-    if (!(supportsMechanism(CKM_RSA_X9_31_KEY_PAIR_GEN) || supportsMechanism(CKM_RSA_PKCS_KEY_PAIR_GEN))) {
+    if (!(supportsMechanism(CKM_RSA_X9_31_KEY_PAIR_GEN, CKF_GENERATE_KEY_PAIR)
+        || supportsMechanism(CKM_RSA_PKCS_KEY_PAIR_GEN, CKF_GENERATE_KEY_PAIR))) {
       throw new TokenException(buildOrMechanismsUnsupportedMessage(
           CKM_RSA_X9_31_KEY_PAIR_GEN, CKM_RSA_PKCS_KEY_PAIR_GEN));
     }
@@ -622,7 +612,7 @@ public abstract class P11Slot implements Closeable {
     notNull(q, "q");
     notNull(g, "g");
 
-    assertMechanismSupported(CKM_DSA_KEY_PAIR_GEN);
+    assertMechanismSupported(CKM_DSA_KEY_PAIR_GEN, CKF_GENERATE_KEY_PAIR);
     return generateDSAKeypairOtf0(p, q, g);
   }
 
@@ -688,13 +678,13 @@ public abstract class P11Slot implements Closeable {
     notNull(curveOid, "curveOid");
 
     if (EdECConstants.isEdwardsCurve(curveOid)) {
-      assertMechanismSupported(CKM_EC_EDWARDS_KEY_PAIR_GEN);
+      assertMechanismSupported(CKM_EC_EDWARDS_KEY_PAIR_GEN, CKF_GENERATE_KEY_PAIR);
       return doGenerateECEdwardsKeypairOtf(curveOid);
     } else if (EdECConstants.isMontgomeryCurve(curveOid)) {
-      assertMechanismSupported(CKM_EC_MONTGOMERY_KEY_PAIR_GEN);
+      assertMechanismSupported(CKM_EC_MONTGOMERY_KEY_PAIR_GEN, CKF_GENERATE_KEY_PAIR);
       return doGenerateECMontgomeryKeypairOtf(curveOid);
     } else {
-      assertMechanismSupported(CKM_EC_KEY_PAIR_GEN);
+      assertMechanismSupported(CKM_EC_KEY_PAIR_GEN, CKF_GENERATE_KEY_PAIR);
       return doGenerateECKeypairOtf(curveOid);
     }
   }
@@ -738,7 +728,7 @@ public abstract class P11Slot implements Closeable {
    *         if PKCS#11 token exception occurs.
    */
   public PrivateKeyInfo generateSM2KeypairOtf() throws TokenException {
-    assertMechanismSupported(CKM_VENDOR_SM2_KEY_PAIR_GEN);
+    assertMechanismSupported(CKM_VENDOR_SM2_KEY_PAIR_GEN, CKF_GENERATE_KEY_PAIR);
     return doGenerateSM2KeypairOtf();
   }
 
@@ -763,11 +753,11 @@ public abstract class P11Slot implements Closeable {
     notNull(control, "control");
     assertWritable(methodName);
     if (orMechanisms.length < 2) {
-      assertMechanismSupported(orMechanisms[0]);
+      assertMechanismSupported(orMechanisms[0], CKF_GENERATE_KEY_PAIR);
     } else {
       boolean mechSupported = false;
       for (long mechanism : orMechanisms) {
-        if (supportsMechanism(mechanism)) {
+        if (supportsMechanism(mechanism, CKF_GENERATE_KEY_PAIR)) {
           mechSupported = true;
           break;
         }
@@ -805,13 +795,7 @@ public abstract class P11Slot implements Closeable {
 
     StringBuilder sb = new StringBuilder();
     sb.append("\nSupported mechanisms:\n");
-    List<Long> sortedMechs = new ArrayList<>(mechanisms);
-    int no = 0;
-    Collections.sort(sortedMechs);
-    for (Long mech : sortedMechs) {
-      sb.append("  ").append(formatNumber(++no, 3)).append(". ").append(ckmCodeToName(mech)).append("\n");
-    }
-
+    printMechanisms(sb, mechanisms);
     stream.write(sb.toString().getBytes(StandardCharsets.UTF_8));
   }
 

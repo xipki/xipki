@@ -22,10 +22,7 @@ import org.apache.karaf.shell.api.console.Completer;
 import org.apache.karaf.shell.api.console.Session;
 import org.apache.karaf.shell.support.completers.StringsCompleter;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Completer with static enums.
@@ -47,6 +44,10 @@ public abstract class EnumCompleter implements Completer {
 
   protected void setTokens(String... a) {
     setTokens(Arrays.asList(a));
+  }
+
+  public List<String> enums() {
+    return Collections.unmodifiableList(enums);
   }
 
   @Override
