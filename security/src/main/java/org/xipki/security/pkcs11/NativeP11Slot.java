@@ -477,7 +477,6 @@ class NativeP11Slot extends P11Slot {
           || keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
         byte[] ecPoint = session.getByteArrayAttrValue(publicKeyHandle, CKA_EC_POINT);
         ASN1ObjectIdentifier curveOid = identity.getEcParams();
-        byte[] encodedPoint = DEROctetString.getInstance(ecPoint).getOctets();
 
         if (keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
           if (keyType == CKK_EC_EDWARDS) {
@@ -489,7 +488,7 @@ class NativeP11Slot extends P11Slot {
               throw new TokenException("unknown Montgomery curve OID " + curveOid);
             }
           }
-          SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(new AlgorithmIdentifier(curveOid), encodedPoint);
+          SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(new AlgorithmIdentifier(curveOid), ecPoint);
           try {
             return KeyUtil.generatePublicKey(pkInfo);
           } catch (InvalidKeySpecException ex) {
@@ -497,7 +496,7 @@ class NativeP11Slot extends P11Slot {
           }
         } else {
           try {
-            return KeyUtil.createECPublicKey(curveOid, encodedPoint);
+            return KeyUtil.createECPublicKey(curveOid, ecPoint);
           } catch (InvalidKeySpecException ex) {
             throw new TokenException(ex.getMessage(), ex);
           }
@@ -905,11 +904,13 @@ class NativeP11Slot extends P11Slot {
     KeyPairTemplate template = new KeyPairTemplate(keyType);
     setPrivateKeyAttrsOtf(template.privateKey());
 
+    byte[] ecParams;
     try {
-      template.publicKey().ecParams(curveId.getEncoded());
+      ecParams = curveId.getEncoded();
     } catch (IOException ex) {
       throw new TokenException(ex.getMessage(), ex);
     }
+    template.publicKey().ecParams(ecParams);
 
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
@@ -918,26 +919,26 @@ class NativeP11Slot extends P11Slot {
       PKCS11KeyPair keypair = null;
       try {
         keypair = session.generateKeyPair(new Mechanism(mech), template);
-
         byte[] ecPoint = session.getByteArrayAttrValue(keypair.getPublicKey(), CKA_EC_POINT);
-        byte[] encodedPublicPoint = DEROctetString.getInstance(ecPoint).getOctets();
-
         byte[] privValue = session.getByteArrayAttrValue(keypair.getPrivateKey(), CKA_VALUE);
 
         if (CKK_EC_EDWARDS == keyType || CKK_EC_MONTGOMERY == keyType) {
           AlgorithmIdentifier algId = new AlgorithmIdentifier(curveId);
-          return new PrivateKeyInfo(algId, new DEROctetString(privValue), null, encodedPublicPoint);
+          return new PrivateKeyInfo(algId, new DEROctetString(privValue), null, ecPoint);
         } else {
           AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveId);
 
-          if (encodedPublicPoint[0] != 4) {
+          if (ecPoint[0] != 4) {
             throw new TokenException("EcPoint does not start with 0x04");
           }
 
-          int orderBigLen = (encodedPublicPoint.length - 1) / 2 * 8;
+          Integer orderBitLen = Functions.getCurveOrderBitLength(ecParams);
+          if (orderBitLen == null) {
+            throw new TokenException("unknown curve " + curveId.getId());
+          }
           return new PrivateKeyInfo(algId,
-              new org.bouncycastle.asn1.sec.ECPrivateKey(orderBigLen,
-                  new BigInteger(1, privValue), new DERBitString(encodedPublicPoint), null));
+              new org.bouncycastle.asn1.sec.ECPrivateKey(orderBitLen,
+                  new BigInteger(1, privValue), new DERBitString(ecPoint), null));
         }
       } catch (PKCS11Exception | IOException ex) {
         throw new TokenException("could not generate keypair " + ckmCodeToName(mech), ex);
