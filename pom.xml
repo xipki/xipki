@@ -37,8 +37,8 @@
     <slf4j.version>1.7.32</slf4j.version>
     <slf4j.4tinylog.version>2.0.6</slf4j.4tinylog.version>
     <!-- can be one of ipkcs11wrapper and jpkcs11wrapper -->
-    <pkcs11wrapper.artifactId>jpkcs11wrapper</pkcs11wrapper.artifactId>
-    <pkcs11wrapper.version>1.0.1-SNAPSHOT</pkcs11wrapper.version>
+    <pkcs11wrapper.artifactId>ipkcs11wrapper</pkcs11wrapper.artifactId>
+    <pkcs11wrapper.version>1.0.0-SNAPSHOT</pkcs11wrapper.version>
     <hikaricp.version>4.0.3</hikaricp.version>
     <gson.version>2.10.1</gson.version>
     <zip4j.version>2.11.3</zip4j.version>
