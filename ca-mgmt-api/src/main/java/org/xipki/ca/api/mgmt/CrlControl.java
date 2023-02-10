@@ -30,12 +30,31 @@ import java.util.List;
  * # The following settings are only for updateMode 'interval'
  *
  * # Intervals between two full CRLs. Default is 1.
- * # Should be greater than 0
+ * # Valid values depends on interval.hours:
+ * # -  1 hour:  any positive number
+ * # -  2 hours: 1, 2, 3, 4, 6, 12, 24, 36, ...(+12 = 24/2)
+ * # -  3 hours: 1, 2, 4,        8, 16, 24, ...(+8  = 24/3)
+ * # -  4 hours: 1, 2, 3,        6, 12, 18, ...(+6  = 24/4)
+ * # -  6 hours: 1, 2,           4,  8, 12, ...(+4  = 24/6)
+ * # -  8 hours: 1,              3,  6,  9, ...(+3  = 24/8)
+ * # - 12 hours: 1,              2,  4,  6, ...(+2  = 24/12)
+ * # - 24 hours: any positive number
+ *
  * fullcrl.intervals=&lt;integer&gt;
  *
  * # Elapsed intervals before a deltaCRL is generated since the last CRL or deltaCRL.
  * # Should be 0 or a positive integer less than fullcrl.intervals. Default is 0.
  * # 0 indicates that no deltaCRL will be generated
+ * #
+ * # Valid values depends on interval.hours:
+ * # -  1 hour:  any positive number
+ * # -  2 hours: 1, 2, 3, 4, 6, 12, 24, 36, ...(+12 = 24/2)
+ * # -  3 hours: 1, 2, 4,        8, 16, 24, ...(+8  = 24/3)
+ * # -  4 hours: 1, 2, 3,        6, 12, 18, ...(+6  = 24/4)
+ * # -  6 hours: 1, 2,           4,  8, 12, ...(+4  = 24/6)
+ * # -  8 hours: 1,              3,  6,  9, ...(+3  = 24/8)
+ * # - 12 hours: 1,              2,  4,  6, ...(+2  = 24/12)
+ * # - 24 hours: any positive number
  * deltacrl.intervals=&lt;integer&gt;
  *
  * # Overlap time, unit is m (minutes), h (hour), d (day), w (week), y (year).
@@ -47,7 +66,6 @@ import java.util.List;
  * interval.hours=&lt;integer&gt;
  *
  * # UTC time at which CRL is generated, Default is 01:00.
- * # If day.intervals is greater than 1, this specifies only one of the generation times.
  * interval.time=&lt;update time (hh:mm of UTC time)&gt;
  *
  * # If set to true, the nextUpdate of a fullCRL is set to the update time of the next fullCRL.
@@ -150,8 +168,16 @@ public class CrlControl {
     this.excludeReason = getBoolean(props, KEY_EXCLUDE_REASON, false);
     this.includeExpiredCerts = getBoolean(props, KEY_INCLUDE_EXPIREDCERTS, false);
 
+    int h = getInteger(props, KEY_INTERVAL_HOURS, 24);
+    if (h != 1 && h != 2 && h != 3 && h != 4 && h != 6 && h != 8 && h != 12 && h != 24) {
+      throw new InvalidConfException(KEY_INTERVAL_HOURS + " " + h + " not in [1,2,3,4,6,8,12,24]");
+    }
+
+    this.intervalHours = h;
+    this.intervalMillis = h * 60L * 60 * 1000;
+
     // Maximal interval allowed by CA/Browser Forum's Baseline Requirements
-    this.fullCrlIntervals = getInteger(props, KEY_FULLCRL_INTERVALS, 7);
+    this.fullCrlIntervals = getInteger(props, KEY_FULLCRL_INTERVALS, 7 * 24 / h);
     this.deltaCrlIntervals = getInteger(props, KEY_DELTACRL_INTERVALS, 0);
     this.extendedNextUpdate = getBoolean(props, KEY_FULLCRL_EXTENDED_NEXTUPDATE, false);
 
@@ -172,13 +198,6 @@ public class CrlControl {
     } else {
       this.overlap = ov;
     }
-
-    int hours = getInteger(props, KEY_INTERVAL_HOURS, 24);
-    if (!(hours >= 1 && hours <= 24 && (24 - 24 / hours * hours == 0))) {
-      throw new InvalidConfException(KEY_INTERVAL_HOURS + " " + hours + " not in [1,2,3,4,6,8,12,24]");
-    }
-    this.intervalHours = hours;
-    this.intervalMillis = hours * 60L * 60 * 1000;
 
     str = props.value(KEY_INTERVAL_TIME);
 
@@ -291,17 +310,28 @@ public class CrlControl {
   }
 
   public final void validate() throws InvalidConfException {
-    if (fullCrlIntervals < deltaCrlIntervals) {
-      throw new InvalidConfException(
-          "fullCRLIntervals may not be less than deltaCRLIntervals " + fullCrlIntervals + " < " + deltaCrlIntervals);
-    }
-
-    if (fullCrlIntervals < 1) {
-      throw new InvalidConfException("fullCRLIntervals may not be less than 1: " + fullCrlIntervals);
+    int h = intervalHours;
+    if (!(h == 1 || h == 2 || h == 3 || h == 4 || h == 6 || h == 8 || h == 12 || h == 24)) {
+      throw new InvalidConfException(intervalHours + " " + h + " not in [1,2,3,4,6,8,12,24]");
     }
 
     if (deltaCrlIntervals < 0) {
       throw new InvalidConfException("deltaCRLIntervals may not be less than 0: " + deltaCrlIntervals);
+    } else if (deltaCrlIntervals > 0 && deltaCrlIntervals >= fullCrlIntervals) {
+      throw new InvalidConfException("deltaCrlIntervals shall not be greater than or equal to fullCrlIntervals: "
+              + deltaCrlIntervals + " >= " + fullCrlIntervals);
+    }
+
+    int prod = fullCrlIntervals * intervalHours;
+    if (!(fullCrlIntervals > 0 && (prod % 24 == 0 || 24 % prod == 0))) {
+      throw new InvalidConfException("invalid fullCRLIntervals: " + fullCrlIntervals);
+    }
+
+    if (deltaCrlIntervals > 0) {
+      prod = deltaCrlIntervals * intervalHours;
+      if (!(prod % 24 == 0 || 24 % prod == 0)) {
+        throw new InvalidConfException("invalid deltaCRLIntervals: " + deltaCrlIntervals);
+      }
     }
 
   } // method validate
