@@ -1,5 +1,3 @@
-// #THIRDPARTY# HikariCP
-
 /*
  * Copyright (C) 2013, 2014 Brett Wooldridge
  *
@@ -30,7 +28,9 @@ import java.util.function.UnaryOperator;
  *
  * @author Brett Wooldridge
  */
+@SuppressWarnings("NullableProblems")
 public final class FastList<T> implements List<T>, RandomAccess, Serializable {
+  private static final long serialVersionUID = -4598088075242913858L;
 
   private final Class<?> clazz;
   private T[] elementData;
@@ -80,11 +80,6 @@ public final class FastList<T> implements List<T>, RandomAccess, Serializable {
     return true;
   }
 
-  @Override
-  public void add(int index, T element) {
-    throw new UnsupportedOperationException();
-  }
-
   /**
    * Get the element at the specified index.
    *
@@ -107,6 +102,29 @@ public final class FastList<T> implements List<T>, RandomAccess, Serializable {
     T element = elementData[--size];
     elementData[size] = null;
     return element;
+  }
+
+  /**
+   * This remove method is most efficient when the element being removed
+   * is the last element.  Equality is identity based, not equals() based.
+   * Only the first matching element is removed.
+   *
+   * @param element the element to remove
+   */
+  @Override
+  public boolean remove(Object element) {
+    for (int index = size - 1; index >= 0; index--) {
+      if (element == elementData[index]) {
+        final int numMoved = size - index - 1;
+        if (numMoved > 0) {
+          System.arraycopy(elementData, index + 1, elementData, index, numMoved);
+        }
+        elementData[--size] = null;
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -161,31 +179,8 @@ public final class FastList<T> implements List<T>, RandomAccess, Serializable {
     return old;
   }
 
-  /**
-   * This remove method is most efficient when the element being removed
-   * is the last element.  Equality is identity based, not equals() based.
-   * Only the first matching element is removed.
-   *
-   * @param element the element to remove
-   */
   @Override
-  public boolean remove(Object element) {
-    for (int index = size - 1; index >= 0; index--) {
-      if (element == elementData[index]) {
-        final int numMoved = size - index - 1;
-        if (numMoved > 0) {
-          System.arraycopy(elementData, index + 1, elementData, index, numMoved);
-        }
-        elementData[--size] = null;
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  @Override
-  public boolean contains(Object obj) {
+  public boolean contains(Object o) {
     throw new UnsupportedOperationException();
   }
 
@@ -216,42 +211,47 @@ public final class FastList<T> implements List<T>, RandomAccess, Serializable {
   }
 
   @Override
-  public <E> E[] toArray(E[] ar) {
+  public <E> E[] toArray(E[] a) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public boolean containsAll(Collection<?> co) {
+  public boolean containsAll(Collection<?> c) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public boolean addAll(Collection<? extends T> co) {
+  public boolean addAll(Collection<? extends T> c) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public boolean addAll(int index, Collection<? extends T> co) {
+  public boolean addAll(int index, Collection<? extends T> c) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public boolean removeAll(Collection<?> cc) {
+  public boolean removeAll(Collection<?> c) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public boolean retainAll(Collection<?> co) {
+  public boolean retainAll(Collection<?> c) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public int indexOf(Object ob) {
+  public void add(int index, T element) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public int lastIndexOf(Object ob) {
+  public int indexOf(Object o) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public int lastIndexOf(Object o) {
     throw new UnsupportedOperationException();
   }
 
@@ -296,7 +296,7 @@ public final class FastList<T> implements List<T>, RandomAccess, Serializable {
   }
 
   @Override
-  public void sort(Comparator<? super T> co) {
+  public void sort(Comparator<? super T> c) {
     throw new UnsupportedOperationException();
   }
 
