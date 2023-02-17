@@ -192,7 +192,7 @@ class NativeP11SlotUtil {
         LOG.warn("label is set, but ignored: '{}'", control.getLabel());
       }
     } else {
-      template.label(control.getLabel());
+      template.labels(control.getLabel());
     }
 
     if (control.getExtractable() != null) {
