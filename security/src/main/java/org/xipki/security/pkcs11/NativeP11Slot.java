@@ -312,10 +312,10 @@ class NativeP11Slot extends P11Slot {
   } // method openSession
 
   private ConcurrentBagEntry<Session> borrowSession() throws TokenException {
-    return doBorrowSession(0);
+    return doBorrowSession(0, System.currentTimeMillis() + timeOutWaitNewSession);
   }
 
-  private ConcurrentBagEntry<Session> doBorrowSession(int retries) throws TokenException {
+  private ConcurrentBagEntry<Session> doBorrowSession(int retries, long maxTimeMs) throws TokenException {
     ConcurrentBagEntry<Session> session = null;
     synchronized (sessions) {
       if (countSessions.get() < maxSessionCount) {
@@ -332,8 +332,9 @@ class NativeP11Slot extends P11Slot {
     }
 
     if (session == null) {
+      long timeOutMs = maxTimeMs - System.currentTimeMillis();
       try {
-        session = sessions.borrow(timeOutWaitNewSession, TimeUnit.MILLISECONDS);
+        session = sessions.borrow(Math.max(1, timeOutMs), TimeUnit.MILLISECONDS);
       } catch (InterruptedException ex) {
       }
     }
@@ -365,7 +366,7 @@ class NativeP11Slot extends P11Slot {
       sessions.remove(session);
       countSessions.decrementAndGet();
       if (retries < maxSessionCount) {
-        return doBorrowSession(retries + 1);
+        return doBorrowSession(retries + 1, maxTimeMs);
       } else {
         throw new TokenException("could not borrow session after " + (retries + 1) + " tries.");
       }
