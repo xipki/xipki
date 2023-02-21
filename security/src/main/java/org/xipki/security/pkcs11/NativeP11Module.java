@@ -143,6 +143,11 @@ public class NativeP11Module extends P11Module {
   public static P11Module getInstance(P11ModuleConf moduleConf) throws TokenException {
     notNull(moduleConf, "moduleConf");
 
+    long userType = moduleConf.getUserType();
+    if (userType == PKCS11Constants.CKU_SO) {
+      throw new TokenException("CKU_SO is not allowed in P11Module, too dangerous.");
+    }
+
     String path = moduleConf.getNativeLibrary();
     path = IoUtil.expandFilepath(path, false);
 
