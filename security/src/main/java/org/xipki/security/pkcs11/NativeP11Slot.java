@@ -312,6 +312,10 @@ class NativeP11Slot extends P11Slot {
   } // method openSession
 
   private ConcurrentBagEntry<Session> borrowSession() throws TokenException {
+    return doBorrowSession(0);
+  }
+
+  private ConcurrentBagEntry<Session> doBorrowSession(int retries) throws TokenException {
     ConcurrentBagEntry<Session> session = null;
     synchronized (sessions) {
       if (countSessions.get() < maxSessionCount) {
@@ -338,7 +342,40 @@ class NativeP11Slot extends P11Slot {
       throw new TokenException("no idle session");
     }
 
-    login(session.value());
+    SessionInfo sessionInfo = null;
+    try {
+      sessionInfo = session.value().getSessionInfo();
+    } catch (PKCS11Exception ex) {
+      long ckr = ex.getErrorCode();
+      LOG.warn("error getSessionInfo: {}", ckrCodeToName(ckr));
+      if (ckr != CKR_SESSION_CLOSED && ckr != CKR_SESSION_HANDLE_INVALID) {
+        throw ex;
+      }
+    }
+
+    long deviceError = 0;
+    if (sessionInfo != null) {
+      deviceError = sessionInfo.getDeviceError();
+      if (deviceError != 0) {
+        LOG.error("device has error {}", deviceError);
+      }
+    }
+
+    if (sessionInfo == null || deviceError != 0) {
+      sessions.remove(session);
+      countSessions.decrementAndGet();
+      if (retries < maxSessionCount) {
+        return doBorrowSession(retries + 1);
+      } else {
+        throw new TokenException("could not borrow session after " + (retries + 1) + " tries.");
+      }
+    }
+
+    if (LOG.isTraceEnabled()) {
+      LOG.debug("SessionInfo: {}", sessionInfo);
+    }
+
+    login(session.value(), sessionInfo.getState());
     return session;
   } // method borrowSession
 
@@ -363,9 +400,11 @@ class NativeP11Slot extends P11Slot {
     }
   } // method firstLogin
 
-  private void login(Session session) throws TokenException {
-    boolean isSessionLoggedIn = checkSessionLoggedIn(session, userType);
-    if (isSessionLoggedIn) {
+  private void login(Session session, long sessionState) throws TokenException {
+    boolean sessionLoggedIn = (userType == CKU_SO) ? (sessionState == CKS_RW_SO_FUNCTIONS)
+        : (sessionState == CKS_RW_USER_FUNCTIONS) || (sessionState == CKS_RO_USER_FUNCTIONS);
+    LOG.debug("sessionLoggedIn: {}", sessionLoggedIn);
+    if (sessionLoggedIn) {
       return;
     }
 

@@ -102,28 +102,6 @@ class NativeP11SlotUtil {
     return new Mechanism(mechanism, paramObj);
   } // method getMechanism
 
-  static boolean checkSessionLoggedIn(Session session, long userType) throws TokenException {
-    SessionInfo info = session.getSessionInfo();
-    if (LOG.isTraceEnabled()) {
-      LOG.debug("SessionInfo: {}", info);
-    }
-
-    long state = info.getState();
-    long deviceError = info.getDeviceError();
-
-    LOG.debug("to be verified PKCS11Module: state = {}, deviceError: {}", codeToName(Category.CKS, state), deviceError);
-    if (deviceError != 0) {
-      LOG.error("deviceError {}", deviceError);
-      return false;
-    }
-
-    boolean sessionLoggedIn = (userType == CKU_SO) ? (state == CKS_RW_SO_FUNCTIONS)
-        : (state == CKS_RW_USER_FUNCTIONS) || (state == CKS_RO_USER_FUNCTIONS);
-
-    LOG.debug("sessionLoggedIn: {}", sessionLoggedIn);
-    return sessionLoggedIn;
-  } // method checkSessionLoggedIn
-
   static List<Long> getObjects(Session session, AttributeVector template) throws TokenException {
     return getObjects(session, template, 9999);
   }
