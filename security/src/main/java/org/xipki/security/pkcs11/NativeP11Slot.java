@@ -49,6 +49,7 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
+import java.time.Clock;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -74,6 +75,8 @@ class NativeP11Slot extends P11Slot {
   private static final Logger LOG = LoggerFactory.getLogger(NativeP11Slot.class);
 
   private static final long DEFAULT_MAX_COUNT_SESSION = 32;
+
+  private static final Clock clock = Clock.systemUTC();
 
   private final int maxMessageSize;
 
@@ -312,7 +315,7 @@ class NativeP11Slot extends P11Slot {
   } // method openSession
 
   private ConcurrentBagEntry<Session> borrowSession() throws TokenException {
-    return doBorrowSession(0, System.currentTimeMillis() + timeOutWaitNewSession);
+    return doBorrowSession(0, clock.millis() + timeOutWaitNewSession);
   }
 
   private ConcurrentBagEntry<Session> doBorrowSession(int retries, long maxTimeMs) throws TokenException {
@@ -332,7 +335,7 @@ class NativeP11Slot extends P11Slot {
     }
 
     if (session == null) {
-      long timeOutMs = maxTimeMs - System.currentTimeMillis();
+      long timeOutMs = maxTimeMs - clock.millis();
       try {
         session = sessions.borrow(Math.max(1, timeOutMs), TimeUnit.MILLISECONDS);
       } catch (InterruptedException ex) {
@@ -343,41 +346,50 @@ class NativeP11Slot extends P11Slot {
       throw new TokenException("no idle session");
     }
 
-    SessionInfo sessionInfo = null;
+    boolean requiteSession = true;
+
     try {
-      sessionInfo = session.value().getSessionInfo();
-    } catch (PKCS11Exception ex) {
-      long ckr = ex.getErrorCode();
-      LOG.warn("error getSessionInfo: {}", ckrCodeToName(ckr));
-      if (ckr != CKR_SESSION_CLOSED && ckr != CKR_SESSION_HANDLE_INVALID) {
-        throw ex;
+      SessionInfo sessionInfo = null;
+      try {
+        sessionInfo = session.value().getSessionInfo();
+      } catch (PKCS11Exception ex) {
+        long ckr = ex.getErrorCode();
+        LOG.warn("error getSessionInfo: {}", ckrCodeToName(ckr));
+      }
+
+      long deviceError = 0;
+      if (sessionInfo != null) {
+        deviceError = sessionInfo.getDeviceError();
+        if (deviceError != 0) {
+          LOG.error("device has error {}", deviceError);
+        }
+      }
+
+      if (sessionInfo == null || deviceError != 0) {
+        requiteSession = false;
+        sessions.remove(session);
+        countSessions.decrementAndGet();
+        if (retries < maxSessionCount) {
+          ConcurrentBagEntry<Session> session2 = doBorrowSession(retries + 1, maxTimeMs);
+          LOG.info("borrowed session after " + (retries + 1) + " tries.");
+          return session2;
+        } else {
+          throw new TokenException("could not borrow session after " + (retries + 1) + " tries.");
+        }
+      }
+
+      if (LOG.isTraceEnabled()) {
+        LOG.debug("SessionInfo: {}", sessionInfo);
+      }
+
+      login(session.value(), sessionInfo.getState());
+      requiteSession = false;
+      return session;
+    } finally {
+      if (requiteSession) {
+        sessions.requite(session);
       }
     }
-
-    long deviceError = 0;
-    if (sessionInfo != null) {
-      deviceError = sessionInfo.getDeviceError();
-      if (deviceError != 0) {
-        LOG.error("device has error {}", deviceError);
-      }
-    }
-
-    if (sessionInfo == null || deviceError != 0) {
-      sessions.remove(session);
-      countSessions.decrementAndGet();
-      if (retries < maxSessionCount) {
-        return doBorrowSession(retries + 1, maxTimeMs);
-      } else {
-        throw new TokenException("could not borrow session after " + (retries + 1) + " tries.");
-      }
-    }
-
-    if (LOG.isTraceEnabled()) {
-      LOG.debug("SessionInfo: {}", sessionInfo);
-    }
-
-    login(session.value(), sessionInfo.getState());
-    return session;
   } // method borrowSession
 
   private void firstLogin(Session session, List<char[]> password) throws TokenException {
