@@ -17,6 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
+import org.xipki.pkcs11.wrapper.StaticLogger;
 import org.xipki.pkcs11.wrapper.TokenException;
 
 /**
@@ -37,6 +38,7 @@ public class NativeP11ModuleFactory implements P11ModuleFactory {
 
   @Override
   public P11Module newModule(P11ModuleConf conf) throws TokenException {
+    StaticLogger.setLogger(P11Logger.INSTANCE);
     return NativeP11Module.getInstance(conf);
   }
 
