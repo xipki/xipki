@@ -191,7 +191,8 @@ public class ConcurrentBag<T extends ConcurrentBagEntry> implements AutoCloseabl
    *         from the bag that was not borrowed or reserved first
    */
   public boolean remove(final T bagEntry) {
-    if (!bagEntry.compareAndSet(STATE_IN_USE, STATE_REMOVED) && !bagEntry.compareAndSet(STATE_RESERVED, STATE_REMOVED) && !closed) {
+    if (!bagEntry.compareAndSet(STATE_IN_USE, STATE_REMOVED)
+        && !bagEntry.compareAndSet(STATE_RESERVED, STATE_REMOVED) && !closed) {
       LOGGER.warn("Attempt to remove an object from the bag that was not borrowed or reserved: {}", bagEntry);
       return false;
     }
@@ -335,7 +336,8 @@ public class ConcurrentBag<T extends ConcurrentBagEntry> implements AutoCloseabl
    */
   private boolean useWeakThreadLocals() {
     try {
-      if (System.getProperty("org.xipki.useWeakReferences") != null) {   // undocumented manual override of WeakReference behavior
+      if (System.getProperty("org.xipki.useWeakReferences") != null) {
+        // undocumented manual override of WeakReference behavior
         return Boolean.getBoolean("org.xipki.useWeakReferences");
       }
 
