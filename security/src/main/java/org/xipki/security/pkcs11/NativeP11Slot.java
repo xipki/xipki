@@ -736,7 +736,7 @@ class NativeP11Slot extends P11Slot {
 
       template.id(id);
       keyHandle = session.generateKey(mechanism, template);
-      label = session.getCkaLabel(keyHandle);
+      label = session.getStringAttrValue(keyHandle, CKA_LABEL);
 
       return new P11IdentityId(slotId, new P11ObjectId(keyHandle, CKO_SECRET_KEY, keyType, id, label), null);
     } finally {
@@ -778,7 +778,7 @@ class NativeP11Slot extends P11Slot {
       keyHandle = session.createObject(template);
 
       try {
-        label = session.getCkaLabel(keyHandle);
+        label = session.getStringAttrValue(keyHandle, CKA_LABEL);
       } catch (PKCS11Exception e) {
       }
 
@@ -1283,7 +1283,7 @@ class NativeP11Slot extends P11Slot {
 
     String keySpec = null;
     if (objClass == CKO_PRIVATE_KEY || objClass == CKO_PUBLIC_KEY || objClass == CKO_SECRET_KEY) {
-      long keyType = session.getCkaKeyType(handle);
+      long keyType = session.getLongAttrValue(handle, CKA_KEY_TYPE);
 
       if (objClass == CKO_SECRET_KEY) {
         int valueLen;
