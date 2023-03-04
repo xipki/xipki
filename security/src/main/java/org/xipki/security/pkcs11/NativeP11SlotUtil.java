@@ -109,31 +109,9 @@ class NativeP11SlotUtil {
   static List<Long> getObjects(Session session, AttributeVector template, int maxNo) throws TokenException {
     List<Long> objList = new LinkedList<>();
 
-    boolean initialized = false;
-
-    try {
-      session.findObjectsInit(template);
-      initialized = true;
-
-      while (objList.size() < maxNo) {
-        int maxObjectCount = Math.min(maxNo - objList.size(), 100);
-        long[] foundObjectHandles = session.findObjects(maxObjectCount);
-        if (foundObjectHandles == null || foundObjectHandles.length == 0) {
-          break;
-        }
-
-        for (long hObject : foundObjectHandles) {
-          objList.add(hObject);
-        }
-      }
-    } finally {
-      if (initialized) {
-        try {
-          session.findObjectsFinal();
-        } catch (Exception ex) {
-          LogUtil.error(LOG, ex, "session.findObjectsFinal() failed");
-        }
-      }
+    long[] objHandles = session.findObjectsSingle(template, maxNo);
+    for (long hObject : objHandles) {
+      objList.add(hObject);
     }
 
     return objList;

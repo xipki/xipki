@@ -285,7 +285,8 @@ class NativeP11Slot extends P11Slot {
 
     byte[] sigvalue;
     if (len <= maxMessageSize) {
-      sigvalue = singleSign(session, mechanism, content, signingKeyHandle);
+      LOG.debug("signSingle");
+      sigvalue = session.signSingle(mechanism, signingKeyHandle, content);
     } else {
       LOG.debug("sign (init, update, then finish)");
       session.signInit(mechanism, signingKeyHandle);
@@ -300,13 +301,6 @@ class NativeP11Slot extends P11Slot {
 
     return sigvalue;
   } // method sign0
-
-  private byte[] singleSign(Session session, Mechanism mechanism, byte[] content, long signingKeyHandle)
-      throws PKCS11Exception {
-    LOG.debug("single sign");
-    session.signInit(mechanism, signingKeyHandle);
-    return session.sign(content);
-  } // method singleSign
 
   private Session openSession() throws TokenException {
     Session session = slot.getToken().openSession(!isReadOnly());
@@ -1230,22 +1224,7 @@ class NativeP11Slot extends P11Slot {
 
     try {
       Session session = session0.value();
-      session.findObjectsInit(null);
-
-      // get handles of all objects
-      List<Long> allHandles = new LinkedList<>();
-      long[] handles;
-      try {
-        do {
-          handles = session.findObjects(10);
-          for (long handle : handles) {
-            allHandles.add(handle);
-          }
-        } while (handles.length >= 10);
-      } finally {
-        session.findObjectsFinal();
-      }
-
+      long[] allHandles = session.findObjectsSingle(null, 99999);
       int no = 0;
       for (long handle : allHandles) {
         String objectText = objectToString(session, handle);
