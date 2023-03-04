@@ -34,6 +34,7 @@ import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
+import org.xipki.pkcs11.wrapper.Functions;
 import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
@@ -52,6 +53,7 @@ import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,81 +91,39 @@ public class SignerUtil {
   }
 
   public static Signer createPSSRSASigner(SignAlgo sigAlgo) throws XiSecurityException {
-    return createPSSRSASigner(sigAlgo, null);
-  }
-
-  public static Signer createPSSRSASigner(SignAlgo sigAlgo, AsymmetricBlockCipher cipher)
-      throws XiSecurityException {
     notNull(sigAlgo, "sigAlgo");
     if (!sigAlgo.isRSAPSSSigAlgo()) {
       throw new XiSecurityException(sigAlgo + " is not an RSAPSS algorithm");
     }
 
     HashAlgo hashAlgo = sigAlgo.getHashAlgo();
-
-    AsymmetricBlockCipher tmpCipher = (cipher == null) ? new RSABlindedEngine() : cipher;
-
-    Digest dig = hashAlgo.createDigest();
-    Digest mgfDig = hashAlgo.createDigest();
-
-    return new PSSSigner(tmpCipher, dig, mgfDig, hashAlgo.getLength(),
+    return new PSSSigner(new RSABlindedEngine(), hashAlgo.createDigest(), hashAlgo.createDigest(), hashAlgo.getLength(),
         org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT);
   } // method createPSSRSASigner
 
   public static byte[] dsaSigPlainToX962(byte[] signature) throws XiSecurityException {
     notNull(signature, "signature");
-    if (signature.length % 2 != 0) {
-      throw new XiSecurityException("signature.lenth must be even, but is odd");
+    byte[] x962Sig = Functions.plainToX962DSASignature(signature);
+    if (Arrays.equals(x962Sig, signature)) {
+      throw new XiSecurityException("signature is not correctly encoded.");
     }
-    byte[] ba = new byte[signature.length / 2];
-    ASN1EncodableVector sigder = new ASN1EncodableVector();
-
-    System.arraycopy(signature, 0, ba, 0, ba.length);
-    sigder.add(new ASN1Integer(new BigInteger(1, ba)));
-
-    System.arraycopy(signature, ba.length, ba, 0, ba.length);
-    sigder.add(new ASN1Integer(new BigInteger(1, ba)));
-
-    DERSequence seq = new DERSequence(sigder);
-    try {
-      return seq.getEncoded();
-    } catch (IOException ex) {
-      throw new XiSecurityException("IOException, message: " + ex.getMessage(), ex);
-    }
-  } // method dsaSigPlainToX962
+    return x962Sig;
+  }
 
   public static byte[] dsaSigX962ToPlain(byte[] x962Signature, int orderBitLen)
       throws XiSecurityException {
     notNull(x962Signature, "x962Signature");
-    try {
-      BufferedInputStream is = new BufferedInputStream(new ByteArrayInputStream(x962Signature));
-      int tag = Asn1StreamParser.markAndReadTag(is);
-      Asn1StreamParser.assertTag(Asn1StreamParser.TAG_CONSTRUCTED_SEQUENCE, tag, "X962Signature");
-      Asn1StreamParser.MyInt lenBytesLen = new Asn1StreamParser.MyInt();
-      int len = Asn1StreamParser.readLength(lenBytesLen, is);
-      if (1 + lenBytesLen.get() + len != x962Signature.length) {
-        throw new XiSecurityException("invalid length");
-      }
-
-      // r
-      byte[] r = Asn1StreamParser.readValue(0x02, is, "r");
-
-      // s
-      byte[] s = Asn1StreamParser.readValue(0x02, is, "s");
-      return dsaSigToPlain(new BigInteger(1, r), new BigInteger(1, s), orderBitLen);
-    } catch (IOException ex) {
-      throw new XiSecurityException("error parsing X509Signature", ex);
+    byte[] plainSig = Functions.x962ToPlainDSASignature(x962Signature, (orderBitLen + 7) / 8);
+    if (Arrays.equals(x962Signature, plainSig)) {
+      throw new XiSecurityException("x962Signature is not correctly encoded.");
     }
-  } // method dsaSigX962ToPlain
+    return plainSig;
+  }
 
-  public static byte[] dsaSigToPlain(BigInteger sigR, BigInteger sigS, int orderBitLen)
-      throws XiSecurityException {
-    notNull(sigR, "sigR");
-    notNull(sigS, "sigS");
-
+  public static byte[] dsaSigToPlain(BigInteger sigR, BigInteger sigS, int orderBitLen) throws XiSecurityException {
     final int blockSize = (orderBitLen + 7) / 8;
-    int bitLenOfR = sigR.bitLength();
-    int bitLenOfS = sigS.bitLength();
+    int bitLenOfR = notNull(sigR, "sigR").bitLength();
+    int bitLenOfS = notNull(sigS, "sigS").bitLength();
     int bitLen = Math.max(bitLenOfR, bitLenOfS);
     if ((bitLen + 7) / 8 > blockSize) {
       throw new XiSecurityException("signature is too large");
@@ -187,8 +147,7 @@ public class SignerUtil {
   } // method bigIntToBytes
 
   public static ContentVerifierProvider getContentVerifierProvider(
-      PublicKey publicKey, DHSigStaticKeyCertPair ownerKeyAndCert)
-      throws InvalidKeyException {
+      PublicKey publicKey, DHSigStaticKeyCertPair ownerKeyAndCert) throws InvalidKeyException {
     notNull(publicKey, "publicKey");
 
     String keyAlg = publicKey.getAlgorithm().toUpperCase();

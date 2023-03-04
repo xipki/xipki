@@ -59,9 +59,7 @@ public class PKCS1Util {
     public static byte[] EMSA_PKCS1_v1_5_encoding(byte[] hashValue, int modulusBigLength, HashAlgo hashAlgo)
         throws XiSecurityException {
         notNull(hashValue, "hashValue");
-        notNull(hashAlgo, "hashAlgo");
-
-        final int hashLen = hashAlgo.getLength();
+        final int hashLen = notNull(hashAlgo, "hashAlgo").getLength();
         range(hashValue.length, "hashValue.length", hashLen, hashLen);
 
         int blockSize = (modulusBigLength + 7) / 8;
@@ -135,7 +133,7 @@ public class PKCS1Util {
         final int hLen = contentDigest.getLength();
         final byte[] salt = new byte[saltLen];
         final byte[] mDash = new byte[8 + saltLen + hLen];
-        final byte trailer = (byte)0xBC;
+        final byte trailer = (byte) 0xBC;
 
         if (hashValue.length != hLen) {
             throw new XiSecurityException("hashValue.length is incorrect: " + hashValue.length + " != " + hLen);
@@ -222,7 +220,7 @@ public class PKCS1Util {
         }
         byte[] DB = new byte[emLen - hLen - 1];
         byte[] H = new byte[hLen];
-        System.arraycopy(EM, 0,                DB, 0, emLen - hLen - 1);
+        System.arraycopy(EM, 0, DB, 0, emLen - hLen - 1);
         System.arraycopy(EM, emLen - hLen - 1, H,  0, hLen);
         // 7. Let dbMask = MGF(H, emLen ? hLen ? 1).
         byte[] dbMask = mgf(mgfDigest, H, emLen - hLen - 1);
@@ -233,7 +231,7 @@ public class PKCS1Util {
         }
         // 9. Set the leftmost 8.emLen ? emBits bits of DB to zero.
         DB[0] &= (0xFF >>> (8*emLen - emBits));
-        // 10. If the emLen -hLen -sLen -2 leftmost octets of DB are not zero or
+        // 10. If the emLen - hLen -sLen -2 leftmost octets of DB are not zero or
         //     if the octet at position emLen -hLen -sLen -1 is not equal to 0x01,
         //     output 'inconsistent' and stop.
         // IMPORTANT (rsn): this is an error in the specs, the index of the 0x01

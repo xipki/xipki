@@ -186,14 +186,12 @@ public class X509Util {
       certBytes = bytes;
     }
 
-    byte[] derBytes = toDerEncoded(certBytes);
-    X509CertificateHolder certHolder;
     try {
-      certHolder = new X509CertificateHolder(derBytes);
+      byte[] derBytes = toDerEncoded(certBytes);
+      return new X509Cert(new X509CertificateHolder(derBytes), derBytes);
     } catch (IOException ex) {
       throw new CertificateEncodingException("error decoding certificate: " + ex.getMessage(), ex);
     }
-    return new X509Cert(certHolder, derBytes);
   }
 
   public static CertificationRequest parseCsr(File file) throws IOException {
@@ -269,25 +267,20 @@ public class X509Util {
   }
 
   public static String toPemCert(X509Cert cert) {
-    notNull(cert, "cert");
-    return StringUtil.toUtf8String(PemEncoder.encode(cert.getEncoded(), PemLabel.CERTIFICATE));
+    return StringUtil.toUtf8String(PemEncoder.encode(notNull(cert, "cert").getEncoded(), PemLabel.CERTIFICATE));
   }
 
-  public static X509Certificate parseX509Certificate(InputStream crlStream)
-      throws CertificateException {
-    notNull(crlStream, "crlStream");
-    return (X509Certificate) getCertFactory().generateCertificate(crlStream);
+  public static X509Certificate parseX509Certificate(InputStream crlStream) throws CertificateException {
+    return (X509Certificate) getCertFactory().generateCertificate(notNull(crlStream, "crlStream"));
   }
 
   public static X509CRLHolder parseCrl(File file) throws IOException, CRLException {
-    notNull(file, "file");
-    return parseCrl(Files.readAllBytes(expandFilepath(file).toPath()));
+    return parseCrl(Files.readAllBytes(expandFilepath(notNull(file, "file")).toPath()));
   }
 
   public static X509CRLHolder parseCrl(byte[] encodedCrl) throws CRLException {
-    byte[] derBytes = toDerEncoded(notNull(encodedCrl, "encodedCrl"));
     try {
-      return new X509CRLHolder(derBytes);
+      return new X509CRLHolder(toDerEncoded(notNull(encodedCrl, "encodedCrl")));
     } catch (IOException ex) {
       throw new CRLException("the given one is not a valid X.509 CRL");
     }
@@ -298,9 +291,7 @@ public class X509Util {
   }
 
   public static long fpCanonicalizedName(X500Name name) {
-    String canonicalizedName = canonicalizName(notNull(name, "name"));
-    byte[] encoded = toUtf8Bytes(canonicalizedName);
-    return FpIdCalculator.hash(encoded);
+    return FpIdCalculator.hash(toUtf8Bytes(canonicalizName(notNull(name, "name"))));
   }
 
   public static String canonicalizName(X500Name name) {
@@ -328,13 +319,11 @@ public class X509Util {
           AttributeTypeAndValue[] atvs = rdn.getTypesAndValues();
           for (AttributeTypeAndValue atv : atvs) {
             if (type.equals(atv.getType().getId())) {
-              String textValue = IETFUtils.valueToString(atv.getValue()).toLowerCase();
-              values.add(textValue);
+              values.add(IETFUtils.valueToString(atv.getValue()).toLowerCase());
             }
           }
         } else {
-          String textValue = IETFUtils.valueToString(rdn.getFirst().getValue()).toLowerCase();
-          values.add(textValue);
+          values.add(IETFUtils.valueToString(rdn.getFirst().getValue()).toLowerCase());
         }
       } // end for(j)
 
@@ -383,11 +372,13 @@ public class X509Util {
     }
 
     List<ASN1ObjectIdentifier> list = new ArrayList<>(usages);
-    List<ASN1ObjectIdentifier> sortedUsages = sortOidList(list);
-    KeyPurposeId[] kps = new KeyPurposeId[sortedUsages.size()];
+    Collections.sort(list, (o1, o2) -> o1.getId().compareTo(o2.getId()));
+    list = removeDuplication(list);
+
+    KeyPurposeId[] kps = new KeyPurposeId[list.size()];
 
     int idx = 0;
-    for (ASN1ObjectIdentifier oid : sortedUsages) {
+    for (ASN1ObjectIdentifier oid : list) {
       kps[idx++] = KeyPurposeId.getInstance(oid);
     }
 
@@ -395,30 +386,21 @@ public class X509Util {
   }
 
   // sort the list and remove duplicated OID.
-  private static List<ASN1ObjectIdentifier> sortOidList(List<ASN1ObjectIdentifier> oids) {
-    List<String> list = new ArrayList<>(notNull(oids, "oids").size());
-    for (ASN1ObjectIdentifier m : oids) {
-      list.add(m.getId());
-    }
-    Collections.sort(list);
-
-    List<ASN1ObjectIdentifier> sorted = new ArrayList<>(oids.size());
-    for (String m : list) {
-      for (ASN1ObjectIdentifier n : oids) {
-        if (m.equals(n.getId()) && !sorted.contains(n)) {
-          sorted.add(n);
-        }
+  private static List<ASN1ObjectIdentifier> removeDuplication(List<ASN1ObjectIdentifier> oids) {
+    List<ASN1ObjectIdentifier> res = new ArrayList<>(oids.size());
+    for (ASN1ObjectIdentifier n : oids) {
+      if (!res.contains(n)) {
+        res.add(n);
       }
     }
-    return sorted;
+    return res;
   }
 
   public static byte[] getCoreExtValue(Extensions extensions, ASN1ObjectIdentifier extnType) {
     if (extensions == null) {
       return null;
     }
-    notNull(extnType, "extnType");
-    Extension extn = extensions.getExtension(extnType);
+    Extension extn = extensions.getExtension(notNull(extnType, "extnType"));
     if (extn == null) {
       return null;
     }

@@ -29,10 +29,10 @@ import org.bouncycastle.crypto.util.PrivateKeyFactory;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
-import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.util.BigIntegers;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.pkcs11.wrapper.Functions;
 import org.xipki.security.EdECConstants;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.StringUtil;
@@ -152,8 +152,7 @@ public class KeyUtil {
 
   public static DSAPublicKey generateDSAPublicKey(DSAPublicKeySpec keySpec) throws InvalidKeySpecException {
     notNull(keySpec, "keySpec");
-    KeyFactory kf = getKeyFactory("DSA");
-    return (DSAPublicKey) kf.generatePublic(keySpec);
+    return (DSAPublicKey) getKeyFactory("DSA").generatePublic(keySpec);
   }
 
   public static KeyPair generateEdECKeypair(ASN1ObjectIdentifier curveId, SecureRandom random)
@@ -202,9 +201,7 @@ public class KeyUtil {
           edPki = new PrivateKeyInfo(new AlgorithmIdentifier(EdECConstants.id_ED25519), xdhPki.parsePrivateKey());
         } else if (xdhAlgo.equalsIgnoreCase(EdECConstants.X448)) {
           byte[] x448Octets = ASN1OctetString.getInstance(xdhPki.parsePrivateKey()).getOctets();
-          byte[] ed448Octets = new byte[57];
-          System.arraycopy(x448Octets, 0, ed448Octets, 0, 56);
-
+          byte[] ed448Octets = Arrays.copyOf(x448Octets, 57);
           edPki = new PrivateKeyInfo(new AlgorithmIdentifier(EdECConstants.id_ED448), new DEROctetString(ed448Octets));
         } else {
           throw new IllegalArgumentException("unknown key algorithm " + xdhAlgo);
@@ -234,63 +231,55 @@ public class KeyUtil {
   }
 
   private static KeyFactory getKeyFactory(String algorithm) throws InvalidKeySpecException {
-    String alg = algorithm.toUpperCase();
-    if ("ECDSA".equals(alg)) {
-      alg = "EC";
+    if ("ECDSA".equalsIgnoreCase(algorithm)) {
+      algorithm = "EC";
     }
 
     try {
-      return KeyFactory.getInstance(alg, "BC");
+      if ("EC".equalsIgnoreCase(algorithm)) {
+        return KeyFactory.getInstance(algorithm, "BC");
+      } else {
+        return KeyFactory.getInstance(algorithm);
+      }
     } catch (NoSuchAlgorithmException | NoSuchProviderException ex) {
-      throw new InvalidKeySpecException("could not find KeyFactory for " + alg + ": " + ex.getMessage());
+      throw new InvalidKeySpecException("could not find KeyFactory for " + algorithm + ": " + ex.getMessage());
     }
   } // method getKeyFactory
 
   private static KeyPairGenerator getKeyPairGenerator(String algorithm)
       throws NoSuchAlgorithmException, NoSuchProviderException {
-    String alg = algorithm.toUpperCase();
-    if ("ECDSA".equals(alg)) {
-      alg = "EC";
+    if ("ECDSA".equalsIgnoreCase(algorithm)) {
+      algorithm = "EC";
     }
 
-    if ("EC".equalsIgnoreCase(algorithm) ) {
+    if ("EC".equalsIgnoreCase(algorithm)) {
       return KeyPairGenerator.getInstance(algorithm, "BC");
     } else {
-      return KeyPairGenerator.getInstance(alg);
+      return KeyPairGenerator.getInstance(algorithm);
     }
   } // method getKeyPairGenerator
 
   public static PrivateKey generatePrivateKey(PrivateKeyInfo pkInfo) throws InvalidKeySpecException {
-    notNull(pkInfo, "pkInfo");
-
-    PKCS8EncodedKeySpec keyspec;
     try {
-      keyspec = new PKCS8EncodedKeySpec(pkInfo.getEncoded());
+      PKCS8EncodedKeySpec keyspec = new PKCS8EncodedKeySpec(notNull(pkInfo, "pkInfo").getEncoded());
+      return getKeyFactory(pkInfo.getPrivateKeyAlgorithm()).generatePrivate(keyspec);
     } catch (IOException ex) {
       throw new InvalidKeySpecException(ex.getMessage(), ex);
     }
-    KeyFactory kf = getKeyFactory(pkInfo.getPrivateKeyAlgorithm());
-    return kf.generatePrivate(keyspec);
   } // method generatePublicKey
 
   public static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo) throws InvalidKeySpecException {
-    notNull(pkInfo, "pkInfo");
-
-    X509EncodedKeySpec keyspec;
     try {
-      keyspec = new X509EncodedKeySpec(pkInfo.getEncoded());
+      X509EncodedKeySpec keyspec = new X509EncodedKeySpec(notNull(pkInfo, "pkInfo").getEncoded());
+      return getKeyFactory(pkInfo.getAlgorithm()).generatePublic(keyspec);
     } catch (IOException ex) {
       throw new InvalidKeySpecException(ex.getMessage(), ex);
     }
-
-    KeyFactory kf = getKeyFactory(pkInfo.getAlgorithm());
-    return kf.generatePublic(keyspec);
   } // method generatePublicKey
 
   public static RSAPublicKey generateRSAPublicKey(RSAPublicKeySpec keySpec) throws InvalidKeySpecException {
     notNull(keySpec, "keySpec");
-    KeyFactory kf = getKeyFactory("RSA");
-    return (RSAPublicKey) kf.generatePublic(keySpec);
+    return (RSAPublicKey) getKeyFactory("RSA").generatePublic(keySpec);
   }
 
   public static AsymmetricKeyParameter generatePrivateKeyParameter(PrivateKey key) throws InvalidKeyException {
@@ -446,8 +435,7 @@ public class KeyUtil {
       }
 
       byte[] keyData = Arrays.copyOfRange(encoded, prefix.length, prefix.length + keysize);
-      AlgorithmIdentifier algId = new AlgorithmIdentifier(algOid);
-      return new SubjectPublicKeyInfo(algId, keyData);
+      return new SubjectPublicKeyInfo(new AlgorithmIdentifier(algOid), keyData);
     } else {
       throw new InvalidKeyException("unknown publicKey class " + publicKey.getClass().getName());
     }
@@ -466,34 +454,29 @@ public class KeyUtil {
 
   public static ECPublicKey createECPublicKey(ASN1ObjectIdentifier curveOid, byte[] encodedPoint)
       throws InvalidKeySpecException {
-    notNull(curveOid, "curveOid");
-    notNull(encodedPoint, "encodedPoint");
-    return doCreateECPublicKey(curveOid, encodedPoint);
+    return doCreateECPublicKey(notNull(curveOid, "curveOid"), notNull(encodedPoint, "encodedPoint"));
   }
 
   private static ECPublicKey doCreateECPublicKey(ASN1Encodable algParams, byte[] encodedPoint)
       throws InvalidKeySpecException {
     AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, algParams);
 
-    SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo(algId, encodedPoint);
-    X509EncodedKeySpec keySpec;
     try {
-      keySpec = new X509EncodedKeySpec(spki.getEncoded());
-    } catch (IOException ex) {
+      X509EncodedKeySpec keySpec = new X509EncodedKeySpec(new SubjectPublicKeyInfo(algId, encodedPoint).getEncoded());
+      KeyFactory kf = KeyFactory.getInstance("EC", "BC");
+      return (ECPublicKey) kf.generatePublic(keySpec);
+    } catch (IOException | NoSuchAlgorithmException | NoSuchProviderException ex) {
       throw new InvalidKeySpecException(ex.getMessage(), ex);
     }
-
-    KeyFactory kf;
-    try {
-      kf = KeyFactory.getInstance("EC", "BC");
-    } catch (NoSuchAlgorithmException | NoSuchProviderException ex) {
-      throw new InvalidKeySpecException(ex.getMessage(), ex);
-    }
-    return (ECPublicKey) kf.generatePublic(keySpec);
   } // method createECPublicKey
 
   public static ASN1ObjectIdentifier detectCurveOid(ECParameterSpec paramSpec) {
-    return ECUtil.getNamedCurveOid(EC5Util.convertSpec(paramSpec));
+    byte[] ecParams = Functions.getEcParams(paramSpec.getOrder(), paramSpec.getGenerator().getAffineX());
+    if (ecParams == null) {
+      throw new IllegalArgumentException("unknown paramSpec");
+    }
+    return new ASN1ObjectIdentifier(Functions.decodeOid(ecParams));
+    // return ECUtil.getNamedCurveOid(EC5Util.convertSpec(paramSpec));
   }
 
   public static byte[] getUncompressedEncodedECPoint(ECPoint point, int fieldBitSize) {
