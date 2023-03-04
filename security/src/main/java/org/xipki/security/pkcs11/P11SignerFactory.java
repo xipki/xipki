@@ -19,15 +19,16 @@ package org.xipki.security.pkcs11;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.wrapper.PKCS11Constants;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.*;
 import org.xipki.util.Hex;
+import org.xipki.util.LogUtil;
 import org.xipki.util.exception.ObjectCreationException;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.security.PublicKey;
+import java.util.*;
 
 /**
  * {@link SignerFactory} for PKCS#11 token.
@@ -145,20 +146,36 @@ public class P11SignerFactory implements SignerFactory {
       String algoName = conf.getConfValue("algo");
       if (algoName != null) {
         algo = SignAlgo.getInstance(algoName);
-      }
-
-      if (algo != null && algo.isMac()) {
-        P11MacContentSignerBuilder signerBuilder = new P11MacContentSignerBuilder(identity);
-        return signerBuilder.createSigner(algo, parallelism);
       } else {
-        if (algo == null) {
-          algo = SignAlgo.getInstance(identity, conf);
-        }
-
-        P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(
-            securityFactory, identity, certificateChain);
-        return signerBuilder.createSigner(algo, parallelism);
+        algo = SignAlgo.getInstance(identity, conf);
       }
+
+      List<XiContentSigner> signers = new ArrayList<>(parallelism);
+      PublicKey publicKey = null;
+      if (certificateChain != null && certificateChain.length > 0) {
+        publicKey = certificateChain[0].getPublicKey();
+      }
+
+      for (int i = 0; i < parallelism; i++) {
+        XiContentSigner signer = P11ContentSigner.newInstance(identity, algo,
+            securityFactory.getRandom4Sign(), publicKey);
+        signers.add(signer);
+      }
+
+      DfltConcurrentContentSigner concurrentSigner = new DfltConcurrentContentSigner(algo.isMac(), signers);
+
+      if (certificateChain != null) {
+        concurrentSigner.setCertificateChain(certificateChain);
+      } else {
+        concurrentSigner.setPublicKey(identity.getPublicKey());
+      }
+
+      if (algo.isMac()) {
+        byte[] sha1HashOfKey = identity.digestSecretKey(PKCS11Constants.CKM_SHA_1);
+        concurrentSigner.setSha1DigestOfMacKey(sha1HashOfKey);
+      }
+
+      return concurrentSigner;
     } catch (TokenException | NoSuchAlgorithmException | XiSecurityException ex) {
       throw new ObjectCreationException(ex.getMessage(), ex);
     }
