@@ -156,18 +156,10 @@ public class PKCS1Util {
         block[block.length - saltLen - 1 - hLen - 1] = 0x01;
         System.arraycopy(salt, 0, block, block.length - saltLen - hLen - 1, saltLen);
 
-        byte[] dbMask;
         int dbMaskLen = block.length - hLen - 1;
-        if (contentDigest.isShake()) {
-            Xof xof = (Xof) contentDigest.createDigest();
-            xof.update(hv, 0, hv.length);
-            dbMask = new byte[dbMaskLen];
-            xof.doFinal(dbMask, 0, dbMaskLen);
-        } else {
-            dbMask = mgf1(mgfDigest, hv, dbMaskLen);
-        }
+        byte[] dbMask = mgf(mgfDigest, hv, dbMaskLen);
 
-        for (int i = 0; i != dbMask.length; i++) {
+        for (int i = 0; i != dbMaskLen; i++) {
             block[i] ^= dbMask[i];
         }
 
@@ -178,6 +170,94 @@ public class PKCS1Util {
         block[block.length - 1] = trailer;
         return block;
     } // method EMSA_PSS_ENCODE
+
+    /**
+     * <p>The decoding operation EMSA-PSS-Decode recovers the message hash from
+     * an encoded message <code>EM</code> and compares it to the hash of
+     * <code>M</code>.</p>
+     *
+     * @param mHash the byte sequence resulting from applying the message digest
+     * algorithm Hash to the message <i>M</i>.
+     * @param EM the <i>encoded message</i>, an octet string of length
+     * <code>emLen = CEILING(emBits/8).
+     * @param emBits the maximal bit length of the integer OS2IP(EM), at least
+     * <code>8.hLen + 8.sLen + 9</code>.
+     * @param sLen the length, in octets, of the expected salt.
+     * @return <code>true</code> if the result of the verification was
+     * <i>consistent</i> with the expected result; and <code>false</code> if the
+     * result was <i>inconsistent</i>.
+     * @exception IllegalArgumentException if an exception occurs.
+     */
+    public static boolean EMSA_PSS_DECODE(HashAlgo mgfDigest, byte[] mHash, byte[] EM, int sLen, int modulusBitLength) {
+        if (sLen < 0) {
+            throw new IllegalArgumentException("sLen");
+        }
+
+        int emBits = modulusBitLength - 1;
+        int hLen = mgfDigest.getLength();
+
+        // 1. If the length of M is greater than the input limitation for the hash
+        //    function (2**61 ? 1 octets for SHA-1) then output 'inconsistent' and
+        //    stop.
+        // 2. Let mHash = Hash(M), an octet string of length hLen.
+        if (hLen != mHash.length) {
+            throw new IllegalArgumentException("wrong hash");
+        }
+        // 3. If emBits < 8.hLen + 8.sLen + 9, output 'decoding error' and stop.
+        if (emBits < (8 * hLen + 8*sLen + 9)) {
+            throw new IllegalArgumentException("decoding error");
+        }
+        int emLen = (emBits + 7) / 8;
+        // 4. If the rightmost octet of EM does not have hexadecimal value bc,
+        //    output 'inconsistent' and stop.
+        if ((EM[EM.length - 1] & 0xFF) != 0xBC) {
+            return false;
+        }
+        // 5. Let maskedDB be the leftmost emLen ? hLen ? 1 octets of EM, and let
+        //    H be the next hLen octets.
+        // 6. If the leftmost 8.emLen ? emBits bits of the leftmost octet in
+        //    maskedDB are not all equal to zero, output 'inconsistent' and stop.
+        if ((EM[0] & (0xFF << (8 - (8*emLen - emBits)))) != 0) {
+            return false;
+        }
+        byte[] DB = new byte[emLen - hLen - 1];
+        byte[] H = new byte[hLen];
+        System.arraycopy(EM, 0,                DB, 0, emLen - hLen - 1);
+        System.arraycopy(EM, emLen - hLen - 1, H,  0, hLen);
+        // 7. Let dbMask = MGF(H, emLen ? hLen ? 1).
+        byte[] dbMask = mgf(mgfDigest, H, emLen - hLen - 1);
+        // 8. Let DB = maskedDB XOR dbMask.
+        int i;
+        for (i = 0; i < DB.length; i++) {
+            DB[i] = (byte)(DB[i] ^ dbMask[i]);
+        }
+        // 9. Set the leftmost 8.emLen ? emBits bits of DB to zero.
+        DB[0] &= (0xFF >>> (8*emLen - emBits));
+        // 10. If the emLen -hLen -sLen -2 leftmost octets of DB are not zero or
+        //     if the octet at position emLen -hLen -sLen -1 is not equal to 0x01,
+        //     output 'inconsistent' and stop.
+        // IMPORTANT (rsn): this is an error in the specs, the index of the 0x01
+        // byte should be emLen -hLen -sLen -2 and not -1! authors have been
+        // advised
+        for (i = 0; i < (emLen - hLen - sLen - 2); i++) {
+            if (DB[i] != 0) {
+                return false;
+            }
+        }
+        if (DB[i] != 0x01) { // i == emLen -hLen -sLen -2
+            return false;
+        }
+        // 11. Let salt be the last sLen octets of DB.
+        byte[] salt = new byte[sLen];
+        System.arraycopy(DB, DB.length - sLen, salt, 0, sLen);
+        // 12. Let M0 = 00 00 00 00 00 00 00 00 || mHash || salt;
+        //     M0 is an octet string of length 8 + hLen + sLen with eight initial
+        //     zero octets.
+        // 13. Let H0 = Hash(M0), an octet string of length hLen.
+        byte[] H0 = mgfDigest.hash(new byte[8], mHash, salt);
+        // 14. If H = H0, output 'consistent.' Otherwise, output 'inconsistent.'
+        return Arrays.equals(H, H0);
+    }
 
     public static byte[] getDigestPkcsPrefix(HashAlgo hashAlgo) {
         byte[] bytes = digestPkcsPrefix.get(hashAlgo);
@@ -277,6 +357,18 @@ public class PKCS1Util {
     /**
      * mask generator function, as described in PKCS1v2.
      */
+    private static byte[] mgf(HashAlgo mgfDigest, byte[] Z, int length) {
+        if (mgfDigest.isShake()) {
+            Xof xof = (Xof) mgfDigest.createDigest();
+            xof.update(Z, 0, Z.length);
+            byte[] res = new byte[length];
+            xof.doFinal(res, 0, length);
+            return res;
+        } else {
+            return mgf1(mgfDigest, Z, length);
+        }
+    }
+
     private static byte[] mgf1(HashAlgo mgfDigest, byte[] Z, int length) {
         int mgfhLen = mgfDigest.getLength();
         byte[] mask = new byte[length];
