@@ -2,10 +2,11 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 6.1.1
+## 6.2.0
 - Release date: xxx
 - CA
-    - N/A
+    - Add option to control whether duplicate public keys in one CA is allowed.
+      A new column SKI (Subject Key Identifier) is added to the table CERT.
 - OCSP
     - N/A
 - CLI
