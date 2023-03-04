@@ -220,6 +220,10 @@ public class CaActions {
     @Completion(Completers.YesNoCompleter.class)
     private String saveKeypairS = "no";
 
+    @Option(name = "--unique-key", description = "whether to require unique public keys")
+    @Completion(Completers.YesNoCompleter.class)
+    private String uniqueKeyS = "yes";
+
     @Option(name = "--validity-mode", description = "mode of valditity")
     @Completion(CaCompleters.ValidityModeCompleter.class)
     private String validityModeS = "STRICT";
@@ -254,8 +258,9 @@ public class CaActions {
           signerType, signerConf, caUris, numCrls, expirationPeriod);
 
       entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
-      entry.setSaveCert(isEnabled(saveCertS, false, "save-cert"));
+      entry.setSaveCert(isEnabled(saveCertS, true, "save-cert"));
       entry.setSaveKeypair(isEnabled(saveKeypairS, false, "save-keypair"));
+      entry.setUniqueKey(isEnabled(uniqueKeyS, false, "unique-key"));
       entry.setValidityMode(ValidityMode.forName(validityModeS));
       entry.setStatus(CaStatus.forName(caStatus));
 
@@ -666,6 +671,10 @@ public class CaActions {
     @Completion(Completers.YesNoCompleter.class)
     private String saveKeypairS;
 
+    @Option(name = "--unique-key", description = "whether to require unique public keys")
+    @Completion(Completers.YesNoCompleter.class)
+    private String uniqueKeyS;
+
     @Option(name = "--validity-mode", description = "mode of valditity")
     @Completion(CaCompleters.ValidityModeCompleter.class)
     private String validityModeS;
@@ -735,6 +744,10 @@ public class CaActions {
 
       if (saveKeypairS != null) {
         entry.setSaveKeypair(isEnabled(saveKeypairS, false, "save-keypair"));
+      }
+
+      if (uniqueKeyS != null) {
+        entry.setUniqueKey(isEnabled(uniqueKeyS, false, "unique-key"));
       }
 
       if (CollectionUtil.isNotEmpty(permissions)) {

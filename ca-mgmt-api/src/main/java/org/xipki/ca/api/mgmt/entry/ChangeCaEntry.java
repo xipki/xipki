@@ -60,6 +60,8 @@ public class ChangeCaEntry extends MgmtEntry {
 
   private Boolean saveKeypair;
 
+  private Boolean uniqueKey;
+
   private ValidityMode validityMode;
 
   private Integer permission;
@@ -191,6 +193,14 @@ public class ChangeCaEntry extends MgmtEntry {
 
   public void setSaveKeypair(Boolean saveKeypair) {
     this.saveKeypair = saveKeypair;
+  }
+
+  public Boolean getUniqueKey() {
+    return uniqueKey;
+  }
+
+  public void setUniqueKey(Boolean uniqueKey) {
+    this.uniqueKey = uniqueKey;
   }
 
   public Integer getPermission() {

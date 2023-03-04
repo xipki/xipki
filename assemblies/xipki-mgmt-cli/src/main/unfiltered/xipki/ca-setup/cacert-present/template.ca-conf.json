@@ -96,8 +96,9 @@
 			"maxValidity":"10y",
 			"nextCrlNo":2,
 			"permissions":["all"],
-			"saveCert": true,
+			"saveCert":true,
 			"saveKeypair":false,
+			"uniqueKey":false,
 			"signerType":"${token.type}",
 			"signerConf":{
 				"value":"${ca.signerConf}"

@@ -277,6 +277,10 @@ public class CaInfo {
     return caEntry.isSaveCert();
   }
 
+  public boolean isUniqueKey() {
+    return caEntry.isUniqueKey();
+  }
+
   public boolean isSaveKeypair() {
     return caEntry.isSaveKeypair();
   }

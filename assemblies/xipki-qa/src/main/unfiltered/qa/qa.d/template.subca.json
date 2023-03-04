@@ -42,7 +42,9 @@
 				"targetReason":"cessationOfOperation",
 				"unchangedSince":"15d"
 			},
-			"saveKeypair":true,
+			"saveCert":true,
+			"saveKeypair":false,
+			"uniqueKey":false,
 			"signerType":"${token.type}",
 			"signerConf":{
 				"value":"${ca.signerConf}"

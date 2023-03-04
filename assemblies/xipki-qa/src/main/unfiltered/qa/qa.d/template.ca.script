@@ -88,7 +88,8 @@ ca:gen-rootca \
   --crl-control "interval.hours=24,fullcrl.intervals=90,overlap=90d,interval.time=02:00" \
   --validity-mode cutoff \
   --save-cert yes \
-  --save-keypair yes \
+  --save-keypair no \
+  --unique-key no \
   --keypair-gen software
 
 ## Remove the profile rootca
@@ -272,6 +273,7 @@ ca:ca-add \
   --ca-cert-uri http://myorg.org/subca1.der \
   --save-cert yes \
   --save-keypair yes \
+  --unique-key yes \
   --keypair-gen software \
   --revoke-suspended-control enabled=true,targetReason=cessationOfOperation,unchangedSince=15d \
   --cert output/subca1.crt \
@@ -341,6 +343,7 @@ ca:ca-add \
   --validity-mode lax \
   --save-cert yes \
   --save-keypair yes \
+  --unique-key yes \
   --keypair-gen software \
   --cert output/subcawithcrl1.crt \
   --certchain output/rootca1.crt

@@ -361,6 +361,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
     cc.setSaveCert(caEntry.isSaveCert());
     cc.setSaveKeypair(caEntry.isSaveKeypair());
+    caEntry.setUniqueKey(caEntry.isUniqueKey());
     cc.setPermission(caEntry.getPermission());
     cc.setNumCrls(caEntry.getNumCrls());
     cc.setExpirationPeriod(caEntry.getExpirationPeriod());
@@ -695,6 +696,11 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     b = changeCaEntry.getSaveKeypair();
     if (b != null) {
       newCC.setSaveKeypair(b);
+    }
+
+    b = changeCaEntry.getUniqueKey();
+    if (b != null) {
+      newCC.setUniqueKey(b);
     }
 
     Integer i = changeCaEntry.getPermission();

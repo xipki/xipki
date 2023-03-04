@@ -49,6 +49,7 @@ import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.ctlog.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.Base64;
 import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.util.exception.OperationException;
 
@@ -529,6 +530,13 @@ public class X509Ca extends X509CaModule implements Closeable {
   private CertificateInfo generateCert0(RequestorInfo requestor, GrantedCertTemplate gct,
                                         String transactionId, AuditEvent event) throws OperationException {
     notNull(gct, "gct");
+    if (caInfo.isUniqueKey()) {
+      byte[] ski = HashAlgo.SHA1.hash(gct.grantedPublicKey.getPublicKeyData().getOctets());
+      if (certstore.getCertIdBySki(caIdent, ski) != 0) {
+        throw new OperationException(ALREADY_ISSUED, "certificate with SKI " + Base64.encodeToString(ski)
+            + " already issued");
+      }
+    }
 
     IdentifiedCertprofile certprofile = gct.certprofile;
 

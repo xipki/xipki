@@ -78,6 +78,8 @@ public class CaConfColumn {
    */
   private boolean saveKeypair;
 
+  private boolean uniqueKey;
+
   private String validityMode;
 
   private int permission;
@@ -201,6 +203,14 @@ public class CaConfColumn {
     this.saveKeypair = saveKeypair;
   }
 
+  public boolean isUniqueKey() {
+    return uniqueKey;
+  }
+
+  public void setUniqueKey(boolean uniqueKey) {
+    this.uniqueKey = uniqueKey;
+  }
+
   public String getValidityMode() {
     return validityMode;
   }
@@ -268,6 +278,7 @@ public class CaConfColumn {
     entry.setCtlogControl(ctlogControl());
     entry.setSaveCert((isSaveCert()));
     entry.setSaveKeypair(isSaveKeypair());
+    entry.setUniqueKey(isUniqueKey());
     entry.setPermission(permission);
     entry.setValidityMode(validityMode());
   }

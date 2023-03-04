@@ -81,6 +81,8 @@ public class CaEntry extends MgmtEntry {
 
   private boolean saveCert = true;
 
+  private boolean uniqueKey;
+
   private ValidityMode validityMode = ValidityMode.STRICT;
 
   private int permission;
@@ -154,6 +156,7 @@ public class CaEntry extends MgmtEntry {
     ret.keypairGenNames = keypairGenNames;
     ret.saveKeypair = saveKeypair;
     ret.saveCert = saveCert;
+    ret.uniqueKey = uniqueKey;
     ret.validityMode = validityMode;
     ret.permission = permission;
     ret.keepExpiredCertInDays = keepExpiredCertInDays;
@@ -291,6 +294,14 @@ public class CaEntry extends MgmtEntry {
     this.saveCert = saveCert;
   }
 
+  public boolean isUniqueKey() {
+    return uniqueKey;
+  }
+
+  public void setUniqueKey(boolean uniqueKey) {
+    this.uniqueKey = uniqueKey;
+  }
+
   public ValidityMode getValidityMode() {
     return validityMode;
   }
@@ -385,6 +396,7 @@ public class CaEntry extends MgmtEntry {
         "\nKeyPair generation names: ", keypairGenNames,
         "\nsave certificate: ", saveCert,
         "\nsave keypair: ", saveKeypair,
+        "\nunique public key: ", uniqueKey,
         "\nvalidity mode: ", validityMode,
         "\npermission: ", permissionText,
         "\nkeep expired certs: ", (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),
@@ -431,6 +443,7 @@ public class CaEntry extends MgmtEntry {
         && CompareUtil.equalsObject(revocationInfo, obj.revocationInfo)
         && CompareUtil.equalsObject(revokeSuspendedControl, obj.revokeSuspendedControl)
         && (saveCert == obj.saveCert)
+        && (uniqueKey == obj.uniqueKey)
         && (saveKeypair == obj.saveKeypair)
         && CompareUtil.equalsObject(keypairGenNames, obj.keypairGenNames)
         && (serialNoLen == obj.serialNoLen)
