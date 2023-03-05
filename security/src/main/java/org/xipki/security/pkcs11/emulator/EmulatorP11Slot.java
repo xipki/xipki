@@ -17,10 +17,7 @@
 
 package org.xipki.security.pkcs11.emulator;
 
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -36,8 +33,7 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkcs11.wrapper.MechanismInfo;
-import org.xipki.pkcs11.wrapper.TokenException;
+import org.xipki.pkcs11.wrapper.*;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.pkcs11.*;
@@ -98,7 +94,6 @@ class EmulatorP11Slot extends P11Slot {
   private static final String INFO_FILE_SUFFIX = ".info";
   private static final String VALUE_FILE_SUFFIX = ".value";
 
-  private static final String PROP_HANDLE = "handle";
   private static final String PROP_ID = "id";
   private static final String PROP_LABEL = "label";
   private static final String PROP_SHA1SUM = "sha1";
@@ -457,10 +452,8 @@ class EmulatorP11Slot extends P11Slot {
 
   private long savePkcs11PublicKey(byte[] id, String label, long keyType, PublicKey publicKey, String keyspec)
       throws TokenException {
-    long handle = random.nextLong() & 0x7FFFFFFFFFFFFFFFL;
     String hexId = hex(id);
     StringBuilder sb = new StringBuilder(100)
-        .append(propertyToString(PROP_HANDLE, Long.toString(handle)))
         .append(propertyToString(PROP_ID, hexId))
         .append(propertyToString(PROP_LABEL, label))
         .append(propertyToString(PROP_KEYTYPE, Long.toString(keyType)));
@@ -549,7 +542,7 @@ class EmulatorP11Slot extends P11Slot {
       throw new TokenException(ex.getMessage(), ex);
     }
 
-    return handle;
+    return (Arrays.hashCode(id) & 0xFFFFFFFFL) << 8 + 1;
   } // method savePkcs11PublicKey
 
   private static String propertyToString(String propKey, byte[] propValue) {
@@ -592,8 +585,7 @@ class EmulatorP11Slot extends P11Slot {
     String hexId = hex(notNull(id, "id"));
 
     StringBuilder str = new StringBuilder();
-    str.append(propertyToString(PROP_HANDLE, Long.toString(handle)))
-        .append(propertyToString(PROP_ID, hexId))
+    str.append(propertyToString(PROP_ID, hexId))
         .append(propertyToString(PROP_LABEL, label))
         .append(propertyToString(PROP_KEYTYPE, Long.toString(keyType)));
 
@@ -756,7 +748,7 @@ class EmulatorP11Slot extends P11Slot {
       keyId = getKeyIdFromInfoFilename(infoFile.getName());
       Properties props = loadProperties(infoFile);
 
-      long keyHandle = Long.parseLong(props.getProperty(PROP_HANDLE, "0"));
+      long keyHandle = (Arrays.hashCode(keyId) & 0xFFFFFFFFL) << 8;
       long keyType   = Long.parseLong(props.getProperty(PROP_KEYTYPE));
       String label = props.getProperty(PROP_LABEL);
 
@@ -764,9 +756,7 @@ class EmulatorP11Slot extends P11Slot {
 
       Long pubicKeyHandle = null;
       if (!isSecretKey) {
-        File pubKeyFile = getInfoFile(pubKeyDir, hex(keyId));
-        Properties pubKeyProps = loadProperties(pubKeyFile);
-        pubicKeyHandle = Long.parseLong(pubKeyProps.getProperty(PROP_HANDLE, "0"));
+        pubicKeyHandle = keyHandle + 1;
       }
 
       return new P11IdentityId(slotId, keyObjectId, pubicKeyHandle);
@@ -796,14 +786,12 @@ class EmulatorP11Slot extends P11Slot {
 
       keyLabel = label;
 
-      long keyHandle = Long.parseLong(props.getProperty(PROP_HANDLE, "0"));
+      long keyHandle = (Arrays.hashCode(keyId) & 0xFFFFFFFFL) << 8;
       long keyType   = Long.parseLong(props.getProperty(PROP_KEYTYPE));
 
       Long publicKeyHandle = null;
       if (!isSecretKey) {
-        File pubKeyInfoFile = getInfoFile(pubKeyDir, hexId);
-        Properties pubKeyProps = loadProperties(keyInfoFile);
-        publicKeyHandle = Long.parseLong(props.getProperty(PROP_HANDLE, "0"));
+        publicKeyHandle = keyHandle + 1;
       }
 
       return new P11IdentityId(slotId, new P11ObjectId(keyHandle, objClass, keyType, keyId, keyLabel), publicKeyHandle);
@@ -1052,42 +1040,134 @@ class EmulatorP11Slot extends P11Slot {
   }
 
   @Override
-  public void showDetails(OutputStream stream, boolean verbose) throws IOException {
+  public void showDetails(OutputStream stream, Long objectHandle, boolean verbose) throws IOException {
     if (verbose) {
       printSupportedMechanism(stream);
     }
 
-    stream.write("\nList of objects:\n".getBytes(StandardCharsets.UTF_8));
+    if (objectHandle != null) {
+      stream.write(("\nDetails of object with handle " + objectHandle +
+          "\n").getBytes(StandardCharsets.UTF_8));
 
-    // Secret Keys
-    File[] keyInfoFiles = secKeyDir.listFiles(INFO_FILENAME_FILTER);
+      long keyClass;
+      File infoFile = null;
+      if ((objectHandle & 0xFF) == 1) {
+        keyClass = CKO_PUBLIC_KEY;
+        int hashCode = (int) (objectHandle >> 8);
+        // public key
+        infoFile = getInfoFileForHashCode(pubKeyDir, hashCode);
+      } else {
+        int hashCode = (int) (objectHandle >> 8);
+        keyClass = CKO_PRIVATE_KEY;
+        infoFile = getInfoFileForHashCode(privKeyDir, hashCode);
+        if (infoFile == null) {
+          keyClass = CKO_SECRET_KEY;
+          infoFile = getInfoFileForHashCode(secKeyDir, hashCode);
+        }
+      }
 
-    int no = 0;
-    if (keyInfoFiles != null && keyInfoFiles.length != 0) {
-      for (File keyInfoFile : keyInfoFiles) {
-        String text = formatNumber(++no, 3) + ". " + objectToString(CKO_SECRET_KEY, keyInfoFile) + "\n";
-        stream.write(("  " + text).getBytes(StandardCharsets.UTF_8));
+      if (infoFile == null) {
+        stream.write("  error: CKR_OBJECT_HANDLE_INVALID\n".getBytes(StandardCharsets.UTF_8));
+        return;
+      }
+
+      Properties properties = new Properties();
+      properties.load(Files.newBufferedReader(infoFile.toPath()));
+      properties.put("CLASS", ckoCodeToName(keyClass));
+
+      Set<String> names = properties.stringPropertyNames();
+      int nameLen = 0;
+      for (String name: names) {
+        nameLen = Math.max(nameLen, name.length());
+      }
+
+      String text = "";
+
+      for (String name : properties.stringPropertyNames()) {
+        if (name.equals(PROP_SHA1SUM) || name.equals("handle")) {
+          continue;
+        }
+
+        String nameText = name + ": ";
+        if (name.length() < nameLen) {
+          char[] padding = new char[nameLen - name.length()];
+          Arrays.fill(padding, ' ');
+          nameText += new String(padding);
+        }
+
+        String value = properties.getProperty(name);
+        String valueText;
+        switch (name) {
+          case PROP_KEYTYPE:
+            valueText = ckkCodeToName(Long.parseLong(value));
+            break;
+          case PROP_DSA_BASE:
+          case PROP_DSA_PRIME:
+          case PROP_DSA_SUBPRIME:
+          case PROP_DSA_VALUE:
+          case PROP_RSA_MODUS:
+          case PROP_RSA_PUBLIC_EXPONENT:
+          case PROP_EC_PARAMS:
+          case PROP_EC_POINT:
+          case PROP_ID:
+            byte[] bytes;
+            if (name.equals(PROP_EC_POINT)) {
+              bytes = ASN1OctetString.getInstance(Hex.decode(value)).getOctets();
+            } else {
+              bytes = Hex.decode(value);
+            }
+            valueText = "byte[" + bytes.length + "]\n" + Functions.toString("    ", bytes);
+            break;
+          default:
+            valueText = value;
+        }
+
+        text += "  " + nameText + valueText + "\n";
+      }
+      stream.write(text.getBytes(StandardCharsets.UTF_8));
+    } else {
+      stream.write("\nList of objects:\n".getBytes(StandardCharsets.UTF_8));
+
+      // Secret Keys
+      File[] keyInfoFiles = secKeyDir.listFiles(INFO_FILENAME_FILTER);
+
+      int no = 0;
+      if (keyInfoFiles != null) {
+        for (File keyInfoFile : keyInfoFiles) {
+          String text = formatNumber(++no, 3) + ". " + objectToString(CKO_SECRET_KEY, keyInfoFile) + "\n";
+          stream.write(("  " + text).getBytes(StandardCharsets.UTF_8));
+        }
+      }
+
+      // Public keys
+      keyInfoFiles = privKeyDir.listFiles(INFO_FILENAME_FILTER);
+      if (keyInfoFiles != null) {
+        for (File keyInfoFile : keyInfoFiles) {
+          String text = formatNumber(++no, 3) + ". " + objectToString(CKO_PRIVATE_KEY, keyInfoFile) + "\n";
+          stream.write(("  " + text).getBytes(StandardCharsets.UTF_8));
+        }
+      }
+
+      // Public keys
+      keyInfoFiles = pubKeyDir.listFiles(INFO_FILENAME_FILTER);
+      if (keyInfoFiles != null) {
+        for (File keyInfoFile : keyInfoFiles) {
+          String text = formatNumber(++no, 3) + ". " + objectToString(CKO_PUBLIC_KEY, keyInfoFile) + "\n";
+          stream.write(("  " + text).getBytes(StandardCharsets.UTF_8));
+        }
       }
     }
+  }
 
-    // Public keys
-    keyInfoFiles = privKeyDir.listFiles(INFO_FILENAME_FILTER);
-    if (keyInfoFiles != null && keyInfoFiles.length != 0) {
-      for (File keyInfoFile : keyInfoFiles) {
-        String text = formatNumber(++no, 3) + ". " + objectToString(CKO_PRIVATE_KEY, keyInfoFile) + "\n";
-        stream.write(("  " + text).getBytes(StandardCharsets.UTF_8));
+  private static File getInfoFileForHashCode(File dir, int hashCode) {
+    File[] files = dir.listFiles(INFO_FILENAME_FILTER);
+    for (File file : files) {
+      byte[] id = getKeyIdFromInfoFilename(file.getName());
+      if (hashCode == Arrays.hashCode(id)) {
+        return file;
       }
     }
-
-    // Public keys
-    keyInfoFiles = pubKeyDir.listFiles(INFO_FILENAME_FILTER);
-    if (keyInfoFiles != null && keyInfoFiles.length != 0) {
-      for (File keyInfoFile : keyInfoFiles) {
-        String text = formatNumber(++no, 3) + ". " + objectToString(CKO_PUBLIC_KEY, keyInfoFile) + "\n";
-        stream.write(("  " + text).getBytes(StandardCharsets.UTF_8));
-      }
-    }
-
+    return null;
   }
 
   private String objectToString(long objClass, File infoFile) {
@@ -1095,7 +1175,10 @@ class EmulatorP11Slot extends P11Slot {
     try {
       Properties props = loadProperties(infoFile);
 
-      long handle = Long.parseLong(props.getProperty(PROP_HANDLE, "0"));
+      long handle = (Arrays.hashCode(id) & 0xFFFFFFFFL) << 8;
+      if (objClass == CKO_PUBLIC_KEY) {
+        handle += 1;
+      }
       long keyType = Long.parseLong(props.getProperty(PROP_KEYTYPE));
       String label = props.getProperty(PROP_LABEL);
       String keyspec = props.getProperty(PROP_KEYSPEC, "");

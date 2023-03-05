@@ -236,19 +236,7 @@ class NativeP11Slot extends P11Slot {
     Mechanism mechanismObj = new Mechanism(mech);
 
     try {
-      Session session = session0.value();
-      try {
-        return NativeP11SlotUtil.digestKey(session, digestLen, mechanismObj, keyHandle);
-      } catch (PKCS11Exception ex) {
-        if (ex.getErrorCode() != CKR_USER_NOT_LOGGED_IN) {
-          throw ex;
-        }
-
-        LOG.info("digestKey ended with ERROR CKR_USER_NOT_LOGGED_IN, login and then retry it");
-        // force the login
-        forceLogin(session);
-        return NativeP11SlotUtil.digestKey(session, digestLen, mechanismObj, keyHandle);
-      }
+      return NativeP11SlotUtil.digestKey(session0.value(), digestLen, mechanismObj, keyHandle);
     } finally {
       sessions.requite(session0);
     }
@@ -262,18 +250,8 @@ class NativeP11Slot extends P11Slot {
     long signingKeyHandle = identity.getId().getKeyId().getHandle();
 
     ConcurrentBagEntry<Session> session0 = borrowSession();
-    Session session = session0.value();
     try {
-      return sign0(session, mechanismObj, content, signingKeyHandle);
-    } catch (PKCS11Exception ex) {
-      if (ex.getErrorCode() == CKR_USER_NOT_LOGGED_IN) {
-        LOG.info("sign ended with ERROR CKR_USER_NOT_LOGGED_IN, login and then retry it");
-        // force the login
-        forceLogin(session);
-        return sign0(session, mechanismObj, content, signingKeyHandle);
-      } else {
-        throw ex;
-      }
+      return sign0(session0.value(), mechanismObj, content, signingKeyHandle);
     } finally {
       sessions.requite(session0);
     }
@@ -1189,7 +1167,7 @@ class NativeP11Slot extends P11Slot {
   }
 
   @Override
-  public void showDetails(OutputStream stream, boolean verbose) throws IOException {
+  public void showDetails(OutputStream stream, Long objectHandle, boolean verbose) throws IOException {
     String tokenInfo;
     try {
       tokenInfo = slot.getToken().getTokenInfo().toString("  ");
@@ -1213,8 +1191,6 @@ class NativeP11Slot extends P11Slot {
       printSupportedMechanism(stream);
     }
 
-    stream.write("\nList of objects:\n".getBytes(StandardCharsets.UTF_8));
-
     ConcurrentBagEntry<Session> session0;
     try {
       session0 = borrowSession();
@@ -1224,26 +1200,34 @@ class NativeP11Slot extends P11Slot {
 
     try {
       Session session = session0.value();
-      long[] allHandles = session.findObjectsSingle(null, 99999);
-      int no = 0;
-      for (long handle : allHandles) {
-        String objectText = objectToString(session, handle);
+      if (objectHandle != null) {
+        stream.write(("\nDetails of object with handle " + objectHandle +
+            "\n").getBytes(StandardCharsets.UTF_8));
+        AttributeVector attrs = session0.value().getDefaultAttrValues(objectHandle);
+        stream.write(attrs.toString(false, "  ").getBytes(StandardCharsets.UTF_8));
+      } else {
+        stream.write("\nList of objects:\n".getBytes(StandardCharsets.UTF_8));
+        long[] allHandles = session.findObjectsSingle(null, 99999);
+        for (int i = 0; i < allHandles.length; i++) {
+          long handle = allHandles[i];
+          String objectText = objectToString(session, handle);
 
-        String text;
-        try {
-          text = formatNumber(++no, 3) + ". " + objectText;
-        } catch (Exception ex) {
-          text = formatNumber(no, 3) + ". " + "Error reading object with handle " + handle;
-          LOG.debug(text, ex);
-        }
+          String text;
+          try {
+            text = formatNumber(i + 1, 3) + ". " + objectText;
+          } catch (Exception ex) {
+            text = formatNumber(i + 1, 3) + ". " + "Error reading object with handle " + handle;
+            LOG.debug(text, ex);
+          }
 
-        stream.write(("  " + text + "\n").getBytes(StandardCharsets.UTF_8));
-        if (no % 10 == 0) {
-          stream.flush();
+          stream.write(("  " + text + "\n").getBytes(StandardCharsets.UTF_8));
+          if ((i + 1) % 10 == 0) {
+            stream.flush();
+          }
         }
       }
     } catch (PKCS11Exception e) {
-      String message = "error finding objects: " + e.getMessage();
+      String message = "  error: " + e.getMessage();
       stream.write(message.getBytes(StandardCharsets.UTF_8));
       LogUtil.warn(LOG, e, message);
     } finally {
@@ -1253,8 +1237,7 @@ class NativeP11Slot extends P11Slot {
     stream.flush();
   }
 
-  private String objectToString(Session session, long handle)
-      throws PKCS11Exception {
+  private String objectToString(Session session, long handle) throws PKCS11Exception {
     AttributeVector attrs = session.getAttrValues(handle, CKA_ID, CKA_LABEL, CKA_CLASS);
     long objClass = attrs.class_();
     byte[] id = attrs.id();

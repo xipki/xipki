@@ -612,6 +612,9 @@ public class P11Actions {
     @Option(name = "--slot", description = "slot index")
     private Integer slotIndex;
 
+    @Option(name = "--object", description = "object handle")
+    private Long objectHandle;
+
     @Reference (optional = true)
     protected P11CryptServiceFactory p11CryptServiceFactory;
 
@@ -635,7 +638,8 @@ public class P11Actions {
       P11SlotId slotId = module.getSlotIdForIndex(slotIndex);
       P11Slot slot = module.getSlot(slotId);
       println("Details of slot " + slotId + ":");
-      slot.showDetails(System.out, verbose);
+      slot.showDetails(System.out, objectHandle, verbose);
+
       System.out.flush();
       System.out.println();
       return null;

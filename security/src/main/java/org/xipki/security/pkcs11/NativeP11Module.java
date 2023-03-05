@@ -110,7 +110,7 @@ public class NativeP11Module extends P11Module {
       }
 
       TokenInfo ti = slot.getToken().getTokenInfo();
-      if (!ti.hasFlagBit(PKCS11Constants.CKF_TOKEN_INITIALIZED)) {
+      if (!ti.isTokenInitialized()) {
         LOG.info("slot {} not initialized, skipped it.", slotId);
         continue;
       }

@@ -187,7 +187,7 @@ class SignerManager {
         sb.append("Details of slot\n");
 
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        slot.showDetails(bout, verbose);
+        slot.showDetails(bout, null, verbose);
         bout.flush();
         sb.append(StringUtil.toUtf8String(bout.toByteArray())).append(NL);
       }
