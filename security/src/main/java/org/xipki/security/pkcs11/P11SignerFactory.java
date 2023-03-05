@@ -23,7 +23,6 @@ import org.xipki.pkcs11.wrapper.PKCS11Constants;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.*;
 import org.xipki.util.Hex;
-import org.xipki.util.LogUtil;
 import org.xipki.util.exception.ObjectCreationException;
 
 import java.security.NoSuchAlgorithmException;

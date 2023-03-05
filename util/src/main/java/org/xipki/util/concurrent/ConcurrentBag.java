@@ -28,11 +28,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static org.xipki.util.concurrent.ClockSource.currentTime;
-import static org.xipki.util.concurrent.ClockSource.elapsedNanos;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.locks.LockSupport.parkNanos;
+import static org.xipki.util.concurrent.ClockSource.currentTime;
+import static org.xipki.util.concurrent.ClockSource.elapsedNanos;
 
 /**
  * This is a specialized concurrent bag that achieves superior performance

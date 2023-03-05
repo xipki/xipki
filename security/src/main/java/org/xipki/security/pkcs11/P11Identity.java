@@ -20,7 +20,6 @@ package org.xipki.security.pkcs11;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkcs11.wrapper.PKCS11Constants;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.LogUtil;

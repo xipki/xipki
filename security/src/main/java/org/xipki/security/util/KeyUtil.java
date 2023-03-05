@@ -43,8 +43,6 @@ import java.security.*;
 import java.security.interfaces.*;
 import java.security.spec.*;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.xipki.util.Args.notBlank;
 import static org.xipki.util.Args.notNull;

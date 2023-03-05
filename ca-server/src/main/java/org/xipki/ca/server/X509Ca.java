@@ -48,8 +48,8 @@ import org.xipki.security.*;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.ctlog.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.*;
 import org.xipki.util.Base64;
+import org.xipki.util.*;
 import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.util.exception.OperationException;
 
