@@ -354,7 +354,7 @@ public abstract class P11Slot implements Closeable {
    * @throws IOException
    *         if IO error occurs.
    */
-  public abstract void showDetails(OutputStream stream, boolean verbose) throws IOException;
+  public abstract void showDetails(OutputStream stream, Long objectHandle, boolean verbose) throws IOException;
 
   @Override
   public abstract void close();
