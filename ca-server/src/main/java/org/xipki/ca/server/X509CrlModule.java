@@ -34,10 +34,7 @@ import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.DateUtil;
-import org.xipki.util.HourMinute;
-import org.xipki.util.LogUtil;
+import org.xipki.util.*;
 import org.xipki.util.exception.OperationException;
 
 import java.io.Closeable;
@@ -100,7 +97,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         Date nearestScheduledCrlIssueTime = getScheduledCrlGenTimeNotAfter(new Date(lastIssueTimeOfFullCrl * 1000));
         Date nextScheduledCrlIssueTime = new Date(
             nearestScheduledCrlIssueTime.getTime() + control.getFullCrlIntervals() * control.getIntervalMillis());
-        if (!nextScheduledCrlIssueTime.after(now)) {
+        if (nextScheduledCrlIssueTime.getTime() > now.getTime() + shardId * 10000L) { // delay: shardId * 10 seconds
           // at least one interval was skipped
           createFullCrlNow = true;
         }
@@ -116,7 +113,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         Date nearestScheduledCrlIssueTime = getScheduledCrlGenTimeNotAfter(new Date(lastIssueTime * 1000));
         Date nextScheduledCrlIssueTime = new Date(
             nearestScheduledCrlIssueTime.getTime() + control.getDeltaCrlIntervals() * control.getIntervalMillis());
-        if (!nextScheduledCrlIssueTime.after(now)) {
+        if (nextScheduledCrlIssueTime.getTime() > now.getTime() + shardId * 10000L) { // delay: shardId * 10 seconds
           // at least one interval was skipped
           createDeltaCrlNow = true;
         }
@@ -144,7 +141,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       nextUpdate = control.getOverlap().add(nextUpdate);
 
       try {
-        generateCrl(null, createDeltaCrlNow, now, nextUpdate);
+        scheduledGenerateCrl(createDeltaCrlNow, now, nextUpdate);
       } catch (Throwable th) {
         LogUtil.error(LOG, th);
       }
@@ -153,6 +150,8 @@ public class X509CrlModule extends X509CaModule implements Closeable {
   } // class CrlGenerationService
 
   private final X509Cert caCert;
+
+  private final int shardId;
 
   private final CertStore certstore;
 
@@ -164,10 +163,12 @@ public class X509CrlModule extends X509CaModule implements Closeable {
 
   private final X509PublisherModule publisher;
 
-  public X509CrlModule(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore, X509PublisherModule publisher)
+  public X509CrlModule(CaManagerImpl caManager, CaInfo caInfo,
+                       CertStore certstore, X509PublisherModule publisher)
       throws OperationException {
     super(caInfo);
 
+    this.shardId = caManager.getShardId();
     this.publisher = publisher;
     this.caManager = notNull(caManager, "caManager");
     this.caCert = caInfo.getCert();
@@ -187,10 +188,6 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         LOG.error(msg);
         throw new OperationException(SYSTEM_FAILURE, msg);
       }
-    }
-
-    if (!caManager.isMasterMode()) {
-      return;
     }
 
     Random random = new Random();
@@ -333,17 +330,30 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       // add overlap
       nextUpdate = control.getOverlap().add(nextUpdate);
 
-      return generateCrl(requestor, false, thisUpdate, nextUpdate);
+      return generateCrl(false, requestor, false, thisUpdate, nextUpdate);
     } finally {
       crlGenInProcess.set(false);
     }
   } // method generateCrlOnDemand
 
-  private X509CRLHolder generateCrl(RequestorInfo requestor, boolean deltaCrl, Date thisUpdate, Date nextUpdate)
+  private void scheduledGenerateCrl(boolean deltaCrl, Date thisUpdate, Date nextUpdate)
+      throws OperationException {
+    AuditEvent event = newAuditEvent(TYPE_gen_crl, null);
+    try {
+      generateCrl0(true, deltaCrl, thisUpdate, nextUpdate, event);
+      finish(event, true);
+    } catch (OperationException ex) {
+      finish(event, false);
+      throw ex;
+    }
+  }
+
+  private X509CRLHolder generateCrl(boolean scheduled, RequestorInfo requestor, boolean deltaCrl,
+                                    Date thisUpdate, Date nextUpdate)
       throws OperationException {
     AuditEvent event = newAuditEvent(TYPE_gen_crl, requestor);
     try {
-      X509CRLHolder ret = generateCrl0(deltaCrl, thisUpdate, nextUpdate, event);
+      X509CRLHolder ret = generateCrl0(scheduled, deltaCrl, thisUpdate, nextUpdate, event);
       finish(event, true);
       return ret;
     } catch (OperationException ex) {
@@ -352,7 +362,8 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     }
   }
 
-  private X509CRLHolder generateCrl0(boolean deltaCrl, Date thisUpdate, Date nextUpdate, AuditEvent event)
+  private X509CRLHolder generateCrl0(boolean scheduled, boolean deltaCrl,
+                                     Date thisUpdate, Date nextUpdate, AuditEvent event)
       throws OperationException {
     CrlControl control = caInfo.getCrlControl();
     if (control == null) {
@@ -562,6 +573,17 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         crl = crlBuilder.build(signer0.value());
       } finally {
         concurrentSigner.requiteSigner(signer0);
+      }
+
+      // check again
+      if (scheduled) {
+        long lastIssueTimeOfFullCrl = certstore.getThisUpdateOfCurrentCrl(caIdent, deltaCrl);
+        if (lastIssueTimeOfFullCrl * 1000L + 10000L < thisUpdate.getTime()) {
+          // CRL generated in the last time by other instance, ignore my own.
+          successful = true;
+          LOG.info("IGNORE generateCrl: ca={}", caIdent.getName());
+          return null;
+        }
       }
 
       caInfo.setNextCrlNumber(crlNumber.longValue() + 1);

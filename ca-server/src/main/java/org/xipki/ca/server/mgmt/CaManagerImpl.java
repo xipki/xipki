@@ -273,6 +273,10 @@ public class CaManagerImpl implements CaManager, Closeable {
     this.keypairGenManager = new KeypairGenManager(this);
   } // constructor
 
+  public int getShardId() {
+    return shardId;
+  }
+
   public SecurityFactory getSecurityFactory() {
     return securityFactory;
   }
