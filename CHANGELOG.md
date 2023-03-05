@@ -7,6 +7,7 @@ See also <https://github.com/xipki/xipki/releases>
 - CA
     - Add option to control whether duplicate public keys in one CA is allowed.
       A new column SKI (Subject Key Identifier) is added to the table CERT.
+    - Extend the entities to generate CRLs from master CAs to all CAs.
 - OCSP
     - N/A
 - CLI
