@@ -94,7 +94,7 @@ public class SignerUtil {
 
   public static byte[] dsaSigPlainToX962(byte[] signature) throws XiSecurityException {
     notNull(signature, "signature");
-    byte[] x962Sig = Functions.plainToX962DSASignature(signature);
+    byte[] x962Sig = Functions.dsaSigPlainToX962(signature);
     if (Arrays.equals(x962Sig, signature)) {
       throw new XiSecurityException("signature is not correctly encoded.");
     }
@@ -104,7 +104,7 @@ public class SignerUtil {
   public static byte[] dsaSigX962ToPlain(byte[] x962Signature, int orderBitLen)
       throws XiSecurityException {
     notNull(x962Signature, "x962Signature");
-    byte[] plainSig = Functions.x962ToPlainDSASignature(x962Signature, (orderBitLen + 7) / 8);
+    byte[] plainSig = Functions.dsaSigX962ToPlain(x962Signature, (orderBitLen + 7) / 8);
     if (Arrays.equals(x962Signature, plainSig)) {
       throw new XiSecurityException("x962Signature is not correctly encoded.");
     }

@@ -20,10 +20,12 @@ package org.xipki.security.pkcs11;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.wrapper.Functions;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.LogUtil;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.PublicKey;
 
@@ -48,6 +50,8 @@ public abstract class P11Identity {
   private boolean sign;
 
   private ASN1ObjectIdentifier ecParams;
+
+  private Integer ecOrderBitSize;
 
   private BigInteger rsaModulus;
 
@@ -75,7 +79,19 @@ public abstract class P11Identity {
     return ecParams;
   }
 
+  public Integer getEcOrderBitSize() {
+    return ecOrderBitSize;
+  }
+
   public void setEcParams(ASN1ObjectIdentifier ecParams) {
+    if (ecParams == null) {
+      this.ecOrderBitSize = null;
+    } else {
+      try {
+        this.ecOrderBitSize = Functions.getCurveOrderBitLength(ecParams.getEncoded());
+      } catch (IOException e) {
+      }
+    }
     this.ecParams = ecParams;
   }
 

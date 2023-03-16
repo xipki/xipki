@@ -37,18 +37,38 @@ public class NativeP11ModuleFactory implements P11ModuleFactory {
     private final org.slf4j.Logger LOG = LoggerFactory.getLogger(org.xipki.pkcs11.wrapper.Logger.class);
 
     @Override
-    public void info(String msg) {
-      LOG.info(msg);
+    public void info(String format, Object... arguments) {
+      LOG.info(format, arguments);
     }
 
     @Override
-    public void warn(String msg) {
-      LOG.warn(msg);
+    public void warn(String format, Object... arguments) {
+      LOG.warn(format, arguments);
     }
 
     @Override
-    public void error(String msg) {
-      LOG.error(msg);
+    public void error(String format, Object... arguments) {
+      LOG.error(format, arguments);
+    }
+
+    @Override
+    public void debug(String format, Object... arguments) {
+      LOG.debug(format, arguments);
+    }
+
+    @Override
+    public boolean isDebugEnabled() {
+      return LOG.isDebugEnabled();
+    }
+
+    @Override
+    public boolean isInfoEnabled() {
+      return LOG.isInfoEnabled();
+    }
+
+    @Override
+    public boolean isWarnEnabled() {
+      return LOG.isWarnEnabled();
     }
   }
 

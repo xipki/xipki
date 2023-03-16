@@ -146,6 +146,8 @@ public class Pkcs11conf extends ValidatableConf {
      */
     private String user;
 
+    private String userName;
+
     /**
      * maximal size of the message sent to the PKCS#11 device.
      */
@@ -246,12 +248,20 @@ public class Pkcs11conf extends ValidatableConf {
       this.user = user;
     }
 
+    public void setUserName(String userName) {
+      this.userName = userName;
+    }
+
     public void setMaxMessageSize(Integer maxMessageSize) {
       this.maxMessageSize = maxMessageSize;
     }
 
     public String getUser() {
       return user == null ? "CKU_USER" : user;
+    }
+
+    public String getUserName() {
+      return userName;
     }
 
     public int getMaxMessageSize() {

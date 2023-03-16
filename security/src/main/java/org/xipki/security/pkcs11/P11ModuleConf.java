@@ -277,6 +277,8 @@ public class P11ModuleConf {
 
   private final long userType;
 
+  private final char[] userName;
+
   private final P11NewObjectConf newObjectConf;
 
   private final Integer numSessions;
@@ -304,11 +306,12 @@ public class P11ModuleConf {
       }
     }
     this.userType = userType;
+    this.userName = (moduleType.getUserName() == null) ? null : moduleType.getUserName().toCharArray();
 
     this.maxMessageSize = moduleType.getMaxMessageSize();
     this.type = moduleType.getType();
-    if (maxMessageSize < 128) {
-      throw new InvalidConfException("invalid maxMessageSize (< 128): " + maxMessageSize);
+    if (maxMessageSize < 256) {
+      throw new InvalidConfException("invalid maxMessageSize (< 256): " + maxMessageSize);
     }
 
     this.numSessions = moduleType.getNumSessions();
@@ -476,6 +479,10 @@ public class P11ModuleConf {
 
   public long getUserType() {
     return userType;
+  }
+
+  public char[] getUserName() {
+    return userName;
   }
 
   public P11PasswordsRetriever getPasswordRetriever() {

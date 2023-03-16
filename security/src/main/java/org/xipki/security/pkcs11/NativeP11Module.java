@@ -131,10 +131,13 @@ public class NativeP11Module extends P11Module {
       } catch (PasswordResolverException ex) {
         throw new TokenException("PasswordResolverException: " + ex.getMessage(), ex);
       }
-      P11Slot p11Slot = new NativeP11Slot(moduleConf.getName(), slotId, slot,
-          moduleConf.isReadOnly(), moduleConf.getUserType(), pwd, moduleConf.getMaxMessageSize(),
-          moduleConf.getP11MechanismFilter(), moduleConf.getP11NewObjectConf(),
-          moduleConf.getNumSessions(), moduleConf.getSecretKeyTypes(), moduleConf.getKeyPairTypes());
+
+      PKCS11Token token = new PKCS11Token(slot.getToken(), moduleConf.isReadOnly(), moduleConf.getUserType(),
+          moduleConf.getUserName(), pwd, moduleConf.getNumSessions());
+      token.setMaxMessageSize(moduleConf.getMaxMessageSize());
+
+      P11Slot p11Slot = new NativeP11Slot(moduleConf.getName(), slotId, token , moduleConf.getP11MechanismFilter(),
+          moduleConf.getP11NewObjectConf(), moduleConf.getSecretKeyTypes(), moduleConf.getKeyPairTypes());
 
       slots.add(p11Slot);
     }
