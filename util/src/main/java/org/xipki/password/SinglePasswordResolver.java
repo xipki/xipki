@@ -67,6 +67,8 @@ public interface SinglePasswordResolver {
 
     private PasswordCallback masterPwdCallback;
 
+    private int iterationCount = 2000;
+
     public PBE() {
     }
 
@@ -89,49 +91,9 @@ public interface SinglePasswordResolver {
         return;
       }
 
-      if (StringUtil.isBlank(masterPasswordCallback)) {
-        return;
+      if (!StringUtil.isBlank(masterPasswordCallback)) {
+        this.masterPwdCallback = PasswordCallback.getInstance(masterPasswordCallback);
       }
-
-      String type;
-      String conf = null;
-
-      int delimIndex = masterPasswordCallback.indexOf(' ');
-      if (delimIndex == -1) {
-        type = masterPasswordCallback.toUpperCase();
-      } else {
-        type = masterPasswordCallback.substring(0, delimIndex).toUpperCase();
-        conf = masterPasswordCallback.substring(delimIndex + 1);
-      }
-
-      PasswordCallback pwdCallback;
-      switch (type) {
-        case "FILE":
-          pwdCallback = new PasswordCallback.File();
-          break;
-        case "GUI":
-          pwdCallback = new PasswordCallback.Gui();
-          break;
-        case "PBE-GUI":
-          pwdCallback = new PasswordCallback.PBEGui();
-          break;
-        case OBFPasswordService.PROTOCOL_OBF:
-          pwdCallback = new PasswordCallback.OBF();
-          if (conf != null && !StringUtil.startsWithIgnoreCase(conf, OBFPasswordService.PROTOCOL_OBF + ":")) {
-            conf = StringUtil.concat(OBFPasswordService.PROTOCOL_OBF, ":", conf);
-          }
-          break;
-        default:
-          throw new IllegalStateException("unknown PasswordCallback type '" + type + "'");
-      }
-
-      try {
-        pwdCallback.init(conf);
-      } catch (PasswordResolverException ex) {
-        throw new IllegalArgumentException("invalid masterPasswordCallback configuration "
-            + masterPasswordCallback + ", " + ex.getClass().getName() + ": " + ex.getMessage());
-      }
-      this.masterPwdCallback = pwdCallback;
     } // method init
 
     public void clearMasterPassword() {
@@ -150,7 +112,6 @@ public interface SinglePasswordResolver {
 
     @Override
     public String protectPassword(char[] password) throws PasswordResolverException {
-      final int iterationCount = 2000;
       return PBEPasswordService.encryptPassword(PBEAlgo.PBEWithHmacSHA256AndAES_256, iterationCount,
           getMasterPassword(null), password);
     }
@@ -158,6 +119,10 @@ public interface SinglePasswordResolver {
     public void setMasterPasswordCallback(String masterPasswordCallback) {
       Args.notBlank(masterPasswordCallback, "masterPasswordCallback");
       this.masterPasswordCallback = masterPasswordCallback.trim();
+    }
+
+    public void setIterationCount(int iterationCount) {
+      this.iterationCount = Args.min(iterationCount, "iterationCount", 1000);
     }
 
   } // class PBE

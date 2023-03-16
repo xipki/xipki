@@ -4,7 +4,6 @@
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
   <feature name="xipki-ca-mgmt" version="${project.version}" description="CA management shell">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
-    <bundle>mvn:org.xipki/password/${project.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
@@ -24,7 +23,6 @@
   </feature>
   <feature name="xipki-ocsp-mgmt" version="${project.version}" description="OCSP management">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
-    <bundle>mvn:org.xipki/password/${project.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>

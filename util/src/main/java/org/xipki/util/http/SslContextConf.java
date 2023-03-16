@@ -17,6 +17,8 @@
 
 package org.xipki.util.http;
 
+import org.xipki.password.PasswordResolver;
+import org.xipki.password.PasswordResolverException;
 import org.xipki.util.Base64;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.FileOrBinary;
@@ -44,6 +46,8 @@ public class SslContextConf {
   private static final byte[] PEM_PREFIX = StringUtil.toUtf8Bytes("-----BEGIN");
 
   private boolean useSslConf = true;
+
+  private PasswordResolver passwordResolver;
 
   private String sslStoreType;
 
@@ -82,6 +86,14 @@ public class SslContextConf {
 
   public void setUseSslConf(boolean useSslConf) {
     this.useSslConf = useSslConf;
+  }
+
+  public PasswordResolver getPasswordResolver() {
+    return passwordResolver;
+  }
+
+  public void setPasswordResolver(PasswordResolver passwordResolver) {
+    this.passwordResolver = passwordResolver;
   }
 
   public String getSslStoreType() {
@@ -161,7 +173,13 @@ public class SslContextConf {
 
       try {
         if (sslKeystore != null) {
-          char[] password = sslKeystorePassword == null ? null : sslKeystorePassword.toCharArray();
+          char[] password;
+          if (sslKeystorePassword == null) {
+            password = null;
+          } else {
+            password = (passwordResolver == null) ? sslKeystorePassword.toCharArray()
+                        : passwordResolver.resolvePassword(sslKeystorePassword);
+          }
           try (InputStream is = new ByteArrayInputStream(sslKeystore.readContent())) {
             builder.loadKeyMaterial(is, password, password);
           }
@@ -203,7 +221,7 @@ public class SslContextConf {
 
         sslContext = builder.build();
       } catch (IOException | UnrecoverableKeyException | NoSuchAlgorithmException
-          | KeyStoreException | CertificateException | KeyManagementException ex) {
+          | KeyStoreException | CertificateException | KeyManagementException | PasswordResolverException ex) {
         throw new ObjectCreationException("could not build SSLContext: " + ex.getMessage(), ex);
       }
     }

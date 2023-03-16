@@ -40,6 +40,8 @@ public class PasswordResolverImpl implements PasswordResolver {
   private boolean initialized = false;
   private String masterPasswordCallback;
 
+  private int masterPasswordIterationCount = 2000;
+
   public PasswordResolverImpl() {
   }
 
@@ -133,4 +135,11 @@ public class PasswordResolverImpl implements PasswordResolver {
     this.masterPasswordCallback = masterPasswordCallback;
   }
 
+  public int getMasterPasswordIterationCount() {
+    return masterPasswordIterationCount;
+  }
+
+  public void setMasterPasswordIterationCount(int masterPasswordIterationCount) {
+    this.masterPasswordIterationCount = masterPasswordIterationCount;
+  }
 }

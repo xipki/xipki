@@ -28,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 /**
  * Callback to get password.
@@ -227,6 +228,55 @@ public interface PasswordCallback {
       }
     }
 
+  }
+
+  public static PasswordCallback getInstance(String passwordCallback) {
+    String type;
+    String conf = null;
+
+    int delimIndex = passwordCallback.indexOf(' ');
+    if (delimIndex == -1) {
+      type = passwordCallback;
+    } else {
+      type = passwordCallback.substring(0, delimIndex);
+      conf = passwordCallback.substring(delimIndex + 1);
+    }
+
+    PasswordCallback pwdCallback;
+    switch (type.toUpperCase(Locale.ROOT)) {
+      case "FILE":
+        pwdCallback = new PasswordCallback.File();
+        break;
+      case "GUI":
+        pwdCallback = new PasswordCallback.Gui();
+        break;
+      case "PBE-GUI":
+        pwdCallback = new PasswordCallback.PBEGui();
+        break;
+      case OBFPasswordService.PROTOCOL_OBF:
+        pwdCallback = new PasswordCallback.OBF();
+        if (conf != null && !StringUtil.startsWithIgnoreCase(conf, OBFPasswordService.PROTOCOL_OBF + ":")) {
+          conf = StringUtil.concat(OBFPasswordService.PROTOCOL_OBF, ":", conf);
+        }
+        break;
+      default:
+        String callbackClass = type;
+        try {
+          pwdCallback = (PasswordCallback) PasswordCallback.class.getClassLoader()
+              .loadClass(callbackClass).getConstructor().newInstance();
+        } catch (Exception e) {
+          throw new IllegalStateException("unknown PasswordCallback type '" + type + "'");
+        }
+    }
+
+    try {
+      pwdCallback.init(conf);
+    } catch (PasswordResolverException ex) {
+      throw new IllegalArgumentException("invalid passwordCallback configuration "
+          + passwordCallback + ", " + ex.getClass().getName() + ": " + ex.getMessage());
+    }
+
+    return pwdCallback;
   }
 
 }

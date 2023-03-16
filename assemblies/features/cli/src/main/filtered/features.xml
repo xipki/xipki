@@ -4,7 +4,6 @@
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
   <feature name="xipki-cmp-client" version="${project.version}" description="CA client">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
-    <bundle>mvn:org.xipki/password/${project.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
@@ -19,7 +18,6 @@
   <feature name="xipki-scep-client" version="${project.version}"
       description="SCEP client shell">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
-    <bundle>mvn:org.xipki/password/${project.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
@@ -33,7 +31,6 @@
   </feature>
   <feature name="xipki-ocsp-client" version="${project.version}" description="OCSP client shell">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
-    <bundle>mvn:org.xipki/password/${project.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
