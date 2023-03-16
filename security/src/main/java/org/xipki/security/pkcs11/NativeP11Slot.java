@@ -217,10 +217,9 @@ class NativeP11Slot extends P11Slot {
     if (keyType == CKK_RSA) {
       return buildRSAKey(identity.getRsaModulus(), identity.getRsaPublicExponent());
     } else if (keyType == CKK_DSA) {
-      BigInteger q = identity.getDsaQ();
       AttributeVector attrs = token.getAttrValues(publicKeyHandle, CKA_PRIME, CKA_VALUE, CKA_BASE);
       DSAPublicKeySpec keySpec = new DSAPublicKeySpec(
-          new BigInteger(1, attrs.value()), attrs.prime(), q, attrs.base());
+          new BigInteger(1, attrs.value()), attrs.prime(), identity.getDsaQ(), attrs.base());
       try {
         return KeyUtil.generateDSAPublicKey(keySpec);
       } catch (InvalidKeySpecException ex) {
@@ -280,8 +279,8 @@ class NativeP11Slot extends P11Slot {
   @Override
   public int destroyAllObjects() {
     try {
-      List<Long> handles = getObjects(null, 9999);
-      return token.destroyObjects(handles).size();
+      long[] handles = token.findAllObjects(null);
+      return token.destroyObjects(handles).length;
     } catch (TokenException e) {
       LogUtil.warn(LOG, e, "error destroyAllObjects()");
       return 0;
@@ -351,9 +350,9 @@ class NativeP11Slot extends P11Slot {
       hasValueLen = false;
     } else if (CKK_GENERIC_SECRET == keyType) {
       mech = CKM_GENERIC_SECRET_KEY_GEN;
-    } else if (CKK_SHA_1_HMAC == keyType || CKK_SHA224_HMAC   == keyType || CKK_SHA256_HMAC == keyType
-        || CKK_SHA384_HMAC   == keyType  || CKK_SHA512_HMAC   == keyType || CKK_SHA3_224_HMAC == keyType
-        || CKK_SHA3_256_HMAC == keyType  || CKK_SHA3_384_HMAC == keyType || CKK_SHA3_512_HMAC == keyType) {
+    } else if (CKK_SHA_1_HMAC == keyType || CKK_SHA224_HMAC   == keyType || CKK_SHA256_HMAC   == keyType
+        || CKK_SHA384_HMAC    == keyType || CKK_SHA512_HMAC   == keyType || CKK_SHA3_224_HMAC == keyType
+        || CKK_SHA3_256_HMAC  == keyType || CKK_SHA3_384_HMAC == keyType || CKK_SHA3_512_HMAC == keyType) {
       mech = CKM_GENERIC_SECRET_KEY_GEN;
     } else {
       throw new IllegalArgumentException("unsupported key type 0x" + codeToName(Category.CKK, keyType));
@@ -392,8 +391,7 @@ class NativeP11Slot extends P11Slot {
       id = generateId();
     }
 
-    template.id(id);
-    keyHandle = token.generateKey(mechanism, template);
+    keyHandle = token.generateKey(mechanism, template.id(id));
     label = token.getAttrValues(keyHandle, CKA_LABEL).label();
 
     return new P11IdentityId(slotId, new P11ObjectId(keyHandle, CKO_SECRET_KEY, keyType, id, label), null);
@@ -414,7 +412,6 @@ class NativeP11Slot extends P11Slot {
     }
 
     setKeyAttributes(control, template, label);
-    template.value(keyValue);
 
     if (label != null && labelExists(label)) {
       throw new IllegalArgumentException("label " + control.getLabel() + " exists, please specify another one");
@@ -425,8 +422,7 @@ class NativeP11Slot extends P11Slot {
       id = generateId();
     }
 
-    template.id(id);
-    long keyHandle = token.createObject(template);
+    long keyHandle = token.createObject(template.value(keyValue).id(id));
 
     try {
       label = token.getAttrValues(keyHandle, CKA_LABEL).label();
