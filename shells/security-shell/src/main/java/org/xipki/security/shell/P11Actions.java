@@ -13,6 +13,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolverException;
+import org.xipki.pkcs11.wrapper.PKCS11KeyId;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.*;
 import org.xipki.security.pkcs11.*;
@@ -190,9 +191,9 @@ public class P11Actions {
         return null;
       }
 
-      if (force || confirm("Do you want to remove the identity " + identity.getId(), 3)) {
+      if (force || confirm("Do you want to remove the identity " + identity.getKeyId(), 3)) {
         identity.destroy();
-        println("deleted identity " + identity.getId());
+        println("deleted identity " + identity.getKeyId());
       }
       return null;
     }
@@ -237,7 +238,7 @@ public class P11Actions {
     @Completion(SecurityCompleters.P11KeyUsageCompleter.class)
     private List<String> keyusages;
 
-    protected void finalize(String keyType, P11IdentityId keyId) {
+    protected void finalize(String keyType, PKCS11KeyId keyId) {
       Args.notNull(keyId, "keyId");
       println("generated " + keyType + " key " + keyId + " on slot " + slotIndex);
     }
@@ -446,7 +447,7 @@ public class P11Actions {
         byte[] keyValue = new byte[keysize / 8];
         securityFactory.getRandom4Key().nextBytes(keyValue);
 
-        P11IdentityId objId = slot.importSecretKey(p11KeyType, keyValue, control);
+        PKCS11KeyId objId = slot.importSecretKey(p11KeyType, keyValue, control);
         Arrays.fill(keyValue, (byte) 0); // clear the memory
         String msg = "generated in memory and imported " + keyType + " key " + objId;
         if (LOG.isInfoEnabled()) {
@@ -519,7 +520,7 @@ public class P11Actions {
       }
 
       P11Slot slot = getSlot();
-      P11IdentityId objId = slot.importSecretKey(p11KeyType, keyValue, getControl());
+      PKCS11KeyId objId = slot.importSecretKey(p11KeyType, keyValue, getControl());
       println("imported " + keyType + " key " + objId);
       return null;
     } // method execute0
@@ -567,7 +568,7 @@ public class P11Actions {
         throws IllegalCmdParamException, XiSecurityException, TokenException {
       P11Slot slot = getSlot();
       byte[] id = hexId == null ? null : Hex.decode(hexId);
-      return slot.getIdentity(id, label);
+      return slot.getKey(id, label);
     }
 
   } // class P11SecurityAction
