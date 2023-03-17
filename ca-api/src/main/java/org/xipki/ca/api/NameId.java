@@ -10,7 +10,7 @@ import org.xipki.util.StringUtil;
 /**
  * Name and Identifier.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 

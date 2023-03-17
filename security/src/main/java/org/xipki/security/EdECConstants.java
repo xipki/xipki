@@ -8,7 +8,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 /**
  * EdDSA constants class.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class EdECConstants {
 

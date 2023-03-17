@@ -8,7 +8,7 @@ import org.xipki.util.Base64;
 /**
  * The CT Log servlet RSA.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class CtLogServletRSA extends CtLogServlet {
 

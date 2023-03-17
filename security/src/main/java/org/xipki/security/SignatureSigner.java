@@ -19,7 +19,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * {@link XiContentSigner} based on {@link Signature}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

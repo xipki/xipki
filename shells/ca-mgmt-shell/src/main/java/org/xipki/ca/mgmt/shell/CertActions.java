@@ -53,7 +53,7 @@ import java.util.List;
 /**
  * Actions to management certificates and CRLs.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class CertActions {

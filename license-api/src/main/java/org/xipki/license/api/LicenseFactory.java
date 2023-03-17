@@ -5,7 +5,7 @@ package org.xipki.license.api;
 
 /**
  * Unlimited license factory.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public interface LicenseFactory {

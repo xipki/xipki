@@ -34,7 +34,7 @@ import static org.xipki.util.StringUtil.concat;
 /**
  * PKCS#11 slot.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

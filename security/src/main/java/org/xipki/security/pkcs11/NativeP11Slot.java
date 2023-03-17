@@ -47,7 +47,7 @@ import static org.xipki.util.CollectionUtil.isNotEmpty;
 /**
  * {@link P11Slot} based on the ipkcs11wrapper or jpkcs11wrapper.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 class NativeP11Slot extends P11Slot {

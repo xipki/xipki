@@ -18,7 +18,7 @@ import java.util.Map;
  * Defines how to publish the certificates and CRLs. All CertPublisher classes must extend this
  * class.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

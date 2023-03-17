@@ -8,7 +8,7 @@ import org.xipki.scep.transaction.CaCapability;
 /**
  * Test CA with only the CACapability SCEPStandard.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CaWithOnlyStandardTest extends AbstractCaTest {

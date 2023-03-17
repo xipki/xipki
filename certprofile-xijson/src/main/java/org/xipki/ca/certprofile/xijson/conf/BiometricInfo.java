@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Extension BiometricInfo.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class BiometricInfo extends ValidatableConf {

@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * CA Management request via the REST API.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public abstract class MgmtRequest extends MgmtMessage {

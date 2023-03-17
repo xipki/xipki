@@ -13,7 +13,7 @@ import java.net.URL;
 /**
  * OCSP requestor interface.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

@@ -6,7 +6,7 @@ package org.xipki.security;
 /**
  * TLS feature extension type. See RFC 7633 for details.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

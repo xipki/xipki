@@ -48,7 +48,7 @@ import java.util.Set;
 /**
  * Actions for PKCS#12 security.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class P12Actions {

@@ -11,7 +11,7 @@ import java.util.Set;
 
 /**
  * Management Entry CA-has-Requestor.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 

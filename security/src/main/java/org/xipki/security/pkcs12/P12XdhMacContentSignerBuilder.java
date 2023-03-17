@@ -26,7 +26,7 @@ import static org.xipki.util.Args.positive;
 /**
  * Builder of PKCS#12 XDH (e.g. X25519, X448) MAC signer.
  *s
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class P12XdhMacContentSignerBuilder {

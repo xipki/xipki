@@ -21,7 +21,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * X509CA module base class.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public abstract class X509CaModule {

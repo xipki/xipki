@@ -19,7 +19,7 @@ import static org.xipki.util.Args.positive;
 /**
  * Builder of {@link ConcurrentContentSigner} for PKCS#11 token.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

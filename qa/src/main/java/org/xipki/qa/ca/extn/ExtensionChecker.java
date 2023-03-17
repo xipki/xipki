@@ -9,7 +9,7 @@ import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
 
 /**
  * Extension checker.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 class ExtensionChecker {
 

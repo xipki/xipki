@@ -6,7 +6,7 @@ package org.xipki.ca.sdk;
 /**
  * Constants used to identify the audit event.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

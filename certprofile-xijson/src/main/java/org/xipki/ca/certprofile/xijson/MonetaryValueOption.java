@@ -11,7 +11,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * Control of the MonetaryValue (in the extension QCStatements).
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

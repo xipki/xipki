@@ -23,7 +23,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * Database tool base.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

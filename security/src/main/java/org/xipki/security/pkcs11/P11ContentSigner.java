@@ -40,7 +40,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * PKCS#11 {@link XiContentSigner}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 abstract class P11ContentSigner implements XiContentSigner {

@@ -18,7 +18,7 @@ import static org.xipki.util.Args.notBlank;
 /**
  * Speed test of signature creation for JCE based Token.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class JceSignSpeed extends BenchmarkExecutor {

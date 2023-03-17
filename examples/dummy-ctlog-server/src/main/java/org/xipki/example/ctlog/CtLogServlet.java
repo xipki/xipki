@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * HTTP servlet of CT Log server.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 @SuppressWarnings("serial")
 public class CtLogServlet extends HttpServlet {

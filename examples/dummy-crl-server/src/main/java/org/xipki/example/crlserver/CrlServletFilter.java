@@ -25,7 +25,7 @@ import java.sql.ResultSet;
 /**
  * Dummy CRL ServletFilter.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class CrlServletFilter implements Filter {
 

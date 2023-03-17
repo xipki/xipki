@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * ASN.1 Extensions.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 

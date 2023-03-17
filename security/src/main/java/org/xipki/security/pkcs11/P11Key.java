@@ -22,7 +22,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * PKCS#11 key.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

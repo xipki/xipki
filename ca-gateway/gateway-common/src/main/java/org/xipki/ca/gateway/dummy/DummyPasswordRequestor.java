@@ -13,7 +13,7 @@ import java.util.Map;
 
 /**
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

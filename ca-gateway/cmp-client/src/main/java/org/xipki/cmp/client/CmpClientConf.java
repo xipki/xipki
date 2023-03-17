@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Configuration of CMP client.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CmpClientConf extends ValidatableConf {

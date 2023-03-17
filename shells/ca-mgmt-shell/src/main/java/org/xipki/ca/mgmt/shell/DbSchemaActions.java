@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Actions to operate on databases directly.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since  6.0.0
  */
 public class DbSchemaActions {

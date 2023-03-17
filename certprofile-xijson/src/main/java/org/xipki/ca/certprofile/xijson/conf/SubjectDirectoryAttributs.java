@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Extension SubjectDirectoryAttributs.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class SubjectDirectoryAttributs extends ValidatableConf {

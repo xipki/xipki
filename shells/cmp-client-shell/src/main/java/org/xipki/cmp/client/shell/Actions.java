@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * CMP client actions.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class Actions {

@@ -30,7 +30,7 @@ import static org.xipki.util.StringUtil.concat;
 /**
  * Manages the signers.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 class SignerManager {

@@ -20,7 +20,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * {@link ContentVerifierProvider} for the signature algorithm EdDSA (Ed25519 and Ed448).
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.1.0
  */
 

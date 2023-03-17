@@ -22,7 +22,7 @@ import static org.xipki.util.StringUtil.concat;
 /**
  * Manages the requestors.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 class RequestorManager {

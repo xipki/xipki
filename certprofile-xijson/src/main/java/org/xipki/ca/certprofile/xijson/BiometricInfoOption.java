@@ -20,7 +20,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * Control of the extension BiometricInfo.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

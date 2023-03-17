@@ -9,7 +9,7 @@ import org.xipki.util.exception.InvalidConfException;
 /**
  * CA configuration entry with database table id.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public abstract class IdentifiedDbObject extends ValidatableConf {

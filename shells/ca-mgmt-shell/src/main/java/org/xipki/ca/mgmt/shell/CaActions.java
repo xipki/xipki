@@ -33,7 +33,7 @@ import java.util.*;
 /**
  * Actions to manage CA.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class CaActions {

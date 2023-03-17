@@ -21,7 +21,7 @@ import java.security.NoSuchAlgorithmException;
  * Extends {@link BcECContentVerifierProviderBuilder} to support the signature algorithms
  * RSAPSS.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.1.0
  */
 

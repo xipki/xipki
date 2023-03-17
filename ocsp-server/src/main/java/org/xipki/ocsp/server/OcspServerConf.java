@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * Configuration of OCSP server.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class OcspServerConf extends ValidatableConf {
 

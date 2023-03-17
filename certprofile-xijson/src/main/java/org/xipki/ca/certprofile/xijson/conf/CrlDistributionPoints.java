@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Extension CRLDistributionPoints.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CrlDistributionPoints extends ValidatableConf {

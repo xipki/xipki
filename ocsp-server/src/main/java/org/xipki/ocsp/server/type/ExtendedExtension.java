@@ -17,7 +17,7 @@ import java.util.Arrays;
 /**
  * ASN.1 extension that can be read and written.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 

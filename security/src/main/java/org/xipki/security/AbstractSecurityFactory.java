@@ -16,7 +16,7 @@ import java.security.PublicKey;
  * Abstract implementation of {@link SecurityFactory}. It provides some common
  * methods.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

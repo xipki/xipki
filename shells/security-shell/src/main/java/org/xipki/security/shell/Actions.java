@@ -58,7 +58,7 @@ import java.util.Map.Entry;
 /**
  * Security actions.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class Actions {

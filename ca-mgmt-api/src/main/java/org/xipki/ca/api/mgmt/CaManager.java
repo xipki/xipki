@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * Interface to manage the CA system.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

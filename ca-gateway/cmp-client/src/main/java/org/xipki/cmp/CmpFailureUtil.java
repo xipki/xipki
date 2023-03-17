@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * CMP failure utility class.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

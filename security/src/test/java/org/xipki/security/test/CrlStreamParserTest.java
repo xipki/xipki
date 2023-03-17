@@ -23,7 +23,7 @@ import java.security.Security;
 /**
  * CRL Stream Parser test.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class CrlStreamParserTest {
 

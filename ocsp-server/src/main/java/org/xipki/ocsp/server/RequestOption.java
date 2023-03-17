@@ -24,7 +24,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * OCSP request option.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

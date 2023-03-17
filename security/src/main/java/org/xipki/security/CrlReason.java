@@ -14,7 +14,7 @@ import java.util.*;
  * RFC 3280: Internet X.509 Public Key Infrastructure Certificate and CRL
  * Profile</a>.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

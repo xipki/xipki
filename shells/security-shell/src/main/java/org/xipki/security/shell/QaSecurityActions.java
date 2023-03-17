@@ -36,7 +36,7 @@ import java.util.Queue;
 /**
  * Actions of QA for security.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class QaSecurityActions {

@@ -19,7 +19,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * HTTP OCSP requestor.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

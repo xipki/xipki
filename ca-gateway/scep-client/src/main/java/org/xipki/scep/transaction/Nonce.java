@@ -11,7 +11,7 @@ import java.util.Arrays;
 /**
  * Nonce.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class Nonce {

@@ -9,7 +9,7 @@ import static org.xipki.util.Args.notNegative;
 
 /**
  * Identifier of a {@link P11Slot}.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

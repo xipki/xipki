@@ -11,7 +11,7 @@ import java.security.PrivateKey;
 /**
  * RA emulator.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class RaEmulator {

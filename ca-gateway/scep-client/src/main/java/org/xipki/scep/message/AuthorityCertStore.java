@@ -10,7 +10,7 @@ import org.xipki.util.Args;
 /**
  * Contains the CA certificate and the corresponding RA certificates, if exists.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class AuthorityCertStore {

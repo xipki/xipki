@@ -43,7 +43,7 @@ import static org.xipki.util.exception.ErrorCode.*;
 /**
  * X509CA CRL module.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class X509CrlModule extends X509CaModule implements Closeable {

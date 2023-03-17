@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Certificate Transparency Log control.
  * Currently, it is only a placeholder. Need to be implemented in a later version.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CtlogControl {

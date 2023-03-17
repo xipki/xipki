@@ -21,7 +21,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * {@link P11Module} based on the ipkcs11wrapper or jpkcs11wrapper.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

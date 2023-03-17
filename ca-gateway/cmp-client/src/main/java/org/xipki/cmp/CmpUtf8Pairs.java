@@ -12,7 +12,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * Specifies utf8Pairs defined in RFC4211.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

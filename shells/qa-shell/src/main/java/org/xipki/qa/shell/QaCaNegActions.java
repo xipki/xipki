@@ -15,7 +15,7 @@ import org.xipki.shell.CmdFailure;
 /**
  * Actions of negative tests for CA.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class QaCaNegActions {

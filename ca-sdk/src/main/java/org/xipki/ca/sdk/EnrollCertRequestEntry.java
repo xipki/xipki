@@ -12,7 +12,7 @@ import java.util.Date;
 
 /**
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

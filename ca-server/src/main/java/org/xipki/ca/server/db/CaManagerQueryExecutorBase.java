@@ -23,7 +23,7 @@ import static org.xipki.util.StringUtil.concat;
 /**
  * Base class to execute the database queries to manage CA system.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 class CaManagerQueryExecutorBase extends QueryExecutor {

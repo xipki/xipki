@@ -25,7 +25,7 @@ import java.security.Signature;
  * Abstract class of JUnit tests to test the signature creation and verification
  * of PKCS#12 token.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 public abstract class Pkcs12SignVerifyTest {

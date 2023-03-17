@@ -7,7 +7,7 @@ import org.xipki.util.exception.ErrorCode;
 
 /**
  * Exception wraps the error response.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class SdkErrorResponseException extends Exception {
 

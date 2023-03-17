@@ -10,7 +10,7 @@ import org.xipki.util.Args;
 /**
  * Response Audit Exception.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 3.0.1
  */
 

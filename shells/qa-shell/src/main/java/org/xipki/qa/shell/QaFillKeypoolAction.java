@@ -18,7 +18,7 @@ import org.xipki.shell.XiAction;
  * Shell to fill the keypool with keypairs.
  *
  * @since 6.0.0
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 @Command(scope = "qa", name = "fill-keypool", description = "Fill the keypool")

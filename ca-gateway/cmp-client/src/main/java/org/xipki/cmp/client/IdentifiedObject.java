@@ -8,7 +8,7 @@ import org.xipki.util.Args;
 /**
  * Object with id.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

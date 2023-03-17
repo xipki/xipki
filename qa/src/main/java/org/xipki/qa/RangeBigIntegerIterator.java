@@ -12,7 +12,7 @@ import static org.xipki.util.Args.notEmpty;
  * Iterator which iterates the {@link BigInteger} as specified by a list of
  * {@link BigIntegerRange}s.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.1.0
  */
 

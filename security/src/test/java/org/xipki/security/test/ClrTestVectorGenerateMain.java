@@ -18,7 +18,7 @@ import java.util.Date;
 /**
  * Generate CRL test vectors.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class ClrTestVectorGenerateMain {
 

@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * CertprofileFactory for the Certprofile of type 'xijson'.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

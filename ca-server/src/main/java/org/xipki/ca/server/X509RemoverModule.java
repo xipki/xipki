@@ -29,7 +29,7 @@ import static org.xipki.util.exception.ErrorCode.NOT_PERMITTED;
 /**
  * X509CA revoker module.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class X509RemoverModule extends X509CaModule implements Closeable {

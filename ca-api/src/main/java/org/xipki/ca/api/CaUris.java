@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * CA URIs.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

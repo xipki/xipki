@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Control of SubjectDirectoryAttributes.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.1
  */
 

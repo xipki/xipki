@@ -53,7 +53,7 @@ import static org.xipki.util.StringUtil.concat;
 /**
  * Manages the CAs.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 class Ca2Manager {

@@ -30,7 +30,7 @@ import java.util.zip.ZipFile;
 /**
  * Database importer of OCSP CertStore.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

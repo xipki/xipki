@@ -24,7 +24,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * RFC 6962 implementation of the required classes for the extension SCT in certificate.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class CtLog {
 

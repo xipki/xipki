@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * JSON util class
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.1.0
  */
 public class JSON {

@@ -42,7 +42,7 @@ import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**
  * Checker for extensions whose name is from O to T.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 class O2tChecker extends ExtensionChecker {

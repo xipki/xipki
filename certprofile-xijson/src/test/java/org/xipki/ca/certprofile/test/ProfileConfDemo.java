@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * Demo the creation of xijson configuration.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class ProfileConfDemo extends ProfileConfBuilder {

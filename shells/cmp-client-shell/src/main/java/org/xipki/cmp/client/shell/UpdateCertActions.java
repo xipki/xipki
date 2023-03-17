@@ -40,7 +40,7 @@ import java.util.List;
 /**
  * CMP client actions to update certificates.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class UpdateCertActions {

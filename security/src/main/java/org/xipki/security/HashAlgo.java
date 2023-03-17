@@ -23,7 +23,7 @@ import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.*;
 /**
  * Hash algorithm enum.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

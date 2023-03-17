@@ -45,7 +45,7 @@ import java.util.*;
 /**
  * Builder to create xijson configuration.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class ProfileConfBuilder extends ExtensionConfBuilder {

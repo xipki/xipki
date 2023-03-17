@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * ASN.1 SingleResponse.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 

@@ -12,7 +12,7 @@ import org.xipki.util.exception.InvalidConfException;
 /**
  * Extension configuration.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

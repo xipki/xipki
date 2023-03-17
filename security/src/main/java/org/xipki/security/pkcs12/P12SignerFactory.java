@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * {@link SignerFactory} for the types pkcs12 and jceks.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

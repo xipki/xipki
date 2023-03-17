@@ -19,7 +19,7 @@ import java.security.spec.EllipticCurve;
 
 /**
  * Chinese GM/SM Util class.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class GMUtil {

@@ -8,7 +8,7 @@ import java.math.BigInteger;
 /**
  * Range with [from, to].
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.1.0
  */
 

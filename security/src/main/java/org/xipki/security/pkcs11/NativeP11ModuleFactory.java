@@ -11,7 +11,7 @@ import org.xipki.pkcs11.wrapper.TokenException;
 /**
  * {@link P11ModuleFactory} to create {@link P11Module} of type "native".
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class NativeP11ModuleFactory implements P11ModuleFactory {

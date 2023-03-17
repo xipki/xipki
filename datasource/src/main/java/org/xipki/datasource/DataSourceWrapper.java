@@ -25,7 +25,7 @@ import static org.xipki.util.StringUtil.*;
 /**
  * A wrapper of {@link HikariDataSource}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

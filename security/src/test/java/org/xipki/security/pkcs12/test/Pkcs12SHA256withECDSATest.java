@@ -9,7 +9,7 @@ import org.xipki.security.SignAlgo;
  * JUnit tests to test the signature creation and verification of PKCS#12 token
  * for the signature algorithm SHA256withRSA.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 public class Pkcs12SHA256withECDSATest extends Pkcs12SignVerifyTest {

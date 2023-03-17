@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Factory to create {@link KeypairGenerator}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

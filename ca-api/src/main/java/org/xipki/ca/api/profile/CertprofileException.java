@@ -6,7 +6,7 @@ package org.xipki.ca.api.profile;
 /**
  * Exception related to Certprofile.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

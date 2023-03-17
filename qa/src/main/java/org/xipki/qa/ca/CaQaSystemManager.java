@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * QA system manager for CA.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

@@ -28,7 +28,7 @@ import java.security.Signature;
 
 /**
  * Public keys can be found under https://ct.grahamedgecombe.com/
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class CtLogVerifyTest {

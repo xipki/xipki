@@ -37,7 +37,7 @@ import java.util.Set;
  * Keypool based keypair generator.
  *
  * @since 6.0.0
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class KeypoolKeypairGenerator extends KeypairGenerator {

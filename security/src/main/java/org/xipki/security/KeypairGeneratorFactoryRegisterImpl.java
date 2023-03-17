@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 /**
  * An implementation of {@link KeypairGeneratorFactoryRegister}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

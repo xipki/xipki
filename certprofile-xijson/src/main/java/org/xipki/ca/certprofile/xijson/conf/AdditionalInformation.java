@@ -10,7 +10,7 @@ import org.xipki.util.exception.InvalidConfException;
 /**
  * Extension Additional Information.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class AdditionalInformation extends ValidatableConf {

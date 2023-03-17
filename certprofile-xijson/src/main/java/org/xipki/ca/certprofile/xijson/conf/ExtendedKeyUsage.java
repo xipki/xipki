@@ -14,7 +14,7 @@ import java.util.*;
 /**
  * Extension ExtendedKeyUsage.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class ExtendedKeyUsage extends ValidatableConf {

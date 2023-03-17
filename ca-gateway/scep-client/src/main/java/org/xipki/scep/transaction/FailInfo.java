@@ -6,7 +6,7 @@ package org.xipki.scep.transaction;
 /**
  * FailInfo enum.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public enum FailInfo {

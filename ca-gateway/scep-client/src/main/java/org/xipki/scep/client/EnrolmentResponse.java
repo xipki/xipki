@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Response of certificate enrolment.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public final class EnrolmentResponse {

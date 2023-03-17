@@ -20,7 +20,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * Configuration of a PKCS#11 module.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class P11ModuleConf {

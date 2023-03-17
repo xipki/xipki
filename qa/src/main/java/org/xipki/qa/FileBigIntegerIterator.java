@@ -21,7 +21,7 @@ import static org.xipki.util.Args.notBlank;
 /**
  * Iterator which iterates the {@link BigInteger} specified in the file.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.1.0
  */
 

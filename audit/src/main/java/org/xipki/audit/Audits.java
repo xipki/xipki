@@ -13,7 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * Helper class to configure and initialize the Audit.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class Audits {

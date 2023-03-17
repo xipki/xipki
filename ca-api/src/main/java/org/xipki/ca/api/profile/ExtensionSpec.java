@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * Extension specification.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public abstract class ExtensionSpec {
 

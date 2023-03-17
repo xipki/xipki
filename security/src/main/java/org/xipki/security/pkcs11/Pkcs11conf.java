@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Configuration of PKCS#11.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class Pkcs11conf extends ValidatableConf {

@@ -9,7 +9,7 @@ import org.xipki.util.exception.InvalidConfException;
 /**
  * Extension PrivateKeyUsagePeriod.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class PrivateKeyUsagePeriod extends ValidatableConf {

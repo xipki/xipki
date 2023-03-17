@@ -29,7 +29,7 @@ import java.util.Date;
 /**
  * CMP client actions to revoke, unrevoke and remove certificates.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class UnRevokeCertActions {

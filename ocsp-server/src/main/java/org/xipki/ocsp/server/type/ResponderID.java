@@ -11,7 +11,7 @@ import java.io.IOException;
 /**
  * ASN.1 ResponderID.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 public class ResponderID extends ASN1Type {

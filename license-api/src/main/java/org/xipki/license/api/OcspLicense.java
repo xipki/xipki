@@ -6,7 +6,7 @@ package org.xipki.license.api;
 /**
  * OCSP License Feature.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public interface OcspLicense {
 

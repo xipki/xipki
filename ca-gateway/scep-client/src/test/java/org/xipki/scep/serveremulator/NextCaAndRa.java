@@ -9,7 +9,7 @@ import org.xipki.util.Args;
 /**
  * Contains the next CA certificate and next RA certificate.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class NextCaAndRa {

@@ -10,7 +10,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * PKI message with verification result.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

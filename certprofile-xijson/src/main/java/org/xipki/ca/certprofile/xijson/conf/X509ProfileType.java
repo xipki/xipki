@@ -32,7 +32,7 @@ import java.util.*;
 /**
  * Root configuration of the xijson Certprofile.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

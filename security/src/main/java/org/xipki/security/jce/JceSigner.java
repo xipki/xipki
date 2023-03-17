@@ -15,7 +15,7 @@ import java.security.*;
 
 /**
  * JCE signer
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class JceSigner implements XiContentSigner {
 

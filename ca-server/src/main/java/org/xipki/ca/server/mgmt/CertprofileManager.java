@@ -32,7 +32,7 @@ import static org.xipki.util.StringUtil.concat;
 /**
  * Manages the certificate profiles.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 class CertprofileManager {

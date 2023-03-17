@@ -27,7 +27,7 @@ import java.util.Locale;
 
 /**
  * Software-based keypair generator.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 public class SoftwareKeypairGenerator extends KeypairGenerator {

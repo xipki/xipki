@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  * Completers for security shells.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class SecurityCompleters {
 

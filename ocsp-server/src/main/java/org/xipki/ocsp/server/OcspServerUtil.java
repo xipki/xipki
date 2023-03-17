@@ -35,7 +35,7 @@ import java.util.*;
 /**
  * Utility functions for {@link OcspServer}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

@@ -6,7 +6,7 @@ package org.xipki.ca.sdk;
 /**
  * Mode to embed the certificates.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

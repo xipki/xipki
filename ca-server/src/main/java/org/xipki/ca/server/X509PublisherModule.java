@@ -26,7 +26,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * X509CA publisher module.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 class X509PublisherModule extends X509CaModule {

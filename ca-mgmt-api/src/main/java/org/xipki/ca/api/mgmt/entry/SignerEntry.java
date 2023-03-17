@@ -13,7 +13,7 @@ import org.xipki.util.StringUtil;
 
 /**
  * Management Entry Signer.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 

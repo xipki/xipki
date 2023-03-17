@@ -13,7 +13,7 @@ import java.security.Security;
 /**
  * Helper class to register providers {@link BouncyCastleProvider}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

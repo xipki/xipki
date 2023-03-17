@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Extension NameConstraints.
  * Only for CA, at least one of permittedSubtrees and excludedSubtrees must be present.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class NameConstraints extends ValidatableConf {
 

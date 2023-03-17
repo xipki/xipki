@@ -9,7 +9,7 @@ import org.xipki.util.exception.ErrorCode;
 /**
  * Error response.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

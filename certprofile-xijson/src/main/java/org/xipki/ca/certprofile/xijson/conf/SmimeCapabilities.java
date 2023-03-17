@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Extension S/MIME Capabilities.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class SmimeCapabilities extends ValidatableConf {

@@ -48,7 +48,7 @@ import java.util.*;
 /**
  * CMP client actions to enroll certificates.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class EnrollCertActions {

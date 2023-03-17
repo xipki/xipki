@@ -43,7 +43,7 @@ import static org.xipki.util.exception.ErrorCode.*;
 /**
  * SDK responder.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

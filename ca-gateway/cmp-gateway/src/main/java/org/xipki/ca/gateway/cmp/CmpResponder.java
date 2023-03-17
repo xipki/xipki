@@ -37,7 +37,7 @@ import static org.bouncycastle.asn1.cmp.PKIStatus.*;
 /**
  * CMP responder.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

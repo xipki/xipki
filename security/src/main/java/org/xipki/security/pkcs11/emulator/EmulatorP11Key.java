@@ -44,7 +44,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * {@link P11Key} for PKCS#11 emulator.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

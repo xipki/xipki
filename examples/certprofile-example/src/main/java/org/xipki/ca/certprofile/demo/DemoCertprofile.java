@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * Example Certprofile.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class DemoCertprofile extends XijsonCertprofile {

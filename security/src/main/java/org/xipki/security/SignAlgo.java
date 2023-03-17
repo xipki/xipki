@@ -43,7 +43,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * Hash algorithm enum.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 // See https://www.itu.int/ITU-T/formal-language/itu-t/x/x509/2019/AlgorithmObjectIdentifiers.html

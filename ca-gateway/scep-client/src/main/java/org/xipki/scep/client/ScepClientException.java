@@ -6,7 +6,7 @@ package org.xipki.scep.client;
 /**
  * SCEP client exception.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class ScepClientException extends Exception {

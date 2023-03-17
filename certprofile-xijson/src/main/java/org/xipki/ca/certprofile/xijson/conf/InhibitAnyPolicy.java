@@ -9,7 +9,7 @@ import org.xipki.util.exception.InvalidConfException;
 /**
  * Extension InhibitAnyPolicy.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class InhibitAnyPolicy extends ValidatableConf {

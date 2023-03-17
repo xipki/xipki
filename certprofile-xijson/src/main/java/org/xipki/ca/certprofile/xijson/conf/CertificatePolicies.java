@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Extension CertificatePolicies.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CertificatePolicies extends ValidatableConf {

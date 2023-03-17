@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * Anchor of all CA tests.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public abstract class AbstractCaTest {

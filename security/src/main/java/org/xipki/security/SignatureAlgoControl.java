@@ -6,7 +6,7 @@ package org.xipki.security;
 /**
  * Control the signature algorithm.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

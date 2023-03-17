@@ -16,7 +16,7 @@ import static org.xipki.util.Args.notBlank;
 /**
  * Certificate issuer filter.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

@@ -54,7 +54,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * CA emulator.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CaEmulator {

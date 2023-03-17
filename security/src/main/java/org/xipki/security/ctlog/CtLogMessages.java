@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Certificate transparency (CT) log client.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class CtLogMessages {
 

@@ -19,7 +19,7 @@ import org.xipki.util.StringUtil;
 /**
  * Security actions to protect the password.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class PasswordActions {

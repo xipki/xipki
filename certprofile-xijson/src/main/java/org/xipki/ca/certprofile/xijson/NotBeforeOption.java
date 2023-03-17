@@ -12,7 +12,7 @@ import java.util.TimeZone;
 /**
  * Control of the certificate's NotBefore field.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 public class NotBeforeOption {

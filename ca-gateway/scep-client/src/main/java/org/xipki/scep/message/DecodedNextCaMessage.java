@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * Decoded {@link NextCaMessage}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class DecodedNextCaMessage {

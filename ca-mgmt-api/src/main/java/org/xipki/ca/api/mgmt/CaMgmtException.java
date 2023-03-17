@@ -6,7 +6,7 @@ package org.xipki.ca.api.mgmt;
 /**
  * Exception related to CA management.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

@@ -41,7 +41,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11Constants.*;
 /**
  * Actions for PKCS#11 security.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class P11Actions {

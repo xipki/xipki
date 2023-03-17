@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * OCSP Request builder.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class XiOCSPReqBuilder {

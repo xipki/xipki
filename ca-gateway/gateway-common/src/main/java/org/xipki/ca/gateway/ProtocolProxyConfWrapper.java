@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * Class to build the protocol proxy from the configuration.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 public class ProtocolProxyConfWrapper {

@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 /**
  * An implementation of {@link P11ModuleFactoryRegister}s.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 3.0.1
  */
 

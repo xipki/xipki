@@ -9,7 +9,7 @@ import org.xipki.util.exception.InvalidConfException;
 /**
  * Extension CCC simple ExtensionSchema.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

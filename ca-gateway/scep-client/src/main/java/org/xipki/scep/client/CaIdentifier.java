@@ -15,7 +15,7 @@ import java.net.URLEncoder;
 
 /**
  * CA identifier.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CaIdentifier {

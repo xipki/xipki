@@ -20,7 +20,7 @@ import java.util.Set;
  * {@link ConcurrentContentSigner}, {@link ContentVerifierProvider},
  * to verify POP, to the random, etc.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

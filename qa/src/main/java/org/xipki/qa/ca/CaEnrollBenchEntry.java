@@ -17,7 +17,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * Entry for benchmark enrollment test.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

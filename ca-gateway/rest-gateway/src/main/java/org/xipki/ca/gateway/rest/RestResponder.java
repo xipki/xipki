@@ -46,7 +46,7 @@ import static org.xipki.util.exception.ErrorCode.*;
 /**
  * REST API responder.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 3.0.1
  */
 

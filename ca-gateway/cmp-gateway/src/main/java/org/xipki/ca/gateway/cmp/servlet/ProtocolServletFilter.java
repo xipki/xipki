@@ -24,7 +24,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * CMP Gateway ServletFilter.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class ProtocolServletFilter implements Filter {
 

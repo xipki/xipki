@@ -16,7 +16,7 @@ import static org.xipki.util.Args.notNull;
  * An implementation of {@link AlgorithmValidator} where the permitted algorithms
  * are contained in a static collection.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.1.0
  */
 

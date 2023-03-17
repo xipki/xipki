@@ -40,7 +40,7 @@ import static org.xipki.util.Args.notNull;
  * utility class for converting java.security RSA objects into their
  * org.bouncycastle.crypto counterparts.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

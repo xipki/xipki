@@ -17,7 +17,7 @@ import java.util.*;
 /**
  * Completers for the CA actions.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class CaCompleters {
 

@@ -21,7 +21,7 @@ import org.xipki.util.Validity.Unit;
  *</pre>
  * where duration is of format &lt;n&gt;h, &lt;n&gt;d, &lt;n&gt;y.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

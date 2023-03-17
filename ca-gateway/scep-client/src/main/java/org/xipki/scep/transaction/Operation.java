@@ -8,7 +8,7 @@ import org.xipki.util.Args;
 /**
  * Operation enum.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public enum Operation {

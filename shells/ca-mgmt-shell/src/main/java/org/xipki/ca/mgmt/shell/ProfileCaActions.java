@@ -27,7 +27,7 @@ import java.util.Set;
 /**
  * Actions to manage certificate profiles.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class ProfileCaActions {

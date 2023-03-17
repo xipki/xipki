@@ -34,7 +34,7 @@ import java.util.*;
 /**
  * Extension builder for xijson configuration.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class ExtensionConfBuilder {

@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * CMP control.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

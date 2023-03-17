@@ -14,7 +14,7 @@ import org.xipki.util.Args;
 /**
  * Control of how the CA generate keypair for the new certificate.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 

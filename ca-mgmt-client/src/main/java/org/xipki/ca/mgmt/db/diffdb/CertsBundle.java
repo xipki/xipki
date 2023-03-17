@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Container of the map of serial number to digest value of certificates.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

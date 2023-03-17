@@ -6,7 +6,7 @@ package org.xipki.ocsp.api.mgmt;
 /**
  * OCSP server management request.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public abstract class MgmtRequest extends MgmtMessage {

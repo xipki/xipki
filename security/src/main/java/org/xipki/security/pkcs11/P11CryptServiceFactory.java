@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Factory to create {@link P11CryptService}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

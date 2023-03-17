@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * Actions to manage publishers.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class PublisherCaActions {

@@ -8,7 +8,7 @@ import org.xipki.util.Args;
 /**
  * Control of the CertificatePolicyQualifier (in the extension CertificatePolicies).
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

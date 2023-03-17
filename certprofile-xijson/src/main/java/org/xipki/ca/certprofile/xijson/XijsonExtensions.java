@@ -43,7 +43,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * Extenions configuration.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class XijsonExtensions {

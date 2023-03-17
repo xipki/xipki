@@ -6,7 +6,7 @@ package org.xipki.ocsp.server.type;
 /**
  * Write only extension.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 

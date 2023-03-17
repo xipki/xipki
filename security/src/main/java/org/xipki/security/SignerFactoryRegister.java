@@ -11,7 +11,7 @@ import java.util.Set;
  * Interface to register {@link SignerFactory} and to create new
  * {@link ConcurrentContentSigner}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

@@ -10,7 +10,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * QA extension value.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Extension SubjectInfoAccess.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class SubjectInfoAccess extends ValidatableConf {

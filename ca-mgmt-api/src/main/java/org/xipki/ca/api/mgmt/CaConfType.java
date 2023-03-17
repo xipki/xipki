@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * CA configuration types.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class CaConfType {

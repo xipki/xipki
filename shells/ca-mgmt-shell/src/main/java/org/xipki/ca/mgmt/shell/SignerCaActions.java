@@ -30,7 +30,7 @@ import java.util.Set;
 /**
  * Actions to manage signers.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class SignerCaActions {

@@ -58,7 +58,7 @@ import static org.xipki.util.IoUtil.save;
 /**
  * {@link P11Slot} for PKCS#11 emulator.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

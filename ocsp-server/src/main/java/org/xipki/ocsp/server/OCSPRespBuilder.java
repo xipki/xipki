@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Generator for OCSP response objects.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

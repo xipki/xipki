@@ -13,7 +13,7 @@ import org.xipki.util.Args;
  *  <li>CUTOFF: Use CA's notAfter.</li>
  *  <li>BY_CA: CA decides.</li>
  * </ul>
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public enum NotAfterMode {

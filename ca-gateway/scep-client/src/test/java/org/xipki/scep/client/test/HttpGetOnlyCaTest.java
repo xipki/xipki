@@ -8,7 +8,7 @@ import org.xipki.scep.transaction.CaCapability;
 /**
  * Test CA with only HTTP GET (no POST) support.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class HttpGetOnlyCaTest extends AbstractCaTest {

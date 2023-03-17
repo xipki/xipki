@@ -9,7 +9,7 @@ import org.xipki.util.exception.InvalidConfException;
 /**
  * Extension AuthorityKeyIdentifier.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class AuthorityKeyIdentifier extends ValidatableConf {

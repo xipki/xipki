@@ -6,7 +6,7 @@ package org.xipki.shell;
 /**
  * Exception for illegagl action parameters / options.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

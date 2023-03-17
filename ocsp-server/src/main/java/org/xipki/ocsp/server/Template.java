@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * OCSP response template.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 

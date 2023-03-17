@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  * Configuration of GeneralName.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

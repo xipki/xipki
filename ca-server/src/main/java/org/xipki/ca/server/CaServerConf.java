@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * CA server configuration.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class CaServerConf extends ValidatableConf {
 

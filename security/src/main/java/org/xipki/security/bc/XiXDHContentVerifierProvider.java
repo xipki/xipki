@@ -34,7 +34,7 @@ import static org.xipki.util.Args.notNull;
  * {@link ContentVerifierProvider} for the algorithm X25519 static HMAC (XiPKI own
  * algorithm, based on RFC 6955).
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class XiXDHContentVerifierProvider implements ContentVerifierProvider {

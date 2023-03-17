@@ -19,7 +19,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * HTTP health check servlet of the OCSP server.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 3.0.1
  */
 

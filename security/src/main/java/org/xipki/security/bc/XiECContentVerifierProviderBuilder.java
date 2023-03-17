@@ -22,7 +22,7 @@ import java.security.NoSuchAlgorithmException;
  * Extends {@link BcECContentVerifierProviderBuilder} to support the signature algorithms
  * Plain-ECDSA and SM3.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.1.0
  */
 

@@ -17,7 +17,7 @@ import java.util.*;
 /**
  * Concurrent keypair generator.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

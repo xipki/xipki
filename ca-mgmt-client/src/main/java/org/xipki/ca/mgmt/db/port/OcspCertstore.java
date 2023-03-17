@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * OCSP CertStore.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class OcspCertstore extends ValidatableConf {

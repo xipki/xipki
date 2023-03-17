@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Response of revoking certificates.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

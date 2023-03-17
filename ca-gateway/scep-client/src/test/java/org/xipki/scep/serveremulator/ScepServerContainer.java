@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * This class starts and shutdowns the Jetty HTTP server.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class ScepServerContainer {

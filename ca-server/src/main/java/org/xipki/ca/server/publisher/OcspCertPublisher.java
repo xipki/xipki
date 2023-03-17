@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * Publish certificates to XiPKI OCSP database.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

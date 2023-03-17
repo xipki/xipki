@@ -11,7 +11,7 @@ import org.xipki.security.pkcs11.P11ModuleFactory;
 /**
  * {@link P11ModuleFactory} to create {@link P11Module} of type "emulator".
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class EmulatorP11ModuleFactory implements P11ModuleFactory {

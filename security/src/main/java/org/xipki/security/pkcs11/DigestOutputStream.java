@@ -11,7 +11,7 @@ import java.io.OutputStream;
 /**
  * {@link OutputStream} with a {@link Digest} as the backend.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

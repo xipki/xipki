@@ -13,7 +13,7 @@ import java.util.HashSet;
 /**
  * Certificate validator.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public interface CertificateValidator {

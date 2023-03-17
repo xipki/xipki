@@ -10,7 +10,7 @@ import org.xipki.util.exception.InvalidConfException;
 /**
  * Configuration with description.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

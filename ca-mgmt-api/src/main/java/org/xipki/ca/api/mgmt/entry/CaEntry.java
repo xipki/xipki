@@ -16,7 +16,7 @@ import java.util.List;
 
 /**
  * Management Entry CA.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 

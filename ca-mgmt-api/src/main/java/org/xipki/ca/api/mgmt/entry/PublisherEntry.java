@@ -10,7 +10,7 @@ import org.xipki.util.StringUtil;
 
 /**
  * Management Entry Publisher.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 

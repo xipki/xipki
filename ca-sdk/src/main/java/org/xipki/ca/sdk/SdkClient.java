@@ -24,7 +24,7 @@ import static org.xipki.ca.sdk.SdkConstants.*;
 /**
  * API client.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

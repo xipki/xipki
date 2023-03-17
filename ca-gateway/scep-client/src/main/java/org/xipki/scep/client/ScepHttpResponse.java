@@ -13,7 +13,7 @@ import java.io.InputStream;
 /**
  * HTTP Response.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class ScepHttpResponse {

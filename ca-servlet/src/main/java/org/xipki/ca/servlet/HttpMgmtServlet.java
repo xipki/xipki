@@ -35,7 +35,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * CA management servlet.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 3.0.1
  */
 

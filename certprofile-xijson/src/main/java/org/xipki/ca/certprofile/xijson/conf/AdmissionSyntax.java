@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Extension Admission.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class AdmissionSyntax extends ValidatableConf {

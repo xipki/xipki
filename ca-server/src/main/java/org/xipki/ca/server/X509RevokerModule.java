@@ -39,7 +39,7 @@ import static org.xipki.util.exception.ErrorCode.SYSTEM_FAILURE;
 /**
  * X509CA revoker module.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class X509RevokerModule extends X509CaModule implements Closeable {

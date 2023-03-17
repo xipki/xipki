@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * HTTP request metadata retriever.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 3.0.1
  */
 

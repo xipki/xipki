@@ -6,7 +6,7 @@ package org.xipki.ocsp.api.mgmt;
 /**
  * OCSP server management response.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public abstract class MgmtResponse extends MgmtMessage {

@@ -11,7 +11,7 @@ import java.util.Set;
  * Interface to register {@link KeypairGeneratorFactory} and to create new
  * {@link KeypairGenerator}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

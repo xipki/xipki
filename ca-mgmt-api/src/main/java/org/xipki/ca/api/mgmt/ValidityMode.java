@@ -13,7 +13,7 @@ import org.xipki.util.Args;
  *  <li>LAX: Use the requested notAfter.</li>
  *  <li>CUTOFF: Use CA's notAfter.</li>
  * </ul>
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

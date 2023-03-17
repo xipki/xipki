@@ -10,7 +10,7 @@ import java.security.SecureRandom;
 /**
  * Parameters for the keystore generation.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 

@@ -8,7 +8,7 @@ import org.xipki.security.X509Cert;
 
 /**
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

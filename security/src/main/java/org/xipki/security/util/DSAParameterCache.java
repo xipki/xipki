@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * Cache for DSA parameter specs.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 public final class DSAParameterCache {

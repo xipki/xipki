@@ -12,7 +12,7 @@ import java.util.*;
 /**
  * Extension KeyUsage.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class KeyUsage extends ValidatableConf {

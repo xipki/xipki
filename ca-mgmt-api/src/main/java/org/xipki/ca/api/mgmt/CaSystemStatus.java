@@ -5,7 +5,7 @@ package org.xipki.ca.api.mgmt;
 
 /**
  * CA system status enum.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

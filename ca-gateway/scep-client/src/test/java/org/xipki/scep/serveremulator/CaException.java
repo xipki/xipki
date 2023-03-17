@@ -6,7 +6,7 @@ package org.xipki.scep.serveremulator;
 /**
  * Emulator CA exception.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CaException extends Exception {

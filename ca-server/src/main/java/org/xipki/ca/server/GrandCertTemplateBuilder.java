@@ -47,7 +47,7 @@ import static org.xipki.util.exception.ErrorCode.*;
 /**
  * X509CA GrandCertTemplate builder.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 class GrandCertTemplateBuilder {

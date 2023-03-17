@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * CA CertStore configuration.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CaCertstore extends ValidatableConf {

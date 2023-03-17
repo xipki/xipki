@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * Interface to retrieve the metadata of HTTP request.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 3.0.1
  */
 

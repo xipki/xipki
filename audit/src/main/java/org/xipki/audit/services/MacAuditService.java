@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * The Mac protected audit service.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

@@ -37,7 +37,7 @@ import static org.xipki.util.exception.ErrorCode.SYSTEM_FAILURE;
 /**
  * Base class to exec the database queries to manage CA system.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class CertStoreBase extends QueryExecutor {
 

@@ -10,7 +10,7 @@ import java.io.Closeable;
 /**
  * Register of {@link P11ModuleFactory}s.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

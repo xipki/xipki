@@ -8,7 +8,7 @@ import org.xipki.util.Base64;
 /**
  * The CT Log servlet EC.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class CtLogServletEC extends CtLogServlet {
 

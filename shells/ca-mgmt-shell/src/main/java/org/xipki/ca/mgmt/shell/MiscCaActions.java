@@ -30,7 +30,7 @@ import java.util.Map.Entry;
 /**
  * Misc actions to manage CA.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class MiscCaActions {

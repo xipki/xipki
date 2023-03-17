@@ -28,7 +28,7 @@ import java.util.*;
 /**
  * Demo the creation of xijson configuration for complex certificates.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class ComplexProfileConfDemo extends ProfileConfBuilder {

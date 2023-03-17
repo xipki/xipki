@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Worker for database export / import.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 5.3.15
  */
 

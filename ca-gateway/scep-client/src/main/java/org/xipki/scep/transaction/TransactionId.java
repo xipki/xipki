@@ -15,7 +15,7 @@ import java.security.spec.InvalidKeySpecException;
 /**
  * Transaction ID.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class TransactionId {

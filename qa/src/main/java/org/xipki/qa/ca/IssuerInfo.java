@@ -15,7 +15,7 @@ import static org.xipki.util.CollectionUtil.isEmpty;
 /**
  * Certificate issuer information.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

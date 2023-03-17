@@ -14,7 +14,7 @@ import static org.xipki.util.Args.notEmpty;
 /**
  * Validation result consisting of failed validation issues and successful issues.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

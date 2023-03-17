@@ -26,7 +26,7 @@ import java.util.*;
 /**
  * POP (proof-of-possession) control.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class PopControl {
 

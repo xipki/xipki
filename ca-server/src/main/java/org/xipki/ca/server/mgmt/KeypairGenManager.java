@@ -22,7 +22,7 @@ import static org.xipki.util.StringUtil.concat;
 /**
  * Manages the keypair generation.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since  6.0.0
  */
 

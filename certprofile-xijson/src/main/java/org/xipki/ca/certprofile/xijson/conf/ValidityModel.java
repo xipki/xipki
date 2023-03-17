@@ -10,7 +10,7 @@ import org.xipki.util.exception.InvalidConfException;
 /**
  * Extension ValidityModel.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class ValidityModel extends ValidatableConf {

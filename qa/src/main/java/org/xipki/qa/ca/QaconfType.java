@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Configuration the QA system.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class QaconfType extends ValidatableConf {
 

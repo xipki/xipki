@@ -8,7 +8,7 @@ import org.xipki.scep.transaction.CaCapability;
 /**
  * Test the basic CA operation.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CaTest extends AbstractCaTest {

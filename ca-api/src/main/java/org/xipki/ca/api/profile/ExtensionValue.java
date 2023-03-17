@@ -9,7 +9,7 @@ import org.xipki.util.Args;
 /**
  * Extension value control.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

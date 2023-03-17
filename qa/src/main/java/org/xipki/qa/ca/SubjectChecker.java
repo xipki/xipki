@@ -25,7 +25,7 @@ import static org.xipki.util.CollectionUtil.isNotEmpty;
 /**
  * Subject checker.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

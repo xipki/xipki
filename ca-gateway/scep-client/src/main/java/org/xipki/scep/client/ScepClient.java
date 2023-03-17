@@ -13,7 +13,7 @@ import java.io.IOException;
 /**
  * A concrete SCEP client.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class ScepClient extends Client {

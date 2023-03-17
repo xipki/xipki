@@ -9,7 +9,7 @@ import org.xipki.license.api.OcspLicense;
 
 /**
  * Example license factory.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class ExampleLicenseFactory implements LicenseFactory {

@@ -13,7 +13,7 @@ import java.util.Map.Entry;
 /**
  * Completers for actions.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class Completers {
 

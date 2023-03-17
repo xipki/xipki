@@ -50,7 +50,7 @@ import static org.xipki.util.StringUtil.toUtf8Bytes;
 /**
  * X.509 certificate utility class.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

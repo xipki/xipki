@@ -33,7 +33,7 @@ import static org.xipki.util.Args.positive;
 /**
  * Builder of signer based PKCS#12 keystore.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

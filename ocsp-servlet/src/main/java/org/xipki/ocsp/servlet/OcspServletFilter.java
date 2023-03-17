@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * The Servlet Filter of OCSP servlets.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class OcspServletFilter implements Filter {

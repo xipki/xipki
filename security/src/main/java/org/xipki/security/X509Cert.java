@@ -29,7 +29,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * Wrapper to an {@link X509Certificate}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 5.3.8
  */
 

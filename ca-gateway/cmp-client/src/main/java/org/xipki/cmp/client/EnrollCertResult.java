@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * Certificate enrollment result.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

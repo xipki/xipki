@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Actions to operate on databases directly.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class DbActions {

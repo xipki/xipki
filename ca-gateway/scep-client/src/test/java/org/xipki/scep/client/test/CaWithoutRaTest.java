@@ -8,7 +8,7 @@ import org.xipki.scep.transaction.CaCapability;
 /**
  * Test CA without RA.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CaWithoutRaTest extends AbstractCaTest {

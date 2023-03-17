@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Extension QCStatements.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class QcStatements extends ValidatableConf {

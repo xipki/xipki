@@ -47,7 +47,7 @@ import java.util.List;
 /**
  * SCEP client.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public abstract class Client {

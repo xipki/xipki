@@ -6,7 +6,7 @@ package org.xipki.ocsp.api.mgmt;
 /**
  * OCSP management exception.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

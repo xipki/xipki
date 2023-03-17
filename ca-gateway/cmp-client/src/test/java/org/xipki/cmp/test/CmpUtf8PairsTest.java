@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * Test the {@link CmpUtf8Pairs}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

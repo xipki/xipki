@@ -10,7 +10,7 @@ import java.util.Date;
 /**
  * The anchor class of ASN.1 types defined in this package.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 

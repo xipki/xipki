@@ -8,7 +8,7 @@ import org.bouncycastle.operator.ContentSigner;
 /**
  * Extends {@link ContentSigner} by a new method {@link #getEncodedAlgorithmIdentifier()}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 

@@ -43,7 +43,7 @@ import java.util.Map.Entry;
 /**
  * CA management client via REST API.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CaMgmtClient implements CaManager {

@@ -12,7 +12,7 @@ import org.xipki.password.PasswordResolverException;
 /**
  * The No-Operation audit service. The events will be ignored.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

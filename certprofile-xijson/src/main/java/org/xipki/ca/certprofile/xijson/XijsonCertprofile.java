@@ -44,7 +44,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * Certprofile configured by JSON.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

@@ -8,7 +8,7 @@ import org.xipki.security.X509Cert;
 /**
  * Certificate with id of this certificate in the database.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

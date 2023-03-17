@@ -19,7 +19,7 @@ import static org.xipki.util.Args.range;
 /**
  * PKCS#1 utility class.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 5.3.14
  */
 public class PKCS1Util {

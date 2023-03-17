@@ -11,7 +11,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * CertId or PKI error.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

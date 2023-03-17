@@ -16,7 +16,7 @@ import java.util.List;
  * Extension PolicyMappings.
  * Only for CA.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class PolicyMappings extends ValidatableConf {

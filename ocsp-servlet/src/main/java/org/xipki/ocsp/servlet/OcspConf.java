@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Configuration of the OCSP server.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class OcspConf extends ValidatableConf {
 

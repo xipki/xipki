@@ -35,7 +35,7 @@ import java.util.Set;
 /**
  * CA ServletFilter.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class CaServletFilter implements Filter {
 

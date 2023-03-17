@@ -8,7 +8,7 @@ import org.xipki.util.Args;
 /**
  * DigestEntry with the id and caId in database.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

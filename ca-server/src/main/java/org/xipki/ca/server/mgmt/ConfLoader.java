@@ -37,7 +37,7 @@ import static org.xipki.util.StringUtil.concat;
 /**
  * Load / export CA configuration.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 class ConfLoader {

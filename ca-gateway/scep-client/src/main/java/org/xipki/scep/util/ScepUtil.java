@@ -31,7 +31,7 @@ import java.util.*;
 /**
  * SCEP utility class.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class ScepUtil {

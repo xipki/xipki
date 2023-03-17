@@ -64,7 +64,7 @@ import static org.xipki.util.Args.notNull;
  *                                 }
  * </pre>
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class CrlStreamParser extends Asn1StreamParser {

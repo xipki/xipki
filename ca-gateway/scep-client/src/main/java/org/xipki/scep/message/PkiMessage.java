@@ -32,7 +32,7 @@ import static org.xipki.scep.util.ScepConstants.*;
 /**
  * SCEP PKI-Message.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class PkiMessage {

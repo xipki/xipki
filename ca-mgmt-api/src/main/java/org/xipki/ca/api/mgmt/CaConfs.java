@@ -22,7 +22,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * Helper class to convert the CA configuration.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.1.0
  */
 

@@ -49,7 +49,7 @@ import static org.xipki.util.exception.ErrorCode.*;
 /**
  * EST responder.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

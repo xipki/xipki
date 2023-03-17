@@ -17,7 +17,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * Pending certificate pool.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 5.3.4
  */
 

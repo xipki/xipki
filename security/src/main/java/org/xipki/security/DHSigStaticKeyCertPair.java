@@ -14,7 +14,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * Specifies private key and certificate pair for the DHSig-static defined in RFC 6955.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

@@ -8,7 +8,7 @@ import org.xipki.util.Args;
 /**
  * SCEP control.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class ScepControl {

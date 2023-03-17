@@ -16,7 +16,7 @@ import org.xipki.util.ConfPairs;
 /**
  * Actions for JCE device.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class JceActions {

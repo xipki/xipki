@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * Factory to create certprofile of type demo-profiletype.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

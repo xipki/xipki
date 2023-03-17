@@ -37,7 +37,7 @@ import static org.xipki.scep.util.ScepConstants.*;
 /**
  * Decoded {@link PkiMessage}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class DecodedPkiMessage extends PkiMessage {

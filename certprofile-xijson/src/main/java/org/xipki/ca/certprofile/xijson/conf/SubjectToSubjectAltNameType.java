@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Control which RDNs and how they are converted to the SubjectAltNames extension.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

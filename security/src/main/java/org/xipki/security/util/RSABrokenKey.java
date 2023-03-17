@@ -16,7 +16,7 @@ import java.math.BigInteger;
 /**
  * RSA broken key checker.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.1.0
  */
 public class RSABrokenKey {

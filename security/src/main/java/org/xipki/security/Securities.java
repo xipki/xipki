@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Utility class to initialize {@link SecurityFactory} and {@link P11CryptServiceFactory}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class Securities implements Closeable {

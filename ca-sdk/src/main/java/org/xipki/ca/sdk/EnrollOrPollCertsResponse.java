@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Response for the operations enrolling certificates and polling certificates.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

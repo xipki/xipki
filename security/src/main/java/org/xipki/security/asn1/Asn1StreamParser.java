@@ -18,7 +18,7 @@ import java.util.Date;
 /**
  * ASN.1 stream parser.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class Asn1StreamParser {

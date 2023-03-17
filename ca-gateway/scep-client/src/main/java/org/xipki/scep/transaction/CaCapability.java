@@ -8,7 +8,7 @@ import org.xipki.util.Args;
 /**
  * CA capability enum.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public enum CaCapability {

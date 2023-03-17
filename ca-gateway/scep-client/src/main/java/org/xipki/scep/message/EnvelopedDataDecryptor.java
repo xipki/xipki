@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * EnvelopedData decryptor.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public final class EnvelopedDataDecryptor {

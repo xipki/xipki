@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Demo the creation of xijson configuration for CA/Browser Forum certificates.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CabProfileConfDemo extends ProfileConfBuilder {

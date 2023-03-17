@@ -9,7 +9,7 @@ import org.xipki.security.CertRevocationInfo;
 /**
  * Certificate with revocation information.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

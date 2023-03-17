@@ -10,7 +10,7 @@ import org.xipki.util.exception.InvalidConfException;
 /**
  * Extension Restriction.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class Restriction extends ValidatableConf {

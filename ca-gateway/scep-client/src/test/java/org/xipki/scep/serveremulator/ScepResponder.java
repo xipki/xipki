@@ -29,7 +29,7 @@ import java.util.Date;
 /**
  * SCEP responder.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class ScepResponder {

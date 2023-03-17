@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Get Next CA Response Message.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class NextCaMessage {

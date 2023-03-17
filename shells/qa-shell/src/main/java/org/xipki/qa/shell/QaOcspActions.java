@@ -39,7 +39,7 @@ import java.util.*;
 /**
  * Actions of QA for OCSP.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class QaOcspActions {

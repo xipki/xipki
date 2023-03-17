@@ -6,7 +6,7 @@ package org.xipki.scep.transaction;
 /**
  * Message type enum.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public enum MessageType {

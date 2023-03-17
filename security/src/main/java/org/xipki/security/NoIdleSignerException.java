@@ -8,7 +8,7 @@ import java.security.GeneralSecurityException;
 /**
  * Exception that indicates no idle signer is available.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

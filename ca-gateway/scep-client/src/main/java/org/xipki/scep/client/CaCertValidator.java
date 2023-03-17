@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * CA Certificate validator.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 

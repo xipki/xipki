@@ -13,7 +13,7 @@ import java.math.BigInteger;
 /**
  * Extension PolicyConstraints.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class PolicyConstraints extends ValidatableConf {

@@ -32,7 +32,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * Keypair with certificate.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class KeypairWithCert {

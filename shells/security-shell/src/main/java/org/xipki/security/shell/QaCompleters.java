@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Completers for QA shells.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class QaCompleters {

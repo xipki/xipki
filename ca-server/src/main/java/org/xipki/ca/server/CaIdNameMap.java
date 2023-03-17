@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Container of NameId of CA management entries.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 

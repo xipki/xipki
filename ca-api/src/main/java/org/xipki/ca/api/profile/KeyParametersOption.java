@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * Control the permitted public key in the certificate.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

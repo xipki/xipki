@@ -8,7 +8,7 @@ import org.xipki.util.Args;
 /**
  * Protection verification result with the requestor.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

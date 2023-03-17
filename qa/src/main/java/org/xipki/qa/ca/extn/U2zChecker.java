@@ -13,7 +13,7 @@ import static org.xipki.qa.ca.extn.CheckerUtil.addViolation;
 
 /**
  * Checker for extensions whose name is from U to Z.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 class U2zChecker extends ExtensionChecker {

@@ -29,7 +29,7 @@ import java.security.SecureRandom;
 /**
  * CRMF key wrapper.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 abstract class CrmfKeyWrapper {

@@ -42,7 +42,7 @@ import java.util.Map;
  * <li>REVOKED if serial-number % 3 == 1</li>
  * <li>UNKNOWN if serial-number % 3 == 2</li>
  * </ul>
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 5.0.2
  */
 public class DummyStore extends OcspStore {

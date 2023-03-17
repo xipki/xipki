@@ -17,7 +17,7 @@ import org.xipki.util.IoUtil;
 /**
  * CTLog test.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class CtLogTest {

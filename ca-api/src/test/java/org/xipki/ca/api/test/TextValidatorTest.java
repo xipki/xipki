@@ -10,7 +10,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * TextValidator test.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class TextValidatorTest {

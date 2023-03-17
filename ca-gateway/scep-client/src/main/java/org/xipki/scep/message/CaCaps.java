@@ -18,7 +18,7 @@ import static org.xipki.scep.transaction.CaCapability.*;
 /**
  * CA caps.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CaCaps {

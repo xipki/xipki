@@ -24,7 +24,7 @@ import java.util.*;
 /**
  * Defines how the certificate looks like. All Certprofile classes must extend this class.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

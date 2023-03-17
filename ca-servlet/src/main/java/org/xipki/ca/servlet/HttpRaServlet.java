@@ -22,7 +22,7 @@ import java.io.IOException;
 /**
  * REST API exception.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 3.0.1
  */
 

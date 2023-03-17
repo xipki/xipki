@@ -26,7 +26,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * PKCS#11 {@link P11KeypairGenerator}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  *
  */

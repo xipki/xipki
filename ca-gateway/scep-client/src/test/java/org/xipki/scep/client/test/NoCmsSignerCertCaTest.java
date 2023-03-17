@@ -8,7 +8,7 @@ import org.xipki.scep.transaction.CaCapability;
 /**
  * Test CA without CMS signer certificate.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class NoCmsSignerCertCaTest extends AbstractCaTest {

@@ -26,7 +26,7 @@ import static org.xipki.util.Args.positive;
 /**
  * An implementation of {@link SecurityFactory}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

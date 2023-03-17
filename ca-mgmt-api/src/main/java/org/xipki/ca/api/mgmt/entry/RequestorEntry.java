@@ -14,7 +14,7 @@ import java.security.cert.CertificateException;
 
 /**
  * Management Entry Requestor.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 

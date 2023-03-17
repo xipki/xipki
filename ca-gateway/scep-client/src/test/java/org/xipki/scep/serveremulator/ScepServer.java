@@ -21,7 +21,7 @@ import java.util.Date;
 /**
  * SCEP server.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class ScepServer {

@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  * Tool to run database scripts.
  * @author Apach project iBATIS
  * @author Benoit Duffez
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class ScriptRunner {
   private static final String DEFAULT_DELIMITER = ";";

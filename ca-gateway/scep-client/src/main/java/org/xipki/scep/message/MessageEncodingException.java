@@ -6,7 +6,7 @@ package org.xipki.scep.message;
 /**
  * Exception indicate error while encoding message.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class MessageEncodingException extends Exception {

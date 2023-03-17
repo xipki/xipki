@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 /**
  * Domain validator.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 class DomainValidator {

@@ -14,7 +14,7 @@ import static org.xipki.util.Args.positive;
 /**
  * OCSP request options.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

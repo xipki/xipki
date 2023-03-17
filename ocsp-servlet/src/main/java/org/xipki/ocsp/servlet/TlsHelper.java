@@ -25,7 +25,7 @@ import java.security.cert.X509Certificate;
  *   <li>SSL_CLIENT_VERIFY</li>
  *   <li>SSL_CLIENT_CERT</li>
  * </ul>
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.1.0
  */
 

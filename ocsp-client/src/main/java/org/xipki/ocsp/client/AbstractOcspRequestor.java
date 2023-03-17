@@ -39,7 +39,7 @@ import static org.xipki.util.Args.positive;
 /**
  * Abstract class of OCSP requestor.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

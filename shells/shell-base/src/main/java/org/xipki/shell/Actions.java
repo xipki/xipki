@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * Basic actions.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class Actions {

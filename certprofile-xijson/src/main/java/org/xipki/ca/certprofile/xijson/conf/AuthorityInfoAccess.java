@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Extension AuthorityInfoAccess.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class AuthorityInfoAccess extends ValidatableConf {

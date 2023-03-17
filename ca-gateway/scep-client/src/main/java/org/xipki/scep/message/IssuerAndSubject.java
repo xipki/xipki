@@ -10,7 +10,7 @@ import org.xipki.util.Args;
 /**
  * ASN.1 IssuerAndSubject.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class IssuerAndSubject extends ASN1Object {

@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * CMP request to enroll certificates.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

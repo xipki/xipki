@@ -9,7 +9,7 @@ import org.xipki.pkcs11.wrapper.TokenException;
 /**
  * {@link P11Key} based on the ipkcs11wrapper or jpkcs11wrapper.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

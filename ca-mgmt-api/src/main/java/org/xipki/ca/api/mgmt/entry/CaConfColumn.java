@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Represent the CONF column in the table CA.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class CaConfColumn {
 

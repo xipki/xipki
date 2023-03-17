@@ -40,7 +40,7 @@ import java.util.List;
 /**
  * Actions for CA client via SCEP.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class Actions {

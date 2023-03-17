@@ -6,7 +6,7 @@ package org.xipki.ca.gateway.conf;
 /**
  * Keystore configuration.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 public class KeystoreConf {

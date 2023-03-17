@@ -10,7 +10,7 @@ import org.xipki.util.exception.InvalidConfException;
 /**
  * Configuration of DataSource.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class DataSourceConf extends ValidatableConf {
 

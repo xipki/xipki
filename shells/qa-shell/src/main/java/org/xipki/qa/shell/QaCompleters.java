@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * Completers for QA shells.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class QaCompleters {

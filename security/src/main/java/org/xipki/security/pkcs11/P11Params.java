@@ -9,7 +9,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11Constants.*;
 /**
  * PKCS#11 params.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

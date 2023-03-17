@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * CtLog public key finder.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class CtLogPublicKeyFinder {
 

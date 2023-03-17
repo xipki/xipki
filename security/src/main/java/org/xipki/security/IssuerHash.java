@@ -12,7 +12,7 @@ import static org.xipki.util.Args.range;
 /**
  * Contains issuerNameHash and issuerKeyHash as specified in the OCSP standard RFC 6960.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

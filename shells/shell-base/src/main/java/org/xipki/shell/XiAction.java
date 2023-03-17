@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Anchor class for all actions. All actions should derive from this one.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 3.0.1
  */
 

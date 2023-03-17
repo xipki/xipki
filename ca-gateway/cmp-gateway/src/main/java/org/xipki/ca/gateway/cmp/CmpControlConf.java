@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * CMP control configuration.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 

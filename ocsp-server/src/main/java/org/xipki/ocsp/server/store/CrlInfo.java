@@ -18,7 +18,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * CRL information.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 

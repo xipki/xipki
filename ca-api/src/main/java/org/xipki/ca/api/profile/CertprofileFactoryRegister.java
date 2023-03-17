@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 /**
  * Register of CertprofileFactories.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

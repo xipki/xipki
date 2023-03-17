@@ -51,7 +51,7 @@ import static org.xipki.util.exception.ErrorCode.*;
 /**
  * SCEP responder.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  *
  */

@@ -26,7 +26,7 @@ import java.util.*;
 /**
  * Subject DN specification.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 public class SubjectDnSpec {

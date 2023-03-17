@@ -38,7 +38,7 @@ import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**
  * Checker for extensions whose name is from A to G.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 class A2gChecker extends ExtensionChecker {

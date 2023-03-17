@@ -32,7 +32,7 @@ import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**
  * Checker for extensions whose name is from H to N.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 class H2nChecker extends ExtensionChecker {

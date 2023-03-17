@@ -6,7 +6,7 @@ package org.xipki.license.api;
 /**
  * CM License Feature.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public interface CmLicense {
 

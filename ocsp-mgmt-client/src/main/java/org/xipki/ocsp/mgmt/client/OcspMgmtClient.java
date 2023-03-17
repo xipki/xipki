@@ -30,7 +30,7 @@ import java.util.Map;
 /**
  * OCSP Management client. It communicates with the server via REST API.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class OcspMgmtClient implements OcspManager {

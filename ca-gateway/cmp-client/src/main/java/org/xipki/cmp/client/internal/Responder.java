@@ -20,7 +20,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * CMP responder.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.1.0
  */
 

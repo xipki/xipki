@@ -26,7 +26,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * Speed test of PKCS#12 signature creation.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

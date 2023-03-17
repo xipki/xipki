@@ -14,7 +14,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * Base class to execute the database queries to manage CA system.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 class QueryExecutor {

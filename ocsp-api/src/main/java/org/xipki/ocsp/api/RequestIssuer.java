@@ -14,7 +14,7 @@ import java.util.Arrays;
 /**
  * Issuer in the OCSP request.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 

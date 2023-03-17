@@ -44,7 +44,7 @@ import java.util.Map;
 /**
  * Utility class.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class MyUtil {

@@ -19,7 +19,7 @@ import org.xipki.util.ReqRespDebug;
 /**
  * CMP client actions related to CRL.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class CrlActions {

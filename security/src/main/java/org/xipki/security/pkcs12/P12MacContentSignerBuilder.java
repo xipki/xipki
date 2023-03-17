@@ -24,7 +24,7 @@ import static org.xipki.util.Args.positive;
 /**
  * Builder of PKCS#12 MAC signers.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 

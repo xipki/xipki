@@ -14,7 +14,7 @@ import org.xipki.shell.XiAction;
 /**
  * OCSP server management actions.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class Actions {

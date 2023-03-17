@@ -6,7 +6,7 @@ package org.xipki.ca.api.publisher;
 /**
  * Exception related to the publishing of certificates and CRLs.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

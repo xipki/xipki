@@ -33,7 +33,7 @@ import java.util.Iterator;
 /**
  * CMS EnvelopedData test class.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CmsEnveloperTest {

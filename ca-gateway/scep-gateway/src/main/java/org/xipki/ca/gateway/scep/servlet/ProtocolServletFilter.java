@@ -23,7 +23,7 @@ import java.io.IOException;
 /**
  * SCEP Gateway ServletFilter.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 public class ProtocolServletFilter implements Filter {

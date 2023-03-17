@@ -8,7 +8,7 @@ import org.xipki.pkcs11.wrapper.TokenException;
 /**
  * Factory to create {@link P11Module}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 3.0.1
  */
 

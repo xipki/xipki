@@ -14,7 +14,7 @@ import java.security.SecureRandom;
 /**
  * Test for {@link PKCS1Util}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class PKCS1UtilTest {

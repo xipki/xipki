@@ -12,7 +12,7 @@ import java.io.IOException;
 
 /**
  * Configure extension with given (constant) extension value.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class ConstantExtnValue extends ValidatableConf {
 

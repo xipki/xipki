@@ -26,7 +26,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * REST management servlet of OCSP server.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 3.0.1
  */
 

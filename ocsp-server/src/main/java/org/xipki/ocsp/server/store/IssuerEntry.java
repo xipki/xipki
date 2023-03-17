@@ -23,7 +23,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * Issuer entry.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

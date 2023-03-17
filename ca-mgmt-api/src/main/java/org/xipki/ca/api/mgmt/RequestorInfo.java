@@ -13,7 +13,7 @@ import org.xipki.util.exception.InsufficientPermissionException;
 /**
  * Requestor info interface.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

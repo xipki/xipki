@@ -6,7 +6,7 @@ package org.xipki.ca.api.mgmt.entry;
 /**
  * CA management entry.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public abstract class MgmtEntry {

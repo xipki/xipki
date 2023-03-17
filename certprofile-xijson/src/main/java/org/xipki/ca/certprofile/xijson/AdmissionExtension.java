@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 /**
  * Control of the extension Admission (Germany national standard CommonPKI).
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.1
  */
 

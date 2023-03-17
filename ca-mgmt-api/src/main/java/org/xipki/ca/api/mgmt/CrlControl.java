@@ -72,7 +72,7 @@ import java.util.List;
  * include.expiredcerts=&lt;'true'|'false'&gt;
  *
  * </pre>
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

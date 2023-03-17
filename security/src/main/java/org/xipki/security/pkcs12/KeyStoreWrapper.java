@@ -10,7 +10,7 @@ import java.security.KeyStore;
 /**
  * Keystore wrapper (containing the keystore object and its encoded form).
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 
