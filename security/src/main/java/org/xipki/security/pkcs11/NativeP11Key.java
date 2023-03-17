@@ -17,19 +17,20 @@
 
 package org.xipki.security.pkcs11;
 
+import org.xipki.pkcs11.wrapper.PKCS11KeyId;
 import org.xipki.pkcs11.wrapper.TokenException;
 
 /**
- * {@link P11Identity} based on the ipkcs11wrapper or jpkcs11wrapper.
+ * {@link P11Key} based on the ipkcs11wrapper or jpkcs11wrapper.
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-class NativeP11Identity extends P11Identity {
+class NativeP11Key extends P11Key {
 
-  NativeP11Identity(NativeP11Slot slot, P11IdentityId identityId) {
-    super(slot, identityId);
+  NativeP11Key(NativeP11Slot slot, PKCS11KeyId keyId) {
+    super(slot, keyId);
   }
 
   @Override
@@ -39,10 +40,10 @@ class NativeP11Identity extends P11Identity {
 
   @Override
   public void destroy() throws TokenException {
-    if (id.getPublicKeyHandle() == null) {
-      slot.destroyObjectsByHandle(id.getKeyId().getHandle());
+    if (keyId.getPublicKeyHandle() == null) {
+      slot.destroyObjectsByHandle(keyId.getHandle());
     } else {
-      slot.destroyObjectsByHandle(id.getKeyId().getHandle(), id.getPublicKeyHandle());
+      slot.destroyObjectsByHandle(keyId.getHandle(), keyId.getPublicKeyHandle());
     }
   }
 

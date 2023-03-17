@@ -30,7 +30,7 @@ import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.xipki.pkcs11.wrapper.PKCS11Constants;
 import org.xipki.security.ObjectIdentifiers.Xipki;
-import org.xipki.security.pkcs11.P11Identity;
+import org.xipki.security.pkcs11.P11Key;
 import org.xipki.util.Args;
 
 import java.security.Key;
@@ -413,7 +413,7 @@ public enum SignAlgo {
     return alg;
   }
 
-  public static SignAlgo getInstance(P11Identity p11Key, SignerConf signerConf) throws NoSuchAlgorithmException {
+  public static SignAlgo getInstance(P11Key p11Key, SignerConf signerConf) throws NoSuchAlgorithmException {
     if (notNull(signerConf, "signerConf").getHashAlgo() == null) {
       return getInstance(signerConf.getConfValue("algo"));
     }

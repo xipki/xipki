@@ -61,13 +61,13 @@ abstract class P11ContentSigner implements XiContentSigner {
 
   private static final Logger LOG = LoggerFactory.getLogger(P11ContentSigner.class);
 
-  protected final P11Identity identity;
+  protected final P11Key identity;
 
   protected final SignAlgo signAlgo;
 
   protected final byte[] encodedAlgorithmIdentifier;
 
-  private P11ContentSigner(P11Identity identity, SignAlgo signAlgo) throws XiSecurityException {
+  private P11ContentSigner(P11Key identity, SignAlgo signAlgo) throws XiSecurityException {
     this.identity = notNull(identity, "identity");
     this.signAlgo = notNull(signAlgo, "signAlgo");
     try {
@@ -77,7 +77,7 @@ abstract class P11ContentSigner implements XiContentSigner {
     }
   }
 
-  static P11ContentSigner newInstance(P11Identity identity, SignAlgo signAlgo,
+  static P11ContentSigner newInstance(P11Key identity, SignAlgo signAlgo,
                                       SecureRandom random, PublicKey publicKey)
       throws XiSecurityException {
     long keyType = identity.getKeyType();
@@ -192,7 +192,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       algoMechMap.put(DSA_SHA3_512, CKM_DSA_SHA3_512);
     } // method static
 
-    DSA(P11Identity identity, SignAlgo signAlgo) throws XiSecurityException {
+    DSA(P11Key identity, SignAlgo signAlgo) throws XiSecurityException {
       super(identity, signAlgo);
 
       if (!signAlgo.isDSASigAlgo()) {
@@ -271,7 +271,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       algoMechMap.put(ECDSA_SHA3_512, CKM_ECDSA_SHA3_512);
     } // method static
 
-    ECDSA(P11Identity identity, SignAlgo signAlgo) throws XiSecurityException {
+    ECDSA(P11Key identity, SignAlgo signAlgo) throws XiSecurityException {
       super(identity, signAlgo);
       if (!signAlgo.isECDSASigAlgo()) {
         throw new XiSecurityException("not an ECDSA algorithm: " + signAlgo);
@@ -334,7 +334,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
     private final long mechanism;
 
-    EdDSA(P11Identity identity, SignAlgo signAlgo) throws XiSecurityException {
+    EdDSA(P11Key identity, SignAlgo signAlgo) throws XiSecurityException {
       super(identity, signAlgo);
 
       if (SignAlgo.ED25519 != signAlgo) {
@@ -389,7 +389,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       algoMechMap.put(HMAC_SHA3_512, CKM_SHA3_512_HMAC);
     } // method static
 
-    Mac(P11Identity identity, SignAlgo signAlgo) throws XiSecurityException {
+    Mac(P11Key identity, SignAlgo signAlgo) throws XiSecurityException {
       super(identity, signAlgo);
 
       Long mech = algoMechMap.get(signAlgo);
@@ -452,7 +452,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       algoMechMap.put(RSA_SHA3_512, CKM_SHA3_512_RSA_PKCS);
     } // method static
 
-    RSAPkcs1v1_5(P11Identity identity, SignAlgo signAlgo) throws XiSecurityException {
+    RSAPkcs1v1_5(P11Key identity, SignAlgo signAlgo) throws XiSecurityException {
       super(identity, signAlgo);
 
       if (!signAlgo.isRSAPkcs1SigAlgo()) {
@@ -544,7 +544,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
     private final SecureRandom random;
 
-    RSAPSS(P11Identity identity, SignAlgo signAlgo, SecureRandom random) throws XiSecurityException {
+    RSAPSS(P11Key identity, SignAlgo signAlgo, SecureRandom random) throws XiSecurityException {
       super(identity, signAlgo);
       if (!signAlgo.isRSAPSSSigAlgo()) {
         throw new XiSecurityException("not an RSA PSS algorithm: " + signAlgo);
@@ -646,7 +646,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       algoMechMap.put(SM2_SM3, CKM_VENDOR_SM2_SM3);
     }
 
-    SM2(P11Identity identity, SignAlgo signAlgo, ASN1ObjectIdentifier curveOid,
+    SM2(P11Key identity, SignAlgo signAlgo, ASN1ObjectIdentifier curveOid,
         BigInteger pubPointX, BigInteger pubPointY) throws XiSecurityException {
       super(identity, signAlgo);
       if (!signAlgo.isSM2SigAlgo()) {

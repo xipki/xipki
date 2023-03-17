@@ -31,12 +31,12 @@ import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkcs11.wrapper.PKCS11KeyId;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.pkcs11.P11Identity;
-import org.xipki.security.pkcs11.P11IdentityId;
+import org.xipki.security.pkcs11.P11Key;
 import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.util.PKCS1Util;
@@ -56,15 +56,15 @@ import static org.xipki.security.HashAlgo.*;
 import static org.xipki.util.Args.notNull;
 
 /**
- * {@link P11Identity} for PKCS#11 emulator.
+ * {@link P11Key} for PKCS#11 emulator.
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-class EmulatorP11Identity extends P11Identity {
+class EmulatorP11Key extends P11Key {
 
-  private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Identity.class);
+  private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Key.class);
 
   private static final Map<Long, HashAlgo> mgfMechHashMap = new HashMap<>();
 
@@ -171,9 +171,9 @@ class EmulatorP11Identity extends P11Identity {
     mechHashMap.put(CKM_SHA3_512_HMAC, SHA512);
   }
 
-  public EmulatorP11Identity(
-      P11Slot slot, P11IdentityId identityId, Key signingKey, int maxSessions, SecureRandom random) {
-    super(slot, identityId);
+  public EmulatorP11Key(
+      P11Slot slot, PKCS11KeyId keyId, Key signingKey, int maxSessions, SecureRandom random) {
+    super(slot, keyId);
     this.signingKey = notNull(signingKey, "signingKey");
     this.random = notNull(random, "random");
     this.maxSessions = maxSessions;
@@ -187,8 +187,8 @@ class EmulatorP11Identity extends P11Identity {
     }
   }
 
-  public void setDsaQ(BigInteger q) {
-    super.setDsaQ(q);
+  public void setDsaParameters(BigInteger p, BigInteger q, BigInteger g) {
+    super.setDsaParameters(p, q, g);
     dsaOrderBitLen = q.bitLength();
   }
 
@@ -284,7 +284,7 @@ class EmulatorP11Identity extends P11Identity {
 
   @Override
   public void destroy() throws TokenException {
-    slot.destroyObjectsById(id.getKeyId().getId());
+    slot.destroyObjectsById(keyId.getId());
   }
 
   @Override

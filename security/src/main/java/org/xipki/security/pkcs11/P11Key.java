@@ -21,6 +21,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pkcs11.wrapper.Functions;
+import org.xipki.pkcs11.wrapper.PKCS11KeyId;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.LogUtil;
@@ -33,19 +34,19 @@ import static org.xipki.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.util.Args.notNull;
 
 /**
- * PKCS#11 identity (private key and the corresponding public key and certificates).
+ * PKCS#11 key.
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public abstract class P11Identity {
+public abstract class P11Key {
 
-  private static final Logger LOG = LoggerFactory.getLogger(P11Identity.class);
+  private static final Logger LOG = LoggerFactory.getLogger(P11Key.class);
 
   protected final P11Slot slot;
 
-  protected final P11IdentityId id;
+  protected final PKCS11KeyId keyId;
 
   private boolean sign;
 
@@ -57,18 +58,22 @@ public abstract class P11Identity {
 
   private BigInteger rsaPublicExponent;
 
+  private BigInteger dsaP;
+
   private BigInteger dsaQ;
+
+  private BigInteger dsaG;
 
   private boolean publicKeyInitialized;
 
   private PublicKey publicKey;
 
-  protected P11Identity(P11Slot slot, P11IdentityId id) {
+  protected P11Key(P11Slot slot, PKCS11KeyId keyId) {
     this.slot = notNull(slot, "slot");
-    this.id = notNull(id, "id");
+    this.keyId = notNull(keyId, "keyId");
   }
 
-  public P11Identity sign(Boolean sign) {
+  public P11Key sign(Boolean sign) {
     this.sign = (sign == null) ? true : sign;
     return this;
   }
@@ -108,12 +113,22 @@ public abstract class P11Identity {
     this.rsaPublicExponent = publicExponent;
   }
 
+  public BigInteger getDsaP() {
+    return dsaP;
+  }
+
   public BigInteger getDsaQ() {
     return dsaQ;
   }
 
-  public void setDsaQ(BigInteger q) {
+  public BigInteger getDsaG() {
+    return dsaG;
+  }
+
+  public void setDsaParameters(BigInteger p, BigInteger q, BigInteger g) {
+    this.dsaP = p;
     this.dsaQ = q;
+    this.dsaG = g;
   }
 
   public byte[] sign(long mechanism, P11Params parameters, byte[] content) throws TokenException {
@@ -130,20 +145,8 @@ public abstract class P11Identity {
   }
 
   public boolean supportsSign(long mechanism) {
-    if (!sign) {
-      return false;
-    }
-
-    long objClass = id.getKeyId().getObjectCLass();
-    if (objClass == CKO_PUBLIC_KEY) {
-      return false;
-    }
-
-    if (id.getKeyId().getKeyType() == CKK_EC_MONTGOMERY) {
-      return false;
-    }
-
-    return slot.supportsMechanism(mechanism, CKF_SIGN);
+    return sign && (keyId.getObjectCLass() != CKO_PUBLIC_KEY)
+        && (keyId.getKeyType() == CKK_EC_MONTGOMERY) && slot.supportsMechanism(mechanism, CKF_SIGN);
   }
 
   /**
@@ -159,8 +162,7 @@ public abstract class P11Identity {
    * @throws TokenException
    *         if PKCS#11 token error occurs.
    */
-  protected abstract byte[] sign0(long mechanism, P11Params parameters, byte[] content)
-      throws TokenException;
+  protected abstract byte[] sign0(long mechanism, P11Params parameters, byte[] content) throws TokenException;
 
   public byte[] digestSecretKey(long mechanism) throws TokenException, XiSecurityException {
     if (!supportsDigest(mechanism)) {
@@ -173,25 +175,25 @@ public abstract class P11Identity {
   }
 
   public boolean supportsDigest(long mechanism) throws TokenException, XiSecurityException {
-    long objClass = id.getKeyId().getObjectCLass();
-    if (objClass != CKO_SECRET_KEY) {
-      return false;
-    }
-    return slot.supportsMechanism(mechanism, CKF_DIGEST);
+    return (keyId.getObjectCLass() == CKO_SECRET_KEY) ? slot.supportsMechanism(mechanism, CKF_DIGEST) : false;
   }
 
   protected abstract byte[] digestSecretKey0(long mechanism) throws TokenException;
 
-  public P11IdentityId getId() {
-    return id;
+  public P11SlotId getSlotId() {
+    return slot.getSlotId();
+  }
+
+  public PKCS11KeyId getKeyId() {
+    return keyId;
   }
 
   public long getKeyType() {
-    return id.getKeyId().getKeyType();
+    return keyId.getKeyType();
   }
 
   public boolean isSecretKey() {
-    return id.getKeyId().getObjectCLass() == CKO_SECRET_KEY;
+    return keyId.getObjectCLass() == CKO_SECRET_KEY;
   }
 
   public final synchronized PublicKey getPublicKey() {
@@ -201,16 +203,17 @@ public abstract class P11Identity {
 
     if (publicKeyInitialized) {
       return publicKey;
-    } else {
-      try {
-        publicKey = slot.getPublicKey(this);
-      } catch (Exception e) {
-        LogUtil.error(LOG, e, "could not initialize public key for (private) key " + id);
-      } finally {
-        publicKeyInitialized = true;
-      }
-      return publicKey;
     }
+
+    try {
+      publicKey = slot.getPublicKey(this);
+    } catch (Exception e) {
+      LogUtil.error(LOG, e, "could not initialize public key for (private) key " + keyId
+          + " on slot " + slot.getSlotId());
+    } finally {
+      publicKeyInitialized = true;
+    }
+    return publicKey;
   }
 
 }

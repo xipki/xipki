@@ -129,14 +129,14 @@ public class P11SignerFactory implements SignerFactory {
     }
 
     String str2 = (keyId != null) ? "id " + Hex.encode(keyId) : "label " + keyLabel;
-    P11Identity identity = null;
+    P11Key key = null;
     try {
-      identity = slot.getIdentity(keyId, keyLabel);
+      key = slot.getKey(keyId, keyLabel);
     } catch (TokenException e) {
       throw new ObjectCreationException("error finding identity with " + str2 + ": " + e.getMessage());
     }
 
-    if (identity == null) {
+    if (key == null) {
       throw new ObjectCreationException("unknown identity with " + str2);
     }
 
@@ -146,7 +146,7 @@ public class P11SignerFactory implements SignerFactory {
       if (algoName != null) {
         algo = SignAlgo.getInstance(algoName);
       } else {
-        algo = SignAlgo.getInstance(identity, conf);
+        algo = SignAlgo.getInstance(key, conf);
       }
 
       List<XiContentSigner> signers = new ArrayList<>(parallelism);
@@ -156,8 +156,7 @@ public class P11SignerFactory implements SignerFactory {
       }
 
       for (int i = 0; i < parallelism; i++) {
-        XiContentSigner signer = P11ContentSigner.newInstance(identity, algo,
-            securityFactory.getRandom4Sign(), publicKey);
+        XiContentSigner signer = P11ContentSigner.newInstance(key, algo, securityFactory.getRandom4Sign(), publicKey);
         signers.add(signer);
       }
 
@@ -166,11 +165,11 @@ public class P11SignerFactory implements SignerFactory {
       if (certificateChain != null) {
         concurrentSigner.setCertificateChain(certificateChain);
       } else {
-        concurrentSigner.setPublicKey(identity.getPublicKey());
+        concurrentSigner.setPublicKey(key.getPublicKey());
       }
 
       if (algo.isMac()) {
-        byte[] sha1HashOfKey = identity.digestSecretKey(PKCS11Constants.CKM_SHA_1);
+        byte[] sha1HashOfKey = key.digestSecretKey(PKCS11Constants.CKM_SHA_1);
         concurrentSigner.setSha1DigestOfMacKey(sha1HashOfKey);
       }
 

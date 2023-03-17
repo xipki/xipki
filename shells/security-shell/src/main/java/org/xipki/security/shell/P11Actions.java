@@ -198,7 +198,7 @@ public class P11Actions {
     @Override
     protected Object execute0() throws Exception {
       P11Slot slot = getSlot();
-      P11Identity identity = getIdentity(id, label);
+      P11Key identity = getIdentity(id, label);
       if (identity == null) {
         println("unknown identity");
         return null;
@@ -577,7 +577,7 @@ public class P11Actions {
       return p11Service.getModule();
     }
 
-    public P11Identity getIdentity(String hexId, String label)
+    public P11Key getIdentity(String hexId, String label)
         throws IllegalCmdParamException, XiSecurityException, TokenException {
       P11Slot slot = getSlot();
       byte[] id = hexId == null ? null : Hex.decode(hexId);
