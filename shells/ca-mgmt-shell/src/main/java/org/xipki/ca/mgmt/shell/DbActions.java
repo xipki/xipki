@@ -21,7 +21,6 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.mgmt.db.DbWorker;
@@ -31,14 +30,12 @@ import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.DatabaseType;
 import org.xipki.datasource.ScriptRunner;
-import org.xipki.password.PasswordResolver;
+import org.xipki.password.PasswordResolverException;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
-import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,9 +63,6 @@ public class DbActions {
   public abstract static class DbAction extends XiAction {
 
     protected DataSourceFactory datasourceFactory;
-
-    @Reference
-    protected PasswordResolver passwordResolver;
 
     public DbAction() {
       datasourceFactory = new DataSourceFactory();
@@ -133,23 +127,11 @@ public class DbActions {
 
   public abstract static class DbPortAction extends DbAction {
 
-    @Option(name = "--quorum", aliases = "-q", description = "quorum of the password parts, " +
-            "valid value is 0..10 (inclusive). 0 indicates no password will be applied.")
-    private Integer quorum = 0;
+    @Option(name = "--password", description = "password, as plaintext or PBE-encrypted.")
+    private String passwordHint;
 
-    protected char[] readPassword() throws IOException {
-      Args.range(quorum, "mk", 0, 10);
-      if (quorum == 0) {
-        return null;
-      } else if (quorum == 1) {
-        return readPassword("Master password");
-      } else {
-        char[][] parts = new char[quorum][];
-        for (int i = 0; i < quorum; i++) {
-          parts[i] = readPassword("Master password (part " + (i + 1) + "/" + quorum + ")");
-        }
-        return StringUtil.merge(parts);
-      }
+    protected char[] readPassword() throws IOException, PasswordResolverException {
+      return readPasswordIfNotSet(passwordHint);
     }
   } // class DbAction
 
@@ -202,9 +184,6 @@ public class DbActions {
   @Command(scope = "ca", name = "sql", description = "Run SQL script")
   @Service
   public static class Sql extends XiAction {
-
-    @Reference
-    private PasswordResolver passwordResolver;
 
     @Option(name = "--db-conf", required = true, description = "database configuration file")
     @Completion(FileCompleter.class)

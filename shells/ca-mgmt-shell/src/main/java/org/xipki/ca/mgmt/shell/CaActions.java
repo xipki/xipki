@@ -29,7 +29,6 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
-import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.SecurityFactory;
@@ -230,9 +229,6 @@ public class CaActions {
 
     @Option(name = "--extra-control", description = "extra control")
     private String extraControl;
-
-    @Reference
-    private PasswordResolver passwordResolver;
 
     protected CaEntry getCaEntry() throws Exception {
       Args.range(snLen, "snLen", CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
@@ -681,9 +677,6 @@ public class CaActions {
 
     @Option(name = "--extra-control", description = "extra control")
     private String extraControl;
-
-    @Reference
-    private PasswordResolver passwordResolver;
 
     protected ChangeCaEntry getChangeCaEntry() throws Exception {
       ChangeCaEntry entry = new ChangeCaEntry(new NameId(null, caName));

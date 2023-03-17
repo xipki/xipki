@@ -121,9 +121,6 @@ public class PasswordActions {
   @Service
   public static class PbeDec extends SecurityAction {
 
-    @Reference
-    private PasswordResolver passwordResolver;
-
     @Option(name = "--password", description = "encrypted password, starts with PBE:\n"
             + "exactly one of password and password-file must be specified")
     private String passwordHint;
@@ -165,9 +162,6 @@ public class PasswordActions {
   @Command(scope = "xi", name = "pbe-enc", description = "encrypt password with master password")
   @Service
   public static class PbeEnc extends SecurityAction {
-
-    @Reference
-    private PasswordResolver passwordResolver;
 
     @Option(name = "--out", description = "where to save the encrypted password")
     @Completion(FileCompleter.class)

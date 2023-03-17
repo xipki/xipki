@@ -25,6 +25,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.cmp.client.CmpClient;
 import org.xipki.cmp.client.Requestor;
+import org.xipki.password.PasswordResolverException;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -65,23 +66,23 @@ public class Actions {
         description = "User, text key ID, or prefix 0x for hex-encoded key ID")
     private String signerKeyId;
 
-    @Option(name = "--signer-password", description = "Signer password")
-    private String signerPassword;
+    @Option(name = "--signer-password", description = "Signer password, as plaintext or PBE-encrypted.")
+    private String signerPasswordHint;
 
     protected Requestor getRequestor()
-        throws IllegalCmdParamException, ObjectCreationException, IOException {
+        throws IllegalCmdParamException, ObjectCreationException, IOException, PasswordResolverException {
       if ((signerP12File == null) == (signerKeyId == null)) {
         throw new IllegalCmdParamException("Exactly one of signer-p12 and signer-keyid must be specified");
       }
 
       if (signerP12File != null) {
-        if (signerPassword == null) {
+        if (signerPasswordHint == null) {
           char[] pwd = readPassword("Enter the password for " + signerP12File);
-          signerPassword = new String(pwd);
+          signerPasswordHint = new String(pwd);
         }
 
         ConfPairs cp = new ConfPairs()
-            .putPair("password", signerPassword)
+            .putPair("password", signerPasswordHint)
             .putPair("keystore", "file:" + signerP12File);
 
         SignerConf sc;
@@ -95,13 +96,13 @@ public class Actions {
         ConcurrentContentSigner signer = securityFactory.createSigner("PKCS12", sc, (X509Cert)  null);
         return new Requestor.SignatureCmpRequestor(signer);
       } else {
-        if (signerPassword == null) {
-          signerPassword = new String(readPassword("Enter the password for the user/keyID " + signerKeyId));
+        if (signerPasswordHint == null) {
+          signerPasswordHint = new String(readPassword("Enter the password for the user/keyID " + signerKeyId));
         }
         byte[] senderKID = StringUtil.startsWithIgnoreCase(signerKeyId, "0x")
             ? Hex.decode(signerKeyId) : signerKeyId.getBytes(StandardCharsets.UTF_8);
         int iterationCount = 2048;
-        return new Requestor.PbmMacCmpRequestor(signerPassword.toCharArray(),
+        return new Requestor.PbmMacCmpRequestor(resolvePassword(signerPasswordHint),
             senderKID, HashAlgo.SHA256, iterationCount, SignAlgo.HMAC_SHA256);
       }
     }

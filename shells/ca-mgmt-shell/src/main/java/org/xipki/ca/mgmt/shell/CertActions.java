@@ -174,9 +174,10 @@ public class CertActions {
     @Completion(FileCompleter.class)
     protected String outFile;
 
-    @Option(name = "--key-password", description = "Password to protect the private key,\n" +
+    @Option(name = "--key-password",
+        description = "Password to protect the private key, as plaintext or PBE-encrypted.\n" +
         "For key-outform PEM, NONE may be used to save the key in unecrypted form.")
-    protected String keyPassword;
+    protected String keyPasswordHint;
 
     @Option(name = "--profile", aliases = "-p", required = true, description = "profile name")
     @Completion(CaCompleters.ProfileNameCompleter.class)
@@ -213,7 +214,7 @@ public class CertActions {
         certBytes = caManager.generateCertificate(caName, profileName, encodedCsr, notBefore, notAfter).getEncoded();
       } else {
         boolean needKeyPwd = true;
-        if ("NONE".equalsIgnoreCase(keyPassword)) {
+        if ("NONE".equalsIgnoreCase(keyPasswordHint)) {
           needKeyPwd = false;
           if (!"pem".equalsIgnoreCase(keyOutform)) {
             throw new IllegalCmdParamException("Password NONE is not allowed");
@@ -222,8 +223,7 @@ public class CertActions {
 
         char[] keyPwd = null;
         if (needKeyPwd) {
-          keyPwd = (keyPassword != null) ? keyPassword.toCharArray()
-                    : readPassword("Enter password to protect the private key");
+          keyPwd = readPasswordIfNotSet("Enter password to protect the private key", keyPasswordHint);
         }
 
         KeyCertBytesPair keyCertBytesPair =

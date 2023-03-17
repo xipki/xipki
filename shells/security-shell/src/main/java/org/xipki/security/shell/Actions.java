@@ -41,6 +41,7 @@ import org.bouncycastle.operator.OutputEncryptor;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
+import org.xipki.password.PasswordResolverException;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.*;
 import org.xipki.security.ObjectIdentifiers.Xipki;
@@ -165,8 +166,8 @@ public class Actions {
     @Completion(SecurityCompleters.KeystoreTypeCompleter.class)
     private String inType;
 
-    @Option(name = "--inpwd", description = "password of the source keystore")
-    private String inPwd;
+    @Option(name = "--inpwd", description = "password of the source keystore, as plaintext or PBE-encrypted.")
+    private String inPwdHint;
 
     @Option(name = "--out", required = true, description = "destination keystore file")
     @Completion(FileCompleter.class)
@@ -176,9 +177,10 @@ public class Actions {
     @Completion(SecurityCompleters.KeystoreTypeWithPEMCompleter.class)
     private String outType;
 
-    @Option(name = "--outpwd", description = "password of the destination keystore.\n" +
+    @Option(name = "--outpwd",
+        description = "password of the destination keystore, as plaintext or PBE-encrypted.\n" +
         "For PEM, you may use NONE to save the private key unprotected.")
-    private String outPwd;
+    private String outPwdHint;
 
     private static final byte[] CRLF = new byte[]{'\r', '\n'};
 
@@ -203,13 +205,13 @@ public class Actions {
         outKs.load(null);
       }
 
-      char[] inPassword = readPasswordIfNotSet("password of the source keystore", inPwd);
+      char[] inPassword = readPasswordIfNotSet("password of the source keystore", inPwdHint);
       try (InputStream inStream = Files.newInputStream(realInFile.toPath())) {
         inKs.load(inStream, inPassword);
       }
 
-      char[] outPassword = ("PEM".equalsIgnoreCase(outType) && "NONE".equalsIgnoreCase(outPwd)) ? null
-          : readPasswordIfNotSet("password of the destination keystore", outPwd);
+      char[] outPassword = ("PEM".equalsIgnoreCase(outType) && "NONE".equalsIgnoreCase(outPwdHint)) ? null
+          : readPasswordIfNotSet("password of the destination keystore", outPwdHint);
 
       OutputEncryptor pemOe = null;
       if ("PEM".equalsIgnoreCase(outType) && outPassword != null) {
@@ -431,8 +433,9 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String outputFilename;
 
-    @Option(name = "--challenge-password", aliases = "-c", description = "challenge password")
-    private String challengePassword;
+    @Option(name = "--challenge-password", aliases = "-c",
+        description = "challenge password, as plaintext or PBE-encrypted.")
+    private String challengePasswordHint;
 
     @Option(name = "--keyusage", multiValued = true, description = "keyusage")
     @Completion(Completers.KeyusageCompleter.class)
@@ -610,6 +613,9 @@ public class Actions {
       }
 
       extensions.addAll(getAdditionalExtensions());
+
+      char[] challengePassword = StringUtil.isBlank(challengePasswordHint)
+          ? null : resolvePassword(challengePasswordHint);
 
       if (certFile != null) {
         Certificate cert = Certificate.getInstance(X509Util.toDerEncoded(IoUtil.read(certFile)));
@@ -790,7 +796,7 @@ public class Actions {
 
     private PKCS10CertificationRequest generateRequest(
         ConcurrentContentSigner signer, SubjectPublicKeyInfo subjectPublicKeyInfo,
-        X500Name subjectDn, String challengePassword, List<Extension> extensions, Attribute... attrs)
+        X500Name subjectDn, char[] challengePassword, List<Extension> extensions, Attribute... attrs)
             throws XiSecurityException {
       Args.notNull(signer, "signer");
       Args.notNull(subjectPublicKeyInfo, "subjectPublicKeyInfo");
@@ -802,8 +808,9 @@ public class Actions {
             new Extensions(extensions.toArray(new Extension[0])));
       }
 
-      if (isNotBlank(challengePassword)) {
-        attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword, new DERPrintableString(challengePassword));
+      if (challengePassword != null && challengePassword.length > 0) {
+        attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword,
+            new DERPrintableString(new String(challengePassword)));
       }
 
       PKCS10CertificationRequestBuilder csrBuilder =
@@ -854,8 +861,8 @@ public class Actions {
     @Completion(SecurityCompleters.KeystoreTypeCompleter.class)
     private String keystoreType = "PKCS12";
 
-    @Option(name = "--keystore-password", description = "password of the keystore")
-    private String keystorePassword;
+    @Option(name = "--keystore-password", description = "password of the keystore, as plaintext or PBE-encrypted.")
+    private String keystorePasswordHint;
 
     @Override
     protected Object execute0() throws Exception {
@@ -865,14 +872,14 @@ public class Actions {
 
       DHSigStaticKeyCertPair peerKeyAndCert = null;
       if (Xipki.id_alg_dhPop_x25519.equals(algOid) || Xipki.id_alg_dhPop_x448.equals(algOid)) {
-        if (peerKeystoreFile == null || keystorePassword == null) {
+        if (peerKeystoreFile == null || keystorePasswordHint == null) {
           System.err.println("could not verify CSR, please specify the peer's keystore");
           return null;
         }
 
         String requiredKeyAlg = Xipki.id_alg_dhPop_x25519.equals(algOid) ? EdECConstants.X25519 : EdECConstants.X448;
 
-        char[] password = keystorePassword.toCharArray();
+        char[] password = readPasswordIfNotSet("Enter the keystore password", keystorePasswordHint);
         KeyStore ks = KeyUtil.getInKeyStore(keystoreType);
 
         File file = IoUtil.expandFilepath(new File(peerKeystoreFile));
@@ -922,8 +929,8 @@ public class Actions {
     @Completion(SecurityCompleters.KeystoreTypeCompleter.class)
     private String ksType;
 
-    @Option(name = "--password", description = "password of the keystore")
-    private String ksPwd;
+    @Option(name = "--password", description = "password of the keystore, as plaintext or PBE-encrypted.")
+    private String ksPwdHint;
 
     @Option(name = "--cert", aliases = "-c", required = true, multiValued = true, description = "certificate files")
     @Completion(FileCompleter.class)
@@ -933,7 +940,7 @@ public class Actions {
     protected Object execute0() throws Exception {
       File realKsFile = new File(IoUtil.expandFilepath(ksFile));
       KeyStore ks = KeyUtil.getOutKeyStore(ksType);
-      char[] password = readPasswordIfNotSet(ksPwd);
+      char[] password = readPasswordIfNotSet("Enter the keystore password", ksPwdHint);
 
       Set<String> aliases = new HashSet<>(10);
       if (realKsFile.exists()) {

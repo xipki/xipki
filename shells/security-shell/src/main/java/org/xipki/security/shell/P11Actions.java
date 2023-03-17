@@ -26,6 +26,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.password.PasswordResolverException;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.*;
 import org.xipki.security.pkcs11.*;
@@ -487,8 +488,8 @@ public class P11Actions {
     @Completion(FileCompleter.class)
     private String keyOutFile;
 
-    @Option(name = "--password", description = "password of the keystore file")
-    private String password;
+    @Option(name = "--password", description = "password of the keystore file, as plaintext or PBE-encrypted.")
+    private String passwordHint;
 
     @Override
     protected Object execute0() throws Exception {
@@ -537,10 +538,10 @@ public class P11Actions {
       return null;
     } // method execute0
 
-    protected char[] getPassword() throws IOException {
-      char[] pwdInChar = readPasswordIfNotSet(password);
+    protected char[] getPassword() throws IOException, PasswordResolverException {
+      char[] pwdInChar = readPasswordIfNotSet("Enter the keystore password", passwordHint);
       if (pwdInChar != null) {
-        password = new String(pwdInChar);
+        passwordHint = new String(pwdInChar);
       }
       return pwdInChar;
     }

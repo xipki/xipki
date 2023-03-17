@@ -22,6 +22,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.console.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.password.PasswordResolver;
+import org.xipki.password.PasswordResolverException;
 import org.xipki.password.SecurePasswordInputPanel;
 import org.xipki.util.*;
 import org.xipki.util.PemEncoder.PemLabel;
@@ -48,6 +50,13 @@ public abstract class XiAction implements Action {
 
   @Reference
   protected Session session;
+
+  @Reference
+  protected PasswordResolver passwordResolver;
+
+  protected char[] resolvePassword(String passwordHint) throws PasswordResolverException {
+    return passwordResolver.resolvePassword(passwordHint);
+  }
 
   protected abstract Object execute0() throws Exception;
 
@@ -219,19 +228,19 @@ public abstract class XiAction implements Action {
     return readLine(tmpPrompt, null);
   }
 
-  protected char[] readPasswordIfNotSet(String password) throws IOException {
+  protected char[] readPasswordIfNotSet(String password) throws IOException, PasswordResolverException {
     return readPasswordIfNotSet(null, password);
   }
 
-  protected char[] readPasswordIfNotSet(String prompt, String password) throws IOException {
-    return (password != null) ? password.toCharArray() : readPassword(prompt);
+  protected char[] readPasswordIfNotSet(String prompt, String password) throws IOException, PasswordResolverException {
+    return (password != null) ? resolvePassword(password) : readPassword(prompt);
   }
 
-  protected char[] readPassword() throws IOException {
+  protected char[] readPassword() throws IOException, PasswordResolverException {
     return readPassword(null);
   }
 
-  protected char[] readPassword(String prompt) throws IOException {
+  protected char[] readPassword(String prompt) throws IOException, PasswordResolverException {
     String tmpPrompt = (prompt == null) ? "Password:" : prompt.trim();
 
     if (!tmpPrompt.endsWith(":")) {
@@ -239,8 +248,13 @@ public abstract class XiAction implements Action {
     }
 
     String passwordUi = System.getProperty("org.xipki.console.passwordui");
-    return "gui".equalsIgnoreCase(passwordUi)
+    char[] pwd = "gui".equalsIgnoreCase(passwordUi)
               ? SecurePasswordInputPanel.readPassword(tmpPrompt) : readLine(tmpPrompt, '*').toCharArray();
+    if (pwd == null || pwd.length == 0) {
+      return pwd;
+    } else {
+      return passwordResolver.resolvePassword(new String(pwd));
+    }
   }
 
   private String readLine(String prompt, Character ch) throws IOException {

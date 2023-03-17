@@ -117,8 +117,8 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String p12File;
 
-    @Option(name = "--password", description = "password of the PKCS#12 keystore file")
-    private String password;
+    @Option(name = "--password", description = "password of the PKCS#12 keystore file, as plaintext or PBE-encrypted.")
+    private String passwordHint;
 
     private ScepClient scepClient;
     private PrivateKey identityKey;
@@ -149,7 +149,7 @@ public class Actions {
     }
 
     private void readIdentity() throws Exception {
-      char[] pwd = readPasswordIfNotSet(password);
+      char[] pwd = readPasswordIfNotSet("Enter the keystore password", passwordHint);
 
       KeyStore ks = KeyUtil.getInKeyStore("PKCS12");
       try (InputStream is = Files.newInputStream(Paths.get(p12File))) {

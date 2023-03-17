@@ -21,14 +21,12 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.mgmt.shell.CaActions.CaAction;
-import org.xipki.password.PasswordResolver;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -68,9 +66,6 @@ public class SignerCaActions {
     @Option(name = "--cert", description = "signer certificate file")
     @Completion(FileCompleter.class)
     private String certFile;
-
-    @Reference
-    private PasswordResolver passwordResolver;
 
     @Override
     protected Object execute0() throws Exception {
@@ -172,9 +167,6 @@ public class SignerCaActions {
   @Command(scope = "ca", name = "signer-up", description = "update signer")
   @Service
   public static class SignerUp extends CaAction {
-
-    @Reference
-    protected PasswordResolver passwordResolver;
 
     @Option(name = "--name", aliases = "-n", required = true, description = "signer name")
     @Completion(CaCompleters.SignerNameCompleter.class)

@@ -26,6 +26,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.xipki.password.PasswordResolverException;
 import org.xipki.security.*;
 import org.xipki.security.pkcs12.KeyStoreWrapper;
 import org.xipki.security.pkcs12.KeypairWithCert;
@@ -245,19 +246,20 @@ public class P12Actions {
     @Completion(FileCompleter.class)
     private String p12File;
 
-    @Option(name = "--password", description = "password of the PKCS#12 keystore file")
-    private String password;
+    @Option(name = "--password", description = "password of the PKCS#12 keystore file, as plaintext or PBE-encrypted.")
+    private String passwordHint;
 
-    private char[] getPassword() throws IOException {
-      char[] pwdInChar = readPasswordIfNotSet(password);
+    private char[] getPassword() throws IOException, PasswordResolverException {
+      char[] pwdInChar = readPasswordIfNotSet("Enter the keystore password", passwordHint);
       if (pwdInChar != null) {
-        password = new String(pwdInChar);
+        passwordHint = new String(pwdInChar);
       }
       return pwdInChar;
     }
 
     public KeyStore getKeyStore()
-        throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException {
+        throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException,
+        PasswordResolverException {
       KeyStore ks;
       try (InputStream in = Files.newInputStream(Paths.get(expandFilepath(p12File)))) {
         ks = KeyUtil.getInKeyStore("PKCS12");
@@ -272,7 +274,7 @@ public class P12Actions {
       char[] pwd;
       try {
         pwd = getPassword();
-      } catch (IOException ex) {
+      } catch (IOException | PasswordResolverException ex) {
         throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
       }
 
@@ -363,15 +365,15 @@ public class P12Actions {
     @Completion(FileCompleter.class)
     protected String keyOutFile;
 
-    @Option(name = "--password", description = "password of the keystore file")
-    protected String password;
+    @Option(name = "--password", description = "password of the keystore file, as plaintext or PBE-encrypted.")
+    protected String passwordHint;
 
     protected void saveKey(KeyStoreWrapper keyGenerationResult) throws IOException {
       Args.notNull(keyGenerationResult, "keyGenerationResult");
       saveVerbose("saved PKCS#12 keystore to file", keyOutFile, keyGenerationResult.keystore());
     }
 
-    protected KeystoreGenerationParameters getKeyGenParameters() throws IOException {
+    protected KeystoreGenerationParameters getKeyGenParameters() throws IOException, PasswordResolverException {
       KeystoreGenerationParameters params = new KeystoreGenerationParameters(getPassword());
 
       SecureRandom random = securityFactory.getRandom4Key();
@@ -382,10 +384,10 @@ public class P12Actions {
       return params;
     }
 
-    private char[] getPassword() throws IOException {
-      char[] pwdInChar = readPasswordIfNotSet(password);
+    private char[] getPassword() throws IOException, PasswordResolverException {
+      char[] pwdInChar = readPasswordIfNotSet("Enter the keystore password", passwordHint);
       if (pwdInChar != null) {
-        password = new String(pwdInChar);
+        passwordHint = new String(pwdInChar);
       }
       return pwdInChar;
     }
@@ -424,19 +426,20 @@ public class P12Actions {
     @Completion(FileCompleter.class)
     protected String p12File;
 
-    @Option(name = "--password", description = "password of the PKCS#12 file")
-    protected String password;
+    @Option(name = "--password", description = "password of the PKCS#12 file, as plaintext or PBE-encrypted.")
+    protected String passwordHint;
 
-    protected char[] getPassword() throws IOException {
-      char[] pwdInChar = readPasswordIfNotSet(password);
+    protected char[] getPassword() throws IOException, PasswordResolverException {
+      char[] pwdInChar = readPasswordIfNotSet("Enter the keystore password", passwordHint);
       if (pwdInChar != null) {
-        password = new String(pwdInChar);
+        passwordHint = new String(pwdInChar);
       }
       return pwdInChar;
     }
 
     protected KeyStore getInKeyStore()
-        throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
+        throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException,
+        PasswordResolverException {
       try (InputStream in = Files.newInputStream(Paths.get(expandFilepath(p12File)))) {
         KeyStore ks = KeyUtil.getInKeyStore("PKCS12");
         ks.load(in, getPassword());

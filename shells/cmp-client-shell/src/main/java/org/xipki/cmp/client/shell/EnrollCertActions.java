@@ -39,6 +39,7 @@ import org.xipki.cmp.client.EnrollCertRequest;
 import org.xipki.cmp.client.EnrollCertRequest.EnrollType;
 import org.xipki.cmp.client.EnrollCertResult;
 import org.xipki.cmp.client.EnrollCertResult.CertifiedKeyPairOrError;
+import org.xipki.password.PasswordResolverException;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.*;
 import org.xipki.security.util.KeyUtil;
@@ -146,8 +147,8 @@ public class EnrollCertActions {
     @Completion(FileCompleter.class)
     private String p12OutputFile;
 
-    @Option(name = "--password", description = "password of the PKCS#12 file")
-    private String password;
+    @Option(name = "--password", description = "password of the PKCS#12 file, as plaintext or PBE-encrypted.")
+    private String passwordHint;
 
     @Override
     protected SubjectPublicKeyInfo getPublicKey() throws Exception {
@@ -225,10 +226,10 @@ public class EnrollCertActions {
       }
     } // method getCmpReqType
 
-    private char[] getPassword() throws IOException {
-      char[] pwdInChar = readPasswordIfNotSet(password);
+    private char[] getPassword() throws IOException, PasswordResolverException {
+      char[] pwdInChar = readPasswordIfNotSet(passwordHint);
       if (pwdInChar != null) {
-        password = new String(pwdInChar);
+        passwordHint = new String(pwdInChar);
       }
       return pwdInChar;
     } // method getPassword
@@ -312,23 +313,22 @@ public class EnrollCertActions {
     @Completion(FileCompleter.class)
     private String p12File;
 
-    @Option(name = "--password", description = "password of the PKCS#12 keystore file")
-    private String password;
+    @Option(name = "--password", description = "password of the PKCS#12 keystore file, as plaintext or PBE-encrypted.")
+    private String passwordHint;
 
     private ConcurrentContentSigner signer;
 
     @Override
     protected ConcurrentContentSigner getSigner() throws ObjectCreationException, CmpClientException {
       if (signer == null) {
-        if (password == null) {
-          try {
-            password = new String(readPassword());
-          } catch (IOException ex) {
-            throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
-          }
+        char[] password;
+        try {
+          password = readPasswordIfNotSet("Enter keystore password", passwordHint);
+        } catch (IOException | PasswordResolverException ex) {
+          throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
         }
 
-        ConfPairs conf = new ConfPairs("password", password)
+        ConfPairs conf = new ConfPairs("password", new String(password))
             .putPair("parallelism", Integer.toString(1))
             .putPair("keystore", "file:" + p12File);
 

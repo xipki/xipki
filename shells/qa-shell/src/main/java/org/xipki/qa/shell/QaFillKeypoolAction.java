@@ -24,7 +24,6 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.datasource.DataSourceFactory;
-import org.xipki.password.PasswordResolver;
 import org.xipki.qa.ca.FillKeytool;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
@@ -51,13 +50,11 @@ public class QaFillKeypoolAction extends XiAction {
           "Valid values are AES128/GCM, AES192/GCM and AES256/GCM")
   private String encAlg = "AES128/GCM";
 
-  @Option(name = "--password", description = "password to encrypt the generated keypair")
-  private String password;
+  @Option(name = "--password",
+      description = "password to encrypt the generated keypair, as plaintext or PBE-encrypted.")
+  private String passwordHint;
 
   private DataSourceFactory datasourceFactory;
-
-  @Reference
-  private PasswordResolver passwordResolver;
 
   public QaFillKeypoolAction() {
     datasourceFactory = new DataSourceFactory();
@@ -69,7 +66,7 @@ public class QaFillKeypoolAction extends XiAction {
       throw new IllegalCmdParamException("invalid num " + num);
     }
 
-    char[] passwordChars = (password == null) ? readPassword() : password.toCharArray();
+    char[] passwordChars = readPasswordIfNotSet(passwordHint);
     try (FillKeytool fillKeytool = new FillKeytool(datasourceFactory, passwordResolver, dbconfFile)) {
       fillKeytool.execute(num, encAlg, passwordChars);
     }
