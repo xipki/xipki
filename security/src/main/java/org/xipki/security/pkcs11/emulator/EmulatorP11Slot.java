@@ -448,12 +448,12 @@ class EmulatorP11Slot extends P11Slot {
         Integer.toString(secretKey.getEncoded().length * 8));
   }
 
-  private PKCS11ObjectId savePkcs11PrivateKey(byte[] id, String label, long keyType, PrivateKey privateKey, String keyspec)
-      throws TokenException {
+  private PKCS11ObjectId savePkcs11PrivateKey(
+      byte[] id, String label, long keyType, PrivateKey privateKey, String keyspec) throws TokenException {
     long handle = random.nextLong() & 0x7FFFFFFFFFFFFFFFL;
     byte[] encryptedPrivKeyInfo = keyCryptor.encrypt(privateKey);
-    return savePkcs11Entry(CKO_PRIVATE_KEY, handle, id, label, keyType, privateKey.getAlgorithm(), encryptedPrivKeyInfo,
-        keyspec);
+    return savePkcs11Entry(CKO_PRIVATE_KEY, handle, id, label, keyType, privateKey.getAlgorithm(),
+        encryptedPrivKeyInfo, keyspec);
   }
 
   private long savePkcs11PublicKey(byte[] id, String label, long keyType, PublicKey publicKey, String keyspec)
