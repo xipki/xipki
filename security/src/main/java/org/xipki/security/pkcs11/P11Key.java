@@ -132,7 +132,7 @@ public abstract class P11Key {
 
   public boolean supportsSign(long mechanism) {
     return sign && (keyId.getObjectCLass() != CKO_PUBLIC_KEY)
-        && (keyId.getKeyType() == CKK_EC_MONTGOMERY) && slot.supportsMechanism(mechanism, CKF_SIGN);
+        && (keyId.getKeyType() != CKK_EC_MONTGOMERY) && slot.supportsMechanism(mechanism, CKF_SIGN);
   }
 
   /**
