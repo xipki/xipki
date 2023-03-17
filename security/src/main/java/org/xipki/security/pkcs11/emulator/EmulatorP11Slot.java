@@ -35,12 +35,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pkcs11.wrapper.Functions;
 import org.xipki.pkcs11.wrapper.MechanismInfo;
+import org.xipki.pkcs11.wrapper.PKCS11ObjectId;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.pkcs11.*;
+import org.xipki.security.pkcs11.P11Identity;
+import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
 import org.xipki.security.pkcs11.P11ModuleConf.P11NewObjectConf;
+import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.security.pkcs11.P11SlotId;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Hex;
@@ -342,7 +346,7 @@ class EmulatorP11Slot extends P11Slot {
     LOG.info("close slot " + slotId);
   }
 
-  private boolean removePkcs11Entry(File dir, P11ObjectId objectId) throws TokenException {
+  private boolean removePkcs11Entry(File dir, PKCS11ObjectId objectId) throws TokenException {
     byte[] id = objectId.getId();
     String label = objectId.getLabel();
     if (id != null) {
@@ -436,7 +440,7 @@ class EmulatorP11Slot extends P11Slot {
     return ids.size();
   } // method deletePkcs11Entry
 
-  private P11ObjectId savePkcs11SecretKey(byte[] id, String label, long keyType, SecretKey secretKey)
+  private PKCS11ObjectId savePkcs11SecretKey(byte[] id, String label, long keyType, SecretKey secretKey)
       throws TokenException {
     long handle = random.nextLong() & 0x7FFFFFFFFFFFFFFFL;
     byte[] encryptedValue = keyCryptor.encrypt(secretKey);
@@ -444,7 +448,7 @@ class EmulatorP11Slot extends P11Slot {
         Integer.toString(secretKey.getEncoded().length * 8));
   }
 
-  private P11ObjectId savePkcs11PrivateKey(byte[] id, String label, long keyType, PrivateKey privateKey, String keyspec)
+  private PKCS11ObjectId savePkcs11PrivateKey(byte[] id, String label, long keyType, PrivateKey privateKey, String keyspec)
       throws TokenException {
     long handle = random.nextLong() & 0x7FFFFFFFFFFFFFFFL;
     byte[] encryptedPrivKeyInfo = keyCryptor.encrypt(privateKey);
@@ -578,7 +582,7 @@ class EmulatorP11Slot extends P11Slot {
     }
   }
 
-  private P11ObjectId savePkcs11Entry(
+  private PKCS11ObjectId savePkcs11Entry(
       long objectClass, long handle, byte[] id, String label, long keyType, String algo, byte[] value, String keyspec)
       throws TokenException {
     notBlank(label, "label");
@@ -610,7 +614,7 @@ class EmulatorP11Slot extends P11Slot {
       throw new TokenException("could not save " + ckoCodeToName(objectClass).substring(4));
     }
 
-    return new P11ObjectId(handle, objectClass, keyType, id, label);
+    return new PKCS11ObjectId(handle, objectClass, keyType, id, label);
   } // method savePkcs11Entry
 
   @Override
@@ -636,7 +640,7 @@ class EmulatorP11Slot extends P11Slot {
 
   @Override
   public P11Identity getIdentity(P11IdentityId identityId) throws TokenException {
-    P11ObjectId keyId = identityId.getKeyId();
+    PKCS11ObjectId keyId = identityId.getKeyId();
     String hexId = hex(keyId.getId());
     long keyType = keyId.getKeyType();
 
@@ -754,14 +758,15 @@ class EmulatorP11Slot extends P11Slot {
       long keyType   = Long.parseLong(props.getProperty(PROP_KEYTYPE));
       String label = props.getProperty(PROP_LABEL);
 
-      P11ObjectId keyObjectId = new P11ObjectId(keyHandle, objClass, keyType, keyId, keyLabel);
+      PKCS11ObjectId keyObjectId = new PKCS11ObjectId(keyHandle, objClass, keyType, keyId, keyLabel);
 
       Long pubicKeyHandle = null;
       if (!isSecretKey) {
         pubicKeyHandle = keyHandle + 1;
+        keyObjectId.setPublicKeyHandle(pubicKeyHandle);
       }
 
-      return new P11IdentityId(slotId, keyObjectId, pubicKeyHandle);
+      return new P11IdentityId(slotId, keyObjectId);
     } else {
       // keyId != null
       String hexId = hex(keyId);
@@ -796,7 +801,10 @@ class EmulatorP11Slot extends P11Slot {
         publicKeyHandle = keyHandle + 1;
       }
 
-      return new P11IdentityId(slotId, new P11ObjectId(keyHandle, objClass, keyType, keyId, keyLabel), publicKeyHandle);
+      PKCS11ObjectId objectId = new PKCS11ObjectId(keyHandle, objClass, keyType, keyId, keyLabel);
+      objectId.setPublicKeyHandle(publicKeyHandle);
+
+      return new P11IdentityId(slotId, objectId);
     }
   }
 
@@ -827,14 +835,14 @@ class EmulatorP11Slot extends P11Slot {
     byte[] keyBytes = new byte[keysize / 8];
     random.nextBytes(keyBytes);
     SecretKey key = new SecretKeySpec(keyBytes, getSecretKeyAlgorithm(keyType));
-    return new P11IdentityId(slotId, saveSecretP11Entity(keyType, key, control), null);
+    return new P11IdentityId(slotId, saveSecretP11Entity(keyType, key, control));
   }
 
   @Override
   protected P11IdentityId doImportSecretKey(long keyType, byte[] keyValue, P11NewKeyControl control)
       throws TokenException {
     SecretKey key = new SecretKeySpec(keyValue, getSecretKeyAlgorithm(keyType));
-    return new P11IdentityId(slotId, saveSecretP11Entity(keyType, key, control), null);
+    return new P11IdentityId(slotId, saveSecretP11Entity(keyType, key, control));
   }
 
   private static String getSecretKeyAlgorithm(long keyType) {
@@ -1026,11 +1034,12 @@ class EmulatorP11Slot extends P11Slot {
     String label = control.getLabel();
 
     long publicKeyHandle = savePkcs11PublicKey(id, label, keyType, keypair.getPublic(), keySpec);
-    P11ObjectId privateKeyId = savePkcs11PrivateKey(id, label, keyType, keypair.getPrivate(), keySpec);
-    return new P11IdentityId(slotId, privateKeyId, publicKeyHandle);
+    PKCS11ObjectId privateKeyId = savePkcs11PrivateKey(id, label, keyType, keypair.getPrivate(), keySpec);
+    privateKeyId.setPublicKeyHandle(publicKeyHandle);
+    return new P11IdentityId(slotId, privateKeyId);
   }
 
-  private P11ObjectId saveSecretP11Entity(long keyType, SecretKey key, P11NewObjectControl control)
+  private PKCS11ObjectId saveSecretP11Entity(long keyType, SecretKey key, P11NewObjectControl control)
       throws TokenException {
     byte[] id = control.getId();
     if (id == null) {

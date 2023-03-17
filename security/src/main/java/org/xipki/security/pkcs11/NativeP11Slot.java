@@ -38,8 +38,6 @@ import org.xipki.security.pkcs11.P11ModuleConf.P11NewObjectConf;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
-import org.xipki.util.concurrent.ConcurrentBag;
-import org.xipki.util.concurrent.ConcurrentBagEntry;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -53,13 +51,10 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.time.Clock;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static org.xipki.pkcs11.wrapper.AttributeVector.newSecretKey;
 import static org.xipki.pkcs11.wrapper.PKCS11Constants.*;
 import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.positive;
 import static org.xipki.util.CollectionUtil.isEmpty;
 import static org.xipki.util.CollectionUtil.isNotEmpty;
 
@@ -394,7 +389,7 @@ class NativeP11Slot extends P11Slot {
     keyHandle = token.generateKey(mechanism, template.id(id));
     label = token.getAttrValues(keyHandle, CKA_LABEL).label();
 
-    return new P11IdentityId(slotId, new P11ObjectId(keyHandle, CKO_SECRET_KEY, keyType, id, label), null);
+    return new P11IdentityId(slotId, new PKCS11ObjectId(keyHandle, CKO_SECRET_KEY, keyType, id, label));
   } // method generateSecretKey0
 
   @Override
@@ -429,7 +424,7 @@ class NativeP11Slot extends P11Slot {
     } catch (PKCS11Exception e) {
     }
 
-    return new P11IdentityId(slotId, new P11ObjectId(keyHandle, CKO_SECRET_KEY, keyType, id, label), null);
+    return new P11IdentityId(slotId, new PKCS11ObjectId(keyHandle, CKO_SECRET_KEY, keyType, id, label));
   } // method importSecretKey0
 
   @Override
@@ -667,30 +662,31 @@ class NativeP11Slot extends P11Slot {
       PKCS11KeyPair keypair;
       try {
         keypair = token.generateKeyPair(new Mechanism(mech), template);
-        } catch (PKCS11Exception ex) {
-          if (mech == CKM_EC_KEY_PAIR_GEN) {
-            // Named Curve is not supported, use explicit curve parameters.
-            ASN1ObjectIdentifier curveId = ASN1ObjectIdentifier.getInstance(template.publicKey().ecParams());
-            X9ECParameters ecParams = ECNamedCurveTable.getByOID(curveId);
-            if (ecParams == null) {
-              throw ex;
-            }
-
-            try {
-              template.publicKey().ecParams(ecParams.getEncoded());
-            } catch (IOException ex2) {
-              throw ex;
-            }
-            keypair = token.generateKeyPair(new Mechanism(mech), template);
-          } else {
-            throw new TokenException("could not generate keypair " + ckmCodeToName(mech), ex);
+      } catch (PKCS11Exception ex) {
+        if (mech == CKM_EC_KEY_PAIR_GEN) {
+          // Named Curve is not supported, use explicit curve parameters.
+          ASN1ObjectIdentifier curveId = ASN1ObjectIdentifier.getInstance(template.publicKey().ecParams());
+          X9ECParameters ecParams = ECNamedCurveTable.getByOID(curveId);
+          if (ecParams == null) {
+            throw ex;
           }
-        }
 
-        P11IdentityId ret = new P11IdentityId(slotId,
-            new P11ObjectId(keypair.getPrivateKey(), CKO_PRIVATE_KEY, keyType, id, label), keypair.getPublicKey());
-        succ = true;
-        return ret;
+          try {
+            template.publicKey().ecParams(ecParams.getEncoded());
+          } catch (IOException ex2) {
+            throw ex;
+          }
+          keypair = token.generateKeyPair(new Mechanism(mech), template);
+        } else {
+          throw new TokenException("could not generate keypair " + ckmCodeToName(mech), ex);
+        }
+      }
+
+      PKCS11ObjectId objectId = new PKCS11ObjectId(keypair.getPrivateKey(), CKO_PRIVATE_KEY, keyType, id, label);
+      objectId.setPublicKeyHandle(keypair.getPublicKey());
+      P11IdentityId ret = new P11IdentityId(slotId, objectId);
+      succ = true;
+      return ret;
     } finally {
       if (!succ && (id != null)) {
         try {
@@ -708,97 +704,25 @@ class NativeP11Slot extends P11Slot {
       return null;
     }
 
-    if (keyId == null) {
-      AttributeVector template = new AttributeVector().label(keyLabel);
-
-      long objClass = CKO_PRIVATE_KEY;
-      List<Long> objHandles = getObjects(template.class_(objClass), 2);
-      if (objHandles.isEmpty()) {
-        objClass = CKO_SECRET_KEY;
-        objHandles = getObjects(template.class_(objClass), 2);
-      }
-
-      if (objHandles.isEmpty()) {
-        return null;
-      } else if (objHandles.size() > 1) {
-        throw new TokenException("found more than 1 " + ckkCodeToName(objClass).substring(4) +
-            " with label=" + keyLabel);
-      }
-
-      long keyHandle = objHandles.get(0);
-      AttributeVector attrs = token.getAttrValues(keyHandle, CKA_ID, CKA_KEY_TYPE);
-      long keyType = attrs.keyType();
-      keyId = attrs.id();
-
-      P11ObjectId secretOrPrivKeyId = new P11ObjectId(keyHandle, objClass, keyType, keyId, keyLabel);
-
-      Long publicKeyHandle = null;
-      if (objClass == CKO_PRIVATE_KEY) {
-        if (keyId == null) {
-          List<Long> handles = getObjects(AttributeVector.newPublicKey().label(keyLabel), 2);
-          if (handles.size() > 1) {
-            LOG.warn("found more than 1 public key with label={}, ignore them", keyLabel);
-          } else if (handles.size() == 1){
-            publicKeyHandle = handles.get(0);
-          }
-        } else {
-          List<Long> handles = getObjects(AttributeVector.newPublicKey().id(keyId), 2);
-          if (handles.size() > 1) {
-            LOG.warn("found more than 1 public key with id={}, ignore them", Hex.encode(keyId));
-          } else if (handles.size() == 1){
-            publicKeyHandle = handles.get(0);
-          }
-        }
-      }
-
-      return new P11IdentityId(slotId, secretOrPrivKeyId, publicKeyHandle);
-    } else {
-      // keyId != null
-      AttributeVector template = new AttributeVector().id(keyId);
-      if (keyLabel != null) {
-        template.label(keyLabel);
-      }
-
-      long objClass = CKO_PRIVATE_KEY;
-      List<Long> objHandles = getObjects(template.class_(objClass), 2);
-      if (objHandles.isEmpty()) {
-        objClass = CKO_SECRET_KEY;
-        objHandles = getObjects(template.class_(objClass), 2);
-      }
-
-      if (objHandles.isEmpty()) {
-        return null;
-      } else if (objHandles.size() > 1) {
-        throw new TokenException("found more than 1 " + ckoCodeToName(objClass).substring(4) +
-            " with " + getDescription(keyId, keyLabel));
-      }
-
-      long keyHandle = objHandles.get(0);
-      AttributeVector attrs;
-      if (keyLabel == null) {
-        attrs = token.getAttrValues(keyHandle, CKA_KEY_TYPE, CKA_LABEL);
-        keyLabel = attrs.label();
-      } else {
-        attrs = token.getAttrValues(keyHandle, CKA_KEY_TYPE);
-      }
-
-      P11ObjectId secretOrPrivKeyId = new P11ObjectId(keyHandle, objClass, attrs.keyType(), keyId, keyLabel);
-
-      Long publicKeyHandle = null;
-      if (objClass == CKO_PRIVATE_KEY) {
-        objHandles = getObjects(AttributeVector.newPublicKey().id(keyId), 2);
-
-        if (objHandles.isEmpty()) {
-          LOG.warn("found no public key with ID {}.", hex(keyId));
-        } else if (objHandles.size() > 1) {
-          LOG.warn("found more than 1 public key with ID {}, ignore them", hex(keyId));
-        } else {
-          publicKeyHandle = objHandles.get(0);
-        }
-      }
-
-      return new P11IdentityId(slotId, secretOrPrivKeyId, publicKeyHandle);
+    AttributeVector criteria = new AttributeVector();
+    if (keyId != null && keyId.length > 0) {
+      criteria.id(keyId);
     }
+    if (StringUtil.isNotBlank(keyLabel)) {
+      criteria.label(keyLabel);
+    }
+
+    PKCS11ObjectId objectId = token.getObjectId(criteria);
+    if (objectId == null) {
+      return null;
+    }
+
+    long objClass = objectId.getObjectCLass();
+    if (objClass != CKO_PRIVATE_KEY && objClass != CKO_SECRET_KEY) {
+      throw new TokenException("could not find private key or secret key for " + getDescription(keyId, keyLabel));
+    }
+
+    return new P11IdentityId(slotId, objectId);
   }
 
   @Override
@@ -922,15 +846,7 @@ class NativeP11Slot extends P11Slot {
   }
 
   private byte[] generateId() throws TokenException {
-    while (true) {
-      byte[] keyId = new byte[newObjectConf.getIdLength()];
-      random.nextBytes(keyId);
-
-      AttributeVector template = new AttributeVector().id(keyId);
-      if (isEmpty(getObjects(template, 1))) {
-        return keyId;
-      }
-    }
+    return token.generateUniqueId(null, newObjectConf.getIdLength(), random);
   }
 
   private boolean labelExists(String keyLabel) throws TokenException {
