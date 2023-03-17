@@ -389,7 +389,7 @@ class NativeP11Slot extends P11Slot {
     keyHandle = token.generateKey(mechanism, template.id(id));
     label = token.getAttrValues(keyHandle, CKA_LABEL).label();
 
-    return new P11IdentityId(slotId, new PKCS11ObjectId(keyHandle, CKO_SECRET_KEY, keyType, id, label));
+    return new P11IdentityId(slotId, new PKCS11KeyId(keyHandle, CKO_SECRET_KEY, keyType, id, label));
   } // method generateSecretKey0
 
   @Override
@@ -424,7 +424,7 @@ class NativeP11Slot extends P11Slot {
     } catch (PKCS11Exception e) {
     }
 
-    return new P11IdentityId(slotId, new PKCS11ObjectId(keyHandle, CKO_SECRET_KEY, keyType, id, label));
+    return new P11IdentityId(slotId, new PKCS11KeyId(keyHandle, CKO_SECRET_KEY, keyType, id, label));
   } // method importSecretKey0
 
   @Override
@@ -682,7 +682,7 @@ class NativeP11Slot extends P11Slot {
         }
       }
 
-      PKCS11ObjectId objectId = new PKCS11ObjectId(keypair.getPrivateKey(), CKO_PRIVATE_KEY, keyType, id, label);
+      PKCS11KeyId objectId = new PKCS11KeyId(keypair.getPrivateKey(), CKO_PRIVATE_KEY, keyType, id, label);
       objectId.setPublicKeyHandle(keypair.getPublicKey());
       P11IdentityId ret = new P11IdentityId(slotId, objectId);
       succ = true;
@@ -712,7 +712,7 @@ class NativeP11Slot extends P11Slot {
       criteria.label(keyLabel);
     }
 
-    PKCS11ObjectId objectId = token.getObjectId(criteria);
+    PKCS11KeyId objectId = token.getKeyId(criteria);
     if (objectId == null) {
       return null;
     }

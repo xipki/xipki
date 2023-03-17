@@ -17,7 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
-import org.xipki.pkcs11.wrapper.PKCS11ObjectId;
+import org.xipki.pkcs11.wrapper.PKCS11KeyId;
 
 import static org.xipki.util.Args.notNull;
 
@@ -32,7 +32,7 @@ public class P11IdentityId {
 
   private final P11SlotId slotId;
 
-  private final PKCS11ObjectId keyId;
+  private final PKCS11KeyId keyId;
 
   /**
    * Constructor.
@@ -41,7 +41,7 @@ public class P11IdentityId {
    * @param keyId  Object identifier. Must not be {@code null}.
    *
    */
-  public P11IdentityId(P11SlotId slotId, PKCS11ObjectId keyId) {
+  public P11IdentityId(P11SlotId slotId, PKCS11KeyId keyId) {
     this.slotId = notNull(slotId, "slotId");
     this.keyId = notNull(keyId, "keyId");
   }
@@ -54,7 +54,7 @@ public class P11IdentityId {
     return slotId;
   }
 
-  public PKCS11ObjectId getKeyId() {
+  public PKCS11KeyId getKeyId() {
     return keyId;
   }
 
