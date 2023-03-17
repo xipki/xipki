@@ -12,7 +12,7 @@ import org.xipki.util.Args;
 /**
  * A demo PasswordCallback which just pass-through the password.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 6.2.0
  */
 public class PassThroughPasswordCallback implements PasswordCallback {

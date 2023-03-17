@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * This interface specifies similar operations like the Linux command curl.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public interface Curl {

@@ -17,7 +17,7 @@ import static org.xipki.util.Args.range;
 /**
  * PBE (Password Based Encryption) password service.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 public class PBEPasswordService {

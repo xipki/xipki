@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * File utility class.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 

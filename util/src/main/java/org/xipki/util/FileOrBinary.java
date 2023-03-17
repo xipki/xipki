@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * Configuration consisting either file path or the binary content.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class FileOrBinary extends ValidatableConf {

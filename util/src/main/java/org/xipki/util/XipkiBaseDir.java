@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * XIPKI_BASE utility class.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class XipkiBaseDir {
 

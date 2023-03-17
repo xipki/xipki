@@ -8,7 +8,7 @@ import java.security.SecureRandom;
 /**
  * Random utility class.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.1.0
  *
  */

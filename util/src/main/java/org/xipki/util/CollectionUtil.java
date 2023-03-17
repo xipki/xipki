@@ -9,7 +9,7 @@ import java.util.*;
  * Utility class for operations on {@link Collection}, {@link Set}, {@link List}, {@link Map},
  * and arrays.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

@@ -17,7 +17,7 @@ import static org.xipki.util.Args.positive;
 /**
  * Password based encryption utility class.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

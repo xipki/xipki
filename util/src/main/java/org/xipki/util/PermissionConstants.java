@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 /**
  * CA permission constants.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

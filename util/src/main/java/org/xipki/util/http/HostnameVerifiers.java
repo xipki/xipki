@@ -13,7 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * Utility class to create {@link HostnameVerifier}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class HostnameVerifiers {
 

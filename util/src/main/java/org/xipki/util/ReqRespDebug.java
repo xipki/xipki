@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Helper class for debug.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

@@ -21,7 +21,7 @@ import java.util.Map.Entry;
 /**
  * An implementation of {@link Curl}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class DefaultCurl implements Curl {

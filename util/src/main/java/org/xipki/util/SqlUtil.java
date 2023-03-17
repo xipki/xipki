@@ -6,7 +6,7 @@ package org.xipki.util;
 /**
  * SQL utilities.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class SqlUtil {
 

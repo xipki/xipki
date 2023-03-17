@@ -2,7 +2,7 @@
 
 /*
  *
- * Copyright (c) 2013 - 2020 Lijun Liao
+ * Copyright (c) 2013 - 2020 Lijun Liao (xipki)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 /**
  * ConcurrentBagEntry.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 

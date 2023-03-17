@@ -21,7 +21,7 @@ import java.net.URLConnection;
 /**
  * The HTTP client.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class XiHttpClient {

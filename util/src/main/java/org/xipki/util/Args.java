@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * Utility class to validate the parameters.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

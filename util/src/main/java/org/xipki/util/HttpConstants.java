@@ -6,7 +6,7 @@ package org.xipki.util;
 /**
  * XiPKI's HTTP constants.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class HttpConstants {

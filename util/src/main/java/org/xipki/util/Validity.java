@@ -12,7 +12,7 @@ import static org.xipki.util.Args.*;
 /**
  * Validity like the certificate validity, e.g. 3 years.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class Validity implements Comparable<Validity> {

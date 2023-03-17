@@ -6,7 +6,7 @@ package org.xipki.util;
 /**
  * HEX encoder and decoder.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 3.0.1
  */
 

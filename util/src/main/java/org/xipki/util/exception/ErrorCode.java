@@ -5,7 +5,7 @@ package org.xipki.util.exception;
 
 /**
  * Error code.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public enum ErrorCode {
 

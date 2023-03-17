@@ -24,7 +24,7 @@ import java.util.StringTokenizer;
 /**
  * Configuration of SSL context.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class SslContextConf {

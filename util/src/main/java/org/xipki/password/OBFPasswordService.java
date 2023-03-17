@@ -12,7 +12,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * OBF (jetty's Obfuscate) password service.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 public class OBFPasswordService {

@@ -12,7 +12,7 @@ import org.xipki.util.StringUtil;
 /**
  * Test for the algorithm PBEWithHmacSHA256AndAES256.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 

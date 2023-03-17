@@ -6,7 +6,7 @@ package org.xipki.util.http;
 /**
  * HTTP client exception.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class XiHttpClientException extends Exception {

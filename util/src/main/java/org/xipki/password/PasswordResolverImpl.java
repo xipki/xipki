@@ -13,7 +13,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * An implementation of {@link PasswordResolver}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

@@ -6,7 +6,7 @@ package org.xipki.util;
 /**
  * PEM encoder. For details please refer to RFC 7468.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  *
  */
 public class PemEncoder {

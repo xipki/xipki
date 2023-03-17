@@ -6,7 +6,7 @@ package org.xipki.password;
 /**
  * Password based encryption algorithm enum.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.2.0
  */
 

@@ -6,7 +6,7 @@ package org.xipki.util.http;
 /**
  * HTTP response.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class HttpRespContent {

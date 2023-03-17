@@ -12,7 +12,7 @@ import static org.xipki.util.Args.notNull;
 /**
  * Utility class for String.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 

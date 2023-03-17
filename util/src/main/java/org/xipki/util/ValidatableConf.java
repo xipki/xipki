@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * Configuration that can be validated.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public abstract class ValidatableConf {
