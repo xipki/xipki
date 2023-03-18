@@ -43,9 +43,9 @@
     <gson.version>2.10.1</gson.version>
     <zip4j.version>2.11.3</zip4j.version>
     <!-- only for runtime -->
-    <tinylog.version>2.6.0</tinylog.version>
+    <tinylog.version>2.6.1</tinylog.version>
     <jdbc.mariadb.version>3.1.2</jdbc.mariadb.version>
-    <jdbc.postgresql.version>42.5.3</jdbc.postgresql.version>
+    <jdbc.postgresql.version>42.6.0</jdbc.postgresql.version>
     <jdbc.h2.version>2.1.214</jdbc.h2.version>
     <!-- Only for test purpose -->
     <junit.version>4.13.1</junit.version>

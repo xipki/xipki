@@ -8,16 +8,25 @@ See also <https://github.com/xipki/xipki/releases>
     - Add option to control whether duplicate public keys in one CA is allowed.
       A new column SKI (Subject Key Identifier) is added to the table CERT.
     - Extend the entities to generate CRLs from master CAs to all CAs.
+    - Rewritten the PKCS#11 code.
 - OCSP
-    - N/A
+    - Rewritten the PKCS#11 code.
 - CLI
-    - N/A
+    - Support PBE-encrypted password in the karaf shell.
+    - Support PBE-encrypted password in the SSL configuration.
+    - Rewritten the PKCS#11 code.
+    - Add missing letters in SecurePasswordInputPanel.
 - MGMT-CLI (Management Client)
-    - N/A
+    - Support PBE-encrypted password in the karaf shell.
+    - Support PBE-encrypted password in the SSL configuration.
+    - Rewritten the PKCS#11 code.
+    - Add missing letters in SecurePasswordInputPanel.
 - DB Tool
     - N/A
 - Dependencies
-    - N/A
+    - Replace jpkcs11wrapper v1.0.0 by ipkcs11wrapper v1.0.3.
+    - tinylog: 2.6.0 --> 2.6.1
+    - JDBC driver postgresql: 42.5.3 --> 42.6.0
 
 ## 6.1.0
 - Release date: February 5, 2023
