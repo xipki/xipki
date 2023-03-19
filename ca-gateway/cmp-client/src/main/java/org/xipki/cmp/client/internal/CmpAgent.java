@@ -191,8 +191,7 @@ class CmpAgent {
         throw new CmpClientException(ex.getMessage(), ex);
       }
     } else {
-      int bodyType = response.getBody().getType();
-      if (bodyType != PKIBody.TYPE_ERROR) {
+      if (response.getBody().getType() != PKIBody.TYPE_ERROR) {
         throw new CmpClientException("response is not signed");
       }
     }
@@ -200,8 +199,7 @@ class CmpAgent {
     return ret;
   }
 
-  private GeneralPKIMessage send(String caName, PKIMessage request, ReqRespDebug debug)
-      throws CmpClientException {
+  private GeneralPKIMessage send(String caName, PKIMessage request, ReqRespDebug debug) throws CmpClientException {
     byte[] encodedRequest;
     try {
       encodedRequest = request.getEncoded();
@@ -235,7 +233,7 @@ class CmpAgent {
     if (!resp.isOK()) {
       String msg = "received HTTP status code " + resp.getStatusCode();
       LOG.warn(msg);
-      throw new CmpClientException("Received HTTP status code");
+      throw new CmpClientException(msg);
     }
 
     GeneralPKIMessage response;
