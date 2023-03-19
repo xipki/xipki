@@ -52,8 +52,8 @@ HikariCP-*.jar,\
 license-*,jar,\
 log4j-*.jar,\
 mariadb-java-client-*.jar,\
+mysql-connector-j-*.jar,\
 ocsp-*.jar,\
-password-*.jar,\
 postgresql-*.jar,\
 scep-client-*.jar,\
 security-*.jar,\

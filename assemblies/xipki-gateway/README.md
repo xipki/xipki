@@ -7,16 +7,15 @@ Deployment in Tomcat 8 and 9
    (cmp.war for CMP, scep.war for SCEP, .well-known.war for EST, and rest.war for RESTful API)
 2. Optional, configure the TLS listener in the file
    `${CATALINA_HOME}conf/server.xml` (we use here the port 8082 and 8445, can be changed to any other port)
-    - Use NIO connector
-
+    - Use NIO connector (applied to all cases)
    ```sh
    <Connector port="8445" protocol="org.apache.coyote.http11.Http11NioProtocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
                connectionTimeout="4000">
         <SSLHostConfig
                 certificateVerification="optional"
-                protocols="TLSv1.2"
-                ciphers="TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256, TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
+                protocols="TLSv1.2+TLSv1.3"
+                ciphers="TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POLY1305_SHA256,TLS_AES_128_GCM_SHA256,TLS_AES_128_CCM_8_SHA256,TLS_AES_128_CCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256, TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
                 truststoreFile="${XIPKI_BASE}/keycerts/tlskeys/ca/tls-ca-cert.p12"
                 truststorePassword="1234"
                 truststoreType="PKCS12">
@@ -27,7 +26,7 @@ Deployment in Tomcat 8 and 9
         </SSLHostConfig>
    </Connector>
    ```
-    - Use APR connector (fast). See https://tomcat.apache.org/tomcat-8.0-doc/apr.html for more details.
+    - Use APR connector, fast but with pre-condition, please refer to https://tomcat.apache.org/tomcat-8.0-doc/apr.html for more details.
 
    ```sh
    <Connector port="8445" protocol="org.apache.coyote.http11.Http11AprProtocol"
@@ -35,8 +34,8 @@ Deployment in Tomcat 8 and 9
                connectionTimeout="4000">
         <SSLHostConfig
                 certificateVerification="optional"
-                protocols="TLSv1.2"
-                ciphers="TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,  TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
+                protocols="TLSv1.2+TLSv1.3"
+                ciphers="TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POLY1305_SHA256,TLS_AES_128_GCM_SHA256,TLS_AES_128_CCM_8_SHA256,TLS_AES_128_CCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256, TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
                 caCertificateFile="xipki/keycerts/tlskeys/ca/tls-ca-cert.pem">
             <Certificate
                          certificateKeyFile="xipki/keycerts/tlskeys/server/tls-server-key.pem"
@@ -55,7 +54,6 @@ bcprov-*.jar,\
 bcutil-*.jar,\
 gson-*.jar,\
 log4j-*.jar,\
-password-*.jar,\
 security-*.jar,\
 slf4j-*.jar,\
 *pkcs11wrapper-*.jar,\
