@@ -689,7 +689,7 @@ public class EstResponder {
     }
 
     KeyType[] keyTypes = sdkResp.getKeyTypes();
-    if (keyTypes != null && keyTypes.length != 0) {
+    if (keyTypes != null) {
       for (KeyType keyType : keyTypes) {
         ASN1ObjectIdentifier typeOid = new ASN1ObjectIdentifier(keyType.getKeyType());
         String[] ecCurves = keyType.getEcCurves();

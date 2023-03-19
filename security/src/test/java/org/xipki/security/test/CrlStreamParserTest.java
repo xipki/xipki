@@ -12,7 +12,7 @@ import org.xipki.security.asn1.CrlStreamParser;
 import org.xipki.security.asn1.CrlStreamParser.RevokedCertsIterator;
 import org.xipki.security.util.X509Util;
 
-import javax.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateEncodingException;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;

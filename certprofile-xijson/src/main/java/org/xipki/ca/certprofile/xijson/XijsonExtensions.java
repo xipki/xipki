@@ -376,7 +376,7 @@ public class XijsonExtensions {
       extnIds.remove(type);
       BasicConstraints extConf = getExtension(type, extensions).getBasicConstraints();
       if (extConf == null) {
-        extConf = getExtension(type, extensions).getBasicConstrains();
+        extConf = getExtension(type, extensions).getBasicConstraints();
       }
       if (extConf != null) {
         this.pathLen = extConf.getPathLen();
@@ -823,7 +823,7 @@ public class XijsonExtensions {
           rdns = requestedSubject.getRDNs(attrType);
         }
 
-        if (rdns == null || rdns.length == 0) {
+        if (rdns == null) {
           continue;
         }
 

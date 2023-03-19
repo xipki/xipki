@@ -918,7 +918,7 @@ abstract class BaseCmpResponder {
     InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
 
     InfoTypeAndValue itv = null;
-    if (itvs != null && itvs.length > 0) {
+    if (itvs != null) {
       for (InfoTypeAndValue entry : itvs) {
         String itvType = entry.getInfoType().getId();
         if (CMPObjectIdentifiers.id_it_caCerts.getId().equals(itvType)

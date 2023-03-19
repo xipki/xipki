@@ -549,7 +549,7 @@ class CmpAgent {
 
     // CA certificates
     CMPCertificate[] caPubs = certRep.getCaPubs();
-    if (caPubs != null && caPubs.length > 0) {
+    if (caPubs != null) {
       for (CMPCertificate caPub : caPubs) {
         if (caPub != null) {
           result.addCaCertificate(caPub);
@@ -1080,7 +1080,7 @@ class CmpAgent {
 
     InfoTypeAndValue[] itvs = genRep.toInfoTypeAndValueArray();
     InfoTypeAndValue itv = null;
-    if (itvs != null && itvs.length > 0) {
+    if (itvs != null) {
       for (InfoTypeAndValue m : itvs) {
         if (expectedType.equals(m.getInfoType())) {
           itv = m;

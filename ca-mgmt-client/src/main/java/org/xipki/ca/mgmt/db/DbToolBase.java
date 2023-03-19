@@ -223,7 +223,7 @@ public class DbToolBase implements Closeable {
     // delete the temporary files
     File dir = new File(dirName);
     File[] children = dir.listFiles();
-    if (children != null && children.length > 0) {
+    if (children != null) {
       for (File child : children) {
         if (child.getName().startsWith(prefix)) {
           child.delete();

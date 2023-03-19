@@ -434,7 +434,7 @@ class O2tChecker extends ExtensionChecker {
           rdns = requestedSubject.getRDNs(attrType);
         }
 
-        if (rdns == null || rdns.length == 0) {
+        if (rdns == null) {
           continue;
         }
 
