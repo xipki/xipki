@@ -17,7 +17,7 @@ ca:dbschema-add --name KEYPAIR_ENC_KEY --value 00112233445566778899AABBCCDDEEFF
 list = [ cross subca subca-complex ocsp scep multiple-ous multi-valued-rdn \
   qc ee-complex smime smime-legacy tls tls-c max-time fixed-partial-subject \
   constant-ext gmt0015 \
-  tls-dsa tls-ec tls-ed25519 tls-rsa tls-sm2]
+  tls-dsa tls-ec tls-ed25519 tls-rsa tls-sm2 tls-sm2-enc]
 
 each ($list) {
   ca:profile-add --name ${it} \
@@ -361,7 +361,9 @@ ca:caprofile-add \
   --profile multiple-ous \
   --profile multi-valued-rdn \
   --profile max-time \
-  --profile gmt0015
+  --profile gmt0015 \
+  --profile tls-sm2 \
+  --profile tls-sm2-enc
 
 ## Add CMP requestor to CA
 ca:careq-add \
