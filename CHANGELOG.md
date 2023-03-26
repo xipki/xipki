@@ -5,7 +5,6 @@ See also <https://github.com/xipki/xipki/releases>
 ## 6.2.0
 - Release date: March 26, 2023
 - CA
-      A new column SKI (Subject Key Identifier) is added to the table CERT.
     - Extend the entities to generate CRLs from master CAs to all CAs.
     - Rewritten the PKCS#11 code.
 - OCSP
