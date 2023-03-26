@@ -47,13 +47,9 @@ class CaCertstoreDbImporter extends DbPorter {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaCertstoreDbImporter.class);
 
-  private static final String SQL_ADD_CERT_V7 = buildInsertSql("CERT",
+  private static final String SQL_ADD_CERT = buildInsertSql("CERT",
       "ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,FP_SAN,NBEFORE,NAFTER,REV,RR,RT,RIT,"
       + "PID,CA_ID,RID,EE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT,PRIVATE_KEY");
-
-  private static final String SQL_ADD_CERT_V8 = buildInsertSql("CERT",
-      "ID,LUPDATE,SN,SUBJECT,SKI,FP_S,FP_RS,FP_SAN,NBEFORE,NAFTER,REV,RR,RT,RIT,"
-          + "PID,CA_ID,RID,EE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT,PRIVATE_KEY");
 
   private static final String SQL_ADD_CRL = buildInsertSql("CRL",
       "ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL_SCOPE,SHA1,CRL");
@@ -202,7 +198,7 @@ class CaCertstoreDbImporter extends DbPorter {
 
       if (type == CaDbEntryType.CERT) {
         total = certstore.getCountCerts();
-        sql = dbSchemaVersion < 8 ? SQL_ADD_CERT_V7 : SQL_ADD_CERT_V8;
+        sql = SQL_ADD_CERT;
       } else if (type == CaDbEntryType.CRL) {
         total = certstore.getCountCrls();
         sql = SQL_ADD_CRL;
@@ -360,12 +356,6 @@ class CaCertstoreDbImporter extends DbPorter {
           stmt.setString(idx++, subjectText);
           long fpSubject = X509Util.fpCanonicalizedName(tbsCert.getSubject());
           stmt.setLong(idx++, fpSubject);
-
-          if (dbSchemaVersion >= 8) {
-            // SubjectKeyIdentifier
-            String b64ski = HashAlgo.SHA1.base64Hash(tbsCert.getSubjectPublicKeyInfo().getPublicKeyData().getOctets());
-            stmt.setString(idx++, b64ski);
-          }
 
           if (cert.getFpRs() != null) {
             stmt.setLong(idx++, cert.getFpRs());
