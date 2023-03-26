@@ -3,7 +3,7 @@
 See also <https://github.com/xipki/xipki/releases>
 
 ## 6.2.0
-- Release date: xxx
+- Release date: March 26, 2023
 - CA
       A new column SKI (Subject Key Identifier) is added to the table CERT.
     - Extend the entities to generate CRLs from master CAs to all CAs.
@@ -23,9 +23,11 @@ See also <https://github.com/xipki/xipki/releases>
 - DB Tool
     - N/A
 - Dependencies
-    - Replace jpkcs11wrapper v1.0.0 by ipkcs11wrapper v1.0.3.
+    - Replace jpkcs11wrapper v1.0.0 by ipkcs11wrapper v1.0.4.
     - tinylog: 2.6.0 --> 2.6.1
     - JDBC driver postgresql: 42.5.3 --> 42.6.0
+    - JDBC driver mariadb: 3.1.2 --> 3.1.3
+    - zip4j: 2.11.3 --> 2.11.5
 
 ## 6.1.0
 - Release date: February 5, 2023
