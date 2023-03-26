@@ -43,6 +43,16 @@ public class NativeP11ModuleFactory implements P11ModuleFactory {
     }
 
     @Override
+    public void trace(String format, Object... arguments) {
+      LOG.trace(format, arguments);
+    }
+
+    @Override
+    public boolean isTraceEnabled() {
+      return LOG.isTraceEnabled();
+    }
+
+    @Override
     public boolean isDebugEnabled() {
       return LOG.isDebugEnabled();
     }
