@@ -54,7 +54,7 @@ public class MyUtil {
       PrivateKey rcaKey, X500Name issuer, SubjectPublicKeyInfo pubKeyInfo, X500Name subject,
       BigInteger serialNumber, Instant startTime)
       throws OperatorCreationException {
-    Instant notAfter = startTime.plus(10, ChronoUnit.YEARS);
+    Instant notAfter = startTime.plus(3650, ChronoUnit.DAYS);
     X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(issuer, serialNumber,
         Date.from(startTime), Date.from(notAfter), subject, pubKeyInfo);
     X509KeyUsage ku = new X509KeyUsage(X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
