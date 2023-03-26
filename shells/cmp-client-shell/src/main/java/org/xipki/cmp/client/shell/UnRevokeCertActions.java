@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * CMP client actions to revoke, unrevoke and remove certificates.
@@ -59,7 +59,7 @@ public class UnRevokeCertActions {
 
       CertIdOrError certIdOrError;
 
-      Date invalidityDate = null;
+      Instant invalidityDate = null;
       if (isNotBlank(invalidityDateS)) {
         invalidityDate = DateUtil.parseUtcTimeyyyyMMddhhmmss(invalidityDateS);
       }

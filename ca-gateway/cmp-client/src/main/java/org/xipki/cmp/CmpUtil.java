@@ -20,6 +20,7 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -126,7 +127,7 @@ public class CmpUtil {
     }
 
     if (header.getMessageTime() != null) {
-      builder.setMessageTime(new Date());
+      builder.setMessageTime(Date.from(Instant.now()));
     }
     builder.setBody(pkiMessage.getBody());
 

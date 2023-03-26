@@ -7,6 +7,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
+import org.xipki.password.PasswordResolverException;
 import org.xipki.password.Passwords;
 import org.xipki.password.Passwords.PasswordConf;
 import org.xipki.security.pkcs11.*;
@@ -119,7 +120,6 @@ public class Securities implements Closeable {
 
     @Override
     public void validate() throws InvalidConfException {
-      validate(password);
     }
 
   } // class SecurityConf
@@ -174,7 +174,12 @@ public class Securities implements Closeable {
       conf = SecurityConf.DEFAULT;
     }
 
-    initSecurityFactory(conf);
+    try {
+      initSecurityFactory(conf);
+    } catch (PasswordResolverException e) {
+      LOG.error("could not initialize passwords", e);
+      throw new InvalidConfException(e.getMessage());
+    }
   }
 
   @Override
@@ -198,7 +203,7 @@ public class Securities implements Closeable {
     }
   } // method close
 
-  private void initSecurityFactory(SecurityConf conf) throws IOException, InvalidConfException {
+  private void initSecurityFactory(SecurityConf conf) throws PasswordResolverException, InvalidConfException {
     Passwords passwords = new Passwords();
     passwords.init(conf.getPassword());
 

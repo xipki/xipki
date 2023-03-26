@@ -26,8 +26,8 @@ import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import static org.xipki.util.SqlUtil.buildInsertSql;
@@ -149,8 +149,8 @@ public class CertStoreBase extends QueryExecutor {
     long revTime    = rs.getLong("RT");
     long revInvTime = rs.getLong("RIT");
 
-    Date invalidityTime = (revInvTime == 0) ? null : new Date(revInvTime * 1000);
-    return new CertRevocationInfo(rs.getInt("RR"), new Date(revTime * 1000), invalidityTime);
+    Instant invalidityTime = (revInvTime == 0) ? null : Instant.ofEpochSecond(revInvTime);
+    return new CertRevocationInfo(rs.getInt("RR"), Instant.ofEpochSecond(revTime), invalidityTime);
   }
 
   protected long getMax(String table, String column) throws OperationException {

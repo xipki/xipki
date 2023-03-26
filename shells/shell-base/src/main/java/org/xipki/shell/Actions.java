@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -583,7 +584,7 @@ public class Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      return new SimpleDateFormat(format).format(new Date());
+      return new SimpleDateFormat(format).format(Instant.now());
     }
   }
 

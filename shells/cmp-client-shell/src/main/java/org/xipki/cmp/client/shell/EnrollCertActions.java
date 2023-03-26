@@ -43,6 +43,8 @@ import java.io.IOException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -82,8 +84,8 @@ public class EnrollCertActions {
     protected Object execute0() throws Exception {
       CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
 
-      Date notBefore = StringUtil.isNotBlank(notBeforeS) ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
-      Date notAfter = StringUtil.isNotBlank(notAfterS) ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
+      Instant notBefore = StringUtil.isNotBlank(notBeforeS) ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
+      Instant notAfter = StringUtil.isNotBlank(notAfterS) ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
       EnrollCertResult result;
       ReqRespDebug debug = getReqRespDebug();
       try {
@@ -334,8 +336,6 @@ public class EnrollCertActions {
 
   public abstract static class EnrollAction extends Actions.AuthClientAction {
 
-    private static final long _12_HOURS_MS = 12L * 60 * 60 * 1000;
-
     @Reference
     protected SecurityFactory securityFactory;
 
@@ -440,8 +440,7 @@ public class EnrollCertActions {
         RDN[] rdns = subjectDn.getRDNs(id);
 
         if (rdns == null || rdns.length == 0) {
-          Date date = DateUtil.parseUtcTimeyyyyMMdd(dateOfBirth);
-          date = new Date(date.getTime() + _12_HOURS_MS);
+          Instant date = DateUtil.parseUtcTimeyyyyMMdd(dateOfBirth).plus(12, ChronoUnit.HOURS);
           ASN1Encodable atvValue = new DERGeneralizedTime(DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z");
           RDN rdn = new RDN(id, atvValue);
           list.add(rdn);
@@ -481,9 +480,9 @@ public class EnrollCertActions {
 
       if (StringUtil.isNotBlank(notBeforeS) || StringUtil.isNotBlank(notAfterS)) {
         Time notBefore = StringUtil.isNotBlank(notBeforeS)
-            ? new Time(DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS)) : null;
+            ? new Time(Date.from(DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS))) : null;
         Time notAfter = StringUtil.isNotBlank(notAfterS)
-            ? new Time(DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS)) : null;
+            ? new Time(Date.from(DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS))) : null;
         OptionalValidity validity = new OptionalValidity(notBefore, notAfter);
         certTemplateBuilder.setValidity(validity);
       }

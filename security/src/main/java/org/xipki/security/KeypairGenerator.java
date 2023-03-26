@@ -12,6 +12,7 @@ import org.xipki.util.StringUtil;
 
 import java.io.Closeable;
 import java.math.BigInteger;
+import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.*;
 
 /**
@@ -56,7 +57,7 @@ public abstract class KeypairGenerator implements Closeable {
     }
 
     if (rsaE == null) {
-      rsaE = BigInteger.valueOf(0x10001);
+      rsaE = RSAKeyGenParameterSpec.F4;
     }
 
     Set<String> tokens = null;

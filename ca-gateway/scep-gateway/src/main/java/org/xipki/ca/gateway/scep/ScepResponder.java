@@ -41,8 +41,8 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import static org.xipki.util.Args.notNull;
@@ -160,7 +160,7 @@ public class ScepResponder {
     }
 
     AuditService auditService = Audits.getAuditService();
-    AuditEvent event = new AuditEvent(new Date());
+    AuditEvent event = new AuditEvent();
     event.setApplicationName("scep-gw");
     event.addEventData("name", caName + "/" + certprofileName);
 
@@ -387,11 +387,11 @@ public class ScepResponder {
       return fail(rep, FailInfo.badRequest);
     }
 
-    Date signingTime = req.getSigningTime();
+    Instant signingTime = req.getSigningTime();
     long maxSigningTimeBiasInMs = 1000L * control.getMaxSigningTimeBias();
     if (maxSigningTimeBiasInMs > 0) {
       boolean isTimeBad = signingTime == null ||
-          Math.abs(System.currentTimeMillis() - signingTime.getTime()) > maxSigningTimeBiasInMs;
+          Math.abs(Instant.now().toEpochMilli() - signingTime.toEpochMilli()) > maxSigningTimeBiasInMs;
 
       if (isTimeBad) {
         return fail(rep, FailInfo.badTime);

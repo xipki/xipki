@@ -21,6 +21,7 @@ import org.xipki.util.*;
 import org.xipki.util.exception.ObjectCreationException;
 
 import java.math.BigInteger;
+import java.time.Clock;
 
 import static org.xipki.util.Args.notBlank;
 import static org.xipki.util.Args.notNull;
@@ -282,7 +283,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
   protected static P11NewKeyControl getNewKeyControl(byte[] id, String label) {
     if (StringUtil.isBlank(label)) {
-      label = "speed-" + System.currentTimeMillis();
+      label = "speed-" + Clock.systemUTC().millis();
     }
     return new P11NewKeyControl(id, label);
   }

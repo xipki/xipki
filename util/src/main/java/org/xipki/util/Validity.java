@@ -3,9 +3,10 @@
 
 package org.xipki.util;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static org.xipki.util.Args.*;
 
@@ -19,33 +20,32 @@ public class Validity implements Comparable<Validity> {
 
   public enum Unit {
 
-    YEAR("y"),
-    WEEK("w"),
-    DAY("d"),
-    HOUR("h"),
-    MINUTE("m");
+    YEAR("y", ChronoUnit.YEARS),
+    WEEK("w", ChronoUnit.WEEKS),
+    DAY("d", ChronoUnit.DAYS),
+    HOUR("h", ChronoUnit.HOURS),
+    MINUTE("m", ChronoUnit.MINUTES);
 
     private final String suffix;
 
-    Unit(String suffix) {
+    private final ChronoUnit unit;
+
+    Unit(String suffix, ChronoUnit unit) {
       this.suffix = suffix;
+      this.unit = unit;
     }
 
     public String getSuffix() {
       return suffix;
     }
 
+    public ChronoUnit getUnit() {
+      return unit;
+    }
+
   } // class Unit
 
-  private static final long MINUTE = 60L * 1000;
-
-  private static final long HOUR = 60L * MINUTE;
-
-  private static final long DAY = 24L * HOUR;
-
-  private static final long WEEK = 7L * DAY;
-
-  private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
+  private static final ZoneId TIMEZONE_UTC = ZoneId.of("UTC");
 
   private int validity;
   private Unit unit;
@@ -110,55 +110,26 @@ public class Validity implements Comparable<Validity> {
     return unit;
   }
 
-  public Date add(Date referenceDate) {
-    switch (unit) {
-      case YEAR:
-        Calendar cal = Calendar.getInstance(TIMEZONE_UTC);
-        cal.setTime(referenceDate);
-        cal.add(Calendar.YEAR, validity);
-
-        int month = cal.get(Calendar.MONTH);
-        // February
-        if (month == 1) {
-          int day = cal.get(Calendar.DAY_OF_MONTH);
-          if (day > 28) {
-            int year = cal.get(Calendar.YEAR);
-            int maxDay = isLeapYear(year) ? 29 : 28;
-            if (day > maxDay) {
-              cal.set(Calendar.DAY_OF_MONTH, maxDay);
-            }
-          }
+  public Instant add(Instant referenceDate) {
+    if (unit == Unit.YEAR) {
+      ZonedDateTime utcDate = referenceDate.atZone(TIMEZONE_UTC);
+      int year = utcDate.getYear();
+      int month = utcDate.getMonthValue();
+      int day = utcDate.getDayOfMonth();
+      if (month == 2 && day == 29) {
+        if (!isLeapYear(validity + year)) {
+          day = 28;
         }
-
-        return cal.getTime();
-      case WEEK:
-        return new Date(referenceDate.getTime() + validity * WEEK);
-      case DAY:
-        return new Date(referenceDate.getTime() + validity * DAY);
-      case HOUR:
-        return new Date(referenceDate.getTime() + validity * HOUR);
-      case MINUTE:
-        return new Date(referenceDate.getTime() + validity * MINUTE);
-      default:
-        throw new IllegalStateException(String.format("should not reach here, unknown Validity.Unit %s", unit));
+      }
+      return ZonedDateTime.of(year + validity, month, day, utcDate.getHour(), utcDate.getMinute(),
+          utcDate.getSecond(), 0, TIMEZONE_UTC).toInstant();
+    } else {
+      return referenceDate.plus(validity, unit.getUnit());
     }
   } // method add
 
   public long approxMinutes() {
-    switch (unit) {
-      case YEAR:
-        return (365L * 24 * validity + 6L * validity) * 60;
-      case WEEK:
-        return 7L * 24 * 60 * validity;
-      case DAY:
-        return 24L * 60 * validity;
-      case HOUR:
-        return 60L * validity;
-      case MINUTE:
-        return validity;
-      default:
-        throw new IllegalStateException(String.format("should not reach here, unknown Validity.Unit %s", unit));
-    }
+    return unit.getUnit().getDuration().getSeconds() / 60;
   }
 
   @Override

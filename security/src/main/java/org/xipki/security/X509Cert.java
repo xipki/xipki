@@ -21,8 +21,8 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 
 import static org.xipki.util.Args.notNull;
 
@@ -49,9 +49,9 @@ public class X509Cert {
 
   private final X500Name subject;
 
-  private final Date notBefore;
+  private final Instant notBefore;
 
-  private final Date notAfter;
+  private final Instant notAfter;
 
   private String issuerText;
 
@@ -94,8 +94,8 @@ public class X509Cert {
     this.jceInstance = notNull(cert, "cert");
     this.encoded = encoded;
 
-    this.notBefore = cert.getNotBefore();
-    this.notAfter = cert.getNotAfter();
+    this.notBefore = cert.getNotBefore().toInstant();
+    this.notAfter = cert.getNotAfter().toInstant();
     this.serialNumber = cert.getSerialNumber();
 
     this.issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
@@ -117,8 +117,8 @@ public class X509Cert {
     this.jceInstance = null;
     this.encoded = encoded;
 
-    this.notBefore = cert.getNotBefore();
-    this.notAfter = cert.getNotAfter();
+    this.notBefore = cert.getNotBefore().toInstant();
+    this.notAfter = cert.getNotAfter().toInstant();
     this.serialNumber = cert.getSerialNumber();
 
     this.issuer = cert.getIssuer();
@@ -349,11 +349,11 @@ public class X509Cert {
     return selfSigned;
   }
 
-  public Date getNotBefore() {
+  public Instant getNotBefore() {
     return notBefore;
   }
 
-  public Date getNotAfter() {
+  public Instant getNotAfter() {
     return notAfter;
   }
 

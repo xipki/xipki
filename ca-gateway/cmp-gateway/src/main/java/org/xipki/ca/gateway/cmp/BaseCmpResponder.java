@@ -61,6 +61,7 @@ import java.security.*;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -404,10 +405,10 @@ abstract class BaseCmpResponder {
     Integer failureCode = null;
     String statusText = null;
 
-    Date messageTime = null;
+    Instant messageTime = null;
     if (reqHeader.getMessageTime() != null) {
       try {
-        messageTime = reqHeader.getMessageTime().getDate();
+        messageTime = reqHeader.getMessageTime().getDate().toInstant();
       } catch (ParseException ex) {
         LogUtil.error(LOG, ex, "tid=" + tidStr + ": could not parse messageTime");
       }
@@ -434,18 +435,15 @@ abstract class BaseCmpResponder {
         statusText = "missing time-stamp";
       }
     } else {
-      long messageTimeBias = cmpControl.getMessageTimeBias();
-      if (messageTimeBias < 0) {
-        messageTimeBias *= -1;
-      }
+      long messageTimeBiasSeconds = cmpControl.getMessageTimeBias().getSeconds();
 
-      long msgTimeMs = messageTime.getTime();
-      long currentTimeMs = System.currentTimeMillis();
-      long bias = (msgTimeMs - currentTimeMs) / 1000L;
-      if (bias > messageTimeBias) {
+      long msgTime = messageTime.getEpochSecond();
+      long currentTime = Instant.now().getEpochSecond();
+      long bias = msgTime - currentTime;
+      if (bias > messageTimeBiasSeconds) {
         failureCode = PKIFailureInfo.badTime;
         statusText = "message time is in the future";
-      } else if (bias * -1 > messageTimeBias) {
+      } else if (bias * -1 > messageTimeBiasSeconds) {
         failureCode = PKIFailureInfo.badTime;
         statusText = "message too old";
       }
@@ -654,7 +652,7 @@ abstract class BaseCmpResponder {
 
     PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
         requestHeader.getPvno().getValue().intValue(), respSender, respRecipient);
-    respHeader.setMessageTime(new ASN1GeneralizedTime(new Date()));
+    respHeader.setMessageTime(new ASN1GeneralizedTime(Date.from(Instant.now())));
     if (tid != null) {
       respHeader.setTransactionID(tid);
     }

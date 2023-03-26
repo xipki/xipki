@@ -28,8 +28,8 @@ import org.xipki.util.StringUtil;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
+import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Set;
 
 import static org.xipki.scep.util.ScepConstants.*;
@@ -56,7 +56,7 @@ public class DecodedPkiMessage extends PkiMessage {
 
   private Boolean decryptionSuccessful;
 
-  private Date signingTime;
+  private Instant signingTime;
 
   private String failureMessage;
 
@@ -117,11 +117,11 @@ public class DecodedPkiMessage extends PkiMessage {
     return signatureValid;
   }
 
-  public Date getSigningTime() {
+  public Instant getSigningTime() {
     return signingTime;
   }
 
-  public void setSigningTime(Date signingTime) {
+  public void setSigningTime(Instant signingTime) {
     this.signingTime = signingTime;
   }
 
@@ -163,7 +163,7 @@ public class DecodedPkiMessage extends PkiMessage {
 
     // signingTime
     ASN1Encodable attrValue = ScepUtil.getFirstAttrValue(signedAttrs, CMSAttributes.signingTime);
-    Date signingTime = (attrValue == null) ? null : ScepUtil.getTime(attrValue);
+    Instant signingTime = (attrValue == null) ? null : ScepUtil.getTime(attrValue);
 
     // transactionId
     String str = getPrintableStringAttrValue(signedAttrs, ID_TRANSACTION_ID);

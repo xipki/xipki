@@ -33,6 +33,7 @@ import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.time.Clock;
 import java.util.List;
 
 /**
@@ -114,7 +115,7 @@ public class CtLogServlet extends HttpServlet {
       byte[] preCertTbsCert = CtLog.getPreCertTbsCert(cert.getTBSCertificate());
 
       byte sctVersion = 0;
-      long timestamp = System.currentTimeMillis();
+      long timestamp = Clock.systemUTC().millis();
       byte[] sctExtensions = null;
 
       Signature sig = Signature.getInstance(signatureAlgo);

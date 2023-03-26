@@ -33,7 +33,6 @@ import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.util.DateUtil;
 import org.xipki.util.IoUtil;
 import org.xipki.util.PemEncoder;
 import org.xipki.util.StringUtil;
@@ -47,7 +46,7 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -191,8 +190,8 @@ public class CertActions {
         throw  new IllegalCmdParamException("invalid key-outform " + keyOutform);
       }
 
-      Date notBefore = parseDate(notBeforeS);
-      Date notAfter = parseDate(notAfterS);
+      Instant notBefore = parseDate(notBeforeS);
+      Instant notAfter = parseDate(notAfterS);
 
       byte[] certBytes;
       if (StringUtil.isNotBlank(csrFile)) {
@@ -277,8 +276,8 @@ public class CertActions {
         throw new CmdFailure("CA " + caName + " not available");
       }
 
-      Date notBefore = parseDate(notBeforeS);
-      Date notAfter = parseDate(notAfterS);
+      Instant notBefore = parseDate(notBeforeS);
+      Instant notAfter = parseDate(notAfterS);
 
       byte[] encodedCsr = X509Util.toDerEncoded(IoUtil.read(csrFile));
       byte[] encodedTargetCert = X509Util.toDerEncoded(IoUtil.read(targetCertFile));
@@ -479,8 +478,7 @@ public class CertActions {
     private String format(int index, CertListInfo info) {
       return StringUtil.concat(StringUtil.formatAccount(index, 4), " | ",
           StringUtil.formatText(info.getSerialNumber().toString(16), 20), " | ",
-          DateUtil.toUtcTimeyyyyMMddhhmmss(info.getNotBefore()), " | ",
-          DateUtil.toUtcTimeyyyyMMddhhmmss(info.getNotAfter()), " | ", info.getSubject());
+          info.getNotBefore(), " | ", info.getNotAfter(), " | ", info.getSubject());
     } // method format
 
   } // class ListCert

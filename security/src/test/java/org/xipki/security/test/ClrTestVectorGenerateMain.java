@@ -13,6 +13,8 @@ import org.xipki.util.ConfPairs;
 import org.xipki.util.IoUtil;
 
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 /**
@@ -50,8 +52,9 @@ public class ClrTestVectorGenerateMain {
       X509v2CRLBuilder builder = getBuilder(caCert, true, true);
       buildCrl(builder, signer, "no-revoked-certs.crl");
 
-      Date revokedDate = new Date(System.currentTimeMillis() - 24 * 2600 * 1000L);
-      Date invalidityDate = new Date(System.currentTimeMillis() - 48 * 2600 * 1000L);
+      Instant now = Instant.now();
+      Date revokedDate = Date.from(now.minus(1, ChronoUnit.DAYS));
+      Date invalidityDate = Date.from(now.minus(2, ChronoUnit.DAYS));
 
       // with revoked certs
       builder = getBuilder(caCert, true, true);
@@ -61,8 +64,7 @@ public class ClrTestVectorGenerateMain {
 
       // with invalidity date
       builder = getBuilder(caCert, true, true);
-      builder.addCRLEntry(BigInteger.valueOf(255), revokedDate, CRLReason.keyCompromise,
-          invalidityDate);
+      builder.addCRLEntry(BigInteger.valueOf(255), revokedDate, CRLReason.keyCompromise, invalidityDate);
       buildCrl(builder, signer, "invaliditydate.crl");
 
       // no crlnumber
@@ -87,9 +89,9 @@ public class ClrTestVectorGenerateMain {
 
   private static X509v2CRLBuilder getBuilder(X509Cert caCert, boolean addCrlNumber, boolean addAki)
       throws Exception {
-    Date thisUpdate = new Date();
-    X509v2CRLBuilder builder = new X509v2CRLBuilder(caCert.getSubject(), thisUpdate);
-    builder.setNextUpdate(new Date(thisUpdate.getTime() + 50L * 365 * 24 * 60 * 60 * 1000));
+    Instant thisUpdate = Instant.now();
+    X509v2CRLBuilder builder = new X509v2CRLBuilder(caCert.getSubject(), Date.from(thisUpdate));
+    builder.setNextUpdate(Date.from(thisUpdate.plus(50 * 365, ChronoUnit.DAYS)));
     if (addCrlNumber) {
       builder.addExtension(Extension.cRLNumber, false, new ASN1Integer(BigInteger.ONE));
     }

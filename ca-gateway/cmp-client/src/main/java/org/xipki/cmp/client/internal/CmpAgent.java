@@ -69,6 +69,7 @@ import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
+import java.time.Instant;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -293,7 +294,7 @@ class CmpAgent {
     GeneralName recipient = responder != null ? responder.getName() : new GeneralName(new X500Name(new RDN[0]));
 
     PKIHeaderBuilder hdrBuilder = new PKIHeaderBuilder(PKIHeader.CMP_2000, sender, recipient);
-    hdrBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));
+    hdrBuilder.setMessageTime(new ASN1GeneralizedTime(Date.from(Instant.now())));
 
     ASN1OctetString tmpTid = (tid == null) ? new DEROctetString(randomTransactionId()) : tid;
     hdrBuilder.setTransactionID(tmpTid);
@@ -482,8 +483,8 @@ class CmpAgent {
     return parse(response, request.getRequestEntries());
   } // method unrevokeCertificate
 
-  EnrollCertResponse requestCertificate(
-      String caName, Requestor requestor, CsrEnrollCertRequest csr, Date notBefore, Date notAfter, ReqRespDebug debug)
+  EnrollCertResponse requestCertificate(String caName, Requestor requestor, CsrEnrollCertRequest csr,
+                                        Instant notBefore, Instant notAfter, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     Responder responder = getResponder(requestor);
     PKIMessage request = buildPkiMessage(requestor, responder, notNull(csr, "csr"), notBefore, notAfter);
@@ -688,7 +689,7 @@ class CmpAgent {
         certTempBuilder.setExtensions(certTempExts);
       }
 
-      Date invalidityDate = requestEntry.getInvalidityDate();
+      Instant invalidityDate = requestEntry.getInvalidityDate();
       int idx = (invalidityDate == null) ? 1 : 2;
       Extension[] extensions = new Extension[idx];
 
@@ -697,7 +698,7 @@ class CmpAgent {
         extensions[0] = new Extension(Extension.reasonCode, true, new DEROctetString(reason.getEncoded()));
 
         if (invalidityDate != null) {
-          ASN1GeneralizedTime time = new ASN1GeneralizedTime(invalidityDate);
+          ASN1GeneralizedTime time = new ASN1GeneralizedTime(Date.from(invalidityDate));
           extensions[1] = new Extension(Extension.invalidityDate, true, new DEROctetString(time.getEncoded()));
         }
       } catch (IOException ex) {
@@ -749,7 +750,7 @@ class CmpAgent {
   } // method buildUnrevokeOrRemoveCertRequest
 
   private PKIMessage buildPkiMessage(
-      Requestor requestor, Responder responder, CsrEnrollCertRequest csr, Date notBefore, Date notAfter) {
+      Requestor requestor, Responder responder, CsrEnrollCertRequest csr, Instant notBefore, Instant notAfter) {
     CmpUtf8Pairs utf8Pairs = null;
     if (notBefore != null) {
       utf8Pairs = new CmpUtf8Pairs();

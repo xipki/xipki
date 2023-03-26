@@ -9,7 +9,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.util.Args;
 
 import java.math.BigInteger;
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * Certificate template data.
@@ -24,9 +24,9 @@ public class CertTemplateData {
 
   private final SubjectPublicKeyInfo publicKeyInfo;
 
-  private final Date notBefore;
+  private final Instant notBefore;
 
-  private final Date notAfter;
+  private final Instant notAfter;
 
   private final String certprofileName;
 
@@ -38,12 +38,12 @@ public class CertTemplateData {
 
   private boolean forCrossCert;
 
-  public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Date notBefore,
-                          Date notAfter, Extensions extensions, String certprofileName) {
+  public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Instant notBefore,
+                          Instant notAfter, Extensions extensions, String certprofileName) {
     this(subject, publicKeyInfo, notBefore, notAfter, extensions, certprofileName, null, false);
   }
 
-  public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Date notBefore, Date notAfter,
+  public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Instant notBefore, Instant notAfter,
                           Extensions extensions, String certprofileName, BigInteger certReqId, boolean serverkeygen) {
     this.publicKeyInfo = publicKeyInfo;
     this.subject = Args.notNull(subject, "subject");
@@ -75,11 +75,11 @@ public class CertTemplateData {
     return serverkeygen;
   }
 
-  public Date getNotBefore() {
+  public Instant getNotBefore() {
     return notBefore;
   }
 
-  public Date getNotAfter() {
+  public Instant getNotAfter() {
     return notAfter;
   }
 

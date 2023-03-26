@@ -26,7 +26,11 @@ import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.text.ParseException;
-import java.util.*;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * SCEP utility class.
@@ -121,15 +125,16 @@ public class ScepUtil {
     generator.addCertificates(new JcaCertStore(certColl));
   } // method addCmsCertSet
 
-  public static Date getTime(Object obj) {
+  public static Instant getTime(Object obj) {
+
     if (obj instanceof byte[]) {
       byte[] encoded = (byte[]) obj;
       int tag = encoded[0] & 0xFF;
       try {
         if (tag == BERTags.UTC_TIME) {
-          return DERUTCTime.getInstance(encoded).getDate();
+          return DERUTCTime.getInstance(encoded).getDate().toInstant();
         } else if (tag == BERTags.GENERALIZED_TIME) {
-          return DERGeneralizedTime.getInstance(encoded).getDate();
+          return DERGeneralizedTime.getInstance(encoded).getDate().toInstant();
         } else {
           throw new IllegalArgumentException("invalid tag " + tag);
         }
@@ -137,11 +142,11 @@ public class ScepUtil {
         throw new IllegalArgumentException("error parsing time", ex);
       }
     } else if (obj instanceof Time) {
-      return ((Time) obj).getDate();
+      return ((Time) obj).getDate().toInstant();
     } else if (obj instanceof org.bouncycastle.asn1.cms.Time) {
-      return ((org.bouncycastle.asn1.cms.Time) obj).getDate();
+      return ((org.bouncycastle.asn1.cms.Time) obj).getDate().toInstant();
     } else {
-      return Time.getInstance(obj).getDate();
+      return Time.getInstance(obj).getDate().toInstant();
     }
   } // method getTime
 

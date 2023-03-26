@@ -27,6 +27,7 @@ import org.xipki.util.*;
 import org.xipki.util.exception.BadCertTemplateException;
 
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -73,9 +74,9 @@ public abstract class BaseCertprofile extends Certprofile {
   }
 
   @Override
-  public Date getNotBefore(Date requestedNotBefore) {
-    Date now = new Date();
-    return (requestedNotBefore != null && requestedNotBefore.after(now)) ? requestedNotBefore : now;
+  public Instant getNotBefore(Instant requestedNotBefore) {
+    Instant now = Instant.now();
+    return (requestedNotBefore != null && requestedNotBefore.isAfter(now)) ? requestedNotBefore : now;
   }
 
   @Override
@@ -96,7 +97,7 @@ public abstract class BaseCertprofile extends Certprofile {
 
     verifySubjectDnOccurrence(requestedSubject);
 
-    RDN[] requstedRdns = requestedSubject.getRDNs();
+    RDN[] requestedRdns = requestedSubject.getRDNs();
     SubjectControl scontrol = getSubjectControl();
 
     List<RDN> rdns = new LinkedList<>();
@@ -110,7 +111,7 @@ public abstract class BaseCertprofile extends Certprofile {
       String cvalue = control.getValue();
       RDN[] thisRdns = null;
       if (control.isValueOverridable()) {
-        thisRdns = getRdns(requstedRdns, type);
+        thisRdns = getRdns(requestedRdns, type);
       }
 
       int len = thisRdns == null ? 0 : thisRdns.length;

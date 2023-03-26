@@ -24,7 +24,8 @@ import org.xipki.util.exception.OperationException;
 
 import java.io.Closeable;
 import java.math.BigInteger;
-import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ScheduledFuture;
@@ -109,7 +110,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
   } // constructor
 
   public CertWithRevocationInfo revokeCert(BigInteger serialNumber, CrlReason reason,
-      Date invalidityTime, AuditEvent event) throws OperationException {
+      Instant invalidityTime, AuditEvent event) throws OperationException {
     if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
       throw new OperationException(NOT_PERMITTED, "insufficient permission to revoke CA certificate");
     }
@@ -162,7 +163,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
   } // method unsuspendCert
 
   private CertWithRevocationInfo revokeCertificate0(
-      BigInteger serialNumber, CrlReason reason, Date invalidityTime, boolean force, AuditEvent event)
+      BigInteger serialNumber, CrlReason reason, Instant invalidityTime, boolean force, AuditEvent event)
       throws OperationException {
     String hexSerial = LogUtil.formatCsn(serialNumber);
     event.addEventData(NAME_serial, hexSerial);
@@ -176,7 +177,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
 
     CertWithRevocationInfo revokedCert;
 
-    CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(), invalidityTime);
+    CertRevocationInfo revInfo = new CertRevocationInfo(reason, Instant.now(), invalidityTime);
     revokedCert = certstore.revokeCert(caIdent, serialNumber, revInfo, force, caIdNameMap);
     if (revokedCert == null) {
       return null;
@@ -322,18 +323,18 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     Validity val = control.getUnchangedSince();
     int validity = val.getValidity();
     Unit unit = val.getUnit();
-    long ms = (unit == Unit.MINUTE) ? validity * MS_PER_MINUTE
-        : (unit == Unit.HOUR) ? validity * MS_PER_HOUR
-        : (unit == Unit.DAY)  ? validity * MS_PER_DAY
-        : (unit == Unit.WEEK) ? validity * MS_PER_WEEK
-        : (unit == Unit.YEAR) ? validity * 365 * MS_PER_DAY
+    long durationMinutes = (unit == Unit.MINUTE) ? validity
+        : (unit == Unit.HOUR) ? validity * 60
+        : (unit == Unit.DAY)  ? validity * 24 * 60
+        : (unit == Unit.WEEK) ? validity * 7 * 24 * 60
+        : (unit == Unit.YEAR) ? validity * 365 * 24 * 60
         : -1;
 
-    if (ms == -1) {
+    if (durationMinutes == -1) {
         throw new IllegalStateException("should not reach here, unknown Validity Unit " + val.getUnit());
     }
 
-    final long latestLastUpdatedAt = (System.currentTimeMillis() - ms) / 1000; // seconds
+    final Instant latestLastUpdatedAt = Instant.now().minus(durationMinutes, ChronoUnit.MINUTES);
     final CrlReason reason = control.getTargetReason();
 
     int sum = 0;

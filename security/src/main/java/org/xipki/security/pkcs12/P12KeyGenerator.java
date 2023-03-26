@@ -34,6 +34,8 @@ import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.InvalidKeySpecException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import static org.xipki.util.Args.notNull;
@@ -82,10 +84,6 @@ public class P12KeyGenerator {
     }
 
   } // class KeyAndCertPair
-
-  private static final long MIN = 60L * 1000;
-
-  private static final long DAY = 24L * 60 * 60 * 1000;
 
   public P12KeyGenerator() {
   }
@@ -189,9 +187,9 @@ public class P12KeyGenerator {
   public static KeyStoreWrapper generateIdentity(
       KeyPairWithSubjectPublicKeyInfo kp, KeystoreGenerationParameters params, String selfSignedCertSubject)
       throws Exception {
-    Date now = new Date();
-    Date notBefore = new Date(now.getTime() - 10 * MIN); // 10 minutes past
-    Date notAfter = new Date(notBefore.getTime() + 3650 * DAY);
+    Instant now = Instant.now();
+    Instant notBefore = Instant.now().minus(10, ChronoUnit.MINUTES); // 10 minutes past
+    Instant notAfter = notBefore.plus(3650, ChronoUnit.DAYS);
 
     String dnStr = (selfSignedCertSubject == null) ? "CN=DUMMY" : selfSignedCertSubject;
     X500Name subjectDn = new X500Name(dnStr);
@@ -199,8 +197,8 @@ public class P12KeyGenerator {
     ContentSigner contentSigner = getContentSigner(kp.getKeypair().getPrivate(), kp.getKeypair().getPublic());
 
     // Generate keystore
-    X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(subjectDn,
-        BigInteger.ONE, notBefore, notAfter, subjectDn, subjectPublicKeyInfo);
+    X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(subjectDn, BigInteger.ONE,
+        Date.from(notBefore), Date.from(notAfter), subjectDn, subjectPublicKeyInfo);
 
     byte[] encodedSpki = kp.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
     byte[] skiValue = HashAlgo.SHA1.hash(encodedSpki);

@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
 
 /**
  * REST servlet.
@@ -56,7 +55,7 @@ public class HttpRestServlet extends HttpServlet {
   private void service0(HttpServletRequest req, HttpServletResponse resp, boolean viaPost)
       throws IOException {
     AuditService auditService = Audits.getAuditService();
-    AuditEvent event = new AuditEvent(new Date());
+    AuditEvent event = new AuditEvent();
     event.setApplicationName("rest-gw");
     try {
       String path = req.getServletPath();

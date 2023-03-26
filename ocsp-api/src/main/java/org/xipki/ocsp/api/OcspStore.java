@@ -10,7 +10,7 @@ import org.xipki.util.Validity;
 
 import java.io.Closeable;
 import java.math.BigInteger;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Map;
 
 import static org.xipki.util.Args.notBlank;
@@ -23,8 +23,6 @@ import static org.xipki.util.Args.notBlank;
  */
 
 public abstract class OcspStore implements Closeable {
-
-  protected static final long DAY = 24L * 60 * 60 * 1000;
 
   protected String name;
 
@@ -95,7 +93,7 @@ public abstract class OcspStore implements Closeable {
    *           If OCSP store failed to retrieve the status.
    */
   public final CertStatusInfo getCertStatus(
-      Date time, RequestIssuer reqIssuer, BigInteger serialNumber, boolean includeCertHash,
+      Instant time, RequestIssuer reqIssuer, BigInteger serialNumber, boolean includeCertHash,
       boolean includeRit, boolean inheritCaRevocation)
       throws OcspStoreException {
     CertStatusInfo info = getCertStatus0(time, reqIssuer, serialNumber,
@@ -105,18 +103,18 @@ public abstract class OcspStore implements Closeable {
       return null;
     }
 
-    Date nextUpdate = info.getNextUpdate();
+    Instant nextUpdate = info.getNextUpdate();
 
     if (minNextUpdatePeriod != null) {
-      Date minNextUpdate = minNextUpdatePeriod.add(time);
-      if (nextUpdate == null || minNextUpdate.after(nextUpdate)) {
+      Instant minNextUpdate = minNextUpdatePeriod.add(time);
+      if (nextUpdate == null || minNextUpdate.isAfter(nextUpdate)) {
         info.setNextUpdate(minNextUpdate);
       }
     }
 
     if (maxNextUpdatePeriod != null) {
-      Date maxNextUpdate = maxNextUpdatePeriod.add(time);
-      if (nextUpdate == null || nextUpdate.after(maxNextUpdate)) {
+      Instant maxNextUpdate = maxNextUpdatePeriod.add(time);
+      if (nextUpdate == null || nextUpdate.isAfter(maxNextUpdate)) {
         info.setNextUpdate(maxNextUpdate);
       }
     }
@@ -144,7 +142,7 @@ public abstract class OcspStore implements Closeable {
    *           If OCSP store failed to retrieve the status.
    */
   protected abstract CertStatusInfo getCertStatus0(
-      Date time, RequestIssuer reqIssuer, BigInteger serialNumber,
+      Instant time, RequestIssuer reqIssuer, BigInteger serialNumber,
       boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
       throws OcspStoreException;
 

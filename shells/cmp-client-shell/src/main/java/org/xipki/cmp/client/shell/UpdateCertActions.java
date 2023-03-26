@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -264,9 +265,9 @@ public class UpdateCertActions {
 
       if (StringUtil.isNotBlank(notBeforeS) || StringUtil.isNotBlank(notAfterS)) {
         Time notBefore = StringUtil.isNotBlank(notBeforeS)
-            ? new Time(DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS)) : null;
+            ? new Time(Date.from(DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS))) : null;
         Time notAfter = StringUtil.isNotBlank(notAfterS)
-            ? new Time(DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS)) : null;
+            ? new Time(Date.from(DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS))) : null;
         OptionalValidity validity = new OptionalValidity(notBefore, notAfter);
         certTemplateBuilder.setValidity(validity);
       }

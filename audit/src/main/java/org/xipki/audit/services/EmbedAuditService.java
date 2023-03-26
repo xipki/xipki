@@ -22,10 +22,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 import java.util.Locale;
-import java.util.TimeZone;
 
 /**
  * The embedded audit service.
@@ -54,7 +53,7 @@ public class EmbedAuditService implements AuditService {
 
   private String logFileNameSuffix;
 
-  private long lastMsOfToday;
+  private Instant lastMsOfToday;
 
   private int maxFileSize;
 
@@ -121,8 +120,7 @@ public class EmbedAuditService implements AuditService {
     this.logFileNamePrefix = prefix + "_";
 
     // analyze the existing log files
-    Calendar now = Calendar.getInstance(TimeZone.getDefault());
-
+    ZonedDateTime now = ZonedDateTime.now();
     int yyyyMMddNow = DateUtil.getYyyyMMdd(now);
     this.lastMsOfToday = DateUtil.getLastMsOfDay(now);
 
@@ -144,14 +142,12 @@ public class EmbedAuditService implements AuditService {
 
     String payload = DTF.format(date.atZone(timeZone)) + DELIM + level.getText() + DELIM + eventType + DELIM + message;
 
-    long ms = date.toEpochMilli();
     try {
       long size = Files.size(writerPath);
-      if (ms > lastMsOfToday || size >= maxFileSize) {
-        long oldLastOfToday = lastMsOfToday;
+      if (date.isAfter(lastMsOfToday) || size >= maxFileSize) {
+        Instant oldLastOfToday = lastMsOfToday;
 
-        Calendar now = Calendar.getInstance(TimeZone.getDefault());
-        now.setTimeInMillis(ms);
+        ZonedDateTime now = ZonedDateTime.ofInstant(date, ZoneId.systemDefault());
         int yyyyMMddNow = DateUtil.getYyyyMMdd(now);
         lastMsOfToday = DateUtil.getLastMsOfDay(now);
         writer.close();

@@ -27,6 +27,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.time.Instant;
 import java.util.*;
 
 import static org.xipki.util.Args.notEmpty;
@@ -49,7 +50,7 @@ public class OcspQa {
 
   public ValidationResult checkOcsp(
       OCSPResp response, IssuerHash issuerHash, BigInteger serialNumber, byte[] encodedCert,
-      OcspCertStatus expectedOcspStatus, OcspResponseOption responseOption, Date exptectedRevTime,
+      OcspCertStatus expectedOcspStatus, OcspResponseOption responseOption, Instant exptectedRevTime,
       boolean noSigVerify) {
     List<BigInteger> serialNumbers = new ArrayList<>(1);
     serialNumbers.add(serialNumber);
@@ -66,7 +67,7 @@ public class OcspQa {
       expectedOcspStatuses.put(serialNumber, expectedOcspStatus);
     }
 
-    Map<BigInteger, Date> exptectedRevTimes = null;
+    Map<BigInteger, Instant> exptectedRevTimes = null;
     if (exptectedRevTime != null) {
       exptectedRevTimes = new HashMap<>();
       exptectedRevTimes.put(serialNumber, exptectedRevTime);
@@ -97,7 +98,7 @@ public class OcspQa {
 
   public ValidationResult checkOcsp(
       OCSPResp response, IssuerHash issuerHash, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts,
-      Map<BigInteger, OcspCertStatus> expectedOcspStatuses, Map<BigInteger, Date> expectedRevTimes,
+      Map<BigInteger, OcspCertStatus> expectedOcspStatuses, Map<BigInteger, Instant> expectedRevTimes,
       OcspResponseOption responseOption, boolean noSigVerify) {
     notNull(response, "response");
     notEmpty(serialNumbers, "serialNumbers");
@@ -267,7 +268,7 @@ public class OcspQa {
       SingleResp singleResp = singleResponses[i];
       BigInteger serialNumber = singleResp.getCertID().getSerialNumber();
       OcspCertStatus expectedStatus = expectedOcspStatuses.get(serialNumber);
-      Date expectedRevTime = null;
+      Instant expectedRevTime = null;
       if (expectedRevTimes != null) {
         expectedRevTime = expectedRevTimes.get(serialNumber);
       }
@@ -288,7 +289,7 @@ public class OcspQa {
 
   private List<ValidationIssue> checkSingleCert(int index, SingleResp singleResp,
       IssuerHash issuerHash, OcspCertStatus expectedStatus, byte[] encodedCert,
-      Date expectedRevTime, boolean extendedRevoke, TripleState nextupdateOccurrence,
+      Instant expectedRevTime, boolean extendedRevoke, TripleState nextupdateOccurrence,
       TripleState certhashOccurrence, HashAlgo certhashAlg) {
     if (expectedStatus == OcspCertStatus.unknown || expectedStatus == OcspCertStatus.issuerUnknown) {
       certhashOccurrence = TripleState.forbidden;
@@ -322,7 +323,7 @@ public class OcspQa {
       status = OcspCertStatus.good;
     } else if (singleCertStatus instanceof RevokedStatus) {
       RevokedStatus revStatus = (RevokedStatus) singleCertStatus;
-      revTimeSec = revStatus.getRevocationTime().getTime() / 1000;
+      revTimeSec = DateUtil.toEpochSecond(revStatus.getRevocationTime());
 
       if (revStatus.hasRevocationReason()) {
         int reason = revStatus.getRevocationReason();
@@ -386,14 +387,15 @@ public class OcspQa {
     if (expectedRevTime != null) {
       if (revTimeSec == null) {
         issue.setFailureMessage("is='null', but expected='" + formatTime(expectedRevTime) + "'");
-      } else if (revTimeSec != expectedRevTime.getTime() / 1000) {
-        issue.setFailureMessage("is='" +  formatTime(new Date(revTimeSec * 1000))
+      } else if (revTimeSec != expectedRevTime.getEpochSecond()) {
+        issue.setFailureMessage("is='" +  formatTime(Instant.ofEpochSecond(revTimeSec))
             + "', but expected='" + formatTime(expectedRevTime) + "'");
       }
     }
 
     // nextUpdate
-    Date nextUpdate = singleResp.getNextUpdate();
+    Date d = singleResp.getNextUpdate();
+    Instant nextUpdate = (d == null) ? null : d.toInstant();
     issue = checkOccurrence("OCSP.RESPONSE." + index + ".NEXTUPDATE", nextUpdate, nextupdateOccurrence);
     issues.add(issue);
 
@@ -457,7 +459,7 @@ public class OcspQa {
     return issue;
   } // method checkOccurrence
 
-  private static String formatTime(Date date) {
+  private static String formatTime(Instant date) {
     return DateUtil.toUtcTimeyyyyMMddhhmmss(date);
   }
 }

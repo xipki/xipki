@@ -12,13 +12,13 @@ import org.xipki.security.asn1.CrlStreamParser;
 import org.xipki.security.asn1.CrlStreamParser.RevokedCertsIterator;
 import org.xipki.security.util.X509Util;
 
-import java.security.cert.CertificateEncodingException;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Security;
+import java.security.cert.CertificateEncodingException;
 
 /**
  * CRL Stream Parser test.

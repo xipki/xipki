@@ -3,7 +3,7 @@
 
 package org.xipki.ocsp.server.type;
 
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * ASN.1 SingleResponse.
@@ -18,9 +18,9 @@ public class SingleResponse extends ASN1Type {
 
   private final byte[] certStatus;
 
-  private final Date thisUpdate;
+  private final Instant thisUpdate;
 
-  private final Date nextUpdate;
+  private final Instant nextUpdate;
 
   private final Extensions extensions;
 
@@ -28,7 +28,8 @@ public class SingleResponse extends ASN1Type {
 
   private final int encodedLength;
 
-  public SingleResponse(CertID certId, byte[] certStatus, Date thisUpdate, Date nextUpdate, Extensions extensions) {
+  public SingleResponse(CertID certId, byte[] certStatus, Instant thisUpdate, Instant nextUpdate,
+                        Extensions extensions) {
     this.certId = certId;
     this.certStatus = certStatus;
     this.thisUpdate = thisUpdate;

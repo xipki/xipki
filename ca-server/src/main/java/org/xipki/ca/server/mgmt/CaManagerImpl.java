@@ -39,6 +39,9 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.SocketException;
 import java.sql.Connection;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -94,9 +97,9 @@ public class CaManagerImpl implements CaManager, Closeable {
         long caChangedTime = (event == null) ? 0 : event.getEventTime();
 
         LOG.info("check the restart CA system event: changed at={}, lastStartTime={}",
-            new Date(caChangedTime * 1000L), lastStartTime);
+            Instant.ofEpochSecond(caChangedTime), lastStartTime);
 
-        if (caChangedTime > lastStartTime.getTime() / 1000L) {
+        if (caChangedTime > lastStartTime.getEpochSecond()) {
           LOG.info("received event to restart CA");
           restartCaSystem();
         } else {
@@ -195,7 +198,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   private boolean caSystemSetuped;
 
-  private Date lastStartTime;
+  private Instant lastStartTime;
 
   private boolean initializing;
 
@@ -385,8 +388,9 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
 
-    final long epoch = DateUtil.parseUtcTimeyyyyMMdd("20100101").getTime();
-    UniqueIdGenerator idGen = new UniqueIdGenerator(epoch, shardId);
+    // 2010-01-01T00:00:00.000 UTC
+    final long epochSecond = ZonedDateTime.of(2010, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).toEpochSecond();
+    UniqueIdGenerator idGen = new UniqueIdGenerator(epochSecond, shardId);
 
     boolean initSucc = true;
     try {
@@ -490,7 +494,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     if (lockInfo != null) {
       String lockedBy = lockInfo.getOwner();
-      Date lockedAt = new Date(lockInfo.getEventTime() * 1000L);
+      Instant lockedAt = Instant.ofEpochSecond(lockInfo.getEventTime());
 
       if (!this.lockInstanceId.equals(lockedBy)) {
         String msg = concat("could not lock CA, it has been locked by ", lockedBy, " since ",
@@ -503,7 +507,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       LOG.info("CA has been locked by me since {}, re-lock it", lockedAt);
     }
 
-    SystemEvent newLockInfo = new SystemEvent(EVENT_LOCK, lockInstanceId, System.currentTimeMillis() / 1000L);
+    SystemEvent newLockInfo = new SystemEvent(EVENT_LOCK, lockInstanceId, Instant.now().getEpochSecond());
     queryExecutor.changeSystemEvent(newLockInfo);
     caLockedByMe = true;
   } // method lockCa
@@ -557,7 +561,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void notifyCaChange() throws CaMgmtException {
     try {
-      SystemEvent systemEvent = new SystemEvent(EVENT_CACHAGNE, lockInstanceId, System.currentTimeMillis() / 1000L);
+      SystemEvent systemEvent = new SystemEvent(EVENT_CACHAGNE, lockInstanceId, Instant.now().getEpochSecond());
       queryExecutor.changeSystemEvent(systemEvent);
       LOG.info("notified the change of CA system");
     } catch (CaMgmtException ex) {
@@ -654,7 +658,7 @@ public class CaManagerImpl implements CaManager, Closeable {
         return false;
       }
 
-      this.lastStartTime = new Date();
+      this.lastStartTime = Instant.now();
 
       x509cas.clear();
 
@@ -1075,7 +1079,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   static void auditLogPciEvent(boolean successful, String eventType) {
-    PciAuditEvent event = new PciAuditEvent(new Date());
+    PciAuditEvent event = new PciAuditEvent();
     event.setUserId("CA-SYSTEM");
     event.setEventType(eventType);
     event.setAffectedResource("CORE");
@@ -1099,7 +1103,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method shutdownScheduledThreadPoolExecutor
 
   @Override
-  public void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason, Date invalidityTime)
+  public void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason, Instant invalidityTime)
       throws CaMgmtException {
     ca2Manager.revokeCertificate(caName, serialNumber, reason, invalidityTime);
   }
@@ -1116,21 +1120,21 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public X509Cert generateCertificate(
-      String caName, String profileName, byte[] encodedCsr, Date notBefore, Date notAfter)
+      String caName, String profileName, byte[] encodedCsr, Instant notBefore, Instant notAfter)
       throws CaMgmtException {
     return ca2Manager.generateCertificate(caName, profileName, encodedCsr, notBefore, notAfter);
   }
 
   @Override
-  public X509Cert generateCrossCertificate(
-      String caName, String profileName, byte[] encodedCsr, byte[] encodedTargetCert, Date notBefore, Date notAfter)
+  public X509Cert generateCrossCertificate(String caName, String profileName, byte[] encodedCsr,
+                                           byte[] encodedTargetCert, Instant notBefore, Instant notAfter)
       throws CaMgmtException {
     return ca2Manager.generateCrossCertificate(caName, profileName, encodedCsr, encodedTargetCert, notBefore, notAfter);
   }
 
   @Override
   public KeyCertBytesPair generateKeyCert(
-      String caName, String profileName, String subject, Date notBefore, Date notAfter)
+      String caName, String profileName, String subject, Instant notBefore, Instant notAfter)
       throws CaMgmtException {
     return ca2Manager.generateKeyCert(caName, profileName, subject, notBefore, notAfter);
   }
@@ -1155,7 +1159,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public X509Cert generateRootCa(
-      CaEntry caEntry, String profileName, String subject, String serialNumber, Date notBefore, Date notAfter)
+      CaEntry caEntry, String profileName, String subject, String serialNumber, Instant notBefore, Instant notAfter)
       throws CaMgmtException {
     return ca2Manager.generateRootCa(caEntry, profileName, subject, serialNumber, notBefore, notAfter);
   }
@@ -1219,8 +1223,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public List<CertListInfo> listCertificates(
-      String caName, X500Name subjectPattern, Date validFrom, Date validTo, CertListOrderBy orderBy, int numEntries)
+  public List<CertListInfo> listCertificates(String caName, X500Name subjectPattern, Instant validFrom,
+                                             Instant validTo, CertListOrderBy orderBy, int numEntries)
       throws CaMgmtException {
     return ca2Manager.listCertificates(caName, subjectPattern, validFrom, validTo, orderBy, numEntries);
   }

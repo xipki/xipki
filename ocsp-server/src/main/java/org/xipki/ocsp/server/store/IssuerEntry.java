@@ -13,8 +13,8 @@ import org.xipki.util.CompareUtil;
 
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +33,7 @@ public class IssuerEntry {
 
   private final Map<HashAlgo, byte[]> issuerHashMap;
 
-  private final Date notBefore;
+  private final Instant notBefore;
 
   private final X509Cert cert;
 
@@ -98,7 +98,7 @@ public class IssuerEntry {
         reqIssuer.getNameHashFrom(), issuerHash.length);
   }
 
-  public void setRevocationInfo(Date revocationTime) {
+  public void setRevocationInfo(Instant revocationTime) {
     notNull(revocationTime, "revocationTime");
     this.revocationInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE, revocationTime, null);
   }
@@ -115,7 +115,7 @@ public class IssuerEntry {
     this.crlId = crlId;
   }
 
-  public Date getNotBefore() {
+  public Instant getNotBefore() {
     return notBefore;
   }
 

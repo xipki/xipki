@@ -43,7 +43,11 @@ import org.xipki.util.http.SslContextConf;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
-import java.util.*;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.xipki.ca.sdk.CaAuditConstants.APPNAME;
 import static org.xipki.ca.server.CaUtil.canonicalizeSignerConf;
@@ -497,7 +501,7 @@ class Ca2Manager {
   } // method getX509Ca
 
   X509Cert generateRootCa(CaEntry caEntry, String profileName, String subject,
-      String serialNumber, Date notBefore, Date notAfter) throws CaMgmtException {
+                          String serialNumber, Instant notBefore, Instant notAfter) throws CaMgmtException {
     assertMasterModeAndSetuped();
 
     notNull(caEntry, "caEntry");
@@ -576,8 +580,8 @@ class Ca2Manager {
     return caCert;
   } // method generateRootCa
 
-  X509Cert generateCrossCertificate(
-      String caName, String profileName, byte[] encodedCsr, byte[] encodedTargetCert, Date notBefore, Date notAfter)
+  X509Cert generateCrossCertificate(String caName, String profileName, byte[] encodedCsr,
+                                    byte[] encodedTargetCert, Instant notBefore, Instant notAfter)
       throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     profileName = toNonBlankLower(profileName, "profileName");
@@ -617,20 +621,22 @@ class Ca2Manager {
     SubjectPublicKeyInfo publicKeyInfo = targetCert.getSubjectPublicKeyInfo();
 
     if (notBefore != null) {
-      Date now = new Date();
-      if (notBefore.before(now)) {
+      Instant now = Instant.now();
+      if (notBefore.isBefore(now)) {
         notBefore = now;
       }
-      if (notBefore.before(targetCert.getStartDate().getDate())) {
-        notBefore = targetCert.getStartDate().getDate();
+
+      Instant targetCertNotBefore = targetCert.getStartDate().getDate().toInstant();
+      if (notBefore.isBefore(targetCertNotBefore)) {
+        notBefore = targetCertNotBefore;
       }
     }
 
-    Date targetCertNotAfter = targetCert.getEndDate().getDate();
+    Instant targetCertNotAfter = targetCert.getEndDate().getDate().toInstant();
     if (notAfter == null) {
       notAfter = targetCertNotAfter;
     } else {
-      if (notAfter.after(targetCertNotAfter)) {
+      if (notAfter.isAfter(targetCertNotAfter)) {
         notAfter = targetCertNotAfter;
       }
     }
@@ -649,12 +655,13 @@ class Ca2Manager {
     return certInfo.getCert().getCert();
   }
 
-  KeyCertBytesPair generateKeyCert(String caName, String profileName, String subject, Date notBefore, Date notAfter)
+  KeyCertBytesPair generateKeyCert(String caName, String profileName, String subject,
+                                   Instant notBefore, Instant notAfter)
       throws CaMgmtException {
     profileName = toNonBlankLower(profileName, "profileName");
     notBlank(subject, "subject");
 
-    AuditEvent event = new AuditEvent(new Date());
+    AuditEvent event = new AuditEvent();
     event.setApplicationName(APPNAME);
     event.addEventType("CAMGMT_GEN_KEYCERT");
 
@@ -679,12 +686,13 @@ class Ca2Manager {
     }
   }
 
-  X509Cert generateCertificate(String caName, String profileName, byte[] encodedCsr, Date notBefore, Date notAfter)
+  X509Cert generateCertificate(String caName, String profileName, byte[] encodedCsr,
+                               Instant notBefore, Instant notAfter)
       throws CaMgmtException {
     profileName = toNonBlankLower(profileName, "profileName");
     notNull(encodedCsr, "encodedCsr");
 
-    AuditEvent event = new AuditEvent(new Date());
+    AuditEvent event = new AuditEvent();
     event.setApplicationName(APPNAME);
     event.addEventType("CAMGMT_GEN_CERT");
 
@@ -726,7 +734,7 @@ class Ca2Manager {
     return certInfo.getCert().getCert();
   } // method generateCertificate
 
-  void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason, Date invalidityTime)
+  void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason, Instant invalidityTime)
       throws CaMgmtException {
     assertMasterModeAndSetuped();
 
@@ -844,8 +852,8 @@ class Ca2Manager {
     }
   } // method getCert
 
-  List<CertListInfo> listCertificates(
-      String caName, X500Name subjectPattern, Date validFrom, Date validTo, CertListOrderBy orderBy, int numEntries)
+  List<CertListInfo> listCertificates(String caName, X500Name subjectPattern, Instant validFrom, Instant validTo,
+                                      CertListOrderBy orderBy, int numEntries)
       throws CaMgmtException {
     range(numEntries, "numEntries", 1, 1000);
     X509Ca ca = getX509Ca(caName);

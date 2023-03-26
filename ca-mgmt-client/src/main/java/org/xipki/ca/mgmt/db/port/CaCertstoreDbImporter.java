@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import static org.xipki.util.DateUtil.toEpochSecond;
 import static org.xipki.util.SqlUtil.buildInsertSql;
 
 /**
@@ -379,8 +380,8 @@ class CaCertstoreDbImporter extends DbPorter {
             stmt.setNull(idx++, Types.BIGINT);
           }
 
-          stmt.setLong(idx++, tbsCert.getStartDate().getDate().getTime() / 1000);
-          stmt.setLong(idx++, tbsCert.getEndDate().getDate().getTime() / 1000);
+          stmt.setLong(idx++, toEpochSecond(tbsCert.getStartDate().getDate()));
+          stmt.setLong(idx++, toEpochSecond(tbsCert.getEndDate().getDate()));
           setInt(stmt, idx++, cert.getRev());
           setInt(stmt, idx++, cert.getRr());
           setLong(stmt, idx++, cert.getRt());
@@ -527,9 +528,9 @@ class CaCertstoreDbImporter extends DbPorter {
           stmt.setLong(idx++, crl.getId());
           stmt.setInt(idx++, crl.getCaId());
           stmt.setLong(idx++, crlNumber.longValue());
-          stmt.setLong(idx++, x509crl.getThisUpdate().getTime() / 1000);
+          stmt.setLong(idx++, toEpochSecond(x509crl.getThisUpdate()));
           if (x509crl.getNextUpdate() != null) {
-            stmt.setLong(idx++, x509crl.getNextUpdate().getTime() / 1000);
+            stmt.setLong(idx++, toEpochSecond(x509crl.getNextUpdate()));
           } else {
             stmt.setNull(idx++, Types.INTEGER);
           }

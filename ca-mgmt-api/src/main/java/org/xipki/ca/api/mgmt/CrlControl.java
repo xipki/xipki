@@ -117,8 +117,6 @@ public class CrlControl {
 
   private final int intervalHours;
 
-  private final long intervalMillis;
-
   private final Validity overlap;
 
   private final boolean extendedNextUpdate;
@@ -160,8 +158,6 @@ public class CrlControl {
     }
 
     this.intervalHours = h;
-    this.intervalMillis = h * 60L * 60 * 1000;
-
     // Maximal interval allowed by CA/Browser Forum's Baseline Requirements
     this.fullCrlIntervals = getInteger(props, KEY_FULLCRL_INTERVALS, 7 * 24 / h);
     this.deltaCrlIntervals = getInteger(props, KEY_DELTACRL_INTERVALS, 0);
@@ -289,10 +285,6 @@ public class CrlControl {
 
   public int getIntervalHours() {
     return intervalHours;
-  }
-
-  public long getIntervalMillis() {
-    return intervalMillis;
   }
 
   public final void validate() throws InvalidConfException {

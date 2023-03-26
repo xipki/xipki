@@ -391,7 +391,7 @@ public class P12Actions {
     private Integer keysize = 2048;
 
     @Option(name = "-e", description = "public exponent")
-    private String publicExponent = "0x10001";
+    private String publicExponent = Actions.TEXT_F4;
 
     @Override
     protected Object execute0() throws Exception {

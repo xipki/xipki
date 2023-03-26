@@ -400,7 +400,7 @@ public class X509Util {
    * @param certs collection of certificates.
    * @return the certificate path
    * @throws CertPathBuilderException
-   *           If cannot build a valid certificate path.
+   *           If a valid certificate path can not be built.
    */
   public static X509Cert[] buildCertPath(X509Cert targetCert, Collection<X509Cert> certs)
       throws CertPathBuilderException {
@@ -574,9 +574,9 @@ public class X509Util {
     }
 
     if (issues) {
-      long issuerNotBefore = issuerCert.getNotBefore().getTime();
-      long issuerNotAfter = issuerCert.getNotAfter().getTime();
-      long notBefore = cert.getNotBefore().getTime();
+      long issuerNotBefore = issuerCert.getNotBefore().toEpochMilli();
+      long issuerNotAfter = issuerCert.getNotAfter().toEpochMilli();
+      long notBefore = cert.getNotBefore().toEpochMilli();
       issues = notBefore <= issuerNotAfter && notBefore >= issuerNotBefore;
     }
 

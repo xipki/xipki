@@ -152,7 +152,7 @@ public class CaServerConf extends ValidatableConf {
    */
   private List<String> certprofileFactories;
 
-  private final Map<String, SslContextConf> sslContextConfMap = new HashMap<>();
+  private final transient Map<String, SslContextConf> sslContextConfMap = new HashMap<>();
 
   public static CaServerConf readConfFromFile(String fileName) throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");

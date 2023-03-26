@@ -24,6 +24,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Clock;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -241,7 +242,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     OcspCertstore.Certs certsInCurrentFile = new OcspCertstore.Certs();
 
     File currentCertsZipFile = new File(baseDir,
-        "tmp-certs-" + System.currentTimeMillis() + ".zip");
+        "tmp-certs-" + Clock.systemUTC().millis() + ".zip");
     ZipOutputStream currentCertsZip = getZipOutputStream(currentCertsZipFile);
 
     long minCertIdOfCurrentFile = -1;
@@ -358,7 +359,7 @@ class OcspCertstoreDbExporter extends DbPorter {
             numCertInCurrentFile = 0;
             minCertIdOfCurrentFile = -1;
             maxCertIdOfCurrentFile = -1;
-            currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
+            currentCertsZipFile = new File(baseDir, "tmp-certs-" + Clock.systemUTC().millis() + ".zip");
             currentCertsZip = getZipOutputStream(currentCertsZipFile);
           } // end if
         } while (rs.next());

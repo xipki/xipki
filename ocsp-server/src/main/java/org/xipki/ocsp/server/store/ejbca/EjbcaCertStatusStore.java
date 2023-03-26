@@ -31,6 +31,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -139,7 +141,8 @@ public class EjbcaCertStatusStore extends OcspStore {
               // CA is revoked
               str = extractTextFromCaData(caData, "revokationdate", "long");
 
-              Date revTime = (str == null || "-1".contentEquals(str)) ? new Date() : new Date(Long.parseLong(str));
+              Instant revTime = (str == null || "-1".contentEquals(str))
+                  ? Instant.now() : Instant.ofEpochMilli(Long.parseLong(str));
               issuerEntry.setRevocationInfo(revTime);
             }
 
@@ -200,7 +203,7 @@ public class EjbcaCertStatusStore extends OcspStore {
 
   @Override
   protected CertStatusInfo getCertStatus0(
-      Date time, RequestIssuer reqIssuer, BigInteger serialNumber,
+      Instant time, RequestIssuer reqIssuer, BigInteger serialNumber,
       boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
       throws OcspStoreException {
     if (includeRit) {
@@ -208,7 +211,7 @@ public class EjbcaCertStatusStore extends OcspStore {
     }
 
     if (serialNumber.signum() != 1) { // non-positive serial number
-      return CertStatusInfo.getUnknownCertStatusInfo(new Date(), null);
+      return CertStatusInfo.getUnknownCertStatusInfo(Instant.now(), null);
     }
 
     if (!initialized) {
@@ -227,8 +230,8 @@ public class EjbcaCertStatusStore extends OcspStore {
 
       String sql = includeCertHash ? sqlCsWithCertHash : sqlCs;
 
-      Date thisUpdate = new Date();
-      final Date nextUpdate = null;
+      Instant thisUpdate = Instant.now();
+      final Instant nextUpdate = null;
 
       ResultSet rs = null;
 
@@ -250,7 +253,7 @@ public class EjbcaCertStatusStore extends OcspStore {
         if (rs.next()) {
           unknown = false;
 
-          long timeInMs = time.getTime();
+          long timeInMs = time.toEpochMilli();
           if (ignoreNotYetValidCert) {
             long notBefore = rs.getLong("notBefore");
             if (timeInMs < notBefore) {
@@ -292,7 +295,7 @@ public class EjbcaCertStatusStore extends OcspStore {
       } else {
         byte[] certHash = (hexCertHash == null) ? null : Hex.decode(hexCertHash);
         if (revoked) {
-          CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(revTime * 1000), null);
+          CertRevocationInfo revInfo = new CertRevocationInfo(reason, Instant.ofEpochSecond(revTime), null);
           certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
               certHashAlgo, certHash, thisUpdate, nextUpdate, null);
         } else {
@@ -303,14 +306,13 @@ public class EjbcaCertStatusStore extends OcspStore {
 
       if (includeArchiveCutoff) {
         if (retentionInterval != 0) {
-          Date date;
+          Instant date;
           // expired certificate remains in status store forever
           if (retentionInterval < 0) {
             date = issuer.getNotBefore();
           } else {
-            long nowInMs = System.currentTimeMillis();
-            long dateInMs = Math.max(issuer.getNotBefore().getTime(), nowInMs - DAY * retentionInterval);
-            date = new Date(dateInMs);
+            Instant t1 = Instant.now().minus(retentionInterval, ChronoUnit.DAYS);
+            date = issuer.getNotBefore().isAfter(t1) ? issuer.getNotBefore() : t1;
           }
 
           certStatusInfo.setArchiveCutOff(date);
@@ -331,7 +333,7 @@ public class EjbcaCertStatusStore extends OcspStore {
           replaced = true;
         }
       } else if (certStatus == CertStatus.REVOKED) {
-        if (certStatusInfo.getRevocationInfo().getRevocationTime().after(caRevInfo.getRevocationTime())) {
+        if (certStatusInfo.getRevocationInfo().getRevocationTime().isAfter(caRevInfo.getRevocationTime())) {
           replaced = true;
         }
       }

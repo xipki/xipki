@@ -3,9 +3,9 @@
 
 package org.xipki.ocsp.server.type;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.Date;
 
 /**
  * The anchor class of ASN.1 types defined in this package.
@@ -65,8 +65,8 @@ public abstract class ASN1Type {
     return idx - offset;
   } // method writeHeader
 
-  public static int writeGeneralizedTime(Date time, byte[] out, int offset) {
-    OffsetDateTime offsetTime = time.toInstant().atOffset(ZoneOffset.UTC);
+  public static int writeGeneralizedTime(Instant time, byte[] out, int offset) {
+    OffsetDateTime offsetTime = time.atOffset(ZoneOffset.UTC);
     int idx = offset;
     out[idx++] = 0x18;
     out[idx++] = 15;

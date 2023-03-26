@@ -8,7 +8,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Date;
+import java.time.Instant;
 
 /**
  *
@@ -128,8 +128,8 @@ public class EnrollCertRequestEntry {
     this.notBefore = notBefore;
   }
 
-  public void notBefore(Date notBefore) {
-    this.notBefore = notBefore == null ? null : notBefore.getTime() / 1000;
+  public void notBefore(Instant notBefore) {
+    this.notBefore = notBefore == null ? null : notBefore.getEpochSecond();
   }
 
   public Long getNotAfter() {
@@ -140,8 +140,8 @@ public class EnrollCertRequestEntry {
     this.notAfter = notAfter;
   }
 
-  public void notAfter(Date notAfter) {
-    this.notAfter = notAfter == null ? null : notAfter.getTime() / 1000;
+  public void notAfter(Instant notAfter) {
+    this.notAfter = notAfter == null ? null : notAfter.getEpochSecond();
   }
 
   public OldCertInfoByIssuerAndSerial getOldCertIsn() {

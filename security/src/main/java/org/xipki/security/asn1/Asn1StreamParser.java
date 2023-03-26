@@ -13,7 +13,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * ASN.1 stream parser.
@@ -113,21 +113,21 @@ public class Asn1StreamParser {
     }
   }
 
-  public static Date readTime(ASN1Encodable  obj) {
-    return (obj instanceof Time) ? ((Time) obj).getDate()
-        : (obj instanceof org.bouncycastle.asn1.cms.Time) ? ((org.bouncycastle.asn1.cms.Time) obj).getDate()
-        : Time.getInstance(obj).getDate();
+  public static Instant readTime(ASN1Encodable  obj) {
+    return  (obj instanceof Time) ? ((Time) obj).getDate().toInstant()
+        : (obj instanceof org.bouncycastle.asn1.cms.Time) ? ((org.bouncycastle.asn1.cms.Time) obj).getDate().toInstant()
+        : Time.getInstance(obj).getDate().toInstant();
   }
 
-  public static Date readTime(MyInt bytesLen, BufferedInputStream instream, String name) throws IOException {
+  public static Instant readTime(MyInt bytesLen, BufferedInputStream instream, String name) throws IOException {
     int tag = markAndReadTag(instream);
     byte[] bytes = readBlock(instream, name);
     bytesLen.set(bytes.length);
     try {
       if (tag == BERTags.UTC_TIME) {
-        return DERUTCTime.getInstance(bytes).getDate();
+        return DERUTCTime.getInstance(bytes).getDate().toInstant();
       } else if (tag == BERTags.GENERALIZED_TIME) {
-        return DERGeneralizedTime.getInstance(bytes).getDate();
+        return DERGeneralizedTime.getInstance(bytes).getDate().toInstant();
       } else {
         throw new IllegalArgumentException("invalid tag for " + name + ": " + tag);
       }

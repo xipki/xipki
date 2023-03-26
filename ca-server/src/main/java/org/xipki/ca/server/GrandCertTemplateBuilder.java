@@ -38,7 +38,10 @@ import org.xipki.util.exception.OperationException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
 
@@ -54,11 +57,8 @@ class GrandCertTemplateBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(GrandCertTemplateBuilder.class);
 
-  private static final long MAX_CERT_TIME_MS = 253402300799000L; //9999-12-31-23-59-59.000
-
-  private static final Date MAX_CERT_TIME = new Date(MAX_CERT_TIME_MS);
-
-  private static final long MS_PER_10MINUTES = 300000L;
+  private static final Instant MAX_CERT_TIME = ZonedDateTime.of(9999, 12, 31,
+      23, 59, 59, 000, ZoneOffset.UTC).toInstant(); //9999-12-31T23:59:59.000
 
   private final ASN1ObjectIdentifier keyAlgOidByImplicitCA;
   private final String keyspecByImplicitCA;
@@ -118,22 +118,22 @@ class GrandCertTemplateBuilder {
     X500Name requestedSubject = forCrossCert ? certTemplate.getSubject()
         : CaUtil.removeEmptyRdns(certTemplate.getSubject());
 
-    Date reqNotBefore = certTemplate.getNotBefore();
+    Instant reqNotBefore = certTemplate.getNotBefore();
 
-    Date grantedNotBefore = certprofile.getNotBefore(reqNotBefore);
+    Instant grantedNotBefore = certprofile.getNotBefore(reqNotBefore);
     // notBefore in the past is not permitted (due to the fact that some clients may not have
     // accurate time, we allow max. 5 minutes in the past)
-    long currentMillis = System.currentTimeMillis();
-    if (currentMillis - grantedNotBefore.getTime() > MS_PER_10MINUTES) {
-      grantedNotBefore = new Date(currentMillis - MS_PER_10MINUTES);
+    Instant _10MinBefore = Instant.now().minus(10, ChronoUnit.MINUTES);
+    if (grantedNotBefore.isBefore(_10MinBefore)) {
+      grantedNotBefore = _10MinBefore;
     }
 
-    long time = caInfo.getNoNewCertificateAfter();
-    if (grantedNotBefore.getTime() > time) {
-      throw new OperationException(NOT_PERMITTED, "CA is not permitted to issue certificate after " + new Date(time));
+    if (grantedNotBefore.isAfter(caInfo.getNoNewCertificateAfter())) {
+      throw new OperationException(NOT_PERMITTED,
+          "CA is not permitted to issue certificate after " + caInfo.getNoNewCertificateAfter());
     }
 
-    if (grantedNotBefore.before(caInfo.getNotBefore())) {
+    if (grantedNotBefore.isBefore(caInfo.getNotBefore())) {
       // notBefore may not be before CA's notBefore
       grantedNotBefore = caInfo.getNotBefore();
     }
@@ -312,7 +312,7 @@ class GrandCertTemplateBuilder {
       throw new OperationException(ALREADY_ISSUED, "certificate with the same subject as CA is not allowed");
     }
 
-    Date grantedNotAfter;
+    Instant grantedNotAfter;
 
     if (certprofile.hasNoWellDefinedExpirationDate()) {
       grantedNotAfter = MAX_CERT_TIME;
@@ -325,16 +325,16 @@ class GrandCertTemplateBuilder {
         validity = caInfo.getMaxValidity();
       }
 
-      Date maxNotAfter = validity.add(grantedNotBefore);
+      Instant maxNotAfter = validity.add(grantedNotBefore);
       // maxNotAfter not after 99991231-235959.000
-      if (maxNotAfter.getTime() > MAX_CERT_TIME_MS) {
+      if (maxNotAfter.isAfter(MAX_CERT_TIME)) {
         maxNotAfter = MAX_CERT_TIME;
       }
 
       grantedNotAfter = certTemplate.getNotAfter();
 
       if (grantedNotAfter != null) {
-        if (grantedNotAfter.after(maxNotAfter)) {
+        if (grantedNotAfter.isAfter(maxNotAfter)) {
           grantedNotAfter = maxNotAfter;
           msgBuilder.append(", notAfter modified");
         }
@@ -342,7 +342,7 @@ class GrandCertTemplateBuilder {
         grantedNotAfter = maxNotAfter;
       }
 
-      if (grantedNotAfter.after(caInfo.getNotAfter())) {
+      if (grantedNotAfter.isAfter(caInfo.getNotAfter())) {
         ValidityMode caMode = caInfo.getValidityMode();
         NotAfterMode profileMode = certprofile.getNotAfterMode();
         if (profileMode == null) {

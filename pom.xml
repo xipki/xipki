@@ -52,6 +52,8 @@
   </properties>
   <modules>
     <!-- Base components -->
+    <module>xipki-tomcat-password</module>
+    <module>password</module>
     <module>util</module>
     <module>audit</module>
     <module>audit-extra</module>

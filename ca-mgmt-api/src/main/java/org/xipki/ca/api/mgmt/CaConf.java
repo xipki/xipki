@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.security.cert.CertificateException;
+import java.time.Instant;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
@@ -45,11 +46,11 @@ public class CaConf {
 
     private final String serialNumber;
 
-    private final Date notBefore;
+    private final Instant notBefore;
 
-    private final Date notAfter;
+    private final Instant notAfter;
 
-    public GenSelfIssued(String profile, String subject, String serialNumber, Date notBefore, Date notAfter) {
+    public GenSelfIssued(String profile, String subject, String serialNumber, Instant notBefore, Instant notAfter) {
       this.profile = Args.notBlank(profile, "profile");
       this.subject = Args.notBlank(subject, "subject");
       this.serialNumber = serialNumber;
@@ -69,11 +70,11 @@ public class CaConf {
       return serialNumber;
     }
 
-    public Date getNotBefore() {
+    public Instant getNotBefore() {
       return notBefore;
     }
 
-    public Date getNotAfter() {
+    public Instant getNotAfter() {
       return notAfter;
     }
   } // class GenSelfIssued
@@ -285,9 +286,9 @@ public class CaConf {
               throw new InvalidConfException("cert.file of CA " + name + " may not be set");
             }
 
-            Date notBefore = gsi.getNotBefore() == null ? null
+            Instant notBefore = gsi.getNotBefore() == null ? null
                 : DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.getNotBefore());
-            Date notAfter = gsi.getNotAfter() == null ? null
+            Instant notAfter = gsi.getNotAfter() == null ? null
                 : DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.getNotAfter());
             genSelfIssued = new GenSelfIssued(gsi.getProfile(), gsi.getSubject(), gsi.getSerialNumber(),
                 notBefore, notAfter);

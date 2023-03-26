@@ -18,6 +18,7 @@
 
 package org.xipki.util.concurrent;
 
+import java.time.Clock;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.*;
@@ -194,12 +195,12 @@ public interface ClockSource {
   final class MillisecondClockSource implements ClockSource {
     @Override
     public long currentTime0() {
-      return System.currentTimeMillis();
+      return Clock.systemUTC().millis();
     }
 
     @Override
     public long elapsedMillis0(final long startTime) {
-      return System.currentTimeMillis() - startTime;
+      return Clock.systemUTC().millis() - startTime;
     }
 
     @Override
@@ -209,7 +210,7 @@ public interface ClockSource {
 
     @Override
     public long elapsedNanos0(final long startTime) {
-      return MILLISECONDS.toNanos(System.currentTimeMillis() - startTime);
+      return MILLISECONDS.toNanos(Clock.systemUTC().millis() - startTime);
     }
 
     @Override

@@ -14,9 +14,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
-import java.util.Calendar;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.StringTokenizer;
-import java.util.TimeZone;
 
 /**
  * File-based MAC protected audit service.
@@ -37,7 +37,7 @@ public class FileMacAuditService extends MacAuditService {
 
   private String logFileNameSuffix;
 
-  private long lastMsOfToday;
+  private Instant lastMsOfToday;
 
   private OutputStreamWriter writer;
 
@@ -55,11 +55,9 @@ public class FileMacAuditService extends MacAuditService {
     String logLine = formatDate(date) + DELIM + levelText + DELIM + eventType + DELIM + shardId +
         DELIM + thisId + DELIM + previousId + DELIM + thisTag + DELIM + message;
 
-    long ms = date.toEpochMilli();
     try {
-      if (ms > lastMsOfToday) {
-        Calendar now = Calendar.getInstance(TimeZone.getDefault());
-        now.setTimeInMillis(ms);
+      if (date.isAfter(lastMsOfToday)) {
+        ZonedDateTime now = ZonedDateTime.ofInstant(date, ZoneId.systemDefault());
         int yyyyMMddNow = DateUtil.getYyyyMMdd(now);
         lastMsOfToday = DateUtil.getLastMsOfDay(now);
         writer.close();
@@ -109,7 +107,7 @@ public class FileMacAuditService extends MacAuditService {
     this.logFileNamePrefix = prefix + "_";
 
     // analyze the existing log files
-    Calendar now = Calendar.getInstance(TimeZone.getDefault());
+    ZonedDateTime now = ZonedDateTime.now();
 
     int yyyyMMddNow = DateUtil.getYyyyMMdd(now);
     this.lastMsOfToday = DateUtil.getLastMsOfDay(now);

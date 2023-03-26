@@ -12,7 +12,7 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 
 import java.io.IOException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,7 +78,7 @@ class Template {
     return new WritableOnlyExtension(rv);
   } // method getCertHashExtension
 
-  public static WritableOnlyExtension getInvalidityDateExtension(Date invalidityDate) {
+  public static WritableOnlyExtension getInvalidityDateExtension(Instant invalidityDate) {
     int len = extnInvalidityDate.length;
     byte[] encoded = new byte[len];
     System.arraycopy(extnInvalidityDate, 0, encoded, 0, len - 17);
@@ -86,7 +86,7 @@ class Template {
     return new WritableOnlyExtension(encoded);
   } // method getInvalidityDateExtension
 
-  public static WritableOnlyExtension getArchiveOffExtension(Date archiveCutoff) {
+  public static WritableOnlyExtension getArchiveOffExtension(Instant archiveCutoff) {
     int len = extnArchiveCutof.length;
     byte[] encoded = new byte[len];
     System.arraycopy(extnArchiveCutof, 0, encoded, 0, len - 17);
@@ -94,7 +94,7 @@ class Template {
     return new WritableOnlyExtension(encoded);
   } // method getArchiveOffExtension
 
-  public static byte[] getEncodeRevokedInfo(CrlReason reason, Date revocationTime) {
+  public static byte[] getEncodeRevokedInfo(CrlReason reason, Instant revocationTime) {
     byte[] encoded;
     if (reason == null) {
       encoded = new byte[19];

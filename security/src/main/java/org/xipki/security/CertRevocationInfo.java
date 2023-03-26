@@ -7,7 +7,7 @@ import org.xipki.util.CompareUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.StringUtil;
 
-import java.util.Date;
+import java.time.Instant;
 
 import static org.xipki.util.Args.notNull;
 
@@ -22,9 +22,9 @@ public class CertRevocationInfo {
 
   private CrlReason reason;
 
-  private Date revocationTime;
+  private Instant revocationTime;
 
-  private Date invalidityTime;
+  private Instant invalidityTime;
 
   // For the deserialization only
   @SuppressWarnings("unused")
@@ -32,28 +32,28 @@ public class CertRevocationInfo {
   }
 
   public CertRevocationInfo(CrlReason reason) {
-    this(reason, new Date(), null);
+    this(reason, Instant.now(), null);
   }
 
-  public CertRevocationInfo(CrlReason reason, Date revocationTime) {
+  public CertRevocationInfo(CrlReason reason, Instant revocationTime) {
     this(reason, revocationTime, null);
   }
 
-  public CertRevocationInfo(CrlReason reason, Date revocationTime, Date invalidityTime) {
+  public CertRevocationInfo(CrlReason reason, Instant revocationTime, Instant invalidityTime) {
     this.reason = notNull(reason, "reason");
     this.revocationTime = notNull(revocationTime, "revocationTime");
     this.invalidityTime = invalidityTime;
   }
 
   public CertRevocationInfo(int reasonCode) {
-    this(reasonCode, new Date(), null);
+    this(reasonCode, Instant.now(), null);
   }
 
-  public CertRevocationInfo(int reasonCode, Date revocationTime) {
+  public CertRevocationInfo(int reasonCode, Instant revocationTime) {
     this(reasonCode, revocationTime, null);
   }
 
-  public CertRevocationInfo(int reasonCode, Date revocationTime, Date invalidityTime) {
+  public CertRevocationInfo(int reasonCode, Instant revocationTime, Instant invalidityTime) {
     this.revocationTime = notNull(revocationTime, "revocationTime");
     this.reason = CrlReason.forReasonCode(reasonCode);
     this.invalidityTime = invalidityTime;
@@ -67,7 +67,7 @@ public class CertRevocationInfo {
     return reason;
   }
 
-  public void setRevocationTime(Date revocationTime) {
+  public void setRevocationTime(Instant revocationTime) {
     this.revocationTime = notNull(revocationTime, "revocationTime");
   }
 
@@ -75,9 +75,9 @@ public class CertRevocationInfo {
    * Gets the revocation time.
    * @return revocation time, never be null
    */
-  public Date getRevocationTime() {
+  public Instant getRevocationTime() {
     if (revocationTime == null) {
-      revocationTime = new Date();
+      revocationTime = Instant.now();
     }
     return revocationTime;
   }
@@ -86,11 +86,11 @@ public class CertRevocationInfo {
    * Get the invalidity time.
    * @return invalidity time, may be null
    */
-  public Date getInvalidityTime() {
+  public Instant getInvalidityTime() {
     return invalidityTime;
   }
 
-  public void setInvalidityTime(Date invalidityTime) {
+  public void setInvalidityTime(Instant invalidityTime) {
     this.invalidityTime = invalidityTime;
   }
 
@@ -103,11 +103,11 @@ public class CertRevocationInfo {
   public static CertRevocationInfo fromEncoded(String encoded) {
     ConfPairs pairs = new ConfPairs(encoded);
     CrlReason reason = CrlReason.forNameOrText(pairs.value("reason"));
-    Date revocationTime = new Date(1000L * Long.parseLong(pairs.value("revocationTime")));
+    Instant revocationTime = Instant.ofEpochSecond(Long.parseLong(pairs.value("revocationTime")));
     String str = pairs.value("invalidityTime");
-    Date invalidityTime = null;
+    Instant invalidityTime = null;
     if (str != null) {
-      invalidityTime = new Date(1000L * Long.parseLong(pairs.value("invalidityTime")));
+      invalidityTime = Instant.ofEpochSecond(Long.parseLong(pairs.value("invalidityTime")));
     }
 
     return new CertRevocationInfo(reason, revocationTime, invalidityTime);
@@ -116,9 +116,9 @@ public class CertRevocationInfo {
   public String getEncoded() {
     ConfPairs pairs = new ConfPairs()
         .putPair("reason", reason.getDescription())
-        .putPair("revocationTime", Long.toString(revocationTime.getTime() / 1000));
+        .putPair("revocationTime", Long.toString(revocationTime.getEpochSecond()));
     if (invalidityTime != null) {
-      pairs.putPair("invalidityTime", Long.toString(invalidityTime.getTime() / 1000));
+      pairs.putPair("invalidityTime", Long.toString(invalidityTime.getEpochSecond()));
     }
     return pairs.getEncoded();
   }

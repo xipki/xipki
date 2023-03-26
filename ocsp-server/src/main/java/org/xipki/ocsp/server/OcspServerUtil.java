@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateException;
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -196,7 +197,7 @@ public class OcspServerUtil {
     return store;
   } // method newStore
 
-  static boolean canBuildCertpath(X509Cert[] certsInReq, RequestOption requestOption, Date referenceTime) {
+  static boolean canBuildCertpath(X509Cert[] certsInReq, RequestOption requestOption, Instant referenceTime) {
     X509Cert target = certsInReq[0];
 
     Set<X509Cert> trustanchors = requestOption.getTrustanchors();
@@ -219,7 +220,7 @@ public class OcspServerUtil {
 
     if (model == null || model == CertpathValidationModel.PKIX) {
       for (X509Cert m : certpath) {
-        if (m.getNotBefore().after(referenceTime) || m.getNotAfter().before(referenceTime)) {
+        if (m.getNotBefore().isAfter(referenceTime) || m.getNotAfter().isBefore(referenceTime)) {
           return false;
         }
       }

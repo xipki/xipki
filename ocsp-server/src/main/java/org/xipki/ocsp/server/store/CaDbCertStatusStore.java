@@ -32,6 +32,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -116,13 +118,13 @@ public class CaDbCertStatusStore extends OcspStore {
               }
 
               int id = rs.getInt("ID");
-              Long revTimeMs = null;
+              Instant revTime = null;
               String str = rs.getString("REV_INFO");
               if (str != null) {
                 CertRevocationInfo revInfo = CertRevocationInfo.fromEncoded(str);
-                revTimeMs = revInfo.getRevocationTime().getTime();
+                revTime = revInfo.getRevocationTime();
               }
-              SimpleIssuerEntry issuerEntry = new SimpleIssuerEntry(id, revTimeMs);
+              SimpleIssuerEntry issuerEntry = new SimpleIssuerEntry(id, revTime);
               newIssuers.put(id, issuerEntry);
             }
 
@@ -210,11 +212,11 @@ public class CaDbCertStatusStore extends OcspStore {
 
   @Override
   protected CertStatusInfo getCertStatus0(
-      Date time, RequestIssuer reqIssuer, BigInteger serialNumber,
+      Instant time, RequestIssuer reqIssuer, BigInteger serialNumber,
       boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
       throws OcspStoreException {
     if (serialNumber.signum() != 1) { // non-positive serial number
-      return CertStatusInfo.getUnknownCertStatusInfo(new Date(), null);
+      return CertStatusInfo.getUnknownCertStatusInfo(Instant.now(), null);
     }
 
     if (!initialized) {
@@ -235,7 +237,7 @@ public class CaDbCertStatusStore extends OcspStore {
         sql = includeRit ? sqlCs : sqlCsNoRit;
       }
 
-      Date thisUpdate = new Date();
+      Instant thisUpdate = Instant.now();
 
       ResultSet rs = null;
 
@@ -257,7 +259,7 @@ public class CaDbCertStatusStore extends OcspStore {
         if (rs.next()) {
           unknown = false;
 
-          long timeInSec = time.getTime() / 1000;
+          long timeInSec = time.getEpochSecond();
           if (ignoreNotYetValidCert) {
             long notBeforeInSec = rs.getLong("NBEFORE");
             if (notBeforeInSec != 0 && timeInSec < notBeforeInSec) {
@@ -293,7 +295,7 @@ public class CaDbCertStatusStore extends OcspStore {
         releaseDbResources(ps, rs);
       }
 
-      final Date nextUpdate = null;
+      final Instant nextUpdate = null;
 
       CertStatusInfo certStatusInfo;
       if (unknown) {
@@ -303,8 +305,8 @@ public class CaDbCertStatusStore extends OcspStore {
       } else {
         byte[] certHash = (b64CertHash == null) ? null : Base64.decodeFast(b64CertHash);
         if (revoked) {
-          Date invTime = (invalTime == 0 || invalTime == revTime) ? null : new Date(invalTime * 1000);
-          CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(revTime * 1000), invTime);
+          Instant invTime = (invalTime == 0 || invalTime == revTime) ? null : Instant.ofEpochSecond(invalTime);
+          CertRevocationInfo revInfo = new CertRevocationInfo(reason, Instant.ofEpochSecond(revTime), invTime);
           certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
               certHashAlgo, certHash, thisUpdate, nextUpdate, null);
         } else {
@@ -314,14 +316,13 @@ public class CaDbCertStatusStore extends OcspStore {
 
       if (includeArchiveCutoff) {
         if (retentionInterval != 0) {
-          Date date;
+          Instant date;
           // expired certificate remains in status store forever.
           if (retentionInterval < 0) {
             date = issuer.getNotBefore();
           } else {
-            long nowInMs = System.currentTimeMillis();
-            long dateInMs = Math.max(issuer.getNotBefore().getTime(), nowInMs - DAY * retentionInterval);
-            date = new Date(dateInMs);
+            Instant t1 = Instant.now().minus(retentionInterval, ChronoUnit.DAYS);
+            date = issuer.getNotBefore().isAfter(t1) ? issuer.getNotBefore() : t1;
           }
 
           certStatusInfo.setArchiveCutOff(date);
@@ -342,7 +343,7 @@ public class CaDbCertStatusStore extends OcspStore {
           replaced = true;
         }
       } else if (certStatus == CertStatus.REVOKED) {
-        if (certStatusInfo.getRevocationInfo().getRevocationTime().after(caRevInfo.getRevocationTime())) {
+        if (certStatusInfo.getRevocationInfo().getRevocationTime().isAfter(caRevInfo.getRevocationTime())) {
           replaced = true;
         }
       }

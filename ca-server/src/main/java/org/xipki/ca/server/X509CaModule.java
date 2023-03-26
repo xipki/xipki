@@ -13,7 +13,6 @@ import org.xipki.security.X509Cert;
 
 import java.security.PublicKey;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static org.xipki.util.Args.notNull;
@@ -25,18 +24,6 @@ import static org.xipki.util.Args.notNull;
  */
 
 public abstract class X509CaModule {
-
-  protected static final long MS_PER_SECOND = 1000L;
-
-  protected static final long MS_PER_MINUTE = 60000L;
-
-  protected static final long MS_PER_HOUR = 60 * MS_PER_MINUTE;
-
-  protected static final int MINUTE_PER_DAY = 24 * 60;
-
-  protected static final long MS_PER_DAY = MINUTE_PER_DAY * MS_PER_MINUTE;
-
-  protected static final long MS_PER_WEEK = 7 * MS_PER_DAY;
 
   protected final Logger LOG = LoggerFactory.getLogger(getClass());
 
@@ -67,7 +54,7 @@ public abstract class X509CaModule {
 
   protected AuditEvent newAuditEvent(String eventType, RequestorInfo requestor) {
     notNull(eventType, "eventType");
-    AuditEvent event = new AuditEvent(new Date());
+    AuditEvent event = new AuditEvent();
     event.setApplicationName(CaAuditConstants.APPNAME);
     event.setEventData(CaAuditConstants.NAME_ca, caIdent.getName());
     event.setEventType(eventType);

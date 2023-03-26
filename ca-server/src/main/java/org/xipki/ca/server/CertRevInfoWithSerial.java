@@ -7,7 +7,7 @@ import org.xipki.security.CrlReason;
 import org.xipki.util.Args;
 
 import java.math.BigInteger;
-import java.util.Date;
+import java.time.Instant;
 
 import static org.xipki.util.Args.notNull;
 
@@ -26,11 +26,12 @@ public class CertRevInfoWithSerial implements Comparable<CertRevInfoWithSerial> 
 
   private final CrlReason reason;
 
-  private Date revocationTime;
+  private Instant revocationTime;
 
-  private final Date invalidityTime;
+  private final Instant invalidityTime;
 
-  public CertRevInfoWithSerial(long id, BigInteger serial, CrlReason reason, Date revocationTime, Date invalidityTime) {
+  public CertRevInfoWithSerial(long id, BigInteger serial, CrlReason reason,
+                               Instant revocationTime, Instant invalidityTime) {
     this.reason = notNull(reason, "reason");
     this.revocationTime = notNull(revocationTime, "revocationTime");
     this.invalidityTime = invalidityTime;
@@ -38,7 +39,8 @@ public class CertRevInfoWithSerial implements Comparable<CertRevInfoWithSerial> 
     this.serial = Args.notNull(serial, "serial");
   } // method constructor
 
-  public CertRevInfoWithSerial(long id, BigInteger serial, int reasonCode, Date revocationTime, Date invalidityTime) {
+  public CertRevInfoWithSerial(long id, BigInteger serial, int reasonCode,
+                               Instant revocationTime, Instant invalidityTime) {
     this(id, serial, CrlReason.forReasonCode(reasonCode), revocationTime, invalidityTime);
   } // method constructor
 
@@ -58,9 +60,9 @@ public class CertRevInfoWithSerial implements Comparable<CertRevInfoWithSerial> 
    * Gets the revocation time.
    * @return revocation time, never be null
    */
-  public Date getRevocationTime() {
+  public Instant getRevocationTime() {
     if (revocationTime == null) {
-      revocationTime = new Date();
+      revocationTime = Instant.now();
     }
     return revocationTime;
   }
@@ -69,7 +71,7 @@ public class CertRevInfoWithSerial implements Comparable<CertRevInfoWithSerial> 
    * Get the invalidity time.
    * @return invalidity time, may be null
    */
-  public Date getInvalidityTime() {
+  public Instant getInvalidityTime() {
     return invalidityTime;
   }
 

@@ -4,9 +4,10 @@
 package org.xipki.ca.api.mgmt;
 
 import org.xipki.util.Args;
+import org.xipki.util.DateUtil;
 
 import java.math.BigInteger;
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * Certificate list container.
@@ -18,9 +19,9 @@ import java.util.Date;
 public class CertListInfo {
   private BigInteger serialNumber;
 
-  private Date notBefore;
+  private String notBefore;
 
-  private Date notAfter;
+  private String notAfter;
 
   private String subject;
 
@@ -29,10 +30,10 @@ public class CertListInfo {
   private CertListInfo() {
   }
 
-  public CertListInfo(BigInteger serialNumber, String subject, Date notBefore, Date notAfter) {
+  public CertListInfo(BigInteger serialNumber, String subject, Instant notBefore, Instant notAfter) {
     this.serialNumber = Args.notNull(serialNumber, "serialNumber");
-    this.notBefore = Args.notNull(notBefore, "notBefore");
-    this.notAfter = Args.notNull(notAfter, "notAfter");
+    this.notBefore = DateUtil.toUtcTimeyyyyMMddhhmmss(Args.notNull(notBefore, "notBefore"));
+    this.notAfter = DateUtil.toUtcTimeyyyyMMddhhmmss(Args.notNull(notAfter, "notAfter"));
     this.subject = Args.notNull(subject, "subject");
   }
 
@@ -44,19 +45,19 @@ public class CertListInfo {
     return serialNumber;
   }
 
-  public void setNotBefore(Date notBefore) {
+  public void setNotBefore(String notBefore) {
     this.notBefore = Args.notNull(notBefore, "notBefore");
   }
 
-  public Date getNotBefore() {
+  public String getNotBefore() {
     return notBefore;
   }
 
-  public void setNotAfter(Date notAfter) {
+  public void setNotAfter(String notAfter) {
     this.notAfter = Args.notNull(notAfter, "notAfter");
   }
 
-  public Date getNotAfter() {
+  public String getNotAfter() {
     return notAfter;
   }
 

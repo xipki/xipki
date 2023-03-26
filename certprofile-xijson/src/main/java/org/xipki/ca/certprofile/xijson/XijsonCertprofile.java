@@ -35,6 +35,8 @@ import org.xipki.util.exception.BadCertTemplateException;
 
 import java.io.ByteArrayInputStream;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -207,7 +209,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
     String str = conf.getNotBeforeTime().toLowerCase().trim();
     Long offsetSeconds = null;
-    TimeZone midnightTimeZone = null;
+    ZoneId midnightTimeZone = null;
     if (str.startsWith("midnight")) {
       int seperatorIdx = str.indexOf(':');
       String timezoneId = (seperatorIdx == -1) ? "GMT+0" : str.substring(seperatorIdx + 1).toUpperCase();
@@ -221,7 +223,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         throw new CertprofileException("invalid time zone id " + timezoneId);
       }
 
-      midnightTimeZone = TimeZone.getTimeZone(timezoneId);
+      midnightTimeZone = ZoneId.of(timezoneId);
     } else if ("current".equalsIgnoreCase(str)) {
       offsetSeconds = 0L;
     } else if (str.length() > 2) {
@@ -381,8 +383,9 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   @Override
   public ExtensionValues getExtensions(
-      Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls, X500Name requestedSubject, X500Name grantedSubject,
-      Map<ASN1ObjectIdentifier, Extension> requestedExtensions, Date notBefore, Date notAfter, PublicCaInfo caInfo)
+      Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls, X500Name requestedSubject,
+      X500Name grantedSubject, Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
+      Instant notBefore, Instant notAfter, PublicCaInfo caInfo)
       throws CertprofileException, BadCertTemplateException {
     ExtensionValues values = new ExtensionValues();
     if (CollectionUtil.isEmpty(extensionControls)) {
@@ -642,20 +645,20 @@ public class XijsonCertprofile extends BaseCertprofile {
     // PrivateKeyUsagePeriod
     type = Extension.privateKeyUsagePeriod;
     if (occurrences.contains(type)) {
-      Date tmpNotAfter;
+      Instant tmpNotAfter;
       Validity privateKeyUsagePeriod = extensions.getPrivateKeyUsagePeriod();
       if (privateKeyUsagePeriod == null) {
         tmpNotAfter = notAfter;
       } else {
         tmpNotAfter = privateKeyUsagePeriod.add(notBefore);
-        if (tmpNotAfter.after(notAfter)) {
+        if (tmpNotAfter.isAfter(notAfter)) {
           tmpNotAfter = notAfter;
         }
       }
 
       ASN1EncodableVector vec = new ASN1EncodableVector();
-      vec.add(new DERTaggedObject(false, 0, new DERGeneralizedTime(notBefore)));
-      vec.add(new DERTaggedObject(false, 1, new DERGeneralizedTime(tmpNotAfter)));
+      vec.add(new DERTaggedObject(false, 0, new DERGeneralizedTime(Date.from(notBefore))));
+      vec.add(new DERTaggedObject(false, 1, new DERGeneralizedTime(Date.from(tmpNotAfter))));
       ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(), new DERSequence(vec));
       values.addExtension(type, extValue);
       occurrences.remove(type);
@@ -939,7 +942,7 @@ public class XijsonCertprofile extends BaseCertprofile {
   protected ExtensionValues getExtraExtensions(
       Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurrences, X500Name requestedSubject,
       X500Name grantedSubject, Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
-      Date notBefore, Date notAfter, PublicCaInfo caInfo)
+      Instant notBefore, Instant notAfter, PublicCaInfo caInfo)
       throws CertprofileException, BadCertTemplateException {
     return null;
   } // method getExtraExtensions
@@ -1024,7 +1027,7 @@ public class XijsonCertprofile extends BaseCertprofile {
   }
 
   @Override
-  public Date getNotBefore(Date requestedNotBefore) {
+  public Instant getNotBefore(Instant requestedNotBefore) {
     return notBeforeOption.getNotBefore(requestedNotBefore);
   }
 

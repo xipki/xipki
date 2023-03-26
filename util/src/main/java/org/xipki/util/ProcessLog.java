@@ -3,7 +3,11 @@
 
 package org.xipki.util;
 
-import java.util.Calendar;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -19,11 +23,11 @@ public class ProcessLog {
 
   private static class MeasurePoint {
 
-    private final long measureTime;
+    private final Instant measureTime;
 
     private final long measureAccount;
 
-    public MeasurePoint(long measureTime, long measureAccount) {
+    public MeasurePoint(Instant measureTime, long measureAccount) {
       this.measureTime = measureTime;
       this.measureAccount = measureAccount;
     }
@@ -31,8 +35,6 @@ public class ProcessLog {
   }
 
   private static final long MS_900 = 900L;
-
-  private static final long DAY_IN_SEC = 24L * 60 * 60;
 
   private static final int DURATION_LEN = 10;
 
@@ -48,17 +50,17 @@ public class ProcessLog {
 
   private boolean hasTotal;
 
-  private long startTimeMs;
+  private Instant startTime;
 
-  private long endTimeMs;
+  private Instant endTime;
 
   private AtomicLong numProcessed;
 
-  private AtomicLong lastPrintTimeMs;
+  private Instant lastPrintTime;
 
   private final AtomicBoolean finished = new AtomicBoolean(false);
 
-  private long totalElapsedTimeMs;
+  private Duration totalElapsedTime;
 
   private int totalAverageSpeed;
 
@@ -110,12 +112,12 @@ public class ProcessLog {
 
   public void finish() {
     finished.set(true);
-    endTimeMs = System.currentTimeMillis();
-    totalElapsedTimeMs = endTimeMs - startTimeMs;
+    endTime = Instant.now();
+    totalElapsedTime = Duration.between(startTime, endTime);
 
     totalAverageSpeed = 0;
-    if (totalElapsedTimeMs > 0) {
-      totalAverageSpeed = (int) (numProcessed.get() * 1000 / totalElapsedTimeMs);
+    if (totalElapsedTime.toMillis() > 0) {
+      totalAverageSpeed = (int) averagePerSecond(numProcessed.get(), totalElapsedTime.toMillis());
     }
   }
 
@@ -146,21 +148,21 @@ public class ProcessLog {
   }
 
   public final void reset() {
-    startTimeMs = System.currentTimeMillis();
+    startTime = Instant.now();
     numProcessed = new AtomicLong(0);
-    lastPrintTimeMs = new AtomicLong(0);
+    lastPrintTime = Instant.ofEpochMilli(0);
     measureDeque.clear();
-    measureDeque.add(new MeasurePoint(startTimeMs, 0));
+    measureDeque.add(new MeasurePoint(startTime, 0));
 
     hasTotal = total > 0;
   }
 
-  public long startTimeMs() {
-    return startTimeMs;
+  public Instant startTime() {
+    return startTime;
   }
 
-  public long endTimeMs() {
-    return endTimeMs;
+  public Instant endTime() {
+    return endTime;
   }
 
   public long addNumProcessed(long numProcessed) {
@@ -172,15 +174,15 @@ public class ProcessLog {
   }
 
   private void printStatus(boolean forcePrint) {
-    final long nowMs = System.currentTimeMillis();
+    final Instant now = Instant.now();
     final long tmpNumProcessed = numProcessed.get();
 
-    if (!forcePrint && nowMs - lastPrintTimeMs.get() < MS_900) {
+    if (!forcePrint && Duration.between(lastPrintTime, now).toMillis() < MS_900) {
       return;
     }
 
-    measureDeque.addLast(new MeasurePoint(nowMs, numProcessed.get()));
-    lastPrintTimeMs.set(nowMs);
+    measureDeque.addLast(new MeasurePoint(now, numProcessed.get()));
+    lastPrintTime = now;
 
     int numMeasurePoints = measureDeque.size();
     MeasurePoint referenceMeasurePoint = (numMeasurePoints > 10) ? measureDeque.removeFirst()
@@ -199,45 +201,39 @@ public class ProcessLog {
 
     // average speed
     long averageSpeed = 0;
-    long elapsedTimeMs = nowMs - startTimeMs;
-    if (elapsedTimeMs > 0) {
-      averageSpeed = tmpNumProcessed * 1000 / elapsedTimeMs;
+    long elapsedTimeMilli = Duration.between(startTime, now).toMillis();
+    if (elapsedTimeMilli > 0) {
+      averageSpeed = averagePerSecond(tmpNumProcessed, elapsedTimeMilli);
     }
     sb.append(StringUtil.formatAccount(averageSpeed, SPEED_LEN));
 
     // current speed
     long currentSpeed = 0;
-    long t2inms = nowMs - referenceMeasurePoint.measureTime; // in ms
-    if (t2inms > 0) {
-      currentSpeed = (tmpNumProcessed - referenceMeasurePoint.measureAccount) * 1000 / t2inms;
+    long t2Milli = Duration.between(referenceMeasurePoint.measureTime, now).toMillis();
+    if (t2Milli > 0) {
+      currentSpeed = averagePerSecond(tmpNumProcessed - referenceMeasurePoint.measureAccount, t2Milli);
     }
     sb.append(StringUtil.formatAccount(currentSpeed, SPEED_LEN));
 
     // elapsed time
-    sb.append(StringUtil.formatTime(elapsedTimeMs / 1000, DURATION_LEN));
+    sb.append(StringUtil.formatTime(elapsedTimeMilli / 1000, DURATION_LEN));
 
     // remaining time and finish at
     if (hasTotal) {
-      long remaingTimeMs = -1;
+      long remaingTimeSeconds = -1;
       if (currentSpeed > 0) {
-        remaingTimeMs = (total - tmpNumProcessed) * 1000 / currentSpeed;
+        remaingTimeSeconds = (total - tmpNumProcessed) / currentSpeed;
       }
 
-      long finishAtMs = -1;
-      if (remaingTimeMs != -1) {
-        finishAtMs = nowMs + remaingTimeMs;
+      Instant finishAt = null;
+      if (remaingTimeSeconds != -1) {
+        finishAt = now.plus(remaingTimeSeconds, ChronoUnit.SECONDS);
       }
 
-      if (remaingTimeMs < 1) {
-        sb.append(formatText("--", DURATION_LEN));
+      if (remaingTimeSeconds < 1) {
+        sb.append(formatText("--", DURATION_LEN)).append(formatText("--", TIME_LEN));
       } else {
-        sb.append(StringUtil.formatTime(remaingTimeMs / 1000, DURATION_LEN));
-      }
-
-      if (remaingTimeMs < 1) {
-        sb.append(formatText("--", TIME_LEN));
-      } else {
-        sb.append(buildDateTime(finishAtMs));
+        sb.append(StringUtil.formatTime(remaingTimeSeconds, DURATION_LEN)).append(buildDateTime(finishAt));
       }
     }
 
@@ -245,12 +241,12 @@ public class ProcessLog {
     System.out.flush();
   } // method printStatus
 
-  public long totalElapsedTime() {
+  public Duration totalElapsedTime() {
     if (finished.get()) {
-      return totalElapsedTimeMs;
+      return totalElapsedTime;
     }
 
-    return System.currentTimeMillis() - startTimeMs;
+    return Duration.between(startTime, Instant.now());
   }
 
   public int totalAverageSpeed() {
@@ -258,10 +254,10 @@ public class ProcessLog {
       return totalAverageSpeed;
     }
 
-    long elapsedTimeMs = System.currentTimeMillis() - startTimeMs;
+    Duration elapsedTime = Duration.between(startTime, Instant.now());
     int averageSpeed = 0;
-    if (elapsedTimeMs > 0) {
-      averageSpeed = (int) (numProcessed.get() * 1000 / elapsedTimeMs);
+    if (!elapsedTime.isZero()) {
+      averageSpeed = (int) averagePerSecond(numProcessed.get(), elapsedTime.toMillis());
     }
     return averageSpeed;
   }
@@ -270,37 +266,35 @@ public class ProcessLog {
     return StringUtil.formatText(text, minLen);
   }
 
-  private static String buildDateTime(long timeMs) {
-    Calendar cal = Calendar.getInstance();
-    cal.setTimeInMillis(timeMs);
+  private static String buildDateTime(Instant time) {
+    ZonedDateTime cal = time.atZone(ZoneId.systemDefault());
 
     StringBuilder sb = new StringBuilder();
-    int hour = cal.get(Calendar.HOUR_OF_DAY);
+    int hour = cal.getHour();
     if (hour < 10) {
       sb.append('0');
     }
     sb.append(hour);
 
-    int minute = cal.get(Calendar.MINUTE);
+    int minute = cal.getMinute();
     sb.append(":");
     if (minute < 10) {
       sb.append('0');
     }
     sb.append(minute);
 
-    int second = cal.get(Calendar.SECOND);
+    int second = cal.getSecond();
     sb.append(":");
     if (second < 10) {
       sb.append('0');
     }
     sb.append(second);
 
-    Calendar midNight = Calendar.getInstance();
-    midNight.set(Calendar.HOUR_OF_DAY, 0);
-    midNight.set(Calendar.MINUTE, 0);
-    midNight.set(Calendar.SECOND, 0);
-    long midNightSec = midNight.getTimeInMillis() / 1000;
-    long days = (timeMs / 1000 - midNightSec) / DAY_IN_SEC;
+    ZonedDateTime now = ZonedDateTime.now();
+    ZonedDateTime midNight = ZonedDateTime.of(now.getYear(), now.getMonthValue(), now.getDayOfMonth(),
+        0, 0, 0, 0, now.getZone());
+    long midNightSec = midNight.toInstant().getEpochSecond();
+    long days = Duration.between(midNight, time).toDays();
     if (days > 0) {
       sb.append('+').append(days > 9 ? "x" : Long.toString(days));
     }
@@ -327,4 +321,9 @@ public class ProcessLog {
 
     return len;
   }
+
+  private static long averagePerSecond(long value, long millis) {
+    return value * 1000 / millis;
+  }
+
 }

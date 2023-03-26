@@ -29,6 +29,7 @@ import java.security.cert.CRLException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Clock;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -202,7 +203,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
     int sum = 0;
     File currentEntriesZipFile = new File(baseDir,
-        "tmp-" + type.getDirName() + "-" + System.currentTimeMillis() + ".zip");
+        "tmp-" + type.getDirName() + "-" + Clock.systemUTC().millis() + ".zip");
     ZipOutputStream currentEntriesZip = getZipOutputStream(currentEntriesZipFile);
 
     long minIdOfCurrentFile = -1;
@@ -382,7 +383,7 @@ class CaCertstoreDbExporter extends DbPorter {
             minIdOfCurrentFile = -1;
             maxIdOfCurrentFile = -1;
             currentEntriesZipFile = new File(baseDir, "tmp-" + type.getDirName() + "-"
-                + System.currentTimeMillis() + ".zip");
+                + Clock.systemUTC().millis() + ".zip");
             currentEntriesZip = getZipOutputStream(currentEntriesZipFile);
           }
         } while (rs.next());

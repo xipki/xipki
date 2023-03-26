@@ -24,7 +24,8 @@ import org.xipki.util.Args;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.util.Date;
+import java.time.Duration;
+import java.time.Instant;
 
 /**
  * SCEP responder.
@@ -132,10 +133,10 @@ public class ScepResponder {
       return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
     }
 
-    Date signingTime = req.getSigningTime();
+    Instant signingTime = req.getSigningTime();
     if (maxSigningTimeBiasInMs > 0) {
       boolean isTimeBad = signingTime == null ? true
-          : Math.abs(System.currentTimeMillis() - signingTime.getTime()) > maxSigningTimeBiasInMs;
+          : Math.abs(Duration.between(signingTime, Instant.now()).toMillis()) > maxSigningTimeBiasInMs;
 
       if (isTimeBad) {
         return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badTime);

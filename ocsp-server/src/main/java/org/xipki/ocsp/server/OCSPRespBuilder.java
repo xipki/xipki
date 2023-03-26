@@ -13,7 +13,7 @@ import org.xipki.util.Hex;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Date;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,7 +52,7 @@ public class OCSPRespBuilder {
    * @param singleExtensions optional extensions
    */
   public void addResponse(
-      CertID certId, byte[] certStatus, Date thisUpdate, Date nextUpdate, Extensions singleExtensions) {
+      CertID certId, byte[] certStatus, Instant thisUpdate, Instant nextUpdate, Extensions singleExtensions) {
     list.add(new SingleResponse(certId, certStatus, thisUpdate, nextUpdate, singleExtensions));
   }
 
@@ -66,7 +66,7 @@ public class OCSPRespBuilder {
   }
 
   public byte[] buildOCSPResponse(
-      ConcurrentContentSigner signer, TaggedCertSequence taggedCertSequence, Date producedAt)
+      ConcurrentContentSigner signer, TaggedCertSequence taggedCertSequence, Instant producedAt)
       throws OCSPException, NoIdleSignerException {
     ResponseData responseData = new ResponseData(0, responderId, producedAt, list, responseExtensions);
 

@@ -33,6 +33,7 @@ import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -76,7 +77,8 @@ class SelfSignedCertBuilder {
 
   public static GenerateSelfSignedResult generateSelfSigned(
       SecurityFactory securityFactory, String signerType, String signerConf, IdentifiedCertprofile certprofile,
-      String subject, BigInteger serialNumber, CaUris caUris, ConfPairs extraControl, Date notBefore, Date notAfter)
+      String subject, BigInteger serialNumber, CaUris caUris, ConfPairs extraControl,
+      Instant notBefore, Instant notAfter)
       throws OperationException, InvalidConfException {
     notNull(securityFactory, "securityFactory");
     notBlank(signerType, "signerType");
@@ -128,8 +130,7 @@ class SelfSignedCertBuilder {
           "CA does not support any signature algorithm restricted by the cert profile");
       }
 
-      signer = securityFactory.createSigner(signerType, new SignerConf(thisSignerConf),
-          (X509Cert[]) null);
+      signer = securityFactory.createSigner(signerType, new SignerConf(thisSignerConf), (X509Cert[]) null);
     } catch (XiSecurityException | ObjectCreationException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
     }
@@ -142,7 +143,7 @@ class SelfSignedCertBuilder {
 
   private static X509Cert generateCertificate(
       ConcurrentContentSigner signer, IdentifiedCertprofile certprofile, String subject, BigInteger serialNumber,
-      CaUris caUris, ConfPairs extraControl, Date notBefore, Date notAfter)
+      CaUris caUris, ConfPairs extraControl, Instant notBefore, Instant notAfter)
       throws OperationException {
     SubjectPublicKeyInfo publicKeyInfo;
     try {
@@ -196,7 +197,7 @@ class SelfSignedCertBuilder {
 
     notBefore = certprofile.getNotBefore(notBefore);
     if (notBefore == null) {
-      notBefore = new Date();
+      notBefore = Instant.now();
     }
 
     Validity validity = certprofile.getValidity();
@@ -205,17 +206,17 @@ class SelfSignedCertBuilder {
           "no validity specified in the profile " + certprofile.getIdent());
     }
 
-    Date maxNotAfter = validity.add(notBefore);
+    Instant maxNotAfter = validity.add(notBefore);
     if (notAfter == null) {
       notAfter = maxNotAfter;
-    } else if (notAfter.after(maxNotAfter)) {
+    } else if (notAfter.isAfter(maxNotAfter)) {
       notAfter = maxNotAfter;
     }
 
     X500Name grantedSubject = subjectInfo.getGrantedSubject();
 
-    X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(grantedSubject,
-        serialNumber, notBefore, notAfter, grantedSubject, publicKeyInfo);
+    X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(grantedSubject, serialNumber,
+        Date.from(notBefore), Date.from(notAfter), grantedSubject, publicKeyInfo);
 
     try {
       SubjectKeyIdentifier ski = certprofile.getSubjectKeyIdentifier(publicKeyInfo);

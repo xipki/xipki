@@ -48,6 +48,7 @@ import java.security.spec.KeySpec;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.Clock;
 import java.util.*;
 
 /**
@@ -187,7 +188,7 @@ public class FillKeytool implements AutoCloseable {
         System.out.println(name + ":");
         boolean rsa = keyspec.startsWith("RSA/");
         System.out.println("\t" + (rsa ? "loading " : "generating ") + numKeypairs + " keypairs");
-        long start = System.currentTimeMillis();
+        long start = Clock.systemUTC().millis();
 
         List<byte[]> rsaKeys = null;
         if (rsa) {
@@ -222,7 +223,7 @@ public class FillKeytool implements AutoCloseable {
             ps.executeBatch();
           }
         } // end for
-        long duration = System.currentTimeMillis() - start;
+        long duration = Clock.systemUTC().millis() - start;
         System.out.println("\t" + (rsa ? "loaded " : "generated ")
             + numKeypairs + " keypairs, took " + duration + " ms");
       } // end for

@@ -10,7 +10,7 @@ import org.xipki.util.ReqRespDebug;
 
 import java.io.Closeable;
 import java.math.BigInteger;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +46,7 @@ public interface CmpClient extends Closeable {
    */
   EnrollCertResult enrollCert(
       String caName, Requestor requestor, CertificationRequest csr, String profile,
-      Date notBefore, Date notAfter, ReqRespDebug debug)
+      Instant notBefore, Instant notAfter, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -90,7 +90,7 @@ public interface CmpClient extends Closeable {
    */
   CertIdOrError revokeCert(
       String caName, Requestor requestor, X509Cert issuerCert, BigInteger serial,
-      int reason, Date invalidityTime, ReqRespDebug debug)
+      int reason, Instant invalidityTime, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -116,7 +116,7 @@ public interface CmpClient extends Closeable {
    */
   CertIdOrError revokeCert(
       String caName, Requestor requestor, X509Cert issuerCert, X509Cert cert,
-      int reason, Date invalidityTime, ReqRespDebug debug)
+      int reason, Instant invalidityTime, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**

@@ -15,8 +15,8 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import static org.xipki.ca.sdk.SdkConstants.*;
@@ -112,12 +112,12 @@ public class SdkClient {
     return currentCrl(ca, null, null, null);
   }
 
-  public byte[] currentCrl(String ca, BigInteger crlNumber, Date thisUpdate, String crlDp)
+  public byte[] currentCrl(String ca, BigInteger crlNumber, Instant thisUpdate, String crlDp)
       throws IOException, SdkErrorResponseException {
     GetCRLRequest req = new GetCRLRequest();
     req.setCrlNumber(crlNumber);
     req.setCrlDp(crlDp);
-    req.setThisUpdate(thisUpdate == null ? null : thisUpdate.getTime() / 1000);
+    req.setThisUpdate(thisUpdate == null ? null : thisUpdate.getEpochSecond());
     byte[] respBytes = send(ca, CMD_crl, req);
     CrlResponse resp = CrlResponse.decode(respBytes);
     return resp.getCrl();

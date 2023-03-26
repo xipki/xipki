@@ -11,7 +11,7 @@ import org.xipki.util.StringUtil;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Date;
+import java.time.Instant;
 
 import static org.xipki.util.Args.notNull;
 
@@ -38,9 +38,9 @@ public class CrlInfo {
 
   private BigInteger baseCrlNumber;
 
-  private final Date thisUpdate;
+  private final Instant thisUpdate;
 
-  private final Date nextUpdate;
+  private final Instant nextUpdate;
 
   private final CrlID crlId;
 
@@ -75,7 +75,7 @@ public class CrlInfo {
     return str;
   }
 
-  public CrlInfo(BigInteger crlNumber, BigInteger baseCrlNumber, Date thisUpdate, Date nextUpdate, CrlID crlId) {
+  public CrlInfo(BigInteger crlNumber, BigInteger baseCrlNumber, Instant thisUpdate, Instant nextUpdate, CrlID crlId) {
     this.crlNumber = notNull(crlNumber, "crlNumber");
     this.baseCrlNumber = baseCrlNumber;
     this.thisUpdate = notNull(thisUpdate, "thisUpdate");
@@ -115,11 +115,11 @@ public class CrlInfo {
     return baseCrlNumber;
   }
 
-  public Date getThisUpdate() {
+  public Instant getThisUpdate() {
     return thisUpdate;
   }
 
-  public Date getNextUpdate() {
+  public Instant getNextUpdate() {
     return nextUpdate;
   }
 

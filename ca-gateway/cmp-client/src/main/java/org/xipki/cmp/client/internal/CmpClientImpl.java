@@ -37,6 +37,7 @@ import java.security.*;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -169,7 +170,7 @@ public final class CmpClientImpl implements CmpClient {
   @Override
   public EnrollCertResult enrollCert(
       String caName, Requestor requestor, CertificationRequest csr, String profile,
-      Date notBefore, Date notAfter, ReqRespDebug debug)
+      Instant notBefore, Instant notAfter, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     notNull(csr, "csr");
     caName = notBlank(caName, "caName").toLowerCase(Locale.ROOT);
@@ -197,7 +198,7 @@ public final class CmpClientImpl implements CmpClient {
   @Override
   public CertIdOrError revokeCert(
       String caName, Requestor requestor, X509Cert issuerCert, X509Cert cert,
-      int reason, Date invalidityDate, ReqRespDebug debug)
+      int reason, Instant invalidityDate, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     notNull(cert, "cert");
     assertIssuedByCa(cert, issuerCert);
@@ -207,7 +208,7 @@ public final class CmpClientImpl implements CmpClient {
   @Override
   public CertIdOrError revokeCert(
       String caName, Requestor requestor, X509Cert issuerCert, BigInteger serial,
-      int reason, Date invalidityDate, ReqRespDebug debug)
+      int reason, Instant invalidityDate, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     notNull(caName, "caName");
     notNull(serial, "serial");

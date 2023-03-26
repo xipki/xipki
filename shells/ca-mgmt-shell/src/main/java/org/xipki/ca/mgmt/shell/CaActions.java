@@ -28,6 +28,7 @@ import org.xipki.util.*;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -46,7 +47,7 @@ public class CaActions {
     @Reference
     protected SecurityFactory securityFactory;
 
-    protected static Date parseDate(String dateStr) {
+    protected static Instant parseDate(String dateStr) {
       return StringUtil.isBlank(dateStr) ? null : DateUtil.parseUtcTimeyyyyMMddhhmmss(dateStr);
     }
 
@@ -406,8 +407,8 @@ public class CaActions {
     @Override
     protected Object execute0() throws Exception {
       CaEntry caEntry = getCaEntry();
-      Date notBefore = parseDate(notBeforeS);
-      Date notAfter = parseDate(notAfterS);
+      Instant notBefore = parseDate(notBeforeS);
+      Instant notAfter = parseDate(notAfterS);
       X509Cert rootcaCert = caManager.generateRootCa(caEntry, rootcaProfile, subject, serialS, notBefore, notAfter);
       if (rootcaCertOutFile != null) {
         saveVerbose("saved root certificate to file", rootcaCertOutFile,
@@ -525,10 +526,10 @@ public class CaActions {
         throw new IllegalCmdParamException("invalid CA name " + caName);
       }
 
-      Date revocationDate = isNotBlank(revocationDateS)
-          ? DateUtil.parseUtcTimeyyyyMMddhhmmss(revocationDateS) : new Date();
+      Instant revocationDate = isNotBlank(revocationDateS)
+          ? DateUtil.parseUtcTimeyyyyMMddhhmmss(revocationDateS) : Instant.now();
 
-      Date invalidityDate = null;
+      Instant invalidityDate = null;
       if (isNotBlank(invalidityDateS)) {
         invalidityDate = DateUtil.parseUtcTimeyyyyMMddhhmmss(invalidityDateS);
       }

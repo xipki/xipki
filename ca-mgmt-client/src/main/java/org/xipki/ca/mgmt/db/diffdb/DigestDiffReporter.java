@@ -14,7 +14,7 @@ import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Date;
+import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -40,7 +40,7 @@ class DigestDiffReporter implements Closeable {
 
   private final BufferedWriter errorWriter;
 
-  private Date startTime;
+  private Instant startTime;
 
   private final AtomicInteger numGood = new AtomicInteger(0);
 
@@ -71,7 +71,7 @@ class DigestDiffReporter implements Closeable {
   } // constructor
 
   public final void start() {
-    startTime = new Date();
+    startTime = Instant.now();
   }
 
   public String getReportDirname() {
@@ -126,8 +126,8 @@ class DigestDiffReporter implements Closeable {
     closeWriter(missingWriter, unexpectedWriter, diffWriter, goodWriter, errorWriter);
 
     int sum = numGood.get() + numDiff.get() + numMissing.get() + numUnexpected.get() + numError.get();
-    Date now = new Date();
-    int durationSec = (int) ((now.getTime() - startTime.getTime()) / 1000);
+    Instant now = Instant.now();
+    int durationSec = (int) (now.getEpochSecond() - startTime.getEpochSecond());
 
     String speedStr = (durationSec > 0)
         ? StringUtil.formatAccount(sum / durationSec, false) + " /s" : "--";

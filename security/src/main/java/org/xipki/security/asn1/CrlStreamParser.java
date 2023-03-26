@@ -25,7 +25,7 @@ import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Iterator;
 
 import static org.xipki.util.Args.notNull;
@@ -91,14 +91,15 @@ public class CrlStreamParser extends Asn1StreamParser {
     private final X500Name certificateIssuer;
 
     private RevokedCert(
-        BigInteger serialNumber, Date revocationDate, int reason, Date invalidityDate, X500Name certificateIssuer) {
+        BigInteger serialNumber, Instant revocationDate, int reason, Instant invalidityDate,
+        X500Name certificateIssuer) {
       this.serialNumber = serialNumber;
-      this.revocationDate = revocationDate.getTime() / 1000;
+      this.revocationDate = revocationDate.getEpochSecond();
       this.reason = reason;
       this.certificateIssuer = certificateIssuer;
       this.invalidityDate = (invalidityDate == null) ? 0
           : revocationDate.equals(invalidityDate) ? 0
-          : invalidityDate.getTime() / 1000;
+          : invalidityDate.getEpochSecond();
     }
 
     public BigInteger getSerialNumber() {
@@ -178,8 +179,8 @@ public class CrlStreamParser extends Asn1StreamParser {
        */
       ASN1Sequence revCert = ASN1Sequence.getInstance(bytes);
       BigInteger serialNumber = ASN1Integer.getInstance(revCert.getObjectAt(0)).getValue();
-      Date revocationDate = readTime(revCert.getObjectAt(1));
-      Date invalidityDate = null;
+      Instant revocationDate = readTime(revCert.getObjectAt(1));
+      Instant invalidityDate = null;
       int reason = 0;
       X500Name certificateIssuer = null;
 
@@ -195,9 +196,9 @@ public class CrlStreamParser extends Asn1StreamParser {
           int tag = coreExtValue[0] & 0xFF;
           try {
             if (tag == BERTags.UTC_TIME) {
-              invalidityDate = DERUTCTime.getInstance(coreExtValue).getDate();
+              invalidityDate = DERUTCTime.getInstance(coreExtValue).getDate().toInstant();
             } else if (tag == BERTags.GENERALIZED_TIME) {
-              invalidityDate = DERGeneralizedTime.getInstance(coreExtValue).getDate();
+              invalidityDate = DERGeneralizedTime.getInstance(coreExtValue).getDate().toInstant();
             } else {
               throw new IllegalArgumentException("invalid tag " + tag);
             }
@@ -232,9 +233,9 @@ public class CrlStreamParser extends Asn1StreamParser {
 
   private final X500Name issuer;
 
-  private final Date thisUpdate;
+  private final Instant thisUpdate;
 
-  private final Date nextUpdate;
+  private final Instant nextUpdate;
 
   private final AlgorithmIdentifier algorithmIdentifier;
 
@@ -411,11 +412,11 @@ public class CrlStreamParser extends Asn1StreamParser {
     return issuer;
   }
 
-  public Date getThisUpdate() {
+  public Instant getThisUpdate() {
     return thisUpdate;
   }
 
-  public Date getNextUpdate() {
+  public Instant getNextUpdate() {
     return nextUpdate;
   }
 

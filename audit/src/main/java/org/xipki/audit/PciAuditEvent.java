@@ -7,10 +7,10 @@ import org.xipki.util.Args;
 
 import java.io.CharArrayWriter;
 import java.net.*;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -76,9 +76,15 @@ public class PciAuditEvent {
    */
   private AuditLevel level;
 
-  public PciAuditEvent(Date date) {
-    Args.notNull(date, "date");
-    LocalDateTime localDate = LocalDateTime.ofInstant(date.toInstant(), ZONE_UTC);
+  public PciAuditEvent() {
+    this(null);
+  }
+
+  public PciAuditEvent(Instant date) {
+    if (date == null) {
+      date = Instant.now();
+    }
+    LocalDateTime localDate = LocalDateTime.ofInstant(date, ZONE_UTC);
     this.date = DATE_FORMATTER.format(localDate);
     this.time = TIME_FORMATTER.format(localDate);
     this.level = AuditLevel.INFO;

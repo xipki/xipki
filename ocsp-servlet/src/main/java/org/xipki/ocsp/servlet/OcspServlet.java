@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.EOFException;
 import java.io.IOException;
+import java.time.Clock;
 
 import static org.xipki.util.Args.notNull;
 
@@ -168,7 +169,7 @@ public class OcspServlet extends HttpServlet {
       OcspRespWithCacheInfo.ResponseCacheInfo cacheInfo = ocspRespWithCacheInfo.getCacheInfo();
       if (cacheInfo != null) {
         encodedOcspResp = ocspRespWithCacheInfo.getResponse();
-        long now = System.currentTimeMillis();
+        long now = Clock.systemUTC().millis();
 
         // RFC 5019 6.2: Date: The date and time at which the OCSP server generated
         // the HTTP response.

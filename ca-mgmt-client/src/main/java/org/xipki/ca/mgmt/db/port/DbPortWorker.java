@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Clock;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -168,7 +169,7 @@ public abstract class DbPortWorker extends DbWorker {
         deleteDecryptedFiles(srcFolder);
       }
 
-      long start = System.currentTimeMillis();
+      long start = Clock.systemUTC().millis();
       try {
         if (!resume) {
           // CAConfiguration
@@ -246,7 +247,7 @@ public abstract class DbPortWorker extends DbWorker {
 
     @Override
     protected void run0() throws Exception {
-      long start = System.currentTimeMillis();
+      long start = Clock.systemUTC().millis();
       try {
         if (!resume) {
           // CAConfiguration
@@ -320,7 +321,7 @@ public abstract class DbPortWorker extends DbWorker {
 
     @Override
     protected void run0() throws Exception {
-      long start = System.currentTimeMillis();
+      long start = Clock.systemUTC().millis();
       try {
         // CertStore
         OcspCertstoreDbExporter certStoreExporter = new OcspCertstoreDbExporter(datasource,
@@ -363,7 +364,7 @@ public abstract class DbPortWorker extends DbWorker {
 
     @Override
     protected void run0() throws Exception {
-      long start = System.currentTimeMillis();
+      long start = Clock.systemUTC().millis();
       if (password != null) {
         decrypt(srcFolder);
       }
@@ -410,7 +411,7 @@ public abstract class DbPortWorker extends DbWorker {
 
     @Override
     protected void run0() throws Exception {
-      long start = System.currentTimeMillis();
+      long start = Clock.systemUTC().millis();
       if (password != null) {
         decrypt(srcFolder);
       }
@@ -436,7 +437,7 @@ public abstract class DbPortWorker extends DbWorker {
   } // class ImportOcspFromCaDb
 
   private static void printFinishedIn(long startMs) {
-    long duration = (System.currentTimeMillis() - startMs) / 1000;
+    long duration = (Clock.systemUTC().millis() - startMs) / 1000;
     System.out.println("Finished in " + StringUtil.formatTime(duration, false));
   }
 

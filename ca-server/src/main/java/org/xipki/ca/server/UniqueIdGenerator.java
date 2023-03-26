@@ -5,6 +5,7 @@ package org.xipki.ca.server;
 
 import org.xipki.util.Args;
 
+import java.time.Clock;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntBinaryOperator;
 
@@ -54,7 +55,7 @@ public class UniqueIdGenerator {
   } // constructor
 
   public long nextId() {
-    long now = System.currentTimeMillis();
+    long now = Clock.systemUTC().millis();
     long ret = now - epoch;
     ret <<= 10;
 

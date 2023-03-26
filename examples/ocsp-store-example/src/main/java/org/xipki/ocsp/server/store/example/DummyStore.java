@@ -19,7 +19,8 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
-import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 /**
@@ -89,7 +90,7 @@ public class DummyStore extends OcspStore {
 
   @Override
   protected CertStatusInfo getCertStatus0(
-      Date time, RequestIssuer reqIssuer, BigInteger serialNumber,
+      Instant time, RequestIssuer reqIssuer, BigInteger serialNumber,
       boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
       throws OcspStoreException {
     if (!knowsIssuer(reqIssuer)) {
@@ -97,11 +98,11 @@ public class DummyStore extends OcspStore {
     }
 
     final int rest = serialNumber.mod(BN_3).intValue();
-    Date thisUpdate = new Date();
-    Date nextUpdate = new Date(thisUpdate.getTime() + 12 * 60 * 60 * 1000L); // 12 hours
+    Instant thisUpdate = Instant.now();
+    Instant nextUpdate = thisUpdate.plus(12, ChronoUnit.HOURS); // 12 hours
 
     if (rest == 0) {
-      return CertStatusInfo.getGoodCertStatusInfo(new Date(), nextUpdate);
+      return CertStatusInfo.getGoodCertStatusInfo(thisUpdate, nextUpdate);
     } else if (rest == 1) {
       CertRevocationInfo revInfo = new CertRevocationInfo(CrlReason.KEY_COMPROMISE);
       return CertStatusInfo.getRevokedCertStatusInfo(revInfo, thisUpdate, nextUpdate);

@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.util.DateUtil;
 
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * Test for {@link DateUtil}.
@@ -20,9 +20,9 @@ public class DateUtilTest {
 
   @Test
   public void test1() {
-    Date utcDate = DateUtil.parseUtcTimeyyyyMMddhhmmss("20150223134459");
-    long expTimeMs = 1424699099L;
+    Instant utcDate = DateUtil.parseUtcTimeyyyyMMddhhmmss("20150223134459");
+    long expTimeSeconds = 1424699099L;
 
-    Assert.assertEquals("DateTime parsing", expTimeMs, utcDate.getTime() / 1000);
+    Assert.assertEquals("DateTime parsing", expTimeSeconds, utcDate.getEpochSecond());
   }
 }

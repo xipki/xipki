@@ -16,7 +16,8 @@ import org.xipki.util.exception.OperationException;
 
 import java.io.Closeable;
 import java.math.BigInteger;
-import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ScheduledFuture;
@@ -50,7 +51,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
       }
 
       inProcess = true;
-      final Date expiredAt = new Date(System.currentTimeMillis() - MS_PER_DAY * (keepDays + 1));
+      final Instant expiredAt = Instant.now().minus(keepDays + 1, ChronoUnit.DAYS);
 
       try {
         LOG.debug("revoking expired certificates");
@@ -144,7 +145,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
     }
   } // method removeCertificate
 
-  private int removeExpiredCerts0(Date expiredAtTime, AuditEvent event) throws OperationException {
+  private int removeExpiredCerts0(Instant expiredAtTime, AuditEvent event) throws OperationException {
     notNull(expiredAtTime, "expiredtime");
     if (!masterMode) {
       throw new OperationException(NOT_PERMITTED, "CA could not remove expired certificates in slave mode");
@@ -153,7 +154,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
     event.addEventData(CaAuditConstants.NAME_expired_at, expiredAtTime);
     final int numEntries = 100;
 
-    final long expiredAt = expiredAtTime.getTime() / 1000;
+    final long expiredAt = expiredAtTime.getEpochSecond();
 
     int sum = 0;
     while (true) {

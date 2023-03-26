@@ -29,6 +29,7 @@ import org.xipki.util.TripleState;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -59,6 +60,7 @@ public class ExtensionConfBuilder {
   public static List<ExtensionType> createConstantExtensions(ASN1ObjectIdentifier oidPrefix) {
     List<ExtensionType> list = new LinkedList<>();
 
+    Date now = Date.from(Instant.now());
     // Custom Constant Extension Value
     list.add(createConstantExtension(oidPrefix.branch("1"), true, false,
         new DERBitString(new byte[] {1, 2})));
@@ -85,9 +87,9 @@ public class ExtensionConfBuilder {
     list.add(createConstantExtension(oidPrefix.branch("13"), true, false,
         new ASN1Enumerated(2)));
     list.add(createConstantExtension(oidPrefix.branch("14"), true, false,
-        new ASN1GeneralizedTime(new Date())));
+        new ASN1GeneralizedTime(now)));
     list.add(createConstantExtension(oidPrefix.branch("15"), true, false,
-        new DERUTCTime(new Date())));
+        new DERUTCTime(now)));
     list.add(createConstantExtension(oidPrefix.branch("16"), true, false,
         new X500Name("CN=abc,C=DE")));
 

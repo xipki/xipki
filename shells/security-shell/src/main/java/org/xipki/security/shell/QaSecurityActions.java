@@ -28,6 +28,7 @@ import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
 import org.xipki.util.*;
 
+import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.Locale;
@@ -313,7 +314,7 @@ public class QaSecurityActions {
     protected BenchmarkExecutor nextTester() throws Exception {
       KeyControl.RSA control = queue.poll();
       return (control == null) ? null
-          : new P11KeyGenSpeed.RSA(getSlot(), control.modulusLen(), toBigInt("0x10001"));
+          : new P11KeyGenSpeed.RSA(getSlot(), control.modulusLen(), RSAKeyGenParameterSpec.F4);
     }
 
   } // class BspeedRsaGenP11
@@ -334,7 +335,7 @@ public class QaSecurityActions {
       KeyControl.RSA control = queue.poll();
       return (control == null) ? null
           : new P11SignSpeed.RSA(securityFactory, getSlot(), getKeyId(), signAlgo, getNumThreads(),
-                control.modulusLen(), toBigInt("0x10001"));
+                control.modulusLen(), RSAKeyGenParameterSpec.F4);
     }
 
   } // class BspeedRsaGenP11
@@ -537,7 +538,7 @@ public class QaSecurityActions {
     private Integer keysize = 2048;
 
     @Option(name = "--exponent", aliases = "-e", description = "public exponent")
-    private String publicExponent = "0x10001";
+    private String publicExponent = Actions.TEXT_F4;
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
@@ -560,7 +561,7 @@ public class QaSecurityActions {
     private Integer keysize = 2048;
 
     @Option(name = "-e", description = "public exponent")
-    private String publicExponent = "0x10001";
+    private String publicExponent = Actions.TEXT_F4;
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.RSASigAlgCompleter.class)
@@ -703,7 +704,7 @@ public class QaSecurityActions {
     protected BenchmarkExecutor nextTester() throws Exception {
       KeyControl.RSA control = queue.poll();
       return (control == null) ? null
-          : new P12KeyGenSpeed.RSA(control.modulusLen(), toBigInt("0x10001"), securityFactory);
+          : new P12KeyGenSpeed.RSA(control.modulusLen(), RSAKeyGenParameterSpec.F4, securityFactory);
     }
 
   } // class BspeedRsaGenP12
@@ -720,7 +721,7 @@ public class QaSecurityActions {
       KeyControl.RSA control = queue.poll();
       return (control == null) ? null
         : new P12SignSpeed.RSA(securityFactory, signAlgo, getNumThreads(),
-          control.modulusLen(), toBigInt("0x10001"));
+          control.modulusLen(), RSAKeyGenParameterSpec.F4);
     }
   } // class BspeedRsaSignP12
 
@@ -885,7 +886,7 @@ public class QaSecurityActions {
     private Integer keysize = 2048;
 
     @Option(name = "-e", description = "public exponent")
-    private String publicExponent = "0x10001";
+    private String publicExponent = Actions.TEXT_F4;
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
@@ -903,7 +904,7 @@ public class QaSecurityActions {
     private Integer keysize = 2048;
 
     @Option(name = "-e", description = "public exponent")
-    private String publicExponent = "0x10001";
+    private String publicExponent = Actions.TEXT_F4;
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.RSASigAlgCompleter.class)

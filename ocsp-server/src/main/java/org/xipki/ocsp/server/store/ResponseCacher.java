@@ -27,7 +27,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
@@ -93,7 +93,7 @@ public class ResponseCacher implements Closeable {
 
       synchronized (lock) {
         inProcess.set(true);
-        long now = System.currentTimeMillis() / 1000;
+        long now = Instant.now().getEpochSecond();
         long maxGeneratedAt = now - validity;
         long minNextUpdate = now + SEC_NEXT_UPDATE_BUFFER;
 
@@ -102,8 +102,8 @@ public class ResponseCacher implements Closeable {
           if (num1 > 0 && LOG.isInfoEnabled()) {
             LOG.info("removed {} with thisUpdate < {} ({}) OR nextUpdate < {} ({})",
                 num1 == 1 ? "1 response" : num1 + " responses",
-                maxGeneratedAt, new Date(maxGeneratedAt * 1000),
-                minNextUpdate, new Date(minNextUpdate * 1000));
+                maxGeneratedAt, Instant.ofEpochSecond(maxGeneratedAt),
+                minNextUpdate, Instant.ofEpochSecond(minNextUpdate));
           }
         } catch (Throwable th) {
           LogUtil.error(LOG, th, "could not remove expired responses");
@@ -283,7 +283,7 @@ public class ResponseCacher implements Closeable {
       long nextUpdate = rs.getLong("NEXT_UPDATE");
       if (nextUpdate != 0) {
         // nextUpdate must be at least in 600 seconds
-        long minNextUpdate = System.currentTimeMillis() / 1000 + 600;
+        long minNextUpdate = Instant.now().getEpochSecond() + 600;
 
         if (nextUpdate < minNextUpdate) {
           return null;
@@ -307,7 +307,7 @@ public class ResponseCacher implements Closeable {
 
   public void storeOcspResponse(
       int issuerId, BigInteger serialNumber, long generatedAt, Long nextUpdate, SignAlgo sigAlgo, byte[] response) {
-    long nowInSec = System.currentTimeMillis() / 1000;
+    long nowInSec = Instant.now().getEpochSecond();
     if (nextUpdate == null) {
       nextUpdate = nowInSec + SEC_DFLT_NEXT_UPDATE_DURATION;
     }

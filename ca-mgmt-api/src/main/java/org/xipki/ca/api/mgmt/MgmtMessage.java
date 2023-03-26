@@ -250,7 +250,7 @@ public abstract class MgmtMessage {
 
     private int numCrls;
 
-    private CertRevocationInfo revocationInfo;
+    private String revocationInfo;
 
     public CaEntryWrapper() {
     }
@@ -290,7 +290,7 @@ public abstract class MgmtMessage {
       nextCrlNumber = caEntry.getNextCrlNumber();
       numCrls = caEntry.getNumCrls();
       permission = caEntry.getPermission();
-      revocationInfo = caEntry.getRevocationInfo();
+      revocationInfo = caEntry.getRevocationInfo() == null ? null : caEntry.getRevocationInfo().getEncoded();
       if (caEntry.getRevokeSuspendedControl() != null) {
         revokeSuspended = caEntry.getRevokeSuspendedControl().getConf();
       }
@@ -501,11 +501,11 @@ public abstract class MgmtMessage {
       this.numCrls = numCrls;
     }
 
-    public CertRevocationInfo getRevocationInfo() {
+    public String getRevocationInfo() {
       return revocationInfo;
     }
 
-    public void setRevocationInfo(CertRevocationInfo revocationInfo) {
+    public void setRevocationInfo(String revocationInfo) {
       this.revocationInfo = revocationInfo;
     }
 
@@ -546,7 +546,9 @@ public abstract class MgmtMessage {
 
       rv.setNextCrlNumber(nextCrlNumber);
       rv.setPermission(permission);
-      rv.setRevocationInfo(revocationInfo);
+      if (revocationInfo != null) {
+        rv.setRevocationInfo(CertRevocationInfo.fromEncoded(revocationInfo));
+      }
       rv.setSaveCert(saveCert);
       rv.setSaveKeypair(saveKeypair);
       rv.setUniqueKey(uniqueKey);

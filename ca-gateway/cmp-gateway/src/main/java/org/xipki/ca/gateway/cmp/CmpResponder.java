@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
 import static org.bouncycastle.asn1.cmp.PKIFailureInfo.*;
@@ -107,10 +109,10 @@ public class CmpResponder extends BaseCmpResponder {
       Long notAfter = null;
       if (validity != null) {
         if (validity.getNotBefore() != null) {
-          notBefore = validity.getNotBefore().getDate().getTime() / 1000;
+          notBefore = DateUtil.toEpochSecond(validity.getNotBefore().getDate());
         }
         if (validity.getNotAfter() != null) {
-          notAfter = validity.getNotAfter().getDate().getTime() / 1000;
+          notAfter = DateUtil.toEpochSecond(validity.getNotAfter().getDate());
         }
       }
 
@@ -264,12 +266,12 @@ public class CmpResponder extends BaseCmpResponder {
       if (keyvalues != null) {
         String str = keyvalues.value(CmpUtf8Pairs.KEY_NOTBEFORE);
         if (str != null) {
-          notBefore = DateUtil.parseUtcTimeyyyyMMddhhmmss(str).getTime() / 1000;
+          notBefore = DateUtil.parseUtcTimeyyyyMMddhhmmss(str).getEpochSecond();
         }
 
         str = keyvalues.value(CmpUtf8Pairs.KEY_NOTAFTER);
         if (str != null) {
-          notAfter = DateUtil.parseUtcTimeyyyyMMddhhmmss(str).getTime() / 1000;
+          notAfter = DateUtil.parseUtcTimeyyyyMMddhhmmss(str).getEpochSecond();
         }
       }
 
@@ -331,7 +333,7 @@ public class CmpResponder extends BaseCmpResponder {
     EnrollCertsRequest sdkReq = new EnrollCertsRequest();
     sdkReq.setExplicitConfirm(cmpControl.isConfirmCert());
     sdkReq.setGroupEnroll(groupEnroll);
-    sdkReq.setConfirmWaitTimeMs(cmpControl.getConfirmWaitTimeMs());
+    sdkReq.setConfirmWaitTimeMs((int) cmpControl.getConfirmWaitTime().toMillis());
     sdkReq.setCaCertMode(cmpControl.getCaCertsMode());
     sdkReq.setTransactionId(Hex.encode(tid.getOctets()));
     sdkReq.setEntries(templates);
@@ -446,7 +448,7 @@ public class CmpResponder extends BaseCmpResponder {
       }
 
       if (revoke) {
-        Date invalidityDate = null;
+        Instant invalidityDate = null;
         CrlReason reason = null;
 
         Extensions crlDetails = revDetails.getCrlEntryDetails();
@@ -462,7 +464,7 @@ public class CmpResponder extends BaseCmpResponder {
           extValue = crlDetails.getExtensionParsedValue(extId);
           if (extValue != null) {
             try {
-              invalidityDate = ASN1GeneralizedTime.getInstance(extValue).getDate();
+              invalidityDate = ASN1GeneralizedTime.getInstance(extValue).getDate().toInstant();
             } catch (ParseException ex) {
               return buildErrorMsgPkiBody(rejection, badCertTemplate, "invalid extension InvalidityDate");
             }
@@ -478,7 +480,7 @@ public class CmpResponder extends BaseCmpResponder {
         entry.setSerialNumber(serialNumber);
         entry.setReason(reason);
         if (invalidityDate != null) {
-          entry.setInvalidityTime(invalidityDate.getTime() / 1000);
+          entry.setInvalidityTime(invalidityDate.getEpochSecond());
         }
         revokeEntries.add(entry);
       } else {
@@ -580,11 +582,7 @@ public class CmpResponder extends BaseCmpResponder {
       dfltCertprofileName = dfltCertprofileName.toLowerCase(Locale.ROOT);
     }
 
-    long confirmWaitTime = cmpControl.getConfirmWaitTime();
-    if (confirmWaitTime < 0) {
-      confirmWaitTime *= -1;
-    }
-    confirmWaitTime *= 1000; // second to millisecond
+    Duration confirmWaitTime = cmpControl.getConfirmWaitTime();
 
     PKIBody respBody;
 
@@ -631,10 +629,10 @@ public class CmpResponder extends BaseCmpResponder {
     if (!cmpControl.isConfirmCert() && CmpUtil.isImplicitConfirm(reqHeader)) {
       tv = CmpUtil.getImplicitConfirmGeneralInfo();
     } else {
-      Date now = new Date();
-      respHeader.setMessageTime(new ASN1GeneralizedTime(now));
+      Instant now = Instant.now();
+      respHeader.setMessageTime(new ASN1GeneralizedTime(Date.from(now)));
       tv = new InfoTypeAndValue(CMPObjectIdentifiers.it_confirmWaitTime,
-          new ASN1GeneralizedTime(new Date(System.currentTimeMillis() + confirmWaitTime)));
+          new ASN1GeneralizedTime(Date.from((Instant) confirmWaitTime.addTo(now))));
     }
 
     respHeader.setGeneralInfo(tv);

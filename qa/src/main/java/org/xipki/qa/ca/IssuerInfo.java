@@ -7,7 +7,11 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 
 import java.security.cert.CertificateException;
-import java.util.*;
+import java.time.Instant;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.CollectionUtil.isEmpty;
@@ -75,11 +79,11 @@ public class IssuerInfo {
     return cutoffNotAfter;
   }
 
-  public Date getCaNotBefore() {
+  public Instant getCaNotBefore() {
     return cert.getNotBefore();
   }
 
-  public Date getCaNotAfter() {
+  public Instant getCaNotAfter() {
     return cert.getNotAfter();
   }
 

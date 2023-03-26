@@ -39,8 +39,8 @@ import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -427,14 +427,14 @@ public abstract class Client {
       throw new ScepClientException("Signature is invalid");
     }
 
-    Date signingTime = resp.getSigningTime();
+    Instant signingTime = resp.getSigningTime();
     long maxSigningTimeBias = getMaxSigningTimeBiasInMs();
     if (maxSigningTimeBias > 0) {
       if (signingTime == null) {
         throw new ScepClientException("CMS signingTime attribute is not present");
       }
 
-      if (Math.abs(System.currentTimeMillis() - signingTime.getTime()) > maxSigningTimeBias) {
+      if (Math.abs(Instant.now().toEpochMilli() - signingTime.toEpochMilli()) > maxSigningTimeBias) {
         throw new ScepClientException("CMS signingTime is out of permitted period");
       }
     }
@@ -475,14 +475,14 @@ public abstract class Client {
       throw new ScepClientException("Decryption failed");
     }
 
-    Date signingTime = resp.getSigningTime();
+    Instant signingTime = resp.getSigningTime();
     long maxSigningTimeBias = getMaxSigningTimeBiasInMs();
     if (maxSigningTimeBias > 0) {
       if (signingTime == null) {
         throw new ScepClientException("CMS signingTime attribute is not present");
       }
 
-      if (Math.abs(System.currentTimeMillis() - signingTime.getTime()) > maxSigningTimeBias) {
+      if (Math.abs(Instant.now().toEpochMilli() - signingTime.toEpochMilli()) > maxSigningTimeBias) {
         throw new ScepClientException("CMS signingTime is out of permitted period");
       }
     }

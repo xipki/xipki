@@ -28,7 +28,6 @@ import org.xipki.util.FileOrValue;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -158,7 +157,7 @@ public class OcspCertPublisher extends CertPublisher {
         messagePrefix, issuer, subjectText, serialText, ex.getMessage());
     LOG.debug("error", ex);
 
-    AuditEvent event = new AuditEvent(new Date());
+    AuditEvent event = new AuditEvent();
     event.setApplicationName("CAPublisher");
     event.setLevel(AuditLevel.ERROR);
     event.setStatus(AuditStatus.FAILED);

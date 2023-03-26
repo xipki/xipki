@@ -12,6 +12,7 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,9 +26,9 @@ import java.util.List;
 
 public class CmpControl {
 
-  private static final int DFLT_MESSAGE_TIME_BIAS = 300; // 300 seconds
+  private static final Duration DFLT_MESSAGE_TIME_BIAS = Duration.ofSeconds(300); // 300 seconds
 
-  private static final int DFLT_CONFIRM_WAIT_TIME = 300; // 300 seconds
+  private static final Duration DFLT_CONFIRM_WAIT_TIME = Duration.ofSeconds(300); // 300 seconds
 
   private static final int DFLT_PBM_ITERATIONCOUNT = 10240;
 
@@ -41,11 +42,9 @@ public class CmpControl {
 
   private final boolean sendResponderCert;
 
-  private final int messageTimeBias;
+  private final Duration messageTimeBias;
 
-  private final int confirmWaitTime;
-
-  private final int confirmWaitTimeMs;
+  private final Duration confirmWaitTime;
 
   private HashAlgo responsePbmOwf;
 
@@ -65,12 +64,10 @@ public class CmpControl {
     this.sendCertChain = getBoolean(conf.getSendCertChain(), false);
     this.sendResponderCert = getBoolean(conf.getSendResponderCert(), true);
     this.messageTimeRequired = getBoolean(conf.getMessageTimeRequired(), true);
-    this.messageTimeBias = getInt(conf.getMessageTimeBias(), DFLT_MESSAGE_TIME_BIAS);
-    this.confirmWaitTime = getInt(conf.getConfirmWaitTime(), DFLT_CONFIRM_WAIT_TIME);
-    if (this.confirmWaitTime < 0) {
-      throw new InvalidConfException("invalid confirmWaitTime " + confirmWaitTime);
-    }
-    this.confirmWaitTimeMs = this.confirmWaitTime * 1000;
+    this.messageTimeBias = conf.getMessageTimeBias() == null ? DFLT_MESSAGE_TIME_BIAS
+                              : Duration.ofSeconds(Math.abs(conf.getMessageTimeBias()));
+    this.confirmWaitTime = conf.getConfirmWaitTime() == null ? DFLT_CONFIRM_WAIT_TIME
+                              : Duration.ofSeconds(Math.abs(conf.getConfirmWaitTime()));
 
     // protection algorithms
     List<String> requestSigAlgos = conf.getRequestSigAlgos();
@@ -167,16 +164,12 @@ public class CmpControl {
     return confirmCert;
   }
 
-  public int getMessageTimeBias() {
+  public Duration getMessageTimeBias() {
     return messageTimeBias;
   }
 
-  public int getConfirmWaitTime() {
+  public Duration getConfirmWaitTime() {
     return confirmWaitTime;
-  }
-
-  public int getConfirmWaitTimeMs() {
-    return confirmWaitTimeMs;
   }
 
   public boolean isSendResponderCert() {

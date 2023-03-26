@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -343,7 +344,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     }
 
     File crlInfoFile = new File(generatedDir, "ca.crl.info");
-    Date nextUpdate;
+    Instant nextUpdate;
     BigInteger crlNumber = null;
 
     File crlDownloadFile = new File(subDir, "crl.download");
@@ -372,7 +373,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       if (validity.getValidity() < 1) {
         LOG.error("invalid download.before.nextupdate {}", validity);
       } else {
-        if (validity.add(new Date()).after(nextUpdate)) {
+        if (validity.add(Instant.now()).isAfter(nextUpdate)) {
           downloadCrl = true;
         }
       }

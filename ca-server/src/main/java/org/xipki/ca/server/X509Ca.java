@@ -43,6 +43,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -69,8 +70,8 @@ public class X509Ca extends X509CaModule implements Closeable {
     private final ConcurrentContentSigner signer;
     private final Extensions extensions;
     private final IdentifiedCertprofile certprofile;
-    private final Date grantedNotBefore;
-    private final Date grantedNotAfter;
+    private final Instant grantedNotBefore;
+    private final Instant grantedNotAfter;
     private final X500Name requestedSubject;
     private final SubjectPublicKeyInfo grantedPublicKey;
     private final PrivateKeyInfo privateKey;
@@ -80,8 +81,9 @@ public class X509Ca extends X509CaModule implements Closeable {
     private String grantedSubjectText;
 
     GrantedCertTemplate(boolean batch, BigInteger certId, Extensions extensions, IdentifiedCertprofile certprofile,
-        Date grantedNotBefore, Date grantedNotAfter, X500Name requestedSubject, SubjectPublicKeyInfo grantedPublicKey,
-        PrivateKeyInfo privateKey, ConcurrentContentSigner signer, String warning) {
+                        Instant grantedNotBefore, Instant grantedNotAfter,
+                        X500Name requestedSubject, SubjectPublicKeyInfo grantedPublicKey,
+                        PrivateKeyInfo privateKey, ConcurrentContentSigner signer, String warning) {
       this.batch = batch;
       this.certId = certId == null ? BigInteger.ZERO : certId;
       this.extensions = extensions;
@@ -237,7 +239,7 @@ public class X509Ca extends X509CaModule implements Closeable {
   }
 
   public List<CertListInfo> listCerts(
-      X500Name subjectPattern, Date validFrom, Date validTo, CertListOrderBy orderBy, int numEntries)
+      X500Name subjectPattern, Instant validFrom, Instant validTo, CertListOrderBy orderBy, int numEntries)
       throws OperationException {
     return certstore.listCerts(caIdent, subjectPattern, validFrom, validTo, orderBy, numEntries);
   }
@@ -267,7 +269,7 @@ public class X509Ca extends X509CaModule implements Closeable {
   }
 
   public CertWithRevocationInfo revokeCert(
-      RequestorInfo requestor, BigInteger serialNumber, CrlReason reason, Date invalidityTime)
+      RequestorInfo requestor, BigInteger serialNumber, CrlReason reason, Instant invalidityTime)
       throws OperationException {
     AuditEvent event = newAuditEvent(
         reason == CrlReason.CERTIFICATE_HOLD ? TYPE_suspend_cert : TYPE_revoke_cert, requestor);
@@ -577,8 +579,9 @@ public class X509Ca extends X509CaModule implements Closeable {
     event.addEventData(auditPrefix + CaAuditConstants.NAME_serial, LogUtil.formatCsn(serialNumber));
 
     X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
-        caInfo.getPublicCaInfo().getSubject(), serialNumber, gct.grantedNotBefore,
-        gct.grantedNotAfter, gct.grantedSubject, gct.grantedPublicKey);
+        caInfo.getPublicCaInfo().getSubject(), serialNumber,
+        Date.from(gct.grantedNotBefore), Date.from(gct.grantedNotAfter),
+        gct.grantedSubject, gct.grantedPublicKey);
 
     CertificateInfo ret;
 

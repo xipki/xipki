@@ -8,6 +8,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.util.CollectionUtil;
 
 import java.math.BigInteger;
+import java.time.Clock;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -137,7 +138,7 @@ class PendingCertificatePool {
         return null;
       }
 
-      long now = System.currentTimeMillis();
+      long now = Clock.systemUTC().millis();
 
       Set<CertificateInfo> ret = new HashSet<>();
 

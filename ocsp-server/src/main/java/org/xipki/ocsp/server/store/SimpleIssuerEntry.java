@@ -3,6 +3,8 @@
 
 package org.xipki.ocsp.server.store;
 
+import java.time.Instant;
+
 /**
  * Simple IssuerEntry containing only the id and RevocationTime.
  *
@@ -14,11 +16,11 @@ class SimpleIssuerEntry {
 
   private final int id;
 
-  private final Long revocationTimeMs;
+  private final Instant revocationTime;
 
-  SimpleIssuerEntry(int id, Long revocationTimeMs) {
+  SimpleIssuerEntry(int id, Instant revocationTime) {
     this.id = id;
-    this.revocationTimeMs = revocationTimeMs;
+    this.revocationTime = revocationTime;
   }
 
   public boolean match(IssuerEntry issuer) {
@@ -26,12 +28,12 @@ class SimpleIssuerEntry {
       return false;
     }
 
-    if (revocationTimeMs == null) {
+    if (revocationTime == null) {
       return issuer.getRevocationInfo() == null;
     }
 
     return issuer.getRevocationInfo() != null
-        && revocationTimeMs == issuer.getRevocationInfo().getRevocationTime().getTime();
+        && revocationTime == Instant.ofEpochSecond(issuer.getRevocationInfo().getRevocationTime().getEpochSecond());
   }
 
 } // class SimpleIssuerEntry

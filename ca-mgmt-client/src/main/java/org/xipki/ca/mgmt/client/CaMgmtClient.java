@@ -16,10 +16,7 @@ import org.xipki.security.KeyCertBytesPair;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.HttpConstants;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.SslContextConf;
@@ -37,8 +34,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
-import java.util.*;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * CA management client via REST API.
@@ -511,13 +512,13 @@ public class CaMgmtClient implements CaManager {
   } // method unrevokeCa
 
   @Override
-  public void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason, Date invalidityTime)
+  public void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason, Instant invalidityTime)
       throws CaMgmtException {
     MgmtRequest.RevokeCertificate req = new MgmtRequest.RevokeCertificate();
     req.setCaName(caName);
     req.setSerialNumber(serialNumber);
     req.setReason(reason);
-    req.setInvalidityTime(invalidityTime);
+    req.setInvalidityTime(toUtcTime(invalidityTime));
     voidTransmit(MgmtAction.revokeCertificate, req);
   } // method revokeCertificate
 
@@ -540,16 +541,16 @@ public class CaMgmtClient implements CaManager {
   } // method removeCertificate
 
   @Override
-  public X509Cert generateCrossCertificate(
-      String caName, String profileName, byte[] encodedCsr, byte[] encodedTargetCert, Date notBefore, Date notAfter)
+  public X509Cert generateCrossCertificate(String caName, String profileName, byte[] encodedCsr,
+                                           byte[] encodedTargetCert, Instant notBefore, Instant notAfter)
       throws CaMgmtException {
     MgmtRequest.GenerateCrossCertificate req = new MgmtRequest.GenerateCrossCertificate();
     req.setCaName(caName);
     req.setProfileName(profileName);
     req.setEncodedCsr(encodedCsr);
     req.setEncodedTargetCert(encodedTargetCert);
-    req.setNotBefore(notBefore);
-    req.setNotAfter(notAfter);
+    req.setNotBefore(toUtcTime(notBefore));
+    req.setNotAfter(toUtcTime(notAfter));
 
     byte[] respBytes = transmit(MgmtAction.generateCrossCertificate, req);
     return parseCert(((MgmtResponse.ByteArray) parse(respBytes, MgmtResponse.ByteArray.class)).getResult());
@@ -557,14 +558,14 @@ public class CaMgmtClient implements CaManager {
 
   @Override
   public X509Cert generateCertificate(
-      String caName, String profileName, byte[] encodedCsr, Date notBefore, Date notAfter)
+      String caName, String profileName, byte[] encodedCsr, Instant notBefore, Instant notAfter)
       throws CaMgmtException {
     MgmtRequest.GenerateCert req = new MgmtRequest.GenerateCert();
     req.setCaName(caName);
     req.setProfileName(profileName);
     req.setEncodedCsr(encodedCsr);
-    req.setNotBefore(notBefore);
-    req.setNotAfter(notAfter);
+    req.setNotBefore(toUtcTime(notBefore));
+    req.setNotAfter(toUtcTime(notAfter));
 
     byte[] respBytes = transmit(MgmtAction.generateCertificate, req);
     return parseCert(((MgmtResponse.ByteArray) parse(respBytes, MgmtResponse.ByteArray.class)).getResult());
@@ -572,14 +573,14 @@ public class CaMgmtClient implements CaManager {
 
   @Override
   public KeyCertBytesPair generateKeyCert(
-      String caName, String profileName, String subject, Date notBefore, Date notAfter)
+      String caName, String profileName, String subject, Instant notBefore, Instant notAfter)
       throws CaMgmtException {
     MgmtRequest.GenerateKeyCert req = new MgmtRequest.GenerateKeyCert();
     req.setCaName(caName);
     req.setProfileName(profileName);
     req.setSubject(subject);
-    req.setNotBefore(notBefore);
-    req.setNotAfter(notAfter);
+    req.setNotBefore(toUtcTime(notBefore));
+    req.setNotAfter(toUtcTime(notAfter));
 
     byte[] respBytes = transmit(MgmtAction.generateKeyCert, req);
     MgmtResponse.KeyCertBytes resp = parse(respBytes, MgmtResponse.KeyCertBytes.class);
@@ -588,15 +589,15 @@ public class CaMgmtClient implements CaManager {
 
   @Override
   public X509Cert generateRootCa(
-      CaEntry caEntry, String certprofileName, String subject, String serialNumber, Date notBefore, Date notAfter)
+      CaEntry caEntry, String certprofileName, String subject, String serialNumber, Instant notBefore, Instant notAfter)
       throws CaMgmtException {
     MgmtRequest.GenerateRootCa req = new MgmtRequest.GenerateRootCa();
     req.setCaEntry(new CaEntryWrapper(caEntry));
     req.setCertprofileName(certprofileName);
     req.setSubject(subject);
     req.setSerialNumber(serialNumber);
-    req.setNotBefore(notBefore);
-    req.setNotAfter(notAfter);
+    req.setNotBefore(toUtcTime(notBefore));
+    req.setNotAfter(toUtcTime(notAfter));
 
     byte[] respBytes = transmit(MgmtAction.generateRootCa, req);
     return parseCert(((MgmtResponse.ByteArray) parse(respBytes, MgmtResponse.ByteArray.class)).getResult());
@@ -690,8 +691,8 @@ public class CaMgmtClient implements CaManager {
   } // method exportConf
 
   @Override
-  public List<CertListInfo> listCertificates(
-      String caName, X500Name subjectPattern, Date validFrom, Date validTo, CertListOrderBy orderBy, int numEntries)
+  public List<CertListInfo> listCertificates(String caName, X500Name subjectPattern, Instant validFrom,
+                                             Instant validTo, CertListOrderBy orderBy, int numEntries)
       throws CaMgmtException {
     MgmtRequest.ListCertificates req = new MgmtRequest.ListCertificates();
     req.setCaName(caName);
@@ -703,8 +704,8 @@ public class CaMgmtClient implements CaManager {
       }
     }
 
-    req.setValidFrom(validFrom);
-    req.setValidTo(validTo);
+    req.setValidFrom(toUtcTime(validFrom));
+    req.setValidTo(toUtcTime(validTo));
     req.setOrderBy(orderBy);
     req.setNumEntries(numEntries);
 
@@ -849,5 +850,9 @@ public class CaMgmtClient implements CaManager {
       throw new CaMgmtException("cannot parse response " + clazz + " from byte[]", ex);
     }
   } // method parse
+
+  private static String toUtcTime(Instant instant) {
+    return instant == null ? null : DateUtil.toUtcTimeyyyyMMddhhmmss(instant);
+  }
 
 }

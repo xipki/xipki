@@ -3,7 +3,7 @@
 
 package org.xipki.ocsp.server.type;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -19,7 +19,7 @@ public class ResponseData extends ASN1Type {
 
   private final ResponderID responderId;
 
-  private final Date producedAt;
+  private final Instant producedAt;
 
   private final List<SingleResponse> responses;
 
@@ -29,7 +29,7 @@ public class ResponseData extends ASN1Type {
 
   private final int encodedLength;
 
-  public ResponseData(int version, ResponderID responderId, Date producedAt,
+  public ResponseData(int version, ResponderID responderId, Instant producedAt,
                       List<SingleResponse> responses, Extensions extensions) {
     if (version < 0 || version > 127) {
       throw new IllegalArgumentException("invalid version: " + version);

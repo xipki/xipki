@@ -32,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.sql.*;
+import java.time.Instant;
 import java.util.Date;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -288,8 +289,8 @@ class ImportCrl {
 
         String str = props.getProperty(KEY_CA_REVOCATION_TIME);
         if (StringUtil.isNotBlank(str)) {
-          Date revocationTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
-          Date invalidityTime = null;
+          Instant revocationTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
+          Instant invalidityTime = null;
 
           str = props.getProperty(KEY_CA_INVALIDITY_TIME);
           if (StringUtil.isNotBlank(str)) {
@@ -418,7 +419,7 @@ class ImportCrl {
     IoUtil.deleteFile(new File(generatedDir, "UPDATEME.SUCC"));
     IoUtil.deleteFile(new File(generatedDir, "UPDATEME.FAIL"));
 
-    long startTimeSec = System.currentTimeMillis() / 1000;
+    long startTimeSec = Instant.now().getEpochSecond();
 
     int id = crlDirInfo.crlId;
     String crlName = crlDirInfo.crlName;
@@ -443,13 +444,13 @@ class ImportCrl {
 
       if (!crlDirInfo.deleteMe && crlDirInfo.revocationinfo == null) {
         crl = new CrlStreamParser(crlDirInfo.crlFile);
-        Date now = new Date();
-        if (crl.getNextUpdate() != null && crl.getNextUpdate().before(now)) {
+        Instant now = Instant.now();
+        if (crl.getNextUpdate() != null && crl.getNextUpdate().isBefore(now)) {
           if (ignoreExpiredCrls) {
             LOG.error("CRL is expired, ignore it");
             return;
           }
-        } else if (crl.getThisUpdate().after(now)) {
+        } else if (crl.getThisUpdate().isAfter(now)) {
           LOG.error("CRL is not valid yet, ignore it");
           return;
         }
@@ -509,7 +510,7 @@ class ImportCrl {
         }
 
         vec.add(new DERTaggedObject(true, 1, new ASN1Integer(crl.getCrlNumber())));
-        vec.add(new DERTaggedObject(true, 2, new ASN1GeneralizedTime(crl.getThisUpdate())));
+        vec.add(new DERTaggedObject(true, 2, new ASN1GeneralizedTime(Date.from(crl.getThisUpdate()))));
         CrlID crlId = CrlID.getInstance(new DERSequence(vec));
 
         BigInteger crlNumber = crl.getCrlNumber();
@@ -602,7 +603,7 @@ class ImportCrl {
             id, crlDir.getPath()), th);
       }
 
-      crlDirInfo.updatemeFile.setLastModified(System.currentTimeMillis());
+      crlDirInfo.updatemeFile.setLastModified(Instant.now().toEpochMilli());
       crlDirInfo.updatemeFile.renameTo(new File(generatedDir, "UPDATEME." + (updateSucc ? "SUCC" : "FAIL")));
       if (!updateSucc && caCert != null) {
         if (!crlDirInfo.shareCaWithOtherCrl && caCert.databaseId != null) {
@@ -676,8 +677,8 @@ class ImportCrl {
 
         ps.setInt(offset++, issuerId);
         ps.setString(offset++, subject);
-        ps.setLong(offset++, caCert.cert.getNotBefore().getTime() / 1000);
-        ps.setLong(offset++, caCert.cert.getNotAfter().getTime() / 1000);
+        ps.setLong(offset++, caCert.cert.getNotBefore().getEpochSecond());
+        ps.setLong(offset++, caCert.cert.getNotAfter().getEpochSecond());
         ps.setString(offset++, caCert.base64Sha1Fp);
         ps.setString(offset++, caCert.base64Encoded);
         ps.setString(offset, revInfo == null ? null : revInfo.getEncoded());
@@ -765,11 +766,11 @@ class ImportCrl {
         num++;
 
         // If the system time is adjusted to a previous time point during the
-        // import process, System.currentTime...() may be before startTime.
+        // import process, Instant.now() may be before startTime.
         // Since all entries in the database whose Last-Update is before
         // startTime will be deleted, we must ensure that the Last-Update is
         // not before startTime.
-        long updateTimeSec = Math.max(System.currentTimeMillis() / 1000, startTimeSec);
+        long updateTimeSec = Math.max(Instant.now().getEpochSecond(), startTimeSec);
 
         RevokedCert revCert = revokedCertList.next();
         BigInteger serial = revCert.getSerialNumber();
@@ -1019,13 +1020,13 @@ class ImportCrl {
         ps.setNull(offset++, Types.BIGINT);
 
         // last update LUPDATE
-        ps.setLong(offset++, System.currentTimeMillis() / 1000);
+        ps.setLong(offset++, Instant.now().getEpochSecond());
 
         TBSCertificate tbsCert = cert.toBcCert().toASN1Structure().getTBSCertificate();
         // not before NBEFORE
-        ps.setLong(offset++, tbsCert.getStartDate().getDate().getTime() / 1000);
+        ps.setLong(offset++, tbsCert.getStartDate().getDate().toInstant().getEpochSecond());
         // not after NAFTER
-        ps.setLong(offset++, tbsCert.getEndDate().getDate().getTime() / 1000);
+        ps.setLong(offset++, tbsCert.getEndDate().getDate().toInstant().getEpochSecond());
         ps.setInt(offset++, crlInfoId);
 
         ps.setString(offset, b64CertHash);
@@ -1036,13 +1037,13 @@ class ImportCrl {
 
           int offset = 1;
           // last update LUPDATE
-          ps.setLong(offset++, System.currentTimeMillis() / 1000);
+          ps.setLong(offset++, Instant.now().getEpochSecond());
 
           TBSCertificate tbsCert = cert.toBcCert().toASN1Structure().getTBSCertificate();
           // not before NBEFORE
-          ps.setLong(offset++, tbsCert.getStartDate().getDate().getTime() / 1000);
+          ps.setLong(offset++, tbsCert.getStartDate().getDate().toInstant().getEpochSecond());
           // not after NAFTER
-          ps.setLong(offset++, tbsCert.getEndDate().getDate().getTime() / 1000);
+          ps.setLong(offset++, tbsCert.getEndDate().getDate().toInstant().getEpochSecond());
           ps.setInt(offset++, crlInfoId);
 
           ps.setString(offset++, b64CertHash);
@@ -1052,7 +1053,7 @@ class ImportCrl {
           ps = psUpdateCertLastupdate;
 
           // last update LUPDATE
-          ps.setLong(1, System.currentTimeMillis() / 1000);
+          ps.setLong(1, Instant.now().getEpochSecond());
           ps.setLong(2, existingCertInfo.id);
         }
       }
@@ -1093,7 +1094,7 @@ class ImportCrl {
         ps.setNull(offset++, Types.BIGINT);
         ps.setNull(offset++, Types.BIGINT);
         // last update LUPDATE
-        ps.setLong(offset++, System.currentTimeMillis() / 1000);
+        ps.setLong(offset++, Instant.now().getEpochSecond());
 
         // not before NBEFORE, we use the minimal time
         ps.setLong(offset++, 0);
@@ -1108,7 +1109,7 @@ class ImportCrl {
 
           int offset = 1;
           // last update LUPDATE
-          ps.setLong(offset++, System.currentTimeMillis() / 1000);
+          ps.setLong(offset++, Instant.now().getEpochSecond());
 
           // not before NBEFORE, we use the minimal time
           ps.setLong(offset++, 0);
@@ -1122,7 +1123,7 @@ class ImportCrl {
           ps = psUpdateCertLastupdate;
 
           // last update LUPDATE
-          ps.setLong(1, System.currentTimeMillis() / 1000);
+          ps.setLong(1, Instant.now().getEpochSecond());
           ps.setLong(2, existingCertInfo.id);
         }
       }

@@ -16,7 +16,8 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.Security;
-import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 /**
  * SCEP server.
@@ -90,7 +91,7 @@ public class ScepServer {
     SubjectPublicKeyInfo pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
     X500Name subject = new X500Name("CN=CA1, OU=emulator, O=myorg.org, C=DE");
     this.caCert = MyUtil.issueSubCaCert(rcaKey, rcaSubject, pkInfo, subject, BigInteger.valueOf(2),
-        new Date(System.currentTimeMillis() - 10 * CaEmulator.MIN_IN_MS));
+                    Instant.now().minus(10, ChronoUnit.MINUTES));
     CaEmulator ca = new CaEmulator(keypair.getPrivate(), this.caCert, generateCrl);
 
     RaEmulator ra = null;
@@ -112,7 +113,7 @@ public class ScepServer {
       pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
       subject = new X500Name("CN=CA2, OU=emulator, O=myorg.org, C=DE");
 
-      Date startTime = new Date(System.currentTimeMillis() + 365 * CaEmulator.DAY_IN_MS);
+      Instant startTime = Instant.now().plus(365, ChronoUnit.DAYS);
       this.nextCaCert = MyUtil.issueSubCaCert(rcaKey, rcaSubject, pkInfo, subject, BigInteger.valueOf(2), startTime);
       CaEmulator tmpCa = new CaEmulator(keypair.getPrivate(), this.nextCaCert, generateCrl);
 
@@ -122,7 +123,7 @@ public class ScepServer {
         pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
 
         subject = new X500Name("CN=RA2, OU=emulator, O=myorg.org, C=DE");
-        Date raStartTime = new Date(startTime.getTime() + 10 * CaEmulator.DAY_IN_MS);
+        Instant raStartTime = Instant.now().plus(10, ChronoUnit.DAYS);
         this.nextRaCert = tmpCa.generateCert(pkInfo, subject, raStartTime);
       } // end if(withRA)
 

@@ -34,6 +34,8 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -193,8 +195,8 @@ public class QaOcspActions {
         String line;
 
         int sum = 0;
-        long startDate = System.currentTimeMillis();
-        long lastPrintDate = 0;
+        Instant startDate = Instant.now();
+        Instant lastPrintDate = Instant.ofEpochMilli(0);
         while ((line = snReader.readLine()) != null) {
           lineNo++;
           line = line.trim();
@@ -225,9 +227,9 @@ public class QaOcspActions {
 
           println(resultText, resultOut);
 
-          long now = System.currentTimeMillis();
-          if (now - lastPrintDate > 980) { // use 980 ms to ensure the output every second.
-            String duration = StringUtil.formatTime((now - startDate) / 1000, false);
+          Instant now = Instant.now();
+          if (Duration.between(lastPrintDate, now).toMillis() > 980) { // use 980 ms to ensure the output every second.
+            String duration = StringUtil.formatTime(Duration.between(startDate, now).getSeconds(), false);
             print("\rProcessed " + sum + " requests in " + duration);
             lastPrintDate = now;
           }
@@ -259,7 +261,7 @@ public class QaOcspActions {
         sum++;
 
         print("\rProcessed " + sum + " requests in "
-            + StringUtil.formatTime((System.currentTimeMillis() - startDate) / 1000, false));
+            + StringUtil.formatTime(Duration.between(startDate, Instant.now()).getSeconds(), false));
         println("");
 
         println(resultText, resultOut);
@@ -283,7 +285,7 @@ public class QaOcspActions {
       int count = tokens.countTokens();
       BigInteger serialNumber;
       OcspCertStatus status;
-      Date revTime = null;
+      Instant revTime = null;
       try {
         serialNumber = toBigInt(tokens.nextToken(), hex);
 
@@ -344,8 +346,9 @@ public class QaOcspActions {
     } // method processOcspQuery
 
     private ValidationResult processOcspQuery(
-        OcspQa ocspQa, BigInteger serialNumber, OcspCertStatus status, Date revTime, File messageDir, File detailsDir,
-        URL serverUrl, X509Cert respIssuer, X509Cert issuerCert, IssuerHash issuerHash, RequestOptions requestOptions)
+        OcspQa ocspQa, BigInteger serialNumber, OcspCertStatus status, Instant revTime,
+        File messageDir, File detailsDir, URL serverUrl, X509Cert respIssuer,
+        X509Cert issuerCert, IssuerHash issuerHash, RequestOptions requestOptions)
         throws Exception {
       if (status == OcspCertStatus.unknown) {
         if (isNotBlank(unknownAs)) {
@@ -573,7 +576,7 @@ public class QaOcspActions {
 
     private Map<BigInteger, OcspCertStatus> expectedStatuses;
 
-    private Map<BigInteger, Date> expecteRevTimes;
+    private Map<BigInteger, Instant> expectedRevTimes;
 
     private TripleState expectedNextUpdateOccurrence;
 
@@ -621,12 +624,12 @@ public class QaOcspActions {
               + (revTimeTexts.size()) + ", it should be " + serialNumbers.size());
         }
 
-        expecteRevTimes = new HashMap<>();
+        expectedRevTimes = new HashMap<>();
         final int n = serialNumbers.size();
 
         for (int i = 0; i < n; i++) {
-          Date revTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(revTimeTexts.get(i));
-          expecteRevTimes.put(serialNumbers.get(i), revTime);
+          Instant revTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(revTimeTexts.get(i));
+          expectedRevTimes.put(serialNumbers.get(i), revTime);
         }
       }
 
@@ -662,7 +665,7 @@ public class QaOcspActions {
         result = ocspQa.checkOcsp(response, expectedOcspError);
       } else {
         result = ocspQa.checkOcsp(response, issuerHash, serialNumbers, encodedCerts,
-                    expectedStatuses, expecteRevTimes, responseOption, noSigVerify);
+                    expectedStatuses, expectedRevTimes, responseOption, noSigVerify);
       }
 
       StringBuilder sb = new StringBuilder(50);

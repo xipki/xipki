@@ -19,6 +19,7 @@ import org.xipki.util.exception.BadCertTemplateException;
 import java.io.Closeable;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -614,7 +615,7 @@ public abstract class Certprofile implements Closeable {
    *          Requested NotBefore. Could be {@code null}.
    * @return the granted NotBefore.
    */
-  public abstract Date getNotBefore(Date notBefore);
+  public abstract Instant getNotBefore(Instant notBefore);
 
   public abstract Validity getValidity();
 
@@ -704,7 +705,7 @@ public abstract class Certprofile implements Closeable {
   public abstract ExtensionValues getExtensions(
       Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls, X500Name requestedSubject,
       X500Name grantedSubject, Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
-      Date notBefore, Date notAfter, PublicCaInfo caInfo)
+      Instant notBefore, Instant notAfter, PublicCaInfo caInfo)
           throws CertprofileException, BadCertTemplateException;
 
   /**

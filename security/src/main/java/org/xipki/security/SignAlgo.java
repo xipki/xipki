@@ -134,9 +134,9 @@ public enum SignAlgo {
 
   // AES-GMAC
   // we ignore there the params of GMAC
-  GMAC_AES128("AES128GMAC", 0x61, new ASN1ObjectIdentifier("2.16.840.1.101.3.4.1.9")),
-  GMAC_AES192("AES192GMAC", 0x62, new ASN1ObjectIdentifier("2.16.840.1.101.3.4.1.29")),
-  GMAC_AES256("AES256GMAC", 0x63, new ASN1ObjectIdentifier("2.16.840.1.101.3.4.1.49")),
+  GMAC_AES128("AES-GMAC", 0x61, new ASN1ObjectIdentifier("2.16.840.1.101.3.4.1.9")),
+  GMAC_AES192("AES-GMAC", 0x62, new ASN1ObjectIdentifier("2.16.840.1.101.3.4.1.29")),
+  GMAC_AES256("AES-GMAC", 0x63, new ASN1ObjectIdentifier("2.16.840.1.101.3.4.1.49")),
 
   //DHPOP-MAC
   DHPOP_X25519("DHPOP-X25519", 0x5A, Xipki.id_alg_dhPop_x25519, SHA512, false),

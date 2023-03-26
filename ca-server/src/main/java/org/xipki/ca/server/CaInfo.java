@@ -27,6 +27,8 @@ import org.xipki.util.exception.OperationException;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -40,19 +42,17 @@ public class CaInfo {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaInfo.class);
 
-  private static final long MS_PER_DAY = 24L * 60 * 60 * 1000;
-
   private final CaEntry caEntry;
 
   private final CaConfColumn caConfColumn;
 
-  private final long noNewCertificateAfter;
+  private final Instant noNewCertificateAfter;
 
   private final BigInteger serialNumber;
 
-  private final Date notBefore;
+  private final Instant notBefore;
 
-  private final Date notAfter;
+  private final Instant notAfter;
 
   private final boolean selfSigned;
 
@@ -102,7 +102,7 @@ public class CaInfo {
         this.certchainInCmpFormat.add(new CMPCertificate(c.toBcCert().toASN1Structure()));
       }
     }
-    this.noNewCertificateAfter = notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
+    this.noNewCertificateAfter = notAfter.minus(caEntry.getExpirationPeriod(), ChronoUnit.DAYS);
     this.randomSnGenerator = RandomSerialNumberGenerator.getInstance();
     this.extraControl = caEntry.getExtraControl();
 
@@ -154,11 +154,11 @@ public class CaInfo {
     return caEntry.getSubject();
   }
 
-  public Date getNotBefore() {
+  public Instant getNotBefore() {
     return notBefore;
   }
 
-  public Date getNotAfter() {
+  public Instant getNotAfter() {
     return notAfter;
   }
 
@@ -174,7 +174,7 @@ public class CaInfo {
     return certInCmpFormat;
   }
 
-  public long getNoNewCertificateAfter() {
+  public Instant getNoNewCertificateAfter() {
     return noNewCertificateAfter;
   }
 

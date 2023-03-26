@@ -3,8 +3,10 @@
 
 package org.xipki.util;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -180,7 +182,7 @@ public abstract class BenchmarkExecutor {
 
   protected boolean stop() {
     return interrupted || errorAccount.get() > 0
-        || System.currentTimeMillis() - processLog.startTimeMs() >= duration * 1000L;
+        || Duration.between(processLog.startTime(), Instant.now()).getSeconds() >= duration;
   }
 
   protected void printHeader() {
@@ -202,9 +204,9 @@ public abstract class BenchmarkExecutor {
     String averageText = StringUtil.formatAccount(processLog.totalAverageSpeed(), 1);
 
     String msg = StringUtil.concatObjectsCap(400,
-        " started at: ", new Date(processLog.startTimeMs()),
-        "\nfinished at: ", new Date(processLog.endTimeMs()),
-        "\n   duration: ", StringUtil.formatTime(processLog.totalElapsedTime() / 1000, false),
+        " started at: ", processLog.startTime().atZone(ZoneOffset.systemDefault()),
+        "\nfinished at: ", processLog.endTime().atZone(ZoneOffset.systemDefault()),
+        "\n   duration: ", StringUtil.formatTime(processLog.totalElapsedTime().getSeconds(), false),
         "\n    account: ", StringUtil.formatAccount(processLog.numProcessed(), 1), " ", unit,
         "\n     failed: ", StringUtil.formatAccount(errorAccount.get(), 1), " ", unit,
         "\n    average: ", averageText, " ", unit, "/s\n");

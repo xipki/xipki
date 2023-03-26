@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Clock;
 import java.util.Properties;
 import java.util.Set;
 
@@ -82,7 +83,7 @@ public class DigestDiffWorker extends DbWorker {
 
   @Override
   protected void run0() throws Exception {
-    long start = System.currentTimeMillis();
+    long start = Clock.systemUTC().millis();
 
     try {
       DigestDiff diff = new DigestDiff(datasource, targetDatasource, reportDir, revokedOnly,
@@ -101,7 +102,7 @@ public class DigestDiffWorker extends DbWorker {
       } catch (Throwable th) {
         LOG.error("datasource.close()", th);
       }
-      long end = System.currentTimeMillis();
+      long end = Clock.systemUTC().millis();
       System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
     }
   } // method run0

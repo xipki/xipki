@@ -15,6 +15,7 @@ package org.xipki.datasource;
  * GPSHansl, 06.08.2015: regex for delimiter, rearrange comment/delimiter detection, remove
  * some ide warnings.
  */
+
 import org.xipki.password.PasswordResolver;
 import org.xipki.util.IoUtil;
 
@@ -22,7 +23,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.*;
-import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -105,7 +106,7 @@ public class ScriptRunner {
     } catch(IOException e){
       System.err.println("Unable to access or create the db_create error log");
     }
-    String timeStamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date());
+    String timeStamp = ZonedDateTime.now().toString();
     println("\n-------\n" + timeStamp + "\n-------\n");
     printlnError("\n-------\n" + timeStamp + "\n-------\n");
   }

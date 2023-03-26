@@ -33,6 +33,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -62,7 +64,7 @@ public class DbCertStatusStore extends OcspStore {
 
   private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
 
-  private static final long MS_PER_5MIN = 300L * 1000;
+  private static final int SECONDS_PER_5MIN = 300;
 
   private final Object lock = new Object();
 
@@ -149,12 +151,12 @@ public class DbCertStatusStore extends OcspStore {
             }
 
             int id = rs.getInt("ID");
-            Long revTimeMs = null;
+            Instant revTime = null;
             String str = rs.getString("REV_INFO");
             if (str != null) {
-              revTimeMs = CertRevocationInfo.fromEncoded(str).getRevocationTime().getTime();
+              revTime = CertRevocationInfo.fromEncoded(str).getRevocationTime();
             }
-            newIssuers.put(id, new SimpleIssuerEntry(id, revTimeMs));
+            newIssuers.put(id, new SimpleIssuerEntry(id, revTime));
           }
 
           // no change in the issuerStore
@@ -260,11 +262,11 @@ public class DbCertStatusStore extends OcspStore {
   } // method updateCrls
 
   @Override
-  protected CertStatusInfo getCertStatus0(Date time, RequestIssuer reqIssuer, BigInteger serialNumber,
+  protected CertStatusInfo getCertStatus0(Instant time, RequestIssuer reqIssuer, BigInteger serialNumber,
                                           boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
       throws OcspStoreException {
     if (serialNumber.signum() != 1) { // non-positive serial number
-      return CertStatusInfo.getUnknownCertStatusInfo(new Date(), null);
+      return CertStatusInfo.getUnknownCertStatusInfo(Instant.now(), null);
     }
 
     if (!initialized) {
@@ -285,7 +287,7 @@ public class DbCertStatusStore extends OcspStore {
         // check whether CRL is expired
         if (isIgnoreExpiredCrls()) {
           // CRL will expire in 5 minutes
-          if (crlInfo.getNextUpdate().getTime() < time.getTime() + MS_PER_5MIN) {
+          if (crlInfo.getNextUpdate().getEpochSecond() < time.getEpochSecond() + SECONDS_PER_5MIN) {
             return CertStatusInfo.getCrlExpiredStatusInfo();
           }
         }
@@ -320,7 +322,7 @@ public class DbCertStatusStore extends OcspStore {
           unknown = false;
           crlId = rs.getInt("CRL_ID");
 
-          long timeInSec = time.getTime() / 1000;
+          long timeInSec = time.getEpochSecond();
           if (ignoreNotYetValidCert) {
             long notBeforeInSec = rs.getLong("NBEFORE");
             if (notBeforeInSec != 0 && timeInSec < notBeforeInSec) {
@@ -364,10 +366,10 @@ public class DbCertStatusStore extends OcspStore {
         crlInfo = issuerStore.getCrlInfo(crlId);
       }
 
-      Date thisUpdate;
-      Date nextUpdate;
+      Instant thisUpdate;
+      Instant nextUpdate;
       if (crlInfo == null) {
-        thisUpdate = new Date();
+        thisUpdate = Instant.now();
         nextUpdate = null;
       } else {
         thisUpdate = crlInfo.getThisUpdate();
@@ -375,7 +377,7 @@ public class DbCertStatusStore extends OcspStore {
 
         if (isIgnoreExpiredCrls()) {
           // CRL will expire in 5 minutes
-          if (crlInfo.getNextUpdate().getTime() < time.getTime() + MS_PER_5MIN) {
+          if (crlInfo.getNextUpdate().getEpochSecond() < time.getEpochSecond() + SECONDS_PER_5MIN) {
             return CertStatusInfo.getCrlExpiredStatusInfo();
           }
         }
@@ -388,8 +390,8 @@ public class DbCertStatusStore extends OcspStore {
       } else {
         byte[] certHash = (b64CertHash == null) ? null : Base64.decodeFast(b64CertHash);
         if (revoked) {
-          Date invTime = (invalTime == 0 || invalTime == revTime) ? null : new Date(invalTime * 1000);
-          CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(revTime * 1000), invTime);
+          Instant invTime = (invalTime == 0 || invalTime == revTime) ? null : Instant.ofEpochSecond(invalTime);
+          CertRevocationInfo revInfo = new CertRevocationInfo(reason, Instant.ofEpochSecond(revTime), invTime);
           certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
               certHashAlgo, certHash, thisUpdate, nextUpdate, null);
         } else {
@@ -403,9 +405,14 @@ public class DbCertStatusStore extends OcspStore {
 
       if (includeArchiveCutoff) {
         if (retentionInterval != 0) {
-          Date date = (retentionInterval < 0)
-            ? issuer.getNotBefore() // expired certificate remains in status store forever
-            : new Date(Math.max(issuer.getNotBefore().getTime(), System.currentTimeMillis() - DAY * retentionInterval));
+          Instant date;
+
+          if (retentionInterval < 0) {
+            date = issuer.getNotBefore(); // expired certificate remains in status store forever
+          } else {
+            Instant t1 = Instant.now().minus(retentionInterval, ChronoUnit.DAYS);
+            date = issuer.getNotBefore().isBefore(t1) ? issuer.getNotBefore() : t1;
+          }
 
           certStatusInfo.setArchiveCutOff(date);
         }
@@ -425,7 +432,7 @@ public class DbCertStatusStore extends OcspStore {
           replaced = true;
         }
       } else if (certStatus == CertStatus.REVOKED) {
-        if (certStatusInfo.getRevocationInfo().getRevocationTime().after(caRevInfo.getRevocationTime())) {
+        if (certStatusInfo.getRevocationInfo().getRevocationTime().isAfter(caRevInfo.getRevocationTime())) {
           replaced = true;
         }
       }

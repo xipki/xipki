@@ -34,6 +34,7 @@ import org.xipki.util.http.HttpRespContent;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.time.Instant;
 import java.util.*;
 
 import static org.xipki.audit.AuditLevel.ERROR;
@@ -458,10 +459,10 @@ public class RestResponder {
     }
 
     String strNotBefore = httpRetriever.getParameter(PARAM_not_before);
-    Date notBefore = (strNotBefore == null) ? null :  DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotBefore);
+    Instant notBefore = (strNotBefore == null) ? null :  DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotBefore);
 
     String strNotAfter = httpRetriever.getParameter(PARAM_not_after);
-    Date notAfter = (strNotAfter == null) ? null : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotAfter);
+    Instant notAfter = (strNotAfter == null) ? null : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotAfter);
 
     X500Name subject;
     Extensions extensions;
@@ -619,10 +620,10 @@ public class RestResponder {
     }
 
     String strNotBefore = httpRetriever.getParameter(PARAM_not_before);
-    Date notBefore = (strNotBefore == null) ? null : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotBefore);
+    Instant notBefore = (strNotBefore == null) ? null : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotBefore);
 
     String strNotAfter = httpRetriever.getParameter(PARAM_not_after);
-    Date notAfter = (strNotAfter == null) ? null : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotAfter);
+    Instant notAfter = (strNotAfter == null) ? null : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotAfter);
 
     byte[] csrBytes = null;
     byte[] targetCertBytes = null;
@@ -675,8 +676,10 @@ public class RestResponder {
     Extensions extensions = targetCert.getTBSCertificate().getExtensions();
     X500Name subject = targetCert.getSubject();
     BigInteger certId = BigInteger.ONE;
-    if (notAfter == null || notAfter.after(targetCert.getEndDate().getDate())) {
-      notAfter = targetCert.getEndDate().getDate();
+
+    Instant targetCertEndDate = targetCert.getEndDate().getDate().toInstant();
+    if (notAfter == null || notAfter.isAfter(targetCertEndDate)) {
+      notAfter = targetCertEndDate;
     }
 
     EnrollCertRequestEntry template = new EnrollCertRequestEntry();
@@ -807,7 +810,7 @@ public class RestResponder {
       }
       event.addEventData(CaAuditConstants.NAME_reason, reason);
 
-      Date invalidityTime = null;
+      Instant invalidityTime = null;
       String strInvalidityTime = httpRetriever.getParameter(PARAM_invalidity_time);
       if (StringUtil.isNotBlank(strInvalidityTime)) {
         invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(strInvalidityTime);
@@ -816,7 +819,7 @@ public class RestResponder {
       RevokeCertRequestEntry entry = new RevokeCertRequestEntry();
       entry.setSerialNumber(serialNumber);
       if (invalidityTime != null) {
-        entry.setInvalidityTime(invalidityTime.getTime() / 1000);
+        entry.setInvalidityTime(invalidityTime.getEpochSecond());
       }
       entry.setReason(reason);
 

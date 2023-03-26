@@ -27,7 +27,6 @@ import org.bouncycastle.operator.OutputEncryptor;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
-import org.xipki.password.PasswordResolverException;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.*;
 import org.xipki.security.ObjectIdentifiers.Xipki;
@@ -52,6 +51,8 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -62,6 +63,8 @@ import java.util.Map.Entry;
  */
 
 public class Actions {
+
+  public static final String TEXT_F4 = "0x10001";
 
   @Command(scope = "xi", name = "cert-info", description = "print certificate information")
   @Service
@@ -294,10 +297,10 @@ public class Actions {
       } else if (issuer != null && issuer) {
         return crl.getIssuer().toString();
       } else if (thisUpdate != null && thisUpdate) {
-        return toUtcTimeyyyyMMddhhmmssZ(crl.getThisUpdate().getDate());
+        return toUtcTimeyyyyMMddhhmmssZ(crl.getThisUpdate().getDate().toInstant());
       } else if (nextUpdate != null && nextUpdate) {
         return crl.getNextUpdate() == null ? "null" :
-          toUtcTimeyyyyMMddhhmmssZ(crl.getNextUpdate().getDate());
+          toUtcTimeyyyyMMddhhmmssZ(crl.getNextUpdate().getDate().toInstant());
       }
 
       return null;
@@ -352,7 +355,6 @@ public class Actions {
   }
 
   public abstract static class BaseCsrGenAction extends SecurityAction {
-    private static final long _12_HOURS_MS = 12L * 60 * 60 * 1000;
 
     @Option(name = "--subject-alt-name", aliases = "--san", multiValued = true,
             description = "subjectAltName, in the form of [tagNo]value or [tagText]value. "
@@ -668,8 +670,8 @@ public class Actions {
           RDN[] rdns = newSubjectDn.getRDNs(id);
 
           if (rdns == null || rdns.length == 0) {
-            Date date = DateUtil.parseUtcTimeyyyyMMdd(dateOfBirth);
-            date = new Date(date.getTime() + _12_HOURS_MS);
+            Instant date = DateUtil.parseUtcTimeyyyyMMdd(dateOfBirth);
+            date = date.plus(12, ChronoUnit.HOURS);
             list.add(new RDN(id, new DERGeneralizedTime(DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z")));
           }
         }
@@ -1137,7 +1139,7 @@ public class Actions {
     @Reference
     protected SecurityFactory securityFactory;
 
-    protected String toUtcTimeyyyyMMddhhmmssZ(Date date) {
+    protected String toUtcTimeyyyyMMddhhmmssZ(Instant date) {
       return DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z";
     }
 

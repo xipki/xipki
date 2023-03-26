@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
 
 /**
  * EST servlet.
@@ -56,7 +55,7 @@ public class HttpEstServlet extends HttpServlet {
   private void service0(HttpServletRequest req, HttpServletResponse resp, boolean viaPost)
       throws IOException {
     AuditService auditService = Audits.getAuditService();
-    AuditEvent event = new AuditEvent(new Date());
+    AuditEvent event = new AuditEvent();
     event.setApplicationName("est-gw");
 
     try {

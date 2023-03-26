@@ -5,9 +5,10 @@ package org.xipki.ca.certprofile.xijson;
 
 import org.xipki.util.Args;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Control of the certificate's NotBefore field.
@@ -17,16 +18,16 @@ import java.util.TimeZone;
  */
 public class NotBeforeOption {
 
-  private final TimeZone midNightTimeZone;
+  private final ZoneId midNightTimeZone;
 
-  private final Long offsetMillis;
+  private final Long offsetSeconds;
 
-  private NotBeforeOption(TimeZone midNightTimeZone, Long offsetSeconds) {
+  private NotBeforeOption(ZoneId midNightTimeZone, Long offsetSeconds) {
     this.midNightTimeZone = midNightTimeZone;
-    this.offsetMillis = (offsetSeconds == null) ? null : offsetSeconds * 1000;
+    this.offsetSeconds = (offsetSeconds == null) ? null : offsetSeconds;
   }
 
-  static NotBeforeOption getMidNightOption(TimeZone timeZone) {
+  static NotBeforeOption getMidNightOption(ZoneId timeZone) {
     return new NotBeforeOption(timeZone, null);
   }
 
@@ -35,36 +36,33 @@ public class NotBeforeOption {
     return new NotBeforeOption(null, offsetSeconds);
   }
 
-  Date getNotBefore(Date requestedNotBefore) {
-    long now = System.currentTimeMillis();
+  Instant getNotBefore(Instant requestedNotBefore) {
+    long nowSecond = Instant.now().getEpochSecond();
     if (requestedNotBefore != null) {
-      long notOlderThan = (offsetMillis != null && offsetMillis < 0) ? now + offsetMillis : now;
-      long notBefore = Math.max(requestedNotBefore.getTime(), notOlderThan);
-
-      return (midNightTimeZone == null) ? new Date(notBefore) : setToMidnight(notBefore);
+      long notOlderThan = (offsetSeconds != null && offsetSeconds < 0) ? nowSecond + offsetSeconds : nowSecond;
+      long notBefore = Math.max(requestedNotBefore.getEpochSecond(), notOlderThan);
+      return (midNightTimeZone != null) ? setToMidnight(notBefore) : Instant.now();
     } else {
-      return (midNightTimeZone != null) ? setToMidnight(now) : new Date(System.currentTimeMillis() + offsetMillis);
+      return (midNightTimeZone != null) ? setToMidnight(nowSecond) : Instant.now().plusSeconds(offsetSeconds);
     }
   } // method getNotBefore
 
-  private Date setToMidnight(long date) {
-    Calendar cal = Calendar.getInstance(midNightTimeZone);
-    // the next midnight time
-    final long dayInMs = 24L * 60 * 60 * 1000;
-    cal.setTime(new Date(date + dayInMs - 1));
-    cal.set(Calendar.HOUR_OF_DAY, 0);
-    cal.set(Calendar.MINUTE, 0);
-    cal.set(Calendar.SECOND, 0);
-    cal.set(Calendar.MILLISECOND, 0);
-    return cal.getTime();
+  // get the next mid-night time.
+  private Instant setToMidnight(long epochSeconds) {
+    ZonedDateTime zd = ZonedDateTime.ofInstant(
+        Instant.ofEpochSecond(epochSeconds).plus(1, ChronoUnit.DAYS).minus(1, ChronoUnit.MILLIS),
+        midNightTimeZone);
+
+    return ZonedDateTime.of(zd.getYear(), zd.getMonthValue(), zd.getDayOfMonth(),
+        0, 0, 0, 0, midNightTimeZone).toInstant();
   } // method setToMidnight
 
-  public TimeZone getMidNightTimeZone() {
+  public ZoneId getMidNightTimeZone() {
     return midNightTimeZone;
   }
 
-  public Long getOffsetMillis() {
-    return offsetMillis;
+  public Long getOffsetSeconds() {
+    return offsetSeconds;
   }
 
 }

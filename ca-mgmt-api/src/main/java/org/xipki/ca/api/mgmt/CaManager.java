@@ -14,7 +14,7 @@ import org.xipki.security.X509Cert;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -545,7 +545,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason, Date invalidityTime)
+  void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason, Instant invalidityTime)
       throws CaMgmtException;
 
   /**
@@ -592,7 +592,8 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  X509Cert generateCertificate(String caName, String profileName, byte[] encodedCsr, Date notBefore, Date notAfter)
+  X509Cert generateCertificate(String caName, String profileName, byte[] encodedCsr,
+                               Instant notBefore, Instant notAfter)
       throws CaMgmtException;
 
   /**
@@ -613,7 +614,7 @@ public interface CaManager {
    *          if error occurs.
    */
   KeyCertBytesPair generateKeyCert(
-      String caName, String profileName, String subject, Date notBefore, Date notAfter)
+      String caName, String profileName, String subject, Instant notBefore, Instant notAfter)
       throws CaMgmtException;
 
   /**
@@ -637,8 +638,8 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  X509Cert generateCrossCertificate(
-      String caName, String profileName, byte[] encodedCsr, byte[] encodedTargetCert, Date notBefore, Date notAfter)
+  X509Cert generateCrossCertificate(String caName, String profileName, byte[] encodedCsr, byte[] encodedTargetCert,
+                                    Instant notBefore, Instant notAfter)
       throws CaMgmtException;
 
   /**
@@ -662,7 +663,7 @@ public interface CaManager {
    *          if error occurs.
    */
   X509Cert generateRootCa(
-      CaEntry caEntry, String certprofileName, String subject, String serialNumber, Date notBefore, Date notAfter)
+      CaEntry caEntry, String certprofileName, String subject, String serialNumber, Instant notBefore, Instant notAfter)
       throws CaMgmtException;
 
   /**
@@ -768,8 +769,8 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  List<CertListInfo> listCertificates(
-      String caName, X500Name subjectPattern, Date validFrom, Date validTo, CertListOrderBy orderBy, int numEntries)
+  List<CertListInfo> listCertificates(String caName, X500Name subjectPattern, Instant validFrom,
+                                      Instant validTo, CertListOrderBy orderBy, int numEntries)
       throws CaMgmtException;
 
   /**

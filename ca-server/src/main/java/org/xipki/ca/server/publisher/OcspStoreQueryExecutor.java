@@ -21,6 +21,7 @@ import org.xipki.util.exception.OperationException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -208,8 +209,6 @@ class OcspStoreQueryExecutor {
     String certHash = certhashAlgo.base64Hash(encodedCert);
 
     X509Cert cert = certificate.getCert();
-    long notBeforeSeconds = cert.getNotBefore().getTime() / 1000;
-    long notAfterSeconds = cert.getNotAfter().getTime() / 1000;
     String cuttedSubject = X509Util.cutText(certificate.getCert().getSubjectText(), maxX500nameLen);
 
     PreparedStatement ps = datasource.prepareStatement(sql);
@@ -218,20 +217,20 @@ class OcspStoreQueryExecutor {
       // CERT
       int idx = 1;
       ps.setLong(idx++, certId);
-      ps.setLong(idx++, System.currentTimeMillis() / 1000); // currentTimeSeconds
+      ps.setLong(idx++, Instant.now().getEpochSecond()); // currentTimeSeconds
       ps.setString(idx++, serialNumber.toString(16));
-      ps.setLong(idx++, notBeforeSeconds);
-      ps.setLong(idx++, notAfterSeconds);
+      ps.setLong(idx++, cert.getNotBefore().getEpochSecond());
+      ps.setLong(idx++, cert.getNotAfter().getEpochSecond());
       setBoolean(ps, idx++, revoked);
       ps.setInt(idx++, issuerId);
       ps.setString(idx++, certHash);
       ps.setString(idx++, cuttedSubject);
 
       if (revoked) {
-        long revTime = revInfo.getRevocationTime().getTime() / 1000;
+        long revTime = revInfo.getRevocationTime().getEpochSecond();
         ps.setLong(idx++, revTime);
         if (revInfo.getInvalidityTime() != null) {
-          ps.setLong(idx++, revInfo.getInvalidityTime().getTime() / 1000);
+          ps.setLong(idx++, revInfo.getInvalidityTime().getEpochSecond());
         } else {
           ps.setNull(idx++, Types.BIGINT);
         }
@@ -271,13 +270,13 @@ class OcspStoreQueryExecutor {
 
     try {
       int idx = 1;
-      ps.setLong(idx++, System.currentTimeMillis() / 1000); // currentTimeSeconds
+      ps.setLong(idx++, Instant.now().getEpochSecond()); // currentTimeSeconds
       setBoolean(ps, idx++, revoked);
       if (revoked) {
-        long revTime = revInfo.getRevocationTime().getTime() / 1000;
+        long revTime = revInfo.getRevocationTime().getEpochSecond();
         ps.setLong(idx++, revTime);
         if (revInfo.getInvalidityTime() != null) {
-          ps.setLong(idx++, revInfo.getInvalidityTime().getTime() / 1000);
+          ps.setLong(idx++, revInfo.getInvalidityTime().getEpochSecond());
         } else {
           ps.setNull(idx++, Types.INTEGER);
         }
@@ -323,7 +322,7 @@ class OcspStoreQueryExecutor {
 
       try {
         int idx = 1;
-        ps.setLong(idx++, System.currentTimeMillis() / 1000);
+        ps.setLong(idx++, Instant.now().getEpochSecond());
         setBoolean(ps, idx++, false);
         ps.setNull(idx++, Types.INTEGER);
         ps.setNull(idx++, Types.INTEGER);
@@ -429,8 +428,6 @@ class OcspStoreQueryExecutor {
     cachedIssuerId.set(id);
 
     byte[] encodedCert = issuerCert.getEncoded();
-    long notBeforeSeconds = issuerCert.getNotBefore().getTime() / 1000;
-    long notAfterSeconds = issuerCert.getNotAfter().getTime() / 1000;
 
     final String sql = "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT) VALUES (?,?,?,?,?,?)";
 
@@ -442,8 +439,8 @@ class OcspStoreQueryExecutor {
       int idx = 1;
       ps.setInt(idx++, id);
       ps.setString(idx++, subject);
-      ps.setLong(idx++, notBeforeSeconds);
-      ps.setLong(idx++, notAfterSeconds);
+      ps.setLong(idx++, issuerCert.getNotBefore().getEpochSecond());
+      ps.setLong(idx++, issuerCert.getNotAfter().getEpochSecond());
       ps.setString(idx++, sha1FpCert);
       ps.setString(idx, b64Cert);
 

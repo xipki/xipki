@@ -134,7 +134,7 @@ public class CaServletFilter implements Filter {
     if (this.remoteMgmtEnabled) {
       List<FileOrBinary> certFiles = remoteMgmt.getCerts();
       if (CollectionUtil.isEmpty(certFiles)) {
-        LOG.error("no client certificate is configured, disable the remote managent");
+        LOG.error("no client certificate is configured, disable the remote management");
       } else {
         Set<X509Cert> certs = new HashSet<>();
         for (FileOrBinary m : certFiles) {

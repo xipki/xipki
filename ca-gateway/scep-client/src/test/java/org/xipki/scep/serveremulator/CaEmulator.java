@@ -45,6 +45,8 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -58,10 +60,6 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 
 public class CaEmulator {
-
-  public static final long MIN_IN_MS = 60L * 1000;
-
-  public static final long DAY_IN_MS = 24L * 60 * MIN_IN_MS;
 
   private static final Logger LOG = LoggerFactory.getLogger(CaEmulator.class);
 
@@ -122,19 +120,19 @@ public class CaEmulator {
 
   public X509Cert generateCert(SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn)
       throws Exception {
-    return generateCert(pubKeyInfo, subjectDn, new Date(System.currentTimeMillis() - 10 * CaEmulator.MIN_IN_MS));
+    return generateCert(pubKeyInfo, subjectDn, Instant.now().minus(10, ChronoUnit.MINUTES));
   }
 
-  public X509Cert generateCert(SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn, Date notBefore)
+  public X509Cert generateCert(SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn, Instant notBefore)
       throws Exception {
     Args.notNull(pubKeyInfo, "pubKeyInfo");
     Args.notNull(subjectDn, "subjectDn");
     Args.notNull(notBefore, "notBefore");
 
-    Date notAfter = new Date(notBefore.getTime() + 730 * DAY_IN_MS);
+    Instant notAfter = notBefore.plus(730, ChronoUnit.DAYS);
     BigInteger tmpSerialNumber = BigInteger.valueOf(serialNumber.getAndAdd(1));
-    X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(caSubject,
-            tmpSerialNumber, notBefore, notAfter, subjectDn, pubKeyInfo);
+    X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(caSubject, tmpSerialNumber,
+        Date.from(notBefore), Date.from(notAfter), subjectDn, pubKeyInfo);
 
     X509KeyUsage ku = new X509KeyUsage(X509KeyUsage.digitalSignature | X509KeyUsage.dataEncipherment
         | X509KeyUsage.keyAgreement | X509KeyUsage.keyEncipherment);
@@ -169,16 +167,16 @@ public class CaEmulator {
 
   public synchronized CertificateList getCrl(X500Name issuer, BigInteger serialNumber)
       throws Exception {
-    Date thisUpdate = new Date();
-    X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(caSubject, thisUpdate);
-    Date nextUpdate = new Date(thisUpdate.getTime() + 30 * DAY_IN_MS);
-    crlBuilder.setNextUpdate(nextUpdate);
-    Date caStartTime = caCert.getNotBefore();
-    Date revocationTime = new Date(caStartTime.getTime() + 1);
-    if (revocationTime.after(thisUpdate)) {
+    Instant thisUpdate = Instant.now();
+    X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(caSubject, Date.from(thisUpdate));
+    Instant nextUpdate = thisUpdate.plus(30, ChronoUnit.DAYS);
+    crlBuilder.setNextUpdate(Date.from(nextUpdate));
+    Instant caStartTime = caCert.getNotBefore();
+    Instant revocationTime = caStartTime.plus(1, ChronoUnit.MILLIS);
+    if (revocationTime.isAfter(thisUpdate)) {
       revocationTime = caStartTime;
     }
-    crlBuilder.addCRLEntry(BigInteger.valueOf(2), revocationTime, CRLReason.keyCompromise);
+    crlBuilder.addCRLEntry(BigInteger.valueOf(2), Date.from(revocationTime), CRLReason.keyCompromise);
     crlBuilder.addExtension(Extension.cRLNumber, false, new ASN1Integer(crlNumber.getAndAdd(1)));
 
     String signatureAlgorithm = ScepUtil.getSignatureAlgName(caKey, HashAlgo.SHA256);

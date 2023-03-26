@@ -28,7 +28,11 @@ import org.xipki.util.Validity;
 import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.xipki.util.Args.notNull;
 
@@ -43,13 +47,12 @@ public class CertprofileQa {
 
   private static final Logger LOG = LoggerFactory.getLogger(CertprofileQa.class);
 
-  private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+  private static final Instant MAX_CERT_TIME = ZonedDateTime.of(9999, 12, 31,
+      23, 59, 59, 000, ZoneOffset.UTC).toInstant(); //9999-12-31T23:59:59.000
 
-  private static final long SECOND = 1000L;
-
-  private static final long MAX_CERT_TIME_MS = 253402300799000L; //9999-12-31-23-59-59.000
-
-  private static final long EPOCHTIME_2050010100 = 2524608000L;
+  private static final Instant EPOCHTIME_2050010100 = ZonedDateTime.of(2050, 01, 01,
+      0, 0, 0, 000, ZoneOffset.UTC).toInstant();
+  //2050-01-01T00:00:00.000;
 
   private final SubjectChecker subjectChecker;
 
@@ -67,7 +70,6 @@ public class CertprofileQa {
     notNull(dataBytes, "dataBytes");
     try {
       X509ProfileType conf = X509ProfileType.parse(new ByteArrayInputStream(dataBytes));
-
       certprofile = new XijsonCertprofile();
       certprofile.initialize(conf);
 
@@ -175,10 +177,10 @@ public class CertprofileQa {
     if (certprofile.getNotBeforeOption().getMidNightTimeZone() != null) {
       issue = new ValidationIssue("X509.NOTBEFORE", "notBefore midnight");
       resultIssues.add(issue);
-      Calendar cal = Calendar.getInstance(UTC);
-      cal.setTime(cert.getNotBefore());
-      int minute = cal.get(Calendar.MINUTE);
-      int second = cal.get(Calendar.SECOND);
+      ZonedDateTime cal = ZonedDateTime.ofInstant(cert.getNotBefore(), ZoneOffset.UTC);
+
+      int minute = cal.getMinute();
+      int second = cal.getSecond();
 
       if (minute != 0 || second != 0) {
         issue.setFailureMessage(" '" + cert.getNotBefore() + "' is not midnight time");
@@ -189,27 +191,27 @@ public class CertprofileQa {
     issue = new ValidationIssue("X509.VALIDITY", "cert validity");
     resultIssues.add(issue);
 
-    if (cert.getNotAfter().before(cert.getNotBefore())) {
+    if (cert.getNotAfter().isBefore(cert.getNotBefore())) {
       issue.setFailureMessage("notAfter may not be before notBefore");
-    } else if (cert.getNotBefore().before(issuerInfo.getCaNotBefore())) {
+    } else if (cert.getNotBefore().isBefore(issuerInfo.getCaNotBefore())) {
       issue.setFailureMessage("notBefore may not be before CA's notBefore");
     } else {
       if (certprofile.hasNoWellDefinedExpirationDate()) {
-        if (MAX_CERT_TIME_MS != cert.getNotAfter().getTime()) {
+        if (MAX_CERT_TIME.getEpochSecond() != cert.getNotAfter().getEpochSecond()) {
           issue.setFailureMessage("cert notAfter != 99991231235959Z");
         }
       } else {
         Validity validity = certprofile.getValidity();
-        Date expectedNotAfter = validity.add(cert.getNotBefore());
-        if (expectedNotAfter.getTime() > MAX_CERT_TIME_MS) {
-          expectedNotAfter = new Date(MAX_CERT_TIME_MS);
+        Instant expectedNotAfter = validity.add(cert.getNotBefore());
+        if (expectedNotAfter.isAfter(MAX_CERT_TIME)) {
+          expectedNotAfter = MAX_CERT_TIME;
         }
 
-        if (issuerInfo.isCutoffNotAfter() && expectedNotAfter.after(issuerInfo.getCaNotAfter())) {
+        if (issuerInfo.isCutoffNotAfter() && expectedNotAfter.isAfter(issuerInfo.getCaNotAfter())) {
           expectedNotAfter = issuerInfo.getCaNotAfter();
         }
 
-        if (Math.abs(expectedNotAfter.getTime() - cert.getNotAfter().getTime()) > 60 * SECOND) {
+        if (Math.abs(expectedNotAfter.getEpochSecond() - cert.getNotAfter().getEpochSecond()) > 60) {
           issue.setFailureMessage("cert validity is not within " + validity);
         }
       }
@@ -268,7 +270,7 @@ public class CertprofileQa {
 
   private static void checkTime(Time time, ValidationIssue issue) {
     ASN1Primitive asn1Time = time.toASN1Primitive();
-    if (time.getDate().getTime() / 1000 < EPOCHTIME_2050010100) {
+    if (time.getDate().toInstant().isBefore(EPOCHTIME_2050010100)) {
       if (!(asn1Time instanceof ASN1UTCTime)) {
         issue.setFailureMessage("not encoded as UTCTime");
       }

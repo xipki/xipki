@@ -21,7 +21,6 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
-import org.xipki.scep.serveremulator.CaEmulator;
 import org.xipki.scep.util.ScepUtil;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
@@ -36,6 +35,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -49,17 +50,13 @@ import java.util.Map;
 
 public class MyUtil {
 
-  private static final long MIN_IN_MS = 60L * 1000;
-
-  private static final long DAY_IN_MS = 24L * 60 * MIN_IN_MS;
-
   public static X509Cert issueSubCaCert(
       PrivateKey rcaKey, X500Name issuer, SubjectPublicKeyInfo pubKeyInfo, X500Name subject,
-      BigInteger serialNumber, Date startTime)
+      BigInteger serialNumber, Instant startTime)
       throws OperatorCreationException {
-    Date notAfter = new Date(startTime.getTime() + CaEmulator.DAY_IN_MS * 3650);
+    Instant notAfter = startTime.plus(10, ChronoUnit.YEARS);
     X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(issuer, serialNumber,
-        startTime, notAfter, subject, pubKeyInfo);
+        Date.from(startTime), Date.from(notAfter), subject, pubKeyInfo);
     X509KeyUsage ku = new X509KeyUsage(X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
     try {
       certGenerator.addExtension(Extension.keyUsage, true, ku);
@@ -123,11 +120,11 @@ public class MyUtil {
     Args.notNull(pubKeyInfo, "pubKeyInfo");
     Args.notNull(identityKey, "identityKey");
 
-    Date notBefore = new Date(System.currentTimeMillis() - 5 * MIN_IN_MS);
-    Date notAfter = new Date(notBefore.getTime() + 30 * DAY_IN_MS);
+    Instant notBefore = Instant.now().minus(5, ChronoUnit.MINUTES);
+    Instant notAfter = notBefore.plus(30, ChronoUnit.DAYS);
 
-    X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(subjectDn,
-        BigInteger.ONE, notBefore, notAfter, subjectDn, pubKeyInfo);
+    X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(subjectDn, BigInteger.ONE,
+        Date.from(notBefore), Date.from(notAfter), subjectDn, pubKeyInfo);
 
     X509KeyUsage ku = new X509KeyUsage(X509KeyUsage.digitalSignature
         | X509KeyUsage.dataEncipherment | X509KeyUsage.keyAgreement | X509KeyUsage.keyEncipherment);

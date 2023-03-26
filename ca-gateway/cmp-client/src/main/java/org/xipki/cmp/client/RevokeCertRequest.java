@@ -7,8 +7,8 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.util.Args;
 
 import java.math.BigInteger;
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,11 +25,11 @@ public class RevokeCertRequest {
 
     private final int reason;
 
-    private final Date invalidityDate;
+    private final Instant invalidityDate;
 
     private byte[] authorityKeyIdentifier;
 
-    public Entry(String id, X500Name issuer, BigInteger serialNumber, int reason, Date invalidityDate) {
+    public Entry(String id, X500Name issuer, BigInteger serialNumber, int reason, Instant invalidityDate) {
       super(id, issuer, serialNumber);
 
       if (!(reason >= 0 && reason <= 10 && reason != 7)) {
@@ -44,7 +44,7 @@ public class RevokeCertRequest {
       return reason;
     }
 
-    public Date getInvalidityDate() {
+    public Instant getInvalidityDate() {
       return invalidityDate;
     }
 

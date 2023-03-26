@@ -30,6 +30,7 @@ import org.xipki.util.exception.BadCertTemplateException;
 
 import java.io.Closeable;
 import java.math.BigInteger;
+import java.time.Instant;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -79,7 +80,7 @@ public class IdentifiedCertprofile implements Closeable {
     return certprofile.getSignatureAlgorithms();
   }
 
-  public Date getNotBefore(Date notBefore) {
+  public Instant getNotBefore(Instant notBefore) {
     return certprofile.getNotBefore(notBefore);
   }
 
@@ -278,7 +279,7 @@ public class IdentifiedCertprofile implements Closeable {
   public ExtensionValues getExtensions(
       X500Name requestedSubject, X500Name grantedSubject, Extensions requestedExtensions,
       SubjectPublicKeyInfo publicKeyInfo, PublicCaInfo publicCaInfo, X509Cert crlSignerCert,
-      Date notBefore, Date notAfter)
+      Instant notBefore, Instant notAfter)
       throws CertprofileException, BadCertTemplateException {
     notNull(publicKeyInfo, "publicKeyInfo");
     ExtensionValues values = new ExtensionValues();

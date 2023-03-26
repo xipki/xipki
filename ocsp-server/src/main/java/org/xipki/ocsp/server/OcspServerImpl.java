@@ -40,6 +40,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -759,7 +761,7 @@ public class OcspServerImpl implements OcspServer {
           : (certsMode == EmbedCertsMode.NONE) ? null
           : signer.getSequenceOfCertChain(); // certsMode == EmbedCertsMode.SIGNER_AND_CA
 
-      Date producedAt = new Date();
+      Instant producedAt = Instant.now();
       byte[] encodeOcspResponse;
       try {
         encodeOcspResponse = builder.buildOCSPResponse(concurrentSigner, certsInResp, producedAt);
@@ -770,7 +772,7 @@ public class OcspServerImpl implements OcspServer {
         return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);
       }
 
-      long producedAtSeconds = producedAt.getTime() / 1000;
+      long producedAtSeconds = producedAt.getEpochSecond();
       // cache response in database
       if (canCacheDb && repControl.canCacheInfo) {
         // Don't cache the response with status UNKNOWN, since this may result in DDoS
@@ -809,7 +811,7 @@ public class OcspServerImpl implements OcspServer {
     BigInteger serial = certId.getSerialNumber();
 
     RequestIssuer reqIssuer = certId.getIssuer();
-    Date now = new Date();
+    Instant now = Instant.now();
     for (OcspStore store : responder.getStores()) {
       if (!store.knowsIssuer(reqIssuer)) {
         continue;
@@ -860,8 +862,7 @@ public class OcspServerImpl implements OcspServer {
       LOG.info("issuer unknown, return {}", unknownIssuerBehaviour);
       switch (unknownIssuerBehaviour) {
         case unknown:
-          final long msPerDay = 86400000L; // 24 * 60 * 60 * 1000L;
-          Date nextUpdate = new Date(now.getTime() + msPerDay);
+          Instant nextUpdate = Instant.now().plus(1, ChronoUnit.DAYS);
           certStatusInfo = CertStatusInfo.getIssuerUnknownCertStatusInfo(now, nextUpdate);
           break;
         case malformedRequest:
@@ -878,12 +879,12 @@ public class OcspServerImpl implements OcspServer {
     }
 
     // certStatusInfo may not be null in any case, since at least one store is configured
-    Date thisUpdate = certStatusInfo.getThisUpdate();
+    Instant thisUpdate = certStatusInfo.getThisUpdate();
     if (thisUpdate == null) {
-      thisUpdate = new Date();
+      thisUpdate = Instant.now();
     }
 
-    Date nextUpdate = certStatusInfo.getNextUpdate();
+    Instant nextUpdate = certStatusInfo.getNextUpdate();
 
     List<Extension> extensions = new LinkedList<>();
     unknownAsRevoked.set(false);
@@ -911,7 +912,7 @@ public class OcspServerImpl implements OcspServer {
         certStatus = Template.getEncodeRevokedInfo(
             repOpt.isIncludeRevReason() ? revInfo.getReason() : null, revInfo.getRevocationTime());
 
-        Date invalidityDate = revInfo.getInvalidityTime();
+        Instant invalidityDate = revInfo.getInvalidityTime();
         if (repOpt.isIncludeInvalidityDate() && invalidityDate != null
             && !invalidityDate.equals(revInfo.getRevocationTime())) {
           extensions.add(Template.getInvalidityDateExtension(invalidityDate));
@@ -959,7 +960,7 @@ public class OcspServerImpl implements OcspServer {
     }
 
     if (nextUpdate != null) {
-      repControl.cacheNextUpdate = Math.min(repControl.cacheNextUpdate, nextUpdate.getTime() / 1000);
+      repControl.cacheNextUpdate = Math.min(repControl.cacheNextUpdate, nextUpdate.getEpochSecond());
     }
 
     return null;
@@ -1032,7 +1033,7 @@ public class OcspServerImpl implements OcspServer {
     }
 
     // validate the certPath
-    Date referenceTime = new Date();
+    Instant referenceTime = Instant.now();
     if (canBuildCertpath(certs, requestOption, referenceTime)) {
       try {
         return OcspRequest.getInstance(req);

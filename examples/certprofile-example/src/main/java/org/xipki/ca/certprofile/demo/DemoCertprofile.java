@@ -19,7 +19,7 @@ import org.xipki.security.util.JSON;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.exception.BadCertTemplateException;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -96,7 +96,7 @@ public class DemoCertprofile extends XijsonCertprofile {
   public ExtensionValues getExtraExtensions(
       Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurrences, X500Name requestedSubject,
       X500Name grantedSubject, Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
-      Date notBefore, Date notAfter, PublicCaInfo caInfo)
+      Instant notBefore, Instant notAfter, PublicCaInfo caInfo)
       throws CertprofileException, BadCertTemplateException {
     ExtensionValues extnValues = new ExtensionValues();
 

@@ -34,6 +34,7 @@ import org.xipki.util.exception.BadCertTemplateException;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.time.Instant;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -141,19 +142,19 @@ class O2tChecker extends ExtensionChecker {
   } // method checkExtnMappings
 
   void checkExtnPrivateKeyUsagePeriod(
-      StringBuilder failureMsg, byte[] extnValue, Date certNotBefore, Date certNotAfter) {
-    ASN1GeneralizedTime notBefore = new ASN1GeneralizedTime(certNotBefore);
-    Date dateNotAfter;
+      StringBuilder failureMsg, byte[] extnValue, Instant certNotBefore, Instant certNotAfter) {
+    ASN1GeneralizedTime notBefore = new ASN1GeneralizedTime(Date.from(certNotBefore));
+    Instant dateNotAfter;
     Validity privateKeyUsagePeriod = getCertprofile().extensions().getPrivateKeyUsagePeriod();
     if (privateKeyUsagePeriod == null) {
       dateNotAfter = certNotAfter;
     } else {
       dateNotAfter = privateKeyUsagePeriod.add(certNotBefore);
-      if (dateNotAfter.after(certNotAfter)) {
+      if (dateNotAfter.isAfter(certNotAfter)) {
         dateNotAfter = certNotAfter;
       }
     }
-    ASN1GeneralizedTime notAfter = new ASN1GeneralizedTime(dateNotAfter);
+    ASN1GeneralizedTime notAfter = new ASN1GeneralizedTime(Date.from(dateNotAfter));
 
     org.bouncycastle.asn1.x509.PrivateKeyUsagePeriod extValue =
         org.bouncycastle.asn1.x509.PrivateKeyUsagePeriod.getInstance(extnValue);

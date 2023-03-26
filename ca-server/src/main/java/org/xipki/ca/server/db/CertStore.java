@@ -31,6 +31,7 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
+import org.xipki.util.DateUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.LruCache;
 import org.xipki.util.exception.OperationException;
@@ -43,6 +44,7 @@ import java.security.cert.CRLException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -242,7 +244,7 @@ public class CertStore extends CertStoreBase {
 
       columns.add(col2Long(certId));
       // currentTimeSeconds
-      columns.add(col2Long(System.currentTimeMillis() / 1000));
+      columns.add(col2Long(Instant.now().getEpochSecond()));
       columns.add(col2Str(cert0.getSerialNumber().toString(16)));
       columns.add(col2Str(subjectText));
       if (dbSchemaVersion >= 8) {
@@ -253,9 +255,9 @@ public class CertStore extends CertStoreBase {
       columns.add(col2Long(fpReqSubject));
       columns.add(col2Long(fpSan));
       // notBeforeSeconds
-      columns.add(col2Long(cert0.getNotBefore().getTime() / 1000));
+      columns.add(col2Long(cert0.getNotBefore().getEpochSecond()));
       // notAfterSeconds
-      columns.add(col2Long(cert0.getNotAfter().getTime() / 1000));
+      columns.add(col2Long(cert0.getNotAfter().getEpochSecond()));
       columns.add(col2Bool(false));
       columns.add(col2Int(certInfo.getProfile().getId()));
       columns.add(col2Int(certInfo.getIssuer().getId()));
@@ -370,7 +372,7 @@ public class CertStore extends CertStoreBase {
     columns.add(col2Int(crlId));
     columns.add(col2Int(ca.getId()));
     columns.add(col2Long(crlNumber));
-    columns.add(col2Long(crl.getThisUpdate().getTime() / 1000));
+    columns.add(col2Long(DateUtil.toEpochSecond(crl.getThisUpdate())));
     columns.add(col2Long(getDateSeconds(crl.getNextUpdate())));
     columns.add(col2Bool((baseCrlNumber != null)));
     columns.add(col2Long(baseCrlNumber));
@@ -415,12 +417,12 @@ public class CertStore extends CertStoreBase {
 
     Long invTimeSeconds = null;
     if (revInfo.getInvalidityTime() != null) {
-      invTimeSeconds = revInfo.getInvalidityTime().getTime() / 1000;
+      invTimeSeconds = revInfo.getInvalidityTime().getEpochSecond();
     }
 
     int count = execUpdatePrepStmt0(SQL_REVOKE_CERT,
-        col2Long(System.currentTimeMillis() / 1000), col2Bool(true),
-        col2Long(revInfo.getRevocationTime().getTime() / 1000), // revTimeSeconds
+        col2Long(Instant.now().getEpochSecond()), col2Bool(true),
+        col2Long(revInfo.getRevocationTime().getEpochSecond()), // revTimeSeconds
         col2Long(invTimeSeconds), col2Int(revInfo.getReason().getCode()),
         col2Long(certWithRevInfo.getCert().getCertId())); // certId
     if (count != 1) {
@@ -456,7 +458,7 @@ public class CertStore extends CertStoreBase {
           + CrlReason.CERTIFICATE_HOLD.getDescription());
     }
 
-    int count = execUpdatePrepStmt0(SQL_REVOKE_SUSPENDED_CERT, col2Long(System.currentTimeMillis() / 1000),
+    int count = execUpdatePrepStmt0(SQL_REVOKE_SUSPENDED_CERT, col2Long(Instant.now().getEpochSecond()),
         col2Int(reason.getCode()), col2Long(serialNumber.getId())); // certId
 
     if (count != 1) {
@@ -497,7 +499,7 @@ public class CertStore extends CertStoreBase {
 
     SqlColumn2 nullInt = new SqlColumn2(ColumnType.INT, null);
     int count = execUpdatePrepStmt0("UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?",
-        col2Long(System.currentTimeMillis() / 1000), // currentTimeSeconds
+        col2Long(Instant.now().getEpochSecond()), // currentTimeSeconds
         col2Bool(false), nullInt, nullInt, nullInt,
         col2Long(certWithRevInfo.getCert().getCertId())); // certId
 
@@ -602,7 +604,7 @@ public class CertStore extends CertStoreBase {
     return getSerialNumbers0(sql, numEntries, col2Int(ca.getId()), col2Long(expiredAt));
   } // method getExpiredSerialNumbers
 
-  public List<SerialWithId> getSuspendedCertSerials(NameId ca, long latestLastUpdate, int numEntries)
+  public List<SerialWithId> getSuspendedCertSerials(NameId ca, Instant latestLastUpdate, int numEntries)
       throws OperationException {
     notNull(ca, "ca");
     positive(numEntries, "numEntries");
@@ -613,7 +615,7 @@ public class CertStore extends CertStoreBase {
       cacheSqlSuspendedSerials.put(numEntries, sql);
     }
 
-    return getSerialNumbers0(sql, numEntries, col2Int(ca.getId()), col2Long(latestLastUpdate + 1),
+    return getSerialNumbers0(sql, numEntries, col2Int(ca.getId()), col2Long(latestLastUpdate.getEpochSecond() + 1),
             col2Int(CrlReason.CERTIFICATE_HOLD.getCode()));
   } // method getSuspendedCertIds
 
@@ -818,7 +820,7 @@ public class CertStore extends CertStoreBase {
   } // method getCert
 
   public List<CertListInfo> listCerts(
-      NameId ca, X500Name subjectPattern, Date validFrom, Date validTo, CertListOrderBy orderBy, int numEntries)
+      NameId ca, X500Name subjectPattern, Instant validFrom, Instant validTo, CertListOrderBy orderBy, int numEntries)
       throws OperationException {
     notNull(ca, "ca");
     positive(numEntries, "numEntries");
@@ -831,11 +833,11 @@ public class CertStore extends CertStoreBase {
 
     if (validFrom != null) {
       sb.append(" AND NBEFORE<?");
-      params.add(col2Long(validFrom.getTime() / 1000 - 1));
+      params.add(col2Long(validFrom.getEpochSecond() - 1));
     }
     if (validTo != null) {
       sb.append(" AND NAFTER>?");
-      params.add(col2Long(validTo.getTime() / 1000));
+      params.add(col2Long(validTo.getEpochSecond()));
     }
 
     if (subjectPattern != null) {
@@ -884,14 +886,14 @@ public class CertStore extends CertStoreBase {
     List<CertListInfo> ret = new LinkedList<>();
     for (ResultRow rs : rows) {
       CertListInfo info = new CertListInfo(new BigInteger(rs.getString("SN"), 16),
-          rs.getString("SUBJECT"), new Date(rs.getLong("NBEFORE") * 1000),
-          new Date(rs.getLong("NAFTER") * 1000));
+          rs.getString("SUBJECT"), Instant.ofEpochSecond(rs.getLong("NBEFORE")),
+          Instant.ofEpochSecond(rs.getLong("NAFTER")));
       ret.add(info);
     }
     return ret;
   } // method listCerts
 
-  public List<CertRevInfoWithSerial> getRevokedCerts(NameId ca, Date notExpiredAt, long startId, int numEntries)
+  public List<CertRevInfoWithSerial> getRevokedCerts(NameId ca, Instant notExpiredAt, long startId, int numEntries)
       throws OperationException {
     notNulls(ca, "ca", notExpiredAt, "notExpiredAt");
     positive(numEntries, "numEntries");
@@ -904,22 +906,22 @@ public class CertStore extends CertStoreBase {
     }
 
     List<ResultRow> rows = execQueryPrepStmt0(sql,
-        col2Long(startId - 1), col2Int(ca.getId()), col2Long(notExpiredAt.getTime() / 1000 + 1));
+        col2Long(startId - 1), col2Int(ca.getId()), col2Long(notExpiredAt.getEpochSecond() + 1));
 
     List<CertRevInfoWithSerial> ret = new LinkedList<>();
     for (ResultRow rs : rows) {
       long revInvalidityTime = rs.getLong("RIT");
-      Date invalidityTime = (revInvalidityTime == 0) ? null : new Date(1000 * revInvalidityTime);
+      Instant invalidityTime = (revInvalidityTime == 0) ? null : Instant.ofEpochSecond(revInvalidityTime);
       CertRevInfoWithSerial revInfo = new CertRevInfoWithSerial(rs.getLong("ID"),
           new BigInteger(rs.getString("SN"), 16), rs.getInt("RR"), // revReason
-          new Date(1000 * rs.getLong("RT")), invalidityTime);
+          Instant.ofEpochSecond(rs.getLong("RT")), invalidityTime);
       ret.add(revInfo);
     }
 
     return ret;
   } // method getRevokedCerts
 
-  public List<CertRevInfoWithSerial> getCertsForDeltaCrl(NameId ca, BigInteger baseCrlNumber, Date notExpiredAt)
+  public List<CertRevInfoWithSerial> getCertsForDeltaCrl(NameId ca, BigInteger baseCrlNumber, Instant notExpiredAt)
       throws OperationException {
     notNulls(ca, "ca", notExpiredAt, "notExpiredAt", baseCrlNumber, "baseCrlNumber");
 
@@ -972,7 +974,7 @@ public class CertStore extends CertStoreBase {
             while (rs.next()) {
               ret.add(new CertRevInfoWithSerial(0L, new BigInteger(rs.getString("SN"), 16),
                   CrlReason.REMOVE_FROM_CRL, // reason
-                  new Date(100L * rs.getLong("LUPDATE")), //revocationTime,
+                  Instant.ofEpochSecond(rs.getLong("LUPDATE")), //revocationTime,
                   null)); // invalidityTime
             }
           } finally {
@@ -998,7 +1000,7 @@ public class CertStore extends CertStoreBase {
           try {
             if (rs.next()) {
               ret.add(new CertRevInfoWithSerial(0L, sn, CrlReason.REMOVE_FROM_CRL,
-                  new Date(100L * rs.getLong("LUPDATE")), //revocationTime,
+                  Instant.ofEpochSecond(rs.getLong("LUPDATE")), //revocationTime,
                   null)); // invalidityTime
             }
           } finally {
@@ -1023,14 +1025,14 @@ public class CertStore extends CertStoreBase {
 
     // -1: so that no entry is ignored: consider all revoked certificates with
     // Database.lastUpdate >= CRL.thisUpdate
-    final long updatedSince = crl.getThisUpdate().getDate().getTime() / 1000 - 1;
+    final long updatedSince = DateUtil.toEpochSecond(crl.getThisUpdate().getDate()) - 1;
 
     try {
       ResultSet rs;
       while (true) {
         ps.setLong(1, startId - 1);
         ps.setInt(2, ca.getId());
-        ps.setLong(3, notExpiredAt.getTime() / 1000 + 1);
+        ps.setLong(3, notExpiredAt.getEpochSecond() + 1);
         ps.setLong(4, updatedSince);
         rs = ps.executeQuery();
 
@@ -1050,9 +1052,9 @@ public class CertStore extends CertStoreBase {
             }
 
             long revInvalidityTime = rs.getLong("RIT");
-            Date invalidityTime = (revInvalidityTime == 0) ? null : new Date(1000 * revInvalidityTime);
+            Instant invalidityTime = (revInvalidityTime == 0) ? null : Instant.ofEpochSecond(revInvalidityTime);
             CertRevInfoWithSerial revInfo = new CertRevInfoWithSerial(id, sn,
-                rs.getInt("RR"), new Date(1000 * rs.getLong("RT")), invalidityTime);
+                rs.getInt("RR"), Instant.ofEpochSecond(rs.getLong("RT")), invalidityTime);
             ret.add(revInfo);
           }
 
@@ -1091,7 +1093,7 @@ public class CertStore extends CertStoreBase {
   } // method isHealthy
 
   private static Long getDateSeconds(Date date) {
-    return date == null ? null : date.getTime() / 1000;
+    return date == null ? null : DateUtil.toEpochSecond(date);
   }
 
 }

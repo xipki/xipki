@@ -30,6 +30,10 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CRLException;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -76,17 +80,19 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       CrlControl control = caInfo.getCrlControl();
       // In seconds
       long lastIssueTimeOfFullCrl = certstore.getThisUpdateOfCurrentCrl(caIdent, false);
-      Date now = new Date();
+      Instant now = Instant.now();
 
       boolean createFullCrlNow = false;
       if (lastIssueTimeOfFullCrl == 0L) {
         // still no CRL available. Create a new FullCRL
         createFullCrlNow = true;
       } else {
-        Date nearestScheduledCrlIssueTime = getScheduledCrlGenTimeNotAfter(new Date(lastIssueTimeOfFullCrl * 1000));
-        Date nextScheduledCrlIssueTime = new Date(
-            nearestScheduledCrlIssueTime.getTime() + control.getFullCrlIntervals() * control.getIntervalMillis());
-        if (nextScheduledCrlIssueTime.getTime() > now.getTime() + shardId * 10000L) { // delay: shardId * 10 seconds
+        Instant nearestScheduledCrlIssueTime =
+            getScheduledCrlGenTimeNotAfter(Instant.ofEpochSecond(lastIssueTimeOfFullCrl));
+        Instant nextScheduledCrlIssueTime = nearestScheduledCrlIssueTime.plus(
+            control.getFullCrlIntervals() * control.getIntervalHours(), ChronoUnit.HOURS);
+        // delay: shardId * 10 seconds
+        if (nextScheduledCrlIssueTime.getEpochSecond() > now.getEpochSecond() + shardId * 10L) {
           // at least one interval was skipped
           createFullCrlNow = true;
         }
@@ -99,10 +105,11 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         long lastIssueTimeOfDeltaCrl = certstore.getThisUpdateOfCurrentCrl(caIdent, true);
         long lastIssueTime = Math.max(lastIssueTimeOfDeltaCrl, lastIssueTimeOfFullCrl);
 
-        Date nearestScheduledCrlIssueTime = getScheduledCrlGenTimeNotAfter(new Date(lastIssueTime * 1000));
-        Date nextScheduledCrlIssueTime = new Date(
-            nearestScheduledCrlIssueTime.getTime() + control.getDeltaCrlIntervals() * control.getIntervalMillis());
-        if (nextScheduledCrlIssueTime.getTime() > now.getTime() + shardId * 10000L) { // delay: shardId * 10 seconds
+        Instant nearestScheduledCrlIssueTime = getScheduledCrlGenTimeNotAfter(Instant.ofEpochSecond(lastIssueTime));
+        Instant nextScheduledCrlIssueTime = nearestScheduledCrlIssueTime.plus(
+            control.getDeltaCrlIntervals() * control.getIntervalHours(), ChronoUnit.HOURS);
+        // delay: shardId * 10 seconds
+        if (nextScheduledCrlIssueTime.getEpochSecond() > now.getEpochSecond() + shardId * 10L) {
           // at least one interval was skipped
           createDeltaCrlNow = true;
         }
@@ -124,8 +131,8 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         }
       }
 
-      Date scheduledCrlGenTime = getScheduledCrlGenTimeNotAfter(now);
-      Date nextUpdate = new Date(scheduledCrlGenTime.getTime() + intervals * control.getIntervalMillis());
+      Instant scheduledCrlGenTime = getScheduledCrlGenTimeNotAfter(now);
+      Instant nextUpdate = scheduledCrlGenTime.plus(intervals * control.getIntervalHours(), ChronoUnit.HOURS);
       // add overlap
       nextUpdate = control.getOverlap().add(nextUpdate);
 
@@ -305,8 +312,8 @@ public class X509CrlModule extends X509CaModule implements Closeable {
 
     crlGenInProcess.set(true);
     try {
-      Date thisUpdate = new Date();
-      Date nearestScheduledIssueTime = getScheduledCrlGenTimeNotAfter(thisUpdate);
+      Instant thisUpdate = Instant.now();
+      Instant nearestScheduledIssueTime = getScheduledCrlGenTimeNotAfter(thisUpdate);
 
       int intervals;
       if (!control.isExtendedNextUpdate() && control.getDeltaCrlIntervals() > 0) {
@@ -315,7 +322,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         intervals = control.getFullCrlIntervals();
       }
 
-      Date nextUpdate = new Date(nearestScheduledIssueTime.getTime() + intervals * control.getIntervalMillis());
+      Instant nextUpdate = nearestScheduledIssueTime.plus(intervals * control.getIntervalHours(), ChronoUnit.HOURS);
       // add overlap
       nextUpdate = control.getOverlap().add(nextUpdate);
 
@@ -325,7 +332,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     }
   } // method generateCrlOnDemand
 
-  private void scheduledGenerateCrl(boolean deltaCrl, Date thisUpdate, Date nextUpdate)
+  private void scheduledGenerateCrl(boolean deltaCrl, Instant thisUpdate, Instant nextUpdate)
       throws OperationException {
     AuditEvent event = newAuditEvent(TYPE_gen_crl, null);
     try {
@@ -338,7 +345,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
   }
 
   private X509CRLHolder generateCrl(boolean scheduled, RequestorInfo requestor, boolean deltaCrl,
-                                    Date thisUpdate, Date nextUpdate)
+                                    Instant thisUpdate, Instant nextUpdate)
       throws OperationException {
     AuditEvent event = newAuditEvent(TYPE_gen_crl, requestor);
     try {
@@ -352,7 +359,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
   }
 
   private X509CRLHolder generateCrl0(boolean scheduled, boolean deltaCrl,
-                                     Date thisUpdate, Date nextUpdate, AuditEvent event)
+                                     Instant thisUpdate, Instant nextUpdate, AuditEvent event)
       throws OperationException {
     CrlControl control = caInfo.getCrlControl();
     if (control == null) {
@@ -376,7 +383,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       event.addEventData(NAME_next_update, "null");
     } else {
       event.addEventData(NAME_next_update, DateUtil.toUtcTimeyyyyMMddhhmmss(nextUpdate));
-      if (nextUpdate.getTime() - thisUpdate.getTime() < 10 * 60 * MS_PER_SECOND) {
+      if (nextUpdate.getEpochSecond() - thisUpdate.getEpochSecond() < 10 * 60) {
         // less than 10 minutes
         throw new OperationException(CRL_FAILURE, "nextUpdate and thisUpdate are too close");
       }
@@ -391,9 +398,9 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       boolean indirectCrl = (crlSigner != null);
       X500Name crlIssuer = indirectCrl ? crlSigner.getSubject() : pci.getSubject();
 
-      X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(crlIssuer, thisUpdate);
+      X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(crlIssuer, Date.from(thisUpdate));
       if (nextUpdate != null) {
-        crlBuilder.setNextUpdate(nextUpdate);
+        crlBuilder.setNextUpdate(Date.from(nextUpdate));
       }
 
       final int numEntries = 100;
@@ -403,7 +410,8 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       boolean withExpiredCerts = crlControl.isIncludeExpiredcerts();
 
       // 10 minutes buffer
-      Date notExpiredAt = withExpiredCerts ? new Date(0) : new Date(thisUpdate.getTime() - 600L * MS_PER_SECOND);
+      Instant notExpiredAt = withExpiredCerts
+          ? Instant.ofEpochSecond(0) : thisUpdate.minus(600L, ChronoUnit.SECONDS);
 
       // we have to cache the serial entries to sort them
       List<CertRevInfoWithSerial> allRevInfos = new LinkedList<>();
@@ -447,8 +455,8 @@ public class X509CrlModule extends X509CaModule implements Closeable {
             reason = CrlReason.UNSPECIFIED;
           }
 
-          Date revocationTime = revInfo.getRevocationTime();
-          Date invalidityTime = revInfo.getInvalidityTime();
+          Instant revocationTime = revInfo.getRevocationTime();
+          Instant invalidityTime = revInfo.getInvalidityTime();
 
           switch (crlControl.getInvalidityDateMode()) {
             case forbidden:
@@ -470,9 +478,10 @@ public class X509CrlModule extends X509CaModule implements Closeable {
 
           if (!indirectCrl || !isFirstCrlEntry) {
             if (invalidityTime != null) {
-              crlBuilder.addCRLEntry(serial, revocationTime, reason.getCode(), invalidityTime);
+              crlBuilder.addCRLEntry(serial, Date.from(revocationTime),
+                  reason.getCode(), Date.from(invalidityTime));
             } else {
-              crlBuilder.addCRLEntry(serial, revocationTime, reason.getCode());
+              crlBuilder.addCRLEntry(serial, Date.from(revocationTime), reason.getCode());
             }
             continue;
           }
@@ -490,7 +499,8 @@ public class X509CrlModule extends X509CaModule implements Closeable {
           Extension ext = createCertificateIssuerExtension(pci.getSubject());
           extensions.add(ext);
 
-          crlBuilder.addCRLEntry(serial, revocationTime, new Extensions(extensions.toArray(new Extension[0])));
+          crlBuilder.addCRLEntry(serial, Date.from(revocationTime),
+              new Extensions(extensions.toArray(new Extension[0])));
           isFirstCrlEntry = false;
         }
 
@@ -539,7 +549,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         }
 
         if (withExpiredCerts) {
-          DERGeneralizedTime statusSince = new DERGeneralizedTime(caCert.getNotBefore());
+          DERGeneralizedTime statusSince = new DERGeneralizedTime(Date.from(caCert.getNotBefore()));
           crlBuilder.addExtension(Extension.expiredCertsOnCRL, false, statusSince);
         }
       } catch (CertIOException ex) {
@@ -567,7 +577,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       // check again
       if (scheduled) {
         long lastIssueTimeOfFullCrl = certstore.getThisUpdateOfCurrentCrl(caIdent, deltaCrl);
-        if (lastIssueTimeOfFullCrl * 1000L + 10000L < thisUpdate.getTime()) {
+        if (lastIssueTimeOfFullCrl + 10L < thisUpdate.getEpochSecond()) {
           // CRL generated in the last time by other instance, ignore my own.
           successful = true;
           LOG.info("IGNORE generateCrl: ca={}", caIdent.getName());
@@ -601,29 +611,29 @@ public class X509CrlModule extends X509CaModule implements Closeable {
    * @param date the reference time
    * @return the nearest scheduled time
    */
-  private Date getScheduledCrlGenTimeNotAfter(Date date) {
-    long time = date.getTime();
-    long epochDaysInMillis = time / MS_PER_DAY * MS_PER_DAY;
-
+  private Instant getScheduledCrlGenTimeNotAfter(Instant date) {
+    ZonedDateTime cal = ZonedDateTime.ofInstant(date, ZoneOffset.UTC);
     // time less than one day
-    long minutesInDay = (time - epochDaysInMillis) / MS_PER_MINUTE;
-
-    long intervalMinutes = caInfo.getCrlControl().getIntervalHours() * 60L;
+    int minutesInDay = cal.getHour() * 60 + cal.getMinute();
+    int intervalMinutes = caInfo.getCrlControl().getIntervalHours() * 60;
 
     HourMinute hm = caInfo.getCrlControl().getIntervalDayTime();
     int hmInMinutes = hm.getHour() * 60 + hm.getMinute();
 
+    Instant midNight = ZonedDateTime.of(cal.getYear(), cal.getMonthValue(), cal.getDayOfMonth(),
+        0, 0, 0, 0, cal.getZone()).toInstant();
+
     if (minutesInDay == hmInMinutes) {
       // If time == hm
-      return new Date(epochDaysInMillis + hmInMinutes * MS_PER_MINUTE);
+      return midNight.plus(hmInMinutes, ChronoUnit.MINUTES);
     } else if (minutesInDay < hmInMinutes) {
       // If time is before hm, use the previous interval
-      return new Date(epochDaysInMillis + (hmInMinutes - intervalMinutes) * MS_PER_MINUTE);
+      return midNight.plus(hmInMinutes - intervalMinutes, ChronoUnit.MINUTES);
     } else {
       // If time is after hm, use the nearest interval before reference time
-      for (int i = 0;; i++) {
-        if (minutesInDay < (hmInMinutes + (i + 1L) * intervalMinutes)) {
-          return new Date(epochDaysInMillis + (hmInMinutes + i * intervalMinutes) * MS_PER_MINUTE);
+      for (int i = 0;;i++) {
+        if (minutesInDay < (hmInMinutes + (i + 1) * intervalMinutes)) {
+          return midNight.plus(hmInMinutes + i * intervalMinutes, ChronoUnit.MINUTES);
         }
       }
     }
@@ -659,9 +669,9 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     }
   }
 
-  private static Extension createInvalidityDateExtension(Date invalidityDate) {
+  private static Extension createInvalidityDateExtension(Instant invalidityDate) {
     try {
-      ASN1GeneralizedTime asnTime = new ASN1GeneralizedTime(invalidityDate);
+      ASN1GeneralizedTime asnTime = new ASN1GeneralizedTime(Date.from(invalidityDate));
       return new Extension(Extension.invalidityDate, false, asnTime.getEncoded());
     } catch (IOException ex) {
       throw new IllegalArgumentException("error encoding reason: " + ex.getMessage(), ex);

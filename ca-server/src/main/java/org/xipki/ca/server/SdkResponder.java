@@ -32,6 +32,8 @@ import org.xipki.util.exception.OperationException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -58,7 +60,7 @@ public class SdkResponder {
         return;
       }
 
-      Date invalidityDate = new Date();
+      Instant invalidityDate = Instant.now();
       X509Ca ca = null;
       for (CertificateInfo remainingCert : remainingCerts) {
         String caName = remainingCert.getIssuer().getName();
@@ -289,10 +291,10 @@ public class SdkResponder {
       String profile = entry.getCertprofile();
 
       Long notBeforeInSec = entry.getNotBefore();
-      Date notBefore = (notBeforeInSec == null) ? null : new Date(notBeforeInSec * 1000);
+      Instant notBefore = (notBeforeInSec == null) ? null : Instant.ofEpochSecond(notBeforeInSec);
 
       Long notAfterInSec = entry.getNotAfter();
-      Date notAfter = (notAfterInSec == null) ? null : new Date(notAfterInSec * 1000);
+      Instant notAfter = (notAfterInSec == null) ? null : Instant.ofEpochSecond(notAfterInSec);
 
       X500Name subject = null;
       Extensions extensions = null;
@@ -449,7 +451,7 @@ public class SdkResponder {
     if (explicitConform) {
       int confirmWaitTimeMs = req.getConfirmWaitTimeMs() == null
           ? DFLT_CONFIRM_WAIT_TIME_MS : req.getConfirmWaitTimeMs();
-      waitForConfirmUtil = System.currentTimeMillis() + confirmWaitTimeMs;
+      waitForConfirmUtil = Clock.systemUTC().millis() + confirmWaitTimeMs;
     }
 
     List<EnrollOrPullCertResponseEntry> rentries =
@@ -534,8 +536,8 @@ public class SdkResponder {
         String msg = "Reason removeFromCRL is not permitted";
         rentry.setError(new ErrorEntry(BAD_REQUEST, msg));
       } else {
-        Date invalidityTime = entry.getInvalidityTime() == null
-            ? null : new Date(entry.getInvalidityTime() * 1000);
+        Instant invalidityTime = entry.getInvalidityTime() == null
+            ? null : Instant.ofEpochSecond(entry.getInvalidityTime());
         try {
           ca.revokeCert(requestor, serialNumber, reason, invalidityTime);
         } catch (OperationException e) {
@@ -796,7 +798,7 @@ public class SdkResponder {
 
       BigInteger serialNumber = certInfo.getCert().getCert().getSerialNumber();
       try {
-        ca.revokeCert(requestor, serialNumber, CrlReason.CESSATION_OF_OPERATION, new Date());
+        ca.revokeCert(requestor, serialNumber, CrlReason.CESSATION_OF_OPERATION, Instant.now());
       } catch (OperationException ex) {
         LogUtil.warn(LOG, ex, "could not revoke certificate ca=" + ca.getCaInfo().getIdent()
             + " serialNumber=" + LogUtil.formatCsn(serialNumber));
@@ -825,7 +827,7 @@ public class SdkResponder {
     }
 
     boolean successful = true;
-    Date invalidityDate = new Date();
+    Instant invalidityDate = Instant.now();
     for (CertificateInfo remainingCert : remainingCerts) {
       try {
         ca.revokeCert(requestor, remainingCert.getCert().getCert().getSerialNumber(),

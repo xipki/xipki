@@ -24,8 +24,8 @@ import org.xipki.util.LogUtil;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class DecodedNextCaMessage {
 
   private Boolean signatureValid;
 
-  private Date signingTime;
+  private Instant signingTime;
 
   private String failureMessage;
 
@@ -94,11 +94,11 @@ public class DecodedNextCaMessage {
     this.failureMessage = failureMessage;
   }
 
-  public Date getSigningTime() {
+  public Instant getSigningTime() {
     return signingTime;
   }
 
-  public void setSigningTime(Date signingTime) {
+  public void setSigningTime(Instant signingTime) {
     this.signingTime = signingTime;
   }
 
@@ -135,7 +135,7 @@ public class DecodedNextCaMessage {
       throw new MessageDecodingException("missing signed attributes");
     }
 
-    Date signingTime = null;
+    Instant signingTime = null;
     // signingTime
     ASN1Encodable attrValue = ScepUtil.getFirstAttrValue(signedAttrs, CMSAttributes.signingTime);
     if (attrValue != null) {

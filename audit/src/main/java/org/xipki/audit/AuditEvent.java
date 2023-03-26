@@ -6,8 +6,9 @@ package org.xipki.audit;
 import org.slf4j.Logger;
 import org.xipki.util.Args;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,24 +34,28 @@ public class AuditEvent {
   /**
    * Time-stamp when the event was saved.
    */
-  private final Date timestamp;
+  private final Instant timestamp;
 
   private AuditStatus status;
 
   /**
-   * Duration in milliseconds.
+   * Duration.
    */
-  private long duration;
+  private Duration duration;
 
   /**
    * The data array belonging to the event.
    */
   private final List<AuditEventData> eventDatas = new LinkedList<>();
 
-  public AuditEvent(Date timestamp) {
-    this.timestamp = (timestamp == null) ? new Date() : timestamp;
+  public AuditEvent() {
+    this(null);
+  }
+
+  public AuditEvent(Instant timestamp) {
+    this.timestamp = (timestamp == null) ? Instant.now() : timestamp;
     this.level = AuditLevel.INFO;
-    this.duration = -1;
+    this.duration = null;
   }
 
   public AuditLevel getLevel() {
@@ -78,7 +83,7 @@ public class AuditEvent {
     this.applicationName = Args.notNull(applicationName, "applicationName");
   }
 
-  public Date getTimestamp() {
+  public Instant getTimestamp() {
     return timestamp;
   }
 
@@ -166,10 +171,10 @@ public class AuditEvent {
   }
 
   public void finish() {
-    this.duration = System.currentTimeMillis() - timestamp.getTime();
+    this.duration = Duration.between(timestamp, Instant.now());
   }
 
-  public long getDuration() {
+  public Duration getDuration() {
     return duration;
   }
 
@@ -190,14 +195,14 @@ public class AuditEvent {
     sb.append(";\tstatus: ").append(status.name());
     List<AuditEventData> eventDataArray = getEventDatas();
 
-    long duration = getDuration();
-    if (duration >= 0) {
-      sb.append("\tduration: ").append(duration);
+    Duration duration = getDuration();
+    if (duration != null) {
+      sb.append("\tduration: ").append(duration.toMillis());
     }
 
     if ((eventDataArray != null) && (eventDataArray.size() > 0)) {
       for (AuditEventData m : eventDataArray) {
-        if (duration >= 0 && "duration".equalsIgnoreCase(m.getName())) {
+        if ("duration".equalsIgnoreCase(m.getName())) {
           continue;
         }
 
