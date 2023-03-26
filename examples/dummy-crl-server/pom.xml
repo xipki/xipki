@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.example</groupId>
     <artifactId>examples</artifactId>
-    <version>6.2.0-SNAPSHOT</version>
+    <version>6.2.0</version>
   </parent>
   <artifactId>dummy-crl-server</artifactId>
   <packaging>war</packaging>

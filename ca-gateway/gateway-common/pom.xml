@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.gateway</groupId>
     <artifactId>gateway-parent</artifactId>
-    <version>6.2.0-SNAPSHOT</version>
+    <version>6.2.0</version>
   </parent>
   <artifactId>gateway-common</artifactId>
   <packaging>bundle</packaging>
