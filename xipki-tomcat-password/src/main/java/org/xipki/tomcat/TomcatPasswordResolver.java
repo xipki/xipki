@@ -1,3 +1,6 @@
+// Copyright (c) 2013-2023 xipki. All rights reserved.
+// License Apache License 2.0
+
 package org.xipki.tomcat;
 
 import org.apache.tomcat.util.net.SSLHostConfig;
@@ -11,6 +14,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+/**
+ * Utility class to resolve password for apache tomcat web server.
+ *
+ * @author Lijun Liao (xipki)
+ */
 public class TomcatPasswordResolver {
 
   public static TomcatPasswordResolver INSTANCE = new TomcatPasswordResolver();
@@ -47,7 +55,6 @@ public class TomcatPasswordResolver {
       }
     }
   }
-
 
   private synchronized void initPasswordResolver() {
     if (passwordResolverInitialized) {
