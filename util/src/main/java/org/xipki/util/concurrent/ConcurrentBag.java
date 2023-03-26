@@ -75,8 +75,6 @@ public class ConcurrentBag<T extends ConcurrentBagEntry> implements AutoCloseabl
 
   /**
    * Construct a ConcurrentBag with the specified listener.
-   *
-   * @param listener the IBagStateListener to attach to this bag
    */
   public ConcurrentBag() {
     this.weakThreadLocals = useWeakThreadLocals();
@@ -223,7 +221,7 @@ public class ConcurrentBag<T extends ConcurrentBagEntry> implements AutoCloseabl
    * or reserve items in any way.  Call <code>reserve(T)</code>
    * on items in list before performing any action on them.
    *
-   * @param state one of the {@link IConcurrentBagEntry} states
+   * @param state one of the {@link ConcurrentBagEntry} states
    * @return a possibly empty list of objects having the state specified
    */
   public List<T> values(final int state) {

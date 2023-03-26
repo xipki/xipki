@@ -160,15 +160,15 @@ public class PKCS1Util {
      * an encoded message <code>EM</code> and compares it to the hash of
      * <code>M</code>.</p>
      *
+     * @param mgfDigest The MGF digest.
      * @param mHash the byte sequence resulting from applying the message digest
      * algorithm Hash to the message <i>M</i>.
      * @param EM the <i>encoded message</i>, an octet string of length
-     * <code>emLen = CEILING(emBits/8).
-     * @param emBits the maximal bit length of the integer OS2IP(EM), at least
-     * <code>8.hLen + 8.sLen + 9</code>.
+     * emLen = CEILING(emBits/8).
      * @param sLen the length, in octets, of the expected salt.
-     * @return <code>true</code> if the result of the verification was
-     * <i>consistent</i> with the expected result; and <code>false</code> if the
+     * @param modulusBitLength bit length of the RSA modulus.
+     * @return true if the result of the verification was
+     * <i>consistent</i> with the expected result; and false if the
      * result was <i>inconsistent</i>.
      * @exception IllegalArgumentException if an exception occurs.
      */

@@ -335,6 +335,8 @@ public abstract class P11Slot implements Closeable {
    *          Output stream. Must not be {@code null}.
    * @param verbose
    *          Whether to show the details verbosely.
+   * @param objectHandle
+   *          If present, only details of this object will be shown.
    * @throws IOException
    *         if IO error occurs.
    */
@@ -399,7 +401,7 @@ public abstract class P11Slot implements Closeable {
 
   public boolean supportsMechanism(long mechanism, long flagBit) {
     MechanismInfo info = mechanisms.get(mechanism);
-    return info == null ? false : info.hasFlagBit(flagBit);
+    return info != null && info.hasFlagBit(flagBit);
   }
 
   public void assertMechanismSupported(long mechanism, long flagBit) throws TokenException {
