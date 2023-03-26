@@ -6,6 +6,7 @@ package org.xipki.util;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -83,9 +84,10 @@ public abstract class BenchmarkExecutor {
         sb.append('\n');
       }
     }
-    sb.append("threads: ").append(threads).append("\n");
+    sb.append("threads:  ").append(threads).append("\n");
     sb.append("duration: ").append(StringUtil.formatTime(duration, false)).append("\n");
-    sb.append("unit: ").append(unit);
+    sb.append("unit:     ").append(unit).append("\n");
+    sb.append("start at: ").append(ZonedDateTime.now());
 
     System.out.println(sb);
 
