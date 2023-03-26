@@ -7,7 +7,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.password.PBEAlgo;
 import org.xipki.password.PasswordBasedEncryption;
-import org.xipki.util.StringUtil;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * Test for the algorithm PBEWithHmacSHA256AndAES256.
@@ -25,7 +26,7 @@ public class PBEWithHmacSHA256AndAES256Test {
   @Test
   public void encrypThenDecrypt() throws Exception {
     char[] password = "qwert".toCharArray();
-    byte[] plainText = StringUtil.toUtf8Bytes("123456");
+    byte[] plainText = "123456".getBytes(StandardCharsets.UTF_8);
     int iterationCount = 1000;
     byte[] encrypted = PasswordBasedEncryption.encrypt(algo, plainText, password, iterationCount, salt);
     byte[] decrypted = PasswordBasedEncryption.decrypt(algo, encrypted, password, iterationCount, salt);
@@ -39,7 +40,7 @@ public class PBEWithHmacSHA256AndAES256Test {
       -15, -2, 113, -42, -46, 43, -65, -8, -51, 48, 6, 26, -73, -38, -111, -1, // IV
       75, 76, -36, -17, -96, -123, 2, -107, 92, -27, -114, -74, -80, 105, 46, 91};
     byte[] decrypted = PasswordBasedEncryption.decrypt(algo, encrypted, password, 1000, salt);
-    Assert.assertArrayEquals(StringUtil.toUtf8Bytes("123456"), decrypted);
+    Assert.assertArrayEquals("123456".getBytes(StandardCharsets.UTF_8), decrypted);
   }
 
 }

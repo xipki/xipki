@@ -23,6 +23,12 @@
       <version>${slf4j.4tinylog.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xipki</groupId>
+      <artifactId>password</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <version>${servlet.version}</version>

@@ -135,6 +135,16 @@
               <outputDirectory>${project.build.directory}/lib</outputDirectory>
               <artifactItems>
                 <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>xipki-tomcat-password</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>password</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
                   <groupId>org.bouncycastle</groupId>
                   <artifactId>bcpkix-jdk18on</artifactId>
                   <version>${bc.version}</version>

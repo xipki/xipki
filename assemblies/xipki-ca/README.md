@@ -13,9 +13,8 @@ Deployment in Tomcat 8 and 9
    In xipki-mgmt-cli, call `ca:sql --db-conf /path/to/ca-db.properties xipki/sql/ca-init.sql`
 7. Disable the HTTP listener, and configure the TLS listener in the file 
    `${CATALINA_HOME}conf/server.xml` (we use here the port 8444, can be changed to any other port)
-  - Use NIO connector (applied to all cases)
    ```sh
-    <Connector port="8444" protocol="org.apache.coyote.http11.Http11NioProtocol"
+    <Connector port="8444" protocol="org.apache.coyote.http11.Http11Nio2Protocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
                connectionTimeout="4000">
         <SSLHostConfig
@@ -32,22 +31,7 @@ Deployment in Tomcat 8 and 9
         </SSLHostConfig>
     </Connector>
   ```
-  - Use APR connector, fast but with pre-condition, please refer to https://tomcat.apache.org/tomcat-8.0-doc/apr.html for more details.
-  ```sh
-    <Connector port="8444" protocol="org.apache.coyote.http11.Http11AprProtocol"
-               maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
-               connectionTimeout="4000">
-        <SSLHostConfig
-                certificateVerification="required"
-                protocols="TLSv1.2+TLSv1.3"
-                ciphers="TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POLY1305_SHA256,TLS_AES_128_GCM_SHA256,TLS_AES_128_CCM_8_SHA256,TLS_AES_128_CCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256, TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
-                caCertificateFile="${XIPKI_BASE}/keycerts/tlskeys/ca/tls-ca-cert.pem">
-            <Certificate
-                         certificateKeyFile="${XIPKI_BASE}/keycerts/tlskeys/server/tls-server-key.pem"
-                         certificateFile="${XIPKI_BASE}/keycerts/tlskeys/server/tls-server-cert.pem"/>
-        </SSLHostConfig>
-    </Connector>
-  ```
+
 8. (optional) To accelerate the start process, append the following block to the property
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
 
@@ -75,8 +59,12 @@ slf4j-*.jar,\
 *-tinylog.jar,\
 tinylog*.jar,\
 util-*.jar,\
+xipki-tomcat-password-*.jar,\
 gateway-common-*.jar
 ```
+9. (optional) If you encrypt the passwords in the conf/server.xml with XiPKI solution, replace 
+  `org.apache.coyote.http11.Http11Nio2Protocol` by `org.xipki.tomcat.XiHttp11Nio2Protocol`
+
 - Start tomcat
 
 ```sh

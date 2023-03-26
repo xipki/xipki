@@ -11,9 +11,6 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import java.security.GeneralSecurityException;
 
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.positive;
-
 /**
  * Password based encryption utility class.
  *
@@ -45,10 +42,10 @@ public class PasswordBasedEncryption {
    */
   public static byte[] encrypt(PBEAlgo algo, byte[] plaintext, char[] password, int iterationCount, byte[] salt)
       throws GeneralSecurityException {
-    notNull(plaintext, "plaintext");
-    notNull(password, "password");
-    positive(iterationCount, "iterationCount");
-    notNull(salt, "salt");
+    Args.notNull(plaintext, "plaintext");
+    Args.notNull(password, "password");
+    Args.positive(iterationCount, "iterationCount");
+    Args.notNull(salt, "salt");
 
     SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algo.algoName());
 
@@ -80,10 +77,10 @@ public class PasswordBasedEncryption {
 
   public static byte[] decrypt(PBEAlgo algo, byte[] cipherTextWithIv, char[] password, int iterationCount, byte[] salt)
       throws GeneralSecurityException {
-    notNull(cipherTextWithIv, "cipherTextWithIv");
-    notNull(password, "password");
-    positive(iterationCount, "iterationCount");
-    notNull(salt, "salt");
+    Args.notNull(cipherTextWithIv, "cipherTextWithIv");
+    Args.notNull(password, "password");
+    Args. positive(iterationCount, "iterationCount");
+    Args. notNull(salt, "salt");
 
     PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
 

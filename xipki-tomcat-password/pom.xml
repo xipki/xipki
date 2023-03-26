@@ -8,31 +8,19 @@
     <artifactId>xipki-parent</artifactId>
     <version>6.2.0-SNAPSHOT</version>
   </parent>
-  <packaging>bundle</packaging>
-  <artifactId>util</artifactId>
-  <name>XiPKI :: ${project.artifactId}</name>
-  <properties>
-    <DynamicImport-Package>*</DynamicImport-Package>
-  </properties>
+  <artifactId>xipki-tomcat-password</artifactId>
   <dependencies>
+    <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-coyote -->
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-coyote</artifactId>
+      <version>9.0.73</version>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>password</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

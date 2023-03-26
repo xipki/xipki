@@ -3,16 +3,10 @@
 
 package org.xipki.password;
 
-import org.xipki.util.Base64;
-import org.xipki.util.RandomUtil;
-import org.xipki.util.StringUtil;
-
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
-
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.range;
+import java.util.Base64;
 
 /**
  * PBE (Password Based Encryption) password service.
@@ -29,10 +23,23 @@ public class PBEPasswordService {
 
   public static char[] decryptPassword(char[] masterPassword, String passwordHint)
       throws PasswordResolverException {
-    notNull(masterPassword, "masterPassword");
-    notNull(passwordHint, "passwordHint");
+    Args.notNull(masterPassword, "masterPassword");
+    Args.notNull(passwordHint, "passwordHint");
 
-    byte[] bytes = Base64.decode(passwordHint.substring(PROTOCOL_PBE.length() + 1));
+    passwordHint = passwordHint.trim();
+    if (!passwordHint.startsWith(PROTOCOL_PBE + ":")) {
+      throw new PasswordResolverException("encrypted password does not start with 'PBE:'");
+    }
+
+    String passwordHintWithoutPrefix = passwordHint.substring(4); // 4 = "PBE:".length()
+    int b64Len = passwordHintWithoutPrefix.length();
+    if (b64Len % 4 != 0) {
+      char[] suffix = new char[4 - b64Len % 4];
+      Arrays.fill(suffix, '=');
+      passwordHintWithoutPrefix += new String(suffix);
+    }
+
+    byte[] bytes = Base64.getDecoder().decode(passwordHintWithoutPrefix);
     int len = bytes.length;
     if (len <= 16 && len != 0) {
       throw new PasswordResolverException("invalid length of the encrypted password");
@@ -77,19 +84,19 @@ public class PBEPasswordService {
 
   public static String encryptPassword(PBEAlgo algo, int iterationCount, char[] masterPassword, char[] password)
       throws PasswordResolverException {
-    range(iterationCount, "iterationCount", 1, 65535);
-    notNull(masterPassword, "masterPassword");
-    notNull(password, "password");
+    Args.range(iterationCount, "iterationCount", 1, 65535);
+    Args.notNull(masterPassword, "masterPassword");
+    Args.notNull(password, "password");
 
     byte[] iterationCountBytes = new byte[2];
     iterationCountBytes[0] = (byte) (iterationCount >>> 8);
     iterationCountBytes[1] = (byte) (iterationCount & 0xFF);
 
-    byte[] salt = RandomUtil.nextBytes(16);
+    byte[] salt = Args.nextBytes(16);
     byte[] encrypted;
     try {
       encrypted = PasswordBasedEncryption.encrypt(algo,
-          StringUtil.toUtf8Bytes(new String(password)), masterPassword, iterationCount, salt);
+          Args.toUtf8Bytes(new String(password)), masterPassword, iterationCount, salt);
     } catch (GeneralSecurityException ex) {
       throw new PasswordResolverException("could not encrypt the password: " + ex.getMessage());
     }
@@ -111,7 +118,17 @@ public class PBEPasswordService {
 
     // cipher text
     System.arraycopy(encrypted, 0, encryptedText, offset, encrypted.length);
-    return StringUtil.concat(PROTOCOL_PBE, ":", Base64.encodeToString(encryptedText));
+    String b64 = Base64.getEncoder().encodeToString(encryptedText);
+
+    // remove the ending '='.
+    int endIndex = b64.length();
+    for (;;endIndex--) {
+      if (b64.charAt(endIndex - 1) != '=') {
+        break;
+      }
+    }
+
+    return PROTOCOL_PBE + ":" + b64.substring(0, endIndex);
   } // method encryptPassword
 
 }

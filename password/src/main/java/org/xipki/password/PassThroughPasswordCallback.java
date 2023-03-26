@@ -3,12 +3,6 @@
 
 package org.xipki.password;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.password.PasswordCallback;
-import org.xipki.password.PasswordResolverException;
-import org.xipki.util.Args;
-
 /**
  * A demo PasswordCallback which just pass-through the password.
  *
@@ -17,8 +11,6 @@ import org.xipki.util.Args;
  */
 public class PassThroughPasswordCallback implements PasswordCallback {
 
-  private static Logger LOG = LoggerFactory.getLogger(PassThroughPasswordCallback.class);
-
   private char[] password;
 
   public PassThroughPasswordCallback() {
@@ -26,7 +18,6 @@ public class PassThroughPasswordCallback implements PasswordCallback {
     String msg = sepLine + "\n|| PassThroughPasswordCallback IS ONLY FOR DEMO PURPOSE, ||" +
                            "\n|| DO NOT USE IT IN THE PRODUCTION ENVIRONMENT.          ||\n" + sepLine;
     System.out.println(msg);
-    LOG.warn(msg);
   }
 
   @Override

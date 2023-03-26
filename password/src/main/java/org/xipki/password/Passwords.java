@@ -3,12 +3,6 @@
 
 package org.xipki.password;
 
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.ValidatableConf;
-import org.xipki.util.exception.InvalidConfException;
-
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -20,7 +14,7 @@ import java.util.List;
 
 public class Passwords {
 
-  public static class PasswordConf extends ValidatableConf {
+  public static class PasswordConf {
 
     public static final String dflt_masterPasswordCallback = "PBE-GUI quorum=1,tries=3";
 
@@ -38,7 +32,7 @@ public class Passwords {
     private List<String> singlePasswordResolvers;
 
     public String getMasterPasswordCallback() {
-      return StringUtil.isBlank(masterPasswordCallback) ? dflt_masterPasswordCallback : masterPasswordCallback;
+      return Args.isBlank(masterPasswordCallback) ? dflt_masterPasswordCallback : masterPasswordCallback;
     }
 
     public void setMasterPasswordCallback(String masterPasswordCallback) {
@@ -53,19 +47,15 @@ public class Passwords {
       this.singlePasswordResolvers = singlePasswordResolvers;
     }
 
-    @Override
-    public void validate() throws InvalidConfException {
-    }
-
   } // class PasswordConf
 
   private PasswordResolverImpl passwordResolver;
 
-  public void init() throws IOException, InvalidConfException {
+  public void init() throws PasswordResolverException {
     init(null);
   }
 
-  public void init(PasswordConf conf) throws IOException, InvalidConfException {
+  public void init(PasswordConf conf) throws PasswordResolverException {
     passwordResolver = new PasswordResolverImpl();
     if (conf == null) {
       conf = PasswordConf.DEFAULT;
@@ -76,7 +66,7 @@ public class Passwords {
 
     List<String> singlePasswordResolvers = conf.getSinglePasswordResolvers();
     // register additional SinglePasswordResolvers
-    if (CollectionUtil.isNotEmpty(singlePasswordResolvers)) {
+    if (Args.isNotEmpty(singlePasswordResolvers)) {
       for (String className : singlePasswordResolvers) {
         try {
           Class<?> clazz = Class.forName(className);
@@ -84,7 +74,7 @@ public class Passwords {
           passwordResolver.registResolver(resolver);
         } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException |
                  InvocationTargetException ex) {
-          throw new InvalidConfException("error caught while initializing SinglePasswordResolver "
+          throw new PasswordResolverException("error caught while initializing SinglePasswordResolver "
               + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
       }

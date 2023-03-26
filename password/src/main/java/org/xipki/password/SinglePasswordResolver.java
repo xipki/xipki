@@ -3,9 +3,6 @@
 
 package org.xipki.password;
 
-import org.xipki.util.Args;
-import org.xipki.util.StringUtil;
-
 /**
  * Single password resolver.
  *
@@ -77,7 +74,7 @@ public interface SinglePasswordResolver {
         return;
       }
 
-      if (!StringUtil.isBlank(masterPasswordCallback)) {
+      if (!Args.isBlank(masterPasswordCallback)) {
         this.masterPwdCallback = PasswordCallback.getInstance(masterPasswordCallback);
       }
     } // method init

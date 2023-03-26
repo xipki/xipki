@@ -3,12 +3,7 @@
 
 package org.xipki.password;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * An implementation of {@link PasswordResolver}.
@@ -18,8 +13,6 @@ import static org.xipki.util.Args.notNull;
  */
 
 public class PasswordResolverImpl implements PasswordResolver {
-
-  private static final Logger LOG = LoggerFactory.getLogger(PasswordResolverImpl.class);
 
   private final ConcurrentLinkedQueue<SinglePasswordResolver> resolvers = new ConcurrentLinkedQueue<>();
 
@@ -49,37 +42,28 @@ public class PasswordResolverImpl implements PasswordResolver {
   public void registResolver(SinglePasswordResolver resolver) {
     //might be null if dependency is optional
     if (resolver == null) {
-      LOG.debug("registResolver invoked with null.");
       return;
     }
 
-    boolean replaced = resolvers.remove(resolver);
+    resolvers.remove(resolver);
     resolvers.add(resolver);
-    String txt = replaced ? "replaced" : "added";
-    LOG.debug("{} SinglePasswordResolver binding for {}", txt, resolver);
   } // method registResolver
 
   public void unregistResolver(SinglePasswordResolver resolver) {
     //might be null if dependency is optional
     if (resolver == null) {
-      LOG.debug("unregistResolver invoked with null.");
       return;
     }
 
     try {
-      if (resolvers.remove(resolver)) {
-        LOG.debug("removed SinglePasswordResolver binding for {}", resolver);
-      } else {
-        LOG.debug("no SinglePasswordResolver binding found to remove for '{}'", resolver);
-      }
+      resolvers.remove(resolver);
     } catch (Exception ex) {
-      LOG.debug("caught Exception({}). service is probably destroyed.", ex.getMessage());
     }
   } // method unregistResolver
 
   @Override
   public char[] resolvePassword(String passwordHint) throws PasswordResolverException {
-    notNull(passwordHint, "passwordHint");
+    Args.notNull(passwordHint, "passwordHint");
     int index = passwordHint.indexOf(':');
     if (index == -1) {
       return passwordHint.toCharArray();
@@ -104,8 +88,8 @@ public class PasswordResolverImpl implements PasswordResolver {
 
   @Override
   public String protectPassword(String protocol, char[] password) throws PasswordResolverException {
-    notNull(protocol, "protocol");
-    notNull(password, "password");
+    Args.notNull(protocol, "protocol");
+    Args.notNull(password, "password");
 
     for (SinglePasswordResolver resolver : resolvers) {
       if (resolver.canResolveProtocol(protocol)) {

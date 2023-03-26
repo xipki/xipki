@@ -3,13 +3,6 @@
 
 package org.xipki.password;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.util.Args;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -49,8 +42,6 @@ public interface PasswordCallback {
 
   class File implements PasswordCallback {
 
-    private static final Logger LOG = LoggerFactory.getLogger(File.class);
-
     private String passwordFile;
 
     @Override
@@ -59,37 +50,25 @@ public interface PasswordCallback {
         throw new PasswordResolverException("please initialize me first");
       }
 
-      passwordFile = IoUtil.detectPath(passwordFile);
-
       String passwordHint = null;
-      BufferedReader reader = null;
-      try {
-        reader = Files.newBufferedReader(Paths.get(passwordFile));
+      try (BufferedReader reader = Files.newBufferedReader(Paths.get(passwordFile))) {
         String line;
         while ((line = reader.readLine()) != null) {
           line = line.trim();
-          if (StringUtil.isNotBlank(line) && !line.startsWith("#")) {
+          if (Args.isNotBlank(line) && !line.startsWith("#")) {
             passwordHint = line;
             break;
           }
         }
       } catch (IOException ex) {
         throw new PasswordResolverException("could not read file " + passwordFile, ex);
-      } finally {
-        if (reader != null) {
-          try {
-            reader.close();
-          } catch (IOException ex) {
-            LOG.error("could not close reader: {}", ex.getMessage());
-          }
-        }
       }
 
       if (passwordHint == null) {
         throw new PasswordResolverException("no password is specified in file " + passwordFile);
       }
 
-      if (StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordService.PROTOCOL_OBF + ":")) {
+      if (Args.startsWithIgnoreCase(passwordHint, OBFPasswordService.PROTOCOL_OBF + ":")) {
         return OBFPasswordService.deobfuscate(passwordHint).toCharArray();
       } else {
         return passwordHint.toCharArray();
@@ -101,10 +80,9 @@ public interface PasswordCallback {
       Args.notBlank(conf, "conf");
       ConfPairs pairs = new ConfPairs(conf);
       passwordFile = pairs.value("file");
-      if (StringUtil.isBlank(passwordFile)) {
+      if (Args.isBlank(passwordFile)) {
         throw new PasswordResolverException("invalid configuration " + conf + ", no file is specified");
       }
-      passwordFile = IoUtil.expandFilepath(passwordFile);
     }
 
   }
@@ -122,7 +100,7 @@ public interface PasswordCallback {
     @Override
     public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
       String tmpPrompt = prompt;
-      if (StringUtil.isBlank(tmpPrompt)) {
+      if (Args.isBlank(tmpPrompt)) {
         tmpPrompt = "Password required";
       }
 
@@ -142,7 +120,7 @@ public interface PasswordCallback {
               throw new PasswordResolverException("user has cancelled");
             }
           }
-          password = StringUtil.merge(passwordParts);
+          password = Args.merge(passwordParts);
         }
 
         if (isPasswordValid(password, testToken)) {
@@ -155,7 +133,7 @@ public interface PasswordCallback {
 
     @Override
     public void init(String conf) throws PasswordResolverException {
-      if (StringUtil.isBlank(conf)) {
+      if (Args.isBlank(conf)) {
         quorum = 1;
         return;
       }
@@ -168,7 +146,7 @@ public interface PasswordCallback {
       }
 
       str = pairs.value("tries");
-      if (StringUtil.isNotBlank(str)) {
+      if (Args.isNotBlank(str)) {
         int intValue = Integer.parseInt(str);
         if (intValue > 0) {
           this.tries = intValue;
@@ -203,7 +181,7 @@ public interface PasswordCallback {
 
     @Override
     protected boolean isPasswordValid(char[] password, String testToken) {
-      if (StringUtil.isBlank(testToken)) {
+      if (Args.isBlank(testToken)) {
         return true;
       }
       try {
@@ -216,7 +194,7 @@ public interface PasswordCallback {
 
   }
 
-  public static PasswordCallback getInstance(String passwordCallback) {
+  static PasswordCallback getInstance(String passwordCallback) {
     String type;
     String conf = null;
 
@@ -241,8 +219,8 @@ public interface PasswordCallback {
         break;
       case OBFPasswordService.PROTOCOL_OBF:
         pwdCallback = new PasswordCallback.OBF();
-        if (conf != null && !StringUtil.startsWithIgnoreCase(conf, OBFPasswordService.PROTOCOL_OBF + ":")) {
-          conf = StringUtil.concat(OBFPasswordService.PROTOCOL_OBF, ":", conf);
+        if (conf != null && !Args.startsWithIgnoreCase(conf, OBFPasswordService.PROTOCOL_OBF + ":")) {
+          conf = OBFPasswordService.PROTOCOL_OBF + ":" + conf;
         }
         break;
       default:

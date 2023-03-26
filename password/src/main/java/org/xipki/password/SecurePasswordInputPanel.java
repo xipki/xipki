@@ -3,9 +3,6 @@
 
 package org.xipki.password;
 
-import org.xipki.util.RandomUtil;
-import org.xipki.util.StringUtil;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
@@ -61,7 +58,7 @@ public class SecurePasswordInputPanel extends Panel {
     final int n = rows.size();
 
     while (!rows.isEmpty()) {
-      int row = RandomUtil.nextInt(n);
+      int row = Args.nextInt(n);
       if (!rows.contains(row)) {
         continue;
       }
@@ -75,7 +72,7 @@ public class SecurePasswordInputPanel extends Panel {
         button.setFont(button.getFont().deriveFont(Font.TRUETYPE_FONT));
         if (CLEAR.equalsIgnoreCase(text)) {
           button.setBackground(Color.red);
-        } else if (StringUtil.orEqualsIgnoreCase(text, CAPS, BACKSPACE)) {
+        } else if (Args.orEqualsIgnoreCase(text, CAPS, BACKSPACE)) {
           button.setBackground(Color.lightGray);
         } else {
           buttons.add(button);

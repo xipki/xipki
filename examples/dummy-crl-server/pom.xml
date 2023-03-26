@@ -14,6 +14,12 @@
   <dependencies>
     <dependency>
       <groupId>org.xipki</groupId>
+      <artifactId>password</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki</groupId>
       <artifactId>datasource</artifactId>
       <version>${project.version}</version>
     </dependency>

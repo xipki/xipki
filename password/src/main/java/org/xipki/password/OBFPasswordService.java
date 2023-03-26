@@ -3,11 +3,7 @@
 
 package org.xipki.password;
 
-import org.xipki.util.StringUtil;
-
 import java.nio.charset.StandardCharsets;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * OBF (jetty's Obfuscate) password service.
@@ -20,9 +16,9 @@ public class OBFPasswordService {
   public static final String PROTOCOL_OBF = "OBF";
 
   public static String obfuscate(String str) {
-    notNull(str, "str");
+    Args.notNull(str, "str");
     StringBuilder buf = new StringBuilder();
-    byte[] bytes = StringUtil.toUtf8Bytes(str);
+    byte[] bytes = Args.toUtf8Bytes(str);
 
     buf.append(PROTOCOL_OBF).append(":");
     for (int i = 0; i < bytes.length; i++) {
@@ -47,7 +43,7 @@ public class OBFPasswordService {
   } // method obfuscate
 
   public static String deobfuscate(String str) {
-    notNull(str, "str");
+    Args.notNull(str, "str");
 
     if (startsWithIgnoreCase(str, PROTOCOL_OBF + ":")) {
       str = str.substring(4);
