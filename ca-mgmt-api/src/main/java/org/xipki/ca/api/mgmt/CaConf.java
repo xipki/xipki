@@ -338,7 +338,6 @@ public class CaConf {
 
           caEntry.setSaveCert(ci.isSaveCert());
           caEntry.setSaveKeypair(ci.isSaveKeyPair());
-          caEntry.setUniqueKey(ci.isUniqueKey());
           caEntry.setStatus(CaStatus.forName(ci.getStatus()));
 
           if (ci.getValidityMode() != null) {

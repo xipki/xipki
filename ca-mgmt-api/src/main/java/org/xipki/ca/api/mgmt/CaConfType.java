@@ -245,8 +245,6 @@ public class CaConfType {
 
     private boolean saveKeyPair;
 
-    private boolean uniqueKey = false;
-
     private String signerType;
 
     private FileOrValue signerConf;
@@ -387,14 +385,6 @@ public class CaConfType {
 
     public void setSaveKeyPair(boolean saveKeyPair) {
       this.saveKeyPair = saveKeyPair;
-    }
-
-    public boolean isUniqueKey() {
-      return uniqueKey;
-    }
-
-    public void setUniqueKey(boolean uniqueKey) {
-      this.uniqueKey = uniqueKey;
     }
 
     public String getSignerType() {

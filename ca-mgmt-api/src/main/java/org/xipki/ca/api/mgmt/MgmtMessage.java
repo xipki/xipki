@@ -226,8 +226,6 @@ public abstract class MgmtMessage {
 
     private boolean saveKeypair;
 
-    private boolean uniqueKey;
-
     private ValidityMode validityMode = ValidityMode.STRICT;
 
     private int permission;
@@ -297,7 +295,6 @@ public abstract class MgmtMessage {
 
       saveCert = caEntry.isSaveCert();
       saveKeypair = caEntry.isSaveKeypair();
-      uniqueKey = caEntry.isUniqueKey();
       keypairGenNames = caEntry.getKeypairGenNames();
 
       serialNoLen = caEntry.getSerialNoLen();
@@ -403,14 +400,6 @@ public abstract class MgmtMessage {
 
     public void setSaveKeypair(boolean saveKeypair) {
       this.saveKeypair = saveKeypair;
-    }
-
-    public boolean isUniqueKey() {
-      return uniqueKey;
-    }
-
-    public void setUniqueKey(boolean uniqueKey) {
-      this.uniqueKey = uniqueKey;
     }
 
     public ValidityMode getValidityMode() {
@@ -551,7 +540,6 @@ public abstract class MgmtMessage {
       }
       rv.setSaveCert(saveCert);
       rv.setSaveKeypair(saveKeypair);
-      rv.setUniqueKey(uniqueKey);
 
       if (revokeSuspended != null) {
         rv.setRevokeSuspendedControl(new RevokeSuspendedControl(revokeSuspended));

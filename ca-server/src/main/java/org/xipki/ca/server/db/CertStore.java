@@ -125,8 +125,6 @@ public class CertStore extends CertStoreBase {
 
   private final String sqlCertWithRevInfoBySubjectAndSan;
 
-  private final String sqlCertIdByCaSki;
-
   private final String sqlCertIdByCaSn;
 
   private final String sqlCertInfo;
@@ -170,7 +168,6 @@ public class CertStore extends CertStoreBase {
     this.sqlCertWithRevInfoBySubjectAndSan = buildSelectFirstSql("NBEFORE DESC",
         "ID,NBEFORE,REV,RR,RT,RIT,PID,CERT FROM CERT WHERE CA_ID=? AND FP_S=? AND FP_SAN=?");
 
-    this.sqlCertIdByCaSki = buildSelectFirstSql("ID FROM CERT WHERE CA_ID=? AND SKI=?");
     this.sqlCertIdByCaSn = buildSelectFirstSql("ID FROM CERT WHERE CA_ID=? AND SN=?");
     this.sqlCertInfo = buildSelectFirstSql("PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE CA_ID=? AND SN=?");
     this.sqlCertStatusForSubjectFp = buildSelectFirstSql("REV FROM CERT WHERE FP_S=? AND CA_ID=?");
@@ -247,10 +244,6 @@ public class CertStore extends CertStoreBase {
       columns.add(col2Long(Instant.now().getEpochSecond()));
       columns.add(col2Str(cert0.getSerialNumber().toString(16)));
       columns.add(col2Str(subjectText));
-      if (dbSchemaVersion >= 8) {
-        String b64ski = HashAlgo.SHA1.base64Hash(cert0.getSubjectPublicKeyInfo().getPublicKeyData().getOctets());
-        columns.add(col2Str(b64ski));
-      }
       columns.add(col2Long(fpSubject));
       columns.add(col2Long(fpReqSubject));
       columns.add(col2Long(fpSan));
@@ -758,13 +751,6 @@ public class CertStore extends CertStoreBase {
     ret.setRevInfo(buildCertRevInfo(rs));
     return ret;
   } // method getCertWithRevocationInfo
-
-  public long getCertIdBySki(NameId ca, byte[] ski) throws OperationException {
-    notNulls(ca, "ca", ski, "ski");
-
-    ResultRow rs = execQuery1PrepStmt0(sqlCertIdByCaSki, col2Int(ca.getId()), col2Str(HashAlgo.SHA1.base64Hash(ski)));
-    return (rs == null) ? 0 : rs.getLong("ID");
-  }
 
   public long getCertId(NameId ca, BigInteger serial) throws OperationException {
     notNulls(ca, "ca", serial, "serial");

@@ -44,7 +44,6 @@
 			"permissions":["all"],
 			"saveCert":true,
 			"saveKeypair":false,
-			"uniqueKey":false,
 			"signerType":"${token.type}",
 			"signerConf":{
 				"value":"${ca.signerConf}"

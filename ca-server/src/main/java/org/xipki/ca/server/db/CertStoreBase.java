@@ -92,11 +92,7 @@ public class CertStoreBase extends QueryExecutor {
     }
     this.maxX500nameLen = Integer.parseInt(dbSchemaInfo.variableValue("X500NAME_MAXLEN"));
 
-    String addCertSql = "ID,LUPDATE,SN,SUBJECT,";
-    if (dbSchemaVersion >= 8) {
-      addCertSql += "SKI,";
-    }
-    addCertSql += "FP_S,FP_RS,FP_SAN,NBEFORE,NAFTER,REV,PID,CA_ID,RID,EE,TID,SHA1," +
+    String addCertSql = "ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,FP_SAN,NBEFORE,NAFTER,REV,PID,CA_ID,RID,EE,TID,SHA1," +
                     "REQ_SUBJECT,CRL_SCOPE,CERT,PRIVATE_KEY";
     this.SQL_ADD_CERT = buildInsertSql("CERT", addCertSql);
 
