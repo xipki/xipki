@@ -538,6 +538,12 @@ public class X509Ca extends X509CaModule implements Closeable {
     while (true) {
       if (StringUtil.isBlank(serialNumberMode) || "CA".equalsIgnoreCase(serialNumberMode)) {
         serialNumber = caInfo.nextSerial();
+        if (caInfo.getCaEntry().getSerialNoLen() > 12) {
+          // Serial number have enough entropy (at least 12 bytes), do not check the uniqueness.
+          // We need 2^{48} (about 10^{16}) serial numbers to have two same serial numbers with
+          // 1/2 probability.
+          break;
+        }
       } else if ("PROFILE".equalsIgnoreCase(serialNumberMode)) {
         try {
           BigInteger previousSerialNumber = serialNumber;

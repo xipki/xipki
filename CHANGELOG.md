@@ -2,6 +2,22 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
+## 6.2.1
+- Release date: XX XX, 2023
+- CA
+    - Do not check the uniqueness of serial number in database if it contains 
+      at least 95 random bits.
+- OCSP
+    - N/A
+- CLI
+    - N/A
+- MGMT-CLI (Management Client)
+    - N/A
+- DB Tool
+    - N/A
+- Dependencies
+    - N/A
+
 ## 6.2.0
 - Release date: March 26, 2023
 - CA
