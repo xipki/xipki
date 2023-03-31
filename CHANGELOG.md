@@ -2,8 +2,9 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 6.2.1
+## 6.3.0
 - Release date: XX XX, 2023
+- Compared to 6.2.0, there is only one ZIP-file for all software components.
 - CA
     - Do not check the uniqueness of serial number in database if it contains 
       at least 95 random bits.
