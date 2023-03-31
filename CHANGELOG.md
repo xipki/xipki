@@ -9,11 +9,11 @@ See also <https://github.com/xipki/xipki/releases>
       at least 95 random bits.
 - OCSP
     - N/A
+- Gateway
+    - N/A
 - CLI
     - N/A
 - MGMT-CLI (Management Client)
-    - N/A
-- DB Tool
     - N/A
 - Dependencies
     - N/A

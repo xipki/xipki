@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xipki.assembly</groupId>
+    <artifactId>assemblies</artifactId>
+    <version>6.2.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>xipki-setup</artifactId>
+  <packaging>pom</packaging>
+  <name>XiPKI :: assembly :: ${project.artifactId}</name>
+  <dependencies>
+    <dependency>
+      <groupId>org.xipki.tools</groupId>
+      <artifactId>app-package</artifactId>
+      <version>${xipki.tools.version}</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <resources>
+      <resource>
+        <directory>src/assembly/unfiltered</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>filter</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>resources</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>prepare-package</phase>
+            <configuration>
+              <target>
+                <copy file="${project.basedir}/../../README.md"
+                      todir="${project.build.directory}/t"/>
+
+                <unzip src="../xipki-ca/target/xipki-ca-${project.version}.zip"
+                   dest="${project.build.directory}/t"/>
+                <move file="${project.build.directory}/t/xipki-ca-${project.version}"
+                      tofile="${project.build.directory}/t/xipki-ca"/>
+
+                <unzip src="../xipki-ocsp/target/xipki-ocsp-${project.version}.zip"
+                   dest="${project.build.directory}/t"/>
+                <move file="${project.build.directory}/t/xipki-ocsp-${project.version}"
+                      tofile="${project.build.directory}/t/xipki-ocsp"/>
+
+                <unzip src="../xipki-gateway/target/xipki-gateway-${project.version}.zip"
+                       dest="${project.build.directory}/t"/>
+                <move file="${project.build.directory}/t/xipki-gateway-${project.version}"
+                      tofile="${project.build.directory}/t/xipki-gateway"/>
+
+                <untar src="../xipki-cli/target/xipki-cli-${project.version}.tar.gz"
+                       dest="${project.build.directory}/t" compression="gzip"/>
+                <move file="${project.build.directory}/t/xipki-cli-${project.version}"
+                      tofile="${project.build.directory}/t/xipki-cli"/>
+
+                <untar src="../xipki-mgmt-cli/target/xipki-mgmt-cli-${project.version}.tar.gz"
+                       dest="${project.build.directory}/t" compression="gzip"/>
+                <move file="${project.build.directory}/t/xipki-mgmt-cli-${project.version}"
+                      tofile="${project.build.directory}/t/xipki-mgmt-cli"/>
+
+                <java failonerror="true" classname="org.xipki.apppackage.CompressPackage">
+                  <arg value="${project.basedir}/src/assembly/descriptors/posix-permissions.conf"/>
+                  <arg value="${project.build.directory}/t"/>
+                  <arg value="${project.build.directory}/t2"/>
+                </java>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>jdk11on</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/assembly/descriptors/main.xml</descriptor>
+              </descriptors>
+              <appendAssemblyId>false</appendAssemblyId>
+              <tarLongFileMode>posix</tarLongFileMode>
+              <!-- Don't install/publish the result -->
+              <attach>false</attach>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

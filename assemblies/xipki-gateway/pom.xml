@@ -141,6 +141,11 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
+                  <artifactId>${pkcs11wrapper.artifactId}</artifactId>
+                  <version>${pkcs11wrapper.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
                   <artifactId>password</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>

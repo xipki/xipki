@@ -13,7 +13,7 @@ a highly scalable and high-performance open source PKI (CA and OCSP responder).
 * The Apache Software License, Version 2.0
 
 ## Support
-Just [create issue](https://github.com/xipki/xipki/issues) or [new discussion](https://github.com/xipki/xipki/discussions).
+Just [create issue](https://github.com/xipki/xipki/issues).
 
 For bug-report please upload the test data and log files, describe the version of XiPKI, OS and
 JRE/JDK, and the steps to reproduce the bug.
@@ -40,9 +40,7 @@ JRE/JDK, and the steps to reproduce the bug.
 
 ### Binaries
 
-Download the binaries `xipki-ca-<version>.zip`, `xipki-ocsp-<version>.zip`, 
-`xipki-gateway-<version>.zip`, `xipki-mgmt-cli-<version>.tar.gz`, `xipki-cli-<version>.tar.gz`
-from [releases](https://github.com/xipki/xipki/releases).
+Download the binary `xipki-setup-<version>.zip`from [releases](https://github.com/xipki/xipki/releases).
 
 Only if you want to use the development version, build it from source code as
 follows.
@@ -58,64 +56,48 @@ follows.
   mvn clean install -DskipTests
   ```
  
-  Then you will find the following binaries:
-   - CA: `assemblies/xipki-ca/target/xipki-ca-<version>.zip`
-   - OCSP: `assemblies/xipki-ocsp/target/xipki-ocsp-<version>.zip`
-   - Protocol Gateway (CMP, SCEP, EST, REST): `assemblies/xipki-gateway/target/xipki-gateway-<version>.zip`
-   - Management CLI: `assemblies/xipki-mgmt-cli/target/xipki-mgmt-cli-<version>.tar.gz`
-   - CLI: `assemblies/xipki-cli/target/xipki-cli-<version>.tar.gz`
+  Then you will find the binary `assemblies/xipki-setup/target/xipki-setup-<version>.zip`
+
+
+## Prepare
+
+1. Unpack the binary `xipki-setup-<version>.zip`. To restore the files to a destination 
+   folder, run the script `bin/restore.sh /path/to/dest-dir` (or `bin\restore.bat` in Windows).
+
+**Note that all keys and certificates in the binary are only for demo purpose. In production environment
+they MUST be replaced.**
+
+**In the following sections, we assume the destination folder is `xipki-<version>`**.
 
 ## Install CA Server
 
 JDK 8+ is required.
 
-**Note that all keys and certificates in the delivery are only for demo purpose. In production environment
-they MUST be replaced.**
-
 1. Unpack tomcat to a new folder
-2. Unpack the binary `xipki-ca-<version>.zip` and install CA as described in the
-   unpacked README file.
+2. Install CA as described in the `xipki-<version>/xipki-ca/README` file.
 
 ## Install OCSP Responder
 
 JDK 8+ is required.
 
-**Note that all keys and certificates in the delivery are only for demo purpose. In production environment
-they MUST be replaced.**
-
 1. Unpack tomcat to a new folder
-2. Unpack the binary `xipki-ocsp-<version>.zip` and install OCSP responder as described in the
-   unpacked README file.
+2. Install CA as described in the `xipki-<version>/xipki-ocsp/README` file.
 
 ## Install Protocol Gateway
 
 JDK 8+ is required.
 
-**Note that all keys and certificates in the delivery are only for demo purpose. In production environment
-they MUST be replaced.**
-
 1. Unpack tomcat to a new folder
-2. Unpack the binary `xipki-gate-<version>.zip` and install protocol gateway as described in the
-   unpacked README file.
+2. Install CA as described in the `xipki-<version>/xipki-gateway/README` file.
 
 ## Install Management Command Line Interface
 
 JDK 11+ is required.
 
-**Note that all keys and certificates in the delivery are only for demo purpose. In production environment
-they MUST be replaced.**
-
-1. Unpack the binary `xipki-mgmt-cli-<version>.tar.gz`
-2. If you get "java.lang.ClassNotFoundException: &lt;jdbc class&gt;", please copy the missing JDBC driver jar to the directory `lib/boot`.
-
 ## Install Command Line Interface
 
 JDK 11+ is required.
 
-**Note that all keys and certificates in the delivery are only for demo purpose. In production environment
-they MUST be replaced.**
-
-1. Unpack the binary `xipki-cli-<version>.tar.gz`
 
 ## Configure PKCS#11 device (optional)
 
@@ -126,7 +108,7 @@ they MUST be replaced.**
 
 ## Configure how to handle SSL client certificate (optional)
 
-  This step is only required if the CA is behind a reverse proxy apache httpd.
+  This step is only required if the tomcat is behind a reverse proxy apache httpd.
 
   * Add the java property org.xipki.reverseproxy.mode
     ```sh
@@ -158,14 +140,14 @@ they MUST be replaced.**
 
 ## Setup CA Server
 
-1. Start the servlet container  
+1. Start the servlet container, e.g. tomcat. 
 HSM devices of Thales, e.g. nCipher, can use Thales preload to manage the
 PKCS#11 sessions. In this case, the servlet container should be started as follows
 ```sh
 preload <start script>
 ```
 
-2. Setup CA in Management CLI (xipki-mgmt-cli)
+2. Setup CA in Management CLI (in folder `xipki-mgmt-cli`)
     * _(If error like "Identity or Certificate with label=mylabel already exists" occurs,
       you need to comment the line which generate the key (e.g. dsa-p11 ec-p11, rsa-p11, sm2-p12)
       or delete the existing key using command `delete-key-p11`)_.
@@ -198,26 +180,26 @@ preload <start script>
    * Verify the installation, execute the command in CLI:  
      `ca-info myca1`
 
-## Enroll/Revoke Certificate
+## Enroll/Revoke Certificate (in folder `xipki-cli`)
 
 * EST  
   Use any EST client.
 
-  The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
+  The folder `xipki-cli` contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:
   - `source xipki/client-script/est-client.script`
 
 * SCEP  
   Use any SCEP client. XiPKI provides also a SCEP client.
 
-  The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
+  The folder `xipki-cli` contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:  
   - `source xipki/client-script/scep-client.script`
 
 * CMP  
   Use any CMP client. XiPKI provides also a CMP client.
 
-  The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
+  The folder `xipki-cli` contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:  
   - `source xipki/client-script/cmp-client.script` (use argument 'help' to print the usage)
 

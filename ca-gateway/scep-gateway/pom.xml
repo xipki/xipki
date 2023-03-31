@@ -29,6 +29,12 @@
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
+      <artifactId>${pkcs11wrapper.artifactId}</artifactId>
+      <version>${pkcs11wrapper.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki</groupId>
       <artifactId>password</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
