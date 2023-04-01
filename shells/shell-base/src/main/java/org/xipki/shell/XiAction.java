@@ -327,9 +327,6 @@ public abstract class XiAction implements Action {
     }
 
     String answer = readLine(tmpPrompt, null);
-    if (answer == null) {
-      throw new IOException("interrupted");
-    }
 
     int tries = 1;
 

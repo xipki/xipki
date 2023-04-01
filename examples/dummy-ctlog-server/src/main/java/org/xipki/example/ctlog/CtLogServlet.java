@@ -116,11 +116,10 @@ public class CtLogServlet extends HttpServlet {
 
       byte sctVersion = 0;
       long timestamp = Clock.systemUTC().millis();
-      byte[] sctExtensions = null;
 
       Signature sig = Signature.getInstance(signatureAlgo);
       sig.initSign(signingKey);
-      CtLog.update(sig, sctVersion, timestamp, sctExtensions, issuerKeyHash, preCertTbsCert);
+      CtLog.update(sig, sctVersion, timestamp, null, issuerKeyHash, preCertTbsCert);
       byte[] signature = sig.sign();
 
       AddPreChainResponse resp0 = new AddPreChainResponse();

@@ -491,7 +491,7 @@ public class QaOcspActions {
             BigInteger to = st2.hasMoreTokens() ? toBigInt(st2.nextToken(), hex) : from;
             serialNumbers.add(new BigIntegerRange(from, to));
           }
-        } else  if (certFiles != null) {
+        } else {
           for (String certFile : certFiles) {
             X509Cert cert;
             try {

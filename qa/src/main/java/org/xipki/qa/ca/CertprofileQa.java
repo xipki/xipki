@@ -48,10 +48,10 @@ public class CertprofileQa {
   private static final Logger LOG = LoggerFactory.getLogger(CertprofileQa.class);
 
   private static final Instant MAX_CERT_TIME = ZonedDateTime.of(9999, 12, 31,
-      23, 59, 59, 000, ZoneOffset.UTC).toInstant(); //9999-12-31T23:59:59.000
+      23, 59, 59, 0, ZoneOffset.UTC).toInstant(); //9999-12-31T23:59:59.000
 
-  private static final Instant EPOCHTIME_2050010100 = ZonedDateTime.of(2050, 01, 01,
-      0, 0, 0, 000, ZoneOffset.UTC).toInstant();
+  private static final Instant EPOCHTIME_2050010100 = ZonedDateTime.of(2050, 1, 1,
+      0, 0, 0, 0, ZoneOffset.UTC).toInstant();
   //2050-01-01T00:00:00.000;
 
   private final SubjectChecker subjectChecker;

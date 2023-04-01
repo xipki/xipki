@@ -154,7 +154,7 @@ public class SubjectChecker {
     StringBuilder failureMsg = new StringBuilder();
 
     // check the encoding
-    StringType stringType = (rdnControl == null) ? null : rdnControl.getStringType();
+    StringType stringType = rdnControl.getStringType();
 
     for (int i = 0; i < rdns.length; i++) {
       RDN rdn = rdns[i];

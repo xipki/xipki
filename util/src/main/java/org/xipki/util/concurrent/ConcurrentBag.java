@@ -253,7 +253,7 @@ public class ConcurrentBag<T extends ConcurrentBagEntry> implements AutoCloseabl
    * the <code>unreserve(T)</code> method.
    *
    * @param bagEntry the item to reserve
-   * @return true if the item was able to be reserved, false otherwise
+   * @return true if the item was able to be reserved; false otherwise
    */
   public boolean reserve(final T bagEntry) {
     return bagEntry.compareAndSet(STATE_NOT_IN_USE, STATE_RESERVED);

@@ -481,42 +481,38 @@ public class Actions {
           throw new CmdFailure("no responder certificate match the ResponderId");
         }
 
-        boolean validOn = true;
         for (Date thisUpdate : thisUpdates) {
-          validOn = respSigner.isValidOn(thisUpdate);
-          if (!validOn) {
+          if (!respSigner.isValidOn(thisUpdate)) {
             throw new CmdFailure("responder certificate is not valid on " + thisUpdate);
           }
         }
 
-        if (validOn) {
-          PublicKey responderPubKey = KeyUtil.generatePublicKey(respSigner.getSubjectPublicKeyInfo());
-          ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(responderPubKey);
-          boolean sigValid = basicResp.isSignatureValid(cvp);
+        PublicKey responderPubKey = KeyUtil.generatePublicKey(respSigner.getSubjectPublicKeyInfo());
+        ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(responderPubKey);
+        boolean sigValid = basicResp.isSignatureValid(cvp);
 
-          if (!sigValid) {
-            throw new CmdFailure("response is equipped with invalid signature");
+        if (!sigValid) {
+          throw new CmdFailure("response is equipped with invalid signature");
+        }
+
+        // verify the OCSPResponse signer
+        if (respIssuer != null) {
+          boolean certValid = true;
+          X509Cert respSigner2 = new X509Cert(respSigner);
+          if (X509Util.issues(respIssuer, respSigner2)) {
+            try {
+              respSigner2.verify(respIssuer.getPublicKey());
+            } catch (SignatureException ex) {
+              certValid = false;
+            }
           }
 
-          // verify the OCSPResponse signer
-          if (respIssuer != null) {
-            boolean certValid = true;
-            X509Cert respSigner2 = new X509Cert(respSigner);
-            if (X509Util.issues(respIssuer, respSigner2)) {
-              try {
-                respSigner2.verify(respIssuer.getPublicKey());
-              } catch (SignatureException ex) {
-                certValid = false;
-              }
-            }
-
-            if (!certValid) {
-              throw new CmdFailure("response is equipped with valid signature but the OCSP signer is not trusted");
-            }
-          } else {
-            println("response is equipped with valid signature");
-          } // end if(respIssuer)
-        } // end if(validOn)
+          if (!certValid) {
+            throw new CmdFailure("response is equipped with valid signature but the OCSP signer is not trusted");
+          }
+        } else {
+          println("response is equipped with valid signature");
+        } // end if(respIssuer)
 
         if (verbose) {
           println("responder is " + X509Util.x500NameText(responderCerts[0].getSubject()));

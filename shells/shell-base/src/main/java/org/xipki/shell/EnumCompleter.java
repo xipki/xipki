@@ -21,7 +21,7 @@ public abstract class EnumCompleter implements Completer {
 
   private final List<String> enums = new LinkedList<>();
 
-  protected void setTokens(Collection<? extends Object> tokens) {
+  protected void setTokens(Collection<?> tokens) {
     enums.clear();
     for (Object token : tokens) {
       enums.add(token.toString());

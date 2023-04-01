@@ -608,7 +608,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
   private SqlColumn buildChangeCaConfColumn(
       ChangeCaEntry changeCaEntry, CaConfColumn currentCaConfColumn) {
-    CaConfColumn newCC = currentCaConfColumn.clone();
+    CaConfColumn newCC = currentCaConfColumn.copy();
 
     if (changeCaEntry.getMaxValidity() != null) {
       newCC.setMaxValidity(changeCaEntry.getMaxValidity().toString());

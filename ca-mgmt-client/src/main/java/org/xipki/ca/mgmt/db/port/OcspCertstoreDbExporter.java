@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.sql.PreparedStatement;
@@ -69,8 +70,9 @@ class OcspCertstoreDbExporter extends DbPorter {
 
   public void export() throws Exception {
     OcspCertstore certstore;
+    Path path = Paths.get(baseDir, FILENAME_OCSP_CERTSTORE);
     if (resume) {
-      try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_OCSP_CERTSTORE))) {
+      try (InputStream is = Files.newInputStream(path)) {
         certstore = JSON.parseObject(is, OcspCertstore.class);
       }
       certstore.validate();
@@ -94,7 +96,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
     Exception exception = exportCert(certstore, processLogFile);
 
-    try (OutputStream os = Files.newOutputStream(Paths.get(baseDir, FILENAME_OCSP_CERTSTORE))) {
+    try (OutputStream os = Files.newOutputStream(path)) {
       JSON.writeJSON(certstore, os);
     }
 
@@ -214,7 +216,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     Long minId = null;
     if (processLogFile.exists()) {
       byte[] content = IoUtil.read(processLogFile);
-      if (content != null && content.length > 0) {
+      if (content.length > 0) {
         minId = 1 + Long.parseLong(StringUtil.toUtf8String(content).trim());
       }
     }

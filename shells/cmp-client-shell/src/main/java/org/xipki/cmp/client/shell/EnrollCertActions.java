@@ -229,7 +229,7 @@ public class EnrollCertActions {
   public static class CmpEnrollP11 extends EnrollCertAction {
 
     @Option(name = "--slot", required = true, description = "slot index")
-    private Integer slotIndex;
+    private String slotIndex = "0";
 
     @Option(name = "--key-id",
         description = "id of the private key in the PKCS#11 device\neither keyId or keyLabel must be specified")
@@ -252,7 +252,7 @@ public class EnrollCertActions {
           keyIdBytes = Hex.decode(keyId);
         }
 
-        SignerConf signerConf = getPkcs11SignerConf(moduleName, slotIndex, keyLabel,
+        SignerConf signerConf = getPkcs11SignerConf(moduleName, Integer.parseInt(slotIndex), keyLabel,
             keyIdBytes, getHashAlgo(hashAlgo), getSignatureAlgoControl());
         signer = securityFactory.createSigner("PKCS11", signerConf, (X509Cert[]) null);
       }
@@ -260,10 +260,9 @@ public class EnrollCertActions {
     } // method getSigner
 
     public static SignerConf getPkcs11SignerConf(
-        String pkcs11ModuleName, Integer slotIndex, String keyLabel, byte[] keyId,
+        String pkcs11ModuleName, int slotIndex, String keyLabel, byte[] keyId,
         HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl) {
       Args.notNull(hashAlgo, "hashAlgo");
-      Args.notNull(slotIndex, "slotIndex");
 
       if (keyId == null && keyLabel == null) {
         throw new IllegalArgumentException("at least one of keyId and keyLabel may not be null");
@@ -276,9 +275,7 @@ public class EnrollCertActions {
         conf.putPair("module", pkcs11ModuleName);
       }
 
-      if (slotIndex != null) {
-        conf.putPair("slot", slotIndex.toString());
-      }
+      conf.putPair("slot", Integer.toString(slotIndex));
 
       if (keyId != null) {
         conf.putPair("key-id", Hex.encode(keyId));

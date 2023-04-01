@@ -231,7 +231,6 @@ public class EjbcaCertStatusStore extends OcspStore {
       String sql = includeCertHash ? sqlCsWithCertHash : sqlCs;
 
       Instant thisUpdate = Instant.now();
-      final Instant nextUpdate = null;
 
       ResultSet rs = null;
 
@@ -289,18 +288,18 @@ public class EjbcaCertStatusStore extends OcspStore {
 
       CertStatusInfo certStatusInfo;
       if (unknown) {
-        certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
+        certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
       } else if (ignore) {
-        certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, nextUpdate);
+        certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, null);
       } else {
         byte[] certHash = (hexCertHash == null) ? null : Hex.decode(hexCertHash);
         if (revoked) {
           CertRevocationInfo revInfo = new CertRevocationInfo(reason, Instant.ofEpochSecond(revTime), null);
           certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
-              certHashAlgo, certHash, thisUpdate, nextUpdate, null);
+              certHashAlgo, certHash, thisUpdate, null, null);
         } else {
           certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo,
-              certHash, thisUpdate, nextUpdate, null);
+              certHash, thisUpdate, null, null);
         }
       }
 

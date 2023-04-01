@@ -22,7 +22,7 @@ import java.util.Arrays;
  *
  * <p>This encode/decode algorithm doesn't create any temporary arrays as many
  * other codecs do, it only allocates the resulting array. This produces less
- * garbage and it is possible to handle arrays twice as large as algorithms that
+ * garbage, and it is possible to handle arrays twice as large as algorithms that
  * create a temporary array. (E.g. Jakarta Commons Codec). It is unknown whether
  * Sun's <code>sun.misc.Encoder()/Decoder()</code> produce temporary arrays but
  * since performance is quite low it probably does.
@@ -41,10 +41,10 @@ import java.util.Arrays;
  *
  * <p>There is also a "fast" version of all decode methods that works the same
  * way as the normal ones, but har a few demands on the decoded input. Normally
- * though, these fast verions should be used if the source if the input is
- * known and it hasn't bee tampered with.
+ * though, these fast versions should be used if the source is
+ * known, and it hasn't been tampered with.
  *
- * <p>If you find the code useful or you find a bug, please send me a note at
+ * <p>If you find the code useful, or you find a bug, please send me a note at
  * base64 @ miginfocom.com.
  *
  * <p>Licence (BSD):

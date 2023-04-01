@@ -295,22 +295,20 @@ public class CaDbCertStatusStore extends OcspStore {
         releaseDbResources(ps, rs);
       }
 
-      final Instant nextUpdate = null;
-
       CertStatusInfo certStatusInfo;
       if (unknown) {
-        certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
+        certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
       } else if (ignore) {
-        certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, nextUpdate);
+        certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, null);
       } else {
         byte[] certHash = (b64CertHash == null) ? null : Base64.decodeFast(b64CertHash);
         if (revoked) {
           Instant invTime = (invalTime == 0 || invalTime == revTime) ? null : Instant.ofEpochSecond(invalTime);
           CertRevocationInfo revInfo = new CertRevocationInfo(reason, Instant.ofEpochSecond(revTime), invTime);
           certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
-              certHashAlgo, certHash, thisUpdate, nextUpdate, null);
+              certHashAlgo, certHash, thisUpdate, null, null);
         } else {
-          certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, certHash, thisUpdate, nextUpdate, null);
+          certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, certHash, thisUpdate, null, null);
         }
       }
 

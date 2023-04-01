@@ -267,10 +267,10 @@ public class XijsonExtensions {
     }
 
     // Remove the extension processed not by the Certprofile, but by the CA
-    extnIds.removeAll(Arrays.asList(
+    Arrays.asList(
         Extension.issuerAlternativeName,     Extension.authorityInfoAccess,  Extension.cRLDistributionPoints,
         Extension.freshestCRL,               Extension.subjectKeyIdentifier, Extension.subjectInfoAccess,
-        Extn.id_extension_pkix_ocsp_nocheck, Extn.id_SCTs));
+        Extn.id_extension_pkix_ocsp_nocheck, Extn.id_SCTs).forEach(extnIds::remove);
 
     // to avoid race conflict.
     Set<ASN1ObjectIdentifier> copyOfExtnIds = new HashSet<>(extnIds);
@@ -739,8 +739,9 @@ public class XijsonExtensions {
   } // method initSubjectDirAttrs
 
   private void initGmt0015Extensions(Set<ASN1ObjectIdentifier> extnIds) {
-    extnIds.removeAll(Arrays.asList(Extn.id_GMT_0015_ICRegistrationNumber,   Extn.id_GMT_0015_IdentityCode,
-        Extn.id_GMT_0015_InsuranceNumber, Extn.id_GMT_0015_OrganizationCode, Extn.id_GMT_0015_TaxationNumber));
+    Arrays.asList(Extn.id_GMT_0015_ICRegistrationNumber,   Extn.id_GMT_0015_IdentityCode,
+        Extn.id_GMT_0015_InsuranceNumber, Extn.id_GMT_0015_OrganizationCode, Extn.id_GMT_0015_TaxationNumber)
+        .forEach(extnIds::remove);
   } // method initGmt0015Extensions
 
   private void initCCCExtensionSchemas(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)

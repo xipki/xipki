@@ -235,8 +235,7 @@ public class CaConfColumn {
     this.extraControl = extraControl;
   }
 
-  @Override
-  public CaConfColumn clone() {
+  public CaConfColumn copy() {
     return decode(encode());
   }
 
@@ -267,13 +266,9 @@ public class CaConfColumn {
   }
 
   public int snSize() {
-    if (snSize > CaManager.MAX_SERIALNUMBER_SIZE) {
-      return CaManager.MAX_SERIALNUMBER_SIZE;
-    } else if (snSize < CaManager.MIN_SERIALNUMBER_SIZE) {
-      return CaManager.MIN_SERIALNUMBER_SIZE;
-    } else {
-      return snSize;
-    }
+    return (snSize > CaManager.MAX_SERIALNUMBER_SIZE)
+      ? CaManager.MAX_SERIALNUMBER_SIZE
+      : Math.max(snSize, CaManager.MIN_SERIALNUMBER_SIZE);
   }
 
   private RevokeSuspendedControl revokeSuspendedControl() {

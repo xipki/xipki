@@ -353,9 +353,6 @@ public class KeyUtil {
 
       ECParameterSpec paramSpec = ecPubKey.getParams();
       ASN1ObjectIdentifier curveOid = detectCurveOid(paramSpec);
-      if (curveOid == null) {
-        throw new InvalidKeyException("Cannot find namedCurve of the given private key");
-      }
 
       java.security.spec.ECPoint pointW = ecPubKey.getW();
       BigInteger wx = pointW.getAffineX();

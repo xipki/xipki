@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.cert.CRLException;
@@ -66,8 +67,9 @@ class CaCertstoreDbExporter extends DbPorter {
 
   public void export() throws Exception {
     CaCertstore certstore;
+    Path path = Paths.get(baseDir, FILENAME_CA_CERTSTORE);
     if (resume) {
-      try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_CA_CERTSTORE))) {
+      try (InputStream is = Files.newInputStream(path)) {
         certstore = JSON.parseObject(is, CaCertstore.class);
       }
       certstore.validate();
@@ -94,7 +96,7 @@ class CaCertstoreDbExporter extends DbPorter {
       CaDbEntryType typeProcessedInLastProcess = null;
       if (processLogFile.exists()) {
         byte[] content = IoUtil.read(processLogFile);
-        if (content != null && content.length > 0) {
+        if (content.length > 0) {
           String str = StringUtil.toUtf8String(content);
           int idx = str.indexOf(':');
           String typeName = str.substring(0, idx).trim();
@@ -120,7 +122,7 @@ class CaCertstoreDbExporter extends DbPorter {
       }
 
       certstore.validate();
-      try (OutputStream os = Files.newOutputStream(Paths.get(baseDir, FILENAME_CA_CERTSTORE))) {
+      try (OutputStream os = Files.newOutputStream(path)) {
         JSON.writeJSON(certstore, os);
       }
     } catch (Exception ex) {

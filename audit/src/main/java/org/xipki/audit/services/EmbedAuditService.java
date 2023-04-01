@@ -87,12 +87,13 @@ public class EmbedAuditService implements AuditService {
       this.maxFileSize = 10 * mb; // 10 MB
     } else {
       str = str.trim().toLowerCase(Locale.ROOT);
+      int value = Integer.parseInt(str.substring(0, str.length() - 2).trim());
       if (str.endsWith("gb")) {
-        this.maxFileSize = Integer.parseInt(str.substring(0, str.length() - 2).trim()) * 1024 * mb;
+        this.maxFileSize = value * 1024 * mb;
       } else if (str.endsWith("mb")) {
-        this.maxFileSize = Integer.parseInt(str.substring(0, str.length() - 2).trim()) * mb;
+        this.maxFileSize = value * mb;
       } else if (str.endsWith("kb")) {
-        this.maxFileSize = Integer.parseInt(str.substring(0, str.length() - 2).trim()) * 1024;
+        this.maxFileSize = value * 1024;
       } else {
         this.maxFileSize = Integer.parseInt(str);
       }

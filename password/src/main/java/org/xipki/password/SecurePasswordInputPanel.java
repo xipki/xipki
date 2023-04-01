@@ -19,9 +19,9 @@ import java.util.Set;
 
 public class SecurePasswordInputPanel extends Panel {
 
-  private static final String BACKSPACE = "⇦"; // \u21E6, ⇦
+  private static final String BACKSPACE = "⇦"; // double left arrow
 
-  private static final String CAPS = "⇧"; // \u21EE7, ⇧
+  private static final String CAPS = "⇧"; // double upper arrow
 
   private static final String CLEAR = "Clear";
 

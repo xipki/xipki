@@ -572,7 +572,7 @@ class Ca2Manager {
       }
     }
 
-    CaEntry entry = caEntry.clone();
+    CaEntry entry = caEntry.copy();
     entry.setSignerConf(signerConf);
     entry.setCert(caCert);
 

@@ -120,8 +120,7 @@ public class CaEntry extends MgmtEntry {
     this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
   } // constructor Ca
 
-  @Override
-  public CaEntry clone() {
+  public CaEntry copy() {
     CaEntry ret = new CaEntry();
     ret.ident = ident;
     ret.serialNoLen = serialNoLen;

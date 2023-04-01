@@ -162,7 +162,7 @@ Security Commands
 
    * `xi:key-exists-p11`
 
-     return whether key and certs exist in PKCS#11 device)
+     return whether key and certs exist in PKCS#11 device
 
    * `xi:obfuscate`
 

@@ -100,7 +100,7 @@ class CaconfDbExporter extends DbPorter {
   private void exportRequestor(CaCertstore.Caconf caconf)
       throws DataAccessException, IOException, InvalidConfException {
     System.out.print("    exporting table REQUESTOR ... ");
-    boolean succ = true;
+    boolean succ = false;
     List<CaCertstore.IdNameTypeConf> requestors = new LinkedList<>();
     final String sql = "SELECT ID,NAME,TYPE,CONF FROM REQUESTOR";
 

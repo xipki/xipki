@@ -137,9 +137,10 @@ class RefDigestReader implements Closeable {
         }
       } catch (Exception ex) {
         if (ex instanceof SQLException) {
-          ex = datasource.translate(selectCertSql, (SQLException) ex);
+          result.setException(datasource.translate(selectCertSql, (SQLException) ex));
+        } else {
+          result.setException(ex);
         }
-        result.setException(ex);
       } finally {
         releaseResources(null, rs);
       }

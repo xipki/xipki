@@ -418,7 +418,7 @@ class O2tChecker extends ExtensionChecker {
 
     Set<GeneralNameMode> subjectAltNameModes = certprofile.getSubjectAltNameModes();
     if (subjectAltNameModes == null && subjectToSubjectAltNameModes == null) {
-      return (reqNames == null) ? null : reqNames.getNames();
+      return reqNames.getNames();
     }
 
     List<GeneralName> grantedNames = new LinkedList<>();

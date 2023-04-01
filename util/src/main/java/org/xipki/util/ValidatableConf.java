@@ -15,15 +15,27 @@ import java.util.Collection;
 
 public abstract class ValidatableConf {
 
-  protected static void validate(ValidatableConf... confs) throws InvalidConfException {
-    for (ValidatableConf conf : confs) {
+  protected static void validate(ValidatableConf aConf, ValidatableConf... extraConfs) throws InvalidConfException {
+    if (aConf != null) {
+      aConf.validate();
+    }
+
+    for (ValidatableConf conf : extraConfs) {
       if (conf != null) {
         conf.validate();
       }
     }
   }
 
-  protected static void validate(Collection<? extends ValidatableConf>... confLists) throws InvalidConfException {
+  @SafeVarargs
+  protected static void validate(Collection<? extends ValidatableConf> aConfList,
+                                 Collection<? extends ValidatableConf>... confLists) throws InvalidConfException {
+    if (aConfList != null) {
+      for (ValidatableConf conf : aConfList) {
+        conf.validate();
+      }
+    }
+
     for (Collection<? extends ValidatableConf> confList : confLists) {
       if (confList != null) {
         for (ValidatableConf conf : confList) {

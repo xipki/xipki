@@ -95,7 +95,7 @@ class CaCertstoreDbImporter extends DbPorter {
       Long idProcessedInLastProcess = null;
       if (processLogFile.exists()) {
         byte[] content = IoUtil.read(processLogFile);
-        if (content != null && content.length > 5) {
+        if (content.length > 5) {
           StringTokenizer st = new StringTokenizer(StringUtil.toUtf8String(content), ":");
           String type = st.nextToken();
           typeProcessedInLastProcess = CaDbEntryType.valueOf(type);
@@ -243,10 +243,8 @@ class CaCertstoreDbImporter extends DbPorter {
             long lastId;
             if (type == CaDbEntryType.CERT) {
               lastId = importCerts(entriesFile, minId, processLogFile, processLog, numProcessedBefore, stmt, sql);
-            } else if (type == CaDbEntryType.CRL) {
+            } else { // if (type == CaDbEntryType.CRL) {
               lastId = importCrls(entriesFile, minId, processLogFile, processLog, numProcessedBefore, stmt, sql);
-            } else {
-              throw new IllegalStateException("unknown CaDbEntryType " + type);
             }
 
             minId = lastId + 1;

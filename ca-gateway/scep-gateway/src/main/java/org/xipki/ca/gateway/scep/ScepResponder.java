@@ -155,7 +155,7 @@ public class ScepResponder {
       } // end if
     } // end if
 
-    if (caName == null || certprofileName == null) {
+    if (caName == null) {
       return new RestResponse(HttpServletResponse.SC_NOT_FOUND);
     }
 

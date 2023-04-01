@@ -22,7 +22,7 @@ import java.util.Date;
  *
  * @author Lijun Liao (xipki)
  */
-public class ClrTestVectorGenerateMain {
+public class CrlTestVectorGenerateMain {
 
   public static void main(String[] args) {
     try {

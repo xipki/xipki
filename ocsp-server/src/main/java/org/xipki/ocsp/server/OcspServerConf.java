@@ -718,7 +718,7 @@ public class OcspServerConf extends ValidatableConf {
 
     private String datasource;
 
-    private Map<String, ? extends Object> conf;
+    private Map<String, ?> conf;
 
     public String getType() {
       return type;

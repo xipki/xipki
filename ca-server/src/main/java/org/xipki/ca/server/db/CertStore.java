@@ -756,9 +756,6 @@ public class CertStore extends CertStoreBase {
     notNulls(ca, "ca", serial, "serial");
 
     ResultRow rs = execQuery1PrepStmt0(sqlCertIdByCaSn, col2Int(ca.getId()), col2Str(serial.toString(16)));
-    if (rs == null) {
-      return 0;
-    }
     return (rs == null) ? 0 : rs.getLong("ID");
   }
 

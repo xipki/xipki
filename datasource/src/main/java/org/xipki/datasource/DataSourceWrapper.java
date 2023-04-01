@@ -374,17 +374,17 @@ public abstract class DataSourceWrapper implements Closeable {
     return service.getMaximumPoolSize();
   }
 
-  public final Connection getConnection()
-      throws DataAccessException {
+  public final Connection getConnection() throws DataAccessException {
     try {
       return service.getConnection();
     } catch (Exception ex) {
       Throwable cause = ex.getCause();
+      LogUtil.error(LOG, cause instanceof SQLException ? cause : ex,
+          "could not create connection to database");
+
       if (cause instanceof SQLException) {
-        ex = (SQLException) cause;
-      }
-      LogUtil.error(LOG, ex, "could not create connection to database");
-      if (ex instanceof SQLException) {
+        throw translate(null, (SQLException) cause);
+      } else if (ex instanceof SQLException) {
         throw translate(null, (SQLException) ex);
       } else {
         throw new DataAccessException("error occured while getting Connection: " + ex.getMessage(), ex);
@@ -401,10 +401,8 @@ public abstract class DataSourceWrapper implements Closeable {
       conn.close();
     } catch (Exception ex) {
       Throwable cause = ex.getCause();
-      if (cause instanceof SQLException) {
-        ex = (SQLException) cause;
-      }
-      LogUtil.error(LOG, ex, "could not close connection to database {}");
+      LogUtil.error(LOG, cause instanceof SQLException ? cause : ex,
+          "could not close connection to database {}");
     }
   } // method returnConnection
 
