@@ -373,10 +373,10 @@ class EmulatorP11Slot extends P11Slot {
   private static boolean deletePkcs11Entry(File dir, byte[] objectId) {
     String hextId = hex(objectId);
     File infoFile = getInfoFile(dir, hextId);
-    boolean b1 = infoFile.exists() ? infoFile.delete() : true;
+    boolean b1 = !infoFile.exists() || infoFile.delete();
 
     File valueFile = getValueFile(dir, hextId);
-    boolean b2 = valueFile.exists() ? valueFile.delete() : true;
+    boolean b2 = !valueFile.exists() || valueFile.delete();
 
     return b1 || b2;
   } // method deletePkcs11Entry

@@ -106,7 +106,7 @@ public class ProcessLog {
     }
     sb.append('\n');
 
-    System.out.println(sb.toString());
+    System.out.println(sb);
     System.out.flush();
   } // method printHeader
 
@@ -131,7 +131,7 @@ public class ProcessLog {
       sb.append('-');
     }
 
-    System.out.println(sb.toString());
+    System.out.println(sb);
     System.out.flush();
   }
 
@@ -237,7 +237,7 @@ public class ProcessLog {
       }
     }
 
-    System.out.print(sb.toString());
+    System.out.print(sb);
     System.out.flush();
   } // method printStatus
 

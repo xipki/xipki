@@ -60,7 +60,7 @@ public abstract class P11Key {
   }
 
   public P11Key sign(Boolean sign) {
-    this.sign = (sign == null) ? true : sign;
+    this.sign = sign == null || sign;
     return this;
   }
 
@@ -161,7 +161,7 @@ public abstract class P11Key {
   }
 
   public boolean supportsDigest(long mechanism) throws TokenException, XiSecurityException {
-    return (keyId.getObjectCLass() == CKO_SECRET_KEY) ? slot.supportsMechanism(mechanism, CKF_DIGEST) : false;
+    return keyId.getObjectCLass() == CKO_SECRET_KEY && slot.supportsMechanism(mechanism, CKF_DIGEST);
   }
 
   protected abstract byte[] digestSecretKey0(long mechanism) throws TokenException;

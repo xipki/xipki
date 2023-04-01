@@ -91,7 +91,7 @@ public class SecurityCompleters {
   @Service
   public static class SignAlgoCompleter extends EnumCompleter {
 
-    private static Set<String> algos = new HashSet<>();
+    private static final Set<String> algos = new HashSet<>();
 
     static {
       for (SignAlgo m : SignAlgo.values()) {

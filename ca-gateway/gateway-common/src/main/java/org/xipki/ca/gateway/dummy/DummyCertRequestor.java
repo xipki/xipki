@@ -14,7 +14,7 @@ import org.xipki.security.X509Cert;
 
 public class DummyCertRequestor implements Requestor {
 
-  private X509Cert cert;
+  private final X509Cert cert;
 
   static {
     System.err.println("DO NOT USE " + DummyCertRequestor.class.getName() + " IN THE PRODUCT ENVIRONMENT");

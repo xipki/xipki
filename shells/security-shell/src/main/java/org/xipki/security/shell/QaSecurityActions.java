@@ -284,8 +284,7 @@ public class QaSecurityActions {
 
       boolean isSm2SignAlgo = signAlgo.toUpperCase(Locale.ROOT).contains("SM2");
       while (control != null) {
-        boolean match = control.curveName.toUpperCase(Locale.ROOT).contains("SM2")
-                          ? isSm2SignAlgo : !isSm2SignAlgo;
+        boolean match = control.curveName.toUpperCase(Locale.ROOT).contains("SM2") == isSm2SignAlgo;
         if (match) {
           break;
         } else {
@@ -678,8 +677,7 @@ public class QaSecurityActions {
 
       boolean isSm2SignAlgo = signAlgo.toUpperCase(Locale.ROOT).contains("SM2");
       while (control != null) {
-        boolean match = control.curveName.toUpperCase(Locale.ROOT).contains("SM2")
-            ? isSm2SignAlgo : !isSm2SignAlgo;
+        boolean match = control.curveName.toUpperCase(Locale.ROOT).contains("SM2") == isSm2SignAlgo;
         if (match) {
           break;
         } else {

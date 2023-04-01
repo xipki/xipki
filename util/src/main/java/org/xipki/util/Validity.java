@@ -184,7 +184,7 @@ public class Validity implements Comparable<Validity> {
   }
 
   private static boolean isLeapYear(int year) {
-    return (year % 4 != 0) ? false : (year % 100 != 0) ? true : year % 400 == 0;
+    return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
   }
 
 }

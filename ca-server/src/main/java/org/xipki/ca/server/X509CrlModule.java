@@ -90,7 +90,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         Instant nearestScheduledCrlIssueTime =
             getScheduledCrlGenTimeNotAfter(Instant.ofEpochSecond(lastIssueTimeOfFullCrl));
         Instant nextScheduledCrlIssueTime = nearestScheduledCrlIssueTime.plus(
-            control.getFullCrlIntervals() * control.getIntervalHours(), ChronoUnit.HOURS);
+            (long) control.getFullCrlIntervals() * control.getIntervalHours(), ChronoUnit.HOURS);
         // delay: shardId * 10 seconds
         if (nextScheduledCrlIssueTime.getEpochSecond() > now.getEpochSecond() + shardId * 10L) {
           // at least one interval was skipped
@@ -107,7 +107,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
 
         Instant nearestScheduledCrlIssueTime = getScheduledCrlGenTimeNotAfter(Instant.ofEpochSecond(lastIssueTime));
         Instant nextScheduledCrlIssueTime = nearestScheduledCrlIssueTime.plus(
-            control.getDeltaCrlIntervals() * control.getIntervalHours(), ChronoUnit.HOURS);
+            (long) control.getDeltaCrlIntervals() * control.getIntervalHours(), ChronoUnit.HOURS);
         // delay: shardId * 10 seconds
         if (nextScheduledCrlIssueTime.getEpochSecond() > now.getEpochSecond() + shardId * 10L) {
           // at least one interval was skipped
@@ -132,7 +132,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       }
 
       Instant scheduledCrlGenTime = getScheduledCrlGenTimeNotAfter(now);
-      Instant nextUpdate = scheduledCrlGenTime.plus(intervals * control.getIntervalHours(), ChronoUnit.HOURS);
+      Instant nextUpdate = scheduledCrlGenTime.plus((long) intervals * control.getIntervalHours(), ChronoUnit.HOURS);
       // add overlap
       nextUpdate = control.getOverlap().add(nextUpdate);
 
@@ -322,7 +322,8 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         intervals = control.getFullCrlIntervals();
       }
 
-      Instant nextUpdate = nearestScheduledIssueTime.plus(intervals * control.getIntervalHours(), ChronoUnit.HOURS);
+      Instant nextUpdate = nearestScheduledIssueTime.plus(
+          (long) intervals * control.getIntervalHours(), ChronoUnit.HOURS);
       // add overlap
       nextUpdate = control.getOverlap().add(nextUpdate);
 
@@ -633,7 +634,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       // If time is after hm, use the nearest interval before reference time
       for (int i = 0;;i++) {
         if (minutesInDay < (hmInMinutes + (i + 1) * intervalMinutes)) {
-          return midNight.plus(hmInMinutes + i * intervalMinutes, ChronoUnit.MINUTES);
+          return midNight.plus(hmInMinutes + (long) i * intervalMinutes, ChronoUnit.MINUTES);
         }
       }
     }

@@ -24,7 +24,7 @@ public class NotBeforeOption {
 
   private NotBeforeOption(ZoneId midNightTimeZone, Long offsetSeconds) {
     this.midNightTimeZone = midNightTimeZone;
-    this.offsetSeconds = (offsetSeconds == null) ? null : offsetSeconds;
+    this.offsetSeconds = offsetSeconds;
   }
 
   static NotBeforeOption getMidNightOption(ZoneId timeZone) {

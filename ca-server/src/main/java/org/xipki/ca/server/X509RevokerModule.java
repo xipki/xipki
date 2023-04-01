@@ -324,10 +324,10 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     int validity = val.getValidity();
     Unit unit = val.getUnit();
     long durationMinutes = (unit == Unit.MINUTE) ? validity
-        : (unit == Unit.HOUR) ? validity * 60
-        : (unit == Unit.DAY)  ? validity * 24 * 60
-        : (unit == Unit.WEEK) ? validity * 7 * 24 * 60
-        : (unit == Unit.YEAR) ? validity * 365 * 24 * 60
+        : (unit == Unit.HOUR) ? validity * 60L
+        : (unit == Unit.DAY)  ? (long) validity * 24 * 60
+        : (unit == Unit.WEEK) ? (long) validity * 7 * 24 * 60
+        : (unit == Unit.YEAR) ? (long) validity * 365 * 24 * 60
         : -1;
 
     if (durationMinutes == -1) {

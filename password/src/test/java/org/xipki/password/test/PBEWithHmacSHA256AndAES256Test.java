@@ -19,9 +19,9 @@ import java.nio.charset.StandardCharsets;
 
 public class PBEWithHmacSHA256AndAES256Test {
 
-  private static PBEAlgo algo = PBEAlgo.PBEWithHmacSHA256AndAES_256;
+  private static final PBEAlgo algo = PBEAlgo.PBEWithHmacSHA256AndAES_256;
 
-  private static byte[] salt = new byte[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 15, 16};
+  private static final byte[] salt = new byte[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 15, 16};
 
   @Test
   public void encrypThenDecrypt() throws Exception {

@@ -40,7 +40,7 @@ public class JSON {
         return null;
       }
 
-      double d = (double) aDouble;
+      double d = aDouble;
       if (d == (long) d) {
         return new JsonPrimitive((long) d);
       } else {
@@ -70,7 +70,7 @@ public class JSON {
 
     @Override
     public Appendable append(char c) throws IOException {
-      out.write(new String(new char[]{c}).getBytes(StandardCharsets.UTF_8));
+      out.write(String.valueOf(c).getBytes(StandardCharsets.UTF_8));
       return this;
     }
   }

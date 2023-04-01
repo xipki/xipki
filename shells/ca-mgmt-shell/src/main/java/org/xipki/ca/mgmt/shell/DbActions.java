@@ -222,7 +222,7 @@ public class DbActions {
         scriptFile = expandFilepath(scriptFile);
         Path p = Paths.get(scriptFile);
         String derivedScriptFile = null;
-        if (!Files.exists(p, new LinkOption[0])) {
+        if (!Files.exists(p)) {
           if (!scriptFile.contains("." + type + ".")) {
             // script file does not exist, try script file with database type identifier
             String fn = p.getFileName().toString();
@@ -233,7 +233,7 @@ public class DbActions {
           }
         }
 
-        if (!Files.exists(p, new LinkOption[0])) {
+        if (!Files.exists(p)) {
           if (derivedScriptFile != null) {
             throw new IllegalCmdParamException("Could not find script files " + scriptFile
                 + " and " + derivedScriptFile);
@@ -243,9 +243,9 @@ public class DbActions {
         }
 
         if (force || confirm("Do you want to execute the SQL script?", 3)) {
-          System.out.println("Start executing script " + p.toString());
+          System.out.println("Start executing script " + p);
           ScriptRunner.runScript(dataSource, p.toString(), passwordResolver);
-          System.out.println("  End executing script " + p.toString());
+          System.out.println("  End executing script " + p);
         }
         return null;
       }

@@ -193,6 +193,6 @@ public abstract class CaEnrollBenchKeyEntry {
 
   } // class ECKeyEntry
 
-  public abstract SubjectPublicKeyInfo getSubjectPublicKeyInfo() throws IOException, Exception;
+  public abstract SubjectPublicKeyInfo getSubjectPublicKeyInfo() throws Exception;
 
 }

@@ -520,9 +520,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
 
   protected static void addRdns(X509ProfileType profile, RdnType... rdns) {
     List<RdnType> list = profile.getSubject().getRdns();
-    for (RdnType rdn : rdns) {
-      list.add(rdn);
-    }
+    Collections.addAll(list, rdns);
   }
 
 }

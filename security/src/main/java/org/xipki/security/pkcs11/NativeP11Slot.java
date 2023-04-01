@@ -59,11 +59,11 @@ class NativeP11Slot extends P11Slot {
 
   private static final Clock clock = Clock.systemUTC();
 
-  private PKCS11Token token;
+  private final PKCS11Token token;
 
   private final SecureRandom random = new SecureRandom();
 
-  private long rsaKeyPairGenMech;
+  private final long rsaKeyPairGenMech;
 
   private String libDesc;
 

@@ -135,8 +135,8 @@ public class ScepResponder {
 
     Instant signingTime = req.getSigningTime();
     if (maxSigningTimeBiasInMs > 0) {
-      boolean isTimeBad = signingTime == null ? true
-          : Math.abs(Duration.between(signingTime, Instant.now()).toMillis()) > maxSigningTimeBiasInMs;
+      boolean isTimeBad = signingTime == null
+          || Math.abs(Duration.between(signingTime, Instant.now()).toMillis()) > maxSigningTimeBiasInMs;
 
       if (isTimeBad) {
         return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badTime);
