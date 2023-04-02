@@ -13,9 +13,8 @@
   <packaging>bundle</packaging>
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xipki.commons</groupId>
       <artifactId>security</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

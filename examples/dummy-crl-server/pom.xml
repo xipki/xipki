@@ -13,15 +13,13 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki</groupId>
+      <groupId>org.xipki.commons</groupId>
       <artifactId>password</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.xipki</groupId>
+      <groupId>org.xipki.commons</groupId>
       <artifactId>datasource</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -31,19 +29,16 @@
     <dependency>
       <groupId>org.tinylog</groupId>
       <artifactId>slf4j-tinylog</artifactId>
-      <version>${tinylog.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.tinylog</groupId>
       <artifactId>tinylog-impl</artifactId>
-      <version>${tinylog.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <version>${servlet.version}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

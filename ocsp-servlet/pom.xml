@@ -14,38 +14,32 @@
   <dependencies>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>${pkcs11wrapper.artifactId}</artifactId>
-      <version>${pkcs11wrapper.version}</version>
+      <artifactId>ipkcs11wrapper</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.xipki</groupId>
+      <groupId>org.xipki.commons</groupId>
       <artifactId>password</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <version>${servlet.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk18on</artifactId>
-      <version>${bc.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcutil-jdk18on</artifactId>
-      <version>${bc.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-jdk18on</artifactId>
-      <version>${bc.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -56,7 +50,6 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <version>${gson.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki.example</groupId>
@@ -72,13 +65,11 @@
     <dependency>
       <groupId>org.tinylog</groupId>
       <artifactId>slf4j-tinylog</artifactId>
-      <version>${tinylog.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.tinylog</groupId>
       <artifactId>tinylog-impl</artifactId>
-      <version>${tinylog.version}</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

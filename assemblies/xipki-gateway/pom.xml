@@ -135,19 +135,19 @@
               <outputDirectory>${project.build.directory}/lib</outputDirectory>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xipki</groupId>
+                  <groupId>org.xipki.commons</groupId>
                   <artifactId>xipki-tomcat-password</artifactId>
-                  <version>${project.version}</version>
+                  <version>${xipki.commons.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
-                  <artifactId>${pkcs11wrapper.artifactId}</artifactId>
+                  <artifactId>ipkcs11wrapper</artifactId>
                   <version>${pkcs11wrapper.version}</version>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki</groupId>
+                  <groupId>org.xipki.commons</groupId>
                   <artifactId>password</artifactId>
-                  <version>${project.version}</version>
+                  <version>${xipki.commons.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>

@@ -3,14 +3,14 @@
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
   <feature name="xipki-cmp-client" version="${project.version}" description="CA client">
-    <bundle>mvn:org.xipki/password/${project.version}</bundle>
-    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/password/${xipki.commons.version}</bundle>
+    <bundle>mvn:org.xipki.commons/util/${xipki.commons.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:org.xipki/${pkcs11wrapper.artifactId}/${pkcs11wrapper.version}</bundle>
+    <bundle>mvn:org.xipki/ipkcs11wrapper/${pkcs11wrapper.version}</bundle>
     <bundle>mvn:com.google.code.gson/gson/${gson.version}</bundle>
-    <bundle>mvn:org.xipki/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/security/${xipki.commons.version}</bundle>
     <bundle>mvn:org.xipki.gateway/cmp-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/security-shell/${project.version}</bundle>
@@ -18,28 +18,28 @@
   </feature>
   <feature name="xipki-scep-client" version="${project.version}"
       description="SCEP client shell">
-    <bundle>mvn:org.xipki/password/${project.version}</bundle>
-    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/password/${xipki.commons.version}</bundle>
+    <bundle>mvn:org.xipki.commons/util/${xipki.commons.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:org.xipki/${pkcs11wrapper.artifactId}/${pkcs11wrapper.version}</bundle>
+    <bundle>mvn:org.xipki/ipkcs11wrapper/${pkcs11wrapper.version}</bundle>
     <bundle>mvn:com.google.code.gson/gson/${gson.version}</bundle>
-    <bundle>mvn:org.xipki/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/security/${xipki.commons.version}</bundle>
     <bundle>mvn:org.xipki.gateway/scep-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/security-shell/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/scep-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocsp-client" version="${project.version}" description="OCSP client shell">
-    <bundle>mvn:org.xipki/password/${project.version}</bundle>
-    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/password/${xipki.commons.version}</bundle>
+    <bundle>mvn:org.xipki.commons/util/${xipki.commons.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:org.xipki/${pkcs11wrapper.artifactId}/${pkcs11wrapper.version}</bundle>
+    <bundle>mvn:org.xipki/ipkcs11wrapper/${pkcs11wrapper.version}</bundle>
     <bundle>mvn:com.google.code.gson/gson/${gson.version}</bundle>
-    <bundle>mvn:org.xipki/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/security/${xipki.commons.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/security-shell/${project.version}</bundle>

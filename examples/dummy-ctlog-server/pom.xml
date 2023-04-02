@@ -23,14 +23,12 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.xipki</groupId>
+      <groupId>org.xipki.commons</groupId>
       <artifactId>security</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <version>${servlet.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -41,13 +39,11 @@
     <dependency>
       <groupId>org.tinylog</groupId>
       <artifactId>slf4j-tinylog</artifactId>
-      <version>${tinylog.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.tinylog</groupId>
       <artifactId>tinylog-impl</artifactId>
-      <version>${tinylog.version}</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>
