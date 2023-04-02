@@ -331,6 +331,16 @@
         <version>${xipki.commons.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.xipki.commons</groupId>
+        <artifactId>shell-base</artifactId>
+        <version>${xipki.commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xipki.commons</groupId>
+        <artifactId>security-shell</artifactId>
+        <version>${xipki.commons.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.xipki</groupId>
         <artifactId>ipkcs11wrapper</artifactId>
         <version>${pkcs11wrapper.version}</version>

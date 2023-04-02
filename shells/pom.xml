@@ -13,8 +13,6 @@
   <packaging>pom</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <modules>
-    <module>shell-base</module>
-    <module>security-shell</module>
     <module>cmp-client-shell</module>
     <module>ocsp-client-shell</module>
     <module>scep-client-shell</module>
