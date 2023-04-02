@@ -78,7 +78,6 @@
                 <artifactItem>
                   <groupId>org.apache.karaf</groupId>
                   <artifactId>apache-karaf-minimal</artifactId>
-                  <version>${karaf.version}</version>
                   <type>tar.gz</type>
                 </artifactItem>
               </artifactItems>
@@ -98,7 +97,6 @@
                   <groupId>org.xipki.tools</groupId>
                   <artifactId>tlskeys-example</artifactId>
                   <classifier>ec</classifier>
-                  <version>${xipki.tools.version}</version>
                   <type>zip</type>
                 </artifactItem>
               </artifactItems>
@@ -114,12 +112,12 @@
             </goals>
             <configuration>
               <stripVersion>false</stripVersion>
-              <outputDirectory>${project.build.directory}/jdk11on/system/org/osgi/org.osgi.service.metatype/1.4.1</outputDirectory>
+              <outputDirectory>${project.build.directory}/jdk11on/system/org/osgi/org.osgi.service.metatype/${osgi.metatype.version}</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.osgi</groupId>
                   <artifactId>org.osgi.service.metatype</artifactId>
-                  <version>1.4.1</version>
+                  <version>${osgi.metatype.version}</version>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -173,7 +171,7 @@
                   <arg value="--file"/>
                   <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/startup.properties"/>
                   <arg value="--value"/>
-                  <arg value="mvn\:org.osgi/org.osgi.service.metatype/1.4.1 = 9"/>
+                  <arg value="mvn\:org.osgi/org.osgi.service.metatype/${osgi.metatype.version} = 9"/>
                 </java>
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
                   <arg value="--backup"/>

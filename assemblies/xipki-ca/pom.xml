@@ -101,42 +101,34 @@
                 <artifactItem>
                   <groupId>org.xipki.commons</groupId>
                   <artifactId>xipki-tomcat-password</artifactId>
-                  <version>${xipki.commons.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
                   <artifactId>ipkcs11wrapper</artifactId>
-                  <version>${pkcs11wrapper.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki.commons</groupId>
                   <artifactId>password</artifactId>
-                  <version>${xipki.commons.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.mariadb.jdbc</groupId>
                   <artifactId>mariadb-java-client</artifactId>
-                  <version>${jdbc.mariadb.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.postgresql</groupId>
                   <artifactId>postgresql</artifactId>
-                  <version>${jdbc.postgresql.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>
                   <artifactId>bcpkix-jdk18on</artifactId>
-                  <version>${bc.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>
                   <artifactId>bcprov-jdk18on</artifactId>
-                  <version>${bc.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>
                   <artifactId>bcutil-jdk18on</artifactId>
-                  <version>${bc.version}</version>
                 </artifactItem>
               </artifactItems>
             </configuration>
