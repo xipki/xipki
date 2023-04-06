@@ -155,14 +155,6 @@ public class CaMgmtClient implements CaManager {
   } // method republishCertificates
 
   @Override
-  public void clearPublishQueue(String caName, List<String> publisherNames) throws CaMgmtException {
-    MgmtRequest.ClearPublishQueue req = new MgmtRequest.ClearPublishQueue();
-    req.setCaName(caName);
-    req.setPublisherNames(publisherNames);
-    voidTransmit(MgmtAction.clearPublishQueue, req);
-  } // class clearPublishQueue
-
-  @Override
   public void removeCa(String caName) throws CaMgmtException {
     removeEntity(MgmtAction.removeCa, caName);
   } // method removeCa

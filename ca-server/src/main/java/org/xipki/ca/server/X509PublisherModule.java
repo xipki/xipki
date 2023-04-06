@@ -7,16 +7,15 @@ import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
+import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.exception.OperationException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,29 +65,33 @@ class X509PublisherModule extends X509CaModule {
       return 1;
     }
 
+    List<String> failedPublishers = null;
+
     for (IdentifiedCertPublisher publisher : publishers()) {
       boolean successful;
       try {
         successful = publisher.certificateAdded(certInfo);
       } catch (RuntimeException ex) {
         successful = false;
-        LogUtil.warn(LOG, ex, "could not publish certificate to the publisher " + publisher.getIdent());
       }
 
-      if (successful) {
-        continue;
-      }
-
-      Long certId = certInfo.getCert().getCertId();
-      try {
-        certstore.addToPublishQueue(publisher.getIdent(), certId, caIdent);
-      } catch (Throwable th) {
-        LogUtil.error(LOG, th, "could not add entry to PublishQueue");
-        return 2;
+      if (!successful) {
+        if (failedPublishers == null) {
+          failedPublishers = new ArrayList<>(1);
+        }
+        failedPublishers.add(publisher.getIdent().getName());
       }
     } // end for
 
-    return 0;
+    if (failedPublishers == null) {
+      return 0;
+    }
+
+    if (LOG.isWarnEnabled()) {
+      LOG.warn("could not publish to publishers {}: {}", failedPublishers,
+          Base64.encodeToString(certInfo.getCert().getCert().getEncoded(), true));
+    }
+    return 2;
   } // method publishCert0
 
   boolean republishCerts(List<String> publisherNames, int numThreads) {
@@ -127,16 +130,7 @@ class X509PublisherModule extends X509CaModule {
     for (IdentifiedCertPublisher publisher : publishers) {
       if (publisher.publishsGoodCert()) {
         onlyRevokedCerts = false;
-      }
-
-      NameId publisherIdent = publisher.getIdent();
-      String name = publisherIdent.getName();
-      try {
-        LOG.info("clearing PublishQueue for publisher {}", name);
-        certstore.clearPublishQueue(caIdent, publisherIdent);
-        LOG.info(" cleared PublishQueue for publisher {}", name);
-      } catch (OperationException ex) {
-        LogUtil.error(LOG, ex, "could not clear PublishQueue for publisher " + name);
+        break;
       }
     } // end for
 
@@ -167,84 +161,6 @@ class X509PublisherModule extends X509CaModule {
       caInfo.setStatus(status);
     }
   } // method republishCerts
-
-  void clearPublishQueue(List<String> publisherNames) throws CaMgmtException {
-    if (publisherNames == null) {
-      try {
-        certstore.clearPublishQueue(caIdent, null);
-      } catch (OperationException ex) {
-        throw new CaMgmtException("could not clear publish queue of CA " + caIdent + ": " + ex.getMessage(), ex);
-      }
-
-      return;
-    }
-
-    for (String publisherName : publisherNames) {
-      NameId publisherIdent = caIdNameMap.getPublisher(publisherName);
-      try {
-        certstore.clearPublishQueue(caIdent, publisherIdent);
-      } catch (OperationException ex) {
-        throw new CaMgmtException("could not clear publish queue of CA " + caIdent + ": " + ex.getMessage()
-            + " for publisher " + publisherName, ex);
-      }
-    }
-  } // method clearPublishQueue
-
-  boolean publishCertsInQueue() {
-    boolean allSuccessful = true;
-    for (IdentifiedCertPublisher publisher : publishers()) {
-      if (!publishCertsInQueue(publisher)) {
-        allSuccessful = false;
-      }
-    }
-
-    return allSuccessful;
-  }
-
-  boolean publishCertsInQueue(IdentifiedCertPublisher publisher) {
-    notNull(publisher, "publisher");
-    final int numEntries = 500;
-
-    while (true) {
-      List<Long> certIds;
-      try {
-        certIds = certstore.getPublishQueueEntries(caIdent, publisher.getIdent(), numEntries);
-      } catch (OperationException ex) {
-        LogUtil.error(LOG, ex);
-        return false;
-      }
-
-      if (CollectionUtil.isEmpty(certIds)) {
-        break;
-      }
-
-      for (Long certId : certIds) {
-        CertificateInfo certInfo;
-
-        try {
-          certInfo = certstore.getCertForId(caIdent, caCert, certId, caIdNameMap);
-        } catch (OperationException ex) {
-          LogUtil.error(LOG, ex);
-          return false;
-        }
-
-        boolean successful = publisher.certificateAdded(certInfo);
-        if (!successful) {
-          LOG.error("republishing certificate id={} failed", certId);
-          return false;
-        }
-
-        try {
-          certstore.removeFromPublishQueue(publisher.getIdent(), certId);
-        } catch (OperationException ex) {
-          LogUtil.warn(LOG, ex, "could not remove republished cert id=" + certId
-              + " and publisher=" + publisher.getIdent().getName());
-        }
-      } // end for
-    } // end while
-
-    return true;
-  } // method publishCertsInQueue
 
   void publishCrl(X509CRLHolder crl) {
     try {
@@ -300,45 +216,37 @@ class X509PublisherModule extends X509CaModule {
                 revokedCert.getCertprofile(), revokedCert.getRevInfo());
       } catch (RuntimeException ex) {
         successful = false;
-        LogUtil.error(LOG, ex, "could not publish revocation of certificate to the publisher "
-            + publisher.getIdent());
       }
 
-      if (successful) {
-        continue;
-      }
-
-      Long certId = revokedCert.getCert().getCertId();
-      try {
-        certstore.addToPublishQueue(publisher.getIdent(), certId, caIdent);
-      } catch (Throwable th) {
-        LogUtil.error(LOG, th, "could not add entry to PublishQueue");
-      }
+      // TODO
+      LOG.error("could not publish revocation of certificate to the publisher {}", publisher.getIdent());
     } // end for
   }
 
   void publishCertUnrevoked(CertWithDbId unrevokedCert) {
+    List<String> failedPublishers = null;
     for (IdentifiedCertPublisher publisher : publishers()) {
       boolean successful;
       try {
         successful = publisher.certificateUnrevoked(caCert, unrevokedCert);
       } catch (RuntimeException ex) {
         successful = false;
-        LogUtil.error(LOG, ex, "could not publish unrevocation of certificate to the publisher "
-                + publisher.getIdent().getName());
       }
 
-      if (successful) {
-        continue;
+      if (!successful) {
+        if (failedPublishers == null) {
+          failedPublishers = new ArrayList<>(1);
+        }
+        failedPublishers.add(publisher.getIdent().getName());
       }
+    } // end for
 
-      Long certId = unrevokedCert.getCertId();
-      try {
-        certstore.addToPublishQueue(publisher.getIdent(), certId, caIdent);
-      } catch (Throwable th) {
-        LogUtil.error(LOG, th, "could not add entry to PublishQueue");
-      }
+    if (failedPublishers == null) {
+      return;
     }
+
+    LOG.error("could not publishCertUnrevoked of certificate {} to publishers {}",
+        unrevokedCert.getCertId(), failedPublishers);
   }
 
   boolean publishCaRevoked(CertRevocationInfo revocationInfo) {

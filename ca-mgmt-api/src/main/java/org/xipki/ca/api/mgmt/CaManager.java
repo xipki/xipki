@@ -73,19 +73,6 @@ public interface CaManager {
       throws CaMgmtException;
 
   /**
-   * Clear the publishing queue for the CA {@code caName} and publishers {@code publisherNames}.
-   *
-   * @param caName
-   *          CA name. Could be {@code null}.
-   * @param publisherNames
-   *          Publisher names. Could be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void clearPublishQueue(String caName, List<String> publisherNames)
-      throws CaMgmtException;
-
-  /**
    * Removes the CA {@code caName} from the system.
    *
    * @param caName

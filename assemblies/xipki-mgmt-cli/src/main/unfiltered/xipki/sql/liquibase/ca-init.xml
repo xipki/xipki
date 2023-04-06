@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
+ v8: XiPKI version 7.0.0, changes compared to v7
+   - Delete tables CRL, CERT, and PUBLISHQUEUE, which are now part of the
+     schema file certstore-init.xml.
  v7: XiPKI version 6.0.0, changes compared to v6
    - Table CRL:  add column SHA1
    - Table CA:   merge columns to a new column CONF, remove columns
@@ -18,9 +21,6 @@
   logicalFilePath="ca-init.xml">
   <property name="cert.cert.type" value="VARCHAR(6000)"/>
   <property name="x500name.type" value="VARCHAR(350)"/>
-  <!-- 100 MB for DB2 -->
-  <property name="crl.data.type" value="CLOB(104857600)" dbms="db2"/>
-  <property name="crl.data.type" value="CLOB" dbms="oracle,postgresql,mysql,mariadb,h2,hsqldb"/>
   <!-- CA configuration :: create table -->
   <changeSet author="xipki" id="1">
     <!-- table DBSCHEMA -->
@@ -39,7 +39,7 @@
     </insert>
     <insert tableName="DBSCHEMA">
       <column name="NAME" value="VERSION"/>
-      <column name="VALUE2" value="7"/>
+      <column name="VALUE2" value="8"/>
     </insert>
     <insert tableName="DBSCHEMA">
       <column name="NAME" value="X500NAME_MAXLEN"/>
@@ -201,123 +201,6 @@
       </column>
     </createTable>
   </changeSet>
-  <changeSet author="xipki" id="2">
-    <!-- table CRL -->
-    <createTable tableName="CRL">
-      <column name="ID" type="INT">
-        <constraints primaryKey="true"/>
-      </column>
-      <column name="CA_ID" type="SMALLINT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="CRL_SCOPE" type="SMALLINT" remarks="CRL scope, reserved for future use">
-        <constraints nullable="false"/>
-      </column>
-      <column name="CRL_NO" type="BIGINT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="THISUPDATE" type="BIGINT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="NEXTUPDATE" type="BIGINT"/>
-      <column name="DELTACRL" type="SMALLINT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="BASECRL_NO" type="BIGINT"/>
-      <column name="SHA1" type="CHAR(28)" remarks="base64 encoded SHA1 fingerprint of the CRL">
-        <constraints nullable="false"/>
-      </column>
-      <column name="CRL" type="${crl.data.type}">
-        <constraints nullable="false"/>
-      </column>
-    </createTable>
-    <addUniqueConstraint tableName="CRL" columnNames="CA_ID, CRL_NO" constraintName="CONST_CA_CRLNO"/>
-    <!-- table CERT -->
-    <createTable tableName="CERT">
-      <column name="ID" type="BIGINT">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="CA_ID" type="SMALLINT" remarks="Issuer (CA) id">
-        <constraints nullable="false"/>
-      </column>
-      <column name="SN" type="VARCHAR(40)" remarks="serial number">
-        <constraints nullable="false"/>
-      </column>
-      <column name="PID" type="SMALLINT" remarks="certificate profile id">
-        <constraints nullable="false"/>
-      </column>
-      <column name="RID" type="SMALLINT" remarks="requestor id">
-      </column>
-      <column name="FP_S" type="BIGINT" remarks="first 8 bytes of the SHA1 sum of the subject">
-        <constraints nullable="false"/>
-      </column>
-      <column name="FP_SAN" type="BIGINT" remarks="first 8 bytes of the SHA1 sum of the extension value of SubjectAltNames">
-        <constraints nullable="true"/>
-      </column>
-      <column name="FP_RS" type="BIGINT" remarks="first 8 bytes of the SHA1 sum of the requested subject">
-      </column>
-      <column name="LUPDATE" type="BIGINT" remarks="last update, seconds since January 1, 1970, 00:00:00 GMT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="NBEFORE" type="BIGINT" remarks="notBefore, seconds since January 1, 1970, 00:00:00 GMT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="NAFTER" type="BIGINT" remarks="notAfter, seconds since January 1, 1970, 00:00:00 GMT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="REV" type="SMALLINT" remarks="whether the certificate is revoked">
-        <constraints nullable="false"/>
-      </column>
-      <column name="RR" type="SMALLINT" remarks="revocation reason">
-      </column>
-      <column name="RT"  type="BIGINT" remarks="revocation time, seconds since January 1, 1970, 00:00:00 GMT">
-      </column>
-      <column name="RIT" type="BIGINT" remarks="revocation invalidity time, seconds since January 1, 1970, 00:00:00 GMT">
-      </column>
-      <column name="EE" type="SMALLINT" remarks="whether it is an end entity cert">
-        <constraints nullable="false"/>
-      </column>
-      <column name="SUBJECT" type="${x500name.type}">
-        <constraints nullable="false"/>
-      </column>
-      <column name="TID" type="VARCHAR(43)" remarks="base64 encoded transactionId, maximal 256 bit">
-      </column>
-      <column name="CRL_SCOPE" type="SMALLINT" remarks="CRL scope, reserved for future use">
-        <constraints nullable="false"/>
-      </column>
-      <column name="SHA1" type="CHAR(28)" remarks="base64 encoded SHA1 fingerprint of the certificate">
-        <constraints nullable="false"/>
-      </column>
-      <column name="REQ_SUBJECT" type="${x500name.type}"/>
-      <column name="CERT" type="VARCHAR(6000)" remarks="Base64 encoded certificate">
-        <constraints nullable="false"/>
-      </column>
-      <column name="PRIVATE_KEY" type="VARCHAR(6000)" remarks="Base64-encoded encrypted PKCS#8 private key">
-        <!--
-          key-name : keyid : algorithm : base64(iv) : base64 (encrypted private key), where
-          the algorithm is 1 for AES/GCM/NoPadding.
-        -->
-      </column>
-    </createTable>
-    <addUniqueConstraint tableName="CERT" columnNames="CA_ID, SN" constraintName="CONST_CA_SN"/>
-    <createIndex tableName="CERT" unique="false" indexName="IDX_CA_FPS">
-      <column name="CA_ID"/>
-      <column name="FP_S"/>
-      <column name="FP_SAN"/>
-    </createIndex>
-    <!-- table PUBLISHQUEUE -->
-    <createTable tableName="PUBLISHQUEUE">
-      <column name="CID" type="BIGINT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="PID" type="SMALLINT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="CA_ID" type="SMALLINT">
-        <constraints nullable="false"/>
-      </column>
-    </createTable>
-  </changeSet>
   <!-- CA Configuration :: foreign key -->
   <changeSet author="xipki" id="3">
     <addForeignKeyConstraint constraintName="FK_CA_CRL_SIGNER1"
@@ -363,40 +246,5 @@
       onDelete="CASCADE" onUpdate="NO ACTION"
       baseColumnNames="CA_ID" baseTableName="CA_HAS_PROFILE"
       referencedColumnNames="ID" referencedTableName="CA"/>
-  </changeSet>
-  <!-- CertStore :: foreign key -->
-  <changeSet author="xipki" id="4">
-    <addForeignKeyConstraint constraintName="FK_CRL_CA1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="CA_ID" baseTableName="CRL"
-      referencedColumnNames="ID" referencedTableName="CA"/>
-    <addForeignKeyConstraint constraintName="FK_CERT_CA1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="CA_ID" baseTableName="CERT"
-      referencedColumnNames="ID" referencedTableName="CA"/>
-     <addForeignKeyConstraint constraintName="FK_CERT_REQUESTOR1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="RID" baseTableName="CERT"
-      referencedColumnNames="ID" referencedTableName="REQUESTOR"/>
-    <addForeignKeyConstraint constraintName="FK_CERT_PROFILE1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="PID" baseTableName="CERT"
-      referencedColumnNames="ID" referencedTableName="PROFILE"/>
-    <!-- Remove the foreignKey constraint due to unsync. in some
-         high-available database systems-->
-    <addForeignKeyConstraint constraintName="FK_PUBLISHQUEUE_PUBLISHER1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="PID" baseTableName="PUBLISHQUEUE"
-      referencedColumnNames="ID" referencedTableName="PUBLISHER"/>
-    <addForeignKeyConstraint constraintName="FK_PUBLISHQUEUE_CERT1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="CID" baseTableName="PUBLISHQUEUE"
-      referencedColumnNames="ID" referencedTableName="CERT"/>
   </changeSet>
 </databaseChangeLog>

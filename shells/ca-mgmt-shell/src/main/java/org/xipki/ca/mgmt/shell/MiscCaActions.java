@@ -35,52 +35,6 @@ import java.util.Map.Entry;
  */
 public class MiscCaActions {
 
-  @Command(scope = "ca", name = "clear-publishqueue", description = "clear publish queue")
-  @Service
-  public static class ClearPublishqueue extends CaAction {
-
-    @Option(name = "--ca", required = true, description = "CA name or 'all' for all CAs")
-    @Completion(CaCompleters.CaNamePlusAllCompleter.class)
-    private String caName;
-
-    @Option(name = "--publisher", required = true, multiValued = true,
-        description = "publisher name or 'all' for all publishers")
-    @Completion(CaCompleters.PublisherNamePlusAllCompleter.class)
-    private List<String> publisherNames;
-
-    @Override
-    protected Object execute0() throws Exception {
-      if (publisherNames == null) {
-        throw new IllegalStateException("should not reach here");
-      }
-      boolean allPublishers = false;
-      for (String publisherName : publisherNames) {
-        if ("all".equalsIgnoreCase(publisherName)) {
-          allPublishers = true;
-          break;
-        }
-      }
-
-      if (allPublishers) {
-        publisherNames = null;
-      }
-
-      if ("all".equalsIgnoreCase(caName)) {
-        caName = null;
-      }
-
-      String msg = "publish queue of CA " + caName + " for publishers " + toString(publisherNames);
-      try {
-        caManager.clearPublishQueue(caName, publisherNames);
-        println("cleared " + msg);
-        return null;
-      } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not clear " + msg + ", error: " + ex.getMessage(), ex);
-      }
-    } // method execute0
-
-  } // class ClearPublishqueue
-
   @Command(scope = "ca", name = "export-conf", description = "export configuration to zip file")
   @Service
   public static class ExportConf extends CaAction {

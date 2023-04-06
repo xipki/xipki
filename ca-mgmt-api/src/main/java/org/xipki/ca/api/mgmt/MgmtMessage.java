@@ -48,7 +48,6 @@ public abstract class MgmtMessage {
     changePublisher,
     changeRequestor,
     changeSigner,
-    clearPublishQueue,
     exportConf,
     generateCertificate,
     generateKeyCert,

@@ -294,20 +294,6 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class ChangeTypeConfEntity
 
-  public static class ClearPublishQueue extends CaNameRequest {
-
-    private List<String> publisherNames;
-
-    public List<String> getPublisherNames() {
-      return publisherNames;
-    }
-
-    public void setPublisherNames(List<String> publisherNames) {
-      this.publisherNames = publisherNames;
-    }
-
-  } // class ClearPublishQueue
-
   public static class ExportConf extends MgmtRequest {
 
     private List<String> caNames;

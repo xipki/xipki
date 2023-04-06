@@ -14,7 +14,6 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
-import org.xipki.util.exception.InvalidConfException;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,8 +30,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Clock;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -86,10 +83,6 @@ class CaCertstoreDbExporter extends DbPorter {
     Exception exception = null;
     System.out.println("exporting CA certstore from database");
     try {
-      if (!resume) {
-        exportPublishQueue(certstore);
-      }
-
       File processLogFile = new File(baseDir, DbPorter.EXPORT_PROCESS_LOG_FILENAME);
 
       Long idProcessedInLastProcess = null;
@@ -426,52 +419,6 @@ class CaCertstoreDbExporter extends DbPorter {
     processLogFile.delete();
     System.out.println(" exported " + sum + " entries from " + tablesText);
   } // method exportEntries
-
-  private void exportPublishQueue(CaCertstore certstore) throws DataAccessException, InvalidConfException {
-    System.out.print("    exporting table PUBLISHQUEUE ... ");
-
-    String sql = "SELECT CID,PID,CA_ID FROM PUBLISHQUEUE WHERE CID>=? AND CID<? ORDER BY CID ASC";
-    final int minId = (int) min("PUBLISHQUEUE", "CID");
-    final int maxId = (int) max("PUBLISHQUEUE", "CID");
-
-    List<CaCertstore.ToPublish> queue = new LinkedList<>();
-    certstore.setPublishQueue(queue);
-    if (maxId == 0) {
-      System.out.println("SUCCESSFUL");
-      return;
-    }
-
-    PreparedStatement ps = prepareStatement(sql);
-    ResultSet rs = null;
-
-    final int n = 500;
-    boolean succ = false;
-
-    try {
-      for (int i = minId; i <= maxId; i += n) {
-        ps.setInt(1, i);
-        ps.setInt(2, i + n);
-
-        rs = ps.executeQuery();
-
-        while (rs.next()) {
-          CaCertstore.ToPublish toPub = new CaCertstore.ToPublish();
-          toPub.setPubId(rs.getInt("PID"));
-          toPub.setCertId(rs.getInt("CID"));
-          toPub.setCaId(rs.getInt("CA_ID"));
-
-          toPub.validate();
-          queue.add(toPub);
-        }
-      }
-      succ = true;
-    } catch (SQLException ex) {
-      throw translate(sql, ex);
-    } finally {
-      releaseResources(ps, rs);
-      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
-    }
-  } // method exportPublishQueue
 
   private void finalizeZip(ZipOutputStream zipOutStream, String filename, Object container)
       throws IOException {

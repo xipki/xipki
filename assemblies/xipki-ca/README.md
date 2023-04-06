@@ -7,10 +7,12 @@ Deployment in Tomcat 8 and 9
    download the JDBC driver to the folder `${CATALINA_HOME}/lib`.
 3. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
    configuration templates with those in the corresponding sub folder in `${CONTAINER_ROOT}/xipki/etc/ca/database`.
-4. Adapt the database configurations `${CONTAINER_ROOT}/xipki/etc/ca/database/ca-db.properties`.
+4. Adapt the database configurations `${CONTAINER_ROOT}/xipki/etc/ca/database/ca-db.properties` and 
+   `${CONTAINER_ROOT}/xipki/etc/ca/database/certstore-db.properties`.
 5. Create new databases configured in Step 4.
 6. Initialize the databases configured in Step 4.
-   In xipki-mgmt-cli, call `ca:sql --db-conf /path/to/ca-db.properties xipki/sql/ca-init.sql`
+   In xipki-mgmt-cli, call `ca:sql --db-conf /path/to/ca-db.properties xipki/sql/ca-init.sql` and
+   `ca:sql --db-conf /path/to/certstore-db.properties xipki/sql/certstore-init.sql`
 7. Disable the HTTP listener, and configure the TLS listener in the file 
    `${CATALINA_HOME}conf/server.xml` (we use here the port 8444, can be changed to any other port)
    ```sh

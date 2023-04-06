@@ -52,12 +52,13 @@ import static org.xipki.util.Args.*;
 import static org.xipki.util.exception.ErrorCode.*;
 
 /**
- * CA database store.
+ * CA cert store.
  *
  * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 
+// TODO: add entry to table CA with the same ID and name as in the database 'ca'.
 public class CertStore extends CertStoreBase {
 
   public enum CertStatus {
@@ -89,34 +90,6 @@ public class CertStore extends CertStoreBase {
 
   }
 
-  public static class SystemEvent {
-
-    private final String name;
-
-    private final String owner;
-
-    private final long eventTime;
-
-    public SystemEvent(String name, String owner, long eventTime) {
-      this.name = notBlank(name, "name");
-      this.owner = notBlank(owner, "owner");
-      this.eventTime = eventTime;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public String getOwner() {
-      return owner;
-    }
-
-    public long getEventTime() {
-      return eventTime;
-    }
-
-  } // class SystemEvent
-
   private static final Logger LOG = LoggerFactory.getLogger(CertStore.class);
 
   private final String sqlCertForId;
@@ -138,8 +111,6 @@ public class CertStore extends CertStoreBase {
   private final String sqlSelectUnrevokedSn100;
 
   private final String sqlSelectUnrevokedSn;
-
-  private final LruCache<Integer, String> cacheSqlCidFromPublishQueue = new LruCache<>(5);
 
   private final LruCache<Integer, String> cacheSqlExpiredSerials = new LruCache<>(5);
 
@@ -277,40 +248,6 @@ public class CertStore extends CertStoreBase {
 
     return true;
   } // method addCert
-
-  public void addToPublishQueue(NameId publisher, long certId, NameId ca)
-      throws OperationException {
-    notNull(ca, "ca");
-    execUpdatePrepStmt0(SQL_INSERT_PUBLISHQUEUE, col2Int(publisher.getId()), col2Int(ca.getId()), col2Long(certId));
-  } // method addToPublishQueue
-
-  public void removeFromPublishQueue(NameId publisher, long certId) throws OperationException {
-    execUpdatePrepStmt0(SQL_REMOVE_PUBLISHQUEUE, col2Int(publisher.getId()), col2Long(certId));
-  } // method removeFromPublishQueue
-
-  public void clearPublishQueue(NameId ca, NameId publisher) throws OperationException {
-    StringBuilder sqlBuilder = new StringBuilder(80);
-    sqlBuilder.append("DELETE FROM PUBLISHQUEUE");
-
-    List<SqlColumn2> params = new ArrayList<>(2);
-    if (ca != null || publisher != null) {
-      sqlBuilder.append(" WHERE");
-      if (ca != null) {
-        sqlBuilder.append(" CA_ID=?");
-        params.add(col2Int(ca.getId()));
-
-        if (publisher != null) {
-          sqlBuilder.append(" AND");
-        }
-      }
-      if (publisher != null) {
-        sqlBuilder.append(" PID=?");
-        params.add(col2Int(publisher.getId()));
-      }
-    }
-
-    execUpdatePrepStmt0(sqlBuilder.toString(), params.toArray(new SqlColumn2[0]));
-  } // method clearPublishQueue
 
   public long getMaxFullCrlNumber(NameId ca) throws OperationException {
     return getMaxCrlNumber(ca, SQL_MAX_FULL_CRLNO);
@@ -508,30 +445,6 @@ public class CertStore extends CertStoreBase {
   public void removeCert(long id) throws OperationException {
     execUpdatePrepStmt0(SQL_REMOVE_CERT_FOR_ID, col2Long(id));
   }
-
-  public List<Long> getPublishQueueEntries(NameId ca, NameId publisher, int numEntries)
-      throws OperationException {
-    String sql = cacheSqlCidFromPublishQueue.get(numEntries);
-    if (sql == null) {
-      sql = datasource.buildSelectFirstSql(numEntries, "CID ASC",
-          "CID FROM PUBLISHQUEUE WHERE PID=? AND CA_ID=?");
-      cacheSqlCidFromPublishQueue.put(numEntries, sql);
-    }
-
-    List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(publisher.getId()), col2Int(ca.getId()));
-
-    List<Long> ret = new ArrayList<>();
-    for (ResultRow rs : rows) {
-      long certId = rs.getLong("CID");
-      if (!ret.contains(certId)) {
-        ret.add(certId);
-      }
-      if (ret.size() >= numEntries) {
-        break;
-      }
-    }
-    return ret;
-  } // method getPublishQueueEntries
 
   public long getCountOfCerts(NameId ca, boolean onlyRevoked) throws OperationException {
     final String sql = onlyRevoked ? "SELECT COUNT(*) FROM CERT WHERE CA_ID=? AND REV=1"

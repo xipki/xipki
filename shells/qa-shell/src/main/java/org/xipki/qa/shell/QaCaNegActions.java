@@ -267,25 +267,6 @@ public class QaCaNegActions {
 
   } // class NegCaUp
 
-  @Command(scope = "caqa", name = "neg-clear-publishqueue", description = "clear publish queue (negative, QA)")
-  @Service
-  public static class NegClearPublishQueue extends MiscCaActions.ClearPublishqueue {
-
-    @Override
-    protected Object execute0() throws Exception {
-      println("neg-clear-publishqueue");
-
-      try {
-        super.execute0();
-      } catch (Exception ex) {
-        return null;
-      }
-
-      throw new CmdFailure("exception expected, but received none");
-    }
-
-  } // class NegClearPublishQueue
-
   @Command(scope = "caqa", name = "neg-enroll-cert", description = "enroll certificate (negative, QA)")
   @Service
   public static class NegEnrollCert extends EnrollCert {

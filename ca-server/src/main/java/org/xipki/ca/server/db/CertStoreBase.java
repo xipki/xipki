@@ -47,10 +47,6 @@ public class CertStoreBase extends QueryExecutor {
 
   protected static final String SQL_REVOKE_SUSPENDED_CERT = "UPDATE CERT SET LUPDATE=?,RR=? WHERE ID=?";
 
-  protected static final String SQL_INSERT_PUBLISHQUEUE = buildInsertSql("PUBLISHQUEUE", "PID,CA_ID,CID");
-
-  protected static final String SQL_REMOVE_PUBLISHQUEUE = "DELETE FROM PUBLISHQUEUE WHERE PID=? AND CID=?";
-
   protected static final String SQL_MAX_CRLNO = "SELECT MAX(CRL_NO) FROM CRL WHERE CA_ID=?";
 
   protected static final String SQL_MAX_FULL_CRLNO = "SELECT MAX(CRL_NO) FROM CRL WHERE CA_ID=? AND DELTACRL = 0";

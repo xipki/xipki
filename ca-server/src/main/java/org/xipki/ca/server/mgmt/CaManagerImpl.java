@@ -20,7 +20,7 @@ import org.xipki.ca.sdk.CertprofileInfoResponse;
 import org.xipki.ca.server.*;
 import org.xipki.ca.server.db.CaManagerQueryExecutor;
 import org.xipki.ca.server.db.CertStore;
-import org.xipki.ca.server.db.CertStore.SystemEvent;
+import org.xipki.ca.server.db.SystemEvent;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.datasource.DataSourceFactory;
@@ -60,26 +60,6 @@ import static org.xipki.util.StringUtil.concat;
  */
 
 public class CaManagerImpl implements CaManager, Closeable {
-
-  private class CertsInQueuePublisher implements Runnable {
-
-    private boolean inProcess;
-
-    @Override
-    public void run() {
-      if (inProcess || !caSystemSetuped) {
-        return;
-      }
-
-      inProcess = true;
-      try {
-        ca2Manager.pulishCertsInQueue();
-      } finally {
-        inProcess = false;
-      }
-    } // method run
-
-  } // class CertsInQueuePublisher
 
   private class CaRestarter implements Runnable {
 
@@ -706,8 +686,6 @@ public class CaManagerImpl implements CaManager, Closeable {
 
         int len = sb.length();
         sb.delete(len - 2, len);
-
-        scheduledThreadPoolExecutor.scheduleAtFixedRate(new CertsInQueuePublisher(), 120, 120, SECONDS);
       } else {
         sb.append(": no CA is configured");
       }
@@ -1086,11 +1064,6 @@ public class CaManagerImpl implements CaManager, Closeable {
     event.setStatus((successful ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED).name());
     event.setLevel(successful ? AuditLevel.INFO : AuditLevel.ERROR);
     Audits.getAuditService().logEvent(event);
-  }
-
-  @Override
-  public void clearPublishQueue(String caName, List<String> publisherNames) throws CaMgmtException {
-    ca2Manager.clearPublishQueue(caName, publisherNames);
   }
 
   private void shutdownScheduledThreadPoolExecutor() {

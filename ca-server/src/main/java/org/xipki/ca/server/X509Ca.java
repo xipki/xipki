@@ -259,14 +259,6 @@ public class X509Ca extends X509CaModule implements Closeable {
     return publisherModule.republishCerts(publisherNames, numThreads);
   }
 
-  public void clearPublishQueue(List<String> publisherNames) throws CaMgmtException {
-    publisherModule.clearPublishQueue(publisherNames);
-  }
-
-  public boolean publishCertsInQueue() {
-    return publisherModule.publishCertsInQueue();
-  }
-
   public CertWithRevocationInfo revokeCert(
       RequestorInfo requestor, BigInteger serialNumber, CrlReason reason, Instant invalidityTime)
       throws OperationException {

@@ -878,50 +878,6 @@ class Ca2Manager {
     }
   } // method commitNextCrlNo
 
-  void pulishCertsInQueue() {
-    LOG.debug("publishing certificates in PUBLISHQUEUE");
-    try {
-      for (String name : manager.x509cas.keySet()) {
-        X509Ca ca = manager.x509cas.get(name);
-        boolean bo = ca.publishCertsInQueue();
-        if (bo) {
-          LOG.info(" published certificates of CA {} in PUBLISHQUEUE", name);
-        } else {
-          LOG.error("publishing certificates of CA {} in PUBLISHQUEUE failed", name);
-        }
-      }
-    } catch (Throwable th) {
-      LogUtil.error(LOG, th, "could not publish CertsInQueue");
-    }
-  }
-
-  void clearPublishQueue(String caName, List<String> publisherNames) throws CaMgmtException {
-    assertMasterModeAndSetuped();
-
-    publisherNames = CollectionUtil.toLowerCaseList(publisherNames);
-
-    if (caName == null) {
-      if (CollectionUtil.isNotEmpty(publisherNames)) {
-        throw new IllegalArgumentException("non-empty publisherNames is not allowed");
-      }
-
-      try {
-        manager.certstore.clearPublishQueue(null, null);
-      } catch (OperationException ex) {
-        throw new CaMgmtException(ex.getMessage(), ex);
-      }
-      return;
-    }
-
-    caName = caName.toLowerCase();
-    X509Ca ca = manager.x509cas.get(caName);
-    if (ca == null) {
-      throw new CaMgmtException(concat("could not find CA named ", caName));
-    }
-
-    ca.clearPublishQueue(publisherNames);
-  } // method clearPublishQueue
-
   private void assertMasterMode() throws CaMgmtException {
     manager.assertMasterMode();
   }

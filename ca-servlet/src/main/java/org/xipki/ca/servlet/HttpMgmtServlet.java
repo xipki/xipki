@@ -182,11 +182,6 @@ public class HttpMgmtServlet extends HttpServlet {
           caManager.changeSigner(req.getName(), req.getType(), req.getConf(), req.getBase64Cert());
           break;
         }
-        case clearPublishQueue: {
-          MgmtRequest.ClearPublishQueue req = new MgmtRequest.ClearPublishQueue();
-          caManager.clearPublishQueue(req.getCaName(), req.getPublisherNames());
-          break;
-        }
         case exportConf: {
           MgmtRequest.ExportConf req = parse(in, MgmtRequest.ExportConf.class);
           InputStream confStream = caManager.exportConf(req.getCaNames());

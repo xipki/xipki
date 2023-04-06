@@ -564,12 +564,6 @@ if { $printUsage equals "true" } then {
   ca:careq-add --requestor requestor1 --ca rootca1 --profile all \
     --ra yes --permission all
 
-  ##### clear-publishqueue #####
-
-  ca:clear-publishqueue --ca rootca1 --publisher ocsp-publisher
-
-  ca:clear-publishqueue --ca all --publisher all
-
   ##### profile #####
 
   ca:profile-info

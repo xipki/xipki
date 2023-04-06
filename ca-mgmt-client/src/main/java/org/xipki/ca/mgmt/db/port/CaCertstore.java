@@ -880,51 +880,11 @@ public class CaCertstore extends ValidatableConf {
 
   } // class Signer
 
-  public static class ToPublish extends ValidatableConf {
-
-    private int pubId;
-
-    private long certId;
-
-    private int caId;
-
-    public int getPubId() {
-      return pubId;
-    }
-
-    public void setPubId(int pubId) {
-      this.pubId = pubId;
-    }
-
-    public long getCertId() {
-      return certId;
-    }
-
-    public void setCertId(long certId) {
-      this.certId = certId;
-    }
-
-    public int getCaId() {
-      return caId;
-    }
-
-    public void setCaId(int caId) {
-      this.caId = caId;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-    }
-
-  } // class ToPublish
-
   private int version;
 
   private int countCrls;
 
   private int countCerts;
-
-  private List<ToPublish> publishQueue;
 
   public int getVersion() {
     return version;
@@ -950,20 +910,8 @@ public class CaCertstore extends ValidatableConf {
     this.countCerts = countCerts;
   }
 
-  public List<ToPublish> getPublishQueue() {
-    if (publishQueue == null) {
-      publishQueue = new LinkedList<>();
-    }
-    return publishQueue;
-  }
-
-  public void setPublishQueue(List<ToPublish> publishQueue) {
-    this.publishQueue = publishQueue;
-  }
-
   @Override
   public void validate() throws InvalidConfException {
-    validate(publishQueue);
   }
 
 }

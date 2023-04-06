@@ -12,6 +12,11 @@
 		"conf":{
 			"file":"etc/ca/database/ca-db.properties"
 		}
+	},{
+		"name":"certstore",
+		"conf":{
+			"file":"etc/ca/database/certstore-db.properties"
+		}
 	}
 	//,{
 	//	"name":"ocsp",

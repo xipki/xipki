@@ -9,7 +9,6 @@ import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.FpIdCalculator;
 import org.xipki.security.HashAlgo;
@@ -143,8 +142,6 @@ class CaCertstoreDbImporter extends DbPorter {
         }
       }
 
-      importPublishQueue(certstore.getPublishQueue());
-
       processLogFile.delete();
     } catch (Exception ex) {
       System.err.println("could not import CA certstore to database");
@@ -152,32 +149,6 @@ class CaCertstoreDbImporter extends DbPorter {
     }
     System.out.println(" imported CA certstore to database");
   } // method importToDb
-
-  private void importPublishQueue(List<CaCertstore.ToPublish> publishQueue) throws DataAccessException {
-    final String sql = buildInsertSql("PUBLISHQUEUE", "CID,PID,CA_ID");
-    System.out.print("    importing table PUBLISHQUEUE ... s");
-    PreparedStatement ps = prepareStatement(sql);
-
-    boolean succ = false;
-    try {
-      for (CaCertstore.ToPublish tbp : publishQueue) {
-        try {
-          ps.setLong(1, tbp.getCertId());
-          ps.setInt(2, tbp.getPubId());
-          ps.setInt(3, tbp.getCaId());
-          ps.execute();
-        } catch (SQLException ex) {
-          System.err.println("could not import PUBLISHQUEUE with CID="
-              + tbp.getCertId() + " and PID=" + tbp.getPubId() + ", message: " + ex.getMessage());
-          throw translate(sql, ex);
-        }
-      }
-      succ = true;
-    } finally {
-      releaseResources(ps, null);
-      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
-    }
-  } // method importPublishQueue
 
   private Exception importEntries(CaDbEntryType type, CaCertstore certstore,
       File processLogFile, Integer numProcessedInLastProcess, Long idProcessedInLastProcess) {
