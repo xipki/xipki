@@ -7,6 +7,9 @@ OS_NAME = $(osinfo --name)
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties"
 ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
 
+DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/caconf-db.properties"
+ca:sql --force --db-conf "${DB_CONF}" xipki/sql/caconf-init.sql
+
 ca:restart
 
 xi:copy-file -f qa/tools/template.ca-conf.json qa/tools/ca-conf.json

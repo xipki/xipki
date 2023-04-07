@@ -15,6 +15,7 @@ echo "||                             Export CA Database                         
 echo "============================================================================"
 
 ca:export-ca --out-dir output/dbexport/ca \
+  --caconf-db-conf ${CA_XIPKI_DIR}/etc/ca/database/caconf-db.properties \
   --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties
 
 ## Export OCSP
@@ -41,8 +42,12 @@ OS_NAME = $(osinfo --name)
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties"
 ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
 
+DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/caconf-db.properties"
+ca:sql --force --db-conf "${DB_CONF}" xipki/sql/caconf-init.sql
+
 ca:import-ca --in-dir output/dbexport/ca \
-  --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties
+  --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties \
+  --caconf-db-conf ${CA_XIPKI_DIR}/etc/ca/database/caconf-db.properties
 
 ## Import OCSP
 

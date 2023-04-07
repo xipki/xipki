@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ v8: XiPKI version 6.3.0, changes compared to v7
+   - ca-init.xml is split to ca-init.xml and caconf-init.xml.
+
+ Maximal column size: 4k
+  - DB2: PAGESIZE 4 k
+-->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+  logicalFilePath="caconf-init.xml">
+  <property name="cert.cert.type" value="VARCHAR(6000)"/>
+  <property name="x500name.type" value="VARCHAR(350)"/>
+  <!-- CA configuration :: create table -->
+  <changeSet author="xipki" id="1">
+    <!-- table DBSCHEMA -->
+    <createTable tableName="DBSCHEMA">
+      <!--remarks="database schema information"-->
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="VALUE2" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="VENDOR"/>
+      <column name="VALUE2" value="XIPKI"/>
+    </insert>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="VERSION"/>
+      <column name="VALUE2" value="8"/>
+    </insert>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="X500NAME_MAXLEN"/>
+      <!-- must be the length of x500name.type -->
+      <column name="VALUE2" value="350"/>
+    </insert>
+    <!-- table SYSTEM_EVENT -->
+    <createTable tableName="SYSTEM_EVENT">
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="EVENT_TIME" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="EVENT_TIME2" type="TIMESTAMP"/>
+      <column name="EVENT_OWNER" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <!-- table KEYPAIR_GEN -->
+    <createTable tableName="KEYPAIR_GEN">
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="TYPE" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CONF" type="CLOB"/>
+    </createTable>
+    <insert tableName="KEYPAIR_GEN">
+      <column name="NAME" value="software"/>
+      <column name="TYPE" value="SOFTWARE"/>
+    </insert>
+    <!-- table SIGNER -->
+    <createTable tableName="SIGNER">
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="TYPE" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CERT" type="${cert.cert.type}"/>
+      <column name="CONF" type="CLOB"/>
+    </createTable>
+    <!-- table REQUESTOR -->
+    <createTable tableName="REQUESTOR">
+      <column name="ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints nullable="false"/>
+        <!--remarks="duplication is not permitted"-->
+      </column>
+      <column name="TYPE" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CONF" type="CLOB"/>
+    </createTable>
+    <addUniqueConstraint tableName="REQUESTOR" columnNames="NAME" constraintName="CONST_REQUESTOR_NAME"/>
+    <!-- table PUBLISHER -->
+    <createTable tableName="PUBLISHER">
+      <column name="ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="NAME" type="VARCHAR(45)" remarks="duplication is not permitted">
+        <constraints nullable="false"/>
+      </column>
+      <column name="TYPE" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CONF" type="CLOB"/>
+    </createTable>
+    <addUniqueConstraint tableName="PUBLISHER" columnNames="NAME" constraintName="CONST_PUBLISHER_NAME"/>
+    <!-- table "PROFILE" -->
+    <createTable tableName="PROFILE">
+      <column name="ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="NAME" type="VARCHAR(45)" remarks="duplication is not permitted">
+        <constraints nullable="false"/>
+      </column>
+      <column name="TYPE" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CONF" type="CLOB" remarks="profile data, depends on the type">
+      </column>
+    </createTable>
+    <addUniqueConstraint tableName="PROFILE" columnNames="NAME" constraintName="CONST_PROFILE_NAME"/>
+    <!-- table CA -->
+    <createTable tableName="CA">
+      <column name="ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="NAME" type="VARCHAR(45)" remarks="duplication is not permitted">
+        <constraints nullable="false"/>
+      </column>
+      <column name="STATUS" type="VARCHAR(10)" remarks="valid values: active, inactive">
+        <constraints nullable="false"/>
+      </column>
+      <column name="NEXT_CRLNO" type="BIGINT"/>
+      <column name="CRL_SIGNER_NAME" type="VARCHAR(45)"/>
+      <column name="SUBJECT" type="${x500name.type}">
+        <constraints nullable="false"/>
+      </column>
+      <column name="REV_INFO" type="varchar(200)" remarks="CA revocation information">
+      </column>
+      <column name="CERT" type="VARCHAR(6000)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SIGNER_TYPE" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SIGNER_CONF" type="CLOB">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CERTCHAIN" type="CLOB" remarks="Certificate chain without CA's certificate">
+      </column>
+      <column name="CONF" type="CLOB">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addUniqueConstraint tableName="CA" columnNames="NAME" constraintName="CONST_CA_NAME"/>
+    <!-- table CAALIAS -->
+    <createTable tableName="CAALIAS">
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="CA_ID" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <!-- table CA_HAS_REQUESTOR -->
+    <createTable tableName="CA_HAS_REQUESTOR">
+      <column name="CA_ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="REQUESTOR_ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="PERMISSION" type="INT"/>
+      <column name="PROFILES" type="VARCHAR(500)"/>
+    </createTable>
+    <!-- table CA_HAS_PUBLISHER -->
+    <createTable tableName="CA_HAS_PUBLISHER">
+      <column name="CA_ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="PUBLISHER_ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+    </createTable>
+    <!-- table CA_HAS_PROFILE -->
+    <createTable tableName="CA_HAS_PROFILE">
+      <column name="CA_ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="PROFILE_ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  <!-- CA Configuration :: foreign key -->
+  <changeSet author="xipki" id="3">
+    <addForeignKeyConstraint constraintName="FK_CA_CRL_SIGNER1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
+      baseColumnNames="CRL_SIGNER_NAME" baseTableName="CA"
+      referencedColumnNames="NAME" referencedTableName="SIGNER"/>
+    <addForeignKeyConstraint constraintName="FK_CAALIAS_CA1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CA_ID" baseTableName="CAALIAS"
+      referencedColumnNames="ID" referencedTableName="CA"/>
+    <!-- ca_has_requestor -->
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_REQUESTOR_REQUESTOR1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="REQUESTOR_ID" baseTableName="CA_HAS_REQUESTOR"
+      referencedColumnNames="ID" referencedTableName="REQUESTOR"/>
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_REQUESTOR_CA1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CA_ID" baseTableName="CA_HAS_REQUESTOR"
+      referencedColumnNames="ID" referencedTableName="CA"/>
+    <!-- ca_has_publisher -->
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_PUBLISHER_PUBLISHER1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="PUBLISHER_ID" baseTableName="CA_HAS_PUBLISHER"
+      referencedColumnNames="ID" referencedTableName="PUBLISHER"/>
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_PUBLISHER_CA1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CA_ID" baseTableName="CA_HAS_PUBLISHER"
+      referencedColumnNames="ID" referencedTableName="CA"/>
+    <!-- CA_HAS_PROFILE -->
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_PROFILE_PROFILE1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="PROFILE_ID" baseTableName="CA_HAS_PROFILE"
+      referencedColumnNames="ID" referencedTableName="PROFILE"/>
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_PROFILE_CA1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CA_ID" baseTableName="CA_HAS_PROFILE"
+      referencedColumnNames="ID" referencedTableName="CA"/>
+  </changeSet>
+</databaseChangeLog>

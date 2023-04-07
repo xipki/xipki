@@ -9,14 +9,17 @@ import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.FpIdCalculator;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -55,11 +58,14 @@ class CaCertstoreDbImporter extends DbPorter {
 
   private final int numCertsPerCommit;
 
+  private final CaCertstore.Caconf caconf;
+
   CaCertstoreDbImporter(DataSourceWrapper datasource, String srcDir, int numCertsPerCommit,
-      boolean resume, AtomicBoolean stopMe)
+      boolean resume, AtomicBoolean stopMe, CaCertstore.Caconf caconf)
       throws Exception {
     super(datasource, srcDir, stopMe);
 
+    this.caconf = Args.notNull(caconf, "caconf");
     this.numCertsPerCommit = Args.positive(numCertsPerCommit, "numCertsPerCommit");
 
     File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
@@ -75,7 +81,102 @@ class CaCertstoreDbImporter extends DbPorter {
     }
   } // constructor
 
+  private void importProfile(List<CaCertstore.IdNameTypeConf> profiles) throws DataAccessException {
+    System.out.print("    importing table PROFILE ... ");
+    boolean succ = false;
+    final String sql = buildInsertSql("PROFILE", "ID,NAME");
+    PreparedStatement ps = null;
+    try {
+      ps = prepareStatement(sql);
+      for (CaCertstore.IdNameTypeConf certprofile : profiles) {
+        try {
+          ps.setInt(1, certprofile.getId());
+          ps.setString(2, certprofile.getName());
+
+          ps.executeUpdate();
+        } catch (SQLException ex) {
+          System.err.println("could not import PROFILE with NAME=" + certprofile.getName());
+          throw translate(sql, ex);
+        }
+      }
+      succ = true;
+    } finally {
+      releaseResources(ps, null);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
+    }
+  } // method importProfile
+
+  private void importRequestor(List<CaCertstore.IdNameTypeConf> requestors) throws DataAccessException {
+    System.out.print("    importing table REQUESTOR ... ");
+    final String sql = buildInsertSql("REQUESTOR", "ID,NAME");
+    boolean succ = false;
+    PreparedStatement ps = null;
+    try {
+      ps = prepareStatement(sql);
+
+      for (CaCertstore.IdNameTypeConf requestor : requestors) {
+        try {
+          ps.setInt(1, requestor.getId());
+          ps.setString(2, requestor.getName());
+          ps.executeUpdate();
+        } catch (SQLException ex) {
+          System.err.println("could not import REQUESTOR with NAME=" + requestor.getName());
+          throw translate(sql, ex);
+        }
+      }
+
+      succ = true;
+    } finally {
+      releaseResources(ps, null);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
+    }
+  } // method importRequestor
+
+  private void importCa(List<CaCertstore.Ca> cas)
+      throws DataAccessException, CertificateException, IOException {
+    System.out.print("    importing table CA ... ");
+    boolean succ = false;
+
+    final String sql = buildInsertSql("CA", "ID,NAME,SUBJECT,REV_INFO,CERT");
+
+    PreparedStatement ps = null;
+    try {
+      ps = prepareStatement(sql);
+
+      for (CaCertstore.Ca ca : cas) {
+        try {
+          byte[] certBytes = readContent(ca.getCert());
+          X509Cert cert = X509Util.parseCert(certBytes);
+
+          int idx = 1;
+          ps.setInt(   idx++, ca.getId());
+          ps.setString(idx++, ca.getName().toLowerCase());
+          ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
+          ps.setString(idx++, ca.getRevInfo());
+          ps.setString(idx++, Base64.encodeToString(certBytes));
+
+          ps.executeUpdate();
+        } catch (SQLException ex) {
+          System.err.println("could not import CA with NAME=" + ca.getName());
+          throw translate(sql, ex);
+        } catch (CertificateException | IOException ex) {
+          System.err.println("could not import CA with NAME=" + ca.getName());
+          throw ex;
+        }
+      }
+
+      succ = true;
+    } finally {
+      releaseResources(ps, null);
+      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
+    }
+  } // method importCa
+
   public void importToDb() throws Exception {
+    importRequestor(caconf.getRequestors());
+    importProfile(caconf.getProfiles());
+    importCa(caconf.getCas());
+
     CaCertstore certstore;
     try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_CA_CERTSTORE))) {
       certstore = JSON.parseObject(is, CaCertstore.class);

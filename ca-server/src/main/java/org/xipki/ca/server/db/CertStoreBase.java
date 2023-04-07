@@ -12,6 +12,7 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.Hex;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
@@ -72,9 +73,13 @@ public class CertStoreBase extends QueryExecutor {
 
   protected SecretKey keypairEncKey;
 
-  protected CertStoreBase(DataSourceWrapper datasource, PasswordResolver passwordResolver)
+  protected final DataSourceWrapper caConfDatasource;
+
+  protected CertStoreBase(DataSourceWrapper datasource, DataSourceWrapper caConfDatasource,
+                          PasswordResolver passwordResolver)
       throws DataAccessException, CaMgmtException {
     super(datasource);
+    this.caConfDatasource = Args.notNull(caConfDatasource, "caConfDatasource");
 
     DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
     String vendor = dbSchemaInfo.variableValue("VENDOR");
@@ -95,12 +100,12 @@ public class CertStoreBase extends QueryExecutor {
     this.SQL_ADD_CRL = buildInsertSql("CRL", "ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE," +
         "DELTACRL,BASECRL_NO,CRL_SCOPE,SHA1,CRL");
 
-    // INSERT INTO CRL
     updateDbInfo(passwordResolver);
   } // constructor
 
-  public void updateDbInfo(PasswordResolver passwordResolver) throws DataAccessException, CaMgmtException {
-    DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
+  public void updateDbInfo(PasswordResolver passwordResolver)
+      throws DataAccessException, CaMgmtException {
+    DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(caConfDatasource);
 
     // Save keypair control
     String str = dbSchemaInfo.variableValue("KEYPAIR_ENC_KEY");

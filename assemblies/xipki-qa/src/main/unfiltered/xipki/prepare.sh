@@ -22,7 +22,10 @@ mkdir ${TOMCAT_DIR}/webapps
 rm -rf ${TOMCAT_DIR}/lib/bc*.jar \
     ${TOMCAT_DIR}/lib/mariadb-java-client-*.jar \
     ${TOMCAT_DIR}/lib/postgresql-*.jar \
-    ${TOMCAT_DIR}/lib/h2-*.jar
+    ${TOMCAT_DIR}/lib/h2-*.jar \
+    ${TOMCAT_DIR}/lib/*pkcs11wrapper-*.jar \
+    ${TOMCAT_DIR}/lib/password-*.jar \
+    ${TOMCAT_DIR}/lib/xipki-tomcat-password-*.jar
 
 cp -r xipki-ca/* ${TOMCAT_DIR}/
 
@@ -46,7 +49,10 @@ mkdir ${TOMCAT_DIR}/webapps
 rm -rf ${TOMCAT_DIR}/lib/bc*.jar \
     ${TOMCAT_DIR}/lib/mariadb-java-client-*.jar \
     ${TOMCAT_DIR}/lib/postgresql-*.jar \
-    ${TOMCAT_DIR}/lib/h2-*.jar
+    ${TOMCAT_DIR}/lib/h2-*.jar \
+    ${TOMCAT_DIR}/lib/*pkcs11wrapper-*.jar \
+    ${TOMCAT_DIR}/lib/password-*.jar \
+    ${TOMCAT_DIR}/lib/xipki-tomcat-password-*.jar
 
 cp -r xipki-ocsp/* ${TOMCAT_DIR}/
 cp -r ${DIR}/tomcat/ocsp/* ${TOMCAT_DIR}/
@@ -68,8 +74,17 @@ echo "tomcat dir: ${TOMCAT_DIR}"
 
 XIPKI_DIR=${TOMCAT_DIR}/xipki
 
-rm -rf ${TOMCAT_DIR}/webapps ${TOMCAT_DIR}/logs/* ${TOMCAT_DIR}/xipki -rf ${TOMCAT_DIR}/lib/bc*.jar
+rm -rf ${TOMCAT_DIR}/webapps ${TOMCAT_DIR}/logs/* ${TOMCAT_DIR}/xipki
+
 mkdir ${TOMCAT_DIR}/webapps
+
+rm -rf ${TOMCAT_DIR}/lib/bc*.jar \
+    ${TOMCAT_DIR}/lib/mariadb-java-client-*.jar \
+    ${TOMCAT_DIR}/lib/postgresql-*.jar \
+    ${TOMCAT_DIR}/lib/h2-*.jar \
+    ${TOMCAT_DIR}/lib/*pkcs11wrapper-*.jar \
+    ${TOMCAT_DIR}/lib/password-*.jar \
+    ${TOMCAT_DIR}/lib/xipki-tomcat-password-*.jar
 
 cp -r xipki-gateway/* ${TOMCAT_DIR}/
 cp -r ${DIR}/tomcat/gateway/* ${TOMCAT_DIR}/

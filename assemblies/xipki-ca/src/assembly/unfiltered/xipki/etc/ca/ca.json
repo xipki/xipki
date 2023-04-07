@@ -13,9 +13,9 @@
 			"file":"etc/ca/database/ca-db.properties"
 		}
 	},{
-		"name":"certstore",
+		"name":"caconf",
 		"conf":{
-			"file":"etc/ca/database/certstore-db.properties"
+			"file":"etc/ca/database/caconf-db.properties"
 		}
 	}
 	//,{

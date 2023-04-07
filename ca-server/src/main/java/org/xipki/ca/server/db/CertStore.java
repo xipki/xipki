@@ -17,10 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.CertListInfo;
-import org.xipki.ca.api.mgmt.CertListOrderBy;
-import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
+import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.server.CaIdNameMap;
 import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.CertRevInfoWithSerial;
@@ -30,10 +27,8 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.*;
 import org.xipki.util.Base64;
-import org.xipki.util.DateUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.LruCache;
 import org.xipki.util.exception.OperationException;
 
 import javax.crypto.Cipher;
@@ -128,9 +123,10 @@ public class CertStore extends CertStoreBase {
 
   private final long earliestNotBefore;
 
-  public CertStore(DataSourceWrapper datasource, UniqueIdGenerator idGenerator, PasswordResolver passwordResolver)
+  public CertStore(DataSourceWrapper datasource, DataSourceWrapper caConfDatasource,
+                   UniqueIdGenerator idGenerator, PasswordResolver passwordResolver)
       throws DataAccessException, CaMgmtException {
-    super(datasource, passwordResolver);
+    super(datasource, caConfDatasource, passwordResolver);
 
     this.idGenerator = notNull(idGenerator, "idGenerator");
 
@@ -151,6 +147,160 @@ public class CertStore extends CertStoreBase {
     this.sqlSelectUnrevokedSn100 = buildArraySql(datasource, prefix, 100);
     this.earliestNotBefore = datasource.getMin(null, "CERT", "NBEFORE");
   } // constructor
+
+  public void removeCa(String name) throws CaMgmtException {
+    removeEntry(name, "CA");
+  }
+
+  public void removeCertProfile(String name) throws CaMgmtException {
+    removeEntry(name, "PROFILE");
+  }
+
+  public void removeRequestor(String name) throws CaMgmtException {
+    removeEntry(name, "REQUESTOR");
+  }
+
+  private void removeEntry(String name, String table) throws CaMgmtException {
+    if (dbSchemaVersion < 8) {
+      return;
+    }
+
+    notBlank(name, "name");
+    final String sql = "DELETE FROM " + table + " WHERE NAME=?";
+
+    try {
+      execUpdatePrepStmt0(sql, col2Str(name));
+    } catch (OperationException ex) {
+      throw new CaMgmtException(ex);
+    }
+  }
+
+  public void addCertProfile(NameId ident) throws CaMgmtException {
+    addNameId(ident, "PROFILE");
+  }
+
+  public void addRequestor(NameId ident) throws CaMgmtException {
+    addNameId(ident, "REQUESTOR");
+  }
+
+  private void addNameId(NameId ident, String table) throws CaMgmtException {
+    if (dbSchemaVersion < 8) {
+      return;
+    }
+
+    notNull(ident, "ident");
+
+    if (existsIdent(ident, table)) {
+      return;
+    }
+
+    int num = 0;
+    try {
+      final String sql = SqlUtil.buildInsertSql(table, "ID,NAME");
+      num = execUpdatePrepStmt0(sql, col2Int(ident.getId()), col2Str(ident.getName()));
+    } catch (OperationException ex) {
+      throw new CaMgmtException(ex);
+    }
+
+    if (num == 0) {
+      throw new CaMgmtException("could not add requestor " + ident);
+    }
+
+    if (LOG.isInfoEnabled()) {
+      LOG.info("added requestor '{}'", ident);
+    }
+  } // method addRequestor
+
+  public void addCa(NameId ident, X509Cert caCert) throws CaMgmtException {
+    if (dbSchemaVersion < 8) {
+      return;
+    }
+
+    notNull(ident, "ident");
+    notNull(caCert, "caCert");
+
+    if (existsIdent(ident, "CA")) {
+      byte[] existingCert;
+      try {
+        existingCert = Base64.decode(
+            datasource.getFirstStringValue(null, "CA", "CERT", "ID=" + ident.getId()));
+      } catch (DataAccessException e) {
+        throw new CaMgmtException(e);
+      }
+
+      if (Arrays.equals(existingCert, caCert.getEncoded())) {
+        return;
+      } else {
+        throw new CaMgmtException("an entry in table CA with ID=" + ident.getId() +
+            " exists, but the certificate differs");
+      }
+    }
+
+    int num;
+    try {
+      String subjectText = X509Util.cutText(caCert.getSubjectText(), maxX500nameLen);
+      String sql = SqlUtil.buildInsertSql("CA", "ID,NAME,SUBJECT,CERT");
+      num = execUpdatePrepStmt0(sql, col2Int(ident.getId()), col2Str(ident.getName()),
+                col2Str(subjectText), col2Str(Base64.encodeToString(caCert.getEncoded())));
+    } catch (OperationException ex) {
+      throw new CaMgmtException(ex);
+    }
+
+    if (num == 0) {
+      throw new CaMgmtException("could not add CA " + ident);
+    }
+
+    if (caCert.isSelfSigned()) {
+      addRootCert(caCert, ident);
+    }
+  }
+
+  private boolean existsIdent(NameId ident, String table) throws CaMgmtException {
+    String existingName;
+    try {
+      existingName = datasource.getFirstStringValue(null, table, "NAME", "ID=" + ident.getId());
+    } catch (DataAccessException e) {
+      throw new CaMgmtException(e);
+    }
+
+    if (existingName == null) {
+      return false;
+    }
+
+    if (ident.getName().equals(existingName)) {
+      // already existing, do nothing
+      return true;
+    }
+
+    // an entry with given id exists, but the name differs.
+    throw new CaMgmtException("an entry in table " + table + " with ID=" + ident.getId() +
+        " exists, but the name differs (expected " + ident.getName() + ", is " + existingName);
+  }
+
+  public void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {
+    if (dbSchemaVersion < 8) {
+      return;
+    }
+
+    try {
+      execUpdatePrepStmt0("UPDATE CA SET REV_INFO=? WHERE NAME=?",
+          col2Str(revocationInfo.getEncoded()), col2Str(caName));
+    } catch (OperationException ex) {
+      throw new CaMgmtException(ex);
+    }
+  }
+
+  public void unrevokeCa(String caName) throws CaMgmtException {
+    if (dbSchemaVersion < 8) {
+      return;
+    }
+
+    try {
+      execUpdatePrepStmt0("UPDATE CA SET REV_INFO=? WHERE NAME=?", col2Str(null), col2Str(caName));
+    } catch (OperationException ex) {
+      throw new CaMgmtException(ex);
+    }
+  }
 
   public boolean addCert(CertificateInfo certInfo, boolean saveKeypair) {
     if (saveKeypair && certInfo.getPrivateKey() != null) {
@@ -223,9 +373,21 @@ public class CertStore extends CertStoreBase {
       // notAfterSeconds
       columns.add(col2Long(cert0.getNotAfter().getEpochSecond()));
       columns.add(col2Bool(false));
-      columns.add(col2Int(certInfo.getProfile().getId()));
+
+      if (certInfo.getProfile() != null) {
+        columns.add(col2Int(certInfo.getProfile().getId()));
+      } else {
+        columns.add(col2Int(null));
+      }
+
       columns.add(col2Int(certInfo.getIssuer().getId()));
-      columns.add(col2Int(certInfo.getRequestor().getId()));
+
+      if (certInfo.getRequestor() != null) {
+        columns.add(col2Int(certInfo.getRequestor().getId()));
+      } else {
+        columns.add(col2Int(null));
+      }
+
       columns.add(col2Int(isEeCert ? 1 : 0));
       columns.add(col2Str(tid));
       columns.add(col2Str(b64FpCert));
@@ -248,6 +410,58 @@ public class CertStore extends CertStoreBase {
 
     return true;
   } // method addCert
+
+  private boolean addRootCert(X509Cert cert, NameId issuer) {
+    byte[] encodedCert = cert.getEncoded();
+
+    try {
+      final long certId = idGenerator.nextId();
+      String subjectText = X509Util.cutText(cert.getSubjectText(), maxX500nameLen);
+      long fpSubject = X509Util.fpCanonicalizedName(cert.getSubject());
+
+      byte[] san = cert.getSubjectAltNames();
+      Long fpSan = san == null ? null : FpIdCalculator.hash(san);
+
+      final String b64FpCert = HashAlgo.SHA1.base64Hash(encodedCert);
+
+      List<SqlColumn2> columns = new ArrayList<>(20);
+
+      columns.add(col2Long(certId)); // ID
+      // currentTimeSeconds
+      columns.add(col2Long(Instant.now().getEpochSecond())); // LUPDATE
+      columns.add(col2Str(cert.getSerialNumber().toString(16))); // SN
+      columns.add(col2Str(subjectText)); // SUBJECT
+      columns.add(col2Long(fpSubject)); // FP_S
+      columns.add(col2Long(null)); // FP_RS
+      columns.add(col2Long(fpSan)); // FP_SAN
+      // notBeforeSeconds
+      columns.add(col2Long(cert.getNotBefore().getEpochSecond())); // NBEFORE
+      // notAfterSeconds
+      columns.add(col2Long(cert.getNotAfter().getEpochSecond())); // NAFTER
+      columns.add(col2Bool(false)); // REV
+      columns.add(col2Int(null)); // PID
+      columns.add(col2Int(issuer.getId())); // CA_ID
+      columns.add(col2Int(null)); // RID
+
+      columns.add(col2Int(0)); // EE
+      columns.add(col2Str(null)); // TID
+      columns.add(col2Str(b64FpCert)); // SHA1
+      columns.add(col2Str(null)); // REQ_SUBJECT
+      // in this version we set CRL_SCOPE to fixed value 0
+      columns.add(col2Int(0)); // CRL_SCOPE
+      columns.add(col2Str(Base64.encodeToString(encodedCert))); // CERT
+      columns.add(col2Str(null)); // PRIVATE_KEY
+
+      execUpdatePrepStmt0(SQL_ADD_CERT, columns.toArray(new SqlColumn2[0]));
+    } catch (Exception ex) {
+      LOG.error("could not save certificate {}: {}. Message: {}", cert.getSubject(),
+          encodedCert == null ? "null" : Base64.encodeToString(encodedCert, true), ex.getMessage());
+      LOG.debug("error", ex);
+      return false;
+    }
+
+    return true;
+  } // method addRootCert
 
   public long getMaxFullCrlNumber(NameId ca) throws OperationException {
     return getMaxCrlNumber(ca, SQL_MAX_FULL_CRLNO);

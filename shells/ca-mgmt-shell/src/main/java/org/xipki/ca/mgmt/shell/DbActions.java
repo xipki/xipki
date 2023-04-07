@@ -85,9 +85,13 @@ public class DbActions {
   @Service
   public static class ExportCa extends DbPortAction {
 
-    @Option(name = "--db-conf", required = true, description = "database configuration file")
+    @Option(name = "--caconf-db-conf", description = "CA configuration database file")
     @Completion(FileCompleter.class)
-    private String dbconfFile;
+    private String caConfDbConfFile;
+
+    @Option(name = "--db-conf", required = true, description = "CA database file")
+    @Completion(FileCompleter.class)
+    private String dbConfFile;
 
     @Option(name = "--out-dir", required = true, description = "output directory")
     @Completion(Completers.DirCompleter.class)
@@ -104,8 +108,8 @@ public class DbActions {
 
     @Override
     protected DbPortWorker getDbWorker() throws Exception {
-      return new DbPortWorker.ExportCaDb(datasourceFactory, passwordResolver, dbconfFile, outdir,
-          resume, numCertsInBundle, numCertsPerCommit, readPassword());
+      return new DbPortWorker.ExportCaDb(datasourceFactory, passwordResolver, caConfDbConfFile, dbConfFile,
+          outdir, resume, numCertsInBundle, numCertsPerCommit, readPassword());
     }
 
   } // class ExportCa
@@ -116,7 +120,7 @@ public class DbActions {
     private String passwordHint;
 
     protected char[] readPassword() throws IOException, PasswordResolverException {
-      return readPasswordIfNotSet(passwordHint);
+      return readPasswordIfNotSet("Please enter password of the ZIP file", passwordHint);
     }
   } // class DbAction
 
@@ -284,9 +288,13 @@ public class DbActions {
   @Service
   public static class ImportCa extends DbPortAction {
 
-    @Option(name = "--db-conf", required = true, description = "database configuration file")
+    @Option(name = "--caconf-db-conf", required = true, description = "CA configuration database file")
     @Completion(FileCompleter.class)
-    private String dbconfFile;
+    private String caconfDbFile;
+
+    @Option(name = "--db-conf", required = true, description = "CA database file")
+    @Completion(FileCompleter.class)
+    private String dbConfFile;
 
     @Option(name = "--in-dir", required = true, description = "input directory")
     @Completion(Completers.DirCompleter.class)
@@ -300,8 +308,8 @@ public class DbActions {
 
     @Override
     protected DbPortWorker getDbWorker() throws Exception {
-      return new DbPortWorker.ImportCaDb(datasourceFactory, passwordResolver, dbconfFile, resume,
-          indir, numCertsPerCommit, readPassword());
+      return new DbPortWorker.ImportCaDb(datasourceFactory, passwordResolver, caconfDbFile, dbConfFile,
+          resume, indir, numCertsPerCommit, readPassword());
     }
 
   } // class ImportCa

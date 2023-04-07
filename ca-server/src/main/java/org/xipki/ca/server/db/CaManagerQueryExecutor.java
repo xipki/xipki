@@ -78,6 +78,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         "SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN,CONF FROM CA WHERE NAME=?");
     this.sqlNextSelectCrlNo = buildSelectFirstSql("NEXT_CRLNO FROM CA WHERE ID=?");
     this.sqlSelectSystemEvent = buildSelectFirstSql("EVENT_TIME,EVENT_OWNER FROM SYSTEM_EVENT WHERE NAME=?");
+
+    this.dbSchemaVersion = getDbSchemaVersion();
   } // constructor
 
   /**
@@ -298,7 +300,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         col2Str(caEntry.getStatus().getStatus()), // STATUS
         col2Long(caEntry.getNextCrlNumber()), // NEXT_CRLNO
         col2Str(caEntry.getCrlSignerName()), // CRL_SIGNER_NAME
-        col2Str(caEntry.getSubject()), // SUBJECT
+        col2Str(X509Util.cutText(caEntry.getSubject(), getMaxX500nameLen())), // SUBJECT
         col2Str(caEntry.getSignerType()), // SIGNER_TYPE
         col2Str(caEntry.getSignerConf()),  // SIGNER_CONF
         col2Str(Base64.encodeToString(encodedCert)), // CERT
@@ -439,19 +441,22 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
   } // method addRequestor
 
-  public void addEmbeddedRequestor(String requestorName) throws CaMgmtException {
+  public NameId addEmbeddedRequestor(String requestorName) throws CaMgmtException {
     requestorName = requestorName.toLowerCase();
 
     final String sql = SqlUtil.buildInsertSql("REQUESTOR", "ID,NAME,TYPE,CONF");
     int nextId = (int) getNextId(Table.REQUESTOR);
+    String name = "EMBEDDED";
 
     int num = execUpdatePrepStmt0(sql,
-          col2Int(nextId), col2Str(requestorName), col2Str("EMBEDDED"), col2Str("DEFAULT"));
+          col2Int(nextId), col2Str(requestorName), col2Str(name), col2Str("DEFAULT"));
 
     if (num == 0) {
       throw new CaMgmtException("could not add requestor " + requestorName);
     }
+
     LOG.info("added requestor '{}'", requestorName);
+    return new NameId(nextId, name);
   } // method addEmbeddedRequestor
 
   public void addRequestorToCa(CaHasRequestorEntry requestor, NameId ca) throws CaMgmtException {
@@ -469,7 +474,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       throw new CaMgmtException("could not add requestor " + requestorIdent + " to CA " + ca);
     }
 
-    LOG.info("added requestor '{}' to CA '{}': ermission: {}; profile: {}",
+    LOG.info("added requestor '{}' to CA '{}': permission: {}; profile: {}",
         requestorIdent, ca, requestor.getPermission(), profilesText);
   } // method addRequestorToCa
 
@@ -990,10 +995,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       throw new CaMgmtException(ex);
     }
   } // method generateCertchain
-
-  private static boolean getBoolean(ResultRow rs, String label) {
-    return rs.getBoolean(label);
-  }
 
   private static int getInt(ResultRow rs, String label) {
     return rs.getInt(label);

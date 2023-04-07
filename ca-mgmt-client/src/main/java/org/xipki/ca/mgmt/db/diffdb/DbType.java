@@ -15,5 +15,6 @@ enum DbType {
   XIPKI_CA_v5,
   XIPKI_CA_v6,
   XIPKI_CA_v7,
+  XIPKI_CA_v8,
   XIPKI_OCSP_v4
 }

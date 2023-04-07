@@ -162,7 +162,9 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   private final CmLicense license;
 
-  private DataSourceWrapper datasource;
+  private DataSourceWrapper caconfDatasource;
+
+  private DataSourceWrapper certstoreDatasource;
 
   private final String lockInstanceId;
 
@@ -341,10 +343,33 @@ public class CaManagerImpl implements CaManager, Closeable {
         throw new CaMgmtException("no datasource named 'ca' configured");
       }
 
-      this.datasource = loadDatasource("ca", caDatasourceConf);
+      FileOrValue caconfDatasourceConf = datasourceNameConfFileMap.remove("caconf");
+
+      if (caconfDatasourceConf != null) {
+        this.caconfDatasource = loadDatasource("caconf", caconfDatasourceConf);
+      } else {
+        this.caconfDatasource = loadDatasource("caconf", caconfDatasourceConf);
+      }
+      this.queryExecutor = new CaManagerQueryExecutor(this.caconfDatasource);
+      int dbSchemaVersion = this.queryExecutor.getDbSchemaVersion();
+      LOG.info("dbSchemaVersion: {}", dbSchemaVersion);
+
+      if (dbSchemaVersion < 8) {
+        if (caconfDatasourceConf != null) {
+          LOG.warn("ignore datasource named 'caconf'");
+        }
+        this.certstoreDatasource = caconfDatasource;
+      } else {
+        if (caconfDatasourceConf == null) {
+          throw new CaMgmtException("no datasource named 'caconf' configured");
+        }
+        this.certstoreDatasource = loadDatasource("ca", caDatasourceConf);
+      }
     }
 
-    this.queryExecutor = new CaManagerQueryExecutor(this.datasource);
+    // 2010-01-01T00:00:00.000 UTC
+    final long epochSecond = ZonedDateTime.of(2010, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).toEpochSecond();
+    UniqueIdGenerator idGen = new UniqueIdGenerator(epochSecond, shardId);
 
     if (masterMode) {
       if (!noLock) {
@@ -368,13 +393,9 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
 
-    // 2010-01-01T00:00:00.000 UTC
-    final long epochSecond = ZonedDateTime.of(2010, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).toEpochSecond();
-    UniqueIdGenerator idGen = new UniqueIdGenerator(epochSecond, shardId);
-
     boolean initSucc = true;
     try {
-      this.certstore = new CertStore(datasource, idGen, securityFactory.getPasswordResolver());
+      this.certstore = new CertStore(certstoreDatasource, caconfDatasource, idGen, securityFactory.getPasswordResolver());
     } catch (DataAccessException ex) {
       initSucc = false;
       LogUtil.error(LOG, ex, "error constructing CertStore");
@@ -427,6 +448,25 @@ public class CaManagerImpl implements CaManager, Closeable {
     } catch (CaMgmtException ex) {
       initSucc = false;
       LogUtil.error(LOG, ex, "error initCas");
+    }
+
+    // synchronize caconf and ca certstore databases
+    if (masterMode) {
+      for (CertprofileEntry entry : certprofileDbEntries.values()) {
+        certstore.addCertProfile(entry.getIdent());
+      }
+
+      if (byCaRequestor != null) {
+        certstore.addRequestor(byCaRequestor.getIdent());
+      }
+
+      for (RequestorEntry entry : requestorDbEntries.values()) {
+        certstore.addRequestor(entry.getIdent());
+      }
+
+      for (CaInfo entry : caInfos.values()) {
+        certstore.addCa(entry.getIdent(), entry.getCert());
+      }
     }
 
     if (!initSucc) {
@@ -747,13 +787,22 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
 
-    if (datasource != null) {
+    if (caconfDatasource != null) {
       try {
-        datasource.close();
+        caconfDatasource.close();
       } catch (Exception ex) {
         LogUtil.warn(LOG, ex, concat("could not close datasource ca"));
       }
     }
+
+    if (certstoreDatasource != null) {
+      try {
+        certstoreDatasource.close();
+      } catch (Exception ex) {
+        LogUtil.warn(LOG, ex, concat("could not close datasource certstore"));
+      }
+    }
+
 
     publisherManager.close();
     certprofileManager.close();
@@ -827,7 +876,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public void addCa(CaEntry caEntry) throws CaMgmtException {
-    ca2Manager.addCa(caEntry);
+    ca2Manager.addCa(caEntry, certstore);
   }
 
   @Override
@@ -883,10 +932,13 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void addRequestor(RequestorEntry requestorEntry) throws CaMgmtException {
     requestorManager.addRequestor(requestorEntry);
+    certstore.addRequestor(requestorEntry.getIdent());
   }
 
   @Override
   public void removeRequestor(String name) throws CaMgmtException {
+    assertMasterMode();
+    certstore.removeRequestor(name);
     requestorManager.removeRequestor(name);
   }
 
@@ -912,6 +964,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public void removeCertprofile(String name) throws CaMgmtException {
+    assertMasterMode();
+    certstore.removeCertProfile(name);
     certprofileManager.removeCertprofile(name);
   }
 
@@ -923,6 +977,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void addCertprofile(CertprofileEntry certprofileEntry) throws CaMgmtException {
     certprofileManager.addCertprofile(certprofileEntry);
+    certstore.addCertProfile(certprofileEntry.getIdent());
   }
 
   public CertprofileInfoResponse getCertprofileInfo(String profileName) throws OperationException {
@@ -1029,6 +1084,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public void removeCa(String name) throws CaMgmtException {
+    assertMasterMode();
+    certstore.removeCa(name);
     ca2Manager.removeCa(name);
   }
 
@@ -1041,11 +1098,13 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {
     ca2Manager.revokeCa(caName, revocationInfo);
+    certstore.revokeCa(caName, revocationInfo);
   }
 
   @Override
   public void unrevokeCa(String caName) throws CaMgmtException {
     ca2Manager.unrevokeCa(caName);
+    certstore.unrevokeCa(caName);
   }
 
   public void setCertprofileFactoryRegister(CertprofileFactoryRegister register) {
@@ -1134,7 +1193,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   public X509Cert generateRootCa(
       CaEntry caEntry, String profileName, String subject, String serialNumber, Instant notBefore, Instant notAfter)
       throws CaMgmtException {
-    return ca2Manager.generateRootCa(caEntry, profileName, subject, serialNumber, notBefore, notAfter);
+    return ca2Manager.generateRootCa(caEntry, profileName, subject, serialNumber,
+        notBefore, notAfter, certstore);
   }
 
   void assertMasterMode() throws CaMgmtException {

@@ -623,9 +623,9 @@ public class CaCertstore extends ValidatableConf {
       notNull(caId, "caId");
       notNull(ee, "ee");
       notBlank(file, "file");
-      notNull(pid, "pid");
+      //notNull(pid, "pid");
       notNull(rev, "rev");
-      notNull(rid, "rid");
+      //notNull(rid, "rid");
       notBlank(sn, "sn");
       notNull(update, "update");
       notNull(crlScope, "crlScope");

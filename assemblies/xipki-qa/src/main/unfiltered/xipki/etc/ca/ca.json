@@ -13,6 +13,11 @@
 			"file":"etc/ca/database/ca-db.properties"
 		}
 	},{
+		"name":"caconf",
+		"conf":{
+			"file":"etc/ca/database/caconf-db.properties"
+		}
+	},{
 		"name":"ocsp",
 		"conf":{
 			"file":"etc/ca/database/ocsp-db.properties"

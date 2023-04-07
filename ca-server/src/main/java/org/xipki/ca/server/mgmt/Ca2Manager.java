@@ -26,11 +26,11 @@ import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.server.*;
 import org.xipki.ca.server.db.CaManagerQueryExecutor;
+import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.mgmt.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.RandomUtil;
 import org.xipki.util.StringUtil;
@@ -256,7 +256,7 @@ class Ca2Manager {
     return true;
   } // method createCa
 
-  void addCa(CaEntry caEntry) throws CaMgmtException {
+  void addCa(CaEntry caEntry, CertStore certstore) throws CaMgmtException {
     assertMasterMode();
 
     notNull(caEntry, "caEntry");
@@ -294,6 +294,7 @@ class Ca2Manager {
     }
 
     manager.queryExecutor.addCa(caEntry);
+    certstore.addCa(caEntry.getIdent(), caEntry.getCert());
     if (createCa(name)) {
       if (startCa(name)) {
         LOG.info("started CA {}", name);
@@ -501,7 +502,8 @@ class Ca2Manager {
   } // method getX509Ca
 
   X509Cert generateRootCa(CaEntry caEntry, String profileName, String subject,
-                          String serialNumber, Instant notBefore, Instant notAfter) throws CaMgmtException {
+                          String serialNumber, Instant notBefore, Instant notAfter, CertStore certstore)
+      throws CaMgmtException {
     assertMasterModeAndSetuped();
 
     notNull(caEntry, "caEntry");
@@ -576,7 +578,8 @@ class Ca2Manager {
     entry.setSignerConf(signerConf);
     entry.setCert(caCert);
 
-    addCa(entry);
+    addCa(entry, certstore);
+
     return caCert;
   } // method generateRootCa
 

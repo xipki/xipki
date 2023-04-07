@@ -40,11 +40,15 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
 
   protected int dbSchemaVersion;
 
+  protected int maxX500nameLen;
+
   CaManagerQueryExecutorBase(DataSourceWrapper datasource) throws CaMgmtException {
     super(datasource);
     try {
       DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
       this.dbSchemaVersion = Integer.parseInt(dbSchemaInfo.variableValue("VERSION"));
+      String str = dbSchemaInfo.variableValue("X500NAME_MAXLEN");
+      this.maxX500nameLen = str != null ? Integer.parseInt(str) : 350;
     } catch (DataAccessException ex) {
       throw new CaMgmtException(ex);
     }
@@ -56,6 +60,10 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
 
   public int getDbSchemaVersion() {
     return dbSchemaVersion;
+  }
+
+  public int getMaxX500nameLen() {
+    return maxX500nameLen;
   }
 
   protected String buildSelectFirstSql(String coreSql) {

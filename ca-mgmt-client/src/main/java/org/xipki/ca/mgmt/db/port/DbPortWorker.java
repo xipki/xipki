@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.mgmt.db.DbWorker;
 import org.xipki.datasource.DataSourceFactory;
+import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.util.Args;
@@ -23,10 +24,12 @@ import org.xipki.util.StringUtil;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Clock;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Worker for database export / import.
@@ -138,49 +141,55 @@ public abstract class DbPortWorker extends DbWorker {
 
     private final int batchEntriesPerCommit;
 
-    public ImportCaDb(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String dbConfFile,
+    private DataSourceWrapper caDataSource;
+
+    public ImportCaDb(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
+                      String caConfDbFile, String caDbFile,
                       boolean resume, String srcFolder, int batchEntriesPerCommit, char[] password)
         throws PasswordResolverException, IOException {
-      super(datasourceFactory, passwordResolver, dbConfFile, password);
+      super(datasourceFactory, passwordResolver, caConfDbFile, password);
       this.resume = resume;
       this.srcFolder = IoUtil.expandFilepath(srcFolder);
       this.batchEntriesPerCommit = batchEntriesPerCommit;
+
+      Properties props = DbPorter.getDbConfProperties(Files.newInputStream(
+                            Paths.get(IoUtil.expandFilepath(caDbFile))));
+      this.caDataSource = datasourceFactory.createDataSource("ds-" + caDbFile,
+                            props, passwordResolver);
     }
 
     @Override
     protected void run0() throws Exception {
-      if (password != null) {
-        decrypt(srcFolder);
-      }
-
-      try {
-        File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
-        if (resume) {
-          if (!processLogFile.exists()) {
-            throw new Exception("could not process with '--resume' option");
-          }
-        } else {
-          if (processLogFile.exists()) {
-            throw new Exception("please either specify '--resume' option or delete the file "
-                    + processLogFile.getPath() + " first");
-          }
+      File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
+      if (resume) {
+        if (!processLogFile.exists()) {
+          throw new Exception("could not process with '--resume' option");
         }
-      } finally {
-        deleteDecryptedFiles(srcFolder);
+      } else {
+        if (processLogFile.exists()) {
+          throw new Exception("please either specify '--resume' option or delete the file "
+              + processLogFile.getPath() + " first");
+        }
       }
 
       long start = Clock.systemUTC().millis();
       try {
+        if (password != null) {
+          decrypt(srcFolder);
+        }
+
+        CaconfDbImporter caConfImporter = new CaconfDbImporter(datasource, srcFolder, stopMe);
         if (!resume) {
           // CAConfiguration
-          CaconfDbImporter caConfImporter = new CaconfDbImporter(datasource, srcFolder, stopMe);
           caConfImporter.importToDb();
           caConfImporter.close();
         }
 
+        CaCertstore.Caconf caconf = caConfImporter.getCaConf();
+
         // CertStore
-        CaCertstoreDbImporter certStoreImporter = new CaCertstoreDbImporter(datasource,
-                srcFolder, batchEntriesPerCommit, resume, stopMe);
+        CaCertstoreDbImporter certStoreImporter = new CaCertstoreDbImporter(caDataSource,
+                srcFolder, batchEntriesPerCommit, resume, stopMe, caconf);
         certStoreImporter.importToDb();
         certStoreImporter.close();
       } finally {
@@ -188,6 +197,11 @@ public abstract class DbPortWorker extends DbWorker {
           datasource.close();
         } catch (Throwable th) {
           LOG.error("datasource.close()", th);
+        }
+        try {
+          caDataSource.close();
+        } catch (Throwable th) {
+          LOG.error("certStoreDataSource.close()", th);
         }
         deleteDecryptedFiles(srcFolder);
         printFinishedIn(start);
@@ -206,16 +220,23 @@ public abstract class DbPortWorker extends DbWorker {
 
     private final int numCertsPerSelect;
 
+    private final DataSourceWrapper caDataSource;
+
     public ExportCaDb(
-        DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String dbConfFile,
+        DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String caConfDbFile, String caDbFile,
         String destFolder, boolean resume, int numCertsInBundle, int numCertsPerSelect, char[] password)
         throws PasswordResolverException, IOException {
-      super(datasourceFactory, passwordResolver, dbConfFile, password);
+      super(datasourceFactory, passwordResolver, caConfDbFile != null ? caConfDbFile : caDbFile, password);
       this.destFolder = IoUtil.expandFilepath(destFolder);
       this.resume = resume;
       this.numCertsInBundle = numCertsInBundle;
       this.numCertsPerSelect = numCertsPerSelect;
       checkDestFolder();
+
+      Properties props = DbPorter.getDbConfProperties(Files.newInputStream(
+          Paths.get(IoUtil.expandFilepath(caDbFile))));
+      this.caDataSource = datasourceFactory.createDataSource("ds-" + caDbFile,
+          props, passwordResolver);
     }
 
     private void checkDestFolder() throws IOException {
@@ -257,7 +278,7 @@ public abstract class DbPortWorker extends DbWorker {
         }
 
         // CertStore
-        CaCertstoreDbExporter certStoreExporter = new CaCertstoreDbExporter(datasource, destFolder,
+        CaCertstoreDbExporter certStoreExporter = new CaCertstoreDbExporter(caDataSource, destFolder,
             numCertsInBundle, numCertsPerSelect, resume, stopMe);
         certStoreExporter.export();
         certStoreExporter.close();

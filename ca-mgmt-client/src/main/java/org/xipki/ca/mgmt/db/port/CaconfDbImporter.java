@@ -10,6 +10,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,18 +34,23 @@ import static org.xipki.util.SqlUtil.buildInsertSql;
 
 class CaconfDbImporter extends DbPorter {
 
-  CaconfDbImporter(DataSourceWrapper datasource, String srcDir, AtomicBoolean stopMe)
-      throws DataAccessException {
-    super(datasource, srcDir, stopMe);
-  }
+  private CaCertstore.Caconf caconf;
 
-  public void importToDb() throws Exception {
-    CaCertstore.Caconf caconf;
+  CaconfDbImporter(DataSourceWrapper datasource, String srcDir, AtomicBoolean stopMe)
+      throws DataAccessException, IOException, InvalidConfException {
+    super(datasource, srcDir, stopMe);
+
     try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_CA_CONFIGURATION))) {
       caconf = JSON.parseObject(is, CaCertstore.Caconf.class);
     }
     caconf.validate();
+  }
 
+  public CaCertstore.Caconf getCaConf() {
+    return caconf;
+  }
+
+  public void importToDb() throws Exception {
     if (caconf.getVersion() > VERSION_V2) {
       throw new Exception("could not import CA configuration greater than " + VERSION_V2 + ": " + caconf.getVersion());
     }
@@ -56,7 +62,7 @@ class CaconfDbImporter extends DbPorter {
       importRequestor(caconf.getRequestors());
       importPublisher(caconf.getPublishers());
       importProfile(caconf.getProfiles());
-      importCa(caconf.getCas(), caconf.getVersion());
+      importCa(caconf.getCas());
       importCaalias(caconf.getCaaliases());
       importCaHasRequestor(caconf.getCaHasRequestors());
       importCaHasPublisher(caconf.getCaHasPublishers());
@@ -292,7 +298,7 @@ class CaconfDbImporter extends DbPorter {
     }
   } // method importKeypairGen
 
-  private void importCa(List<CaCertstore.Ca> cas, int confVersion)
+  private void importCa(List<CaCertstore.Ca> cas)
       throws DataAccessException, CertificateException, IOException {
     System.out.print("    importing table CA ... ");
     boolean succ = false;

@@ -12,8 +12,8 @@ OS_NAME = $(osinfo --name)
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties"
 ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
 
-DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/certstore-db.properties"
-ca:sql --force --db-conf "${DB_CONF}" xipki/sql/certstore-init.sql
+DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/caconf-db.properties"
+ca:sql --force --db-conf "${DB_CONF}" xipki/sql/caconf-init.sql
 
 ## OCSP Database
 

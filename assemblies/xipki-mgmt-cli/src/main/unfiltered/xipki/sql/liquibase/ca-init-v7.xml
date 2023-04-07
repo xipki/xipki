@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ v7: XiPKI version 6.0.0, changes compared to v6
+   - Table CRL:  add column SHA1
+   - Table CA:   merge columns to a new column CONF, remove columns
+   -             CMP_SIGNER_NAME, SCEP_SIGNER_NAME, PROTOCOL_SUPPORT
+   - Table CERT: add column PRIVATE_KEY, remove columns UID, RTYPE
+   - Table CA_HAS_REQUESTOR: remove column RA
+   - Add table KEYPAIR_GEN
+   - Remove tables TUSER, CA_HAS_USER, REQUEST, REQCERT
+
+ Maximal column size: 4k
+  - DB2: PAGESIZE 4 k
+-->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+  logicalFilePath="ca-init.xml">
+  <property name="cert.cert.type" value="VARCHAR(6000)"/>
+  <property name="x500name.type" value="VARCHAR(350)"/>
+  <!-- 100 MB for DB2 -->
+  <property name="crl.data.type" value="CLOB(104857600)" dbms="db2"/>
+  <property name="crl.data.type" value="CLOB" dbms="oracle,postgresql,mysql,mariadb,h2,hsqldb"/>
+  <!-- CA configuration :: create table -->
+  <changeSet author="xipki" id="1">
+    <!-- table DBSCHEMA -->
+    <createTable tableName="DBSCHEMA">
+      <!--remarks="database schema information"-->
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="VALUE2" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="VENDOR"/>
+      <column name="VALUE2" value="XIPKI"/>
+    </insert>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="VERSION"/>
+      <column name="VALUE2" value="7"/>
+    </insert>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="X500NAME_MAXLEN"/>
+      <!-- must be the length of x500name.type -->
+      <column name="VALUE2" value="350"/>
+    </insert>
+    <!-- table SYSTEM_EVENT -->
+    <createTable tableName="SYSTEM_EVENT">
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="EVENT_TIME" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="EVENT_TIME2" type="TIMESTAMP"/>
+      <column name="EVENT_OWNER" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <!-- table KEYPAIR_GEN -->
+    <createTable tableName="KEYPAIR_GEN">
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="TYPE" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CONF" type="CLOB"/>
+    </createTable>
+    <insert tableName="KEYPAIR_GEN">
+      <column name="NAME" value="software"/>
+      <column name="TYPE" value="SOFTWARE"/>
+    </insert>
+    <!-- table SIGNER -->
+    <createTable tableName="SIGNER">
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="TYPE" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CERT" type="${cert.cert.type}"/>
+      <column name="CONF" type="CLOB"/>
+    </createTable>
+    <!-- table REQUESTOR -->
+    <createTable tableName="REQUESTOR">
+      <column name="ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints nullable="false"/>
+        <!--remarks="duplication is not permitted"-->
+      </column>
+      <column name="TYPE" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CONF" type="CLOB"/>
+    </createTable>
+    <addUniqueConstraint tableName="REQUESTOR" columnNames="NAME" constraintName="CONST_REQUESTOR_NAME"/>
+    <!-- table PUBLISHER -->
+    <createTable tableName="PUBLISHER">
+      <column name="ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="NAME" type="VARCHAR(45)" remarks="duplication is not permitted">
+        <constraints nullable="false"/>
+      </column>
+      <column name="TYPE" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CONF" type="CLOB"/>
+    </createTable>
+    <addUniqueConstraint tableName="PUBLISHER" columnNames="NAME" constraintName="CONST_PUBLISHER_NAME"/>
+    <!-- table "PROFILE" -->
+    <createTable tableName="PROFILE">
+      <column name="ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="NAME" type="VARCHAR(45)" remarks="duplication is not permitted">
+        <constraints nullable="false"/>
+      </column>
+      <column name="TYPE" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CONF" type="CLOB" remarks="profile data, depends on the type">
+      </column>
+    </createTable>
+    <addUniqueConstraint tableName="PROFILE" columnNames="NAME" constraintName="CONST_PROFILE_NAME"/>
+    <!-- table CA -->
+    <createTable tableName="CA">
+      <column name="ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="NAME" type="VARCHAR(45)" remarks="duplication is not permitted">
+        <constraints nullable="false"/>
+      </column>
+      <column name="STATUS" type="VARCHAR(10)" remarks="valid values: active, inactive">
+        <constraints nullable="false"/>
+      </column>
+      <column name="NEXT_CRLNO" type="BIGINT"/>
+      <column name="CRL_SIGNER_NAME" type="VARCHAR(45)"/>
+      <column name="SUBJECT" type="${x500name.type}">
+        <constraints nullable="false"/>
+      </column>
+      <column name="REV_INFO" type="varchar(200)" remarks="CA revocation information">
+      </column>
+      <column name="CERT" type="VARCHAR(6000)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SIGNER_TYPE" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SIGNER_CONF" type="CLOB">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CERTCHAIN" type="CLOB" remarks="Certificate chain without CA's certificate">
+      </column>
+      <column name="CONF" type="CLOB">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addUniqueConstraint tableName="CA" columnNames="NAME" constraintName="CONST_CA_NAME"/>
+    <!-- table CAALIAS -->
+    <createTable tableName="CAALIAS">
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="CA_ID" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <!-- table CA_HAS_REQUESTOR -->
+    <createTable tableName="CA_HAS_REQUESTOR">
+      <column name="CA_ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="REQUESTOR_ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="PERMISSION" type="INT"/>
+      <column name="PROFILES" type="VARCHAR(500)"/>
+    </createTable>
+    <!-- table CA_HAS_PUBLISHER -->
+    <createTable tableName="CA_HAS_PUBLISHER">
+      <column name="CA_ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="PUBLISHER_ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+    </createTable>
+    <!-- table CA_HAS_PROFILE -->
+    <createTable tableName="CA_HAS_PROFILE">
+      <column name="CA_ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="PROFILE_ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  <changeSet author="xipki" id="2">
+    <!-- table CRL -->
+    <createTable tableName="CRL">
+      <column name="ID" type="INT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="CA_ID" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CRL_SCOPE" type="SMALLINT" remarks="CRL scope, reserved for future use">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CRL_NO" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="THISUPDATE" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="NEXTUPDATE" type="BIGINT"/>
+      <column name="DELTACRL" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="BASECRL_NO" type="BIGINT"/>
+      <column name="SHA1" type="CHAR(28)" remarks="base64 encoded SHA1 fingerprint of the CRL">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CRL" type="${crl.data.type}">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addUniqueConstraint tableName="CRL" columnNames="CA_ID, CRL_NO" constraintName="CONST_CA_CRLNO"/>
+    <!-- table CERT -->
+    <createTable tableName="CERT">
+      <column name="ID" type="BIGINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="CA_ID" type="SMALLINT" remarks="Issuer (CA) id">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SN" type="VARCHAR(40)" remarks="serial number">
+        <constraints nullable="false"/>
+      </column>
+      <column name="PID" type="SMALLINT" remarks="certificate profile id">
+        <constraints nullable="false"/>
+      </column>
+      <column name="RID" type="SMALLINT" remarks="requestor id">
+      </column>
+      <column name="FP_S" type="BIGINT" remarks="first 8 bytes of the SHA1 sum of the subject">
+        <constraints nullable="false"/>
+      </column>
+      <column name="FP_SAN" type="BIGINT" remarks="first 8 bytes of the SHA1 sum of the extension value of SubjectAltNames">
+        <constraints nullable="true"/>
+      </column>
+      <column name="FP_RS" type="BIGINT" remarks="first 8 bytes of the SHA1 sum of the requested subject">
+      </column>
+      <column name="LUPDATE" type="BIGINT" remarks="last update, seconds since January 1, 1970, 00:00:00 GMT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="NBEFORE" type="BIGINT" remarks="notBefore, seconds since January 1, 1970, 00:00:00 GMT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="NAFTER" type="BIGINT" remarks="notAfter, seconds since January 1, 1970, 00:00:00 GMT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="REV" type="SMALLINT" remarks="whether the certificate is revoked">
+        <constraints nullable="false"/>
+      </column>
+      <column name="RR" type="SMALLINT" remarks="revocation reason">
+      </column>
+      <column name="RT"  type="BIGINT" remarks="revocation time, seconds since January 1, 1970, 00:00:00 GMT">
+      </column>
+      <column name="RIT" type="BIGINT" remarks="revocation invalidity time, seconds since January 1, 1970, 00:00:00 GMT">
+      </column>
+      <column name="EE" type="SMALLINT" remarks="whether it is an end entity cert">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SUBJECT" type="${x500name.type}">
+        <constraints nullable="false"/>
+      </column>
+      <column name="TID" type="VARCHAR(43)" remarks="base64 encoded transactionId, maximal 256 bit">
+      </column>
+      <column name="CRL_SCOPE" type="SMALLINT" remarks="CRL scope, reserved for future use">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SHA1" type="CHAR(28)" remarks="base64 encoded SHA1 fingerprint of the certificate">
+        <constraints nullable="false"/>
+      </column>
+      <column name="REQ_SUBJECT" type="${x500name.type}"/>
+      <column name="CERT" type="VARCHAR(6000)" remarks="Base64 encoded certificate">
+        <constraints nullable="false"/>
+      </column>
+      <column name="PRIVATE_KEY" type="VARCHAR(6000)" remarks="Base64-encoded encrypted PKCS#8 private key">
+        <!--
+          key-name : keyid : algorithm : base64(iv) : base64 (encrypted private key), where
+          the algorithm is 1 for AES/GCM/NoPadding.
+        -->
+      </column>
+    </createTable>
+    <addUniqueConstraint tableName="CERT" columnNames="CA_ID, SN" constraintName="CONST_CA_SN"/>
+    <createIndex tableName="CERT" unique="false" indexName="IDX_CA_FPS">
+      <column name="CA_ID"/>
+      <column name="FP_S"/>
+      <column name="FP_SAN"/>
+    </createIndex>
+    <!-- table PUBLISHQUEUE -->
+    <createTable tableName="PUBLISHQUEUE">
+      <column name="CID" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="PID" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CA_ID" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  <!-- CA Configuration :: foreign key -->
+  <changeSet author="xipki" id="3">
+    <addForeignKeyConstraint constraintName="FK_CA_CRL_SIGNER1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
+      baseColumnNames="CRL_SIGNER_NAME" baseTableName="CA"
+      referencedColumnNames="NAME" referencedTableName="SIGNER"/>
+    <addForeignKeyConstraint constraintName="FK_CAALIAS_CA1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CA_ID" baseTableName="CAALIAS"
+      referencedColumnNames="ID" referencedTableName="CA"/>
+    <!-- ca_has_requestor -->
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_REQUESTOR_REQUESTOR1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="REQUESTOR_ID" baseTableName="CA_HAS_REQUESTOR"
+      referencedColumnNames="ID" referencedTableName="REQUESTOR"/>
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_REQUESTOR_CA1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CA_ID" baseTableName="CA_HAS_REQUESTOR"
+      referencedColumnNames="ID" referencedTableName="CA"/>
+    <!-- ca_has_publisher -->
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_PUBLISHER_PUBLISHER1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="PUBLISHER_ID" baseTableName="CA_HAS_PUBLISHER"
+      referencedColumnNames="ID" referencedTableName="PUBLISHER"/>
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_PUBLISHER_CA1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CA_ID" baseTableName="CA_HAS_PUBLISHER"
+      referencedColumnNames="ID" referencedTableName="CA"/>
+    <!-- CA_HAS_PROFILE -->
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_PROFILE_PROFILE1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="PROFILE_ID" baseTableName="CA_HAS_PROFILE"
+      referencedColumnNames="ID" referencedTableName="PROFILE"/>
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_PROFILE_CA1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CA_ID" baseTableName="CA_HAS_PROFILE"
+      referencedColumnNames="ID" referencedTableName="CA"/>
+  </changeSet>
+  <!-- CertStore :: foreign key -->
+  <changeSet author="xipki" id="4">
+    <addForeignKeyConstraint constraintName="FK_CRL_CA1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
+      baseColumnNames="CA_ID" baseTableName="CRL"
+      referencedColumnNames="ID" referencedTableName="CA"/>
+    <addForeignKeyConstraint constraintName="FK_CERT_CA1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
+      baseColumnNames="CA_ID" baseTableName="CERT"
+      referencedColumnNames="ID" referencedTableName="CA"/>
+     <addForeignKeyConstraint constraintName="FK_CERT_REQUESTOR1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
+      baseColumnNames="RID" baseTableName="CERT"
+      referencedColumnNames="ID" referencedTableName="REQUESTOR"/>
+    <addForeignKeyConstraint constraintName="FK_CERT_PROFILE1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
+      baseColumnNames="PID" baseTableName="CERT"
+      referencedColumnNames="ID" referencedTableName="PROFILE"/>
+    <!-- Remove the foreignKey constraint due to unsync. in some
+         high-available database systems-->
+    <addForeignKeyConstraint constraintName="FK_PUBLISHQUEUE_PUBLISHER1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="PID" baseTableName="PUBLISHQUEUE"
+      referencedColumnNames="ID" referencedTableName="PUBLISHER"/>
+    <addForeignKeyConstraint constraintName="FK_PUBLISHQUEUE_CERT1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CID" baseTableName="PUBLISHQUEUE"
+      referencedColumnNames="ID" referencedTableName="CERT"/>
+  </changeSet>
+</databaseChangeLog>
+
