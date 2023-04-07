@@ -30,6 +30,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CRLException;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -91,10 +92,15 @@ public class X509CrlModule extends X509CaModule implements Closeable {
             getScheduledCrlGenTimeNotAfter(Instant.ofEpochSecond(lastIssueTimeOfFullCrl));
         Instant nextScheduledCrlIssueTime = nearestScheduledCrlIssueTime.plus(
             (long) control.getFullCrlIntervals() * control.getIntervalHours(), ChronoUnit.HOURS);
-        // delay: shardId * 10 seconds
-        if (nextScheduledCrlIssueTime.getEpochSecond() > now.getEpochSecond() + shardId * 10L) {
-          // at least one interval was skipped
-          createFullCrlNow = true;
+        // whether the next scheduled CRL should be generated before now.
+        createFullCrlNow = nextScheduledCrlIssueTime.isBefore(now);
+
+        if (createFullCrlNow) {
+          // delay: shardId * 10 seconds
+          if (Duration.between(nextScheduledCrlIssueTime, now).getSeconds() < shardId * 10L) {
+            // wait, other instances with lower shardId may also generate the CRL.
+            createFullCrlNow = false;
+          }
         }
       }
 
@@ -108,10 +114,15 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         Instant nearestScheduledCrlIssueTime = getScheduledCrlGenTimeNotAfter(Instant.ofEpochSecond(lastIssueTime));
         Instant nextScheduledCrlIssueTime = nearestScheduledCrlIssueTime.plus(
             (long) control.getDeltaCrlIntervals() * control.getIntervalHours(), ChronoUnit.HOURS);
-        // delay: shardId * 10 seconds
-        if (nextScheduledCrlIssueTime.getEpochSecond() > now.getEpochSecond() + shardId * 10L) {
-          // at least one interval was skipped
-          createDeltaCrlNow = true;
+        // whether the next scheduled CRL should be generated before now.
+        createDeltaCrlNow = nextScheduledCrlIssueTime.isBefore(now);
+
+        if (createDeltaCrlNow) {
+          // delay: shardId * 10 seconds
+          if (Duration.between(nextScheduledCrlIssueTime, now).getSeconds() < shardId * 10L) {
+            // wait, other instances with lower shardId may also generate the CRL.
+            createDeltaCrlNow = false;
+          }
         }
       }
 
@@ -376,8 +387,8 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       }
     }
 
-    LOG.info("     START generateCrl: ca={}, deltaCRL={}, nextUpdate={}, baseCRLNumber={}",
-        caIdent.getName(), deltaCrl, nextUpdate, deltaCrl ? baseCrlNumber : "-");
+    LOG.info("     START generateCrl: ca={}, deltaCRL={}, thisUpdate={}, nextUpdate={}, baseCRLNumber={}",
+        caIdent.getName(), deltaCrl, thisUpdate, nextUpdate, deltaCrl ? baseCrlNumber : "-");
     event.addEventData(NAME_crl_type, (deltaCrl ? "DELTA_CRL" : "FULL_CRL"));
 
     if (nextUpdate == null) {
@@ -578,7 +589,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       // check again
       if (scheduled) {
         long lastIssueTimeOfFullCrl = certstore.getThisUpdateOfCurrentCrl(caIdent, deltaCrl);
-        if (lastIssueTimeOfFullCrl + 10L < thisUpdate.getEpochSecond()) {
+        if (lastIssueTimeOfFullCrl > thisUpdate.getEpochSecond() - 10) {
           // CRL generated in the last time by other instance, ignore my own.
           successful = true;
           LOG.info("IGNORE generateCrl: ca={}", caIdent.getName());
