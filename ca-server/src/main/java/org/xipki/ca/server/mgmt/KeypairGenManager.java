@@ -10,8 +10,10 @@ import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
 import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.KeypairGenEntryWrapper;
+import org.xipki.util.LogUtil;
 import org.xipki.util.exception.ObjectCreationException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +42,16 @@ class KeypairGenManager {
 
   void reset() {
     keypairGenInitialized = false;
+  }
+
+  void close() {
+    for (KeypairGenEntryWrapper entry : manager.keypairGens.values()) {
+      try {
+        entry.getGenerator().close();
+      } catch (IOException e) {
+        LogUtil.warn(LOG, e, "error closing keypair generator " + entry.getDbEntry().getName());
+      }
+    }
   }
 
   void initKeypairGens() throws CaMgmtException {

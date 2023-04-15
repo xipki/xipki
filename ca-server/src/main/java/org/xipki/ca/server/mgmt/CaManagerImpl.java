@@ -803,7 +803,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
 
-
+    keypairGenManager.close();
     publisherManager.close();
     certprofileManager.close();
 
