@@ -67,18 +67,8 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.4tinylog.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.tinylog</groupId>
-      <artifactId>slf4j-tinylog</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.tinylog</groupId>
-      <artifactId>tinylog-impl</artifactId>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

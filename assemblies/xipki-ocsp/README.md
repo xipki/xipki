@@ -59,8 +59,6 @@ scep-client-*.jar,\
 security-*.jar,\
 slf4j-*.jar,\
 *pkcs11wrapper-*.jar,\
-*-tinylog.jar,\
-tinylog*.jar,\
 util-*.jar,\
 xipki-tomcat-password-*.jar
 ```

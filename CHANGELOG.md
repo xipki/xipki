@@ -8,6 +8,11 @@ See also <https://github.com/xipki/xipki/releases>
 - CA
     - Do not check the uniqueness of serial number in database if it contains 
       at least 95 random bits.
+    - Fixed bug "the scheduled generation of CRLs does not work".
+    - Split the database of CA to 2 databases: 1 only for the CA's
+      configuration, and 1 for the generated certificate and CRLs.
+      Note: software of this version works also with databases of verions
+      between 6.0.0 and 6.2.x.
 - OCSP
     - N/A
 - Gateway
@@ -17,6 +22,8 @@ See also <https://github.com/xipki/xipki/releases>
 - MGMT-CLI (Management Client)
     - N/A
 - Dependencies
+    - bouncycastle: 1.72 --> 1.73
+    - replace tinylog with log4j2 v2.19.0.
     - N/A
 
 ## 6.2.0

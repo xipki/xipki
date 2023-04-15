@@ -21,7 +21,7 @@
 		"responsePbmOwf":"SHA256",
 		"responsePbmIterationCount":10240
 	},
-	// If set to true, please set writer.level to debug in the file META-INF/classes/tinylog.properties.
+	// If set to true, please set writer.level to debug in the file META-INF/classes/log4j2.properties.
 	"logReqResp":false,
 	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
 	"pop":{

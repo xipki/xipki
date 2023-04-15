@@ -1,5 +1,5 @@
 {
-	// If set to true, please set writer.level to debug in the file META-INF/classes/tinylog.properties.
+	// If set to true, please set writer.level to debug in the file META-INF/classes/log4j2.properties.
 	"logReqResp": false,
 	"serverConf":"etc/ocsp/ocsp-responder.json",
 	"security":{
