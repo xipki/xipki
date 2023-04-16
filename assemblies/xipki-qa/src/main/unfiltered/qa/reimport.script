@@ -14,7 +14,7 @@ echo "==========================================================================
 echo "||                             Export CA Database                         ||"
 echo "============================================================================"
 
-ca:export-ca --out-dir output/dbexport/ca \
+ca:export-ca --out-dir output/dbexport/ca --password 1234 \
   --caconf-db-conf ${CA_XIPKI_DIR}/etc/ca/database/caconf-db.properties \
   --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties
 
@@ -24,12 +24,47 @@ echo "==========================================================================
 echo "||                            Export OCSP Database                        ||"
 echo "============================================================================"
 
-ca:export-ocsp --out-dir output/dbexport/ocsp \
+ca:export-ocsp --out-dir output/dbexport/ocsp --password 1234 \
   --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties
 
 # Reset the CA and OCSP database
 
 ## Import CA
+
+echo "============================================================================"
+echo "||               Import CA Database (DBSCHEMA.VERSION=7)                  ||"
+echo "============================================================================"
+
+OS_NAME = $(osinfo --name)
+
+## CA Database
+
+DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties"
+ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ca-init-v7-sql/ca-init.sql
+
+ca:import-ca --in-dir output/dbexport/ca --password 1234 \
+  --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties
+
+## Restart the CA
+
+echo "Sleeping 1 second"
+sleep 1
+
+ca:restart
+
+## Export CA
+echo "============================================================================"
+echo "||                Export CA Database (DBSCHEMA.VERSION=7)                  ||"
+echo "============================================================================"
+
+ca:export-ca --out-dir output/dbexport/ca-v7 --password 1234 \
+  --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties
+
+DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties"
+ca:sql --force --db-conf "${DB_CONF}" qa/sql/qa-ca-init.sql
+
+DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/caconf-db.properties"
+ca:sql --force --db-conf "${DB_CONF}" qa/sql/qa-ca-init.sql
 
 echo "============================================================================"
 echo "||                             Import CA Database                         ||"
@@ -45,7 +80,7 @@ ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/caconf-db.properties"
 ca:sql --force --db-conf "${DB_CONF}" xipki/sql/caconf-init.sql
 
-ca:import-ca --in-dir output/dbexport/ca \
+ca:import-ca --in-dir output/dbexport/ca --password 1234 \
   --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties \
   --caconf-db-conf ${CA_XIPKI_DIR}/etc/ca/database/caconf-db.properties
 
@@ -60,7 +95,7 @@ echo "==========================================================================
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties"
 ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ocsp-init.sql
 
-ca:import-ocsp --in-dir output/dbexport/ocsp \
+ca:import-ocsp --in-dir output/dbexport/ocsp --password 1234 \
   --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties
 
 ## Import OCSP FROM CA
@@ -72,7 +107,7 @@ echo "==========================================================================
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties"
 ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ocsp-init.sql
 
-ca:import-ocspfromca --in-dir output/dbexport/ca \
+ca:import-ocspfromca --in-dir output/dbexport/ca --password 1234 \
   --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties
 
 ## Restart the CA
