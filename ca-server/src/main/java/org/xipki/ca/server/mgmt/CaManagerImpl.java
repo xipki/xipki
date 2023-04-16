@@ -144,7 +144,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   int shardId;
 
-  Map<String, FileOrValue> datasourceNameConfFileMap;
+  Map<String, DataSourceWrapper> datasourceMap;
 
   CaServerConf caServerConf;
 
@@ -324,13 +324,13 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
 
-    if (this.datasourceNameConfFileMap == null) {
-      this.datasourceNameConfFileMap = new ConcurrentHashMap<>();
+    if (this.datasourceMap == null) {
+      this.datasourceMap = new ConcurrentHashMap<>();
       List<DataSourceConf> datasourceList = caServerConf.getDatasources();
       for (DataSourceConf datasource : datasourceList) {
         String name = datasource.getName();
         FileOrValue conf = datasource.getConf();
-        this.datasourceNameConfFileMap.put(name, conf);
+        this.datasourceMap.put(name, loadDatasource(name, conf));
         if (conf.getFile() != null) {
           LOG.info("associate datasource {} to the file {}", name, conf.getFile());
         } else {
@@ -338,33 +338,33 @@ public class CaManagerImpl implements CaManager, Closeable {
         }
       }
 
-      FileOrValue caDatasourceConf = datasourceNameConfFileMap.remove("ca");
-      if (caDatasourceConf == null) {
+      certstoreDatasource = datasourceMap.get("ca");
+      if (certstoreDatasource == null) {
         throw new CaMgmtException("no datasource named 'ca' configured");
       }
 
-      FileOrValue caconfDatasourceConf = datasourceNameConfFileMap.remove("caconf");
-
-      if (caconfDatasourceConf != null) {
-        this.caconfDatasource = loadDatasource("caconf", caconfDatasourceConf);
-      } else {
-        this.caconfDatasource = loadDatasource("caconf", caconfDatasourceConf);
+      caconfDatasource = datasourceMap.get("caconf");
+      if (caconfDatasource == null) {
+        caconfDatasource = certstoreDatasource;
       }
-      this.queryExecutor = new CaManagerQueryExecutor(this.caconfDatasource);
-      int dbSchemaVersion = this.queryExecutor.getDbSchemaVersion();
+
+      queryExecutor = new CaManagerQueryExecutor(caconfDatasource);
+      int dbSchemaVersion = queryExecutor.getDbSchemaVersion();
       LOG.info("dbSchemaVersion: {}", dbSchemaVersion);
 
       if (dbSchemaVersion < 8) {
-        if (caconfDatasourceConf != null) {
+        if (datasourceMap.containsKey("caconf")) {
           LOG.warn("ignore datasource named 'caconf'");
         }
-        this.certstoreDatasource = caconfDatasource;
+        this.caconfDatasource = certstoreDatasource;
       } else {
-        if (caconfDatasourceConf == null) {
+        if (!datasourceMap.containsKey("caconf")) {
           throw new CaMgmtException("no datasource named 'caconf' configured");
         }
-        this.certstoreDatasource = loadDatasource("ca", caDatasourceConf);
       }
+
+      datasourceMap.remove("ca");
+      datasourceMap.remove("caconf");
     }
 
     // 2010-01-01T00:00:00.000 UTC
@@ -787,19 +787,18 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
 
-    if (caconfDatasource != null) {
-      try {
-        caconfDatasource.close();
-      } catch (Exception ex) {
-        LogUtil.warn(LOG, ex, concat("could not close datasource ca"));
-      }
+    Map<String, DataSourceWrapper> allDataSources = new HashMap<>(datasourceMap);
+    allDataSources.put("ca", certstoreDatasource);
+    if (certstoreDatasource != caconfDatasource) {
+      allDataSources.put("caconf", caconfDatasource);
     }
 
-    if (certstoreDatasource != null) {
+    for (String name : allDataSources.keySet()) {
+      DataSourceWrapper dataSource = allDataSources.get(name);
       try {
-        certstoreDatasource.close();
+        dataSource.close();
       } catch (Exception ex) {
-        LogUtil.warn(LOG, ex, concat("could not close datasource certstore"));
+        LogUtil.warn(LOG, ex, concat("could not close datasource " + name));
       }
     }
 

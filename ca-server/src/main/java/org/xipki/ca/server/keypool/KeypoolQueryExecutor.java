@@ -41,12 +41,6 @@ class KeypoolQueryExecutor {
         "ID,ENC_ALG,ENC_META,DATA FROM KEYPOOL WHERE SHARD_ID=" + shardId + " AND KID=?");
   } // constructor
 
-  void close() {
-    if (datasource != null) {
-      datasource.close();
-    }
-  }
-
   Map<String, Integer> getKeyspecs() throws DataAccessException {
     final String sql = "SELECT ID,KEYSPEC FROM KEYSPEC";
     Statement ps = datasource.createStatement();

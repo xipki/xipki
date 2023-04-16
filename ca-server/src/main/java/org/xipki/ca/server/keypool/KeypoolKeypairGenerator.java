@@ -4,18 +4,13 @@
 package org.xipki.ca.server.keypool;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
-import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
-import org.xipki.password.PasswordResolverException;
 import org.xipki.security.KeypairGenerator;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.FileOrValue;
 import org.xipki.util.StringUtil;
 
 import javax.crypto.*;
@@ -27,7 +22,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.spec.KeySpec;
-import java.sql.Connection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -48,8 +42,6 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     byte[] cipherText;
   }
 
-  private static final Logger LOG = LoggerFactory.getLogger(KeypoolKeypairGenerator.class);
-
   private int shardId;
 
   private KeypoolQueryExecutor queryExecutor;
@@ -62,7 +54,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
 
   private Cipher cipher;
 
-  private Map<String, FileOrValue> datasourceConfs;
+  private Map<String, DataSourceWrapper> datasources;
 
   private final Map<String, Integer> keyspecToId = new HashMap<>();
 
@@ -74,20 +66,8 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     return shardId;
   }
 
-  public KeypoolQueryExecutor getQueryExecutor() {
-    return queryExecutor;
-  }
-
-  public void setQueryExecutor(KeypoolQueryExecutor queryExecutor) {
-    this.queryExecutor = queryExecutor;
-  }
-
-  public Map<String, FileOrValue> getDatasourceConfs() {
-    return datasourceConfs;
-  }
-
-  public void setDatasourceConfs(Map<String, FileOrValue> datasourceConfs) {
-    this.datasourceConfs = datasourceConfs;
+  public void setDatasources(Map<String, DataSourceWrapper> datasources) {
+    this.datasources = datasources;
   }
 
   @Override
@@ -96,17 +76,14 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     Args.notNull(conf, "conf");
 
     String datasourceName = conf.value("datasource");
-
-    FileOrValue datasourceConf = null;
+    DataSourceWrapper datasource = null;
     if (datasourceName != null) {
-      datasourceConf = datasourceConfs.get(datasourceName);
+      datasource = datasources.get(datasourceName);
     }
 
-    if (datasourceConf == null) {
+    if (datasource == null) {
       throw new XiSecurityException("no datasource named '" + datasourceName + "' is specified");
     }
-
-    DataSourceWrapper datasource = loadDatasource(datasourceName, datasourceConf, passwordResolver);
 
     try {
       queryExecutor = new KeypoolQueryExecutor(datasource, shardId);
@@ -206,26 +183,6 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
 
   @Override
   public void close() throws IOException {
-    queryExecutor.close();
   }
-
-  private static DataSourceWrapper loadDatasource(
-      String datasourceName, FileOrValue datasourceConf, PasswordResolver passwordResolver)
-      throws XiSecurityException {
-    try {
-      DataSourceWrapper datasource = new DataSourceFactory().createDataSource(
-          datasourceName, datasourceConf, passwordResolver);
-
-      // test the datasource
-      Connection conn = datasource.getConnection();
-      datasource.returnConnection(conn);
-
-      LOG.info("loaded datasource.{}", datasourceName);
-      return datasource;
-    } catch (DataAccessException | PasswordResolverException | IOException | RuntimeException ex) {
-      throw new XiSecurityException(
-          ex.getClass().getName() + " while parsing datasource " + datasourceName + ": " + ex.getMessage(), ex);
-    }
-  } // method loadDatasource
 
 }

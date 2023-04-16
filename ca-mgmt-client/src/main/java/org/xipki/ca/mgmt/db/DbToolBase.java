@@ -209,9 +209,7 @@ public class DbToolBase implements Closeable {
     }
 
     // adapt the configuration
-    if (props.getProperty("minimumIdle") != null) {
-      props.setProperty("minimumIdle", "1");
-    }
+    props.setProperty("minimumIdle", "1");
 
     return props;
   } // method getDbConfProperties

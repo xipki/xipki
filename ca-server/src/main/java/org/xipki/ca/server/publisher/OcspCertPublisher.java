@@ -15,19 +15,14 @@ import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.datasource.DataAccessException;
-import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
-import org.xipki.password.PasswordResolverException;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.FileOrValue;
 
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
 import java.util.Map;
 
 /**
@@ -51,7 +46,7 @@ public class OcspCertPublisher extends CertPublisher {
   }
 
   @Override
-  public void initialize(String conf, PasswordResolver passwordResolver, Map<String, FileOrValue> datasourceConfs)
+  public void initialize(String conf, PasswordResolver passwordResolver, Map<String, DataSourceWrapper> datasourceConfs)
       throws CertPublisherException {
     Args.notNull(conf, "conf");
 
@@ -62,16 +57,14 @@ public class OcspCertPublisher extends CertPublisher {
     ConfPairs confPairs = new ConfPairs(conf);
     String datasourceName = confPairs.value("datasource");
 
-    FileOrValue datasourceConf = null;
+    DataSourceWrapper datasource = null;
     if (datasourceName != null) {
-      datasourceConf = datasourceConfs.get(datasourceName);
+      datasource = datasourceConfs.get(datasourceName);
     }
 
-    if (datasourceConf == null) {
+    if (datasource == null) {
       throw new CertPublisherException("no datasource named '" + datasourceName + "' is specified");
     }
-
-    datasource = loadDatasource(datasourceName, datasourceConf, passwordResolver);
 
     try {
       queryExecutor = new OcspStoreQueryExecutor(datasource, this.publishsGoodCert);
@@ -79,25 +72,6 @@ public class OcspCertPublisher extends CertPublisher {
       throw new CertPublisherException(ex.getMessage(), ex);
     }
   } // method initialize
-
-  private DataSourceWrapper loadDatasource(
-      String datasourceName, FileOrValue datasourceConf, PasswordResolver passwordResolver)
-      throws CertPublisherException {
-    try {
-      DataSourceWrapper datasource = new DataSourceFactory().createDataSource(
-          datasourceName, datasourceConf, passwordResolver);
-
-      // test the datasource
-      Connection conn = datasource.getConnection();
-      datasource.returnConnection(conn);
-
-      LOG.info("loaded datasource.{}", datasourceName);
-      return datasource;
-    } catch (DataAccessException | PasswordResolverException | IOException | RuntimeException ex) {
-      throw new CertPublisherException(
-          ex.getClass().getName() + " while parsing datasource " + datasourceName + ": " + ex.getMessage(), ex);
-    }
-  } // method loadDatasource
 
   @Override
   public boolean caAdded(X509Cert issuer) {
@@ -218,13 +192,6 @@ public class OcspCertPublisher extends CertPublisher {
   @Override
   public boolean publishsGoodCert() {
     return publishsGoodCert;
-  }
-
-  @Override
-  public void close() {
-    if (datasource != null) {
-      datasource.close();
-    }
   }
 
 }

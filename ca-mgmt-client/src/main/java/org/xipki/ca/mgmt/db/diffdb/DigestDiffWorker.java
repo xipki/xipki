@@ -82,29 +82,20 @@ public class DigestDiffWorker extends DbWorker {
   } // constructor
 
   @Override
+  protected void close0() {
+    targetDatasource.close();
+  }
+
+  @Override
   protected void run0() throws Exception {
     long start = Clock.systemUTC().millis();
 
-    try {
-      DigestDiff diff = new DigestDiff(datasource, targetDatasource, reportDir, revokedOnly,
-          stopMe, numCertsPerSelect, numThreads);
-      diff.setIncludeCaCerts(includeCaCerts);
-      diff.diff();
-    } finally {
-      try {
-        datasource.close();
-      } catch (Throwable th) {
-        LOG.error("refDatasource.close()", th);
-      }
-
-      try {
-        targetDatasource.close();
-      } catch (Throwable th) {
-        LOG.error("datasource.close()", th);
-      }
-      long end = Clock.systemUTC().millis();
-      System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
-    }
+    DigestDiff diff = new DigestDiff(datasource, targetDatasource, reportDir, revokedOnly,
+        stopMe, numCertsPerSelect, numThreads);
+    diff.setIncludeCaCerts(includeCaCerts);
+    diff.diff();
+    long end = Clock.systemUTC().millis();
+    System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
   } // method run0
 
 }

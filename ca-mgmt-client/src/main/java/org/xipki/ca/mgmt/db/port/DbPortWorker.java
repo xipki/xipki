@@ -147,7 +147,7 @@ public abstract class DbPortWorker extends DbWorker {
                       String caConfDbFile, String caDbFile,
                       boolean resume, String srcFolder, int batchEntriesPerCommit, char[] password)
         throws PasswordResolverException, IOException {
-      super(datasourceFactory, passwordResolver, caConfDbFile, password);
+      super(datasourceFactory, passwordResolver, (caConfDbFile == null ? caDbFile : caConfDbFile), password);
       this.resume = resume;
       this.srcFolder = IoUtil.expandFilepath(srcFolder);
       this.batchEntriesPerCommit = batchEntriesPerCommit;
@@ -156,6 +156,11 @@ public abstract class DbPortWorker extends DbWorker {
                             Paths.get(IoUtil.expandFilepath(caDbFile))));
       this.caDataSource = datasourceFactory.createDataSource("ds-" + caDbFile,
                             props, passwordResolver);
+    }
+
+    @Override
+    protected void close0() {
+      caDataSource.close();
     }
 
     @Override
@@ -198,6 +203,7 @@ public abstract class DbPortWorker extends DbWorker {
         } catch (Throwable th) {
           LOG.error("datasource.close()", th);
         }
+
         try {
           caDataSource.close();
         } catch (Throwable th) {
@@ -237,6 +243,11 @@ public abstract class DbPortWorker extends DbWorker {
           Paths.get(IoUtil.expandFilepath(caDbFile))));
       this.caDataSource = datasourceFactory.createDataSource("ds-" + caDbFile,
           props, passwordResolver);
+    }
+
+    @Override
+    protected void close0() {
+      caDataSource.close();
     }
 
     private void checkDestFolder() throws IOException {
@@ -341,6 +352,10 @@ public abstract class DbPortWorker extends DbWorker {
     } // constructor
 
     @Override
+    protected void close0() {
+    }
+
+    @Override
     protected void run0() throws Exception {
       long start = Clock.systemUTC().millis();
       try {
@@ -381,6 +396,10 @@ public abstract class DbPortWorker extends DbWorker {
       this.resume = resume;
       this.srcFolder = IoUtil.expandFilepath(srcFolder);
       this.batchEntriesPerCommit = batchEntriesPerCommit;
+    }
+
+    @Override
+    protected void close0() {
     }
 
     @Override
@@ -428,6 +447,10 @@ public abstract class DbPortWorker extends DbWorker {
       this.resume = resume;
       this.srcFolder = IoUtil.expandFilepath(srcFolder);
       this.batchEntriesPerCommit = batchEntriesPerCommit;
+    }
+
+    @Override
+    protected void close0() {
     }
 
     @Override

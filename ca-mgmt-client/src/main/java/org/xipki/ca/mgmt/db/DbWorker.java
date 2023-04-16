@@ -49,6 +49,8 @@ public abstract class DbWorker implements Runnable {
     this.stopMe.set(stopMe);
   }
 
+  protected abstract void close0();
+
   @Override
   public void run() {
     try {
@@ -56,6 +58,9 @@ public abstract class DbWorker implements Runnable {
     } catch (Exception ex) {
       LOG.error("exception thrown", ex);
       exception = ex;
+    } finally {
+      datasource.close();
+      close0();
     }
   } // method run
 

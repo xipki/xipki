@@ -6,10 +6,10 @@ package org.xipki.ca.api.publisher;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
+import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
-import org.xipki.util.FileOrValue;
 
 import java.io.Closeable;
 import java.util.Map;
@@ -40,7 +40,7 @@ public abstract class CertPublisher implements Closeable {
    *         If error during the initialization occurs.
    */
   public abstract void initialize(
-      String conf, PasswordResolver passwordResolver, Map<String, FileOrValue> datasourceConfs)
+      String conf, PasswordResolver passwordResolver, Map<String, DataSourceWrapper> datasourceConfs)
       throws CertPublisherException;
 
   @Override
@@ -48,15 +48,6 @@ public abstract class CertPublisher implements Closeable {
   }
 
   public abstract boolean publishsGoodCert();
-
-  /**
-   * Will not be considered.
-   * @return whether data will be published asynchronously.
-   */
-  @Deprecated
-  public boolean isAsyn() {
-    return false;
-  }
 
   /**
    * Publishes the certificate of the CA.

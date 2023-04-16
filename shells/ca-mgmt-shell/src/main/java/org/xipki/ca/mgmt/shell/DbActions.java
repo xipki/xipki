@@ -247,7 +247,7 @@ public class DbActions {
 
         if (force || confirm("Do you want to execute the SQL script?", 3)) {
           System.out.println("Start executing script " + p);
-          ScriptRunner.runScript(dataSource, p.toString(), passwordResolver);
+          ScriptRunner.runScript(dataSource, p.toString());
           System.out.println("  End executing script " + p);
         }
         return null;
@@ -288,7 +288,7 @@ public class DbActions {
   @Service
   public static class ImportCa extends DbPortAction {
 
-    @Option(name = "--caconf-db-conf", required = true, description = "CA configuration database file")
+    @Option(name = "--caconf-db-conf", description = "CA configuration database file")
     @Completion(FileCompleter.class)
     private String caconfDbFile;
 
