@@ -76,6 +76,15 @@ echo "#        Manage certificate via EST extended by XiPKI           #"
 echo "#################################################################"
 
 #####
+CMD = ucacerts
+
+echo "=====EST /${CMD}====="
+
+FILE = output/est/${CMD}
+
+xi:curl --out ${FILE}.pem $BASE_URL/${CMD}
+
+#####
 CMD = ucacert
 
 echo "=====EST /${CMD}====="
@@ -84,6 +93,16 @@ FILE = output/est/${CMD}
 
 xi:curl --out ${FILE}.crt.b64 $BASE_URL/${CMD}
 base64 -d ${FILE}.crt.b64 ${FILE}.crt
+
+#####
+CMD = ucrl
+
+echo "=====EST /${CMD}====="
+
+FILE = output/est/${CMD}
+
+xi:curl --out ${FILE}.crl.b64 $BASE_URL/${CMD}
+base64 -d ${FILE}.crl.b64 ${FILE}.crl
 
 #####
 CMD = usimpleenroll

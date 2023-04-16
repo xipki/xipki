@@ -42,6 +42,8 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.util.*;
 
+import static org.xipki.audit.AuditLevel.INFO;
+import static org.xipki.audit.AuditStatus.FAILED;
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.StringUtil.*;
 import static org.xipki.util.exception.ErrorCode.*;
@@ -107,6 +109,16 @@ public class EstResponder {
   private static final String CMD_ucacert = "ucacert";
 
   /**
+   * XiPKI own command. Same as cacerts, but returns the CA's certificates in a PEM file.
+   */
+  private static final String CMD_ucacerts = "ucacerts";
+
+  /**
+   * XiPKI own command. Returns the raw CRL.
+   */
+  private static final String CMD_ucrl = "ucrl";
+
+  /**
    * XiPKI own command. Same as simpleenroll, but returns the raw certificate.
    */
   private static final String CMD_usimpleenroll = "usimpleenroll";
@@ -126,6 +138,8 @@ public class EstResponder {
   private static final String CMD_fullcmc = "fullcmc";
 
   private static final String CT_pkix_cert = "application/pkix-cert";
+
+  private static final String CT_pkix_crl = "application/pkix-crl";
 
   private static final String CT_pkcs8 = "application/pkcs8";
 
@@ -173,8 +187,8 @@ public class EstResponder {
 
   static {
     knownCommands = CollectionUtil.asUnmodifiableSet(
-        CMD_cacerts, CMD_simpleenroll, CMD_simplereenroll, CMD_serverkeygen, CMD_ucacert,
-        CMD_usimpleenroll, CMD_usimplereenroll, CMD_userverkeygen, CMD_csrattrs, CMD_fullcmc);
+        CMD_cacerts, CMD_simpleenroll, CMD_simplereenroll, CMD_serverkeygen, CMD_cacerts, CMD_csrattrs, CMD_fullcmc,
+        CMD_ucacerts, CMD_ucacert, CMD_ucrl, CMD_usimpleenroll, CMD_usimplereenroll, CMD_userverkeygen);
   }
 
   public EstResponder(
@@ -255,9 +269,24 @@ public class EstResponder {
           byte[][] certsBytes = sdk.cacerts(caName);
           return toRestResponse(HttpRespContent.ofOk(CT_pkcs7_mime, true, buildCertsOnly(certsBytes)));
         }
+        case CMD_ucacerts: {
+          byte[][] certsBytes = sdk.cacerts(caName);
+          return toRestResponse(HttpRespContent.ofOk(CT_pem_file,
+              StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certsBytes))));
+        }
         case CMD_ucacert: {
           byte[] certBytes = sdk.cacert(caName);
           return toRestResponse(HttpRespContent.ofOk(CT_pkix_cert, true, certBytes));
+        }
+        case CMD_ucrl: {
+          byte[] crlBytes = sdk.currentCrl(caName);
+          if (crlBytes == null) {
+            String message = "could not get CRL";
+            LOG.warn(message);
+            throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, message, INFO, FAILED);
+          }
+
+          return toRestResponse(HttpRespContent.ofOk(CT_pkix_crl, true, crlBytes));
         }
         case CMD_csrattrs: {
           return toRestResponse(getCsrAttrs(caName, profile));
@@ -340,9 +369,9 @@ public class EstResponder {
 
       HttpRespContent respContent;
       if (CMD_simplereenroll.equals(command) || CMD_usimplereenroll.equals(command)) {
-        respContent = reenrollCert(command, caName, profile, requestor, csr, httpRetriever, event);
+        respContent = reenrollCert(command, caName, profile, csr, event);
       } else {
-        respContent = enrollCert(command, caName, profile, requestor, csr, httpRetriever, event);
+        respContent = enrollCert(command, caName, profile, csr, event);
       }
 
       return toRestResponse(respContent);
@@ -431,8 +460,7 @@ public class EstResponder {
   }
 
   private HttpRespContent enrollCert(
-      String command, String caName, String profile, Requestor requestor, CertificationRequest csr,
-      HttpRequestMetadataRetriever httpRetriever, AuditEvent event)
+      String command, String caName, String profile, CertificationRequest csr, AuditEvent event)
       throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
     boolean caGenKeyPair  = CMD_serverkeygen.equals(command) || CMD_userverkeygen.equals(command);
 
@@ -538,8 +566,7 @@ public class EstResponder {
   }
 
   private HttpRespContent reenrollCert(
-      String command, String caName, String profile, Requestor requestor, CertificationRequest csr,
-      HttpRequestMetadataRetriever httpRetriever, AuditEvent event)
+      String command, String caName, String profile, CertificationRequest csr, AuditEvent event)
       throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
     CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
 
@@ -739,18 +766,14 @@ public class EstResponder {
   }
 
   private static byte[] buildCertsOnly(byte[]... certsBytes) throws IOException {
-    ASN1Set digestAlgorithms = new DERSet();
-    ContentInfo contentInfo = new ContentInfo(CMSObjectIdentifiers.data, null);
-    ASN1Set crls = new DERSet();
-    ASN1Set signerInfos = new DERSet();
-
     ASN1EncodableVector v = new ASN1EncodableVector();
     for (byte[] certBytes : certsBytes) {
       v.add(Certificate.getInstance(certBytes));
     }
     ASN1Set certs = new DERSet(v);
 
-    SignedData sd = new SignedData(digestAlgorithms, contentInfo, certs, crls, signerInfos);
+    SignedData sd = new SignedData(new DERSet(), new ContentInfo(CMSObjectIdentifiers.data, null),
+        certs, new DERSet(), new DERSet());
 
     ContentInfo ci = new ContentInfo(CMSObjectIdentifiers.signedData, sd);
     return ci.getEncoded("DER");

@@ -7,6 +7,10 @@ ca:gen-crl --ca subcawithcrl1 \
   --outform $OUTFORM \
   --out output/subcawithcrl1-camgmt-gen.crl
 
+ca:gen-crl --ca subca1 \
+  --outform $OUTFORM \
+  --out output/subca1-camgmt-gen.crl
+
 ## Get CRL
 ca:get-crl --ca rootca1 \
   --outform $OUTFORM \
