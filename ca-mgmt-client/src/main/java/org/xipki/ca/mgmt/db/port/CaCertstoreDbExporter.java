@@ -286,16 +286,8 @@ class CaCertstoreDbExporter extends DbPorter {
               cert.setRs(rs.getString("REQ_SUBJECT"));
             }
 
-            int intValue = rs.getInt("PID");
-            if (intValue != 0) {
-              cert.setPid(intValue);
-            }
-
-            intValue = rs.getInt("RID");
-            if (intValue != 0) {
-              cert.setRid(intValue);
-            }
-
+            cert.setPid(rs.getInt("PID"));
+            cert.setRid(rs.getInt("RID"));
             cert.setSn(rs.getString("SN"));
 
             String str = rs.getString("TID");

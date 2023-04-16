@@ -130,8 +130,10 @@
         <constraints nullable="false"/>
       </column>
       <column name="PID" type="SMALLINT" remarks="certificate profile id">
+        <constraints nullable="false"/>
       </column>
       <column name="RID" type="SMALLINT" remarks="requestor id">
+        <constraints nullable="false"/>
       </column>
       <column name="FP_S" type="BIGINT" remarks="first 8 bytes of the SHA1 sum of the subject">
         <constraints nullable="false"/>

@@ -173,9 +173,11 @@ class CaCertstoreDbImporter extends DbPorter {
   } // method importCa
 
   public void importToDb() throws Exception {
-    importRequestor(caconf.getRequestors());
-    importProfile(caconf.getProfiles());
-    importCa(caconf.getCas());
+    if (dbSchemaVersion >= 8) {
+      importRequestor(caconf.getRequestors());
+      importProfile(caconf.getProfiles());
+      importCa(caconf.getCas());
+    }
 
     CaCertstore certstore;
     try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_CA_CERTSTORE))) {

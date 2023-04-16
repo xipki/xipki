@@ -249,10 +249,6 @@ public class CertStore extends CertStoreBase {
     if (num == 0) {
       throw new CaMgmtException("could not add CA " + ident);
     }
-
-    if (caCert.isSelfSigned()) {
-      addRootCert(caCert, ident);
-    }
   }
 
   private boolean existsIdent(NameId ident, String table) throws CaMgmtException {
@@ -374,19 +370,9 @@ public class CertStore extends CertStoreBase {
       columns.add(col2Long(cert0.getNotAfter().getEpochSecond()));
       columns.add(col2Bool(false));
 
-      if (certInfo.getProfile() != null) {
-        columns.add(col2Int(certInfo.getProfile().getId()));
-      } else {
-        columns.add(col2Int(null));
-      }
-
+      columns.add(col2Int(certInfo.getProfile().getId()));
       columns.add(col2Int(certInfo.getIssuer().getId()));
-
-      if (certInfo.getRequestor() != null) {
-        columns.add(col2Int(certInfo.getRequestor().getId()));
-      } else {
-        columns.add(col2Int(null));
-      }
+      columns.add(col2Int(certInfo.getRequestor().getId()));
 
       columns.add(col2Int(isEeCert ? 1 : 0));
       columns.add(col2Str(tid));
@@ -410,58 +396,6 @@ public class CertStore extends CertStoreBase {
 
     return true;
   } // method addCert
-
-  private boolean addRootCert(X509Cert cert, NameId issuer) {
-    byte[] encodedCert = cert.getEncoded();
-
-    try {
-      final long certId = idGenerator.nextId();
-      String subjectText = X509Util.cutText(cert.getSubjectText(), maxX500nameLen);
-      long fpSubject = X509Util.fpCanonicalizedName(cert.getSubject());
-
-      byte[] san = cert.getSubjectAltNames();
-      Long fpSan = san == null ? null : FpIdCalculator.hash(san);
-
-      final String b64FpCert = HashAlgo.SHA1.base64Hash(encodedCert);
-
-      List<SqlColumn2> columns = new ArrayList<>(20);
-
-      columns.add(col2Long(certId)); // ID
-      // currentTimeSeconds
-      columns.add(col2Long(Instant.now().getEpochSecond())); // LUPDATE
-      columns.add(col2Str(cert.getSerialNumber().toString(16))); // SN
-      columns.add(col2Str(subjectText)); // SUBJECT
-      columns.add(col2Long(fpSubject)); // FP_S
-      columns.add(col2Long(null)); // FP_RS
-      columns.add(col2Long(fpSan)); // FP_SAN
-      // notBeforeSeconds
-      columns.add(col2Long(cert.getNotBefore().getEpochSecond())); // NBEFORE
-      // notAfterSeconds
-      columns.add(col2Long(cert.getNotAfter().getEpochSecond())); // NAFTER
-      columns.add(col2Bool(false)); // REV
-      columns.add(col2Int(null)); // PID
-      columns.add(col2Int(issuer.getId())); // CA_ID
-      columns.add(col2Int(null)); // RID
-
-      columns.add(col2Int(0)); // EE
-      columns.add(col2Str(null)); // TID
-      columns.add(col2Str(b64FpCert)); // SHA1
-      columns.add(col2Str(null)); // REQ_SUBJECT
-      // in this version we set CRL_SCOPE to fixed value 0
-      columns.add(col2Int(0)); // CRL_SCOPE
-      columns.add(col2Str(Base64.encodeToString(encodedCert))); // CERT
-      columns.add(col2Str(null)); // PRIVATE_KEY
-
-      execUpdatePrepStmt0(SQL_ADD_CERT, columns.toArray(new SqlColumn2[0]));
-    } catch (Exception ex) {
-      LOG.error("could not save certificate {}: {}. Message: {}", cert.getSubject(),
-          encodedCert == null ? "null" : Base64.encodeToString(encodedCert, true), ex.getMessage());
-      LOG.debug("error", ex);
-      return false;
-    }
-
-    return true;
-  } // method addRootCert
 
   public long getMaxFullCrlNumber(NameId ca) throws OperationException {
     return getMaxCrlNumber(ca, SQL_MAX_FULL_CRLNO);
