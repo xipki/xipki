@@ -69,8 +69,9 @@ public class PublisherEntry extends MgmtEntry {
 
   @Override
   public String toString() {
-    return StringUtil.concatObjectsCap(200, "id: ", ident.getId(), "\nname: ", ident.getName(),
-        "\nfaulty: ", faulty, "\ntype: ", type, "\nconf: ", conf);
+    return StringUtil.concatObjectsCap(200,
+        "id:     ", ident.getId(), "\nname:   ", ident.getName(),
+        "\nfaulty: ", faulty, "\ntype:   ", type, "\nconf:   ", conf);
   }
 
   @Override

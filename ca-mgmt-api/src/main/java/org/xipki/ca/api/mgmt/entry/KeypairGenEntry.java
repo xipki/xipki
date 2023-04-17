@@ -59,10 +59,10 @@ public class KeypairGenEntry extends MgmtEntry {
 
   public String toString(boolean ignoreSensitiveInfo) {
     StringBuilder sb = new StringBuilder(1000);
-    sb.append("name: ").append(name).append('\n');
+    sb.append("name:   ").append(name).append('\n');
     sb.append("faulty: ").append(isFaulty()).append('\n');
-    sb.append("type: ").append(type).append('\n');
-    sb.append("conf: ");
+    sb.append("type:   ").append(type).append('\n');
+    sb.append("conf:   ");
     if (conf == null) {
       sb.append("null");
     } else {

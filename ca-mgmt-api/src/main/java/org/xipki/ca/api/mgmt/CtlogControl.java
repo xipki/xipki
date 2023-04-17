@@ -126,9 +126,9 @@ public class CtlogControl {
   @Override
   public String toString() {
     return StringUtil.concatObjects(
-        "  enabled: ", enabled,
+        "  enabled:          ", enabled,
         "\n  SSL context name: ", sslContextName,
-        "\n  Servers: ", servers);
+        "\n  Servers:          ", servers);
   }
 
   @Override

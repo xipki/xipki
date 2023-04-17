@@ -91,8 +91,8 @@ public class RevokeSuspendedControl {
   @Override
   public String toString() {
     return StringUtil.concatObjects(
-        "  enabled: ", enabled,
-        "\n  target reason: ", targetReason,
+        "  enabled:         ", enabled,
+        "\n  target reason:   ", targetReason,
         "\n  unchanged since: ", unchangedSince);
   }
 

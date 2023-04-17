@@ -100,26 +100,22 @@ public class SignerEntry extends MgmtEntry {
 
   public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
     StringBuilder sb = new StringBuilder(1000);
-    sb.append("name: ").append(name).append('\n');
+    sb.append("name:   ").append(name).append('\n');
     sb.append("faulty: ").append(isFaulty()).append('\n');
-    sb.append("type: ").append(type).append('\n');
-    sb.append("conf: ");
+    sb.append("type:   ").append(type).append('\n');
+    sb.append("conf:   ");
     if (conf == null) {
       sb.append("null");
     } else {
       sb.append(signerConfToString(conf, verbose, ignoreSensitiveInfo));
     }
     sb.append('\n');
-    sb.append("certificate: ").append("\n");
+    sb.append("cert:   ").append("\n");
     if (certificate != null || base64Cert != null) {
       if (certificate != null) {
-        sb.append("\tissuer: ").append(certificate.getIssuerText()).append('\n');
-        sb.append("\tserialNumber: ").append(certificate.getSerialNumberHex()).append('\n');
-        sb.append("\tsubject: ").append(certificate.getSubjectText());
-      }
-      if (verbose) {
-        sb.append("\n\tencoded: ");
-        sb.append(Base64.encodeToString(certificate.getEncoded()));
+        sb.append(X509Util.formatCert(certificate, verbose));
+      } else {
+        sb.append("  encoded: " + base64Cert);
       }
     } else {
       sb.append("  null");

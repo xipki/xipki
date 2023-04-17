@@ -80,9 +80,10 @@ public class CertprofileEntry extends MgmtEntry {
 
   public String toString(boolean verbose) {
     boolean bo = (verbose || conf == null || conf.length() < 301);
-    return StringUtil.concatObjectsCap(200, "id: ", ident.getId(), "\nname: ", ident.getName(),
-        "\nfaulty: ", faulty, "\ntype: ", type, "\nconf: ",
-        (bo ? conf : StringUtil.concat(conf.substring(0, 297), "...")));
+    return StringUtil.concatObjectsCap(200,
+        "id:     ", ident.getId(), "\nname:   ", ident.getName(),
+        "\nfaulty: ", faulty, "\ntype:   ", type,
+        "\nconf:   ", (bo ? conf : StringUtil.concat(conf.substring(0, 297), "...")));
   }
 
   @Override

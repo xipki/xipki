@@ -1,8 +1,8 @@
 Deployment in Tomcat 8 and 9
 ----
 1. Copy the sub-folders `bin`, `webapps`, `xipki` and `lib ` to the tomcat root folder `${CATALINA_HOME}`.
-  The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
-  `setenv.sh` and `setenv.bat` must be adapted to point to the new position.
+   The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
+   `setenv.sh` and `setenv.bat` must be adapted to point to the new position.
 2. (Optional) If you use database other than H2, PostgreSQL, MariaDB and MySQL, you need to
    download the JDBC driver to the folder `${CATALINA_HOME}/lib`.
 3. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the

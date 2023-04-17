@@ -446,10 +446,10 @@ public class CaActions {
         } else {
           if (CaStatus.ACTIVE == entry.getStatus()) {
             boolean started = caManager.getSuccessfulCaNames().contains(entry.getIdent().getName());
-            sb.append("started: ").append(started).append("\n");
+            sb.append("started:              ").append(started).append("\n");
           }
           Set<String> aliases = caManager.getAliasesForCa(name);
-          sb.append("aliases: ").append(toString(aliases)).append("\n").append(entry.toString(verbose));
+          sb.append("aliases:              ").append(toString(aliases)).append("\n").append(entry.toString(verbose));
         }
       }
 

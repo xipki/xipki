@@ -92,11 +92,11 @@ public class RequestorEntry extends MgmtEntry {
 
   public String toString(boolean verbose) {
     StringBuilder sb = new StringBuilder(500);
-    sb.append("id: ").append(ident.getId());
-    sb.append("\nname: ").append(ident.getName());
-    sb.append("\ntype: ").append(type);
+    sb.append(  "id:     ").append(ident.getId());
+    sb.append("\nname:   ").append(ident.getName());
+    sb.append("\ntype:   ").append(type);
 
-    sb.append("\nconf: ");
+    sb.append("\nconf:   ");
     if (verbose || conf.length() < 101) {
       sb.append(conf);
     } else {
@@ -106,14 +106,12 @@ public class RequestorEntry extends MgmtEntry {
     sb.append("\nfaulty: ").append(faulty).append('\n');
 
     if (!faulty && TYPE_CERT.equalsIgnoreCase(type)) {
+      sb.append("cert:\n");
       try {
         X509Cert cert = X509Util.parseCert(StringUtil.toUtf8Bytes(conf));
-        sb.append("cert:");
-        sb.append("\n\tissuer: ").append(cert.getIssuerText());
-        sb.append("\n\tserialNumber: ").append(cert.getSerialNumberHex());
-        sb.append("\n\tsubject: ").append(cert.getSubjectText()).append('\n');
+        sb.append(X509Util.formatCert(cert, false));
       } catch (CertificateException ex) {
-        sb.append("cert: ERROR(").append(ex.getMessage()).append(")\n");
+        sb.append("  ERROR(").append(ex.getMessage()).append(")\n");
       }
     }
 
