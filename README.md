@@ -24,13 +24,16 @@ JRE/JDK, and the steps to reproduce the bug.
 * Hardware: Any available hardware (tested on Raspberry Pi 2 Model B with 900MHz quad-core ARM CPU and 1 GB Memory)
 
 ## Tested PKCS#11 Devices
-* [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/)
+* [AWS CloudHSM](https://aws.amazon.com/cloudhsm)
 * [Nitrokey HSM 2](https://www.nitrokey.com/#comparison) / [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick)
 * [nCipher Connect](https://www.ncipher.com/products/general-purpose-hsms/nshield-connect)
 * [nCipher Solo](https://www.ncipher.com/products/general-purpose-hsms/nshield-solo)
-* [Utimaco Se](https://hsm.utimaco.com/products-hardware-security-modules/general-purpose-hsm/)
 * [Sansec HSM](https://en.sansec.com.cn)
-* [AWS CloudHSM](https://aws.amazon.com/cloudhsm)
+* [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/)
+* [TASS HSM](https://www.tass.com.cn/portal/list/index/id/15.html)
+* [Thales LUNA](https://cpl.thalesgroup.com/encryption/hardware-security-modules/general-purpose-hsms)
+* [Thales ProtectServer](https://cpl.thalesgroup.com/encryption/hardware-security-modules/protectserver-hsms)
+* [Utimaco Se](https://hsm.utimaco.com/products-hardware-security-modules/general-purpose-hsm/)
 
 ## Get Started
 
