@@ -13,6 +13,7 @@ public interface OcspLicense {
   /**
    * Whether the license is valid. The criteria may be the validity period,
    * license signature, or any other criteria.
+   * @return true if the license is valid, false otherwise.
    */
   boolean isValid();
 
