@@ -35,7 +35,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
 
     @Override
     public void run() {
-      while (!stop() && getErrorAccout() < 1) {
+      while (!stop() && getErrorAccount() < 1) {
         try {
           EnrollCertsRequest certReq = nextCertRequest();
           if (certReq == null) {

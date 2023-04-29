@@ -52,7 +52,7 @@ public class PublicCaInfo {
     this.issuer = caCert.getIssuer();
     this.serialNumber = caCert.getSerialNumber();
     this.subject = caCert.getSubject();
-    this.c14nSubject = X509Util.canonicalizName(subject);
+    this.c14nSubject = X509Util.canonicalizeName(subject);
     this.subjectKeyIdentifier = caCert.getSubjectKeyId();
     this.extraControl = extraControl;
 
@@ -76,7 +76,7 @@ public class PublicCaInfo {
     this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
 
     this.caCert = null;
-    this.c14nSubject = X509Util.canonicalizName(subject);
+    this.c14nSubject = X509Util.canonicalizeName(subject);
 
     this.subjectKeyIdentifier = (subjectKeyIdentifier == null) ? null
         : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
