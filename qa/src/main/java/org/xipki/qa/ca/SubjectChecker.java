@@ -333,7 +333,7 @@ public class SubjectChecker {
       return (atvValue instanceof DERPrintableString || atvValue instanceof DERUTF8String);
     }
 
-    boolean correctStringType = true;
+    boolean correctStringType;
     switch (stringType) {
       case bmpString:
         correctStringType = (atvValue instanceof DERBMPString);

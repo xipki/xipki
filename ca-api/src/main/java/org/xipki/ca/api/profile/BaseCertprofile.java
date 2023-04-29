@@ -567,7 +567,7 @@ public abstract class BaseCertprofile extends Certprofile {
 
     tmpText = tmpText.trim();
 
-    Boolean isPrintableString = null;
+    Boolean isPrintableString;
     if (stringType == null) {
       isPrintableString = isPrintableString(tmpText);
       stringType = isPrintableString ? StringType.printableString : StringType.utf8String;

@@ -46,7 +46,6 @@ import org.xipki.cmp.*;
 import org.xipki.cmp.client.*;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.DateUtil;
 import org.xipki.util.*;
 import org.xipki.util.ReqRespDebug.ReqRespPair;
 import org.xipki.util.http.HttpRespContent;

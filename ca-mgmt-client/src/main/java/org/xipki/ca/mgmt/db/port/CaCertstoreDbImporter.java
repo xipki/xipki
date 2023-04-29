@@ -153,7 +153,7 @@ class CaCertstoreDbImporter extends DbPorter {
           ps.setString(idx++, ca.getName().toLowerCase());
           ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
           ps.setString(idx++, ca.getRevInfo());
-          ps.setString(idx++, Base64.encodeToString(certBytes));
+          ps.setString(idx, Base64.encodeToString(certBytes));
 
           ps.executeUpdate();
         } catch (SQLException ex) {

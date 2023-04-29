@@ -218,8 +218,9 @@ class X509PublisherModule extends X509CaModule {
         successful = false;
       }
 
-      // TODO
-      LOG.error("could not publish revocation of certificate to the publisher {}", publisher.getIdent());
+      if (!successful) {
+        LOG.error("could not publish revocation of certificate to the publisher {}", publisher.getIdent());
+      }
     } // end for
   }
 

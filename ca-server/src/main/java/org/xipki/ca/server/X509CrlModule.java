@@ -83,7 +83,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       long lastIssueTimeOfFullCrl = certstore.getThisUpdateOfCurrentCrl(caIdent, false);
       Instant now = Instant.now();
 
-      boolean createFullCrlNow = false;
+      boolean createFullCrlNow;
       if (lastIssueTimeOfFullCrl == 0L) {
         // still no CRL available. Create a new FullCRL
         createFullCrlNow = true;

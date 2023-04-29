@@ -194,7 +194,7 @@ public class CertStore extends CertStoreBase {
       return;
     }
 
-    int num = 0;
+    int num;
     try {
       final String sql = SqlUtil.buildInsertSql(table, "ID,NAME");
       num = execUpdatePrepStmt0(sql, col2Int(ident.getId()), col2Str(ident.getName()));

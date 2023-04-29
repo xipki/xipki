@@ -21,7 +21,6 @@ import org.xipki.cmp.CmpUtil;
 import org.xipki.security.CrlReason;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.DateUtil;
 import org.xipki.util.*;
 import org.xipki.util.exception.InsufficientPermissionException;
 

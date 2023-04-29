@@ -7,7 +7,6 @@ import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
-import org.xipki.util.Base64;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.StringUtil;
 
@@ -115,7 +114,7 @@ public class SignerEntry extends MgmtEntry {
       if (certificate != null) {
         sb.append(X509Util.formatCert(certificate, verbose));
       } else {
-        sb.append("  encoded: " + base64Cert);
+        sb.append("  encoded: ").append(base64Cert);
       }
     } else {
       sb.append("  null");
