@@ -3,28 +3,32 @@
 See also <https://github.com/xipki/xipki/releases>
 
 ## 6.3.0
-- Release date: XX XX, 2023
-- Compared to 6.2.0, there is only one ZIP-file for all software components.
+- Release date: 2023/04/29
 - CA
-    - Do not check the uniqueness of serial number in database if it contains 
-      at least 95 random bits.
-    - Fixed bug "the scheduled generation of CRLs does not work".
-    - Split the database of CA to 2 databases: 1 only for the CA's
-      configuration, and 1 for the generated certificate and CRLs.
-      Note: software of this version works also with databases of verions
-      between 6.0.0 and 6.2.x.
+  - Do not check the uniqueness of serial number in database if it contains 
+    at least 95 random bits.
+  - Fixed bug "the scheduled generation of CRLs does not work".
+  - Split the database of CA to 2 databases: 1 only for the CA's
+    configuration, and 1 for the generated certificate and CRLs.
+    Note: software of this version works also with databases of versions
+    between 6.0.0 and 6.2.x.
 - OCSP
-    - N/A
+  - N/A
 - Gateway
-    - N/A
+  - N/A
 - CLI
-    - N/A
+  - N/A
 - MGMT-CLI (Management Client)
-    - N/A
+  - N/A
 - Dependencies
-    - bouncycastle: 1.72 --> 1.73
-    - replace tinylog with log4j2 v2.19.0.
-    - N/A
+  - ipkcs11wrapper: 1.0.4 --> 1.0.5
+  - bouncycastle: 1.72 --> 1.73
+  - replace tinylog with log4j2 v2.19.0.
+- Misc
+  - Compared to 6.2.0, there is only one ZIP-file for all software components.
+  - Source: the modules audit, audit-extra, datasource, password, security,
+    shell-base, util, xipki-tomcat-password have beed moved to
+    [xipki/commons](https://github.com/xipki/commons/).
 
 ## 6.2.0
 - Release date: March 26, 2023
