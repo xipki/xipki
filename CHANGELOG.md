@@ -2,6 +2,21 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
+## 6.3.1
+- Release date: 2023/mm/dd
+- CA
+  - N/A
+- OCSP
+  - N/A
+- Gateway
+  - N/A
+- CLI
+  - N/A
+- MGMT-CLI (Management Client)
+  - N/A
+- Dependencies
+  - N/A
+ 
 ## 6.3.0
 - Release date: 2023/04/29
 - CA
