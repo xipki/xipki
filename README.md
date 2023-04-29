@@ -69,28 +69,28 @@ follows.
 **Note that all keys and certificates in the binary are only for demo purpose. In production environment
 they MUST be replaced.**
 
-**In the following sections, we assume the destination folder is `xipki-<version>`**.
+**In the following sections, we assume the destination folder is `xipki-install`**.
 
 ## Install CA Server
 
 JDK 8+ is required.
 
 1. Unpack tomcat to a new folder
-2. Install CA as described in the `xipki-<version>/xipki-ca/README` file.
+2. Install CA as described in the `xipki-install/xipki-ca/README` file.
 
 ## Install OCSP Responder
 
 JDK 8+ is required.
 
 1. Unpack tomcat to a new folder
-2. Install CA as described in the `xipki-<version>/xipki-ocsp/README` file.
+2. Install CA as described in the `xipki-install/xipki-ocsp/README` file.
 
 ## Install Protocol Gateway
 
 JDK 8+ is required.
 
 1. Unpack tomcat to a new folder
-2. Install CA as described in the `xipki-<version>/xipki-gateway/README` file.
+2. Install protocol gateway as described in the `xipki-install/xipki-gateway/README` file.
 
 ## Install Management Command Line Interface
 
@@ -142,12 +142,7 @@ JDK 11+ is required.
 
 ## Setup CA Server
 
-1. Start the servlet container, e.g. tomcat. 
-HSM devices of Thales, e.g. nCipher, can use Thales preload to manage the
-PKCS#11 sessions. In this case, the servlet container should be started as follows
-```sh
-preload <start script>
-```
+1. Start the servlet container, e.g. tomcat.
 
 2. Setup CA in Management CLI (in folder `xipki-mgmt-cli`)
     * _(If error like "Identity or Certificate with label=mylabel already exists" occurs,
@@ -157,12 +152,6 @@ preload <start script>
    * Start Management CLI.
 
      `bin/karaf`
-
-     HSM devices of Thales, e.g. nCipher, can use Thales preload to manage the
-     PKCS#11 sessions. In this case, the cli should be started as follows
-     ```sh
-     preload bin/karaf
-     ```
  
    * Setup CA (choose p11 if the key is saved in PKCS#11 device, p12 in PKCS#12 device)
       * In case of using new keys and certificates, in CLI:  
@@ -175,9 +164,6 @@ preload <start script>
 
       * If you wish to generate the signing key and certificate for the OCSP responder, in CLI:  
          `source xipki/ca-setup/setup-ocsp-*.script`.
-
-      * If you wish to add the SCEP support, in CLI:  
-         `source xipki/ca-setup/setup-scep.script`.
 
    * Verify the installation, execute the command in CLI:  
      `ca-info myca1`
