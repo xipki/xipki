@@ -151,5 +151,3 @@ xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password 1234  --out ${FILE}.csr \
   --subject "CN=${CUR_TIME}-est-${CMD}.myorg.org,O=myorg,C=DE"
 
 xi:curl --base64 --header "${CT_PKCS10}" --out ${FILE}.p7m --data-file ${FILE}.csr "$BASE_URL/${CMD}"
-
-xi:export-keycert-est ${FILE}.p7m ${FILE}.key ${FILE}.crt
