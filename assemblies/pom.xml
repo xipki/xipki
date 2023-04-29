@@ -12,6 +12,9 @@
   <artifactId>assemblies</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
   <packaging>pom</packaging>
+  <properties>
+    <skipDeploy>true</skipDeploy>
+  </properties>
   <modules>
     <module>features</module>
     <module>xipki-cli</module>

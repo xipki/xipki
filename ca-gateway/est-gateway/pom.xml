@@ -11,6 +11,9 @@
   <artifactId>est-gateway</artifactId>
   <packaging>war</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
+  <properties>
+    <skipDeploy>true</skipDeploy>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

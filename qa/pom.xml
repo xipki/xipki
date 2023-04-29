@@ -11,6 +11,9 @@
   <artifactId>qa</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
+  <properties>
+    <skipDeploy>true</skipDeploy>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

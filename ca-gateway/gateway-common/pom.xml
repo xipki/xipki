@@ -11,6 +11,9 @@
   <artifactId>gateway-common</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
+  <properties>
+    <skipDeploy>true</skipDeploy>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>

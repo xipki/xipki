@@ -12,6 +12,9 @@
   <artifactId>shells</artifactId>
   <packaging>pom</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
+  <properties>
+    <skipDeploy>true</skipDeploy>
+  </properties>
   <modules>
     <module>cmp-client-shell</module>
     <module>ocsp-client-shell</module>
