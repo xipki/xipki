@@ -27,9 +27,9 @@ public class KeypairGenerationType extends ValidatableConf {
 
   public static final String PARAM_qlength = "qlength";
 
-  private boolean inheritCA;
+  private Boolean inheritCA;
 
-  private boolean forbidden;
+  private Boolean forbidden;
 
   private DescribableOid algorithm;
 
@@ -64,19 +64,19 @@ public class KeypairGenerationType extends ValidatableConf {
    */
   private Map<String, String> parameters;
 
-  public boolean isInheritCA() {
+  public Boolean getInheritCA() {
     return inheritCA;
   }
 
-  public void setInheritCA(boolean inheritCA) {
+  public void setInheritCA(Boolean inheritCA) {
     this.inheritCA = inheritCA;
   }
 
-  public boolean isForbidden() {
+  public Boolean getForbidden() {
     return forbidden;
   }
 
-  public void setForbidden(boolean forbidden) {
+  public void setForbidden(Boolean forbidden) {
     this.forbidden = forbidden;
   }
 
@@ -106,7 +106,11 @@ public class KeypairGenerationType extends ValidatableConf {
 
   @Override
   public void validate() throws InvalidConfException {
-    if (inheritCA || forbidden) {
+    if (inheritCA == null || inheritCA.booleanValue()) {
+      return;
+    }
+
+    if (forbidden == null || forbidden.booleanValue()) {
       return;
     }
 

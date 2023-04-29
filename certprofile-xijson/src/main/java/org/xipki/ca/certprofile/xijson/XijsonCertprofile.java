@@ -179,9 +179,9 @@ public class XijsonCertprofile extends BaseCertprofile {
 
     this.serialNumberMode = conf.getSerialNumberMode();
 
-    if (kg == null || kg.isForbidden()) {
+    if (kg == null || (kg.getForbidden() != null && kg.getForbidden().booleanValue())) {
       this.keypairGenControl = KeypairGenControl.ForbiddenKeypairGenControl.INSTANCE;
-    } else if (kg.isInheritCA()) {
+    } else if (kg.getInheritCA() != null && kg.getInheritCA().booleanValue()) {
       this.keypairGenControl = KeypairGenControl.InheritCAKeypairGenControl.INSTANCE;
     } else {
       KeyType keyType = kg.getKeyType();
