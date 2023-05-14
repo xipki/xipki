@@ -173,29 +173,30 @@ JDK 11+ is required.
 * EST  
   Use any EST client.
 
-  The folder `xipki-cli` contains an example script in the folder xipki/client-script.
+  The shell script `xipki/client-script/est.sh` demonstrates the use of EST API.
+
+  An example script in available under `xipki/client-script/est-client.script`.
   It can be executed in the CLI as follows:
   - `source xipki/client-script/est-client.script`
 
 * SCEP  
   Use any SCEP client. XiPKI provides also a SCEP client.
 
-  The folder `xipki-cli` contains an example script in the folder xipki/client-script.
+  An example script in available under `xipki/client-script/scep-client.script`.
   It can be executed in the CLI as follows:  
   - `source xipki/client-script/scep-client.script`
 
 * CMP  
   Use any CMP client. XiPKI provides also a CMP client.
 
-  The folder `xipki-cli` contains an example script in the folder xipki/client-script.
+  An example script in available under `xipki/client-script/cmp-client.script`.
   It can be executed in the CLI as follows:  
   - `source xipki/client-script/cmp-client.script` (use argument 'help' to print the usage)
 
 * REST API  
-  The shell script `xipki/client-script/rest.sh` of the `xipki-cli` demonstrates
-  the use of REST API.
+  The shell script `xipki/client-script/rest.sh` demonstrates the use of REST API.
 
-  The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
+  An example script in available under `xipki/client-script/rest-client.script`.
   It can be executed in the CLI as follows:  
   - `source xipki/client-script/rest-client.script` (use argument 'help' to print the usage)
 
@@ -216,7 +217,7 @@ Features
 - CA Protocol Gateway
   - EST (RFC 7030)
   - SCEP (RFC 8894)
-  - CMP (RFC 4210 and RFC 4211)
+  - CMP (RFC 4210, 4211, 9045, draft-ietf-lamps-cmp-updates)
   - RESTful API
 
 - CA (Certification Authority)
