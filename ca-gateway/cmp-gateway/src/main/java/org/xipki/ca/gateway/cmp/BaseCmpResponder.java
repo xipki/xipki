@@ -776,8 +776,6 @@ abstract class BaseCmpResponder {
     AlgorithmIdentifier intendedAlg = privKey.getPrivateKeyAlgorithm();
     EncryptedValue encKey;
 
-    // Due to the bug mentioned in https://github.com/bcgit/bc-java/issues/359
-    // we cannot use BoucyCastle's EncryptedValueBuilder to build the EncryptedValue.
     try {
       if (requestor.getCert() != null) {
         // use private key of the requestor to encrypt the private key

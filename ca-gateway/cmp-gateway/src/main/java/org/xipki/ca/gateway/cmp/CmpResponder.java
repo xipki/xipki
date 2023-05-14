@@ -61,12 +61,20 @@ public class CmpResponder extends BaseCmpResponder {
     final int n = certReqMsgs.length;
 
     String[] certprofileNames = CmpUtil.extractCertProfile(request.getHeader().getGeneralInfo());
-    if (certprofileNames == null) {
+    if (certprofileNames == null || certprofileNames.length == 0) {
       if (dfltCertprofileName != null) {
         certprofileNames = new String[n];
 
         for (int i = 0; i < n; i++) {
           certprofileNames[i] = dfltCertprofileName;
+        }
+      }
+    } else if (certprofileNames.length == 1) {
+      if (n > 1) {
+        String certprofileName = certprofileNames[0];
+        certprofileNames = new String[n];
+        for (int i = 0; i < n; i++) {
+          certprofileNames[i] = certprofileName;
         }
       }
     }
