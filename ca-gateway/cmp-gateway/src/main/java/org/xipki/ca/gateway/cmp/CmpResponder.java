@@ -60,33 +60,39 @@ public class CmpResponder extends BaseCmpResponder {
     CertReqMsg[] certReqMsgs = cr.toCertReqMsgArray();
     final int n = certReqMsgs.length;
 
+    boolean reenroll = (request.getBody().getType() == PKIBody.TYPE_KEY_UPDATE_REQ);
     String[] certprofileNames = CmpUtil.extractCertProfile(request.getHeader().getGeneralInfo());
-    if (certprofileNames == null || certprofileNames.length == 0) {
-      if (dfltCertprofileName != null) {
-        certprofileNames = new String[n];
 
-        for (int i = 0; i < n; i++) {
+    int numCertprofileNames = certprofileNames == null ? 0 : certprofileNames.length;
+
+    if (numCertprofileNames == 0) {
+      certprofileNames = new String[n];
+    } else if (numCertprofileNames < n) {
+      certprofileNames = Arrays.copyOf(certprofileNames, n);
+    }
+
+    if (certprofileNames.length == n && StringUtil.isNotBlank(dfltCertprofileName)) {
+      for (int i = 0; i < n; i++) {
+        if (StringUtil.isBlank(certprofileNames[i])) {
           certprofileNames[i] = dfltCertprofileName;
-        }
-      }
-    } else if (certprofileNames.length == 1) {
-      if (n > 1) {
-        String certprofileName = certprofileNames[0];
-        certprofileNames = new String[n];
-        for (int i = 0; i < n; i++) {
-          certprofileNames[i] = certprofileName;
         }
       }
     }
 
-    boolean reenroll = (request.getBody().getType() == PKIBody.TYPE_KEY_UPDATE_REQ);
-    int numCertprofileNames = (certprofileNames == null) ? 0 : certprofileNames.length;
-    if (!((numCertprofileNames == n) || (reenroll && numCertprofileNames == 0))) {
+    boolean withNullProfileNames = false;
+    for (int i = 0; i < n; i++) {
+      if (StringUtil.isBlank(certprofileNames[i])) {
+        withNullProfileNames = true;
+        break;
+      }
+    }
+
+    if (numCertprofileNames > n || // more cert profile names than allowed
+        (!reenroll && withNullProfileNames)) { // cert profile names specified are not enough
       CertResponse[] certResps = new CertResponse[n];
       for (int i = 0; i < n; i++) {
-        ASN1Integer certReqId = certReqMsgs[i].getCertReq().getCertReqId();
-        String msg = "expected " + n + ", but " + numCertprofileNames + " CertProfile names are specified";
-        certResps[i] = new CertResponse(certReqId, generateRejectionStatus(badCertTemplate, msg));
+        certResps[i] = new CertResponse(certReqMsgs[i].getCertReq().getCertReqId(),
+            generateRejectionStatus(badCertTemplate, "number of specified cert profile names is not correct"));
       }
 
       event.setStatus(AuditStatus.FAILED);
@@ -106,9 +112,6 @@ public class CmpResponder extends BaseCmpResponder {
 
       SubjectPublicKeyInfo publicKey = certTemp.getPublicKey();
       X500Name subject = certTemp.getSubject();
-
-      // till version 5.3.13, UTF8Pairs is used to specify the CertProfile
-      String certprofileName = certprofileNames == null ? null : certprofileNames[i];
 
       OptionalValidity validity = certTemp.getValidity();
 
@@ -159,38 +162,42 @@ public class CmpResponder extends BaseCmpResponder {
           addErrCertResp(failureResps, i, certReqId, badCertId, "invalid regCtrl oldCertID");
           continue;
         }
-        if (!requestor.isCertprofilePermitted(certprofileName)) {
-          addErrCertResp(failureResps, i, certReqId, notAuthorized,
-              "certprofile " + certprofileName + " is not allowed");
-          continue;
-        }
-
-        if (publicKey != null) {
-          if (!req.hasProofOfPossession()) {
-            addErrCertResp(failureResps, i, certReqId, badPOP, "no POP");
-            continue;
-          }
-
-          if (!verifyPop(req, publicKey)) {
-            LOG.warn("could not validate POP for request {}", certReqId.getValue());
-            addErrCertResp(failureResps, i, certReqId, badPOP, "invalid POP");
-            continue;
-          }
-        } else {
-          checkPermission(requestor, PermissionConstants.GEN_KEYPAIR);
-        }
 
         oldCertInfo = new OldCertInfoByIssuerAndSerial();
         oldCertInfo.setIssuer(new X500NameType(X500Name.getInstance(oldCertId.getIssuer().getName())));
         oldCertInfo.setSerialNumber(oldCertId.getSerialNumber().getValue());
         oldCertInfo.setReusePublicKey(false);
+      } // end if(reenroll)
+
+      String certprofileName = certprofileNames[i];
+      if (StringUtil.isNotBlank(certprofileName) && !requestor.isCertprofilePermitted(certprofileName)) {
+        addErrCertResp(failureResps, i, certReqId, notAuthorized,
+            "certprofile " + certprofileName + " is not allowed");
+        continue;
+      }
+
+      if (publicKey != null) {
+        if (!req.hasProofOfPossession()) {
+          addErrCertResp(failureResps, i, certReqId, badPOP, "no POP");
+          continue;
+        }
+
+        if (!verifyPop(req, publicKey)) {
+          LOG.warn("could not validate POP for request {}", certReqId.getValue());
+          addErrCertResp(failureResps, i, certReqId, badPOP, "invalid POP");
+          continue;
+        }
+      } else {
+        checkPermission(requestor, PermissionConstants.GEN_KEYPAIR);
       }
 
       EnrollCertRequestEntry template = new EnrollCertRequestEntry();
       template.setNotBefore(notBefore);
       template.setNotAfter(notAfter);
       template.setCertReqId(certReqId.getValue());
-      template.setCertprofile(certprofileName);
+      if (StringUtil.isNotBlank(certprofileName)) {
+        template.setCertprofile(certprofileName);
+      }
 
       try {
         template.extensions(certTemp.getExtensions());
