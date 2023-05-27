@@ -6,6 +6,7 @@
 		"user":"CKU_USER",
 		"numSessions": 100,
 		"maxMessageSize":16384,
+		"newSessionTimeout":30000,
 		"includeSlots":[
 			{
 				"index":0
