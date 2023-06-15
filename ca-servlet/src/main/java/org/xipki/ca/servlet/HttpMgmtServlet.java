@@ -607,7 +607,7 @@ public class HttpMgmtServlet extends HttpServlet {
       throws CaMgmtException {
     try {
       return JSON.parseObject(in, clazz);
-    } catch (RuntimeException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new CaMgmtException("cannot parse request " + clazz + " from InputStream");
     }
   } // method parse

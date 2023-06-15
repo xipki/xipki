@@ -124,7 +124,7 @@ public class X509ProfileType extends ValidatableConf {
       X509ProfileType root = JSON.parseObject(confStream, X509ProfileType.class);
       root.validate();
       return root;
-    } catch (InvalidConfException | RuntimeException ex) {
+    } catch (InvalidConfException | IOException | RuntimeException ex) {
       throw new CertprofileException("parse profile failed, message: " + ex.getMessage(), ex);
     } finally {
       try {
