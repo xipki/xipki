@@ -8,6 +8,7 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 
 import java.math.BigInteger;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -312,9 +313,9 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     private String profileName;
 
-    private String notBefore;
+    private Instant notBefore;
 
-    private String notAfter;
+    private Instant notAfter;
 
     public String getProfileName() {
       return profileName;
@@ -324,19 +325,19 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.profileName = profileName;
     }
 
-    public String getNotBefore() {
+    public Instant getNotBefore() {
       return notBefore;
     }
 
-    public void setNotBefore(String notBefore) {
+    public void setNotBefore(Instant notBefore) {
       this.notBefore = notBefore;
     }
 
-    public String getNotAfter() {
+    public Instant getNotAfter() {
       return notAfter;
     }
 
-    public void setNotAfter(String notAfter) {
+    public void setNotAfter(Instant notAfter) {
       this.notAfter = notAfter;
     }
 
@@ -377,9 +378,9 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     private byte[] encodedTargetCert;
 
-    private String notBefore;
+    private Instant notBefore;
 
-    private String notAfter;
+    private Instant notAfter;
 
     public String getProfileName() {
       return profileName;
@@ -405,19 +406,19 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.encodedTargetCert = encodedTargetCert;
     }
 
-    public String getNotBefore() {
+    public Instant getNotBefore() {
       return notBefore;
     }
 
-    public void setNotBefore(String notBefore) {
+    public void setNotBefore(Instant notBefore) {
       this.notBefore = notBefore;
     }
 
-    public String getNotAfter() {
+    public Instant getNotAfter() {
       return notAfter;
     }
 
-    public void setNotAfter(String notAfter) {
+    public void setNotAfter(Instant notAfter) {
       this.notAfter = notAfter;
     }
 
@@ -433,9 +434,9 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     private String serialNumber;
 
-    private String notBefore;
+    private Instant notBefore;
 
-    private String notAfter;
+    private Instant notAfter;
 
     public CaEntryWrapper getCaEntry() {
       return caEntry;
@@ -469,19 +470,19 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.serialNumber = serialNumber;
     }
 
-    public String getNotBefore() {
+    public Instant getNotBefore() {
       return notBefore;
     }
 
-    public void setNotBefore(String notBefore) {
+    public void setNotBefore(Instant notBefore) {
       this.notBefore = notBefore;
     }
 
-    public String getNotAfter() {
+    public Instant getNotAfter() {
       return notAfter;
     }
 
-    public void setNotAfter(String notAfter) {
+    public void setNotAfter(Instant notAfter) {
       this.notAfter = notAfter;
     }
   } // class GenerateRootCa
@@ -568,9 +569,9 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     private byte[] encodedSubjectDnPattern;
 
-    private String validFrom;
+    private Instant validFrom;
 
-    private String validTo;
+    private Instant validTo;
 
     private CertListOrderBy orderBy;
 
@@ -584,19 +585,19 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.encodedSubjectDnPattern = encodedSubjectDnPattern;
     }
 
-    public String getValidFrom() {
+    public Instant getValidFrom() {
       return validFrom;
     }
 
-    public void setValidFrom(String validFrom) {
+    public void setValidFrom(Instant validFrom) {
       this.validFrom = validFrom;
     }
 
-    public String getValidTo() {
+    public Instant getValidTo() {
       return validTo;
     }
 
-    public void setValidTo(String validTo) {
+    public void setValidTo(Instant validTo) {
       this.validTo = validTo;
     }
 
@@ -725,7 +726,7 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     private CrlReason reason;
 
-    private String invalidityTime;
+    private Instant invalidityTime;
 
     public BigInteger getSerialNumber() {
       return serialNumber;
@@ -743,11 +744,11 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.reason = reason;
     }
 
-    public String getInvalidityTime() {
+    public Instant getInvalidityTime() {
       return invalidityTime;
     }
 
-    public void setInvalidityTime(String invalidityTime) {
+    public void setInvalidityTime(Instant invalidityTime) {
       this.invalidityTime = invalidityTime;
     }
 

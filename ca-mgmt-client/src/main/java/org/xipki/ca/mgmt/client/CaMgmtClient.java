@@ -510,7 +510,7 @@ public class CaMgmtClient implements CaManager {
     req.setCaName(caName);
     req.setSerialNumber(serialNumber);
     req.setReason(reason);
-    req.setInvalidityTime(toUtcTime(invalidityTime));
+    req.setInvalidityTime(invalidityTime);
     voidTransmit(MgmtAction.revokeCertificate, req);
   } // method revokeCertificate
 
@@ -541,8 +541,8 @@ public class CaMgmtClient implements CaManager {
     req.setProfileName(profileName);
     req.setEncodedCsr(encodedCsr);
     req.setEncodedTargetCert(encodedTargetCert);
-    req.setNotBefore(toUtcTime(notBefore));
-    req.setNotAfter(toUtcTime(notAfter));
+    req.setNotBefore(notBefore);
+    req.setNotAfter(notAfter);
 
     byte[] respBytes = transmit(MgmtAction.generateCrossCertificate, req);
     return parseCert(parse(respBytes, MgmtResponse.ByteArray.class).getResult());
@@ -556,8 +556,8 @@ public class CaMgmtClient implements CaManager {
     req.setCaName(caName);
     req.setProfileName(profileName);
     req.setEncodedCsr(encodedCsr);
-    req.setNotBefore(toUtcTime(notBefore));
-    req.setNotAfter(toUtcTime(notAfter));
+    req.setNotBefore(notBefore);
+    req.setNotAfter(notAfter);
 
     byte[] respBytes = transmit(MgmtAction.generateCertificate, req);
     return parseCert(parse(respBytes, MgmtResponse.ByteArray.class).getResult());
@@ -571,8 +571,8 @@ public class CaMgmtClient implements CaManager {
     req.setCaName(caName);
     req.setProfileName(profileName);
     req.setSubject(subject);
-    req.setNotBefore(toUtcTime(notBefore));
-    req.setNotAfter(toUtcTime(notAfter));
+    req.setNotBefore(notBefore);
+    req.setNotAfter(notAfter);
 
     byte[] respBytes = transmit(MgmtAction.generateKeyCert, req);
     MgmtResponse.KeyCertBytes resp = parse(respBytes, MgmtResponse.KeyCertBytes.class);
@@ -588,8 +588,8 @@ public class CaMgmtClient implements CaManager {
     req.setCertprofileName(certprofileName);
     req.setSubject(subject);
     req.setSerialNumber(serialNumber);
-    req.setNotBefore(toUtcTime(notBefore));
-    req.setNotAfter(toUtcTime(notAfter));
+    req.setNotBefore(notBefore);
+    req.setNotAfter(notAfter);
 
     byte[] respBytes = transmit(MgmtAction.generateRootCa, req);
     return parseCert(parse(respBytes, MgmtResponse.ByteArray.class).getResult());
@@ -696,8 +696,8 @@ public class CaMgmtClient implements CaManager {
       }
     }
 
-    req.setValidFrom(toUtcTime(validFrom));
-    req.setValidTo(toUtcTime(validTo));
+    req.setValidFrom(validFrom);
+    req.setValidTo(validTo);
     req.setOrderBy(orderBy);
     req.setNumEntries(numEntries);
 
@@ -842,9 +842,5 @@ public class CaMgmtClient implements CaManager {
       throw new CaMgmtException("cannot parse response " + clazz + " from byte[]", ex);
     }
   } // method parse
-
-  private static String toUtcTime(Instant instant) {
-    return instant == null ? null : DateUtil.toUtcTimeyyyyMMddhhmmss(instant);
-  }
 
 }

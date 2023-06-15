@@ -191,7 +191,7 @@ public class HttpMgmtServlet extends HttpServlet {
         case generateCertificate: {
           MgmtRequest.GenerateCert req = parse(in, MgmtRequest.GenerateCert.class);
           X509Cert cert = caManager.generateCertificate(req.getCaName(), req.getProfileName(),
-              req.getEncodedCsr(), parseUtcTime(req.getNotBefore()), parseUtcTime(req.getNotAfter()));
+              req.getEncodedCsr(), req.getNotBefore(), req.getNotAfter());
           resp = toByteArray(cert);
           break;
         }
@@ -199,14 +199,14 @@ public class HttpMgmtServlet extends HttpServlet {
           MgmtRequest.GenerateCrossCertificate req = parse(in, MgmtRequest.GenerateCrossCertificate.class);
           X509Cert cert = caManager.generateCrossCertificate(req.getCaName(), req.getProfileName(),
               req.getEncodedCsr(), req.getEncodedTargetCert(),
-              parseUtcTime(req.getNotBefore()), parseUtcTime(req.getNotAfter()));
+              req.getNotBefore(), req.getNotAfter());
           resp = toByteArray(cert);
           break;
         }
         case generateKeyCert: {
           MgmtRequest.GenerateKeyCert req = parse(in, MgmtRequest.GenerateKeyCert.class);
           KeyCertBytesPair keyCertBytesPair = caManager.generateKeyCert(req.getCaName(), req.getProfileName(),
-              req.getSubject(), parseUtcTime(req.getNotBefore()), parseUtcTime(req.getNotAfter()));
+              req.getSubject(), req.getNotBefore(), req.getNotAfter());
           resp = new MgmtResponse.KeyCertBytes(keyCertBytesPair.getKey(), keyCertBytesPair.getCert());
           break;
         }
@@ -227,7 +227,7 @@ public class HttpMgmtServlet extends HttpServlet {
           }
 
           X509Cert cert = caManager.generateRootCa(caEntry, req.getCertprofileName(), req.getSubject(),
-              req.getSerialNumber(), parseUtcTime(req.getNotBefore()), parseUtcTime(req.getNotAfter()));
+              req.getSerialNumber(), req.getNotBefore(), req.getNotAfter());
           resp = toByteArray(cert);
           break;
         }
@@ -385,7 +385,7 @@ public class HttpMgmtServlet extends HttpServlet {
           MgmtRequest.ListCertificates req = parse(in, MgmtRequest.ListCertificates.class);
           X500Name subjectPattern = X500Name.getInstance(req.getEncodedSubjectDnPattern());
           List<CertListInfo> result = caManager.listCertificates(req.getCaName(), subjectPattern,
-              parseUtcTime(req.getValidFrom()), parseUtcTime(req.getValidTo()), req.getOrderBy(), req.getNumEntries());
+              req.getValidFrom(), req.getValidTo(), req.getOrderBy(), req.getNumEntries());
           resp = new MgmtResponse.ListCertificates(result);
           break;
         }
@@ -476,7 +476,7 @@ public class HttpMgmtServlet extends HttpServlet {
         case revokeCertificate: {
           MgmtRequest.RevokeCertificate req = parse(in, MgmtRequest.RevokeCertificate.class);
           caManager.revokeCertificate(req.getCaName(), req.getSerialNumber(), req.getReason(),
-              parseUtcTime(req.getInvalidityTime()));
+              req.getInvalidityTime());
           break;
         }
         case tokenInfoP11: {
@@ -611,9 +611,5 @@ public class HttpMgmtServlet extends HttpServlet {
       throw new CaMgmtException("cannot parse request " + clazz + " from InputStream");
     }
   } // method parse
-
-  private static Instant parseUtcTime(String utcTime) {
-    return utcTime == null ? null : DateUtil.parseUtcTimeyyyyMMddhhmmss(utcTime);
-  }
 
 }

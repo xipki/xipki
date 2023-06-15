@@ -256,10 +256,10 @@ class X509PublisherModule extends X509CaModule {
       NameId ident = publisher.getIdent();
       boolean successful = publisher.caRevoked(caCert, revocationInfo);
       if (successful) {
-        LOG.info("published event caUnrevoked of CA {} to publisher {}", caIdent.getName(), ident.getName());
+        LOG.info("published event caRevoked of CA {} to publisher {}", caIdent.getName(), ident.getName());
       } else {
         succ = false;
-        LOG.error("could not publish event caUnrevoked of CA {} to publisher {}", caIdent.getName(), ident.getName());
+        LOG.error("could not publish event caRevoked of CA {} to publisher {}", caIdent.getName(), ident.getName());
       }
     }
 
