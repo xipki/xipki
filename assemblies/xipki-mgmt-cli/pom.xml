@@ -15,7 +15,7 @@
     <app.name>management-cli</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <patchkaraf.repos>mvn:org.xipki.feature/mgmt-cli/${project.version}/xml/features</patchkaraf.repos>
-    <patchkaraf.features>(aries-blueprint,wrap),xipki-ca-mgmt,xipki-ocsp-mgmt</patchkaraf.features>
+    <patchkaraf.features>(-ssh,aries-blueprint,wrap),xipki-ca-mgmt,xipki-ocsp-mgmt</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
