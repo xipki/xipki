@@ -1,11 +1,12 @@
 {
-	"scep":{
-		"includeCaCert":true,
-		"includeCertChain":false,
-		"includeSignerCert":true,
-		"supportGetCrl":true,
-		"maxSigningTimeBiasInMs":300
-	},
+	"baseUrl": "https://localhost:8445/acme/",
+	"ca": "myca",
+	"tlsProfile": "tls",
+	"nonceLen": "16",
+	"termsOfService": "http://example.org/tos",
+	"website": "http://example.org/doc/acme",
+	//"contactVerifier": "org.example.MyContactVerifier",
+	//"caaIdentities": ["example.org"],
 	// If set to true, please set writer.level to debug in the file META-INF/classes/log4j2.properties.
 	"logReqResp":false,
 	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
@@ -23,8 +24,8 @@
 			"keystore":{
 				"file":"keycerts/tlskeys/client/tls-client.p12"
 			},
-			"trustanchors":[{
-				"file": "keycerts/tlskeys/ca/tls-ca-cert.pem"
+			"trustanchors": [{
+				"file":"keycerts/tlskeys/ca/tls-ca-cert.pem"
 			}],
 			// valid values: 'default' for standard verification, 'no_op' for no-operation, or
 			// 'java:'<class implements javax.net.ssl.HostnameVerifier>
@@ -33,25 +34,12 @@
 	},
 	"audit":{
 		"type":"embed",
-		"conf": "file=logs/scep-audit.log"
-	},
-	"signers":{
-		"signers":[{
-			"names":["myca"],
-			"signer":{
-				"type":"pkcs12",
-				"conf":"password=1234,keystore=file:keycerts/scep1.p12,algo=SHA256withRSA"
-			}
-		}]
+		"conf": "file=logs/acme-audit.log"
 	},
 	"security":{
 		"keyStrongrandomEnabled":false,
 		"signStrongrandomEnabled":false,
 		"defaultSignerParallelism":10,
-		// pkcs11Conf if signes.signer.type is pkcs11
-		//"pkcs11Conf":{
-		//	"file":"security/pkcs11.json"
-		//},
 		"password":{
 			"masterPasswordCallback":"FILE file=security/masterpassword.secret"
 		},

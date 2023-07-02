@@ -39,6 +39,12 @@
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
+    <dependency>
+      <groupId>org.xipki.gateway</groupId>
+      <artifactId>acme-gateway</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
   </dependencies>
   <build>
     <resources>
@@ -117,6 +123,12 @@
                 <artifactItem>
                   <groupId>org.xipki.gateway</groupId>
                   <artifactId>est-gateway</artifactId>
+                  <version>${project.version}</version>
+                  <type>war</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.gateway</groupId>
+                  <artifactId>acme-gateway</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>

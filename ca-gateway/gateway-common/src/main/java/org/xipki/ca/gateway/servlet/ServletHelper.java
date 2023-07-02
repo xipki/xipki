@@ -13,6 +13,7 @@ import org.xipki.util.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -135,6 +136,28 @@ public class ServletHelper {
     }
 
   } // method getTlsClientCert
+
+  public static void logTextReqResp(
+      String prefix, Logger log, boolean logReqResp, boolean viaPost,
+      HttpServletRequest req, byte[] requestBytes, byte[] respBody) {
+    if (logReqResp && log.isDebugEnabled()) {
+      String requestURI = req.getRequestURI();
+
+      if (viaPost) {
+        log.debug("{} HTTP POST path: {}\nRequest:\n{}\nResponse:\n{}",
+            prefix, requestURI, toUtf8String(requestBytes), toUtf8String(respBody));
+      } else {
+        log.debug("{} HTTP GET path: {}\nResponse:\n{}", prefix, requestURI, toUtf8String(respBody));
+      }
+    }
+  }
+
+  private static String toUtf8String(byte[] bytes) {
+    if (bytes == null) {
+      return "NULL";
+    }
+    return new String(bytes, StandardCharsets.UTF_8);
+  }
 
   public static void logReqResp(
       String prefix, Logger log, boolean logReqResp, boolean viaPost,

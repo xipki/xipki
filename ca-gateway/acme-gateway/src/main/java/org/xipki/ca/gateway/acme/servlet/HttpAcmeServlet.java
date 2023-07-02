@@ -1,15 +1,14 @@
 // Copyright (c) 2013-2023 xipki. All rights reserved.
 // License Apache License 2.0
 
-package org.xipki.ca.gateway.est.servlet;
+package org.xipki.ca.gateway.acme.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.RestResponse;
-import org.xipki.ca.gateway.est.EstResponder;
-import org.xipki.ca.gateway.servlet.HttpRequestMetadataRetrieverImpl;
+import org.xipki.ca.gateway.acme.AcmeResponder;
 import org.xipki.ca.gateway.servlet.ServletHelper;
 import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
@@ -20,26 +19,30 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * EST servlet.
+ * ACME servlet.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
+ * @since 6.4.0
  */
 
-public class HttpEstServlet extends HttpServlet {
+public class HttpAcmeServlet extends HttpServlet {
 
-  private static final Logger LOG = LoggerFactory.getLogger(HttpEstServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HttpAcmeServlet.class);
 
   private boolean logReqResp;
 
-  private EstResponder responder;
+  private AcmeResponder responder;
 
   public void setLogReqResp(boolean logReqResp) {
     this.logReqResp = logReqResp;
   }
 
-  public void setResponder(EstResponder responder) {
+  void setResponder(AcmeResponder responder) {
     this.responder = Args.notNull(responder, "responder");
+  }
+
+  AcmeResponder getResponder() {
+    return responder;
   }
 
   @Override
@@ -56,16 +59,15 @@ public class HttpEstServlet extends HttpServlet {
       throws IOException {
     AuditService auditService = Audits.getAuditService();
     AuditEvent event = new AuditEvent();
-    event.setApplicationName("est-gw");
+    event.setApplicationName("acme-gw");
 
     try {
-      String path = req.getServletPath();
       byte[] requestBytes = viaPost ? IoUtil.read(req.getInputStream()) : null;
 
-      RestResponse restResp = responder.service(path, requestBytes, new HttpRequestMetadataRetrieverImpl(req), event);
+      RestResponse restResp = responder.service(req, requestBytes, event);
       restResp.fillResponse(resp);
 
-      ServletHelper.logReqResp("EST Gateway", LOG, logReqResp, viaPost, req, requestBytes, restResp.getBody());
+      ServletHelper.logTextReqResp("ACME Gateway", LOG, logReqResp, viaPost, req, requestBytes, restResp.getBody());
 
       if (event.getStatus() == null) {
         event.setStatus(AuditStatus.SUCCESSFUL);

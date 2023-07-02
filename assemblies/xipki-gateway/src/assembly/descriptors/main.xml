@@ -71,6 +71,12 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
+      <source>${project.build.directory}/webapps/acme-gateway.war</source>
+      <outputDirectory>webapps</outputDirectory>
+      <destName>acme.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>${project.build.directory}/xipki/security/example/pkcs11-emulator.json</source>
       <outputDirectory>xipki/security</outputDirectory>
       <destName>pkcs11.json</destName>

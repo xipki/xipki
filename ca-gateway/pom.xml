@@ -20,5 +20,6 @@
     <module>scep-client</module>
     <module>scep-gateway</module>
     <module>est-gateway</module>
+    <module>acme-gateway</module>
   </modules>
 </project>

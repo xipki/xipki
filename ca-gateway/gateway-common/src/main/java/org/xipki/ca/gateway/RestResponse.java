@@ -8,6 +8,7 @@ import org.xipki.util.CollectionUtil;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -40,7 +41,7 @@ public class RestResponse {
     this.statusCode = statusCode;
     this.base64 = base64;
     this.contentType = contentType;
-    this.headers = headers;
+    this.headers = headers == null ? new HashMap<>() : headers;
     this.body = body;
   }
 
@@ -86,6 +87,11 @@ public class RestResponse {
       resp.setContentLength(content.length);
       resp.getOutputStream().write(content);
     }
+  }
+
+  public RestResponse putHeader(String name, String value) {
+    getHeaders().put(name, value);
+    return this;
   }
 
 }

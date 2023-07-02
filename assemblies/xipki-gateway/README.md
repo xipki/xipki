@@ -43,6 +43,8 @@ log4j-*.jar,\
 security-*.jar,\
 slf4j-*.jar,\
 *pkcs11wrapper-*.jar,\
+jose4j-*.jar,\
+dnsjava-*.jar,\
 util-*.jar,\
 xipki-tomcat-password-*.jar,\
 gateway-common-*.jar
