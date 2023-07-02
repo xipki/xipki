@@ -152,23 +152,39 @@ JDK 11+ is required.
    * Start Management CLI.
 
      `bin/karaf`
+
  
    * Setup CA (choose p11 if the key is saved in PKCS#11 device, p12 in PKCS#12 device)
-      * In case of using new keys and certificates, in CLI:  
+      * In case of using new keys and certificates, in the Management CLI:  
         `source xipki/ca-setup/cacert-none/setup-*-*.script`
-         where * is place holder.
+         where * is placeholder.
 
-      * In case of using existing keys and certificates, in CLI:  
+      * In case of using existing keys and certificates, in the Management CLI:  
         `source xipki/ca-setup/cacert-present/setup-*-*.script`
-         where * is place holder.
+         where * is placeholder.
 
-      * If you wish to generate the signing key and certificate for the OCSP responder, in CLI:  
+      * If you wish to generate the signing key and certificate for the OCSP responder, in the Management CLI:  
          `source xipki/ca-setup/setup-ocsp-*.script`.
 
-   * Verify the installation, execute the command in CLI:  
+   * Verify the installation, execute the command in the Management CLI:  
      `ca-info myca1`
 
+   * Note: You may access the Management CLI via SSH.
+     * Configure karaf to start the SSH server.
+        * Add `"ssh,"` to the field `featuresBoot` in the file `etc/org.apache.karaf.features.cfg`.
+        * Configure the SSH server. See https://karaf.apache.org/manual/latest/security for details.
+     * Use a SSH client (either `bin/client` or any ssh client) to access the SSH service. Supported authentication
+       methods are
+       * username and password
+       * public key (see Section `Managing authentication by key` at https://karaf.apache.org/manual/latest/security).
+
 ## Enroll/Revoke Certificate (in folder `xipki-cli`)
+
+* Start CLI (not needed for the `*.sh` scripts).
+
+  `bin/karaf`
+
+  You may access the CLI via SSH (details see the last text block in the previous section).
 
 * EST  
   Use any EST client.

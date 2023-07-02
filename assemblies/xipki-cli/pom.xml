@@ -15,7 +15,7 @@
     <app.name>cli</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <patchkaraf.repos>mvn:org.xipki.feature/cli/${project.version}/xml/features</patchkaraf.repos>
-    <patchkaraf.features>(-jaas,-ssh,-config,aries-blueprint,wrap),xipki-cmp-client,xipki-scep-client,xipki-ocsp-client</patchkaraf.features>
+    <patchkaraf.features>(aries-blueprint,wrap),xipki-cmp-client,xipki-scep-client,xipki-ocsp-client</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
@@ -146,6 +146,9 @@
                 <feature>framework</feature>
                 <feature>aries-blueprint</feature>
                 <feature>wrap</feature>
+                <feature>ssh</feature>
+                <feature>jaas</feature>
+                <feature>config</feature>
                 <!-- project-core features -->
                 <feature>xipki-cmp-client</feature>
                 <feature>xipki-ocsp-client</feature>
