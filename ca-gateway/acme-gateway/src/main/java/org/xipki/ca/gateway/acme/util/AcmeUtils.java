@@ -1,4 +1,5 @@
 /*
+ * #THIRDPARTY#
  * acme4j - Java ACME client
  *
  * Copyright (C) 2016 Richard "Shred" Körber
@@ -53,6 +54,7 @@ import java.util.regex.Pattern;
  * <p>
  * This class is internal. You may use it in your own code, but be warned that methods may
  * change their signature or disappear without prior announcement.
+ * @author ACME4J team
  */
 public final class AcmeUtils {
     private static final char[] HEX = "0123456789abcdef".toCharArray();
@@ -99,7 +101,6 @@ public final class AcmeUtils {
             return label;
         }
     }
-
 
     private AcmeUtils() {
         // Utility class without constructor
@@ -336,7 +337,6 @@ public final class AcmeUtils {
         }
     }
 
-
     public static PublicKey jwkPublicKey(Map<String, String> jwk) throws InvalidKeySpecException {
         String kty = jwk.get("kty");
         if ("RSA".equalsIgnoreCase(kty)) {
@@ -405,7 +405,6 @@ public final class AcmeUtils {
             throw new RuntimeException("unsupported kty " + kty);
         }
     }
-
 
     private static byte[] buildECPublicKeyData(ASN1ObjectIdentifier curveOid, byte[] x, byte[] y)
         throws InvalidKeySpecException {

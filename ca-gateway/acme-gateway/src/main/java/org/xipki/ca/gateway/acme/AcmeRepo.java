@@ -1,8 +1,15 @@
+// Copyright (c) 2013-2023 xipki. All rights reserved.
+// License Apache License 2.0
+
 package org.xipki.ca.gateway.acme;
 
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ *
+ * @author Lijun Liao (xipki)
+ */
 public interface AcmeRepo {
 
   // set also the label

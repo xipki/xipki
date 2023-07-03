@@ -1,5 +1,6 @@
 /*
- * acme4j - Java ACME client
+ * #THIRDPARTY#
+ *  acme4j - Java ACME client
  *
  * Copyright (C) 2016 Richard "Shred" Körber
  *   http://acme4j.shredzone.org
@@ -48,6 +49,7 @@ import org.xipki.ca.gateway.acme.AcmeProtocolException;
 
 /**
  * A model containing a JSON result. The content is immutable.
+ * @author ACME4J team
  */
 public final class AcmeJson implements Serializable {
     private static final long serialVersionUID = 3091273044605709204L;
@@ -311,7 +313,6 @@ public final class AcmeJson implements Serializable {
         public Optional<Value> optional() {
             return val != null ? Optional.of(this) : Optional.empty();
         }
-
 
         /**
          * Returns this value as an {@link Optional} of the desired type, for further

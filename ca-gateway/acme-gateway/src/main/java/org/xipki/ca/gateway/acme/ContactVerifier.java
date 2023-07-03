@@ -1,7 +1,14 @@
+// Copyright (c) 2013-2023 xipki. All rights reserved.
+// License Apache License 2.0
+
 package org.xipki.ca.gateway.acme;
 
 import java.util.regex.Pattern;
 
+/**
+ *
+ * @author Lijun Liao (xipki)
+ */
 public interface ContactVerifier {
 
   int invalidContact = 1;

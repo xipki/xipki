@@ -1,5 +1,12 @@
+// Copyright (c) 2013-2023 xipki. All rights reserved.
+// License Apache License 2.0
+
 package org.xipki.ca.gateway.acme;
 
+/**
+ *
+ * @author Lijun Liao (xipki)
+ */
 public class AcmeConstants {
 
   public static final String CMD_directory = "directory";

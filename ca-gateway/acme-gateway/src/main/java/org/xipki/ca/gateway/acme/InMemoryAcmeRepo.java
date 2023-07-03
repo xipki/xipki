@@ -1,3 +1,6 @@
+// Copyright (c) 2013-2023 xipki. All rights reserved.
+// License Apache License 2.0
+
 package org.xipki.ca.gateway.acme;
 
 import org.xipki.ca.gateway.acme.type.AuthzStatus;
@@ -13,6 +16,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ *
+ * @author Lijun Liao (xipki)
+ */
 public class InMemoryAcmeRepo implements AcmeRepo {
 
   private static class ListIterator implements Iterator<String> {

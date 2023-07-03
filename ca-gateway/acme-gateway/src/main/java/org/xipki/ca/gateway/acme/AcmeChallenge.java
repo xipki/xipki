@@ -1,3 +1,6 @@
+// Copyright (c) 2013-2023 xipki. All rights reserved.
+// License Apache License 2.0
+
 package org.xipki.ca.gateway.acme;
 
 import org.xipki.ca.gateway.acme.msg.ChallengeResponse;
@@ -6,6 +9,10 @@ import org.xipki.ca.gateway.acme.type.ChallengeStatus;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
+/**
+ *
+ * @author Lijun Liao (xipki)
+ */
 public class AcmeChallenge {
 
   private String label;

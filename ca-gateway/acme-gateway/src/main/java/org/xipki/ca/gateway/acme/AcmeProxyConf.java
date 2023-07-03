@@ -20,7 +20,6 @@ import java.nio.file.Paths;
  * @author Lijun Liao (xipki)
  * @since 6.4.0
  */
-
 public class AcmeProxyConf extends ProtocolProxyConf {
 
   private int nonceNumBytes = 16;

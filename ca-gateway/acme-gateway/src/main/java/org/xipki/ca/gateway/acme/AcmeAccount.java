@@ -1,3 +1,6 @@
+// Copyright (c) 2013-2023 xipki. All rights reserved.
+// License Apache License 2.0
+
 package org.xipki.ca.gateway.acme;
 
 import org.xipki.ca.gateway.acme.msg.AccountResponse;
@@ -9,6 +12,10 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Map;
 
+/**
+ *
+ * @author Lijun Liao (xipki)
+ */
 public class AcmeAccount {
 
   private String label;

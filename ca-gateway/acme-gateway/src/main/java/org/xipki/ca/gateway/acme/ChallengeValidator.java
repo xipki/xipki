@@ -1,8 +1,10 @@
+// Copyright (c) 2013-2023 xipki. All rights reserved.
+// License Apache License 2.0
+
 package org.xipki.ca.gateway.acme;
 
 import org.bouncycastle.asn1.ASN1IA5String;
 import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
@@ -14,7 +16,6 @@ import org.xbill.DNS.Record;
 import org.xipki.ca.gateway.acme.type.AuthzStatus;
 import org.xipki.ca.gateway.acme.type.ChallengeStatus;
 import org.xipki.ca.gateway.acme.type.OrderStatus;
-import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 import org.xipki.util.http.HttpRespContent;
@@ -23,7 +24,6 @@ import org.xipki.util.http.XiHttpClient;
 import javax.net.ssl.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.DirectoryNotEmptyException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
@@ -31,8 +31,11 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.Iterator;
-import java.util.List;
 
+/**
+ *
+ * @author Lijun Liao (xipki)
+ */
 public class ChallengeValidator implements Runnable {
 
   private static final TrustManager trustAll = new X509TrustManager() {

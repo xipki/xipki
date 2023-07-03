@@ -50,12 +50,11 @@ import static org.xipki.util.Base64Url.decodeFast;
 import static org.xipki.ca.gateway.acme.AcmeConstants.*;
 
 /**
- * EST responder.
+ * ACME responder.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
+ * @since 6.4.0
  */
-
 public class AcmeResponder {
 
   private static class HttpRespAuditException extends Exception {

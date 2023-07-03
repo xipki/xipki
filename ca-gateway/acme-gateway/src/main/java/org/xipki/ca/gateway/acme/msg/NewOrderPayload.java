@@ -1,7 +1,14 @@
+// Copyright (c) 2013-2023 xipki. All rights reserved.
+// License Apache License 2.0
+
 package org.xipki.ca.gateway.acme.msg;
 
 import org.xipki.ca.gateway.acme.type.Identifier;
 
+/**
+ *
+ * @author Lijun Liao (xipki)
+ */
 public class NewOrderPayload {
 
   private Identifier[] identifiers;

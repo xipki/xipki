@@ -1,5 +1,12 @@
+// Copyright (c) 2013-2023 xipki. All rights reserved.
+// License Apache License 2.0
+
 package org.xipki.ca.gateway.acme.msg;
 
+/**
+ *
+ * @author Lijun Liao (xipki)
+ */
 public class NewAccountPayload {
 
   private Boolean termsOfServiceAgreed;
@@ -9,7 +16,6 @@ public class NewAccountPayload {
   private String[] contact;
 
   private JoseMessage externalAccountBinding;
-
 
   public Boolean getTermsOfServiceAgreed() {
     return termsOfServiceAgreed;

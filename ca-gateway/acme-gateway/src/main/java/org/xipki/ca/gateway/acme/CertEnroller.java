@@ -1,3 +1,6 @@
+// Copyright (c) 2013-2023 xipki. All rights reserved.
+// License Apache License 2.0
+
 package org.xipki.ca.gateway.acme;
 
 import org.slf4j.Logger;
@@ -10,6 +13,10 @@ import org.xipki.util.LogUtil;
 import java.util.Collections;
 import java.util.Iterator;
 
+/**
+ *
+ * @author Lijun Liao (xipki)
+ */
 public class CertEnroller implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(CertEnroller.class);
