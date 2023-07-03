@@ -43,7 +43,7 @@ public class AcmeError {
   /**
    * The JWS was signed with an algorithm the server does not support.
    */
-  public static final String badSignatureAlgorithm = ACME_PREFIX + "v";
+  public static final String badSignatureAlgorithm = ACME_PREFIX + "badSignatureAlgorithm";
 
   /**
    * Certification Authority Authorization (CAA) records forbid the CA from issuing a certificate.

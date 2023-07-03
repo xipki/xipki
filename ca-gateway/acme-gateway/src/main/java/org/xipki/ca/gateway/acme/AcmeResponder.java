@@ -22,6 +22,7 @@ import org.xipki.ca.gateway.acme.util.AcmeJson;
 import org.xipki.ca.gateway.acme.util.AcmeUtils;
 import org.xipki.ca.sdk.*;
 import org.xipki.security.CrlReason;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.util.*;
 import org.xipki.util.*;
@@ -686,13 +687,31 @@ public class AcmeResponder {
                   "unsupported identifier '" + value + "'");
             }
 
+            Map<String, String> jwk0 = account.getJwk();
+            List<String> jwkNames = new ArrayList<>(jwk0.keySet());
+            Collections.sort(jwkNames);
+            StringBuilder canonJwk = new StringBuilder();
+            canonJwk.append("{");
+            for (String jwkName : jwkNames) {
+              canonJwk.append("\"").append(jwkName).append("\":\"").append(jwk0.get(jwkName)).append("\",");
+            }
+            // remove the last ","
+            canonJwk.deleteCharAt(canonJwk.length() - 1);
+            canonJwk.append("}");
+            String jwkSha256 = Base64Url.encodeToStringNoPadding(
+                HashAlgo.SHA256.hash(canonJwk.toString().getBytes(StandardCharsets.UTF_8)));
+
+            String authorization = token + "." + jwkSha256;
+            String authorizationSha256 = Base64Url.encodeToStringNoPadding(
+                HashAlgo.SHA256.hash(authorization.getBytes(StandardCharsets.UTF_8)));
+
             List<AcmeChallenge> challenges = new ArrayList<>(3);
             if (!value.startsWith("*.")) {
-              challenges.add(newChall(HTTP_01, token));
-              challenges.add(newChall(ALPN_01, token));
+              challenges.add(newChall(HTTP_01, token, authorization));
+              challenges.add(newChall(TLS_ALPN_01, token, authorizationSha256));
             }
 
-            challenges.add(newChall(DNS_01, token));
+            challenges.add(newChall(DNS_01, token, authorizationSha256));
             authz.setChallenges(challenges.toArray(new AcmeChallenge[0]));
           } else {
             return buildProblemResp(SC_BAD_REQUEST, AcmeError.unsupportedIdentifier,
@@ -942,11 +961,13 @@ public class AcmeResponder {
     return Base64Url.encodeToStringNoPadding(token);
   }
 
-  private AcmeChallenge newChall(String type, String token) {
+  private AcmeChallenge newChall(String type, String token, String expectedAuthorization) {
     AcmeChallenge chall = new AcmeChallenge();
     chall.setStatus(ChallengeStatus.pending);
     chall.setType(type);
     chall.setToken(token);
+    chall.setExpectedAuthorization(expectedAuthorization);
+    LOG.info("challenge: {}:{}={}", type, token, expectedAuthorization);
     return chall;
   }
 

@@ -1,5 +1,5 @@
 {
-	"baseUrl": "https://localhost:8445/acme/",
+	"baseUrl": "https://real.host.name:8445/acme/", // TODO: adapt it with the real host name.
 	"ca": "myca",
 	"tlsProfile": "tls",
 	"nonceLen": "16",
@@ -9,6 +9,7 @@
 	//"caaIdentities": ["example.org"],
 	// If set to true, please set writer.level to debug in the file META-INF/classes/log4j2.properties.
 	"logReqResp":false,
+	// no authentication of requestor is needed in ACME, so Dummy is ok.
 	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
 	"pop":{
 		"sigAlgos":[

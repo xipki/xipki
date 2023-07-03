@@ -18,6 +18,8 @@ public class AcmeChallenge {
 
   private Instant validated;
 
+  private String expectedAuthorization;
+
   public String getLabel() {
     return label;
   }
@@ -56,6 +58,14 @@ public class AcmeChallenge {
 
   public void setStatus(ChallengeStatus status) {
     this.status = status;
+  }
+
+  public String getExpectedAuthorization() {
+    return expectedAuthorization;
+  }
+
+  public void setExpectedAuthorization(String expectedAuthorization) {
+    this.expectedAuthorization = expectedAuthorization;
   }
 
   public ChallengeResponse toChallengeResponse(String baseUrl) {

@@ -70,6 +70,8 @@ public class AcmeConstants {
 
   public static final String HTTP_01 = "http-01";
 
-  public static final String ALPN_01 = "alpn-01";
+  public static final String TLS_ALPN_01 = "tls-alpn-01";
+
+  public static final String id_pe_acmeIdentifier = "1.3.6.1.5.5.7.1.31";
 
 }
