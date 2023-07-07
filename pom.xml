@@ -47,7 +47,7 @@
     <log4j.version>2.19.0</log4j.version>
     <jdbc.mariadb.version>3.1.3</jdbc.mariadb.version>
     <jdbc.postgresql.version>42.6.0</jdbc.postgresql.version>
-    <jdbc.h2.version>2.1.214</jdbc.h2.version>
+    <jdbc.h2.version>2.2.220</jdbc.h2.version>
     <!-- Only for test purpose -->
     <junit.version>4.13.1</junit.version>
     <!-- Fix bug introduced from karaf 4.3.8 and 4.4.2: remove this block if no exception presented in the log file-->
