@@ -234,6 +234,8 @@ Features
   - EST (RFC 7030)
   - SCEP (RFC 8894)
   - CMP (RFC 4210, 4211, 9045, draft-ietf-lamps-cmp-updates)
+  - ACME (RFC 8555, RFC 8737)
+    - Challenge types: dns-01, http-01, tls-apln-01
   - RESTful API
 
 - CA (Certification Authority)

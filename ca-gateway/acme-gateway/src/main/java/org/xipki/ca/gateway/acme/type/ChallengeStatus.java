@@ -9,8 +9,28 @@ package org.xipki.ca.gateway.acme.type;
  */
 public enum ChallengeStatus {
 
-  pending,
-  processing,
-  valid,
-  invalid
+  valid(1),
+  pending(2),
+  processing(3),
+  invalid(12);
+
+  private final int code;
+
+  ChallengeStatus(int code) {
+    this.code = code;
+  }
+
+  public int getCode() {
+    return code;
+  }
+
+  public static ChallengeStatus ofCode(int code) {
+    for (ChallengeStatus status : values()) {
+      if (status.code == code) {
+        return status;
+      }
+    }
+    return null;
+  }
+
 }

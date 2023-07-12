@@ -5,6 +5,8 @@ package org.xipki.ca.gateway.acme;
 
 import org.xipki.ca.gateway.acme.msg.ChallengeResponse;
 import org.xipki.ca.gateway.acme.type.ChallengeStatus;
+import org.xipki.ca.gateway.acme.util.AcmeUtils;
+import org.xipki.util.CompareUtil;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -15,7 +17,7 @@ import java.time.temporal.ChronoUnit;
  */
 public class AcmeChallenge {
 
-  private String label;
+  private int subId;
 
   private ChallengeStatus status;
 
@@ -27,12 +29,19 @@ public class AcmeChallenge {
 
   private String expectedAuthorization;
 
-  public String getLabel() {
-    return label;
+  private transient AcmeAuthz authz;
+
+  public void setAuthz(AcmeAuthz authz) {
+    this.authz = authz;
   }
 
-  public void setLabel(String label) {
-    this.label = label;
+  public int getSubId() {
+    return subId;
+  }
+
+  public void setSubId(int subId) {
+    markOrder();
+    this.subId = subId;
   }
 
   public Instant getValidated() {
@@ -40,6 +49,7 @@ public class AcmeChallenge {
   }
 
   public void setValidated(Instant validated) {
+    markOrder();
     this.validated = validated;
   }
 
@@ -48,6 +58,7 @@ public class AcmeChallenge {
   }
 
   public void setType(String type) {
+    markOrder();
     this.type = type;
   }
 
@@ -56,6 +67,7 @@ public class AcmeChallenge {
   }
 
   public void setToken(String token) {
+    markOrder();
     this.token = token;
   }
 
@@ -64,6 +76,7 @@ public class AcmeChallenge {
   }
 
   public void setStatus(ChallengeStatus status) {
+    markOrder();
     this.status = status;
   }
 
@@ -72,20 +85,52 @@ public class AcmeChallenge {
   }
 
   public void setExpectedAuthorization(String expectedAuthorization) {
+    markOrder();
     this.expectedAuthorization = expectedAuthorization;
   }
 
-  public ChallengeResponse toChallengeResponse(String baseUrl) {
+  private void markOrder() {
+    if (authz != null) {
+      authz.markOrder();
+    }
+  }
+
+  public ChallengeResponse toChallengeResponse(long authzId, String baseUrl) {
     ChallengeResponse resp = new ChallengeResponse();
     if (validated != null) {
       resp.setValidated(validated.truncatedTo(ChronoUnit.SECONDS).toString());
     }
 
-    resp.setUrl(baseUrl + "chall/" + label);
+    resp.setUrl(baseUrl + "chall/" + AcmeUtils.toBase64(authzId) + "/" + AcmeUtils.toBase64(subId));
     resp.setStatus(status);
     resp.setType(type);
     resp.setToken(token);
     return resp;
+  }
+
+  public AcmeChallenge copy() {
+    AcmeChallenge copy = new AcmeChallenge();
+    copy.subId = subId;
+    copy.status = status;
+    copy.type = type;
+    copy.token = token;
+    copy.validated = validated;
+    copy.expectedAuthorization = expectedAuthorization;
+    return copy;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof AcmeChallenge)) {
+      return false;
+    }
+
+    AcmeChallenge b = (AcmeChallenge) obj;
+    return subId == b.subId && status == b.status
+        && CompareUtil.equalsObject(type, b.type)
+        && CompareUtil.equalsObject(token, b.token)
+        && CompareUtil.equalsObject(validated, b.validated)
+        && CompareUtil.equalsObject(expectedAuthorization, b.expectedAuthorization);
   }
 
 }

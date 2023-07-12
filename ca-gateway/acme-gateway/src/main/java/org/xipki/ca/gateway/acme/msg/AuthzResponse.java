@@ -6,6 +6,8 @@ package org.xipki.ca.gateway.acme.msg;
 import org.xipki.ca.gateway.acme.type.AuthzStatus;
 import org.xipki.ca.gateway.acme.type.Identifier;
 
+import java.util.List;
+
 /**
  *
  * @author Lijun Liao (xipki)
@@ -16,7 +18,7 @@ public class AuthzResponse {
   private String expires;
   private Identifier identifier;
 
-  private ChallengeResponse[] challenges;
+  private List<ChallengeResponse> challenges;
 
   public AuthzStatus getStatus() {
     return status;
@@ -42,11 +44,11 @@ public class AuthzResponse {
     this.identifier = identifier;
   }
 
-  public ChallengeResponse[] getChallenges() {
+  public List<ChallengeResponse> getChallenges() {
     return challenges;
   }
 
-  public void setChallenges(ChallengeResponse[] challenges) {
+  public void setChallenges(List<ChallengeResponse> challenges) {
     this.challenges = challenges;
   }
 }

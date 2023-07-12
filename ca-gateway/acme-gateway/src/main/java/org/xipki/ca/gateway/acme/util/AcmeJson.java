@@ -14,38 +14,25 @@
  */
 package org.xipki.ca.gateway.acme.util;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.stream.Collectors.joining;
+import org.jose4j.json.JsonUtil;
+import org.jose4j.lang.JoseException;
+import org.xipki.ca.gateway.acme.AcmeProtocolException;
+import org.xipki.util.Base64Url;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.jose4j.json.JsonUtil;
-import org.jose4j.lang.JoseException;
-import org.xipki.ca.gateway.acme.AcmeProtocolException;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.joining;
 
 /**
  * A model containing a JSON result. The content is immutable.
@@ -90,7 +77,7 @@ public final class AcmeJson implements Serializable {
      *            Bytes.
      * @return {@link AcmeJson} of the read content.
      */
-    public static AcmeJson parse(byte[] bytes) throws IOException {
+    public static AcmeJson parse(byte[] bytes) {
         return parse(new String(bytes, UTF_8));
     }
 
@@ -356,7 +343,7 @@ public final class AcmeJson implements Serializable {
         public AcmeJson asEncodedObject() {
             required();
             try {
-                byte[] raw = AcmeUtils.base64UrlDecode(val.toString());
+                byte[] raw = Base64Url.decodeFast(val.toString());
                 return new AcmeJson(path, JsonUtil.parseJson(new String(raw, UTF_8)));
             } catch (IllegalArgumentException | JoseException ex) {
                 throw new AcmeProtocolException(path + ": expected an encoded object", ex);
@@ -460,7 +447,7 @@ public final class AcmeJson implements Serializable {
          */
         public byte[] asBinary() {
             required();
-            return AcmeUtils.base64UrlDecode(val.toString());
+            return Base64Url.decodeFast(val.toString());
         }
 
         /**

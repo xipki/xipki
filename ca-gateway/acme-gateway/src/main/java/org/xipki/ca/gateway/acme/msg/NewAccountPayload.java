@@ -3,6 +3,8 @@
 
 package org.xipki.ca.gateway.acme.msg;
 
+import java.util.List;
+
 /**
  *
  * @author Lijun Liao (xipki)
@@ -13,7 +15,7 @@ public class NewAccountPayload {
 
   private Boolean onlyReturnExisting;
 
-  private String[] contact;
+  private List<String> contact;
 
   private JoseMessage externalAccountBinding;
 
@@ -33,11 +35,11 @@ public class NewAccountPayload {
     this.onlyReturnExisting = onlyReturnExisting;
   }
 
-  public String[] getContact() {
+  public List<String> getContact() {
     return contact;
   }
 
-  public void setContact(String[] contact) {
+  public void setContact(List<String> contact) {
     this.contact = contact;
   }
 

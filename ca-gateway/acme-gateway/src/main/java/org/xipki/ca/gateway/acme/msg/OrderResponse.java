@@ -3,8 +3,10 @@
 
 package org.xipki.ca.gateway.acme.msg;
 
-import org.xipki.ca.gateway.acme.type.OrderStatus;
 import org.xipki.ca.gateway.acme.type.Identifier;
+import org.xipki.ca.gateway.acme.type.OrderStatus;
+
+import java.util.List;
 
 /**
  *
@@ -16,8 +18,8 @@ public class OrderResponse {
   private String expires;
   private String notBefore;
   private String notAfter;
-  private Identifier[] identifiers;
-  private String[] authorizations;
+  private List<Identifier> identifiers;
+  private List<String> authorizations;
   private String finalize;
 
   private String certificate;
@@ -54,19 +56,19 @@ public class OrderResponse {
     this.notAfter = notAfter;
   }
 
-  public Identifier[] getIdentifiers() {
+  public List<Identifier> getIdentifiers() {
     return identifiers;
   }
 
-  public void setIdentifiers(Identifier[] identifiers) {
+  public void setIdentifiers(List<Identifier> identifiers) {
     this.identifiers = identifiers;
   }
 
-  public String[] getAuthorizations() {
+  public List<String> getAuthorizations() {
     return authorizations;
   }
 
-  public void setAuthorizations(String[] authorizations) {
+  public void setAuthorizations(List<String> authorizations) {
     this.authorizations = authorizations;
   }
 

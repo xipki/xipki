@@ -9,9 +9,29 @@ package org.xipki.ca.gateway.acme.type;
  */
 public enum OrderStatus {
 
-  invalid,
-  pending,
-  ready,
-  processing,
-  valid
+  valid(1),
+  pending(2),
+  processing(3),
+  ready(4),
+  invalid(12);
+
+  private final int code;
+
+  OrderStatus(int code) {
+    this.code = code;
+  }
+
+  public int getCode() {
+    return code;
+  }
+
+  public static OrderStatus ofCode(int code) {
+    for (OrderStatus status : values()) {
+      if (status.code == code) {
+        return status;
+      }
+    }
+    return null;
+  }
+
 }

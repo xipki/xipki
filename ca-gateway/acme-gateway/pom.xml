@@ -26,6 +26,11 @@
       <version>${jose4j.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xipki.commons</groupId>
+      <artifactId>datasource</artifactId>
+      <version>${xipki.commons.version}</version>
+    </dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>gateway-common</artifactId>
       <version>${project.version}</version>

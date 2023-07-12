@@ -3,6 +3,8 @@
 
 package org.xipki.ca.gateway.acme.type;
 
+import org.xipki.ca.gateway.acme.AcmeIdentifier;
+
 /**
  *
  * @author Lijun Liao (xipki)
@@ -28,4 +30,9 @@ public class Identifier {
   public void setValue(String value) {
     this.value = value;
   }
+
+  public AcmeIdentifier toAcmeIdentifier() {
+    return new AcmeIdentifier(type, value);
+  }
+
 }

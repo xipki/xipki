@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ XiPKI version 6.4.0
+ Maximal column size: 4k
+  - DB2: PAGESIZE 4 k
+-->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+  logicalFilePath="acme-init.xml">
+  <changeSet author="xipki" id="1">
+    <!-- table DBSCHEMA -->
+    <createTable tableName="DBSCHEMA" remarks="database schema information">
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="VALUE2" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="VENDOR"/>
+      <column name="VALUE2" value="XIPKI"/>
+    </insert>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="VERSION"/>
+      <column name="VALUE2" value="1"/>
+    </insert>
+    <!-- table ACCOUNT -->
+    <createTable tableName="ACCOUNT">
+      <column name="ID" type="BIGINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="LUPDATE" type="BIGINT" remarks="last update, seconds since January 1, 1970, 00:00:00 GMT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="STATUS" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="JWK_SHA256" type="CHAR((43)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="DATA" type="VARCHAR(2000)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <!-- table ORDER2 (ORDER is SQL keyword) -->
+    <createTable tableName="ORDER2">
+      <column name="ID" type="BIGINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="LUPDATE" type="BIGINT" remarks="last update, seconds since January 1, 1970, 00:00:00 GMT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="ACCOUNT_ID" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="STATUS" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="EXPIRES" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CERT_NAFTER" type="BIGINT"/>
+      <column name="CERT_SHA256" type="CHAR(43)"/>
+      <column name="AUTHZS" type="VArCHAR(2000)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CERTREQ_META" type="VARCHAR(200)"/>
+      <column name="CSR" type="VARCHAR(2000)"/>
+      <column name="CERT" type="VARCHAR(3000)"/>
+    </createTable>
+    <!-- table AUTHZ -->
+    <createTable tableName="AUTHZ" remarks="authorization">
+      <column name="ID" type="BIGINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="ORDER_ID" type="BIGINT" remarks="ORDER ID">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  <!-- foreign key -->
+  <changeSet author="xipki" id="2">
+    <addForeignKeyConstraint constraintName="FK_ORDER_ACCOUNT1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
+      baseColumnNames="ACCOUNT_ID" baseTableName="ORDER2"
+      referencedColumnNames="ID" referencedTableName="ACCOUNT"/>
+    <addForeignKeyConstraint constraintName="FK_AUTHZ_ORDER1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="ORDER_ID" baseTableName="AUTHZ"
+      referencedColumnNames="ID" referencedTableName="ORDER2"/>
+  </changeSet>
+</databaseChangeLog>

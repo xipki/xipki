@@ -9,8 +9,27 @@ package org.xipki.ca.gateway.acme.type;
  */
 public enum AccountStatus {
 
-  valid,
-  deactivated,
-  revoked
+  valid(1),
+  deactivated (10),
+  revoked (13);
+
+  private final int code;
+
+  AccountStatus(int code) {
+    this.code = code;
+  }
+
+  public int getCode() {
+    return code;
+  }
+
+  public static AccountStatus ofCode(int code) {
+    for (AccountStatus status : values()) {
+      if (status.code == code) {
+        return status;
+      }
+    }
+    return null;
+  }
 
 }

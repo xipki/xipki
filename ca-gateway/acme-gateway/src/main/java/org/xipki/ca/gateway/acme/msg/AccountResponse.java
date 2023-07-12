@@ -5,6 +5,8 @@ package org.xipki.ca.gateway.acme.msg;
 
 import org.xipki.ca.gateway.acme.type.AccountStatus;
 
+import java.util.List;
+
 /**
  *
  * @author Lijun Liao (xipki)
@@ -12,7 +14,7 @@ import org.xipki.ca.gateway.acme.type.AccountStatus;
 public class AccountResponse {
   private AccountStatus status;
 
-  private String[] contact;
+  private List<String> contact;
 
   private JoseMessage externalAccountBinding;
 
@@ -28,11 +30,11 @@ public class AccountResponse {
     this.status = status;
   }
 
-  public String[] getContact() {
+  public List<String> getContact() {
     return contact;
   }
 
-  public void setContact(String[] contact) {
+  public void setContact(List<String> contact) {
     this.contact = contact;
   }
 

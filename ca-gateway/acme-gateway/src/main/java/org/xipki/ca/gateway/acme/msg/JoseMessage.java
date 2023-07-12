@@ -40,4 +40,12 @@ public class JoseMessage {
     this.signature = signature;
   }
 
+  public JoseMessage copy() {
+    JoseMessage copy = new JoseMessage();
+    copy.setProtected(protected_);
+    copy.setPayload(payload);
+    copy.setSignature(signature);
+    return copy;
+  }
+
 }

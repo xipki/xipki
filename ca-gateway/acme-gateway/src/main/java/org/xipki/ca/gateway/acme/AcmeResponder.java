@@ -7,6 +7,7 @@ import org.bouncycastle.asn1.ASN1IA5String;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.util.Pack;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.lang.InvalidAlgorithmException;
 import org.jose4j.lang.JoseException;
@@ -15,39 +16,48 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
-import org.xipki.ca.gateway.*;
+import org.xipki.ca.gateway.GatewayUtil;
+import org.xipki.ca.gateway.PopControl;
+import org.xipki.ca.gateway.RestResponse;
 import org.xipki.ca.gateway.acme.msg.*;
 import org.xipki.ca.gateway.acme.type.*;
 import org.xipki.ca.gateway.acme.util.AcmeJson;
 import org.xipki.ca.gateway.acme.util.AcmeUtils;
 import org.xipki.ca.sdk.*;
+import org.xipki.datasource.DataSourceFactory;
+import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.util.*;
+import org.xipki.security.util.JSON;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.HttpRespContent;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.EOFException;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
+import static org.xipki.ca.gateway.acme.AcmeConstants.*;
 import static org.xipki.util.Args.notBlank;
 import static org.xipki.util.Args.notNull;
-import static org.xipki.util.StringUtil.*;
-import static org.xipki.util.exception.ErrorCode.*;
 import static org.xipki.util.Base64Url.decodeFast;
-import static org.xipki.ca.gateway.acme.AcmeConstants.*;
+import static org.xipki.util.StringUtil.isBlank;
+import static org.xipki.util.exception.ErrorCode.UNKNOWN_CERT;
 
 /**
  * ACME responder.
@@ -123,13 +133,11 @@ public class AcmeResponder {
 
   private final String accountPrefix;
 
-  private final String ca;
-
-  private final String tlsProfile;
+  private final List<AcmeProxyConf.CaProfile> caProfiles;
 
   private final SecureRandom rnd;
 
-  private final AcmeRepo acmeRepo;
+  private final AcmeRepo repo;
 
   private byte[] caSubject;
 
@@ -137,9 +145,13 @@ public class AcmeResponder {
 
   private final int tokenNumBytes;
 
+  private final AcmeProxyConf.CleanupOrderConf cleanOrderConf;
+
   private final ChallengeValidator challengeValidator;
 
   private final CertEnroller certEnroller;
+
+  private final AtomicLong lastOrdersCleaned = new AtomicLong(0);
 
   static {
     knownCommands = CollectionUtil.asUnmodifiableSet(
@@ -147,7 +159,7 @@ public class AcmeResponder {
         CMD_account, CMD_order, CMD_orders, CMD_authz, CMD_chall, CMD_finalize, CMD_cert);
   }
 
-  public AcmeResponder(SdkClient sdk, SecurityFactory securityFactory, PopControl popControl, AcmeProxyConf conf)
+  public AcmeResponder(SdkClient sdk, SecurityFactory securityFactory, PopControl popControl, AcmeProxyConf.Acme conf)
       throws InvalidConfException {
     this.sdk = notNull(sdk, "sdk");
     this.popControl = notNull(popControl, "popControl");
@@ -155,6 +167,16 @@ public class AcmeResponder {
 
     this.baseUrl = notBlank(conf.getBaseUrl(), "baseUrl");
     this.accountPrefix = this.baseUrl + "acct/";
+    this.cleanOrderConf = new AcmeProxyConf.CleanupOrderConf();
+    AcmeProxyConf.CleanupOrderConf cleanOrder = conf.getCleanupOrder();
+    if (cleanOrder == null) {
+      this.cleanOrderConf.setExpiredOrderDays(365);
+      this.cleanOrderConf.setExpiredCertDays(365);
+    } else {
+      // minimal 10 days
+      this.cleanOrderConf.setExpiredCertDays(Math.max(10, cleanOrder.getExpiredCertDays()));
+      this.cleanOrderConf.setExpiredOrderDays(Math.max(10, cleanOrder.getExpiredOrderDays()));
+    }
 
     try {
       URL url = new URL(baseUrl);
@@ -176,8 +198,7 @@ public class AcmeResponder {
     this.nonceManager = new NonceManager(conf.getNonceNumBytes());
     this.tokenNumBytes = conf.getTokenNumBytes();
     this.directoryHeader = "<" + baseUrl + "directory>;rel=\"index\"";
-    this.ca = conf.getCa();
-    this.tlsProfile = conf.getTlsProfile();
+    this.caProfiles = conf.getCaProfiles();
 
     StringBuilder sb = new StringBuilder();
     sb.append("{");
@@ -198,7 +219,7 @@ public class AcmeResponder {
       addJsonField(sb, "termsOfService", conf.getTermsOfService());
     }
 
-    if (conf.getCaaIdentities() != null && conf.getCaaIdentities().length > 0) {
+    if (conf.getCaaIdentities() != null && !conf.getCaaIdentities().isEmpty()) {
       sb.append(addQuoteSign("caaIdentities")).append(":[");
       for (String caIdentity : conf.getCaaIdentities()) {
         sb.append(addQuoteSign(caIdentity)).append(",");
@@ -229,11 +250,24 @@ public class AcmeResponder {
     }
 
     rnd = new SecureRandom();
-    // TODO: use database
-    acmeRepo = new InMemoryAcmeRepo();
 
-    this.challengeValidator = new ChallengeValidator(acmeRepo);
-    this.certEnroller = new CertEnroller(acmeRepo, sdk, ca);
+    if (conf.getDbConf() == null) {
+      throw new InvalidConfException("dbConf is not specified");
+    }
+
+    try {
+      FileOrValue fileOrValue = new FileOrValue();
+      fileOrValue.setFile(conf.getDbConf());
+      DataSourceWrapper dataSource0 = new DataSourceFactory().createDataSource(
+          "acme-db", fileOrValue, securityFactory.getPasswordResolver());
+      AcmeDataSource dataSource = new AcmeDataSource(dataSource0);
+      repo = new AcmeRepo(dataSource, conf.getCacheSize(), conf.getSyncDbSeconds());
+    } catch (Exception ex) {
+      throw new InvalidConfException("could not initialize database", ex);
+    }
+
+    this.challengeValidator = new ChallengeValidator(repo);
+    this.certEnroller = new CertEnroller(repo, sdk);
   }
 
   private static String addQuoteSign(String text) {
@@ -247,19 +281,23 @@ public class AcmeResponder {
   public void start() {
     Thread t = new Thread(challengeValidator);
     t.setName("challengeValidator");
-    //t.setDaemon(true);
+    t.setDaemon(true);
     t.start();
 
     t = new Thread(certEnroller);
     t.setName("certEnroller");
-    //t.setDaemon(true);
+    t.setDaemon(true);
     t.start();
+
+    repo.start();
   }
 
   public void close() {
     challengeValidator.close();
     certEnroller.close();
     nonceManager.destroy();
+
+    repo.close();
   }
 
   public RestResponse service(HttpServletRequest servletReq, byte[] request, AuditEvent event) {
@@ -315,8 +353,6 @@ public class AcmeResponder {
       throws HttpRespAuditException, IOException, InvalidKeySpecException, JoseException, SdkErrorResponseException {
     String method = servletReq.getMethod();
     String path = servletReq.getServletPath();
-
-    String ca = this.ca;
 
     String[] tokens;
     String hdrHost = servletReq.getHeader(HDR_HOST);
@@ -447,7 +483,10 @@ public class AcmeResponder {
       // extract the location
       kid = protected_.get("kid").asString();
       if (kid.startsWith(accountPrefix)) {
-        account = acmeRepo.getAccount(kid.substring(accountPrefix.length()));
+        Long id = toLongId(kid.substring(accountPrefix.length()));
+        if (id != null) {
+          account = repo.getAccount(id);
+        }
       }
 
       if (account == null) {
@@ -491,7 +530,7 @@ public class AcmeResponder {
         NewAccountPayload reqPayload =
             JSON.parseObject(decodeFast(body.getPayload()), NewAccountPayload.class);
 
-        AcmeAccount existingAccount = acmeRepo.getAccountForJwk(jwk);
+        AcmeAccount existingAccount = repo.getAccountForJwk(jwk);
         if (existingAccount != null) {
           return buildSuccJsonResp(SC_OK, existingAccount.toResponse(baseUrl))
               .putHeader(HDR_LOCATION, existingAccount.getLocation(baseUrl));
@@ -506,9 +545,9 @@ public class AcmeResponder {
                 "terms of service has not been agreed");
           }
 
-          AcmeAccount acmeAccount = new AcmeAccount();
-          String[] contacts = reqPayload.getContact();
-          if (contacts != null) {
+          AcmeAccount acmeAccount = repo.newAcmeAccount();
+          List<String> contacts = reqPayload.getContact();
+          if (contacts != null && !contacts.isEmpty()) {
             RestResponse verifyErrorResp = verifyContacts(contacts);
             if (verifyErrorResp != null) {
               return verifyErrorResp;
@@ -519,7 +558,7 @@ public class AcmeResponder {
           acmeAccount.setTermsOfServiceAgreed(true);
           acmeAccount.setJwk(jwk);
           acmeAccount.setStatus(AccountStatus.valid);
-          acmeRepo.addAccount(acmeAccount);
+          repo.addAccount(acmeAccount);
 
           AccountResponse resp = acmeAccount.toResponse(baseUrl);
 
@@ -532,7 +571,7 @@ public class AcmeResponder {
         AcmeJson innerProtected = AcmeJson.parse(decodeFast(reqPayload.getProtected()));
 
         Map<String, String> newJwk = AcmeUtils.jsonToMap(innerProtected.get("jwk").asObject());
-        AcmeAccount accountForNewJwk = acmeRepo.getAccountForJwk(newJwk);
+        AcmeAccount accountForNewJwk = repo.getAccountForJwk(newJwk);
         if (accountForNewJwk != null) {
           // jwk must not exist.
           return toRestResponse(HttpRespContent.of(SC_CONFLICT, null, null))
@@ -558,25 +597,26 @@ public class AcmeResponder {
           return buildProblemResp(SC_BAD_REQUEST, AcmeError.malformed, "inner signature is not valid");
         }
 
-        account = acmeRepo.keyChange(account.getLabel(), newJwk);
+        account.setJwk(newJwk);
         return buildSuccJsonResp(SC_OK, account.toResponse(baseUrl))
             .putHeader(HDR_LOCATION, account.getLocation(baseUrl));
       }
       case CMD_account: {
         AccountResponse reqPayload = JSON.parseObject(decodeFast(body.getPayload()), AccountResponse.class);
         AccountStatus status = reqPayload.getStatus();
-        if (status != null) {
-          if (status == AccountStatus.deactivated) {
-            // 7.3.6.  Account Deactivation
-            account.setStatus(AccountStatus.deactivated);
-          } else if (status == AccountStatus.revoked) {
-            return buildProblemResp(SC_UNAUTHORIZED, AcmeError.unauthorized, "status revoked is not allowed");
-          }
+
+        if (status == AccountStatus.revoked) {
+          return buildProblemResp(SC_UNAUTHORIZED, AcmeError.unauthorized, "status revoked is not allowed");
+        }
+
+        if (status == AccountStatus.deactivated) {
+          // 7.3.6.  Account Deactivation
+          account.setStatus(AccountStatus.deactivated);
         }
 
         // 7.3.2.  Account Update
-        String[] contacts = reqPayload.getContact();
-        if (contacts != null && contacts.length > 0) {
+        List<String> contacts = reqPayload.getContact();
+        if (contacts != null && !contacts.isEmpty()) {
           RestResponse errResp = verifyContacts(contacts);
           if (errResp != null) {
             return errResp;
@@ -602,15 +642,36 @@ public class AcmeResponder {
           return buildProblemResp(SC_BAD_REQUEST, AcmeError.badRevocationReason, null);
         }
 
-        Certificate cert = Certificate.getInstance(decodeFast(reqPayload.getCertificate()));
-        boolean jwkAndCertMatch;
-        try {
-          jwkAndCertMatch = AcmeUtils.matchKey(jwk, cert.getSubjectPublicKeyInfo());
-        } catch (InvalidKeySpecException e) {
-          return buildProblemResp(SC_BAD_REQUEST, AcmeError.badPublicKey, "bad jwk");
+        byte[] certBytes = decodeFast(reqPayload.getCertificate());
+
+        Certificate cert = Certificate.getInstance(certBytes);
+        if (jwk != null) {
+          // request is signed with the private paired with the certificate.
+          boolean jwkAndCertMatch;
+          try {
+            jwkAndCertMatch = AcmeUtils.matchKey(jwk, cert.getSubjectPublicKeyInfo());
+          } catch (InvalidKeySpecException e) {
+            return buildProblemResp(SC_BAD_REQUEST, AcmeError.badPublicKey, "bad jwk");
+          }
+          if (!jwkAndCertMatch) {
+            return buildProblemResp(SC_BAD_REQUEST, AcmeError.unauthorized, "jwk and certificate do not match");
+          }
         }
-        if (!jwkAndCertMatch) {
-          return buildProblemResp(SC_BAD_REQUEST, AcmeError.unauthorized, "jwk and certificate do not match");
+
+        AcmeOrder order = repo.getOrderForCert(certBytes);
+        if (order == null) {
+          return buildProblemResp(SC_BAD_REQUEST, AcmeError.unauthorized,
+              "certificate not enrolled through this ACME server");
+        }
+
+        if (jwk == null) {
+          // account is non-null here.
+          // request is signed with the account keypair.
+          // assert the certificate is owned by the account
+          if (order.getAccountId() != account.getId()) {
+            // certificate has not been issued to the given account.
+            return buildProblemResp(SC_BAD_REQUEST, AcmeError.unauthorized, "account and certificate do not match");
+          }
         }
 
         RevokeCertsRequest sdkReq = new RevokeCertsRequest();
@@ -618,7 +679,7 @@ public class AcmeResponder {
         sdkEntry.setReason(reason);
         sdkEntry.setSerialNumber(cert.getSerialNumber().getPositiveValue());
         sdkReq.setEntries(Collections.singletonList(sdkEntry));
-        RevokeCertsResponse sdkResp = sdk.revokeCerts(ca, sdkReq);
+        RevokeCertsResponse sdkResp = sdk.revokeCerts(order.getCertReqMeta().getCa(), sdkReq);
         ErrorEntry errorEntry = sdkResp.getEntries().get(0).getError();
         if (errorEntry == null) {
           return buildSuccResp(SC_OK);
@@ -634,16 +695,21 @@ public class AcmeResponder {
         }
       }
       case CMD_orders: {
-        String label = tokens[1];
-        if (!account.getLabel().equals(label)) {
+        // clean the orders.
+        cleanOrders();
+
+        Long id = toLongId(tokens[1]);
+        if (id == null || id != account.getId()) {
           return buildProblemResp(SC_NOT_FOUND, null, null);
         }
 
-        AcmeOrder[] orders = acmeRepo.getOrders(label);
-        int size = orders == null ? 0 : orders.length;
-        String[] urls = new String[size];
-        for (int i = 0; i < size; i++) {
-          urls[i] = baseUrl + "order/" + orders[i].getLabel();
+        List<Long> orderIds = repo.getOrderIds(id);
+        int size = orderIds == null ? 0 : orderIds.size();
+        List<String> urls = new ArrayList<>(size);
+        if (orderIds != null) {
+          for (Long orderId : orderIds) {
+            urls.add(baseUrl + "order/" + AcmeUtils.toBase64(orderId));
+          }
         }
         OrdersResponse resp = new OrdersResponse();
         resp.setOrders(urls);
@@ -651,23 +717,22 @@ public class AcmeResponder {
       }
       case CMD_newOrder: {
         NewOrderPayload newOrderReq = JSON.parseObject(decodeFast(body.getPayload()), NewOrderPayload.class);
-        Identifier[] identifiers = newOrderReq.getIdentifiers();
-        int size = identifiers == null ? 0 : identifiers.length;
+        List<Identifier> identifiers = newOrderReq.getIdentifiers();
+        int size = identifiers == null ? 0 : identifiers.size();
 
         if (size == 0) {
           return buildProblemResp(SC_BAD_REQUEST, AcmeError.malformed, "no identifier is specified");
         }
 
         // 7 days validity
-        Instant expires = Instant.now().plus(5, ChronoUnit.DAYS);
+        Instant expires = Instant.now().truncatedTo(ChronoUnit.SECONDS).plus(7, ChronoUnit.DAYS);
 
-        AcmeAuthz[] authzs = new AcmeAuthz[size];
-        for (int i = 0; i < size; i++) {
+        List<AcmeAuthz> authzs = new ArrayList<>(size);
+        for (Identifier identifier : identifiers) {
           AcmeAuthz authz = new AcmeAuthz();
-          authzs[i] = authz;
+          authzs.add(authz);
 
-          Identifier identifier = identifiers[i];
-          authz.setIdentifier(identifier);
+          authz.setIdentifier(identifier.toAcmeIdentifier());
           authz.setStatus(AuthzStatus.pending);
           authz.setExpires(expires);
 
@@ -686,19 +751,7 @@ public class AcmeResponder {
                   "unsupported identifier '" + value + "'");
             }
 
-            Map<String, String> jwk0 = account.getJwk();
-            List<String> jwkNames = new ArrayList<>(jwk0.keySet());
-            Collections.sort(jwkNames);
-            StringBuilder canonJwk = new StringBuilder();
-            canonJwk.append("{");
-            for (String jwkName : jwkNames) {
-              canonJwk.append("\"").append(jwkName).append("\":\"").append(jwk0.get(jwkName)).append("\",");
-            }
-            // remove the last ","
-            canonJwk.deleteCharAt(canonJwk.length() - 1);
-            canonJwk.append("}");
-            String jwkSha256 = Base64Url.encodeToStringNoPadding(
-                HashAlgo.SHA256.hash(canonJwk.toString().getBytes(StandardCharsets.UTF_8)));
+            String jwkSha256 = account.getJwkSha256();
 
             String authorization = token + "." + jwkSha256;
             String authorizationSha256 = Base64Url.encodeToStringNoPadding(
@@ -711,43 +764,66 @@ public class AcmeResponder {
             }
 
             challenges.add(newChall(DNS_01, token, authorizationSha256));
-            authz.setChallenges(challenges.toArray(new AcmeChallenge[0]));
+            authz.setChallenges(challenges);
           } else {
             return buildProblemResp(SC_BAD_REQUEST, AcmeError.unsupportedIdentifier,
                 "unsupported identifier type '" + type + "'");
           }
         }
 
-        AcmeOrder order = new AcmeOrder();
+        AcmeOrder order = repo.newAcmeOrder(account.getId());
+
+        Instant notBefore = null;
+        Instant notAfter = null;
         if (newOrderReq.getNotBefore() != null) {
-          order.setNotBefore(AcmeUtils.parseTimestamp(newOrderReq.getNotBefore()));
+          notBefore = AcmeUtils.parseTimestamp(newOrderReq.getNotBefore());
         }
 
         if (newOrderReq.getNotAfter() != null) {
-          order.setNotAfter(AcmeUtils.parseTimestamp(newOrderReq.getNotAfter()));
+          notAfter = AcmeUtils.parseTimestamp(newOrderReq.getNotAfter());
         }
 
-        order.setCertProfile(tlsProfile);
         order.setAuthzs(authzs);
         order.setExpires(expires);
         order.setAuthzs(authzs);
 
-        acmeRepo.addOrder(account.getLabel(), order);
+        if (notBefore != null || notAfter != null)  {
+          CertReqMeta certReqMeta = new CertReqMeta();
+          certReqMeta.setNotBefore(notBefore);
+          certReqMeta.setNotAfter(notAfter);
+          order.setCertReqMeta(certReqMeta);
+        }
+
+        repo.addOrder(order);
 
         return buildSuccJsonResp(SC_CREATED, order.toResponse(baseUrl))
             .putHeader(HDR_LOCATION, order.getLocation(baseUrl));
       }
       case CMD_order: {
-        String label = tokens[1];
-        AcmeOrder order = getOrder(label);
-        return buildSuccJsonResp(SC_CREATED, order.toResponse(baseUrl))
+        String id = tokens[1];
+        AcmeOrder order = getOrder(id);
+        return buildSuccJsonResp(SC_OK, order.toResponse(baseUrl))
             .putHeader(HDR_LOCATION, order.getLocation(baseUrl));
       }
       case CMD_finalize: {
-        String label = tokens[1];
-        AcmeOrder order = getOrder(label);
-        if (order.getStatus() != OrderStatus.ready) {
-          return buildProblemResp(SC_FORBIDDEN, AcmeError.orderNotReady, "order not ready");
+        String id = tokens[1];
+        AcmeOrder order = getOrder(id);
+        order.updateStatus();
+
+        // check whether all authorizations have been finished
+        switch (order.getStatus()) {
+          case ready:
+            break;
+          case pending:
+            return buildProblemResp(SC_FORBIDDEN, AcmeError.orderNotReady, "Order is not ready");
+          case invalid:
+            return buildProblemResp(SC_FORBIDDEN, AcmeError.unauthorized, "Order is invalid");
+          case processing:
+            return buildProblemResp(SC_FORBIDDEN, AcmeError.orderNotReady, "Enrolling certificate is processing");
+          case valid:
+            return buildProblemResp(SC_FORBIDDEN, AcmeError.orderNotReady, "Certificate has been issued");
+          default:
+            throw new RuntimeException("should not reach here, invalid order status " + order.getStatus());
         }
 
         FinalizeOrderPayload finalizeOrderReq = JSON.parseObject(decodeFast(body.getPayload()),
@@ -762,10 +838,17 @@ public class AcmeResponder {
           return buildProblemResp(SC_BAD_REQUEST, AcmeError.badCSR, "could not parse CSR");
         }
 
+        String keyAlgOid =
+            csr.getCertificationRequestInfo().getSubjectPublicKeyInfo().getAlgorithm().getAlgorithm().getId();
+        AcmeProxyConf.CaProfile caProfile = getCaProfile(keyAlgOid);
+        if (caProfile == null) {
+          return buildProblemResp(SC_BAD_REQUEST, AcmeError.badCSR, "unsupported key type " + keyAlgOid);
+        }
+
         // verify the CSR
         Set<Identifier> identifiers = new HashSet<>();
         for (AcmeAuthz authz : order.getAuthzs()) {
-          identifiers.add(authz.getIdentifier());
+          identifiers.add(authz.getIdentifier().toIdentifier());
         }
 
         X500Name csrSubject = csr.getCertificationRequestInfo().getSubject();
@@ -829,14 +912,22 @@ public class AcmeResponder {
           return buildProblemResp(SC_BAD_REQUEST, AcmeError.badCSR, ex.getMessage());
         }
 
+        CertReqMeta certReqMeta = order.getCertReqMeta();
+        if (certReqMeta == null) {
+          certReqMeta = new CertReqMeta();
+          order.setCertReqMeta(certReqMeta);
+        }
+        certReqMeta.setCa(caProfile.getCa());
+        certReqMeta.setCertProfile(caProfile.getTlsProfile());
+
         order.setCsr(csrBytes);
         order.setStatus(OrderStatus.processing);
         return buildSuccJsonResp(SC_OK, order.toResponse(baseUrl))
             .putHeader(HDR_LOCATION, order.getLocation(baseUrl));
       }
       case CMD_cert: {
-        String label = tokens[1];
-        AcmeOrder order = getOrder(label);
+        String id = tokens[1];
+        AcmeOrder order = getOrder(id);
         byte[] certBytes = order.getCert();
         if (certBytes == null) {
           return buildProblemResp(SC_NOT_FOUND, AcmeError.orderNotReady, "found no certificate");
@@ -846,7 +937,7 @@ public class AcmeResponder {
         if (!Arrays.equals(cert.getIssuer().getEncoded(), caSubject)) {
           // TODO: extend SDK to retrieve cacerts according to X500Name: to cover case where ca
           // has changed the certificate meanwhile.
-          cacerts = sdk.cacerts(ca);
+          cacerts = sdk.cacerts(order.getCertReqMeta().getCa());
         }
 
         byte[][] certchain = new byte[1 + cacerts.length][];
@@ -861,22 +952,34 @@ public class AcmeResponder {
           throw new HttpRespAuditException(SC_NOT_FOUND, "unknown authz", AuditLevel.ERROR, AuditStatus.FAILED);
         }
 
-        String label = tokens[1];
-        AcmeAuthz authz = acmeRepo.getAuthz(label);
+        Long id = toLongId(tokens[1]);
+        AcmeAuthz authz = id == null ? null : repo.getAuthz(id);
         if (authz == null) {
           throw new HttpRespAuditException(SC_NOT_FOUND, "unknown authz", AuditLevel.ERROR, AuditStatus.FAILED);
         }
         return buildSuccJsonResp(SC_OK, authz.toResponse(baseUrl));
       }
       case CMD_chall: {
-        String label = tokens[1];
-        AcmeChallenge chall = acmeRepo.getChallenge(label);
+        Long authzId = toLongId(tokens[1]);
+        Integer subId = tokens.length > 2 ? toIntId(tokens[2]) : null;
+        if (authzId == null || subId == null) {
+          throw new HttpRespAuditException(SC_NOT_FOUND, "unknown challenge", AuditLevel.ERROR, AuditStatus.FAILED);
+        }
+
+        ChallId id = new ChallId(authzId, subId);
+
+        AcmeChallenge2 chall2 = repo.getChallenge(id);
+        if (chall2 == null) {
+          throw new HttpRespAuditException(SC_NOT_FOUND, "unknown challenge", AuditLevel.ERROR, AuditStatus.FAILED);
+        }
+
+        AcmeChallenge chall = chall2.getChallenge();
+
         ChallengeStatus status = chall.getStatus();
         if (status == ChallengeStatus.pending) {
           chall.setStatus(ChallengeStatus.processing);
         }
-        ChallengeResponse resp = chall.toChallengeResponse(baseUrl);
-        resp.setUrl(baseUrl + "chall/" + label);
+        ChallengeResponse resp = chall.toChallengeResponse(authzId, baseUrl);
         return buildSuccJsonResp(SC_OK, resp);//.putHeader(HDR_RETRY_AFTER, "2"); // wait for 2 seconds
       }
       default: {
@@ -887,7 +990,7 @@ public class AcmeResponder {
   } // method service
 
   private static boolean value(Boolean v, boolean dflt) {
-    return v == null ? dflt : v.booleanValue();
+    return v == null ? dflt : v;
   }
 
   private RestResponse toRestResponse(HttpRespContent respContent) {
@@ -899,8 +1002,9 @@ public class AcmeResponder {
     }
   }
 
-  private AcmeOrder getOrder(String label) throws HttpRespAuditException {
-    AcmeOrder order = acmeRepo.getOrder(label);
+  private AcmeOrder getOrder(String id) throws HttpRespAuditException {
+    Long lLabel = toLongId(id);
+    AcmeOrder order = lLabel == null ? null : repo.getOrder(lLabel);
     if (order == null) {
       throw new HttpRespAuditException(SC_NOT_FOUND, "unknown order", AuditLevel.ERROR, AuditStatus.FAILED);
     }
@@ -936,8 +1040,8 @@ public class AcmeResponder {
     return jws.verifySignature();
   }
 
-  private RestResponse verifyContacts(String[] contacts) {
-    if (contacts == null || contacts.length == 0) {
+  private RestResponse verifyContacts(List<String> contacts) {
+    if (contacts == null || contacts.isEmpty()) {
       return buildProblemResp(SC_BAD_REQUEST, AcmeError.invalidContact, "no contact is specified");
     }
 
@@ -968,6 +1072,53 @@ public class AcmeResponder {
     chall.setExpectedAuthorization(expectedAuthorization);
     LOG.info("challenge: {}:{}={}", type, token, expectedAuthorization);
     return chall;
+  }
+
+  private void cleanOrders() {
+    synchronized (lastOrdersCleaned) {
+      Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+      Instant last = Instant.ofEpochSecond(lastOrdersCleaned.get());
+      if (Duration.between(last, now).compareTo(Duration.ofDays(1)) < 0) {
+        // last cleanup was still within 1 day
+        return;
+      }
+
+      lastOrdersCleaned.set(now.getEpochSecond());
+      Instant certExpired = now.minus(cleanOrderConf.getExpiredCertDays(), ChronoUnit.DAYS);
+      Instant notFinishedOrderExpires = now.minus(cleanOrderConf.getExpiredOrderDays(), ChronoUnit.DAYS);
+
+      Thread thread = new Thread(() -> {
+        int num = repo.cleanOrders(certExpired, notFinishedOrderExpires);
+        LOG.info("removed {} orders with cert.notAfter<{} or not-finished-order.expires<{}",
+            num, certExpired, notFinishedOrderExpires);
+      });
+      thread.setDaemon(true);
+      thread.start();
+    }
+  }
+
+  private static Long toLongId(String id) {
+    if (id.length() != 11) {
+      return null;
+    }
+    return Pack.littleEndianToLong(Base64Url.decodeFast(id), 0);
+  }
+
+  private static Integer toIntId(String id) {
+    if (id.length() != 6) {
+      return null;
+    }
+    return Pack.littleEndianToInt(Base64Url.decodeFast(id), 0);
+  }
+
+  private AcmeProxyConf.CaProfile getCaProfile(String keyAlgId) {
+    for (AcmeProxyConf.CaProfile caProfile : caProfiles) {
+      if (caProfile.getKeyTypes().contains(keyAlgId)) {
+        return caProfile;
+      }
+    }
+
+    return null;
   }
 
 }

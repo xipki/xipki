@@ -3,19 +3,21 @@
 
 package org.xipki.ca.gateway.acme.msg;
 
+import java.util.List;
+
 /**
  *
  * @author Lijun Liao (xipki)
  */
 public class OrdersResponse {
 
-  private String[] orders;
+  private List<String> orders;
 
-  public String[] getOrders() {
+  public List<String> getOrders() {
     return orders;
   }
 
-  public void setOrders(String[] orders) {
+  public void setOrders(List<String> orders) {
     this.orders = orders;
   }
 

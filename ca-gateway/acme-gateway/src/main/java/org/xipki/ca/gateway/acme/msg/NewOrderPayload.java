@@ -5,23 +5,25 @@ package org.xipki.ca.gateway.acme.msg;
 
 import org.xipki.ca.gateway.acme.type.Identifier;
 
+import java.util.List;
+
 /**
  *
  * @author Lijun Liao (xipki)
  */
 public class NewOrderPayload {
 
-  private Identifier[] identifiers;
+  private List<Identifier> identifiers;
 
   private String notBefore;
 
   private String notAfter;
 
-  public Identifier[] getIdentifiers() {
+  public List<Identifier> getIdentifiers() {
     return identifiers;
   }
 
-  public void setIdentifiers(Identifier[] identifiers) {
+  public void setIdentifiers(List<Identifier> identifiers) {
     this.identifiers = identifiers;
   }
 

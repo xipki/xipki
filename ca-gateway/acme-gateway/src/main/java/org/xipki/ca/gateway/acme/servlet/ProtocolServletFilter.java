@@ -51,7 +51,7 @@ public class ProtocolServletFilter implements Filter {
       conf = new ProtocolProxyConfWrapper(conf0);
 
       AcmeResponder responder = new AcmeResponder(
-          conf.getSdkClient(), conf.getSecurities().getSecurityFactory(), conf.getPopControl(), conf0);
+          conf.getSdkClient(), conf.getSecurities().getSecurityFactory(), conf.getPopControl(), conf0.getAcme());
       responder.start();
 
       servlet = new HttpAcmeServlet();

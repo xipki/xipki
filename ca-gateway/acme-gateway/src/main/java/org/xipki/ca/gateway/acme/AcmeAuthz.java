@@ -6,9 +6,12 @@ package org.xipki.ca.gateway.acme;
 import org.xipki.ca.gateway.acme.msg.AuthzResponse;
 import org.xipki.ca.gateway.acme.msg.ChallengeResponse;
 import org.xipki.ca.gateway.acme.type.AuthzStatus;
-import org.xipki.ca.gateway.acme.type.Identifier;
+import org.xipki.ca.gateway.acme.util.AcmeUtils;
+import org.xipki.util.CompareUtil;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -16,20 +19,34 @@ import java.time.Instant;
  */
 public class AcmeAuthz {
 
-  private String label;
+  private long id;
+
+  private transient String idStr;
 
   private AuthzStatus status;
   private Instant expires;
-  private Identifier identifier;
+  private AcmeIdentifier identifier;
 
-  private AcmeChallenge[] challenges;
+  private List<AcmeChallenge> challenges;
 
-  public String getLabel() {
-    return label;
+  private transient AcmeOrder order;
+
+  public void setOrder(AcmeOrder order) {
+    this.order = order;
   }
 
-  public void setLabel(String label) {
-    this.label = label;
+  public long getId() {
+    return id;
+  }
+
+  public void setId(long id) {
+    markOrder();
+    this.id = id;
+    this.idStr = AcmeUtils.toBase64(id);
+  }
+
+  public String getIdStr() {
+    return idStr;
   }
 
   public AuthzStatus getStatus() {
@@ -37,6 +54,7 @@ public class AcmeAuthz {
   }
 
   public void setStatus(AuthzStatus status) {
+    markOrder();
     this.status = status;
   }
 
@@ -45,36 +63,79 @@ public class AcmeAuthz {
   }
 
   public void setExpires(Instant expires) {
+    markOrder();
     this.expires = expires;
   }
 
-  public Identifier getIdentifier() {
+  public AcmeIdentifier getIdentifier() {
     return identifier;
   }
 
-  public void setIdentifier(Identifier identifier) {
+  public void setIdentifier(AcmeIdentifier identifier) {
+    markOrder();
     this.identifier = identifier;
   }
 
-  public AcmeChallenge[] getChallenges() {
+  public List<AcmeChallenge> getChallenges() {
     return challenges;
   }
 
-  public void setChallenges(AcmeChallenge[] challenges) {
+  public void setChallenges(List<AcmeChallenge> challenges) {
+    markOrder();
     this.challenges = challenges;
+    if (challenges != null) {
+      for (AcmeChallenge chall : challenges) {
+        chall.setAuthz(this);
+      }
+    }
+  }
+
+  void markOrder() {
+    if (order != null) {
+      order.markMe();
+    }
   }
 
   public AuthzResponse toResponse(String baseUrl) {
     AuthzResponse resp = new AuthzResponse();
     resp.setExpires(expires.toString());
     resp.setStatus(status);
-    resp.setIdentifier(identifier);
-    ChallengeResponse[] challResps = new ChallengeResponse[challenges.length];
+    resp.setIdentifier(identifier.toIdentifier());
+    List<ChallengeResponse> challResps = new ArrayList<>(challenges.size());
     resp.setChallenges(challResps);
-    for (int i = 0; i < challenges.length; i++) {
-      challResps[i] = challenges[i].toChallengeResponse(baseUrl);
+    for (AcmeChallenge chall : challenges) {
+      challResps.add(chall.toChallengeResponse(id, baseUrl));
     }
     return resp;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (!(other instanceof AcmeAuthz)) {
+      return false;
+    }
+
+    AcmeAuthz b = (AcmeAuthz) other;
+    return status == b.status && id == b.id
+        && CompareUtil.equalsObject(expires, b.expires)
+        && CompareUtil.equalsObject(identifier, b.identifier)
+        && CompareUtil.equalsObject(challenges, b.challenges);
+  }
+
+  public AcmeAuthz copy() {
+    AcmeAuthz copy = new AcmeAuthz();
+    copy.id = id;
+    copy.idStr = idStr;
+    copy.status = status;
+    copy.expires = expires;
+    copy.identifier = identifier;
+    if (challenges != null) {
+      copy.challenges = new ArrayList<>(challenges.size());
+      for (AcmeChallenge chall : challenges) {
+        copy.challenges.add(chall.copy());
+      }
+    }
+    return copy;
   }
 
 }

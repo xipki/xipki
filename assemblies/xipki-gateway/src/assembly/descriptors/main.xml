@@ -82,5 +82,10 @@
       <destName>pkcs11.json</destName>
       <fileMode>0644</fileMode>
     </file>
+    <file>
+      <source>${project.build.directory}/xipki/etc/acme/database/mariadb/acme-db.properties</source>
+      <outputDirectory>xipki/etc/acme/database</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
   </files>
 </assembly>

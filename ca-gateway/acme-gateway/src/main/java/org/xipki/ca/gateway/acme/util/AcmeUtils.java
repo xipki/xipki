@@ -24,21 +24,13 @@ import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.xipki.ca.gateway.acme.AcmeProtocolException;
+import org.bouncycastle.util.Pack;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
+import org.xipki.util.Base64Url;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.xipki.util.Base64Url.decodeFast;
-
-import java.io.IOException;
-import java.io.Writer;
 import java.math.BigInteger;
-import java.net.IDN;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
@@ -49,6 +41,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.xipki.util.Base64Url.decodeFast;
+
 /**
  * Contains utility methods that are frequently used for the ACME protocol.
  * <p>
@@ -57,9 +52,6 @@ import java.util.regex.Pattern;
  * @author ACME4J team
  */
 public final class AcmeUtils {
-    private static final char[] HEX = "0123456789abcdef".toCharArray();
-    private static final String ACME_ERROR_PREFIX = "urn:ietf:params:acme:error:";
-
     private static final Pattern DATE_PATTERN = Pattern.compile(
                     "^(\\d{4})-(\\d{2})-(\\d{2})T"
                   + "(\\d{2}):(\\d{2}):(\\d{2})"
@@ -69,129 +61,8 @@ public final class AcmeUtils {
     private static final Pattern TZ_PATTERN = Pattern.compile(
                 "([+-])(\\d{2}):?(\\d{2})$");
 
-    private static final Pattern CONTENT_TYPE_PATTERN = Pattern.compile(
-                "([^;]+)(?:;.*?charset=(\"?)([a-z0-9_-]+)(\\2))?.*", Pattern.CASE_INSENSITIVE);
-
-    private static final Pattern MAIL_PATTERN = Pattern.compile("\\?|@.*,");
-
-    private static final Pattern BASE64URL_PATTERN = Pattern.compile("[0-9A-Za-z_-]*");
-
-    private static final Base64.Encoder PEM_ENCODER = Base64.getMimeEncoder(64,
-                "\n".getBytes(StandardCharsets.US_ASCII));
-    private static final Base64.Encoder URL_ENCODER = Base64.getUrlEncoder().withoutPadding();
-    private static final Base64.Decoder URL_DECODER = Base64.getUrlDecoder();
-
-    /**
-     * Enumeration of PEM labels.
-     */
-    public enum PemLabel {
-        CERTIFICATE("CERTIFICATE"),
-        CERTIFICATE_REQUEST("CERTIFICATE REQUEST"),
-        PRIVATE_KEY("PRIVATE KEY"),
-        PUBLIC_KEY("PUBLIC KEY");
-
-        private final String label;
-
-        PemLabel(String label) {
-            this.label = label;
-        }
-
-        @Override
-        public String toString() {
-            return label;
-        }
-    }
-
     private AcmeUtils() {
         // Utility class without constructor
-    }
-
-    /**
-     * Computes a SHA-256 hash of the given string.
-     *
-     * @param z
-     *            String to hash
-     * @return Hash
-     */
-    public static byte[] sha256hash(String z) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.update(z.getBytes(UTF_8));
-            return md.digest();
-        } catch (NoSuchAlgorithmException ex) {
-            throw new AcmeProtocolException("Could not compute hash", ex);
-        }
-    }
-
-    /**
-     * Hex encodes the given byte array.
-     *
-     * @param data
-     *            byte array to hex encode
-     * @return Hex encoded string of the data (with lower case characters)
-     */
-    public static String hexEncode(byte[] data) {
-        char[] result = new char[data.length * 2];
-        for (int ix = 0; ix < data.length; ix++) {
-            int val = data[ix] & 0xFF;
-            result[ix * 2] = HEX[val >>> 4];
-            result[ix * 2 + 1] = HEX[val & 0x0F];
-        }
-        return new String(result);
-    }
-
-    /**
-     * Base64 encodes the given byte array, using URL style encoding.
-     *
-     * @param data
-     *            byte array to base64 encode
-     * @return base64 encoded string
-     */
-    public static String base64UrlEncode(byte[] data) {
-        return URL_ENCODER.encodeToString(data);
-    }
-
-    /**
-     * Base64 decodes to a byte array, using URL style encoding.
-     *
-     * @param base64
-     *            base64 encoded string
-     * @return decoded data
-     */
-    public static byte[] base64UrlDecode(String base64) {
-        return URL_DECODER.decode(base64);
-    }
-
-    /**
-     * Validates that the given {@link String} is a valid base64url encoded value.
-     *
-     * @param base64
-     *            {@link String} to validate
-     * @return {@code true}: String contains a valid base64url encoded value.
-     *         {@code false} if the {@link String} was {@code null} or contained illegal
-     *         characters.
-     * @since 2.6
-     */
-    public static boolean isValidBase64Url(String base64) {
-        return base64 != null && BASE64URL_PATTERN.matcher(base64).matches();
-    }
-
-    /**
-     * ASCII encodes a domain name.
-     * <p>
-     * The conversion is done as described in
-     * <a href="http://www.ietf.org/rfc/rfc3490.txt">RFC 3490</a>. Additionally, all
-     * leading and trailing white spaces are trimmed, and the result is lowercased.
-     * <p>
-     * It is safe to pass in ACE encoded domains, they will be returned unchanged.
-     *
-     * @param domain
-     *            Domain name to encode
-     * @return Encoded domain name, white space trimmed and lower cased.
-     */
-    public static String toAce(String domain) {
-        Objects.requireNonNull(domain, "domain");
-        return IDN.toASCII(domain.trim()).toLowerCase();
     }
 
     /**
@@ -236,105 +107,6 @@ public final class AcmeUtils {
         return ZonedDateTime.of(
                 year, month, dom, hour, minute, second, ms * 1_000_000,
                 ZoneId.of(tz)).toInstant();
-    }
-
-    /**
-     * Converts the given locale to an Accept-Language header value.
-     *
-     * @param locale
-     *         {@link Locale} to be used in the header
-     * @return Value that can be used in an Accept-Language header
-     */
-    public static String localeToLanguageHeader(Locale locale) {
-        if (locale == null || "und".equals(locale.toLanguageTag())) {
-            return "*";
-        }
-
-        String langTag = locale.toLanguageTag();
-
-        StringBuilder header = new StringBuilder(langTag);
-        if (langTag.indexOf('-') >= 0) {
-            header.append(',').append(locale.getLanguage()).append(";q=0.8");
-        }
-        header.append(",*;q=0.1");
-
-        return header.toString();
-    }
-
-    /**
-     * Strips the acme error prefix from the error string.
-     * <p>
-     * For example, for "urn:ietf:params:acme:error:unauthorized", "unauthorized" is
-     * returned.
-     *
-     * @param type
-     *            Error type to strip the prefix from. {@code null} is safe.
-     * @return Stripped error type, or {@code null} if the prefix was not found.
-     */
-    public static String stripErrorPrefix(String type) {
-        if (type != null && type.startsWith(ACME_ERROR_PREFIX)) {
-            return type.substring(ACME_ERROR_PREFIX.length());
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Writes an encoded key or certificate to a file in PEM format.
-     *
-     * @param encoded
-     *            Encoded data to write
-     * @param label
-     *            {@link PemLabel} to be used
-     * @param out
-     *            {@link Writer} to write to. It will not be closed after use!
-     */
-    public static void writeToPem(byte[] encoded, PemLabel label, Writer out)
-                throws IOException {
-        out.append("-----BEGIN ").append(label.toString()).append("-----\n");
-        out.append(new String(PEM_ENCODER.encode(encoded), StandardCharsets.US_ASCII));
-        out.append("\n-----END ").append(label.toString()).append("-----\n");
-    }
-
-    /**
-     * Extracts the content type of a Content-Type header.
-     *
-     * @param header
-     *            Content-Type header
-     * @return Content-Type, or {@code null} if the header was invalid or empty
-     * @throws AcmeProtocolException
-     *             if the Content-Type header contains a different charset than "utf-8".
-     */
-    public static String getContentType(String header) {
-        if (header != null) {
-            Matcher m = CONTENT_TYPE_PATTERN.matcher(header);
-            if (m.matches()) {
-                String charset = m.group(3);
-                if (charset != null && !"utf-8".equalsIgnoreCase(charset)) {
-                    throw new AcmeProtocolException("Unsupported charset " + charset);
-                }
-                return m.group(1).trim().toLowerCase();
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Validates a contact {@link URI}.
-     *
-     * @param contact
-     *            Contact {@link URI} to validate
-     * @throws IllegalArgumentException
-     *             if the contact {@link URI} is not suitable for account contacts.
-     */
-    public static void validateContact(URI contact) {
-        if ("mailto".equalsIgnoreCase(contact.getScheme())) {
-            String address = contact.toString().substring(7);
-            if (MAIL_PATTERN.matcher(address).find()) {
-                throw new IllegalArgumentException(
-                        "multiple recipients or hfields are not allowed: " + contact);
-            }
-        }
     }
 
     public static PublicKey jwkPublicKey(Map<String, String> jwk) throws InvalidKeySpecException {
@@ -468,6 +240,30 @@ public final class AcmeUtils {
             map.put(name, json.get(name).asString());
         }
         return map;
+    }
+
+    public static String toBase64(long label) {
+        return Base64Url.encodeToStringNoPadding(Pack.longToLittleEndian(label));
+    }
+
+    public static String toBase64(int label) {
+        return Base64Url.encodeToStringNoPadding(Pack.intToLittleEndian(label));
+    }
+
+    public static String jwkSha256(Map<String, String> jwk) {
+        List<String> jwkNames = new ArrayList<>(jwk.keySet());
+        Collections.sort(jwkNames);
+        StringBuilder canonJwk = new StringBuilder();
+        canonJwk.append("{");
+        for (String jwkName : jwkNames) {
+            canonJwk.append("\"").append(jwkName).append("\":\"").append(jwk.get(jwkName)).append("\",");
+        }
+        // remove the last ","
+        canonJwk.deleteCharAt(canonJwk.length() - 1);
+        canonJwk.append("}");
+
+        return Base64Url.encodeToStringNoPadding(
+            HashAlgo.SHA256.hash(canonJwk.toString().getBytes(UTF_8)));
     }
 
 }
