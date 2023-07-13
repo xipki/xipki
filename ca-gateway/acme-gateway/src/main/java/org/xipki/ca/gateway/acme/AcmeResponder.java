@@ -121,6 +121,7 @@ public class AcmeResponder {
 
   private static final Set<String> knownCommands;
 
+  private final boolean termsOfServicePresent;
   private final byte[] directoryBytes;
 
   private final String directoryHeader;
@@ -215,7 +216,8 @@ public class AcmeResponder {
       addJsonField(sb, "website", conf.getWebsite());
     }
 
-    if (StringUtil.isNotBlank(conf.getTermsOfService())) {
+    this.termsOfServicePresent = StringUtil.isNotBlank(conf.getTermsOfService());
+    if (termsOfServicePresent) {
       addJsonField(sb, "termsOfService", conf.getTermsOfService());
     }
 
@@ -540,7 +542,10 @@ public class AcmeResponder {
           return buildProblemResp(SC_BAD_REQUEST, AcmeError.accountDoesNotExist, null);
         } else {
           // create a new account
-          if (!value(reqPayload.getTermsOfServiceAgreed(), false)) {
+          Boolean b = reqPayload.getTermsOfServiceAgreed();
+          boolean tosAgreed = (b != null) ? b : !termsOfServicePresent;
+
+          if (!tosAgreed) {
             return buildProblemResp(SC_UNAUTHORIZED, AcmeError.userActionRequired,
                 "terms of service has not been agreed");
           }
@@ -555,7 +560,10 @@ public class AcmeResponder {
             acmeAccount.setContact(contacts);
           }
           acmeAccount.setExternalAccountBinding(reqPayload.getExternalAccountBinding());
-          acmeAccount.setTermsOfServiceAgreed(true);
+          if (b != null) {
+            acmeAccount.setTermsOfServiceAgreed(true);
+          }
+
           acmeAccount.setJwk(jwk);
           acmeAccount.setStatus(AccountStatus.valid);
           repo.addAccount(acmeAccount);
