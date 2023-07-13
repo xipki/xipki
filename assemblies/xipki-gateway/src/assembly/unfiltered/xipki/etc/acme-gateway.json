@@ -7,11 +7,11 @@
 		"syncDbSeconds": 60,
 		"dbConf": "etc/acme/database/acme-db.properties",
 		//"contactVerifier": "org.example.MyContactVerifier",
-		"termsOfService": "http://example.org/tos",
+		//"termsOfService": "http://example.org/tos",
 		"website": "http://example.org/doc/acme",
-		"caaIdentities": [
-			"example.org"
-		],
+		//"caaIdentities": [
+		//	"example.org"
+		//],
 		"cleanupOrders": {
 			"expiredCertDays": 390,
 			"expiredOrderDays": 390
