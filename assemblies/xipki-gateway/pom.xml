@@ -136,7 +136,7 @@
             </configuration>
           </execution>
           <execution>
-            <!-- Copy the BouncyCastle jars -->
+            <!-- Copy the BouncyCastle and JDBC jars -->
             <id>ext-libs</id>
             <phase>generate-resources</phase>
             <goals>
@@ -169,6 +169,14 @@
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>
                   <artifactId>bcutil-jdk18on</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.mariadb.jdbc</groupId>
+                  <artifactId>mariadb-java-client</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.postgresql</groupId>
+                  <artifactId>postgresql</artifactId>
                 </artifactItem>
               </artifactItems>
             </configuration>
