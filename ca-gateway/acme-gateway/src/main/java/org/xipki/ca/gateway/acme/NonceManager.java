@@ -52,6 +52,7 @@ public class NonceManager {
   public boolean containsNonce(String nonce) {
     return noncePool.containsKey(nonce);
   }
+
   public void destroy() {
     // TODO: save the nonce
   }

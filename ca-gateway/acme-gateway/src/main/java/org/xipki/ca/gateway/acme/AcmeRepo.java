@@ -1,7 +1,6 @@
 // Copyright (c) 2013-2023 xipki. All rights reserved.
 // License Apache License 2.0
 
-// TODO: make sure id of account, order and authz does not exist before adding to database.
 package org.xipki.ca.gateway.acme;
 
 import org.slf4j.Logger;
