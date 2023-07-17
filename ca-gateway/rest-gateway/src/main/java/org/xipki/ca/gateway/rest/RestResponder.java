@@ -328,7 +328,7 @@ public class RestResponder {
         case CMD_revoke_cert:
         case CMD_unsuspend_cert:
         case CMD_unrevoke_cert:
-          unRevoke(command, caName, requestor, httpRetriever, event);
+          unRevoke(command, requestor, httpRetriever, event);
           respContent = null;
           break;
         default:
@@ -766,7 +766,7 @@ public class RestResponder {
   }
 
   private void unRevoke(
-      String command, String caName, Requestor requestor,HttpRequestMetadataRetriever httpRetriever, AuditEvent event)
+      String command, Requestor requestor,HttpRequestMetadataRetriever httpRetriever, AuditEvent event)
       throws OperationException, HttpRespAuditException, IOException, SdkErrorResponseException {
     boolean revoke = command.equals(CMD_revoke_cert);
     int permission = revoke ? PermissionConstants.REVOKE_CERT : PermissionConstants.UNSUSPEND_CERT;
@@ -800,7 +800,7 @@ public class RestResponder {
       UnsuspendOrRemoveRequest sdkReq = new UnsuspendOrRemoveRequest();
       sdkReq.setIssuerCertSha1Fp(caSha1);
       sdkReq.setEntries(Collections.singletonList(serialNumber));
-      sdk.unsuspendCerts(caName, sdkReq);
+      sdk.unsuspendCerts(sdkReq);
     } else {
       String strReason = httpRetriever.getParameter(PARAM_reason);
       CrlReason reason = (strReason == null) ? CrlReason.UNSPECIFIED : CrlReason.forNameOrText(strReason);
@@ -826,7 +826,7 @@ public class RestResponder {
       RevokeCertsRequest sdkReq = new RevokeCertsRequest();
       sdkReq.setIssuerCertSha1Fp(caSha1);
       sdkReq.setEntries(Collections.singletonList(entry));
-      sdk.revokeCerts(caName, sdkReq);
+      sdk.revokeCerts(sdkReq);
     }
   }
 

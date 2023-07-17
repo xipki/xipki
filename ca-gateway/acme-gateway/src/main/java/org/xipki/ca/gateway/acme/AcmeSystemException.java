@@ -7,8 +7,7 @@ package org.xipki.ca.gateway.acme;
  *
  * @author Lijun Liao (xipki)
  */
-public class AcmeSystemException extends RuntimeException {
-    private static final long serialVersionUID = 2031203835755725193L;
+public class AcmeSystemException extends Exception {
 
     public AcmeSystemException(String msg) {
         super(msg);

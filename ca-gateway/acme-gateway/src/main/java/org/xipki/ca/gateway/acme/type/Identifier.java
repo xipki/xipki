@@ -35,4 +35,8 @@ public class Identifier {
     return new AcmeIdentifier(type, value);
   }
 
+  public String toString() {
+    return type + "/" + value;
+  }
+
 }

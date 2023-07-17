@@ -5,6 +5,8 @@ package org.xipki.ca.gateway.acme.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.Audits;
+import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.ProtocolProxyConfWrapper;
 import org.xipki.ca.gateway.acme.AcmeProxyConf;
 import org.xipki.ca.gateway.acme.AcmeResponder;
@@ -71,6 +73,11 @@ public class ProtocolServletFilter implements Filter {
     }
 
     servlet.getResponder().close();
+    try {
+      Audits.getAuditService().close();
+    } catch (Exception e) {
+      LOG.error("error closing audit service", e);
+    }
   } // method destroy
 
   @Override

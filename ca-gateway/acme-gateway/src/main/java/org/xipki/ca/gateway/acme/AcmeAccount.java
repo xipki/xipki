@@ -73,6 +73,10 @@ public class AcmeAccount {
     return id;
   }
 
+  public String idText() {
+    return idStr + " (" + id + ")";
+  }
+
   public String getJwkSha256() {
     if (jwkSha256 == null && data.jwk != null) {
       jwkSha256 = AcmeUtils.jwkSha256(data.jwk);
@@ -160,7 +164,7 @@ public class AcmeAccount {
   }
 
   // do not throws any exception
-  public synchronized void flush() {
+  public synchronized void flush() throws AcmeSystemException {
     if (inDb) {
       if (mark != null) {
         dataSource.updateAccount(mark, this);

@@ -70,16 +70,6 @@
       <column name="CSR" type="VARCHAR(2000)"/>
       <column name="CERT" type="VARCHAR(3000)"/>
     </createTable>
-    <!-- table AUTHZ -->
-    <createTable tableName="AUTHZ" remarks="authorization">
-      <column name="ID" type="BIGINT">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="ORDER_ID" type="BIGINT" remarks="ORDER ID">
-        <constraints nullable="false"/>
-      </column>
-    </createTable>
-  </changeSet>
   <!-- foreign key -->
   <changeSet author="xipki" id="2">
     <addForeignKeyConstraint constraintName="FK_ORDER_ACCOUNT1"
@@ -87,10 +77,5 @@
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="ACCOUNT_ID" baseTableName="ORDER2"
       referencedColumnNames="ID" referencedTableName="ACCOUNT"/>
-    <addForeignKeyConstraint constraintName="FK_AUTHZ_ORDER1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="ORDER_ID" baseTableName="AUTHZ"
-      referencedColumnNames="ID" referencedTableName="ORDER2"/>
   </changeSet>
 </databaseChangeLog>

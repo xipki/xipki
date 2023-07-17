@@ -510,14 +510,14 @@ public class CmpResponder extends BaseCmpResponder {
       req.setEntries(revokeEntries);
       req.setIssuer(new X500NameType(issuer));
       req.setAuthorityKeyIdentifier(aki);
-      RevokeCertsResponse resp = sdk.revokeCerts(caName, req);
+      RevokeCertsResponse resp = sdk.revokeCerts(req);
       respEntries = resp.getEntries();
     } else {
       UnsuspendOrRemoveRequest req = new UnsuspendOrRemoveRequest();
       req.setEntries(unrevokeEntries);
       req.setIssuer(new X500NameType(issuer));
       req.setAuthorityKeyIdentifier(aki);
-      UnSuspendOrRemoveCertsResponse resp = sdk.unsuspendCerts(caName, req);
+      UnSuspendOrRemoveCertsResponse resp = sdk.unsuspendCerts(req);
       respEntries = resp.getEntries();
     }
 

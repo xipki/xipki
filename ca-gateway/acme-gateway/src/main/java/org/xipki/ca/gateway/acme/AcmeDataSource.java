@@ -3,26 +3,24 @@
 
 package org.xipki.ca.gateway.acme;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.ca.gateway.acme.type.*;
 import org.xipki.ca.gateway.acme.util.AcmeUtils;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.security.asn1.Asn1StreamParser;
 import org.xipki.security.util.JSON;
 import org.xipki.util.Args;
 import org.xipki.util.Base64Url;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
+import java.security.SecureRandom;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.xipki.util.CompareUtil.equalsObject;
 
@@ -32,20 +30,28 @@ import static org.xipki.util.CompareUtil.equalsObject;
  */
 public class AcmeDataSource {
 
+  public interface IdChecker {
+
+    boolean accountIdExists(long id);
+
+    boolean orderIdExists(long id);
+
+  }
+
   private static final String SQL_ADD_ACCOUNT =
       "INSERT INTO ACCOUNT (ID,LUPDATE,STATUS,JWK_SHA256,DATA) VALUES (?,?,?,?,?)";
 
   private static final String SQL_ADD_ORDER = "INSERT INTO ORDER2 (ID,LUPDATE,ACCOUNT_ID,STATUS,EXPIRES," +
       "CERT_NAFTER,CERT_SHA256,CERTREQ_META,CSR,CERT,AUTHZS) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
-  private static final String SQL_ADD_AUTHZ_ID = "INSERT INTO AUTHZ (ID, ORDER_ID) VALUES (?,?)";
-
   private static final String SQL_DELETE_ORDER_CERT_EXPIRED = "DELETE FROM ORDER2 WHERE CERT_NAFTER<?";
 
-  private static final String SQL_DELETE_NOT_FISINED_ORDER = "DELETE FROM ORDER2 WHERE " +
-      "STATUS != " + OrderStatus.valid + " AND EXPIRES<?";
+  private static final String SQL_DELETE_NOT_FINISHED_ORDER = "DELETE FROM ORDER2 WHERE " +
+      "STATUS != " + OrderStatus.valid.getCode() + " AND EXPIRES<?";
 
   private static final String SQL_SELECT_ORDER_ID = "SELECT ID FROM ORDER2 WHERE ACCOUNT=?";
+
+  private static final Logger LOG = LoggerFactory.getLogger(AcmeDataSource.class);
 
   private final String sqlGetAccount;
 
@@ -56,6 +62,10 @@ public class AcmeDataSource {
   private final String sqlGetOrderByCertSha256;
 
   private final DataSourceWrapper dataSource;
+
+  private final SecureRandom rnd = new SecureRandom();
+
+  private IdChecker idChecker;
 
   public AcmeDataSource(DataSourceWrapper dataSource) {
     this.dataSource = Args.notNull(dataSource, "dataSource");
@@ -69,6 +79,10 @@ public class AcmeDataSource {
         "ID,ACCOUNT_ID,STATUS,EXPIRES,CERTREQ_META,AUTHZS FROM ORDER2 WHERE CERT_SHA256=?");
   }
 
+  public void setIdChecker(IdChecker idChecker) {
+    this.idChecker = idChecker;
+  }
+
   private PreparedStatement prepareStatement(String sql) throws AcmeSystemException {
     try {
       return dataSource.prepareStatement(sql);
@@ -77,7 +91,7 @@ public class AcmeDataSource {
     }
   } // method prepareStatement
 
-  public void addNewAccount(AcmeAccount account) {
+  public void addNewAccount(AcmeAccount account) throws AcmeSystemException {
     if (account.getId() == 0) {
       throw new AcmeSystemException("account.id not set");
     }
@@ -94,6 +108,7 @@ public class AcmeDataSource {
       ps.setString(index++, account.getJwkSha256());
       ps.setString(index, JSON.toJson(account.getData()));
       ps.executeUpdate();
+      LOG.info("Database: added account " + account.getId());
     } catch (SQLException ex) {
       throw new AcmeSystemException(dataSource.translate(sql, ex));
     } finally {
@@ -101,7 +116,7 @@ public class AcmeDataSource {
     }
   }
 
-  public byte[] getCert(long orderId) {
+  public byte[] getCert(long orderId) throws AcmeSystemException {
     try {
       String str = dataSource.getFirstStringValue(null, "ORDER2", "CERT", "ID=" + orderId);
       return str == null ? null : Base64Url.decodeFast(str);
@@ -110,7 +125,7 @@ public class AcmeDataSource {
     }
   }
 
-  public byte[] getCsr(long orderId) {
+  public byte[] getCsr(long orderId) throws AcmeSystemException {
     try {
       String str = dataSource.getFirstStringValue(null, "ORDER2", "CSR", "ID=" + orderId);
       return str == null ? null : Base64Url.decodeFast(str);
@@ -119,7 +134,7 @@ public class AcmeDataSource {
     }
   }
 
-  public AcmeAccount getAccount(long accountId) {
+  public AcmeAccount getAccount(long accountId) throws AcmeSystemException {
     // STATUS,DATA FROM ACCOUNT
     PreparedStatement ps = prepareStatement(sqlGetAccount);
     try {
@@ -132,7 +147,7 @@ public class AcmeDataSource {
     }
   }
 
-  public void updateAccount(AcmeAccount oldAccount, AcmeAccount newAccount) {
+  public void updateAccount(AcmeAccount oldAccount, AcmeAccount newAccount) throws AcmeSystemException {
     if (oldAccount.getId() != newAccount.getId()) {
       throw new IllegalArgumentException("oldAccount and newAccount does not have the same id");
     }
@@ -183,6 +198,7 @@ public class AcmeDataSource {
       }
 
       ps.executeUpdate();
+      LOG.info("Database: added account " + oldAccount.getId());
     } catch (SQLException ex) {
       throw new AcmeSystemException(dataSource.translate(sql, ex));
     } finally {
@@ -190,7 +206,7 @@ public class AcmeDataSource {
     }
   }
 
-  public AcmeAccount getAccountForJwk(Map<String, String> jwk) {
+  public AcmeAccount getAccountForJwk(Map<String, String> jwk) throws AcmeSystemException {
     String sha256 = AcmeUtils.jwkSha256(jwk);
     final String sql = sqlGetAccountFowJwkSha256;
     PreparedStatement ps = prepareStatement(sql);
@@ -204,7 +220,7 @@ public class AcmeDataSource {
     }
   }
 
-  private AcmeAccount getAccount(PreparedStatement ps, String sql) {
+  private AcmeAccount getAccount(PreparedStatement ps, String sql) throws AcmeSystemException {
     // ID,JWK_SHA256,STATUS,DATA FROM ACCOUNT
     ResultSet rs = null;
     try {
@@ -231,7 +247,7 @@ public class AcmeDataSource {
     }
   }
 
-  public void addNewOrder(AcmeOrder order) {
+  public void addNewOrder(AcmeOrder order) throws AcmeSystemException {
     String sql = SQL_ADD_ORDER;
 
     PreparedStatement ps = prepareStatement(sql);
@@ -250,7 +266,7 @@ public class AcmeDataSource {
       if (certBytes == null) {
         ps.setNull(index++, Types.BIGINT);
       } else {
-        ps.setLong(index++, extractNotAfter(certBytes));
+        ps.setLong(index++, AcmeUtils.extractNotAfter(certBytes));
       }
       ps.setString(index++, order.getCertSha256());
 
@@ -275,27 +291,10 @@ public class AcmeDataSource {
       }
       index++;
 
-      AcmeAuthzs authzs = new AcmeAuthzs();
-      authzs.setAuthzs(order.getAuthzs());
-      ps.setString(index, JSON.toJson(authzs));
+      ps.setString(index, JSON.toJson(order.getAuthzs()));
 
       ps.executeUpdate();
-    } catch (SQLException ex) {
-      throw new AcmeSystemException(dataSource.translate(sql, ex));
-    } finally {
-      dataSource.releaseResources(ps, null);
-    }
-
-    sql = SQL_ADD_AUTHZ_ID;
-    ps = prepareStatement(sql);
-    // ID, ORDER_ID
-    try {
-      for (AcmeAuthz authz : order.getAuthzs()) {
-        ps.setLong(1, authz.getId());
-        ps.setLong(2, order.getId());
-        ps.addBatch();
-      }
-      ps.executeBatch();
+      LOG.info("Database: added order " + order.getId());
     } catch (SQLException ex) {
       throw new AcmeSystemException(dataSource.translate(sql, ex));
     } finally {
@@ -303,7 +302,7 @@ public class AcmeDataSource {
     }
   }
 
-  public void updateOrder(AcmeOrder oldOrder, AcmeOrder newOrder) {
+  public void updateOrder(AcmeOrder oldOrder, AcmeOrder newOrder) throws AcmeSystemException {
     if (oldOrder.getId() != newOrder.getId()) {
       throw new IllegalArgumentException("oldOrder and newOrder does not have the same id");
     }
@@ -315,7 +314,7 @@ public class AcmeDataSource {
     newOrder.updateStatus();
 
     // ACCOUNT_ID,STATUS,EXPIRES,CSR,AUTHZS
-    boolean updateStatus = oldOrder.getStatus() != oldOrder.getStatus();
+    boolean updateStatus = oldOrder.getStatus() != newOrder.getStatus();
     boolean updateExpires = !equalsObject(oldOrder.getExpires(), newOrder.getExpires());
     boolean updateAuthzs = !equalsObject(oldOrder.getAuthzs(), newOrder.getAuthzs());
     boolean updateCertReqMeta = !equalsObject(oldOrder.getCertReqMeta(), newOrder.getCertReqMeta());
@@ -372,9 +371,7 @@ public class AcmeDataSource {
         if (newOrder.getAuthzs() == null) {
           ps.setNull(index, Types.VARCHAR);
         } else {
-          AcmeAuthzs authzs = new AcmeAuthzs();
-          authzs.setAuthzs(newOrder.getAuthzs());
-          ps.setString(index, JSON.toJson(authzs));
+          ps.setString(index, JSON.toJson(newOrder.getAuthzs()));
         }
         index++;
       }
@@ -394,12 +391,13 @@ public class AcmeDataSource {
 
       if (updateCert) {
         byte[] certBytes = newOrder.getCert();
-        ps.setLong(index++, extractNotAfter(certBytes));
+        ps.setLong(index++, AcmeUtils.extractNotAfter(certBytes));
         ps.setString(index++, newOrder.getCertSha256());
         ps.setString(index, Base64Url.encodeToStringNoPadding(certBytes));
       }
 
       ps.executeUpdate();
+      LOG.info("Database: updated order " + oldOrder.getId());
     } catch (SQLException ex) {
       throw new AcmeSystemException(dataSource.translate(sql, ex));
     } finally {
@@ -407,7 +405,7 @@ public class AcmeDataSource {
     }
   }
 
-  public AcmeOrder getOrder(long orderId) {
+  public AcmeOrder getOrder(long orderId) throws AcmeSystemException {
     // do not read CSR and CERT to save bandwidth.
     PreparedStatement ps = prepareStatement(sqlGetOrderById);
     ResultSet rs = null;
@@ -430,7 +428,7 @@ public class AcmeDataSource {
     }
   }
 
-  public AcmeOrder getOrderForCertSha256(String certSha256) {
+  public AcmeOrder getOrderForCertSha256(String certSha256) throws AcmeSystemException {
     PreparedStatement ps = prepareStatement(sqlGetOrderByCertSha256);
     ResultSet rs = null;
     try {
@@ -442,6 +440,7 @@ public class AcmeDataSource {
 
       AcmeOrder order = buildOrder(rs, null);
       order.setCertSha256(certSha256);
+
       return order;
     } catch (SQLException ex) {
       throw new AcmeSystemException(dataSource.translate(sqlGetOrderByCertSha256, ex));
@@ -458,7 +457,8 @@ public class AcmeDataSource {
       id = rs.getLong("ID");
     }
 
-    AcmeOrder order = new AcmeOrder(id, accountId, this);
+    AcmeOrder order = new AcmeOrder(accountId, id, this);
+    order.setInDb(true);
     order.setStatus(OrderStatus.ofCode(rs.getInt("STATUS")));
     order.setExpires(Instant.ofEpochSecond(rs.getLong("EXPIRES")));
     String str = rs.getString("CERTREQ_META");
@@ -466,32 +466,27 @@ public class AcmeDataSource {
       order.setCertReqMeta(JSON.parseObject(str, CertReqMeta.class));
     }
 
-    AcmeAuthzs authzs = JSON.parseObject(authzsStr, AcmeAuthzs.class);
-    order.setAuthzs(authzs.getAuthzs());
+    AcmeAuthz[] authzs = JSON.parseObject(authzsStr, AcmeAuthz[].class);
+    List<AcmeAuthz> list = new ArrayList<>(authzs.length);
+    for (AcmeAuthz authz : authzs) {
+      list.add(authz);
+    }
+    order.setAuthzs(list);
 
     return order;
   }
 
-  public AcmeAuthz getAuthz(long authzId) {
-    // from database
-    Long orderId;
-    try {
-      orderId = dataSource.getFirstLongValue(null, "AUTHZ", "ORDER_ID", "ID=" + authzId);
-    } catch (DataAccessException ex) {
-      throw new AcmeSystemException(ex);
+  public AcmeAuthz getAuthz(byte[] authzId) throws AcmeSystemException {
+    AuthzId id = new AuthzId(authzId);
+    AcmeOrder order = getOrder(id.getOrderId());
+    if (order == null) {
+      return null;
     }
 
-    if (orderId != null) {
-      AcmeOrder order = getOrder(orderId);
-      if (order != null) {
-        return order.getAuthz(authzId);
-      }
-    }
-
-    return null;
+    return order.getAuthz(id.getSubId());
   }
 
-  public List<Long> getOrderIds(long accountId) {
+  public List<Long> getOrderIds(long accountId) throws AcmeSystemException {
     List<Long> orderIds = new LinkedList<>();
     // from database
     final String sql = SQL_SELECT_ORDER_ID;
@@ -515,29 +510,28 @@ public class AcmeDataSource {
     return orderIds;
   }
 
-  public List<ChallId> getChallengesToValidate() {
-    List<ChallId> ids =  new LinkedList<>();
-    final String sql = dataSource.buildSelectFirstSql(1000, "AUTHZS FROM ORDER2 WHERE STATUS=?");
+  public List<ChallId> getChallengesToValidate() throws AcmeSystemException {
+    final String sql = dataSource.buildSelectFirstSql(1000, "ID,AUTHZS FROM ORDER2 WHERE STATUS=?");
     PreparedStatement ps = prepareStatement(sql);
     ResultSet rs = null;
     try {
       ps.setInt(1, OrderStatus.pending.getCode());
       rs = ps.executeQuery();
+
+      List<ChallId> ids =  new LinkedList<>();
       while (rs.next()) {
-        List<AcmeAuthz> authzs = JSON.parseObject(rs.getString("AUTHZS"), AcmeAuthzs.class).getAuthzs();
-        addChallengesToValidate(ids, authzs);
+        AcmeAuthz[] authzs = JSON.parseObject(rs.getString("AUTHZS"), AcmeAuthz[].class);
+        addChallengesToValidate(ids, rs.getLong("ID"), authzs);
       }
+      return ids;
     } catch (SQLException ex) {
       throw new AcmeSystemException(dataSource.translate(sql, ex));
     } finally {
       dataSource.releaseResources(ps, rs);
     }
-
-    return ids;
   }
 
-  public List<Long> getOrdersToEnroll() {
-    List<Long> ids =  new LinkedList<>();
+  public List<Long> getOrdersToEnroll() throws AcmeSystemException {
     // add those from database
     final String sql = dataSource.buildSelectFirstSql(1000, "ID FROM ORDER2 WHERE STATUS=?");
     PreparedStatement ps = prepareStatement(sql);
@@ -545,18 +539,20 @@ public class AcmeDataSource {
     try {
       ps.setInt(1, OrderStatus.processing.getCode());
       rs = ps.executeQuery();
+
+      List<Long> ids =  new LinkedList<>();
       while (rs.next()) {
         ids.add(rs.getLong("ID"));
       }
+      return ids;
     } catch (SQLException ex) {
       throw new AcmeSystemException(dataSource.translate(sql, ex));
     } finally {
       dataSource.releaseResources(ps, rs);
     }
-    return ids;
   }
 
-  public int cleanOrders(Instant certNotAfter, Instant notFinishedOrderExpires) {
+  public int cleanOrders(Instant certNotAfter, Instant notFinishedOrderExpires) throws AcmeSystemException {
     // delete order with expired certificates
     Instant dateLimit = Instant.now().minus(10, ChronoUnit.DAYS);
     if (certNotAfter.isAfter(dateLimit)) {
@@ -573,17 +569,20 @@ public class AcmeDataSource {
     try {
       ps.setLong(1, certNotAfter.getEpochSecond());
       sum += ps.executeUpdate();
+
+      LOG.info("Database: deleted orders with certificates expired before {}", certNotAfter);
     } catch (SQLException ex) {
       throw new AcmeSystemException(dataSource.translate(sql, ex));
     } finally {
       dataSource.releaseResources(ps, null);
     }
 
-    sql = SQL_DELETE_NOT_FISINED_ORDER;
+    sql = SQL_DELETE_NOT_FINISHED_ORDER;
     ps = prepareStatement(sql);
     try {
       ps.setLong(1, notFinishedOrderExpires.getEpochSecond());
       sum += ps.executeUpdate();
+      LOG.info("Database: deleted orders expired before {}", certNotAfter);
     } catch (SQLException ex) {
       throw new AcmeSystemException(dataSource.translate(sql, ex));
     } finally {
@@ -592,46 +591,74 @@ public class AcmeDataSource {
     return sum;
   }
 
-  private static void addChallengesToValidate(List<ChallId> res, List<AcmeAuthz> authzs) {
+  private static void addChallengesToValidate(List<ChallId> res, long orderId, AcmeAuthz[] authzs) {
     for (AcmeAuthz authz : authzs) {
-      if (authz.getStatus() == AuthzStatus.pending) {
-        for (AcmeChallenge challenge : authz.getChallenges()) {
-          if (challenge.getStatus() == ChallengeStatus.processing) {
-            res.add(new ChallId(authz.getId(), challenge.getSubId()));
-            break;
-          }
+      if (authz.getStatus() != AuthzStatus.pending) {
+        continue;
+      }
+
+      for (AcmeChallenge challenge : authz.getChallenges()) {
+        if (challenge.getStatus() == ChallengeStatus.processing) {
+          res.add(new ChallId(orderId, authz.getSubId(), challenge.getSubId()));
+          break;
         }
       }
     }
   }
 
-  private static long extractNotAfter(byte[] certBytes) {
-    try {
-      BufferedInputStream instream = new BufferedInputStream(new ByteArrayInputStream(certBytes));
-      // SEQUENCE of Certificate
-      Asn1StreamParser.skipTagLen(instream);
-
-      // SEQUENCE OF TBSCertificate
-      Asn1StreamParser.skipTagLen(instream);
-
-      // #num = 4: version, serialNumber, signature, issuer
-      int numFields = 4;
-      for (int i = 0; i < numFields; i++) {
-        Asn1StreamParser.skipField(instream);
+  public long nextAccountId() throws DataAccessException {
+    while (true) {
+      long id = rnd.nextLong();
+      if (idChecker.accountIdExists(id)) {
+        continue;
       }
 
-      // Validity
-      Asn1StreamParser.skipTagLen(instream);
-
-      // notBefore
-      Asn1StreamParser.skipField(instream);
-
-      // notAfter
-      Instant notAfter = Asn1StreamParser.readTime(new Asn1StreamParser.MyInt(), instream, "notAfter");
-      return notAfter.getEpochSecond();
-    } catch (Exception ex) {
-      throw new AcmeSystemException("certificate is invalid, should not happen");
+      if (!dataSource.columnExists(null, "ACCOUNT", "ID", id)) {
+        return id;
+      }
     }
+  }
+
+  public long nextOrderId() throws DataAccessException {
+    while (true) {
+      long id = rnd.nextLong();
+      if (idChecker.orderIdExists(id)) {
+        continue;
+      }
+
+      if (!dataSource.columnExists(null, "ORDER2", "ID", id)) {
+        return id;
+      }
+    }
+  }
+
+  public int[] nextAuthzIds(int numAuthzs) {
+    return nextIntIds(numAuthzs);
+  }
+
+  public int[] nextChallIds(int numChalls) {
+    return nextIntIds(numChalls);
+  }
+
+  private int[] nextIntIds(int num) {
+    if (num == 1) {
+      return new int[]{ rnd.nextInt() & 0xFFFF};
+    }
+
+    List<Integer> ids = new ArrayList<>(num);
+    for (int i = 0; i < num; i++) {
+      int id = rnd.nextInt() & 0xFFFF;
+      while (ids.contains(id)) {
+        id = rnd.nextInt() & 0xFFFF;
+      }
+      ids.add(id);
+    }
+
+    int[] ret = new int[num];
+    for (int i = 0; i < num; i++) {
+      ret[i] = ids.get(i);
+    }
+    return ret;
   }
 
 }

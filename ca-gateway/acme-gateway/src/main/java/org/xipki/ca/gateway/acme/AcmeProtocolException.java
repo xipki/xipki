@@ -3,19 +3,37 @@
 
 package org.xipki.ca.gateway.acme;
 
+import org.xipki.ca.gateway.acme.type.AcmeError;
+import org.xipki.util.Args;
+
 /**
  *
  * @author Lijun Liao (xipki)
  */
-public class AcmeProtocolException extends RuntimeException {
-    private static final long serialVersionUID = 2031203835755725193L;
+public class AcmeProtocolException extends Exception {
 
-    public AcmeProtocolException(String msg) {
-        super(msg);
+    private final int httpError;
+
+    private final AcmeError acmeError;
+
+    private final String acmeDetail;
+
+    public AcmeProtocolException(int httpError, AcmeError acmeError, String acmeDetail) {
+        super(acmeError + ": " + acmeDetail);
+        this.httpError = httpError;
+        this.acmeError = Args.notNull(acmeError, "acmeError");
+        this.acmeDetail = acmeDetail;
     }
 
-    public AcmeProtocolException(String msg, Throwable cause) {
-        super(msg, cause);
+    public int getHttpError() {
+        return httpError;
     }
 
+    public AcmeError getAcmeError() {
+        return acmeError;
+    }
+
+    public String getAcmeDetail() {
+        return acmeDetail;
+    }
 }

@@ -16,18 +16,15 @@ package org.xipki.ca.gateway.acme.util;
 
 import org.jose4j.json.JsonUtil;
 import org.jose4j.lang.JoseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.ca.gateway.acme.AcmeConstants;
 import org.xipki.ca.gateway.acme.AcmeProtocolException;
-import org.xipki.util.Base64Url;
+import org.xipki.ca.gateway.acme.type.AcmeError;
+import org.xipki.util.LogUtil;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -39,9 +36,8 @@ import static java.util.stream.Collectors.joining;
  * @author ACME4J team
  */
 public final class AcmeJson implements Serializable {
-    private static final long serialVersionUID = 3091273044605709204L;
 
-    private static final AcmeJson EMPTY_JSON = new AcmeJson(new HashMap<>());
+    private static final Logger LOG = LoggerFactory.getLogger(AcmeJson.class);
 
     private final String path;
 
@@ -77,7 +73,7 @@ public final class AcmeJson implements Serializable {
      *            Bytes.
      * @return {@link AcmeJson} of the read content.
      */
-    public static AcmeJson parse(byte[] bytes) {
+    public static AcmeJson parse(byte[] bytes) throws AcmeProtocolException {
         return parse(new String(bytes, UTF_8));
     }
 
@@ -88,7 +84,7 @@ public final class AcmeJson implements Serializable {
      *            {@link InputStream} to read from. Will be closed after use.
      * @return {@link AcmeJson} of the read content.
      */
-    public static AcmeJson parse(InputStream in) throws IOException {
+    public static AcmeJson parse(InputStream in) throws IOException, AcmeProtocolException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, UTF_8))) {
             String json = reader.lines().map(String::trim).collect(joining());
             return parse(json);
@@ -102,21 +98,13 @@ public final class AcmeJson implements Serializable {
      *            JSON string
      * @return {@link AcmeJson} of the read content.
      */
-    public static AcmeJson parse(String json) {
+    public static AcmeJson parse(String json) throws AcmeProtocolException {
         try {
             return new AcmeJson(JsonUtil.parseJson(json));
         } catch (JoseException ex) {
-            throw new AcmeProtocolException("Bad JSON: " + json, ex);
+            LogUtil.error(LOG, ex);
+            throw new AcmeProtocolException(AcmeConstants.SC_BAD_REQUEST, AcmeError.malformed, "Bad JSON: " + json);
         }
-    }
-
-    /**
-     * Returns a {@link AcmeJson} of an empty document.
-     *
-     * @return Empty {@link AcmeJson}
-     */
-    public static AcmeJson empty() {
-        return EMPTY_JSON;
     }
 
     /**
@@ -152,10 +140,6 @@ public final class AcmeJson implements Serializable {
                 data.get(key));
     }
 
-    public Value getOptional(String key) {
-        return contains(key) ? get(key) : null;
-    }
-
     /**
      * Returns the content as JSON string.
      */
@@ -165,32 +149,11 @@ public final class AcmeJson implements Serializable {
     }
 
     /**
-     * Returns the content as unmodifiable Map.
-     *
-     * @since 2.8
-     */
-    public Map<String,Object> toMap() {
-        return Collections.unmodifiableMap(data);
-    }
-
-    /**
      * Serialize the data map in JSON.
      */
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeUTF(JsonUtil.toJson(data));
         out.defaultWriteObject();
-    }
-
-    /**
-     * Deserialize the JSON representation of the data map.
-     */
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        try {
-            data = new HashMap<>(JsonUtil.parseJson(in.readUTF()));
-            in.defaultReadObject();
-        } catch (JoseException ex) {
-            throw new AcmeProtocolException("Cannot deserialize", ex);
-        }
     }
 
     /**
@@ -295,30 +258,15 @@ public final class AcmeJson implements Serializable {
          *
          * @return {@link Optional} of this value, or {@link Optional#empty()} if this
          *         value is {@code null}.
-         * @see #map(Function)
          */
         public Optional<Value> optional() {
             return val != null ? Optional.of(this) : Optional.empty();
         }
 
         /**
-         * Returns this value as an {@link Optional} of the desired type, for further
-         * mapping and filtering.
-         *
-         * @param mapper
-         *            A {@link Function} that converts a {@link Value} to the desired type
-         * @return {@link Optional} of this value, or {@link Optional#empty()} if this
-         *         value is {@code null}.
-         * @see #optional()
-         */
-        public <T> Optional<T> map(Function <Value, T> mapper) {
-            return optional().map(mapper);
-        }
-
-        /**
          * Returns the value as {@link String}.
          */
-        public String asString() {
+        public String asString() throws AcmeProtocolException {
             required();
             return val.toString();
         }
@@ -326,137 +274,25 @@ public final class AcmeJson implements Serializable {
         /**
          * Returns the value as JSON object.
          */
-        public AcmeJson asObject() {
+        public AcmeJson asObject() throws AcmeProtocolException {
             required();
             try {
                 return new AcmeJson(path, (Map<String, Object>) val);
             } catch (ClassCastException ex) {
-                throw new AcmeProtocolException(path + ": expected an object", ex);
+                LogUtil.error(LOG, ex);
+                throw new AcmeProtocolException(AcmeConstants.SC_BAD_REQUEST,
+                    AcmeError.malformed, path + ": expected an object");
             }
-        }
-
-        /**
-         * Returns the value as JSON object that was Base64 URL encoded.
-         *
-         * @since 2.8
-         */
-        public AcmeJson asEncodedObject() {
-            required();
-            try {
-                byte[] raw = Base64Url.decodeFast(val.toString());
-                return new AcmeJson(path, JsonUtil.parseJson(new String(raw, UTF_8)));
-            } catch (IllegalArgumentException | JoseException ex) {
-                throw new AcmeProtocolException(path + ": expected an encoded object", ex);
-            }
-        }
-
-        /**
-         * Returns the value as {@link AcmeJson.Array}.
-         * <p>
-         * Unlike the other getters, this method returns an empty array if the value is
-         * not set. Use {@link #isPresent()} to find out if the value was actually set.
-         */
-        public Array asArray() {
-            if (val == null) {
-                return new Array(path, Collections.emptyList());
-            }
-
-            try {
-                return new Array(path, (List<Object>) val);
-            } catch (ClassCastException ex) {
-                throw new AcmeProtocolException(path + ": expected an array", ex);
-            }
-        }
-
-        /**
-         * Returns the value as int.
-         */
-        public int asInt() {
-            required();
-            try {
-                return ((Number) val).intValue();
-            } catch (ClassCastException ex) {
-                throw new AcmeProtocolException(path + ": bad number " + val, ex);
-            }
-        }
-
-        /**
-         * Returns the value as boolean.
-         */
-        public boolean asBoolean() {
-            required();
-            try {
-                return (Boolean) val;
-            } catch (ClassCastException ex) {
-                throw new AcmeProtocolException(path + ": bad boolean " + val, ex);
-            }
-        }
-
-        /**
-         * Returns the value as {@link URI}.
-         */
-        public URI asURI() {
-            required();
-            try {
-                return new URI(val.toString());
-            } catch (URISyntaxException ex) {
-                throw new AcmeProtocolException(path + ": bad URI " + val, ex);
-            }
-        }
-
-        /**
-         * Returns the value as {@link URL}.
-         */
-        public URL asURL() {
-            required();
-            try {
-                return new URL(val.toString());
-            } catch (MalformedURLException ex) {
-                throw new AcmeProtocolException(path + ": bad URL " + val, ex);
-            }
-        }
-
-        /**
-         * Returns the value as {@link Instant}.
-         */
-        public Instant asInstant() {
-            required();
-            try {
-                return AcmeUtils.parseTimestamp(val.toString());
-            } catch (IllegalArgumentException ex) {
-                throw new AcmeProtocolException(path + ": bad date " + val, ex);
-            }
-        }
-
-        /**
-         * Returns the value as {@link Duration}.
-         *
-         * @since 2.3
-         */
-        public Duration asDuration() {
-            required();
-            try {
-                return Duration.ofSeconds(((Number) val).longValue());
-            } catch (ClassCastException ex) {
-                throw new AcmeProtocolException(path + ": bad duration " + val, ex);
-            }
-        }
-
-        /**
-         * Returns the value as base64 decoded byte array.
-         */
-        public byte[] asBinary() {
-            required();
-            return Base64Url.decodeFast(val.toString());
         }
 
         /**
          * Checks if the value is present. An {@link AcmeProtocolException} is thrown if
          * the value is {@code null}.
          */
-        private void required() {
+        private void required() throws AcmeProtocolException {
             if (!isPresent()) {
-                throw new AcmeProtocolException(path + ": required, but not set");
+                throw new AcmeProtocolException(AcmeConstants.SC_BAD_REQUEST,
+                    AcmeError.malformed, path + ": required, but not set");
             }
         }
 

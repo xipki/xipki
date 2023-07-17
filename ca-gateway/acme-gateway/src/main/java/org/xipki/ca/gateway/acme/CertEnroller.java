@@ -24,12 +24,12 @@ public class CertEnroller implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(CertEnroller.class);
 
-  private final AcmeRepo acmeRepo;
+  private final AcmeRepo repo;
 
   private final SdkClient sdk;
 
-  public CertEnroller(AcmeRepo acmeRepo, SdkClient sdk) {
-    this.acmeRepo = Args.notNull(acmeRepo, "acmeRepo");
+  public CertEnroller(AcmeRepo repo, SdkClient sdk) {
+    this.repo = Args.notNull(repo, "repo");
     this.sdk = Args.notNull(sdk, "sdk");
   }
 
@@ -43,17 +43,16 @@ public class CertEnroller implements Runnable {
       } catch (Throwable t) {
         LogUtil.error(LOG, t, "expected error");
       }
-    }
-  }
 
-  public void singleRun() {
-    Iterator<Long> orderIds = acmeRepo.getOrdersToEnroll();
-    if (!orderIds.hasNext()) {
       try {
         Thread.sleep(1000); // sleep for 1 second.
       } catch (InterruptedException e) {
       }
     }
+  }
+
+  public void singleRun() throws AcmeSystemException {
+    Iterator<Long> orderIds = repo.getOrdersToEnroll();
 
     while (orderIds.hasNext()) {
       Long orderId = orderIds.next();
@@ -61,18 +60,19 @@ public class CertEnroller implements Runnable {
         continue;
       }
 
-      String orderIdStr = AcmeUtils.toBase64(orderId) + "(" + orderId + ")";
+      String orderIdStr = AcmeUtils.toBase64(orderId) + " (" + orderId + ")";
       LOG.info("try to enroll certificate for order {}", orderIdStr);
 
-      AcmeOrder order = acmeRepo.getOrder(orderId);
+      AcmeOrder order = repo.getOrder(orderId);
       if (order == null) {
-        LOG.error("found not order for order {}", orderIdStr);
+        LOG.error("found no order for id {}", orderIdStr);
         continue;
       }
+
       byte[] csr = order.getCsr();
       if (csr == null) {
-        // if the order is read from datatbase, csr is null in the object, even present in the database
-        csr = acmeRepo.getCsr(orderId);
+        // if the order is read from database, csr is null in the object, even present in the database
+        csr = repo.getCsr(orderId);
       }
 
       if (csr == null) {
@@ -91,7 +91,7 @@ public class CertEnroller implements Runnable {
         entry.setNotAfter(certReqMeta.getNotAfter().getEpochSecond());
       }
       entry.setCertprofile(certReqMeta.getCertProfile());
-      entry.setP10req(order.getCsr());
+      entry.setP10req(csr);
 
       EnrollCertsRequest sdkReq = new EnrollCertsRequest();
       sdkReq.setCaCertMode(CertsMode.NONE);
@@ -116,11 +116,14 @@ public class CertEnroller implements Runnable {
         }
 
         if (valid) {
+          LOG.info("enrolled certificate for order {}", orderIdStr);
           order.setCert(certBytes);
           order.setStatus(OrderStatus.valid);
         } else {
           order.setStatus(OrderStatus.invalid);
         }
+
+        repo.flushOrderIfNotCached(order);
       } catch (Throwable t) {
         LogUtil.error(LOG, t);
         order.setStatus(OrderStatus.invalid);

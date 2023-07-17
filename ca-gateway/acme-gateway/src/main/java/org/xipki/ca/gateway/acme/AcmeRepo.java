@@ -1,6 +1,7 @@
 // Copyright (c) 2013-2023 xipki. All rights reserved.
 // License Apache License 2.0
 
+// TODO: make sure id of account, order and authz does not exist before adding to database.
 package org.xipki.ca.gateway.acme;
 
 import org.slf4j.Logger;
@@ -8,28 +9,27 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.gateway.acme.type.AuthzStatus;
 import org.xipki.ca.gateway.acme.type.ChallengeStatus;
 import org.xipki.ca.gateway.acme.type.OrderStatus;
+import org.xipki.datasource.DataAccessException;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.Args;
 import org.xipki.util.Base64Url;
 import org.xipki.util.LogUtil;
 import org.xipki.util.LruCache;
 
-import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
  * @author Lijun Liao (xipki)
  */
-public class AcmeRepo {
+public class AcmeRepo implements AcmeDataSource.IdChecker {
 
-  private static class ListIterator <T> implements Iterator<T> {
+  static class ListIterator <T> implements Iterator<T> {
 
     private final List<T> list;
     private final AtomicInteger index = new AtomicInteger(0);
@@ -69,6 +69,13 @@ public class AcmeRepo {
     @Override
     protected void entryRemoved(boolean evicted, Long key, AcmeAccount oldValue, AcmeAccount newValue) {
       super.entryRemoved(evicted, key, oldValue, newValue);
+      if (oldValue != null) {
+        try {
+          oldValue.flush();
+        } catch (Throwable th) {
+          LogUtil.error(LOG, th, "error flushing AcmeAccount " + oldValue.getId());
+        }
+      }
     }
 
   }
@@ -89,6 +96,13 @@ public class AcmeRepo {
     @Override
     protected void entryRemoved(boolean evicted, Long key, AcmeOrder oldValue, AcmeOrder newValue) {
       super.entryRemoved(evicted, key, oldValue, newValue);
+      if (oldValue != null) {
+        try {
+          oldValue.flush();
+        } catch (Throwable th) {
+          LogUtil.error(LOG, th, "error flushing AcmeOrder " + oldValue.getId());
+        }
+      }
     }
 
   }
@@ -106,22 +120,45 @@ public class AcmeRepo {
 
           writeToDb();
         } catch (Throwable t) {
-          LogUtil.error(LOG, t, "expected error");
+          LogUtil.error(LOG, t, "unexpected error");
         }
       }
     }
 
   }
 
-  private static final Logger LOG = LoggerFactory.getLogger(AcmeRepo.class);
+  static class IdsForOrder {
 
-  private final SecureRandom rnd = new SecureRandom();
+    private final long orderId;
+
+    private final int[] authzSubIds;
+
+    private final int[] challSubIds;
+
+    public IdsForOrder(long orderId, int[] authzSubIds, int[] challSubIds) {
+      this.orderId = orderId;
+      this.authzSubIds = authzSubIds;
+      this.challSubIds = challSubIds;
+    }
+
+    public long getOrderId() {
+      return orderId;
+    }
+
+    public int[] getAuthzSubIds() {
+      return authzSubIds;
+    }
+
+    public int[] getChallSubIds() {
+      return challSubIds;
+    }
+  }
+
+  private static final Logger LOG = LoggerFactory.getLogger(AcmeRepo.class);
 
   private final AccountLruCache accountCache;
 
   private final OrderLruCache orderCache;
-
-  private final ConcurrentHashMap<Long, Long> authzIdToOrderMap = new ConcurrentHashMap<>();
 
   private final AcmeDataSource dataSource;
 
@@ -134,6 +171,22 @@ public class AcmeRepo {
     this.orderCache = new OrderLruCache(Args.min(cacheSize, "cacheSize", 1));
     this.syncDbSeconds = Args.min(syncDbSeconds, "syncDbSeconds", 1);
     this.dataSource = Args.notNull(dataSource, "dataSource");
+    this.dataSource.setIdChecker(this);
+  }
+
+  @Override
+  public boolean accountIdExists(long id) {
+    return accountCache.containsKey(id);
+  }
+
+  @Override
+  public boolean orderIdExists(long id) {
+    return orderCache.containsKey(id);
+  }
+
+  IdsForOrder newIdsForOrder(int numAuthzs, int numChalls) throws DataAccessException {
+    return new IdsForOrder(dataSource.nextOrderId(),
+        dataSource.nextAuthzIds(numAuthzs), dataSource.nextChallIds(numChalls));
   }
 
   public void start() {
@@ -143,24 +196,12 @@ public class AcmeRepo {
     t.start();
   }
 
-  private long rndId() {
-    return rnd.nextLong();
-  }
-
   public void addAccount(AcmeAccount account) {
     accountCache.put(account.getId(), account);
+    LOG.info("added account {}", account.idText());
   }
 
-  public byte[] getCert(long orderId) {
-    AcmeOrder order = orderCache.get(orderId);
-    if (order != null && order.getCert() != null) {
-      return order.getCert();
-    } else {
-      return dataSource.getCert(orderId);
-    }
-  }
-
-  public byte[] getCsr(long orderId) {
+  public byte[] getCsr(long orderId) throws AcmeSystemException {
     AcmeOrder order = orderCache.get(orderId);
     if (order != null && order.getCsr() != null) {
       return order.getCsr();
@@ -169,15 +210,18 @@ public class AcmeRepo {
     }
   }
 
-  public AcmeAccount getAccount(long accountId) {
+  public AcmeAccount getAccount(long accountId) throws AcmeSystemException {
     AcmeAccount account = accountCache.get(accountId);
     if (account == null) {
       account = dataSource.getAccount(accountId);
+      if (account != null) {
+        accountCache.put(account.getId(), account);
+      }
     }
     return account;
   }
 
-  public AcmeAccount getAccountForJwk(Map<String, String> jwk) {
+  public AcmeAccount getAccountForJwk(Map<String, String> jwk) throws AcmeSystemException {
     // from cache
     for (Map.Entry<Long, AcmeAccount> entry : accountCache.snapshot().entrySet()) {
       if (entry.getValue().hasJwk(jwk)) {
@@ -185,39 +229,31 @@ public class AcmeRepo {
       }
     }
 
-    return dataSource.getAccountForJwk(jwk);
+    AcmeAccount account = dataSource.getAccountForJwk(jwk);
+    if (account != null) {
+      accountCache.put(account.getId(), account);
+    }
+    return account;
   }
 
   public void addOrder(AcmeOrder order) {
-    AcmeAccount account = getAccount(order.getAccountId());
-    if (account == null) {
-      throw new AcmeProtocolException("account is unknown");
-    }
-
     // set IDs
-    long orderId = order.getId();
-    for (AcmeAuthz authz : order.getAuthzs()) {
-      long authzId = rndId();
-      authz.setId(authzId);
-      authzIdToOrderMap.put(authzId, orderId);
-
-      for (AcmeChallenge chall : authz.getChallenges()) {
-        chall.setSubId(rnd.nextInt());
-      }
-    }
-
-    orderCache.put(orderId, order);
+    orderCache.put(order.getId(), order);
+    LOG.info("added order {}", order.idText());
   }
 
-  public AcmeOrder getOrder(long orderId) {
+  public AcmeOrder getOrder(long orderId) throws AcmeSystemException {
     AcmeOrder order = orderCache.get(orderId);
     if (order == null) {
       order = dataSource.getOrder(orderId);
+      if (order != null) {
+        orderCache.put(order.getId(), order);
+      }
     }
     return order;
   }
 
-  public AcmeOrder getOrderForCert(byte[] cert) {
+  public AcmeOrder getOrderForCert(byte[] cert) throws AcmeSystemException {
     String sha256 = Base64Url.encodeToStringNoPadding(HashAlgo.SHA256.hash(cert));
     // do not read CSR and CERT to save bandwidth.
     AcmeOrder order = null;
@@ -229,38 +265,45 @@ public class AcmeRepo {
     }
 
     if (order == null) {
-      return dataSource.getOrderForCertSha256(sha256);
+      order = dataSource.getOrderForCertSha256(sha256);
+      if (order != null) {
+        orderCache.put(order.getId(), order);
+      }
     }
+
     return order;
   }
 
-  public AcmeChallenge2 getChallenge(ChallId challId) {
-    AcmeAuthz authz = getAuthz(challId.getAuthzId());
-    if (authz != null) {
-      for (AcmeChallenge chall : authz.getChallenges()) {
-        if (chall.getSubId() == challId.getSubId()) {
-          return new AcmeChallenge2(chall, authz.getIdentifier());
-        }
+  public AcmeChallenge2 getChallenge(ChallId challId) throws AcmeSystemException {
+    AcmeOrder order = getOrder(challId.getOrderId());
+    if (order == null) {
+      return null;
+    }
+
+    AcmeAuthz authz = order.getAuthz(challId.getAuthzId());
+    if (authz == null) {
+      return null;
+    }
+
+    for (AcmeChallenge chall : authz.getChallenges()) {
+      if (chall.getSubId() == challId.getSubId()) {
+        return new AcmeChallenge2(chall, authz.getIdentifier());
       }
     }
 
     return null;
   }
 
-  public AcmeAuthz getAuthz(long authzId) {
-    // from cache
-    Long orderId = authzIdToOrderMap.get(authzId);
-    if (orderId != null) {
-      AcmeOrder order = orderCache.get(orderId);
-      if (order != null) {
-        return order.getAuthz(authzId);
-      }
+  public AcmeAuthz getAuthz(AuthzId authzId) throws AcmeSystemException {
+    AcmeOrder order = getOrder(authzId.getOrderId());
+    if (order == null) {
+      return null;
     }
 
-    return dataSource.getAuthz(authzId);
+    return order.getAuthz(authzId.getSubId());
   }
 
-  public List<Long> getOrderIds(long accountId) {
+  public List<Long> getOrderIds(long accountId) throws AcmeSystemException {
     List<Long> orderIds = new LinkedList<>();
     // from cache
     for (Map.Entry<Long, AcmeOrder> entry : orderCache.snapshot().entrySet()) {
@@ -275,71 +318,86 @@ public class AcmeRepo {
     return orderIds;
   }
 
-  public Iterator<ChallId> getChallengesToValidate() {
+  public Iterator<ChallId> getChallengesToValidate() throws AcmeSystemException {
     List<ChallId> ids =  new LinkedList<>();
-    // from cache
-    for (Long id : orderCache.keySnapshot()) {
-      AcmeOrder order = orderCache.get(id);
-      if (order.getStatus() == OrderStatus.pending) {
-        for (AcmeAuthz authz : order.getAuthzs()) {
-          if (authz.getStatus() == AuthzStatus.pending) {
-            for (AcmeChallenge challenge : authz.getChallenges()) {
-              if (challenge.getStatus() == ChallengeStatus.processing) {
-                ids.add(new ChallId(authz.getId(), challenge.getSubId()));
-                break;
-              }
-            }
-          }
-        }
-
-      }
-    }
 
     // from database
     List<ChallId> dbIds = dataSource.getChallengesToValidate();
     ids.addAll(dbIds);
 
+    // from cache
+    for (Long id : orderCache.keySnapshot()) {
+      AcmeOrder order = orderCache.get(id);
+      for (AcmeAuthz authz : order.getAuthzs()) {
+        for (AcmeChallenge challenge : authz.getChallenges()) {
+          ChallId challId = new ChallId(order.getId(), authz.getSubId(), challenge.getSubId());
+          boolean addMe = challenge.getStatus() == ChallengeStatus.processing
+              && authz.getStatus() == AuthzStatus.pending
+              && order.getStatus() == OrderStatus.pending;
+
+          if (addMe) {
+            ids.add(challId);
+            break;
+          } else {
+            if (ids.contains(challId)) {
+              ids.remove(challId);
+            }
+          }
+        } // end AcmeChallenge-for
+      } // end AcmeAuthz-for
+    }
+
     return new ListIterator<>(ids);
   }
 
-  public Iterator<Long> getOrdersToEnroll() {
-    List<Long> ids =  new LinkedList<>();
+  public Iterator<Long> getOrdersToEnroll() throws AcmeSystemException {
+    List<Long> ids = new LinkedList<>();
+
+    // add those from database
+    List<Long> dbIds = dataSource.getOrdersToEnroll();
+    ids.addAll(dbIds);
+
     // from cache
     for (Long id : orderCache.keySnapshot()) {
       AcmeOrder order = orderCache.get(id);
       order.updateStatus();
 
       if (order.getStatus() == OrderStatus.processing) {
-        ids.add(id);
+        if (!ids.contains(id)) {
+          ids.add(id);
+        }
+      } else {
+        if (ids.contains(id)) {
+          ids.remove(id);
+        }
       }
     }
 
-    // add those from database
-    List<Long> dbIds = dataSource.getOrdersToEnroll();
-    ids.addAll(dbIds);
     return new ListIterator<>(ids);
   }
 
-  public int cleanOrders(Instant certNotAfter, Instant notFinishedOrderExpires) {
+  public int cleanOrders(Instant certNotAfter, Instant notFinishedOrderExpires) throws AcmeSystemException {
     return dataSource.cleanOrders(certNotAfter, notFinishedOrderExpires);
   }
 
-  public AcmeOrder newAcmeOrder(long accountId) {
-    long orderId = rndId();
-    return new AcmeOrder(orderId, accountId, dataSource);
+  public AcmeOrder newAcmeOrder(long accountId, long orderId) {
+    return new AcmeOrder(accountId, orderId, dataSource);
   }
 
-  public AcmeAccount newAcmeAccount() {
-    long id = rndId();
-    return new AcmeAccount(id, dataSource);
+  public AcmeAccount newAcmeAccount() throws DataAccessException {
+    return new AcmeAccount(dataSource.nextAccountId(), dataSource);
   }
 
   public void close() {
     stopMe = true;
-    writeToDb();
+    try {
+      writeToDb();
+    } catch (Exception e) {
+      LogUtil.error(LOG, e, "error closing AcmeRepo.");
+    }
   }
 
-  private synchronized void writeToDb() {
+  private synchronized void writeToDb() throws AcmeSystemException {
     // save the accounts and orders
     for (Map.Entry<Long, AcmeAccount> account : accountCache.snapshot().entrySet()) {
       account.getValue().flush();
@@ -348,6 +406,13 @@ public class AcmeRepo {
     // save the accounts and orders
     for (Map.Entry<Long, AcmeOrder> order : orderCache.snapshot().entrySet()) {
       order.getValue().flush();
+    }
+  }
+
+  public synchronized void flushOrderIfNotCached(AcmeOrder order) throws AcmeSystemException {
+    AcmeOrder cachedOrder = orderCache.get(order.getId());
+    if (cachedOrder != order) {
+      order.flush();
     }
   }
 

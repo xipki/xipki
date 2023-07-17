@@ -1,15 +1,25 @@
 Deployment in Tomcat 8 and 9
 ----
-1. Copy the sub-folders `bin`, `webapps`, `xipki` and `lib` to the tomcat root folder
+1. Copy the sub-folders `bin`, `webapps`, `xipki` and `lib` to the tomcat root folder.
    The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
    `setenv.sh` and `setenv.bat` must be adapted to point to the new position.
    Note if you do not support all protocols CMP, SCEP and RESTful API, please delete the unsupported ones
-   (cmp.war for CMP, scep.war for SCEP, .well-known.war for EST, and rest.war for RESTful API)
+   (cmp.war for CMP, scep.war for SCEP, .well-known.war for EST, acme.war for ACME, and rest.war for RESTful API)
 2. If SCEP is supported, you need to have a SCEP server certificate with private key. For the demo you may generate this
    certificate in the `xipki-mgmt-cli` via the command 
    `enroll-cert --ca myca1 --subject "CN=scep responder" --profile scep --key-password 1234 --out output/scep1.der`,
    and then copy the generated file `scep1.p12` to the folder `xipki/keycerts`.
-3. Optional, configure the TLS listener in the file
+3. If ACME is supported
+   1. (Optional) If you use database other than H2, PostgreSQL, MariaDB and MySQL, you need to
+      download the JDBC driver to the folder `${CATALINA_HOME}/lib`.
+   2. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
+      `acme-db.properties` with the one in the corresponding sub folder in `${CONTAINER_ROOT}/xipki/etc/acme/database`.
+   3. Adapt the database configurations `${CONTAINER_ROOT}/xipki/etc/acme/database/acme-db.properties`.
+   4. Create new database configured in previous step.
+   5. Initialize the database configured in previous step.  
+      In xipki-mgmt-cli, call `ca:sql --db-conf /path/to/acme-db.properties xipki/sql/acme-init.sql`
+   6. Adapt the `acme`-block in the `${CONTAINER_ROOT}/xipki/etc/acme-gateway.json`.
+5. Optional, configure the TLS listener in the file
    `${CATALINA_HOME}conf/server.xml` (we use here the port 8082 and 8445, can be changed to any other port)
    ```sh
    <Connector port="8445" protocol="org.apache.coyote.http11.Http11Nio2Protocol"

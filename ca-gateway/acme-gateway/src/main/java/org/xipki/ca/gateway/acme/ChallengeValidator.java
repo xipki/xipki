@@ -54,10 +54,10 @@ public class ChallengeValidator implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(CertEnroller.class);
 
-  private final AcmeRepo acmeRepo;
+  private final AcmeRepo repo;
 
-  public ChallengeValidator(AcmeRepo acmeRepo) {
-    this.acmeRepo = Args.notNull(acmeRepo, "acmeRepo");
+  public ChallengeValidator(AcmeRepo repo) {
+    this.repo = Args.notNull(repo, "repo");
   }
 
   private boolean stopMe;
@@ -70,18 +70,16 @@ public class ChallengeValidator implements Runnable {
       } catch (Throwable t) {
         LogUtil.error(LOG, t, "expected error");
       }
-    }
-  }
 
-  public void singleRun() {
-    Iterator<ChallId> challIds = acmeRepo.getChallengesToValidate();
-    if (!challIds.hasNext()) {
       try {
         Thread.sleep(1000); // sleep for 1 second.
       } catch (InterruptedException e) {
       }
-      return;
     }
+  }
+
+  public void singleRun() throws AcmeSystemException {
+    Iterator<ChallId> challIds = repo.getChallengesToValidate();
 
     while (challIds.hasNext()) {
       ChallId challId = challIds.next();
@@ -89,11 +87,9 @@ public class ChallengeValidator implements Runnable {
         continue;
       }
 
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("validate challenge {}", challId);
-      }
+      LOG.info("validate challenge {}", challId);
 
-      AcmeChallenge2 chall2 = acmeRepo.getChallenge(challId);
+      AcmeChallenge2 chall2 = repo.getChallenge(challId);
       if (chall2 == null) {
         continue;
       }
@@ -106,16 +102,17 @@ public class ChallengeValidator implements Runnable {
 
       switch (type) {
         case AcmeConstants.HTTP_01: {
+          String host = identifier.getValue();
+          // TODO: DEBUG
+          host = "localhost:9081";
+          String url = "http://" + host + "/.well-known/acme-challenge/" + chall.getToken();
+
           try {
             org.xipki.util.http.XiHttpClient client = new XiHttpClient();
-            String host = identifier.getValue();
-            // TODO: DEBUG
-            // host = "localhost:9081";
-            String url = "http://" + host + "/.well-known/acme-challenge/" + chall.getToken();
             HttpRespContent authzResp = client.httpGet(url);
             receivedAuthorization = new String(authzResp.getContent(), StandardCharsets.UTF_8);
           } catch (IOException ex) {
-            String message = "error while validation challenge"; // TODO: more info
+            String message = "error while validating challenge " + challId + " for identifier " + identifier;
             LogUtil.error(LOG, ex, message);
           }
           break;
@@ -135,7 +132,7 @@ public class ChallengeValidator implements Runnable {
             SSLSession session = socket.getSession();
             certs = session.getPeerCertificates();
           } catch (NoSuchAlgorithmException | IOException | KeyManagementException ex) {
-            String message = "error while validation challenge"; // TODO: more info
+            String message = "error while validating challenge " + challId + " for identifier " + identifier;
             LogUtil.error(LOG, ex, message);
           }
 
@@ -177,14 +174,14 @@ public class ChallengeValidator implements Runnable {
           try {
             records = new Lookup(host, Type.TXT).run();
           } catch (TextParseException ex) {
-            String message = "error validating challenge"; // TODO: more info
+            String message = "error while validating challenge " + challId + " for identifier " + identifier;
             LogUtil.error(LOG, ex, message);
           }
 
           String expectedName = "_acme-challenge." + host + ".";
           if (records != null) {
-            for (int i = 0; i < records.length; i++) {
-              TXTRecord txt = (TXTRecord) records[i];
+            for (Record record : records) {
+              TXTRecord txt = (TXTRecord) record;
               String name = txt.getName().toString();
               if (!expectedName.equals(name)) {
                 continue;
@@ -215,6 +212,10 @@ public class ChallengeValidator implements Runnable {
             chall.getType(), challId, identifier.getType(), identifier.getValue(),
             receivedAuthorization, chall.getExpectedAuthorization());
         chall.setStatus(ChallengeStatus.invalid);
+      }
+
+      if (chall.getAuthz() != null && chall.getAuthz().getOrder() != null) {
+        repo.flushOrderIfNotCached(chall.getAuthz().getOrder());
       }
     }
 

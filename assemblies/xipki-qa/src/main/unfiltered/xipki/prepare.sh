@@ -87,6 +87,9 @@ rm -rf ${TOMCAT_DIR}/lib/bc*.jar \
     ${TOMCAT_DIR}/lib/xipki-tomcat-password-*.jar
 
 cp -r xipki-gateway/* ${TOMCAT_DIR}/
+
+rm ${TOMCAT_DIR}/webapps/acme.war
+
 cp -r ${DIR}/tomcat/gateway/* ${TOMCAT_DIR}/
 cp ${DIR}/etc/*-gateway.json ${XIPKI_DIR}/etc
 cp ${DIR}/../qa/keys/dhpop.p12 ${XIPKI_DIR}/keycerts

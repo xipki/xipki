@@ -573,7 +573,7 @@ public class ScepResponder {
 
           EnrollOrPollCertsResponse sdkResp;
           try {
-            sdkResp = sdk.pollCerts(caName, sdkReq);
+            sdkResp = sdk.pollCerts(sdkReq);
           } catch (IOException e) {
             LOG.error("error pollCerts", e);
             throw new OperationException(SYSTEM_FAILURE, e.getMessage());

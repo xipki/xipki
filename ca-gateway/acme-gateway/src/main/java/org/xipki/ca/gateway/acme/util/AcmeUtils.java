@@ -14,22 +14,27 @@
  */
 package org.xipki.ca.gateway.acme.util;
 
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.util.Pack;
+import org.xipki.ca.gateway.acme.AcmeProtocolException;
+import org.xipki.ca.gateway.acme.AcmeSystemException;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.asn1.Asn1StreamParser;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Base64Url;
+import org.xipki.util.Hex;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
@@ -234,7 +239,7 @@ public final class AcmeUtils {
         return res;
     }
 
-    public static Map<String, String> jsonToMap(AcmeJson json) {
+    public static Map<String, String> jsonToMap(AcmeJson json) throws AcmeProtocolException {
         Map<String, String> map = new HashMap<>();
         for (String name : json.keySet()) {
             map.put(name, json.get(name).asString());
@@ -264,6 +269,84 @@ public final class AcmeUtils {
 
         return Base64Url.encodeToStringNoPadding(
             HashAlgo.SHA256.hash(canonJwk.toString().getBytes(UTF_8)));
+    }
+
+    public static byte[] extractSubject(byte[] certBytes) throws AcmeSystemException {
+        return extractField(certBytes, "subject");
+    }
+
+    public static byte[] extractIssuer(byte[] certBytes) throws AcmeSystemException {
+        return extractField(certBytes, "issuer");
+    }
+
+    public static long extractNotBefore(byte[] certBytes) throws AcmeSystemException {
+        return extractTime(certBytes, "notBefore");
+    }
+
+    public static long extractNotAfter(byte[] certBytes) throws AcmeSystemException {
+        return extractTime(certBytes, "notAfter");
+    }
+
+    private static long extractTime(byte[] certBytes, String fieldName) throws AcmeSystemException {
+        byte[] bytes = extractField(certBytes, fieldName);
+        if (bytes[0] == BERTags.UTC_TIME) {
+            return Time.getInstance(ASN1UTCTime.getInstance(bytes)).getDate().getTime() / 1000;
+        } else {
+            return Time.getInstance(ASN1GeneralizedTime.getInstance(bytes)).getDate().getTime() / 1000;
+        }
+    }
+
+    private static byte[] extractField(byte[] certBytes, String fieldName) throws AcmeSystemException {
+        try {
+            BufferedInputStream instream = new BufferedInputStream(new ByteArrayInputStream(certBytes));
+            // SEQUENCE of Certificate
+            Asn1StreamParser.skipTagLen(instream);
+
+            // SEQUENCE OF TBSCertificate
+            Asn1StreamParser.skipTagLen(instream);
+
+            // #num = 3: version, serialNumber, signature
+            int numFields = 3;
+            for (int i = 0; i < numFields; i++) {
+                Asn1StreamParser.skipField(instream);
+            }
+
+            // issuer
+            if ("issuer".equalsIgnoreCase(fieldName)) {
+                return Asn1StreamParser.readBlock(Asn1StreamParser.TAG_CONSTRUCTED_SEQUENCE, instream, "issuer");
+            } else {
+                Asn1StreamParser.skipField(instream);
+            }
+
+            // Validity
+            if ("notBefore".equalsIgnoreCase(fieldName) || "notAfter".equalsIgnoreCase(fieldName)) {
+                Asn1StreamParser.skipTagLen(instream);
+
+                // notBefore
+                if ("notBefore".equalsIgnoreCase(fieldName)) {
+                    return Asn1StreamParser.readBlock(instream, "notBefore");
+                } else {
+                    Asn1StreamParser.skipField(instream);
+                }
+
+                // notAfter
+                if ("notAfter".equalsIgnoreCase(fieldName)) {
+                    return Asn1StreamParser.readBlock(instream, "notAfter");
+                } else {
+                    Asn1StreamParser.skipField(instream);
+                }
+            } else {
+                Asn1StreamParser.skipField(instream);
+            }
+
+            if ("subject".equalsIgnoreCase(fieldName)) {
+                return Asn1StreamParser.readBlock(Asn1StreamParser.TAG_CONSTRUCTED_SEQUENCE, instream, "subject");
+            }
+
+            throw new IllegalArgumentException("unknown fieldName " + fieldName);
+        } catch (Exception ex) {
+            throw new AcmeSystemException("certificate is invalid, should not happen");
+        }
     }
 
 }

@@ -24,6 +24,7 @@ import org.xipki.ca.gateway.acme.type.*;
 import org.xipki.ca.gateway.acme.util.AcmeJson;
 import org.xipki.ca.gateway.acme.util.AcmeUtils;
 import org.xipki.ca.sdk.*;
+import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CrlReason;
@@ -38,7 +39,6 @@ import org.xipki.util.http.HttpRespContent;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -50,6 +50,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.xipki.ca.gateway.acme.AcmeConstants.*;
@@ -140,9 +141,7 @@ public class AcmeResponder {
 
   private final AcmeRepo repo;
 
-  private byte[] caSubject;
-
-  private byte[][] cacerts;
+  private final Map<String, byte[][]> cacertsMap = new ConcurrentHashMap<>();
 
   private final int tokenNumBytes;
 
@@ -203,13 +202,13 @@ public class AcmeResponder {
 
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    addJsonField(sb, "newNonce", baseUrl + CMD_newNonce);
+    addJsonField(sb, "newNonce",   baseUrl + CMD_newNonce);
     addJsonField(sb, "newAccount", baseUrl + CMD_newAccount);
-    addJsonField(sb, "newOrder", baseUrl + CMD_newOrder);
+    addJsonField(sb, "newOrder",   baseUrl + CMD_newOrder);
     // newAuthz is not supported
     //addJsonField(sb, "newAuthz", baseUrl + CMD_newAuthz);
     addJsonField(sb, "revokeCert", baseUrl + CMD_revokeCert);
-    addJsonField(sb, "keyChange", baseUrl + CMD_keyChange);
+    addJsonField(sb, "keyChange",  baseUrl + CMD_keyChange);
 
     sb.append(addQuoteSign("meta")).append(":{");
     if (StringUtil.isNotBlank(conf.getWebsite())) {
@@ -221,7 +220,7 @@ public class AcmeResponder {
       addJsonField(sb, "termsOfService", conf.getTermsOfService());
     }
 
-    if (conf.getCaaIdentities() != null && !conf.getCaaIdentities().isEmpty()) {
+    if (CollectionUtil.isNotEmpty(conf.getCaaIdentities())) {
       sb.append(addQuoteSign("caaIdentities")).append(":[");
       for (String caIdentity : conf.getCaaIdentities()) {
         sb.append(addQuoteSign(caIdentity)).append(",");
@@ -262,8 +261,7 @@ public class AcmeResponder {
       fileOrValue.setFile(conf.getDbConf());
       DataSourceWrapper dataSource0 = new DataSourceFactory().createDataSource(
           "acme-db", fileOrValue, securityFactory.getPasswordResolver());
-      AcmeDataSource dataSource = new AcmeDataSource(dataSource0);
-      repo = new AcmeRepo(dataSource, conf.getCacheSize(), conf.getSyncDbSeconds());
+      repo = new AcmeRepo(new AcmeDataSource(dataSource0), conf.getCacheSize(), conf.getSyncDbSeconds());
     } catch (Exception ex) {
       throw new InvalidConfException("could not initialize database", ex);
     }
@@ -323,12 +321,26 @@ public class AcmeResponder {
       auditMessage = ex.getAuditMessage();
 
       return new RestResponse(ex.getHttpStatus(), null, null, null);
-    } catch (Throwable th) {
-      if (th instanceof EOFException) {
-        LogUtil.warn(LOG, th, "connection reset by peer");
+    } catch (AcmeProtocolException ex) {
+      auditLevel = AuditLevel.WARN;
+      auditStatus = AuditStatus.FAILED;
+      auditMessage = ex.getMessage();
+      Problem problem = new Problem();
+      problem.setType(ex.getAcmeError().getQualifiedCode());
+      problem.setDetail(ex.getAcmeDetail());
+      return buildProblemResp(ex.getHttpError(), problem);
+    } catch (DataAccessException | AcmeSystemException ex) {
+      LogUtil.error(LOG, ex, null);
+      auditLevel = AuditLevel.ERROR;
+      auditStatus = AuditStatus.FAILED;
+      if (ex instanceof DataAccessException) {
+        auditMessage = "database error";
       } else {
-        LOG.error("Throwable thrown, this should not happen!", th);
+        auditMessage = "ACME system exception";
       }
+      return new RestResponse(SC_INTERNAL_SERVER_ERROR, null, null, null);
+    } catch (Throwable th) {
+      LOG.error("Throwable thrown, this should not happen!", th);
       auditLevel = AuditLevel.ERROR;
       auditStatus = AuditStatus.FAILED;
       auditMessage = "internal error";
@@ -352,7 +364,7 @@ public class AcmeResponder {
 
   private RestResponse doService(HttpServletRequest servletReq, byte[] request,
       AuditEvent event, StringContainer commandContainer)
-      throws HttpRespAuditException, IOException, InvalidKeySpecException, JoseException, SdkErrorResponseException {
+      throws HttpRespAuditException, AcmeProtocolException, AcmeSystemException, DataAccessException {
     String method = servletReq.getMethod();
     String path = servletReq.getServletPath();
 
@@ -421,30 +433,34 @@ public class AcmeResponder {
 
     String contentType = servletReq.getContentType();
     if (!CT_JOSE_JSON.equals(contentType)) {
-      return buildProblemResp(SC_BAD_REQUEST, AcmeError.malformed,
+      throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
           "invalid Content-Type '" + contentType + "'");
     }
 
     JoseMessage body = JSON.parseObject(request, JoseMessage.class);
-    AcmeJson protected_ = AcmeJson.parse(
-        new ByteArrayInputStream(decodeFast(body.getProtected())));
+    AcmeJson protected_;
+    try {
+      protected_ = AcmeJson.parse(new ByteArrayInputStream(decodeFast(body.getProtected())));
+    } catch (IOException e) {
+      throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "invalid 'protected");
+    }
 
     if (!protected_.contains("url")) {
-      return buildProblemResp(SC_BAD_REQUEST, AcmeError.malformed, "url is not present");
+      throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "url is not present");
     }
 
     String protectedUrl = protected_.get("url").asString();
     if (!protectedUrl.equals(baseUrl + path.substring(1))) {
-      return buildProblemResp(SC_BAD_REQUEST, AcmeError.malformed, "url is not valid: '" + protectedUrl + "'");
+      throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "url is not valid: '" + protectedUrl + "'");
     }
 
     if (!protected_.contains("nonce")) {
-      return buildProblemResp(SC_BAD_REQUEST, AcmeError.badNonce, "nonce is not present");
+      throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badNonce, "nonce is not present");
     }
 
     String nonce = protected_.get("nonce").asString();
     if (!nonceManager.removeNonce(nonce)) {
-      return buildProblemResp(SC_BAD_REQUEST, AcmeError.badNonce, null);
+      throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badNonce, null);
     }
 
     final int MASK_JWK = 1; // jwk is allowed
@@ -462,24 +478,24 @@ public class AcmeResponder {
     PublicKey pubKey;
 
     if (withKid && withJwk) {
-      return buildProblemResp(SC_BAD_REQUEST, AcmeError.malformed,
+      throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
           "Both jwk and kid are specified, but exactly one of them is allowed");
     } else if (withJwk) {
       if ((verificationKeyRequirement & MASK_JWK) == 0) {
-        return buildProblemResp(SC_BAD_REQUEST, AcmeError.malformed,
-            "kid is specified, but jwk is allowed");
+        throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "kid is specified, but jwk is allowed");
       }
 
       jwk = AcmeUtils.jsonToMap(protected_.get("jwk").asObject());
       try {
         pubKey = AcmeUtils.jwkPublicKey(jwk);
-      } catch (Exception e) {
-        return buildProblemResp(SC_BAD_REQUEST, AcmeError.badPublicKey, null);
+      } catch (Exception ex) {
+        LogUtil.error(LOG, ex, "jwkPublicKey");
+        throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badPublicKey, null);
       }
     } else if (protected_.contains("kid")) {
       if ((verificationKeyRequirement & MASK_KID) == 0) {
-        return buildProblemResp(SC_BAD_REQUEST, AcmeError.malformed,
-            "jwk is specified, but kid is allowed");
+        throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
+            "jwk is specified, but only kid is allowed");
       }
 
       // extract the location
@@ -492,45 +508,41 @@ public class AcmeResponder {
       }
 
       if (account == null) {
-        return buildProblemResp(SC_BAD_REQUEST, AcmeError.accountDoesNotExist, null);
+        throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.accountDoesNotExist, null);
       }
-      pubKey = account.getPublicKey();
+
+      try {
+        pubKey = account.getPublicKey();
+      } catch (InvalidKeySpecException e) {
+        throw new AcmeProtocolException(SC_INTERNAL_SERVER_ERROR, AcmeError.badPublicKey, null);
+      }
     } else {
-      return buildProblemResp(SC_BAD_REQUEST, AcmeError.malformed,
+      throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
           "None of jwk and kid is specified, but one of them is required");
     }
 
     // pre-check
     if (CMD_account.equals(command)) {
       if (protected_.get("url").asString().equals(kid)) {
-        return buildProblemResp(SC_BAD_REQUEST, AcmeError.malformed,
-            "kid and url do not match");
+        throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "kid and url do not match");
       }
     }
 
     // assert the account is valid
     if (account != null) {
       if (account.getStatus() != AccountStatus.valid) {
-        return buildProblemResp(SC_UNAUTHORIZED, AcmeError.unauthorized,
-            "account is not valid");
+        throw new AcmeProtocolException(SC_UNAUTHORIZED, AcmeError.unauthorized, "account is not valid");
       }
     }
 
-    boolean sigValid;
-    try {
-      sigValid = verifySignature(pubKey, body);
-    } catch (InvalidAlgorithmException e) {
-      return buildProblemResp(SC_BAD_REQUEST, AcmeError.badSignatureAlgorithm, e.getMessage());
-    }
-
-    if (!sigValid) {
-      return buildProblemResp(SC_BAD_REQUEST, AcmeError.malformed, "signature is not valid");
+    RestResponse verifyRes = verifySignature(pubKey, body);
+    if (verifyRes != null) {
+      return verifyRes;
     }
 
     switch (command) {
       case CMD_newAccount: {
-        NewAccountPayload reqPayload =
-            JSON.parseObject(decodeFast(body.getPayload()), NewAccountPayload.class);
+        NewAccountPayload reqPayload = JSON.parseObject(decodeFast(body.getPayload()), NewAccountPayload.class);
 
         AcmeAccount existingAccount = repo.getAccountForJwk(jwk);
         if (existingAccount != null) {
@@ -538,41 +550,43 @@ public class AcmeResponder {
               .putHeader(HDR_LOCATION, existingAccount.getLocation(baseUrl));
         }
 
-        if (value(reqPayload.getOnlyReturnExisting(), false)) {
-          return buildProblemResp(SC_BAD_REQUEST, AcmeError.accountDoesNotExist, null);
-        } else {
-          // create a new account
-          Boolean b = reqPayload.getTermsOfServiceAgreed();
-          boolean tosAgreed = (b != null) ? b : !termsOfServicePresent;
-
-          if (!tosAgreed) {
-            return buildProblemResp(SC_UNAUTHORIZED, AcmeError.userActionRequired,
-                "terms of service has not been agreed");
-          }
-
-          AcmeAccount acmeAccount = repo.newAcmeAccount();
-          List<String> contacts = reqPayload.getContact();
-          if (contacts != null && !contacts.isEmpty()) {
-            RestResponse verifyErrorResp = verifyContacts(contacts);
-            if (verifyErrorResp != null) {
-              return verifyErrorResp;
-            }
-            acmeAccount.setContact(contacts);
-          }
-          acmeAccount.setExternalAccountBinding(reqPayload.getExternalAccountBinding());
-          if (b != null) {
-            acmeAccount.setTermsOfServiceAgreed(true);
-          }
-
-          acmeAccount.setJwk(jwk);
-          acmeAccount.setStatus(AccountStatus.valid);
-          repo.addAccount(acmeAccount);
-
-          AccountResponse resp = acmeAccount.toResponse(baseUrl);
-
-          return buildSuccJsonResp(SC_CREATED, resp)
-              .putHeader(HDR_LOCATION, acmeAccount.getLocation(baseUrl));
+        Boolean onlyReturnExisting = reqPayload.getOnlyReturnExisting();
+        if (onlyReturnExisting != null && onlyReturnExisting) {
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.accountDoesNotExist, null);
         }
+
+        // create a new account
+        Boolean b = reqPayload.getTermsOfServiceAgreed();
+        boolean tosAgreed = (b != null) ? b : !termsOfServicePresent;
+
+        if (!tosAgreed) {
+          throw new AcmeProtocolException(SC_UNAUTHORIZED, AcmeError.userActionRequired,
+              "terms of service has not been agreed");
+        }
+
+        AcmeAccount newAccount = repo.newAcmeAccount();
+        List<String> contacts = reqPayload.getContact();
+        if (contacts != null && !contacts.isEmpty()) {
+          RestResponse verifyErrorResp = verifyContacts(contacts);
+          if (verifyErrorResp != null) {
+            return verifyErrorResp;
+          }
+          newAccount.setContact(contacts);
+        }
+        newAccount.setExternalAccountBinding(reqPayload.getExternalAccountBinding());
+        if (b != null) {
+          newAccount.setTermsOfServiceAgreed(true);
+        }
+
+        newAccount.setJwk(jwk);
+        newAccount.setStatus(AccountStatus.valid);
+        repo.addAccount(newAccount);
+
+        AccountResponse resp = newAccount.toResponse(baseUrl);
+
+        LOG.info("created new account {}", newAccount.idText());
+        return buildSuccJsonResp(SC_CREATED, resp)
+            .putHeader(HDR_LOCATION, newAccount.getLocation(baseUrl));
       }
       case CMD_keyChange: {
         JoseMessage reqPayload = JSON.parseObject(decodeFast(body.getPayload()), JoseMessage.class);
@@ -581,7 +595,7 @@ public class AcmeResponder {
         Map<String, String> newJwk = AcmeUtils.jsonToMap(innerProtected.get("jwk").asObject());
         AcmeAccount accountForNewJwk = repo.getAccountForJwk(newJwk);
         if (accountForNewJwk != null) {
-          // jwk must not exist.
+          // jwk not exists.
           return toRestResponse(HttpRespContent.of(SC_CONFLICT, null, null))
               .putHeader(HDR_LOCATION, accountForNewJwk.getLocation(baseUrl));
         }
@@ -590,22 +604,31 @@ public class AcmeResponder {
         AcmeJson innerPayload = AcmeJson.parse(decodeFast(reqPayload.getPayload()));
         String innerAccount = innerPayload.get("account").asString();
         if (!innerAccount.equals(kid)) {
-          return buildProblemResp(SC_BAD_REQUEST, AcmeError.malformed, "invalid payload.account");
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "invalid payload.account");
         }
 
         Map<String, String> oldKey = AcmeUtils.jsonToMap(innerPayload.get("oldKey").asObject());
         if (!account.hasJwk(oldKey)) {
-          return buildProblemResp(SC_BAD_REQUEST, AcmeError.malformed, "oldKey does not match the account");
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "oldKey does not match the account");
         }
 
         // check inner signature (by the new key)
-        PublicKey newPubKey = AcmeUtils.jwkPublicKey(newJwk);
-        boolean newSigValid = verifySignature(newPubKey, reqPayload);
-        if (!newSigValid) {
-          return buildProblemResp(SC_BAD_REQUEST, AcmeError.malformed, "inner signature is not valid");
+        PublicKey newPubKey;
+        try {
+          newPubKey = AcmeUtils.jwkPublicKey(newJwk);
+        } catch (InvalidKeySpecException e) {
+          LogUtil.error(LOG, e, "jwkPublicKey");
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badPublicKey, null);
+        }
+
+        verifyRes = verifySignature(newPubKey, reqPayload);
+        if (verifyRes != null) {
+          return verifyRes;
         }
 
         account.setJwk(newJwk);
+
+        LOG.info("changed key of account {}", account.idText());
         return buildSuccJsonResp(SC_OK, account.toResponse(baseUrl))
             .putHeader(HDR_LOCATION, account.getLocation(baseUrl));
       }
@@ -614,7 +637,7 @@ public class AcmeResponder {
         AccountStatus status = reqPayload.getStatus();
 
         if (status == AccountStatus.revoked) {
-          return buildProblemResp(SC_UNAUTHORIZED, AcmeError.unauthorized, "status revoked is not allowed");
+          throw new AcmeProtocolException(SC_UNAUTHORIZED, AcmeError.unauthorized, "status revoked is not allowed");
         }
 
         if (status == AccountStatus.deactivated) {
@@ -633,11 +656,11 @@ public class AcmeResponder {
           account.setContact(contacts);
         }
 
+        LOG.info("updated account {}", account.idText());
         return buildSuccJsonResp(SC_OK, account.toResponse(baseUrl));
       }
       case CMD_revokeCert: {
-        RevokeCertPayload reqPayload =
-            JSON.parseObject(decodeFast(body.getPayload()), RevokeCertPayload.class);
+        RevokeCertPayload reqPayload = JSON.parseObject(decodeFast(body.getPayload()), RevokeCertPayload.class);
         Integer reasonCode = reqPayload.getReason();
         CrlReason reason;
         try {
@@ -647,28 +670,41 @@ public class AcmeResponder {
         }
 
         if (reason == null || !CrlReason.PERMITTED_CLIENT_CRLREASONS.contains(reason)) {
-          return buildProblemResp(SC_BAD_REQUEST, AcmeError.badRevocationReason, null);
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badRevocationReason,
+              "bad revocation reason " + reasonCode);
         }
 
         byte[] certBytes = decodeFast(reqPayload.getCertificate());
 
-        Certificate cert = Certificate.getInstance(certBytes);
+        Certificate cert;
+        byte[] encodedIssuer;
+        try {
+          cert = Certificate.getInstance(certBytes);
+          encodedIssuer = cert.getIssuer().getEncoded();
+        } catch (Exception e) {
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "malformed certificate");
+        }
+
+        LOG.info("try to revoke certificate with (subject={}, issuer={}, serialNumber={})",
+            cert.getSubject(), cert.getIssuer(), cert.getSerialNumber());
+
         if (jwk != null) {
           // request is signed with the private paired with the certificate.
           boolean jwkAndCertMatch;
           try {
             jwkAndCertMatch = AcmeUtils.matchKey(jwk, cert.getSubjectPublicKeyInfo());
           } catch (InvalidKeySpecException e) {
-            return buildProblemResp(SC_BAD_REQUEST, AcmeError.badPublicKey, "bad jwk");
+            LogUtil.error(LOG, e, "matchKey");
+            throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badPublicKey, "bad jwk");
           }
           if (!jwkAndCertMatch) {
-            return buildProblemResp(SC_BAD_REQUEST, AcmeError.unauthorized, "jwk and certificate do not match");
+            throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.unauthorized, "jwk and certificate do not match");
           }
         }
 
         AcmeOrder order = repo.getOrderForCert(certBytes);
         if (order == null) {
-          return buildProblemResp(SC_BAD_REQUEST, AcmeError.unauthorized,
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.unauthorized,
               "certificate not enrolled through this ACME server");
         }
 
@@ -678,27 +714,41 @@ public class AcmeResponder {
           // assert the certificate is owned by the account
           if (order.getAccountId() != account.getId()) {
             // certificate has not been issued to the given account.
-            return buildProblemResp(SC_BAD_REQUEST, AcmeError.unauthorized, "account and certificate do not match");
+            throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.unauthorized,
+                "account and certificate do not match");
           }
         }
 
         RevokeCertsRequest sdkReq = new RevokeCertsRequest();
+        sdkReq.setIssuer(new X500NameType());
+        sdkReq.getIssuer().setEncoded(encodedIssuer);
+
         RevokeCertRequestEntry sdkEntry = new RevokeCertRequestEntry();
         sdkEntry.setReason(reason);
         sdkEntry.setSerialNumber(cert.getSerialNumber().getPositiveValue());
         sdkReq.setEntries(Collections.singletonList(sdkEntry));
-        RevokeCertsResponse sdkResp = sdk.revokeCerts(order.getCertReqMeta().getCa(), sdkReq);
+
+        RevokeCertsResponse sdkResp;
+        try {
+          sdkResp = sdk.revokeCerts(sdkReq);
+          LOG.info("revoked certificate");
+        } catch (IOException | SdkErrorResponseException e) {
+          LogUtil.error(LOG, e, "sdk.revokeCerts");
+          throw new AcmeProtocolException(SC_INTERNAL_SERVER_ERROR, AcmeError.serverInternal,
+              "error revoking the certificate");
+        }
+
         ErrorEntry errorEntry = sdkResp.getEntries().get(0).getError();
         if (errorEntry == null) {
-          return buildSuccResp(SC_OK);
+          return toRestResponse(HttpRespContent.of(SC_OK, null, null));
         } else {
           int errCode = errorEntry.getCode();
           if (errCode == ErrorCode.CERT_REVOKED.getCode()) {
-            return buildProblemResp(SC_BAD_REQUEST, AcmeError.alreadyRevoked, null);
+            throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.alreadyRevoked, null);
           } else if (errCode == UNKNOWN_CERT.getCode()) {
-            return buildProblemResp(SC_BAD_REQUEST, AcmeError.malformed, "certificate is unknown");
+            throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "certificate is unknown");
           } else {
-            return buildProblemResp(SC_FORBIDDEN, AcmeError.unauthorized, null);
+            throw new AcmeProtocolException(SC_FORBIDDEN, AcmeError.unauthorized, null);
           }
         }
       }
@@ -708,7 +758,7 @@ public class AcmeResponder {
 
         Long id = toLongId(tokens[1]);
         if (id == null || id != account.getId()) {
-          return buildProblemResp(SC_NOT_FOUND, null, null);
+          throw new AcmeProtocolException(SC_NOT_FOUND, AcmeError.accountDoesNotExist, null);
         }
 
         List<Long> orderIds = repo.getOrderIds(id);
@@ -729,18 +779,42 @@ public class AcmeResponder {
         int size = identifiers == null ? 0 : identifiers.size();
 
         if (size == 0) {
-          return buildProblemResp(SC_BAD_REQUEST, AcmeError.malformed, "no identifier is specified");
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "no identifier is specified");
+        }
+
+        int numChalls = 0;
+        for (Identifier identifier : identifiers) {
+          String type = identifier.getType();
+          String value = identifier.getValue();
+
+          if ("dns".equals(type)) {
+            if (!value.startsWith("*.")) {
+              numChalls += 2;
+            }
+
+            numChalls++;
+          } else {
+            throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.unsupportedIdentifier,
+                "unsupported identifier type '" + type + "'");
+          }
         }
 
         // 7 days validity
         Instant expires = Instant.now().truncatedTo(ChronoUnit.SECONDS).plus(7, ChronoUnit.DAYS);
 
         List<AcmeAuthz> authzs = new ArrayList<>(size);
+
+        AcmeRepo.IdsForOrder ids = repo.newIdsForOrder(size, numChalls);
+        int[] authzIds = ids.getAuthzSubIds();
+        int[] challIds = ids.getChallSubIds();
+
+        int authzIdOffset = 0;
+        int challIdOffset = 0;
+
         for (Identifier identifier : identifiers) {
-          AcmeAuthz authz = new AcmeAuthz();
+          AcmeAuthz authz = new AcmeAuthz(authzIds[authzIdOffset++], identifier.toAcmeIdentifier());
           authzs.add(authz);
 
-          authz.setIdentifier(identifier.toAcmeIdentifier());
           authz.setStatus(AuthzStatus.pending);
           authz.setExpires(expires);
 
@@ -755,7 +829,7 @@ public class AcmeResponder {
             }
 
             if (v.indexOf('*') != -1) {
-              return buildProblemResp(SC_BAD_REQUEST, AcmeError.unsupportedIdentifier,
+              throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.unsupportedIdentifier,
                   "unsupported identifier '" + value + "'");
             }
 
@@ -767,19 +841,20 @@ public class AcmeResponder {
 
             List<AcmeChallenge> challenges = new ArrayList<>(3);
             if (!value.startsWith("*.")) {
-              challenges.add(newChall(HTTP_01, token, authorization));
-              challenges.add(newChall(TLS_ALPN_01, token, authorizationSha256));
+              challenges.add(newChall(challIds[challIdOffset++], HTTP_01, token, authorization));
+              challenges.add(newChall(challIds[challIdOffset++], TLS_ALPN_01, token, authorizationSha256));
             }
 
-            challenges.add(newChall(DNS_01, token, authorizationSha256));
+            challenges.add(newChall(challIds[challIdOffset++], DNS_01, token, authorizationSha256));
             authz.setChallenges(challenges);
           } else {
-            return buildProblemResp(SC_BAD_REQUEST, AcmeError.unsupportedIdentifier,
+            throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.unsupportedIdentifier,
                 "unsupported identifier type '" + type + "'");
           }
         }
 
-        AcmeOrder order = repo.newAcmeOrder(account.getId());
+        AcmeOrder order = repo.newAcmeOrder(account.getId(), ids.getOrderId());
+        order.setAuthzs(authzs);
 
         Instant notBefore = null;
         Instant notAfter = null;
@@ -791,9 +866,7 @@ public class AcmeResponder {
           notAfter = AcmeUtils.parseTimestamp(newOrderReq.getNotAfter());
         }
 
-        order.setAuthzs(authzs);
         order.setExpires(expires);
-        order.setAuthzs(authzs);
 
         if (notBefore != null || notAfter != null)  {
           CertReqMeta certReqMeta = new CertReqMeta();
@@ -803,8 +876,14 @@ public class AcmeResponder {
         }
 
         repo.addOrder(order);
+        OrderResponse orderResp = order.toResponse(baseUrl);
 
-        return buildSuccJsonResp(SC_CREATED, order.toResponse(baseUrl))
+        if (LOG.isInfoEnabled()) {
+          LOG.info("added new order {} for identifiers {}: {}", order.idText(), identifiers,
+              JSON.toJson(orderResp));
+        }
+
+        return buildSuccJsonResp(SC_CREATED, orderResp)
             .putHeader(HDR_LOCATION, order.getLocation(baseUrl));
       }
       case CMD_order: {
@@ -823,13 +902,14 @@ public class AcmeResponder {
           case ready:
             break;
           case pending:
-            return buildProblemResp(SC_FORBIDDEN, AcmeError.orderNotReady, "Order is not ready");
+            throw new AcmeProtocolException(SC_FORBIDDEN, AcmeError.orderNotReady, "Order is not ready");
           case invalid:
-            return buildProblemResp(SC_FORBIDDEN, AcmeError.unauthorized, "Order is invalid");
+            throw new AcmeProtocolException(SC_FORBIDDEN, AcmeError.unauthorized, "Order is invalid");
           case processing:
-            return buildProblemResp(SC_FORBIDDEN, AcmeError.orderNotReady, "Enrolling certificate is processing");
+            throw new AcmeProtocolException(SC_FORBIDDEN, AcmeError.orderNotReady,
+                "Enrolling certificate is processing");
           case valid:
-            return buildProblemResp(SC_FORBIDDEN, AcmeError.orderNotReady, "Certificate has been issued");
+            throw new AcmeProtocolException(SC_FORBIDDEN, AcmeError.orderNotReady, "Certificate has been issued");
           default:
             throw new RuntimeException("should not reach here, invalid order status " + order.getStatus());
         }
@@ -843,14 +923,14 @@ public class AcmeResponder {
           csrBytes = Base64Url.decodeFast(finalizeOrderReq.getCsr());
           csr = CertificationRequest.getInstance(csrBytes);
         } catch (Exception e) {
-          return buildProblemResp(SC_BAD_REQUEST, AcmeError.badCSR, "could not parse CSR");
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badCSR, "could not parse CSR");
         }
 
         String keyAlgOid =
             csr.getCertificationRequestInfo().getSubjectPublicKeyInfo().getAlgorithm().getAlgorithm().getId();
         AcmeProxyConf.CaProfile caProfile = getCaProfile(keyAlgOid);
         if (caProfile == null) {
-          return buildProblemResp(SC_BAD_REQUEST, AcmeError.badCSR, "unsupported key type " + keyAlgOid);
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badCSR, "unsupported key type " + keyAlgOid);
         }
 
         // verify the CSR
@@ -871,7 +951,7 @@ public class AcmeResponder {
           }
 
           if (!match) {
-            return buildProblemResp(SC_BAD_REQUEST, AcmeError.badCSR, "invalid commonName in CSR");
+            throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badCSR, "invalid commonName in CSR");
           }
         }
 
@@ -879,7 +959,8 @@ public class AcmeResponder {
         byte[] sanExtnValue = csrExtensions == null ? null
             : X509Util.getCoreExtValue(csrExtensions, Extension.subjectAlternativeName);
         if (sanExtnValue == null) {
-          return buildProblemResp(SC_BAD_REQUEST, AcmeError.badCSR, "no extension subjectAlternativeName in CSR");
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badCSR,
+              "no extension subjectAlternativeName in CSR");
         }
 
         GeneralNames generalNames = GeneralNames.getInstance(sanExtnValue);
@@ -898,26 +979,27 @@ public class AcmeResponder {
             if (matchedId != null) {
               identifiers.remove(matchedId);
             } else {
-              return buildProblemResp(SC_BAD_REQUEST, AcmeError.badCSR,
+              throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badCSR,
                   "invalid DNS identifier in the extension subjectAlternativeName in CSR: " + value);
             }
           } else {
-            return buildProblemResp(SC_BAD_REQUEST, AcmeError.badCSR,
+            throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badCSR,
                 "unsupported name in the extension subjectAlternativeName in CSR.");
           }
         }
 
         if (!identifiers.isEmpty()) {
-          return buildProblemResp(SC_BAD_REQUEST, AcmeError.badCSR,
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badCSR,
               "missing identifier in the extension subjectAlternativeName in CSR: " + identifiers);
         }
 
         try {
           if (!GatewayUtil.verifyCsr(csr, securityFactory, popControl)) {
-            return buildProblemResp(SC_BAD_REQUEST, AcmeError.badCSR, "could not verify signature of CSR");
+            throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badCSR, "could not verify signature of CSR");
           }
         } catch (Exception ex) {
-          return buildProblemResp(SC_BAD_REQUEST, AcmeError.badCSR, ex.getMessage());
+          LogUtil.error(LOG, ex, "error verifying CSR");
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badCSR, null);
         }
 
         CertReqMeta certReqMeta = order.getCertReqMeta();
@@ -930,6 +1012,9 @@ public class AcmeResponder {
 
         order.setCsr(csrBytes);
         order.setStatus(OrderStatus.processing);
+
+        LOG.info("finalized order {}", order.idText());
+
         return buildSuccJsonResp(SC_OK, order.toResponse(baseUrl))
             .putHeader(HDR_LOCATION, order.getLocation(baseUrl));
       }
@@ -938,14 +1023,27 @@ public class AcmeResponder {
         AcmeOrder order = getOrder(id);
         byte[] certBytes = order.getCert();
         if (certBytes == null) {
-          return buildProblemResp(SC_NOT_FOUND, AcmeError.orderNotReady, "found no certificate");
+          throw new AcmeProtocolException(SC_NOT_FOUND, AcmeError.orderNotReady, "found no certificate");
         }
 
-        Certificate cert = Certificate.getInstance(certBytes);
-        if (!Arrays.equals(cert.getIssuer().getEncoded(), caSubject)) {
-          // TODO: extend SDK to retrieve cacerts according to X500Name: to cover case where ca
-          // has changed the certificate meanwhile.
-          cacerts = sdk.cacerts(order.getCertReqMeta().getCa());
+        byte[] encodedIssuer = AcmeUtils.extractIssuer(certBytes);
+        String hexIssuer = Hex.encode(encodedIssuer);
+        byte[][] cacerts = cacertsMap.get(hexIssuer);
+
+        if (cacerts == null) {
+          try {
+            cacerts = sdk.cacertsBySubject(encodedIssuer);
+          } catch (IOException | SdkErrorResponseException e) {
+            throw new AcmeProtocolException(SC_INTERNAL_SERVER_ERROR, AcmeError.serverInternal,
+                "could not retrieve CA certificate chain");
+          }
+
+          String hexCaSubject = Hex.encode(AcmeUtils.extractSubject(cacerts[0]));
+          if (!hexIssuer.equals(hexCaSubject)) {
+            throw new AcmeProtocolException(SC_INTERNAL_SERVER_ERROR, AcmeError.serverInternal,
+                "could not retrieve CA certificate chain");
+          }
+          cacertsMap.put(hexCaSubject, cacerts);
         }
 
         byte[][] certchain = new byte[1 + cacerts.length][];
@@ -953,6 +1051,8 @@ public class AcmeResponder {
         System.arraycopy(cacerts, 0, certchain, 1, cacerts.length);
 
         byte[] respBytes = StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certchain));
+
+        LOG.info("downloaded certificate of order {}", order.idText());
         return toRestResponse(HttpRespContent.ofOk(CT_PEM_CERTIFICATE_CHAIN, respBytes));
       }
       case CMD_authz: {
@@ -960,23 +1060,24 @@ public class AcmeResponder {
           throw new HttpRespAuditException(SC_NOT_FOUND, "unknown authz", AuditLevel.ERROR, AuditStatus.FAILED);
         }
 
-        Long id = toLongId(tokens[1]);
-        AcmeAuthz authz = id == null ? null : repo.getAuthz(id);
+        AuthzId id = new AuthzId(Base64Url.decodeFast(tokens[1]));
+        AcmeAuthz authz = repo.getAuthz(id);
         if (authz == null) {
           throw new HttpRespAuditException(SC_NOT_FOUND, "unknown authz", AuditLevel.ERROR, AuditStatus.FAILED);
         }
-        return buildSuccJsonResp(SC_OK, authz.toResponse(baseUrl));
+
+        if (LOG.isInfoEnabled()) {
+          LOG.info("downloaded authz {}: {}", id, JSON.toJson(authz.toResponse(baseUrl, id.getOrderId())));
+        }
+        return buildSuccJsonResp(SC_OK, authz.toResponse(baseUrl, id.getOrderId()));
       }
       case CMD_chall: {
-        Long authzId = toLongId(tokens[1]);
-        Integer subId = tokens.length > 2 ? toIntId(tokens[2]) : null;
-        if (authzId == null || subId == null) {
+        if (tokens.length != 2) {
           throw new HttpRespAuditException(SC_NOT_FOUND, "unknown challenge", AuditLevel.ERROR, AuditStatus.FAILED);
         }
 
-        ChallId id = new ChallId(authzId, subId);
-
-        AcmeChallenge2 chall2 = repo.getChallenge(id);
+        ChallId challId = new ChallId(Base64Url.decodeFast(tokens[1]));
+        AcmeChallenge2 chall2 = repo.getChallenge(challId);
         if (chall2 == null) {
           throw new HttpRespAuditException(SC_NOT_FOUND, "unknown challenge", AuditLevel.ERROR, AuditStatus.FAILED);
         }
@@ -987,7 +1088,9 @@ public class AcmeResponder {
         if (status == ChallengeStatus.pending) {
           chall.setStatus(ChallengeStatus.processing);
         }
-        ChallengeResponse resp = chall.toChallengeResponse(authzId, baseUrl);
+        ChallengeResponse resp = chall.toChallengeResponse(baseUrl, challId.getOrderId(), challId.getAuthzId());
+
+        LOG.info("Received ready for challenge {} of order {}", challId, challId.getOrderId());
         return buildSuccJsonResp(SC_OK, resp);//.putHeader(HDR_RETRY_AFTER, "2"); // wait for 2 seconds
       }
       default: {
@@ -996,10 +1099,6 @@ public class AcmeResponder {
       }
     }
   } // method service
-
-  private static boolean value(Boolean v, boolean dflt) {
-    return v == null ? dflt : v;
-  }
 
   private RestResponse toRestResponse(HttpRespContent respContent) {
     if (respContent == null) {
@@ -1010,7 +1109,7 @@ public class AcmeResponder {
     }
   }
 
-  private AcmeOrder getOrder(String id) throws HttpRespAuditException {
+  private AcmeOrder getOrder(String id) throws HttpRespAuditException, AcmeSystemException {
     Long lLabel = toLongId(id);
     AcmeOrder order = lLabel == null ? null : repo.getOrder(lLabel);
     if (order == null) {
@@ -1019,19 +1118,8 @@ public class AcmeResponder {
     return order;
   }
 
-  private RestResponse buildProblemResp(int statusCode, String type, String detail) {
-    Problem problem = new Problem();
-    problem.setType(type);
-    problem.setDetail(detail);
-    return buildProblemResp(statusCode, problem);
-  }
-
   private RestResponse buildSuccJsonResp(int statusCode, Object body) {
     return toRestResponse(HttpRespContent.of(statusCode, CT_JSON, JSON.toJSONBytes(body)));
-  }
-
-  private RestResponse buildSuccResp(int statusCode) {
-    return toRestResponse(HttpRespContent.of(statusCode, null, null));
   }
 
   private RestResponse buildProblemResp(int statusCode, Problem problem) {
@@ -1040,26 +1128,36 @@ public class AcmeResponder {
     return toRestResponse(content);
   }
 
-  private boolean verifySignature(PublicKey pubKey, JoseMessage joseMessage) throws JoseException {
-    JsonWebSignature jws = new JsonWebSignature();
-    jws.setCompactSerialization(joseMessage.getProtected() + "." + joseMessage.getPayload()
-        + "." + joseMessage.getSignature());
-    jws.setKey(pubKey);
-    return jws.verifySignature();
+  private RestResponse verifySignature(PublicKey pubKey, JoseMessage joseMessage) throws AcmeProtocolException {
+    try {
+      JsonWebSignature jws = new JsonWebSignature();
+      jws.setCompactSerialization(joseMessage.getProtected() + "." + joseMessage.getPayload()
+          + "." + joseMessage.getSignature());
+      jws.setKey(pubKey);
+      boolean sigValid = jws.verifySignature();
+      if (!sigValid) {
+        throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "signature is not valid");
+      }
+      return null;
+    } catch (InvalidAlgorithmException e) {
+      throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badSignatureAlgorithm, e.getMessage());
+    } catch (JoseException e) {
+      throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "signature is not valid");
+    }
   }
 
-  private RestResponse verifyContacts(List<String> contacts) {
+  private RestResponse verifyContacts(List<String> contacts) throws AcmeProtocolException {
     if (contacts == null || contacts.isEmpty()) {
-      return buildProblemResp(SC_BAD_REQUEST, AcmeError.invalidContact, "no contact is specified");
+      throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.invalidContact, "no contact is specified");
     }
 
     for (String contact : contacts) {
       int rc = contactVerifier.verfifyContact(contact);
       if (rc == ContactVerifier.unsupportedContact) {
-        return buildProblemResp(SC_BAD_REQUEST, AcmeError.unsupportedContact,
+        throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.unsupportedContact,
             "unsupported contact '" + contact + "'");
       } else if (rc == ContactVerifier.invalidContact){
-        return buildProblemResp(SC_BAD_REQUEST, AcmeError.invalidContact,
+        throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.invalidContact,
             "invalid contact '" + contact + "'");
       }
     }
@@ -1072,13 +1170,11 @@ public class AcmeResponder {
     return Base64Url.encodeToStringNoPadding(token);
   }
 
-  private AcmeChallenge newChall(String type, String token, String expectedAuthorization) {
-    AcmeChallenge chall = new AcmeChallenge();
+  private AcmeChallenge newChall(int subId, String type, String token, String expectedAuthorization) {
+    AcmeChallenge chall = new AcmeChallenge(subId, expectedAuthorization);
     chall.setStatus(ChallengeStatus.pending);
     chall.setType(type);
     chall.setToken(token);
-    chall.setExpectedAuthorization(expectedAuthorization);
-    LOG.info("challenge: {}:{}={}", type, token, expectedAuthorization);
     return chall;
   }
 
@@ -1096,9 +1192,13 @@ public class AcmeResponder {
       Instant notFinishedOrderExpires = now.minus(cleanOrderConf.getExpiredOrderDays(), ChronoUnit.DAYS);
 
       Thread thread = new Thread(() -> {
-        int num = repo.cleanOrders(certExpired, notFinishedOrderExpires);
-        LOG.info("removed {} orders with cert.notAfter<{} or not-finished-order.expires<{}",
-            num, certExpired, notFinishedOrderExpires);
+        try {
+          int num = repo.cleanOrders(certExpired, notFinishedOrderExpires);
+          LOG.info("removed {} orders with cert.notAfter<{} or not-finished-order.expires<{}",
+              num, certExpired, notFinishedOrderExpires);
+        } catch (Exception e) {
+          LogUtil.error(LOG, e, "error cleaning orders");
+        }
       });
       thread.setDaemon(true);
       thread.start();
@@ -1110,13 +1210,6 @@ public class AcmeResponder {
       return null;
     }
     return Pack.littleEndianToLong(Base64Url.decodeFast(id), 0);
-  }
-
-  private static Integer toIntId(String id) {
-    if (id.length() != 6) {
-      return null;
-    }
-    return Pack.littleEndianToInt(Base64Url.decodeFast(id), 0);
   }
 
   private AcmeProxyConf.CaProfile getCaProfile(String keyAlgId) {

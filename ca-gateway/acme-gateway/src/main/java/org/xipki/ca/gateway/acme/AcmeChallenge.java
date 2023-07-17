@@ -5,7 +5,6 @@ package org.xipki.ca.gateway.acme;
 
 import org.xipki.ca.gateway.acme.msg.ChallengeResponse;
 import org.xipki.ca.gateway.acme.type.ChallengeStatus;
-import org.xipki.ca.gateway.acme.util.AcmeUtils;
 import org.xipki.util.CompareUtil;
 
 import java.time.Instant;
@@ -17,7 +16,9 @@ import java.time.temporal.ChronoUnit;
  */
 public class AcmeChallenge {
 
-  private int subId;
+  private final int subId;
+
+  private final String expectedAuthorization;
 
   private ChallengeStatus status;
 
@@ -27,9 +28,16 @@ public class AcmeChallenge {
 
   private Instant validated;
 
-  private String expectedAuthorization;
-
   private transient AcmeAuthz authz;
+
+  public AcmeChallenge(int subId, String expectedAuthorization) {
+    this.subId = subId;
+    this.expectedAuthorization = expectedAuthorization;
+  }
+
+  public AcmeAuthz getAuthz() {
+    return authz;
+  }
 
   public void setAuthz(AcmeAuthz authz) {
     this.authz = authz;
@@ -37,11 +45,6 @@ public class AcmeChallenge {
 
   public int getSubId() {
     return subId;
-  }
-
-  public void setSubId(int subId) {
-    markOrder();
-    this.subId = subId;
   }
 
   public Instant getValidated() {
@@ -84,24 +87,20 @@ public class AcmeChallenge {
     return expectedAuthorization;
   }
 
-  public void setExpectedAuthorization(String expectedAuthorization) {
-    markOrder();
-    this.expectedAuthorization = expectedAuthorization;
-  }
-
   private void markOrder() {
     if (authz != null) {
       authz.markOrder();
     }
   }
 
-  public ChallengeResponse toChallengeResponse(long authzId, String baseUrl) {
+  public ChallengeResponse toChallengeResponse(String baseUrl, long orderId, int authzId) {
     ChallengeResponse resp = new ChallengeResponse();
     if (validated != null) {
       resp.setValidated(validated.truncatedTo(ChronoUnit.SECONDS).toString());
     }
 
-    resp.setUrl(baseUrl + "chall/" + AcmeUtils.toBase64(authzId) + "/" + AcmeUtils.toBase64(subId));
+    ChallId challId = new ChallId(orderId, authzId, subId);
+    resp.setUrl(baseUrl + "chall/" + challId.toIdText());
     resp.setStatus(status);
     resp.setType(type);
     resp.setToken(token);
@@ -109,13 +108,11 @@ public class AcmeChallenge {
   }
 
   public AcmeChallenge copy() {
-    AcmeChallenge copy = new AcmeChallenge();
-    copy.subId = subId;
+    AcmeChallenge copy = new AcmeChallenge(subId, expectedAuthorization);
     copy.status = status;
     copy.type = type;
     copy.token = token;
     copy.validated = validated;
-    copy.expectedAuthorization = expectedAuthorization;
     return copy;
   }
 

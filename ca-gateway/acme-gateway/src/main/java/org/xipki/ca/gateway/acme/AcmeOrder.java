@@ -48,7 +48,7 @@ public class AcmeOrder {
 
   private final AcmeDataSource dataSource;
 
-  public AcmeOrder(long id, long accountId, AcmeDataSource dataSource) {
+  public AcmeOrder(long accountId, long id, AcmeDataSource dataSource) {
     this.accountId = accountId;
     this.id = id;
     this.idStr = AcmeUtils.toBase64(id);
@@ -120,6 +120,10 @@ public class AcmeOrder {
     return id;
   }
 
+  public String idText() {
+    return idStr + " (" + id + ")";
+  }
+
   public Instant getExpires() {
     return expires;
   }
@@ -166,7 +170,8 @@ public class AcmeOrder {
     List<String> authzUrls = new ArrayList<>(authzs.size());
     List<Identifier> identifiers = new ArrayList<>(authzs.size());
     for (AcmeAuthz authz : authzs) {
-      authzUrls.add(baseUrl + "authz/" + authz.getIdStr());
+      AuthzId authzId = new AuthzId(id, authz.getSubId());
+      authzUrls.add(baseUrl + "authz/" + authzId.toIdText());
       identifiers.add(authz.getIdentifier().toIdentifier());
     }
     resp.setAuthorizations(authzUrls);
@@ -177,9 +182,9 @@ public class AcmeOrder {
     return resp;
   }
 
-  public AcmeAuthz getAuthz(long authzId) {
+  public AcmeAuthz getAuthz(int authzId) {
     for (AcmeAuthz authz : authzs) {
-      if (authz.getId() == authzId) {
+      if (authz.getSubId() == authzId) {
         return authz;
       }
     }
@@ -187,7 +192,7 @@ public class AcmeOrder {
   }
 
   public void updateStatus() {
-    if (status != OrderStatus.pending) {
+    if (status == OrderStatus.valid || status == OrderStatus.invalid) {
       return;
     }
 
@@ -203,6 +208,10 @@ public class AcmeOrder {
           return;
         }
       }
+    }
+
+    if (status == OrderStatus.ready || status == OrderStatus.processing) {
+      return;
     }
 
     boolean allAuthzsValidated = true;
@@ -222,7 +231,9 @@ public class AcmeOrder {
     marked = true;
   }
 
-  public synchronized void flush() {
+  public synchronized void flush() throws AcmeSystemException {
+    updateStatus();
+
     if (inDb) {
       if (mark != null) {
         dataSource.updateOrder(mark, this);
@@ -241,7 +252,7 @@ public class AcmeOrder {
       return;
     }
 
-    AcmeOrder copy = new AcmeOrder(id, accountId, dataSource);
+    AcmeOrder copy = new AcmeOrder(accountId, id, dataSource);
 
     if (authzs != null) {
       copy.authzs = new ArrayList<>(authzs.size());

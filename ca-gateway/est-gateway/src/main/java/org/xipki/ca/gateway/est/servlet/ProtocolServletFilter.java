@@ -5,6 +5,7 @@ package org.xipki.ca.gateway.est.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.Audits;
 import org.xipki.ca.gateway.ProtocolProxyConfWrapper;
 import org.xipki.ca.gateway.est.EstProxyConf;
 import org.xipki.ca.gateway.est.EstResponder;
@@ -67,6 +68,12 @@ public class ProtocolServletFilter implements Filter {
   public void destroy() {
     if (conf != null) {
       conf.destroy();
+    }
+
+    try {
+      Audits.getAuditService().close();
+    } catch (Exception e) {
+      LOG.error("error closing audit service", e);
     }
   } // method destroy
 
