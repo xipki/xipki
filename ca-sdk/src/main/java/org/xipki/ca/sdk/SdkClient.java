@@ -51,10 +51,13 @@ public class SdkClient {
       throws IOException, SdkErrorResponseException {
     String ct = request == null ? null : CONTENT_TYPE_JSON;
     HttpRespContent resp;
+
+    String prefix = ca == null ? serverUrl + "-/" : serverUrl + ca + "/";
+
     if (request == null) {
-      resp = client.httpGet(serverUrl + ca + "/" + command);
+      resp = client.httpGet(prefix + command);
     } else {
-      resp = client.httpPost(serverUrl + ca + "/" + command, ct, request.encode(), CONTENT_TYPE_JSON);
+      resp = client.httpPost(prefix + command, ct, request.encode(), CONTENT_TYPE_JSON);
     }
 
     if (resp.isOK()) {
@@ -89,6 +92,33 @@ public class SdkClient {
     byte[] respBytes = send(ca, CMD_cacerts, null);
     CertChainResponse resp = CertChainResponse.decode(respBytes);
     return resp.getCertificates();
+  }
+
+  public byte[] cacertBySubject(byte[] subject) throws IOException, SdkErrorResponseException {
+    CaIdentifierRequest req = new CaIdentifierRequest();
+    req.setIssuer(new X500NameType());
+    req.getIssuer().setEncoded(subject);
+    byte[] respBytes = send(null, CMD_cacert2, req);
+    CertChainResponse resp = CertChainResponse.decode(respBytes);
+    byte[][] certs = resp.getCertificates();
+    return certs == null || certs.length == 0 ? null : certs[0];
+  }
+
+  public byte[][] cacertsBySubject(byte[] subject) throws IOException, SdkErrorResponseException {
+    CaIdentifierRequest req = new CaIdentifierRequest();
+    req.setIssuer(new X500NameType());
+    req.getIssuer().setEncoded(subject);
+    byte[] respBytes = send(null, CMD_cacerts2, req);
+    CertChainResponse resp = CertChainResponse.decode(respBytes);
+    return resp.getCertificates();
+  }
+
+  public CaNameResponse caNameBySubject(byte[] subject) throws IOException, SdkErrorResponseException {
+    CaIdentifierRequest req = new CaIdentifierRequest();
+    req.setIssuer(new X500NameType());
+    req.getIssuer().setEncoded(subject);
+    byte[] respBytes = send(null, CMD_caname, req);
+    return CaNameResponse.decode(respBytes);
   }
 
   public CertprofileInfoResponse profileInfo(String ca, String profileName)
@@ -240,27 +270,27 @@ public class SdkClient {
     send(ca, CMD_revoke_pending_cert, req);
   }
 
-  public EnrollOrPollCertsResponse pollCerts(String ca, PollCertRequest req)
+  public EnrollOrPollCertsResponse pollCerts(PollCertRequest req)
       throws IOException, SdkErrorResponseException {
-    byte[] respBytes = send(ca, CMD_poll_cert, req);
+    byte[] respBytes = send(null, CMD_poll_cert, req);
     return EnrollOrPollCertsResponse.decode(respBytes);
   }
 
-  public RevokeCertsResponse revokeCerts(String ca, RevokeCertsRequest req)
+  public RevokeCertsResponse revokeCerts(RevokeCertsRequest req)
       throws IOException, SdkErrorResponseException {
-    byte[] respBytes = send(ca, CMD_revoke_cert, req);
+    byte[] respBytes = send(null, CMD_revoke_cert, req);
     return RevokeCertsResponse.decode(respBytes);
   }
 
-  public UnSuspendOrRemoveCertsResponse unsuspendCerts(String ca, UnsuspendOrRemoveRequest req)
+  public UnSuspendOrRemoveCertsResponse unsuspendCerts(UnsuspendOrRemoveRequest req)
       throws IOException, SdkErrorResponseException {
-    byte[] respBytes = send(ca, CMD_unsuspend_cert, req);
+    byte[] respBytes = send(null, CMD_unsuspend_cert, req);
     return UnSuspendOrRemoveCertsResponse.decode(respBytes);
   }
 
-  public UnSuspendOrRemoveCertsResponse removeCerts(String ca, UnsuspendOrRemoveRequest req)
+  public UnSuspendOrRemoveCertsResponse removeCerts(UnsuspendOrRemoveRequest req)
       throws IOException, SdkErrorResponseException {
-    byte[] respBytes = send(ca, CMD_remove_cert, req);
+    byte[] respBytes = send(null, CMD_remove_cert, req);
     return UnSuspendOrRemoveCertsResponse.decode(respBytes);
   }
 

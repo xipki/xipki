@@ -13,7 +13,7 @@ import java.util.List;
  * @since 6.0.0
  */
 
-public class RevokeCertsRequest extends ChangeCertStatusRequest {
+public class RevokeCertsRequest extends CaIdentifierRequest {
 
   private List<RevokeCertRequestEntry> entries;
 

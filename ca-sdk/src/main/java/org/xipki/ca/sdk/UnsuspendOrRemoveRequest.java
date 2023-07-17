@@ -14,7 +14,7 @@ import java.util.List;
  * @since 6.0.0
  */
 
-public class UnsuspendOrRemoveRequest extends ChangeCertStatusRequest {
+public class UnsuspendOrRemoveRequest extends CaIdentifierRequest {
 
   private List<BigInteger> entries;
 

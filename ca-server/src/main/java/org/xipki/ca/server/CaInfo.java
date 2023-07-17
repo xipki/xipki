@@ -23,6 +23,7 @@ import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.security.*;
 import org.xipki.util.*;
+import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
 
 import java.io.IOException;
@@ -60,6 +61,8 @@ public class CaInfo {
 
   private final PublicCaInfo publicCaInfo;
 
+  private final byte[] encodedSubject;
+
   private final List<X509Cert> certchain;
 
   private final List<CMPCertificate> certchainInCmpFormat;
@@ -91,6 +94,11 @@ public class CaInfo {
     this.selfSigned = cert.isSelfSigned();
     this.certInCmpFormat = new CMPCertificate(cert.toBcCert().toASN1Structure());
     this.publicCaInfo = new PublicCaInfo(cert, caEntry.getCaUris(), caEntry.getExtraControl());
+    try {
+      this.encodedSubject = cert.getSubject().getEncoded();
+    } catch (IOException ex) {
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
+    }
     List<X509Cert> certs = caEntry.getCertchain();
     if (certs == null || certs.isEmpty()) {
       this.certchain = Collections.emptyList();
@@ -200,6 +208,10 @@ public class CaInfo {
 
   public Validity getMaxValidity() {
     return caEntry.getMaxValidity();
+  }
+
+  public boolean hasSubject(byte[] subject) {
+    return Arrays.equals(this.encodedSubject, subject);
   }
 
   public X509Cert getCert() {

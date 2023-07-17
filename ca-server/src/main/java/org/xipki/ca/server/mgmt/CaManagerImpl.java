@@ -16,7 +16,9 @@ import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.ca.api.profile.CertprofileFactoryRegister;
 import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
+import org.xipki.ca.sdk.CaIdentifierRequest;
 import org.xipki.ca.sdk.CertprofileInfoResponse;
+import org.xipki.ca.sdk.X500NameType;
 import org.xipki.ca.server.*;
 import org.xipki.ca.server.db.CaManagerQueryExecutor;
 import org.xipki.ca.server.db.CertStore;
@@ -1277,6 +1279,50 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   public CmLicense getLicense() {
     return license;
+  }
+
+  public X509Ca getCa(CaIdentifierRequest req) {
+    X500NameType issuer = req.getIssuer();
+    X500Name x500Issuer = null;
+    if (issuer != null) {
+      try {
+        x500Issuer = issuer.toX500Name();
+      } catch (IOException e) {
+        return null;
+      }
+    }
+
+    byte[] authorityKeyId = req.getAuthorityKeyIdentifier();
+    byte[] issuerCertSha1Fp = req.getIssuerCertSha1Fp();
+
+    if (x500Issuer == null && authorityKeyId == null && issuerCertSha1Fp == null) {
+      return null;
+    }
+
+    for (Map.Entry<String, X509Ca> entry : x509cas.entrySet()) {
+      X509Ca ca = entry.getValue();
+      if (x500Issuer != null) {
+        if (!x500Issuer.equals(ca.getCaCert().getSubject())) {
+          continue;
+        }
+      }
+
+      if (authorityKeyId != null) {
+        if (!Arrays.equals(ca.getCaCert().getSubjectKeyId(), authorityKeyId)) {
+          continue;
+        }
+      }
+
+      if (issuerCertSha1Fp != null) {
+        if (!Hex.encode(issuerCertSha1Fp).equalsIgnoreCase(ca.getHexSha1OfCert())) {
+          continue;
+        }
+      }
+
+      return ca;
+    }
+
+    return null;
   }
 
   CaMgmtException logAndCreateException(String msg) {

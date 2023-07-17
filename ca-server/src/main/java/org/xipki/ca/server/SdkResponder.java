@@ -136,7 +136,6 @@ public class SdkResponder {
       String caName = null;
       String command = null;
 
-      X509Ca ca = null;
       if (path.length() > 1) {
         // the first char is always '/'
         String coreUri = path;
@@ -149,15 +148,13 @@ public class SdkResponder {
         String caAlias = coreUri.substring(1, sepIndex).toLowerCase();
         command = coreUri.substring(sepIndex + 1).toLowerCase();
 
-        caName = caManager.getCaNameForAlias(caAlias);
-        if (caName == null) {
-          caName = caAlias;
-        }
-
-        try {
-          ca = caManager.getX509Ca(caName);
-        } catch (CaMgmtException e) {
-          return new ErrorResponse(null, PATH_NOT_FOUND, "CA unknown");
+        if ("-".equals(caAlias)) {
+          caName = "-";
+        } else {
+          caName = caManager.getCaNameForAlias(caAlias);
+          if (caName == null) {
+            caName = caAlias;
+          }
         }
       }
 
@@ -165,9 +162,55 @@ public class SdkResponder {
         return new ErrorResponse(null, PATH_NOT_FOUND, "command is not specified");
       }
 
-      if (ca == null || ca.getCaInfo().getStatus() != CaStatus.ACTIVE) {
-        String message = (ca == null) ? "unknown CA '" + caName + "'" : "CA '" + caName + "' is out of service";
-        return new ErrorResponse(null, PATH_NOT_FOUND, message);
+      CaIdentifierRequest req = null;
+
+      // get the CA instance
+      X509Ca ca;
+      if (!"-".equals(caName)) {
+        try {
+          ca = caManager.getX509Ca(caName);
+        } catch (CaMgmtException e) {
+          return new ErrorResponse(null, PATH_NOT_FOUND, "CA unknown");
+        }
+
+        if (ca == null) {
+          return new ErrorResponse(null, PATH_NOT_FOUND, "unknown CA '" + caName + "'");
+        }
+      } else {
+        switch (command) {
+          case CMD_caname:
+          case CMD_cacert2:
+          case CMD_cacerts2: {
+            req = CaIdentifierRequest.decode(request);
+            break;
+          }
+          case CMD_poll_cert:
+          case CMD_remove_cert:
+          case CMD_revoke_cert:
+          case CMD_unsuspend_cert: {
+            if (CMD_poll_cert.equals(command)) {
+              req = PollCertRequest.decode(request);
+            } else if (CMD_revoke_cert.equals(command)) {
+              req = RevokeCertsRequest.decode(request);
+            } else {
+              req = UnsuspendOrRemoveRequest.decode(request);
+            }
+            break;
+          }
+          default:
+            return new ErrorResponse(null, PATH_NOT_FOUND, "invalid command '" + command + "'");
+        }
+
+        ca = caManager.getCa(req);
+        if (ca == null) {
+          String message = "could not find CA for " + req.idText();
+          return new ErrorResponse(null, PATH_NOT_FOUND, message);
+        }
+      }
+
+      if (ca.getCaInfo().getStatus() != CaStatus.ACTIVE) {
+        return new ErrorResponse(null, PATH_NOT_FOUND,
+            "CA '" + ca.getCaIdent().getName() + "' is out of service");
       }
 
       X509Cert clientCert;
@@ -177,9 +220,11 @@ public class SdkResponder {
         LogUtil.error(LOG, ex, "error getTlsClientCert");
         return new ErrorResponse(null, UNAUTHORIZED, "error retrieving client certificate");
       }
+
       if (clientCert == null) {
         return new ErrorResponse(null, UNAUTHORIZED, "no client certificate");
       }
+
       RequestorInfo requestor = ca.getRequestor(clientCert);
 
       if (requestor == null) {
@@ -187,96 +232,91 @@ public class SdkResponder {
       }
 
       switch (command) {
-        case CMD_health: {
-          boolean healthy = ca.healthy();
-          return healthy ? null : new ErrorResponse(null, SYSTEM_UNAVAILABLE, "CA is not healthy");
-        }
-        case CMD_cacert: {
-          byte[][] certs = new byte[1][];
-          certs[0] = ca.getCaInfo().getCert().getEncoded();
-          CertChainResponse resp = new CertChainResponse();
-          resp.setCertificates(certs);
-          return resp;
-        }
-        case CMD_cacerts: {
-          List<X509Cert> certchain = ca.getCaInfo().getCertchain();
-          int size = 1 + (certchain == null ? 0 : certchain.size());
-          byte[][] certs = new byte[size][];
-          certs[0] = ca.getCaInfo().getCert().getEncoded();
-          if (size > 1) {
-            for (int i = 1; i < size; i++) {
-              certs[i] = certchain.get(i - 1).getEncoded();
-            }
-          }
-
-          CertChainResponse resp = new CertChainResponse();
-          resp.setCertificates(certs);
-          return resp;
-        }
-        case CMD_enroll: {
+        case CMD_health:
+          return ca.healthy() ? null : new ErrorResponse(null, SYSTEM_UNAVAILABLE, "CA is not healthy");
+        case CMD_cacert:
+          return buildCertChainResponse(ca.getCaInfo().getCert(), null);
+        case CMD_cacerts:
+          return buildCertChainResponse(ca.getCaInfo().getCert(), ca.getCaInfo().getCertchain());
+        case CMD_enroll:
           assertPermitted(requestor, ENROLL_CERT);
           return enroll(ca, request, requestor, false, false);
-        }
-        case CMD_reenroll: {
+        case CMD_reenroll:
           assertPermitted(requestor, REENROLL_CERT);
           return enroll(ca, request, requestor, true, false);
-        }
-        case CMD_enroll_cross: {
+        case CMD_enroll_cross:
           assertPermitted(requestor, ENROLL_CROSS);
           return enroll(ca, request, requestor, false, true);
-        }
-        case CMD_poll_cert: {
+        case CMD_poll_cert:
           if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(REENROLL_CERT))) {
             throw new OperationException(NOT_PERMITTED);
           }
-          return poll(ca, request);
-        }
-        case CMD_revoke_cert: {
+          return poll(ca, (PollCertRequest) req, "-".equals(caName));
+        case CMD_revoke_cert:
           assertPermitted(requestor, REVOKE_CERT);
-          return revoke(requestor, ca, request);
-        }
-        case CMD_confirm_enroll: {
+          return revoke(requestor, ca, (RevokeCertsRequest) req, "-".equals(caName));
+        case CMD_confirm_enroll:
           if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(REENROLL_CERT))) {
             throw new OperationException(NOT_PERMITTED);
           }
           return confirmCertificates(requestor, ca, request);
-        }
-        case CMD_revoke_pending_cert: {
+        case CMD_revoke_pending_cert:
           if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(REENROLL_CERT))) {
             throw new OperationException(NOT_PERMITTED);
           }
-          TransactionIdRequest req = TransactionIdRequest.decode(request);
-          revokePendingCertificates(requestor, ca, req.getTid());
+          revokePendingCertificates(requestor, ca, TransactionIdRequest.decode(request).getTid());
           return null;
-        }
         case CMD_unsuspend_cert:
-        case CMD_remove_cert: {
-          boolean unsuspend = CMD_unsuspend_cert.equals(command);
-          assertPermitted(requestor, unsuspend ? UNSUSPEND_CERT : REMOVE_CERT);
-          return removeOrUnsuspend(requestor, ca, request, unsuspend);
-        }
-        case CMD_gen_crl: {
+          assertPermitted(requestor, UNSUSPEND_CERT);
+          return removeOrUnsuspend(requestor, ca, (UnsuspendOrRemoveRequest) req, true, "-".equals(caName));
+        case CMD_remove_cert:
+          assertPermitted(requestor, REMOVE_CERT);
+          return removeOrUnsuspend(requestor, ca, (UnsuspendOrRemoveRequest) req, false, "-".equals(caName));
+        case CMD_gen_crl:
           assertPermitted(requestor, GEN_CRL);
           return genCrl(requestor, ca, request);
-        }
-        case CMD_crl: {
+        case CMD_crl:
           return getCrl(requestor, ca, request);
-        }
-        case CMD_get_cert: {
+        case CMD_get_cert:
           assertPermitted(requestor, GET_CERT);
           return getCert(ca, request);
-        }
-        case CMD_profileinfo: {
+        case CMD_profileinfo:
           return getProfileInfo(request);
-        }
-        default: {
+        case CMD_cacert2:
+          return buildCertChainResponse(ca.getCaCert(), null);
+        case CMD_cacerts2:
+          return buildCertChainResponse(ca.getCaCert(), ca.caInfo.getCertchain());
+        case CMD_caname:
+          CaNameResponse caNameResp = new CaNameResponse();
+          String name = ca.getCaIdent().getName();
+          caNameResp.setName(name);
+          Set<String> aliases = caManager.getAliasesForCa(name);
+          if (CollectionUtil.isNotEmpty(aliases)) {
+            caNameResp.setAliases(new ArrayList<>(aliases));
+          }
+          return caNameResp;
+        default:
           return new ErrorResponse(null, PATH_NOT_FOUND, "invalid command '" + command + "'");
-        }
       }
     } catch (OperationException ex) {
       return new ErrorResponse(null, ex.getErrorCode(), ex.getErrorMessage());
     }
   } // method service
+
+  private CertChainResponse buildCertChainResponse(X509Cert cert, List<X509Cert> certchain) {
+    int size = 1 + (certchain == null ? 0 : certchain.size());
+    byte[][] certs = new byte[size][];
+    certs[0] = cert.getEncoded();
+    if (size > 1) {
+      for (int i = 1; i < size; i++) {
+        certs[i] = certchain.get(i - 1).getEncoded();
+      }
+    }
+
+    CertChainResponse resp = new CertChainResponse();
+    resp.setCertificates(certs);
+    return resp;
+  }
 
   private SdkResponse enroll(X509Ca ca, byte[] request, RequestorInfo requestor, boolean reenroll, boolean crossCert)
       throws OperationException {
@@ -483,9 +523,10 @@ public class SdkResponder {
     }
   } // enroll
 
-  private SdkResponse poll(X509Ca ca, byte[] request) throws OperationException {
-    PollCertRequest req = PollCertRequest.decode(request);
-    assertIssuerMatch(ca, req.getIssuer(), req.getAuthorityKeyIdentifier(), req.getIssuerCertSha1Fp());
+  private SdkResponse poll(X509Ca ca, PollCertRequest req, boolean caReqMatchChecked) throws OperationException {
+    if (!caReqMatchChecked) {
+      assertIssuerMatch(ca, req);
+    }
 
     String tid = req.getTransactionId();
 
@@ -517,10 +558,12 @@ public class SdkResponder {
     return resp;
   }
 
-  private SdkResponse revoke(RequestorInfo requestor, X509Ca ca, byte[] request)
+  private SdkResponse revoke(RequestorInfo requestor, X509Ca ca, RevokeCertsRequest req,
+                             boolean caReqMatchChecked)
       throws OperationException {
-    RevokeCertsRequest req = RevokeCertsRequest.decode(request);
-    assertIssuerMatch(ca, req);
+    if (!caReqMatchChecked) {
+      assertIssuerMatch(ca, req);
+    }
 
     List<RevokeCertRequestEntry> entries = req.getEntries();
     List<SingleCertSerialEntry> rentries = new ArrayList<>(entries.size());
@@ -551,10 +594,12 @@ public class SdkResponder {
     return resp;
   }
 
-  private SdkResponse removeOrUnsuspend(RequestorInfo requestor, X509Ca ca, byte[] request, boolean unsuspend)
+  private SdkResponse removeOrUnsuspend(RequestorInfo requestor, X509Ca ca,
+                                        UnsuspendOrRemoveRequest req, boolean unsuspend, boolean caReqMatchChecked)
       throws OperationException {
-    UnsuspendOrRemoveRequest req = UnsuspendOrRemoveRequest.decode(request);
-    assertIssuerMatch(ca, req);
+    if (!caReqMatchChecked) {
+      assertIssuerMatch(ca, req);
+    }
 
     List<BigInteger> entries = req.getEntries();
     List<SingleCertSerialEntry> rentries = new ArrayList<>(req.getEntries().size());
@@ -579,12 +624,11 @@ public class SdkResponder {
     return resp;
   }
 
-  private void assertIssuerMatch(X509Ca ca, ChangeCertStatusRequest req) throws OperationException {
-    assertIssuerMatch(ca, req.getIssuer(), req.getAuthorityKeyIdentifier(), req.getIssuerCertSha1Fp());
-  }
+  private void assertIssuerMatch(X509Ca ca, CaIdentifierRequest req) throws OperationException {
+    X500NameType issuer = req.getIssuer();
+    byte[] authorityKeyId = req.getAuthorityKeyIdentifier();
+    byte[] issuerCertSha1Fp = req.getIssuerCertSha1Fp();
 
-  private void assertIssuerMatch(X509Ca ca, X500NameType issuer, byte[] authorityKeyId, byte[] issuerCertSha1Fp)
-      throws OperationException {
     if (issuer == null && authorityKeyId == null && issuerCertSha1Fp == null) {
       throw new OperationException(BAD_REQUEST, "no issuer's identifier is specified");
     }

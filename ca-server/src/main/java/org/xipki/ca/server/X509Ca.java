@@ -492,7 +492,6 @@ public class X509Ca extends X509CaModule implements Closeable {
       throws OperationExceptionWithIndex {
     try {
       CertificateInfo ret = generateCert0(requestor, gct, transactionId, event);
-      finish(event, ret != null);
       setEventStatus(event, ret != null);
       return ret;
     } catch (OperationException ex) {

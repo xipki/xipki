@@ -395,18 +395,6 @@ class Ca2Manager {
     return aliases;
   } // method getAliasesForCa
 
-  X509Cert getCaCert(String caName) {
-    caName = toNonBlankLower(caName, "caName");
-    X509Ca ca = manager.x509cas.get(caName);
-    return (ca == null) ? null : ca.getCaInfo().getCert();
-  } // method getCaCert
-
-  List<X509Cert> getCaCertchain(String caName) {
-    caName = toNonBlankLower(caName, "caName");
-    X509Ca ca = manager.x509cas.get(caName);
-    return (ca == null) ? null : ca.getCaInfo().getCertchain();
-  } // method getCaCertchain
-
   void removeCa(String name) throws CaMgmtException {
     assertMasterMode();
 

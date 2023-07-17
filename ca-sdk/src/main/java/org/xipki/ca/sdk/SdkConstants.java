@@ -12,11 +12,17 @@ package org.xipki.ca.sdk;
 
 public class SdkConstants {
 
+  public static final String CMD_caname = "caname";
+
   public static final String CMD_health = "health";
 
   public static final String CMD_cacert = "cacert";
 
+  public static final String CMD_cacert2 = "cacert2";
+
   public static final String CMD_cacerts = "cacerts";
+
+  public static final String CMD_cacerts2 = "cacerts2";
 
   public static final String CMD_profileinfo = "profileinfo";
 
