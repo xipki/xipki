@@ -33,9 +33,7 @@
 					"oid":"1.2.156.10197.1.301",
 					"description":"sm2p256v1"
 				}],
-				"pointEncodings":[
-					4
-				]
+				"pointEncodings":[4]
 			}
 		}
 	}],

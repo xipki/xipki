@@ -39,9 +39,7 @@
 		"parameters":{
 			"ec":{
 				"curves":[],
-				"pointEncodings":[
-					4
-				]
+				"pointEncodings":[4]
 			}
 		}
 	},{
