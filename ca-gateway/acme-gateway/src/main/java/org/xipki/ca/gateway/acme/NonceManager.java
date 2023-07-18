@@ -3,11 +3,20 @@
 
 package org.xipki.ca.gateway.acme;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.util.Base64Url;
+import org.xipki.util.LogUtil;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.security.SecureRandom;
 import java.time.Clock;
+import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  *
@@ -15,7 +24,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class NonceManager {
 
-  // TODO: remove expired nonces
+  private static final Logger LOG = LoggerFactory.getLogger(NonceManager.class);
+
+  private final AtomicLong lastCleanUp = new AtomicLong();
+
   private final ConcurrentHashMap<String, Long> noncePool = new ConcurrentHashMap<>();
 
   private final int nonceNumBytes;
@@ -27,6 +39,33 @@ public class NonceManager {
 
   public NonceManager(int nonceNumBytes) {
     this.nonceNumBytes = nonceNumBytes;
+    // read saved nonces (which are still valid) from file.
+    File nonceFile = new File(".nonces");
+    if (!nonceFile.exists()) {
+      return;
+    }
+
+    long now = Clock.systemUTC().millis();
+    long maxNotAftter = now + 10000; // + 10 seconds
+
+    int sum = 0;
+    try (BufferedReader reader = new BufferedReader(new FileReader(nonceFile))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        StringTokenizer tokenizer = new StringTokenizer(line, ":");
+        String nonce = tokenizer.nextToken();
+        long notAfter = Math.min(maxNotAftter, Long.parseLong(tokenizer.nextToken(), 16));
+
+        if (notAfter > now) {
+          sum++;
+          noncePool.put(nonce, notAfter);
+        }
+      }
+    } catch (IOException ex) {
+      LogUtil.error(LOG, ex, "error reading nonces");
+    }
+
+    LOG.info("restored {} nonces", sum);
   }
 
   public long getValidityMs() {
@@ -38,6 +77,18 @@ public class NonceManager {
   }
 
   public String newNonce() {
+    if (noncePool.size() > 9999) { // more than 9999 nonces in the memory.
+      long now = Clock.systemUTC().millis();
+      if (now > lastCleanUp.get() + 10000) { // 10 seconds
+        for (Map.Entry<String, Long> entry : noncePool.entrySet()) {
+          if (entry.getValue() < now) {
+            noncePool.remove(entry.getKey());
+          }
+        }
+      }
+      lastCleanUp.set(now);
+    }
+
     byte[] nonce = new byte[nonceNumBytes];
     rnd.nextBytes(nonce);
     String nonceText = Base64Url.encodeToStringNoPadding(nonce);
@@ -53,8 +104,31 @@ public class NonceManager {
     return noncePool.containsKey(nonce);
   }
 
-  public void destroy() {
-    // TODO: save the nonce
+  public void close() {
+    if (noncePool.isEmpty()) {
+      return;
+    }
+
+    long now = Clock.systemUTC().millis();
+
+    // save the unused nonces
+    int sum = 0;
+    try (OutputStream os = Files.newOutputStream(Paths.get(".nonces"),
+        StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+      for (Map.Entry<String, Long> entry : noncePool.entrySet()) {
+        if (entry.getValue() < now) {
+          continue;
+        }
+
+        sum++;
+        String line = entry.getKey() + ":" + Long.toString(entry.getValue(), 16) + "\n";
+        os.write(line.getBytes(StandardCharsets.UTF_8));
+      }
+    } catch (IOException ex) {
+      LogUtil.error(LOG, ex, "error saving nonces");
+    }
+
+    LOG.info("saved {} nonces", sum);
   }
 
 }

@@ -295,7 +295,7 @@ public class AcmeResponder {
   public void close() {
     challengeValidator.close();
     certEnroller.close();
-    nonceManager.destroy();
+    nonceManager.close();
 
     repo.close();
   }
