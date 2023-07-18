@@ -70,6 +70,7 @@
       <column name="CSR" type="VARCHAR(2000)"/>
       <column name="CERT" type="VARCHAR(3000)"/>
     </createTable>
+  </changeSet>
   <!-- foreign key -->
   <changeSet author="xipki" id="2">
     <addForeignKeyConstraint constraintName="FK_ORDER_ACCOUNT1"
