@@ -37,7 +37,7 @@
       <column name="STATUS" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
-      <column name="JWK_SHA256" type="CHAR((43)">
+      <column name="JWK_SHA256" type="CHAR(43)">
         <constraints nullable="false"/>
       </column>
       <column name="DATA" type="VARCHAR(2000)">
