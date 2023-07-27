@@ -93,6 +93,8 @@ public class AcmeProxyConf extends ProtocolProxyConf {
 
     private List<CaProfile> caProfiles;
 
+    private List<String> challengeTypes;
+
     public String getBaseUrl() {
       if (baseUrl != null) {
         if (!baseUrl.endsWith("/")) {
@@ -193,6 +195,14 @@ public class AcmeProxyConf extends ProtocolProxyConf {
 
     public void setCaaIdentities(List<String> caaIdentities) {
       this.caaIdentities = caaIdentities;
+    }
+
+    public List<String> getChallengeTypes() {
+      return challengeTypes;
+    }
+
+    public void setChallengeTypes(List<String> challengeTypes) {
+      this.challengeTypes = challengeTypes;
     }
 
     private void validate() throws InvalidConfException {

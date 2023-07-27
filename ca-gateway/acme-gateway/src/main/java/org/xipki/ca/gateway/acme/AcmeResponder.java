@@ -29,6 +29,7 @@ import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
@@ -137,6 +138,8 @@ public class AcmeResponder {
 
   private final List<AcmeProxyConf.CaProfile> caProfiles;
 
+  private final Set<String> challengeTypes;
+
   private final SecureRandom rnd;
 
   private final AcmeRepo repo;
@@ -199,6 +202,19 @@ public class AcmeResponder {
     this.tokenNumBytes = conf.getTokenNumBytes();
     this.directoryHeader = "<" + baseUrl + "directory>;rel=\"index\"";
     this.caProfiles = conf.getCaProfiles();
+    if (conf.getChallengeTypes() != null) {
+      List<String> types = conf.getChallengeTypes();
+      if (!(types.contains(DNS_01) || types.contains(HTTP_01) || types.contains(TLS_ALPN_01))) {
+        throw new InvalidConfException("invalid challengeTypes '" + types + "'");
+      }
+      challengeTypes = new HashSet<>(types);
+    } else {
+      challengeTypes = new HashSet<>(4);
+      challengeTypes.add(DNS_01);
+      challengeTypes.add(HTTP_01);
+      challengeTypes.add(TLS_ALPN_01);
+    }
+    LOG.info("challenge types: {}", challengeTypes);
 
     StringBuilder sb = new StringBuilder();
     sb.append("{");
@@ -789,10 +805,23 @@ public class AcmeResponder {
 
           if ("dns".equals(type)) {
             if (!value.startsWith("*.")) {
-              numChalls += 2;
+              if (challengeTypes.contains(HTTP_01)) {
+                numChalls++;
+              }
+
+              if (challengeTypes.contains(TLS_ALPN_01)) {
+                numChalls++;
+              }
             }
 
-            numChalls++;
+            if (challengeTypes.contains(DNS_01)) {
+              numChalls++;
+            }
+
+            if (numChalls == 0) {
+              throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.unsupportedIdentifier,
+                  "unsupported identifier '" + type + "/" + value + "'");
+            }
           } else {
             throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.unsupportedIdentifier,
                 "unsupported identifier type '" + type + "'");
@@ -841,11 +870,18 @@ public class AcmeResponder {
 
             List<AcmeChallenge> challenges = new ArrayList<>(3);
             if (!value.startsWith("*.")) {
-              challenges.add(newChall(challIds[challIdOffset++], HTTP_01, token, authorization));
-              challenges.add(newChall(challIds[challIdOffset++], TLS_ALPN_01, token, authorizationSha256));
+              if (challengeTypes.contains(HTTP_01)) {
+                challenges.add(newChall(challIds[challIdOffset++], HTTP_01, token, authorization));
+              }
+
+              if (challengeTypes.contains(TLS_ALPN_01)) {
+                challenges.add(newChall(challIds[challIdOffset++], TLS_ALPN_01, token, authorizationSha256));
+              }
             }
 
-            challenges.add(newChall(challIds[challIdOffset++], DNS_01, token, authorizationSha256));
+            if (challengeTypes.contains(DNS_01)) {
+              challenges.add(newChall(challIds[challIdOffset++], DNS_01, token, authorizationSha256));
+            }
             authz.setChallenges(challenges);
           } else {
             throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.unsupportedIdentifier,
