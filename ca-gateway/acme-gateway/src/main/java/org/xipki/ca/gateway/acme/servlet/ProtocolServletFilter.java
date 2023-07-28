@@ -3,22 +3,16 @@
 
 package org.xipki.ca.gateway.acme.servlet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.audit.Audits;
-import org.xipki.ca.gateway.GatewayUtil;
+import org.xipki.ca.gateway.AbstractProtocolServletFilter;
 import org.xipki.ca.gateway.ProtocolProxyConfWrapper;
 import org.xipki.ca.gateway.acme.AcmeProxyConf;
 import org.xipki.ca.gateway.acme.AcmeResponder;
 import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
 
 import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServlet;
 import java.io.IOException;
 
 /**
@@ -27,21 +21,23 @@ import java.io.IOException;
  * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
-public class ProtocolServletFilter implements Filter {
-
-  private static final Logger LOG = LoggerFactory.getLogger(ProtocolServletFilter.class);
+public class ProtocolServletFilter extends AbstractProtocolServletFilter {
 
   private static final String DFLT_CFG = "etc/acme-gateway.json";
 
   private HttpAcmeServlet servlet;
 
-  private ProtocolProxyConfWrapper conf;
+  public ProtocolServletFilter() {
+    super("ACME");
+  }
 
   @Override
-  public void init(FilterConfig filterConfig) throws ServletException {
-    LOG.info("XiPKI ACME Gateway version {}", StringUtil.getVersion(getClass()));
-    XipkiBaseDir.init();
+  protected HttpServlet getServlet() {
+    return servlet;
+  }
 
+  @Override
+  protected void doInit(FilterConfig filterConfig) throws ObjectCreationException, InvalidConfException {
     AcmeProxyConf conf0;
     try {
       conf0 = AcmeProxyConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CFG, true));
@@ -49,45 +45,20 @@ public class ProtocolServletFilter implements Filter {
       throw new IllegalArgumentException("could not parse configuration file " + DFLT_CFG, ex);
     }
 
-    try {
-      conf = new ProtocolProxyConfWrapper(conf0);
+    conf = new ProtocolProxyConfWrapper(conf0);
 
-      AcmeResponder responder = new AcmeResponder(
-          conf.getSdkClient(), conf.getSecurities().getSecurityFactory(), conf.getPopControl(), conf0.getAcme());
-      responder.start();
+    AcmeResponder responder = new AcmeResponder(
+        conf.getSdkClient(), conf.getSecurities().getSecurityFactory(), conf.getPopControl(), conf0.getAcme());
+    responder.start();
 
-      servlet = new HttpAcmeServlet();
-      servlet.setLogReqResp(conf.isLogReqResp());
-      servlet.setResponder(responder);
-    } catch (InvalidConfException | ObjectCreationException e) {
-      String msg = "error initializing ServletFilter";
-      LOG.error(msg, e);
-      throw new ServletException(msg);
-    }
-  } // method init
+    servlet = new HttpAcmeServlet();
+    servlet.setLogReqResp(conf.isLogReqResp());
+    servlet.setResponder(responder);
+  }
 
   @Override
-  public void destroy() {
-    if (conf != null) {
-      conf.destroy();
-    }
-
+  protected void doDestroy() {
     servlet.getResponder().close();
-    try {
-      Audits.getAuditService().close();
-    } catch (Exception e) {
-      LOG.error("error closing audit service", e);
-    }
-  } // method destroy
-
-  @Override
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-      throws IOException, ServletException {
-    if (!(request instanceof HttpServletRequest & response instanceof HttpServletResponse)) {
-      throw new ServletException("Only HTTP request is supported");
-    }
-
-    servlet.service(request, response);
-  } // method doFilter
+  }
 
 }

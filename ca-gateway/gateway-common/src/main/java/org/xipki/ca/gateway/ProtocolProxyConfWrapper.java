@@ -5,8 +5,11 @@ package org.xipki.ca.gateway;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.AuditLevel;
+import org.xipki.audit.AuditStatus;
 import org.xipki.audit.Audits;
 import org.xipki.audit.Audits.AuditConf;
+import org.xipki.audit.PciAuditEvent;
 import org.xipki.ca.gateway.conf.CaNameSignerConf;
 import org.xipki.ca.gateway.conf.CaNameSignersConf;
 import org.xipki.ca.gateway.conf.ProtocolProxyConf;
