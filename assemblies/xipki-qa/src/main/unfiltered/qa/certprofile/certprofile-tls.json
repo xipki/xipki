@@ -8,7 +8,7 @@
 	"certLevel":"EndEntity",
 	"maxSize":4500,
 	"validity":"5y",
-	"notBeforeTime":"midnight",
+	"notBeforeTime":"current",
 	"keypairGeneration":{
 		"inheritCA":true,
 		"forbidden":false
