@@ -1072,7 +1072,7 @@ public class AcmeResponder {
           throw new AcmeProtocolException(SC_NOT_FOUND, AcmeError.orderNotReady, "found no certificate");
         }
 
-        byte[] encodedIssuer = AcmeUtils.extractIssuer(certBytes);
+        byte[] encodedIssuer = X509Util.extractCertIssuer(certBytes);
         String hexIssuer = Hex.encode(encodedIssuer);
         byte[][] cacerts = cacertsMap.get(hexIssuer);
 
@@ -1084,7 +1084,7 @@ public class AcmeResponder {
                 "could not retrieve CA certificate chain");
           }
 
-          String hexCaSubject = Hex.encode(AcmeUtils.extractSubject(cacerts[0]));
+          String hexCaSubject = Hex.encode(X509Util.extractCertSubject(cacerts[0]));
           if (!hexIssuer.equals(hexCaSubject)) {
             throw new AcmeProtocolException(SC_INTERNAL_SERVER_ERROR, AcmeError.serverInternal,
                 "could not retrieve CA certificate chain");

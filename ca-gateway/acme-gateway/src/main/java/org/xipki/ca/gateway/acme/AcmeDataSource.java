@@ -10,6 +10,7 @@ import org.xipki.ca.gateway.acme.util.AcmeUtils;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.util.JSON;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Base64Url;
 
@@ -269,7 +270,7 @@ public class AcmeDataSource {
       if (certBytes == null) {
         ps.setNull(index++, Types.BIGINT);
       } else {
-        ps.setLong(index++, AcmeUtils.extractNotAfter(certBytes));
+        ps.setLong(index++, X509Util.extractCertNotAfter(certBytes));
       }
       ps.setString(index++, order.getCertSha256());
 
@@ -394,7 +395,7 @@ public class AcmeDataSource {
 
       if (updateCert) {
         byte[] certBytes = newOrder.getCert();
-        ps.setLong(index++, AcmeUtils.extractNotAfter(certBytes));
+        ps.setLong(index++, X509Util.extractCertNotAfter(certBytes));
         ps.setString(index++, newOrder.getCertSha256());
         ps.setString(index, Base64Url.encodeToStringNoPadding(certBytes));
       }
