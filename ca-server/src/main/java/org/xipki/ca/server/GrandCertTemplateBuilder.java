@@ -300,12 +300,6 @@ class GrandCertTemplateBuilder {
       }
     }
 
-    // make sure that empty subject is not permitted
-    ASN1ObjectIdentifier[] attrTypes = grantedSubject.getAttributeTypes();
-    if (attrTypes == null || attrTypes.length == 0) {
-      throw new OperationException(BAD_CERT_TEMPLATE, "empty subject is not permitted");
-    }
-
     // make sure that the grantedSubject does not equal the CA's subject
     if (X509Util.canonicalizeName(grantedSubject).equals(
         caInfo.getPublicCaInfo().getC14nSubject())) {
