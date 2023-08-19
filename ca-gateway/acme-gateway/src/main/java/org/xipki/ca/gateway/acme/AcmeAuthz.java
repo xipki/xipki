@@ -102,6 +102,11 @@ public class AcmeAuthz {
     return resp;
   }
 
+  public String getUrl(String baseUrl) {
+    AuthzId authzId = new AuthzId(order.getId(), subId);
+    return baseUrl + "authz/" + authzId.toIdText();
+  }
+
   @Override
   public boolean equals(Object other) {
     if (!(other instanceof AcmeAuthz)) {

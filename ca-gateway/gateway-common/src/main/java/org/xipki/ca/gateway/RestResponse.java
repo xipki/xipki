@@ -8,8 +8,7 @@ import org.xipki.util.CollectionUtil;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -23,7 +22,7 @@ public class RestResponse {
 
   private final String contentType;
 
-  private final Map<String, String> headers;
+  private final Map<String, List<String>> headers;
 
   private final boolean base64;
 
@@ -41,7 +40,12 @@ public class RestResponse {
     this.statusCode = statusCode;
     this.base64 = base64;
     this.contentType = contentType;
-    this.headers = headers == null ? new HashMap<>() : headers;
+    this.headers = new HashMap<>();
+    if (headers != null) {
+      for (Map.Entry<String, String> m : headers.entrySet()) {
+        this.headers.put(m.getKey(), Arrays.asList(m.getValue()));
+      }
+    }
     this.body = body;
   }
 
@@ -53,7 +57,7 @@ public class RestResponse {
     return contentType;
   }
 
-  public Map<String, String> getHeaders() {
+  public Map<String, List<String>> getHeaders() {
     return headers;
   }
 
@@ -68,8 +72,10 @@ public class RestResponse {
     }
 
     if (CollectionUtil.isNotEmpty(headers)) {
-      for (Map.Entry<String, String> m : headers.entrySet()) {
-        resp.setHeader(m.getKey(), m.getValue());
+      for (Map.Entry<String, List<String>> m : headers.entrySet()) {
+        for (String value : m.getValue()) {
+          resp.addHeader(m.getKey(), value);
+        }
       }
     }
 
@@ -90,7 +96,8 @@ public class RestResponse {
   }
 
   public RestResponse putHeader(String name, String value) {
-    getHeaders().put(name, value);
+    List<String> values = headers.computeIfAbsent(name, k -> new ArrayList<>(1));
+    values.add(value);
     return this;
   }
 

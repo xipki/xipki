@@ -11,7 +11,7 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
 
-import javax.servlet.*;
+import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServlet;
 import java.io.IOException;
 

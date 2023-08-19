@@ -29,7 +29,6 @@ import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
@@ -1000,10 +999,15 @@ public class AcmeResponder {
         }
 
         GeneralNames generalNames = GeneralNames.getInstance(sanExtnValue);
+        String firstSanValue = null;
         for (GeneralName gn : generalNames.getNames()) {
           int tagNo = gn.getTagNo();
           if (tagNo == GeneralName.dNSName) {
             String value = ASN1IA5String.getInstance(gn.getName()).getString();
+            if (firstSanValue == null) {
+              firstSanValue = value;
+            }
+
             Identifier matchedId = null;
             for (Identifier identifier : identifiers) {
               if ("dns".equalsIgnoreCase(identifier.getType()) && value.equals(identifier.getValue())) {
@@ -1043,6 +1047,12 @@ public class AcmeResponder {
           certReqMeta = new CertReqMeta();
           order.setCertReqMeta(certReqMeta);
         }
+
+        if (cn == null || cn.isEmpty()) {
+          // DNS
+          certReqMeta.setSubject("CN=" + firstSanValue);
+        }
+
         certReqMeta.setCa(caProfile.getCa());
         certReqMeta.setCertProfile(caProfile.getTlsProfile());
 
@@ -1127,7 +1137,10 @@ public class AcmeResponder {
         ChallengeResponse resp = chall.toChallengeResponse(baseUrl, challId.getOrderId(), challId.getAuthzId());
 
         LOG.info("Received ready for challenge {} of order {}", challId, challId.getOrderId());
-        return buildSuccJsonResp(SC_OK, resp);//.putHeader(HDR_RETRY_AFTER, "2"); // wait for 2 seconds
+        RestResponse ret = buildSuccJsonResp(SC_OK, resp);//.putHeader(HDR_RETRY_AFTER, "2"); // wait for 2 seconds
+        String authzUrl = chall2.getChallenge().getAuthz().getUrl(baseUrl);
+        ret.putHeader(HDR_LINK, "<" + authzUrl + ">;rel=\"up\"");
+        return ret;
       }
       default: {
         throw new HttpRespAuditException(SC_NOT_FOUND, "unknown command " + command,

@@ -31,7 +31,6 @@ import org.xipki.security.asn1.Asn1StreamParser;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Base64Url;
-import org.xipki.util.Hex;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;

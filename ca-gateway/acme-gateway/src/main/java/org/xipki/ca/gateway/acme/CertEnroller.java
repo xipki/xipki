@@ -3,16 +3,20 @@
 
 package org.xipki.ca.gateway.acme;
 
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.asn1.x509.Extensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.gateway.acme.type.CertReqMeta;
 import org.xipki.ca.gateway.acme.type.OrderStatus;
 import org.xipki.ca.gateway.acme.util.AcmeUtils;
 import org.xipki.ca.sdk.*;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 
@@ -91,7 +95,23 @@ public class CertEnroller implements Runnable {
         entry.setNotAfter(certReqMeta.getNotAfter().getEpochSecond());
       }
       entry.setCertprofile(certReqMeta.getCertProfile());
-      entry.setP10req(csr);
+
+      if (certReqMeta.getSubject() == null) {
+        entry.setP10req(csr);
+      } else {
+        entry.setSubject(new X500NameType(certReqMeta.getSubject()));
+
+        CertificationRequest p10Req = CertificationRequest.getInstance(csr);
+        try {
+          Extensions extensions = X509Util.getExtensions(p10Req.getCertificationRequestInfo());
+          if (extensions != null) {
+            entry.setExtensions(extensions.getEncoded());
+          }
+          entry.setSubjectPublicKey(p10Req.getCertificationRequestInfo().getSubjectPublicKeyInfo().getEncoded());
+        } catch (IOException e) {
+          throw new AcmeSystemException(e);
+        }
+      }
 
       EnrollCertsRequest sdkReq = new EnrollCertsRequest();
       sdkReq.setCaCertMode(CertsMode.NONE);

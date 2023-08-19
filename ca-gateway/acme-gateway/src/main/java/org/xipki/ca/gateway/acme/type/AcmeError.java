@@ -3,8 +3,6 @@
 
 package org.xipki.ca.gateway.acme.type;
 
-import org.xipki.ca.gateway.acme.AcmeProxyConf;
-
 /**
  * ACME Error.
  *

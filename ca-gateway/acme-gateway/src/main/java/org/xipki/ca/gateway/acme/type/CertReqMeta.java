@@ -21,6 +21,8 @@ public class CertReqMeta {
 
   private String certProfile;
 
+  private String subject;
+
   public String getCa() {
     return ca;
   }
@@ -53,6 +55,14 @@ public class CertReqMeta {
     this.notAfter = notAfter;
   }
 
+  public String getSubject() {
+    return subject;
+  }
+
+  public void setSubject(String subject) {
+    this.subject = subject;
+  }
+
   @Override
   public boolean equals(Object other) {
     if (!(other instanceof CertReqMeta)) {
@@ -60,7 +70,7 @@ public class CertReqMeta {
     }
 
     CertReqMeta b = (CertReqMeta) other;
-    return equalsObject(ca, b.ca) && equalsObject(certProfile, b.certProfile)
+    return equalsObject(ca, b.ca) && equalsObject(certProfile, b.certProfile) && equalsObject(subject, b.subject)
         && equalsObject(notBefore, b.notBefore) && equalsObject(notAfter, b.notAfter);
   }
 
@@ -71,6 +81,7 @@ public class CertReqMeta {
     copy.certProfile = certProfile;
     copy.notAfter = notAfter;
     copy.notBefore = notBefore;
+    copy.subject = subject;
     return copy;
   }
 
