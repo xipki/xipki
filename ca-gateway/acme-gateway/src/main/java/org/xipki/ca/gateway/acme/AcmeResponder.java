@@ -538,7 +538,7 @@ public class AcmeResponder {
 
     // pre-check
     if (CMD_account.equals(command)) {
-      if (protected_.get("url").asString().equals(kid)) {
+      if (!protected_.get("url").asString().equals(kid)) {
         throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "kid and url do not match");
       }
     }
