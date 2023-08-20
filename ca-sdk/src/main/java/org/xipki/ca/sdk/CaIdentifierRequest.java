@@ -80,5 +80,4 @@ public class CaIdentifierRequest extends SdkRequest{
     return JSON.parseObject(encoded, CaIdentifierRequest.class);
   }
 
-
 }

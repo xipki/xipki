@@ -42,7 +42,6 @@ public abstract class AbstractProtocolServletFilter implements Filter {
 
   protected abstract void doInit(FilterConfig filterConfig) throws Exception;
 
-
   protected void doDestroy() {
   }
 

@@ -19,6 +19,7 @@ Deployment in Tomcat 8 and 9
    5. Initialize the database configured in previous step.  
       In xipki-mgmt-cli, call `ca:sql --db-conf /path/to/acme-db.properties xipki/sql/acme-init.sql`
    6. Adapt the `acme`-block in the `${CONTAINER_ROOT}/xipki/etc/acme-gateway.json`.
+   7. The server URL is https://<host>:<HTTPS-port>/acme/ or http://<host>:<HTTP-port>/acme/.
 5. Optional, configure the TLS listener in the file
    `${CATALINA_HOME}conf/server.xml` (we use here the port 8082 and 8445, can be changed to any other port)
    ```sh

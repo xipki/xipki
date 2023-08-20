@@ -397,7 +397,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     boolean initSucc = true;
     try {
-      this.certstore = new CertStore(certstoreDatasource, caconfDatasource, idGen, securityFactory.getPasswordResolver());
+      this.certstore = new CertStore(certstoreDatasource, caconfDatasource, idGen,
+          securityFactory.getPasswordResolver());
     } catch (DataAccessException ex) {
       initSucc = false;
       LogUtil.error(LOG, ex, "error constructing CertStore");

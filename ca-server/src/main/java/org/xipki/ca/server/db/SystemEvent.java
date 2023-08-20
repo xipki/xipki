@@ -1,7 +1,15 @@
+// Copyright (c) 2013-2023 xipki. All rights reserved.
+// License Apache License 2.0
+
 package org.xipki.ca.server.db;
 
 import static org.xipki.util.Args.notBlank;
 
+/**
+ * System event.
+ * @author Lijun Liao (xipki)
+ *
+ */
 public class SystemEvent {
 
   private final String name;

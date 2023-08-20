@@ -35,7 +35,7 @@
     <servlet.version>3.1.0</servlet.version>
     <karaf.version>4.4.3</karaf.version>
     <karaf.bc.version>1.70</karaf.bc.version>
-    <bc.version>1.75</bc.version>
+    <bc.version>1.76</bc.version>
     <slf4j.version>1.7.32</slf4j.version>
     <pkcs11wrapper.version>1.0.6-SNAPSHOT</pkcs11wrapper.version>
     <hikaricp.version>4.0.3</hikaricp.version>
@@ -44,8 +44,8 @@
     <jose4j.version>0.9.3</jose4j.version>
     <dnsjava.version>3.5.2</dnsjava.version>
     <!-- only for runtime -->
-    <log4j.version>2.19.0</log4j.version>
-    <jdbc.mariadb.version>3.1.3</jdbc.mariadb.version>
+    <log4j.version>2.20.0</log4j.version>
+    <jdbc.mariadb.version>3.1.4</jdbc.mariadb.version>
     <jdbc.postgresql.version>42.6.0</jdbc.postgresql.version>
     <jdbc.h2.version>2.2.220</jdbc.h2.version>
     <!-- Only for test purpose -->

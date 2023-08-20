@@ -5,7 +5,7 @@ See also <https://github.com/xipki/xipki/releases>
 ## 6.4.0
 - Release date: 2023/mm/dd
 - CA
-  - Add support of ACME (challege types: dns-01, http-01 and tls-alpn-01)
+  - Add support of ACME with challenge types dns-01, http-01 and tls-alpn-01
 - OCSP
   - N/A
 - Gateway
