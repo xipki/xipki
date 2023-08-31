@@ -105,6 +105,7 @@ public class ChallengeValidator implements Runnable {
           String host = identifier.getValue();
           // host = "localhost:9081";
           String url = "http://" + host + "/.well-known/acme-challenge/" + chall.getToken();
+          LOG.debug("http-01: url='{}'", url);
 
           try {
             org.xipki.util.http.XiHttpClient client = new XiHttpClient();
@@ -122,6 +123,7 @@ public class ChallengeValidator implements Runnable {
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, new TrustManager[]{trustAll}, null);
             SSLSocketFactory factory = sslContext.getSocketFactory();
+            LOG.debug("tls-alpn-01: host='{}', port=443", identifier.getValue());
             SSLSocket socket = (SSLSocket) factory.createSocket(identifier.getValue(), 443);
             SSLParameters params = socket.getSSLParameters();
             params.setApplicationProtocols(new String[]{"acme-tls/1.0"});
@@ -169,6 +171,7 @@ public class ChallengeValidator implements Runnable {
             host = host.substring(2);
           }
 
+          LOG.debug("dns-01: host='{}'", identifier.getValue());
           Record[] records = null;
           try {
             records = new Lookup(host, Type.TXT).run();
