@@ -21,6 +21,8 @@ import org.xipki.util.http.XiHttpClient;
 
 import javax.net.ssl.*;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -100,13 +102,25 @@ public class ChallengeValidator implements Runnable {
       AcmeIdentifier identifier = chall2.getIdentifier();
       // boolean authorizationValid = false;
 
+      if (LOG.isDebugEnabled()) {
+        String host = identifier.getValue();
+        if (host.startsWith("*.")) {
+          host = host.substring(2);
+        }
+
+        try {
+          InetAddress inetAddr = InetAddress.getByName(host);
+          LOG.debug("type={}, host={}, InetAddress={}", type, host, inetAddr);
+        } catch (UnknownHostException e) {
+          LOG.debug("type={}, host={}, UnknownHostException", type, host);
+        }
+      }
+
       switch (type) {
         case AcmeConstants.HTTP_01: {
           String host = identifier.getValue();
           // host = "localhost:9081";
           String url = "http://" + host + "/.well-known/acme-challenge/" + chall.getToken();
-          LOG.debug("http-01: url='{}'", url);
-
           try {
             org.xipki.util.http.XiHttpClient client = new XiHttpClient();
             HttpRespContent authzResp = client.httpGet(url);
@@ -123,7 +137,6 @@ public class ChallengeValidator implements Runnable {
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, new TrustManager[]{trustAll}, null);
             SSLSocketFactory factory = sslContext.getSocketFactory();
-            LOG.debug("tls-alpn-01: host='{}', port=443", identifier.getValue());
             SSLSocket socket = (SSLSocket) factory.createSocket(identifier.getValue(), 443);
             SSLParameters params = socket.getSSLParameters();
             params.setApplicationProtocols(new String[]{"acme-tls/1.0"});
