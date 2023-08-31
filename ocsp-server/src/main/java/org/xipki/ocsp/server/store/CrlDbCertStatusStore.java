@@ -364,9 +364,12 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       Properties props = loadProperties(crlInfoFile);
       nextUpdate = DateUtil.parseUtcTimeyyyyMMddhhmmss(props.getProperty("nextupdate"));
       crlNumber = new BigInteger(props.getProperty("crlnumber"));
-      String[] tokens = props.getProperty("hash").split(" ");
-      hashAlgo = tokens[0];
-      hashValue = Hex.decode(tokens[1]);
+      String hash = props.getProperty("hash");
+      if (hash != null && !hash.isEmpty()) {
+        String[] tokens = hash.split(" ");
+        hashAlgo = tokens[0];
+        hashValue = Hex.decode(tokens[1]);
+      }
 
       props = loadProperties(crlDownloadFile);
       Validity validity = Validity.getInstance(props.getProperty("download.before.nextupdate"));
@@ -479,8 +482,10 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
     boolean useNewCrl = crlNumber == null || newCrlNumber.compareTo(crlNumber) > 0;
     if (useNewCrl) {
-      String hashProp = hashAlgo + " " + Hex.encode(crlStream.getHashValue());
-      IoUtil.save(new File(generatedDir, "new-ca.crl.fp"), hashProp.getBytes(StandardCharsets.UTF_8));
+      if (hashAlgo != null) {
+        String hashProp = hashAlgo + " " + Hex.encode(crlStream.getHashValue());
+        IoUtil.save(new File(generatedDir, "new-ca.crl.fp"), hashProp.getBytes(StandardCharsets.UTF_8));
+      }
       tmpCrlFile.renameTo(new File(generatedDir, "new-ca.crl"));
       LOG.info(crlNumber == null ? "Downloaded CRL at first time" : "Downloaded CRL is newer than existing one");
       // notify the change

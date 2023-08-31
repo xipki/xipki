@@ -582,12 +582,23 @@ class ImportCrl {
       if (crlDirInfo.crlDownloded) {
         crlDirInfo.crlFile.renameTo(new File(generatedDir, "ca.crl"));
         File newCrlFpFile = new File(generatedDir, "new-ca.crl.fp");
-        String hashInfo = new String(IoUtil.read(newCrlFpFile));
-        String info = "crlnumber=" + crlInfo.getCrlNumber().toString()
-                + "\nnextupdate=" + DateUtil.toUtcTimeyyyyMMddhhmmss(crlInfo.getNextUpdate())
-                + "\nhash=" + hashInfo;
+        String hashInfo = null;
+        if (newCrlFpFile.exists()) {
+          hashInfo = new String(IoUtil.read(newCrlFpFile));
+        }
+        String info;
+        if (hashInfo == null) {
+          info = "crlnumber=" + crlInfo.getCrlNumber().toString()
+                  + "\nnextupdate=" + DateUtil.toUtcTimeyyyyMMddhhmmss(crlInfo.getNextUpdate());
+        } else {
+          info = "crlnumber=" + crlInfo.getCrlNumber().toString()
+                  + "\nnextupdate=" + DateUtil.toUtcTimeyyyyMMddhhmmss(crlInfo.getNextUpdate())
+                  + "\nhash=" + hashInfo;
+        }
         IoUtil.save(new File(generatedDir, "ca.crl.info"), info.getBytes(StandardCharsets.UTF_8));
-        newCrlFpFile.delete();
+        if (newCrlFpFile.exists()) {
+          newCrlFpFile.delete();
+        }
       }
 
       updateSucc = true;
