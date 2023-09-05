@@ -9,6 +9,8 @@ import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.model.enums.AesKeyStrength;
 import net.lingala.zip4j.model.enums.EncryptionMethod;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.mgmt.db.DbWorker;
@@ -29,7 +31,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Clock;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Worker for database export / import.
@@ -46,7 +47,7 @@ public abstract class DbPortWorker extends DbWorker {
 
   public DbPortWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
                       String dbConfFile, char[] password)
-      throws PasswordResolverException, IOException {
+          throws PasswordResolverException, IOException, ConfigurationException {
     super(datasourceFactory, passwordResolver, dbConfFile);
     this.password = password;
   }
@@ -146,13 +147,13 @@ public abstract class DbPortWorker extends DbWorker {
     public ImportCaDb(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
                       String caConfDbFile, String caDbFile,
                       boolean resume, String srcFolder, int batchEntriesPerCommit, char[] password)
-        throws PasswordResolverException, IOException {
+            throws PasswordResolverException, IOException, ConfigurationException {
       super(datasourceFactory, passwordResolver, (caConfDbFile == null ? caDbFile : caConfDbFile), password);
       this.resume = resume;
       this.srcFolder = IoUtil.expandFilepath(srcFolder);
       this.batchEntriesPerCommit = batchEntriesPerCommit;
 
-      Properties props = DbPorter.getDbConfProperties(Files.newInputStream(
+      PropertiesConfiguration props = DbPorter.getDbConfProperties(Files.newInputStream(
                             Paths.get(IoUtil.expandFilepath(caDbFile))));
       this.caDataSource = datasourceFactory.createDataSource("ds-" + caDbFile,
                             props, passwordResolver);
@@ -231,7 +232,7 @@ public abstract class DbPortWorker extends DbWorker {
     public ExportCaDb(
         DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String caConfDbFile, String caDbFile,
         String destFolder, boolean resume, int numCertsInBundle, int numCertsPerSelect, char[] password)
-        throws PasswordResolverException, IOException {
+            throws PasswordResolverException, IOException, ConfigurationException {
       super(datasourceFactory, passwordResolver, caConfDbFile != null ? caConfDbFile : caDbFile, password);
       this.destFolder = IoUtil.expandFilepath(destFolder);
       this.resume = resume;
@@ -239,7 +240,7 @@ public abstract class DbPortWorker extends DbWorker {
       this.numCertsPerSelect = numCertsPerSelect;
       checkDestFolder();
 
-      Properties props = DbPorter.getDbConfProperties(Files.newInputStream(
+      PropertiesConfiguration props = DbPorter.getDbConfProperties(Files.newInputStream(
           Paths.get(IoUtil.expandFilepath(caDbFile))));
       this.caDataSource = datasourceFactory.createDataSource("ds-" + caDbFile,
           props, passwordResolver);
@@ -322,7 +323,7 @@ public abstract class DbPortWorker extends DbWorker {
     public ExportOcspDb(
         DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String dbConfFile,
         String destFolder, boolean resume, int numCertsInBundle, int numCertsPerSelect, char[] password)
-        throws PasswordResolverException, IOException {
+            throws PasswordResolverException, IOException, ConfigurationException {
       super(datasourceFactory, passwordResolver, dbConfFile, password);
 
       this.destFolder = Args.notBlank(destFolder, destFolder);
@@ -391,7 +392,7 @@ public abstract class DbPortWorker extends DbWorker {
     public ImportOcspDb(
         DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String dbConfFile,
         boolean resume, String srcFolder, int batchEntriesPerCommit, char[] password)
-        throws PasswordResolverException, IOException {
+            throws PasswordResolverException, IOException, ConfigurationException {
       super(datasourceFactory, passwordResolver, dbConfFile, password);
       this.resume = resume;
       this.srcFolder = IoUtil.expandFilepath(srcFolder);
@@ -441,7 +442,7 @@ public abstract class DbPortWorker extends DbWorker {
     public ImportOcspFromCaDb(
         DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String dbConfFile,
         String publisherName, boolean resume, String srcFolder, int batchEntriesPerCommit, char[] password)
-        throws PasswordResolverException, IOException {
+            throws PasswordResolverException, IOException, ConfigurationException {
       super(datasourceFactory, passwordResolver, dbConfFile, password);
       this.publisherName = publisherName;
       this.resume = resume;

@@ -3,6 +3,8 @@
 
 package org.xipki.ca.mgmt.db;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.mgmt.db.port.DbPorter;
@@ -15,7 +17,6 @@ import org.xipki.util.IoUtil;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -36,8 +37,8 @@ public abstract class DbWorker implements Runnable {
   private Exception exception;
 
   public DbWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String dbConfFile)
-          throws PasswordResolverException, IOException {
-    Properties props = DbPorter.getDbConfProperties(Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile))));
+          throws PasswordResolverException, IOException, ConfigurationException {
+    PropertiesConfiguration props = DbPorter.getDbConfProperties(Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile))));
     this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props, passwordResolver);
   }
 

@@ -3,6 +3,7 @@
 
 package org.xipki.ca.mgmt.shell;
 
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -31,7 +32,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -187,7 +187,7 @@ public class DbActions {
 
     @Override
     protected Object execute0() throws Exception {
-      Properties props = new Properties();
+      PropertiesConfiguration props = new PropertiesConfiguration();
       try (InputStream is = Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile)))) {
         props.load(is);
       }

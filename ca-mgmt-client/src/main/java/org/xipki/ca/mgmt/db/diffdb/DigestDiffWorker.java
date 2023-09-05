@@ -3,6 +3,8 @@
 
 package org.xipki.ca.mgmt.db.diffdb;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.mgmt.db.DbWorker;
@@ -20,7 +22,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Clock;
-import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -50,7 +51,7 @@ public class DigestDiffWorker extends DbWorker {
       DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
       boolean revokedOnly, String refDbConfFile, String targetDbConfFile, String reportDirName,
       int numCertsPerSelect, int numThreads, Set<byte[]> includeCaCerts)
-      throws PasswordResolverException, IOException {
+          throws PasswordResolverException, IOException, ConfigurationException {
     super(datasourceFactory, passwordResolver, refDbConfFile);
     this.reportDir = reportDirName;
     this.numThreads = Args.positive(numThreads, "numThreads");
@@ -76,7 +77,7 @@ public class DigestDiffWorker extends DbWorker {
       throw new IOException(reportDirName + " is not empty");
     }
 
-    Properties props = DbPorter.getDbConfProperties(
+    PropertiesConfiguration props = DbPorter.getDbConfProperties(
         Files.newInputStream(Paths.get(IoUtil.expandFilepath(targetDbConfFile))));
     this.targetDatasource = datasourceFactory.createDataSource("ds-" + targetDbConfFile, props, passwordResolver);
   } // constructor
