@@ -7,15 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.util.Args;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.*;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.sql.*;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.Deflater;
 import java.util.zip.ZipOutputStream;
@@ -196,8 +192,8 @@ public class DbToolBase implements Closeable {
     ps.setInt(index, value ? 1 : 0);
   }
 
-  public static Properties getDbConfProperties(InputStream is) throws IOException {
-    Properties props = new Properties();
+  public static ConfigurableProperties getDbConfProperties(InputStream is) throws IOException {
+    ConfigurableProperties props = new ConfigurableProperties();
     try {
       props.load(is);
     } finally {

@@ -12,6 +12,7 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.util.Args;
+import org.xipki.util.ConfigurableProperties;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
@@ -20,7 +21,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Clock;
-import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -76,7 +76,7 @@ public class DigestDiffWorker extends DbWorker {
       throw new IOException(reportDirName + " is not empty");
     }
 
-    Properties props = DbPorter.getDbConfProperties(
+    ConfigurableProperties props = DbPorter.getDbConfProperties(
         Files.newInputStream(Paths.get(IoUtil.expandFilepath(targetDbConfFile))));
     this.targetDatasource = datasourceFactory.createDataSource("ds-" + targetDbConfFile, props, passwordResolver);
   } // constructor

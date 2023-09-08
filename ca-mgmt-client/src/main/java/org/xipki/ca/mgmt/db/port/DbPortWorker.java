@@ -16,10 +16,7 @@ import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.util.Args;
-import org.xipki.util.FileUtils;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +26,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Clock;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Worker for database export / import.
@@ -152,7 +148,7 @@ public abstract class DbPortWorker extends DbWorker {
       this.srcFolder = IoUtil.expandFilepath(srcFolder);
       this.batchEntriesPerCommit = batchEntriesPerCommit;
 
-      Properties props = DbPorter.getDbConfProperties(Files.newInputStream(
+      ConfigurableProperties props = DbPorter.getDbConfProperties(Files.newInputStream(
                             Paths.get(IoUtil.expandFilepath(caDbFile))));
       this.caDataSource = datasourceFactory.createDataSource("ds-" + caDbFile,
                             props, passwordResolver);
@@ -239,7 +235,7 @@ public abstract class DbPortWorker extends DbWorker {
       this.numCertsPerSelect = numCertsPerSelect;
       checkDestFolder();
 
-      Properties props = DbPorter.getDbConfProperties(Files.newInputStream(
+      ConfigurableProperties props = DbPorter.getDbConfProperties(Files.newInputStream(
           Paths.get(IoUtil.expandFilepath(caDbFile))));
       this.caDataSource = datasourceFactory.createDataSource("ds-" + caDbFile,
           props, passwordResolver);

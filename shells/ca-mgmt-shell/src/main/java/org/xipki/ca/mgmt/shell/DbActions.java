@@ -21,6 +21,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
+import org.xipki.util.ConfigurableProperties;
 import org.xipki.util.IoUtil;
 
 import java.io.File;
@@ -31,7 +32,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -187,7 +187,7 @@ public class DbActions {
 
     @Override
     protected Object execute0() throws Exception {
-      Properties props = new Properties();
+      ConfigurableProperties props = new ConfigurableProperties();
       try (InputStream is = Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile)))) {
         props.load(is);
       }

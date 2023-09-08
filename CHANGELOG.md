@@ -2,14 +2,15 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 6.4.0
+##s 6.4.0
 - Release date: 2023/mm/dd
 - CA
-  - Add support of ACME with challenge types dns-01, http-01 and tls-alpn-01
+  - Feature: add support of ACME with challenge types dns-01, http-01 and tls-alpn-01
+  - Feature: extend Properties to use the place-holder ${env:name} for environment and ${sys:name} for system property.
 - OCSP
-  - N/A
+  - Feature: extend Properties to use the place-holder ${env:name} for environment and ${sys:name} for system property.
 - Gateway
-  - N/A
+  - Feature: extend Properties to use the place-holder ${env:name} for environment and ${sys:name} for system property.
 - CLI
   - N/A
 - MGMT-CLI (Management Client)
