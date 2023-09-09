@@ -62,7 +62,7 @@ public class HttpAcmeServlet extends HttpServlet {
     event.setApplicationName("acme-gw");
 
     try {
-      byte[] requestBytes = viaPost ? IoUtil.read(req.getInputStream()) : null;
+      byte[] requestBytes = viaPost ? IoUtil.readAndClose(req.getInputStream()) : null;
 
       RestResponse restResp = responder.service(req, requestBytes, event);
       restResp.fillResponse(resp);

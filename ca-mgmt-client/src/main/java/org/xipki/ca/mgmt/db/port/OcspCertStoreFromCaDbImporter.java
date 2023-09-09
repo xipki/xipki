@@ -359,7 +359,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
             String filename = cert.getFile();
 
             // rawcert
-            byte[] encodedCert = IoUtil.read(zipFile.getInputStream(zipFile.getEntry(filename)));
+            byte[] encodedCert = IoUtil.readAndClose(zipFile.getInputStream(zipFile.getEntry(filename)));
             String certhash = certhashAlgo.base64Hash(encodedCert);
 
             TBSCertificate tbsCert;

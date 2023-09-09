@@ -84,7 +84,7 @@ public class HttpOcspRequestor extends AbstractOcspRequestor {
       throw new IOException("bad response: mime type " + responseContentType + " not supported!");
     }
 
-    return IoUtil.read(inputstream);
+    return IoUtil.readAndClose(inputstream);
   } // method send
 
 }

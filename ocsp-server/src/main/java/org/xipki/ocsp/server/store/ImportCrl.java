@@ -19,8 +19,8 @@ import org.xipki.security.asn1.CrlStreamParser;
 import org.xipki.security.asn1.CrlStreamParser.RevokedCert;
 import org.xipki.security.asn1.CrlStreamParser.RevokedCertsIterator;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.*;
 import org.xipki.util.Base64;
+import org.xipki.util.*;
 
 import java.io.BufferedReader;
 import java.io.File;

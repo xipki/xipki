@@ -11,8 +11,6 @@ import org.xipki.audit.Audits;
 import org.xipki.audit.PciAuditEvent;
 import org.xipki.util.StringUtil;
 import org.xipki.util.XipkiBaseDir;
-import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.exception.ObjectCreationException;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServlet;

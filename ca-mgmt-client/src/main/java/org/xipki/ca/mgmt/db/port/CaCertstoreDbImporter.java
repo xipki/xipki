@@ -393,7 +393,7 @@ class CaCertstoreDbImporter extends DbPorter {
 
         String filename = cert.getFile();
         // rawcert
-        byte[] encodedCert = IoUtil.read(zipFile.getInputStream(zipFile.getEntry(filename)));
+        byte[] encodedCert = IoUtil.readAndClose(zipFile.getInputStream(zipFile.getEntry(filename)));
 
         TBSCertificate tbsCert;
         try {
@@ -414,7 +414,7 @@ class CaCertstoreDbImporter extends DbPorter {
         if (cert.getPrivateKeyFile() != null) {
           ZipEntry keyZipEnty = zipFile.getEntry(cert.getPrivateKeyFile());
           if (keyZipEnty != null) {
-            privateKey = new String(IoUtil.read(zipFile.getInputStream(keyZipEnty)));
+            privateKey = new String(IoUtil.readAndClose(zipFile.getInputStream(keyZipEnty)));
           }
         }
 
@@ -558,7 +558,7 @@ class CaCertstoreDbImporter extends DbPorter {
         ZipEntry zipEnty = zipFile.getEntry(filename);
 
         // rawcert
-        byte[] encodedCrl = IoUtil.read(zipFile.getInputStream(zipEnty));
+        byte[] encodedCrl = IoUtil.readAndClose(zipFile.getInputStream(zipEnty));
         String b64Sha1 = HashAlgo.SHA1.base64Hash(encodedCrl);
 
         X509CRLHolder x509crl;

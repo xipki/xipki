@@ -52,7 +52,7 @@ public class MiscCaActions {
     protected Object execute0() throws Exception {
       String msg = "configuration to file " + confFile;
       try {
-        save(new File(confFile), IoUtil.read(caManager.exportConf(caNames)));
+        save(new File(confFile), IoUtil.readAndClose(caManager.exportConf(caNames)));
         println("exported " + msg);
         return null;
       } catch (CaMgmtException ex) {

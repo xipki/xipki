@@ -60,7 +60,7 @@ public class HttpEstServlet extends HttpServlet {
 
     try {
       String path = req.getServletPath();
-      byte[] requestBytes = viaPost ? IoUtil.read(req.getInputStream()) : null;
+      byte[] requestBytes = viaPost ? IoUtil.readAndClose(req.getInputStream()) : null;
 
       RestResponse restResp = responder.service(path, requestBytes, new HttpRequestMetadataRetrieverImpl(req), event);
       restResp.fillResponse(resp);

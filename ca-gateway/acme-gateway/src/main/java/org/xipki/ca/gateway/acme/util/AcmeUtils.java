@@ -14,26 +14,23 @@
  */
 package org.xipki.ca.gateway.acme.util;
 
-import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.util.Pack;
 import org.xipki.ca.gateway.acme.AcmeProtocolException;
-import org.xipki.ca.gateway.acme.AcmeSystemException;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.asn1.Asn1StreamParser;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Base64Url;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;

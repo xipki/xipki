@@ -15,7 +15,6 @@ import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.security.KeyCertBytesPair;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.JSON;
-import org.xipki.util.DateUtil;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.exception.InvalidConfException;
@@ -27,7 +26,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.CertificateException;
-import java.time.Instant;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -185,7 +183,7 @@ public class HttpMgmtServlet extends HttpServlet {
         case exportConf: {
           MgmtRequest.ExportConf req = parse(in, MgmtRequest.ExportConf.class);
           InputStream confStream = caManager.exportConf(req.getCaNames());
-          resp = new MgmtResponse.ByteArray(IoUtil.read(confStream));
+          resp = new MgmtResponse.ByteArray(IoUtil.readAndClose(confStream));
           break;
         }
         case generateCertificate: {

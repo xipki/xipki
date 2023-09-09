@@ -262,10 +262,7 @@ public class CaConfs {
   private static byte[] getBinary(String fileName, Map<String, String> properties, String baseDir)
       throws IOException {
     fileName = expandConf(fileName, properties);
-
-    InputStream is = Files.newInputStream(Paths.get(resolveFilePath(fileName, baseDir)));
-
-    return IoUtil.read(is);
+    return IoUtil.read(Paths.get(resolveFilePath(fileName, baseDir)).toFile());
   } // method getBinary
 
   private static String expandConf(String confStr, Map<String, String> properties) {

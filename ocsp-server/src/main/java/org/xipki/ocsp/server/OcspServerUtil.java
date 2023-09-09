@@ -271,18 +271,14 @@ public class OcspServerUtil {
   }
 
   private static X509Cert parseCert(FileOrBinary certConf) throws InvalidConfException {
-    InputStream is = null;
     try {
-      is = getInputStream(certConf);
-      return X509Util.parseCert(is);
+      return X509Util.parseCert(certConf.readContent());
     } catch (IOException | CertificateException ex) {
       String msg = "could not parse certificate";
       if (certConf.getFile() != null) {
         msg += " from file " + certConf.getFile();
       }
       throw new InvalidConfException(msg);
-    } finally {
-      closeStream(is);
     }
   } // method parseCert
 

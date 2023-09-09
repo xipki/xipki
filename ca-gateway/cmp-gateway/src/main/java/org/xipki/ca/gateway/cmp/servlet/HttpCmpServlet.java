@@ -84,7 +84,7 @@ public class HttpCmpServlet extends HttpServlet {
 
       event.addEventData(CaAuditConstants.NAME_ca, caName);
 
-      byte[] requestBytes = IoUtil.read(req.getInputStream());
+      byte[] requestBytes = IoUtil.readAndClose(req.getInputStream());
       PKIMessage pkiReq;
       try {
         pkiReq = PKIMessage.getInstance(requestBytes);

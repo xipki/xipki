@@ -148,7 +148,7 @@ public class OcspMgmtClient implements OcspManager {
             return null;
           } else {
             inClosed = true;
-            return IoUtil.read(httpUrlConnection.getInputStream());
+            return IoUtil.readAndClose(httpUrlConnection.getInputStream());
           }
         } finally {
           if (in != null & !inClosed) {

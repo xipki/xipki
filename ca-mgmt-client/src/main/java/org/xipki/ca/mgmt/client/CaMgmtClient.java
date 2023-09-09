@@ -16,7 +16,10 @@ import org.xipki.security.KeyCertBytesPair;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.*;
+import org.xipki.util.Args;
+import org.xipki.util.HttpConstants;
+import org.xipki.util.IoUtil;
+import org.xipki.util.StringUtil;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.SslContextConf;
@@ -656,7 +659,7 @@ public class CaMgmtClient implements CaManager {
   public Map<String, X509Cert> loadConf(InputStream zippedConfStream)
       throws CaMgmtException, IOException {
     MgmtRequest.LoadConf req = new MgmtRequest.LoadConf();
-    req.setConfBytes(IoUtil.read(zippedConfStream));
+    req.setConfBytes(IoUtil.readAndClose(zippedConfStream));
     byte[] respBytes = transmit(MgmtAction.loadConf, req);
 
     MgmtResponse.LoadConf resp = parse(respBytes, MgmtResponse.LoadConf.class);
@@ -808,7 +811,7 @@ public class CaMgmtClient implements CaManager {
             return null;
           } else {
             inClosed = true;
-            return IoUtil.read(httpUrlConnection.getInputStream());
+            return IoUtil.readAndClose(httpUrlConnection.getInputStream());
           }
         } finally {
           if (in != null & !inClosed) {
