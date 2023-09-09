@@ -37,7 +37,7 @@
     <karaf.bc.version>1.70</karaf.bc.version>
     <bc.version>1.76</bc.version>
     <slf4j.version>1.7.32</slf4j.version>
-    <pkcs11wrapper.version>1.0.6-SNAPSHOT</pkcs11wrapper.version>
+    <pkcs11wrapper.version>1.0.6</pkcs11wrapper.version>
     <hikaricp.version>4.0.3</hikaricp.version>
     <gson.version>2.10.1</gson.version>
     <zip4j.version>2.11.5</zip4j.version>
