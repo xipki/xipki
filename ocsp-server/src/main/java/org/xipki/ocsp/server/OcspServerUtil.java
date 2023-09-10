@@ -22,11 +22,8 @@ import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateException;
@@ -246,30 +243,6 @@ public class OcspServerUtil {
     return (bo == null) ? defaultValue : bo;
   }
 
-  private static InputStream getInputStream(FileOrBinary conf) throws IOException {
-    return (conf.getFile() != null)
-        ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile(), true)))
-        : new ByteArrayInputStream(conf.getBinary());
-  }
-
-  static InputStream getInputStream(FileOrValue conf) throws IOException {
-    return (conf.getFile() != null)
-        ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile(), true)))
-        : new ByteArrayInputStream(StringUtil.toUtf8Bytes(conf.getValue()));
-  }
-
-  static void closeStream(InputStream stream) {
-    if (stream == null) {
-      return;
-    }
-
-    try {
-      stream.close();
-    } catch (IOException ex) {
-      LOG.warn("could not close stream: {}", ex.getMessage());
-    }
-  }
-
   private static X509Cert parseCert(FileOrBinary certConf) throws InvalidConfException {
     try {
       return X509Util.parseCert(certConf.readContent());
@@ -283,9 +256,9 @@ public class OcspServerUtil {
   } // method parseCert
 
   static OcspServerConf parseConf(String confFilename) throws InvalidConfException {
-    try (InputStream is = Files.newInputStream(
-          Paths.get(IoUtil.expandFilepath(confFilename, true)))) {
-      OcspServerConf root = JSON.parseObject(is, OcspServerConf.class);
+    try {
+      OcspServerConf root = JSON.parseObject(
+          Paths.get(IoUtil.expandFilepath(confFilename, true)), OcspServerConf.class);
       root.validate();
       return root;
     } catch (IOException | RuntimeException ex) {

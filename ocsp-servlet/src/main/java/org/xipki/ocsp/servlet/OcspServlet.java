@@ -68,7 +68,7 @@ public class OcspServlet extends HttpServlet {
       }
 
       Responder responder = responderAndPath.getResponder();
-      byte[] reqContent = IoUtil.readAndClose(req.getInputStream());
+      byte[] reqContent = IoUtil.readAllBytesAndClose(req.getInputStream());
       // request too long
       if (reqContent.length > responder.getMaxRequestSize()) {
         sendError(resp, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);

@@ -76,7 +76,7 @@ public class ScepServlet extends HttpServlet {
         // parse the request
         try {
           byte[] content = post
-              ? IoUtil.readAndClose(req.getInputStream())
+              ? IoUtil.readAllBytesAndClose(req.getInputStream())
               : Base64.decode(req.getParameter("message"));
 
           reqMessage = new CMSSignedData(content);

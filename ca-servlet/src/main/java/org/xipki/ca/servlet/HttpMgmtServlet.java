@@ -22,7 +22,6 @@ import org.xipki.util.exception.InvalidConfException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.CertificateException;
@@ -183,7 +182,7 @@ public class HttpMgmtServlet extends HttpServlet {
         case exportConf: {
           MgmtRequest.ExportConf req = parse(in, MgmtRequest.ExportConf.class);
           InputStream confStream = caManager.exportConf(req.getCaNames());
-          resp = new MgmtResponse.ByteArray(IoUtil.readAndClose(confStream));
+          resp = new MgmtResponse.ByteArray(IoUtil.readAllBytesAndClose(confStream));
           break;
         }
         case generateCertificate: {
@@ -389,7 +388,8 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case loadConf: {
           MgmtRequest.LoadConf req = parse(in, MgmtRequest.LoadConf.class);
-          Map<String, X509Cert> rootcaNameCertMap = caManager.loadConf(new ByteArrayInputStream(req.getConfBytes()));
+
+          Map<String, X509Cert> rootcaNameCertMap = caManager.loadConf(req.getConfBytes());
 
           if (rootcaNameCertMap == null || rootcaNameCertMap.isEmpty()) {
             resp = new MgmtResponse.LoadConf(null);
@@ -596,15 +596,21 @@ public class HttpMgmtServlet extends HttpServlet {
     return new MgmtResponse.ByteArray(encoded);
   } // method toByteArray
 
+  /**
+   * The speciffied stream is closed after this method call.
+   */
   private static String getNameFromRequest(InputStream in) throws CaMgmtException {
     MgmtRequest.Name req = parse(in, MgmtRequest.Name.class);
     return req.getName();
   } // method getNameFromRequest
 
+  /**
+   * The speciffied stream is closed after this method call.
+   */
   private static <T extends MgmtRequest> T parse(InputStream in, Class<T> clazz)
       throws CaMgmtException {
-    try {
-      return JSON.parseObject(in, clazz);
+    try (InputStream nin = in) {
+      return JSON.parseObjectAndClose(nin, clazz);
     } catch (IOException | RuntimeException ex) {
       throw new CaMgmtException("cannot parse request " + clazz + " from InputStream");
     }

@@ -41,6 +41,7 @@ import org.xipki.util.exception.InvalidConfException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -222,7 +223,11 @@ public class CertActions {
 
         if (StringUtil.orEqualsIgnoreCase(keyOutform, "p12", "pkcs12")) {
           CertificateFactory cf = CertificateFactory.getInstance("X509");
-          Certificate cert = cf.generateCertificate(new ByteArrayInputStream(certBytes));
+
+          Certificate cert;
+          try (InputStream is = new ByteArrayInputStream(certBytes)) {
+            cert = cf.generateCertificate(is);
+          }
 
           KeyStore p12Ks = KeyUtil.getOutKeyStore("PKCS12");
           p12Ks.load(null, keyPwd);

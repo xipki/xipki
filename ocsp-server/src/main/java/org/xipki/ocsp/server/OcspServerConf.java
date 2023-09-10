@@ -15,8 +15,6 @@ import org.xipki.util.Validity.Unit;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
@@ -808,12 +806,9 @@ public class OcspServerConf extends ValidatableConf {
   public static OcspServerConf readConfFromFile(String fileName)
       throws IOException, InvalidConfException {
     notBlank(fileName, "fileName");
-    try (InputStream is = Files.newInputStream(Paths.get(fileName))) {
-      OcspServerConf conf = JSON.parseObject(is, OcspServerConf.class);
-      conf.validate();
-
-      return conf;
-    }
+    OcspServerConf conf = JSON.parseObject(Paths.get(fileName), OcspServerConf.class);
+    conf.validate();
+    return conf;
   }
 
   public ResponseCache getResponseCache() {

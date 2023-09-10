@@ -57,7 +57,7 @@ public class HttpRaServlet extends HttpServlet {
     try {
       String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
       HttpRequestMetadataRetriever httpRetriever = new HttpRequestMetadataRetrieverImpl(req);
-      byte[] requestBytes = IoUtil.readAndClose(req.getInputStream());
+      byte[] requestBytes = IoUtil.readAllBytesAndClose(req.getInputStream());
 
       SdkResponse response = responder.service(path, requestBytes, httpRetriever);
       byte[] respBody = response == null ? null : response.encode();

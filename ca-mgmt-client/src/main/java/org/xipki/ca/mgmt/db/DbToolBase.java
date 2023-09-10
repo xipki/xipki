@@ -11,6 +11,7 @@ import org.xipki.util.*;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.Deflater;
@@ -192,16 +193,10 @@ public class DbToolBase implements Closeable {
     ps.setInt(index, value ? 1 : 0);
   }
 
-  public static ConfigurableProperties getDbConfProperties(InputStream is) throws IOException {
+  public static ConfigurableProperties getDbConfProperties(Path path) throws IOException {
     ConfigurableProperties props = new ConfigurableProperties();
-    try {
+    try (InputStream is = Files.newInputStream(path)) {
       props.load(is);
-    } finally {
-      try {
-        is.close();
-      } catch (IOException ex) {
-        LOG.warn("could not close stream: {}", ex.getMessage());
-      }
     }
 
     // adapt the configuration

@@ -8,10 +8,8 @@ import org.xipki.security.util.JSON;
 import org.xipki.util.Args;
 import org.xipki.util.exception.InvalidConfException;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -256,11 +254,9 @@ public class AcmeProxyConf extends ProtocolProxyConf {
   public static AcmeProxyConf readConfFromFile(String fileName)
       throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");
-    try (InputStream is = Files.newInputStream(Paths.get(fileName))) {
-      AcmeProxyConf conf = JSON.parseObject(is, AcmeProxyConf.class);
-      conf.validate();
-      return conf;
-    }
+    AcmeProxyConf conf = JSON.parseObject(new File(fileName), AcmeProxyConf.class);
+    conf.validate();
+    return conf;
   }
 
   public static class CleanupOrderConf {

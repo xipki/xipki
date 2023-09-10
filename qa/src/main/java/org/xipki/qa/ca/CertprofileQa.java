@@ -25,7 +25,6 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
 
-import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
@@ -69,7 +68,7 @@ public class CertprofileQa {
   public CertprofileQa(byte[] dataBytes) throws CertprofileException {
     notNull(dataBytes, "dataBytes");
     try {
-      X509ProfileType conf = X509ProfileType.parse(new ByteArrayInputStream(dataBytes));
+      X509ProfileType conf = X509ProfileType.parse(dataBytes);
       certprofile = new XijsonCertprofile();
       certprofile.initialize(conf);
 

@@ -15,10 +15,8 @@ import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.SslContextConf;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -156,12 +154,9 @@ public class CaServerConf extends ValidatableConf {
 
   public static CaServerConf readConfFromFile(String fileName) throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");
-    try (InputStream is = Files.newInputStream(Paths.get(fileName))) {
-      CaServerConf conf = JSON.parseObject(is, CaServerConf.class);
-      conf.validate();
-
-      return conf;
-    }
+    CaServerConf conf = JSON.parseObject(new File(fileName), CaServerConf.class);
+    conf.validate();
+    return conf;
   }
 
   public boolean isMaster() {

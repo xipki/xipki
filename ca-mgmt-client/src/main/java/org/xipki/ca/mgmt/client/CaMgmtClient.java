@@ -656,10 +656,17 @@ public class CaMgmtClient implements CaManager {
   } // method getCert
 
   @Override
-  public Map<String, X509Cert> loadConf(InputStream zippedConfStream)
+  public Map<String, X509Cert> loadConf(byte[] zippedConfBytes) throws CaMgmtException, IOException {
+    try (InputStream is = new ByteArrayInputStream(zippedConfBytes)) {
+      return loadConfAndClose(is);
+    }
+  }
+
+  @Override
+  public Map<String, X509Cert> loadConfAndClose(InputStream zippedConfStream)
       throws CaMgmtException, IOException {
     MgmtRequest.LoadConf req = new MgmtRequest.LoadConf();
-    req.setConfBytes(IoUtil.readAndClose(zippedConfStream));
+    req.setConfBytes(IoUtil.readAllBytes(zippedConfStream));
     byte[] respBytes = transmit(MgmtAction.loadConf, req);
 
     MgmtResponse.LoadConf resp = parse(respBytes, MgmtResponse.LoadConf.class);
@@ -811,7 +818,7 @@ public class CaMgmtClient implements CaManager {
             return null;
           } else {
             inClosed = true;
-            return IoUtil.readAndClose(httpUrlConnection.getInputStream());
+            return IoUtil.readAllBytesAndClose(httpUrlConnection.getInputStream());
           }
         } finally {
           if (in != null & !inClosed) {

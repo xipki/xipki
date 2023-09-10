@@ -35,10 +35,13 @@ import org.xipki.security.*;
 import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -356,15 +359,11 @@ public class OcspServerImpl implements OcspServer {
     if (cacheType != null) {
       DataSourceConf cacheSourceConf = cacheType.getDatasource();
       DataSourceWrapper datasource;
-      InputStream dsStream = null;
-      try {
-        dsStream = getInputStream(cacheSourceConf.getConf());
+      try (InputStream dsStream = getInputStream(cacheSourceConf.getConf())) {
         datasource = datasourceFactory.createDataSource(cacheSourceConf.getName(),
                 dsStream, securityFactory.getPasswordResolver());
       } catch (IOException ex) {
         throw new InvalidConfException(ex.getMessage(), ex);
-      } finally {
-        closeStream(dsStream);
       }
       responseCacher = new ResponseCacher(datasource, master, cacheType.validity());
       responseCacher.init();
@@ -392,14 +391,10 @@ public class OcspServerImpl implements OcspServer {
       for (DataSourceConf m : conf.getDatasources()) {
         String name = m.getName();
         DataSourceWrapper datasource;
-        InputStream dsStream = null;
-        try {
-          dsStream = getInputStream(m.getConf());
+        try (InputStream dsStream = getInputStream(m.getConf())) {
           datasource = datasourceFactory.createDataSource(name, dsStream, securityFactory.getPasswordResolver());
         } catch (IOException ex) {
           throw new InvalidConfException(ex.getMessage(), ex);
-        } finally {
-          closeStream(dsStream);
         }
         datasources.put(name, datasource);
       } // end for
@@ -633,18 +628,14 @@ public class OcspServerImpl implements OcspServer {
       if (responder.getResponderOption().getMode() != OcspMode.RFC2560) {
         ExtendedExtension extn = removeExtension(reqExtensions, OID.ID_PKIX_OCSP_PREFSIGALGS);
         if (extn != null) {
-          ASN1InputStream asn1Stream = new ASN1InputStream(extn.getExtnValueStream());
-
           List<AlgorithmIdentifier> prefSigAlgs;
-          try {
+          try (ASN1InputStream asn1Stream = new ASN1InputStream(extn.getExtnValueStream())) {
             ASN1Sequence seq = ASN1Sequence.getInstance(asn1Stream.readObject());
             final int size = seq.size();
             prefSigAlgs = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
               prefSigAlgs.add(AlgorithmIdentifier.getInstance(seq.getObjectAt(i)));
             }
-          } finally {
-            asn1Stream.close();
           }
           concurrentSigner = signer.getSignerForPreferredSigAlgs(prefSigAlgs);
         }
@@ -1045,5 +1036,11 @@ public class OcspServerImpl implements OcspServer {
     LOG.warn("could not build certpath for the request's signer certificate");
     return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
   } // method checkSignature
+
+  private static InputStream getInputStream(FileOrValue conf) throws IOException {
+    return (conf.getFile() != null)
+        ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile(), true)))
+        : new ByteArrayInputStream(StringUtil.toUtf8Bytes(conf.getValue()));
+  }
 
 }

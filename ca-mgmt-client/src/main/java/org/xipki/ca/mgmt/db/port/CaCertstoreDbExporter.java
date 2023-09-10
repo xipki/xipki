@@ -17,7 +17,6 @@ import org.xipki.util.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -66,9 +65,7 @@ class CaCertstoreDbExporter extends DbPorter {
     CaCertstore certstore;
     Path path = Paths.get(baseDir, FILENAME_CA_CERTSTORE);
     if (resume) {
-      try (InputStream is = Files.newInputStream(path)) {
-        certstore = JSON.parseObject(is, CaCertstore.class);
-      }
+      certstore = JSON.parseObject(path, CaCertstore.class);
       certstore.validate();
 
       if (certstore.getVersion() > VERSION_V2) {

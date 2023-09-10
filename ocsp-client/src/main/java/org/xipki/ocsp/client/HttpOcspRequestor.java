@@ -72,6 +72,7 @@ public class HttpOcspRequestor extends AbstractOcspRequestor {
       throw new IOException("bad response: " + httpUrlConnection.getResponseCode() + "    "
           + httpUrlConnection.getResponseMessage());
     }
+
     String responseContentType = httpUrlConnection.getContentType();
     boolean isValidContentType = false;
     if (responseContentType != null) {
@@ -79,12 +80,13 @@ public class HttpOcspRequestor extends AbstractOcspRequestor {
         isValidContentType = true;
       }
     }
+
     if (!isValidContentType) {
       inputstream.close();
       throw new IOException("bad response: mime type " + responseContentType + " not supported!");
     }
 
-    return IoUtil.readAndClose(inputstream);
+    return IoUtil.readAllBytesAndClose(inputstream);
   } // method send
 
 }

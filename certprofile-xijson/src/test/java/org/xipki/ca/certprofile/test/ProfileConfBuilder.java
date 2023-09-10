@@ -35,7 +35,6 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -69,11 +68,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
       }
 
       if (validate) {
-        X509ProfileType profileConf;
-        // Test by deserializing
-        try (InputStream is = Files.newInputStream(path)) {
-          profileConf = X509ProfileType.parse(is);
-        }
+        X509ProfileType profileConf = X509ProfileType.parse(path.toFile());
         XijsonCertprofile profileObj = new XijsonCertprofile();
         profileObj.initialize(profileConf);
         profileObj.close();

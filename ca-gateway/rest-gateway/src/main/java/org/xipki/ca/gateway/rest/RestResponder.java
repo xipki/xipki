@@ -474,7 +474,9 @@ public class RestResponder {
 
       if (ct.startsWith("text/plain")) {
         Properties props = new Properties();
-        props.load(new ByteArrayInputStream(request));
+        try (InputStream is = new ByteArrayInputStream(request)) {
+          props.load(is);
+        }
         String strSubject = props.getProperty("subject");
         if (strSubject == null) {
           throw new OperationException(BAD_CERT_TEMPLATE, "subject is not specified");

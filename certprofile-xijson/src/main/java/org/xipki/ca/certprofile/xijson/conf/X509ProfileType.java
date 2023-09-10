@@ -25,6 +25,7 @@ import org.xipki.util.TripleState;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -118,20 +119,35 @@ public class X509ProfileType extends ValidatableConf {
 
   private List<ExtensionType> extensions;
 
-  public static X509ProfileType parse(InputStream confStream) throws CertprofileException {
-    Args.notNull(confStream, "confStream");
+  public static X509ProfileType parse(byte[] confBytes) throws CertprofileException {
+    Args.notNull(confBytes, "confBytes");
     try {
-      X509ProfileType root = JSON.parseObject(confStream, X509ProfileType.class);
+      X509ProfileType root = JSON.parseObject(confBytes, X509ProfileType.class);
+      root.validate();
+      return root;
+    } catch (InvalidConfException | RuntimeException ex) {
+      throw new CertprofileException("parse profile failed, message: " + ex.getMessage(), ex);
+    }
+  }
+
+  public static X509ProfileType parse(File confFile) throws CertprofileException {
+    Args.notNull(confFile, "confFile");
+    try {
+      X509ProfileType root = JSON.parseObject(confFile, X509ProfileType.class);
       root.validate();
       return root;
     } catch (InvalidConfException | IOException | RuntimeException ex) {
       throw new CertprofileException("parse profile failed, message: " + ex.getMessage(), ex);
-    } finally {
-      try {
-        confStream.close();
-      } catch (IOException ex) {
-        LOG.warn("could not close confStream: {}", ex.getMessage());
-      }
+    }
+  }
+
+  private static X509ProfileType parseAndClose(InputStream confStream) throws CertprofileException {
+    try {
+      X509ProfileType root = JSON.parseObjectAndClose(confStream, X509ProfileType.class);
+      root.validate();
+      return root;
+    } catch (InvalidConfException | IOException | RuntimeException ex) {
+      throw new CertprofileException("parse profile failed, message: " + ex.getMessage(), ex);
     }
   } // method parse
 

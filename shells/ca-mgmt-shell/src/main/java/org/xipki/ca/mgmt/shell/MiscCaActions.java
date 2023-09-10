@@ -52,7 +52,7 @@ public class MiscCaActions {
     protected Object execute0() throws Exception {
       String msg = "configuration to file " + confFile;
       try {
-        save(new File(confFile), IoUtil.readAndClose(caManager.exportConf(caNames)));
+        save(new File(confFile), IoUtil.readAllBytesAndClose(caManager.exportConf(caNames)));
         println("exported " + msg);
         return null;
       } catch (CaMgmtException ex) {
@@ -84,8 +84,7 @@ public class MiscCaActions {
       try {
         InputStream confStream = confFile.endsWith(".json")
             ? CaConfs.convertFileConfToZip(confFile) : Files.newInputStream(Paths.get(confFile));
-
-        Map<String, X509Cert> rootCerts = caManager.loadConf(confStream);
+        Map<String, X509Cert> rootCerts = caManager.loadConfAndClose(confStream);
         if (CollectionUtil.isEmpty(rootCerts)) {
           println("loaded " + msg);
         } else {

@@ -38,7 +38,6 @@ import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.HttpRespContent;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -453,12 +452,7 @@ public class AcmeResponder {
     }
 
     JoseMessage body = JSON.parseObject(request, JoseMessage.class);
-    AcmeJson protected_;
-    try {
-      protected_ = AcmeJson.parse(new ByteArrayInputStream(decodeFast(body.getProtected())));
-    } catch (IOException e) {
-      throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "invalid 'protected");
-    }
+    AcmeJson protected_= AcmeJson.parse(decodeFast(body.getProtected()));
 
     if (!protected_.contains("url")) {
       throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "url is not present");

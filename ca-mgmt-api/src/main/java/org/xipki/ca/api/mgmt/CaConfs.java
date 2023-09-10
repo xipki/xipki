@@ -3,14 +3,11 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xipki.security.util.JSON;
 import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +24,6 @@ import java.util.zip.ZipOutputStream;
  */
 
 public class CaConfs {
-  private static final Logger LOG = LoggerFactory.getLogger(CaConfs.class);
 
   private static final String APP_DIR = "APP_DIR";
 
@@ -35,7 +31,7 @@ public class CaConfs {
   }
 
   public static void marshal(CaConfType.CaSystem root, OutputStream out)
-      throws InvalidConfException, IOException {
+      throws InvalidConfException {
     Args.notNull(root, "root");
     Args.notNull(out, "out");
     root.validate();
@@ -53,12 +49,10 @@ public class CaConfs {
     File confFile = new File(confFilename);
     confFile = IoUtil.expandFilepath(confFile, false);
 
-    InputStream caConfStream = null;
     String baseDir;
 
     try {
-      caConfStream = Files.newInputStream(confFile.toPath());
-      CaConfType.CaSystem root = JSON.parseObject(caConfStream, CaConfType.CaSystem.class);
+      CaConfType.CaSystem root = JSON.parseObject(confFile, CaConfType.CaSystem.class);
 
       baseDir = root.getBasedir();
       if (StringUtil.isBlank(baseDir)) {
@@ -216,14 +210,6 @@ public class CaConfs {
         zipStream.closeEntry();
       }
     } finally {
-      if (caConfStream != null) {
-        try {
-          caConfStream.close();
-        } catch (IOException ex) {
-          LOG.info("could not close caConfStream: {}", ex.getMessage());
-        }
-      }
-
       zipStream.close();
       bytesStream.flush();
     }

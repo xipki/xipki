@@ -715,6 +715,21 @@ public interface CaManager {
 
   /**
    * Loads the CA system configuration.
+   * The specified stream is closed after this method call.
+   * @param zippedConfBytes
+   *          Byte array of the zipped Configuration the CA system. Must not be {@code null}.
+   * @return map of generated root certificates, if newly generated. The key is the CA name.
+   * @throws IOException
+   *          If read the ZIP stream fails.
+   * @throws CaMgmtException
+   *          if other error occurs.
+   */
+  Map<String, X509Cert> loadConf(byte[] zippedConfBytes)
+      throws CaMgmtException, IOException;
+
+  /**
+   * Loads the CA system configuration.
+   * The specified stream is closeds after this method call.
    * @param zippedConfStream
    *          Inputstream of the zipped Configuration the CA system. Must not be {@code null}.
    * @return map of generated root certificates, if newly generated. The key is the CA name.
@@ -723,7 +738,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if other error occurs.
    */
-  Map<String, X509Cert> loadConf(InputStream zippedConfStream)
+  Map<String, X509Cert> loadConfAndClose(InputStream zippedConfStream)
       throws CaMgmtException, IOException;
 
   /**

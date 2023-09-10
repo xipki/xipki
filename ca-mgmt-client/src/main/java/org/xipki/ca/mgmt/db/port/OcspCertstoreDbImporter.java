@@ -14,8 +14,6 @@ import org.xipki.util.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
@@ -65,10 +63,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
   } // constructor
 
   public void importToDb() throws Exception {
-    OcspCertstore certstore;
-    try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_OCSP_CERTSTORE))) {
-      certstore = JSON.parseObject(is, OcspCertstore.class);
-    }
+    OcspCertstore certstore = JSON.parseObject(Paths.get(baseDir, FILENAME_OCSP_CERTSTORE), OcspCertstore.class);
     certstore.validate();
 
     if (certstore.getVersion() > VERSION_V2) {
@@ -268,7 +263,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
     OcspCertstore.Certs certs;
     try {
-      certs = JSON.parseObject(zipFile.getInputStream(certsEntry), OcspCertstore.Certs.class);
+      certs = JSON.parseObjectAndClose(zipFile.getInputStream(certsEntry), OcspCertstore.Certs.class);
     } catch (Exception ex) {
       try {
         zipFile.close();

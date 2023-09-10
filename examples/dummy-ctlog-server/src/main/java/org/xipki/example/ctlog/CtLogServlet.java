@@ -98,9 +98,10 @@ public class CtLogServlet extends HttpServlet {
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException {
+      throws ServletException {
     try {
-      AddPreChainRequest req0 = parse(req.getInputStream(), AddPreChainRequest.class);
+      InputStream is = req.getInputStream();
+      AddPreChainRequest req0 = JSON.parseObjectAndClose(is, AddPreChainRequest.class);
       List<byte[]> chain = req0.getChain();
       if (chain == null || chain.size() < 2) {
         String msg = "chain has less than two certificates";
@@ -141,13 +142,5 @@ public class CtLogServlet extends HttpServlet {
       throw new ServletException(ex.getMessage(), ex);
     }
   } // method doPost
-
-  private static <T> T parse(InputStream in, Class<T> clazz) throws IOException {
-    try {
-      return JSON.parseObject(in, clazz);
-    } catch (RuntimeException ex) {
-      throw new IOException("cannot parse request " + clazz + " from InputStream");
-    }
-  } // method parse
 
 }

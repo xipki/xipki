@@ -20,9 +20,7 @@ import org.xipki.util.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
@@ -179,10 +177,7 @@ class CaCertstoreDbImporter extends DbPorter {
       importCa(caconf.getCas());
     }
 
-    CaCertstore certstore;
-    try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_CA_CERTSTORE))) {
-      certstore = JSON.parseObject(is, CaCertstore.class);
-    }
+    CaCertstore certstore = JSON.parseObject(Paths.get(baseDir, FILENAME_CA_CERTSTORE), CaCertstore.class);
     certstore.validate();
 
     if (certstore.getVersion() > VERSION_V2) {
@@ -356,7 +351,8 @@ class CaCertstoreDbImporter extends DbPorter {
 
     CaCertstore.Certs certs;
     try {
-      certs = JSON.parseObject(zipFile.getInputStream(zipFile.getEntry("overview.json")), CaCertstore.Certs.class);
+      certs = JSON.parseObjectAndClose(
+                zipFile.getInputStream(zipFile.getEntry("overview.json")), CaCertstore.Certs.class);
     } catch (Exception ex) {
       try {
         zipFile.close();
@@ -393,7 +389,7 @@ class CaCertstoreDbImporter extends DbPorter {
 
         String filename = cert.getFile();
         // rawcert
-        byte[] encodedCert = IoUtil.readAndClose(zipFile.getInputStream(zipFile.getEntry(filename)));
+        byte[] encodedCert = IoUtil.readAllBytesAndClose(zipFile.getInputStream(zipFile.getEntry(filename)));
 
         TBSCertificate tbsCert;
         try {
@@ -414,7 +410,7 @@ class CaCertstoreDbImporter extends DbPorter {
         if (cert.getPrivateKeyFile() != null) {
           ZipEntry keyZipEnty = zipFile.getEntry(cert.getPrivateKeyFile());
           if (keyZipEnty != null) {
-            privateKey = new String(IoUtil.readAndClose(zipFile.getInputStream(keyZipEnty)));
+            privateKey = new String(IoUtil.readAllBytesAndClose(zipFile.getInputStream(keyZipEnty)));
           }
         }
 
@@ -521,7 +517,8 @@ class CaCertstoreDbImporter extends DbPorter {
 
     CaCertstore.Crls crls;
     try {
-      crls = JSON.parseObject(zipFile.getInputStream(zipFile.getEntry("overview.json")), CaCertstore.Crls.class);
+      crls = JSON.parseObjectAndClose(
+              zipFile.getInputStream(zipFile.getEntry("overview.json")), CaCertstore.Crls.class);
     } catch (Exception ex) {
       try {
         zipFile.close();
@@ -558,7 +555,7 @@ class CaCertstoreDbImporter extends DbPorter {
         ZipEntry zipEnty = zipFile.getEntry(filename);
 
         // rawcert
-        byte[] encodedCrl = IoUtil.readAndClose(zipFile.getInputStream(zipEnty));
+        byte[] encodedCrl = IoUtil.readAllBytesAndClose(zipFile.getInputStream(zipEnty));
         String b64Sha1 = HashAlgo.SHA1.base64Hash(encodedCrl);
 
         X509CRLHolder x509crl;

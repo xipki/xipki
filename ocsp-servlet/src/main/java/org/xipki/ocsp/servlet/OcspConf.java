@@ -11,8 +11,6 @@ import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -63,12 +61,9 @@ public class OcspConf extends ValidatableConf {
 
   public static OcspConf readConfFromFile(String fileName) throws IOException, InvalidConfException {
     notBlank(fileName, "fileName");
-    try (InputStream is = Files.newInputStream(Paths.get(IoUtil.expandFilepath(fileName, true)))) {
-      OcspConf conf = JSON.parseObject(is, OcspConf.class);
-      conf.validate();
-
-      return conf;
-    }
+    OcspConf conf = JSON.parseObject(Paths.get(IoUtil.expandFilepath(fileName, true)), OcspConf.class);
+    conf.validate();
+    return conf;
   }
 
   public boolean isLogReqResp() {

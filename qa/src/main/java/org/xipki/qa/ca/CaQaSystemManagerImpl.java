@@ -10,10 +10,8 @@ import org.xipki.security.util.JSON;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.cert.CertificateException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -66,8 +64,7 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
 
     QaconfType qaConf;
     try {
-      InputStream confStream = Files.newInputStream(Paths.get(confFile));
-      qaConf = JSON.parseObject(confStream, QaconfType.class);
+      qaConf = JSON.parseObject(new File(confFile), QaconfType.class);
     } catch (Exception ex) {
       final String message = "could not parse the QA configuration";
       LogUtil.error(LOG, ex, message);

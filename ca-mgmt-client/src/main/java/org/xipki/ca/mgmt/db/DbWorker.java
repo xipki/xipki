@@ -14,7 +14,6 @@ import org.xipki.util.ConfigurableProperties;
 import org.xipki.util.IoUtil;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -37,8 +36,7 @@ public abstract class DbWorker implements Runnable {
 
   public DbWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String dbConfFile)
           throws PasswordResolverException, IOException {
-    ConfigurableProperties props =
-        DbPorter.getDbConfProperties(Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile))));
+    ConfigurableProperties props = DbPorter.getDbConfProperties(Paths.get(IoUtil.expandFilepath(dbConfFile)));
     this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props, passwordResolver);
   }
 

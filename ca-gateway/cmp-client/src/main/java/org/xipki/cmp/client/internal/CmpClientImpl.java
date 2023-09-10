@@ -30,9 +30,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
-import java.nio.file.Files;
 import java.security.*;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateEncodingException;
@@ -97,7 +95,7 @@ public final class CmpClientImpl implements CmpClient {
       throw new IllegalStateException("could not find configuration file " + confFile);
     }
 
-    CmpClientConf conf = parse(Files.newInputStream(configFile.toPath()));
+    CmpClientConf conf = parse(configFile);
     SslContextConf sslCc = SslContextConf.ofSslConf(conf.getSsl());
 
     SSLSocketFactory sslSocketFactory = sslCc.getSslSocketFactory();
@@ -145,19 +143,13 @@ public final class CmpClientImpl implements CmpClient {
     LOG.info("initialized");
   } // method init
 
-  private static CmpClientConf parse(InputStream configStream) throws CmpClientException {
+  private static CmpClientConf parse(File configFile) throws CmpClientException {
     CmpClientConf conf;
     try {
-      conf = JSON.parseObject(configStream, CmpClientConf.class);
+      conf = JSON.parseObject(configFile, CmpClientConf.class);
       conf.validate();
     } catch (InvalidConfException | IOException | RuntimeException ex) {
       throw new CmpClientException("parsing profile failed, message: " + ex.getMessage(), ex);
-    } finally {
-      try {
-        configStream.close();
-      } catch (IOException ex) {
-        LOG.warn("could not close confStream: {}", ex.getMessage());
-      }
     }
 
     return conf;

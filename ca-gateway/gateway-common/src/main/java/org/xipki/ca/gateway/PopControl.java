@@ -75,19 +75,7 @@ public class PopControl {
       throw new InvalidConfException("password is not defined in conf");
     }
 
-    InputStream is;
-    if (keystoreStr.startsWith("base64:")) {
-      byte[] bytes = Base64.decode(keystoreStr.substring("base64:".length()));
-      is = new ByteArrayInputStream(bytes);
-    } else {
-      try {
-        is = new FileInputStream(keystoreStr);
-      } catch (FileNotFoundException e) {
-        throw new InvalidConfException(e.getMessage(), e);
-      }
-    }
-
-    try {
+    try (InputStream is = getKeyStoreInputStream(keystoreStr)) {
       char[] password = passwordStr.toCharArray();
       KeyStore ks = KeyUtil.getInKeyStore(type);
       ks.load(is, password);
@@ -117,6 +105,19 @@ public class PopControl {
       throw new InvalidConfException("invalid dhStatic pop configuration", ex);
     }
   } // constructor
+
+  private InputStream getKeyStoreInputStream(String keystoreStr) throws InvalidConfException {
+    if (keystoreStr.startsWith("base64:")) {
+      byte[] bytes = Base64.decode(keystoreStr.substring("base64:".length()));
+      return new ByteArrayInputStream(bytes);
+    } else {
+      try {
+        return new FileInputStream(keystoreStr);
+      } catch (FileNotFoundException e) {
+        throw new InvalidConfException(e.getMessage(), e);
+      }
+    }
+  }
 
   public X509Cert[] getDhCertificates() {
     return (dhCerts == null || dhCerts.length == 0) ? null : Arrays.copyOf(dhCerts, dhCerts.length);

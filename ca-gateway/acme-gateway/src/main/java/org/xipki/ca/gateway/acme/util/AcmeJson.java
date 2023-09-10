@@ -23,13 +23,14 @@ import org.xipki.ca.gateway.acme.AcmeProtocolException;
 import org.xipki.ca.gateway.acme.type.AcmeError;
 import org.xipki.util.LogUtil;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.stream.Collectors.joining;
 
 /**
  * A model containing a JSON result. The content is immutable.
@@ -75,20 +76,6 @@ public final class AcmeJson implements Serializable {
      */
     public static AcmeJson parse(byte[] bytes) throws AcmeProtocolException {
         return parse(new String(bytes, UTF_8));
-    }
-
-    /**
-     * Parses JSON from an {@link InputStream}.
-     *
-     * @param in
-     *            {@link InputStream} to read from. Will be closed after use.
-     * @return {@link AcmeJson} of the read content.
-     */
-    public static AcmeJson parse(InputStream in) throws IOException, AcmeProtocolException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, UTF_8))) {
-            String json = reader.lines().map(String::trim).collect(joining());
-            return parse(json);
-        }
     }
 
     /**

@@ -173,6 +173,9 @@ public class CaConf {
     init(Files.newInputStream(confFile.toPath()), securityFactory);
   }
 
+  /**
+   * The specified stream is closed after this method call.
+   */
   public CaConf(InputStream confFileZipStream, SecurityFactory securityFactory)
       throws IOException, InvalidConfException, CaMgmtException {
     Args.notNull(confFileZipStream, "confFileZipStream");

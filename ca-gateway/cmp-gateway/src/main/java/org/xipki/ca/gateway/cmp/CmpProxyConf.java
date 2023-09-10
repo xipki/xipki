@@ -8,10 +8,8 @@ import org.xipki.security.util.JSON;
 import org.xipki.util.Args;
 import org.xipki.util.exception.InvalidConfException;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
  *
@@ -26,11 +24,9 @@ public class CmpProxyConf extends ProtocolProxyConf {
   public static CmpProxyConf readConfFromFile(String fileName)
       throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");
-    try (InputStream is = Files.newInputStream(Paths.get(fileName))) {
-      CmpProxyConf conf = JSON.parseObject(is, CmpProxyConf.class);
-      conf.validate();
-      return conf;
-    }
+    CmpProxyConf conf = JSON.parseObject(new File(fileName), CmpProxyConf.class);
+    conf.validate();
+    return conf;
   }
 
   public CmpControlConf getCmp() {

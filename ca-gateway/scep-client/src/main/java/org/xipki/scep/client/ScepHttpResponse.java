@@ -62,7 +62,7 @@ public class ScepHttpResponse {
     }
 
     try {
-      return IoUtil.readAndClose(content);
+      return IoUtil.readAllBytesAndClose(content);
     } catch (IOException ex) {
       throw new ScepClientException(ex);
     }

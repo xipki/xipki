@@ -34,10 +34,7 @@ import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.util.*;
 import org.xipki.util.exception.OperationException;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.net.SocketException;
 import java.sql.Connection;
@@ -1265,7 +1262,16 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public Map<String, X509Cert> loadConf(InputStream zippedConfStream) throws CaMgmtException {
+  public Map<String, X509Cert> loadConf(byte[] zippedConfBytes) throws CaMgmtException {
+    try (InputStream is = new ByteArrayInputStream(zippedConfBytes)) {
+      return confLoader.loadConf(is);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public Map<String, X509Cert> loadConfAndClose(InputStream zippedConfStream) throws CaMgmtException {
     return confLoader.loadConf(zippedConfStream);
   }
 

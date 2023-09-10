@@ -148,8 +148,8 @@ public abstract class DbPortWorker extends DbWorker {
       this.srcFolder = IoUtil.expandFilepath(srcFolder);
       this.batchEntriesPerCommit = batchEntriesPerCommit;
 
-      ConfigurableProperties props = DbPorter.getDbConfProperties(Files.newInputStream(
-                            Paths.get(IoUtil.expandFilepath(caDbFile))));
+      ConfigurableProperties props = DbPorter.getDbConfProperties(
+                            Paths.get(IoUtil.expandFilepath(caDbFile)));
       this.caDataSource = datasourceFactory.createDataSource("ds-" + caDbFile,
                             props, passwordResolver);
     }
@@ -235,8 +235,8 @@ public abstract class DbPortWorker extends DbWorker {
       this.numCertsPerSelect = numCertsPerSelect;
       checkDestFolder();
 
-      ConfigurableProperties props = DbPorter.getDbConfProperties(Files.newInputStream(
-          Paths.get(IoUtil.expandFilepath(caDbFile))));
+      ConfigurableProperties props = DbPorter.getDbConfProperties(
+          Paths.get(IoUtil.expandFilepath(caDbFile)));
       this.caDataSource = datasourceFactory.createDataSource("ds-" + caDbFile,
           props, passwordResolver);
     }

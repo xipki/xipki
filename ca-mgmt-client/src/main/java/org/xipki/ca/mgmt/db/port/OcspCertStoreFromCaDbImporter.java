@@ -17,8 +17,6 @@ import org.xipki.util.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -72,20 +70,15 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
   } // constructor
 
   public void importToDb() throws Exception {
-    CaCertstore certstore;
-    try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_CA_CERTSTORE))) {
-      certstore = JSON.parseObject(is, CaCertstore.class);
-    }
+    CaCertstore certstore = JSON.parseObject(Paths.get(baseDir, FILENAME_CA_CERTSTORE), CaCertstore.class);
     certstore.validate();
 
     if (certstore.getVersion() > VERSION_V2) {
       throw new Exception("could not import CertStore greater than " + VERSION_V2 + ": " + certstore.getVersion());
     }
 
-    CaCertstore.Caconf caconf;
-    try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_CA_CONFIGURATION))) {
-      caconf = JSON.parseObject(is, CaCertstore.Caconf.class);
-    }
+    CaCertstore.Caconf caconf = JSON.parseObject(Paths.get(baseDir, FILENAME_CA_CONFIGURATION),
+        CaCertstore.Caconf.class);
     caconf.validate();
 
     if (caconf.getVersion() > VERSION_V2) {
@@ -314,7 +307,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
     CaCertstore.Certs certs;
     try {
-      certs = JSON.parseObject(zipFile.getInputStream(certsEntry), CaCertstore.Certs.class);
+      certs = JSON.parseObjectAndClose(zipFile.getInputStream(certsEntry), CaCertstore.Certs.class);
     } catch (Exception ex) {
       try {
         zipFile.close();
@@ -359,7 +352,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
             String filename = cert.getFile();
 
             // rawcert
-            byte[] encodedCert = IoUtil.readAndClose(zipFile.getInputStream(zipFile.getEntry(filename)));
+            byte[] encodedCert = IoUtil.readAllBytesAndClose(zipFile.getInputStream(zipFile.getEntry(filename)));
             String certhash = certhashAlgo.base64Hash(encodedCert);
 
             TBSCertificate tbsCert;

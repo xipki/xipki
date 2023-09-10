@@ -15,7 +15,6 @@ import org.xipki.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -72,9 +71,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     OcspCertstore certstore;
     Path path = Paths.get(baseDir, FILENAME_OCSP_CERTSTORE);
     if (resume) {
-      try (InputStream is = Files.newInputStream(path)) {
-        certstore = JSON.parseObject(is, OcspCertstore.class);
-      }
+      certstore = JSON.parseObject(path, OcspCertstore.class);
       certstore.validate();
 
       if (certstore.getVersion() > VERSION_V2) {

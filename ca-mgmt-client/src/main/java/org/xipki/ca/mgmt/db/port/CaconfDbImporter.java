@@ -13,8 +13,6 @@ import org.xipki.util.Base64;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
@@ -39,10 +37,7 @@ class CaconfDbImporter extends DbPorter {
   CaconfDbImporter(DataSourceWrapper datasource, String srcDir, AtomicBoolean stopMe)
       throws DataAccessException, IOException, InvalidConfException {
     super(datasource, srcDir, stopMe);
-
-    try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_CA_CONFIGURATION))) {
-      caconf = JSON.parseObject(is, CaCertstore.Caconf.class);
-    }
+    caconf = JSON.parseObject(Paths.get(baseDir, FILENAME_OCSP_CERTSTORE), CaCertstore.Caconf.class);
     caconf.validate();
   }
 

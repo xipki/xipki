@@ -33,7 +33,6 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 import org.xipki.util.exception.BadCertTemplateException;
 
-import java.io.ByteArrayInputStream;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -110,7 +109,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     X509ProfileType conf;
     try {
       byte[] bytes = StringUtil.toUtf8Bytes(data);
-      conf = X509ProfileType.parse(new ByteArrayInputStream(bytes));
+      conf = X509ProfileType.parse(bytes);
     } catch (RuntimeException ex) {
       LogUtil.error(LOG, ex);
       throw new CertprofileException("caught RuntimeException while parsing certprofile: " + ex.getMessage());
