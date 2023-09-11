@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.JSON;
+import org.xipki.security.util.CBOR;
 
 /**
  *
@@ -24,7 +24,7 @@ public class TransactionIdRequest extends SdkRequest {
   }
 
   public static TransactionIdRequest decode(byte[] encoded) {
-    return JSON.parseObject(encoded, TransactionIdRequest.class);
+    return CBOR.parseObject(encoded, TransactionIdRequest.class);
   }
 
 }

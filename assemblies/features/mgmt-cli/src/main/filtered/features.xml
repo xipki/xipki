@@ -6,7 +6,10 @@
     <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:com.google.code.gson/gson/${gson.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${jackson.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/${jackson.version}</bundle>
     <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle>mvn:net.lingala.zip4j/zip4j/${zip4j.version}</bundle>
     <bundle>mvn:org.osgi/org.osgi.service.jdbc/1.0.0</bundle>
@@ -26,7 +29,10 @@
     <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:com.google.code.gson/gson/${gson.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${jackson.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/${jackson.version}</bundle>
     <bundle>mvn:org.xipki.commons/password/${xipki.commons.version}</bundle>
     <bundle>mvn:org.xipki.commons/util/${xipki.commons.version}</bundle>
     <bundle>mvn:org.xipki.commons/security/${xipki.commons.version}</bundle>

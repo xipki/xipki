@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.JSON;
+import org.xipki.security.util.CBOR;
 
 /**
  *
@@ -14,7 +14,7 @@ import org.xipki.security.util.JSON;
 public abstract class SdkMessage {
 
   public byte[] encode() {
-    return JSON.toJSONBytes(this);
+    return CBOR.toBytes(this);
   }
 
 }

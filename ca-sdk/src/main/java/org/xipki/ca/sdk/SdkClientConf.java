@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.JSON;
+import org.xipki.security.util.CBOR;
 import org.xipki.util.IoUtil;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.SslConf;
@@ -46,7 +46,7 @@ public class SdkClientConf {
   }
 
   public static SdkClientConf decode(byte[] encoded) throws InvalidConfException {
-    SdkClientConf conf = JSON.parseObject(encoded, SdkClientConf.class);
+    SdkClientConf conf = CBOR.parseObject(encoded, SdkClientConf.class);
     conf.validate();
     return conf;
   }

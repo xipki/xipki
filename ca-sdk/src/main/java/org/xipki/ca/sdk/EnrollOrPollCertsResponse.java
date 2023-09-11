@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.JSON;
+import org.xipki.security.util.CBOR;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
   }
 
   public static EnrollOrPollCertsResponse decode(byte[] encoded) {
-    return JSON.parseObject(encoded, EnrollOrPollCertsResponse.class);
+    return CBOR.parseObject(encoded, EnrollOrPollCertsResponse.class);
   }
 
 }

@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.JSON;
+import org.xipki.security.util.CBOR;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -27,7 +27,7 @@ public class UnsuspendOrRemoveRequest extends CaIdentifierRequest {
   }
 
   public static UnsuspendOrRemoveRequest decode(byte[] encoded) {
-    return JSON.parseObject(encoded, UnsuspendOrRemoveRequest.class);
+    return CBOR.parseObject(encoded, UnsuspendOrRemoveRequest.class);
   }
 
 }

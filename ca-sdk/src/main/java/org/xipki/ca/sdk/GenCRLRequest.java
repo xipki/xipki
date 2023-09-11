@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.JSON;
+import org.xipki.security.util.CBOR;
 
 /**
  *
@@ -27,7 +27,7 @@ public class GenCRLRequest extends SdkRequest {
   }
 
   public static GenCRLRequest decode(byte[] encoded) {
-    return JSON.parseObject(encoded, GenCRLRequest.class);
+    return CBOR.parseObject(encoded, GenCRLRequest.class);
   }
 
 }

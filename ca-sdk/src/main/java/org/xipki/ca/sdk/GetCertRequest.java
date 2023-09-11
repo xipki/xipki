@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.JSON;
+import org.xipki.security.util.CBOR;
 
 import java.math.BigInteger;
 
@@ -39,7 +39,7 @@ public class GetCertRequest extends SdkRequest {
   }
 
   public static GetCertRequest decode(byte[] encoded) {
-    return JSON.parseObject(encoded, GetCertRequest.class);
+    return CBOR.parseObject(encoded, GetCertRequest.class);
   }
 
 }

@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.JSON;
+import org.xipki.security.util.CBOR;
 import org.xipki.util.exception.ErrorCode;
 
 /**
@@ -55,7 +55,7 @@ public class ErrorResponse extends SdkResponse {
   }
 
   public static ErrorResponse decode(byte[] encoded) {
-    return JSON.parseObject(encoded, ErrorResponse.class);
+    return CBOR.parseObject(encoded, ErrorResponse.class);
   }
 
   @Override

@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.JSON;
+import org.xipki.security.util.CBOR;
 
 /**
  *
@@ -44,7 +44,7 @@ public class CertprofileInfoResponse extends SdkResponse {
   }
 
   public static CertprofileInfoResponse decode(byte[] encoded) {
-    return JSON.parseObject(encoded, CertprofileInfoResponse.class);
+    return CBOR.parseObject(encoded, CertprofileInfoResponse.class);
   }
 
 }

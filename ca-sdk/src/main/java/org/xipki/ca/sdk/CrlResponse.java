@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.JSON;
+import org.xipki.security.util.CBOR;
 
 /**
  * Response containing the CRL.
@@ -25,7 +25,7 @@ public class CrlResponse extends SdkResponse {
   }
 
   public static CrlResponse decode(byte[] encoded) {
-    return JSON.parseObject(encoded, CrlResponse.class);
+    return CBOR.parseObject(encoded, CrlResponse.class);
   }
 
 }

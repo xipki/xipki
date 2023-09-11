@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.JSON;
+import org.xipki.security.util.CBOR;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
   }
 
   public static RevokeCertsRequest decode(byte[] encoded) {
-    return JSON.parseObject(encoded, RevokeCertsRequest.class);
+    return CBOR.parseObject(encoded, RevokeCertsRequest.class);
   }
 
 }

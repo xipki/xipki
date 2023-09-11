@@ -10,6 +10,7 @@ import org.xipki.ca.sdk.SdkResponse;
 import org.xipki.ca.server.SdkResponder;
 import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.util.Args;
+import org.xipki.util.Base64;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.exception.ErrorCode;
@@ -94,13 +95,13 @@ public class HttpRaServlet extends HttpServlet {
       }
 
       resp.setStatus(httpStatus);
-      resp.setContentType("application/json");
+      resp.setContentType("application/cbor");
 
       if (logReqResp && LOG.isDebugEnabled()) {
-        String respBodyStr = respBody == null ? null : new String(respBody);
+        String respBodyStr = respBody == null ? null : Base64.encodeToString(respBody, true);
         if (viaPost) {
           LOG.debug("HTTP POST CA REST path: {}\nRequest:\n{}\nResponse:\n{}", req.getRequestURI(),
-              new String(requestBytes), respBodyStr);
+              Base64.encodeToString(requestBytes, true), respBodyStr);
         } else {
           LOG.debug("HTTP GET CA REST path: {}\nResponse:\n{}", req.getRequestURI(), respBodyStr);
         }

@@ -4,7 +4,7 @@
 package org.xipki.ca.sdk;
 
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.security.util.JSON;
+import org.xipki.security.util.CBOR;
 import org.xipki.security.util.X509Util;
 
 import java.io.IOException;
@@ -77,7 +77,7 @@ public class CaIdentifierRequest extends SdkRequest{
   }
 
   public static CaIdentifierRequest decode(byte[] encoded) {
-    return JSON.parseObject(encoded, CaIdentifierRequest.class);
+    return CBOR.parseObject(encoded, CaIdentifierRequest.class);
   }
 
 }

@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.JSON;
+import org.xipki.security.util.CBOR;
 
 /**
  * Response containing the certificate chain.
@@ -25,7 +25,7 @@ public class CertChainResponse extends SdkResponse {
   }
 
   public static CertChainResponse decode(byte[] encoded) {
-    return JSON.parseObject(encoded, CertChainResponse.class);
+    return CBOR.parseObject(encoded, CertChainResponse.class);
   }
 
 }

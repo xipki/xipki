@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.JSON;
+import org.xipki.security.util.CBOR;
 
 /**
  *
@@ -27,7 +27,7 @@ public class PayloadResponse extends SdkResponse {
   }
 
   public static PayloadResponse decode(byte[] encoded) {
-    return JSON.parseObject(encoded, PayloadResponse.class);
+    return CBOR.parseObject(encoded, PayloadResponse.class);
   }
 
 }

@@ -30,7 +30,7 @@ import static org.xipki.ca.sdk.SdkConstants.*;
 
 public class SdkClient {
 
-  private static final String CONTENT_TYPE_JSON = "application/json";
+  private static final String CONTENT_TYPE_CBOR = "application/cbor";
 
   private final String serverUrl;
 
@@ -49,7 +49,7 @@ public class SdkClient {
 
   public byte[] send(String ca, String command, SdkRequest request)
       throws IOException, SdkErrorResponseException {
-    String ct = request == null ? null : CONTENT_TYPE_JSON;
+    String ct = request == null ? null : CONTENT_TYPE_CBOR;
     HttpRespContent resp;
 
     String prefix = ca == null ? serverUrl + "-/" : serverUrl + ca + "/";
@@ -57,7 +57,7 @@ public class SdkClient {
     if (request == null) {
       resp = client.httpGet(prefix + command);
     } else {
-      resp = client.httpPost(prefix + command, ct, request.encode(), CONTENT_TYPE_JSON);
+      resp = client.httpPost(prefix + command, ct, request.encode(), CONTENT_TYPE_CBOR);
     }
 
     if (resp.isOK()) {

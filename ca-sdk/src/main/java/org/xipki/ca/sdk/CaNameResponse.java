@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.JSON;
+import org.xipki.security.util.CBOR;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class CaNameResponse extends SdkResponse {
   }
 
   public static CaNameResponse decode(byte[] encoded) {
-    return JSON.parseObject(encoded, CaNameResponse.class);
+    return CBOR.parseObject(encoded, CaNameResponse.class);
   }
 
 }

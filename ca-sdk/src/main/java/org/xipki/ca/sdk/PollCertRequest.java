@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.JSON;
+import org.xipki.security.util.CBOR;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class PollCertRequest extends CaIdentifierRequest {
   }
 
   public static PollCertRequest decode(byte[] encoded) {
-    return JSON.parseObject(encoded, PollCertRequest.class);
+    return CBOR.parseObject(encoded, PollCertRequest.class);
   }
 
 }
