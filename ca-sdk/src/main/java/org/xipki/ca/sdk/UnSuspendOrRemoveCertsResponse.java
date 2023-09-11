@@ -3,8 +3,6 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.CBOR;
-
 import java.util.List;
 
 /**

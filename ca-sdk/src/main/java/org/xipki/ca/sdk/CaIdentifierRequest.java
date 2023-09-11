@@ -4,7 +4,6 @@
 package org.xipki.ca.sdk;
 
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.security.util.CBOR;
 import org.xipki.security.util.X509Util;
 
 import java.io.IOException;

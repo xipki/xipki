@@ -3,7 +3,6 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.CBOR;
 import org.xipki.util.IoUtil;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.SslConf;

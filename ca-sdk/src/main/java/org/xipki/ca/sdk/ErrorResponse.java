@@ -3,7 +3,6 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.util.CBOR;
 import org.xipki.util.exception.ErrorCode;
 
 /**
