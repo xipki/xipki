@@ -131,14 +131,14 @@
 		"retentionInterval":0,
 		"minNextUpdatePeriod":"1d",
 		"updateInterval":"10m",
-		"startupDelay":1,
 		"source":{
 			"datasource":"datasource-crl",
 			"type":"crl",
 			"conf":{
 				"dir":"crls/example-crls",
 				"sqlBatchCommit":1000,
-				"ignoreExpiredCrls":true
+				"ignoreExpiredCrls":true,
+				"startupDelay":5
 			}
 		},
 		"unknownCertBehaviour":"good"

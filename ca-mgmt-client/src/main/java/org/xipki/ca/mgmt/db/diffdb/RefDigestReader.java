@@ -17,7 +17,10 @@ import org.xipki.util.StringUtil;
 
 import java.io.Closeable;
 import java.math.BigInteger;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -212,7 +215,7 @@ class RefDigestReader implements Closeable {
       throws Exception {
     Args.notNull(datasource, "datasource");
 
-    Statement stmt = null;
+    PreparedStatement stmt = null;
     ResultSet rs = null;
     String sql = null;
 
@@ -221,13 +224,13 @@ class RefDigestReader implements Closeable {
     long minId;
 
     try {
-      stmt = datasource.createStatement();
-
       String tblCa = (dbType == DbType.XIPKI_OCSP_v4) ? "ISSUER" : "CA";
       String colCaId = (dbType == DbType.XIPKI_OCSP_v4) ? "IID" : "CA_ID";
 
       sql = "SELECT CERT FROM " + tblCa + " WHERE ID=" + caId;
-      rs = stmt.executeQuery(sql);
+      stmt = datasource.prepareStatement(sql);
+
+      rs = stmt.executeQuery();
       if (!rs.next()) {
         throw new IllegalArgumentException("no CA with id '" + caId + "' is available");
       }
@@ -316,7 +319,7 @@ class RefDigestReader implements Closeable {
     }
   } // method close
 
-  protected void releaseResources(Statement ps, ResultSet rs) {
+  protected void releaseResources(PreparedStatement ps, ResultSet rs) {
     datasource.releaseResources(ps, rs);
   }
 

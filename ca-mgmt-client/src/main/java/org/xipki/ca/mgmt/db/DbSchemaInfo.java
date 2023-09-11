@@ -7,9 +7,9 @@ import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.Args;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,16 +31,16 @@ public class DbSchemaInfo {
 
     final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
 
-    Statement stmt = null;
+    PreparedStatement stmt = null;
     ResultSet rs = null;
 
     try {
-      stmt = datasource.createStatement();
+      stmt = datasource.prepareStatement(sql);
       if (stmt == null) {
         throw new DataAccessException("could not create statement");
       }
 
-      rs = stmt.executeQuery(sql);
+      rs = stmt.executeQuery();
       while (rs.next()) {
         variables.put(rs.getString("NAME"), rs.getString("VALUE2"));
       }

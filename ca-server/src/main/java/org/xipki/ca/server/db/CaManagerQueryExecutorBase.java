@@ -70,14 +70,6 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     return datasource.buildSelectFirstSql(1, coreSql);
   }
 
-  private Statement createStatement() throws CaMgmtException {
-    try {
-      return datasource.createStatement();
-    } catch (DataAccessException ex) {
-      throw new CaMgmtException(ex);
-    }
-  } // method createStatement
-
   private PreparedStatement prepareStatement(String sql) throws CaMgmtException {
     try {
       return datasource.prepareStatement(sql);
@@ -299,13 +291,13 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
 
   protected Map<Integer, String> getIdNameMap(String tableName) throws CaMgmtException {
     final String sql = concat("SELECT ID,NAME FROM ", tableName);
-    Statement ps = null;
+    PreparedStatement ps = null;
     ResultSet rs = null;
 
     Map<Integer, String> ret = new HashMap<>();
     try {
-      ps = createStatement();
-      rs = ps.executeQuery(sql);
+      ps = prepareStatement(sql);
+      rs = ps.executeQuery();
       while (rs.next()) {
         ret.put(rs.getInt("ID"), rs.getString("NAME"));
       }

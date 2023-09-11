@@ -1,6 +1,7 @@
 {
-	// If set to true, please set writer.level to debug in the file META-INF/classes/log4j2.properties.
-	"logReqResp":false,
+	// To activate the logging of requests and responses, set writer.level to DEBUG
+	// in the file META-INF/classes/log4j2.properties.
+	"logReqResp":true,
 	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
 	"pop":{
 		"sigAlgos":[

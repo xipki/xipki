@@ -30,7 +30,6 @@ import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -358,7 +357,7 @@ public class EjbcaCertStatusStore extends OcspStore {
   } // method getCertStatus0
 
   /**
-   * Borrow Prepared Statement.
+   * Borrow PreparedStatement.
    * @return the next idle preparedStatement, {@code null} will be returned if no
    *     PreparedStatement can be created within 5 seconds.
    */
@@ -393,7 +392,7 @@ public class EjbcaCertStatusStore extends OcspStore {
     }
   } // method isHealthy
 
-  private void releaseDbResources(Statement ps, ResultSet rs) {
+  private void releaseDbResources(PreparedStatement ps, ResultSet rs) {
     datasource.releaseResources(ps, rs);
   }
 

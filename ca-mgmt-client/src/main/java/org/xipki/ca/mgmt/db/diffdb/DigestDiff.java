@@ -18,9 +18,9 @@ import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -108,12 +108,12 @@ class DigestDiff {
 
     String refSql = (refDbType == DbType.XIPKI_OCSP_v4) ? "SELECT ID FROM ISSUER" : "SELECT ID FROM CA";
 
-    Statement refStmt = null;
+    PreparedStatement refStmt = null;
     try {
-      refStmt = refDatasource.createStatement();
+      refStmt = refDatasource.prepareStatement(refSql);
       ResultSet refRs = null;
       try {
-        refRs = refStmt.executeQuery(refSql);
+        refRs = refStmt.executeQuery();
         while (refRs.next()) {
           int id = refRs.getInt(1);
           refCaIds.add(id);
@@ -209,11 +209,11 @@ class DigestDiff {
     // get a list of available CAs in the target database
     String sql = "SELECT ID,CERT FROM " + (dbType == DbType.XIPKI_OCSP_v4 ? "ISSUER" : "CA");
 
-    Statement stmt = datasource.createStatement();
+    PreparedStatement stmt = datasource.prepareStatement(sql);
     Map<Integer, byte[]> caIdCertMap = new HashMap<>(5);
     ResultSet rs = null;
     try {
-      rs = stmt.executeQuery(sql);
+      rs = stmt.executeQuery();
       while (rs.next()) {
         caIdCertMap.put(rs.getInt("ID"), Base64.decodeFast(rs.getString("CERT")));
       }

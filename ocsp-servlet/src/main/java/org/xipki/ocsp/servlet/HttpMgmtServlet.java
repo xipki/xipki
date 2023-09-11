@@ -96,7 +96,7 @@ public class HttpMgmtServlet extends HttpServlet {
         } catch (InvalidConfException | PasswordResolverException ex) {
           LOG.warn(action + ": could not restart OCSP server", ex);
           throw new MyException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-              "could not build the CaEntry: " + ex.getMessage());
+              "could not restart OCSP server: " + ex.getMessage());
         }
       } else {
           throw new MyException(HttpServletResponse.SC_NOT_FOUND, "unsupported action " + action);

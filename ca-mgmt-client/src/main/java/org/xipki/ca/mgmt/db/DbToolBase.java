@@ -54,14 +54,6 @@ public class DbToolBase implements Closeable {
     this.baseDir = IoUtil.expandFilepath(baseDir);
   } // constructor
 
-  protected Statement createStatement() throws DataAccessException {
-    try {
-      return connection.createStatement();
-    } catch (SQLException ex) {
-      throw datasource.translate(null, ex);
-    }
-  }
-
   protected PreparedStatement prepareStatement(String sql) throws DataAccessException {
     try {
       return connection.prepareStatement(sql);
@@ -73,16 +65,16 @@ public class DbToolBase implements Closeable {
   public boolean deleteFromTableWithLargerId(String table, String idColumn, long id, Logger log) {
     String sql = StringUtil.concatObjects("DELETE FROM ", table, " WHERE ", idColumn, ">", id);
 
-    Statement stmt;
+    PreparedStatement stmt;
     try {
-      stmt = createStatement();
+      stmt = prepareStatement(sql);
     } catch (DataAccessException ex) {
       log.error("could not create statement", ex);
       return false;
     }
 
     try {
-      stmt.execute(sql);
+      stmt.execute();
     } catch (Throwable th) {
       LogUtil.error(log, th, String.format("could not delete columns from table %s with %s > %s", table, idColumn, id));
       return false;
@@ -255,7 +247,7 @@ public class DbToolBase implements Closeable {
     return zipOutStream;
   } // method getZipOutputStream
 
-  public void releaseResources(Statement ps, ResultSet rs) {
+  public void releaseResources(PreparedStatement ps, ResultSet rs) {
     datasource.releaseResources(ps, rs, false);
   }
 

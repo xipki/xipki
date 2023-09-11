@@ -68,7 +68,6 @@
 		"minNextUpdatePeriod":"1d",
 		"unknownCertBehaviour":"good",
 		"updateInterval":"10m",
-		"startupDelay":5,
 		"source":{
 			"datasource":"datasource1",
 			"type":"crl",
@@ -83,7 +82,8 @@
 				// and configure it in the following property "dir".
 				"dir":"crls/example-crlstore",
 				"ignoreExpiredCrls":true,
-				"sqlBatchCommit":1000
+				"sqlBatchCommit":1000,
+				"startupDelay":5
 			}
 		}
 	}]

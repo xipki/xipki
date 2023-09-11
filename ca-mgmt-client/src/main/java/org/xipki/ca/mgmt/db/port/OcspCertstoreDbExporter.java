@@ -23,7 +23,6 @@ import java.nio.file.StandardOpenOption;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.Clock;
 import java.util.LinkedList;
 import java.util.List;
@@ -120,12 +119,11 @@ class OcspCertstoreDbExporter extends DbPorter {
     certstore.setIssuers(issuers);
     final String sql = "SELECT ID,CERT,REV_INFO,CRL_ID FROM ISSUER";
 
-    Statement stmt = null;
+    PreparedStatement stmt = null;
     ResultSet rs = null;
-
     try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
+      stmt = prepareStatement(sql);
+      rs = stmt.executeQuery();
 
       while (rs.next()) {
         int id = rs.getInt("ID");
@@ -161,12 +159,11 @@ class OcspCertstoreDbExporter extends DbPorter {
     certstore.setCrlInfos(crlInfos);
     final String sql = "SELECT ID,NAME,INFO FROM CRL_INFO";
 
-    Statement stmt = null;
+    PreparedStatement stmt = null;
     ResultSet rs = null;
-
     try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
+      stmt = prepareStatement(sql);
+      rs = stmt.executeQuery();
 
       while (rs.next()) {
         OcspCertstore.CrlInfo crlInfo = new OcspCertstore.CrlInfo();

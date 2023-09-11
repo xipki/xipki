@@ -46,7 +46,7 @@ bcutil-*.jar,\
 ca-*.jar,\
 certprofile-*.jar,\
 datasource-*.jar,\
-gson-*.jar,\
+jackson-*.jar,\
 HikariCP-*.jar,\
 license-*,jar,\
 log4j-*.jar,\

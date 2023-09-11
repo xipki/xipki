@@ -49,7 +49,7 @@ animal-sniffer-annotations*.jar,\
 bcpkix-*.jar,\
 bcprov-*.jar,\
 bcutil-*.jar,\
-gson-*.jar,\
+jackson-*.jar,\
 log4j-*.jar,\
 security-*.jar,\
 slf4j-*.jar,\

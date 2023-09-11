@@ -24,19 +24,17 @@
 			"certchain":[{
 				"file":"output/rootca1.crt"
 			}],
-			"ctlog-control":{
+			"ctlogControl":{
 				"enabled":true,
 				"sslcontext.name":"localhost",
 				"servers":"https://localhost/ctlog/"
 			},
-			"cmpResponderName":"responder1",
 			"keypairGenNames":["software"],
 			"expirationPeriod":365,
 			"keepExpiredCertDays":-1,
 			"maxValidity":"5y",
 			"nextCrlNo":2,
 			"permissions":["all"],
-			"protocolSupport":["cmp","rest"],
 			"revokeSuspendedControl":{
 				"enabled":true,
 				"targetReason":"cessationOfOperation",

@@ -14,7 +14,10 @@ import org.xipki.util.StringUtil;
 import java.io.Closeable;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -336,7 +339,7 @@ class TargetDigestReader implements Closeable {
     }
   } // method getSingleCert
 
-  private void releaseResources(Statement ps, ResultSet rs) {
+  private void releaseResources(PreparedStatement ps, ResultSet rs) {
     datasource.releaseResources(ps, rs);
   }
 

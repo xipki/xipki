@@ -127,7 +127,7 @@ public class CaUris {
         StringUtil.split(pairs.value(NAME_DELTACRL_URIS), "|"));
   } // method decode
 
-  public String getEncoded() {
+  public String encode() {
     ConfPairs pairs = new ConfPairs();
     if (!CollectionUtil.isEmpty(cacertUris)) {
       String str = StringUtil.collectionAsString(cacertUris, "|");

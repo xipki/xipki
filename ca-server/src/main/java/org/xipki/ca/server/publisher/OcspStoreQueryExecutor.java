@@ -20,7 +20,10 @@ import org.xipki.util.exception.OperationException;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -128,16 +131,16 @@ class OcspStoreQueryExecutor {
     final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
 
     Map<String, String> variables = new HashMap<>();
-    Statement stmt = null;
+    PreparedStatement stmt = null;
     ResultSet rs = null;
 
     try {
-      stmt = datasource.createStatement();
+      stmt = datasource.prepareStatement(sql);
       if (stmt == null) {
         throw new DataAccessException("could not create statement");
       }
 
-      rs = stmt.executeQuery(sql);
+      rs = stmt.executeQuery();
       while (rs.next()) {
         String name = rs.getString("NAME");
         String value = rs.getString("VALUE2");

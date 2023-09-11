@@ -1150,9 +1150,9 @@ class ImportCrl {
       throws DataAccessException {
     // remove the unmodified entries
     String sql = "DELETE FROM CERT WHERE CRL_ID=" + crlInfoId + " AND LUPDATE<" + timeSec;
-    Statement stmt = datasource.createStatement(conn);
+    PreparedStatement stmt = datasource.prepareStatement(conn, sql);
     try {
-      stmt.executeUpdate(sql);
+      stmt.executeUpdate();
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);
     } finally {
@@ -1160,7 +1160,7 @@ class ImportCrl {
     }
   } // method deleteEntriesNotUpdatedSince
 
-  private void releaseResources(Statement ps, ResultSet rs) {
+  private void releaseResources(PreparedStatement ps, ResultSet rs) {
     datasource.releaseResources(ps, rs, false);
   }
 

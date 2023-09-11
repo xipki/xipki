@@ -16,9 +16,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,12 +70,12 @@ class CaconfDbExporter extends DbPorter {
     List<CaCertstore.Caalias> caaliases = new LinkedList<>();
     final String sql = "SELECT NAME,CA_ID FROM CAALIAS";
 
-    Statement stmt = null;
+    PreparedStatement stmt = null;
     ResultSet rs = null;
     boolean succ = false;
     try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
+      stmt = prepareStatement(sql);
+      rs = stmt.executeQuery();
 
       while (rs.next()) {
         CaCertstore.Caalias caalias = new CaCertstore.Caalias();
@@ -104,11 +104,11 @@ class CaconfDbExporter extends DbPorter {
     List<CaCertstore.IdNameTypeConf> requestors = new LinkedList<>();
     final String sql = "SELECT ID,NAME,TYPE,CONF FROM REQUESTOR";
 
-    Statement stmt = null;
+    PreparedStatement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
+      stmt = prepareStatement(sql);
+      rs = stmt.executeQuery();
 
       while (rs.next()) {
         String name = rs.getString("NAME");
@@ -139,11 +139,11 @@ class CaconfDbExporter extends DbPorter {
     List<CaCertstore.DbSchemaEntry> entries = new LinkedList<>();
     final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
 
-    Statement stmt = null;
+    PreparedStatement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
+      stmt = prepareStatement(sql);
+      rs = stmt.executeQuery();
 
       while (rs.next()) {
         CaCertstore.DbSchemaEntry entry = new CaCertstore.DbSchemaEntry();
@@ -170,11 +170,11 @@ class CaconfDbExporter extends DbPorter {
     List<CaCertstore.Signer> signers = new LinkedList<>();
     final String sql = "SELECT NAME,TYPE,CONF,CERT FROM SIGNER";
 
-    Statement stmt = null;
+    PreparedStatement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
+      stmt = prepareStatement(sql);
+      rs = stmt.executeQuery();
 
       while (rs.next()) {
         String name = rs.getString("NAME");
@@ -207,11 +207,11 @@ class CaconfDbExporter extends DbPorter {
     List<CaCertstore.NameTypeConf> keypairGens = new LinkedList<>();
     final String sql = "SELECT NAME,TYPE,CONF FROM KEYPAIR_GEN";
 
-    Statement stmt = null;
+    PreparedStatement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
+      stmt = prepareStatement(sql);
+      rs = stmt.executeQuery();
 
       while (rs.next()) {
         String name = rs.getString("NAME");
@@ -241,11 +241,11 @@ class CaconfDbExporter extends DbPorter {
     List<CaCertstore.IdNameTypeConf> publishers = new LinkedList<>();
     final String sql = "SELECT ID,NAME,TYPE,CONF FROM PUBLISHER";
 
-    Statement stmt = null;
+    PreparedStatement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
+      stmt = prepareStatement(sql);
+      rs = stmt.executeQuery();
 
       while (rs.next()) {
         String name = rs.getString("NAME");
@@ -278,11 +278,11 @@ class CaconfDbExporter extends DbPorter {
     List<CaCertstore.IdNameTypeConf> profiles = new LinkedList<>();
     final String sql = "SELECT ID,NAME,TYPE,CONF FROM PROFILE";
 
-    Statement stmt = null;
+    PreparedStatement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
+      stmt = prepareStatement(sql);
+      rs = stmt.executeQuery();
 
       while (rs.next()) {
         String name = rs.getString("NAME");
@@ -328,11 +328,11 @@ class CaconfDbExporter extends DbPorter {
 
     final String sql = columns + " FROM CA";
 
-    Statement stmt = null;
+    PreparedStatement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
+      stmt = prepareStatement(sql);
+      rs = stmt.executeQuery();
 
       while (rs.next()) {
         CaCertstore.Ca ca = new CaCertstore.Ca();
@@ -424,11 +424,11 @@ class CaconfDbExporter extends DbPorter {
     List<CaCertstore.CaHasRequestor> caHasRequestors = new LinkedList<>();
     final String sql = "SELECT CA_ID,REQUESTOR_ID,PERMISSION,PROFILES FROM CA_HAS_REQUESTOR";
 
-    Statement stmt = null;
+    PreparedStatement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
+      stmt = prepareStatement(sql);
+      rs = stmt.executeQuery();
 
       while (rs.next()) {
         CaCertstore.CaHasRequestor caHasRequestor = new CaCertstore.CaHasRequestor();
@@ -458,11 +458,11 @@ class CaconfDbExporter extends DbPorter {
     List<CaCertstore.CaHasPublisher> caHasPublishers = new LinkedList<>();
     final String sql = "SELECT CA_ID,PUBLISHER_ID FROM CA_HAS_PUBLISHER";
 
-    Statement stmt = null;
+    PreparedStatement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
+      stmt = prepareStatement(sql);
+      rs = stmt.executeQuery();
 
       while (rs.next()) {
         CaCertstore.CaHasPublisher caHasPublisher = new CaCertstore.CaHasPublisher();
@@ -490,11 +490,11 @@ class CaconfDbExporter extends DbPorter {
     List<CaCertstore.CaHasProfile> caHasProfiles = new LinkedList<>();
     final String sql = "SELECT CA_ID,PROFILE_ID FROM CA_HAS_PROFILE";
 
-    Statement stmt = null;
+    PreparedStatement stmt = null;
     ResultSet rs = null;
     try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
+      stmt = prepareStatement(sql);
+      rs = stmt.executeQuery();
 
       while (rs.next()) {
         CaCertstore.CaHasProfile caHasProfile = new CaCertstore.CaHasProfile();

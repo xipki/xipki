@@ -75,7 +75,7 @@
                       tofile="${project.build.directory}/t/xipki-mgmt-cli"/>
 
                 <java failonerror="true" classname="org.xipki.apppackage.CompressPackage">
-                  <arg value="${project.basedir}/src/assembly/descriptors/package-conf.json"/>
+                  <arg value="${project.basedir}/src/assembly/descriptors/package-conf.properties"/>
                   <arg value="${project.build.directory}/t"/>
                   <arg value="${project.build.directory}/t2"/>
                 </java>

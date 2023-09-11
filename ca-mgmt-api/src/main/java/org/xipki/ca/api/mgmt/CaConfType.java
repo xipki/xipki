@@ -243,7 +243,7 @@ public class CaConfType {
 
     private boolean saveCert = true;
 
-    private boolean saveKeyPair;
+    private boolean saveKeypair;
 
     private String signerType;
 
@@ -379,12 +379,12 @@ public class CaConfType {
       this.saveCert = saveCert;
     }
 
-    public boolean isSaveKeyPair() {
-      return saveKeyPair;
+    public boolean isSaveKeypair() {
+      return saveKeypair;
     }
 
-    public void setSaveKeyPair(boolean saveKeyPair) {
-      this.saveKeyPair = saveKeyPair;
+    public void setSaveKeypair(boolean saveKeypair) {
+      this.saveKeypair = saveKeypair;
     }
 
     public String getSignerType() {

@@ -30,7 +30,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skipDeploy>false</skipDeploy>
-    <xipki.tools.version>1.0.8</xipki.tools.version>
+    <xipki.tools.version>1.0.9-SNAPSHOT</xipki.tools.version>
     <xipki.commons.version>6.3.1-SNAPSHOT</xipki.commons.version>
     <servlet.version>3.1.0</servlet.version>
     <karaf.version>4.4.3</karaf.version>
@@ -39,7 +39,7 @@
     <slf4j.version>1.7.32</slf4j.version>
     <pkcs11wrapper.version>1.0.6</pkcs11wrapper.version>
     <hikaricp.version>4.0.3</hikaricp.version>
-    <gson.version>2.10.1</gson.version>
+    <jackson.version>2.15.2</jackson.version>
     <zip4j.version>2.11.5</zip4j.version>
     <jose4j.version>0.9.3</jose4j.version>
     <dnsjava.version>3.5.2</dnsjava.version>
@@ -385,11 +385,6 @@
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-slf4j-impl</artifactId>
         <version>${log4j.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.code.gson</groupId>
-        <artifactId>gson</artifactId>
-        <version>${gson.version}</version>
       </dependency>
       <dependency>
         <groupId>net.lingala.zip4j</groupId>

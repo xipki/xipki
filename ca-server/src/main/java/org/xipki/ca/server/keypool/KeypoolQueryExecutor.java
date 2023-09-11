@@ -13,7 +13,6 @@ import org.xipki.util.LogUtil;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -43,13 +42,13 @@ class KeypoolQueryExecutor {
 
   Map<String, Integer> getKeyspecs() throws DataAccessException {
     final String sql = "SELECT ID,KEYSPEC FROM KEYSPEC";
-    Statement ps = datasource.createStatement();
+    PreparedStatement ps = datasource.prepareStatement(sql);
     ResultSet rs = null;
 
     Map<String, Integer> rv = new HashMap<>();
 
     try {
-      rs = ps.executeQuery(sql);
+      rs = ps.executeQuery();
       while (rs.next()) {
         rv.put(rs.getString("KEYSPEC").toUpperCase(Locale.ROOT), rs.getInt("ID"));
       }

@@ -96,16 +96,16 @@ class QueryExecutor {
       notNull(datasource, "datasource");
       final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
 
-      Statement stmt = null;
+      PreparedStatement stmt = null;
       ResultSet rs = null;
 
       try {
-        stmt = datasource.createStatement();
+        stmt = datasource.prepareStatement(sql);
         if (stmt == null) {
           throw new DataAccessException("could not create statement");
         }
 
-        rs = stmt.executeQuery(sql);
+        rs = stmt.executeQuery();
         while (rs.next()) {
           variables.put(rs.getString("NAME"), rs.getString("VALUE2"));
         }
@@ -181,9 +181,9 @@ class QueryExecutor {
   }
 
   protected int execUpdateStmt(String sql) throws DataAccessException {
-    Statement ps = datasource.createStatement();
+    PreparedStatement ps = datasource.prepareStatement(sql);
     try {
-      return ps.executeUpdate(sql);
+      return ps.executeUpdate();
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);
     } finally {
@@ -207,11 +207,11 @@ class QueryExecutor {
   }
 
   private List<ResultRow> execQueryStmt(boolean single, String sql) throws DataAccessException {
-    Statement stmt = datasource.createStatement();
+    PreparedStatement stmt = datasource.prepareStatement(sql);
     ResultSet rs = null;
 
     try {
-      rs = stmt.executeQuery(sql);
+      rs = stmt.executeQuery();
       List<ResultRow> rows = new LinkedList<>();
       while (rs.next()) {
         rows.add(new ResultRow(rs));

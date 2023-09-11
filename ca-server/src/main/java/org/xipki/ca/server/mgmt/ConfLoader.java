@@ -455,7 +455,7 @@ class ConfLoader {
           }
 
           caInfoType.setSaveCert(entry.isSaveCert());
-          caInfoType.setSaveKeyPair(entry.isSaveKeypair());
+          caInfoType.setSaveKeypair(entry.isSaveKeypair());
 
           if (entry.getKeypairGenNames() != null) {
             caInfoType.setKeypairGenNames(entry.getKeypairGenNames());

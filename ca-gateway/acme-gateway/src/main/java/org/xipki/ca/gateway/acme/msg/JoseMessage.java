@@ -9,7 +9,6 @@ package org.xipki.ca.gateway.acme.msg;
  */
 public class JoseMessage {
 
-  @com.google.gson.annotations.SerializedName("protected")
   private String protected_;
 
   private String payload;

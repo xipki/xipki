@@ -8,7 +8,7 @@ import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.xipki.util.Args;
 
 /**
- * Control of the QC Statement (in the extension QCStatements).
+ * Control of the QC-Statement (in the extension QCStatements).
  *
  * @author Lijun Liao (xipki)
  * @since 2.0.0
