@@ -77,7 +77,7 @@ public class CBOR {
   }
 
   /**
-   * The specified stream is closed after this method returns.s
+   * The specified stream is closed after this method returns.
    */
   public static <T> T parseObjectAndClose(InputStream jsonInputStream, Class<T> classOfT) throws IOException {
     try (Reader reader = new InputStreamReader(jsonInputStream)) {

@@ -540,14 +540,15 @@ public class CaConf {
   }
 
   private static byte[] read(InputStream in) throws IOException {
-    ByteArrayOutputStream bout = new ByteArrayOutputStream();
-    int readed;
-    byte[] buffer = new byte[2048];
-    while ((readed = in.read(buffer)) != -1) {
-      bout.write(buffer, 0, readed);
-    }
+    try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
+      int readed;
+      byte[] buffer = new byte[2048];
+      while ((readed = in.read(buffer)) != -1) {
+        bout.write(buffer, 0, readed);
+      }
 
-    return bout.toByteArray();
+      return bout.toByteArray();
+    }
   } // method read
 
   private byte[] getBinary(FileOrBinary fileOrBinary, Map<String, byte[]> zipEntries)

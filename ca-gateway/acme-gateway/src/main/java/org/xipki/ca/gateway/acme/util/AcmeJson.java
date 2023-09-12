@@ -23,8 +23,6 @@ import org.xipki.ca.gateway.acme.AcmeProtocolException;
 import org.xipki.ca.gateway.acme.type.AcmeError;
 import org.xipki.util.LogUtil;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Stream;
@@ -133,14 +131,6 @@ public final class AcmeJson implements Serializable {
     @Override
     public String toString() {
         return JsonUtil.toJson(data);
-    }
-
-    /**
-     * Serialize the data map in JSON.
-     */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeUTF(JsonUtil.toJson(data));
-        out.defaultWriteObject();
     }
 
     /**

@@ -195,9 +195,10 @@ public class EnrollCertActions {
       char[] pwd = getPassword();
       ks.load(null, pwd);
       ks.setKeyEntry("main", privateKey, pwd, certchain);
-      ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      ks.store(bout, pwd);
-      saveVerbose("saved key to file", p12OutputFile, bout.toByteArray());
+      try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
+        ks.store(bout, pwd);
+        saveVerbose("saved key to file", p12OutputFile, bout.toByteArray());
+      }
 
       return null;
     } // method execute0

@@ -231,6 +231,9 @@ public class CaUtil {
     return pairs.getEncoded();
   } // method canonicalizeSignerConf
 
+  /**
+   * The specified stream remains open after this method returns.
+   */
   public static FileOrValue createFileOrValue(ZipOutputStream zipStream, String content, String fileName)
       throws IOException {
     if (StringUtil.isBlank(content)) {
@@ -253,6 +256,9 @@ public class CaUtil {
     return ret;
   } // method createFileOrValue
 
+  /**
+   * The specified stream remains open after this method returns.
+   */
   public static FileOrBinary createFileOrBase64Value(ZipOutputStream zipStream, String b64Content, String fileName)
       throws IOException {
     if (StringUtil.isBlank(b64Content)) {
@@ -262,6 +268,9 @@ public class CaUtil {
     return createFileOrBinary(zipStream, Base64.decode(b64Content), fileName);
   } // method createFileOrBase64Value
 
+  /**
+   * The specified stream remains open after this method returns.
+   */
   public static FileOrBinary createFileOrBinary(ZipOutputStream zipStream, byte[] content, String fileName)
       throws IOException {
     if (content == null || content.length == 0) {

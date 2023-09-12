@@ -95,6 +95,8 @@ public class EstResponder {
 
   private static final byte[] NEWLINE = new byte[]{'\r', '\n'};
 
+  private static final byte[] __NEWLINE = new byte[]{'-', '-', '\r', '\n'};
+
   private static final String CMD_cacerts = "cacerts";
 
   private static final String CMD_simpleenroll = "simpleenroll";
@@ -514,16 +516,17 @@ public class EstResponder {
     }
 
     if (CMD_userverkeygen.equals(command)) {
-      ByteArrayOutputStream bo = new ByteArrayOutputStream();
-      bo.write(PemEncoder.encode(entry.getPrivateKey(), PemEncoder.PemLabel.PRIVATE_KEY));
-      bo.write(NEWLINE);
+      try (ByteArrayOutputStream bo = new ByteArrayOutputStream()) {
+        bo.write(PemEncoder.encode(entry.getPrivateKey(), PemEncoder.PemLabel.PRIVATE_KEY));
+        bo.write(NEWLINE);
 
-      bo.write(PemEncoder.encode(entry.getCert(), PemEncoder.PemLabel.CERTIFICATE));
-      bo.write(NEWLINE);
+        bo.write(PemEncoder.encode(entry.getCert(), PemEncoder.PemLabel.CERTIFICATE));
+        bo.write(NEWLINE);
 
-      bo.flush();
+        bo.flush();
 
-      return HttpRespContent.ofOk(CT_pem_file, bo.toByteArray());
+        return HttpRespContent.ofOk(CT_pem_file, bo.toByteArray());
+      }
     }
 
     byte[] t = new byte[9]; // length must be multiple of 3
@@ -531,27 +534,25 @@ public class EstResponder {
     String boundary = "estBounary_" + Base64.encodeToString(t);
     byte[] boundaryBytes = toUtf8Bytes("--" + boundary);
 
-    ByteArrayOutputStream bo = new ByteArrayOutputStream();
+    try (ByteArrayOutputStream bo = new ByteArrayOutputStream()) {
+      writeLine(bo, "XiPKI EST server");
 
-    writeLine(bo, "XiPKI EST server");
+      // private key
+      writeMultipartEntry(bo, boundaryBytes, CT_pkcs8, entry.getPrivateKey());
 
-    // private key
-    writeMultipartEntry(bo, boundaryBytes, CT_pkcs8, entry.getPrivateKey());
+      // certificate
+      String ct = CT_pkcs7_mime_certyonly;
+      byte[] certBytes = buildCertsOnly(entry.getCert());
+      writeMultipartEntry(bo, boundaryBytes, ct, certBytes);
 
-    // certificate
-    String ct = CT_pkcs7_mime_certyonly;
-    byte[] certBytes = buildCertsOnly(entry.getCert());
-    writeMultipartEntry(bo, boundaryBytes, ct, certBytes);
+      // finalize the multipart
+      bo.write(boundaryBytes);
+      bo.write(__NEWLINE);
 
-    // finalize the multipart
-    bo.write(boundaryBytes);
-    bo.write('-');
-    bo.write('-');
-    bo.write(NEWLINE);
+      bo.flush();
 
-    bo.flush();
-
-    return HttpRespContent.ofOk(CT_multipart_mixed + "; boundary=" + boundary, false, bo.toByteArray());
+      return HttpRespContent.ofOk(CT_multipart_mixed + "; boundary=" + boundary, false, bo.toByteArray());
+    }
   } // method enrollCert
 
   private static void writeMultipartEntry(OutputStream os, byte[] boundaryBytes, String ct, byte[] data)

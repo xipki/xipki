@@ -341,12 +341,12 @@ class ConfLoader {
     }
 
     ByteArrayOutputStream bytesStream = new ByteArrayOutputStream(1048576); // initial 1M
-    ZipOutputStream zipStream = new ZipOutputStream(bytesStream);
-    zipStream.setLevel(Deflater.BEST_SPEED);
 
     CaConfType.CaSystem root = new CaConfType.CaSystem();
 
-    try {
+    try (ZipOutputStream zipStream = new ZipOutputStream(bytesStream)) {
+      zipStream.setLevel(Deflater.BEST_SPEED);
+
       // DBSchema
       root.setDbSchemas(manager.getDbSchemas());
 
@@ -583,26 +583,20 @@ class ConfLoader {
       }
 
       // add the CAConf XML file
-      ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      try {
+      try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
         root.validate();
         JSON.writePrettyJSON(root, bout);
+
+        zipStream.putNextEntry(new ZipEntry("caconf.json"));
+        try {
+          zipStream.write(bout.toByteArray());
+        } finally {
+          zipStream.closeEntry();
+        }
       } catch (InvalidConfException ex) {
         LogUtil.error(LOG, ex, "could not marshal CAConf");
         throw new CaMgmtException(concat("could not marshal CAConf: ", ex.getMessage()), ex);
-      } finally {
-        bout.flush();
       }
-
-      zipStream.putNextEntry(new ZipEntry("caconf.json"));
-      try {
-        zipStream.write(bout.toByteArray());
-      } finally {
-        zipStream.closeEntry();
-      }
-    } finally {
-      zipStream.flush();
-      zipStream.close();
     }
 
     return new ByteArrayInputStream(bytesStream.toByteArray());

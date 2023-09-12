@@ -30,6 +30,9 @@ public class CaConfs {
   private CaConfs() {
   }
 
+  /**
+   * The specified stream remains open after this method returns.
+   */
   public static void marshal(CaConfType.CaSystem root, OutputStream out)
       throws InvalidConfException {
     Args.notNull(root, "root");
@@ -43,15 +46,14 @@ public class CaConfs {
     Args.notNull(confFilename, "confFilename");
 
     ByteArrayOutputStream bytesStream = new ByteArrayOutputStream(1048576); // initial 1M
-    ZipOutputStream zipStream = new ZipOutputStream(bytesStream);
-    zipStream.setLevel(Deflater.BEST_SPEED);
-
-    File confFile = new File(confFilename);
-    confFile = IoUtil.expandFilepath(confFile, false);
-
     String baseDir;
 
-    try {
+    try (ZipOutputStream zipStream = new ZipOutputStream(bytesStream)) {
+      zipStream.setLevel(Deflater.BEST_SPEED);
+
+      File confFile = new File(confFilename);
+      confFile = IoUtil.expandFilepath(confFile, false);
+
       CaConfType.CaSystem root = JSON.parseObject(confFile, CaConfType.CaSystem.class);
 
       baseDir = root.getBasedir();
@@ -196,22 +198,18 @@ public class CaConfs {
       }
 
       // add the CAConf XML file
-      ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      try {
+      byte[] bytes;
+      try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
         marshal(root, bout);
-      } finally {
-        bout.flush();
+        bytes = bout.toByteArray();
       }
 
       zipStream.putNextEntry(new ZipEntry("caconf.json"));
       try {
-        zipStream.write(bout.toByteArray());
+        zipStream.write(bytes);
       } finally {
         zipStream.closeEntry();
       }
-    } finally {
-      zipStream.close();
-      bytesStream.flush();
     }
 
     return new ByteArrayInputStream(bytesStream.toByteArray());
