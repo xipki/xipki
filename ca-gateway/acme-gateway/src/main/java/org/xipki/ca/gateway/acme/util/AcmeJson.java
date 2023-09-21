@@ -40,7 +40,7 @@ public final class AcmeJson implements Serializable {
 
     private final String path;
 
-    private transient Map<String, Object> data; // Must not be final for deserialization
+    private Map<String, Object> data; // Must not be final for deserialization
 
     /**
      * Creates a new {@link AcmeJson} root object.

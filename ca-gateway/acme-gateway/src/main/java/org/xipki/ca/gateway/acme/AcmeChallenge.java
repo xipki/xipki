@@ -28,18 +28,18 @@ public class AcmeChallenge {
 
   private Instant validated;
 
-  private transient AcmeAuthz authz;
+  private AcmeAuthz authz;
 
   public AcmeChallenge(int subId, String expectedAuthorization) {
     this.subId = subId;
     this.expectedAuthorization = expectedAuthorization;
   }
 
-  public AcmeAuthz getAuthz() {
+  public AcmeAuthz authz() {
     return authz;
   }
 
-  public void setAuthz(AcmeAuthz authz) {
+  public void authz(AcmeAuthz authz) {
     this.authz = authz;
   }
 

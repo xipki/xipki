@@ -1132,7 +1132,7 @@ public class AcmeResponder {
 
         LOG.info("Received ready for challenge {} of order {}", challId, challId.getOrderId());
         RestResponse ret = buildSuccJsonResp(SC_OK, resp);//.putHeader(HDR_RETRY_AFTER, "2"); // wait for 2 seconds
-        String authzUrl = chall2.getChallenge().getAuthz().getUrl(baseUrl);
+        String authzUrl = chall2.getChallenge().authz().getUrl(baseUrl);
         ret.putHeader(HDR_LINK, "<" + authzUrl + ">;rel=\"up\"");
         return ret;
       }

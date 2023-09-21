@@ -150,7 +150,7 @@ public class CaServerConf extends ValidatableConf {
    */
   private List<String> certprofileFactories;
 
-  private final transient Map<String, SslContextConf> sslContextConfMap = new HashMap<>();
+  private final Map<String, SslContextConf> sslContextConfMap = new HashMap<>();
 
   public static CaServerConf readConfFromFile(String fileName) throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");
@@ -269,7 +269,7 @@ public class CaServerConf extends ValidatableConf {
     this.ctLog = ctLog;
   }
 
-  public void initSsl() throws CaMgmtException {
+  public void initSsl() {
     if (sslContexts == null || sslContexts.isEmpty()) {
       return;
     }
@@ -291,7 +291,7 @@ public class CaServerConf extends ValidatableConf {
 
   public SslContextConf getSslContextConf(String name) {
     return sslContextConfMap.get(name);
-  } // method getSslContextConf
+  }
 
   @Override
   public void validate() throws InvalidConfException {
@@ -301,6 +301,6 @@ public class CaServerConf extends ValidatableConf {
 
     notEmpty(datasources, "datasources");
     validate(remoteMgmt, security);
-  } // method validate
+  }
 
 }

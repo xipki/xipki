@@ -28,18 +28,18 @@ public class AcmeAuthz {
 
   private List<AcmeChallenge> challenges;
 
-  private transient AcmeOrder order;
+  private AcmeOrder order;
 
   public AcmeAuthz(int subId, AcmeIdentifier identifier) {
     this.subId = Args.notNull(subId, "subId");
     this.identifier = Args.notNull(identifier, "identifier");
   }
 
-  public AcmeOrder getOrder() {
+  public AcmeOrder order() {
     return order;
   }
 
-  public void setOrder(AcmeOrder order) {
+  public void order(AcmeOrder order) {
     this.order = order;
   }
 
@@ -78,7 +78,7 @@ public class AcmeAuthz {
     this.challenges = challenges;
     if (challenges != null) {
       for (AcmeChallenge chall : challenges) {
-        chall.setAuthz(this);
+        chall.authz(this);
       }
     }
   }

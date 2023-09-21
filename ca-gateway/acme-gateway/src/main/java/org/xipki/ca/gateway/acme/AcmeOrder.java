@@ -151,7 +151,7 @@ public class AcmeOrder {
     this.authzs = authzs;
     if (authzs != null) {
       for (AcmeAuthz authz : authzs) {
-        authz.setOrder(this);
+        authz.order(this);
       }
     }
   }

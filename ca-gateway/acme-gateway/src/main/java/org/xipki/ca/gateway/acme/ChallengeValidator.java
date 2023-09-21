@@ -229,8 +229,8 @@ public class ChallengeValidator implements Runnable {
         chall.setStatus(ChallengeStatus.invalid);
       }
 
-      if (chall.getAuthz() != null && chall.getAuthz().getOrder() != null) {
-        repo.flushOrderIfNotCached(chall.getAuthz().getOrder());
+      if (chall.authz() != null && chall.authz().order() != null) {
+        repo.flushOrderIfNotCached(chall.authz().order());
       }
     }
 
