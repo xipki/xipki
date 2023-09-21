@@ -13,7 +13,7 @@
 		//	"example.org"
 		//],
 		"challengeTypes": ["dns-01", "http-01", "tls-alpn-01"],
-		"cleanupOrders": {
+		"cleanupOrder": {
 			"expiredCertDays": 390,
 			"expiredOrderDays": 390
 		},
