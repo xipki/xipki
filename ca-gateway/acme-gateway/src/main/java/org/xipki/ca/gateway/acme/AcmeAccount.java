@@ -32,6 +32,37 @@ public class AcmeAccount {
 
     private Boolean termsOfServiceAgreed;
 
+    public Map<String, String> getJwk() {
+      return jwk;
+    }
+
+    public void setJwk(Map<String, String> jwk) {
+      this.jwk = jwk;
+    }
+
+    public List<String> getContact() {
+      return contact;
+    }
+
+    public void setContact(List<String> contact) {
+      this.contact = contact;
+    }
+
+    public JoseMessage getExternalAccountBinding() {
+      return externalAccountBinding;
+    }
+
+    public void setExternalAccountBinding(JoseMessage externalAccountBinding) {
+      this.externalAccountBinding = externalAccountBinding;
+    }
+
+    public Boolean getTermsOfServiceAgreed() {
+      return termsOfServiceAgreed;
+    }
+
+    public void setTermsOfServiceAgreed(Boolean termsOfServiceAgreed) {
+      this.termsOfServiceAgreed = termsOfServiceAgreed;
+    }
   }
 
   private boolean inDb;
@@ -163,7 +194,7 @@ public class AcmeAccount {
     this.marked = true;
   }
 
-  // do not throws any exception
+  // do not throw any exception
   public synchronized void flush() throws AcmeSystemException {
     if (inDb) {
       if (mark != null) {
