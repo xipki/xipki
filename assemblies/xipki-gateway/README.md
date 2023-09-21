@@ -1,9 +1,13 @@
 Deployment in Tomcat 8 and 9
 ----
-1. Copy the sub-folders `bin`, `webapps`, `xipki` and `lib` to the tomcat root folder.
-   The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
-   `setenv.sh` and `setenv.bat` must be adapted to point to the new position.
-   Note if you do not support all protocols CMP, SCEP and RESTful API, please delete the unsupported ones
+1. Copy (and overwrite if files already exist) the sub-folders `bin`, `webapps`, `xipki` and `lib `
+   to the tomcat root folder `${CATALINA_HOME}`.
+   - The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
+     `setenv.sh` and `setenv.bat` must be adapted to point to the new position.
+   - In `${CATALINA_HOME}/lib`, if an old version of a jar file exists, remove it first.
+   - In `${CATALINA_HOME}/webapps`, delete the folder `<some-app>` if the same named `<some-app>.war` file exists.
+   - Note if you do not support all protocols CMP, SCEP and RESTful API, please delete the unsupported `war` 
+     files and the same named folders
    (cmp.war for CMP, scep.war for SCEP, .well-known.war for EST, acme.war for ACME, and rest.war for RESTful API)
 2. If SCEP is supported, you need to have a SCEP server certificate with private key. For the demo you may generate this
    certificate in the `xipki-mgmt-cli` via the command 
@@ -67,5 +71,5 @@ gateway-common-*.jar
 - Start tomcat
 
 ```sh
-  bin/start.sh
+  bin/startup.sh
 ```

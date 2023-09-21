@@ -64,12 +64,12 @@ follows.
 ## Prepare
 
 1. Unpack the binary `xipki-setup-<version>.zip`. To restore the files to a destination 
-   folder, run the script `bin/restore.sh /path/to/dest-dir` (or `bin\restore.bat` in Windows).
+   folder, run the script `bin/restore.sh /path/to/destination-dir` (or `bin\restore.bat` in Windows).
 
 **Note that all keys and certificates in the binary are only for demo purpose. In production environment
 they MUST be replaced.**
 
-**In the following sections, we assume the destination folder is `xipki-install`**.
+**In the following sections, we assume the destination directory (`destination-dir`) is `xipki-install`**.
 
 ## Install CA Server
 

@@ -1,6 +1,8 @@
 Deployment in Tomcat
 ----
-1. Copy the sub-folders `webapps`, `xipki` and `lib ` to the tomcat root folder
+1. Copy (and overwrite if files already exist) the sub-folders `webapps`, `xipki` and `lib `
+   to the tomcat root folder `${CATALINA_HOME}`.
+    - In `${CATALINA_HOME}/lib`, if an old version of a jar file exists, remove it first.
 2. Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
    to the file `conf/catalina.properties` if OCSP over HTTP supported is activated.
 3. Start tomcat
