@@ -518,11 +518,7 @@ public class EstResponder {
     if (CMD_userverkeygen.equals(command)) {
       try (ByteArrayOutputStream bo = new ByteArrayOutputStream()) {
         bo.write(PemEncoder.encode(entry.getPrivateKey(), PemEncoder.PemLabel.PRIVATE_KEY));
-        bo.write(NEWLINE);
-
         bo.write(PemEncoder.encode(entry.getCert(), PemEncoder.PemLabel.CERTIFICATE));
-        bo.write(NEWLINE);
-
         bo.flush();
 
         return HttpRespContent.ofOk(CT_pem_file, bo.toByteArray());
