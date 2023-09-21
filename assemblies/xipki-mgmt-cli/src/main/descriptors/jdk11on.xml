@@ -28,6 +28,10 @@
       <outputDirectory>.</outputDirectory>
       <excludes>
         <exclude>system/org/apache/karaf/features/**</exclude>
+        <!-- do not use the bc* from the apache karaf -->
+        <exclude>system/org/bouncycastle/bcutil-jdk18on/${karaf.bc.version}/**</exclude>
+        <exclude>system/org/bouncycastle/bcprov-jdk18on/${karaf.bc.version}/**</exclude>
+        <exclude>system/org/bouncycastle/bcpkix-jdk18on/${karaf.bc.version}/**</exclude>
       </excludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -124,9 +128,6 @@
         <exclude>etc/org.apache.karaf.jaas.cfg</exclude>
         <exclude>etc/org.apache.karaf.kar</exclude>
         <!-- do not use the bc* from the apache karaf -->
-        <exclude>system/org/bouncycastle/bcutil-jdk15on/**</exclude>
-        <exclude>system/org/bouncycastle/bcprov-jdk15on/**</exclude>
-        <exclude>system/org/bouncycastle/bcpkix-jdk15on/**</exclude>
         <exclude>system/org/bouncycastle/bcutil-jdk18on/**</exclude>
         <exclude>system/org/bouncycastle/bcprov-jdk18on/**</exclude>
         <exclude>system/org/bouncycastle/bcpkix-jdk18on/**</exclude>
