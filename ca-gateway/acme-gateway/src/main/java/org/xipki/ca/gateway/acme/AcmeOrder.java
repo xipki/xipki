@@ -200,10 +200,10 @@ public class AcmeOrder {
     for (AcmeAuthz authz : authzs) {
       for (AcmeChallenge chall : authz.getChallenges()) {
         if (chall.getStatus() == ChallengeStatus.valid) {
-          authz.setStatus(AuthzStatus.valid);
+          authz.status(AuthzStatus.valid);
           break;
         } else if (chall.getStatus() == ChallengeStatus.invalid) {
-          authz.setStatus(AuthzStatus.invalid);
+          authz.status(AuthzStatus.invalid);
           status = OrderStatus.invalid;
           return;
         }

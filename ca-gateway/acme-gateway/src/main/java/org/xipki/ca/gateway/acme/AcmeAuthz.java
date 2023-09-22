@@ -38,10 +38,16 @@ public class AcmeAuthz {
     this.identifier = Args.notNull(identifier, "identifier");
   }
 
+  /**
+   * Do not use this method. Only for JSON deserializer.
+   */
   public void setSubId(int subId) {
     this.subId = subId;
   }
 
+  /**
+   * Do not use this method. Only for JSON deserializer.
+   */
   public void setIdentifier(AcmeIdentifier identifier) {
     this.identifier = identifier;
   }
@@ -62,18 +68,32 @@ public class AcmeAuthz {
     return status;
   }
 
+  /**
+   * Do not use this method. Only for JSON deserializer.
+   */
   public void setStatus(AuthzStatus status) {
-    markOrder();
     this.status = status;
+  }
+
+  public void status(AuthzStatus status) {
+    markOrder();
+    setStatus(status);
   }
 
   public Instant getExpires() {
     return expires;
   }
 
+  /**
+   * Do not use this method. Only for JSON deserializer.
+   */
   public void setExpires(Instant expires) {
-    markOrder();
     this.expires = expires;
+  }
+
+  public void expires(Instant expires) {
+    markOrder();
+    setExpires(expires);
   }
 
   public AcmeIdentifier getIdentifier() {
@@ -84,14 +104,21 @@ public class AcmeAuthz {
     return challenges;
   }
 
+  /**
+   * Do not use this method. Only for JSON deserializer.
+   */
   public void setChallenges(List<AcmeChallenge> challenges) {
-    markOrder();
     this.challenges = challenges;
     if (challenges != null) {
       for (AcmeChallenge chall : challenges) {
         chall.authz(this);
       }
     }
+  }
+
+  public void challenges(List<AcmeChallenge> challenges) {
+    markOrder();
+    setChallenges(challenges);
   }
 
   void markOrder() {

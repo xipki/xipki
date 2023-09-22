@@ -837,8 +837,8 @@ public class AcmeResponder {
           AcmeAuthz authz = new AcmeAuthz(authzIds[authzIdOffset++], identifier.toAcmeIdentifier());
           authzs.add(authz);
 
-          authz.setStatus(AuthzStatus.pending);
-          authz.setExpires(expires);
+          authz.status(AuthzStatus.pending);
+          authz.expires(expires);
 
           String type = identifier.getType();
           String value = identifier.getValue();
@@ -875,7 +875,7 @@ public class AcmeResponder {
             if (challengeTypes.contains(DNS_01)) {
               challenges.add(newChall(challIds[challIdOffset++], DNS_01, token, authorizationSha256));
             }
-            authz.setChallenges(challenges);
+            authz.challenges(challenges);
           } else {
             throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.unsupportedIdentifier,
                 "unsupported identifier type '" + type + "'");
@@ -1126,7 +1126,7 @@ public class AcmeResponder {
 
         ChallengeStatus status = chall.getStatus();
         if (status == ChallengeStatus.pending) {
-          chall.setStatus(ChallengeStatus.processing);
+          chall.status(ChallengeStatus.processing);
         }
         ChallengeResponse resp = chall.toChallengeResponse(baseUrl, challId.getOrderId(), challId.getAuthzId());
 
@@ -1215,9 +1215,9 @@ public class AcmeResponder {
 
   private AcmeChallenge newChall(int subId, String type, String token, String expectedAuthorization) {
     AcmeChallenge chall = new AcmeChallenge(subId, expectedAuthorization);
-    chall.setStatus(ChallengeStatus.pending);
-    chall.setType(type);
-    chall.setToken(token);
+    chall.status(ChallengeStatus.pending);
+    chall.type(type);
+    chall.token(token);
     return chall;
   }
 

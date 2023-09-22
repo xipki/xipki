@@ -38,10 +38,16 @@ public class AcmeChallenge {
     this.expectedAuthorization = expectedAuthorization;
   }
 
+  /**
+   * Do not use this method. Only for JSON deserializer.
+   */
   public void setSubId(int subId) {
     this.subId = subId;
   }
 
+  /**
+   * Do not use this method. Only for JSON deserializer.
+   */
   public void setExpectedAuthorization(String expectedAuthorization) {
     this.expectedAuthorization = expectedAuthorization;
   }
@@ -62,37 +68,66 @@ public class AcmeChallenge {
     return validated;
   }
 
+  /**
+   * Do not use this method. Only for JSON deserializer.
+   */
   public void setValidated(Instant validated) {
-    markOrder();
     this.validated = validated;
+  }
+
+  public void validated(Instant validated) {
+    markOrder();
+    setValidated(validated);
   }
 
   public String getType() {
     return type;
   }
 
+  /**
+   * Do not use this method. Only for JSON deserializer.
+   */
   public void setType(String type) {
-    markOrder();
     this.type = type;
+  }
+
+  public void type(String type) {
+    markOrder();
+    setType(type);
   }
 
   public String getToken() {
     return token;
   }
 
+  /**
+   * Do not use this method. Only for JSON deserializer.
+   */
   public void setToken(String token) {
-    markOrder();
     this.token = token;
+  }
+
+  public void token(String token) {
+    markOrder();
+    setToken(token);
   }
 
   public ChallengeStatus getStatus() {
     return status;
   }
 
+  /**
+   * Do not use this method. Only for JSON deserializer.
+   */
   public void setStatus(ChallengeStatus status) {
-    markOrder();
     this.status = status;
   }
+
+  public void status(ChallengeStatus status) {
+    markOrder();
+    setStatus(status);
+  }
+
 
   public String getExpectedAuthorization() {
     return expectedAuthorization;

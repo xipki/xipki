@@ -220,13 +220,13 @@ public class ChallengeValidator implements Runnable {
       if (authorizationValid) {
         LOG.info("validated challenge {}/{} for identifier {}/{}", chall.getType(), challId,
             identifier.getType(), identifier.getValue());
-        chall.setValidated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-        chall.setStatus(ChallengeStatus.valid);
+        chall.validated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
+        chall.status(ChallengeStatus.valid);
       } else {
         LOG.warn("validation failed for challenge {}/{} for identifier {}/{}: received='{}', expected='{}'",
             chall.getType(), challId, identifier.getType(), identifier.getValue(),
             receivedAuthorization, chall.getExpectedAuthorization());
-        chall.setStatus(ChallengeStatus.invalid);
+        chall.status(ChallengeStatus.invalid);
       }
 
       if (chall.authz() != null && chall.authz().order() != null) {
