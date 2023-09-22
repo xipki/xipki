@@ -41,6 +41,7 @@ public class AcmeChallenge {
   /**
    * Do not use this method. Only for JSON deserializer.
    */
+  @Deprecated
   public void setSubId(int subId) {
     this.subId = subId;
   }
@@ -48,6 +49,7 @@ public class AcmeChallenge {
   /**
    * Do not use this method. Only for JSON deserializer.
    */
+  @Deprecated
   public void setExpectedAuthorization(String expectedAuthorization) {
     this.expectedAuthorization = expectedAuthorization;
   }
@@ -71,6 +73,7 @@ public class AcmeChallenge {
   /**
    * Do not use this method. Only for JSON deserializer.
    */
+  @Deprecated
   public void setValidated(Instant validated) {
     this.validated = validated;
   }
@@ -87,6 +90,7 @@ public class AcmeChallenge {
   /**
    * Do not use this method. Only for JSON deserializer.
    */
+  @Deprecated
   public void setType(String type) {
     this.type = type;
   }
@@ -103,6 +107,7 @@ public class AcmeChallenge {
   /**
    * Do not use this method. Only for JSON deserializer.
    */
+  @Deprecated
   public void setToken(String token) {
     this.token = token;
   }
@@ -119,6 +124,7 @@ public class AcmeChallenge {
   /**
    * Do not use this method. Only for JSON deserializer.
    */
+  @Deprecated
   public void setStatus(ChallengeStatus status) {
     this.status = status;
   }
