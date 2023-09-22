@@ -16,9 +16,9 @@ import java.time.temporal.ChronoUnit;
  */
 public class AcmeChallenge {
 
-  private final int subId;
+  private int subId;
 
-  private final String expectedAuthorization;
+  private String expectedAuthorization;
 
   private ChallengeStatus status;
 
@@ -30,8 +30,19 @@ public class AcmeChallenge {
 
   private AcmeAuthz authz;
 
+  private AcmeChallenge() {
+  }
+
   public AcmeChallenge(int subId, String expectedAuthorization) {
     this.subId = subId;
+    this.expectedAuthorization = expectedAuthorization;
+  }
+
+  public void setSubId(int subId) {
+    this.subId = subId;
+  }
+
+  public void setExpectedAuthorization(String expectedAuthorization) {
     this.expectedAuthorization = expectedAuthorization;
   }
 

@@ -13,13 +13,24 @@ import org.xipki.util.CompareUtil;
  */
 public class AcmeIdentifier {
 
-  private final String type;
+  private String type;
 
-  private final String value;
+  private String value;
+
+  private AcmeIdentifier() {
+  }
 
   public AcmeIdentifier(String type, String value) {
     this.type = Args.notNull(type, "type");
     this.value = Args.notNull(value, "value");
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public void setValue(String value) {
+    this.value = value;
   }
 
   public String getType() {

@@ -19,9 +19,9 @@ import java.util.List;
  */
 public class AcmeAuthz {
 
-  private final int subId;
+  private int subId;
 
-  private final AcmeIdentifier identifier;
+  private AcmeIdentifier identifier;
 
   private AuthzStatus status;
   private Instant expires;
@@ -30,9 +30,20 @@ public class AcmeAuthz {
 
   private AcmeOrder order;
 
+  private AcmeAuthz() {
+  }
+
   public AcmeAuthz(int subId, AcmeIdentifier identifier) {
     this.subId = Args.notNull(subId, "subId");
     this.identifier = Args.notNull(identifier, "identifier");
+  }
+
+  public void setSubId(int subId) {
+    this.subId = subId;
+  }
+
+  public void setIdentifier(AcmeIdentifier identifier) {
+    this.identifier = identifier;
   }
 
   public AcmeOrder order() {
