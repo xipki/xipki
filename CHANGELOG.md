@@ -6,19 +6,23 @@ See also <https://github.com/xipki/xipki/releases>
 - Release date: 2023/mm/dd
 - CA
   - Feature: add support of ACME with challenge types dns-01, http-01 and tls-alpn-01
-  - Feature: encode the requests and responses between gateway and ca-server in CBOR format (it was JSON).
+  - Feature: encode the requests and responses between gateway and ca-server in CBOR format (was JSON).
   - Feature: extend Properties to use the place-holder ${env:name} for environment and ${sys:name} for system property.
 - OCSP
   - Feature: extend Properties to use the place-holder ${env:name} for environment and ${sys:name} for system property.
 - Gateway
   - Feature: extend Properties to use the place-holder ${env:name} for environment and ${sys:name} for system property.
-  - Feature: encode the requests and responses between gateway and ca-server in CBOR format (it was JSON).
+  - Feature: encode the requests and responses between gateway and ca-server in CBOR format (was JSON).
 - CLI
   - N/A
 - MGMT-CLI (Management Client)
   - N/A
 - Dependencies
   - Replace JSON parser gson with jackson.
+  - Bouncycaste: 1.73 -> 1.76
+  - ipkcs11wrapper: 1.0.5 -> 1.0.6
+  - log4j: 2.19.0 -> 2.20.0
+  - mariadb-java-client: 3.1.4 -> 3.2.0
  
 ## 6.3.0
 - Release date: 2023/04/29

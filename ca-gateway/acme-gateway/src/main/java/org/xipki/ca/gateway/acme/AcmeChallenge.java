@@ -134,7 +134,6 @@ public class AcmeChallenge {
     setStatus(status);
   }
 
-
   public String getExpectedAuthorization() {
     return expectedAuthorization;
   }

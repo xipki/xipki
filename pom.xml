@@ -45,7 +45,7 @@
     <dnsjava.version>3.5.2</dnsjava.version>
     <!-- only for runtime -->
     <log4j.version>2.20.0</log4j.version>
-    <jdbc.mariadb.version>3.1.4</jdbc.mariadb.version>
+    <jdbc.mariadb.version>3.2.0</jdbc.mariadb.version>
     <jdbc.postgresql.version>42.6.0</jdbc.postgresql.version>
     <jdbc.h2.version>2.2.220</jdbc.h2.version>
     <!-- Only for test purpose -->

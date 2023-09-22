@@ -19,7 +19,7 @@ JRE/JDK, and the steps to reproduce the bug.
 
 ## Prerequisite
 * OS: Linux, Windows, MacOS
-* JRE / JDK: for `xipki-mgmt-cli` and `xipki-cli`: JDK 11+; for others: JDK 8+.
+* JRE / JDK: for `xipki-mgmt-cli`, `xipki-cli`, and `acme-gateway`: JDK 11+; for others: JDK 8+.
 * Database: DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
 * Hardware: Any available hardware (tested on Raspberry Pi 2 Model B with 900MHz quad-core ARM CPU and 1 GB Memory)
 
@@ -87,9 +87,9 @@ JDK 8+ is required.
 
 ## Install Protocol Gateway
 
-JDK 8+ is required.
+JDK 8+ is required (JDK11+ for `acme.war`).
 
-1. Unpack tomcat to a new folder
+1. Unpack tomcat to a new folder.
 2. Install protocol gateway as described in the `xipki-install/xipki-gateway/README` file.
 
 ## Install Management Command Line Interface

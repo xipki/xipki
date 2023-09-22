@@ -4,7 +4,6 @@
 package org.xipki.ca.server;
 
 import org.xipki.audit.Audits.AuditConf;
-import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.security.Securities.SecurityConf;
 import org.xipki.security.util.JSON;

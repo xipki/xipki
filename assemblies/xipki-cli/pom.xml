@@ -103,8 +103,8 @@
               <includes>server/tls-server-cert.der,server/tls-server.p12,client/*,client2/*,client3/*</includes>
             </configuration>
           </execution>
+          <!-- Patch Karaf -->
           <execution>
-            <!-- Patch Karaf -->
             <id>patch-karaf</id>
             <phase>generate-resources</phase>
             <goals>
