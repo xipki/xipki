@@ -30,6 +30,9 @@ public class AcmeChallenge {
 
   private AcmeAuthz authz;
 
+  /**
+   * Only for JSON deserializer.
+   */
   private AcmeChallenge() {
   }
 
@@ -39,18 +42,16 @@ public class AcmeChallenge {
   }
 
   /**
-   * Do not use this method. Only for JSON deserializer.
+   * Only for JSON deserializer.
    */
-  @Deprecated
-  public void setSubId(int subId) {
+  private void setSubId(int subId) {
     this.subId = subId;
   }
 
   /**
-   * Do not use this method. Only for JSON deserializer.
+   * Only for JSON deserializer.
    */
-  @Deprecated
-  public void setExpectedAuthorization(String expectedAuthorization) {
+  private void setExpectedAuthorization(String expectedAuthorization) {
     this.expectedAuthorization = expectedAuthorization;
   }
 
@@ -71,10 +72,9 @@ public class AcmeChallenge {
   }
 
   /**
-   * Do not use this method. Only for JSON deserializer.
+   * Only for JSON deserializer.
    */
-  @Deprecated
-  public void setValidated(Instant validated) {
+  private void setValidated(Instant validated) {
     this.validated = validated;
   }
 
@@ -88,10 +88,9 @@ public class AcmeChallenge {
   }
 
   /**
-   * Do not use this method. Only for JSON deserializer.
+   * Only for JSON deserializer.
    */
-  @Deprecated
-  public void setType(String type) {
+  private void setType(String type) {
     this.type = type;
   }
 
@@ -105,10 +104,9 @@ public class AcmeChallenge {
   }
 
   /**
-   * Do not use this method. Only for JSON deserializer.
+   * Only for JSON deserializer.
    */
-  @Deprecated
-  public void setToken(String token) {
+  private void setToken(String token) {
     this.token = token;
   }
 
@@ -122,10 +120,9 @@ public class AcmeChallenge {
   }
 
   /**
-   * Do not use this method. Only for JSON deserializer.
+   * Only for JSON deserializer.
    */
-  @Deprecated
-  public void setStatus(ChallengeStatus status) {
+  private void setStatus(ChallengeStatus status) {
     this.status = status;
   }
 

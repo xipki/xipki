@@ -30,6 +30,9 @@ public class AcmeAuthz {
 
   private AcmeOrder order;
 
+  /**
+   * Only for the JSON deserializer
+   */
   private AcmeAuthz() {
   }
 
@@ -39,18 +42,16 @@ public class AcmeAuthz {
   }
 
   /**
-   * Do not use this method. Only for JSON deserializer.
+   * Only for JSON deserializer.
    */
-  @Deprecated
-  public void setSubId(int subId) {
+  private void setSubId(int subId) {
     this.subId = subId;
   }
 
   /**
-   * Do not use this method. Only for JSON deserializer.
+   * Only for JSON deserializer.
    */
-  @Deprecated
-  public void setIdentifier(AcmeIdentifier identifier) {
+  private void setIdentifier(AcmeIdentifier identifier) {
     this.identifier = identifier;
   }
 
@@ -71,10 +72,9 @@ public class AcmeAuthz {
   }
 
   /**
-   * Do not use this method. Only for JSON deserializer.
+   * Only for JSON deserializer.
    */
-  @Deprecated
-  public void setStatus(AuthzStatus status) {
+  private void setStatus(AuthzStatus status) {
     this.status = status;
   }
 
@@ -88,10 +88,9 @@ public class AcmeAuthz {
   }
 
   /**
-   * Do not use this method. Only for JSON deserializer.
+   * Only for JSON deserializer.
    */
-  @Deprecated
-  public void setExpires(Instant expires) {
+  private void setExpires(Instant expires) {
     this.expires = expires;
   }
 
@@ -109,10 +108,9 @@ public class AcmeAuthz {
   }
 
   /**
-   * Do not use this method. Only for JSON deserializer.
+   * Only for JSON deserializer.
    */
-  @Deprecated
-  public void setChallenges(List<AcmeChallenge> challenges) {
+  private void setChallenges(List<AcmeChallenge> challenges) {
     this.challenges = challenges;
     if (challenges != null) {
       for (AcmeChallenge chall : challenges) {

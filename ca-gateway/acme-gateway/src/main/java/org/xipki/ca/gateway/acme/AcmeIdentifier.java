@@ -17,6 +17,9 @@ public class AcmeIdentifier {
 
   private String value;
 
+  /**
+   * Only for JSON deserializer.
+   */
   private AcmeIdentifier() {
   }
 
@@ -25,11 +28,17 @@ public class AcmeIdentifier {
     this.value = Args.notNull(value, "value");
   }
 
-  public void setType(String type) {
+  /**
+   * Only for JSON deserializer.
+   */
+  private void setType(String type) {
     this.type = type;
   }
 
-  public void setValue(String value) {
+  /**
+   * Only for JSON deserializer.
+   */
+  private void setValue(String value) {
     this.value = value;
   }
 
