@@ -77,11 +77,11 @@ public class RequestorEntry extends MgmtEntry {
     return conf;
   }
 
-  public void setFaulty(boolean faulty) {
+  public void faulty(boolean faulty) {
     this.faulty = faulty;
   }
 
-  public boolean isFaulty() {
+  public boolean faulty() {
     return faulty;
   }
 

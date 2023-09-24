@@ -73,11 +73,11 @@ class PublisherManager {
       PublisherEntry dbEntry = manager.queryExecutor.createPublisher(name);
 
       manager.idNameMap.addPublisher(dbEntry.getIdent());
-      dbEntry.setFaulty(true);
+      dbEntry.faulty(true);
       manager.publisherDbEntries.put(name, dbEntry);
 
       IdentifiedCertPublisher publisher = createPublisher(dbEntry);
-      dbEntry.setFaulty(false);
+      dbEntry.faulty(false);
       publishers.put(name, publisher);
       LOG.info("loaded publisher {}", name);
     }
@@ -150,9 +150,9 @@ class PublisherManager {
       throw new CaMgmtException(concat("Publisher named ", name, " exists"));
     }
 
-    entry.setFaulty(true);
+    entry.faulty(true);
     IdentifiedCertPublisher publisher = createPublisher(entry);
-    entry.setFaulty(false);
+    entry.faulty(false);
 
     manager.queryExecutor.addPublisher(entry);
 

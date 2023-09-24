@@ -59,11 +59,11 @@ public class PublisherEntry extends MgmtEntry {
     return conf;
   }
 
-  public boolean isFaulty() {
+  public boolean faulty() {
     return faulty;
   }
 
-  public void setFaulty(boolean faulty) {
+  public void faulty(boolean faulty) {
     this.faulty = faulty;
   }
 

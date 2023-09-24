@@ -37,7 +37,7 @@ public class KeypairGenEntryWrapper {
   public void init(SecurityFactory securityFactory, int shardId, Map<String, DataSourceWrapper> datasources)
       throws ObjectCreationException {
     notNull(securityFactory, "securityFactory");
-    dbEntry.setFaulty(true);
+    dbEntry.faulty(true);
     if ("KEYPOOL".equalsIgnoreCase(dbEntry.getType())) {
       generator = new KeypoolKeypairGenerator();
 
@@ -54,7 +54,7 @@ public class KeypairGenEntryWrapper {
     }
 
     generator.setName(dbEntry.getName());
-    dbEntry.setFaulty(false);
+    dbEntry.faulty(false);
   }
 
   public KeypairGenEntry getDbEntry() {

@@ -384,7 +384,7 @@ class OcspStoreQueryExecutor {
     PreparedStatement ps = datasource.prepareStatement(sql);
 
     try {
-      ps.setString(1, revInfo.getEncoded());
+      ps.setString(1, revInfo.encode());
       ps.setInt(2, issuerId);
       ps.executeUpdate();
     } catch (SQLException ex) {

@@ -283,7 +283,7 @@ public class CertStore extends CertStoreBase {
 
     try {
       execUpdatePrepStmt0("UPDATE CA SET REV_INFO=? WHERE NAME=?",
-          col2Str(revocationInfo.getEncoded()), col2Str(caName));
+          col2Str(revocationInfo.encode()), col2Str(caName));
     } catch (OperationException ex) {
       throw new CaMgmtException(ex);
     }

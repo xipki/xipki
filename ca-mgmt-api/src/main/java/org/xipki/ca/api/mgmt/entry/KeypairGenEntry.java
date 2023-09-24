@@ -18,13 +18,17 @@ import java.util.Collections;
 
 public class KeypairGenEntry extends MgmtEntry {
 
-  private final String name;
+  private String name;
 
-  private final String type;
+  private String type;
 
-  private final String conf;
+  private String conf;
 
   private boolean faulty;
+
+  // For JSON deserializer only.
+  private KeypairGenEntry() {
+  }
 
   public KeypairGenEntry(String name, String type, String conf) {
     this.name = Args.toNonBlankLower(name, "name");
@@ -44,11 +48,11 @@ public class KeypairGenEntry extends MgmtEntry {
     return conf;
   }
 
-  public void setFaulty(boolean faulty) {
+  public void faulty(boolean faulty) {
     this.faulty = faulty;
   }
 
-  public boolean isFaulty() {
+  public boolean faulty() {
     return faulty;
   }
 
@@ -60,7 +64,7 @@ public class KeypairGenEntry extends MgmtEntry {
   public String toString(boolean ignoreSensitiveInfo) {
     StringBuilder sb = new StringBuilder(1000);
     sb.append("name:   ").append(name).append('\n');
-    sb.append("faulty: ").append(isFaulty()).append('\n');
+    sb.append("faulty: ").append(faulty()).append('\n');
     sb.append("type:   ").append(type).append('\n');
     sb.append("conf:   ");
     if (conf == null) {
