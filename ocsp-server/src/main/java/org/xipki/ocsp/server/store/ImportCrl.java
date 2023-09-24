@@ -691,12 +691,12 @@ class ImportCrl {
         ps.setLong(offset++, caCert.cert.getNotAfter().getEpochSecond());
         ps.setString(offset++, caCert.base64Sha1Fp);
         ps.setString(offset++, caCert.base64Encoded);
-        ps.setString(offset, revInfo == null ? null : revInfo.getEncoded());
+        ps.setString(offset, revInfo == null ? null : revInfo.encode());
       } else {
         // issuer exists
         sql = "UPDATE ISSUER SET REV_INFO=? WHERE ID=?";
         ps = datasource.prepareStatement(conn, sql);
-        ps.setString(offset++, revInfo == null ? null : revInfo.getEncoded());
+        ps.setString(offset++, revInfo == null ? null : revInfo.encode());
         ps.setInt(offset, issuerId);
       }
 

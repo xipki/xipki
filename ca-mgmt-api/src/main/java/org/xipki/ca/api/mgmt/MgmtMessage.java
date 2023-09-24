@@ -287,7 +287,7 @@ public abstract class MgmtMessage {
       nextCrlNumber = caEntry.getNextCrlNumber();
       numCrls = caEntry.getNumCrls();
       permission = caEntry.getPermission();
-      revocationInfo = caEntry.getRevocationInfo() == null ? null : caEntry.getRevocationInfo().getEncoded();
+      revocationInfo = caEntry.getRevocationInfo() == null ? null : caEntry.getRevocationInfo().encode();
       if (caEntry.getRevokeSuspendedControl() != null) {
         revokeSuspended = caEntry.getRevokeSuspendedControl().getConf();
       }
