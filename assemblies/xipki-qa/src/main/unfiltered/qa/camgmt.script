@@ -305,6 +305,7 @@ if { $printUsage equals "true" } then {
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://myorg.org/rootca1.der \
+    --crl-uri 'http://localhost:8081/crl/?type=crl&name=rootca1' \
     --validity-mode cutoff \
     --certchain NULL
 
@@ -342,6 +343,7 @@ if { $printUsage equals "true" } then {
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
     --ca-cert-uri http://myorg.org/rootca1-2.der \
+    --crl-uri 'http://localhost:8081/crl/?type=crl&name=rootca1' \
     --validity-mode strict
 
   # for commands neg-gen-rootca
@@ -498,15 +500,15 @@ if { $printUsage equals "true" } then {
   echo "#################################################################"
   echo "#                         CA-has-requestor                      #"
   echo "#################################################################"
-  caqa:careq-check --ca rootca1 --requestor requestor1 --ra yes \
+  caqa:careq-check --ca rootca1 --requestor requestor1 \
     --permission all --profile all
 
   ca:careq-rm -f --ca rootca1 --requestor requestor1 \
 
-  ca:careq-add --ca rootca1 --requestor requestor1 --ra yes \
+  ca:careq-add --ca rootca1 --requestor requestor1 \
     --permission enroll_cert --permission revoke_cert
 
-  caqa:careq-check --ca rootca1 --ra yes --requestor requestor1 \
+  caqa:careq-check --ca rootca1 --requestor requestor1 \
     --permission enroll_cert --permission revoke_cert --profile null
 
   # CA name does not exist
@@ -562,7 +564,7 @@ if { $printUsage equals "true" } then {
   ca:careq-rm -f --requestor requestor1 --ca rootca1
 
   ca:careq-add --requestor requestor1 --ca rootca1 --profile all \
-    --ra yes --permission all
+    --permission all
 
   ##### profile #####
 
@@ -619,11 +621,11 @@ if { $printUsage equals "true" } then {
 
   ca:revoke-cert --ca rootca1 --reason certificateHold --cert output/subcawithcrl1.crt
 
-  ca:unrevoke-cert --ca rootca1 --cert output/subcawithcrl1.crt
+  ca:unsuspend-cert --ca rootca1 --cert output/subcawithcrl1.crt
 
   ca:revoke-cert --ca rootca1 --reason certificateHold --cert output/subcawithcrl1.crt
 
-  ca:unrevoke-cert --ca rootca1 --cert output/subcawithcrl1.crt
+  ca:unsuspend-cert --ca rootca1 --cert output/subcawithcrl1.crt
 
   ca:revoke-cert --ca rootca1 --reason keyCompromise --cert output/subcawithcrl1.crt
 

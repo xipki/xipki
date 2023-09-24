@@ -59,6 +59,9 @@ if { $printUsage equals "true" } then {
       --key-type RSA --subject "CN=myorg.org,O=myorg PKI company RSA,C=DE" \
       --profile TLS -n 5 --random-dn O
 
+    xiqa:benchmark-enroll-serverkeygen --ca subca --duration $duration --thread $threads \
+      --subject "CN=myorg.org,O=myorg PKI company RSA,C=DE" \
+      --profile TLS -n 5 --random-dn O
   } elif { "$action" equals "ocsp" } then {
 
     URL = http://localhost:8080/ocsp/responder1
