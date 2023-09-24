@@ -37,7 +37,7 @@ class CaconfDbImporter extends DbPorter {
   CaconfDbImporter(DataSourceWrapper datasource, String srcDir, AtomicBoolean stopMe)
       throws DataAccessException, IOException, InvalidConfException {
     super(datasource, srcDir, stopMe);
-    caconf = JSON.parseObject(Paths.get(baseDir, FILENAME_OCSP_CERTSTORE), CaCertstore.Caconf.class);
+    caconf = JSON.parseObject(Paths.get(baseDir, FILENAME_CA_CONFIGURATION), CaCertstore.Caconf.class);
     caconf.validate();
   }
 
