@@ -3,7 +3,11 @@
 
 package org.xipki.ca.sdk;
 
-import java.util.List;
+import org.xipki.ca.sdk.jacob.CborDecoder;
+import org.xipki.ca.sdk.jacob.CborEncoder;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 /**
  *
@@ -13,28 +17,46 @@ import java.util.List;
 
 public class CaNameResponse extends SdkResponse {
 
-  private String name;
+  private final String name;
 
-  private List<String> aliases;
+  private final String[] aliases;
+
+  public CaNameResponse(String name, String[] aliases) {
+    this.name = name;
+    this.aliases = aliases;
+  }
 
   public String getName() {
     return name;
   }
 
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public List<String> getAliases() {
+  public String[] getAliases() {
     return aliases;
   }
 
-  public void setAliases(List<String> aliases) {
-    this.aliases = aliases;
+  @Override
+  public void encode(CborEncoder encoder) throws EncodeException {
+    try {
+      encoder.writeArrayStart(2);
+      encoder.writeTextString(name);
+      encoder.writeTextStrings(aliases);
+    } catch (IOException ex) {
+      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    }
   }
 
-  public static CaNameResponse decode(byte[] encoded) {
-    return CBOR.parseObject(encoded, CaNameResponse.class);
+  public static CaNameResponse decode(byte[] encoded) throws DecodeException {
+    try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
+      if (decoder.readNullOrArrayLength(2)) {
+        return null;
+      }
+
+      return new CaNameResponse(
+          decoder.readTextString(),
+          decoder.readTextStrings());
+    } catch (IOException ex) {
+      throw new DecodeException("error decoding " + CaNameResponse.class.getName(), ex);
+    }
   }
 
 }

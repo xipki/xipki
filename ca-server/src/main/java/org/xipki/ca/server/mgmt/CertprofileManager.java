@@ -219,8 +219,6 @@ class CertprofileManager {
     Certprofile profile = profile0.getCertprofile();
     Map<ASN1ObjectIdentifier, Certprofile.ExtensionControl> extnControls = profile.getExtensionControls();
 
-    CertprofileInfoResponse ret = new CertprofileInfoResponse();
-
     List<String> requiredExtensionsInReq = new LinkedList<>();
     List<String> optionalExtensionsInReq = new LinkedList<>();
     for (Map.Entry<ASN1ObjectIdentifier, Certprofile.ExtensionControl> m : extnControls.entrySet()) {
@@ -236,25 +234,25 @@ class CertprofileManager {
       }
     }
 
+    String[] requiredOids = null;
     if (!requiredExtensionsInReq.isEmpty()) {
-      ret.setRequiredExtensionTypes(requiredExtensionsInReq.toArray(new String[0]));
+      requiredOids = requiredExtensionsInReq.toArray(new String[0]);
     }
 
+    String[] optionalOids = null;
     if (!optionalExtensionsInReq.isEmpty()) {
-      ret.setOptionalExtensionTypes(optionalExtensionsInReq.toArray(new String[0]));
+      optionalOids = optionalExtensionsInReq.toArray(new String[0]);
     }
 
+    KeyType[] keyTypes = null;
     Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = profile.getKeyAlgorithms();
     if (keyAlgorithms != null) {
-      List<KeyType> keyTypes = new LinkedList<>();
+      List<KeyType> keyTypeList = new LinkedList<>();
 
       for (Map.Entry<ASN1ObjectIdentifier, KeyParametersOption> m : keyAlgorithms.entrySet()) {
         KeyParametersOption params = m.getValue();
-        KeyType keyType = new KeyType();
-        keyTypes.add(keyType);
 
-        keyType.setKeyType(m.getKey().getId());
-
+        String[] ecCurves = null;
         if (params instanceof KeyParametersOption.ECParamatersOption) {
           // set the curve OIDs,
           Set<ASN1ObjectIdentifier> curveOids = ((KeyParametersOption.ECParamatersOption) params).getCurveOids();
@@ -263,16 +261,20 @@ class CertprofileManager {
             for (ASN1ObjectIdentifier curveOid : curveOids) {
               curveOidsInText.add(curveOid.getId());
             }
-            keyType.setEcCurves(curveOidsInText.toArray(new String[0]));
+
+            ecCurves = curveOidsInText.toArray(new String[0]);
           }
         }
+
+        keyTypeList.add(new KeyType(m.getKey().getId(), ecCurves));
       }
 
-      if (!keyTypes.isEmpty()) {
-        ret.setKeyTypes(keyTypes.toArray(new KeyType[0]));
+      if (!keyTypeList.isEmpty()) {
+        keyTypes = keyTypeList.toArray(new KeyType[0]);
       }
     }
-    return ret;
+
+    return new CertprofileInfoResponse(requiredOids, optionalOids, keyTypes);
   }
 
   void shutdownCertprofile(IdentifiedCertprofile profile) {

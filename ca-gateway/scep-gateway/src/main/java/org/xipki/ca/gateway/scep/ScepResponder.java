@@ -42,8 +42,6 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
 
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.exception.ErrorCode.*;
@@ -542,7 +540,7 @@ public class ScepResponder {
           }
 
           EnrollCertsRequest sdkReq = new EnrollCertsRequest();
-          sdkReq.setEntries(Collections.singletonList(template));
+          sdkReq.setEntries(new EnrollCertRequestEntry[]{template});
           sdkReq.setTransactionId(tid);
           sdkReq.setExplicitConfirm(false);
           CertsMode certsMode = control.isIncludeCertChain() ? CertsMode.CHAIN
@@ -563,13 +561,12 @@ public class ScepResponder {
           IssuerAndSubject is = IssuerAndSubject.getInstance(req.getMessageData());
           audit(event, CaAuditConstants.NAME_issuer, "\"" + X509Util.x500NameText(is.getIssuer()) + "\"");
           audit(event, CaAuditConstants.NAME_subject, "\"" + X509Util.x500NameText(is.getSubject()) + "\"");
-          PollCertRequestEntry template = new PollCertRequestEntry();
-          template.setSubject(new X500NameType(is.getSubject()));
+          PollCertRequestEntry template = new PollCertRequestEntry(null, new X500NameType(is.getSubject()));
 
           PollCertRequest sdkReq = new PollCertRequest();
           sdkReq.setIssuer(new X500NameType(is.getIssuer()));
           sdkReq.setTransactionId(req.getTransactionId().getId());
-          sdkReq.setEntries(Collections.singletonList(template));
+          sdkReq.setEntries(new PollCertRequestEntry[]{template});
 
           EnrollOrPollCertsResponse sdkResp;
           try {
@@ -631,13 +628,13 @@ public class ScepResponder {
 
   private SignedData buildSignedData(EnrollOrPollCertsResponse sdkResp)
     throws OperationException {
-    List<EnrollOrPullCertResponseEntry> entries = sdkResp.getEntries();
-    int n = entries == null ? 0 : entries.size();
+    EnrollOrPullCertResponseEntry[] entries = sdkResp.getEntries();
+    int n = entries == null ? 0 : entries.length;
     if (n != 1) {
       throw new OperationException(SYSTEM_FAILURE, "expected 1 cert, but received " + n);
     }
 
-    EnrollOrPullCertResponseEntry entry = entries.get(0);
+    EnrollOrPullCertResponseEntry entry = entries[0];
     byte[] cert = entry.getCert();
     if (cert == null) {
       throw new OperationException(ErrorCode.ofCode(entry.getError().getCode()), "expected 1 cert, but received none");
@@ -646,7 +643,7 @@ public class ScepResponder {
     return buildSignedData(cert, sdkResp.getExtraCerts());
   }
 
-  private SignedData buildSignedData(byte[] cert, List<byte[]> extraCerts)
+  private SignedData buildSignedData(byte[] cert, byte[][] extraCerts)
       throws OperationException {
     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
     try {

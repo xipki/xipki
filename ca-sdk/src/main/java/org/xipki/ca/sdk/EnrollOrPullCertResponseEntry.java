@@ -3,6 +3,11 @@
 
 package org.xipki.ca.sdk;
 
+import org.xipki.ca.sdk.jacob.CborDecoder;
+import org.xipki.ca.sdk.jacob.CborEncodable;
+import org.xipki.ca.sdk.jacob.CborEncoder;
+
+import java.io.IOException;
 import java.math.BigInteger;
 
 /**
@@ -11,45 +16,81 @@ import java.math.BigInteger;
  * @since 6.0.0
  */
 
-public class EnrollOrPullCertResponseEntry {
+public class EnrollOrPullCertResponseEntry implements CborEncodable {
 
-  private BigInteger id;
+  private final BigInteger id;
 
-  private ErrorEntry error;
+  private final ErrorEntry error;
 
-  private byte[] cert;
+  private final byte[] cert;
 
-  private byte[] privateKey;
+  private final byte[] privateKey;
+
+  public EnrollOrPullCertResponseEntry(BigInteger id, ErrorEntry error, byte[] cert, byte[] privateKey) {
+    this.id = id;
+    this.error = error;
+    this.cert = cert;
+    this.privateKey = privateKey;
+  }
 
   public BigInteger getId() {
     return id;
-  }
-
-  public void setId(BigInteger id) {
-    this.id = id;
   }
 
   public ErrorEntry getError() {
     return error;
   }
 
-  public void setError(ErrorEntry error) {
-    this.error = error;
-  }
-
   public byte[] getCert() {
     return cert;
-  }
-
-  public void setCert(byte[] cert) {
-    this.cert = cert;
   }
 
   public byte[] getPrivateKey() {
     return privateKey;
   }
 
-  public void setPrivateKey(byte[] privateKey) {
-    this.privateKey = privateKey;
+  @Override
+  public void encode(CborEncoder encoder) throws EncodeException {
+    try {
+      encoder.writeArrayStart(4);
+      encoder.writeByteString(id);
+      encoder.writeObject(error);
+      encoder.writeByteString(cert);
+      encoder.writeByteString(privateKey);
+    } catch (IOException ex) {
+      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    }
   }
+
+  public static EnrollOrPullCertResponseEntry decode(CborDecoder decoder) throws DecodeException {
+    try {
+      if (decoder.readNullOrArrayLength(4)) {
+        return null;
+      }
+
+      return new EnrollOrPullCertResponseEntry(
+          decoder.readBigInt(),
+          ErrorEntry.decode(decoder),
+          decoder.readByteString(),
+          decoder.readByteString());
+    } catch (IOException ex) {
+      throw new DecodeException("error decoding " + EnrollOrPullCertResponseEntry.class.getName(), ex);
+    }
+  }
+
+
+  public static EnrollOrPullCertResponseEntry[] decodeArray(CborDecoder decoder) throws DecodeException {
+    Integer arrayLen = decoder.readNullOrArrayLength(EnrollOrPullCertResponseEntry[].class);
+    if (arrayLen == null) {
+      return null;
+    }
+
+    EnrollOrPullCertResponseEntry[] entries = new EnrollOrPullCertResponseEntry[arrayLen];
+    for (int i = 0; i < arrayLen; i++) {
+      entries[i] = EnrollOrPullCertResponseEntry.decode(decoder);
+    }
+
+    return entries;
+  }
+
 }

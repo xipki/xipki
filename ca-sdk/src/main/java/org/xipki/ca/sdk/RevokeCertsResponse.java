@@ -3,7 +3,11 @@
 
 package org.xipki.ca.sdk;
 
-import java.util.List;
+import org.xipki.ca.sdk.jacob.CborDecoder;
+import org.xipki.ca.sdk.jacob.CborEncoder;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 /**
  * Response for the operation revoking certificates.
@@ -14,18 +18,39 @@ import java.util.List;
 
 public class RevokeCertsResponse extends SdkResponse {
 
-  private List<SingleCertSerialEntry> entries;
+  private final SingleCertSerialEntry[] entries;
 
-  public List<SingleCertSerialEntry> getEntries() {
-    return entries;
-  }
-
-  public void setEntries(List<SingleCertSerialEntry> entries) {
+  public RevokeCertsResponse(SingleCertSerialEntry[] entries) {
     this.entries = entries;
   }
 
-  public static RevokeCertsResponse decode(byte[] encoded) {
-    return CBOR.parseObject(encoded, RevokeCertsResponse.class);
+  public SingleCertSerialEntry[] getEntries() {
+    return entries;
   }
+
+
+  @Override
+  public void encode(CborEncoder encoder) throws EncodeException {
+    try {
+      encoder.writeArrayStart(1);
+      encoder.writeObjects(entries);
+    } catch (IOException ex) {
+      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    }
+  }
+
+  public static RevokeCertsResponse decode(byte[] encoded) throws DecodeException {
+    try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
+      if (decoder.readNullOrArrayLength(1)) {
+        return null;
+      }
+
+      return new RevokeCertsResponse(
+          SingleCertSerialEntry.decodeArray(decoder));
+    } catch (IOException ex) {
+      throw new DecodeException("error decoding " + RevokeCertsResponse.class.getName(), ex);
+    }
+  }
+
 
 }

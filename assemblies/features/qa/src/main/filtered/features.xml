@@ -8,7 +8,6 @@
     <feature>xipki-ca-mgmt</feature>
     <feature>xipki-ocsp-client</feature>
     <feature>xipki-cmp-client</feature>
-    <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/${jackson.version}</bundle>
     <bundle>mvn:org.xipki/certprofile-xijson/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-sdk/${project.version}</bundle>
     <bundle>mvn:org.xipki/qa/${project.version}</bundle>

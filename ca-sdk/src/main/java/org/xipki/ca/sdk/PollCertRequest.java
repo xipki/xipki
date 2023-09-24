@@ -3,7 +3,11 @@
 
 package org.xipki.ca.sdk;
 
-import java.util.List;
+import org.xipki.ca.sdk.jacob.CborDecoder;
+import org.xipki.ca.sdk.jacob.CborEncoder;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 /**
  *
@@ -15,26 +19,52 @@ public class PollCertRequest extends CaIdentifierRequest {
 
   private String transactionId;
 
-  private List<PollCertRequestEntry> entries;
-
-  public String getTransactionId() {
-    return transactionId;
-  }
+  private PollCertRequestEntry[] entries;
 
   public void setTransactionId(String transactionId) {
     this.transactionId = transactionId;
   }
 
-  public List<PollCertRequestEntry> getEntries() {
-    return entries;
-  }
-
-  public void setEntries(List<PollCertRequestEntry> entries) {
+  public void setEntries(PollCertRequestEntry[] entries) {
     this.entries = entries;
   }
 
-  public static PollCertRequest decode(byte[] encoded) {
-    return CBOR.parseObject(encoded, PollCertRequest.class);
+  public String getTransactionId() {
+    return transactionId;
   }
+
+  public PollCertRequestEntry[] getEntries() {
+    return entries;
+  }
+
+  @Override
+  public void encode(CborEncoder encoder) throws EncodeException {
+    try {
+      super.encode(encoder, 2);
+      encoder.writeTextString(transactionId);
+      encoder.writeObjects(entries);
+    } catch (IOException ex) {
+      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    }
+  }
+
+  public static PollCertRequest decode(byte[] encoded) throws DecodeException {
+    try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
+      if (decoder.readNullOrArrayLength(5)) {
+        return null;
+      }
+
+      PollCertRequest ret = new PollCertRequest();
+      ret.setIssuerCertSha1Fp(decoder.readByteString());
+      ret.setIssuer(X500NameType.decode(decoder));
+      ret.setAuthorityKeyIdentifier(decoder.readByteString());
+      ret.setTransactionId(decoder.readTextString());
+      ret.setEntries(PollCertRequestEntry.decodeArray(decoder));
+      return ret;
+    } catch (IOException ex) {
+      throw new DecodeException("error decoding " + PollCertRequest.class.getName(), ex);
+    }
+  }
+
 
 }

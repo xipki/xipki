@@ -17,7 +17,6 @@ import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -115,12 +114,12 @@ public class CertEnroller implements Runnable {
 
       EnrollCertsRequest sdkReq = new EnrollCertsRequest();
       sdkReq.setCaCertMode(CertsMode.NONE);
-      sdkReq.setEntries(Collections.singletonList(entry));
+      sdkReq.setEntries(new EnrollCertRequestEntry[]{entry});
 
       LOG.info("start enrolling certificate for order {}", orderIdStr);
       try {
         EnrollOrPollCertsResponse sdkResp = sdk.enrollCerts(certReqMeta.getCa(), sdkReq);
-        EnrollOrPullCertResponseEntry sdkRespEntry = sdkResp.getEntries().get(0);
+        EnrollOrPullCertResponseEntry sdkRespEntry = sdkResp.getEntries()[0];
         byte[] certBytes = sdkRespEntry.getCert();
         boolean valid = certBytes != null;
         if (valid) {

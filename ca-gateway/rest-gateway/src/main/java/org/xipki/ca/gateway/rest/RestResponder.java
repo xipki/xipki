@@ -88,8 +88,6 @@ public class RestResponder {
 
   } // class HttpRespAuditException
 
-  final byte[] NEWLINE = new byte[]{'\r', '\n'};
-
   private static final int OK = 200;
 
   private static final int BAD_REQUEST = 400;
@@ -569,7 +567,7 @@ public class RestResponder {
     }
 
     EnrollCertsRequest sdkReq = new EnrollCertsRequest();
-    sdkReq.setEntries(templates);
+    sdkReq.setEntries(templates.toArray(new EnrollCertRequestEntry[0]));
     sdkReq.setExplicitConfirm(false);
     sdkReq.setGroupEnroll(twin);
     sdkReq.setCaCertMode(CertsMode.NONE);
@@ -702,7 +700,7 @@ public class RestResponder {
       throw new HttpRespAuditException(BAD_REQUEST, message, INFO, FAILED);
     }
 
-    List<EnrollCertRequestEntry> templates = Collections.singletonList(template);
+    EnrollCertRequestEntry[] templates = new EnrollCertRequestEntry[]{template};
 
     EnrollCertsRequest sdkReq = new EnrollCertsRequest();
     sdkReq.setEntries(templates);
@@ -711,14 +709,14 @@ public class RestResponder {
     sdkReq.setCaCertMode(CertsMode.NONE);
 
     EnrollOrPollCertsResponse sdkResp = sdk.enrollCrossCerts(caName, sdkReq);
-    checkResponse(templates.size(), sdkResp);
+    checkResponse(templates.length, sdkResp);
 
     EnrollOrPullCertResponseEntry entry = getEntry(sdkResp.getEntries(), certId);
     return HttpRespContent.ofOk(CT_pkix_cert, entry.getCert());
   }
 
   private static void checkResponse(int expectedSize, EnrollOrPollCertsResponse resp) throws HttpRespAuditException {
-    List<EnrollOrPullCertResponseEntry> entries = resp.getEntries();
+    EnrollOrPullCertResponseEntry[] entries = resp.getEntries();
     if (entries != null) {
       for (EnrollOrPullCertResponseEntry entry : entries) {
         if (entry.getError() != null) {
@@ -727,7 +725,7 @@ public class RestResponder {
       }
     }
 
-    int n = entries == null ? 0 : entries.size();
+    int n = entries == null ? 0 : entries.length;
     if (n != expectedSize) {
       throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, "expected " + expectedSize + " cert, but received " + n,
           INFO, FAILED);
@@ -750,7 +748,7 @@ public class RestResponder {
   }
 
   private static EnrollOrPullCertResponseEntry getEntry(
-      List<EnrollOrPullCertResponseEntry> entries, BigInteger certReqId)
+      EnrollOrPullCertResponseEntry[] entries, BigInteger certReqId)
       throws HttpRespAuditException {
     for (EnrollOrPullCertResponseEntry m : entries) {
       if (certReqId.equals(m.getId())) {
@@ -795,7 +793,7 @@ public class RestResponder {
     if (!revoke) {
       UnsuspendOrRemoveRequest sdkReq = new UnsuspendOrRemoveRequest();
       sdkReq.setIssuerCertSha1Fp(caSha1);
-      sdkReq.setEntries(Collections.singletonList(serialNumber));
+      sdkReq.setEntries(new BigInteger[]{serialNumber});
       sdk.unsuspendCerts(sdkReq);
     } else {
       String strReason = httpRetriever.getParameter(PARAM_reason);
@@ -812,16 +810,12 @@ public class RestResponder {
         invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(strInvalidityTime);
       }
 
-      RevokeCertRequestEntry entry = new RevokeCertRequestEntry();
-      entry.setSerialNumber(serialNumber);
-      if (invalidityTime != null) {
-        entry.setInvalidityTime(invalidityTime.getEpochSecond());
-      }
-      entry.setReason(reason);
+      RevokeCertRequestEntry entry = new RevokeCertRequestEntry(serialNumber, reason,
+          invalidityTime == null ? null : invalidityTime.getEpochSecond());
 
       RevokeCertsRequest sdkReq = new RevokeCertsRequest();
       sdkReq.setIssuerCertSha1Fp(caSha1);
-      sdkReq.setEntries(Collections.singletonList(entry));
+      sdkReq.setEntries(new RevokeCertRequestEntry[]{entry});
       sdk.revokeCerts(sdkReq);
     }
   }

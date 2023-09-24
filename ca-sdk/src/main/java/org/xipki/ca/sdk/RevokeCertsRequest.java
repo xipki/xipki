@@ -3,7 +3,11 @@
 
 package org.xipki.ca.sdk;
 
-import java.util.List;
+import org.xipki.ca.sdk.jacob.CborDecoder;
+import org.xipki.ca.sdk.jacob.CborEncoder;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 /**
  *
@@ -13,18 +17,40 @@ import java.util.List;
 
 public class RevokeCertsRequest extends CaIdentifierRequest {
 
-  private List<RevokeCertRequestEntry> entries;
+  private RevokeCertRequestEntry[] entries;
 
-  public List<RevokeCertRequestEntry> getEntries() {
-    return entries;
-  }
-
-  public void setEntries(List<RevokeCertRequestEntry> entries) {
+  public void setEntries(RevokeCertRequestEntry[] entries) {
     this.entries = entries;
   }
 
-  public static RevokeCertsRequest decode(byte[] encoded) {
-    return CBOR.parseObject(encoded, RevokeCertsRequest.class);
+  public RevokeCertRequestEntry[] getEntries() {
+    return entries;
+  }
+
+  public void encode(CborEncoder encoder) throws EncodeException {
+    super.encode(encoder, 1);
+    try {
+      encoder.writeObjects(entries);
+    } catch (IOException ex) {
+      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    }
+  }
+
+  public static RevokeCertsRequest decode(byte[] encoded) throws DecodeException {
+    try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
+      if (decoder.readNullOrArrayLength(4)) {
+        return null;
+      }
+
+      RevokeCertsRequest ret = new RevokeCertsRequest();
+      ret.setIssuerCertSha1Fp(decoder.readByteString());
+      ret.setIssuer(X500NameType.decode(decoder));
+      ret.setAuthorityKeyIdentifier(decoder.readByteString());
+      ret.setEntries(RevokeCertRequestEntry.decodeArray(decoder));
+      return ret;
+    } catch (IOException ex) {
+      throw new DecodeException("error decoding " + RevokeCertsRequest.class.getName(), ex);
+    }
   }
 
 }

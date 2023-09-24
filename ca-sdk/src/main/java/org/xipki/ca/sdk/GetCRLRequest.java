@@ -3,6 +3,11 @@
 
 package org.xipki.ca.sdk;
 
+import org.xipki.ca.sdk.jacob.CborDecoder;
+import org.xipki.ca.sdk.jacob.CborEncoder;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 
 /**
@@ -16,45 +21,62 @@ public class GetCRLRequest extends SdkRequest {
   /**
    * Returns CRL of this specified crlNumber.
    */
-  private BigInteger crlNumber;
+  private final BigInteger crlNumber;
 
   /**
    * Epoch time in seconds of thisUpdate of the known CRL.
    * If present, returns only CRL with larger thisUpdate.
    */
-  private Long thisUpdate;
+  private final Long thisUpdate;
 
   /**
    * Returns CRL published under this CRL distribution point.
    */
-  private String crlDp;
+  private final String crlDp;
+
+  public GetCRLRequest(BigInteger crlNumber, Long thisUpdate, String crlDp) {
+    this.crlNumber = crlNumber;
+    this.thisUpdate = thisUpdate;
+    this.crlDp = crlDp;
+  }
 
   public BigInteger getCrlNumber() {
     return crlNumber;
-  }
-
-  public void setCrlNumber(BigInteger crlNumber) {
-    this.crlNumber = crlNumber;
   }
 
   public Long getThisUpdate() {
     return thisUpdate;
   }
 
-  public void setThisUpdate(Long thisUpdate) {
-    this.thisUpdate = thisUpdate;
-  }
-
   public String getCrlDp() {
     return crlDp;
   }
 
-  public void setCrlDp(String crlDp) {
-    this.crlDp = crlDp;
+  @Override
+  public void encode(CborEncoder encoder) throws EncodeException {
+    try {
+      encoder.writeArrayStart(3);
+      encoder.writeByteString(crlNumber);
+      encoder.writeIntObj(thisUpdate);
+      encoder.writeTextString(crlDp);
+    } catch (IOException ex) {
+      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    }
   }
 
-  public static GetCRLRequest decode(byte[] encoded) {
-    return CBOR.parseObject(encoded, GetCRLRequest.class);
+  public static GetCRLRequest decode(byte[] encoded) throws DecodeException {
+    try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
+      if (decoder.readNullOrArrayLength(3)) {
+        return null;
+      }
+
+      return new GetCRLRequest(
+          decoder.readBigInt(),
+          decoder.readIntObj(),
+          decoder.readTextString());
+    } catch (IOException ex) {
+      throw new DecodeException("error decoding " + GetCRLRequest.class.getName(), ex);
+    }
   }
 
 }

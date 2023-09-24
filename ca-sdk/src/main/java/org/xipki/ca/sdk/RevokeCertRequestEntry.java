@@ -3,8 +3,12 @@
 
 package org.xipki.ca.sdk;
 
+import org.xipki.ca.sdk.jacob.CborDecoder;
+import org.xipki.ca.sdk.jacob.CborEncodable;
+import org.xipki.ca.sdk.jacob.CborEncoder;
 import org.xipki.security.CrlReason;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
 /**
@@ -13,41 +17,87 @@ import java.math.BigInteger;
  * @since 6.0.0
  */
 
-public class RevokeCertRequestEntry {
+public class RevokeCertRequestEntry implements CborEncodable {
 
   /*
    * Uppercase hex encoded serialNumber.
    */
-  private BigInteger serialNumber;
+  private final BigInteger serialNumber;
 
-  private CrlReason reason;
+  private final CrlReason reason;
 
   /**
    * Epoch time in seconds of invalidity time.
    */
-  private Long invalidityTime;
+  private final Long invalidityTime;
+
+  public RevokeCertRequestEntry(BigInteger serialNumber, CrlReason reason, Long invalidityTime) {
+    this.serialNumber = serialNumber;
+    this.reason = reason;
+    this.invalidityTime = invalidityTime;
+  }
 
   public BigInteger getSerialNumber() {
     return serialNumber;
-  }
-
-  public void setSerialNumber(BigInteger serialNumber) {
-    this.serialNumber = serialNumber;
   }
 
   public CrlReason getReason() {
     return reason;
   }
 
-  public void setReason(CrlReason reason) {
-    this.reason = reason;
-  }
-
   public Long getInvalidityTime() {
     return invalidityTime;
   }
 
-  public void setInvalidityTime(Long invalidityTime) {
-    this.invalidityTime = invalidityTime;
+  @Override
+  public void encode(CborEncoder encoder) throws EncodeException {
+    try {
+      encoder.writeArrayStart(3);
+      encoder.writeByteString(serialNumber);
+      encoder.writeEnumObj(reason);
+      encoder.writeIntObj(invalidityTime);
+    } catch (IOException ex) {
+      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    }
   }
+
+  public static RevokeCertRequestEntry decode(CborDecoder decoder) throws DecodeException {
+    try {
+      if (decoder.readNullOrArrayLength(3)) {
+        return null;
+      }
+
+      BigInteger serialNumber = decoder.readBigInt();
+
+      String str = decoder.readTextString();
+      CrlReason reason = (str == null) ? null : CrlReason.valueOf(str);
+
+      return new RevokeCertRequestEntry(
+          serialNumber, reason,
+          decoder.readIntObj());
+    } catch (IOException | IllegalArgumentException ex) {
+      throw new DecodeException("error decoding " + RevokeCertRequestEntry.class.getName(), ex);
+    }
+  }
+
+  public static RevokeCertRequestEntry[] decodeArray(CborDecoder decoder) throws DecodeException {
+    Integer arrayLen;
+    try {
+      arrayLen = decoder.readNullOrArrayLength();
+    } catch (IOException ex) {
+      throw new DecodeException("error decoding " + RevokeCertRequestEntry[].class.getName(), ex);
+    }
+
+    if (arrayLen == null) {
+      return null;
+    }
+
+    RevokeCertRequestEntry[] entries = new RevokeCertRequestEntry[arrayLen];
+    for (int i = 0; i < arrayLen; i++) {
+      entries[i] = RevokeCertRequestEntry.decode(decoder);
+    }
+
+    return entries;
+  }
+
 }

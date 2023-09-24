@@ -728,14 +728,12 @@ public class AcmeResponder {
           }
         }
 
-        RevokeCertsRequest sdkReq = new RevokeCertsRequest();
-        sdkReq.setIssuer(new X500NameType());
-        sdkReq.getIssuer().setEncoded(encodedIssuer);
+        RevokeCertRequestEntry sdkEntry = new RevokeCertRequestEntry(
+            cert.getSerialNumber().getPositiveValue(), reason, null);
 
-        RevokeCertRequestEntry sdkEntry = new RevokeCertRequestEntry();
-        sdkEntry.setReason(reason);
-        sdkEntry.setSerialNumber(cert.getSerialNumber().getPositiveValue());
-        sdkReq.setEntries(Collections.singletonList(sdkEntry));
+        RevokeCertsRequest sdkReq = new RevokeCertsRequest();
+        sdkReq.setIssuer(new X500NameType(encodedIssuer));
+        sdkReq.setEntries(new RevokeCertRequestEntry[]{sdkEntry});
 
         RevokeCertsResponse sdkResp;
         try {
@@ -747,7 +745,7 @@ public class AcmeResponder {
               "error revoking the certificate");
         }
 
-        ErrorEntry errorEntry = sdkResp.getEntries().get(0).getError();
+        ErrorEntry errorEntry = sdkResp.getEntries()[0].getError();
         if (errorEntry == null) {
           return toRestResponse(HttpRespContent.of(SC_OK, null, null));
         } else {

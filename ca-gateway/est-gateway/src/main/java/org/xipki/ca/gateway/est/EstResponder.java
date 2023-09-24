@@ -496,7 +496,7 @@ public class EstResponder {
       }
     }
 
-    List<EnrollCertRequestEntry> templates = Collections.singletonList(template);
+    EnrollCertRequestEntry[] templates = new EnrollCertRequestEntry[]{template};
 
     EnrollCertsRequest sdkReq = new EnrollCertsRequest();
     sdkReq.setEntries(templates);
@@ -583,16 +583,11 @@ public class EstResponder {
     }
 
     // set the oldCertInfo
-    OldCertInfoBySubject oldCertInfo = new OldCertInfoBySubject();
-    oldCertInfo.setReusePublicKey(false);
-    oldCertInfo.setSubject(oldSubject.getEncoded());
-
     Extensions csrExtns = X509Util.getExtensions(certTemp);
     byte[] extnValue = X509Util.getCoreExtValue(csrExtns, Extension.subjectAlternativeName);
 
-    if (extnValue != null) {
-      oldCertInfo.setSan(extnValue);
-    }
+    OldCertInfoBySubject oldCertInfo = new OldCertInfoBySubject(false, oldSubject.getEncoded(), extnValue);
+
     template.setOldCertSubject(oldCertInfo);
 
     Attribute attr = X509Util.getAttribute(certTemp, ObjectIdentifiers.CMC.id_cmc_changeSubjectName);
@@ -679,7 +674,7 @@ public class EstResponder {
       throw new HttpRespAuditException(BAD_REQUEST, message, AuditLevel.INFO, AuditStatus.FAILED);
     }
 
-    List<EnrollCertRequestEntry> templates = Collections.singletonList(template);
+    EnrollCertRequestEntry[] templates = new EnrollCertRequestEntry[] {template};
 
     EnrollCertsRequest sdkReq = new EnrollCertsRequest();
     sdkReq.setEntries(templates);
@@ -733,7 +728,7 @@ public class EstResponder {
 
   private static void checkResponse(int expectedSize, EnrollOrPollCertsResponse resp)
       throws HttpRespAuditException {
-    List<EnrollOrPullCertResponseEntry> entries = resp.getEntries();
+    EnrollOrPullCertResponseEntry[] entries = resp.getEntries();
     if (entries != null) {
       for (EnrollOrPullCertResponseEntry entry : entries) {
         if (entry.getError() != null) {
@@ -743,7 +738,7 @@ public class EstResponder {
       }
     }
 
-    int n = entries == null ? 0 : entries.size();
+    int n = entries == null ? 0 : entries.length;
     if (n != expectedSize) {
       throw new HttpRespAuditException(INTERNAL_SERVER_ERROR,
           "expected " + expectedSize + " cert, but received " + n, AuditLevel.INFO, AuditStatus.FAILED);
@@ -751,7 +746,7 @@ public class EstResponder {
   }
 
   private static EnrollOrPullCertResponseEntry getEntry(
-      List<EnrollOrPullCertResponseEntry> entries, BigInteger certReqId)
+      EnrollOrPullCertResponseEntry[] entries, BigInteger certReqId)
       throws HttpRespAuditException {
     for (EnrollOrPullCertResponseEntry m : entries) {
       if (certReqId.equals(m.getId())) {

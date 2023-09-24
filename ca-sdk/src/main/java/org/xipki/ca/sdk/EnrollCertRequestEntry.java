@@ -5,6 +5,9 @@ package org.xipki.ca.sdk;
 
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.xipki.ca.sdk.jacob.CborDecoder;
+import org.xipki.ca.sdk.jacob.CborEncodable;
+import org.xipki.ca.sdk.jacob.CborEncoder;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -16,7 +19,7 @@ import java.time.Instant;
  * @since 6.0.0
  */
 
-public class EnrollCertRequestEntry {
+public class EnrollCertRequestEntry implements CborEncodable {
 
   private BigInteger certReqId;
 
@@ -158,6 +161,62 @@ public class EnrollCertRequestEntry {
 
   public void setOldCertSubject(OldCertInfoBySubject oldCertSubject) {
     this.oldCertSubject = oldCertSubject;
+  }
+
+  @Override
+  public void encode(CborEncoder encoder) throws EncodeException {
+    try {
+      encoder.writeArrayStart(10);
+      encoder.writeByteString(certReqId);
+      encoder.writeTextString(certprofile);
+      encoder.writeByteString(p10req);
+      encoder.writeObject(subject);
+      encoder.writeByteString(subjectPublicKey);
+      encoder.writeByteString(extensions);
+      encoder.writeIntObj(notBefore);
+      encoder.writeIntObj(notAfter);
+      encoder.writeObject(oldCertIsn);
+      encoder.writeObject(oldCertSubject);
+    } catch (IOException ex) {
+      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    }
+  }
+
+  public static EnrollCertRequestEntry decode(CborDecoder decoder) throws DecodeException {
+    try {
+      if (decoder.readNullOrArrayLength(10)) {
+        return null;
+      }
+
+      EnrollCertRequestEntry ret = new EnrollCertRequestEntry();
+      ret.setCertReqId(decoder.readBigInt());
+      ret.setCertprofile(decoder.readTextString());
+      ret.setP10req(decoder.readByteString());
+      ret.setSubject(X500NameType.decode(decoder));
+      ret.setSubjectPublicKey(decoder.readByteString());
+      ret.setExtensions(decoder.readByteString());
+      ret.setNotBefore(decoder.readIntObj());
+      ret.setNotAfter(decoder.readIntObj());
+      ret.setOldCertIsn(OldCertInfoByIssuerAndSerial.decode(decoder));
+      ret.setOldCertSubject(OldCertInfoBySubject.decode(decoder));
+      return ret;
+    } catch (IOException ex) {
+      throw new DecodeException("error decoding " + EnrollCertRequestEntry.class.getName(), ex);
+    }
+  }
+
+  public static EnrollCertRequestEntry[] decodeArray(CborDecoder decoder) throws DecodeException {
+    Integer arrayLen = decoder.readNullOrArrayLength(EnrollCertRequestEntry[].class);
+    if (arrayLen == null) {
+      return null;
+    }
+
+    EnrollCertRequestEntry[] entries = new EnrollCertRequestEntry[arrayLen];
+    for (int i = 0; i < arrayLen; i++) {
+      entries[i] = EnrollCertRequestEntry.decode(decoder);
+    }
+
+    return entries;
   }
 
 }

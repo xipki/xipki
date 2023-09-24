@@ -3,6 +3,12 @@
 
 package org.xipki.ca.sdk;
 
+import org.xipki.ca.sdk.jacob.CborDecoder;
+import org.xipki.ca.sdk.jacob.CborEncoder;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
 /**
  *
  * @author Lijun Liao (xipki)
@@ -11,38 +17,55 @@ package org.xipki.ca.sdk;
 
 public class CertprofileInfoResponse extends SdkResponse {
 
-  private String[] requiredExtensionTypes;
+  private final String[] requiredExtensionTypes;
 
-  private String[] optionalExtensionTypes;
+  private final String[] optionalExtensionTypes;
 
-  private KeyType[] keyTypes;
+  private final KeyType[] keyTypes;
+
+  public CertprofileInfoResponse(String[] requiredExtensionTypes, String[] optionalExtensionTypes, KeyType[] keyTypes) {
+    this.requiredExtensionTypes = requiredExtensionTypes;
+    this.optionalExtensionTypes = optionalExtensionTypes;
+    this.keyTypes = keyTypes;
+  }
 
   public String[] getRequiredExtensionTypes() {
     return requiredExtensionTypes;
-  }
-
-  public void setRequiredExtensionTypes(String[] requiredExtensionTypes) {
-    this.requiredExtensionTypes = requiredExtensionTypes;
   }
 
   public String[] getOptionalExtensionTypes() {
     return optionalExtensionTypes;
   }
 
-  public void setOptionalExtensionTypes(String[] optionalExtensionTypes) {
-    this.optionalExtensionTypes = optionalExtensionTypes;
-  }
-
   public KeyType[] getKeyTypes() {
     return keyTypes;
   }
 
-  public void setKeyTypes(KeyType[] keyTypes) {
-    this.keyTypes = keyTypes;
+  @Override
+  public void encode(CborEncoder encoder) throws EncodeException {
+    try {
+      encoder.writeArrayStart(3);
+      encoder.writeTextStrings(requiredExtensionTypes);
+      encoder.writeTextStrings(optionalExtensionTypes);
+      encoder.writeObjects(keyTypes);
+    } catch (IOException ex) {
+      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    }
   }
 
-  public static CertprofileInfoResponse decode(byte[] encoded) {
-    return CBOR.parseObject(encoded, CertprofileInfoResponse.class);
+  public static CertprofileInfoResponse decode(byte[] encoded) throws DecodeException {
+    try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
+      if (decoder.readNullOrArrayLength(3)) {
+        return null;
+      }
+
+      return new CertprofileInfoResponse(
+          decoder.readTextStrings(),
+          decoder.readTextStrings(),
+          KeyType.decodeArray(decoder));
+    } catch (IOException ex) {
+      throw new DecodeException("error decoding " + CertprofileInfoResponse.class.getName(), ex);
+    }
   }
 
 }

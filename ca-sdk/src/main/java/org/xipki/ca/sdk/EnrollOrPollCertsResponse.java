@@ -3,7 +3,11 @@
 
 package org.xipki.ca.sdk;
 
-import java.util.List;
+import org.xipki.ca.sdk.jacob.CborDecoder;
+import org.xipki.ca.sdk.jacob.CborEncoder;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 /**
  * Response for the operations enrolling certificates and polling certificates.
@@ -18,9 +22,9 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
 
   private Long confirmWaitTime;
 
-  private List<EnrollOrPullCertResponseEntry> entries;
+  private EnrollOrPullCertResponseEntry[] entries;
 
-  private List<byte[]> extraCerts;
+  private byte[][] extraCerts;
 
   public String getTransactionId() {
     return transactionId;
@@ -28,22 +32,6 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
 
   public void setTransactionId(String transactionId) {
     this.transactionId = transactionId;
-  }
-
-  public List<EnrollOrPullCertResponseEntry> getEntries() {
-    return entries;
-  }
-
-  public void setEntries(List<EnrollOrPullCertResponseEntry> entries) {
-    this.entries = entries;
-  }
-
-  public List<byte[]> getExtraCerts() {
-    return extraCerts;
-  }
-
-  public void setExtraCerts(List<byte[]> extraCerts) {
-    this.extraCerts = extraCerts;
   }
 
   public Long getConfirmWaitTime() {
@@ -54,8 +42,51 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
     this.confirmWaitTime = confirmWaitTime;
   }
 
-  public static EnrollOrPollCertsResponse decode(byte[] encoded) {
-    return CBOR.parseObject(encoded, EnrollOrPollCertsResponse.class);
+  public EnrollOrPullCertResponseEntry[] getEntries() {
+    return entries;
   }
+
+  public void setEntries(EnrollOrPullCertResponseEntry[] entries) {
+    this.entries = entries;
+  }
+
+  public byte[][] getExtraCerts() {
+    return extraCerts;
+  }
+
+  public void setExtraCerts(byte[][] extraCerts) {
+    this.extraCerts = extraCerts;
+  }
+
+  @Override
+  public void encode(CborEncoder encoder) throws EncodeException {
+    try {
+      encoder.writeArrayStart(4);
+      encoder.writeTextString(transactionId);
+      encoder.writeIntObj(confirmWaitTime);
+      encoder.writeObjects(entries);
+      encoder.writeByteStrings(extraCerts);
+    } catch (IOException ex) {
+      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    }
+  }
+
+  public static EnrollOrPollCertsResponse decode(byte[] encoded) throws DecodeException {
+    try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
+      if (decoder.readNullOrArrayLength(4)) {
+        return null;
+      }
+
+      EnrollOrPollCertsResponse ret = new EnrollOrPollCertsResponse();
+      ret.setTransactionId(decoder.readTextString());
+      ret.setConfirmWaitTime(decoder.readIntObj());
+      ret.setEntries(EnrollOrPullCertResponseEntry.decodeArray(decoder));
+      ret.setExtraCerts(decoder.readByteStrings());
+      return ret;
+    } catch (IOException ex) {
+      throw new DecodeException("error decoding " + EnrollOrPollCertsResponse.class.getName(), ex);
+    }
+  }
+
 
 }

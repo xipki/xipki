@@ -3,6 +3,11 @@
 
 package org.xipki.ca.sdk;
 
+import org.xipki.ca.sdk.jacob.CborDecoder;
+import org.xipki.ca.sdk.jacob.CborEncoder;
+
+import java.io.IOException;
+
 /**
  *
  * @author Lijun Liao (xipki)
@@ -11,23 +16,50 @@ package org.xipki.ca.sdk;
 
 public class OldCertInfoBySubject extends OldCertInfo {
 
-  private byte[] subject;
+  private final byte[] subject;
 
-  private byte[] san;
+  private final byte[] san;
+
+  public OldCertInfoBySubject(boolean reusePublicKey, byte[] subject, byte[] san) {
+    super(reusePublicKey);
+    this.subject = subject;
+    this.san = san;
+  }
 
   public byte[] getSubject() {
     return subject;
-  }
-
-  public void setSubject(byte[] subject) {
-    this.subject = subject;
   }
 
   public byte[] getSan() {
     return san;
   }
 
-  public void setSan(byte[] san) {
-    this.san = san;
+  @Override
+  public void encode(CborEncoder encoder) throws EncodeException {
+    try {
+      encoder.writeArrayStart(3);
+      encoder.writeBoolean(isReusePublicKey());
+      encoder.writeByteString(subject);
+      encoder.writeByteString(san);
+    } catch (IOException ex) {
+      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    }
   }
+
+
+  public static OldCertInfoBySubject decode(CborDecoder decoder) throws DecodeException {
+    try {
+      if (decoder.readNullOrArrayLength(3)) {
+        return null;
+      }
+
+      return new OldCertInfoBySubject(
+          decoder.readBoolean(),
+          decoder.readByteString(),
+          decoder.readByteString());
+    } catch (IOException ex) {
+      throw new DecodeException("error decoding " + OldCertInfoBySubject.class.getName(), ex);
+    }
+  }
+
 }

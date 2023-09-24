@@ -3,6 +3,11 @@
 
 package org.xipki.ca.sdk;
 
+import org.xipki.ca.sdk.jacob.CborDecoder;
+import org.xipki.ca.sdk.jacob.CborEncodable;
+import org.xipki.ca.sdk.jacob.CborEncoder;
+
+import java.io.IOException;
 import java.math.BigInteger;
 
 /**
@@ -11,29 +16,66 @@ import java.math.BigInteger;
  * @since 6.0.0
  */
 
-public class PollCertRequestEntry {
+public class PollCertRequestEntry implements CborEncodable {
 
   /*
    * In SCEP: this field is null.
    */
-  private BigInteger id;
+  private final BigInteger id;
 
-  private X500NameType subject;
+  private final X500NameType subject;
+
+  public PollCertRequestEntry(BigInteger id, X500NameType subject) {
+    this.id = id;
+    this.subject = subject;
+  }
 
   public BigInteger getId() {
     return id;
-  }
-
-  public void setId(BigInteger id) {
-    this.id = id;
   }
 
   public X500NameType getSubject() {
     return subject;
   }
 
-  public void setSubject(X500NameType subject) {
-    this.subject = subject;
+  @Override
+  public void encode(CborEncoder encoder) throws EncodeException {
+    try {
+      encoder.writeArrayStart(2);
+      encoder.writeByteString(id);
+      encoder.writeObject(subject);
+    } catch (IOException ex) {
+      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    }
   }
+
+  public static PollCertRequestEntry decode(CborDecoder decoder) throws DecodeException {
+    try {
+      if (decoder.readNullOrArrayLength(2)) {
+        return null;
+      }
+
+      return new PollCertRequestEntry(
+          decoder.readBigInt(),
+          X500NameType.decode(decoder));
+    } catch (IOException ex) {
+      throw new DecodeException("error decoding " + PollCertRequestEntry.class.getName(), ex);
+    }
+  }
+
+  public static PollCertRequestEntry[] decodeArray(CborDecoder decoder) throws DecodeException {
+    Integer arrayLen = decoder.readNullOrArrayLength(PollCertRequestEntry[].class);
+    if (arrayLen == null) {
+      return null;
+    }
+
+    PollCertRequestEntry[] entries = new PollCertRequestEntry[arrayLen];
+    for (int i = 0; i < arrayLen; i++) {
+      entries[i] = PollCertRequestEntry.decode(decoder);
+    }
+
+    return entries;
+  }
+
 
 }

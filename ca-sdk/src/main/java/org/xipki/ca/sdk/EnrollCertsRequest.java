@@ -3,7 +3,11 @@
 
 package org.xipki.ca.sdk;
 
-import java.util.List;
+import org.xipki.ca.sdk.jacob.CborDecoder;
+import org.xipki.ca.sdk.jacob.CborEncoder;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 /**
  *
@@ -11,20 +15,118 @@ import java.util.List;
  * @since 6.0.0
  */
 
-public class EnrollCertsRequest extends CertsRequest {
+public class EnrollCertsRequest extends SdkRequest {
 
-  private List<EnrollCertRequestEntry> entries;
 
-  public List<EnrollCertRequestEntry> getEntries() {
+  private String transactionId;
+
+  /**
+   * For case to enroll more than 1 certificates in one request, default to false.
+   * <ul>
+   *   <li>true: either all certificates have been enrolled or failed.</li>
+   *   <li>false: each certificate may have been enrolled or failed</li>
+   * </ul>
+   */
+  private Boolean groupEnroll;
+
+  /**
+   * Whether an explicit confirm is required. Default to false.
+   */
+  private Boolean explicitConfirm;
+
+  private Integer confirmWaitTimeMs;
+
+  /**
+   * Specifies how to embed the CA certificate in the response:
+   */
+  private CertsMode caCertMode;
+
+
+  private EnrollCertRequestEntry[] entries;
+
+  public String getTransactionId() {
+    return transactionId;
+  }
+
+  public void setTransactionId(String transactionId) {
+    this.transactionId = transactionId;
+  }
+
+  public Boolean getGroupEnroll() {
+    return groupEnroll;
+  }
+
+  public void setGroupEnroll(Boolean groupEnroll) {
+    this.groupEnroll = groupEnroll;
+  }
+
+  public Boolean getExplicitConfirm() {
+    return explicitConfirm;
+  }
+
+  public void setExplicitConfirm(Boolean explicitConfirm) {
+    this.explicitConfirm = explicitConfirm;
+  }
+
+  public Integer getConfirmWaitTimeMs() {
+    return confirmWaitTimeMs;
+  }
+
+  public void setConfirmWaitTimeMs(Integer confirmWaitTimeMs) {
+    this.confirmWaitTimeMs = confirmWaitTimeMs;
+  }
+
+  public CertsMode getCaCertMode() {
+    return caCertMode;
+  }
+
+  public void setCaCertMode(CertsMode caCertMode) {
+    this.caCertMode = caCertMode;
+  }
+
+  public EnrollCertRequestEntry[] getEntries() {
     return entries;
   }
 
-  public void setEntries(List<EnrollCertRequestEntry> entries) {
+  public void setEntries(EnrollCertRequestEntry[] entries) {
     this.entries = entries;
   }
 
-  public static EnrollCertsRequest decode(byte[] encoded) {
-    return CBOR.parseObject(encoded, EnrollCertsRequest.class);
+  @Override
+  public void encode(CborEncoder encoder) throws EncodeException {
+    try {
+      encoder.writeArrayStart(6);
+      encoder.writeTextString(transactionId);
+      encoder.writeBooleanObj(groupEnroll);
+      encoder.writeBooleanObj(explicitConfirm);
+      encoder.writeIntObj(confirmWaitTimeMs);
+      encoder.writeEnumObj(caCertMode);
+      encoder.writeObjects(entries);
+    } catch (IOException ex) {
+      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    }
+  }
+
+  public static EnrollCertsRequest decode(byte[] encoded) throws DecodeException {
+    try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
+      if (decoder.readNullOrArrayLength(6)) {
+        return null;
+      }
+
+      EnrollCertsRequest ret = new EnrollCertsRequest();
+      ret.setTransactionId(decoder.readTextString());
+      ret.setGroupEnroll(decoder.readBooleanObj());
+      ret.setExplicitConfirm(decoder.readBooleanObj());
+      ret.setConfirmWaitTimeMs(decoder.readInt32Obj());
+      String str = decoder.readTextString();
+      if (str != null) {
+        ret.setCaCertMode(CertsMode.valueOf(str));
+      }
+      ret.setEntries(EnrollCertRequestEntry.decodeArray(decoder));
+      return ret;
+    } catch (IOException | IllegalArgumentException ex) {
+      throw new DecodeException("error decoding " + EnrollCertsRequest.class.getName(), ex);
+    }
   }
 
 }

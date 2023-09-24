@@ -5,14 +5,12 @@ package org.xipki.ca.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.sdk.EncodeException;
 import org.xipki.ca.sdk.ErrorResponse;
 import org.xipki.ca.sdk.SdkResponse;
 import org.xipki.ca.server.SdkResponder;
 import org.xipki.security.util.HttpRequestMetadataRetriever;
-import org.xipki.util.Args;
-import org.xipki.util.Base64;
-import org.xipki.util.HttpConstants;
-import org.xipki.util.IoUtil;
+import org.xipki.util.*;
 import org.xipki.util.exception.ErrorCode;
 
 import javax.servlet.http.HttpServlet;
@@ -113,6 +111,9 @@ public class HttpRaServlet extends HttpServlet {
         resp.setContentLength(respBody.length);
         resp.getOutputStream().write(respBody);
       }
+    } catch (EncodeException ex) {
+      LOG.error("Error encoding SdkResponse", ex);
+      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     } catch (RuntimeException ex) {
       LOG.error("RuntimeException thrown, this should not happen!", ex);
       resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
