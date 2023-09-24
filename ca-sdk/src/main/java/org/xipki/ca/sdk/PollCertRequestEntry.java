@@ -77,5 +77,4 @@ public class PollCertRequestEntry implements CborEncodable {
     return entries;
   }
 
-
 }

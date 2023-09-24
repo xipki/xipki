@@ -66,5 +66,4 @@ public class PollCertRequest extends CaIdentifierRequest {
     }
   }
 
-
 }

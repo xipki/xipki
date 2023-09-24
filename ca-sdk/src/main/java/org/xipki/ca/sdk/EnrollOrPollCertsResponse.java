@@ -88,5 +88,4 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
     }
   }
 
-
 }

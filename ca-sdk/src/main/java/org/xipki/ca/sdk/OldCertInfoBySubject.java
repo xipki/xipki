@@ -46,7 +46,6 @@ public class OldCertInfoBySubject extends OldCertInfo {
     }
   }
 
-
   public static OldCertInfoBySubject decode(CborDecoder decoder) throws DecodeException {
     try {
       if (decoder.readNullOrArrayLength(3)) {

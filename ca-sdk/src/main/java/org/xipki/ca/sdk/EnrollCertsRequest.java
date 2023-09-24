@@ -17,7 +17,6 @@ import java.io.IOException;
 
 public class EnrollCertsRequest extends SdkRequest {
 
-
   private String transactionId;
 
   /**
@@ -40,7 +39,6 @@ public class EnrollCertsRequest extends SdkRequest {
    * Specifies how to embed the CA certificate in the response:
    */
   private CertsMode caCertMode;
-
 
   private EnrollCertRequestEntry[] entries;
 

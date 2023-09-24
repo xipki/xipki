@@ -10,7 +10,10 @@ import org.xipki.ca.sdk.ErrorResponse;
 import org.xipki.ca.sdk.SdkResponse;
 import org.xipki.ca.server.SdkResponder;
 import org.xipki.security.util.HttpRequestMetadataRetriever;
-import org.xipki.util.*;
+import org.xipki.util.Args;
+import org.xipki.util.Base64;
+import org.xipki.util.HttpConstants;
+import org.xipki.util.IoUtil;
 import org.xipki.util.exception.ErrorCode;
 
 import javax.servlet.http.HttpServlet;

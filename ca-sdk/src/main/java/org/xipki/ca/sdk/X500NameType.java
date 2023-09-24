@@ -4,7 +4,9 @@
 package org.xipki.ca.sdk;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.ca.sdk.jacob.*;
+import org.xipki.ca.sdk.jacob.CborDecoder;
+import org.xipki.ca.sdk.jacob.CborEncodable;
+import org.xipki.ca.sdk.jacob.CborEncoder;
 import org.xipki.util.Hex;
 
 import java.io.IOException;

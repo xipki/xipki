@@ -86,5 +86,4 @@ public class ConfirmCertRequestEntry implements CborEncodable {
     return entries;
   }
 
-
 }

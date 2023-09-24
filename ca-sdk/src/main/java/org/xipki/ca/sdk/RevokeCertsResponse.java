@@ -28,7 +28,6 @@ public class RevokeCertsResponse extends SdkResponse {
     return entries;
   }
 
-
   @Override
   public void encode(CborEncoder encoder) throws EncodeException {
     try {
@@ -51,6 +50,5 @@ public class RevokeCertsResponse extends SdkResponse {
       throw new DecodeException("error decoding " + RevokeCertsResponse.class.getName(), ex);
     }
   }
-
 
 }

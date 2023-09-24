@@ -1,7 +1,7 @@
+// #THIRDPARTY
 /*
- * #THIRDPARTY#
  * JACOB - CBOR implementation in Java.
- * 
+ *
  * (C) Copyright - 2013 - J.W. Janssen <j.w.janssen@lxtreme.nl>
  *
  * Licensed under Apache License v2.0.
@@ -25,7 +25,7 @@ public class CborType {
 
     /**
      * Returns a descriptive string for the given major type.
-     * 
+     *
      * @param mt the major type to return as string, values from [0..7] are supported.
      * @return the name of the given major type, as String, never <code>null</code>.
      * @throws IllegalArgumentException in case the given major type is not supported.
@@ -55,7 +55,7 @@ public class CborType {
 
     /**
      * Decodes a given byte value to a {@link CborType} value.
-     * 
+     *
      * @param i the input byte (8-bit) to decode into a {@link CborType} instance.
      * @return a {@link CborType} instance, never <code>null</code>.
      */
@@ -110,7 +110,7 @@ public class CborType {
 
     /**
      * Determines whether the major type of a given {@link CborType} equals the major type of this {@link CborType}.
-     * 
+     *
      * @param other the {@link CborType} to compare against, cannot be <code>null</code>.
      * @return <code>true</code> if the given {@link CborType} is of the same major type as this {@link CborType}, <code>false</code> otherwise.
      * @throws IllegalArgumentException in case the given argument was <code>null</code>.
@@ -124,7 +124,7 @@ public class CborType {
 
     /**
      * Determines whether the major type of a given byte value (representing an encoded {@link CborType}) equals the major type of this {@link CborType}.
-     * 
+     *
      * @param encoded the encoded CBOR type to compare.
      * @return <code>true</code> if the given byte value represents the same major type as this {@link CborType}, <code>false</code> otherwise.
      */

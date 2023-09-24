@@ -8,7 +8,6 @@ import org.xipki.ca.sdk.jacob.CborEncoder;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Response for the operations unrevoking certificates and removing certificates.

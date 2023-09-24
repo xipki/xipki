@@ -78,7 +78,6 @@ public class EnrollOrPullCertResponseEntry implements CborEncodable {
     }
   }
 
-
   public static EnrollOrPullCertResponseEntry[] decodeArray(CborDecoder decoder) throws DecodeException {
     Integer arrayLen = decoder.readNullOrArrayLength(EnrollOrPullCertResponseEntry[].class);
     if (arrayLen == null) {

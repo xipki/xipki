@@ -1,7 +1,7 @@
+// #THIRDPARTY
 /*
- * #THIRDPARTY#
  * JACOB - CBOR implementation in Java.
- * 
+ *
  * (C) Copyright - 2013 - J.W. Janssen <j.w.janssen@lxtreme.nl>
  */
 package org.xipki.ca.sdk.jacob;
@@ -22,7 +22,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Creates a new {@link CborDecoder} instance.
-     * 
+     *
      * @param is the actual input stream to read the CBOR-encoded data from, cannot be <code>null</code>.
      */
     public CborDecoder(InputStream is) {
@@ -43,7 +43,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Peeks in the input stream for the upcoming type.
-     * 
+     *
      * @return the upcoming type in the stream, or <code>null</code> in case of an end-of-stream.
      * @throws IOException in case of I/O problems reading the CBOR-type from the underlying input stream.
      */
@@ -66,7 +66,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Prolog to reading an array value in CBOR format.
-     * 
+     *
      * @return the number of elements in the array to read, or -1 in case of infinite-length arrays.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
      */
@@ -76,7 +76,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads a boolean value in CBOR format.
-     * 
+     *
      * @return the read boolean.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
      */
@@ -90,7 +90,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads a "break"/stop value in CBOR format.
-     * 
+     *
      * @return always <code>null</code>.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
      */
@@ -102,7 +102,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads a byte string value in CBOR format.
-     * 
+     *
      * @return the read byte string, or <code>null</code>.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
      */
@@ -125,7 +125,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Prolog to reading a byte string value in CBOR format.
-     * 
+     *
      * @return the number of bytes in the string to read, or -1 in case of infinite-length strings.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
      */
@@ -135,7 +135,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads a double-precision float value in CBOR format.
-     * 
+     *
      * @return the read double value, values from {@link Float#MIN_VALUE} to {@link Float#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
      */
@@ -147,7 +147,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads a single-precision float value in CBOR format.
-     * 
+     *
      * @return the read float value, values from {@link Float#MIN_VALUE} to {@link Float#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
      */
@@ -159,7 +159,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads a half-precision float value in CBOR format.
-     * 
+     *
      * @return the read half-precision float value, values from {@link Float#MIN_VALUE} to {@link Float#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
      */
@@ -186,7 +186,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads a signed or unsigned integer value in CBOR format.
-     * 
+     *
      * @return the read integer value, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
      */
@@ -201,7 +201,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads a signed or unsigned 16-bit integer value in CBOR format.
-     * 
+     *
      * read the small integer value, values from [-65536..65535] are supported.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying output stream.
      */
@@ -216,7 +216,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads a signed or unsigned 32-bit integer value in CBOR format.
-     * 
+     *
      * read the small integer value, values in the range [-4294967296..4294967295] are supported.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying output stream.
      */
@@ -231,7 +231,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads a signed or unsigned 64-bit integer value in CBOR format.
-     * 
+     *
      * read the small integer value, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying output stream.
      */
@@ -246,7 +246,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads a signed or unsigned 8-bit integer value in CBOR format.
-     * 
+     *
      * read the small integer value, values in the range [-256..255] are supported.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying output stream.
      */
@@ -261,7 +261,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Prolog to reading a map of key-value pairs in CBOR format.
-     * 
+     *
      * @return the number of entries in the map, &gt;= 0.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
      */
@@ -271,7 +271,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads a <code>null</code>-value in CBOR format.
-     * 
+     *
      * @return always <code>null</code>.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
      */
@@ -282,7 +282,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads a single byte value in CBOR format.
-     * 
+     *
      * @return the read byte value.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
      */
@@ -293,7 +293,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads a signed or unsigned small (&lt;= 23) integer value in CBOR format.
-     * 
+     *
      * read the small integer value, values in the range [-24..23] are supported.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying output stream.
      */
@@ -308,7 +308,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads a semantic tag value in CBOR format.
-     * 
+     *
      * @return the read tag value.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
      */
@@ -318,7 +318,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads an UTF-8 encoded string value in CBOR format.
-     * 
+     *
      * @return the read UTF-8 encoded string, or <code>null</code>.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
      */
@@ -341,7 +341,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Prolog to reading an UTF-8 encoded string value in CBOR format.
-     * 
+     *
      * @return the length of the string to read, or -1 in case of infinite-length strings.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
      */
@@ -351,7 +351,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads an undefined value in CBOR format.
-     * 
+     *
      * @return always <code>null</code>.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
      */
@@ -362,7 +362,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads the next major type from the underlying input stream, and verifies whether it matches the given expectation.
-     * 
+     *
      * @param ib the expected major type, cannot be <code>null</code> (unchecked).
      * @return either -1 if the major type was an signed integer, or 0 otherwise.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
@@ -378,7 +378,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads the next major type from the underlying input stream, and verifies whether it matches the given expectation.
-     * 
+     *
      * @param majorType the expected major type, cannot be <code>null</code> (unchecked).
      * @return the read subtype, or payload, of the read major type.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
@@ -393,7 +393,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads the next major type from the underlying input stream, and verifies whether it matches the given expectations.
-     * 
+     *
      * @param majorType the expected major type, cannot be <code>null</code> (unchecked);
      * @param subtype the expected subtype.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
@@ -407,7 +407,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads the next major type from the underlying input stream, verifies whether it matches the given expectation, and decodes the payload into a size.
-     * 
+     *
      * @param majorType the expected major type, cannot be <code>null</code> (unchecked).
      * @return the number of succeeding bytes, &gt;= 0, or -1 if an infinite-length type is read.
      * @throws IOException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
@@ -418,7 +418,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads an unsigned integer with a given length-indicator.
-     * 
+     *
      * @param length the length indicator to use;
      * @return the read unsigned integer, as long value.
      * @throws IOException in case of I/O problems reading the unsigned integer from the underlying input stream.
@@ -446,7 +446,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads an unsigned 16-bit integer value
-     * 
+     *
      * @return value the read value, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
@@ -457,7 +457,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads an unsigned 32-bit integer value
-     * 
+     *
      * @return value the read value, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
@@ -468,7 +468,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads an unsigned 64-bit integer value
-     * 
+     *
      * @return value the read value, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
@@ -480,7 +480,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads an unsigned 8-bit integer value
-     * 
+     *
      * @return value the read value, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
@@ -490,7 +490,7 @@ public class CborDecoder implements AutoCloseable {
 
     /**
      * Reads an unsigned integer with a given length-indicator.
-     * 
+     *
      * @param length the length indicator to use;
      * @return the read unsigned integer, as long value.
      * @throws IOException in case of I/O problems reading the unsigned integer from the underlying input stream.
@@ -652,7 +652,6 @@ public class CborDecoder implements AutoCloseable {
         }
         return (int) v;
     }
-
 
     @Override
     public void close() throws IOException {

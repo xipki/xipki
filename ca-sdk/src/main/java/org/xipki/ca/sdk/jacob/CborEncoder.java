@@ -1,7 +1,7 @@
+// #THIRDPARTY
 /*
- * #THIRDPARTY#
  * JACOB - CBOR implementation in Java.
- * 
+ *
  * (C) Copyright - 2013 - J.W. Janssen <j.w.janssen@lxtreme.nl>
  *
  * Licensed under Apache License v2.0.
@@ -13,7 +13,6 @@ import org.xipki.ca.sdk.EncodeException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.util.List;
 
 /**
  * Provides an encoder capable of encoding data into CBOR format to a given {@link OutputStream}.
@@ -25,7 +24,7 @@ public class CborEncoder {
 
     /**
      * Creates a new {@link CborEncoder} instance.
-     * 
+     *
      * @param os the actual output stream to write the CBOR-encoded data to, cannot be <code>null</code>.
      */
     public CborEncoder(OutputStream os) {
@@ -41,7 +40,7 @@ public class CborEncoder {
      * <p>
      * Taken from: <a href="http://stackoverflow.com/a/6162687/229140">this Stack Overflow answer</a>.
      * </p>
-     * 
+     *
      * @param fval the value to convert.
      * @return the raw integer representation of the given float value.
      */
@@ -81,7 +80,7 @@ public class CborEncoder {
      * After calling this method, one is expected to write the given number of array elements, which can be of any type. No length checks are performed.<p>
      * After all array elements are written, one should write a single break value to end the array, see {@link #writeBreak()}.
      * </p>
-     * 
+     *
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
     public void writeArrayStart() throws IOException {
@@ -93,7 +92,7 @@ public class CborEncoder {
      * <p>
      * After calling this method, one is expected to write the given number of array elements, which can be of any type. No length checks are performed.
      * </p>
-     * 
+     *
      * @param length the number of array elements to write, should &gt;= 0.
      * @throws IllegalArgumentException in case the given length was negative;
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
@@ -107,7 +106,7 @@ public class CborEncoder {
 
     /**
      * Writes a boolean value in canonical CBOR format.
-     * 
+     *
      * @param value the boolean to write.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
@@ -117,7 +116,7 @@ public class CborEncoder {
 
     /**
      * Writes a "break" stop-value in canonical CBOR format.
-     * 
+     *
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
     public void writeBreak() throws IOException {
@@ -126,7 +125,7 @@ public class CborEncoder {
 
     /**
      * Writes a byte string in canonical CBOR-format.
-     * 
+     *
      * @param bytes the byte string to write, can be <code>null</code> in which case a byte-string of length 0 is written.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
@@ -140,7 +139,7 @@ public class CborEncoder {
      * After calling this method, one is expected to write the given number of string parts. No length checks are performed.<p>
      * After all string parts are written, one should write a single break value to end the string, see {@link #writeBreak()}.
      * </p>
-     * 
+     *
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
     public void writeByteStringStart() throws IOException {
@@ -149,7 +148,7 @@ public class CborEncoder {
 
     /**
      * Writes a double-precision float value in canonical CBOR format.
-     * 
+     *
      * @param value the value to write, values from {@link Double#MIN_VALUE} to {@link Double#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
@@ -159,7 +158,7 @@ public class CborEncoder {
 
     /**
      * Writes a single-precision float value in canonical CBOR format.
-     * 
+     *
      * @param value the value to write, values from {@link Float#MIN_VALUE} to {@link Float#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
@@ -169,7 +168,7 @@ public class CborEncoder {
 
     /**
      * Writes a half-precision float value in canonical CBOR format.
-     * 
+     *
      * @param value the value to write, values from {@link Float#MIN_VALUE} to {@link Float#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
@@ -179,7 +178,7 @@ public class CborEncoder {
 
     /**
      * Writes a signed or unsigned integer value in canonical CBOR format, that is, tries to encode it in a little bytes as possible..
-     * 
+     *
      * @param value the value to write, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
@@ -196,7 +195,7 @@ public class CborEncoder {
 
     /**
      * Writes a signed or unsigned 16-bit integer value in CBOR format.
-     * 
+     *
      * @param value the value to write, values from [-65536..65535] are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
@@ -211,7 +210,7 @@ public class CborEncoder {
 
     /**
      * Writes a signed or unsigned 32-bit integer value in CBOR format.
-     * 
+     *
      * @param value the value to write, values in the range [-4294967296..4294967295] are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
@@ -226,7 +225,7 @@ public class CborEncoder {
 
     /**
      * Writes a signed or unsigned 64-bit integer value in CBOR format.
-     * 
+     *
      * @param value the value to write, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
@@ -241,7 +240,7 @@ public class CborEncoder {
 
     /**
      * Writes a signed or unsigned 8-bit integer value in CBOR format.
-     * 
+     *
      * @param value the value to write, values in the range [-256..255] are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
@@ -260,7 +259,7 @@ public class CborEncoder {
      * After calling this method, one is expected to write any number of map entries, as separate key and value. Keys and values can both be of any type. No length checks are performed.<p>
      * After all map entries are written, one should write a single break value to end the map, see {@link #writeBreak()}.
      * </p>
-     * 
+     *
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
     public void writeMapStart() throws IOException {
@@ -272,7 +271,7 @@ public class CborEncoder {
      * <p>
      * After calling this method, one is expected to write any number of map entries, as separate key and value. Keys and values can both be of any type. No length checks are performed.
      * </p>
-     * 
+     *
      * @param length the number of map entries to write, should &gt;= 0.
      * @throws IllegalArgumentException in case the given length was negative;
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
@@ -286,7 +285,7 @@ public class CborEncoder {
 
     /**
      * Writes a <code>null</code> value in canonical CBOR format.
-     * 
+     *
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
     public void writeNull() throws IOException {
@@ -295,7 +294,7 @@ public class CborEncoder {
 
     /**
      * Writes a simple value, i.e., an "atom" or "constant" value in canonical CBOR format.
-     * 
+     *
      * @param simpleValue the (unsigned byte) value to write, values from 32 to 255 are supported (though not enforced).
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
@@ -307,7 +306,7 @@ public class CborEncoder {
 
     /**
      * Writes a signed or unsigned small (&lt;= 23) integer value in CBOR format.
-     * 
+     *
      * @param value the value to write, values in the range [-24..23] are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
@@ -324,7 +323,7 @@ public class CborEncoder {
 
     /**
      * Writes a semantic tag in canonical CBOR format.
-     * 
+     *
      * @param tag the tag to write, should &gt;= 0.
      * @throws IllegalArgumentException in case the given tag was negative;
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
@@ -342,7 +341,7 @@ public class CborEncoder {
      * Note that this method is <em>platform</em> specific, as the given string value will be encoded in a byte array
      * using the <em>platform</em> encoding! This means that the encoding must be standardized and known.
      * </p>
-     * 
+     *
      * @param value the UTF-8 string to write, can be <code>null</code> in which case a null is written.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
@@ -356,7 +355,7 @@ public class CborEncoder {
      * After calling this method, one is expected to write the given number of string parts. No length checks are performed.<p>
      * After all string parts are written, one should write a single break value to end the string, see {@link #writeBreak()}.
      * </p>
-     * 
+     *
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
     public void writeTextStringStart() throws IOException {
@@ -365,7 +364,7 @@ public class CborEncoder {
 
     /**
      * Writes an "undefined" value in canonical CBOR format.
-     * 
+     *
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
      */
     public void writeUndefined() throws IOException {
@@ -374,7 +373,7 @@ public class CborEncoder {
 
     /**
      * Encodes and writes the major type and value as a simple type.
-     * 
+     *
      * @param majorType the major type of the value to write, denotes what semantics the written value has;
      * @param value the value to write, values from [0..31] are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
@@ -385,7 +384,7 @@ public class CborEncoder {
 
     /**
      * Writes a byte string in canonical CBOR-format.
-     * 
+     *
      * @param majorType the major type of the string, should be either 0x40 or 0x60;
      * @param bytes the byte string to write, can be <code>null</code> in which case a null is written.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
@@ -401,7 +400,7 @@ public class CborEncoder {
 
     /**
      * Encodes and writes the major type indicator with a given payload (length).
-     * 
+     *
      * @param majorType the major type of the value to write, denotes what semantics the written value has;
      * @param value the value to write, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
@@ -412,7 +411,7 @@ public class CborEncoder {
 
     /**
      * Encodes and writes an unsigned integer value, that is, tries to encode it in a little bytes as possible.
-     * 
+     *
      * @param mt the major type of the value to write, denotes what semantics the written value has;
      * @param value the value to write, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
@@ -433,7 +432,7 @@ public class CborEncoder {
 
     /**
      * Encodes and writes an unsigned 16-bit integer value
-     * 
+     *
      * @param mt the major type of the value to write, denotes what semantics the written value has;
      * @param value the value to write, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
@@ -446,7 +445,7 @@ public class CborEncoder {
 
     /**
      * Encodes and writes an unsigned 32-bit integer value
-     * 
+     *
      * @param mt the major type of the value to write, denotes what semantics the written value has;
      * @param value the value to write, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
@@ -461,7 +460,7 @@ public class CborEncoder {
 
     /**
      * Encodes and writes an unsigned 64-bit integer value
-     * 
+     *
      * @param mt the major type of the value to write, denotes what semantics the written value has;
      * @param value the value to write, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
@@ -480,7 +479,7 @@ public class CborEncoder {
 
     /**
      * Encodes and writes an unsigned 8-bit integer value
-     * 
+     *
      * @param mt the major type of the value to write, denotes what semantics the written value has;
      * @param value the value to write, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
      * @throws IOException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.

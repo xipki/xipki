@@ -77,5 +77,4 @@ public class SingleCertSerialEntry implements CborEncodable {
     return entries;
   }
 
-
 }
