@@ -4,9 +4,11 @@
 package org.xipki.ca.sdk;
 
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.ca.sdk.jacob.CborDecoder;
-import org.xipki.ca.sdk.jacob.CborEncoder;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.cbor.CborDecoder;
+import org.xipki.util.cbor.CborEncoder;
+import org.xipki.util.exception.DecodeException;
+import org.xipki.util.exception.EncodeException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

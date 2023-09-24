@@ -4,10 +4,12 @@
 package org.xipki.ca.sdk;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.ca.sdk.jacob.CborDecoder;
-import org.xipki.ca.sdk.jacob.CborEncodable;
-import org.xipki.ca.sdk.jacob.CborEncoder;
 import org.xipki.util.Hex;
+import org.xipki.util.cbor.CborDecoder;
+import org.xipki.util.cbor.CborEncodable;
+import org.xipki.util.cbor.CborEncoder;
+import org.xipki.util.exception.DecodeException;
+import org.xipki.util.exception.EncodeException;
 
 import java.io.IOException;
 

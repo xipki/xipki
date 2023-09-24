@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.ca.sdk.jacob.CborEncodable;
+import org.xipki.util.cbor.CborEncodable;
 
 /**
  *

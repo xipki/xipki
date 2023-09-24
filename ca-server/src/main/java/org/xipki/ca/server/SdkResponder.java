@@ -26,6 +26,8 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.exception.DecodeException;
+import org.xipki.util.exception.EncodeException;
 import org.xipki.util.exception.InsufficientPermissionException;
 import org.xipki.util.exception.OperationException;
 

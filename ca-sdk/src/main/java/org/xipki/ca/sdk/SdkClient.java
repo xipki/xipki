@@ -5,6 +5,8 @@ package org.xipki.ca.sdk;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.security.KeyCertBytesPair;
+import org.xipki.util.exception.DecodeException;
+import org.xipki.util.exception.EncodeException;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.HttpRespContent;
