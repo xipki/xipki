@@ -15,7 +15,7 @@ By default, the OCSP responder is reachable under `http://<host>:<port>/ocsp/<pa
  - With `webapps/ROOT.war` and `"servletPaths":["/"]` the OCSP responder is reachable
    under `http://<host>:<port>`.
 
-Deployment in Tomcat 8 and 9
+Deployment in Tomcat 8 and 9 (does not work in Tomcat 10+)
 ----
 1. Copy (and overwrite if files already exist) the sub-folders `bin`, `webapps`, `xipki` and `lib `
       to the tomcat root folder `${CATALINA_HOME}`.

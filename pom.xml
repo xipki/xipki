@@ -32,7 +32,7 @@
     <skipDeploy>false</skipDeploy>
     <xipki.tools.version>1.0.9</xipki.tools.version>
     <xipki.commons.version>6.3.1-SNAPSHOT</xipki.commons.version>
-    <servlet.version>3.1.0</servlet.version>
+    <servlet.version>4.0.1</servlet.version>
     <karaf.version>4.4.4</karaf.version>
     <karaf.bc.version>1.75</karaf.bc.version>
     <bc.version>1.76</bc.version>

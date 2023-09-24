@@ -75,21 +75,21 @@ they MUST be replaced.**
 
 JDK 8+ is required.
 
-1. Unpack tomcat to a new folder
+1. Unpack tomcat (up to 9) to a new folder
 2. Install CA as described in the `xipki-install/xipki-ca/README` file.
 
 ## Install OCSP Responder
 
 JDK 8+ is required.
 
-1. Unpack tomcat to a new folder
+1. Unpack tomcat (up to 9) to a new folder
 2. Install CA as described in the `xipki-install/xipki-ocsp/README` file.
 
 ## Install Protocol Gateway
 
 JDK 8+ is required (JDK11+ for `acme.war`).
 
-1. Unpack tomcat to a new folder.
+1. Unpack tomcat (up to 9) to a new folder.
 2. Install protocol gateway as described in the `xipki-install/xipki-gateway/README` file.
 
 ## Install Management Command Line Interface
