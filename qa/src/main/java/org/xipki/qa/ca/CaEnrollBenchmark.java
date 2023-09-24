@@ -11,8 +11,6 @@ import org.xipki.util.BenchmarkExecutor;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -61,7 +59,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
 
   } // class Tester
 
-  private static final String CONf_FILE = "xipki/ca-qa/qa-benchmark-conf.json";
+  private static final String CONF_FILE = "xipki/ca-qa/qa-benchmark-conf.json";
 
   private static final Logger LOG = LoggerFactory.getLogger(CaEnrollBenchmark.class);
 
@@ -93,7 +91,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
     this.benchmarkEntry = notNull(benchmarkEntry, "benchmarkEntry");
     this.index = new AtomicLong(getSecureIndex());
     this.caGenKeyPair = benchmarkEntry.getSubjectPublicKeyInfo() == null;
-    this.client = new SdkClient(SdkClientConf.readConfFromFile(CONf_FILE));
+    this.client = new SdkClient(SdkClientConf.readConfFromFile(CONF_FILE));
   } // constructor
 
   @Override
@@ -114,7 +112,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
       }
     }
 
-    List<EnrollCertRequestEntry> entries = new ArrayList<>(num);
+    EnrollCertRequestEntry[] entries = new EnrollCertRequestEntry[num];
 
     for (int i = 0; i < num; i++) {
       long thisIndex = index.getAndIncrement();
@@ -125,7 +123,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
       }
       entry.setCertprofile(benchmarkEntry.getCertprofile());
       entry.setCertReqId(BigInteger.valueOf(i + 1));
-      entries.add(entry);
+      entries[i] = entry;
     }
 
     EnrollCertsRequest req = new EnrollCertsRequest();
@@ -136,14 +134,14 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
 
   private void parseEnrollCertResult(EnrollOrPollCertsResponse response, int numCerts)
       throws Exception {
-    List<EnrollOrPullCertResponseEntry> entries = response.getEntries();
-    int n = entries == null ? 0 : entries.size();
+    EnrollOrPullCertResponseEntry[] entries = response.getEntries();
+    int n = entries == null ? 0 : entries.length;
     if (n != numCerts) {
       throw new Exception("expected " + numCerts + " CertResponse, but returned " + n);
     }
 
     for (int i = 0; i < numCerts; i++) {
-      EnrollOrPullCertResponseEntry certResp = entries.get(i);
+      EnrollOrPullCertResponseEntry certResp = entries[i];
       if (certResp.getError() != null) {
         throw new Exception("CertReqId " + certResp.getId() + ": server returned PKIStatus: " + certResp.getError());
       }

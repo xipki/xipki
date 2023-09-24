@@ -706,6 +706,14 @@ public class QaCaActions {
 
       String signerConf = getSignerConf();
       if (signerConf != null) {
+        ConfPairs pairs = new ConfPairs(signerConf);
+
+        String name = "algo";
+        if (pairs.value(name) != null) {
+          pairs.putPair(name, pairs.value(name).toUpperCase(Locale.ROOT));
+        }
+        signerConf = pairs.getEncoded();
+
         assertEquals("conf", signerConf, cr.getConf());
       }
 

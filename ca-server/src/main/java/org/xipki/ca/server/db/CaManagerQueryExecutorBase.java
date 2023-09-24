@@ -156,7 +156,8 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     }
 
     if (noAction) {
-      throw new IllegalArgumentException("nothing to change");
+      LOG.info("nothing to update");
+      return;
     }
 
     buf.deleteCharAt(buf.length() - 1); // delete the last ','

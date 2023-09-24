@@ -324,12 +324,12 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
 
     if (this.datasourceMap == null) {
-      this.datasourceMap = new ConcurrentHashMap<>();
+      ConcurrentHashMap<String, DataSourceWrapper> datasourceMap = new ConcurrentHashMap<>();
       List<DataSourceConf> datasourceList = caServerConf.getDatasources();
       for (DataSourceConf datasource : datasourceList) {
         String name = datasource.getName();
         FileOrValue conf = datasource.getConf();
-        this.datasourceMap.put(name, loadDatasource(name, conf));
+        datasourceMap.put(name, loadDatasource(name, conf));
         if (conf.getFile() != null) {
           LOG.info("associate datasource {} to the file {}", name, conf.getFile());
         } else {
@@ -364,6 +364,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
       datasourceMap.remove("ca");
       datasourceMap.remove("caconf");
+
+      this.datasourceMap = datasourceMap;
     }
 
     // 2010-01-01T00:00:00.000 UTC

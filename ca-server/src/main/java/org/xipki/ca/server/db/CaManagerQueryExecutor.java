@@ -495,7 +495,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     LOG.info("added publisher '{}': {}", dbEntry.getIdent(), dbEntry);
   } // method addPublisher
 
-  public void changeCa(ChangeCaEntry changeCaEntry, CaEntry currentCaEntry,
+  public void changeCa(ChangeCaEntry changeCaEntry,
                        CaConfColumn currentCaConfColumn, SecurityFactory securityFactory)
       throws CaMgmtException {
     notNulls(changeCaEntry, "changeCaEntry", securityFactory, "securityFactory");
@@ -765,7 +765,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
     requestor.setDbEntry(new RequestorEntry(nameId, type, conf));
 
-    if (requestor.getDbEntry().isFaulty()) {
+    if (requestor.getDbEntry().faulty()) {
       throw new CaMgmtException("invalid requestor configuration");
     }
 
@@ -895,7 +895,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     notBlank(caName, "caName");
     notNull(revocationInfo, "revocationInfo");
     int num = execUpdatePrepStmt0("UPDATE CA SET REV_INFO=? WHERE NAME=?",
-                col2Str(revocationInfo.getEncoded()), col2Str(caName));
+                col2Str(revocationInfo.encode()), col2Str(caName));
     if (num == 0) {
       throw new CaMgmtException("could not revoke CA " + caName);
     }
@@ -929,9 +929,17 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method addSigner
 
   public void unlockCa() throws CaMgmtException {
-    int num = execUpdateStmt0("DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'");
+    int num;
+    try {
+      num = execUpdateStmt0("DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'");
+    } catch (CaMgmtException ex) {
+      throw new CaMgmtException("could not unlock CA", ex);
+    }
+
     if (num == 0) {
-      throw new CaMgmtException("could not unlock CA");
+      LOG.info("CA system is not locked");
+    } else {
+      LOG.info("Unlocked CA system");
     }
   } // method unlockCa
 

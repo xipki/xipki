@@ -387,7 +387,7 @@ public class HttpMgmtServlet extends HttpServlet {
           break;
         }
         case loadConf: {
-          MgmtRequest.LoadConf req = parse(in, MgmtRequest.LoadConf.class);
+          MgmtRequest.LoadConf req = parse2(in, MgmtRequest.LoadConf.class);
 
           Map<String, X509Cert> rootcaNameCertMap = caManager.loadConf(req.getConfBytes());
 
@@ -597,7 +597,7 @@ public class HttpMgmtServlet extends HttpServlet {
   } // method toByteArray
 
   /**
-   * The speciffied stream is closed after this method call.
+   * The specified stream is closed after this method call.
    */
   private static String getNameFromRequest(InputStream in) throws CaMgmtException {
     MgmtRequest.Name req = parse(in, MgmtRequest.Name.class);
@@ -605,14 +605,33 @@ public class HttpMgmtServlet extends HttpServlet {
   } // method getNameFromRequest
 
   /**
-   * The speciffied stream is closed after this method call.
+   * The specified stream is closed after this method call.
    */
   private static <T extends MgmtRequest> T parse(InputStream in, Class<T> clazz)
       throws CaMgmtException {
     try (InputStream nin = in) {
-      return JSON.parseObjectAndClose(nin, clazz);
+      if (LOG.isDebugEnabled()) {
+        byte[] reqBytes = IoUtil.readAllBytes(nin);
+        LOG.debug("received request ({}): {}", clazz.getName(), new String(reqBytes));
+        return JSON.parseObject(reqBytes, clazz);
+      } else {
+        return JSON.parseObject(nin, clazz);
+      }
     } catch (IOException | RuntimeException ex) {
-      throw new CaMgmtException("cannot parse request " + clazz + " from InputStream");
+      String msg = "cannot parse request " + clazz + " from InputStream";
+      LOG.error(msg, ex);
+      throw new CaMgmtException(ex);
+    }
+  } // method parse
+
+  private static <T extends MgmtRequest> T parse2(InputStream in, Class<T> clazz)
+      throws CaMgmtException {
+    try (InputStream nin = in) {
+      return JSON.parseObject(nin, clazz);
+    } catch (IOException | RuntimeException ex) {
+      String msg = "cannot parse request " + clazz + " from InputStream";
+      LOG.error(msg, ex);
+      throw new CaMgmtException(ex);
     }
   } // method parse
 

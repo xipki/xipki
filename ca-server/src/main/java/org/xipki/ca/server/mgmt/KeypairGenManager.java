@@ -124,8 +124,7 @@ class KeypairGenManager {
         List<String> newNames = new ArrayList<>(names);
         newNames.remove(name);
         changeCaEntry.setKeypairGenNames(newNames);
-        manager.queryExecutor.changeCa(changeCaEntry, caInfo.getCaEntry(),
-            caInfo.getCaConfColumn(), manager.securityFactory);
+        manager.queryExecutor.changeCa(changeCaEntry, caInfo.getCaConfColumn(), manager.securityFactory);
 
         caInfo.getKeypairGenNames().remove(name);
       }

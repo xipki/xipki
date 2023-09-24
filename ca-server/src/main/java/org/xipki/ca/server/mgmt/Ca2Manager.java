@@ -320,7 +320,7 @@ class Ca2Manager {
     entry.getIdent().setId(ident.getId());
 
     CaInfo caInfo0 = manager.caInfos.get(name);
-    manager.queryExecutor.changeCa(entry, caInfo0.getCaEntry(), caInfo0.getCaConfColumn(), manager.securityFactory);
+    manager.queryExecutor.changeCa(entry, caInfo0.getCaConfColumn(), manager.securityFactory);
 
     if (createCa(name)) {
       CaInfo caInfo = manager.caInfos.get(name);
