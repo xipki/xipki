@@ -197,8 +197,8 @@ public class EnrollCertRequestEntry implements CborEncodable {
       ret.setSubject(X500NameType.decode(decoder));
       ret.setSubjectPublicKey(decoder.readByteString());
       ret.setExtensions(decoder.readByteString());
-      ret.setNotBefore(decoder.readIntObj());
-      ret.setNotAfter(decoder.readIntObj());
+      ret.setNotBefore(decoder.readLongObj());
+      ret.setNotAfter(decoder.readLongObj());
       ret.setOldCertIsn(OldCertInfoByIssuerAndSerial.decode(decoder));
       ret.setOldCertSubject(OldCertInfoBySubject.decode(decoder));
       return ret;

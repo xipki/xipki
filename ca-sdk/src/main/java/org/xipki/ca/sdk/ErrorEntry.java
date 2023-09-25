@@ -75,7 +75,7 @@ public class ErrorEntry implements CborEncodable {
       }
 
       return new ErrorEntry(
-          decoder.readInt32Exact(),
+          decoder.readInt(),
           decoder.readTextString());
     } catch (IOException ex) {
       throw new DecodeException("error decoding " + ErrorEntry.class.getName(), ex);

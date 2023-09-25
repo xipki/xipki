@@ -117,7 +117,7 @@ public class EnrollCertsRequest extends SdkRequest {
       ret.setTransactionId(decoder.readTextString());
       ret.setGroupEnroll(decoder.readBooleanObj());
       ret.setExplicitConfirm(decoder.readBooleanObj());
-      ret.setConfirmWaitTimeMs(decoder.readInt32Obj());
+      ret.setConfirmWaitTimeMs(decoder.readIntObj());
       String str = decoder.readTextString();
       if (str != null) {
         ret.setCaCertMode(CertsMode.valueOf(str));

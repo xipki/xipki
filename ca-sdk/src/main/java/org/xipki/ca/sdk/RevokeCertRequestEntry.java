@@ -76,7 +76,7 @@ public class RevokeCertRequestEntry implements CborEncodable {
 
       return new RevokeCertRequestEntry(
           serialNumber, reason,
-          decoder.readIntObj());
+          decoder.readLongObj());
     } catch (IOException | IllegalArgumentException ex) {
       throw new DecodeException("error decoding " + RevokeCertRequestEntry.class.getName(), ex);
     }

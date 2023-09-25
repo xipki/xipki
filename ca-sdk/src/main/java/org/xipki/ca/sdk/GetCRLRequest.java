@@ -74,7 +74,7 @@ public class GetCRLRequest extends SdkRequest {
 
       return new GetCRLRequest(
           decoder.readBigInt(),
-          decoder.readIntObj(),
+          decoder.readLongObj(),
           decoder.readTextString());
     } catch (IOException ex) {
       throw new DecodeException("error decoding " + GetCRLRequest.class.getName(), ex);

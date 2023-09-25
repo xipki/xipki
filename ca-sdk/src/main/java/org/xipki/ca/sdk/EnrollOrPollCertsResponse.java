@@ -81,7 +81,7 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
 
       EnrollOrPollCertsResponse ret = new EnrollOrPollCertsResponse();
       ret.setTransactionId(decoder.readTextString());
-      ret.setConfirmWaitTime(decoder.readIntObj());
+      ret.setConfirmWaitTime(decoder.readLongObj());
       ret.setEntries(EnrollOrPullCertResponseEntry.decodeArray(decoder));
       ret.setExtraCerts(decoder.readByteStrings());
       return ret;
