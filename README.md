@@ -19,7 +19,7 @@ JRE/JDK, and the steps to reproduce the bug.
 
 ## Prerequisite
 * OS: Linux, Windows, MacOS
-* JRE / JDK: for `xipki-mgmt-cli`, `xipki-cli`, and `acme-gateway`: JDK 11+; for others: JDK 8+.
+* JRE / JDK: Java 11+.
 * Database: DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
 * Hardware: Any available hardware (tested on Raspberry Pi 2 Model B with 900MHz quad-core ARM CPU and 1 GB Memory)
 
@@ -73,33 +73,24 @@ they MUST be replaced.**
 
 ## Install CA Server
 
-JDK 8+ is required.
-
 1. Unpack tomcat (up to 9) to a new folder
 2. Install CA as described in the `xipki-install/xipki-ca/README` file.
 
 ## Install OCSP Responder
-
-JDK 8+ is required.
 
 1. Unpack tomcat (up to 9) to a new folder
 2. Install CA as described in the `xipki-install/xipki-ocsp/README` file.
 
 ## Install Protocol Gateway
 
-JDK 8+ is required (JDK11+ for `acme.war`).
-
 1. Unpack tomcat (up to 9) to a new folder.
 2. Install protocol gateway as described in the `xipki-install/xipki-gateway/README` file.
 
 ## Install Management Command Line Interface
-
-JDK 11+ is required.
+   void
 
 ## Install Command Line Interface
-
-JDK 11+ is required.
-
+   void
 
 ## Configure PKCS#11 device (optional)
 
