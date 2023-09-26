@@ -1,12 +1,12 @@
 // Copyright (c) 2013-2023 xipki. All rights reserved.
 // License Apache License 2.0
 
-package org.xipki.ca.gateway;
+package org.xipki.servlet;
 
+import javax.servlet.http.HttpServletResponse;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 

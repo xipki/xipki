@@ -15,6 +15,7 @@ import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.security.KeyCertBytesPair;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.JSON;
+import org.xipki.servlet.ServletHelper;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.exception.InvalidConfException;
@@ -74,7 +75,7 @@ public class HttpMgmtServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     try {
-      X509Cert clientCert = TlsHelper.getTlsClientCert(request);
+      X509Cert clientCert = ServletHelper.getTlsClientCert(request);
       if (clientCert == null) {
         throw new MyException(HttpServletResponse.SC_UNAUTHORIZED,
             "remote management is not permitted if TLS client certificate is not present");

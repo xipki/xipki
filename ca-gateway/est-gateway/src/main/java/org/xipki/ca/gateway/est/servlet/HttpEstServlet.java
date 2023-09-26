@@ -7,10 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
 import org.xipki.ca.gateway.GatewayUtil;
-import org.xipki.ca.gateway.RestResponse;
 import org.xipki.ca.gateway.est.EstResponder;
-import org.xipki.ca.gateway.servlet.HttpRequestMetadataRetrieverImpl;
-import org.xipki.ca.gateway.servlet.ServletHelper;
+import org.xipki.servlet.HttpRequestMetadataRetrieverImpl;
+import org.xipki.servlet.RestResponse;
+import org.xipki.servlet.ServletHelper;
 import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 

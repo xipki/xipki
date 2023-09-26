@@ -29,6 +29,7 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.util.X509Util;
+import org.xipki.servlet.RestResponse;
 import org.xipki.util.Base64;
 import org.xipki.util.*;
 import org.xipki.util.exception.ErrorCode;

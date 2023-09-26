@@ -9,6 +9,7 @@ import org.xipki.ocsp.api.mgmt.MgmtMessage.MgmtAction;
 import org.xipki.ocsp.server.OcspServerImpl;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.X509Cert;
+import org.xipki.servlet.ServletHelper;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.exception.InvalidConfException;
 
@@ -67,7 +68,7 @@ public class HttpMgmtServlet extends HttpServlet {
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     try {
-      X509Cert clientCert = TlsHelper.getTlsClientCert(request);
+      X509Cert clientCert = ServletHelper.getTlsClientCert(request);
       if (clientCert == null) {
         throw new MyException(HttpServletResponse.SC_UNAUTHORIZED,
             "remote management is not permitted if TLS client certificate is not present");

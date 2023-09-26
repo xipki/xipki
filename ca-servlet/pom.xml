@@ -17,6 +17,11 @@
   <dependencies>
     <dependency>
       <groupId>org.xipki</groupId>
+      <artifactId>servlet-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki</groupId>
       <artifactId>ipkcs11wrapper</artifactId>
       <scope>provided</scope>
     </dependency>

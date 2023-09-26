@@ -31,6 +31,7 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.util.X509Util;
+import org.xipki.servlet.RestResponse;
 import org.xipki.util.LogUtil;
 import org.xipki.util.PermissionConstants;
 import org.xipki.util.exception.ErrorCode;

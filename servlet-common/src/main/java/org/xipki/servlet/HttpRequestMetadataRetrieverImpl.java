@@ -1,7 +1,7 @@
 // Copyright (c) 2013-2023 xipki. All rights reserved.
 // License Apache License 2.0
 
-package org.xipki.ca.servlet;
+package org.xipki.servlet;
 
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.HttpRequestMetadataRetriever;
@@ -16,11 +16,11 @@ import java.io.IOException;
  * @since 3.0.1
  */
 
-class HttpRequestMetadataRetrieverImpl implements HttpRequestMetadataRetriever {
+public class HttpRequestMetadataRetrieverImpl implements HttpRequestMetadataRetriever {
 
   private final HttpServletRequest req;
 
-  HttpRequestMetadataRetrieverImpl(HttpServletRequest req) {
+  public HttpRequestMetadataRetrieverImpl(HttpServletRequest req) {
     this.req = req;
   }
 
@@ -36,7 +36,7 @@ class HttpRequestMetadataRetrieverImpl implements HttpRequestMetadataRetriever {
 
   @Override
   public X509Cert getTlsClientCert() throws IOException {
-    return TlsHelper.getTlsClientCert(req);
+    return ServletHelper.getTlsClientCert(req);
   }
 
 }
