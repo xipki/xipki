@@ -22,6 +22,7 @@ JRE/JDK, and the steps to reproduce the bug.
 * JRE / JDK: Java 11+.
 * Database: DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
 * Hardware: Any available hardware (tested on Raspberry Pi 2 Model B with 900MHz quad-core ARM CPU and 1 GB Memory)
+* Servlet Container: Tomcat 8, 9, 10
 
 ## Tested PKCS#11 Devices
 * [AWS CloudHSM](https://aws.amazon.com/cloudhsm)
@@ -73,17 +74,17 @@ they MUST be replaced.**
 
 ## Install CA Server
 
-1. Unpack tomcat (up to 9) to a new folder
+1. Unpack tomcat to a new folder
 2. Install CA as described in the `xipki-install/xipki-ca/README` file.
 
 ## Install OCSP Responder
 
-1. Unpack tomcat (up to 9) to a new folder
+1. Unpack tomcat to a new folder
 2. Install CA as described in the `xipki-install/xipki-ocsp/README` file.
 
 ## Install Protocol Gateway
 
-1. Unpack tomcat (up to 9) to a new folder.
+1. Unpack tomcat to a new folder.
 2. Install protocol gateway as described in the `xipki-install/xipki-gateway/README` file.
 
 ## Install Management Command Line Interface

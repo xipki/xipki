@@ -1,19 +1,21 @@
-Deployment in Tomcat 8 and 9 (does not work in Tomcat 10+)
+Deployment in Tomcat (8, 9 and 10)
 ----
-1. Copy (and overwrite if files already exist) the sub-folders `bin`, `webapps`, `xipki` and `lib `
+1. Copy the war-files in the sub-folders `webapps` to the tomcat folder:
+   i) for tomcat 8 and 9: `${CATALINA_HOME}/webapps`, or ii) for tomcat 10: `${CATALINA_HOME}/webapps-javaee`
+   - In both `${CATALINA_HOME}/webapps` and `${CATALINA_HOME}/webapps-javaee`, delete the folder `<some-app>` if the same named `<some-app>.war` file exists.
+   - Note if you do not support all protocols CMP, SCEP and RESTful API, please delete the unsupported `war`
+     files and the same named folders
+     (cmp.war for CMP, scep.war for SCEP, .well-known.war for EST, acme.war for ACME, and rest.war for RESTful API)
+2. Copy (and overwrite if files already exist) the sub-folders `bin`, `xipki` and `lib `
    to the tomcat root folder `${CATALINA_HOME}`.
    - The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
      `setenv.sh` and `setenv.bat` must be adapted to point to the new position.
    - In `${CATALINA_HOME}/lib`, if an old version of a jar file exists, remove it first.
-   - In `${CATALINA_HOME}/webapps`, delete the folder `<some-app>` if the same named `<some-app>.war` file exists.
-   - Note if you do not support all protocols CMP, SCEP and RESTful API, please delete the unsupported `war` 
-     files and the same named folders
-   (cmp.war for CMP, scep.war for SCEP, .well-known.war for EST, acme.war for ACME, and rest.war for RESTful API)
-2. If SCEP is supported, you need to have a SCEP server certificate with private key. For the demo you may generate this
+3. If SCEP is supported, you need to have a SCEP server certificate with private key. For the demo you may generate this
    certificate in the `xipki-mgmt-cli` via the command 
    `enroll-cert --ca myca1 --subject "CN=scep responder" --profile scep --key-password 1234 --out output/scep1.der`,
    and then copy the generated file `scep1.p12` to the folder `xipki/keycerts`.
-3. If ACME is supported
+4. If ACME is supported
    1. (Optional) If you use database other than H2, PostgreSQL, MariaDB and MySQL, you need to
       download the JDBC driver to the folder `${CATALINA_HOME}/lib`.
    2. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
@@ -45,7 +47,7 @@ Deployment in Tomcat 8 and 9 (does not work in Tomcat 10+)
    </Connector>
    ```
 
-4. (optional) To accelerate the start process, append the following block to the property
+6. (optional) To accelerate the start process, append the following block to the property
   `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
 
 ```
@@ -65,7 +67,7 @@ xipki-tomcat-password-*.jar,\
 gateway-common-*.jar
 ```
 
-5. (optional) If you encrypt the passwords in the conf/server.xml with XiPKI solution, replace
+7. (optional) If you encrypt the passwords in the conf/server.xml with XiPKI solution, replace
    `org.apache.coyote.http11.Http11Nio2Protocol` by `org.xipki.tomcat.XiHttp11Nio2Protocol`.
 
 - Start tomcat

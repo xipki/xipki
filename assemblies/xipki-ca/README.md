@@ -1,16 +1,18 @@
-Deployment in Tomcat 8 and 9 (does not work in Tomcat 10+)
+Deployment in Tomcat (8, 9 and 10)
 ----
-1. Copy (and overwrite if files already exist) the sub-folders `bin`, `webapps`, `xipki` and `lib ` 
+1. Copy the war-files in the sub-folders `webapps` to the tomcat folder:
+   i) for tomcat 8 and 9: `${CATALINA_HOME}/webapps`, or ii) for tomcat 10: `${CATALINA_HOME}/webapps-javaee`
+   - In both `${CATALINA_HOME}/webapps` and `${CATALINA_HOME}/webapps-javaee`, delete the folder `<some-app>` if the same named `<some-app>.war` file exists.
+2. Copy (and overwrite if files already exist) the sub-folders `bin`, `xipki` and `lib ` 
    to the tomcat root folder `${CATALINA_HOME}`.
    - The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
    `setenv.sh` and `setenv.bat` must be adapted to point to the new position.
    - In `${CATALINA_HOME}/lib`, if an old version of a jar file exists, remove it first.
-   - In `${CATALINA_HOME}/webapps`, delete the folder `<some-app>` if the same named `<some-app>.war` file exists.
-2. (Optional) If you use database other than H2, PostgreSQL, MariaDB and MySQL, you need to
+3. (Optional) If you use database other than H2, PostgreSQL, MariaDB and MySQL, you need to
    download the JDBC driver to the folder `${CATALINA_HOME}/lib`.
-3. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
+4. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
    configuration templates with those in the corresponding sub folder in `${CONTAINER_ROOT}/xipki/etc/ca/database`.
-4. Adapt the database configurations `${CONTAINER_ROOT}/xipki/etc/ca/database/ca-db.properties` and 
+Adapt the database configurations `${CONTAINER_ROOT}/xipki/etc/ca/database/ca-db.properties` and 
    `${CONTAINER_ROOT}/xipki/etc/ca/database/caconf-db.properties`.
 5. Create new databases configured in Step 4.
 6. Initialize the databases configured in Step 4.

@@ -59,6 +59,7 @@
     <!-- PKI SDK/Client -->
     <module>ocsp-client</module>
     <!-- PKI -->
+    <module>servlet-common</module>
     <module>ca-sdk</module>
     <module>ca-api</module>
     <module>ca-mgmt-api</module>
@@ -226,7 +227,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
-          <version>3.5.0</version>
+          <version>4.2.1</version>
         </plugin>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
@@ -258,7 +259,7 @@
         <plugin>
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
-            <source>8</source>
+            <source>11</source>
           </configuration>
           <version>3.0.0</version>
         </plugin>
@@ -478,7 +479,6 @@
             <version>3.0.0</version>
             <configuration>
               <failOnError>true</failOnError>
-              <excludePackageNames>*.jaxb*</excludePackageNames>
             </configuration>
             <executions>
               <execution>
