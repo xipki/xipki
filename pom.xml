@@ -75,7 +75,6 @@
     <module>shells</module>
     <module>examples</module>
     <module>qa</module>
-    <module>assemblies</module>
   </modules>
   <scm>
     <connection>scm:git:git@github.com:xipki/xipki.git</connection>
@@ -439,6 +438,15 @@
     </dependencies>
   </dependencyManagement>
   <profiles>
+    <profile>
+      <id>assembly</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>assemblies</module>
+      </modules>
+    </profile>
     <profile>
       <id>release</id>
       <activation>

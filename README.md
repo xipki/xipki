@@ -56,7 +56,7 @@ follows.
 
   In folder `xipki`
   ```sh
-  mvn clean install -DskipTests
+  mvn clean install -DskipTests -Passembly
   ```
  
   Then you will find the binary `assemblies/xipki-setup/target/xipki-setup-<version>.zip`
