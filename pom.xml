@@ -59,7 +59,6 @@
     <!-- PKI SDK/Client -->
     <module>ocsp-client</module>
     <!-- PKI -->
-    <module>servlet-common</module>
     <module>ca-sdk</module>
     <module>ca-api</module>
     <module>ca-mgmt-api</module>

@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.est.EstResponder;
-import org.xipki.servlet.HttpRequestMetadataRetrieverImpl;
-import org.xipki.servlet.RestResponse;
-import org.xipki.servlet.ServletHelper;
+import org.xipki.commons.servlet3.HttpRequestMetadataRetrieverImpl;
+import org.xipki.commons.servlet3.RestResponse;
+import org.xipki.commons.servlet3.ServletHelper;
 import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 
