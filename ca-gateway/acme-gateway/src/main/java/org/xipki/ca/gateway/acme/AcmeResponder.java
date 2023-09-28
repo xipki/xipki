@@ -23,7 +23,6 @@ import org.xipki.ca.gateway.acme.type.*;
 import org.xipki.ca.gateway.acme.util.AcmeJson;
 import org.xipki.ca.gateway.acme.util.AcmeUtils;
 import org.xipki.ca.sdk.*;
-import org.xipki.commons.servlet3.RestResponse;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
@@ -36,6 +35,7 @@ import org.xipki.util.*;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.HttpRespContent;
+import org.xipki.util.http.RestResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;

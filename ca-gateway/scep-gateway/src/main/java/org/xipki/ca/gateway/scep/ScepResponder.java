@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
 import org.xipki.ca.gateway.*;
 import org.xipki.ca.sdk.*;
-import org.xipki.commons.servlet3.RestResponse;
 import org.xipki.scep.message.*;
 import org.xipki.scep.transaction.*;
 import org.xipki.scep.util.ScepConstants;
@@ -36,6 +35,7 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.PermissionConstants;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
+import org.xipki.util.http.RestResponse;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

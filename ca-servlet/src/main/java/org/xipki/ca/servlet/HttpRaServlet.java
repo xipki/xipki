@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.sdk.ErrorResponse;
 import org.xipki.ca.sdk.SdkResponse;
 import org.xipki.ca.server.SdkResponder;
-import org.xipki.commons.servlet3.HttpRequestMetadataRetrieverImpl;
+import org.xipki.servlet3.HttpRequestMetadataRetrieverImpl;
 import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;

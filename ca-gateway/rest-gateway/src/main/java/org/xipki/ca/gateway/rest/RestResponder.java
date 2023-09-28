@@ -19,7 +19,6 @@ import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
 import org.xipki.ca.gateway.*;
 import org.xipki.ca.sdk.*;
-import org.xipki.commons.servlet3.RestResponse;
 import org.xipki.security.CrlReason;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
@@ -32,6 +31,7 @@ import org.xipki.util.PemEncoder.PemLabel;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
 import org.xipki.util.http.HttpRespContent;
+import org.xipki.util.http.RestResponse;
 
 import java.io.*;
 import java.math.BigInteger;

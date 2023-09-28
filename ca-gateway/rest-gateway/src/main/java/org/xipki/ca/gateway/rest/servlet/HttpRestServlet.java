@@ -8,11 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.rest.RestResponder;
-import org.xipki.commons.servlet3.HttpRequestMetadataRetrieverImpl;
-import org.xipki.commons.servlet3.RestResponse;
-import org.xipki.commons.servlet3.ServletHelper;
+import org.xipki.servlet3.HttpRequestMetadataRetrieverImpl;
+import org.xipki.servlet3.ServletHelper;
 import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
+import org.xipki.util.http.RestResponse;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -60,12 +60,9 @@ public class HttpRestServlet extends HttpServlet {
     try {
       String path = req.getServletPath();
       byte[] requestBytes = viaPost ? IoUtil.readAllBytesAndClose(req.getInputStream()) : null;
-
       RestResponse restResp = responder.service(path, requestBytes, new HttpRequestMetadataRetrieverImpl(req), event);
-      restResp.fillResponse(resp);
-
+      ServletHelper.fillResponse(restResp, resp);
       ServletHelper.logReqResp("REST Gateway", LOG, logReqResp, viaPost, req, requestBytes, restResp.getBody());
-
       if (event.getStatus() == null) {
         event.setStatus(AuditStatus.SUCCESSFUL);
       }

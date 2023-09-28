@@ -12,7 +12,7 @@ import org.xipki.ca.api.mgmt.MgmtMessage.CaEntryWrapper;
 import org.xipki.ca.api.mgmt.MgmtMessage.MgmtAction;
 import org.xipki.ca.api.mgmt.MgmtMessage.SignerEntryWrapper;
 import org.xipki.ca.api.mgmt.entry.*;
-import org.xipki.commons.servlet3.ServletHelper;
+import org.xipki.servlet3.ServletHelper;
 import org.xipki.security.KeyCertBytesPair;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.JSON;

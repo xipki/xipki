@@ -8,10 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.acme.AcmeResponder;
-import org.xipki.commons.servlet3.RestResponse;
-import org.xipki.commons.servlet3.ServletHelper;
+import org.xipki.servlet3.ServletHelper;
 import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
+import org.xipki.util.http.RestResponse;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -63,12 +63,9 @@ public class HttpAcmeServlet extends HttpServlet {
 
     try {
       byte[] requestBytes = viaPost ? IoUtil.readAllBytesAndClose(req.getInputStream()) : null;
-
       RestResponse restResp = responder.service(req, requestBytes, event);
-      restResp.fillResponse(resp);
-
+      ServletHelper.fillResponse(restResp, resp);
       ServletHelper.logTextReqResp("ACME Gateway", LOG, logReqResp, viaPost, req, requestBytes, restResp.getBody());
-
       if (event.getStatus() == null) {
         event.setStatus(AuditStatus.SUCCESSFUL);
       }

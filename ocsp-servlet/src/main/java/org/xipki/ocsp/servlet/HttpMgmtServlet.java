@@ -5,7 +5,7 @@ package org.xipki.ocsp.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.servlet3.ServletHelper;
+import org.xipki.servlet3.ServletHelper;
 import org.xipki.ocsp.api.mgmt.MgmtMessage.MgmtAction;
 import org.xipki.ocsp.server.OcspServerImpl;
 import org.xipki.password.PasswordResolverException;

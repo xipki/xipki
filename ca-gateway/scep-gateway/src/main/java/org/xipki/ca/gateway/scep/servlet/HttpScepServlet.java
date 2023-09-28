@@ -6,12 +6,12 @@ package org.xipki.ca.gateway.scep.servlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.gateway.scep.ScepResponder;
-import org.xipki.commons.servlet3.HttpRequestMetadataRetrieverImpl;
-import org.xipki.commons.servlet3.RestResponse;
-import org.xipki.commons.servlet3.ServletHelper;
+import org.xipki.servlet3.HttpRequestMetadataRetrieverImpl;
+import org.xipki.servlet3.ServletHelper;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
+import org.xipki.util.http.RestResponse;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -55,13 +55,10 @@ public class HttpScepServlet extends HttpServlet {
 
   private void service0(HttpServletRequest req, HttpServletResponse resp, boolean viaPost) throws IOException {
     String path = req.getServletPath();
-
     byte[] requestBytes = viaPost ? IoUtil.readAllBytesAndClose(req.getInputStream())
         : Base64.decode(req.getParameter("message"));
-
     RestResponse restResp = responder.service(path, requestBytes, new HttpRequestMetadataRetrieverImpl(req));
-    restResp.fillResponse(resp);
-
+    ServletHelper.fillResponse(restResp, resp);
     ServletHelper.logReqResp("SCEP Gateway", LOG, logReqResp, viaPost, req, requestBytes, restResp.getBody());
   }
 
