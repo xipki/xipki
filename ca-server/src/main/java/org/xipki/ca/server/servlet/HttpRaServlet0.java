@@ -1,0 +1,109 @@
+// Copyright (c) 2013-2023 xipki. All rights reserved.
+// License Apache License 2.0
+
+package org.xipki.ca.server.servlet;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.ca.sdk.ErrorResponse;
+import org.xipki.ca.sdk.SdkResponse;
+import org.xipki.ca.server.SdkResponder;
+import org.xipki.security.util.HttpRequestMetadataRetriever;
+import org.xipki.util.Args;
+import org.xipki.util.Base64;
+import org.xipki.util.HttpConstants;
+import org.xipki.util.IoUtil;
+import org.xipki.util.exception.EncodeException;
+import org.xipki.util.exception.ErrorCode;
+import org.xipki.util.http.HttpStatusCode;
+import org.xipki.util.http.RestResponse;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+/**
+ * REST API exception.
+ *
+ * @author Lijun Liao (xipki)
+ * @since 3.0.1
+ */
+
+public class HttpRaServlet0 {
+
+  private static final Logger LOG = LoggerFactory.getLogger(HttpRaServlet0.class);
+
+  private boolean logReqResp;
+
+  private SdkResponder responder;
+
+  public void setLogReqResp(boolean logReqResp) {
+    this.logReqResp = logReqResp;
+  }
+
+  public void setResponder(SdkResponder responder) {
+    this.responder = Args.notNull(responder, "responder");
+  }
+
+  public RestResponse doGet(HttpRequestMetadataRetriever req) throws IOException {
+    return service(req, null);
+  }
+
+  public RestResponse doPost(HttpRequestMetadataRetriever req, InputStream reqStream) throws IOException {
+    return service(req, reqStream);
+  }
+
+  private RestResponse service(HttpRequestMetadataRetriever req, InputStream reqStream) throws IOException {
+    try {
+      String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
+      byte[] requestBytes = reqStream == null ? null : IoUtil.readAllBytesAndClose(reqStream);
+
+      SdkResponse response = responder.service(path, requestBytes, req);
+      byte[] respBody = response == null ? null : response.encode();
+      int httpStatus = HttpStatusCode.SC_OK;
+      if (response instanceof ErrorResponse) {
+        ErrorCode errCode = ((ErrorResponse) response).getCode();
+        switch (errCode) {
+          case UNAUTHORIZED:
+          case NOT_PERMITTED:
+            httpStatus = HttpStatusCode.SC_UNAUTHORIZED;
+            break;
+          case BAD_CERT_TEMPLATE:
+          case BAD_POP:
+          case BAD_REQUEST:
+          case INVALID_EXTENSION:
+          case UNKNOWN_CERT_PROFILE:
+          case UNKNOWN_CERT:
+          case ALREADY_ISSUED:
+          case CERT_REVOKED:
+          case CERT_UNREVOKED:
+            httpStatus = HttpStatusCode.SC_BAD_REQUEST;
+            break;
+          case PATH_NOT_FOUND:
+            httpStatus = HttpStatusCode.SC_NOT_FOUND;
+            break;
+          case CRL_FAILURE:
+          case DATABASE_FAILURE:
+          case SYSTEM_FAILURE:
+          case SYSTEM_UNAVAILABLE:
+          default:
+            httpStatus = HttpStatusCode.SC_INTERNAL_SERVER_ERROR;
+            break;
+        }
+      }
+
+      if (logReqResp && LOG.isDebugEnabled()) {
+        String respBodyStr = respBody == null ? null : Base64.encodeToString(respBody, true);
+        LOG.debug("HTTP RA path: {}\nResponse:\n{}", req.getRequestURI(), respBodyStr);
+      }
+
+      return new RestResponse(httpStatus, "application/cbor", null, respBody);
+    } catch (EncodeException ex) {
+      LOG.error("Error encoding SdkResponse", ex);
+      return new RestResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
+    } catch (RuntimeException ex) {
+      LOG.error("RuntimeException thrown, this should not happen!", ex);
+      return new RestResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+}

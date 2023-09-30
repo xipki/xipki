@@ -58,7 +58,7 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.build.directory}/webapps/ocsp-servlet.war</source>
+      <source>${project.build.directory}/webapps/ocsp-servlet3.war</source>
       <outputDirectory>webapps</outputDirectory>
       <destName>ocsp.war</destName>
       <fileMode>0644</fileMode>

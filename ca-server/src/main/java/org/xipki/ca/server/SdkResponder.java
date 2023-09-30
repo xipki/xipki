@@ -183,7 +183,7 @@ public class SdkResponder {
           case CMD_caname:
           case CMD_cacert2:
           case CMD_cacerts2: {
-            req = CaIdentifierRequest.decode(request);
+            req = CaIdentifierRequest.decode(requireNonNullRequest(request));
             break;
           }
           case CMD_poll_cert:
@@ -191,11 +191,11 @@ public class SdkResponder {
           case CMD_revoke_cert:
           case CMD_unsuspend_cert: {
             if (CMD_poll_cert.equals(command)) {
-              req = PollCertRequest.decode(request);
+              req = PollCertRequest.decode(requireNonNullRequest(request));
             } else if (CMD_revoke_cert.equals(command)) {
-              req = RevokeCertsRequest.decode(request);
+              req = RevokeCertsRequest.decode(requireNonNullRequest(request));
             } else {
-              req = UnsuspendOrRemoveRequest.decode(request);
+              req = UnsuspendOrRemoveRequest.decode(requireNonNullRequest(request));
             }
             break;
           }
@@ -242,13 +242,13 @@ public class SdkResponder {
           return buildCertChainResponse(ca.getCaInfo().getCert(), ca.getCaInfo().getCertchain());
         case CMD_enroll:
           assertPermitted(requestor, ENROLL_CERT);
-          return enroll(ca, request, requestor, false, false);
+          return enroll(ca, requireNonNullRequest(request), requestor, false, false);
         case CMD_reenroll:
           assertPermitted(requestor, REENROLL_CERT);
-          return enroll(ca, request, requestor, true, false);
+          return enroll(ca, requireNonNullRequest(request), requestor, true, false);
         case CMD_enroll_cross:
           assertPermitted(requestor, ENROLL_CROSS);
-          return enroll(ca, request, requestor, false, true);
+          return enroll(ca, requireNonNullRequest(request), requestor, false, true);
         case CMD_poll_cert:
           if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(REENROLL_CERT))) {
             throw new OperationException(NOT_PERMITTED);
@@ -261,12 +261,13 @@ public class SdkResponder {
           if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(REENROLL_CERT))) {
             throw new OperationException(NOT_PERMITTED);
           }
-          return confirmCertificates(requestor, ca, request);
+          return confirmCertificates(requestor, ca, requireNonNullRequest(request));
         case CMD_revoke_pending_cert:
           if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(REENROLL_CERT))) {
             throw new OperationException(NOT_PERMITTED);
           }
-          revokePendingCertificates(requestor, ca, TransactionIdRequest.decode(request).getTid());
+          revokePendingCertificates(requestor, ca,
+              TransactionIdRequest.decode(requireNonNullRequest(request)).getTid());
           return null;
         case CMD_unsuspend_cert:
           assertPermitted(requestor, UNSUSPEND_CERT);
@@ -276,14 +277,14 @@ public class SdkResponder {
           return removeOrUnsuspend(requestor, ca, (UnsuspendOrRemoveRequest) req, false, "-".equals(caName));
         case CMD_gen_crl:
           assertPermitted(requestor, GEN_CRL);
-          return genCrl(requestor, ca, request);
+          return genCrl(requestor, ca, requireNonNullRequest(request));
         case CMD_crl:
-          return getCrl(requestor, ca, request);
+          return getCrl(requestor, ca, requireNonNullRequest(request));
         case CMD_get_cert:
           assertPermitted(requestor, GET_CERT);
-          return getCert(ca, request);
+          return getCert(ca, requireNonNullRequest(request));
         case CMD_profileinfo:
-          return getProfileInfo(request);
+          return getProfileInfo(requireNonNullRequest(request));
         case CMD_cacert2:
           return buildCertChainResponse(ca.getCaCert(), null);
         case CMD_cacerts2:
@@ -304,6 +305,13 @@ public class SdkResponder {
       return new ErrorResponse(null, ex.getErrorCode(), ex.getErrorMessage());
     }
   } // method service
+
+  private static byte[] requireNonNullRequest(byte[] reqBytes) throws DecodeException {
+    if (reqBytes == null) {
+      throw new DecodeException("request must no be null");
+    }
+    return reqBytes;
+  }
 
   private CertChainResponse buildCertChainResponse(X509Cert cert, List<X509Cert> certchain) {
     int size = 1 + (certchain == null ? 0 : certchain.size());

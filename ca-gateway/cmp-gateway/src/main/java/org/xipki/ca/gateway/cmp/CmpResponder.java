@@ -51,6 +51,7 @@ public class CmpResponder extends BaseCmpResponder {
       CaNameSigners signers, RequestorAuthenticator authenticator, PopControl popControl)
       throws NoSuchAlgorithmException {
     super(cmpControl, sdk, securityFactory, signers, authenticator, popControl);
+    LOG.info("XiPKI CMP-Gateway version {}", StringUtil.getVersion(getClass()));
   }
 
   private CertRepMessage processCertReqMessages(

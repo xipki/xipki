@@ -20,7 +20,10 @@ import org.bouncycastle.cms.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
-import org.xipki.ca.gateway.*;
+import org.xipki.ca.gateway.GatewayUtil;
+import org.xipki.ca.gateway.PopControl;
+import org.xipki.ca.gateway.Requestor;
+import org.xipki.ca.gateway.RequestorAuthenticator;
 import org.xipki.ca.sdk.*;
 import org.xipki.scep.message.*;
 import org.xipki.scep.transaction.*;
@@ -33,11 +36,12 @@ import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
 import org.xipki.util.PermissionConstants;
+import org.xipki.util.StringUtil;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
+import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.RestResponse;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -113,6 +117,8 @@ public class ScepResponder {
 
   public ScepResponder(ScepControl control, SdkClient sdk, SecurityFactory securityFactory, CaNameScepSigners signers,
                        RequestorAuthenticator authenticator, PopControl popControl) {
+    LOG.info("XiPKI SCEP-Gateway version {}", StringUtil.getVersion(getClass()));
+
     this.control = notNull(control, "control");
     this.sdk = notNull(sdk, "sdk");
     this.securityFactory = notNull(securityFactory, "securityFactory");
@@ -155,7 +161,7 @@ public class ScepResponder {
     } // end if
 
     if (caName == null) {
-      return new RestResponse(HttpServletResponse.SC_NOT_FOUND);
+      return new RestResponse(HttpStatusCode.SC_NOT_FOUND);
     }
 
     AuditService auditService = Audits.getAuditService();
@@ -186,7 +192,7 @@ public class ScepResponder {
           LogUtil.error(LOG, ex, msg);
           auditMessage = msg;
           auditStatus = AuditStatus.FAILED;
-          return new RestResponse(HttpServletResponse.SC_BAD_REQUEST);
+          return new RestResponse(HttpStatusCode.SC_BAD_REQUEST);
         }
 
         ScepSigner signer = signers.getSigner(caName);
@@ -195,7 +201,7 @@ public class ScepResponder {
           LOG.error(msg + " for CA {}", caName);
           auditMessage = msg;
           auditStatus = AuditStatus.FAILED;
-          return new RestResponse(HttpServletResponse.SC_BAD_REQUEST);
+          return new RestResponse(HttpStatusCode.SC_BAD_REQUEST);
         }
 
         ContentInfo ci;
@@ -206,7 +212,7 @@ public class ScepResponder {
           LogUtil.error(LOG, ex, msg);
           auditMessage = msg;
           auditStatus = AuditStatus.FAILED;
-          return new RestResponse(HttpServletResponse.SC_BAD_REQUEST);
+          return new RestResponse(HttpStatusCode.SC_BAD_REQUEST);
         } catch (OperationException | SdkErrorResponseException ex) {
           ErrorCode code;
           if (ex instanceof OperationException) {
@@ -223,7 +229,7 @@ public class ScepResponder {
             case ALREADY_ISSUED:
             case CERT_REVOKED:
             case CERT_UNREVOKED:
-              httpCode = HttpServletResponse.SC_FORBIDDEN;
+              httpCode = HttpStatusCode.SC_FORBIDDEN;
               break;
             case BAD_CERT_TEMPLATE:
             case BAD_REQUEST:
@@ -231,19 +237,19 @@ public class ScepResponder {
             case INVALID_EXTENSION:
             case UNKNOWN_CERT:
             case UNKNOWN_CERT_PROFILE:
-              httpCode = HttpServletResponse.SC_BAD_REQUEST;
+              httpCode = HttpStatusCode.SC_BAD_REQUEST;
               break;
             case NOT_PERMITTED:
-              httpCode = HttpServletResponse.SC_UNAUTHORIZED;
+              httpCode = HttpStatusCode.SC_UNAUTHORIZED;
               break;
             case SYSTEM_UNAVAILABLE:
-              httpCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+              httpCode = HttpStatusCode.SC_SERVICE_UNAVAILABLE;
               break;
             case CRL_FAILURE:
             case DATABASE_FAILURE:
             case SYSTEM_FAILURE:
             default:
-              httpCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+              httpCode = HttpStatusCode.SC_INTERNAL_SERVER_ERROR;
               break;
           }
 
@@ -265,20 +271,20 @@ public class ScepResponder {
       } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation)) {
         auditMessage = "SCEP operation '" + operation + "' is not permitted";
         auditStatus = AuditStatus.FAILED;
-        return new RestResponse(HttpServletResponse.SC_FORBIDDEN);
+        return new RestResponse(HttpStatusCode.SC_FORBIDDEN);
       } else {
         auditMessage = "unknown SCEP operation '" + operation + "'";
         auditStatus = AuditStatus.FAILED;
-        return new RestResponse(HttpServletResponse.SC_BAD_REQUEST);
+        return new RestResponse(HttpStatusCode.SC_BAD_REQUEST);
       }
-      ret = new RestResponse(HttpServletResponse.SC_OK, contentType, null, respBody);
+      ret = new RestResponse(HttpStatusCode.SC_OK, contentType, null, respBody);
     } catch (Throwable th) {
       LOG.error("Throwable thrown, this should not happen!", th);
 
       auditLevel = AuditLevel.ERROR;
       auditStatus = AuditStatus.FAILED;
       auditMessage = "internal error";
-      ret = new RestResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      ret = new RestResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     } finally {
       audit(auditService, event, auditLevel, auditStatus, auditMessage);
     }

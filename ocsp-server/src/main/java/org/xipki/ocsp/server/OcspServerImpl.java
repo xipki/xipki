@@ -89,8 +89,6 @@ public class OcspServerImpl implements OcspServer {
 
   private static final byte[] encodedAcceptableResponses_Basic;
 
-  private static final String version;
-
   private final DataSourceFactory datasourceFactory;
 
   private SecurityFactory securityFactory;
@@ -145,11 +143,10 @@ public class OcspServerImpl implements OcspServer {
     extension_pkix_ocsp_extendedRevoke = new WritableOnlyExtension(encoded);
 
     encodedAcceptableResponses_Basic = Hex.decode("300B06092B0601050507300101");
-    version = StringUtil.getVersion(OcspServerImpl.class);
   } // method static
 
   public OcspServerImpl(OcspLicense license) {
-    LOG.info("XiPKI OCSP Responder version {}", version);
+    LOG.info("XiPKI OCSP Responder version {}", StringUtil.getVersion(getClass()));
     this.datasourceFactory = new DataSourceFactory();
     this.license = Args.notNull(license, "license");
   }

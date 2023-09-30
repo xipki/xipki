@@ -19,7 +19,7 @@
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>ocsp-servlet</artifactId>
+      <artifactId>ocsp-servlet3</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
@@ -41,7 +41,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
-                  <artifactId>ocsp-servlet</artifactId>
+                  <artifactId>ocsp-servlet3</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>

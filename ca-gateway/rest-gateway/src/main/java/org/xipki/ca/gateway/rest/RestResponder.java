@@ -17,7 +17,10 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
-import org.xipki.ca.gateway.*;
+import org.xipki.ca.gateway.GatewayUtil;
+import org.xipki.ca.gateway.PopControl;
+import org.xipki.ca.gateway.Requestor;
+import org.xipki.ca.gateway.RequestorAuthenticator;
 import org.xipki.ca.sdk.*;
 import org.xipki.security.CrlReason;
 import org.xipki.security.SecurityFactory;
@@ -196,6 +199,7 @@ public class RestResponder {
 
   public RestResponder(SdkClient sdk, SecurityFactory securityFactory,
                        RequestorAuthenticator authenticator, PopControl popControl) {
+    LOG.info("XiPKI REST-Gateway version {}", StringUtil.getVersion(getClass()));
     this.sdk = notNull(sdk, "sdk");
     this.securityFactory = notNull(securityFactory, "securityFactory");
     this.authenticator = notNull(authenticator, "authenticator");

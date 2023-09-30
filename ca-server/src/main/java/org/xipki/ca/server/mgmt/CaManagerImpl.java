@@ -95,8 +95,6 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaManagerImpl.class);
 
-  private static final String version;
-
   private static final String EVENT_LOCK = "LOCK";
 
   private static final String EVENT_CACHAGNE = "CA_CHANGE";
@@ -197,12 +195,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   private final KeypairGenManager keypairGenManager;
 
-  static {
-    version = StringUtil.getVersion(CaManagerImpl.class);
-  }
-
   public CaManagerImpl(CmLicense license) {
-    LOG.info("XiPKI CA version {}", version);
+    LOG.info("XiPKI CA version {}", StringUtil.getVersion(getClass()));
 
     this.license = Args.notNull(license, "license");
     this.datasourceFactory = new DataSourceFactory();

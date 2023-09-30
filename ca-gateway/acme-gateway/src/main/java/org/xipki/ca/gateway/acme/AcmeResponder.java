@@ -29,6 +29,7 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
@@ -37,7 +38,6 @@ import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.RestResponse;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -162,6 +162,8 @@ public class AcmeResponder {
 
   public AcmeResponder(SdkClient sdk, SecurityFactory securityFactory, PopControl popControl, AcmeProxyConf.Acme conf)
       throws InvalidConfException {
+    LOG.info("XiPKI ACME-Gateway version {}", getClass());
+
     this.sdk = notNull(sdk, "sdk");
     this.popControl = notNull(popControl, "popControl");
     this.securityFactory = notNull(securityFactory, "securityFactory");
@@ -314,7 +316,7 @@ public class AcmeResponder {
     repo.close();
   }
 
-  public RestResponse service(HttpServletRequest servletReq, byte[] request, AuditEvent event) {
+  public RestResponse service(HttpRequestMetadataRetriever servletReq, byte[] request, AuditEvent event) {
     StringContainer command = new StringContainer();
 
     AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
@@ -376,8 +378,8 @@ public class AcmeResponder {
     return resp;
   }
 
-  private RestResponse doService(HttpServletRequest servletReq, byte[] request,
-      AuditEvent event, StringContainer commandContainer)
+  private RestResponse doService(HttpRequestMetadataRetriever servletReq, byte[] request,
+                                 AuditEvent event, StringContainer commandContainer)
       throws HttpRespAuditException, AcmeProtocolException, AcmeSystemException, DataAccessException {
     String method = servletReq.getMethod();
     String path = servletReq.getServletPath();

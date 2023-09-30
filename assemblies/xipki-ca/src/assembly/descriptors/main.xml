@@ -67,7 +67,7 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.build.directory}/webapps/ca-servlet.war</source>
+      <source>${project.build.directory}/webapps/ca-servlet3.war</source>
       <outputDirectory>webapps</outputDirectory>
       <destName>ca.war</destName>
       <fileMode>0644</fileMode>

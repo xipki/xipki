@@ -14,12 +14,22 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <modules>
     <module>gateway-common</module>
-    <module>cmp-gateway</module>
+    <!-- ACME -->
+    <module>acme-gateway</module>
+    <module>acme-servlet3</module>
+    <!-- CMP -->
     <module>cmp-client</module>
+    <module>cmp-gateway</module>
+    <module>cmp-servlet3</module>
+    <!-- EST -->
+    <module>est-gateway</module>
+    <module>est-servlet3</module>
+    <!-- REST -->
     <module>rest-gateway</module>
+    <module>rest-servlet3</module>
+    <!-- SCEP -->
     <module>scep-client</module>
     <module>scep-gateway</module>
-    <module>est-gateway</module>
-    <module>acme-gateway</module>
+    <module>scep-servlet3</module>
   </modules>
 </project>

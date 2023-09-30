@@ -32,7 +32,8 @@
     <skipDeploy>false</skipDeploy>
     <xipki.tools.version>1.0.9</xipki.tools.version>
     <xipki.commons.version>6.3.1-SNAPSHOT</xipki.commons.version>
-    <servlet.version>3.1.0</servlet.version>
+    <javax.servlet.version>3.1.0</javax.servlet.version>
+    <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
     <karaf.version>4.4.4</karaf.version>
     <karaf.bc.version>1.75</karaf.bc.version>
     <bc.version>1.76</bc.version>
@@ -64,12 +65,12 @@
     <module>ca-mgmt-api</module>
     <module>ca-server</module>
     <module>ca-gateway</module>
-    <module>ca-servlet</module>
+    <module>ca-servlet3</module>
     <module>ca-mgmt-client</module>
     <module>certprofile-xijson</module>
     <module>ocsp-api</module>
     <module>ocsp-server</module>
-    <module>ocsp-servlet</module>
+    <module>ocsp-servlet3</module>
     <module>ocsp-mgmt-client</module>
     <module>shells</module>
     <module>examples</module>
@@ -378,7 +379,12 @@
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
-        <version>${servlet.version}</version>
+        <version>${javax.servlet.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <version>${jakarta.servlet.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>

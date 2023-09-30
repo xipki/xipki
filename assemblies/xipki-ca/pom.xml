@@ -17,7 +17,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>ca-servlet</artifactId>
+      <artifactId>ca-servlet3</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
@@ -80,7 +80,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
-                  <artifactId>ca-servlet</artifactId>
+                  <artifactId>ca-servlet3</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
