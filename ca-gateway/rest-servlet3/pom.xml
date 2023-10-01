@@ -13,6 +13,7 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <properties>
     <skipDeploy>true</skipDeploy>
+    <logfile>rest</logfile>
   </properties>
   <dependencies>
     <dependency>
@@ -57,4 +58,15 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+  <build>
+    <resources>
+      <resource>
+        <directory>../shared/filtered</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
 </project>

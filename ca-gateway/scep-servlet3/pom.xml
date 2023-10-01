@@ -13,6 +13,7 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <properties>
     <skipDeploy>true</skipDeploy>
+    <logfile>scep</logfile>
   </properties>
   <dependencies>
     <dependency>
@@ -59,7 +60,7 @@
   <build>
     <resources>
       <resource>
-        <directory>src/main/resources</directory>
+        <directory>../shared/filtered</directory>
         <filtering>true</filtering>
         <includes>
           <include>**/*</include>
