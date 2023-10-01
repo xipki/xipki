@@ -17,9 +17,9 @@ By default, the OCSP responder is reachable under `http://<host>:<port>/ocsp/<pa
 
 Deployment in Tomcat (8, 9 and 10)
 ----
-1. Copy the war-files in the sub-folders `webapps` to the tomcat folder:
-   i) for tomcat 8 and 9: `${CATALINA_HOME}/webapps`, or ii) for tomcat 10: `${CATALINA_HOME}/webapps-javaee`
-    - In both `${CATALINA_HOME}/webapps` and `${CATALINA_HOME}/webapps-javaee`, delete the folder `<some-app>` if the same named `<some-app>.war` file exists.
+1. Copy the war-files in `webapps` for tomcat 8/9 or `webapps-tomcat10on` for tomcat 10+,
+   to the tomcat folder `${CATALINA_HOME}/webapps`:
+    - In `${CATALINA_HOME}/webapps`, delete the folder `<some-app>` if the same named `<some-app>.war` file exists.
 2. Copy (and overwrite if files already exist) the sub-folders `bin`, `xipki` and `lib `
    to the tomcat root folder `${CATALINA_HOME}`.
     - The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
@@ -38,8 +38,8 @@ Deployment in Tomcat (8, 9 and 10)
 6. (Optional, required only when CRL is used as OCSPSore) 
    1) In xipki-mgmt-cli, call 
       `ca:sql --db-conf /path/to/ocsp-crl-db.json xipki/ocsp-init.sql`.
-7. Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
-   to the file `conf/catalina.properties` if OCSP over HTTP GET support is activated.
+7. If OCSP over HTTP GET support is activated: Add attribute `encodedSolidusHandling="decode"` to the 
+  `Connector`-element in the file `conf/server.xml`
 8. (optional) To accelerate the start process, append the following block to the property
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
 

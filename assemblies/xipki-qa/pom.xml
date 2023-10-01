@@ -28,13 +28,25 @@
     </dependency>
     <dependency>
       <groupId>org.xipki.example</groupId>
-      <artifactId>dummy-ctlog-server</artifactId>
+      <artifactId>dummy-ctlog-servlet3</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
     <dependency>
       <groupId>org.xipki.example</groupId>
-      <artifactId>dummy-crl-server</artifactId>
+      <artifactId>dummy-ctlog-servlet5</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.example</groupId>
+      <artifactId>dummy-crl-servlet3</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.example</groupId>
+      <artifactId>dummy-crl-servlet5</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
@@ -107,7 +119,7 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>copy-war</id>
+            <id>copy-servlet3-war</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>copy</goal>
@@ -118,13 +130,38 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki.example</groupId>
-                  <artifactId>dummy-ctlog-server</artifactId>
+                  <artifactId>dummy-ctlog-servlet3</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki.example</groupId>
-                  <artifactId>dummy-crl-server</artifactId>
+                  <artifactId>dummy-crl-servlet3</artifactId>
+                  <version>${project.version}</version>
+                  <type>war</type>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-servlet5-war</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/webapps-tomcat10on</outputDirectory>
+              <stripVersion>true</stripVersion>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki.example</groupId>
+                  <artifactId>dummy-ctlog-servlet5</artifactId>
+                  <version>${project.version}</version>
+                  <type>war</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.example</groupId>
+                  <artifactId>dummy-crl-servlet5</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>

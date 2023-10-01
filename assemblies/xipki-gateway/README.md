@@ -1,8 +1,8 @@
 Deployment in Tomcat (8, 9 and 10)
 ----
-1. Copy the war-files in the sub-folders `webapps` to the tomcat folder:
-   i) for tomcat 8 and 9: `${CATALINA_HOME}/webapps`, or ii) for tomcat 10: `${CATALINA_HOME}/webapps-javaee`
-   - In both `${CATALINA_HOME}/webapps` and `${CATALINA_HOME}/webapps-javaee`, delete the folder `<some-app>` if the same named `<some-app>.war` file exists.
+1. Copy the war-files in `webapps` for tomcat 8/9 or `webapps-tomcat10on` for tomcat 10+,
+   to the tomcat folder `${CATALINA_HOME}/webapps`:
+   - In `${CATALINA_HOME}/webapps`, delete the folder `<some-app>` if the same named `<some-app>.war` file exists.
    - Note if you do not support all protocols CMP, SCEP and RESTful API, please delete the unsupported `war`
      files and the same named folders
      (cmp.war for CMP, scep.war for SCEP, .well-known.war for EST, acme.war for ACME, and rest.war for RESTful API)

@@ -53,8 +53,20 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
+      <source>${project.build.directory}/webapps/acme-servlet5.war</source>
+      <outputDirectory>webapps-tomcat10on</outputDirectory>
+      <destName>acme.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>${project.build.directory}/webapps/cmp-servlet3.war</source>
       <outputDirectory>webapps</outputDirectory>
+      <destName>cmp.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>${project.build.directory}/webapps/cmp-servlet5.war</source>
+      <outputDirectory>webapps-tomcat10on</outputDirectory>
       <destName>cmp.war</destName>
       <fileMode>0644</fileMode>
     </file>
@@ -65,14 +77,32 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
+      <source>${project.build.directory}/webapps/est-servlet5.war</source>
+      <outputDirectory>webapps-tomcat10on</outputDirectory>
+      <destName>.well-known.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>${project.build.directory}/webapps/rest-servlet3.war</source>
       <outputDirectory>webapps</outputDirectory>
       <destName>rest.war</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
+      <source>${project.build.directory}/webapps/rest-servlet5.war</source>
+      <outputDirectory>webapps-tomcat10on</outputDirectory>
+      <destName>rest.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>${project.build.directory}/webapps/scep-servlet3.war</source>
       <outputDirectory>webapps</outputDirectory>
+      <destName>scep.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>${project.build.directory}/webapps/scep-servlet5.war</source>
+      <outputDirectory>webapps-tomcat10on</outputDirectory>
       <destName>scep.war</destName>
       <fileMode>0644</fileMode>
     </file>

@@ -16,7 +16,6 @@ import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.RestResponse;
 
 import java.io.EOFException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.Clock;
 import java.util.HashMap;
@@ -58,9 +57,8 @@ public class HttpOcspServlet0 {
    * @param req the request wrapper.
    * @param reqStream the inputstream.
    * @return response
-   * @throws IOException
    */
-  public RestResponse doPost(HttpRequestMetadataRetriever req, InputStream reqStream) throws IOException {
+  public RestResponse doPost(HttpRequestMetadataRetriever req, InputStream reqStream) {
     try {
       String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
       ResponderAndPath responderAndPath = server.getResponderForPath(path);
@@ -105,8 +103,10 @@ public class HttpOcspServlet0 {
     }
   } // method doPosts
 
-  public RestResponse doGet(HttpRequestMetadataRetriever req) throws IOException {
+  public RestResponse doGet(HttpRequestMetadataRetriever req) {
+    LOG.info("LIAO-0");
     String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
+    LOG.info("LIAO-1 path={}", path);
     ResponderAndPath responderAndPath = server.getResponderForPath(path);
     if (responderAndPath == null) {
       return new RestResponse(HttpStatusCode.SC_NOT_FOUND);

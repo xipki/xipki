@@ -64,6 +64,12 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
+      <source>${project.build.directory}/webapps/ocsp-servlet5.war</source>
+      <outputDirectory>webapps-tomcat10on</outputDirectory>
+      <destName>ocsp.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>${project.build.directory}/xipki/security/example/pkcs11-emulator.json</source>
       <outputDirectory>xipki/security</outputDirectory>
       <destName>pkcs11.json</destName>

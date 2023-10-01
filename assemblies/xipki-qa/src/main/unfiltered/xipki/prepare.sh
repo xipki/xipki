@@ -1,5 +1,13 @@
 #!/bin/sh
 
+T10FILE=~/tools/xipki/tomcat10
+
+if [ -f "$T10FILE" ]; then
+    echo "TOMCAT 10+"
+else
+    echo "TOMCAT 8/9"
+fi
+
 TOMCAT_CA_DIR=~/tools/xipki/tomcat-ca
 
 TOMCAT_OCSP_DIR=~/tools/xipki/tomcat-ocsp
@@ -27,9 +35,15 @@ rm -rf ${TOMCAT_DIR}/lib/bc*.jar \
     ${TOMCAT_DIR}/lib/password-*.jar \
     ${TOMCAT_DIR}/lib/xipki-tomcat-password-*.jar
 
-cp -r xipki-ca/* ${TOMCAT_DIR}/
+cp -r xipki-ca/bin xipki-ca/lib xipki-ca/xipki ${TOMCAT_DIR}/
 
-cp -r ${DIR}/webapps/* ${TOMCAT_DIR}/webapps
+if [ -f "$T10FILE" ]; then
+    cp -r xipki-ca/webapps-tomcat10on/* ${TOMCAT_DIR}/webapps
+    cp -r ${DIR}/webapps-tomcat10on/* ${TOMCAT_DIR}/webapps
+else
+    cp -r xipki-ca/webapps/* ${TOMCAT_DIR}/webapps
+    cp -r ${DIR}/webapps/* ${TOMCAT_DIR}/webapps
+fi
 
 cp -r ${DIR}/tomcat/ca/* ${TOMCAT_DIR}/
 
@@ -54,7 +68,14 @@ rm -rf ${TOMCAT_DIR}/lib/bc*.jar \
     ${TOMCAT_DIR}/lib/password-*.jar \
     ${TOMCAT_DIR}/lib/xipki-tomcat-password-*.jar
 
-cp -r xipki-ocsp/* ${TOMCAT_DIR}/
+cp -r xipki-ocsp/bin xipki-ocsp/lib xipki-ocsp/xipki ${TOMCAT_DIR}/
+
+if [ -f "$T10FILE" ]; then
+    cp -r xipki-ocsp/webapps-tomcat10on/* ${TOMCAT_DIR}/webapps
+else
+    cp -r xipki-ocsp/webapps/* ${TOMCAT_DIR}/webapps
+fi
+
 cp -r ${DIR}/tomcat/ocsp/* ${TOMCAT_DIR}/
 
 # For the QA, we need to restart the OCSP remotely, and this requires the HTTPS
@@ -75,7 +96,6 @@ echo "tomcat dir: ${TOMCAT_DIR}"
 XIPKI_DIR=${TOMCAT_DIR}/xipki
 
 rm -rf ${TOMCAT_DIR}/webapps ${TOMCAT_DIR}/logs/* ${TOMCAT_DIR}/xipki
-
 mkdir ${TOMCAT_DIR}/webapps
 
 rm -rf ${TOMCAT_DIR}/lib/bc*.jar \
@@ -86,7 +106,15 @@ rm -rf ${TOMCAT_DIR}/lib/bc*.jar \
     ${TOMCAT_DIR}/lib/password-*.jar \
     ${TOMCAT_DIR}/lib/xipki-tomcat-password-*.jar
 
-cp -r xipki-gateway/* ${TOMCAT_DIR}/
+cp -r xipki-gateway/bin xipki-gateway/lib xipki-gateway/xipki ${TOMCAT_DIR}/
+
+if [ -f "$T10FILE" ]; then
+    cp -r xipki-gateway/webapps-tomcat10on/* ${TOMCAT_DIR}/webapps
+    cp -r xipki-gateway/webapps-tomcat10on/.well-known.war ${TOMCAT_DIR}/webapps
+else
+    cp -r xipki-gateway/webapps/* ${TOMCAT_DIR}/webapps
+    cp -r xipki-gateway/webapps/.well-known.war ${TOMCAT_DIR}/webapps
+fi
 
 rm ${TOMCAT_DIR}/webapps/acme.war
 
