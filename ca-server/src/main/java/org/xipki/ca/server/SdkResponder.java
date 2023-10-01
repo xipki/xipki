@@ -4,7 +4,6 @@
 package org.xipki.ca.server;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
@@ -351,8 +350,7 @@ public class SdkResponder {
       if (entry.getP10req() != null) {
         // The PKCS#10 will only be used for transport of public key, subject and extensions.
         // The verification of POP is skipped here.
-        CertificationRequestInfo certTemp =
-            CertificationRequest.getInstance(entry.getP10req()).getCertificationRequestInfo();
+        CertificationRequestInfo certTemp = X509Util.parseCsrInRequest(entry.getP10req()).getCertificationRequestInfo();
         subject = certTemp.getSubject();
         publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
         extensions = X509Util.getExtensions(certTemp);

@@ -950,7 +950,7 @@ public class AcmeResponder {
         CertificationRequest csr;
         try {
           csrBytes = Base64Url.decodeFast(finalizeOrderReq.getCsr());
-          csr = CertificationRequest.getInstance(csrBytes);
+          csr = X509Util.parseCsrInRequest(csrBytes);
         } catch (Exception e) {
           throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badCSR, "could not parse CSR");
         }

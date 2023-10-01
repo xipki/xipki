@@ -453,7 +453,7 @@ public class ScepResponder {
       switch (mt) {
         case PKCSReq:
         case RenewalReq: {
-          CertificationRequest csr = CertificationRequest.getInstance(req.getMessageData());
+          CertificationRequest csr = X509Util.parseCsrInRequest(req.getMessageData());
           X500Name reqSubject = csr.getCertificationRequestInfo().getSubject();
           if (LOG.isInfoEnabled()) {
             LOG.info("tid={}, subject={}", tid, X509Util.x500NameText(reqSubject));

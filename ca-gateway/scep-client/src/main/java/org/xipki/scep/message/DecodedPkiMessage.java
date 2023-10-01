@@ -5,7 +5,6 @@ package org.xipki.scep.message;
 
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cms.*;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.*;
@@ -20,6 +19,7 @@ import org.xipki.scep.util.ScepUtil;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
@@ -375,7 +375,7 @@ public class DecodedPkiMessage extends PkiMessage {
 
     try {
       if (MessageType.PKCSReq == messageType || MessageType.RenewalReq == messageType) {
-        ret.setMessageData(CertificationRequest.getInstance(encodedMessageData));
+        ret.setMessageData(X509Util.parseCsrInRequest(encodedMessageData));
       } else if (MessageType.CertPoll == messageType) {
         ret.setMessageData(IssuerAndSubject.getInstance(encodedMessageData));
       } else if (MessageType.GetCert == messageType || MessageType.GetCRL == messageType) {

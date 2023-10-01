@@ -492,12 +492,10 @@ public class RestResponder {
         }
         extensions = null;
       } else if (CT_pkcs10.equalsIgnoreCase(ct)) {
-        // some clients may send the PEM encoded CSR.
-        request = X509Util.toDerEncoded(request);
-
         // The PKCS#10 will only be used for transport of subject and extensions.
         // The associated key will not be used, so the verification of POP is skipped.
-        CertificationRequestInfo certTemp = CertificationRequest.getInstance(request).getCertificationRequestInfo();
+        CertificationRequest csr = X509Util.parseCsrInRequest(request);
+        CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
         subject = certTemp.getSubject();
         extensions = X509Util.getExtensions(certTemp);
       } else {
@@ -508,7 +506,7 @@ public class RestResponder {
         throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, "unsupported media type " + ct, INFO, FAILED);
       }
 
-      CertificationRequest csr = CertificationRequest.getInstance(request);
+      CertificationRequest csr = X509Util.parseCsrInRequest(request);
       if (!GatewayUtil.verifyCsr(csr, securityFactory, popControl)) {
         throw new OperationException(BAD_POP);
       }
@@ -659,7 +657,7 @@ public class RestResponder {
       throw new HttpRespAuditException(BAD_REQUEST, "PEM CERTIFICATE is not specified", INFO, FAILED);
     }
 
-    CertificationRequest csr = CertificationRequest.getInstance(csrBytes);
+    CertificationRequest csr = X509Util.parseCsrInRequest(csrBytes);
     if (!GatewayUtil.verifyCsr(csr, securityFactory, popControl)) {
       throw new OperationException(BAD_POP);
     }

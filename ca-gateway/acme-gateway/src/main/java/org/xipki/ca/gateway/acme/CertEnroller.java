@@ -15,6 +15,7 @@ import org.xipki.ca.sdk.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
+import org.xipki.util.exception.OperationException;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -100,14 +101,15 @@ public class CertEnroller implements Runnable {
       } else {
         entry.setSubject(new X500NameType(certReqMeta.getSubject()));
 
-        CertificationRequest p10Req = CertificationRequest.getInstance(csr);
+        CertificationRequest p10Req;
         try {
+          p10Req = X509Util.parseCsrInRequest(csr);
           Extensions extensions = X509Util.getExtensions(p10Req.getCertificationRequestInfo());
           if (extensions != null) {
             entry.setExtensions(extensions.getEncoded());
           }
           entry.setSubjectPublicKey(p10Req.getCertificationRequestInfo().getSubjectPublicKeyInfo().getEncoded());
-        } catch (IOException e) {
+        } catch (IOException | OperationException e) {
           throw new AcmeSystemException(e);
         }
       }

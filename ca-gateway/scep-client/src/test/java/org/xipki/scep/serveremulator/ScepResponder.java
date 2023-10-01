@@ -21,6 +21,7 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
+import org.xipki.util.exception.OperationException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -193,7 +194,13 @@ public class ScepResponder {
       case PKCSReq:
         boolean selfSigned = req.getSignatureCert().isSelfSigned();
 
-        CertificationRequest csr = CertificationRequest.getInstance(req.getMessageData());
+        CertificationRequest csr;
+        try {
+          csr = X509Util.parseCsrInRequest(req.getMessageData());
+        } catch (Exception ex) {
+          LOG.warn("tid=" + tid + ": invalid CSR", ex);
+          return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
+        }
 
         if (selfSigned) {
           X500Name name = req.getSignatureCert().getSubject();
@@ -225,7 +232,7 @@ public class ScepResponder {
           buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badCertId);
         }
 
-        break;
+        return rep;
       case CertPoll:
         IssuerAndSubject is = IssuerAndSubject.getInstance(req.getMessageData());
         cert = caEmulator.pollCert(is.getIssuer(), is.getSubject());
@@ -235,7 +242,7 @@ public class ScepResponder {
           buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badCertId);
         }
 
-        break;
+        return rep;
       case GetCert:
         IssuerAndSerialNumber isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
         cert = caEmulator.getCert(isn.getName(), isn.getSerialNumber().getValue());
@@ -244,27 +251,33 @@ public class ScepResponder {
         } else {
           buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badCertId);
         }
-
-        break;
+        return rep;
       case RenewalReq:
         if (!caCaps.supportsRenewal()) {
           buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
-        } else {
-          csr = CertificationRequest.getInstance(req.getMessageData());
-          try {
-            cert = caEmulator.generateCert(csr);
-          } catch (Exception ex) {
-            throw new CaException("system failure: " + ex.getMessage(), ex);
-          }
-
-          if (cert != null) {
-            rep.setMessageData(createSignedData(cert));
-          } else {
-            rep.setPkiStatus(PkiStatus.FAILURE);
-            rep.setFailInfo(FailInfo.badCertId);
-          }
+          return rep;
         }
-        break;
+
+        try {
+          csr = X509Util.parseCsrInRequest(req.getMessageData());
+        } catch (OperationException e) {
+          buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
+          return rep;
+        }
+
+        try {
+          cert = caEmulator.generateCert(csr);
+        } catch (Exception ex) {
+          throw new CaException("system failure: " + ex.getMessage(), ex);
+        }
+
+        if (cert != null) {
+          rep.setMessageData(createSignedData(cert));
+        } else {
+          rep.setPkiStatus(PkiStatus.FAILURE);
+          rep.setFailInfo(FailInfo.badCertId);
+        }
+        return rep;
       case GetCRL:
         isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
         CertificateList crl;
@@ -273,17 +286,17 @@ public class ScepResponder {
         } catch (Exception ex) {
           throw new CaException("system failure: " + ex.getMessage(), ex);
         }
+
         if (crl != null) {
           rep.setMessageData(createSignedData(crl));
         } else {
           buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badCertId);
         }
-        break;
+        return rep;
       default:
         buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
+        return rep;
     } // end switch
-
-    return rep;
   } // method servicePkiOperation0
 
   private ContentInfo createSignedData(CertificateList crl) throws CaException {

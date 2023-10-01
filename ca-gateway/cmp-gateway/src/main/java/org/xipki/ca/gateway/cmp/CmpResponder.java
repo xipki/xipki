@@ -22,7 +22,9 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.InsufficientPermissionException;
+import org.xipki.util.exception.OperationException;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -345,12 +347,14 @@ public class CmpResponder extends BaseCmpResponder {
       String caName, boolean groupEnroll, boolean reenroll, boolean cross, Requestor requestor,
       ASN1OctetString tid, EnrollCertRequestEntry[] templates, AuditEvent event)
       throws IOException, SdkErrorResponseException {
+    String hexTid = Hex.encode(tid.getOctets());
+
     EnrollCertsRequest sdkReq = new EnrollCertsRequest();
     sdkReq.setExplicitConfirm(cmpControl.isConfirmCert());
     sdkReq.setGroupEnroll(groupEnroll);
     sdkReq.setConfirmWaitTimeMs((int) cmpControl.getConfirmWaitTime().toMillis());
     sdkReq.setCaCertMode(cmpControl.getCaCertsMode());
-    sdkReq.setTransactionId(Hex.encode(tid.getOctets()));
+    sdkReq.setTransactionId(hexTid);
     sdkReq.setEntries(templates);
 
     for (EnrollCertRequestEntry m : templates) {
@@ -359,7 +363,12 @@ public class CmpResponder extends BaseCmpResponder {
       if (m.getSubject() != null) {
         subject = m.getSubject().toX500Name();
       } else {
-        CertificationRequest csr = CertificationRequest.getInstance(m.getP10req());
+        CertificationRequest csr;
+        try {
+          csr = X509Util.parseCsrInRequest(m.getP10req());
+        } catch (OperationException e) {
+          throw new SdkErrorResponseException(ErrorCode.BAD_REQUEST, "error parsing PKCS#10 request");
+        }
         subject = csr.getCertificationRequestInfo().getSubject();
       }
       event.addEventData(CaAuditConstants.NAME_req_subject, "\"" + X509Util.x500NameText(subject) + "\"");
@@ -613,7 +622,7 @@ public class CmpResponder extends BaseCmpResponder {
       } else if (type == PKIBody.TYPE_P10_CERT_REQ) {
         checkPermission(requestor, PermissionConstants.ENROLL_CERT);
         respBody = processP10cr(caName, dfltCertprofileName, requestor, tid, reqHeader,
-            CertificationRequest.getInstance(reqBody.getContent()), event);
+            X509Util.parseCsrInRequest(reqBody.getContent()), event);
       } else if (type == PKIBody.TYPE_CROSS_CERT_REQ) {
         checkPermission(requestor, PermissionConstants.ENROLL_CROSS);
         CertReqMessages cr = CertReqMessages.getInstance(reqBody.getContent());
@@ -623,6 +632,9 @@ public class CmpResponder extends BaseCmpResponder {
       } else {
         throw new IllegalStateException("should not reach here");
       } // switch type
+    } catch (OperationException e) {
+      LogUtil.error(LOG, e);
+      return buildErrorMsgPkiBody(rejection, systemFailure, null);
     } catch (IOException e) {
       LogUtil.error(LOG, e);
       return buildErrorMsgPkiBody(rejection, systemFailure, null);

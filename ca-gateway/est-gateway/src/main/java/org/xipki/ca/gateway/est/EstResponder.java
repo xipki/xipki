@@ -368,7 +368,7 @@ public class EstResponder {
         throw new OperationException(NOT_PERMITTED, "certprofile " + profile + " is not allowed");
       }
 
-      CertificationRequest csr = CertificationRequest.getInstance(X509Util.toDerEncoded(request));
+      CertificationRequest csr = X509Util.parseCsrInRequest(request);
       if (!CMD_serverkeygen.equals(command)) {
         if (!GatewayUtil.verifyCsr(csr, securityFactory, popControl)) {
           throw new OperationException(BAD_POP);
