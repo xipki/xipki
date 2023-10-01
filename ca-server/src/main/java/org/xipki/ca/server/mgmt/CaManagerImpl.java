@@ -32,6 +32,7 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.security.*;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.OperationException;
 
 import java.io.*;
@@ -1054,6 +1055,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public void addCaAlias(String aliasName, String caName) throws CaMgmtException {
+    CaManagerImpl.checkName(aliasName, "CA alias");
     ca2Manager.addCaAlias(aliasName, caName);
   }
 
@@ -1331,6 +1333,14 @@ public class CaManagerImpl implements CaManager, Closeable {
   CaMgmtException logAndCreateException(String msg) {
     LOG.error(msg);
     return new CaMgmtException(msg);
+  }
+
+  static void checkName(String param, String paramName) throws CaMgmtException {
+    try {
+      CaConfs.checkName(param, paramName);
+    } catch (InvalidConfException e) {
+      throw new CaMgmtException(e.getMessage());
+    }
   }
 
 }

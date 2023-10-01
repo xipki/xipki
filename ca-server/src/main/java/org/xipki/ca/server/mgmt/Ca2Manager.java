@@ -263,6 +263,7 @@ class Ca2Manager {
 
     NameId ident = caEntry.getIdent();
     String name = ident.getName();
+    CaManagerImpl.checkName(name, "CA name");
 
     if (manager.caInfos.containsKey(name)) {
       throw new CaMgmtException(concat("CA named ", name, " exists"));

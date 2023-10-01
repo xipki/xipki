@@ -146,6 +146,7 @@ class PublisherManager {
     notNull(entry, "entry");
 
     String name = entry.getIdent().getName();
+    CaManagerImpl.checkName(name, "publisher name");
     if (manager.publisherDbEntries.containsKey(name)) {
       throw new CaMgmtException(concat("Publisher named ", name, " exists"));
     }

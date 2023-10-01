@@ -193,6 +193,7 @@ class CertprofileManager {
 
     notNull(certprofileEntry, "certprofileEntry");
     String name = certprofileEntry.getIdent().getName();
+    CaManagerImpl.checkName(name, "certprofile name");
     if (manager.certprofileDbEntries.containsKey(name)) {
       throw new CaMgmtException(concat("Certprofile named ", name, " exists"));
     }

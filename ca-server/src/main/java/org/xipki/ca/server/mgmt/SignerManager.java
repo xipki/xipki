@@ -76,6 +76,7 @@ class SignerManager {
 
     notNull(signerEntry, "signerEntry");
     String name = signerEntry.getName();
+    CaManagerImpl.checkName(name, "signer name");
     if (manager.signerDbEntries.containsKey(name)) {
       throw new CaMgmtException(concat("Signer named ", name, " exists"));
     }

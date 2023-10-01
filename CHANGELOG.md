@@ -7,6 +7,7 @@ See also <https://github.com/xipki/xipki/releases>
 - CA
   - Feature: encode the requests and responses between gateway and ca-server in CBOR format (was JSON).
   - Feature: extend Properties to use the place-holder ${env:name} for environment and ${sys:name} for system property.
+  - Feature: add limitation to the name of CA, publisher, requestor, cert profile, signer, and alias of CA.
   - Add support of tomcat 10
 - OCSP
   - Feature: extend Properties to use the place-holder ${env:name} for environment and ${sys:name} for system property.

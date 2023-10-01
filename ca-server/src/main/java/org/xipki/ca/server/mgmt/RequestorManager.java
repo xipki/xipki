@@ -75,6 +75,7 @@ class RequestorManager {
 
     notNull(requestorEntry, "requestorEntry");
     String name = requestorEntry.getIdent().getName();
+    CaManagerImpl.checkName(name, "requestor name");
     if (manager.requestorDbEntries.containsKey(name)) {
       throw new CaMgmtException(concat("Requestor named ", name, " exists"));
     }

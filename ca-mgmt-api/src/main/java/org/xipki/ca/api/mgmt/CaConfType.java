@@ -546,9 +546,15 @@ public class CaConfType {
 
     @Override
     public void validate() throws InvalidConfException {
-      notBlank(name, "name");
+      CaConfs.checkName(name, "CA name");
       validate(caInfo);
       validate(requestors);
+
+      if (aliases != null) {
+        for (String alias : aliases) {
+          CaConfs.checkName(alias, "CA alias");
+        }
+      }
     }
 
   } // class Ca
@@ -706,7 +712,7 @@ public class CaConfType {
 
     @Override
     public void validate() throws InvalidConfException {
-      notBlank(name, "name");
+      CaConfs.checkName(name, "name");
       notBlank(type, "type");
       validate(conf);
     }
@@ -757,7 +763,7 @@ public class CaConfType {
 
     @Override
     public void validate() throws InvalidConfException {
-      notBlank(name, "name");
+      CaConfs.checkName(name, "requestor name");
       notBlank(type, "type");
       exactOne(conf, "conf", binaryConf, "binaryConf");
       validate(conf, binaryConf);
@@ -809,7 +815,7 @@ public class CaConfType {
 
     @Override
     public void validate() throws InvalidConfException {
-      notBlank(name, "name");
+      CaConfs.checkName(name, "signer name");
       notBlank(type, "type");
       notNull(conf, "conf");
       validate(conf, cert);

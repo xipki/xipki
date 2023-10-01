@@ -302,4 +302,20 @@ public class CaConfs {
     return changed ? confPairs.getEncoded() : conf;
   } // method convertSignerConf
 
+  public static void checkName(String param, String paramName) throws InvalidConfException {
+    if (param == null || param.isEmpty()) {
+      throw new InvalidConfException(paramName + " must not be blank");
+    }
+
+    for (int i = 0; i < param.length(); i++) {
+      char c = param.charAt(i);
+      if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+          || (c == '-') || (c == '_') || (c == '.')) {
+        continue;
+      }
+
+      throw new InvalidConfException("invalid char '" + c + "' in " + paramName);
+    }
+  }
+
 }

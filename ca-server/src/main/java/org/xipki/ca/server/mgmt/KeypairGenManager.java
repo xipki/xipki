@@ -96,6 +96,7 @@ class KeypairGenManager {
     manager.assertMasterMode();
 
     String name = keypairGenEntry.getName();
+    CaManagerImpl.checkName(name, "keypair generation name");
     if (manager.keypairGenDbEntries.containsKey(name)) {
       throw new CaMgmtException(concat("keypair generation named ", name, " exists"));
     }
