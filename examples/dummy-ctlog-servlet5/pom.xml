@@ -11,6 +11,10 @@
   <artifactId>dummy-ctlog-servlet5</artifactId>
   <packaging>war</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
+  <properties>
+    <skipDeploy>true</skipDeploy>
+    <logfile>ctlog</logfile>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.bouncycastle</groupId>
@@ -37,4 +41,15 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+  <build>
+    <resources>
+      <resource>
+        <directory>../../shared/filtered</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>log4j2.properties</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
 </project>

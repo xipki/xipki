@@ -11,6 +11,10 @@
   <artifactId>dummy-crl-servlet5</artifactId>
   <packaging>war</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
+  <properties>
+    <skipDeploy>true</skipDeploy>
+    <logfile>crl</logfile>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xipki.commons</groupId>
@@ -32,4 +36,15 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+  <build>
+    <resources>
+      <resource>
+        <directory>../../shared/filtered</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>log4j2.properties</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
 </project>

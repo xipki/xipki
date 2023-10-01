@@ -60,10 +60,10 @@
   <build>
     <resources>
       <resource>
-        <directory>../shared/filtered</directory>
+        <directory>../../shared/filtered</directory>
         <filtering>true</filtering>
         <includes>
-          <include>**/*</include>
+          <include>log4j2.properties</include>
         </includes>
       </resource>
     </resources>
