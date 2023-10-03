@@ -15,7 +15,7 @@ ca:dbschema-add --name KEYPAIR_ENC_KEY --value 00112233445566778899AABBCCDDEEFF
 ## Certificate Profiles
 
 list = [ cross subca subca-complex ocsp scep multiple-ous multi-valued-rdn \
-  qc ee-complex smime smime-legacy tls tls-c max-time fixed-partial-subject \
+  qc ee-complex smime smime-legacy tls tls-enc tls-c max-time fixed-partial-subject \
   constant-ext gmt0015 \
   tls-dsa tls-ec tls-ed25519 tls-rsa tls-sm2 tls-sm2-enc]
 
@@ -23,10 +23,6 @@ each ($list) {
   ca:profile-add --name ${it} \
     --conf-file qa/certprofile/certprofile-${it}.json
 }
-
-ca:profile-add \
-  --name tlsa \
-  --conf-file qa/certprofile/certprofile-tls.json
 
 ## Publishers
 ca:publisher-add \
@@ -353,7 +349,8 @@ ca:caalias-add \
 ca:caprofile-add \
   --ca subcawithcrl1 \
   --profile ocsp \
-  --profile tlsa \
+  --profile tls \
+  --profile tls-enc \
   --profile scep \
   --profile multiple-ous \
   --profile multi-valued-rdn \

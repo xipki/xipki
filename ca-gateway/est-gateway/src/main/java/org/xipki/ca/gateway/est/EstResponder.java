@@ -26,6 +26,8 @@ import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.PopControl;
 import org.xipki.ca.gateway.Requestor;
 import org.xipki.ca.gateway.RequestorAuthenticator;
+import org.xipki.ca.gateway.conf.CaProfileConf;
+import org.xipki.ca.gateway.conf.CaProfilesControl;
 import org.xipki.ca.sdk.*;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
@@ -183,6 +185,8 @@ public class EstResponder {
 
   private final SecurityFactory securityFactory;
 
+  private final CaProfilesControl caProfilesControl;
+
   private final PopControl popControl;
 
   private final RequestorAuthenticator authenticator;
@@ -198,13 +202,15 @@ public class EstResponder {
   }
 
   public EstResponder(
-      SdkClient sdk, SecurityFactory securityFactory, RequestorAuthenticator authenticator, PopControl popControl) {
+      SdkClient sdk, SecurityFactory securityFactory, RequestorAuthenticator authenticator,
+      PopControl popControl, CaProfilesControl caProfiles) {
     LOG.info("XiPKI EST-Gateway version {}", StringUtil.getVersion(getClass()));
 
     this.sdk = notNull(sdk, "sdk");
     this.securityFactory = notNull(securityFactory, "securityFactory");
     this.authenticator = notNull(authenticator, "authenticator");
     this.popControl = notNull(popControl, "popControl");
+    this.caProfilesControl = notNull(caProfiles, "caProfiles");
   }
 
   private Requestor getRequestor(String user) {
@@ -222,28 +228,39 @@ public class EstResponder {
     String auditMessage = null;
 
     try {
-      String caName;
-      String profile;
-      String command;
-
       if (!path.startsWith("/est/")) {
         String message = "invalid path " + path;
         LOG.error(message);
         throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.ERROR, AuditStatus.FAILED);
-      } else {
-        // the first char is always '/'
-        String coreUri = path.substring("/est/".length());
-        String[] tokens = coreUri.split("/");
-        if (tokens.length == 3) {
-          caName = tokens[0].toLowerCase(Locale.ROOT);
-          profile = tokens[1].toLowerCase(Locale.ROOT);
-          command = tokens[2].toLowerCase(Locale.ROOT);
-        } else {
-          String message = "invalid path " + path;
-          LOG.error(message);
-          throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.ERROR, AuditStatus.FAILED);
-        }
       }
+
+      // the first char is always '/'
+      String coreUri = path.substring("/est/".length());
+      String[] tokens = StringUtil.splitAsArray(coreUri, "/");
+
+      String caName;
+      String profile;
+      String command;
+      if (tokens.length == 1 || tokens.length == 2) {
+        String alias = tokens.length == 1 ? "default" : tokens[0].trim();
+        CaProfileConf caProfileConf = caProfilesControl.getCaProfile(alias);
+        if (caProfileConf == null) {
+          String message = "unknown alias " + alias;
+          LOG.warn(message);
+          throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
+        }
+
+        caName = caProfileConf.getCa();
+        profile = caProfileConf.getCertprofile();
+      } else if (tokens.length == 3) {
+        caName = tokens[0].toLowerCase(Locale.ROOT);
+        profile = tokens[1].toLowerCase(Locale.ROOT);
+      } else {
+        String message = "invalid path " + path;
+        LOG.error(message);
+        throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.ERROR, AuditStatus.FAILED);
+      }
+      command = tokens[tokens.length - 1].toLowerCase(Locale.ROOT);
 
       if (isBlank(caName)) {
         String message = "CA is not specified";

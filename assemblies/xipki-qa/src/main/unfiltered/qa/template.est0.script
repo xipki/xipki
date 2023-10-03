@@ -1,16 +1,20 @@
-BASE_URL = https://localhost:8445/.well-known/est/subca/tls
 CT_PKCS10 = "Content-Type: application/pkcs10"
 
 echo "#################################################################"
 echo "#             Manage certificate via EST interface              #"
+echo "# BASE_URL: $BASE_URL"
+echo "# OUT_DIR:  $OUT_DIR"
 echo "#################################################################"
+
+xi:rm --force --recursive $OUT_DIR
+xi:mkdir $OUT_DIR
 
 #####
 CMD = cacerts
 
 echo "=====EST /${CMD}====="
 
-FILE = output/est/${CMD}
+FILE = $OUT_DIR/${CMD}
 
 xi:curl --out ${FILE}.p7m $BASE_URL/${CMD}
 
@@ -19,7 +23,7 @@ CMD = csrattrs
 
 echo "=====EST /${CMD}====="
 
-FILE = output/est/${CMD}
+FILE = $OUT_DIR/${CMD}
 
 xi:curl --out ${FILE}.p7m $BASE_URL/${CMD}
 
@@ -28,7 +32,7 @@ CMD = simpleenroll
 
 echo "=====EST /${CMD}====="
 
-FILE = output/est/${CMD}
+FILE = $OUT_DIR/${CMD}
 
 xi:csr-p12 --hash $HASH REPLACEME-GM REPLACEME-RSAPSS \
   --p12 output/tls1.p12 --password 1234 --out ${FILE}.csr \
@@ -45,7 +49,7 @@ echo "=====EST /${CMD}====="
 
 OLD_FILE = ${FILE}
 
-FILE = output/est/${CMD}
+FILE = $OUT_DIR/${CMD}
 
 xi:csr-p12 --hash $HASH REPLACEME-GM REPLACEME-RSAPSS \
   --p12 output/tls1.p12 --password 1234 --out ${FILE}.csr \
@@ -61,7 +65,7 @@ CMD = serverkeygen
 
 echo "=====EST /${CMD}====="
 
-FILE = output/est/${CMD}
+FILE = $OUT_DIR/${CMD}
 
 xi:csr-p12 --hash $HASH REPLACEME-GM \
   --p12 output/tls1.p12 --password 1234 --out ${FILE}.csr \
@@ -80,7 +84,7 @@ CMD = ucacerts
 
 echo "=====EST /${CMD}====="
 
-FILE = output/est/${CMD}
+FILE = $OUT_DIR/${CMD}
 
 xi:curl --out ${FILE}.pem $BASE_URL/${CMD}
 
@@ -89,7 +93,7 @@ CMD = ucacert
 
 echo "=====EST /${CMD}====="
 
-FILE = output/est/${CMD}
+FILE = $OUT_DIR/${CMD}
 
 xi:curl --out ${FILE}.crt.b64 $BASE_URL/${CMD}
 base64 -d ${FILE}.crt.b64 ${FILE}.crt
@@ -99,7 +103,7 @@ CMD = ucrl
 
 echo "=====EST /${CMD}====="
 
-FILE = output/est/${CMD}
+FILE = $OUT_DIR/${CMD}
 
 xi:curl --out ${FILE}.crl.b64 $BASE_URL/${CMD}
 base64 -d ${FILE}.crl.b64 ${FILE}.crl
@@ -109,7 +113,7 @@ CMD = usimpleenroll
 
 echo "=====EST /${CMD}====="
 
-FILE = output/est/${CMD}
+FILE = $OUT_DIR/${CMD}
 
 xi:csr-p12 --hash $HASH REPLACEME-GM REPLACEME-RSAPSS \
   --p12 output/tls1.p12 --password 1234 --out ${FILE}.csr \
@@ -126,7 +130,7 @@ echo "=====EST /${CMD}====="
 
 OLD_FILE = ${FILE}
 
-FILE = output/est/${CMD}
+FILE = $OUT_DIR/${CMD}
 
 xi:csr-p12 --hash $HASH REPLACEME-GM REPLACEME-RSAPSS \
   --p12 output/tls1.p12 --password 1234 --out ${FILE}.csr \
@@ -142,7 +146,7 @@ CMD = userverkeygen
 
 echo "=====EST /${CMD}====="
 
-FILE = output/est/${CMD}
+FILE = $OUT_DIR/${CMD}
 
 xi:csr-p12 --hash $HASH REPLACEME-GM \
   --p12 output/tls1.p12 --password 1234 --out ${FILE}.csr \

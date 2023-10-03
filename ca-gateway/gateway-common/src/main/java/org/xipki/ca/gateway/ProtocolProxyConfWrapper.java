@@ -7,10 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.Audits;
 import org.xipki.audit.Audits.AuditConf;
-import org.xipki.ca.gateway.conf.CaNameSignerConf;
-import org.xipki.ca.gateway.conf.CaNameSignersConf;
-import org.xipki.ca.gateway.conf.ProtocolProxyConf;
-import org.xipki.ca.gateway.conf.SignerConf;
+import org.xipki.ca.gateway.conf.*;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.Securities;
@@ -48,6 +45,8 @@ public class ProtocolProxyConfWrapper {
 
   private final PopControl popControl;
 
+  private final CaProfilesControl caProfiles;
+
   public ProtocolProxyConfWrapper(ProtocolProxyConf conf)
       throws InvalidConfException, ObjectCreationException {
     XipkiBaseDir.init();
@@ -84,6 +83,7 @@ public class ProtocolProxyConfWrapper {
     }
 
     popControl = new PopControl(conf.getPop());
+    caProfiles = new CaProfilesControl(conf.getCaProfiles());
     sdkClient = new SdkClient(conf.getSdkClient());
 
     CaNameSignersConf signersConf = conf.getSigners();
@@ -136,6 +136,10 @@ public class ProtocolProxyConfWrapper {
 
   public PopControl getPopControl() {
     return popControl;
+  }
+
+  public CaProfilesControl getCaProfiles() {
+    return caProfiles;
   }
 
   public void destroy() {

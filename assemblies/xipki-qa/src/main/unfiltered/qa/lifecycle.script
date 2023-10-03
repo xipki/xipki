@@ -153,8 +153,9 @@ if { $printUsage equals "true" } then {
     xipki/etc/ocsp/ocsp-responder.json
 
   ## Prepare scripts
-  xi:copy-file -f qa/template.rest.script qa/rest.script
-  xi:copy-file -f qa/template.est.script  qa/est.script
+  xi:copy-file -f qa/template.rest0.script qa/rest0.script
+
+  xi:copy-file -f qa/template.est0.script  qa/est0.script
 
   xi:copy-file -f qa/qa.d/template.ca-load.script \
     qa/qa.d/ca-load.script
@@ -192,10 +193,10 @@ if { $printUsage equals "true" } then {
     qa/qa.d/ca-load.script
 
   xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
-    qa/rest.script
+    qa/rest0.script
 
   xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
-    qa/est.script
+    qa/est0.script
 
   xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
     qa/qa.d/ca.script
@@ -209,9 +210,9 @@ if { $printUsage equals "true" } then {
     gm = "--gm"
   }
 
-  xi:replace --old "REPLACEME-GM" --new "${gm}" qa/rest.script
+  xi:replace --old "REPLACEME-GM" --new "${gm}" qa/rest0.script
 
-  xi:replace --old "REPLACEME-GM" --new "${gm}" qa/est.script
+  xi:replace --old "REPLACEME-GM" --new "${gm}" qa/est0.script
 
   xi:replace --old "REPLACEME-GM" --new "${gm}" \
     qa/qa.d/ca-load.script
@@ -289,7 +290,6 @@ if { $printUsage equals "true" } then {
 
   xi:copy-file -f qa/qa.d/rootca.crl.download \
     ${OCSP_XIPKI_DIR}/crls/example-crls/crl-download-mycrl2/crl.download
-
 
   # Restart OCSP server
   ocsp:restart-server

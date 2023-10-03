@@ -5,23 +5,18 @@
 	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
 	"caProfiles": [{
 		"name": "default",
-		"ca": "subcawithcrl",
+		"ca": "subca",
 		"certprofile": "tls"
 	},{
 		"name": "myalias",
-		"ca": "subcawithcrl",
+		"ca": "subca",
 		"certprofile": "tls"
 	}],
 	"pop":{
 		"sigAlgos":[
 			"SHA256withRSA", "SHA256withECDSA", "SHA256withDSA",
 			"SM3withSM2", "ED25519", "ED448", "DHPOP-X25519", "DHPOP-X448"
-		],
-		"dh":{
-			"type":"pkcs12",
-			"password":"1234",
-			"keystore":"keycerts/dhpop.p12"
-		}
+		]
 	},
 	"sdkClient":{
 		"serverUrl":"https://localhost:8444/ca/ra/",
@@ -31,22 +26,22 @@
 			"keystore":{
 				"file":"keycerts/tlskeys/client/tls-client.p12"
 			},
-			"trustanchors":[{
+			"trustanchors": [{
 				"file":"keycerts/tlskeys/ca/tls-ca-cert.pem"
-			}]
+			}],
+			// valid values: 'default' for standard verification, 'no_op' for no-operation, or
+			// 'java:'<class implements javax.net.ssl.HostnameVerifier>
+			"hostnameVerifier":"default"
 		}
 	},
 	"audit":{
 		"type":"embed",
-		"conf": "file=${sys:catalina.home}/logs/rest-audit.log"
+		"conf": "file=${sys:catalina.home}/logs/est-audit.log"
 	},
 	"security":{
 		"keyStrongrandomEnabled":false,
 		"signStrongrandomEnabled":false,
 		"defaultSignerParallelism":10,
-		"pkcs11Conf":{
-			"file":"security/pkcs11.json"
-		},
 		"password":{
 			"masterPasswordCallback":"FILE file=security/masterpassword.secret"
 		},

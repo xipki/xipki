@@ -1,0 +1,11 @@
+BASE_URL = https://localhost:8445/.well-known/est/subca/tls
+OUT_DIR = output/est-raw
+source file:./qa/est0.script
+
+BASE_URL = https://localhost:8445/.well-known/est/myalias
+OUT_DIR = output/est-alias
+source file:./qa/est0.script
+
+BASE_URL = https://localhost:8445/.well-known/est
+OUT_DIR = output/est-none
+source file:./qa/est0.script

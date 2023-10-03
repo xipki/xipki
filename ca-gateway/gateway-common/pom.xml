@@ -15,11 +15,6 @@
     <skipDeploy>true</skipDeploy>
   </properties>
   <dependencies>
-    <!--dependency>
-      <groupId>org.xipki.commons</groupId>
-      <artifactId>servlet3-common</artifactId>
-      <version>${xipki.commons.version}</version>
-    </dependency-->
     <dependency>
       <groupId>org.xipki</groupId>
       <artifactId>ca-sdk</artifactId>

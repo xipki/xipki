@@ -20,6 +20,8 @@ public abstract class ProtocolProxyConf {
 
   protected String authenticator;
 
+  private CaProfileConf[] caProfiles;
+
   protected PopControlConf pop;
 
   protected SdkClientConf sdkClient;
@@ -47,6 +49,14 @@ public abstract class ProtocolProxyConf {
 
   public void setAuthenticator(String authenticator) {
     this.authenticator = authenticator;
+  }
+
+  public CaProfileConf[] getCaProfiles() {
+    return caProfiles;
+  }
+
+  public void setCaProfiles(CaProfileConf[] caProfiles) {
+    this.caProfiles = caProfiles;
   }
 
   public PopControlConf getPop() {
@@ -95,6 +105,9 @@ public abstract class ProtocolProxyConf {
     notNull(pop, "pop");
     notNull(sdkClient, "sdkClient");
     notNull(security, "security");
+    if (caProfiles != null) {
+      new CaProfilesControl(caProfiles).validate();
+    }
   }
 
   protected void notNull(Object obj, String name) throws InvalidConfException {

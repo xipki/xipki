@@ -48,7 +48,7 @@ curl ${OPTS} \
     --header "Content-Type: text/plain; charset=utf-8" \
     --data-ascii "subject=CN=${filename}-genkey.example.org,O=myorg,C=DE" \
     --output ${filename}-genkey.pem -v \
-    "${BASE_URL}/enroll-serverkeygen?profile=tlsa"
+    "${BASE_URL}/enroll-serverkeygen?profile=tls"
 
 echo "enroll certificate"
 
@@ -56,7 +56,7 @@ curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
     --data-binary "@${filename}.csr" \
     --output ${filename}.der -v \
-    "${BASE_URL}/enroll-cert?profile=tlsa"
+    "${BASE_URL}/enroll-cert?profile=tls"
 
 # get the serial number
 SERIAL=0x`openssl x509 -inform der -serial -noout -in ${filename}.der | cut -d '=' -f 2`

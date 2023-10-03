@@ -24,6 +24,8 @@ import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.PopControl;
 import org.xipki.ca.gateway.Requestor;
 import org.xipki.ca.gateway.RequestorAuthenticator;
+import org.xipki.ca.gateway.conf.CaProfileConf;
+import org.xipki.ca.gateway.conf.CaProfilesControl;
 import org.xipki.ca.sdk.*;
 import org.xipki.scep.message.*;
 import org.xipki.scep.transaction.*;
@@ -107,6 +109,8 @@ public class ScepResponder {
 
   private final PopControl popControl;
 
+  private final CaProfilesControl caProfilesControl;
+
   private final CaCaps caCaps;
 
   private final SecurityFactory securityFactory;
@@ -116,7 +120,8 @@ public class ScepResponder {
   private final CaNameScepSigners signers;
 
   public ScepResponder(ScepControl control, SdkClient sdk, SecurityFactory securityFactory, CaNameScepSigners signers,
-                       RequestorAuthenticator authenticator, PopControl popControl) {
+                       RequestorAuthenticator authenticator, PopControl popControl,
+                       CaProfilesControl caProfiles) {
     LOG.info("XiPKI SCEP-Gateway version {}", StringUtil.getVersion(getClass()));
 
     this.control = notNull(control, "control");
@@ -131,6 +136,8 @@ public class ScepResponder {
         CaCapability.Renewal, CaCapability.SHA1, CaCapability.SHA256, CaCapability.SHA512);
     this.caCaps = caps;
     this.signers = signers;
+
+    this.caProfilesControl = notNull(caProfiles, "caProfiles");
   } // constructor
 
   private CaCaps getCaCaps() {
@@ -150,10 +157,27 @@ public class ScepResponder {
     String certprofileName = null;
     if (path.length() > 1) {
       if (path.endsWith(CGI_PROGRAM)) {
-        // skip also the first char (which is always '/')
-        String tpath = path.substring(1, path.length() - CGI_PROGRAM_LEN);
-        String[] tokens = tpath.split("/");
-        if (tokens.length == 2) {
+        String[] tokens;
+        if (path.length() == CGI_PROGRAM_LEN) {
+          tokens = new String[0];
+        } else {
+          // skip also the first char (which is always '/')
+          String tpath = path.substring(1, path.length() - CGI_PROGRAM_LEN);
+          tokens = StringUtil.splitAsArray(tpath, "/");
+        }
+
+        if (tokens.length == 0 || tokens.length == 1) {
+          String alias = tokens.length == 0 ? "default" : tokens[0].trim();
+          CaProfileConf caProfileConf = caProfilesControl.getCaProfile(alias);
+          if (caProfileConf == null) {
+            String message = "unknown alias " + alias;
+            LOG.warn(message);
+            return new RestResponse(HttpStatusCode.SC_NOT_FOUND);
+          }
+
+          caName = caProfileConf.getCa();
+          certprofileName = caProfileConf.getCertprofile();
+        } else if (tokens.length == 2) {
           caName = tokens[0];
           certprofileName = tokens[1].toLowerCase();
         }

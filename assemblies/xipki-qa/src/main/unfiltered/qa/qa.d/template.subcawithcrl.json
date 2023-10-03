@@ -58,7 +58,7 @@
 			"multiple-ous",
 			"multi-valued-rdn",
 			"max-time",
-			"tlsa",
+			"tls", "tls-enc",
 			"gmt0015",
 			"tls-sm2", "tls-sm2-enc"
 		],

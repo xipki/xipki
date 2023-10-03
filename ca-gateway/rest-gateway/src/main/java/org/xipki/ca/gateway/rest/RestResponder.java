@@ -21,6 +21,8 @@ import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.PopControl;
 import org.xipki.ca.gateway.Requestor;
 import org.xipki.ca.gateway.RequestorAuthenticator;
+import org.xipki.ca.gateway.conf.CaProfileConf;
+import org.xipki.ca.gateway.conf.CaProfilesControl;
 import org.xipki.ca.sdk.*;
 import org.xipki.security.CrlReason;
 import org.xipki.security.SecurityFactory;
@@ -34,6 +36,7 @@ import org.xipki.util.PemEncoder.PemLabel;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
 import org.xipki.util.http.HttpRespContent;
+import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.RestResponse;
 
 import java.io.*;
@@ -187,6 +190,8 @@ public class RestResponder {
 
   private final PopControl popControl;
 
+  private final CaProfilesControl caProfilesControl;
+
   private final RequestorAuthenticator authenticator;
 
   private static final Set<String> knownCommands;
@@ -198,12 +203,14 @@ public class RestResponder {
   }
 
   public RestResponder(SdkClient sdk, SecurityFactory securityFactory,
-                       RequestorAuthenticator authenticator, PopControl popControl) {
+                       RequestorAuthenticator authenticator, PopControl popControl,
+                       CaProfilesControl caProfiles) {
     LOG.info("XiPKI REST-Gateway version {}", StringUtil.getVersion(getClass()));
     this.sdk = notNull(sdk, "sdk");
     this.securityFactory = notNull(securityFactory, "securityFactory");
     this.authenticator = notNull(authenticator, "authenticator");
     this.popControl = notNull(popControl, "popControl");
+    this.caProfilesControl = notNull(caProfiles, "caProfiles");
   }
 
   private Requestor getRequestor(String user) {
@@ -221,22 +228,44 @@ public class RestResponder {
     String auditMessage = null;
 
     try {
-      String caName = null;
-      String command = null;
+      if (path.length() == 0) {
+        String message = "blank path is not allowed";
+        LOG.error(message);
+        throw new HttpRespAuditException(NOT_FOUND, message, ERROR, FAILED);
+      }
 
-      if (path.length() > 1) {
-        // the first char is always '/'
-        String coreUri = path;
-        int sepIndex = coreUri.indexOf('/', 1);
-        if (sepIndex == -1 || sepIndex == coreUri.length() - 1) {
-          String message = "invalid path " + path;
-          LOG.error(message);
-          throw new HttpRespAuditException(NOT_FOUND, message, ERROR, FAILED);
+      String caName;
+      String certProfile;
+      String command;
+
+      // the first char is always '/'
+      String coreUri = path.substring(1);
+      String[] tokens = StringUtil.splitAsArray(coreUri, "/");
+      if (tokens.length == 1) {
+        CaProfileConf caProfileConf = caProfilesControl.getCaProfile("default");
+        if (caProfileConf == null) {
+          String message = "unknown alias default";
+          LOG.warn(message);
+          return new RestResponse(HttpStatusCode.SC_NOT_FOUND);
         }
 
-        // skip also the first char ('/')
-        caName = coreUri.substring(1, sepIndex).toLowerCase();
-        command = coreUri.substring(sepIndex + 1).toLowerCase();
+        caName = caProfileConf.getCa();
+        certProfile = caProfileConf.getCertprofile();
+        command = tokens[tokens.length - 1];
+      } else if (tokens.length == 2) {
+        CaProfileConf caProfileConf = caProfilesControl.getCaProfile("default");
+        if (caProfileConf == null) {
+          caName = tokens[1];
+          certProfile = httpRetriever.getParameter(PARAM_profile);
+        } else {
+          caName = caProfileConf.getCa();
+          certProfile = caProfileConf.getCertprofile();
+        }
+        command = tokens[tokens.length - 1];
+      } else {
+        caName = null;
+        certProfile = null;
+        command = null;
       }
 
       if (StringUtil.isBlank(command)) {
@@ -320,13 +349,13 @@ public class RestResponder {
 
       switch (command) {
         case CMD_enroll_cross_cert:
-          respContent = enrollCrossCert(caName, requestor, request, httpRetriever, event);
+          respContent = enrollCrossCert(caName, certProfile, requestor, request, httpRetriever, event);
           break;
         case CMD_enroll_cert:
         case CMD_enroll_serverkeygen:
         case CMD_enroll_cert_twin:
         case CMD_enroll_serverkeygen_twin:
-          respContent = enrollCerts(command, caName, requestor, request, httpRetriever, event);
+          respContent = enrollCerts(command, caName, certProfile, requestor, request, httpRetriever, event);
           break;
         case CMD_revoke_cert:
         case CMD_unsuspend_cert:
@@ -444,7 +473,7 @@ public class RestResponder {
   }
 
   private HttpRespContent enrollCerts(
-      String command, String caName, Requestor requestor, byte[] request,
+      String command, String caName, String profile, Requestor requestor, byte[] request,
       HttpRequestMetadataRetriever httpRetriever, AuditEvent event)
       throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
     if (!requestor.isPermitted(PermissionConstants.ENROLL_CERT)) {
@@ -454,7 +483,7 @@ public class RestResponder {
     boolean twin = CMD_enroll_cert_twin.equals(command) || CMD_enroll_serverkeygen_twin.equals(command);
     boolean caGenKeyPair = CMD_enroll_serverkeygen.equals(command) || CMD_enroll_serverkeygen_twin.equals(command);
 
-    String profile = checkProfile(requestor, httpRetriever);
+    checkProfile(requestor, profile);
 
     String profileEnc = twin ? profile + "-enc" : null;
     if (profileEnc != null && !requestor.isCertprofilePermitted(profileEnc)) {
@@ -602,13 +631,14 @@ public class RestResponder {
   }
 
   private HttpRespContent enrollCrossCert(
-      String caName, Requestor requestor, byte[] request, HttpRequestMetadataRetriever httpRetriever, AuditEvent event)
+      String caName, String profile, Requestor requestor, byte[] request,
+      HttpRequestMetadataRetriever httpRetriever, AuditEvent event)
       throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
     if (!requestor.isPermitted(PermissionConstants.ENROLL_CROSS)) {
       throw new OperationException(NOT_PERMITTED, "ENROLL_CROSS is not allowed");
     }
 
-    String profile = checkProfile(requestor, httpRetriever);
+    checkProfile(requestor, profile);
 
     String ct = httpRetriever.getHeader("Content-Type");
     if (!CT_pem_file.equalsIgnoreCase(ct)) {
@@ -736,10 +766,9 @@ public class RestResponder {
   }
 
   private static String checkProfile(
-      Requestor requestor, HttpRequestMetadataRetriever httpRetriever) throws HttpRespAuditException, OperationException {
-    String profile = httpRetriever.getParameter(PARAM_profile);
+      Requestor requestor, String profile) throws HttpRespAuditException, OperationException {
     if (StringUtil.isBlank(profile)) {
-      throw new HttpRespAuditException(BAD_REQUEST, "required parameter " + PARAM_profile + " not specified",
+      throw new HttpRespAuditException(BAD_REQUEST, "certificate profile is not specified",
           INFO, FAILED);
     }
     profile = profile.toLowerCase();

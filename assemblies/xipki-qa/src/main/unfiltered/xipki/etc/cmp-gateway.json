@@ -33,7 +33,7 @@
 		"dh":{
 			"type":"pkcs12",
 			"password":"1234",
-			"keystore":"xipki/keycerts/dhpop.p12"
+			"keystore":"keycerts/dhpop.p12"
 		}
 	},
 	"sdkClient":{
@@ -51,7 +51,7 @@
 	},
 	"audit":{
 		"type":"embed",
-		"conf": "file=logs/cmp-audit.log"
+		"conf": "file=${sys:catalina.home}/logs/cmp-audit.log"
 	},
 	"signers":{
 		"default":{

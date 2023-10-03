@@ -8,8 +8,7 @@ import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.crmf.DhSigStatic;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.slf4j.Logger;
-import org.xipki.audit.AuditEvent;
-import org.xipki.audit.AuditStatus;
+import org.xipki.audit.*;
 import org.xipki.security.*;
 
 import static org.xipki.util.Args.notNull;
@@ -63,5 +62,11 @@ public class GatewayUtil {
 
     return securityFactory.verifyPop(csr, popValidator, kaKeyAndCert);
   } // method verifyCsr
+
+  public static void auditLogPciEvent(String type, boolean successful, String eventType) {
+    PciAuditEvent event = PciAuditEvent.newPciAuditEvent(type, eventType, "CORE",
+        successful ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED, successful ? AuditLevel.INFO : AuditLevel.ERROR);
+    Audits.getAuditService().logEvent(event);
+  }
 
 }
