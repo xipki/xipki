@@ -179,7 +179,8 @@
 		},
 		"required":true,
 		"constant":{
-			"value":"AwMAAQI="
+			"type": "BIT STRING",
+			"value":"YWJjZGVm"
 		}
 	},{
 		"type":{
@@ -215,7 +216,8 @@
 		},
 		"required":true,
 		"constant":{
-			"value":"AgEK"
+			"type": "INTEGER",
+			"value":"0x1234567890ABCD"
 		}
 	},{
 		"type":{
@@ -233,7 +235,8 @@
 		},
 		"required":true,
 		"constant":{
-			"value":"BAIDBA=="
+			"type": "OCTET STRING",
+			"value":"YWJjZGVm"
 		}
 	},{
 		"type":{
@@ -251,7 +254,8 @@
 		},
 		"required":true,
 		"constant":{
-			"value":"ExJBIHByaW50YWJsZSBzdHJpbmc="
+			"type": "PrintableString",
+			"value":"example printable string"
 		}
 	},{
 		"type":{
@@ -269,7 +273,8 @@
 		},
 		"required":true,
 		"constant":{
-			"value":"DA1BIFVURjggc3RyaW5n"
+			"type": "UTF8String",
+			"value":"example UTF8 string"
 		}
 	},{
 		"type":{

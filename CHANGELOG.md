@@ -8,6 +8,8 @@ See also <https://github.com/xipki/xipki/releases>
   - Feature: encode the requests and responses between gateway and ca-server in CBOR format (was JSON).
   - Feature: extend Properties to use the place-holder ${env:name} for environment and ${sys:name} for system property.
   - Feature: add limitation to the name of CA, publisher, requestor, cert profile, signer, and alias of CA.
+  - Feature: add support of constant value of types PrintableString, UTF8String, INTEGER, BIT STRING and OCTET STRING.
+  - Feature: add limitation to the name of CAs, signers, publishers, requestors, and certificate profiles.
   - Add support of tomcat 10
 - OCSP
   - Feature: extend Properties to use the place-holder ${env:name} for environment and ${sys:name} for system property.
@@ -16,6 +18,7 @@ See also <https://github.com/xipki/xipki/releases>
   - Feature: add support of ACME with challenge types dns-01, http-01 and tls-alpn-01
   - Feature: encode the requests and responses between gateway and ca-server in CBOR format (was JSON).
   - Feature: extend Properties to use the place-holder ${env:name} for environment and ${sys:name} for system property.
+  - Feature: add support of short URLs in EST, REST and SCEP gateways.
   - Add support of tomcat 10
 - CLI
   - N/A
