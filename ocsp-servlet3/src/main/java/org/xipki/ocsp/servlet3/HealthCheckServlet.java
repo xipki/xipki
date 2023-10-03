@@ -1,44 +1,46 @@
 // Copyright (c) 2013-2023 xipki. All rights reserved.
 // License Apache License 2.0
 
-package org.xipki.ocsp.servlet;
+package org.xipki.ocsp.servlet3;
 
-import org.xipki.ocsp.server.servlet.HttpMgmtServlet0;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.ocsp.server.servlet.HealthCheckServlet0;
 import org.xipki.servlet3.HttpRequestMetadataRetrieverImpl;
 import org.xipki.servlet3.ServletHelper;
 import org.xipki.util.Args;
 import org.xipki.util.http.RestResponse;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * REST management servlet of OCSP server.
+ * HTTP health check servlet of the OCSP server.
  *
  * @author Lijun Liao (xipki)
  * @since 3.0.1
  */
 
-public class HttpMgmtServlet extends HttpServlet {
+public class HealthCheckServlet extends HttpServlet {
 
-  private HttpMgmtServlet0 underlying;
+  private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);
 
-  public void setUnderlying(HttpMgmtServlet0 underlying) {
+  private HealthCheckServlet0 underlying;
+
+  public void setUnderlying(HealthCheckServlet0 underlying) {
     this.underlying = Args.notNull(underlying, "undelying");
   }
 
   @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException {
+  protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
     try {
-      RestResponse restResp = underlying.doPost(new HttpRequestMetadataRetrieverImpl(req), req.getInputStream());
+      RestResponse restResp = underlying.doGet(new HttpRequestMetadataRetrieverImpl(req));
       ServletHelper.fillResponse(restResp, resp);
     } finally {
       resp.flushBuffer();
     }
-  }
+  } // method doGet
 
 }

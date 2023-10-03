@@ -1,11 +1,8 @@
 // Copyright (c) 2013-2023 xipki. All rights reserved.
 // License Apache License 2.0
 
-package org.xipki.ca.servlet;
+package org.xipki.ca.server.servlet;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.Audits;
@@ -13,20 +10,18 @@ import org.xipki.audit.Audits.AuditConf;
 import org.xipki.ca.api.profile.CertprofileFactory;
 import org.xipki.ca.api.profile.CertprofileFactoryRegister;
 import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
-import org.xipki.ca.certprofile.xijson.CertprofileFactoryImpl;
 import org.xipki.ca.server.CaServerConf;
 import org.xipki.ca.server.CaServerConf.RemoteMgmt;
 import org.xipki.ca.server.SdkResponder;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.publisher.OcspCertPublisherFactory;
-import org.xipki.ca.server.servlet.HttpMgmtServlet0;
-import org.xipki.ca.server.servlet.HttpRaServlet0;
 import org.xipki.license.api.LicenseFactory;
 import org.xipki.security.Securities;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.exception.ServletException0;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
@@ -39,9 +34,11 @@ import java.util.Set;
  *
  * @author Lijun Liao (xipki)
  */
-public class CaServletFilter implements Filter {
+public class CaServletFilter0 {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CaServletFilter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CaServletFilter0.class);
+
+  private static final String XIJSON_CERTFACTORY = "org.xipki.ca.certprofile.xijson.CertprofileFactoryImpl";
 
   private static final String DFLT_CA_SERVER_CFG = "etc/ca/ca.json";
 
@@ -53,21 +50,20 @@ public class CaServletFilter implements Filter {
 
   private SdkResponder responder;
 
-  private HttpRaServlet raServlet;
+  private HttpRaServlet0 raServlet;
 
   private boolean remoteMgmtEnabled;
 
-  private HttpMgmtServlet mgmtServlet;
+  private HttpMgmtServlet0 mgmtServlet;
 
-  @Override
-  public void init(FilterConfig filterConfig) throws ServletException {
+  public CaServletFilter0(String licenseFactoryClazz) throws ServletException0 {
     XipkiBaseDir.init();
 
     CaServerConf conf;
     try {
       conf = CaServerConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CA_SERVER_CFG, true));
     } catch (IOException | InvalidConfException ex) {
-      throw new IllegalArgumentException("could not parse CA configuration file " + DFLT_CA_SERVER_CFG, ex);
+      throw new ServletException0("could not parse CA configuration file " + DFLT_CA_SERVER_CFG, ex);
     }
 
     boolean logReqResp = conf.isLogReqResp();
@@ -83,7 +79,7 @@ public class CaServletFilter implements Filter {
     try {
       securities.init(conf.getSecurity());
     } catch (IOException | InvalidConfException ex) {
-      throw new ServletException("could not initialize Securities", ex);
+      throw new ServletException0("could not initialize Securities", ex);
     }
 
     int shardId = conf.getShardId();
@@ -94,15 +90,14 @@ public class CaServletFilter implements Filter {
 
     Audits.init(auditType, auditConf, securities.getSecurityFactory().getPasswordResolver());
     if (Audits.getAuditService() == null) {
-      throw new ServletException("could not AuditService");
+      throw new ServletException0("could not AuditService");
     }
 
-    String str = filterConfig.getInitParameter("licenseFactory");
-    LOG.info("Use licenseFactory: {}", str);
+    LOG.info("Use licenseFactory: {}", licenseFactoryClazz);
     try {
-      licenseFactory = (LicenseFactory) Class.forName(str).getDeclaredConstructor().newInstance();
+      licenseFactory = (LicenseFactory) Class.forName(licenseFactoryClazz).getDeclaredConstructor().newInstance();
     } catch (Exception ex) {
-      throw new ServletException("could not initialize LicenseFactory", ex);
+      throw new ServletException0("could not initialize LicenseFactory", ex);
     }
 
     caManager = new CaManagerImpl(licenseFactory.createCmLicense());
@@ -125,12 +120,9 @@ public class CaServletFilter implements Filter {
     if (!conf.isNoRA()) {
       this.responder = new SdkResponder(caManager);
 
-      HttpRaServlet0 underlying = new HttpRaServlet0();
-      underlying.setResponder(responder);
-      underlying.setLogReqResp(logReqResp);
-
-      this.raServlet = new HttpRaServlet();
-      this.raServlet.setUnderlying(underlying);
+      raServlet = new HttpRaServlet0();
+      raServlet.setResponder(responder);
+      raServlet.setLogReqResp(logReqResp);
     }
 
     RemoteMgmt remoteMgmt = conf.getRemoteMgmt();
@@ -160,18 +152,14 @@ public class CaServletFilter implements Filter {
         if (certs.isEmpty()) {
           LOG.error("could not find any valid client certificates, disable the remote management");
         } else {
-          HttpMgmtServlet0 undelying = new HttpMgmtServlet0();
-          undelying.setCaManager(caManager);
-          undelying.setMgmtCerts(certs);
-
-          mgmtServlet = new HttpMgmtServlet();
-          mgmtServlet.setUnderlying(undelying);
+          mgmtServlet = new HttpMgmtServlet0();
+          mgmtServlet.setCaManager(caManager);
+          mgmtServlet.setMgmtCerts(certs);
         }
       }
     }
   } // method init
 
-  @Override
   public void destroy() {
     if (securities != null) {
       securities.close();
@@ -198,44 +186,15 @@ public class CaServletFilter implements Filter {
     }
   } // method destroy
 
-  @Override
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-      throws IOException, ServletException {
-    if (!(request instanceof HttpServletRequest & response instanceof HttpServletResponse)) {
-      throw new ServletException("Only HTTP request is supported");
-    }
-
-    HttpServletRequest req = (HttpServletRequest) request;
-    HttpServletResponse res = (HttpServletResponse) response;
-
-    String path = req.getServletPath();
-    if (path.startsWith("/ra/")) {
-      if (raServlet != null) {
-        req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(3)); // 3 = "/ra".length()
-        raServlet.service(req, res);
-      } else {
-        sendError(res, HttpServletResponse.SC_NOT_FOUND);
-      }
-    } else if (path.startsWith("/mgmt/")) {
-      if (remoteMgmtEnabled) {
-        req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/mgmt".length()
-        mgmtServlet.service(req, res);
-      } else {
-        sendError(res, HttpServletResponse.SC_FORBIDDEN);
-      }
-    } else {
-      sendError(res, HttpServletResponse.SC_NOT_FOUND);
-    }
-  } // method doFilter
-
-  private static void sendError(HttpServletResponse res, int status) {
-    res.setStatus(status);
-    res.setContentLength(0);
-  } // method sendError
-
   private CertprofileFactoryRegister initCertprofileFactoryRegister(List<String> factories) {
     CertprofileFactoryRegister certprofileFactoryRegister = new CertprofileFactoryRegister();
-    certprofileFactoryRegister.registFactory(new CertprofileFactoryImpl());
+    try {
+      CertprofileFactory certprofileFactory = (CertprofileFactory)
+          Class.forName(XIJSON_CERTFACTORY).getConstructor().newInstance();
+      certprofileFactoryRegister.registFactory(certprofileFactory);
+    } catch (Exception ex) {
+      LOG.warn("error initializing " + XIJSON_CERTFACTORY);
+    }
 
     // register additional CertprofileFactories
     if (factories != null) {
@@ -253,4 +212,15 @@ public class CaServletFilter implements Filter {
     return certprofileFactoryRegister;
   } // method initCertprofileFactoryRegister
 
+  public HttpRaServlet0 getRaServlet() {
+    return raServlet;
+  }
+
+  public boolean isRemoteMgmtEnabled() {
+    return remoteMgmtEnabled;
+  }
+
+  public HttpMgmtServlet0 getMgmtServlet() {
+    return mgmtServlet;
+  }
 }

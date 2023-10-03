@@ -1,7 +1,7 @@
 // Copyright (c) 2013-2023 xipki. All rights reserved.
 // License Apache License 2.0
 
-package org.xipki.ocsp.servlet;
+package org.xipki.ocsp.servlet3;
 
 import org.xipki.ocsp.server.servlet.HttpOcspServlet0;
 import org.xipki.servlet3.HttpRequestMetadataRetrieverImpl;

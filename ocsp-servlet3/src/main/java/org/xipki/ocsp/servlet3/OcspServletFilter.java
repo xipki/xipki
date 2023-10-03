@@ -1,15 +1,15 @@
 // Copyright (c) 2013-2023 xipki. All rights reserved.
 // License Apache License 2.0
 
-package org.xipki.ocsp.servlet;
+package org.xipki.ocsp.servlet3;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.xipki.ocsp.server.servlet.OcspServletFilter0;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.exception.ServletException0;
 
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
