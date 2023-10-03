@@ -81,7 +81,7 @@ import static org.xipki.util.Args.notNull;
  * @since 6.0.0
  */
 
-abstract class BaseCmpResponder {
+public abstract class BaseCmpResponder {
 
   public static final String HTTP_HEADER_certprofile = "certprofile";
 

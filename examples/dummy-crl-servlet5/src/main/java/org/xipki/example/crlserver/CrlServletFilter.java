@@ -36,9 +36,9 @@ public class CrlServletFilter implements Filter {
 
   private static final String RESP_CONTENT_TYPE = "application/pkix-crl";
 
-  private static final String DFLT_CA_DB_CFG = "xipki/etc/ca/database/ca-db.properties";
+  private static final String DFLT_CA_DB_CFG = "${sys:catalina.home}/xipki/etc/ca/database/ca-db.properties";
 
-  private static final String DFLT_CA_SERVER_CFG = "xipki/etc/ca/ca.json";
+  private static final String DFLT_CA_SERVER_CFG = "${sys:catalina.home}/xipki/etc/ca/ca.json";
 
   private DataSourceWrapper dataSource;
 
@@ -50,7 +50,8 @@ public class CrlServletFilter implements Filter {
     try {
       String masterPasswordCallback = null;
       // read the password resolver configuration
-      try (BufferedReader reader = new BufferedReader(new FileReader(DFLT_CA_SERVER_CFG))) {
+      try (BufferedReader reader =
+               new BufferedReader(new FileReader(StringUtil.resolveVariables(DFLT_CA_SERVER_CFG)))) {
         String name = "\"masterPasswordCallback\"";
         String line;
         while ((line = reader.readLine()) != null) {
@@ -69,7 +70,8 @@ public class CrlServletFilter implements Filter {
       conf.setMasterPasswordCallback(masterPasswordCallback);
       passwords.init(conf);
 
-      this.dataSource = new DataSourceFactory().createDataSourceForFile("ca", DFLT_CA_DB_CFG,
+      this.dataSource = new DataSourceFactory().createDataSourceForFile("ca",
+          StringUtil.resolveVariables(DFLT_CA_DB_CFG),
           passwords.getPasswordResolver());
       this.hasSha1Column = dataSource.tableHasColumn(null, "CRL", "SHA1");
     } catch (PasswordResolverException | IOException | DataAccessException ex) {

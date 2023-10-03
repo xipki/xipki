@@ -34,7 +34,7 @@
 	},
 	"audit":{
 		"type":"embed",
-		"conf": "file=logs/scep-audit.log"
+		"conf": "file=${sys:catalina.home}/logs/scep-audit.log"
 	},
 	"signers":{
 		"signers":[{

@@ -56,7 +56,7 @@
 	},
 	"audit":{
 		"type":"embed",
-		"conf": "file=logs/acme-audit.log"
+		"conf": "file=${sys:catalina.home}/logs/acme-audit.log"
 	},
 	"security":{
 		"keyStrongrandomEnabled":false,

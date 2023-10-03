@@ -13,6 +13,7 @@ import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Base64;
+import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.exception.InvalidConfException;
 
@@ -112,7 +113,7 @@ public class PopControl {
       return new ByteArrayInputStream(bytes);
     } else {
       try {
-        return new FileInputStream(keystoreStr);
+        return new FileInputStream(IoUtil.expandFilepath(keystoreStr, true));
       } catch (FileNotFoundException e) {
         throw new InvalidConfException(e.getMessage(), e);
       }

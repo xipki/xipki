@@ -27,7 +27,7 @@
 	},
 	"audit":{
 		"type":"embed",
-		"conf": "file=logs/rest-audit.log"
+		"conf": "file=${sys:catalina.home}/logs/rest-audit.log"
 	},
 	"security":{
 		"keyStrongrandomEnabled":false,

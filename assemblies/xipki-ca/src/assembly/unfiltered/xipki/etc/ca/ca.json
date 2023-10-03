@@ -76,8 +76,8 @@
 		// java:<name of class that implements org.xipki.audit.AuditService>
 		// conf: custom defined.
 
-		"type":"embed"
-		//,"conf":"..."
+		"type":"embed",
+		"conf": "file=${sys:catalina.home}/logs/ca-audit.log"
 	}
 	//,"sslContexts":[{
 	//	"name":"localhost",

@@ -49,7 +49,7 @@
 	},
 	"audit":{
 		"type":"embed",
-		"conf": "file=logs/cmp-audit.log"
+		"conf": "file=${sys:catalina.home}/logs/cmp-audit.log"
 	},
 	"signers":{
 		"default":{
