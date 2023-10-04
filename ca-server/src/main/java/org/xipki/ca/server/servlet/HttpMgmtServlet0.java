@@ -14,13 +14,14 @@ import org.xipki.ca.api.mgmt.MgmtMessage.SignerEntryWrapper;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.security.KeyCertBytesPair;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.util.JSON;
+import org.xipki.security.util.TlsHelper;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.HttpStatusCode;
-import org.xipki.util.http.RestResponse;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,9 +72,9 @@ public class HttpMgmtServlet0 {
     this.caManager = notNull(caManager, "caManager");
   }
 
-  public RestResponse doPost(HttpRequestMetadataRetriever request, InputStream requestStream) throws IOException {
+  public XiHttpResponse doPost(XiHttpRequest request) {
     try {
-      X509Cert clientCert = request.getTlsClientCert();
+      X509Cert clientCert = TlsHelper.getTlsClientCert(request);
       if (clientCert == null) {
         throw new MyException(HttpStatusCode.SC_UNAUTHORIZED,
             "remote management is not permitted if TLS client certificate is not present");
@@ -97,6 +98,8 @@ public class HttpMgmtServlet0 {
       }
 
       MgmtResponse resp = null;
+
+      InputStream requestStream = request.getInputStream();
 
       switch (action) {
         case addCa: {
@@ -545,17 +548,17 @@ public class HttpMgmtServlet0 {
       }
 
       byte[] respBytes = resp == null ? new byte[0] : JSON.toJSONBytes(resp);
-      return new RestResponse(HttpStatusCode.SC_OK, CT_RESPONSE, null, respBytes);
+      return new XiHttpResponse(HttpStatusCode.SC_OK, CT_RESPONSE, null, respBytes);
     } catch (MyException ex) {
       Map<String, String> headers = Collections.singletonMap(HttpConstants.HEADER_XIPKI_ERROR, ex.getMessage());
-      return new RestResponse(ex.getStatus(), null, headers, null);
+      return new XiHttpResponse(ex.getStatus(), null, headers, null);
     } catch (CaMgmtException ex) {
       LOG.error("CaMgmtException", ex);
       Map<String, String> headers = Collections.singletonMap(HttpConstants.HEADER_XIPKI_ERROR, ex.getMessage());
-      return new RestResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR, null, headers, null);
+      return new XiHttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR, null, headers, null);
     } catch (Throwable th) {
       LOG.error("Throwable thrown, this should not happen!", th);
-      return new RestResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
+      return new XiHttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     }
   } // method doPost
 

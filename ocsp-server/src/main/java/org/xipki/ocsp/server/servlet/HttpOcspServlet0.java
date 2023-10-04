@@ -10,13 +10,12 @@ import org.xipki.ocsp.api.OcspServer;
 import org.xipki.ocsp.api.Responder;
 import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.util.*;
 import org.xipki.util.http.HttpStatusCode;
-import org.xipki.util.http.RestResponse;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
 
 import java.io.EOFException;
-import java.io.InputStream;
 import java.time.Clock;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,34 +54,33 @@ public class HttpOcspServlet0 {
   /**
    * The reqStream is closed after this method returns.
    * @param req the request wrapper.
-   * @param reqStream the inputstream.
    * @return response
    */
-  public RestResponse doPost(HttpRequestMetadataRetriever req, InputStream reqStream) {
+  public XiHttpResponse doPost(XiHttpRequest req) {
     try {
       String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
       ResponderAndPath responderAndPath = server.getResponderForPath(path);
       if (responderAndPath == null) {
-        return new RestResponse(HttpStatusCode.SC_NOT_FOUND);
+        return new XiHttpResponse(HttpStatusCode.SC_NOT_FOUND);
       }
 
       // accept only "application/ocsp-request" as content type
       String reqContentType = req.getHeader("Content-Type");
       if (!CT_REQUEST.equalsIgnoreCase(reqContentType)) {
-        return new RestResponse(HttpStatusCode.SC_UNSUPPORTED_MEDIA_TYPE);
+        return new XiHttpResponse(HttpStatusCode.SC_UNSUPPORTED_MEDIA_TYPE);
       }
 
       Responder responder = responderAndPath.getResponder();
-      byte[] reqContent = IoUtil.readAllBytesAndClose(reqStream);
+      byte[] reqContent = IoUtil.readAllBytes(req.getInputStream());
       // request too long
       if (reqContent.length > responder.getMaxRequestSize()) {
-        return new RestResponse(HttpStatusCode.SC_REQUEST_ENTITY_TOO_LARGE);
+        return new XiHttpResponse(HttpStatusCode.SC_REQUEST_ENTITY_TOO_LARGE);
       }
 
       OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder, reqContent, false);
       if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.getResponse() == null) {
         LOG.error("processRequest returned null, this should not happen");
-        return new RestResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
+        return new XiHttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
       }
 
       byte[] encodedOcspResp = ocspRespWithCacheInfo.getResponse();
@@ -91,7 +89,7 @@ public class HttpOcspServlet0 {
             LogUtil.base64Encode(reqContent), LogUtil.base64Encode(encodedOcspResp));
       }
 
-      return new RestResponse(HttpStatusCode.SC_OK, CT_RESPONSE, null, encodedOcspResp);
+      return new XiHttpResponse(HttpStatusCode.SC_OK, CT_RESPONSE, null, encodedOcspResp);
     } catch (Throwable th) {
       if (th instanceof EOFException) {
         LogUtil.warn(LOG, th, "Connection reset by peer");
@@ -99,24 +97,24 @@ public class HttpOcspServlet0 {
         LOG.error("Throwable thrown, this should not happen!", th);
       }
 
-      return new RestResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
+      return new XiHttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     }
   } // method doPosts
 
-  public RestResponse doGet(HttpRequestMetadataRetriever req) {
+  public XiHttpResponse doGet(XiHttpRequest req) {
     LOG.info("LIAO-0");
     String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
     LOG.info("LIAO-1 path={}", path);
     ResponderAndPath responderAndPath = server.getResponderForPath(path);
     if (responderAndPath == null) {
-      return new RestResponse(HttpStatusCode.SC_NOT_FOUND);
+      return new XiHttpResponse(HttpStatusCode.SC_NOT_FOUND);
     }
 
     String servletPath = responderAndPath.getServletPath();
     Responder responder = responderAndPath.getResponder();
 
     if (!responder.supportsHttpGet()) {
-      return new RestResponse(HttpStatusCode.SC_METHOD_NOT_ALLOWED);
+      return new XiHttpResponse(HttpStatusCode.SC_METHOD_NOT_ALLOWED);
     }
 
     String b64OcspReq;
@@ -129,7 +127,7 @@ public class HttpOcspServlet0 {
       }
       b64OcspReq = path.substring(offset);
     } else {
-      return new RestResponse(HttpStatusCode.SC_BAD_REQUEST);
+      return new XiHttpResponse(HttpStatusCode.SC_BAD_REQUEST);
     }
 
     try {
@@ -140,18 +138,18 @@ public class HttpOcspServlet0 {
       //      - Which are Base64Url encoded, and/or
       //      - Which do not containing the Base64 padding char '='.
       if (b64OcspReq.length() > responder.getMaxRequestSize()) {
-        return new RestResponse(HttpStatusCode.SC_REQUEST_URI_TOO_LONG);
+        return new XiHttpResponse(HttpStatusCode.SC_REQUEST_URI_TOO_LONG);
       }
 
       byte[] ocsReqBytes = base64Decode(StringUtil.toUtf8Bytes(b64OcspReq));
       if (ocsReqBytes == null) {
-        return new RestResponse(HttpStatusCode.SC_BAD_REQUEST);
+        return new XiHttpResponse(HttpStatusCode.SC_BAD_REQUEST);
       }
 
       OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder, ocsReqBytes, true);
       if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.getResponse() == null) {
         LOG.error("processRequest returned null, this should not happen");
-        return new RestResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
+        return new XiHttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
       }
 
       byte[] encodedOcspResp = ocspRespWithCacheInfo.getResponse();
@@ -201,7 +199,7 @@ public class HttpOcspServlet0 {
             StringUtil.concat("max-age=", Long.toString(maxAge), ",public,no-transform,must-revalidate"));
       } // end if (ocspRespWithCacheInfo)
 
-      return new RestResponse(HttpStatusCode.SC_OK, CT_RESPONSE, headers, encodedOcspResp);
+      return new XiHttpResponse(HttpStatusCode.SC_OK, CT_RESPONSE, headers, encodedOcspResp);
     } catch (Throwable th) {
       if (th instanceof EOFException) {
         LogUtil.warn(LOG, th, "Connection reset by peer");
@@ -209,7 +207,7 @@ public class HttpOcspServlet0 {
         LOG.error("Throwable thrown, this should not happen!", th);
       }
 
-      return new RestResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
+      return new XiHttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     }
   } // method doGet
 

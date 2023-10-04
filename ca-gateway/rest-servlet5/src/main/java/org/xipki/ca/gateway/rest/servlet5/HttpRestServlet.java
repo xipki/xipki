@@ -7,9 +7,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.xipki.ca.gateway.rest.servlet.HttpRestServlet0;
-import org.xipki.servlet5.HttpRequestMetadataRetrieverImpl;
 import org.xipki.servlet5.ServletHelper;
-import org.xipki.util.http.RestResponse;
+import org.xipki.servlet5.XiHttpRequestImpl;
 
 import java.io.IOException;
 
@@ -29,14 +28,12 @@ public class HttpRestServlet extends HttpServlet {
   }
 
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    RestResponse restResp = underlying.doGet(new HttpRequestMetadataRetrieverImpl(req));
-    ServletHelper.fillResponse(restResp, resp);
+    ServletHelper.fillResponse(underlying.doGet(new XiHttpRequestImpl(req)), resp);
   }
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    RestResponse restResp = underlying.doPost(new HttpRequestMetadataRetrieverImpl(req), req.getInputStream());
-    ServletHelper.fillResponse(restResp, resp);
+    ServletHelper.fillResponse(underlying.doPost(new XiHttpRequestImpl(req)), resp);
   }
 
 }

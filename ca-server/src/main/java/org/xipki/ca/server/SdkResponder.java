@@ -22,13 +22,14 @@ import org.xipki.ca.sdk.*;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.CrlReason;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.HttpRequestMetadataRetriever;
+import org.xipki.security.util.TlsHelper;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
 import org.xipki.util.exception.InsufficientPermissionException;
 import org.xipki.util.exception.OperationException;
+import org.xipki.util.http.XiHttpRequest;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -115,9 +116,9 @@ public class SdkResponder {
     threadPoolExecutor.scheduleAtFixedRate(new PendingPoolCleaner(), 10, 10, TimeUnit.MINUTES);
   }
 
-  public SdkResponse service(String path, byte[] request, HttpRequestMetadataRetriever httpRetriever) {
+  public SdkResponse service(String path, byte[] request, XiHttpRequest httpRequest) {
     try {
-      SdkResponse resp = service0(path, request, httpRetriever);
+      SdkResponse resp = service0(path, request, httpRequest);
       if (resp instanceof ErrorResponse) {
         LOG.warn("returned ErrorResponse: {}", resp);
       }
@@ -128,7 +129,7 @@ public class SdkResponder {
     }
   }
 
-  private SdkResponse service0(String path, byte[] request, HttpRequestMetadataRetriever httpRetriever) {
+  private SdkResponse service0(String path, byte[] request, XiHttpRequest httpRequest) {
     try {
       if (caManager == null) {
         return new ErrorResponse(null, SYSTEM_FAILURE, "responderManager in servlet not configured");
@@ -216,7 +217,7 @@ public class SdkResponder {
 
       X509Cert clientCert;
       try {
-        clientCert = httpRetriever.getTlsClientCert();
+        clientCert = TlsHelper.getTlsClientCert(httpRequest);
       } catch (IOException ex) {
         LogUtil.error(LOG, ex, "error getTlsClientCert");
         return new ErrorResponse(null, UNAUTHORIZED, "error retrieving client certificate");

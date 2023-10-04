@@ -6,15 +6,14 @@ package org.xipki.ca.gateway.scep.servlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.gateway.scep.ScepResponder;
-import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.http.RestResponse;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * SCEP servlet.
@@ -41,22 +40,22 @@ public class HttpScepServlet0 {
     this.responder = Args.notNull(responder, "responder");
   }
 
-  public RestResponse doGet(HttpRequestMetadataRetriever req) throws IOException {
-    return service0(req, null, false);
+  public XiHttpResponse doGet(XiHttpRequest req) throws IOException {
+    return service0(req, false);
   }
 
-  public RestResponse doPost(HttpRequestMetadataRetriever req, InputStream reqStream) throws IOException {
-    return service0(req, reqStream, true);
+  public XiHttpResponse doPost(XiHttpRequest req) throws IOException {
+    return service0(req, true);
   }
 
-  private RestResponse service0(HttpRequestMetadataRetriever req, InputStream reqStream, boolean viaPost)
+  private XiHttpResponse service0(XiHttpRequest req, boolean viaPost)
       throws IOException {
     String path = req.getServletPath();
 
     byte[] requestBytes = null;
-    RestResponse restResp = null;
+    XiHttpResponse restResp = null;
     try {
-      requestBytes = viaPost ? IoUtil.readAllBytesAndClose(reqStream)
+      requestBytes = viaPost ? IoUtil.readAllBytes(req.getInputStream())
           : Base64.decode(req.getParameter("message"));
       restResp = responder.service(path, requestBytes, req);
       return restResp;

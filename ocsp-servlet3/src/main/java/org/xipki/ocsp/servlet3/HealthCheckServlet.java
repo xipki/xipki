@@ -6,10 +6,9 @@ package org.xipki.ocsp.servlet3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.server.servlet.HealthCheckServlet0;
-import org.xipki.servlet3.HttpRequestMetadataRetrieverImpl;
 import org.xipki.servlet3.ServletHelper;
+import org.xipki.servlet3.XiHttpRequestImpl;
 import org.xipki.util.Args;
-import org.xipki.util.http.RestResponse;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -36,8 +35,7 @@ public class HealthCheckServlet extends HttpServlet {
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
     try {
-      RestResponse restResp = underlying.doGet(new HttpRequestMetadataRetrieverImpl(req));
-      ServletHelper.fillResponse(restResp, resp);
+      ServletHelper.fillResponse(underlying.doGet(new XiHttpRequestImpl(req)), resp);
     } finally {
       resp.flushBuffer();
     }

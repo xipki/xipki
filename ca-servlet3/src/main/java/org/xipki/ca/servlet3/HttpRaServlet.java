@@ -4,10 +4,9 @@
 package org.xipki.ca.servlet3;
 
 import org.xipki.ca.server.servlet.HttpRaServlet0;
-import org.xipki.servlet3.HttpRequestMetadataRetrieverImpl;
 import org.xipki.servlet3.ServletHelper;
+import org.xipki.servlet3.XiHttpRequestImpl;
 import org.xipki.util.Args;
-import org.xipki.util.http.RestResponse;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -32,8 +31,7 @@ public class HttpRaServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     try {
-      RestResponse restResp = underlying.doGet(new HttpRequestMetadataRetrieverImpl(request));
-      ServletHelper.fillResponse(restResp, response);
+      ServletHelper.fillResponse(underlying.doGet(new XiHttpRequestImpl(request)), response);
     } finally {
       response.flushBuffer();
     }
@@ -42,9 +40,7 @@ public class HttpRaServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     try {
-      RestResponse restResp = underlying.doPost(new HttpRequestMetadataRetrieverImpl(request),
-          request.getInputStream());
-      ServletHelper.fillResponse(restResp, response);
+      ServletHelper.fillResponse(underlying.doPost(new XiHttpRequestImpl(request)), response);
     } finally {
       response.flushBuffer();
     }

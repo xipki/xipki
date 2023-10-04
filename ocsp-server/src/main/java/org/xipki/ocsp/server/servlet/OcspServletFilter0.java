@@ -35,17 +35,17 @@ public class OcspServletFilter0 {
 
   private static final String DFLT_CONF_FILE = "etc/ocsp/ocsp.json";
 
-  private Securities securities;
+  private final Securities securities;
 
-  private LicenseFactory licenseFactory;
+  private final LicenseFactory licenseFactory;
 
-  private OcspServerImpl server;
+  private final OcspServerImpl server;
 
-  private HealthCheckServlet0 healthServlet;
+  private final HealthCheckServlet0 healthServlet;
 
-  private HttpOcspServlet0 ocspServlet;
+  private final HttpOcspServlet0 ocspServlet;
 
-  private boolean remoteMgmtEnabled;
+  private final boolean remoteMgmtEnabled;
 
   private HttpMgmtServlet0 mgmtServlet;
 

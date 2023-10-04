@@ -9,19 +9,21 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.HttpRespAuditException;
+import org.xipki.ca.gateway.cmp.BaseCmpResponder;
 import org.xipki.ca.gateway.cmp.CmpResponder;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.HttpRequestMetadataRetriever;
+import org.xipki.security.util.TlsHelper;
 import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.http.HttpStatusCode;
-import org.xipki.util.http.RestResponse;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -51,9 +53,8 @@ public class HttpCmpServlet0 {
     this.responder = Args.notNull(responder, "responder");
   }
 
-  public RestResponse doPost(HttpRequestMetadataRetriever req, InputStream reqStream,
-                             Map<String, String> reqHeaders) throws IOException {
-    X509Cert clientCert = req.getTlsClientCert();
+  public XiHttpResponse doPost(XiHttpRequest req) throws IOException {
+    X509Cert clientCert = TlsHelper.getTlsClientCert(req);
     AuditService auditService = Audits.getAuditService();
     AuditEvent event = new AuditEvent();
     event.setApplicationName("cmp-gw");
@@ -85,7 +86,7 @@ public class HttpCmpServlet0 {
 
       event.addEventData(CaAuditConstants.NAME_ca, caName);
 
-      requestBytes = IoUtil.readAllBytesAndClose(reqStream);
+      requestBytes = IoUtil.readAllBytes(req.getInputStream());
       PKIMessage pkiReq;
       try {
         pkiReq = PKIMessage.getInstance(requestBytes);
@@ -95,10 +96,24 @@ public class HttpCmpServlet0 {
             "bad request", AuditLevel.INFO, AuditStatus.FAILED);
       }
 
+      String certprofile = req.getHeader(BaseCmpResponder.HTTP_HEADER_certprofile);
+      String groupEnroll = req.getHeader(BaseCmpResponder.HTTP_HEADER_groupenroll);
+
+      Map<String, String> reqHeaders = null;
+      if (certprofile != null || groupEnroll != null) {
+        reqHeaders = new HashMap<>(3);
+        if (certprofile != null) {
+          reqHeaders.put(BaseCmpResponder.HTTP_HEADER_certprofile, certprofile);
+        }
+        if (groupEnroll != null) {
+          reqHeaders.put(BaseCmpResponder.HTTP_HEADER_groupenroll, groupEnroll);
+        }
+      }
+
       PKIMessage pkiResp = responder.processPkiMessage(caName, pkiReq, clientCert, reqHeaders, event);
       encodedPkiResp = pkiResp.getEncoded();
 
-      return new RestResponse(HttpStatusCode.SC_OK, CT_RESPONSE, null, encodedPkiResp);
+      return new XiHttpResponse(HttpStatusCode.SC_OK, CT_RESPONSE, null, encodedPkiResp);
     } catch (Throwable th) {
       AuditLevel auditLevel;
       AuditStatus auditStatus;
@@ -128,7 +143,7 @@ public class HttpCmpServlet0 {
         event.addEventData(CaAuditConstants.NAME_message, auditMessage);
       }
 
-      return new RestResponse(httpStatus);
+      return new XiHttpResponse(httpStatus);
     } finally {
       LogUtil.logReqResp("CMP Gateway", LOG, logReqResp, true,
           req.getRequestURI(), requestBytes, encodedPkiResp);

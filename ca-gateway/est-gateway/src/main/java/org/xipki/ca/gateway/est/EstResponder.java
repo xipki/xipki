@@ -32,14 +32,15 @@ import org.xipki.ca.sdk.*;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.HttpRequestMetadataRetriever;
+import org.xipki.security.util.TlsHelper;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.*;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
 import org.xipki.util.http.HttpRespContent;
-import org.xipki.util.http.RestResponse;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
@@ -221,8 +222,8 @@ public class EstResponder {
     return authenticator.getCertRequestor(cert);
   }
 
-  public RestResponse service(
-      String path, byte[] request, HttpRequestMetadataRetriever httpRetriever, AuditEvent event) {
+  public XiHttpResponse service(
+      String path, byte[] request, XiHttpRequest httpRequest, AuditEvent event) {
     AuditLevel auditLevel = AuditLevel.INFO;
     AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
     String auditMessage = null;
@@ -325,7 +326,7 @@ public class EstResponder {
 
       Requestor requestor;
       // Retrieve the user:password
-      String hdrValue = httpRetriever.getHeader("Authorization");
+      String hdrValue = httpRequest.getHeader("Authorization");
       if (hdrValue != null && hdrValue.startsWith("Basic ")) {
         String user = null;
         byte[] password = null;
@@ -358,7 +359,7 @@ public class EstResponder {
               AuditLevel.INFO, AuditStatus.FAILED);
         }
       } else {
-        X509Cert clientCert = httpRetriever.getTlsClientCert();
+        X509Cert clientCert = TlsHelper.getTlsClientCert(httpRequest);
         if (clientCert == null) {
           throw new HttpRespAuditException(UNAUTHORIZED, "no client certificate", AuditLevel.INFO, AuditStatus.FAILED);
         }
@@ -371,7 +372,7 @@ public class EstResponder {
 
       event.addEventData(CaAuditConstants.NAME_requestor, requestor.getName());
 
-      String ct = httpRetriever.getHeader("Content-Type");
+      String ct = httpRequest.getHeader("Content-Type");
       if (!CT_pkcs10.equalsIgnoreCase(ct)) {
         String message = "unsupported media type " + ct;
         throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, AuditLevel.INFO, AuditStatus.FAILED);
@@ -450,12 +451,12 @@ public class EstResponder {
         auditMessage = code.name() + ": " + ex.getErrorMessage();
       }
 
-      return new RestResponse(sc, null, null, null);
+      return new XiHttpResponse(sc, null, null, null);
     } catch (HttpRespAuditException ex) {
       auditStatus = ex.getAuditStatus();
       auditLevel = ex.getAuditLevel();
       auditMessage = ex.getAuditMessage();
-      return new RestResponse(ex.getHttpStatus(), null, null, null);
+      return new XiHttpResponse(ex.getHttpStatus(), null, null, null);
     } catch (Throwable th) {
       if (th instanceof EOFException) {
         LogUtil.warn(LOG, th, "connection reset by peer");
@@ -465,7 +466,7 @@ public class EstResponder {
       auditLevel = AuditLevel.ERROR;
       auditStatus = AuditStatus.FAILED;
       auditMessage = "internal error";
-      return new RestResponse(INTERNAL_SERVER_ERROR, null, null, null);
+      return new XiHttpResponse(INTERNAL_SERVER_ERROR, null, null, null);
     } finally {
       event.setStatus(auditStatus);
       event.setLevel(auditLevel);
@@ -475,11 +476,11 @@ public class EstResponder {
     }
   } // method service
 
-  private RestResponse toRestResponse(HttpRespContent respContent) {
+  private XiHttpResponse toRestResponse(HttpRespContent respContent) {
     if (respContent == null) {
-      return new RestResponse(OK, null, null, null);
+      return new XiHttpResponse(OK, null, null, null);
     } else {
-      return new RestResponse(OK, respContent.getContentType(), null,
+      return new XiHttpResponse(OK, respContent.getContentType(), null,
           respContent.isBase64(), respContent.getContent());
     }
   }

@@ -34,7 +34,6 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
 import org.xipki.util.PermissionConstants;
@@ -42,7 +41,8 @@ import org.xipki.util.StringUtil;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
 import org.xipki.util.http.HttpStatusCode;
-import org.xipki.util.http.RestResponse;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -152,7 +152,7 @@ public class ScepResponder {
     return authenticator.getCertRequestor(cert);
   }
 
-  public RestResponse service(String path, byte[] request, HttpRequestMetadataRetriever metadataRetriever) {
+  public XiHttpResponse service(String path, byte[] request, XiHttpRequest metadataRetriever) {
     String caName = null;
     String certprofileName = null;
     if (path.length() > 1) {
@@ -172,7 +172,7 @@ public class ScepResponder {
           if (caProfileConf == null) {
             String message = "unknown alias " + alias;
             LOG.warn(message);
-            return new RestResponse(HttpStatusCode.SC_NOT_FOUND);
+            return new XiHttpResponse(HttpStatusCode.SC_NOT_FOUND);
           }
 
           caName = caProfileConf.getCa();
@@ -185,7 +185,7 @@ public class ScepResponder {
     } // end if
 
     if (caName == null) {
-      return new RestResponse(HttpStatusCode.SC_NOT_FOUND);
+      return new XiHttpResponse(HttpStatusCode.SC_NOT_FOUND);
     }
 
     AuditService auditService = Audits.getAuditService();
@@ -200,7 +200,7 @@ public class ScepResponder {
     String operation = metadataRetriever.getParameter("operation");
     event.addEventData("operation", operation);
 
-    RestResponse ret;
+    XiHttpResponse ret;
 
     try {
       byte[] respBody;
@@ -216,7 +216,7 @@ public class ScepResponder {
           LogUtil.error(LOG, ex, msg);
           auditMessage = msg;
           auditStatus = AuditStatus.FAILED;
-          return new RestResponse(HttpStatusCode.SC_BAD_REQUEST);
+          return new XiHttpResponse(HttpStatusCode.SC_BAD_REQUEST);
         }
 
         ScepSigner signer = signers.getSigner(caName);
@@ -225,7 +225,7 @@ public class ScepResponder {
           LOG.error(msg + " for CA {}", caName);
           auditMessage = msg;
           auditStatus = AuditStatus.FAILED;
-          return new RestResponse(HttpStatusCode.SC_BAD_REQUEST);
+          return new XiHttpResponse(HttpStatusCode.SC_BAD_REQUEST);
         }
 
         ContentInfo ci;
@@ -236,7 +236,7 @@ public class ScepResponder {
           LogUtil.error(LOG, ex, msg);
           auditMessage = msg;
           auditStatus = AuditStatus.FAILED;
-          return new RestResponse(HttpStatusCode.SC_BAD_REQUEST);
+          return new XiHttpResponse(HttpStatusCode.SC_BAD_REQUEST);
         } catch (OperationException | SdkErrorResponseException ex) {
           ErrorCode code;
           if (ex instanceof OperationException) {
@@ -279,7 +279,7 @@ public class ScepResponder {
 
           LogUtil.error(LOG, ex, auditMessage);
           auditStatus = AuditStatus.FAILED;
-          return new RestResponse(httpCode);
+          return new XiHttpResponse(httpCode);
         }
 
         respBody = ci.getEncoded();
@@ -295,20 +295,20 @@ public class ScepResponder {
       } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation)) {
         auditMessage = "SCEP operation '" + operation + "' is not permitted";
         auditStatus = AuditStatus.FAILED;
-        return new RestResponse(HttpStatusCode.SC_FORBIDDEN);
+        return new XiHttpResponse(HttpStatusCode.SC_FORBIDDEN);
       } else {
         auditMessage = "unknown SCEP operation '" + operation + "'";
         auditStatus = AuditStatus.FAILED;
-        return new RestResponse(HttpStatusCode.SC_BAD_REQUEST);
+        return new XiHttpResponse(HttpStatusCode.SC_BAD_REQUEST);
       }
-      ret = new RestResponse(HttpStatusCode.SC_OK, contentType, null, respBody);
+      ret = new XiHttpResponse(HttpStatusCode.SC_OK, contentType, null, respBody);
     } catch (Throwable th) {
       LOG.error("Throwable thrown, this should not happen!", th);
 
       auditLevel = AuditLevel.ERROR;
       auditStatus = AuditStatus.FAILED;
       auditMessage = "internal error";
-      ret = new RestResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
+      ret = new XiHttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     } finally {
       audit(auditService, event, auditLevel, auditStatus, auditMessage);
     }

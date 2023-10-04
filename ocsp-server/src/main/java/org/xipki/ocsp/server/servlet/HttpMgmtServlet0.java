@@ -9,13 +9,13 @@ import org.xipki.ocsp.api.mgmt.MgmtMessage.MgmtAction;
 import org.xipki.ocsp.server.OcspServerImpl;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.HttpRequestMetadataRetriever;
+import org.xipki.security.util.TlsHelper;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.HttpStatusCode;
-import org.xipki.util.http.RestResponse;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
 
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -64,9 +64,9 @@ public class HttpMgmtServlet0 {
     this.ocspServer = notNull(ocspServer, "ocspServer");
   }
 
-  public RestResponse doPost(HttpRequestMetadataRetriever req, InputStream reqStream) {
+  public XiHttpResponse doPost(XiHttpRequest req) {
     try {
-      X509Cert clientCert = req.getTlsClientCert();
+      X509Cert clientCert = TlsHelper.getTlsClientCert(req);
       if (clientCert == null) {
         throw new MyException(HttpStatusCode.SC_UNAUTHORIZED,
             "remote management is not permitted if TLS client certificate is not present");
@@ -101,13 +101,13 @@ public class HttpMgmtServlet0 {
           throw new MyException(HttpStatusCode.SC_NOT_FOUND, "unsupported action " + action);
       }
 
-      return new RestResponse(HttpStatusCode.SC_OK, CT_RESPONSE, null, new byte[0]);
+      return new XiHttpResponse(HttpStatusCode.SC_OK, CT_RESPONSE, null, new byte[0]);
     } catch (MyException ex) {
       Map<String, String> headers = Collections.singletonMap(HttpConstants.HEADER_XIPKI_ERROR, ex.getMessage());
-      return new RestResponse(ex.getStatus(), null, headers, null);
+      return new XiHttpResponse(ex.getStatus(), null, headers, null);
     } catch (Throwable th) {
       LOG.error("Throwable thrown, this should not happen!", th);
-      return new RestResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
+      return new XiHttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     }
   } // method doPost
 

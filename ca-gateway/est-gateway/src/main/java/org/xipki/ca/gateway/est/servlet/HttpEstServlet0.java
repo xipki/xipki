@@ -8,15 +8,14 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.est.EstResponder;
-import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.http.HttpStatusCode;
-import org.xipki.util.http.RestResponse;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * EST servlet.
@@ -41,25 +40,24 @@ public class HttpEstServlet0 {
     this.responder = Args.notNull(responder, "responder");
   }
 
-  public RestResponse doGet(HttpRequestMetadataRetriever req) throws IOException {
-    return service0(req, null, false);
+  public XiHttpResponse doGet(XiHttpRequest req) throws IOException {
+    return service0(req, false);
   }
 
-  public RestResponse doPost(HttpRequestMetadataRetriever req, InputStream reqStream) throws IOException {
-    return service0(req, reqStream, true);
+  public XiHttpResponse doPost(XiHttpRequest req) throws IOException {
+    return service0(req, true);
   }
 
-  private RestResponse service0(HttpRequestMetadataRetriever req, InputStream reqStream, boolean viaPost)
-      throws IOException {
+  private XiHttpResponse service0(XiHttpRequest req, boolean viaPost) throws IOException {
     AuditService auditService = Audits.getAuditService();
     AuditEvent event = new AuditEvent();
     event.setApplicationName("est-gw");
 
     byte[] requestBytes = null;
-    RestResponse restResp = null;
+    XiHttpResponse restResp = null;
     try {
       String path = req.getServletPath();
-      requestBytes = viaPost ? IoUtil.readAllBytesAndClose(reqStream) : null;
+      requestBytes = viaPost ? IoUtil.readAllBytes(req.getInputStream()) : null;
       restResp = responder.service(path, requestBytes, req, event);
       if (event.getStatus() == null) {
         event.setStatus(AuditStatus.SUCCESSFUL);
@@ -69,7 +67,7 @@ public class HttpEstServlet0 {
       event.setStatus(AuditStatus.FAILED);
       event.setLevel(AuditLevel.ERROR);
       LOG.error("RuntimeException thrown, this should not happen!", ex);
-      return new RestResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
+      return new XiHttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     } finally {
       LogUtil.logReqResp("EST Gateway", LOG, logReqResp, viaPost, req.getRequestURI(),
           requestBytes, restResp == null ? null : restResp.getBody());

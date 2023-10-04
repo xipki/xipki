@@ -4,10 +4,9 @@
 package org.xipki.ocsp.servlet3;
 
 import org.xipki.ocsp.server.servlet.HttpMgmtServlet0;
-import org.xipki.servlet3.HttpRequestMetadataRetrieverImpl;
 import org.xipki.servlet3.ServletHelper;
+import org.xipki.servlet3.XiHttpRequestImpl;
 import org.xipki.util.Args;
-import org.xipki.util.http.RestResponse;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -34,8 +33,7 @@ public class HttpMgmtServlet extends HttpServlet {
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     try {
-      RestResponse restResp = underlying.doPost(new HttpRequestMetadataRetrieverImpl(req), req.getInputStream());
-      ServletHelper.fillResponse(restResp, resp);
+      ServletHelper.fillResponse(underlying.doPost(new XiHttpRequestImpl(req)), resp);
     } finally {
       resp.flushBuffer();
     }

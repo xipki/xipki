@@ -28,7 +28,7 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.HttpRequestMetadataRetriever;
+import org.xipki.security.util.TlsHelper;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.*;
@@ -37,7 +37,8 @@ import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.HttpStatusCode;
-import org.xipki.util.http.RestResponse;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -221,8 +222,8 @@ public class RestResponder {
     return authenticator.getCertRequestor(cert);
   }
 
-  public RestResponse service(
-      String path, byte[] request, HttpRequestMetadataRetriever httpRetriever, AuditEvent event) {
+  public XiHttpResponse service(
+      String path, byte[] request, XiHttpRequest httpRetriever, AuditEvent event) {
     AuditLevel auditLevel = INFO;
     AuditStatus auditStatus = SUCCESSFUL;
     String auditMessage = null;
@@ -246,7 +247,7 @@ public class RestResponder {
         if (caProfileConf == null) {
           String message = "unknown alias default";
           LOG.warn(message);
-          return new RestResponse(HttpStatusCode.SC_NOT_FOUND);
+          return new XiHttpResponse(HttpStatusCode.SC_NOT_FOUND);
         }
 
         caName = caProfileConf.getCa();
@@ -332,7 +333,7 @@ public class RestResponder {
           throw new HttpRespAuditException(UNAUTHORIZED, "could not authenticate user " + user, INFO, FAILED);
         }
       } else {
-        X509Cert clientCert = httpRetriever.getTlsClientCert();
+        X509Cert clientCert = TlsHelper.getTlsClientCert(httpRetriever);
         if (clientCert == null) {
           throw new HttpRespAuditException(UNAUTHORIZED, "no client certificate", INFO, FAILED);
         }
@@ -439,12 +440,12 @@ public class RestResponder {
       if (StringUtil.isNotBlank(failureInfo)) {
         headers.put(HEADER_failInfo, failureInfo);
       }
-      return new RestResponse(sc, null, headers, null);
+      return new XiHttpResponse(sc, null, headers, null);
     } catch (HttpRespAuditException ex) {
       auditStatus = ex.getAuditStatus();
       auditLevel = ex.getAuditLevel();
       auditMessage = ex.getAuditMessage();
-      return new RestResponse(ex.getHttpStatus(), null, null, null);
+      return new XiHttpResponse(ex.getHttpStatus(), null, null, null);
     } catch (Throwable th) {
       if (th instanceof EOFException) {
         LogUtil.warn(LOG, th, "connection reset by peer");
@@ -454,7 +455,7 @@ public class RestResponder {
       auditLevel = ERROR;
       auditStatus = FAILED;
       auditMessage = "internal error";
-      return new RestResponse(INTERNAL_SERVER_ERROR, null, null, null);
+      return new XiHttpResponse(INTERNAL_SERVER_ERROR, null, null, null);
     } finally {
       event.setStatus(auditStatus);
       event.setLevel(auditLevel);
@@ -464,17 +465,18 @@ public class RestResponder {
     }
   } // method service
 
-  private RestResponse toRestResponse(HttpRespContent respContent) {
+  private XiHttpResponse toRestResponse(HttpRespContent respContent) {
     Map<String, String> headers = new HashMap<>();
     headers.put(HEADER_PKISTATUS, PKISTATUS_accepted);
 
-    return (respContent == null) ? new RestResponse(OK, null, headers, null)
-        : new RestResponse(OK, respContent.getContentType(), headers, respContent.isBase64(), respContent.getContent());
+    return (respContent == null) ? new XiHttpResponse(OK, null, headers, null)
+        : new XiHttpResponse(OK, respContent.getContentType(), headers,
+                  respContent.isBase64(), respContent.getContent());
   }
 
   private HttpRespContent enrollCerts(
       String command, String caName, String profile, Requestor requestor, byte[] request,
-      HttpRequestMetadataRetriever httpRetriever, AuditEvent event)
+      XiHttpRequest httpRetriever, AuditEvent event)
       throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
     if (!requestor.isPermitted(PermissionConstants.ENROLL_CERT)) {
       throw new OperationException(NOT_PERMITTED, "ENROLL_CERT is not allowed");
@@ -632,7 +634,7 @@ public class RestResponder {
 
   private HttpRespContent enrollCrossCert(
       String caName, String profile, Requestor requestor, byte[] request,
-      HttpRequestMetadataRetriever httpRetriever, AuditEvent event)
+      XiHttpRequest httpRetriever, AuditEvent event)
       throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
     if (!requestor.isPermitted(PermissionConstants.ENROLL_CROSS)) {
       throw new OperationException(NOT_PERMITTED, "ENROLL_CROSS is not allowed");
@@ -792,7 +794,7 @@ public class RestResponder {
   }
 
   private void unRevoke(
-      String command, Requestor requestor,HttpRequestMetadataRetriever httpRetriever, AuditEvent event)
+      String command, Requestor requestor, XiHttpRequest httpRetriever, AuditEvent event)
       throws OperationException, HttpRespAuditException, IOException, SdkErrorResponseException {
     boolean revoke = command.equals(CMD_revoke_cert);
     int permission = revoke ? PermissionConstants.REVOKE_CERT : PermissionConstants.UNSUSPEND_CERT;
@@ -852,7 +854,7 @@ public class RestResponder {
     }
   }
 
-  private HttpRespContent getCrl(String caName, HttpRequestMetadataRetriever httpRetriever)
+  private HttpRespContent getCrl(String caName, XiHttpRequest httpRetriever)
       throws OperationException, HttpRespAuditException, IOException, SdkErrorResponseException {
     String strCrlNumber = httpRetriever.getParameter(PARAM_crl_number);
     BigInteger crlNumber = null;

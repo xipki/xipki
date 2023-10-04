@@ -29,14 +29,14 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.HttpRespContent;
-import org.xipki.util.http.RestResponse;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -316,14 +316,14 @@ public class AcmeResponder {
     repo.close();
   }
 
-  public RestResponse service(HttpRequestMetadataRetriever servletReq, byte[] request, AuditEvent event) {
+  public XiHttpResponse service(XiHttpRequest servletReq, byte[] request, AuditEvent event) {
     StringContainer command = new StringContainer();
 
     AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
     AuditLevel auditLevel = AuditLevel.INFO;
     String auditMessage = null;
 
-    RestResponse resp;
+    XiHttpResponse resp;
     try {
       resp = doService(servletReq, request, event, command);
       int sc = resp.getStatusCode();
@@ -336,7 +336,7 @@ public class AcmeResponder {
       auditLevel = ex.getAuditLevel();
       auditMessage = ex.getAuditMessage();
 
-      return new RestResponse(ex.getHttpStatus(), null, null, null);
+      return new XiHttpResponse(ex.getHttpStatus(), null, null, null);
     } catch (AcmeProtocolException ex) {
       auditLevel = AuditLevel.WARN;
       auditStatus = AuditStatus.FAILED;
@@ -354,13 +354,13 @@ public class AcmeResponder {
       } else {
         auditMessage = "ACME system exception";
       }
-      return new RestResponse(SC_INTERNAL_SERVER_ERROR, null, null, null);
+      return new XiHttpResponse(SC_INTERNAL_SERVER_ERROR, null, null, null);
     } catch (Throwable th) {
       LOG.error("Throwable thrown, this should not happen!", th);
       auditLevel = AuditLevel.ERROR;
       auditStatus = AuditStatus.FAILED;
       auditMessage = "internal error";
-      return new RestResponse(SC_INTERNAL_SERVER_ERROR, null, null, null);
+      return new XiHttpResponse(SC_INTERNAL_SERVER_ERROR, null, null, null);
     } finally {
       event.setStatus(auditStatus);
       event.setLevel(auditLevel);
@@ -378,7 +378,7 @@ public class AcmeResponder {
     return resp;
   }
 
-  private RestResponse doService(HttpRequestMetadataRetriever servletReq, byte[] request,
+  private XiHttpResponse doService(XiHttpRequest servletReq, byte[] request,
                                  AuditEvent event, StringContainer commandContainer)
       throws HttpRespAuditException, AcmeProtocolException, AcmeSystemException, DataAccessException {
     String method = servletReq.getMethod();
@@ -429,7 +429,7 @@ public class AcmeResponder {
             AuditLevel.INFO, AuditStatus.FAILED);
       }
 
-      return new RestResponse(sc, null, null, null)
+      return new XiHttpResponse(sc, null, null, null)
           .putHeader("Cache-Control", "no-store");
     } else if (CMD_directory.equalsIgnoreCase(command)) {
       if (!"GET".equals(method)) {
@@ -438,7 +438,7 @@ public class AcmeResponder {
       }
 
       HttpRespContent respContent = HttpRespContent.ofOk(CT_JSON, false, directoryBytes);
-      return new RestResponse(SC_OK, respContent.getContentType(), null,
+      return new XiHttpResponse(SC_OK, respContent.getContentType(), null,
           respContent.isBase64(), respContent.getContent());
     }
 
@@ -546,7 +546,7 @@ public class AcmeResponder {
       }
     }
 
-    RestResponse verifyRes = verifySignature(pubKey, body);
+    XiHttpResponse verifyRes = verifySignature(pubKey, body);
     if (verifyRes != null) {
       return verifyRes;
     }
@@ -578,7 +578,7 @@ public class AcmeResponder {
         AcmeAccount newAccount = repo.newAcmeAccount();
         List<String> contacts = reqPayload.getContact();
         if (contacts != null && !contacts.isEmpty()) {
-          RestResponse verifyErrorResp = verifyContacts(contacts);
+          XiHttpResponse verifyErrorResp = verifyContacts(contacts);
           if (verifyErrorResp != null) {
             return verifyErrorResp;
           }
@@ -659,7 +659,7 @@ public class AcmeResponder {
         // 7.3.2.  Account Update
         List<String> contacts = reqPayload.getContact();
         if (contacts != null && !contacts.isEmpty()) {
-          RestResponse errResp = verifyContacts(contacts);
+          XiHttpResponse errResp = verifyContacts(contacts);
           if (errResp != null) {
             return errResp;
           }
@@ -1131,7 +1131,7 @@ public class AcmeResponder {
         ChallengeResponse resp = chall.toChallengeResponse(baseUrl, challId.getOrderId(), challId.getAuthzId());
 
         LOG.info("Received ready for challenge {} of order {}", challId, challId.getOrderId());
-        RestResponse ret = buildSuccJsonResp(SC_OK, resp);//.putHeader(HDR_RETRY_AFTER, "2"); // wait for 2 seconds
+        XiHttpResponse ret = buildSuccJsonResp(SC_OK, resp);//.putHeader(HDR_RETRY_AFTER, "2"); // wait for 2 seconds
         String authzUrl = chall2.getChallenge().authz().getUrl(baseUrl);
         ret.putHeader(HDR_LINK, "<" + authzUrl + ">;rel=\"up\"");
         return ret;
@@ -1143,11 +1143,11 @@ public class AcmeResponder {
     }
   } // method service
 
-  private RestResponse toRestResponse(HttpRespContent respContent) {
+  private XiHttpResponse toRestResponse(HttpRespContent respContent) {
     if (respContent == null) {
-      return new RestResponse(SC_OK, null, null, null);
+      return new XiHttpResponse(SC_OK, null, null, null);
     } else {
-      return new RestResponse(respContent.getStatusCode(), respContent.getContentType(), null,
+      return new XiHttpResponse(respContent.getStatusCode(), respContent.getContentType(), null,
           respContent.isBase64(), respContent.getContent());
     }
   }
@@ -1161,17 +1161,17 @@ public class AcmeResponder {
     return order;
   }
 
-  private RestResponse buildSuccJsonResp(int statusCode, Object body) {
+  private XiHttpResponse buildSuccJsonResp(int statusCode, Object body) {
     return toRestResponse(HttpRespContent.of(statusCode, CT_JSON, JSON.toJSONBytes(body)));
   }
 
-  private RestResponse buildProblemResp(int statusCode, Problem problem) {
+  private XiHttpResponse buildProblemResp(int statusCode, Problem problem) {
     byte[] bytes = JSON.toJSONBytes(problem);
     HttpRespContent content = HttpRespContent.of(statusCode, CT_PROBLEM_JSON, bytes);
     return toRestResponse(content);
   }
 
-  private RestResponse verifySignature(PublicKey pubKey, JoseMessage joseMessage) throws AcmeProtocolException {
+  private XiHttpResponse verifySignature(PublicKey pubKey, JoseMessage joseMessage) throws AcmeProtocolException {
     try {
       JsonWebSignature jws = new JsonWebSignature();
       jws.setCompactSerialization(joseMessage.getProtected() + "." + joseMessage.getPayload()
@@ -1189,7 +1189,7 @@ public class AcmeResponder {
     }
   }
 
-  private RestResponse verifyContacts(List<String> contacts) throws AcmeProtocolException {
+  private XiHttpResponse verifyContacts(List<String> contacts) throws AcmeProtocolException {
     if (contacts == null || contacts.isEmpty()) {
       throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.invalidContact, "no contact is specified");
     }

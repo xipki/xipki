@@ -7,10 +7,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.xipki.ocsp.server.servlet.HealthCheckServlet0;
-import org.xipki.servlet5.HttpRequestMetadataRetrieverImpl;
 import org.xipki.servlet5.ServletHelper;
+import org.xipki.servlet5.XiHttpRequestImpl;
 import org.xipki.util.Args;
-import org.xipki.util.http.RestResponse;
 
 import java.io.IOException;
 
@@ -32,8 +31,7 @@ public class HealthCheckServlet extends HttpServlet {
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
     try {
-      RestResponse restResp = underlying.doGet(new HttpRequestMetadataRetrieverImpl(req));
-      ServletHelper.fillResponse(restResp, resp);
+      ServletHelper.fillResponse(underlying.doGet(new XiHttpRequestImpl(req)), resp);
     } finally {
       resp.flushBuffer();
     }

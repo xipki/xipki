@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.sdk.ErrorResponse;
 import org.xipki.ca.sdk.SdkResponse;
 import org.xipki.ca.server.SdkResponder;
-import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.HttpConstants;
@@ -16,10 +15,10 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.exception.EncodeException;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.http.HttpStatusCode;
-import org.xipki.util.http.RestResponse;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * REST API exception.
@@ -44,18 +43,18 @@ public class HttpRaServlet0 {
     this.responder = Args.notNull(responder, "responder");
   }
 
-  public RestResponse doGet(HttpRequestMetadataRetriever req) throws IOException {
-    return service(req, null);
+  public XiHttpResponse doGet(XiHttpRequest req) throws IOException {
+    return service(req, false);
   }
 
-  public RestResponse doPost(HttpRequestMetadataRetriever req, InputStream reqStream) throws IOException {
-    return service(req, reqStream);
+  public XiHttpResponse doPost(XiHttpRequest req) throws IOException {
+    return service(req, true);
   }
 
-  private RestResponse service(HttpRequestMetadataRetriever req, InputStream reqStream) throws IOException {
+  private XiHttpResponse service(XiHttpRequest req, boolean post) throws IOException {
     try {
       String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
-      byte[] requestBytes = reqStream == null ? null : IoUtil.readAllBytesAndClose(reqStream);
+      byte[] requestBytes = post ? IoUtil.readAllBytesAndClose(req.getInputStream()) : null;
 
       SdkResponse response = responder.service(path, requestBytes, req);
       byte[] respBody = response == null ? null : response.encode();
@@ -96,13 +95,13 @@ public class HttpRaServlet0 {
         LOG.debug("HTTP RA path: {}\nResponse:\n{}", req.getRequestURI(), respBodyStr);
       }
 
-      return new RestResponse(httpStatus, "application/cbor", null, respBody);
+      return new XiHttpResponse(httpStatus, "application/cbor", null, respBody);
     } catch (EncodeException ex) {
       LOG.error("Error encoding SdkResponse", ex);
-      return new RestResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
+      return new XiHttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     } catch (RuntimeException ex) {
       LOG.error("RuntimeException thrown, this should not happen!", ex);
-      return new RestResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
+      return new XiHttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     }
   }
 

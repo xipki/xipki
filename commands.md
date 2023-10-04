@@ -6,7 +6,7 @@ auto-complete the options and arguments by the `TAB` key.
 
 Basic Commands
 --
-   * `base64`
+   * `xi:base64`
 
      Base64 encode / decode
 
@@ -20,7 +20,7 @@ Basic Commands
 
    * `xi:copy-file`
 
-     copy file
+     copy files.
 
    * `xi:curl`
 
@@ -298,14 +298,6 @@ CA Management Commands
 
      remove requestor from CA
 
-   * `ca:causer-add`
-
-     add user to CA
-
-   * `ca:causer-rm`
-
-     remove user from CA
-
    * `ca:cert-status`
 
      show certificate status
@@ -485,22 +477,6 @@ CA Management Commands
    * `ca:unsuspend-cert`
 
      unsuspend certificate
-
-   * `ca:user-add`
-
-     add user
-
-   * `ca:user-info`
-
-     show information of user
-
-   * `ca:user-rm`
-
-     remove user
-
-   * `ca:user-up`
-
-     update user
 
 CMP Client Commands
 -----
