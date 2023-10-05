@@ -205,8 +205,7 @@ public abstract class Certprofile implements Closeable {
     private final boolean required;
 
     public KeyUsageControl(String keyUsage, boolean required) {
-      Args.notNull(keyUsage, "keyUsage");
-      this.keyUsage = KeyUsage.getKeyUsage(keyUsage);
+      this.keyUsage = KeyUsage.getKeyUsage(Args.notNull(keyUsage, "keyUsage"));
       this.required = required;
     }
 

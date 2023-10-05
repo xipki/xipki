@@ -97,8 +97,7 @@ public class KeyParametersOption {
     }
 
     public boolean allowsCurve(ASN1ObjectIdentifier curveOid) {
-      Args.notNull(curveOid, "curveOid");
-      return curveOids == null || curveOids.contains(curveOid);
+      return curveOids == null || curveOids.contains(Args.notNull(curveOid, "curveOid"));
     }
 
     public boolean allowsPointEncoding(byte encoding) {

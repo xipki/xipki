@@ -40,13 +40,15 @@ public abstract class ExtensionSpec {
 
   static {
     rfc5280Instances.put(CertLevel.RootCA, new Rfc5280RootCA());
-    rfc5280Instances.put(CertLevel.SubCA, new Rfc5280SubCA());
-    rfc5280Instances.put(CertLevel.CROSS, new Rfc5280SubCA());
+    Rfc5280SubCA subCA = new Rfc5280SubCA();
+    rfc5280Instances.put(CertLevel.SubCA, subCA);
+    rfc5280Instances.put(CertLevel.CROSS, subCA);
     rfc5280Instances.put(CertLevel.EndEntity, new Rfc5280EndEntity());
 
     browserForumInstances.put(CertLevel.RootCA, new BrowserForumBRRootCA());
-    browserForumInstances.put(CertLevel.SubCA, new BrowserForumBRSubCA());
-    browserForumInstances.put(CertLevel.CROSS, new BrowserForumBRSubCA());
+    BrowserForumBRSubCA brSubCA = new BrowserForumBRSubCA();
+    browserForumInstances.put(CertLevel.SubCA, brSubCA);
+    browserForumInstances.put(CertLevel.CROSS, brSubCA);
     browserForumInstances.put(CertLevel.EndEntity, new BrowserForumBREndEntity());
   }
 

@@ -23,26 +23,25 @@ public class ExtensionValues {
 
   private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions = new HashMap<>();
 
-  public boolean addExtension(ASN1ObjectIdentifier type, boolean critical, ASN1Encodable value) {
+  public void addExtension(ASN1ObjectIdentifier type, boolean critical, ASN1Encodable value)
+      throws CertprofileException {
     Args.notNull(type, "type");
     Args.notNull(value, "value");
 
     if (extensions.containsKey(type)) {
-      return false;
+      throw new CertprofileException("Extension " + type.getId() + " exists");
     }
     extensions.put(type, new ExtensionValue(critical, value));
-    return true;
   } // method addExtension
 
-  public boolean addExtension(ASN1ObjectIdentifier type, ExtensionValue value) {
+  public void addExtension(ASN1ObjectIdentifier type, ExtensionValue value) throws CertprofileException {
     Args.notNull(type, "type");
     Args.notNull(value, "value");
 
     if (extensions.containsKey(type)) {
-      return false;
+      throw new CertprofileException("Extension " + type.getId() + " exists");
     }
     extensions.put(type, value);
-    return true;
   } // method addExtension
 
   public Set<ASN1ObjectIdentifier> getExtensionTypes() {

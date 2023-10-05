@@ -112,15 +112,13 @@ public class PublicKeyChecker {
       }
 
       // point encoding
-      if (ecOption.getPointEncodings() != null) {
-        byte[] keyData = publicKey.getPublicKeyData().getBytes();
-        if (keyData.length < 1) {
-          throw new BadCertTemplateException("invalid publicKeyData");
-        }
-        byte pointEncoding = keyData[0];
-        if (!ecOption.getPointEncodings().contains(pointEncoding)) {
-          throw new BadCertTemplateException("not-accepted EC point encoding " + pointEncoding);
-        }
+      byte[] keyData = publicKey.getPublicKeyData().getBytes();
+      if (keyData.length < 1) {
+        throw new BadCertTemplateException("invalid publicKeyData");
+      }
+      byte pointEncoding = keyData[0];
+      if (!ecOption.allowsPointEncoding(pointEncoding)) {
+        throw new BadCertTemplateException("not-accepted EC point encoding " + pointEncoding);
       }
 
       try {
