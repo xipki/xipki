@@ -36,9 +36,9 @@ import org.xipki.util.PemEncoder.PemLabel;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
 import org.xipki.util.http.HttpRespContent;
+import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpRequest;
-import org.xipki.util.http.XiHttpResponse;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -48,8 +48,6 @@ import java.util.*;
 import static org.xipki.audit.AuditLevel.ERROR;
 import static org.xipki.audit.AuditLevel.INFO;
 import static org.xipki.audit.AuditStatus.FAILED;
-import static org.xipki.audit.AuditStatus.SUCCESSFUL;
-import static org.xipki.util.Args.notNull;
 import static org.xipki.util.exception.ErrorCode.*;
 
 /**
@@ -207,11 +205,11 @@ public class RestResponder {
                        RequestorAuthenticator authenticator, PopControl popControl,
                        CaProfilesControl caProfiles) {
     LOG.info("XiPKI REST-Gateway version {}", StringUtil.getVersion(getClass()));
-    this.sdk = notNull(sdk, "sdk");
-    this.securityFactory = notNull(securityFactory, "securityFactory");
-    this.authenticator = notNull(authenticator, "authenticator");
-    this.popControl = notNull(popControl, "popControl");
-    this.caProfilesControl = notNull(caProfiles, "caProfiles");
+    this.sdk = Args.notNull(sdk, "sdk");
+    this.securityFactory = Args.notNull(securityFactory, "securityFactory");
+    this.authenticator = Args.notNull(authenticator, "authenticator");
+    this.popControl = Args.notNull(popControl, "popControl");
+    this.caProfilesControl = Args.notNull(caProfiles, "caProfiles");
   }
 
   private Requestor getRequestor(String user) {
@@ -222,10 +220,10 @@ public class RestResponder {
     return authenticator.getCertRequestor(cert);
   }
 
-  public XiHttpResponse service(
+  public HttpResponse service(
       String path, byte[] request, XiHttpRequest httpRetriever, AuditEvent event) {
     AuditLevel auditLevel = INFO;
-    AuditStatus auditStatus = SUCCESSFUL;
+    AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
     String auditMessage = null;
 
     try {
@@ -247,7 +245,7 @@ public class RestResponder {
         if (caProfileConf == null) {
           String message = "unknown alias default";
           LOG.warn(message);
-          return new XiHttpResponse(HttpStatusCode.SC_NOT_FOUND);
+          return new HttpResponse(HttpStatusCode.SC_NOT_FOUND);
         }
 
         caName = caProfileConf.getCa();
@@ -290,14 +288,15 @@ public class RestResponder {
         throw new HttpRespAuditException(NOT_FOUND, message, INFO, FAILED);
       }
 
-      if (CMD_cacert.equals(command)) {
-        return toRestResponse(HttpRespContent.ofOk(CT_pkix_cert, sdk.cacert(caName)));
-      } else if (CMD_cacerts.equals(command)) {
-        byte[][] certsBytes = sdk.cacerts(caName);
-        return toRestResponse(HttpRespContent.ofOk(CT_pem_file,
-            StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certsBytes))));
-      } else if (CMD_crl.equals(command)) {
-        return toRestResponse(getCrl(caName, httpRetriever));
+      switch (command) {
+        case CMD_cacert:
+          return toHttpResponse(HttpRespContent.ofOk(CT_pkix_cert, sdk.cacert(caName)));
+        case CMD_cacerts:
+          byte[][] certsBytes = sdk.cacerts(caName);
+          return toHttpResponse(HttpRespContent.ofOk(CT_pem_file,
+              StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certsBytes))));
+        case CMD_crl:
+          return toHttpResponse(getCrl(caName, httpRetriever));
       }
 
       Requestor requestor;
@@ -368,7 +367,7 @@ public class RestResponder {
           throw new IllegalStateException("invalid command '" + command + "'"); // should not reach here
       }
 
-      return toRestResponse(respContent);
+      return toHttpResponse(respContent);
     } catch (OperationException ex) {
       ErrorCode code = ex.getErrorCode();
       if (LOG.isWarnEnabled()) {
@@ -440,12 +439,12 @@ public class RestResponder {
       if (StringUtil.isNotBlank(failureInfo)) {
         headers.put(HEADER_failInfo, failureInfo);
       }
-      return new XiHttpResponse(sc, null, headers, null);
+      return new HttpResponse(sc, null, headers, null);
     } catch (HttpRespAuditException ex) {
       auditStatus = ex.getAuditStatus();
       auditLevel = ex.getAuditLevel();
       auditMessage = ex.getAuditMessage();
-      return new XiHttpResponse(ex.getHttpStatus(), null, null, null);
+      return new HttpResponse(ex.getHttpStatus(), null, null, null);
     } catch (Throwable th) {
       if (th instanceof EOFException) {
         LogUtil.warn(LOG, th, "connection reset by peer");
@@ -455,7 +454,7 @@ public class RestResponder {
       auditLevel = ERROR;
       auditStatus = FAILED;
       auditMessage = "internal error";
-      return new XiHttpResponse(INTERNAL_SERVER_ERROR, null, null, null);
+      return new HttpResponse(INTERNAL_SERVER_ERROR, null, null, null);
     } finally {
       event.setStatus(auditStatus);
       event.setLevel(auditLevel);
@@ -465,13 +464,16 @@ public class RestResponder {
     }
   } // method service
 
-  private XiHttpResponse toRestResponse(HttpRespContent respContent) {
+  private HttpResponse toHttpResponse(HttpRespContent respContent) {
     Map<String, String> headers = new HashMap<>();
     headers.put(HEADER_PKISTATUS, PKISTATUS_accepted);
 
-    return (respContent == null) ? new XiHttpResponse(OK, null, headers, null)
-        : new XiHttpResponse(OK, respContent.getContentType(), headers,
-                  respContent.isBase64(), respContent.getContent());
+    if (respContent == null) {
+      return new HttpResponse(OK, null, headers, null);
+    }
+
+    return new HttpResponse(OK, respContent.getContentType(), headers,
+        respContent.isBase64(), respContent.getContent());
   }
 
   private HttpRespContent enrollCerts(
@@ -767,7 +769,7 @@ public class RestResponder {
     }
   }
 
-  private static String checkProfile(
+  private static void checkProfile(
       Requestor requestor, String profile) throws HttpRespAuditException, OperationException {
     if (StringUtil.isBlank(profile)) {
       throw new HttpRespAuditException(BAD_REQUEST, "certificate profile is not specified",
@@ -778,7 +780,6 @@ public class RestResponder {
     if (!requestor.isCertprofilePermitted(profile)) {
       throw new OperationException(NOT_PERMITTED, "certprofile " + profile + " is not allowed");
     }
-    return profile;
   }
 
   private static EnrollOrPullCertResponseEntry getEntry(
@@ -855,7 +856,7 @@ public class RestResponder {
   }
 
   private HttpRespContent getCrl(String caName, XiHttpRequest httpRetriever)
-      throws OperationException, HttpRespAuditException, IOException, SdkErrorResponseException {
+      throws HttpRespAuditException, IOException, SdkErrorResponseException {
     String strCrlNumber = httpRetriever.getParameter(PARAM_crl_number);
     BigInteger crlNumber = null;
     if (StringUtil.isNotBlank(strCrlNumber)) {

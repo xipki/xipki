@@ -10,8 +10,7 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.slf4j.Logger;
 import org.xipki.audit.*;
 import org.xipki.security.*;
-
-import static org.xipki.util.Args.notNull;
+import org.xipki.util.Args;
 
 /**
  * Gateway Utilities.
@@ -37,10 +36,9 @@ public class GatewayUtil {
   }
 
   public static boolean verifyCsr(CertificationRequest csr, SecurityFactory securityFactory, PopControl popControl) {
-    notNull(csr, "csr");
-    notNull(popControl, "popControl");
+    Args.notNull(popControl, "popControl");
 
-    ASN1ObjectIdentifier algOid = csr.getSignatureAlgorithm().getAlgorithm();
+    ASN1ObjectIdentifier algOid = Args.notNull(csr, "csr").getSignatureAlgorithm().getAlgorithm();
 
     DHSigStaticKeyCertPair kaKeyAndCert = null;
     if (ObjectIdentifiers.Xipki.id_alg_dhPop_x25519.equals(algOid)

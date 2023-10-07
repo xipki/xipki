@@ -39,8 +39,8 @@ import org.xipki.util.*;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
 import org.xipki.util.http.HttpRespContent;
+import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.XiHttpRequest;
-import org.xipki.util.http.XiHttpResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
@@ -48,12 +48,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.util.*;
-
-import static org.xipki.audit.AuditLevel.INFO;
-import static org.xipki.audit.AuditStatus.FAILED;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.StringUtil.*;
-import static org.xipki.util.exception.ErrorCode.*;
 
 /**
  * EST responder.
@@ -207,11 +201,11 @@ public class EstResponder {
       PopControl popControl, CaProfilesControl caProfiles) {
     LOG.info("XiPKI EST-Gateway version {}", StringUtil.getVersion(getClass()));
 
-    this.sdk = notNull(sdk, "sdk");
-    this.securityFactory = notNull(securityFactory, "securityFactory");
-    this.authenticator = notNull(authenticator, "authenticator");
-    this.popControl = notNull(popControl, "popControl");
-    this.caProfilesControl = notNull(caProfiles, "caProfiles");
+    this.sdk = Args.notNull(sdk, "sdk");
+    this.securityFactory = Args.notNull(securityFactory, "securityFactory");
+    this.authenticator = Args.notNull(authenticator, "authenticator");
+    this.popControl = Args.notNull(popControl, "popControl");
+    this.caProfilesControl = Args.notNull(caProfiles, "caProfiles");
   }
 
   private Requestor getRequestor(String user) {
@@ -222,7 +216,7 @@ public class EstResponder {
     return authenticator.getCertRequestor(cert);
   }
 
-  public XiHttpResponse service(
+  public HttpResponse service(
       String path, byte[] request, XiHttpRequest httpRequest, AuditEvent event) {
     AuditLevel auditLevel = AuditLevel.INFO;
     AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
@@ -263,19 +257,19 @@ public class EstResponder {
       }
       command = tokens[tokens.length - 1].toLowerCase(Locale.ROOT);
 
-      if (isBlank(caName)) {
+      if (StringUtil.isBlank(caName)) {
         String message = "CA is not specified";
         LOG.warn(message);
         throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
       }
 
-      if (isBlank(profile)) {
+      if (StringUtil.isBlank(profile)) {
         String message = "profile is not specified";
         LOG.warn(message);
         throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
       }
 
-      if (isBlank(command)) {
+      if (StringUtil.isBlank(command)) {
         String message = "command is not specified";
         LOG.warn(message);
         throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
@@ -293,29 +287,29 @@ public class EstResponder {
       switch (command) {
         case CMD_cacerts: {
           byte[][] certsBytes = sdk.cacerts(caName);
-          return toRestResponse(HttpRespContent.ofOk(CT_pkcs7_mime, true, buildCertsOnly(certsBytes)));
+          return toHttpResponse(HttpRespContent.ofOk(CT_pkcs7_mime, true, buildCertsOnly(certsBytes)));
         }
         case CMD_ucacerts: {
           byte[][] certsBytes = sdk.cacerts(caName);
-          return toRestResponse(HttpRespContent.ofOk(CT_pem_file,
+          return toHttpResponse(HttpRespContent.ofOk(CT_pem_file,
               StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certsBytes))));
         }
         case CMD_ucacert: {
           byte[] certBytes = sdk.cacert(caName);
-          return toRestResponse(HttpRespContent.ofOk(CT_pkix_cert, true, certBytes));
+          return toHttpResponse(HttpRespContent.ofOk(CT_pkix_cert, true, certBytes));
         }
         case CMD_ucrl: {
           byte[] crlBytes = sdk.currentCrl(caName);
           if (crlBytes == null) {
             String message = "could not get CRL";
             LOG.warn(message);
-            throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, message, INFO, FAILED);
+            throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, message, AuditLevel.INFO, AuditStatus.FAILED);
           }
 
-          return toRestResponse(HttpRespContent.ofOk(CT_pkix_crl, true, crlBytes));
+          return toHttpResponse(HttpRespContent.ofOk(CT_pkix_crl, true, crlBytes));
         }
         case CMD_csrattrs: {
-          return toRestResponse(getCsrAttrs(caName, profile));
+          return toHttpResponse(getCsrAttrs(caName, profile));
         }
         case CMD_fullcmc: {
           String message = "supported command '" + command + "'";
@@ -342,7 +336,7 @@ public class EstResponder {
           }
 
           if (idx != -1 && idx < userPwd.length - 1) {
-            user = toUtf8String(Arrays.copyOfRange(userPwd, 0, idx));
+            user = StringUtil.toUtf8String(Arrays.copyOfRange(userPwd, 0, idx));
             password = Arrays.copyOfRange(userPwd, idx + 1, userPwd.length);
           }
         }
@@ -366,7 +360,7 @@ public class EstResponder {
         requestor = getRequestor(clientCert);
 
         if (requestor == null) {
-          throw new OperationException(NOT_PERMITTED, "no requestor specified");
+          throw new OperationException(ErrorCode.NOT_PERMITTED, "no requestor specified");
         }
       }
 
@@ -379,17 +373,17 @@ public class EstResponder {
       }
 
       if (!requestor.isPermitted(PermissionConstants.ENROLL_CERT)) {
-        throw new OperationException(NOT_PERMITTED, "ENROLL_CERT is not allowed");
+        throw new OperationException(ErrorCode.NOT_PERMITTED, "ENROLL_CERT is not allowed");
       }
 
       if (!requestor.isCertprofilePermitted(profile)) {
-        throw new OperationException(NOT_PERMITTED, "certprofile " + profile + " is not allowed");
+        throw new OperationException(ErrorCode.NOT_PERMITTED, "certprofile " + profile + " is not allowed");
       }
 
       CertificationRequest csr = X509Util.parseCsrInRequest(request);
       if (!CMD_serverkeygen.equals(command)) {
         if (!GatewayUtil.verifyCsr(csr, securityFactory, popControl)) {
-          throw new OperationException(BAD_POP);
+          throw new OperationException(ErrorCode.BAD_POP);
         }
       }
 
@@ -400,11 +394,11 @@ public class EstResponder {
         respContent = enrollCert(command, caName, profile, csr, event);
       }
 
-      return toRestResponse(respContent);
+      return toHttpResponse(respContent);
     } catch (OperationException ex) {
       ErrorCode code = ex.getErrorCode();
       if (LOG.isWarnEnabled()) {
-        String msg = concat("generate certificate, OperationException: code=",
+        String msg = StringUtil.concat("generate certificate, OperationException: code=",
             code.name(), ", message=", ex.getErrorMessage());
         LogUtil.warn(LOG, ex, msg);
       }
@@ -445,18 +439,18 @@ public class EstResponder {
       event.setStatus(AuditStatus.FAILED);
       event.addEventData(CaAuditConstants.NAME_message, code.name());
 
-      if (code == DATABASE_FAILURE || code == SYSTEM_FAILURE) {
+      if (code == ErrorCode.DATABASE_FAILURE || code == ErrorCode.SYSTEM_FAILURE) {
         auditMessage = code.name();
       } else {
         auditMessage = code.name() + ": " + ex.getErrorMessage();
       }
 
-      return new XiHttpResponse(sc, null, null, null);
+      return new HttpResponse(sc);
     } catch (HttpRespAuditException ex) {
       auditStatus = ex.getAuditStatus();
       auditLevel = ex.getAuditLevel();
       auditMessage = ex.getAuditMessage();
-      return new XiHttpResponse(ex.getHttpStatus(), null, null, null);
+      return new HttpResponse(ex.getHttpStatus());
     } catch (Throwable th) {
       if (th instanceof EOFException) {
         LogUtil.warn(LOG, th, "connection reset by peer");
@@ -466,7 +460,7 @@ public class EstResponder {
       auditLevel = AuditLevel.ERROR;
       auditStatus = AuditStatus.FAILED;
       auditMessage = "internal error";
-      return new XiHttpResponse(INTERNAL_SERVER_ERROR, null, null, null);
+      return new HttpResponse(INTERNAL_SERVER_ERROR);
     } finally {
       event.setStatus(auditStatus);
       event.setLevel(auditLevel);
@@ -476,18 +470,18 @@ public class EstResponder {
     }
   } // method service
 
-  private XiHttpResponse toRestResponse(HttpRespContent respContent) {
+  private HttpResponse toHttpResponse(HttpRespContent respContent) {
     if (respContent == null) {
-      return new XiHttpResponse(OK, null, null, null);
+      return new HttpResponse(OK);
     } else {
-      return new XiHttpResponse(OK, respContent.getContentType(), null,
+      return new HttpResponse(OK, respContent.getContentType(), null,
           respContent.isBase64(), respContent.getContent());
     }
   }
 
   private HttpRespContent enrollCert(
       String command, String caName, String profile, CertificationRequest csr, AuditEvent event)
-      throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
+      throws HttpRespAuditException, IOException, SdkErrorResponseException {
     boolean caGenKeyPair  = CMD_serverkeygen.equals(command) || CMD_userverkeygen.equals(command);
 
     CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
@@ -552,7 +546,7 @@ public class EstResponder {
     byte[] t = new byte[9]; // length must be multiple of 3
     random.nextBytes(t);
     String boundary = "estBounary_" + Base64.encodeToString(t);
-    byte[] boundaryBytes = toUtf8Bytes("--" + boundary);
+    byte[] boundaryBytes = StringUtil.toUtf8Bytes("--" + boundary);
 
     try (ByteArrayOutputStream bo = new ByteArrayOutputStream()) {
       writeLine(bo, "XiPKI EST server");
@@ -561,9 +555,8 @@ public class EstResponder {
       writeMultipartEntry(bo, boundaryBytes, CT_pkcs8, entry.getPrivateKey());
 
       // certificate
-      String ct = CT_pkcs7_mime_certyonly;
       byte[] certBytes = buildCertsOnly(entry.getCert());
-      writeMultipartEntry(bo, boundaryBytes, ct, certBytes);
+      writeMultipartEntry(bo, boundaryBytes, CT_pkcs7_mime_certyonly, certBytes);
 
       // finalize the multipart
       bo.write(boundaryBytes);
@@ -588,7 +581,7 @@ public class EstResponder {
 
   private HttpRespContent reenrollCert(
       String command, String caName, String profile, CertificationRequest csr, AuditEvent event)
-      throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
+      throws HttpRespAuditException, IOException, SdkErrorResponseException {
     CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
 
     event.addEventData(CaAuditConstants.NAME_certprofile, profile);
@@ -717,7 +710,7 @@ public class EstResponder {
   } // method reenrollCert
 
   private HttpRespContent getCsrAttrs(String caName, String profile)
-      throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
+      throws IOException, SdkErrorResponseException {
     CertprofileInfoResponse sdkResp = sdk.profileInfo(caName, profile);
     ASN1EncodableVector csrAttrs = new ASN1EncodableVector();
 
@@ -796,7 +789,7 @@ public class EstResponder {
   }
 
   private static void writeLine(OutputStream os, String line) throws IOException {
-    os.write(toUtf8Bytes(line));
+    os.write(StringUtil.toUtf8Bytes(line));
     os.write(NEWLINE);
   }
 

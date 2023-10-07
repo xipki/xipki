@@ -35,14 +35,15 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 import org.xipki.util.PermissionConstants;
 import org.xipki.util.StringUtil;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
+import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpRequest;
-import org.xipki.util.http.XiHttpResponse;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -50,7 +51,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 
-import static org.xipki.util.Args.notNull;
 import static org.xipki.util.exception.ErrorCode.*;
 
 /**
@@ -85,7 +85,7 @@ public class ScepResponder {
     private final FailInfo failInfo;
 
     private FailInfoException(FailInfo failInfo) {
-      super(notNull(failInfo, "failInfo").name());
+      super(Args.notNull(failInfo, "failInfo").name());
       this.failInfo = failInfo;
     }
 
@@ -124,11 +124,11 @@ public class ScepResponder {
                        CaProfilesControl caProfiles) {
     LOG.info("XiPKI SCEP-Gateway version {}", StringUtil.getVersion(getClass()));
 
-    this.control = notNull(control, "control");
-    this.sdk = notNull(sdk, "sdk");
-    this.securityFactory = notNull(securityFactory, "securityFactory");
-    this.authenticator = notNull(authenticator, "authenticator");
-    this.popControl = notNull(popControl, "popControl");
+    this.control = Args.notNull(control, "control");
+    this.sdk = Args.notNull(sdk, "sdk");
+    this.securityFactory = Args.notNull(securityFactory, "securityFactory");
+    this.authenticator = Args.notNull(authenticator, "authenticator");
+    this.popControl = Args.notNull(popControl, "popControl");
 
     // CACaps
     CaCaps caps = new CaCaps();
@@ -137,7 +137,7 @@ public class ScepResponder {
     this.caCaps = caps;
     this.signers = signers;
 
-    this.caProfilesControl = notNull(caProfiles, "caProfiles");
+    this.caProfilesControl = Args.notNull(caProfiles, "caProfiles");
   } // constructor
 
   private CaCaps getCaCaps() {
@@ -152,7 +152,7 @@ public class ScepResponder {
     return authenticator.getCertRequestor(cert);
   }
 
-  public XiHttpResponse service(String path, byte[] request, XiHttpRequest metadataRetriever) {
+  public HttpResponse service(String path, byte[] request, XiHttpRequest metadataRetriever) {
     String caName = null;
     String certprofileName = null;
     if (path.length() > 1) {
@@ -172,7 +172,7 @@ public class ScepResponder {
           if (caProfileConf == null) {
             String message = "unknown alias " + alias;
             LOG.warn(message);
-            return new XiHttpResponse(HttpStatusCode.SC_NOT_FOUND);
+            return new HttpResponse(HttpStatusCode.SC_NOT_FOUND);
           }
 
           caName = caProfileConf.getCa();
@@ -185,7 +185,7 @@ public class ScepResponder {
     } // end if
 
     if (caName == null) {
-      return new XiHttpResponse(HttpStatusCode.SC_NOT_FOUND);
+      return new HttpResponse(HttpStatusCode.SC_NOT_FOUND);
     }
 
     AuditService auditService = Audits.getAuditService();
@@ -200,7 +200,7 @@ public class ScepResponder {
     String operation = metadataRetriever.getParameter("operation");
     event.addEventData("operation", operation);
 
-    XiHttpResponse ret;
+    HttpResponse ret;
 
     try {
       byte[] respBody;
@@ -216,7 +216,7 @@ public class ScepResponder {
           LogUtil.error(LOG, ex, msg);
           auditMessage = msg;
           auditStatus = AuditStatus.FAILED;
-          return new XiHttpResponse(HttpStatusCode.SC_BAD_REQUEST);
+          return new HttpResponse(HttpStatusCode.SC_BAD_REQUEST);
         }
 
         ScepSigner signer = signers.getSigner(caName);
@@ -225,7 +225,7 @@ public class ScepResponder {
           LOG.error(msg + " for CA {}", caName);
           auditMessage = msg;
           auditStatus = AuditStatus.FAILED;
-          return new XiHttpResponse(HttpStatusCode.SC_BAD_REQUEST);
+          return new HttpResponse(HttpStatusCode.SC_BAD_REQUEST);
         }
 
         ContentInfo ci;
@@ -236,7 +236,7 @@ public class ScepResponder {
           LogUtil.error(LOG, ex, msg);
           auditMessage = msg;
           auditStatus = AuditStatus.FAILED;
-          return new XiHttpResponse(HttpStatusCode.SC_BAD_REQUEST);
+          return new HttpResponse(HttpStatusCode.SC_BAD_REQUEST);
         } catch (OperationException | SdkErrorResponseException ex) {
           ErrorCode code;
           if (ex instanceof OperationException) {
@@ -279,7 +279,7 @@ public class ScepResponder {
 
           LogUtil.error(LOG, ex, auditMessage);
           auditStatus = AuditStatus.FAILED;
-          return new XiHttpResponse(httpCode);
+          return new HttpResponse(httpCode);
         }
 
         respBody = ci.getEncoded();
@@ -295,20 +295,20 @@ public class ScepResponder {
       } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation)) {
         auditMessage = "SCEP operation '" + operation + "' is not permitted";
         auditStatus = AuditStatus.FAILED;
-        return new XiHttpResponse(HttpStatusCode.SC_FORBIDDEN);
+        return new HttpResponse(HttpStatusCode.SC_FORBIDDEN);
       } else {
         auditMessage = "unknown SCEP operation '" + operation + "'";
         auditStatus = AuditStatus.FAILED;
-        return new XiHttpResponse(HttpStatusCode.SC_BAD_REQUEST);
+        return new HttpResponse(HttpStatusCode.SC_BAD_REQUEST);
       }
-      ret = new XiHttpResponse(HttpStatusCode.SC_OK, contentType, null, respBody);
+      ret = new HttpResponse(HttpStatusCode.SC_OK, contentType, null, respBody);
     } catch (Throwable th) {
       LOG.error("Throwable thrown, this should not happen!", th);
 
       auditLevel = AuditLevel.ERROR;
       auditStatus = AuditStatus.FAILED;
       auditMessage = "internal error";
-      ret = new XiHttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
+      ret = new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     } finally {
       audit(auditService, event, auditLevel, auditStatus, auditMessage);
     }
@@ -383,9 +383,9 @@ public class ScepResponder {
   private PkiMessage servicePkiOperation0(
       String caName, CMSSignedData requestContent, DecodedPkiMessage req, String certprofileName, AuditEvent event)
       throws OperationException, SdkErrorResponseException {
-    notNull(requestContent, "requestContent");
+    Args.notNull(requestContent, "requestContent");
 
-    String tid = notNull(req, "req").getTransactionId().getId();
+    String tid = Args.notNull(req, "req").getTransactionId().getId();
     // verify and decrypt the request
     audit(event, CaAuditConstants.NAME_tid, tid);
 
@@ -724,8 +724,8 @@ public class ScepResponder {
   private ContentInfo encodeResponse(
       ScepSigner signer, PkiMessage response, DecodedPkiMessage request)
       throws OperationException {
-    notNull(response, "response");
-    notNull(request, "request");
+    Args.notNull(response, "response");
+    Args.notNull(request, "request");
 
     String algorithm = signer.getKey().getAlgorithm();
 

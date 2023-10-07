@@ -6,7 +6,7 @@
   </session-config>
   <filter>
     <filter-name>protocol-filter</filter-name>
-    <filter-class>org.xipki.ca.gateway.acme.servlet3.ProtocolServletFilter</filter-class>
+    <filter-class>org.xipki.ca.gateway.acme.servlet3.AcmeServletFilter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>protocol-filter</filter-name>
