@@ -65,7 +65,7 @@ public abstract class DbPortWorker extends DbWorker {
     if (zipDir.exists()) {
       FileUtils.deleteDirectory(zipDir);
     }
-    zipDir.mkdirs();
+    IoUtil.mkdirs(zipDir);
 
     try (ZipFile zipFile = new ZipFile(new File(zipDir, "main.zip"), password)) {
       // split length: 64M Byte
@@ -137,7 +137,7 @@ public abstract class DbPortWorker extends DbWorker {
 
     private final int batchEntriesPerCommit;
 
-    private DataSourceWrapper caDataSource;
+    private final DataSourceWrapper caDataSource;
 
     public ImportCaDb(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
                       String caConfDbFile, String caDbFile,
@@ -249,7 +249,7 @@ public abstract class DbPortWorker extends DbWorker {
     private void checkDestFolder() throws IOException {
       File file = new File(destFolder);
       if (!file.exists()) {
-        file.mkdirs();
+        IoUtil.mkdirs(file);
       } else {
         if (!file.isDirectory()) {
           throw new IOException(destFolder + " is not a folder");
@@ -325,7 +325,7 @@ public abstract class DbPortWorker extends DbWorker {
 
       File file = new File(destFolder);
       if (!file.exists()) {
-        file.mkdirs();
+        IoUtil.mkdirs(file);
       } else {
         if (!file.isDirectory()) {
           throw new IOException(destFolder + " is not a folder");

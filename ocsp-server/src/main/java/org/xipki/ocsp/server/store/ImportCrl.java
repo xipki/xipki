@@ -37,9 +37,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.xipki.util.Args.min;
-import static org.xipki.util.Args.notNull;
-
 /**
  * Import CRLs to database.
  *
@@ -217,10 +214,10 @@ class ImportCrl {
 
   public ImportCrl(DataSourceWrapper datasource, String basedir, int sqlBatchCommit, boolean ignoreExpiredCrls)
       throws DataAccessException, NoSuchAlgorithmException {
-    this.sqlBatchCommit = min(sqlBatchCommit, "sqlBatchCommit", 1);
+    this.sqlBatchCommit = Args.min(sqlBatchCommit, "sqlBatchCommit", 1);
     this.ignoreExpiredCrls = ignoreExpiredCrls;
-    this.datasource = notNull(datasource, "datasource");
-    this.basedir = notNull(basedir, "basedir");
+    this.datasource = Args.notNull(datasource, "datasource");
+    this.basedir = Args.notNull(basedir, "basedir");
     this.certhashAlgo = DbCertStatusStore.getCertHashAlgo(datasource);
     this.sqlSelectIdCert = datasource.buildSelectFirstSql(1, CORE_SQL_SELECT_ID_CERT);
   }
@@ -378,18 +375,20 @@ class ImportCrl {
     } catch (Throwable th) {
       LogUtil.error(LOG, th, "could not import CRL to OCSP database");
     } finally {
-      try {
-        commit(conn);
-      } catch (Throwable th) {
-        LOG.error("could not import CRL to OCSP database (Connection.commit)");
-      }
-
-      if (autoCommitChanged) {
-        // change the autoCommit back to original value.
+      if (conn != null) {
         try {
-          conn.setAutoCommit(true);
-        } catch (SQLException ex) {
-          LOG.error("could not import CRL to OCSP database (Connection.setAutoCommit)");
+          commit(conn);
+        } catch (Throwable th) {
+          LOG.error("could not import CRL to OCSP database (Connection.commit)");
+        }
+
+        if (autoCommitChanged) {
+          // change the autoCommit back to original value.
+          try {
+            conn.setAutoCommit(true);
+          } catch (SQLException ex) {
+            LOG.error("could not import CRL to OCSP database (Connection.setAutoCommit)");
+          }
         }
       }
 
@@ -412,7 +411,12 @@ class ImportCrl {
   private void importCrl(Connection conn, CrlDirInfo crlDirInfo) {
     File crlDir = crlDirInfo.crlDir;
     File generatedDir = new File(crlDir, ".generated");
-    generatedDir.mkdirs();
+    try {
+      IoUtil.mkdirs(generatedDir);
+    } catch (IOException ex) {
+      LOG.error("error mkdirs", ex);
+      return;
+    }
 
     // Delete the files UPDATE.SUCC and UPDATE.FAIL
     IoUtil.deleteFile(new File(generatedDir, "UPDATEME.SUCC"));
@@ -580,18 +584,24 @@ class ImportCrl {
       }
 
       if (crlDirInfo.crlDownloded) {
-        crlDirInfo.crlFile.renameTo(new File(generatedDir, "ca.crl"));
+        if (crlInfo == null) {
+          throw new IllegalStateException("should not reach here (crlInfo == null)");
+        }
+
+        IoUtil.renameTo(crlDirInfo.crlFile, new File(generatedDir, "ca.crl"));
         File newCrlFpFile = new File(generatedDir, "new-ca.crl.fp");
         String hashInfo = null;
         if (newCrlFpFile.exists()) {
           hashInfo = new String(IoUtil.read(newCrlFpFile));
         }
+
+        BigInteger crlNumber = crlInfo.getCrlNumber();
         String info;
         if (hashInfo == null) {
-          info = "crlnumber=" + crlInfo.getCrlNumber().toString()
+          info = "crlnumber=" + crlNumber.toString()
                   + "\nnextupdate=" + DateUtil.toUtcTimeyyyyMMddhhmmss(crlInfo.getNextUpdate());
         } else {
-          info = "crlnumber=" + crlInfo.getCrlNumber().toString()
+          info = "crlnumber=" + crlNumber.toString()
                   + "\nnextupdate=" + DateUtil.toUtcTimeyyyyMMddhhmmss(crlInfo.getNextUpdate())
                   + "\nhash=" + hashInfo;
         }
@@ -614,7 +624,13 @@ class ImportCrl {
       }
 
       crlDirInfo.updatemeFile.setLastModified(Instant.now().toEpochMilli());
-      crlDirInfo.updatemeFile.renameTo(new File(generatedDir, "UPDATEME." + (updateSucc ? "SUCC" : "FAIL")));
+      try {
+        IoUtil.renameTo(crlDirInfo.updatemeFile,
+            new File(generatedDir, "UPDATEME." + (updateSucc ? "SUCC" : "FAIL")));
+      } catch (IOException ex) {
+        LOG.error("error renaming file", ex);
+      }
+
       if (!updateSucc && caCert != null) {
         if (!crlDirInfo.shareCaWithOtherCrl && caCert.databaseId != null) {
           // try to delete the issuer if no certificate is associated with it
@@ -627,7 +643,11 @@ class ImportCrl {
       }
 
       if (!updateSucc && crlDirInfo.crlDownloded & crlDirInfo.crlFile.exists()) {
-        crlDirInfo.crlFile.renameTo(new File(generatedDir, "INVALID-new-ca.crl"));
+        try {
+          IoUtil.renameTo(crlDirInfo.crlFile, new File(generatedDir, "INVALID-new-ca.crl"));
+        } catch (IOException ex) {
+          LOG.error("error renaming file", ex);
+        }
       }
     }
   } // method importCrl

@@ -10,16 +10,14 @@ import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
 import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.KeypairGenEntryWrapper;
+import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 import org.xipki.util.exception.ObjectCreationException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.toNonBlankLower;
-import static org.xipki.util.StringUtil.concat;
 
 /**
  * Manages the keypair generation.
@@ -88,8 +86,7 @@ class KeypairGenManager {
   } // method initSigners
 
   void addKeypairGen(KeypairGenEntry keypairGenEntry) throws CaMgmtException {
-    notNull(keypairGenEntry, "keypairGenEntry");
-    if ("software".equalsIgnoreCase(keypairGenEntry.getName())) {
+    if ("software".equalsIgnoreCase(Args.notNull(keypairGenEntry, "keypairGenEntry").getName())) {
       throw new CaMgmtException("Adding keypair generation 'software' is not allowed");
     }
 
@@ -98,7 +95,7 @@ class KeypairGenManager {
     String name = keypairGenEntry.getName();
     CaManagerImpl.checkName(name, "keypair generation name");
     if (manager.keypairGenDbEntries.containsKey(name)) {
-      throw new CaMgmtException(concat("keypair generation named ", name, " exists"));
+      throw new CaMgmtException(StringUtil.concat("keypair generation named ", name, " exists"));
     }
 
     KeypairGenEntryWrapper gen = createKeypairGen(keypairGenEntry);
@@ -111,7 +108,7 @@ class KeypairGenManager {
   void removeKeypairGen(String name) throws CaMgmtException {
     manager.assertMasterMode();
 
-    name = toNonBlankLower(name, "name");
+    name = Args.toNonBlankLower(name, "name");
     boolean bo = manager.queryExecutor.deleteRowWithName(name, "KEYPAIR_GEN");
     if (!bo) {
       throw new CaMgmtException("unknown keypair generation " + name);
@@ -139,7 +136,7 @@ class KeypairGenManager {
   void changeKeypairGen(String name, String type, String conf) throws CaMgmtException {
     manager.assertMasterMode();
 
-    name = toNonBlankLower(name, "name");
+    name = Args.toNonBlankLower(name, "name");
     if (type == null && conf == null) {
       throw new IllegalArgumentException("nothing to change");
     }
@@ -158,9 +155,8 @@ class KeypairGenManager {
   } // method changeKeypairGen
 
   KeypairGenEntryWrapper createKeypairGen(KeypairGenEntry entry) throws CaMgmtException {
-    notNull(entry, "entry");
+    Args.notNull(entry, "entry");
     KeypairGenEntryWrapper ret = new KeypairGenEntryWrapper();
-
     ret.setDbEntry(entry);
 
     try {

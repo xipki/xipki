@@ -3,8 +3,7 @@
 
 package org.xipki.qa;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
+import org.xipki.util.Args;
 
 /**
  * Single validation issue.
@@ -24,8 +23,8 @@ public class ValidationIssue {
   private String failureMessage;
 
   public ValidationIssue(String code, String description) {
-    this.code = notBlank(code, "code");
-    this.description = notBlank(description, "description");
+    this.code = Args.notBlank(code, "code");
+    this.description = Args.notBlank(description, "description");
     this.failed = false;
   }
 
@@ -38,7 +37,7 @@ public class ValidationIssue {
   }
 
   public void setFailureMessage(String failureMessage) {
-    this.failureMessage = notNull(failureMessage, "failureMessage");
+    this.failureMessage = Args.notNull(failureMessage, "failureMessage");
     this.failed = true;
   }
 

@@ -28,8 +28,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static org.xipki.util.DateUtil.toEpochSecond;
-
 /**
  * Database importer of OCSP CertStore from CA CertStore.
  *
@@ -206,8 +204,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
       int idx = 1;
       ps.setInt(idx++, issuer.getId());
       ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
-      ps.setLong(idx++, toEpochSecond(cert.getTBSCertificate().getStartDate().getDate()));
-      ps.setLong(idx++, toEpochSecond(cert.getTBSCertificate().getEndDate().getDate()));
+      ps.setLong(idx++, DateUtil.toEpochSecond(cert.getTBSCertificate().getStartDate().getDate()));
+      ps.setLong(idx++, DateUtil.toEpochSecond(cert.getTBSCertificate().getEndDate().getDate()));
       ps.setString(idx++, HashAlgo.SHA1.base64Hash(encodedCert));
       ps.setString(idx++, issuer.getRevInfo());
       ps.setString(idx++, Base64.encodeToString(encodedCert));
@@ -372,8 +370,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
               psCert.setInt(idx++, caId);
               psCert.setString(idx++, tbsCert.getSerialNumber().getPositiveValue().toString(16));
               psCert.setLong(idx++, cert.getUpdate());
-              psCert.setLong(idx++, toEpochSecond(tbsCert.getStartDate().getDate()));
-              psCert.setLong(idx++, toEpochSecond(tbsCert.getEndDate().getDate()));
+              psCert.setLong(idx++, DateUtil.toEpochSecond(tbsCert.getStartDate().getDate()));
+              psCert.setLong(idx++, DateUtil.toEpochSecond(tbsCert.getEndDate().getDate()));
               setInt(psCert, idx++, cert.getRev());
               setInt(psCert, idx++, cert.getRr());
               setLong(psCert, idx++, cert.getRt());

@@ -9,13 +9,12 @@ import org.xipki.ca.certprofile.xijson.conf.BiometricInfo;
 import org.xipki.ca.certprofile.xijson.conf.BiometricInfo.BiometricTypeType;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.security.HashAlgo;
+import org.xipki.util.Args;
 import org.xipki.util.TripleState;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * Control of the extension BiometricInfo.
@@ -35,7 +34,7 @@ public class BiometricInfoOption {
   private final TripleState sourceDataUriOccurrence;
 
   public BiometricInfoOption(BiometricInfo value) throws NoSuchAlgorithmException {
-    notNull(value, "value");
+    Args.notNull(value, "value");
 
     this.sourceDataUriOccurrence = value.getIncludeSourceDataUri();
     this.hashAlgorithms = new HashSet<>();
@@ -57,13 +56,13 @@ public class BiometricInfoOption {
   } // constructor
 
   public boolean isTypePermitted(TypeOfBiometricData type) {
-    return notNull(type, "type").isPredefined()
+    return Args.notNull(type, "type").isPredefined()
       ? predefinedTypes.contains(type.getPredefinedBiometricType())
       : idTypes.contains(type.getBiometricDataOid());
   }
 
   public boolean isHashAlgorithmPermitted(HashAlgo hashAlgorithm) {
-    return hashAlgorithms.contains(notNull(hashAlgorithm, "hashAlgorithm"));
+    return hashAlgorithms.contains(Args.notNull(hashAlgorithm, "hashAlgorithm"));
   }
 
   public TripleState getSourceDataUriOccurrence() {

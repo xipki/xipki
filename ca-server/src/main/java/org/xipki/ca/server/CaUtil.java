@@ -25,14 +25,10 @@ import org.xipki.util.*;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import static org.xipki.util.Args.notEmpty;
-import static org.xipki.util.Args.notNull;
 
 /**
  * Util class of CA.
@@ -139,8 +135,7 @@ public class CaUtil {
 
   public static CRLDistPoint createCrlDistributionPoints(
       List<String> crlUris, X500Name caSubject, X500Name crlSignerSubject) {
-    notEmpty(crlUris, "crlUris");
-    int size = crlUris.size();
+    int size = Args.notEmpty(crlUris, "crlUris").size();
     DistributionPoint[] points = new DistributionPoint[1];
 
     GeneralName[] names = new GeneralName[size];
@@ -162,7 +157,7 @@ public class CaUtil {
   } // method createCrlDistributionPoints
 
   public static X500Name sortX509Name(X500Name name) {
-    RDN[] requestedRdns = notNull(name, "name").getRDNs();
+    RDN[] requestedRdns = Args.notNull(name, "name").getRDNs();
     List<RDN> rdns = new LinkedList<>();
 
     List<ASN1ObjectIdentifier> sortedDNs = SubjectDnSpec.getForwardDNs();
@@ -182,8 +177,8 @@ public class CaUtil {
   } // method sortX509Name
 
   private static RDN[] getRdns(RDN[] rdns, ASN1ObjectIdentifier type) {
-    notNull(rdns, "rdns");
-    notNull(type, "type");
+    Args.notNull(rdns, "rdns");
+    Args.notNull(type, "type");
     List<RDN> ret = new ArrayList<>(1);
     for (RDN rdn : rdns) {
       if (rdn.getFirst().getType().equals(type)) {
@@ -308,23 +303,13 @@ public class CaUtil {
     return list;
   } // method getPermissions
 
-  public static String encodeCertchain(List<X509Cert> certs) throws CaMgmtException {
-    try {
-      return X509Util.encodeCertificates(certs.toArray(new X509Cert[0]));
-    } catch (CertificateException | IOException ex) {
-      throw new CaMgmtException(ex);
-    }
-  } // method encodeCertchain
+  public static String encodeCertchain(List<X509Cert> certs) {
+    return X509Util.encodeCertificates(certs.toArray(new X509Cert[0]));
+  }
 
   public static List<X509Cert> buildCertChain(X509Cert targetCert, List<X509Cert> certs)
       throws CaMgmtException {
-    X509Cert[] certchain;
-    try {
-      certchain = X509Util.buildCertPath(targetCert, certs, false);
-    } catch (CertPathBuilderException ex) {
-      throw new CaMgmtException(ex);
-    }
-
+    X509Cert[] certchain = X509Util.buildCertPath(targetCert, certs, false);
     if (certchain == null || certs.size() != certchain.length) {
       throw new CaMgmtException("could not build certchain containing all specified certs");
     }

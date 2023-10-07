@@ -32,6 +32,7 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Base64Url;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
@@ -41,9 +42,6 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.xipki.util.Base64Url.decodeFast;
 
 /**
  * Contains utility methods that are frequently used for the ACME protocol.
@@ -67,7 +65,7 @@ public final class AcmeUtils {
     }
 
     /**
-     * Parses a RFC 3339 formatted date.
+     * Parses an RFC 3339 formatted date.
      *
      * @param str
      *            Date string
@@ -113,14 +111,14 @@ public final class AcmeUtils {
     public static PublicKey jwkPublicKey(Map<String, String> jwk) throws InvalidKeySpecException {
         String kty = jwk.get("kty");
         if ("RSA".equalsIgnoreCase(kty)) {
-            BigInteger n = new BigInteger(1, decodeFast(jwk.get("n")));
-            BigInteger e = new BigInteger(1, decodeFast(jwk.get("e")));
+            BigInteger n = new BigInteger(1, Base64Url.decodeFast(jwk.get("n")));
+            BigInteger e = new BigInteger(1, Base64Url.decodeFast(jwk.get("e")));
             return KeyUtil.generateRSAPublicKey(new RSAPublicKeySpec(n, e));
         } else if ("EC".equalsIgnoreCase(kty)) {
             String curveName = jwk.get("crv");
             ASN1ObjectIdentifier curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
-            byte[] x = decodeFast(jwk.get("x"));
-            byte[] y = decodeFast(jwk.get("y"));
+            byte[] x = Base64Url.decodeFast(jwk.get("x"));
+            byte[] y = Base64Url.decodeFast(jwk.get("y"));
             byte[] encodedPoint = buildECPublicKeyData(curveOid, x, y);
             return KeyUtil.createECPublicKey(curveOid, encodedPoint);
         } else {
@@ -145,8 +143,8 @@ public final class AcmeUtils {
                 return false;
             }
 
-            BigInteger n = new BigInteger(1, decodeFast(jwk.get("n")));
-            BigInteger e = new BigInteger(1, decodeFast(jwk.get("e")));
+            BigInteger n = new BigInteger(1, Base64Url.decodeFast(jwk.get("n")));
+            BigInteger e = new BigInteger(1, Base64Url.decodeFast(jwk.get("e")));
 
             ASN1Sequence seq = ASN1Sequence.getInstance(pkInfo.getPublicKeyData().getOctets());
             BigInteger n2 = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
@@ -170,8 +168,8 @@ public final class AcmeUtils {
                 return false;
             }
 
-            byte[] x = decodeFast(jwk.get("x"));
-            byte[] y = decodeFast(jwk.get("y"));
+            byte[] x = Base64Url.decodeFast(jwk.get("x"));
+            byte[] y = Base64Url.decodeFast(jwk.get("y"));
             byte[] encodedPoint = buildECPublicKeyData(curveOid, x, y);
             return Arrays.equals(pkInfo.getPublicKeyData().getBytes(), encodedPoint);
         } else {
@@ -247,10 +245,6 @@ public final class AcmeUtils {
         return Base64Url.encodeToStringNoPadding(Pack.longToLittleEndian(label));
     }
 
-    public static String toBase64(int label) {
-        return Base64Url.encodeToStringNoPadding(Pack.intToLittleEndian(label));
-    }
-
     public static String jwkSha256(Map<String, String> jwk) {
         List<String> jwkNames = new ArrayList<>(jwk.keySet());
         Collections.sort(jwkNames);
@@ -264,7 +258,7 @@ public final class AcmeUtils {
         canonJwk.append("}");
 
         return Base64Url.encodeToStringNoPadding(
-            HashAlgo.SHA256.hash(canonJwk.toString().getBytes(UTF_8)));
+            HashAlgo.SHA256.hash(canonJwk.toString().getBytes(StandardCharsets.UTF_8)));
     }
 
 }

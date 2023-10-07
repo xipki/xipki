@@ -33,8 +33,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 import static org.xipki.qa.ca.extn.CheckerUtil.*;
-import static org.xipki.util.CollectionUtil.isEmpty;
-import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**
  * Checker for extensions whose name is from A to G.
@@ -109,7 +107,7 @@ class A2gChecker extends ExtensionChecker {
     Set<String> expOcspUris = (aiaControl == null || aiaControl.isIncludesOcsp())
         ? issuerInfo.getOcspUrls() : Collections.emptySet();
 
-    if (isEmpty(expCaIssuerUris) && isEmpty(expOcspUris)) {
+    if (CollectionUtil.isEmpty(expCaIssuerUris) && CollectionUtil.isEmpty(expOcspUris)) {
       failureMsg.append("AIA is present but expected is 'none'; ");
       return;
     }
@@ -339,7 +337,7 @@ class A2gChecker extends ExtensionChecker {
       }
 
       List<PolicyQualifier> expCpPq = expCp.getPolicyQualifiers();
-      if (isEmpty(expCpPq)) {
+      if (CollectionUtil.isEmpty(expCpPq)) {
         continue;
       }
 
@@ -436,12 +434,12 @@ class A2gChecker extends ExtensionChecker {
 
       Set<String> expCrlUrls = deltaCrl ? issuerInfo.getDeltaCrlUrls() : issuerInfo.getCrlUrls();
       Set<String> diffs = strInBnotInA(expCrlUrls, isCrlUrls);
-      if (isNotEmpty(diffs)) {
+      if (CollectionUtil.isNotEmpty(diffs)) {
         failureMsg.append("URLs of ").append(type).append(" ").append(diffs).append(" are present but not expected; ");
       }
 
       diffs = strInBnotInA(isCrlUrls, expCrlUrls);
-      if (isNotEmpty(diffs)) {
+      if (CollectionUtil.isNotEmpty(diffs)) {
         failureMsg.append("URLs of ").append(type).append(" ").append(diffs).append(" are absent but are required; ");
       }
     }
@@ -468,7 +466,7 @@ class A2gChecker extends ExtensionChecker {
     }
 
     Set<ExtKeyUsageControl> optionalExtKeyusage = caller.getExtKeyusage(false);
-    if (requestedExtns != null && extnControl.isPermittedInRequest() && isNotEmpty(optionalExtKeyusage)) {
+    if (requestedExtns != null && extnControl.isPermittedInRequest() && CollectionUtil.isNotEmpty(optionalExtKeyusage)) {
       Extension extension = requestedExtns.getExtension(Extension.extendedKeyUsage);
       if (extension != null) {
         org.bouncycastle.asn1.x509.ExtendedKeyUsage reqKeyUsage =
@@ -481,7 +479,7 @@ class A2gChecker extends ExtensionChecker {
       }
     }
 
-    if (isEmpty(expectedUsages)) {
+    if (CollectionUtil.isEmpty(expectedUsages)) {
       byte[] constantExtValue = caller.getConstantExtensionValue(Extension.extendedKeyUsage);
       if (constantExtValue != null) {
         expectedUsages = getExtKeyUsage(constantExtValue);
@@ -489,12 +487,12 @@ class A2gChecker extends ExtensionChecker {
     }
 
     Set<String> diffs = strInBnotInA(expectedUsages, isUsages);
-    if (isNotEmpty(diffs)) {
+    if (CollectionUtil.isNotEmpty(diffs)) {
       failureMsg.append("usages ").append(diffs).append(" are present but not expected; ");
     }
 
     diffs = strInBnotInA(isUsages, expectedUsages);
-    if (isNotEmpty(diffs)) {
+    if (CollectionUtil.isNotEmpty(diffs)) {
       failureMsg.append("usages ").append(diffs).append(" are absent but are required; ");
     }
   } // method checkExtnExtendedKeyUsage

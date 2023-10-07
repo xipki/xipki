@@ -630,7 +630,7 @@ public class CaMgmtClient implements CaManager {
     byte[] respBytes = transmit(MgmtAction.getCert, req);
     MgmtResponse.GetCert resp = parse(respBytes, MgmtResponse.GetCert.class);
     try {
-      return resp.getResult().toCertWithRevocationInfo();
+      return resp.getResult() == null ? null : resp.getResult().toCertWithRevocationInfo();
     } catch (CertificateException ex) {
       throw new CaMgmtException("could not parse the certificate", ex);
     }

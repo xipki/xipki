@@ -20,8 +20,6 @@ import org.xipki.util.CollectionUtil;
 import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -52,7 +50,7 @@ public class NextCaMessage {
   }
 
   public void setRaCerts(List<X509Cert> raCerts) {
-    this.raCerts = CollectionUtil.isEmpty(raCerts) ? null : Collections.unmodifiableList(new ArrayList<>(raCerts));
+    this.raCerts = CollectionUtil.isEmpty(raCerts) ? null : List.copyOf(raCerts);
   }
 
   public ContentInfo encode(PrivateKey signingKey, X509Cert signerCert, X509Cert[] cmsCertSet)

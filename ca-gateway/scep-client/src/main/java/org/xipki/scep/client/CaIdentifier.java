@@ -4,14 +4,13 @@
 package org.xipki.scep.client;
 
 import org.xipki.scep.transaction.Operation;
-import org.xipki.scep.transaction.TransactionException;
 import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * CA identifier.
@@ -49,7 +48,7 @@ public class CaIdentifier {
     return profile;
   }
 
-  public String buildGetUrl(Operation operation) throws TransactionException {
+  public String buildGetUrl(Operation operation) {
     return buildGetUrl(operation, null);
   }
 
@@ -60,11 +59,7 @@ public class CaIdentifier {
 
     if (StringUtil.isNotBlank(message)) {
       String urlMessage;
-      try {
-        urlMessage = URLEncoder.encode(message, "UTF-8");
-      } catch (UnsupportedEncodingException ex) {
-        urlMessage = URLEncoder.encode(message);
-      }
+      urlMessage = URLEncoder.encode(message, StandardCharsets.UTF_8);
       ub.append("&message=").append(urlMessage);
     }
     return ub.toString();

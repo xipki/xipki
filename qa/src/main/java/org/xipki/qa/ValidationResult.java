@@ -3,13 +3,12 @@
 
 package org.xipki.qa;
 
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import static org.xipki.util.Args.notEmpty;
 
 /**
  * Validation result consisting of failed validation issues and successful issues.
@@ -31,7 +30,7 @@ public class ValidationResult {
   }
 
   public ValidationResult(List<ValidationIssue> validationIssues) {
-    this.validationIssues = notEmpty(validationIssues, "validationIssues");
+    this.validationIssues = Args.notEmpty(validationIssues, "validationIssues");
 
     List<ValidationIssue> failedIssues = new LinkedList<>();
     List<ValidationIssue> successfulIssues = new LinkedList<>();

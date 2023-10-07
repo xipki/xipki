@@ -113,7 +113,7 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
       while (!stopMe) {
         try {
           try {
-            Thread.sleep(syncDbSeconds * 1000); // sleep for syncDbSeconds.
+            Thread.sleep(syncDbSeconds * 1000L); // sleep for syncDbSeconds.
           } catch (InterruptedException e) {
           }
 
@@ -318,11 +318,9 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
   }
 
   public Iterator<ChallId> getChallengesToValidate() throws AcmeSystemException {
-    List<ChallId> ids =  new LinkedList<>();
-
     // from database
     List<ChallId> dbIds = dataSource.getChallengesToValidate();
-    ids.addAll(dbIds);
+    List<ChallId> ids = new LinkedList<>(dbIds);
 
     // from cache
     for (Long id : orderCache.keySnapshot()) {
@@ -338,9 +336,7 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
             ids.add(challId);
             break;
           } else {
-            if (ids.contains(challId)) {
-              ids.remove(challId);
-            }
+            ids.remove(challId);
           }
         } // end AcmeChallenge-for
       } // end AcmeAuthz-for
@@ -350,11 +346,9 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
   }
 
   public Iterator<Long> getOrdersToEnroll() throws AcmeSystemException {
-    List<Long> ids = new LinkedList<>();
-
     // add those from database
     List<Long> dbIds = dataSource.getOrdersToEnroll();
-    ids.addAll(dbIds);
+    List<Long> ids = new LinkedList<>(dbIds);
 
     // from cache
     for (Long id : orderCache.keySnapshot()) {
@@ -366,9 +360,7 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
           ids.add(id);
         }
       } else {
-        if (ids.contains(id)) {
-          ids.remove(id);
-        }
+        ids.remove(id);
       }
     }
 

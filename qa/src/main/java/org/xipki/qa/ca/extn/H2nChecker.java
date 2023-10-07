@@ -18,6 +18,7 @@ import org.xipki.ca.certprofile.xijson.conf.NameConstraints;
 import org.xipki.qa.ca.IssuerInfo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
 
 import java.math.BigInteger;
@@ -25,10 +26,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static org.xipki.qa.ca.extn.CheckerUtil.*;
-import static org.xipki.util.CollectionUtil.isEmpty;
-import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**
  * Checker for extensions whose name is from H to N.
@@ -63,7 +60,7 @@ class H2nChecker extends ExtensionChecker {
     ASN1Integer asn1Int = ASN1Integer.getInstance(extensionValue);
     int isSkipCerts = asn1Int.getPositiveValue().intValue();
     if (isSkipCerts != conf.getSkipCerts()) {
-      addViolation(failureMsg, "skipCerts", isSkipCerts, conf.getSkipCerts());
+      CheckerUtil.addViolation(failureMsg, "skipCerts", isSkipCerts, conf.getSkipCerts());
     }
   } // method checkExtnInhibitAnyPolicy
 
@@ -76,7 +73,8 @@ class H2nChecker extends ExtensionChecker {
     }
 
     if (!Arrays.equals(caSubjectAltExtensionValue, extensionValue)) {
-      addViolation(failureMsg, "issuerAltNames", hex(extensionValue), hex(caSubjectAltExtensionValue));
+      CheckerUtil.addViolation(failureMsg, "issuerAltNames",
+          CheckerUtil.hex(extensionValue), CheckerUtil.hex(caSubjectAltExtensionValue));
     }
   } // method checkExtnIssuerAltNames
 
@@ -103,7 +101,8 @@ class H2nChecker extends ExtensionChecker {
     }
 
     Set<KeyUsageControl> optionalKeyusage = getKeyusage(false);
-    if (requestedExtns != null && extnControl.isPermittedInRequest() && isNotEmpty(optionalKeyusage)) {
+    if (requestedExtns != null && extnControl.isPermittedInRequest()
+        && CollectionUtil.isNotEmpty(optionalKeyusage)) {
       Extension extension = requestedExtns.getExtension(Extension.keyUsage);
       if (extension != null) {
         org.bouncycastle.asn1.x509.KeyUsage reqKeyUsage =
@@ -116,20 +115,20 @@ class H2nChecker extends ExtensionChecker {
       }
     }
 
-    if (isEmpty(expectedUsages)) {
+    if (CollectionUtil.isEmpty(expectedUsages)) {
       byte[] constantExtValue = caller.getConstantExtensionValue(Extension.keyUsage);
       if (constantExtValue != null) {
-        expectedUsages = getKeyUsage(constantExtValue);
+        expectedUsages = CheckerUtil.getKeyUsage(constantExtValue);
       }
     }
 
     Set<String> diffs = CheckerUtil.strInBnotInA(expectedUsages, isUsages);
-    if (isNotEmpty(diffs)) {
+    if (CollectionUtil.isNotEmpty(diffs)) {
       failureMsg.append("usages ").append(diffs).append(" are present but not expected; ");
     }
 
     diffs = CheckerUtil.strInBnotInA(isUsages, expectedUsages);
-    if (isNotEmpty(diffs)) {
+    if (CollectionUtil.isNotEmpty(diffs)) {
       failureMsg.append("usages ").append(diffs).append(" are absent but are required; ");
     }
   } // method checkExtnKeyUsage
@@ -172,7 +171,7 @@ class H2nChecker extends ExtensionChecker {
     int isSize = (subtrees == null) ? 0 : subtrees.length;
     int expSize = (expectedSubtrees == null) ? 0 : expectedSubtrees.size();
     if (isSize != expSize) {
-      addViolation(failureMsg, "size of " + description, isSize, expSize);
+      CheckerUtil.addViolation(failureMsg, "size of " + description, isSize, expSize);
       return;
     }
 
@@ -189,14 +188,14 @@ class H2nChecker extends ExtensionChecker {
       int expMinimum = (minimum == null) ? 0 : minimum;
       String desc = description + " [" + i + "]";
       if (isMinimum != expMinimum) {
-        addViolation(failureMsg, "minimum of " + desc, isMinimum, expMinimum);
+        CheckerUtil.addViolation(failureMsg, "minimum of " + desc, isMinimum, expMinimum);
       }
 
       bigInt = isSubtree.getMaximum();
       Integer isMaximum = (bigInt == null) ? null : bigInt.intValue();
       Integer expMaximum = expSubtree.getMaximum();
       if (!CompareUtil.equalsObject(isMaximum, expMaximum)) {
-        addViolation(failureMsg, "maxmum of " + desc, isMaximum, expMaximum);
+        CheckerUtil.addViolation(failureMsg, "maxmum of " + desc, isMaximum, expMaximum);
       }
 
       GeneralName isBase = isSubtree.getBase();
@@ -219,7 +218,7 @@ class H2nChecker extends ExtensionChecker {
       }
 
       if (!isBase.equals(expBase)) {
-        addViolation(failureMsg, "base of " + desc, isBase, expBase);
+        CheckerUtil.addViolation(failureMsg, "base of " + desc, isBase, expBase);
       }
     }
   } // method checkExtnNameConstraintsSubtrees

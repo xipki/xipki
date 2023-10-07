@@ -25,8 +25,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static org.xipki.util.DateUtil.toEpochSecond;
-
 /**
  * Database importer of OCSP CertStore.
  *
@@ -130,8 +128,8 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
           int idx = 1;
           ps.setInt(idx++, issuer.getId());
           ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
-          ps.setLong(idx++, toEpochSecond(cert.getTBSCertificate().getStartDate().getDate()));
-          ps.setLong(idx++, toEpochSecond(cert.getTBSCertificate().getEndDate().getDate()));
+          ps.setLong(idx++, DateUtil.toEpochSecond(cert.getTBSCertificate().getStartDate().getDate()));
+          ps.setLong(idx++, DateUtil.toEpochSecond(cert.getTBSCertificate().getEndDate().getDate()));
           ps.setString(idx++, sha1(encodedCert));
           ps.setString(idx++, issuer.getRevInfo());
           ps.setString(idx++, b64Cert);

@@ -13,6 +13,7 @@ import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Base64Url;
+import org.xipki.util.CompareUtil;
 
 import java.security.SecureRandom;
 import java.sql.PreparedStatement;
@@ -21,12 +22,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import static org.xipki.util.CompareUtil.equalsObject;
+import java.util.*;
 
 /**
  *
@@ -319,9 +315,9 @@ public class AcmeDataSource {
 
     // ACCOUNT_ID,STATUS,EXPIRES,CSR,AUTHZS
     boolean updateStatus = oldOrder.getStatus() != newOrder.getStatus();
-    boolean updateExpires = !equalsObject(oldOrder.getExpires(), newOrder.getExpires());
-    boolean updateAuthzs = !equalsObject(oldOrder.getAuthzs(), newOrder.getAuthzs());
-    boolean updateCertReqMeta = !equalsObject(oldOrder.getCertReqMeta(), newOrder.getCertReqMeta());
+    boolean updateExpires = !CompareUtil.equalsObject(oldOrder.getExpires(), newOrder.getExpires());
+    boolean updateAuthzs = !CompareUtil.equalsObject(oldOrder.getAuthzs(), newOrder.getAuthzs());
+    boolean updateCertReqMeta = !CompareUtil.equalsObject(oldOrder.getCertReqMeta(), newOrder.getCertReqMeta());
     boolean updateCsr = newOrder.getCsr() != null; // we do not read cert from database to save the bandwidth
     boolean updateCert = newOrder.getCert() != null; // we do not read cert from database to save the bandwidth
 
@@ -472,9 +468,7 @@ public class AcmeDataSource {
 
     AcmeAuthz[] authzs = JSON.parseObject(authzsStr, AcmeAuthz[].class);
     List<AcmeAuthz> list = new ArrayList<>(authzs.length);
-    for (AcmeAuthz authz : authzs) {
-      list.add(authz);
-    }
+    Collections.addAll(list, authzs);
     order.setAuthzs(list);
 
     return order;

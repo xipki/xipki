@@ -20,6 +20,7 @@ import org.xipki.qa.ValidationResult;
 import org.xipki.security.*;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.DateUtil;
 import org.xipki.util.TripleState;
 
@@ -29,9 +30,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.time.Instant;
 import java.util.*;
-
-import static org.xipki.util.Args.notEmpty;
-import static org.xipki.util.Args.notNull;
 
 /**
  * OCSP QA.
@@ -45,7 +43,7 @@ public class OcspQa {
   private final SecurityFactory securityFactory;
 
   public OcspQa(SecurityFactory securityFactory) {
-    this.securityFactory = notNull(securityFactory, "securityFactory");
+    this.securityFactory = Args.notNull(securityFactory, "securityFactory");
   }
 
   public ValidationResult checkOcsp(
@@ -78,8 +76,8 @@ public class OcspQa {
   } // method checkOcsp
 
   public ValidationResult checkOcsp(OCSPResp response, OcspError expectedOcspError) {
-    notNull(response, "response");
-    notNull(expectedOcspError, "expectedOcspError");
+    Args.notNull(response, "response");
+    Args.notNull(expectedOcspError, "expectedOcspError");
 
     List<ValidationIssue> resultIssues = new LinkedList<>();
 
@@ -100,10 +98,10 @@ public class OcspQa {
       OCSPResp response, IssuerHash issuerHash, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts,
       Map<BigInteger, OcspCertStatus> expectedOcspStatuses, Map<BigInteger, Instant> expectedRevTimes,
       OcspResponseOption responseOption, boolean noSigVerify) {
-    notNull(response, "response");
-    notEmpty(serialNumbers, "serialNumbers");
-    notEmpty(expectedOcspStatuses, "expectedOcspStatuses");
-    notNull(responseOption, "responseOption");
+    Args.notNull(response, "response");
+    Args.notEmpty(serialNumbers, "serialNumbers");
+    Args.notEmpty(expectedOcspStatuses, "expectedOcspStatuses");
+    Args.notNull(responseOption, "responseOption");
 
     List<ValidationIssue> resultIssues = new LinkedList<>();
 

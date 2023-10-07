@@ -14,6 +14,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Hex;
+import org.xipki.util.SqlUtil;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
 
@@ -30,10 +31,6 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.xipki.util.SqlUtil.buildInsertSql;
-import static org.xipki.util.exception.ErrorCode.DATABASE_FAILURE;
-import static org.xipki.util.exception.ErrorCode.SYSTEM_FAILURE;
 
 /**
  * Base class to exec the database queries to manage CA system.
@@ -95,9 +92,9 @@ public class CertStoreBase extends QueryExecutor {
 
     String addCertSql = "ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,FP_SAN,NBEFORE,NAFTER,REV,PID,CA_ID,RID,EE,TID,SHA1," +
                     "REQ_SUBJECT,CRL_SCOPE,CERT,PRIVATE_KEY";
-    this.SQL_ADD_CERT = buildInsertSql("CERT", addCertSql);
+    this.SQL_ADD_CERT = SqlUtil.buildInsertSql("CERT", addCertSql);
 
-    this.SQL_ADD_CRL = buildInsertSql("CRL", "ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE," +
+    this.SQL_ADD_CRL = SqlUtil.buildInsertSql("CRL", "ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE," +
         "DELTACRL,BASECRL_NO,CRL_SCOPE,SHA1,CRL");
 
     updateDbInfo(passwordResolver);
@@ -154,7 +151,7 @@ public class CertStoreBase extends QueryExecutor {
     try {
       return datasource.getMax(null, table, column);
     } catch (DataAccessException ex) {
-      throw new OperationException(DATABASE_FAILURE, ex.getMessage());
+      throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
     }
   }
 
@@ -215,16 +212,14 @@ public class CertStoreBase extends QueryExecutor {
     try {
       return datasource.prepareStatement(sqlQuery);
     } catch (DataAccessException ex) {
-      throw new OperationException(DATABASE_FAILURE, ex);
+      throw new OperationException(ErrorCode.DATABASE_FAILURE, ex);
     }
   } // method borrowPrepStatement
 
   protected static String buildArraySql(DataSourceWrapper datasource, String prefix, int num) {
     StringBuilder sb = new StringBuilder(prefix.length() + num * 2);
     sb.append(prefix).append(" IN (?");
-    for (int i = 1; i < num; i++) {
-      sb.append(",?");
-    }
+    sb.append(",?".repeat(Math.max(0, num - 1)));
     sb.append(")");
     return datasource.buildSelectFirstSql(num, sb.toString());
   }
@@ -233,7 +228,7 @@ public class CertStoreBase extends QueryExecutor {
     try {
       return X509Util.parseCert(encodedCert);
     } catch (CertificateException ex) {
-      throw new OperationException(SYSTEM_FAILURE, ex);
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
     }
   }
 

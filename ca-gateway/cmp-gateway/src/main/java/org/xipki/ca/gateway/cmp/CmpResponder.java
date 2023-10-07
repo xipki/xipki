@@ -632,10 +632,7 @@ public class CmpResponder extends BaseCmpResponder {
       } else {
         throw new IllegalStateException("should not reach here");
       } // switch type
-    } catch (OperationException e) {
-      LogUtil.error(LOG, e);
-      return buildErrorMsgPkiBody(rejection, systemFailure, null);
-    } catch (IOException e) {
+    } catch (OperationException | IOException e) {
       LogUtil.error(LOG, e);
       return buildErrorMsgPkiBody(rejection, systemFailure, null);
     }

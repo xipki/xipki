@@ -6,11 +6,9 @@ package org.xipki.ocsp.server;
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.Responder;
 import org.xipki.ocsp.server.OcspServerConf.ResponseOption;
+import org.xipki.util.Args;
 
 import java.util.List;
-
-import static org.xipki.util.Args.notEmpty;
-import static org.xipki.util.Args.notNull;
 
 /**
  * Implementation of {@link Responder}.
@@ -34,11 +32,11 @@ public class ResponderImpl implements Responder {
   ResponderImpl(
       ResponderOption responderOption, RequestOption requestOption,
       ResponseOption responseOption, ResponseSigner signer, List<OcspStore> stores) {
-    this.responderOption = notNull(responderOption, "responderOption");
-    this.requestOption = notNull(requestOption, "requestOption");
-    this.responseOption = notNull(responseOption, "responseOption");
-    this.signer = notNull(signer, "signer");
-    this.stores = notEmpty(stores, "stores");
+    this.responderOption = Args.notNull(responderOption, "responderOption");
+    this.requestOption = Args.notNull(requestOption, "requestOption");
+    this.responseOption = Args.notNull(responseOption, "responseOption");
+    this.signer = Args.notNull(signer, "signer");
+    this.stores = Args.notEmpty(stores, "stores");
   }
 
   public ResponderOption getResponderOption() {

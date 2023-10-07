@@ -11,13 +11,11 @@ import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.server.RequestorEntryWrapper;
+import org.xipki.util.Args;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static org.xipki.util.Args.*;
-import static org.xipki.util.StringUtil.concat;
 
 /**
  * Manages the requestors.
@@ -34,7 +32,7 @@ class RequestorManager {
   private final CaManagerImpl manager;
 
   RequestorManager(CaManagerImpl manager) {
-    this.manager = notNull(manager, "manager");
+    this.manager = Args.notNull(manager, "manager");
   }
 
   void reset() {
@@ -73,11 +71,10 @@ class RequestorManager {
   void addRequestor(RequestorEntry requestorEntry) throws CaMgmtException {
     manager.assertMasterMode();
 
-    notNull(requestorEntry, "requestorEntry");
-    String name = requestorEntry.getIdent().getName();
+    String name = Args.notNull(requestorEntry, "requestorEntry").getIdent().getName();
     CaManagerImpl.checkName(name, "requestor name");
     if (manager.requestorDbEntries.containsKey(name)) {
-      throw new CaMgmtException(concat("Requestor named ", name, " exists"));
+      throw new CaMgmtException("Requestor " + name + " exists");
     }
 
     RequestorEntryWrapper requestor = new RequestorEntryWrapper();
@@ -92,7 +89,7 @@ class RequestorManager {
   void removeRequestor(String name) throws CaMgmtException {
     manager.assertMasterMode();
 
-    name = toNonBlankLower(name, "name");
+    name = Args.toNonBlankLower(name, "name");
 
     for (String caName : manager.caHasRequestors.keySet()) {
       boolean removeMe = false;
@@ -121,13 +118,13 @@ class RequestorManager {
   void changeRequestor(String name, String type, String conf) throws CaMgmtException {
     manager.assertMasterMode();
 
-    name = toNonBlankLower(name, "name");
-    notBlank(type, "type");
-    notBlank(conf, "conf");
+    name = Args.toNonBlankLower(name, "name");
+    Args.notBlank(type, "type");
+    Args.notBlank(conf, "conf");
 
     NameId ident = manager.idNameMap.getRequestor(name);
     if (ident == null) {
-      throw manager.logAndCreateException(concat("unknown requestor ", name));
+      throw manager.logAndCreateException("unknown requestor " + name);
     }
 
     RequestorEntryWrapper requestor = manager.queryExecutor.changeRequestor(ident, type, conf,
@@ -143,11 +140,11 @@ class RequestorManager {
   void removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException {
     manager.assertMasterMode();
 
-    requestorName = toNonBlankLower(requestorName, "requestorName");
-    caName = toNonBlankLower(caName, "caName");
+    requestorName = Args.toNonBlankLower(requestorName, "requestorName");
+    caName = Args.toNonBlankLower(caName, "caName");
 
     if (requestorName.equals(RequestorInfo.NAME_BY_CA)) {
-      throw new CaMgmtException(concat("removing requestor ", requestorName, " is not permitted"));
+      throw new CaMgmtException("removing requestor " + requestorName + " is not permitted");
     }
 
     manager.queryExecutor.removeRequestorFromCa(requestorName, caName);
@@ -166,18 +163,17 @@ class RequestorManager {
   void addRequestorToCa(CaHasRequestorEntry requestor, String caName) throws CaMgmtException {
     manager.assertMasterMode();
 
-    notNull(requestor, "requestor");
-    caName = toNonBlankLower(caName, "caName");
+    caName = Args.toNonBlankLower(caName, "caName");
 
-    NameId requestorIdent = requestor.getRequestorIdent();
+    NameId requestorIdent = Args.notNull(requestor, "requestor").getRequestorIdent();
     NameId ident = manager.idNameMap.getRequestor(requestorIdent.getName());
     if (ident == null) {
-      throw manager.logAndCreateException(concat("unknown requestor ", requestorIdent.getName()));
+      throw manager.logAndCreateException("unknown requestor " + requestorIdent.getName());
     }
 
     NameId caIdent = manager.idNameMap.getCa(caName);
     if (caIdent == null) {
-      String msg = concat("unknown CA ", caName);
+      String msg = "unknown CA " + caName;
       LOG.warn(msg);
       throw new CaMgmtException(msg);
     }
@@ -193,7 +189,7 @@ class RequestorManager {
       for (CaHasRequestorEntry entry : cmpRequestors) {
         String requestorName = requestorIdent.getName();
         if (entry.getRequestorIdent().getName().equals(requestorName)) {
-          String msg = concat("Requestor ", requestorName, " already associated with CA ", caName);
+          String msg = "Requestor " + requestorName + " already associated with CA " + caName;
           throw manager.logAndCreateException(msg);
         }
       }

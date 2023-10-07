@@ -9,10 +9,9 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.cmp.PkiStatusInfo;
 import org.xipki.cmp.client.IdentifiedObject;
+import org.xipki.util.Args;
 
 import java.math.BigInteger;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * Result entry.
@@ -101,8 +100,8 @@ abstract class ResultEntry extends IdentifiedObject {
 
     UnrevokeOrRemoveCert(String id, X500Name issuer, BigInteger serialNumber) {
       super(id);
-      this.serialNumber = notNull(serialNumber, "serialNumber");
-      this.issuer = notNull(issuer, "issuer");
+      this.serialNumber = Args.notNull(serialNumber, "serialNumber");
+      this.issuer = Args.notNull(issuer, "issuer");
     }
 
     X500Name getIssuer() {

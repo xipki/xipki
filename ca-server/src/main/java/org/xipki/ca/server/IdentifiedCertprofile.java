@@ -23,6 +23,7 @@ import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.Validity;
@@ -35,7 +36,6 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import static org.xipki.ca.server.CertprofileUtil.*;
-import static org.xipki.util.Args.notNull;
 
 /**
  * CertProfiel with identifier.
@@ -51,8 +51,8 @@ public class IdentifiedCertprofile implements Closeable {
 
   public IdentifiedCertprofile(CertprofileEntry dbEntry, Certprofile certprofile)
       throws CertprofileException {
-    this.dbEntry = notNull(dbEntry, "dbEntry");
-    this.certprofile = notNull(certprofile, "certprofile");
+    this.dbEntry = Args.notNull(dbEntry, "dbEntry");
+    this.certprofile = Args.notNull(certprofile, "certprofile");
 
     this.certprofile.initialize(dbEntry.getConf());
     if (this.certprofile.getCertLevel() != CertLevel.EndEntity && this.certprofile.hasNoWellDefinedExpirationDate()) {
@@ -281,7 +281,7 @@ public class IdentifiedCertprofile implements Closeable {
       SubjectPublicKeyInfo publicKeyInfo, PublicCaInfo publicCaInfo, X509Cert crlSignerCert,
       Instant notBefore, Instant notAfter)
       throws CertprofileException, BadCertTemplateException {
-    notNull(publicKeyInfo, "publicKeyInfo");
+    Args.notNull(publicKeyInfo, "publicKeyInfo");
     ExtensionValues values = new ExtensionValues();
 
     Map<ASN1ObjectIdentifier, ExtensionControl> controls = new HashMap<>(certprofile.getExtensionControls());
@@ -672,7 +672,7 @@ public class IdentifiedCertprofile implements Closeable {
 
   public SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
       throws CertprofileException, BadCertTemplateException {
-    return certprofile.checkPublicKey(notNull(publicKey, "publicKey"));
+    return certprofile.checkPublicKey(Args.notNull(publicKey, "publicKey"));
   }
 
   public SubjectKeyIdentifier getSubjectKeyIdentifier(SubjectPublicKeyInfo publicKey)

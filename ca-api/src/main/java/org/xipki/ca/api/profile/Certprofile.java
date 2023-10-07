@@ -45,9 +45,9 @@ public abstract class Certprofile implements Closeable {
         boolean includesCaIssuers, boolean includesOcsp, Set<String> caIssuersProtocols, Set<String> ocspProtocols) {
       this.includesCaIssuers = includesCaIssuers;
       this.includesOcsp = includesOcsp;
-      this.ocspProtocols = ocspProtocols == null ? null : Collections.unmodifiableSet(new HashSet<>(ocspProtocols));
+      this.ocspProtocols = ocspProtocols == null ? null : Set.copyOf(ocspProtocols);
       this.caIssuersProtocols = caIssuersProtocols == null
-          ? null : Collections.unmodifiableSet(new HashSet<>(caIssuersProtocols));
+          ? null : Set.copyOf(caIssuersProtocols);
     }
 
     public boolean isIncludesCaIssuers() {
@@ -73,7 +73,7 @@ public abstract class Certprofile implements Closeable {
     private final Set<String> protocols;
 
     public CrlDistributionPointsControl(Set<String> protocols) {
-      this.protocols = protocols == null ? null : Collections.unmodifiableSet(new HashSet<>(protocols));
+      this.protocols = protocols == null ? null : Set.copyOf(protocols);
     }
 
     public Set<String> getProtocols() {

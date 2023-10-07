@@ -28,6 +28,7 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.ctlog.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.Validity;
 import org.xipki.util.exception.BadCertTemplateException;
@@ -39,7 +40,6 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import static org.xipki.qa.ca.extn.CheckerUtil.*;
-import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**
  * Checker for extensions whose name is from O to T.
@@ -136,7 +136,7 @@ class O2tChecker extends ExtensionChecker {
       }
     }
 
-    if (isNotEmpty(isMap)) {
+    if (CollectionUtil.isNotEmpty(isMap)) {
       failureMsg.append("issuerDomainPolicies '").append(isMap.keySet()).append("' are present but not expected; ");
     }
   } // method checkExtnMappings
@@ -267,13 +267,13 @@ class O2tChecker extends ExtensionChecker {
           }
 
           Set<String> diffs = CheckerUtil.strInBnotInA(expectedPdsLocations, pdsLocations);
-          if (isNotEmpty(diffs)) {
+          if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append("statementInfo[").append(i).append("]: ").append(diffs)
               .append(" are present but not expected; ");
           }
 
           diffs = CheckerUtil.strInBnotInA(pdsLocations, expectedPdsLocations);
-          if (isNotEmpty(diffs)) {
+          if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append("statementInfo[").append(i).append("]: ").append(diffs)
               .append(" are absent but are required; ");
           }
@@ -622,24 +622,24 @@ class O2tChecker extends ExtensionChecker {
 
     if (!countryOfCitizenshipList.isEmpty()) {
       Set<String> diffs = strInBnotInA(expCountryOfCitizenshipList, countryOfCitizenshipList);
-      if (isNotEmpty(diffs)) {
+      if (CollectionUtil.isNotEmpty(diffs)) {
         failureMsg.append("countryOfCitizenship ").append(diffs).append(" are present but not expected; ");
       }
 
       diffs = strInBnotInA(countryOfCitizenshipList, expCountryOfCitizenshipList);
-      if (isNotEmpty(diffs)) {
+      if (CollectionUtil.isNotEmpty(diffs)) {
         failureMsg.append("countryOfCitizenship ").append(diffs).append(" are absent but are required; ");
       }
     }
 
     if (!countryOfResidenceList.isEmpty()) {
       Set<String> diffs = strInBnotInA(expCountryOfResidenceList, countryOfResidenceList);
-      if (isNotEmpty(diffs)) {
+      if (CollectionUtil.isNotEmpty(diffs)) {
         failureMsg.append("countryOfResidence ").append(diffs).append(" are present but not expected; ");
       }
 
       diffs = strInBnotInA(countryOfResidenceList, expCountryOfResidenceList);
-      if (isNotEmpty(diffs)) {
+      if (CollectionUtil.isNotEmpty(diffs)) {
         failureMsg.append("countryOfResidence ").append(diffs).append(" are absent but are required; ");
       }
     }
@@ -767,12 +767,12 @@ class O2tChecker extends ExtensionChecker {
     }
 
     Set<String> diffs = strInBnotInA(expFeatures, isFeatures);
-    if (isNotEmpty(diffs)) {
+    if (CollectionUtil.isNotEmpty(diffs)) {
       failureMsg.append("features ").append(diffs).append(" are present but not expected; ");
     }
 
     diffs = strInBnotInA(isFeatures, expFeatures);
-    if (isNotEmpty(diffs)) {
+    if (CollectionUtil.isNotEmpty(diffs)) {
       failureMsg.append("features ").append(diffs).append(" are absent but are required; ");
     }
   } // method checkExtnTlsFeature

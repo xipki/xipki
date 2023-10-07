@@ -39,9 +39,6 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.Map.Entry;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-
 /**
  * Certprofile configured by JSON.
  *
@@ -104,11 +101,9 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   @Override
   public void initialize(String data) throws CertprofileException {
-    notBlank(data, "data");
-
     X509ProfileType conf;
     try {
-      byte[] bytes = StringUtil.toUtf8Bytes(data);
+      byte[] bytes = StringUtil.toUtf8Bytes(Args.notBlank(data, "data"));
       conf = X509ProfileType.parse(bytes);
     } catch (RuntimeException ex) {
       LogUtil.error(LOG, ex);
@@ -120,7 +115,7 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initialize
 
   public void initialize(X509ProfileType conf) throws CertprofileException {
-    notNull(conf, "conf");
+    Args.notNull(conf, "conf");
 
     reset();
     try {
@@ -178,9 +173,9 @@ public class XijsonCertprofile extends BaseCertprofile {
 
     this.serialNumberMode = conf.getSerialNumberMode();
 
-    if (kg == null || (kg.getForbidden() != null && kg.getForbidden().booleanValue())) {
+    if (kg == null || booleanValue(kg.getForbidden(), false)) {
       this.keypairGenControl = KeypairGenControl.ForbiddenKeypairGenControl.INSTANCE;
-    } else if (kg.getInheritCA() != null && kg.getInheritCA().booleanValue()) {
+    } else if (booleanValue(kg.getInheritCA(), false)) {
       this.keypairGenControl = KeypairGenControl.InheritCAKeypairGenControl.INSTANCE;
     } else {
       KeyType keyType = kg.getKeyType();
@@ -324,12 +319,11 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   @Override
   protected void verifySubjectDnOccurrence(X500Name requestedSubject) throws BadCertTemplateException {
-    notNull(requestedSubject, "requestedSubject");
+    ASN1ObjectIdentifier[] types = Args.notNull(requestedSubject, "requestedSubject").getAttributeTypes();
 
     Map<ASN1ObjectIdentifier, GeneralNameTag> subjectToSubjectAltNameModes =
         extensions.getSubjectToSubjectAltNameModes();
 
-    ASN1ObjectIdentifier[] types = requestedSubject.getAttributeTypes();
     for (ASN1ObjectIdentifier type : types) {
       RdnControl occu = subjectControl.getControl(type);
       if (occu == null) {
@@ -391,9 +385,9 @@ public class XijsonCertprofile extends BaseCertprofile {
       return values;
     }
 
-    notNull(requestedSubject, "requestedSubject");
-    notNull(notBefore, "notBefore");
-    notNull(notAfter, "notAfter");
+    Args.notNull(requestedSubject, "requestedSubject");
+    Args.notNull(notBefore, "notBefore");
+    Args.notNull(notAfter, "notAfter");
 
     Set<ASN1ObjectIdentifier> occurrences = new HashSet<>(extensionControls.keySet());
 
@@ -1066,6 +1060,14 @@ public class XijsonCertprofile extends BaseCertprofile {
   @Override
   public org.bouncycastle.asn1.x509.CertificatePolicies getCertificatePolicies() {
     return extensions.getCertificatePolicies();
+  }
+
+  private static boolean booleanValue(Boolean boolObj, boolean dfltValue) {
+    if (boolObj == null) {
+      return dfltValue;
+    } else {
+      return boolObj;
+    }
   }
 
 }

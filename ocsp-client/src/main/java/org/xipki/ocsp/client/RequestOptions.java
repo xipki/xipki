@@ -5,11 +5,10 @@ package org.xipki.ocsp.client;
 
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
+import org.xipki.util.Args;
 
 import java.util.Arrays;
 import java.util.List;
-
-import static org.xipki.util.Args.positive;
 
 /**
  * OCSP request options.
@@ -50,7 +49,7 @@ public class RequestOptions {
   }
 
   public void setNonceLen(int nonceLen) {
-    this.nonceLen = positive(nonceLen, "nonceLen");
+    this.nonceLen = Args.positive(nonceLen, "nonceLen");
   }
 
   public HashAlgo getHashAlgorithm() {

@@ -183,7 +183,12 @@ class OcspCertstoreDbExporter extends DbPorter {
   } // method exportCrlInfo
 
   private Exception exportCert(OcspCertstore certstore, File processLogFile) {
-    new File(baseDir, OcspDbEntryType.CERT.getDirName()).mkdirs();
+    try {
+      IoUtil.mkdirs(new File(baseDir, OcspDbEntryType.CERT.getDirName()));
+    } catch (IOException ex) {
+      LOG.error("IO Exception", ex);
+      return ex;
+    }
 
     OutputStream certsFileOs = null;
 
@@ -341,7 +346,7 @@ class OcspCertstoreDbExporter extends DbPorter {
 
             String currentCertsFilename = buildFilename("certs_", ".zip",
                 minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxId);
-            currentCertsZipFile.renameTo(new File(certsDir, currentCertsFilename));
+            IoUtil.renameTo(currentCertsZipFile, new File(certsDir, currentCertsFilename));
 
             writeLine(certsFileOs, currentCertsFilename);
             certstore.setCountCerts(numProcessedBefore + sum);
@@ -372,7 +377,7 @@ class OcspCertstoreDbExporter extends DbPorter {
 
         String currentCertsFilename = buildFilename("certs_", ".zip",
             minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxId);
-        currentCertsZipFile.renameTo(new File(certsDir, currentCertsFilename));
+        IoUtil.renameTo(currentCertsZipFile, new File(certsDir, currentCertsFilename));
 
         writeLine(certsFileOs, currentCertsFilename);
         certstore.setCountCerts(numProcessedBefore + sum);

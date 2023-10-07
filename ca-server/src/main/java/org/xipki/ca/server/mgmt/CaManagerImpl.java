@@ -46,11 +46,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.toNonBlankLower;
-import static org.xipki.util.StringUtil.concat;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Manages the CA system.
@@ -488,8 +484,9 @@ public class CaManagerImpl implements CaManager, Closeable {
       LOG.info("loaded datasource.{}", datasourceName);
       return datasource;
     } catch (DataAccessException | PasswordResolverException | IOException | RuntimeException ex) {
-      throw new CaMgmtException(concat(ex.getClass().getName(),
-          " while parsing datasource ", datasourceName, ": ", ex.getMessage()), ex);
+      throw new CaMgmtException(
+          ex.getClass().getName() + " while parsing datasource " + datasourceName + ": " + ex.getMessage(),
+          ex);
     }
   } // method loadDatasource
 
@@ -514,10 +511,10 @@ public class CaManagerImpl implements CaManager, Closeable {
       Instant lockedAt = Instant.ofEpochSecond(lockInfo.getEventTime());
 
       if (!this.lockInstanceId.equals(lockedBy)) {
-        String msg = concat("could not lock CA, it has been locked by ", lockedBy, " since ",
-            lockedAt.toString(),  ". In general this indicates that another CA software in master mode is "
+        String msg = "could not lock CA, it has been locked by " + lockedBy + " since " +
+            lockedAt +  ". In general this indicates that another CA software in master mode is "
                 + "accessing the database or the last shutdown of CA software in master mode is abnormal. "
-                + "If you know what you do, you can unlock it executing the ca:unlock command.");
+                + "If you know what you do, you can unlock it executing the ca:unlock command.";
         throw logAndCreateException(msg);
       }
 
@@ -750,7 +747,8 @@ public class CaManagerImpl implements CaManager, Closeable {
       if (!masterMode && persistentScheduledThreadPoolExecutor == null) {
         persistentScheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
         persistentScheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
-        persistentScheduledThreadPoolExecutor.scheduleAtFixedRate(new CaRestarter(), 300, 300, SECONDS);
+        persistentScheduledThreadPoolExecutor.scheduleAtFixedRate(new CaRestarter(),
+            300, 300, TimeUnit.SECONDS);
       }
     }
 
@@ -795,7 +793,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       try {
         dataSource.close();
       } catch (Exception ex) {
-        LogUtil.warn(LOG, ex, concat("could not close datasource " + name));
+        LogUtil.warn(LOG, ex, "could not close datasource " + name);
       }
     }
 
@@ -813,7 +811,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     try {
       Audits.getAuditService().close();
     } catch (Exception ex) {
-      LogUtil.warn(LOG, ex, concat("could not close audit service"));
+      LogUtil.warn(LOG, ex, "could not close audit service");
     }
   } // method close
 
@@ -877,7 +875,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public CaEntry getCa(String name) {
-    CaInfo caInfo = caInfos.get(toNonBlankLower(name, "name"));
+    CaInfo caInfo = caInfos.get(Args.toNonBlankLower(name, "name"));
     return (caInfo == null) ? null : caInfo.getCaEntry();
   }
 
@@ -908,21 +906,21 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public Set<String> getCertprofilesForCa(String caName) {
-    return caHasProfiles.get(toNonBlankLower(caName, "caName"));
+    return caHasProfiles.get(Args.toNonBlankLower(caName, "caName"));
   }
 
   @Override
   public Set<CaHasRequestorEntry> getRequestorsForCa(String caName) {
-    return caHasRequestors.get(toNonBlankLower(caName, "caName"));
+    return caHasRequestors.get(Args.toNonBlankLower(caName, "caName"));
   }
 
   @Override
   public RequestorEntry getRequestor(String name) {
-    return requestorDbEntries.get(toNonBlankLower(name, "name"));
+    return requestorDbEntries.get(Args.toNonBlankLower(name, "name"));
   }
 
   public RequestorEntryWrapper getRequestorWrapper(String name) {
-    return requestors.get(toNonBlankLower(name, "name"));
+    return requestors.get(Args.toNonBlankLower(name, "name"));
   }
 
   @Override
@@ -1017,11 +1015,11 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public SignerEntry getSigner(String name) {
-    return signerDbEntries.get(toNonBlankLower(name, "name"));
+    return signerDbEntries.get(Args.toNonBlankLower(name, "name"));
   }
 
   public SignerEntryWrapper getSignerWrapper(String name) {
-    return signers.get(toNonBlankLower(name, "name"));
+    return signers.get(Args.toNonBlankLower(name, "name"));
   }
 
   @Override
@@ -1036,7 +1034,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public PublisherEntry getPublisher(String name) {
-    return publisherDbEntries.get(toNonBlankLower(name, "name"));
+    return publisherDbEntries.get(Args.toNonBlankLower(name, "name"));
   }
 
   @Override
@@ -1050,7 +1048,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   public void setCaServerConf(CaServerConf caServerConf) {
-    this.caServerConf = notNull(caServerConf, "caServerConf");
+    this.caServerConf = Args.notNull(caServerConf, "caServerConf");
   }
 
   @Override
@@ -1173,13 +1171,13 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   public KeypairGenerator getKeypairGenerator(String keypairGenName) {
-    keypairGenName = toNonBlankLower(keypairGenName, "keypairGenName");
+    keypairGenName = Args.toNonBlankLower(keypairGenName, "keypairGenName");
     KeypairGenEntryWrapper keypairGen = keypairGens.get(keypairGenName);
     return keypairGen == null ? null : keypairGen.getGenerator();
   }
 
   public IdentifiedCertprofile getIdentifiedCertprofile(String profileName) {
-    return certprofiles.get(toNonBlankLower(profileName, "profileName"));
+    return certprofiles.get(Args.toNonBlankLower(profileName, "profileName"));
   }
 
   public List<IdentifiedCertPublisher> getIdentifiedPublishersForCa(String caName) {

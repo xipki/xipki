@@ -150,8 +150,6 @@ class TargetDigestReader implements Closeable {
 
   private final ProcessLog processLog;
 
-  private final List<Retriever> retrievers;
-
   public TargetDigestReader(boolean revokedOnly, ProcessLog processLog, RefDigestReader reader,
       DigestDiffReporter reporter, DataSourceWrapper datasource, DbType dbType,
       HashAlgo certHashAlgo, int caId, int numPerSelect, int numThreads, AtomicBoolean stopMe)
@@ -187,9 +185,7 @@ class TargetDigestReader implements Closeable {
     if (dbType == DbType.XIPKI_OCSP_v4) {
       singleSql = StringUtil.concat("REV,RR,RT,RIT,HASH FROM CERT WHERE IID=", Integer.toString(caId), " AND SN=?");
       arrayBuffer.append("SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=").append(caId).append(" AND SN IN (?");
-      for (int i = 1; i < numPerSelect; i++) {
-        arrayBuffer.append(",?");
-      }
+      arrayBuffer.append(",?".repeat(Math.max(0, numPerSelect - 1)));
       arrayBuffer.append(")");
     } else {
       String hashOrCertColumn;
@@ -205,16 +201,14 @@ class TargetDigestReader implements Closeable {
       arrayBuffer.append("SN,REV,RR,RT,RIT,").append(hashOrCertColumn)
           .append(" FROM CERT WHERE CA_ID=").append(caId).append(" AND SN IN (?");
 
-      for (int i = 1; i < numPerSelect; i++) {
-        arrayBuffer.append(",?");
-      }
+      arrayBuffer.append(",?".repeat(Math.max(0, numPerSelect - 1)));
       arrayBuffer.append(")");
     }
 
     singleCertSql = datasource.buildSelectFirstSql(1, singleSql);
     inArrayCertsSql = datasource.buildSelectFirstSql(numPerSelect, arrayBuffer.toString());
 
-    retrievers = new ArrayList<>(numThreads);
+    List<Retriever> retrievers = new ArrayList<>(numThreads);
 
     try {
       for (int i = 0; i < numThreads; i++) {
@@ -223,8 +217,8 @@ class TargetDigestReader implements Closeable {
       }
 
       executor = Executors.newFixedThreadPool(numThreads);
-      for (Runnable runnable : retrievers) {
-        executor.execute(runnable);
+      for (Retriever retriever : retrievers) {
+        executor.execute(retriever);
       }
     } catch (Exception ex) {
       close();

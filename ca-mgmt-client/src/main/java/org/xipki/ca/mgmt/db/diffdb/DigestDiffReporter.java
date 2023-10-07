@@ -56,7 +56,7 @@ class DigestDiffReporter implements Closeable {
       throws IOException {
     this.reportDirname = Args.notBlank(reportDirname, "reportDirname");
     File dir = new File(reportDirname);
-    dir.mkdirs();
+    IoUtil.mkdirs(dir);
     IoUtil.save(new File(dir, "ca.der"), caCertBytes);
 
     String dirPath = dir.getPath();

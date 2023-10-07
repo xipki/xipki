@@ -15,26 +15,19 @@ import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.cert.ocsp.*;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.ReqRespDebug;
+import org.xipki.util.*;
 import org.xipki.util.ReqRespDebug.ReqRespPair;
-import org.xipki.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
 import java.security.SecureRandom;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.positive;
 
 /**
  * Abstract class of OCSP requestor.
@@ -81,15 +74,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
   public OCSPResp ask(X509Cert issuerCert, X509Cert cert, URL responderUrl,
                       RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException {
-    notNull(issuerCert, "issuerCert");
-    notNull(cert, "cert");
-
-    try {
-      if (!X509Util.issues(issuerCert, cert)) {
-        throw new IllegalArgumentException("cert and issuerCert do not match");
-      }
-    } catch (CertificateEncodingException ex) {
-      throw new OcspRequestorException(ex.getMessage(), ex);
+    if (!X509Util.issues(Args.notNull(issuerCert, "issuerCert"), Args.notNull(cert, "cert"))) {
+      throw new IllegalArgumentException("cert and issuerCert do not match");
     }
 
     return ask(issuerCert, new BigInteger[]{cert.getSerialNumber()}, responderUrl, requestOptions, debug);
@@ -99,19 +85,15 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
   public OCSPResp ask(X509Cert issuerCert, X509Cert[] certs, URL responderUrl,
                       RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException {
-    notNull(issuerCert, "issuerCert");
-    notNull(certs, "certs");
-    positive(certs.length, "certs.length");
+    Args.notNull(issuerCert, "issuerCert");
+    Args.notNull(certs, "certs");
+    Args.positive(certs.length, "certs.length");
 
     BigInteger[] serialNumbers = new BigInteger[certs.length];
     for (int i = 0; i < certs.length; i++) {
       X509Cert cert = certs[i];
-      try {
-        if (!X509Util.issues(issuerCert, cert)) {
-          throw new IllegalArgumentException("cert at index " + i + " and issuerCert do not match");
-        }
-      } catch (CertificateEncodingException ex) {
-        throw new OcspRequestorException(ex.getMessage(), ex);
+      if (!X509Util.issues(issuerCert, cert)) {
+        throw new IllegalArgumentException("cert at index " + i + " and issuerCert do not match");
       }
       serialNumbers[i] = cert.getSerialNumber();
     }
@@ -130,12 +112,11 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
   public OCSPResp ask(X509Cert issuerCert, BigInteger[] serialNumbers, URL responderUrl,
                       RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException {
-    notNull(issuerCert, "issuerCert");
-    notNull(requestOptions, "requestOptions");
-    notNull(responderUrl, "responderUrl");
+    Args.notNull(issuerCert, "issuerCert");
+    Args.notNull(responderUrl, "responderUrl");
 
     byte[] nonce = null;
-    if (requestOptions.isUseNonce()) {
+    if (Args.notNull(requestOptions, "requestOptions").isUseNonce()) {
       nonce = nextNonce(requestOptions.getNonceLen());
     }
 

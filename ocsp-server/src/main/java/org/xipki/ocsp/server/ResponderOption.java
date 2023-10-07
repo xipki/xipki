@@ -3,14 +3,13 @@
 
 package org.xipki.ocsp.server;
 
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * Responder option.
@@ -43,8 +42,7 @@ class ResponderOption {
   private final List<String> servletPaths;
 
   ResponderOption(OcspServerConf.Responder conf) throws InvalidConfException {
-    notNull(conf, "conf");
-    String str = conf.getMode();
+    String str = Args.notNull(conf, "conf").getMode();
     if (str == null || StringUtil.orEqualsIgnoreCase(str, "RFC6960", "RFC 6960")) {
       this.mode = OcspMode.RFC6960;
     } else if (StringUtil.orEqualsIgnoreCase(str, "RFC2560", "RFC 2560")) {

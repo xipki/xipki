@@ -10,6 +10,7 @@ import org.xipki.ca.api.profile.Certprofile.GeneralNameMode;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.security.KeyUsage;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.Hex;
 import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.util.exception.InvalidConfException;
@@ -17,9 +18,6 @@ import org.xipki.util.exception.InvalidConfException;
 import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
-
-import static org.xipki.util.CollectionUtil.isEmpty;
-import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**
  * Extensions checker.
@@ -67,7 +65,7 @@ public class CheckerUtil {
       map.put(oid, extension);
     }
 
-    if (isEmpty(map)) {
+    if (CollectionUtil.isEmpty(map)) {
       return null;
     }
 
@@ -232,13 +230,13 @@ public class CheckerUtil {
     }
 
     Set<String> diffs = strInBnotInA(expectedUris, isUris);
-    if (isNotEmpty(diffs)) {
+    if (CollectionUtil.isNotEmpty(diffs)) {
       failureMsg.append(typeDesc).append(" URIs ").append(diffs);
       failureMsg.append(" are present but not expected; ");
     }
 
     diffs = strInBnotInA(isUris, expectedUris);
-    if (isNotEmpty(diffs)) {
+    if (CollectionUtil.isNotEmpty(diffs)) {
       failureMsg.append(typeDesc).append(" URIs ").append(diffs);
       failureMsg.append(" are absent but are required; ");
     }

@@ -20,10 +20,7 @@ import org.xipki.qa.ca.extn.ExtensionsChecker;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.Validity;
+import org.xipki.util.*;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -32,8 +29,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.LinkedList;
 import java.util.List;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * QA for Certprofile.
@@ -62,11 +57,11 @@ public class CertprofileQa {
   private final XijsonCertprofile certprofile;
 
   public CertprofileQa(String data) throws CertprofileException {
-    this(StringUtil.toUtf8Bytes(notNull(data, "data")));
+    this(StringUtil.toUtf8Bytes(Args.notNull(data, "data")));
   }
 
   public CertprofileQa(byte[] dataBytes) throws CertprofileException {
-    notNull(dataBytes, "dataBytes");
+    Args.notNull(dataBytes, "dataBytes");
     try {
       X509ProfileType conf = X509ProfileType.parse(dataBytes);
       certprofile = new XijsonCertprofile();
@@ -84,10 +79,10 @@ public class CertprofileQa {
   public ValidationResult checkCert(
       byte[] certBytes, IssuerInfo issuerInfo, X500Name requestedSubject,
       SubjectPublicKeyInfo requestedPublicKey, Extensions requestedExtensions) {
-    notNull(certBytes, "certBytes");
-    notNull(issuerInfo, "issuerInfo");
-    notNull(requestedSubject, "requestedSubject");
-    notNull(requestedPublicKey, "requestedPublicKey");
+    Args.notNull(certBytes, "certBytes");
+    Args.notNull(issuerInfo, "issuerInfo");
+    Args.notNull(requestedSubject, "requestedSubject");
+    Args.notNull(requestedPublicKey, "requestedPublicKey");
 
     List<ValidationIssue> resultIssues = new LinkedList<>();
 

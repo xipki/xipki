@@ -4,8 +4,7 @@
 package org.xipki.cmp;
 
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
-
-import static org.xipki.util.Args.notNull;
+import org.xipki.util.Args;
 
 /**
  * PKI message with verification result.
@@ -21,7 +20,7 @@ public class VerifiedPkiMessage {
   private ProtectionVerificationResult protectionVerificationResult;
 
   public VerifiedPkiMessage(GeneralPKIMessage pkiMessage) {
-    this.pkiMessage = notNull(pkiMessage,"pkiMessage");
+    this.pkiMessage = Args.notNull(pkiMessage,"pkiMessage");
   }
 
   public boolean hasProtection() {

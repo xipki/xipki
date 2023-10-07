@@ -5,16 +5,13 @@ package org.xipki.qa.ca;
 
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 
 import java.security.cert.CertificateException;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.CollectionUtil.isEmpty;
 
 /**
  * Certificate issuer information.
@@ -41,13 +38,13 @@ public class IssuerInfo {
       List<String> caIssuerUrls, List<String> ocspUrls, List<String> crlUrls,
       List<String> deltaCrlUrls, byte[] certBytes, boolean cutoffNotAfter)
       throws CertificateException {
-    notNull(certBytes, "certBytes");
+    Args.notNull(certBytes, "certBytes");
 
     this.cutoffNotAfter = cutoffNotAfter;
-    this.caIssuerUrls = isEmpty(caIssuerUrls) ? null : Collections.unmodifiableSet(new HashSet<>(caIssuerUrls));
-    this.ocspUrls = isEmpty(ocspUrls) ? null : Collections.unmodifiableSet(new HashSet<>(ocspUrls));
-    this.crlUrls = isEmpty(crlUrls) ? null : Collections.unmodifiableSet(new HashSet<>(crlUrls));
-    this.deltaCrlUrls = isEmpty(deltaCrlUrls) ? null : Collections.unmodifiableSet(new HashSet<>(deltaCrlUrls));
+    this.caIssuerUrls = CollectionUtil.isEmpty(caIssuerUrls) ? null : Set.copyOf(caIssuerUrls);
+    this.ocspUrls = CollectionUtil.isEmpty(ocspUrls) ? null : Set.copyOf(ocspUrls);
+    this.crlUrls = CollectionUtil.isEmpty(crlUrls) ? null : Set.copyOf(crlUrls);
+    this.deltaCrlUrls = CollectionUtil.isEmpty(deltaCrlUrls) ? null : Set.copyOf(deltaCrlUrls);
     this.cert = X509Util.parseCert(certBytes);
   } // constructor
 

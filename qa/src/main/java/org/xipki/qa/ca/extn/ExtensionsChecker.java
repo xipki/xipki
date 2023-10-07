@@ -24,14 +24,14 @@ import org.xipki.qa.ca.IssuerInfo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.X509Cert;
+import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
 import static org.xipki.qa.ca.extn.CheckerUtil.*;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**
  * Extensions checker.
@@ -81,12 +81,10 @@ public class ExtensionsChecker {
 
   public ExtensionsChecker(X509ProfileType conf, XijsonCertprofile certprofile)
       throws CertprofileException {
-    this.certprofile = notNull(certprofile, "certprofile");
-
-    notNull(conf, "conf");
+    this.certprofile = Args.notNull(certprofile, "certprofile");
 
     // Extensions
-    Map<String, ExtensionType> extensions = conf.buildExtensions();
+    Map<String, ExtensionType> extensions = Args.notNull(conf, "conf").buildExtensions();
 
     // Extension controls
     Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls = certprofile.getExtensionControls();
@@ -297,11 +295,9 @@ public class ExtensionsChecker {
 
   public List<ValidationIssue> checkExtensions(
       Certificate cert, IssuerInfo issuerInfo, Extensions requestedExtns, X500Name requestedSubject) {
-    notNull(cert, "cert");
-    notNull(issuerInfo, "issuerInfo");
+    Args.notNull(issuerInfo, "issuerInfo");
 
-    X509Cert jceCert = new X509Cert(cert);
-
+    X509Cert jceCert = new X509Cert(Args.notNull(cert, "cert"));
     List<ValidationIssue> result = new LinkedList<>();
 
     // detect the list of extension types in certificate
@@ -485,7 +481,7 @@ public class ExtensionsChecker {
 
       if (!required) {
         Set<KeyUsageControl> requiredKeyusage = h2nChecker.getKeyusage(true);
-        if (isNotEmpty(requiredKeyusage)) {
+        if (CollectionUtil.isNotEmpty(requiredKeyusage)) {
           required = true;
         }
       }
@@ -556,7 +552,7 @@ public class ExtensionsChecker {
 
       if (!required) {
         Set<ExtKeyUsageControl> requiredExtKeyusage = getExtKeyusage(true);
-        if (isNotEmpty(requiredExtKeyusage)) {
+        if (CollectionUtil.isNotEmpty(requiredExtKeyusage)) {
           required = true;
         }
       }

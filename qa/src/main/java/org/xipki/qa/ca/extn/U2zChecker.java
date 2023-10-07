@@ -9,8 +9,6 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.security.ObjectIdentifiers.Extn;
 
-import static org.xipki.qa.ca.extn.CheckerUtil.addViolation;
-
 /**
  * Checker for extensions whose name is from U to Z.
  * @author Lijun Liao (xipki)
@@ -34,7 +32,7 @@ class U2zChecker extends ExtensionChecker {
     ASN1Sequence seq = ASN1Sequence.getInstance(extensionValue);
     ASN1ObjectIdentifier extValue = ASN1ObjectIdentifier.getInstance(seq.getObjectAt(0));
     if (!conf.equals(extValue)) {
-      addViolation(failureMsg, "content", extValue, conf);
+      CheckerUtil.addViolation(failureMsg, "content", extValue, conf);
     }
   } // method checkExtnValidityModel
 

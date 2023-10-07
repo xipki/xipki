@@ -24,7 +24,6 @@ import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.KeypairGenControl;
 import org.xipki.ca.api.profile.NotAfterMode;
 import org.xipki.ca.server.X509Ca.GrantedCertTemplate;
-import org.xipki.ca.server.db.CertStore;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.KeypairGenerator;
 import org.xipki.security.XiSecurityException;
@@ -63,13 +62,10 @@ class GrandCertTemplateBuilder {
   private final ASN1ObjectIdentifier keyAlgOidByImplicitCA;
   private final String keyspecByImplicitCA;
 
-  private final CertStore certstore;
-
   private final CaInfo caInfo;
 
-  GrandCertTemplateBuilder(CaInfo caInfo, CertStore certstore) {
+  GrandCertTemplateBuilder(CaInfo caInfo) {
     this.caInfo = caInfo;
-    this.certstore = certstore;
 
     this.keyspecByImplicitCA = caInfo.getCaKeyspec();
     this.keyAlgOidByImplicitCA = caInfo.getCaKeyAlgId().getAlgorithm();

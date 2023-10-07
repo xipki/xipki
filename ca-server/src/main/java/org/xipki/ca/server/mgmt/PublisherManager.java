@@ -13,15 +13,14 @@ import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.server.CaIdNameMap;
 import org.xipki.ca.server.IdentifiedCertPublisher;
 import org.xipki.ca.server.X509Ca;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 import org.xipki.util.exception.ObjectCreationException;
 
 import java.util.*;
 import java.util.Map.Entry;
-
-import static org.xipki.util.Args.*;
-import static org.xipki.util.StringUtil.concat;
 
 /**
  * Manages the publishers.
@@ -39,7 +38,7 @@ class PublisherManager {
   private final CaManagerImpl manager;
 
   PublisherManager(CaManagerImpl manager) {
-    this.manager = notNull(manager, "manager");
+    this.manager = Args.notNull(manager, "manager");
   }
 
   void reset() {
@@ -88,8 +87,8 @@ class PublisherManager {
   void removePublisherFromCa(String publisherName, String caName) throws CaMgmtException {
     manager.assertMasterMode();
 
-    publisherName = toNonBlankLower(publisherName, "publisherName");
-    caName = toNonBlankLower(caName, "caName");
+    publisherName = Args.toNonBlankLower(publisherName, "publisherName");
+    caName = Args.toNonBlankLower(caName, "caName");
 
     manager.queryExecutor.removePublisherFromCa(publisherName, caName);
 
@@ -102,19 +101,19 @@ class PublisherManager {
   void addPublisherToCa(String publisherName, String caName) throws CaMgmtException {
     manager.assertMasterMode();
 
-    publisherName = toNonBlankLower(publisherName, "publisherName");
-    caName = toNonBlankLower(caName, "caName");
+    publisherName = Args.toNonBlankLower(publisherName, "publisherName");
+    caName = Args.toNonBlankLower(caName, "caName");
 
     CaIdNameMap idNameMap = manager.idNameMap;
 
     NameId ident = idNameMap.getPublisher(publisherName);
     if (ident == null) {
-      throw manager.logAndCreateException(concat("unknown publisher ", publisherName));
+      throw manager.logAndCreateException(StringUtil.concat("unknown publisher ", publisherName));
     }
 
     NameId caIdent = idNameMap.getCa(caName);
     if (caIdent == null) {
-      throw manager.logAndCreateException(concat("unknown CA ", caName));
+      throw manager.logAndCreateException(StringUtil.concat("unknown CA ", caName));
     }
 
     Set<String> publisherNames = manager.caHasPublishers.get(caName);
@@ -123,14 +122,14 @@ class PublisherManager {
       manager.caHasPublishers.put(caName, publisherNames);
     } else {
       if (publisherNames.contains(publisherName)) {
-        String msg = concat("publisher ", publisherName, " already associated with CA ", caName);
+        String msg = StringUtil.concat("publisher ", publisherName, " already associated with CA ", caName);
         throw manager.logAndCreateException(msg);
       }
     }
 
     IdentifiedCertPublisher publisher = manager.publishers.get(publisherName);
     if (publisher == null) {
-      throw new CaMgmtException(concat("publisher '", publisherName, "' is faulty"));
+      throw new CaMgmtException(StringUtil.concat("publisher '", publisherName, "' is faulty"));
     }
 
     manager.queryExecutor.addPublisherToCa(idNameMap.getPublisher(publisherName), caIdent);
@@ -143,12 +142,10 @@ class PublisherManager {
   void addPublisher(PublisherEntry entry) throws CaMgmtException {
     manager.assertMasterMode();
 
-    notNull(entry, "entry");
-
-    String name = entry.getIdent().getName();
+    String name = Args.notNull(entry, "entry").getIdent().getName();
     CaManagerImpl.checkName(name, "publisher name");
     if (manager.publisherDbEntries.containsKey(name)) {
-      throw new CaMgmtException(concat("Publisher named ", name, " exists"));
+      throw new CaMgmtException(StringUtil.concat("Publisher named ", name, " exists"));
     }
 
     entry.faulty(true);
@@ -163,7 +160,7 @@ class PublisherManager {
   } // method addPublisher
 
   List<PublisherEntry> getPublishersForCa(String caName) {
-    caName = toNonBlankLower(caName, "caName");
+    caName = Args.toNonBlankLower(caName, "caName");
     Set<String> publisherNames = manager.caHasPublishers.get(caName);
     if (publisherNames == null) {
       return Collections.emptyList();
@@ -180,7 +177,7 @@ class PublisherManager {
   void removePublisher(String name) throws CaMgmtException {
     manager.assertMasterMode();
 
-    name = toNonBlankLower(name, "name");
+    name = Args.toNonBlankLower(name, "name");
 
     for (String caName : manager.caHasPublishers.keySet()) {
       if (manager.caHasPublishers.get(caName).contains(name)) {
@@ -202,7 +199,7 @@ class PublisherManager {
   void changePublisher(String name, String type, String conf) throws CaMgmtException {
     manager.assertMasterMode();
 
-    name = toNonBlankLower(name, "name");
+    name = Args.toNonBlankLower(name, "name");
 
     if (type == null && conf == null) {
       throw new IllegalArgumentException("nothing to change");
@@ -224,22 +221,22 @@ class PublisherManager {
       throws CaMgmtException {
     manager.assertMasterMode();
 
-    caName = toNonBlankLower(caName, "caName");
-    positive(numThreads, "numThreads");
+    caName = Args.toNonBlankLower(caName, "caName");
+    Args.positive(numThreads, "numThreads");
 
     X509Ca ca = manager.x509cas.get(caName);
     if (ca == null) {
-      throw new CaMgmtException(concat("could not find CA named ", caName));
+      throw new CaMgmtException(StringUtil.concat("could not find CA named ", caName));
     }
 
     publisherNames = CollectionUtil.toLowerCaseList(publisherNames);
     if (!ca.republishCerts(publisherNames, numThreads)) {
-      throw new CaMgmtException(concat("republishing certificates of CA ", caName, " failed"));
+      throw new CaMgmtException(StringUtil.concat("republishing certificates of CA ", caName, " failed"));
     }
   } // method republishCertificates
 
   List<IdentifiedCertPublisher> getIdentifiedPublishersForCa(String caName) {
-    caName = toNonBlankLower(caName, "caName");
+    caName = Args.toNonBlankLower(caName, "caName");
     List<IdentifiedCertPublisher> ret = new LinkedList<>();
     Set<String> publisherNames = manager.caHasPublishers.get(caName);
     if (publisherNames == null) {
@@ -266,8 +263,7 @@ class PublisherManager {
   } // method shutdownPublisher
 
   IdentifiedCertPublisher createPublisher(PublisherEntry entry) throws CaMgmtException {
-    notNull(entry, "entry");
-    String type = entry.getType();
+    String type = Args.notNull(entry, "entry").getType();
 
     CertPublisher publisher;
     IdentifiedCertPublisher ret;

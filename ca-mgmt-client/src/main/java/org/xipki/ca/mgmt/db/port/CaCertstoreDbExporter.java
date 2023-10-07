@@ -132,7 +132,12 @@ class CaCertstoreDbExporter extends DbPorter {
     String tablesText = "table " + type.getTableName();
 
     File dir = new File(baseDir, type.getDirName());
-    dir.mkdirs();
+    try {
+      IoUtil.mkdirs(dir);
+    } catch (IOException ex) {
+      LOG.error("IO Exception", ex);
+      return ex;
+    }
 
     OutputStream entriesFileOs = null;
     try {
@@ -360,7 +365,7 @@ class CaCertstoreDbExporter extends DbPorter {
             String currentEntriesFilename = buildFilename(type.getDirName() + "_", ".zip",
                 minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
             finalizeZip(currentEntriesZip, "overview.json", entriesInCurrentFile);
-            currentEntriesZipFile.renameTo(new File(entriesDir, currentEntriesFilename));
+            IoUtil.renameTo(currentEntriesZipFile, new File(entriesDir, currentEntriesFilename));
 
             writeLine(filenameListOs, currentEntriesFilename);
             setCount(type, certstore, numProcessedBefore + sum);
@@ -393,7 +398,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
         String currentEntriesFilename = buildFilename(type.getDirName() + "_", ".zip",
             minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
-        currentEntriesZipFile.renameTo(new File(entriesDir, currentEntriesFilename));
+        IoUtil.renameTo(currentEntriesZipFile, new File(entriesDir, currentEntriesFilename));
 
         writeLine(filenameListOs, currentEntriesFilename);
         setCount(type, certstore, numProcessedBefore + sum);
@@ -404,7 +409,6 @@ class CaCertstoreDbExporter extends DbPorter {
         currentEntriesZip.close();
         currentEntriesZipFile.delete();
       }
-
     } catch (SQLException ex) {
       throw translate(null, ex);
     } finally {

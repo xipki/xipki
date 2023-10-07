@@ -36,8 +36,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.xipki.util.Args.notNull;
-
 /**
  * Response cacher.
  *
@@ -139,9 +137,9 @@ public class ResponseCacher implements Closeable {
   private final AtomicInteger cachedIssuerId = new AtomicInteger(0);
 
   public ResponseCacher(DataSourceWrapper datasource, boolean master, Validity validity) {
-    this.datasource = notNull(datasource, "datasource");
+    this.datasource = Args.notNull(datasource, "datasource");
     this.master = master;
-    this.validity = (int) (notNull(validity, "validity").approxMinutes() * 60);
+    this.validity = (int) (Args.notNull(validity, "validity").approxMinutes() * 60);
     this.sqlSelectIssuerCert = datasource.buildSelectFirstSql(1, "CERT FROM ISSUER WHERE ID=?");
     this.sqlSelectOcsp = datasource.buildSelectFirstSql(1,
         "IID,IDENT,GENERATED_AT,NEXT_UPDATE,RESP FROM OCSP WHERE ID=?");

@@ -20,10 +20,7 @@ import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.DateUtil;
-import org.xipki.util.HourMinute;
-import org.xipki.util.LogUtil;
+import org.xipki.util.*;
 import org.xipki.util.exception.OperationException;
 
 import java.io.Closeable;
@@ -42,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.xipki.ca.sdk.CaAuditConstants.*;
-import static org.xipki.util.Args.notNull;
 import static org.xipki.util.exception.ErrorCode.*;
 
 /**
@@ -177,9 +173,9 @@ public class X509CrlModule extends X509CaModule implements Closeable {
 
     this.shardId = caManager.getShardId();
     this.publisher = publisher;
-    this.caManager = notNull(caManager, "caManager");
+    this.caManager = Args.notNull(caManager, "caManager");
     this.caCert = caInfo.getCert();
-    this.certstore = notNull(certstore, "certstore");
+    this.certstore = Args.notNull(certstore, "certstore");
 
     if (caInfo.getCrlControl() != null) {
       X509Cert crlSignerCert;

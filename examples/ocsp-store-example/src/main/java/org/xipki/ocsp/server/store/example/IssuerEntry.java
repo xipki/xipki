@@ -10,7 +10,6 @@ import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 
 import java.io.IOException;
-import java.security.cert.CertificateEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +26,7 @@ public class IssuerEntry {
 
   private final X509Cert cert;
 
-  public IssuerEntry(X509Cert cert) throws IOException, CertificateEncodingException {
+  public IssuerEntry(X509Cert cert) throws IOException {
     this.cert = Args.notNull(cert, "cert");
     byte[] encodedName = cert.getSubject().getEncoded("DER");
     byte[] encodedKey = cert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();

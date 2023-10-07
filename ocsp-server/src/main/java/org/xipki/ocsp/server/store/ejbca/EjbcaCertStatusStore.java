@@ -37,8 +37,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.xipki.util.Args.notNull;
-
 /**
  * OcspStore for the EJBCA database.
  *
@@ -423,7 +421,7 @@ public class EjbcaCertStatusStore extends OcspStore {
       }
     }
 
-    this.datasource = notNull(datasource, "datasource");
+    this.datasource = Args.notNull(datasource, "datasource");
 
     String coreSql = "notBefore,expireDate,status,revocationReason,revocationDate"
         + " FROM CertificateData WHERE cAFingerprint=? AND serialNumber=?";
@@ -431,24 +429,20 @@ public class EjbcaCertStatusStore extends OcspStore {
 
     sqlCsWithCertHash = datasource.buildSelectFirstSql(1, "fingerprint," + coreSql);
 
-    try {
-      Set<X509Cert> includeIssuers = null;
-      Set<X509Cert> excludeIssuers = null;
+    Set<X509Cert> includeIssuers = null;
+    Set<X509Cert> excludeIssuers = null;
 
-      if (caCerts != null) {
-        if (CollectionUtil.isNotEmpty(caCerts.getIncludes())) {
-          includeIssuers = parseCerts(caCerts.getIncludes());
-        }
-
-        if (CollectionUtil.isNotEmpty(caCerts.getExcludes())) {
-          excludeIssuers = parseCerts(caCerts.getExcludes());
-        }
+    if (caCerts != null) {
+      if (CollectionUtil.isNotEmpty(caCerts.getIncludes())) {
+        includeIssuers = parseCerts(caCerts.getIncludes());
       }
 
-      this.issuerFilter = new IssuerFilter(includeIssuers, excludeIssuers);
-    } catch (CertificateException ex) {
-      throw new OcspStoreException(ex.getMessage(), ex);
-    } // end try
+      if (CollectionUtil.isNotEmpty(caCerts.getExcludes())) {
+        excludeIssuers = parseCerts(caCerts.getExcludes());
+      }
+    }
+
+    this.issuerFilter = new IssuerFilter(includeIssuers, excludeIssuers);
 
     updateIssuerStore();
 

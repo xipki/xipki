@@ -13,14 +13,13 @@ import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * X509CA publisher module.
@@ -39,9 +38,9 @@ class X509PublisherModule extends X509CaModule {
   X509PublisherModule(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore) {
     super(caInfo);
 
-    this.caManager = notNull(caManager, "caManager");
+    this.caManager = Args.notNull(caManager, "caManager");
     this.caIdNameMap = caManager.idNameMap();
-    this.certstore = notNull(certstore, "certstore");
+    this.certstore = Args.notNull(certstore, "certstore");
 
     for (IdentifiedCertPublisher publisher : publishers()) {
       publisher.caAdded(caCert);
@@ -56,8 +55,7 @@ class X509PublisherModule extends X509CaModule {
    *     any publishers, 2: if could be published to CA certstore but not to all publishers.
    */
   int publishCert(CertificateInfo certInfo, boolean saveKeypair) {
-    notNull(certInfo, "certInfo");
-    if (certInfo.isAlreadyIssued()) {
+    if (Args.notNull(certInfo, "certInfo").isAlreadyIssued()) {
       return 0;
     }
 

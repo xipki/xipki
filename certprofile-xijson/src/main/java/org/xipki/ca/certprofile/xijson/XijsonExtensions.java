@@ -27,6 +27,7 @@ import org.xipki.ca.certprofile.xijson.conf.SubjectInfoAccess.Access;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
@@ -37,8 +38,6 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.Map.Entry;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * Extenions configuration.
@@ -112,10 +111,10 @@ public class XijsonExtensions {
 
   XijsonExtensions(XijsonCertprofile certProfile, X509ProfileType conf, SubjectControl subjectControl)
       throws CertprofileException {
-    notNull(subjectControl, "subjectControl");
+    Args.notNull(subjectControl, "subjectControl");
 
     // Extensions
-    Map<String, ExtensionType> extensions = notNull(conf, "conf").buildExtensions();
+    Map<String, ExtensionType> extensions = Args.notNull(conf, "conf").buildExtensions();
 
     // Extension controls
     this.extensionControls = conf.buildExtensionControls();

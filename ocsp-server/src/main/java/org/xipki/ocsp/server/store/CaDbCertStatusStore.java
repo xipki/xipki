@@ -22,12 +22,9 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.RandomUtil;
+import org.xipki.util.*;
 
 import java.math.BigInteger;
-import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -37,8 +34,6 @@ import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * OcspStore for XiPKI OCSP database.
@@ -423,7 +418,7 @@ public class CaDbCertStatusStore extends OcspStore {
       }
     }
 
-    this.datasource = notNull(datasource, "datasource");
+    this.datasource = Args.notNull(datasource, "datasource");
 
     sqlCs = datasource.buildSelectFirstSql(1, "NBEFORE,NAFTER,REV,RR,RT,RIT FROM CERT WHERE CA_ID=? AND SN=?");
     sqlCsNoRit = datasource.buildSelectFirstSql(1, "NBEFORE,NAFTER,REV,RR,RT FROM CERT WHERE CA_ID=? AND SN=?");
@@ -435,24 +430,20 @@ public class CaDbCertStatusStore extends OcspStore {
 
     this.certHashAlgo = HashAlgo.SHA1;
 
-    try {
-      Set<X509Cert> includeIssuers = null;
-      Set<X509Cert> excludeIssuers = null;
+    Set<X509Cert> includeIssuers = null;
+    Set<X509Cert> excludeIssuers = null;
 
-      if (caCerts != null) {
-        if (CollectionUtil.isNotEmpty(caCerts.getIncludes())) {
-          includeIssuers = DbCertStatusStore.parseCerts(caCerts.getIncludes());
-        }
-
-        if (CollectionUtil.isNotEmpty(caCerts.getExcludes())) {
-          excludeIssuers = DbCertStatusStore.parseCerts(caCerts.getExcludes());
-        }
+    if (caCerts != null) {
+      if (CollectionUtil.isNotEmpty(caCerts.getIncludes())) {
+        includeIssuers = DbCertStatusStore.parseCerts(caCerts.getIncludes());
       }
 
-      this.issuerFilter = new IssuerFilter(includeIssuers, excludeIssuers);
-    } catch (CertificateException ex) {
-      throw new OcspStoreException(ex.getMessage(), ex);
-    } // end try
+      if (CollectionUtil.isNotEmpty(caCerts.getExcludes())) {
+        excludeIssuers = DbCertStatusStore.parseCerts(caCerts.getExcludes());
+      }
+    }
+
+    this.issuerFilter = new IssuerFilter(includeIssuers, excludeIssuers);
 
     updateIssuerStore();
 

@@ -3,7 +3,7 @@
 
 package org.xipki.ca.server.db;
 
-import static org.xipki.util.Args.notBlank;
+import org.xipki.util.Args;
 
 /**
  * System event.
@@ -19,8 +19,8 @@ public class SystemEvent {
   private final long eventTime;
 
   public SystemEvent(String name, String owner, long eventTime) {
-    this.name = notBlank(name, "name");
-    this.owner = notBlank(owner, "owner");
+    this.name = Args.notBlank(name, "name");
+    this.owner = Args.notBlank(owner, "owner");
     this.eventTime = eventTime;
   }
 

@@ -27,8 +27,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.xipki.util.Args.notNull;
-
 /**
  * OcspStore for CRLs. Note that the CRLs will be imported to XiPKI OCSP database.
  *
@@ -158,7 +156,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
   public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource) throws OcspStoreException {
     // we need to canonicalize the configuration first
     new ConfPairs(sourceConf);
-    this.sourceConf = notNull(sourceConf, "sourceConf");
+    this.sourceConf = Args.notNull(sourceConf, "sourceConf");
 
     // check the dir
     this.dir = IoUtil.expandFilepath(getStrValue(sourceConf, "dir", true), true);
@@ -249,7 +247,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
         if (subDirs != null) {
           for (File subDir : subDirs) {
             if (subDir.isDirectory() && subDir.getName().startsWith("crl-")) {
-              new File(subDir, ".generated").mkdirs();
+              IoUtil.mkdirs(new File(subDir, ".generated"));
               withValidSubDirs = true;
             }
           }
@@ -486,7 +484,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
         String hashProp = hashAlgo + " " + Hex.encode(crlStream.getHashValue());
         IoUtil.save(new File(generatedDir, "new-ca.crl.fp"), hashProp.getBytes(StandardCharsets.UTF_8));
       }
-      tmpCrlFile.renameTo(new File(generatedDir, "new-ca.crl"));
+      IoUtil.renameTo(tmpCrlFile, new File(generatedDir, "new-ca.crl"));
       LOG.info(crlNumber == null ? "Downloaded CRL at first time" : "Downloaded CRL is newer than existing one");
       // notify the change
       updatemeFile.createNewFile();

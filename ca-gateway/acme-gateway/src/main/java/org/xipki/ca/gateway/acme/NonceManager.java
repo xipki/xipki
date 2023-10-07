@@ -102,10 +102,6 @@ public class NonceManager {
     return null != noncePool.remove(nonce);
   }
 
-  public boolean containsNonce(String nonce) {
-    return noncePool.containsKey(nonce);
-  }
-
   public void close() {
     if (noncePool.isEmpty()) {
       return;

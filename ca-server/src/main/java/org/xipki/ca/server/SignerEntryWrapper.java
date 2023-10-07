@@ -10,9 +10,8 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
+import org.xipki.util.Args;
 import org.xipki.util.exception.ObjectCreationException;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * Wrapper of signer database entry.
@@ -35,7 +34,7 @@ public class SignerEntryWrapper {
   }
 
   public void setDbEntry(SignerEntry dbEntry) {
-    this.dbEntry = notNull(dbEntry, "dbEntry");
+    this.dbEntry = Args.notNull(dbEntry, "dbEntry");
     signer = null;
     if (dbEntry.getCertificate() != null) {
       subject = dbEntry.getCertificate().getSubject();
@@ -48,7 +47,7 @@ public class SignerEntryWrapper {
   }
 
   public void initSigner(SecurityFactory securityFactory) throws ObjectCreationException {
-    notNull(securityFactory, "securityFactory");
+    Args.notNull(securityFactory, "securityFactory");
     if (signer != null) {
       return;
     }

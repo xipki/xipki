@@ -10,8 +10,10 @@ import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.db.CertStore.SerialWithId;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
+import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
 
 import java.io.Closeable;
@@ -23,9 +25,6 @@ import java.util.Random;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.exception.ErrorCode.NOT_PERMITTED;
 
 /**
  * X509CA revoker module.
@@ -117,7 +116,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
   private CertWithDbId removeCert0(long certId, BigInteger serialNumber, AuditEvent event)
       throws OperationException {
     if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
-      throw new OperationException(NOT_PERMITTED, "could not remove CA certificate");
+      throw new OperationException(ErrorCode.NOT_PERMITTED, "could not remove CA certificate");
     }
 
     boolean successful = true;
@@ -146,9 +145,9 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
   } // method removeCertificate
 
   private int removeExpiredCerts0(Instant expiredAtTime, AuditEvent event) throws OperationException {
-    notNull(expiredAtTime, "expiredtime");
+    Args.notNull(expiredAtTime, "expiredtime");
     if (!masterMode) {
-      throw new OperationException(NOT_PERMITTED, "CA could not remove expired certificates in slave mode");
+      throw new OperationException(ErrorCode.NOT_PERMITTED, "CA could not remove expired certificates in slave mode");
     }
 
     event.addEventData(CaAuditConstants.NAME_expired_at, expiredAtTime);

@@ -6,10 +6,9 @@ package org.xipki.ocsp.api;
 import org.bouncycastle.asn1.ocsp.CrlID;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
+import org.xipki.util.Args;
 
 import java.time.Instant;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * CertStatus information.
@@ -64,8 +63,8 @@ public class CertStatusInfo {
   private Instant archiveCutOff;
 
   private CertStatusInfo(CertStatus certStatus, Instant thisUpdate, Instant nextUpdate, String certprofile) {
-    this.certStatus = notNull(certStatus, "certStatus");
-    this.thisUpdate = notNull(thisUpdate, "thisUpdate");
+    this.certStatus = Args.notNull(certStatus, "certStatus");
+    this.thisUpdate = Args.notNull(thisUpdate, "thisUpdate");
     this.nextUpdate = nextUpdate;
     this.certprofile = certprofile;
   }
@@ -91,7 +90,7 @@ public class CertStatusInfo {
   }
 
   public void setCertStatus(CertStatus certStatus) {
-    this.certStatus = notNull(certStatus, "certStatus");
+    this.certStatus = Args.notNull(certStatus, "certStatus");
   }
 
   public CertRevocationInfo getRevocationInfo() {
@@ -161,7 +160,7 @@ public class CertStatusInfo {
   public static CertStatusInfo getRevokedCertStatusInfo(
       CertRevocationInfo revocationInfo, HashAlgo certHashAlgo, byte[] certHash,
       Instant thisUpdate, Instant nextUpdate, String certprofile) {
-    notNull(revocationInfo, "revocationInfo");
+    Args.notNull(revocationInfo, "revocationInfo");
     CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate, certprofile);
     ret.revocationInfo = revocationInfo;
     ret.certHashAlgo = certHashAlgo;
@@ -171,7 +170,7 @@ public class CertStatusInfo {
 
   public static CertStatusInfo getRevokedCertStatusInfo(
       CertRevocationInfo revocationInfo, Instant thisUpdate, Instant nextUpdate) {
-    notNull(revocationInfo, "revocationInfo");
+    Args.notNull(revocationInfo, "revocationInfo");
     CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate, null);
     ret.revocationInfo = revocationInfo;
     return ret;

@@ -5,9 +5,7 @@ package org.xipki.cmp.client.internal;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.cmp.client.IdentifiedObject;
-
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
+import org.xipki.util.Args;
 
 /**
  * CMP request to enroll certificate for given CSR.
@@ -24,8 +22,8 @@ class CsrEnrollCertRequest extends IdentifiedObject {
 
   CsrEnrollCertRequest(String id, String certprofile, CertificationRequest csr) {
     super(id);
-    this.certprofile = notBlank(certprofile, "certprofile");
-    this.csr = notNull(csr, "csr");
+    this.certprofile = Args.notBlank(certprofile, "certprofile");
+    this.csr = Args.notNull(csr, "csr");
   }
 
   CertificationRequest getCsr() {

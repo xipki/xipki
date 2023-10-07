@@ -13,6 +13,7 @@ import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 
 import java.io.IOException;
@@ -23,8 +24,6 @@ import java.security.SecureRandom;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * SubjectPublicKeyInfo entry for benchmark enrollment test.
@@ -156,10 +155,8 @@ public abstract class CaEnrollBenchKeyEntry {
     }
 
     private SubjectPublicKeyInfo buildSpki(ASN1ObjectIdentifier curveOid) throws Exception {
-      notNull(curveOid, "curveOid");
       KeyPair keypair;
-
-      if (EdECConstants.isEdwardsOrMontgomeryCurve(curveOid)) {
+      if (EdECConstants.isEdwardsOrMontgomeryCurve(Args.notNull(curveOid, "curveOid"))) {
         keypair = KeyUtil.generateEdECKeypair(curveOid, null);
         return KeyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
       } else {

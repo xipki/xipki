@@ -14,11 +14,10 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
+import org.xipki.util.Args;
 
 import java.io.Closeable;
 import java.util.Map;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * CertPublisher with identifier.
@@ -34,8 +33,8 @@ public class IdentifiedCertPublisher implements Closeable {
   private final CertPublisher certPublisher;
 
   public IdentifiedCertPublisher(PublisherEntry entry, CertPublisher certPublisher) {
-    this.entry = notNull(entry, "entry");
-    this.certPublisher = notNull(certPublisher, "certPublisher");
+    this.entry = Args.notNull(entry, "entry");
+    this.certPublisher = Args.notNull(certPublisher, "certPublisher");
   }
 
   public void initialize(PasswordResolver passwordResolver, Map<String, DataSourceWrapper> datasourceConfs)

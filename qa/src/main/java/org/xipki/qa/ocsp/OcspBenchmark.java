@@ -12,6 +12,7 @@ import org.xipki.ocsp.client.HttpOcspRequestor;
 import org.xipki.ocsp.client.OcspRequestor;
 import org.xipki.ocsp.client.RequestOptions;
 import org.xipki.security.X509Cert;
+import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
 
 import java.math.BigInteger;
@@ -20,8 +21,6 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * OCSP benchmark.
@@ -79,11 +78,11 @@ public class OcspBenchmark extends BenchmarkExecutor {
     super(description);
 
     this.client = new HttpOcspRequestor();
-    this.issuerCert = notNull(issuerCert, "issuerCert");
-    this.responderUrl = new URL(notNull(responderUrl, "responderUrl"));
-    this.requestOptions = notNull(requestOptions, "requestOptions");
+    this.issuerCert = Args.notNull(issuerCert, "issuerCert");
+    this.responderUrl = new URL(Args.notNull(responderUrl, "responderUrl"));
+    this.requestOptions = Args.notNull(requestOptions, "requestOptions");
     this.maxRequests = maxRequests;
-    this.serials = notNull(serials, "serials");
+    this.serials = Args.notNull(serials, "serials");
   }
 
   @Override

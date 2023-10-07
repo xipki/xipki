@@ -72,9 +72,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.Map.Entry;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-
 /**
  * CMP agent to communicate with CA.
  *
@@ -123,11 +120,9 @@ class CmpAgent {
            SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier, boolean sendRequestorCert) {
     this.signatureResponder = signatureResponder;
     this.pbmMacResponder = pbmMacResponder;
-    this.securityFactory = notNull(securityFactory, "securityFactory");
-    notBlank(serverUrl, "serverUrl");
-
+    this.securityFactory = Args.notNull(securityFactory, "securityFactory");
     try {
-      this.serverUrl = serverUrl.endsWith("/") ? serverUrl : serverUrl + "/";
+      this.serverUrl = Args.notBlank(serverUrl, "serverUrl").endsWith("/") ? serverUrl : serverUrl + "/";
       new URL(this.serverUrl);
     } catch (MalformedURLException ex) {
       throw new IllegalArgumentException("invalid URL: " + serverUrl);
@@ -141,12 +136,12 @@ class CmpAgent {
   }
 
   private HttpRespContent send(String caName, byte[] request) throws IOException {
-    notNull(request, "request");
+    Args.notNull(request, "request");
     return httpClient.httpPost(serverUrl + caName, CMP_REQUEST_MIMETYPE, request, CMP_RESPONSE_MIMETYPE);
   } // method send
 
   private PKIMessage sign(Requestor requestor, PKIMessage request) throws CmpClientException {
-    notNull(request, "request");
+    Args.notNull(request, "request");
     if (requestor == null) {
       throw new CmpClientException("no request signer is configured");
     }
@@ -173,7 +168,7 @@ class CmpAgent {
   private VerifiedPkiMessage signAndSend(
       String caName, Requestor requestor, Responder responder, PKIMessage request, ReqRespDebug debug)
       throws CmpClientException {
-    ASN1OctetString tid = notNull(request, "request").getHeader().getTransactionID();
+    ASN1OctetString tid = Args.notNull(request, "request").getHeader().getTransactionID();
     PKIMessage tmpRequest = sign(requestor, request);
     GeneralPKIMessage response = send(caName, tmpRequest, debug);
 
@@ -430,10 +425,8 @@ class CmpAgent {
   } // method verifyProtection
 
   private PKIMessage buildMessageWithGeneralMsgContent(ASN1ObjectIdentifier type) {
-    notNull(type, "type");
-
+    InfoTypeAndValue itv = new InfoTypeAndValue(Args.notNull(type, "type"));
     PKIHeader header = buildPkiHeader(null, null);
-    InfoTypeAndValue itv = new InfoTypeAndValue(type);
     return new PKIMessage(header, new PKIBody(PKIBody.TYPE_GEN_MSG, new GenMsgContent(itv)));
   } // method buildMessageWithGeneralMsgContent
 
@@ -467,7 +460,7 @@ class CmpAgent {
       String caName, Requestor requestor, RevokeCertRequest request, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     Responder responder = getResponder(requestor);
-    PKIMessage reqMessage = buildRevokeCertRequest(requestor, responder, notNull(request, "request"));
+    PKIMessage reqMessage = buildRevokeCertRequest(requestor, responder, Args.notNull(request, "request"));
     VerifiedPkiMessage response = signAndSend(caName, requestor, responder, reqMessage, debug);
     return parse(response, request.getRequestEntries());
   } // method revokeCertificate
@@ -476,7 +469,7 @@ class CmpAgent {
       String caName, Requestor requestor, UnrevokeCertRequest request, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     Responder responder = getResponder(requestor);
-    PKIMessage reqMessage = buildUnrevokeCertRequest(requestor, responder, notNull(request, "request"),
+    PKIMessage reqMessage = buildUnrevokeCertRequest(requestor, responder, Args.notNull(request, "request"),
         CrlReason.REMOVE_FROM_CRL.getCode());
     VerifiedPkiMessage response = signAndSend(caName, requestor, responder, reqMessage, debug);
     return parse(response, request.getRequestEntries());
@@ -486,7 +479,7 @@ class CmpAgent {
                                         Instant notBefore, Instant notAfter, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     Responder responder = getResponder(requestor);
-    PKIMessage request = buildPkiMessage(requestor, responder, notNull(csr, "csr"), notBefore, notAfter);
+    PKIMessage request = buildPkiMessage(requestor, responder, Args.notNull(csr, "csr"), notBefore, notAfter);
     Map<BigInteger, String> reqIdIdMap = new HashMap<>();
     reqIdIdMap.put(MINUS_ONE, csr.getId());
     return requestCertificate0(caName, requestor, responder, request, reqIdIdMap, PKIBody.TYPE_CERT_REP, debug);
@@ -495,7 +488,7 @@ class CmpAgent {
   EnrollCertResponse requestCertificate(String caName, Requestor requestor, EnrollCertRequest req, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     Responder responder = getResponder(requestor);
-    PKIMessage request = buildPkiMessage(requestor, responder, notNull(req, "req"));
+    PKIMessage request = buildPkiMessage(requestor, responder, Args.notNull(req, "req"));
     Map<BigInteger, String> reqIdIdMap = new HashMap<>();
     List<EnrollCertRequest.Entry> reqEntries = req.getRequestEntries();
 
@@ -818,9 +811,7 @@ class CmpAgent {
   } // method buildPkiMessage
 
   private static void checkProtection(VerifiedPkiMessage response) throws PkiErrorException {
-    notNull(response, "response");
-
-    if (!response.hasProtection()) {
+    if (!Args.notNull(response, "response").hasProtection()) {
       return;
     }
 
@@ -1006,7 +997,7 @@ class CmpAgent {
         byte[] iv = new byte[16];
         AlgorithmParameterSpec spec = new IESParameterSpec(null, null, aesKeySize, aesKeySize, iv);
 
-        BlockCipher cbcCipher = new CBCBlockCipher(new AESEngine());
+        BlockCipher cbcCipher = CBCBlockCipher.newInstance(AESEngine.newInstance());
         IESEngine engine = new IESEngine(new ECDHBasicAgreement(), new KDF2BytesGenerator(DigestFactory.createSHA1()),
             new HMac(DigestFactory.createSHA1()), new PaddedBufferedBlockCipher(cbcCipher));
         IESCipher keyCipher = new IESCipher(engine, 16);
@@ -1099,7 +1090,7 @@ class CmpAgent {
   private static RevokeCertResponse parse(
       VerifiedPkiMessage response, List<? extends UnrevokeCertRequest.Entry> reqEntries)
       throws CmpClientException, PkiErrorException {
-    checkProtection(notNull(response, "response"));
+    checkProtection(Args.notNull(response, "response"));
 
     PKIBody respBody = response.getPkiMessage().getBody();
     int bodyType = respBody.getType();

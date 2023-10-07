@@ -31,8 +31,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static org.xipki.ca.server.CaUtil.*;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.StringUtil.concat;
 
 /**
  * Load / export CA configuration.
@@ -47,13 +45,13 @@ class ConfLoader {
   CaManagerImpl manager;
 
   ConfLoader(CaManagerImpl manager) {
-    this.manager = notNull(manager, "manager");
+    this.manager = Args.notNull(manager, "manager");
   } // constructor
 
   Map<String, X509Cert> loadConf(InputStream zippedConfStream) throws CaMgmtException {
     manager.assertMasterModeAndSetuped();
 
-    notNull(zippedConfStream, "zippedConfStream");
+    Args.notNull(zippedConfStream, "zippedConfStream");
 
     SecurityFactory securityFactory = manager.securityFactory;
 
@@ -82,7 +80,7 @@ class ConfLoader {
           LOG.info("ignore existed keypairGen {}", name);
           continue;
         } else {
-          throw logAndCreateException(concat("keypairGen ", name, " existed, could not re-added it"));
+          throw logAndCreateException("keypairGen " + name + " existed, could not re-added it");
         }
       }
 
@@ -90,7 +88,7 @@ class ConfLoader {
         manager.addKeypairGen(entry);
         LOG.info("added keypairGen {}", name);
       } catch (CaMgmtException ex) {
-        String msg = concat("could not add keypairGen ", name);
+        String msg = "could not add keypairGen " + name;
         LogUtil.error(LOG, ex, msg);
         throw new CaMgmtException(msg);
       }
@@ -105,7 +103,7 @@ class ConfLoader {
           LOG.info("ignore existed signer {}", name);
           continue;
         } else {
-          throw logAndCreateException(concat("signer ", name, " existed, could not re-added it"));
+          throw logAndCreateException("signer " + name + " existed, could not re-added it");
         }
       }
 
@@ -113,7 +111,7 @@ class ConfLoader {
         manager.addSigner(entry);
         LOG.info("added signer {}", name);
       } catch (CaMgmtException ex) {
-        String msg = concat("could not add signer ", name);
+        String msg = "could not add signer " + name;
         LogUtil.error(LOG, ex, msg);
         throw new CaMgmtException(msg);
       }
@@ -129,7 +127,7 @@ class ConfLoader {
           LOG.info("ignore existed cert-based requestor {}", name);
           continue;
         } else {
-          throw logAndCreateException(concat("cert-based requestor ", name, " existed, could not re-added it"));
+          throw logAndCreateException("cert-based requestor " + name + " existed, could not re-added it");
         }
       }
 
@@ -137,7 +135,7 @@ class ConfLoader {
         manager.addRequestor(entry);
         LOG.info("added cert-based requestor {}", name);
       } catch (CaMgmtException ex) {
-        String msg = concat("could not add cert-based requestor ", name);
+        String msg = "could not add cert-based requestor " + name;
         LogUtil.error(LOG, ex, msg);
         throw new CaMgmtException(msg);
       }
@@ -152,7 +150,7 @@ class ConfLoader {
           LOG.info("ignore existed publisher {}", name);
           continue;
         } else {
-          throw logAndCreateException(concat("publisher ", name, " existed, could not re-added it"));
+          throw logAndCreateException("publisher " + name + " existed, could not re-added it");
         }
       }
 
@@ -175,7 +173,7 @@ class ConfLoader {
           LOG.info("ignore existed certprofile {}", name);
           continue;
         } else {
-          throw logAndCreateException(concat("certprofile ", name, " existed, could not re-added it"));
+          throw logAndCreateException("certprofile " + name + " existed, could not re-added it");
         }
       }
 
@@ -183,7 +181,7 @@ class ConfLoader {
         manager.addCertprofile(entry);
         LOG.info("added certprofile {}", name);
       } catch (CaMgmtException ex) {
-        String msg = concat("could not add certprofile ", name);
+        String msg = "could not add certprofile " + name;
         LogUtil.error(LOG, ex, msg);
         throw new CaMgmtException(msg);
       }
@@ -204,14 +202,14 @@ class ConfLoader {
                      = securityFactory.createSigner(caEntry.getSignerType(), signerConf, (X509Cert) null)) {
               caEntry.setCert(signer.getCertificate());
             } catch (IOException | ObjectCreationException ex) {
-              throw new CaMgmtException(concat("could not create signer for CA ", caName), ex);
+              throw new CaMgmtException("could not create signer for CA " + caName, ex);
             }
           }
 
           if (caEntry.equals(entryB, true, true)) {
             LOG.info("ignore existing CA {}", caName);
           } else {
-            throw logAndCreateException(concat("CA ", caName, " existed, could not re-added it"));
+            throw logAndCreateException("CA " + caName + " existed, could not re-added it");
           }
         } else {
           if (genSelfIssued != null) {
@@ -224,7 +222,7 @@ class ConfLoader {
               manager.addCa(caEntry);
               LOG.info("added CA {}", caName);
             } catch (CaMgmtException ex) {
-              String msg = concat("could not add CA ", caName);
+              String msg = "could not add CA " + caName;
               LogUtil.error(LOG, ex, msg);
               throw new CaMgmtException(msg);
             }
@@ -242,7 +240,7 @@ class ConfLoader {
               manager.addCaAlias(aliasName, caName);
               LOG.info("associated alias {} to CA {}", aliasName, caName);
             } catch (CaMgmtException ex) {
-              String msg = concat("could not associate alias ", aliasName, " to CA ", caName);
+              String msg = "could not associate alias " + aliasName + " to CA " + caName;
               LogUtil.error(LOG, ex, msg);
               throw new CaMgmtException(msg);
             }
@@ -260,7 +258,7 @@ class ConfLoader {
               manager.addCertprofileToCa(profileName, caName);
               LOG.info("added certprofile {} to CA {}", profileName, caName);
             } catch (CaMgmtException ex) {
-              String msg = concat("could not add certprofile ", profileName, " to CA ", caName);
+              String msg = "could not add certprofile " + profileName + " to CA " + caName;
               LogUtil.error(LOG, ex, msg);
               throw new CaMgmtException(msg);
             }
@@ -278,7 +276,7 @@ class ConfLoader {
               manager.addPublisherToCa(publisherName, caName);
               LOG.info("added publisher {} to CA {}", publisherName, caName);
             } catch (CaMgmtException ex) {
-              String msg = concat("could not add publisher ", publisherName, " to CA ", caName);
+              String msg = "could not add publisher " + publisherName + " to CA " + caName;
               LogUtil.error(LOG, ex, msg);
               throw new CaMgmtException(msg);
             }
@@ -305,14 +303,14 @@ class ConfLoader {
             if (requestor.equals(requestorB, ignoreId)) {
               LOG.info("ignored adding requestor {} to CA {}", requestorName, caName);
             } else {
-              throw logAndCreateException(concat("could not add requestor ", requestorName, " to CA", caName));
+              throw logAndCreateException("could not add requestor " + requestorName + " to CA" + caName);
             }
           } else {
             try {
               manager.addRequestorToCa(requestor, caName);
               LOG.info("added publisher {} to CA {}", requestorName, caName);
             } catch (CaMgmtException ex) {
-              String msg = concat("could not add requestor ", requestorName, " to CA ", caName);
+              String msg = "could not add requestor " + requestorName + " to CA " + caName;
               LogUtil.error(LOG, ex, msg);
               throw new CaMgmtException(msg);
             }
@@ -411,7 +409,7 @@ class ConfLoader {
 
           // Certificate
           byte[] certBytes = entry.getCert().getEncoded();
-          caInfoType.setCert(createFileOrBinary(zipStream, certBytes, concat("files/ca-", name, "-cert.der")));
+          caInfoType.setCert(createFileOrBinary(zipStream, certBytes, "files/ca-" + name + "-cert.der"));
 
           // certchain
           List<X509Cert> certchain = entry.getCertchain();
@@ -420,8 +418,7 @@ class ConfLoader {
 
             for (int i = 0; i < certchain.size(); i++) {
               certBytes = certchain.get(i).getEncoded();
-              ccList.add(createFileOrBinary(zipStream, certBytes,
-                  concat("files/ca-", name, "-certchain-" + i + ".der")));
+              ccList.add(createFileOrBinary(zipStream, certBytes, "files/ca-" + name + "-certchain-" + i + ".der"));
             }
             caInfoType.setCertchain(ccList);
           }
@@ -462,7 +459,7 @@ class ConfLoader {
           }
 
           caInfoType.setSignerConf(createFileOrValue(zipStream, entry.getSignerConf(),
-              concat("files/ca-", name, "-signerconf.conf")));
+              "files/ca-" + name + "-signerconf.conf"));
           caInfoType.setSignerType(entry.getSignerType());
           caInfoType.setSnSize(entry.getSerialNoLen());
 
@@ -489,10 +486,10 @@ class ConfLoader {
 
           if (RequestorEntry.TYPE_CERT.equalsIgnoreCase(entry.getType())) {
             FileOrBinary fob = createFileOrBinary(zipStream,
-                Base64.decode(entry.getConf()), concat("files/requestor-", name, ".der"));
+                Base64.decode(entry.getConf()), "files/requestor-" + name + ".der");
             type.setBinaryConf(fob);
           } else {
-            FileOrValue fov = createFileOrValue(zipStream,  entry.getConf(), concat("files/requestor-", name, ".conf"));
+            FileOrValue fov = createFileOrValue(zipStream,  entry.getConf(), "files/requestor-" + name + ".conf");
             type.setConf(fov);
           }
 
@@ -513,7 +510,7 @@ class ConfLoader {
           NameTypeConf conf = new NameTypeConf();
           conf.setName(name);
           conf.setType(entry.getType());
-          conf.setConf(createFileOrValue(zipStream, entry.getConf(), concat("files/publisher-", name, ".conf")));
+          conf.setConf(createFileOrValue(zipStream, entry.getConf(), "files/publisher-" + name + ".conf"));
           list.add(conf);
         }
 
@@ -530,7 +527,7 @@ class ConfLoader {
           NameTypeConf conf = new NameTypeConf();
           conf.setName(name);
           conf.setType(entry.getType());
-          conf.setConf(createFileOrValue(zipStream, entry.getConf(), concat("files/certprofile-", name, ".conf")));
+          conf.setConf(createFileOrValue(zipStream, entry.getConf(), "files/certprofile-" + name + ".conf"));
           list.add(conf);
         }
 
@@ -548,9 +545,8 @@ class ConfLoader {
           CaConfType.Signer conf = new CaConfType.Signer();
           conf.setName(name);
           conf.setType(entry.getType());
-          conf.setConf(createFileOrValue(zipStream, entry.getConf(), concat("files/signer-", name, ".conf")));
-          conf.setCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(),
-              concat("files/signer-", name, ".der")));
+          conf.setConf(createFileOrValue(zipStream, entry.getConf(), "files/signer-" + name + ".conf"));
+          conf.setCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(), "files/signer-" + name + ".der"));
 
           list.add(conf);
         }
@@ -595,7 +591,7 @@ class ConfLoader {
         }
       } catch (InvalidConfException ex) {
         LogUtil.error(LOG, ex, "could not marshal CAConf");
-        throw new CaMgmtException(concat("could not marshal CAConf: ", ex.getMessage()), ex);
+        throw new CaMgmtException("could not marshal CAConf: " + ex.getMessage(), ex);
       }
     }
 

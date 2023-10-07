@@ -7,6 +7,7 @@ import org.xipki.security.CertpathValidationModel;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.exception.InvalidConfException;
@@ -18,8 +19,6 @@ import java.security.cert.CertificateException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * OCSP request option.
@@ -66,9 +65,7 @@ public class RequestOption {
   private final CertpathValidationModel certpathValidationModel;
 
   RequestOption(OcspServerConf.RequestOption conf) throws InvalidConfException {
-    notNull(conf, "conf");
-
-    supportsHttpGet = conf.isSupportsHttpGet();
+    supportsHttpGet = Args.notNull(conf, "conf").isSupportsHttpGet();
     signatureRequired = conf.isSignatureRequired();
     validateSignature = conf.isValidateSignature();
 
@@ -218,7 +215,7 @@ public class RequestOption {
 
   private static Set<X509Cert> getCerts(OcspServerConf.CertCollection conf)
       throws CertificateException, IOException {
-    notNull(conf, "conf");
+    Args.notNull(conf, "conf");
     Set<X509Cert> tmpCerts = new HashSet<>();
 
     if (conf.getCerts() != null) {

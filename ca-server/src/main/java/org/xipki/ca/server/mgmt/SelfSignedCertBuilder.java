@@ -22,10 +22,7 @@ import org.xipki.ca.server.IdentifiedCertprofile;
 import org.xipki.security.*;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.StringUtil;
-import org.xipki.util.Validity;
+import org.xipki.util.*;
 import org.xipki.util.exception.*;
 
 import java.io.IOException;
@@ -36,9 +33,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
-
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
 
 /**
  * Self-signed certificate builder.
@@ -80,16 +74,15 @@ class SelfSignedCertBuilder {
       String subject, BigInteger serialNumber, CaUris caUris, ConfPairs extraControl,
       Instant notBefore, Instant notAfter)
       throws OperationException, InvalidConfException {
-    notNull(securityFactory, "securityFactory");
-    notBlank(signerType, "signerType");
-    notNull(certprofile, "certprofile");
-    notBlank(subject, "subject");
-    notNull(serialNumber, "serialNumber");
-    if (serialNumber.signum() != 1) {
+    Args.notNull(securityFactory, "securityFactory");
+    Args.notBlank(signerType, "signerType");
+    Args.notBlank(subject, "subject");
+
+    if (Args.notNull(serialNumber, "serialNumber").signum() != 1) {
       throw new IllegalArgumentException("serialNumber may not be non-positive: " + serialNumber);
     }
 
-    Certprofile.CertLevel level = certprofile.getCertLevel();
+    Certprofile.CertLevel level = Args.notNull(certprofile, "certprofile").getCertLevel();
     if (Certprofile.CertLevel.RootCA != level) {
       throw new IllegalArgumentException("certprofile is not of level " + Certprofile.CertLevel.RootCA);
     }

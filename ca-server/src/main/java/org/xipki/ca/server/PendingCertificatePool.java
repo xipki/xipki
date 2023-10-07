@@ -5,15 +5,13 @@ package org.xipki.ca.server;
 
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.security.HashAlgo;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
 import java.math.BigInteger;
 import java.time.Clock;
 import java.util.*;
 import java.util.Map.Entry;
-
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
 
 /**
  * Pending certificate pool.
@@ -35,8 +33,8 @@ class PendingCertificatePool {
     private final byte[] certHash;
 
     MyEntry(BigInteger certReqId, long waitForConfirmTill, CertificateInfo certInfo) {
-      this.certReqId = notNull(certReqId, "certReqId");
-      this.certInfo = notNull(certInfo, "certInfo");
+      this.certReqId = Args.notNull(certReqId, "certReqId");
+      this.certInfo = Args.notNull(certInfo, "certInfo");
       this.waitForConfirmTill = waitForConfirmTill;
       this.certHash = HashAlgo.SHA1.hash(certInfo.getCert().getCert().getEncoded());
     } // constructor
@@ -66,9 +64,8 @@ class PendingCertificatePool {
   }
 
   void addCertificate(String transactionId, BigInteger certReqId, CertificateInfo certInfo, long waitForConfirmTill) {
-    notNull(transactionId, "transactionId");
-    notNull(certInfo, "certInfo");
-    if (certInfo.isAlreadyIssued()) {
+    Args.notNull(transactionId, "transactionId");
+    if (Args.notNull(certInfo, "certInfo").isAlreadyIssued()) {
       return;
     }
 
@@ -80,9 +77,9 @@ class PendingCertificatePool {
   } // method addCertificate
 
   CertificateInfo removeCertificate(String transactionId, BigInteger certReqId, byte[] certHash) {
-    notBlank(transactionId, "transactionId");
-    notNull(certReqId, "certReqId");
-    notNull(certHash, "certHash");
+    Args.notBlank(transactionId, "transactionId");
+    Args.notNull(certReqId, "certReqId");
+    Args.notNull(certHash, "certHash");
 
     PendingCertificatePool.MyEntry retEntry = null;
 
@@ -114,7 +111,7 @@ class PendingCertificatePool {
   } // method removeCertificate
 
   Set<CertificateInfo> removeCertificates(String transactionId) {
-    notNull(transactionId, "transactionId");
+    Args.notNull(transactionId, "transactionId");
 
     Set<PendingCertificatePool.MyEntry> entries;
     synchronized  (map) {

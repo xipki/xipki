@@ -50,7 +50,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.xipki.ocsp.server.OcspServerUtil.*;
-import static org.xipki.util.Args.notBlank;
 
 /**
  * Implementation of {@link OcspServer}.
@@ -170,7 +169,7 @@ public class OcspServerImpl implements OcspServer {
   }
 
   public ResponderImpl getResponder(String name) {
-    return responders.get(notBlank(name, "name"));
+    return responders.get(Args.notBlank(name, "name"));
   }
 
   public boolean isInitialized() {

@@ -10,12 +10,10 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.security.X509Cert;
+import org.xipki.util.Args;
 
-import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * X509CA module base class.
@@ -36,7 +34,7 @@ public abstract class X509CaModule {
   protected final List<byte[]> encodedCaCertChain;
 
   public X509CaModule(CaInfo caInfo) {
-    this.caInfo = notNull(caInfo, "caInfo");
+    this.caInfo = Args.notNull(caInfo, "caInfo");
     this.caIdent = caInfo.getIdent();
     this.caCert = caInfo.getCert();
     this.encodedCaCertChain = new ArrayList<>(2);
@@ -53,7 +51,7 @@ public abstract class X509CaModule {
   }
 
   protected AuditEvent newAuditEvent(String eventType, RequestorInfo requestor) {
-    notNull(eventType, "eventType");
+    Args.notNull(eventType, "eventType");
     AuditEvent event = new AuditEvent();
     event.setApplicationName(CaAuditConstants.APPNAME);
     event.setEventData(CaAuditConstants.NAME_ca, caIdent.getName());
@@ -77,10 +75,8 @@ public abstract class X509CaModule {
   }
 
   protected boolean verifySignature(X509Cert cert) {
-    notNull(cert, "cert");
-    PublicKey caPublicKey = caCert.getPublicKey();
     try {
-      cert.verify(caPublicKey);
+      Args.notNull(cert, "cert").verify(caCert.getPublicKey());
       return true;
     } catch (Exception ex) {
       LOG.debug("{} while verifying signature: {}", ex.getClass().getName(), ex.getMessage());

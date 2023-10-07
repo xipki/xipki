@@ -44,14 +44,11 @@ import org.xipki.util.exception.OperationException;
 import java.io.Closeable;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.cert.CertificateException;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import static org.xipki.ca.sdk.CaAuditConstants.*;
-import static org.xipki.util.Args.notEmpty;
-import static org.xipki.util.Args.notNull;
 import static org.xipki.util.exception.ErrorCode.*;
 
 /**
@@ -179,14 +176,14 @@ public class X509Ca extends X509CaModule implements Closeable {
       }
     }
 
-    this.caManager = notNull(caManager, "caManager");
+    this.caManager = Args.notNull(caManager, "caManager");
     this.caIdNameMap = caManager.idNameMap();
     this.ctlogClient = ctlogClient;
-    this.certstore = notNull(certstore, "certstore");
+    this.certstore = Args.notNull(certstore, "certstore");
 
     this.publisherModule = new X509PublisherModule(caManager, caInfo, certstore);
     this.crlModule = new X509CrlModule(caManager, caInfo, certstore, publisherModule);
-    this.grandCertTemplateBuilder = new GrandCertTemplateBuilder(caInfo, certstore);
+    this.grandCertTemplateBuilder = new GrandCertTemplateBuilder(caInfo);
     this.revokerModule = new X509RevokerModule(caManager, caInfo, certstore, publisherModule);
     this.removerModule = new X509RemoverModule(caManager, caInfo, certstore, publisherModule);
     this.saveKeypair = caInfo.isSaveKeypair();
@@ -213,7 +210,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     return encodedCaCertChain;
   }
 
-  public X509Cert getCert(BigInteger serialNumber) throws CertificateException, OperationException {
+  public X509Cert getCert(BigInteger serialNumber) throws OperationException {
     CertificateInfo certInfo = certstore.getCertInfo(caIdent, caCert, serialNumber, caIdNameMap);
     return (certInfo == null) ? null : certInfo.getCert().getCert();
   }
@@ -231,12 +228,12 @@ public class X509Ca extends X509CaModule implements Closeable {
   }
 
   public CertWithRevocationInfo getCertWithRevocationInfo(BigInteger serialNumber)
-      throws CertificateException, OperationException {
+      throws OperationException {
     return certstore.getCertWithRevocationInfo(caIdent.getId(), serialNumber, caIdNameMap);
   }
 
   public CertWithRevocationInfo getCertWithRevocationInfoBySubject(X500Name subject, byte[] san)
-      throws CertificateException, OperationException {
+      throws OperationException {
     return certstore.getCertWithRevocationInfoBySubject(caIdent.getId(), subject, san, caIdNameMap);
   }
 
@@ -334,7 +331,7 @@ public class X509Ca extends X509CaModule implements Closeable {
   private List<CertificateInfo> generateCerts(
       RequestorInfo requestor, List<CertTemplateData> certTemplates, String transactionId, AuditEvent event)
       throws OperationExceptionWithIndex {
-    notEmpty(certTemplates, "certTemplates");
+    Args.notEmpty(certTemplates, "certTemplates");
 
     CmLicense license = caManager.getLicense();
     if (!license.isValid()) {
@@ -474,7 +471,7 @@ public class X509Ca extends X509CaModule implements Closeable {
 
   public CertificateInfo generateCert(RequestorInfo requestor, CertTemplateData certTemplate, String transactionId)
       throws OperationException {
-    notNull(certTemplate, "certTemplate");
+    Args.notNull(certTemplate, "certTemplate");
     AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_gen_cert, requestor);
     try {
       CertificateInfo ret = generateCerts(requestor, Collections.singletonList(certTemplate),
@@ -510,7 +507,7 @@ public class X509Ca extends X509CaModule implements Closeable {
 
   private CertificateInfo generateCert0(RequestorInfo requestor, GrantedCertTemplate gct,
                                         String transactionId, AuditEvent event) throws OperationException {
-    notNull(gct, "gct");
+    Args.notNull(gct, "gct");
 
     IdentifiedCertprofile certprofile = gct.certprofile;
 

@@ -36,6 +36,7 @@ import org.xipki.ca.gateway.CaNameSigners;
 import org.xipki.ca.gateway.PopControl;
 import org.xipki.ca.gateway.Requestor;
 import org.xipki.ca.gateway.RequestorAuthenticator;
+import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.ErrorResponse;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.SdkErrorResponseException;
@@ -43,10 +44,7 @@ import org.xipki.cmp.CmpUtil;
 import org.xipki.cmp.ProtectionResult;
 import org.xipki.cmp.ProtectionVerificationResult;
 import org.xipki.security.*;
-import org.xipki.util.Base64;
-import org.xipki.util.LogUtil;
-import org.xipki.util.PermissionConstants;
-import org.xipki.util.StringUtil;
+import org.xipki.util.*;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
 import org.xipki.util.exception.ErrorCode;
@@ -67,12 +65,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import static org.bouncycastle.asn1.cmp.PKIFailureInfo.badRequest;
-import static org.bouncycastle.asn1.cmp.PKIFailureInfo.systemFailure;
-import static org.bouncycastle.asn1.cmp.PKIStatus.rejection;
-import static org.xipki.ca.sdk.CaAuditConstants.*;
-import static org.xipki.util.Args.notNull;
 
 /**
  * Base CMP responder.
@@ -285,7 +277,7 @@ public abstract class BaseCmpResponder {
   private PKIMessage processPkiMessage0(
       String caName, PKIMessage request, Requestor requestor, ASN1OctetString tid,
       GeneralPKIMessage message, Map<String, String> parameters, AuditEvent event) {
-    event.addEventData(NAME_requestor, requestor == null ? "null" : requestor.getName());
+    event.addEventData(CaAuditConstants.NAME_requestor, requestor == null ? "null" : requestor.getName());
 
     PKIHeader reqHeader = message.getHeader();
 
@@ -370,7 +362,7 @@ public abstract class BaseCmpResponder {
       event.setStatus(AuditStatus.FAILED);
       String statusString = pkiStatus.statusMessage();
       if (statusString != null) {
-        event.addEventData(NAME_message, statusString);
+        event.addEventData(CaAuditConstants.NAME_message, statusString);
       }
     } else if (event.getStatus() == null) {
       event.setStatus(AuditStatus.SUCCESSFUL);
@@ -381,9 +373,8 @@ public abstract class BaseCmpResponder {
 
   public PKIMessage processPkiMessage(
       String caName, PKIMessage pkiMessage, X509Cert tlsClientCert, Map<String, String> parameters, AuditEvent event) {
-    notNull(pkiMessage, "pkiMessage");
-    notNull(event, "event");
-    GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
+    Args.notNull(event, "event");
+    GeneralPKIMessage message = new GeneralPKIMessage(Args.notNull(pkiMessage, "pkiMessage"));
 
     PKIHeader reqHeader = message.getHeader();
     ASN1OctetString tid = reqHeader.getTransactionID();
@@ -391,14 +382,14 @@ public abstract class BaseCmpResponder {
       tid = new DEROctetString(randomTransactionId());
     }
     String tidStr = Base64.encodeToString(tid.getOctets());
-    event.addEventData(NAME_tid, tidStr);
+    event.addEventData(CaAuditConstants.NAME_tid, tidStr);
 
     final GeneralName respSender = reqHeader.getRecipient();
 
     int reqPvno = reqHeader.getPvno().getValue().intValue();
     if (reqPvno < PVNO_CMP2000) {
       event.update(AuditLevel.INFO, AuditStatus.FAILED);
-      event.addEventData(NAME_message, "unsupported version " + reqPvno);
+      event.addEventData(CaAuditConstants.NAME_message, "unsupported version " + reqPvno);
       return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.unsupportedVersion, null, respSender);
     }
 
@@ -451,7 +442,7 @@ public abstract class BaseCmpResponder {
 
     if (failureCode != null) {
       event.update(AuditLevel.INFO, AuditStatus.FAILED);
-      event.addEventData(NAME_message, statusText);
+      event.addEventData(CaAuditConstants.NAME_message, statusText);
       return buildErrorPkiMessage(tid, reqHeader, failureCode, statusText, respSender);
     }
 
@@ -517,7 +508,7 @@ public abstract class BaseCmpResponder {
 
     if (errorStatus != null) {
       event.update(AuditLevel.INFO, AuditStatus.FAILED);
-      event.addEventData(NAME_message, errorStatus);
+      event.addEventData(CaAuditConstants.NAME_message, errorStatus);
       return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck, errorStatus, respSender);
     }
 
@@ -641,7 +632,7 @@ public abstract class BaseCmpResponder {
           PKIFailureInfo.systemFailure, "could not sign the PKIMessage");
 
       event.update(AuditLevel.ERROR, AuditStatus.FAILED);
-      event.addEventData(NAME_message, "could not sign the PKIMessage");
+      event.addEventData(CaAuditConstants.NAME_message, "could not sign the PKIMessage");
       return new PKIMessage(pkiMessage.getHeader(), new PKIBody(PKIBody.TYPE_ERROR, new ErrorMsgContent(status)));
     }
   } // method addProtection
@@ -719,7 +710,7 @@ public abstract class BaseCmpResponder {
     }
 
     // check the POP signature algorithm
-    ProofOfPossession pop = certRequest.toASN1Structure().getPopo();
+    ProofOfPossession pop = certRequest.toASN1Structure().getPop();
     POPOSigningKey popSign = POPOSigningKey.getInstance(pop.getObject());
     SignAlgo popAlg;
     try {
@@ -909,7 +900,7 @@ public abstract class BaseCmpResponder {
   }
 
   protected PKIBody cmpGeneralMsg(String caName, PKIBody reqBody, AuditEvent event)
-      throws InsufficientPermissionException, SdkErrorResponseException {
+      throws SdkErrorResponseException {
     GenMsgContent genMsgBody = GenMsgContent.getInstance(reqBody.getContent());
     InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
 
@@ -927,7 +918,7 @@ public abstract class BaseCmpResponder {
 
     if (itv == null) {
       String statusMessage = "PKIBody type " + PKIBody.TYPE_GEN_MSG + " with given sub-type is not supported";
-      return buildErrorMsgPkiBody(rejection, badRequest, statusMessage);
+      return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest, statusMessage);
     }
 
     InfoTypeAndValue itvResp;
@@ -938,7 +929,7 @@ public abstract class BaseCmpResponder {
         event.addEventType(TYPE_genm_current_crl);
         byte[] encodedCrl = sdk.currentCrl(caName);
         if (encodedCrl == null) {
-          return buildErrorMsgPkiBody(rejection, systemFailure, "no CRL is available");
+          return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure, "no CRL is available");
         }
 
         CertificateList crl = CertificateList.getInstance(encodedCrl);
@@ -947,7 +938,7 @@ public abstract class BaseCmpResponder {
         event.addEventType(TYPE_genm_cacerts);
         byte[][] certchain = sdk.cacerts(caName);
         if (certchain == null || certchain.length == 0) {
-          return buildErrorMsgPkiBody(rejection, systemFailure, "no certchain is available");
+          return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure, "no certchain is available");
         }
 
         ASN1EncodableVector vec = new ASN1EncodableVector();
@@ -958,7 +949,8 @@ public abstract class BaseCmpResponder {
       }
     } catch (IOException e) {
       LogUtil.error(LOG, e);
-      return new PKIBody(PKIBody.TYPE_ERROR, buildErrorMsgPkiBody(rejection, systemFailure, null));
+      return new PKIBody(PKIBody.TYPE_ERROR,
+          buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure, null));
     }
 
     GenRepContent genRepContent = new GenRepContent(itvResp);
@@ -1012,7 +1004,7 @@ public abstract class BaseCmpResponder {
       case SYSTEM_FAILURE:
       case PATH_NOT_FOUND:
       default:
-        failureInfo = systemFailure;
+        failureInfo = PKIFailureInfo.systemFailure;
         break;
     }
 

@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.security.util.JSON;
+import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
@@ -18,9 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
 
 /**
  * An implementation of {@link CaQaSystemManager}.
@@ -49,7 +47,7 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
   }
 
   public void setConfFile(String confFile) {
-    this.confFile = notBlank(confFile, "confFile");
+    this.confFile = Args.notBlank(confFile, "confFile");
   }
 
   @Override
@@ -134,7 +132,7 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
   @Override
   public IssuerInfo getIssuer(String issuerName) {
     assertInitialized();
-    return x509IssuerInfoMap.get(notNull(issuerName, "issuerName"));
+    return x509IssuerInfoMap.get(Args.notNull(issuerName, "issuerName"));
   }
 
   @Override
@@ -146,7 +144,7 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
   @Override
   public CertprofileQa getCertprofile(String certprofileName) {
     assertInitialized();
-    return x509ProfileMap.get(notNull(certprofileName, "certprofileName"));
+    return x509ProfileMap.get(Args.notNull(certprofileName, "certprofileName"));
   }
 
   private void assertInitialized() {

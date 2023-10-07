@@ -130,10 +130,10 @@ public class QaOcspActions {
 
       File outDir = new File(outDirStr);
       File messageDir = new File(outDir, "messages");
-      messageDir.mkdirs();
+      IoUtil.mkdirs(messageDir);
 
       File detailsDir = new File(outDir, "details");
-      detailsDir.mkdirs();
+      IoUtil.mkdirs(detailsDir);
 
       println("The result is saved in the folder " + outDir.getPath());
 

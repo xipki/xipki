@@ -10,10 +10,9 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
+import org.xipki.util.Args;
 
 import java.security.SecureRandom;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * CMP requestor.
@@ -29,7 +28,7 @@ public abstract class Requestor {
   private final GeneralName name;
 
   private Requestor(X500Name name) {
-    this.name = new GeneralName(notNull(name, "name"));
+    this.name = new GeneralName(Args.notNull(name, "name"));
   }
 
   public GeneralName getName() {
@@ -92,8 +91,7 @@ public abstract class Requestor {
     }
 
     private static X500Name getSignerSubject(ConcurrentContentSigner signer) {
-      notNull(signer, "signer");
-      if (signer.getCertificate() == null) {
+      if (Args.notNull(signer, "signer").getCertificate() == null) {
         throw new IllegalArgumentException("requestor without certificate is not allowed");
       }
 

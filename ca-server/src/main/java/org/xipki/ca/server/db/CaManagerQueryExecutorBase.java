@@ -18,8 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static org.xipki.util.StringUtil.concat;
-
 /**
  * Base class to execute the database queries to manage CA system.
  *
@@ -79,7 +77,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
   } // method prepareStatement
 
   public List<String> namesFromTable(String table) throws CaMgmtException {
-    final String sql = concat("SELECT NAME FROM ", table);
+    final String sql = "SELECT NAME FROM " + table;
     List<ResultRow> rows = execQueryStmt0(sql);
 
     List<String> names = new LinkedList<>();
@@ -94,7 +92,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
   } // method namesFromTable
 
   public boolean deleteRowWithName(String name, String table) throws CaMgmtException {
-    final String sql = concat("DELETE FROM ", table, " WHERE NAME=?");
+    final String sql = "DELETE FROM " + table + " WHERE NAME=?";
     int num = execUpdatePrepStmt0(sql, col2Str(name));
     return num > 0;
   } // method deleteRowWithName
@@ -268,7 +266,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
       return id;
     }
 
-    throw new CaMgmtException(concat("Found no entry named ",name));
+    throw new CaMgmtException("Found no entry named " + name);
   } // method getNonNullIdForName
 
   protected Integer getIdForName(String sql, String name) throws CaMgmtException {
@@ -291,7 +289,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
   } // method getIdForName
 
   protected Map<Integer, String> getIdNameMap(String tableName) throws CaMgmtException {
-    final String sql = concat("SELECT ID,NAME FROM ", tableName);
+    final String sql = "SELECT ID,NAME FROM " + tableName;
     PreparedStatement ps = null;
     ResultSet rs = null;
 

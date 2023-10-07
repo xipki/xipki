@@ -21,6 +21,8 @@ import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.LruCache;
 import org.xipki.util.exception.BadCertTemplateException;
 
@@ -28,9 +30,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.CollectionUtil.isEmpty;
 
 /**
  * Public key checker.
@@ -52,8 +51,8 @@ public class PublicKeyChecker {
   }
 
   public List<ValidationIssue> checkPublicKey(SubjectPublicKeyInfo publicKey, SubjectPublicKeyInfo requestedPublicKey) {
-    notNull(publicKey, "publicKey");
-    notNull(requestedPublicKey, "requestedPublicKey");
+    Args.notNull(publicKey, "publicKey");
+    Args.notNull(requestedPublicKey, "requestedPublicKey");
 
     List<ValidationIssue> resultIssues = new LinkedList<>();
     if (keyAlgorithms != null) {
@@ -83,7 +82,7 @@ public class PublicKeyChecker {
   } // method checkPublicKey
 
   private void checkPublicKey(SubjectPublicKeyInfo publicKey) throws BadCertTemplateException {
-    if (isEmpty(keyAlgorithms)) {
+    if (CollectionUtil.isEmpty(keyAlgorithms)) {
       return;
     }
 

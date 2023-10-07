@@ -10,6 +10,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
+import org.xipki.util.SqlUtil;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;
@@ -21,8 +22,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.xipki.util.SqlUtil.buildInsertSql;
-
 /**
  * Database importer of CA configuration.
  *
@@ -32,7 +31,7 @@ import static org.xipki.util.SqlUtil.buildInsertSql;
 
 class CaconfDbImporter extends DbPorter {
 
-  private CaCertstore.Caconf caconf;
+  private final CaCertstore.Caconf caconf;
 
   CaconfDbImporter(DataSourceWrapper datasource, String srcDir, AtomicBoolean stopMe)
       throws DataAccessException, IOException, InvalidConfException {
@@ -81,7 +80,7 @@ class CaconfDbImporter extends DbPorter {
     DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
     Set<String> dbSchemaNames = dbSchemaInfo.getVariableNames();
 
-    final String sql = buildInsertSql("DBSCHEMA", "NAME,VALUE2");
+    final String sql = SqlUtil.buildInsertSql("DBSCHEMA", "NAME,VALUE2");
     PreparedStatement ps = null;
 
     boolean succ = false;
@@ -118,7 +117,7 @@ class CaconfDbImporter extends DbPorter {
       System.out.println("nothing to import");
       return;
     }
-    final String sql = buildInsertSql("SIGNER", "NAME,TYPE,CERT,CONF");
+    final String sql = SqlUtil.buildInsertSql("SIGNER", "NAME,TYPE,CERT,CONF");
 
     boolean succ = false;
     PreparedStatement ps = null;
@@ -151,7 +150,7 @@ class CaconfDbImporter extends DbPorter {
   private void importRequestor(List<CaCertstore.IdNameTypeConf> requestors)
       throws DataAccessException, IOException {
     System.out.print("    importing table REQUESTOR ... ");
-    final String sql = buildInsertSql("REQUESTOR", "ID,NAME,TYPE,CONF");
+    final String sql = SqlUtil.buildInsertSql("REQUESTOR", "ID,NAME,TYPE,CONF");
     boolean succ = false;
     PreparedStatement ps = null;
     try {
@@ -182,7 +181,7 @@ class CaconfDbImporter extends DbPorter {
       throws DataAccessException, IOException {
     System.out.print("    importing table PUBLISHER ... ");
     boolean succ = false;
-    final String sql = buildInsertSql("PUBLISHER", "ID,NAME,TYPE,CONF");
+    final String sql = SqlUtil.buildInsertSql("PUBLISHER", "ID,NAME,TYPE,CONF");
     PreparedStatement ps = null;
     try {
       ps = prepareStatement(sql);
@@ -211,7 +210,7 @@ class CaconfDbImporter extends DbPorter {
       throws DataAccessException, IOException {
     System.out.print("    importing table PROFILE ... ");
     boolean succ = false;
-    final String sql = buildInsertSql("PROFILE", "ID,NAME,TYPE,CONF");
+    final String sql = SqlUtil.buildInsertSql("PROFILE", "ID,NAME,TYPE,CONF");
     PreparedStatement ps = null;
     try {
       ps = prepareStatement(sql);
@@ -249,7 +248,7 @@ class CaconfDbImporter extends DbPorter {
 
     boolean succ = false;
     final String deleteSql = "DELETE FROM KEYPAIR_GEN WHERE NAME=?";
-    final String sql = buildInsertSql("KEYPAIR_GEN", "NAME,TYPE,CONF");
+    final String sql = SqlUtil.buildInsertSql("KEYPAIR_GEN", "NAME,TYPE,CONF");
 
     PreparedStatement ps = null;
     try {
@@ -298,7 +297,7 @@ class CaconfDbImporter extends DbPorter {
     System.out.print("    importing table CA ... ");
     boolean succ = false;
 
-    final String sql = buildInsertSql("CA",
+    final String sql = SqlUtil.buildInsertSql("CA",
         "ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,SUBJECT,REV_INFO,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN,CONF");
 
     PreparedStatement ps = null;
@@ -344,7 +343,7 @@ class CaconfDbImporter extends DbPorter {
   private void importCaalias(List<CaCertstore.Caalias> caaliases) throws DataAccessException {
     System.out.print("    importing table CAALIAS ... ");
     boolean succ = false;
-    final String sql = buildInsertSql("CAALIAS", "NAME,CA_ID");
+    final String sql = SqlUtil.buildInsertSql("CAALIAS", "NAME,CA_ID");
     PreparedStatement ps = prepareStatement(sql);
     try {
       for (CaCertstore.Caalias caalias : caaliases) {
@@ -369,7 +368,7 @@ class CaconfDbImporter extends DbPorter {
       throws DataAccessException {
     System.out.print("    importing table CA_HAS_REQUESTOR ... ");
     boolean succ = false;
-    final String sql = buildInsertSql("CA_HAS_REQUESTOR", "CA_ID,REQUESTOR_ID,PERMISSION,PROFILES");
+    final String sql = SqlUtil.buildInsertSql("CA_HAS_REQUESTOR", "CA_ID,REQUESTOR_ID,PERMISSION,PROFILES");
     PreparedStatement ps = prepareStatement(sql);
     try {
       for (CaCertstore.CaHasRequestor entry : caHasRequestors) {
@@ -398,7 +397,7 @@ class CaconfDbImporter extends DbPorter {
       throws Exception {
     System.out.print("    importing table CA_HAS_PUBLISHER ... ");
     boolean succ = false;
-    final String sql = buildInsertSql("CA_HAS_PUBLISHER", "CA_ID,PUBLISHER_ID");
+    final String sql = SqlUtil.buildInsertSql("CA_HAS_PUBLISHER", "CA_ID,PUBLISHER_ID");
     PreparedStatement ps = prepareStatement(sql);
     try {
       for (CaCertstore.CaHasPublisher entry : caHasPublishers) {
@@ -424,7 +423,7 @@ class CaconfDbImporter extends DbPorter {
       throws DataAccessException {
     System.out.print("    importing table CA_HAS_PROFILE ... ");
     boolean succ = false;
-    final String sql = buildInsertSql("CA_HAS_PROFILE", "CA_ID,PROFILE_ID");
+    final String sql = SqlUtil.buildInsertSql("CA_HAS_PROFILE", "CA_ID,PROFILE_ID");
     PreparedStatement ps = prepareStatement(sql);
     try {
       for (CaCertstore.CaHasProfile entry : caHasCertprofiles) {

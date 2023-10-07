@@ -227,15 +227,11 @@ public class DbToolBase implements Closeable {
 
     int len = Long.toString(maxId).length();
     String minIdStr = Long.toString(minIdOfCurrentFile);
-    for (int i = 0; i < len - minIdStr.length(); i++) {
-      sb.append('0');
-    }
+    sb.append("0".repeat(Math.max(0, len - minIdStr.length())));
     sb.append(minIdStr).append("-");
 
     String maxIdStr = Long.toString(maxIdOfCurrentFile);
-    for (int i = 0; i < len - maxIdStr.length(); i++) {
-      sb.append('0');
-    }
+    sb.append("0".repeat(Math.max(0, len - maxIdStr.length())));
     sb.append(maxIdStr).append(suffix);
     return sb.toString();
   } // method buildFilename

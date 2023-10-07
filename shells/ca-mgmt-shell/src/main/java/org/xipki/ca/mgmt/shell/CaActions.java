@@ -490,10 +490,10 @@ public class CaActions {
   @Service
   public static class CaRevoke extends CaAction {
 
-    public static final List<CrlReason> PERMITTED_REASONS = Collections.unmodifiableList(
-        Arrays.asList(CrlReason.UNSPECIFIED, CrlReason.KEY_COMPROMISE, CrlReason.CA_COMPROMISE,
-            CrlReason.AFFILIATION_CHANGED, CrlReason.SUPERSEDED, CrlReason.CESSATION_OF_OPERATION,
-            CrlReason.CERTIFICATE_HOLD, CrlReason.PRIVILEGE_WITHDRAWN));
+    public static final List<CrlReason> PERMITTED_REASONS = List.of(
+        CrlReason.UNSPECIFIED, CrlReason.KEY_COMPROMISE, CrlReason.CA_COMPROMISE,
+        CrlReason.AFFILIATION_CHANGED, CrlReason.SUPERSEDED, CrlReason.CESSATION_OF_OPERATION,
+        CrlReason.CERTIFICATE_HOLD, CrlReason.PRIVILEGE_WITHDRAWN);
 
     @Argument(index = 0, name = "name", description = "CA name", required = true)
     @Completion(CaCompleters.CaNameCompleter.class)

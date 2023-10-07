@@ -49,22 +49,31 @@ Deployment in Tomcat (8, 9 and 10)
 
 6. (optional) To accelerate the start process, append the following block to the property
   `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
+   (",\" shall be added to the last line of existing property value).
 
 ```
-animal-sniffer-annotations*.jar,\
-bcpkix-*.jar,\
+audit-*.jar,\
 bcprov-*.jar,\
+bcpkix-*.jar,\
 bcutil-*.jar,\
-jackson-*.jar,\
-log4j-*.jar,\
-security-*.jar,\
-slf4j-*.jar,\
-*pkcs11wrapper-*.jar,\
-jose4j-*.jar,\
+ca-sdk-*.jar,\
+cmp-client-*.jar,\
+datasource-*.jar,\
 dnsjava-*.jar,\
-util-*.jar,\
+*-gateway-*.jar,\
+gateway-common-*.jar,\
+HikariCP-*.jar,\
+ipkcs11wrapper-*.jar,\
+jackson-*.jar,\
+jose4j-*.jar,\
+mariadb-java-client-*.jar,\
+password-*.jar,\
+postgresql-*.jar,\
+security-*.jar,\
+scep-client-*.jar,\
+servlet*-common-*.jar,\
 xipki-tomcat-password-*.jar,\
-gateway-common-*.jar
+util-*.jar
 ```
 
 7. (optional) If you encrypt the passwords in the conf/server.xml with XiPKI solution, replace

@@ -105,7 +105,7 @@ abstract class CrmfKeyWrapper {
     @Override
     public byte[] generateWrappedKey(byte[] keyToWrap) throws OperatorException {
       try {
-        BlockCipher cbcCipher = new CBCBlockCipher(new AESEngine());
+        BlockCipher cbcCipher = CBCBlockCipher.newInstance(AESEngine.newInstance());
         IESEngine engine = new IESEngine(new ECDHBasicAgreement(), new KDF2BytesGenerator(new SHA1Digest()),
             new HMac(new SHA1Digest()), new PaddedBufferedBlockCipher(cbcCipher));
         IESCipher cipher = new IESCipher(engine, 16);

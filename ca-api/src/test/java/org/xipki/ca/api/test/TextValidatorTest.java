@@ -3,10 +3,9 @@
 
 package org.xipki.ca.api.test;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.ca.api.profile.TextVadidator;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * TextValidator test.
@@ -21,7 +20,7 @@ public class TextValidatorTest {
 
     String[] strs = {"pki.goog", "abc.com", "*.abc.com", "abc.local", "a.root"};
     for (String str : strs) {
-      assertTrue(str, tv.isValid(str));
+      Assert.assertTrue(str, tv.isValid(str));
     }
   }
 

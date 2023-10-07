@@ -3,6 +3,7 @@
 
 package org.xipki.ocsp.client;
 
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
@@ -13,8 +14,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-
-import static org.xipki.util.Args.notNull;
+import java.nio.charset.StandardCharsets;
 
 /**
  * HTTP OCSP requestor.
@@ -38,15 +38,13 @@ public class HttpOcspRequestor extends AbstractOcspRequestor {
   @Override
   protected byte[] send(byte[] request, URL responderUrl, RequestOptions requestOptions)
       throws IOException {
-    notNull(request, "request");
-    notNull(responderUrl, "responderUrl");
-    notNull(requestOptions, "requestOptions");
+    Args.notNull(responderUrl, "responderUrl");
 
-    int size = request.length;
+    int size = Args.notNull(request, "request").length;
     HttpURLConnection httpUrlConnection;
-    if (size <= MAX_LEN_GET && requestOptions.isUseHttpGetForRequest()) {
+    if (size <= MAX_LEN_GET && Args.notNull(requestOptions, "requestOptions").isUseHttpGetForRequest()) {
       String b64Request = Base64.encodeToString(request);
-      String urlEncodedReq = URLEncoder.encode(b64Request, "UTF-8");
+      String urlEncodedReq = URLEncoder.encode(b64Request, StandardCharsets.UTF_8);
       String baseUrl = responderUrl.toString();
       String url = StringUtil.concat(baseUrl, (baseUrl.endsWith("/") ? "" : "/"), urlEncodedReq);
 

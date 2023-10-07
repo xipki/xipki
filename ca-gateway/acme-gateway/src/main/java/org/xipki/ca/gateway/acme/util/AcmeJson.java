@@ -23,24 +23,22 @@ import org.xipki.ca.gateway.acme.AcmeProtocolException;
 import org.xipki.ca.gateway.acme.type.AcmeError;
 import org.xipki.util.LogUtil;
 
-import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * A model containing a JSON result. The content is immutable.
  * @author ACME4J team
  */
-public final class AcmeJson implements Serializable {
+public final class AcmeJson {
 
     private static final Logger LOG = LoggerFactory.getLogger(AcmeJson.class);
 
     private final String path;
 
-    private Map<String, Object> data; // Must not be final for deserialization
+    private final Map<String, Object> data;
 
     /**
      * Creates a new {@link AcmeJson} root object.
@@ -73,7 +71,7 @@ public final class AcmeJson implements Serializable {
      * @return {@link AcmeJson} of the read content.
      */
     public static AcmeJson parse(byte[] bytes) throws AcmeProtocolException {
-        return parse(new String(bytes, UTF_8));
+        return parse(new String(bytes, StandardCharsets.UTF_8));
     }
 
     /**

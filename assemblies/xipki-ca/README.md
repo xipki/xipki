@@ -40,10 +40,10 @@ Adapt the database configurations `${CONTAINER_ROOT}/xipki/etc/ca/database/ca-db
   ```
 
 8. (optional) To accelerate the start process, append the following block to the property
-`tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
+`tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`
+ (",\" shall be added to the last line of existing property value).
 
 ```
-animal-sniffer-annotations*.jar,\
 audit-*.jar,\
 bcpkix-*.jar,\
 bcprov-*.jar,\
@@ -51,21 +51,19 @@ bcutil-*.jar,\
 ca-*.jar,\
 certprofile-*.jar,\
 datasource-*.jar,\
-jackson-*.jar,\
 HikariCP-*.jar,\
-license-*,jar,\
-log4j-*.jar,\
+ipkcs11wrapper-*.jar,\
+jackson-*.jar,\
+license-*.jar,\
 mariadb-java-client-*.jar,\
-mysql-connector-j-*.jar,\
-ocsp-*.jar,\
+password-*.jar,\
 postgresql-*.jar,\
-scep-client-*.jar,\
 security-*.jar,\
-slf4j-*.jar,\
-*pkcs11wrapper-*.jar,\
+servlet3-common-*.jar,\
+servlet5-common-*.jar,\
 util-*.jar,\
-xipki-tomcat-password-*.jar,\
-gateway-common-*.jar
+xipki-tomcat-password-*.jar
+
 ```
 9. (optional) If you encrypt the passwords in the conf/server.xml with XiPKI solution, replace 
   `org.apache.coyote.http11.Http11Nio2Protocol` by `org.xipki.tomcat.XiHttp11Nio2Protocol`

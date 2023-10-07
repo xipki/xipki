@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
 
@@ -16,8 +17,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * XiPKI Keypool database query executor.
@@ -34,8 +33,8 @@ class KeypoolQueryExecutor {
 
   private final String sqlGetKeyData;
 
-  KeypoolQueryExecutor(DataSourceWrapper datasource, int shardId) throws DataAccessException {
-    this.datasource = notNull(datasource, "datasource");
+  KeypoolQueryExecutor(DataSourceWrapper datasource, int shardId) {
+    this.datasource = Args.notNull(datasource, "datasource");
     this.sqlGetKeyData = datasource.buildSelectFirstSql(1,
         "ID,ENC_ALG,ENC_META,DATA FROM KEYPOOL WHERE SHARD_ID=" + shardId + " AND KID=?");
   } // constructor

@@ -44,26 +44,22 @@ Deployment in Tomcat (8, 9 and 10)
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
 
 ```
-animal-sniffer-annotations*.jar,\
 audit-*.jar,\
 bcpkix-*.jar,\
 bcprov-*.jar,\
 bcutil-*.jar,\
-ca-*.jar,\
-certprofile-*.jar,\
 datasource-*.jar,\
-jackson-*.jar,\
 HikariCP-*.jar,\
-license-*,jar,\
-log4j-*.jar,\
+ipkcs11wrapper-*.jar,\
+jackson-*.jar,\
+license-*.jar,\
 mariadb-java-client-*.jar,\
-mysql-connector-j-*.jar,\
-ocsp-*.jar,\
+ocsp-api-*.jar,\
+ocsp-server-*.jar,\
+password-*.jar,\
 postgresql-*.jar,\
-scep-client-*.jar,\
 security-*.jar,\
-slf4j-*.jar,\
-*pkcs11wrapper-*.jar,\
+servlet*-common-*.jar,\
 util-*.jar,\
 xipki-tomcat-password-*.jar
 ```

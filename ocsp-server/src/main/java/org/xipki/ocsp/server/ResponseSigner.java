@@ -13,6 +13,7 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
+import org.xipki.util.Args;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -21,8 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import static org.xipki.util.Args.notEmpty;
 
 /**
  * Response signer.
@@ -52,7 +51,7 @@ class ResponseSigner {
   private final boolean macSigner;
 
   ResponseSigner(List<ConcurrentContentSigner> signers) throws CertificateException, IOException {
-    this.signers = notEmpty(signers, "signers");
+    this.signers = Args.notEmpty(signers, "signers");
     ConcurrentContentSigner firstSigner = signers.get(0);
     this.macSigner = firstSigner.isMac();
 

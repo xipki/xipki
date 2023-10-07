@@ -3,9 +3,9 @@
 
 package org.xipki.ca.gateway.acme.type;
 
-import java.time.Instant;
+import org.xipki.util.CompareUtil;
 
-import static org.xipki.util.CompareUtil.equalsObject;
+import java.time.Instant;
 
 /**
  *
@@ -70,8 +70,11 @@ public class CertReqMeta {
     }
 
     CertReqMeta b = (CertReqMeta) other;
-    return equalsObject(ca, b.ca) && equalsObject(certProfile, b.certProfile) && equalsObject(subject, b.subject)
-        && equalsObject(notBefore, b.notBefore) && equalsObject(notAfter, b.notAfter);
+    return CompareUtil.equalsObject(ca, b.ca)
+        && CompareUtil.equalsObject(certProfile, b.certProfile)
+        && CompareUtil.equalsObject(subject, b.subject)
+        && CompareUtil.equalsObject(notBefore, b.notBefore)
+        && CompareUtil.equalsObject(notAfter, b.notAfter);
   }
 
   public CertReqMeta copy() {

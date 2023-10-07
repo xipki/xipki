@@ -9,8 +9,6 @@ import org.xipki.util.Args;
 import java.math.BigInteger;
 import java.time.Instant;
 
-import static org.xipki.util.Args.notNull;
-
 /**
  * Certificate revocation information with serial number and database table id.
  *
@@ -32,8 +30,8 @@ public class CertRevInfoWithSerial implements Comparable<CertRevInfoWithSerial> 
 
   public CertRevInfoWithSerial(long id, BigInteger serial, CrlReason reason,
                                Instant revocationTime, Instant invalidityTime) {
-    this.reason = notNull(reason, "reason");
-    this.revocationTime = notNull(revocationTime, "revocationTime");
+    this.reason = Args.notNull(reason, "reason");
+    this.revocationTime = Args.notNull(revocationTime, "revocationTime");
     this.invalidityTime = invalidityTime;
     this.id = id;
     this.serial = Args.notNull(serial, "serial");

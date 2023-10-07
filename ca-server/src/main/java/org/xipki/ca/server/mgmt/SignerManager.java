@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.server.CaInfo;
+import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.SignerEntryWrapper;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.XiSecurityException;
@@ -15,17 +16,13 @@ import org.xipki.security.pkcs11.P11CryptService;
 import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotId;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 import org.xipki.util.exception.ObjectCreationException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
-
-import static org.xipki.ca.server.CaUtil.canonicalizeSignerConf;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.toNonBlankLower;
-import static org.xipki.util.StringUtil.concat;
 
 /**
  * Manages the signers.
@@ -74,16 +71,15 @@ class SignerManager {
   void addSigner(SignerEntry signerEntry) throws CaMgmtException {
     manager.assertMasterMode();
 
-    notNull(signerEntry, "signerEntry");
-    String name = signerEntry.getName();
+    String name = Args.notNull(signerEntry, "signerEntry").getName();
     CaManagerImpl.checkName(name, "signer name");
     if (manager.signerDbEntries.containsKey(name)) {
-      throw new CaMgmtException(concat("Signer named ", name, " exists"));
+      throw new CaMgmtException(StringUtil.concat("Signer named ", name, " exists"));
     }
 
     String conf = signerEntry.getConf();
     if (conf != null) {
-      String newConf = canonicalizeSignerConf(conf);
+      String newConf = CaUtil.canonicalizeSignerConf(conf);
       if (!conf.equals(newConf)) {
         signerEntry.setConf(newConf);
       }
@@ -98,7 +94,7 @@ class SignerManager {
   void removeSigner(String name) throws CaMgmtException {
     manager.assertMasterMode();
 
-    name = toNonBlankLower(name, "name");
+    name = Args.toNonBlankLower(name, "name");
     boolean bo = manager.queryExecutor.deleteRowWithName(name, "SIGNER");
     if (!bo) {
       throw new CaMgmtException("unknown signer " + name);
@@ -121,7 +117,7 @@ class SignerManager {
       throws CaMgmtException {
     manager.assertMasterMode();
 
-    name = toNonBlankLower(name, "name");
+    name = Args.toNonBlankLower(name, "name");
     if (type == null && conf == null && base64Cert == null) {
       throw new IllegalArgumentException("nothing to change");
     }
@@ -139,7 +135,7 @@ class SignerManager {
   } // method changeSigner
 
   SignerEntryWrapper createSigner(SignerEntry entry) throws CaMgmtException {
-    notNull(entry, "entry");
+    Args.notNull(entry, "entry");
     SignerEntryWrapper ret = new SignerEntryWrapper();
     ret.setDbEntry(entry);
     try {

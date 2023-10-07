@@ -26,14 +26,12 @@ import org.xipki.security.util.TlsHelper;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
 import org.xipki.util.exception.InsufficientPermissionException;
 import org.xipki.util.exception.OperationException;
 import org.xipki.util.http.XiHttpRequest;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.cert.CertificateException;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.*;
@@ -299,8 +297,6 @@ public class SdkResponder {
       }
     } catch (DecodeException ex) {
       return new ErrorResponse(null, BAD_REQUEST, ex.getMessage());
-    } catch (EncodeException ex) {
-      return new ErrorResponse(null, SYSTEM_FAILURE, ex.getMessage());
     } catch (OperationException ex) {
       return new ErrorResponse(null, ex.getErrorCode(), ex.getErrorMessage());
     }
@@ -327,7 +323,7 @@ public class SdkResponder {
   }
 
   private SdkResponse enroll(X509Ca ca, byte[] request, RequestorInfo requestor, boolean reenroll, boolean crossCert)
-      throws OperationException, EncodeException, DecodeException {
+      throws OperationException, DecodeException {
     EnrollCertsRequest req = EnrollCertsRequest.decode(request);
     EnrollCertRequestEntry[] entries = req.getEntries();
 
@@ -402,23 +398,13 @@ public class SdkResponder {
             text = "certificate with the issuer '" + X509Util.x500NameText(issuer) +
                     "' and serial number " + serialNumber;
 
-            try {
-              oldCert = ca.getCertWithRevocationInfo(serialNumber);
-            } catch (CertificateException ex) {
-              LogUtil.warn(LOG, ex, "error in ca.getCertWithRevocationInfo");
-              throw new OperationException(SYSTEM_FAILURE, "error while finding " + text);
-            }
+            oldCert = ca.getCertWithRevocationInfo(serialNumber);
           } else {
             reusePublicKey = ocSubject.isReusePublicKey();
             X500Name oldSubject = X500Name.getInstance(ocSubject.getSubject());
             String subjectText = X509Util.x500NameText(oldSubject);
             text = "certificate with subject '" + subjectText + "'";
-            try {
-              oldCert = ca.getCertWithRevocationInfoBySubject(oldSubject, ocSubject.getSan());
-            } catch (CertificateException ex) {
-              LogUtil.warn(LOG, ex, "error in ca.getCertWithRevocationInfoBySubject");
-              throw new OperationException(SYSTEM_FAILURE, "error while finding " + text);
-            }
+            oldCert = ca.getCertWithRevocationInfoBySubject(oldSubject, ocSubject.getSan());
           }
 
           if (oldCert == null) {
@@ -714,12 +700,7 @@ public class SdkResponder {
     }
 
     BigInteger sn = req.getSerialNumber();
-    X509Cert cert;
-    try {
-      cert = ca.getCert(sn);
-    } catch (CertificateException e) {
-      throw new OperationException(SYSTEM_FAILURE, e.getMessage());
-    }
+    X509Cert cert = ca.getCert(sn);
     return cert == null ? null : new PayloadResponse(cert.getEncoded());
   }
 

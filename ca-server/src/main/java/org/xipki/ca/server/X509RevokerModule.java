@@ -15,11 +15,9 @@ import org.xipki.ca.server.db.CertStore.SerialWithId;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.DateUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.Validity;
+import org.xipki.util.*;
 import org.xipki.util.Validity.Unit;
+import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.OperationException;
 
 import java.io.Closeable;
@@ -33,9 +31,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static org.xipki.ca.sdk.CaAuditConstants.*;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.exception.ErrorCode.NOT_PERMITTED;
-import static org.xipki.util.exception.ErrorCode.SYSTEM_FAILURE;
 
 /**
  * X509CA revoker module.
@@ -112,7 +107,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
   public CertWithRevocationInfo revokeCert(BigInteger serialNumber, CrlReason reason,
       Instant invalidityTime, AuditEvent event) throws OperationException {
     if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
-      throw new OperationException(NOT_PERMITTED, "insufficient permission to revoke CA certificate");
+      throw new OperationException(ErrorCode.NOT_PERMITTED, "insufficient permission to revoke CA certificate");
     }
 
     if (reason == null) {
@@ -123,7 +118,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
       case CA_COMPROMISE:
       case AA_COMPROMISE:
       case REMOVE_FROM_CRL:
-        throw new OperationException(NOT_PERMITTED, "insufficient permission to revoke certificate "
+        throw new OperationException(ErrorCode.NOT_PERMITTED, "insufficient permission to revoke certificate "
             + "with reason " + reason.getDescription());
       case UNSPECIFIED:
       case KEY_COMPROMISE:
@@ -149,7 +144,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
 
   public CertWithDbId unsuspendCert(BigInteger serialNumber, AuditEvent event) throws OperationException {
     if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
-      throw new OperationException(NOT_PERMITTED, "insufficient permission to unsuspend CA certificate");
+      throw new OperationException(ErrorCode.NOT_PERMITTED, "insufficient permission to unsuspend CA certificate");
     }
 
     boolean successful = false;
@@ -253,8 +248,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
   } // doUnrevokeCertificate
 
   public void revokeCa(RequestorInfo requestor, CertRevocationInfo revocationInfo) throws OperationException {
-    notNull(revocationInfo, "revocationInfo");
-    caInfo.setRevocationInfo(revocationInfo);
+    caInfo.setRevocationInfo(Args.notNull(revocationInfo, "revocationInfo"));
 
     if (caInfo.isSelfSigned()) {
       AuditEvent event = newAuditEvent(
@@ -271,7 +265,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
 
     boolean succ = publisherModule.publishCaRevoked(revocationInfo);
     if (!succ) {
-      throw new OperationException(SYSTEM_FAILURE, "could not publish event caRevoked of "
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE, "could not publish event caRevoked of "
           + "CA " + caIdent + " to at least one publisher");
     }
   } // method revokeCa
@@ -291,7 +285,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
 
     boolean succ = publisherModule.publishCaUnrevoked();
     if (!succ) {
-      throw new OperationException(SYSTEM_FAILURE, "could not event caUnrevoked of CA " + caIdent
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE, "could not event caUnrevoked of CA " + caIdent
           + " to at least one publisher");
     }
 
@@ -313,7 +307,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
 
   private int revokeSuspendedCerts0() throws OperationException {
     if (!masterMode) {
-      throw new OperationException(NOT_PERMITTED, "CA could not remove expired certificates in slave mode");
+      throw new OperationException(ErrorCode.NOT_PERMITTED, "CA could not remove expired certificates in slave mode");
     }
 
     final int numEntries = 100;

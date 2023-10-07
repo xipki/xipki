@@ -16,6 +16,7 @@ import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.sdk.CertprofileInfoResponse;
 import org.xipki.ca.sdk.KeyType;
 import org.xipki.ca.server.IdentifiedCertprofile;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.TripleState;
@@ -24,10 +25,6 @@ import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.exception.OperationException;
 
 import java.util.*;
-
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.toNonBlankLower;
-import static org.xipki.util.StringUtil.concat;
 
 /**
  * Manages the certificate profiles.
@@ -44,7 +41,7 @@ class CertprofileManager {
   private final CaManagerImpl manager;
 
   CertprofileManager(CaManagerImpl manager) {
-    this.manager = notNull(manager, "manager");
+    this.manager = Args.notNull(manager, "manager");
   }
 
   void reset() {
@@ -89,8 +86,8 @@ class CertprofileManager {
   void removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException {
     manager.assertMasterMode();
 
-    profileName = toNonBlankLower(profileName, "profileName");
-    caName = toNonBlankLower(caName, "caName");
+    profileName = Args.toNonBlankLower(profileName, "profileName");
+    caName = Args.toNonBlankLower(caName, "caName");
 
     manager.queryExecutor.removeCertprofileFromCa(profileName, caName);
 
@@ -105,17 +102,17 @@ class CertprofileManager {
   void addCertprofileToCa(String profileName, String caName) throws CaMgmtException {
     manager.assertMasterMode();
 
-    profileName = toNonBlankLower(profileName, "profileName");
-    caName = toNonBlankLower(caName, "caName");
+    profileName = Args.toNonBlankLower(profileName, "profileName");
+    caName = Args.toNonBlankLower(caName, "caName");
 
     NameId ident = manager.idNameMap.getCertprofile(profileName);
     if (ident == null) {
-      throw manager.logAndCreateException(concat("unknown Certprofile ", profileName));
+      throw manager.logAndCreateException("unknown Certprofile " + profileName);
     }
 
     NameId caIdent = manager.idNameMap.getCa(caName);
     if (caIdent == null) {
-      throw manager.logAndCreateException(concat("unknown CA ", caName));
+      throw manager.logAndCreateException("unknown CA " + caName);
     }
 
     Set<String> set = manager.caHasProfiles.get(caName);
@@ -125,12 +122,12 @@ class CertprofileManager {
     } else {
       if (set.contains(profileName)) {
         throw manager.logAndCreateException(
-            concat("Certprofile ", profileName, " already associated with CA ", caName));
+            "Certprofile '" + profileName + "' already associated with CA " + caName);
       }
     }
 
     if (!manager.certprofiles.containsKey(profileName)) {
-      throw new CaMgmtException(concat("certprofile '", profileName, "' is faulty"));
+      throw new CaMgmtException("certprofile '" + profileName + "' is faulty");
     }
 
     manager.queryExecutor.addCertprofileToCa(ident, caIdent);
@@ -140,7 +137,7 @@ class CertprofileManager {
   void removeCertprofile(String name) throws CaMgmtException {
     manager.assertMasterMode();
 
-    name = toNonBlankLower(name, "name");
+    name = Args.toNonBlankLower(name, "name");
 
     for (String caName : manager.caHasProfiles.keySet()) {
       if (manager.caHasProfiles.get(caName).contains(name)) {
@@ -163,13 +160,13 @@ class CertprofileManager {
   void changeCertprofile(String name, String type, String conf) throws CaMgmtException {
     manager.assertMasterMode();
 
-    name = toNonBlankLower(name, "name");
+    name = Args.toNonBlankLower(name, "name");
     if (type == null && conf == null) {
       throw new IllegalArgumentException("type and conf cannot be both null");
     }
     NameId ident = manager.idNameMap.getCertprofile(name);
     if (ident == null) {
-      throw manager.logAndCreateException(concat("unknown Certprofile ", name));
+      throw manager.logAndCreateException("unknown Certprofile " + name);
     }
 
     if (type != null) {
@@ -190,12 +187,10 @@ class CertprofileManager {
 
   void addCertprofile(CertprofileEntry certprofileEntry) throws CaMgmtException {
     manager.assertMasterMode();
-
-    notNull(certprofileEntry, "certprofileEntry");
-    String name = certprofileEntry.getIdent().getName();
+    String name = Args.notNull(certprofileEntry, "certprofileEntry").getIdent().getName();
     CaManagerImpl.checkName(name, "certprofile name");
     if (manager.certprofileDbEntries.containsKey(name)) {
-      throw new CaMgmtException(concat("Certprofile named ", name, " exists"));
+      throw new CaMgmtException("Certprofile '" + name + "' exists");
     }
 
     certprofileEntry.setFaulty(true);
@@ -291,9 +286,7 @@ class CertprofileManager {
   } // method shutdownCertprofile
 
   IdentifiedCertprofile createCertprofile(CertprofileEntry entry) throws CaMgmtException {
-    notNull(entry, "entry");
-
-    String type = entry.getType();
+    String type = Args.notNull(entry, "entry").getType();
     if (!manager.certprofileFactoryRegister.canCreateProfile(type)) {
       throw new CaMgmtException("unsupported cert profile type " + type);
     }

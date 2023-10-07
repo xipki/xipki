@@ -137,14 +137,15 @@ public class ChallengeValidator implements Runnable {
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, new TrustManager[]{trustAll}, null);
             SSLSocketFactory factory = sslContext.getSocketFactory();
-            SSLSocket socket = (SSLSocket) factory.createSocket(identifier.getValue(), 443);
-            SSLParameters params = socket.getSSLParameters();
-            params.setApplicationProtocols(new String[]{"acme-tls/1.0"});
-            params.setProtocols(new String[]{"TLSv1.2", "TLSv1.3"});
-            socket.setSSLParameters(params);
+            try (SSLSocket socket = (SSLSocket) factory.createSocket(identifier.getValue(), 443)) {
+              SSLParameters params = socket.getSSLParameters();
+              params.setApplicationProtocols(new String[]{"acme-tls/1.0"});
+              params.setProtocols(new String[]{"TLSv1.2", "TLSv1.3"});
+              socket.setSSLParameters(params);
 
-            SSLSession session = socket.getSession();
-            certs = session.getPeerCertificates();
+              SSLSession session = socket.getSession();
+              certs = session.getPeerCertificates();
+            }
           } catch (NoSuchAlgorithmException | IOException | KeyManagementException ex) {
             String message = "error while validating challenge " + challId + " for identifier " + identifier;
             LogUtil.error(LOG, ex, message);

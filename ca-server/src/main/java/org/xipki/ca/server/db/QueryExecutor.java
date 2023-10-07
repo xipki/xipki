@@ -5,11 +5,10 @@ package org.xipki.ca.server.db;
 
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.Args;
 
 import java.sql.*;
 import java.util.*;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * Base class to execute the database queries to manage CA system.
@@ -40,8 +39,8 @@ class QueryExecutor {
     }
 
     public SqlColumn(ColumnType type, String name, Object value, boolean sensitive, boolean signerConf) {
-      this.type = notNull(type, "type");
-      this.name = notNull(name, "name");
+      this.type = Args.notNull(type, "type");
+      this.name = Args.notNull(name, "name");
       this.value = value;
       this.sensitive = sensitive;
       this.signerConf = signerConf;
@@ -75,7 +74,7 @@ class QueryExecutor {
     private final Object value;
 
     public SqlColumn2(ColumnType type, Object value) {
-      this.type = notNull(type, "type");
+      this.type = Args.notNull(type, "type");
       this.value = value;
     }
 
@@ -93,7 +92,7 @@ class QueryExecutor {
     private final Map<String, String> variables = new HashMap<>();
 
     protected DbSchemaInfo(DataSourceWrapper datasource) throws DataAccessException {
-      notNull(datasource, "datasource");
+      Args.notNull(datasource, "datasource");
       final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
 
       PreparedStatement stmt = null;
@@ -121,7 +120,7 @@ class QueryExecutor {
     }
 
     public String variableValue(String variableName) {
-      return variables.get(notNull(variableName, "variableName"));
+      return variables.get(Args.notNull(variableName, "variableName"));
     }
 
   } // class DbSchemaInfo
@@ -129,7 +128,7 @@ class QueryExecutor {
   protected final DataSourceWrapper datasource;
 
   QueryExecutor(DataSourceWrapper datasource) {
-    this.datasource = notNull(datasource, "datasource");
+    this.datasource = Args.notNull(datasource, "datasource");
   } // constructor
 
   protected String buildSelectFirstSql(String coreSql) {
@@ -315,22 +314,22 @@ class QueryExecutor {
   }
 
   protected void notNulls(Object param1, String name1, Object param2, String name2) {
-    notNull(param1, name1);
-    notNull(param2, name2);
+    Args.notNull(param1, name1);
+    Args.notNull(param2, name2);
   }
 
   protected void notNulls(Object param1, String name1, Object param2, String name2, Object param3, String name3) {
-    notNull(param1, name1);
-    notNull(param2, name2);
-    notNull(param3, name3);
+    Args.notNull(param1, name1);
+    Args.notNull(param2, name2);
+    Args.notNull(param3, name3);
   }
 
   protected void notNulls(Object param1, String name1, Object param2, String name2,
       Object param3, String name3, Object param4, String name4) {
-    notNull(param1, name1);
-    notNull(param2, name2);
-    notNull(param3, name3);
-    notNull(param4, name4);
+    Args.notNull(param1, name1);
+    Args.notNull(param2, name2);
+    Args.notNull(param3, name3);
+    Args.notNull(param4, name4);
   }
 
 }

@@ -565,15 +565,11 @@ public abstract class Client {
     AuthorityCertStore cs = AuthorityCertStore.getInstance(caCert, raCerts.toArray(new X509Cert[0]));
     X509Cert raEncCert = cs.getEncryptionCert();
     X509Cert raSignCert = cs.getSignatureCert();
-    try {
-      if (!X509Util.issues(caCert, raEncCert)) {
-        throw new ScepClientException("RA certificate '" + raEncCert.getSubjectText() + " is not issued by the CA");
-      }
-      if (raSignCert != raEncCert && X509Util.issues(caCert, raSignCert)) {
-        throw new ScepClientException("RA certificate '" + raSignCert.getSubjectText() + " is not issued by the CA");
-      }
-    } catch (CertificateException ex) {
-      throw new ScepClientException("invalid certificate: " + ex.getMessage(), ex);
+    if (!X509Util.issues(caCert, raEncCert)) {
+      throw new ScepClientException("RA certificate '" + raEncCert.getSubjectText() + " is not issued by the CA");
+    }
+    if (raSignCert != raEncCert && X509Util.issues(caCert, raSignCert)) {
+      throw new ScepClientException("RA certificate '" + raSignCert.getSubjectText() + " is not issued by the CA");
     }
 
     return cs;

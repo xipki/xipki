@@ -29,8 +29,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.xipki.ca.server.CaUtil.*;
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
 
 /**
  * Execute the database queries to manage CA system.
@@ -281,7 +279,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method getNextId
 
   public void addCa(CaEntry caEntry) throws CaMgmtException {
-    notNull(caEntry, "caEntry");
+    Args.notNull(caEntry, "caEntry");
 
     caEntry.getIdent().setId((int) getNextId(Table.CA));
 
@@ -382,7 +380,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method addCaAlias
 
   public void addCertprofile(CertprofileEntry dbEntry) throws CaMgmtException {
-    notNull(dbEntry, "dbEntry");
+    Args.notNull(dbEntry, "dbEntry");
     final String sql = SqlUtil.buildInsertSql("PROFILE", "ID,NAME,TYPE,CONF");
 
     dbEntry.getIdent().setId((int) getNextId(Table.PROFILE));
@@ -423,7 +421,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method addPublisherToCa
 
   public void addRequestor(RequestorEntry dbEntry) throws CaMgmtException {
-    notNull(dbEntry, "dbEntry");
+    Args.notNull(dbEntry, "dbEntry");
 
     dbEntry.getIdent().setId((int) getNextId(Table.REQUESTOR));
 
@@ -479,7 +477,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method addRequestorToCa
 
   public void addPublisher(PublisherEntry dbEntry) throws CaMgmtException {
-    notNull(dbEntry, "dbEntry");
+    Args.notNull(dbEntry, "dbEntry");
     final String sql = SqlUtil.buildInsertSql("PUBLISHER", "ID,NAME,TYPE,CONF");
 
     dbEntry.getIdent().setId((int) getNextId(Table.PUBLISHER));
@@ -760,7 +758,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   public RequestorEntryWrapper changeRequestor(
       NameId nameId, String type, String conf, PasswordResolver passwordResolver)
       throws CaMgmtException {
-    notNull(nameId, "nameId");
+    Args.notNull(nameId, "nameId");
     RequestorEntryWrapper requestor = new RequestorEntryWrapper();
 
     requestor.setDbEntry(new RequestorEntry(nameId, type, conf));
@@ -776,10 +774,9 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   public SignerEntryWrapper changeSigner(
       String name, String type, String conf, String base64Cert, CaManagerImpl signerManager)
       throws CaMgmtException {
-    notBlank(name, "name");
-    notNull(signerManager, "signerManager");
+    Args.notNull(signerManager, "signerManager");
 
-    SignerEntry dbEntry = createSigner(name);
+    SignerEntry dbEntry = createSigner(Args.notBlank(name, "name"));
     String tmpType = (type == null ? dbEntry.getType() : type);
     if (conf != null) {
       conf = CaUtil.canonicalizeSignerConf(conf);
@@ -796,10 +793,9 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
   public KeypairGenEntryWrapper changeKeypairGen(String name, String type, String conf, CaManagerImpl manager)
       throws CaMgmtException {
-    notBlank(name, "name");
-    notNull(manager, "manager");
+    Args.notNull(manager, "manager");
 
-    KeypairGenEntry dbEntry = createKeypairGen(name);
+    KeypairGenEntry dbEntry = createKeypairGen(Args.notBlank(name, "name"));
     String tmpType = (type == null ? dbEntry.getType() : type);
 
     KeypairGenEntry newDbEntry = new KeypairGenEntry(name, tmpType, (conf == null ? dbEntry.getConf() : conf));
@@ -812,10 +808,9 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
   public IdentifiedCertPublisher changePublisher(String name, String type, String conf, CaManagerImpl publisherManager)
       throws CaMgmtException {
-    notBlank(name, "name");
-    notNull(publisherManager, "publisherManager");
+    Args.notNull(publisherManager, "publisherManager");
 
-    PublisherEntry currentDbEntry = createPublisher(name);
+    PublisherEntry currentDbEntry = createPublisher(Args.notBlank(name, "name"));
     PublisherEntry dbEntry = new PublisherEntry(currentDbEntry.getIdent(),
         (type == null ? currentDbEntry.getType() : type), (conf == null ? currentDbEntry.getConf() : conf));
     IdentifiedCertPublisher publisher = publisherManager.createPublisher(dbEntry);
@@ -825,7 +820,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method changePublisher
 
   public void removeCa(String caName) throws CaMgmtException {
-    notBlank(caName, "caName");
+    Args.notBlank(caName, "caName");
     final String sql = "DELETE FROM CA WHERE NAME=?";
 
     int num = execUpdatePrepStmt0(sql, col2Str(caName));
@@ -835,7 +830,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method removeCa
 
   public void removeCaAlias(String aliasName) throws CaMgmtException {
-    notBlank(aliasName, "aliasName");
+    Args.notBlank(aliasName, "aliasName");
     int num = execUpdatePrepStmt0("DELETE FROM CAALIAS WHERE NAME=?", col2Str(aliasName));
     if (num == 0) {
       throw new CaMgmtException("could not remove CA Alias " + aliasName);
@@ -843,31 +838,31 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method removeCaAlias
 
   public void removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException {
-    notBlank(profileName, "profileName");
-    notBlank(caName, "caName");
+    Args.notBlank(profileName, "profileName");
+    Args.notBlank(caName, "caName");
 
     removeEntityFromCa("profile", profileName, caName, sqlSelectProfileId,
         "DELETE FROM CA_HAS_PROFILE WHERE CA_ID=? AND PROFILE_ID=?");
   } // method removeCertprofileFromCa
 
   public void removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException {
-    notBlank(requestorName, "requestorName");
-    notBlank(caName, "caName");
+    Args.notBlank(requestorName, "requestorName");
+    Args.notBlank(caName, "caName");
 
     removeEntityFromCa("requestor", requestorName, caName, sqlSelectRequestorId,
         "DELETE FROM CA_HAS_REQUESTOR WHERE CA_ID=? AND REQUESTOR_ID=?");
   } // method removeRequestorFromCa
 
   public void removePublisherFromCa(String publisherName, String caName) throws CaMgmtException {
-    notBlank(publisherName, "publisherName");
-    notBlank(caName, "caName");
-
-    removeEntityFromCa("publisher", publisherName, caName, sqlSelectPublisherId,
+    removeEntityFromCa("publisher",
+        Args.notBlank(publisherName, "publisherName"),
+        Args.notBlank(caName, "caName"),
+        sqlSelectPublisherId,
         "DELETE FROM CA_HAS_PUBLISHER WHERE CA_ID=? AND PUBLISHER_ID=?");
   } // method removePublisherFromCa
 
   public void removeDbSchema(String name) throws CaMgmtException {
-    notBlank(name, "name");
+    Args.notBlank(name, "name");
     final String sql = "DELETE FROM DBSCHEMA WHERE NAME=?";
 
     int num = execUpdatePrepStmt0(sql, col2Str(name));
@@ -892,8 +887,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method removeEntityFromCa
 
   public void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {
-    notBlank(caName, "caName");
-    notNull(revocationInfo, "revocationInfo");
+    Args.notBlank(caName, "caName");
+    Args.notNull(revocationInfo, "revocationInfo");
     int num = execUpdatePrepStmt0("UPDATE CA SET REV_INFO=? WHERE NAME=?",
                 col2Str(revocationInfo.encode()), col2Str(caName));
     if (num == 0) {
@@ -902,7 +897,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method revokeCa
 
   public void addKeypairGen(KeypairGenEntry dbEntry) throws CaMgmtException {
-    notNull(dbEntry, "dbEntry");
+    Args.notNull(dbEntry, "dbEntry");
 
     int num = execUpdatePrepStmt0("INSERT INTO KEYPAIR_GEN (NAME,TYPE,CONF) VALUES (?,?,?)",
             col2Str(dbEntry.getName()), col2Str(dbEntry.getType()), col2Str(dbEntry.getConf()));
@@ -915,7 +910,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method addSigner
 
   public void addSigner(SignerEntry dbEntry) throws CaMgmtException {
-    notNull(dbEntry, "dbEntry");
+    Args.notNull(dbEntry, "dbEntry");
 
     int num = execUpdatePrepStmt0(SqlUtil.buildInsertSql("SIGNER", "NAME,TYPE,CERT,CONF"),
             col2Str(dbEntry.getName()),       col2Str(dbEntry.getType()),
@@ -944,7 +939,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method unlockCa
 
   public void unrevokeCa(String caName) throws CaMgmtException {
-    notBlank(caName, "caName");
+    Args.notBlank(caName, "caName");
     LOG.info("Unrevoking of CA '{}'", caName);
 
     int num = execUpdatePrepStmt0("UPDATE CA SET REV_INFO=? WHERE NAME=?", col2Str(null), col2Str(caName));

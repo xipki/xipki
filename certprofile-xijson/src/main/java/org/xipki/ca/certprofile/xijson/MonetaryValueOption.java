@@ -5,8 +5,7 @@ package org.xipki.ca.certprofile.xijson;
 
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.xipki.ca.certprofile.xijson.conf.QcStatements.Range2Type;
-
-import static org.xipki.util.Args.notNull;
+import org.xipki.util.Args;
 
 /**
  * Control of the MonetaryValue (in the extension QCStatements).
@@ -26,9 +25,9 @@ class MonetaryValueOption {
   private final Range2Type exponentRange;
 
   public MonetaryValueOption(Iso4217CurrencyCode currency, Range2Type amountRange, Range2Type exponentRange) {
-    this.currency = notNull(currency, "currency");
-    this.amountRange = notNull(amountRange, "amountRange");
-    this.exponentRange = notNull(exponentRange, "exponentRange");
+    this.currency = Args.notNull(currency, "currency");
+    this.amountRange = Args.notNull(amountRange, "amountRange");
+    this.exponentRange = Args.notNull(exponentRange, "exponentRange");
 
     this.currencyString = currency.isAlphabetic() ? currency.getAlphabetic().toUpperCase()
         : Integer.toString(currency.getNumeric());

@@ -19,14 +19,13 @@ import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.util.Args;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * CMP utility class.
@@ -43,8 +42,8 @@ public class CmpUtil {
   public static PKIMessage addProtection(
       PKIMessage pkiMessage, ConcurrentContentSigner signer, GeneralName signerName, boolean addSignerCert)
       throws CMPException, NoIdleSignerException {
-    notNull(pkiMessage, "pkiMessage");
-    notNull(signer, "signer");
+    Args.notNull(pkiMessage, "pkiMessage");
+    Args.notNull(signer, "signer");
 
     final GeneralName tmpSignerName;
     if (signerName != null) {
@@ -135,7 +134,7 @@ public class CmpUtil {
   } // method newProtectedPKIMessageBuilder
 
   public static boolean isImplicitConfirm(PKIHeader header) {
-    InfoTypeAndValue[] regInfos = notNull(header, "header").getGeneralInfo();
+    InfoTypeAndValue[] regInfos = Args.notNull(header, "header").getGeneralInfo();
     if (regInfos != null) {
       for (InfoTypeAndValue regInfo : regInfos) {
         if (CMPObjectIdentifiers.it_implicitConfirm.equals(regInfo.getInfoType())) {
@@ -194,12 +193,12 @@ public class CmpUtil {
   }
 
   public static InfoTypeAndValue buildInfoTypeAndValue(CmpUtf8Pairs utf8Pairs) {
-    notNull(utf8Pairs, "utf8Pairs");
+    Args.notNull(utf8Pairs, "utf8Pairs");
     return new InfoTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs, new DERUTF8String(utf8Pairs.encoded()));
   }
 
   public static AttributeTypeAndValue buildAttributeTypeAndValue(CmpUtf8Pairs utf8Pairs) {
-    notNull(utf8Pairs, "utf8Pairs");
+    Args.notNull(utf8Pairs, "utf8Pairs");
     return new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs, new DERUTF8String(utf8Pairs.encoded()));
   }
 

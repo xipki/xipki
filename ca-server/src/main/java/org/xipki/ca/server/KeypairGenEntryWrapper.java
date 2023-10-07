@@ -9,11 +9,10 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.KeypairGenerator;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.XiSecurityException;
+import org.xipki.util.Args;
 import org.xipki.util.exception.ObjectCreationException;
 
 import java.util.Map;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * Wrapper of keypair generation database entry.
@@ -31,12 +30,12 @@ public class KeypairGenEntryWrapper {
   }
 
   public void setDbEntry(KeypairGenEntry dbEntry) {
-    this.dbEntry = notNull(dbEntry, "dbEntry");
+    this.dbEntry = Args.notNull(dbEntry, "dbEntry");
   }
 
   public void init(SecurityFactory securityFactory, int shardId, Map<String, DataSourceWrapper> datasources)
       throws ObjectCreationException {
-    notNull(securityFactory, "securityFactory");
+    Args.notNull(securityFactory, "securityFactory");
     dbEntry.faulty(true);
     if ("KEYPOOL".equalsIgnoreCase(dbEntry.getType())) {
       generator = new KeypoolKeypairGenerator();

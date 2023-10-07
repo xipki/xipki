@@ -7,15 +7,13 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.sdk.*;
+import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.positive;
 
 /**
  * CA enrollment benchmark.
@@ -87,8 +85,8 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
     super(description);
     this.caName = caName;
     this.maxRequests = maxRequests;
-    this.num = positive(num, "num");
-    this.benchmarkEntry = notNull(benchmarkEntry, "benchmarkEntry");
+    this.num = Args.positive(num, "num");
+    this.benchmarkEntry = Args.notNull(benchmarkEntry, "benchmarkEntry");
     this.index = new AtomicLong(getSecureIndex());
     this.caGenKeyPair = benchmarkEntry.getSubjectPublicKeyInfo() == null;
     this.client = new SdkClient(SdkClientConf.readConfFromFile(CONF_FILE));

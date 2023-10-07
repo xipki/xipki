@@ -12,6 +12,7 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
 import org.xipki.util.SqlUtil;
@@ -27,8 +28,6 @@ import java.sql.Types;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.xipki.util.Args.notNull;
 
 /**
  * XiPKI OCSP database query executor.
@@ -64,7 +63,7 @@ class OcspStoreQueryExecutor {
     private final List<IssuerEntry> entries;
 
     IssuerStore(List<IssuerEntry> entries) {
-      notNull(entries, "entries");
+      Args.notNull(entries, "entries");
       this.entries = new ArrayList<>(entries.size());
 
       for (IssuerEntry entry : entries) {
@@ -73,7 +72,7 @@ class OcspStoreQueryExecutor {
     } // constructor
 
     final void addIdentityEntry(IssuerEntry entry) {
-      notNull(entry, "entry");
+      Args.notNull(entry, "entry");
       for (IssuerEntry existingEntry : entries) {
         if (existingEntry.getId() == entry.getId()) {
           throw new IllegalArgumentException("issuer with the same id " + entry.getId() + " already available");
@@ -84,7 +83,7 @@ class OcspStoreQueryExecutor {
     } // method addIdentityEntry
 
     Integer getIdForCert(byte[] encodedCert) {
-      notNull(encodedCert, "encodedCert");
+      Args.notNull(encodedCert, "encodedCert");
       for (IssuerEntry entry : entries) {
         if (entry.matchCert(encodedCert)) {
           return entry.getId();
@@ -123,7 +122,7 @@ class OcspStoreQueryExecutor {
 
   OcspStoreQueryExecutor(DataSourceWrapper datasource, boolean publishGoodCerts)
       throws DataAccessException, NoSuchAlgorithmException {
-    this.datasource = notNull(datasource, "datasource");
+    this.datasource = Args.notNull(datasource, "datasource");
     this.issuerStore = initIssuerStore();
     this.publishGoodCerts = publishGoodCerts;
 
@@ -188,7 +187,7 @@ class OcspStoreQueryExecutor {
 
   private void addOrUpdateCert(X509Cert issuer, CertWithDbId certificate, CertRevocationInfo revInfo)
       throws DataAccessException, OperationException {
-    notNull(issuer, "issuer");
+    Args.notNull(issuer, "issuer");
 
     boolean revoked = (revInfo != null);
     int issuerId = getIssuerId(issuer);
@@ -304,8 +303,8 @@ class OcspStoreQueryExecutor {
   }
 
   void unrevokeCert(X509Cert issuer, CertWithDbId cert) throws DataAccessException {
-    notNull(issuer, "issuer");
-    notNull(cert, "cert");
+    Args.notNull(issuer, "issuer");
+    Args.notNull(cert, "cert");
 
     Integer issuerId = issuerStore.getIdForCert(issuer.getEncoded());
     if (issuerId == null) {
@@ -355,9 +354,9 @@ class OcspStoreQueryExecutor {
   } // method unrevokeCert
 
   void removeCert(X509Cert issuer, CertWithDbId cert) throws DataAccessException {
-    notNull(cert, "cert");
+    Args.notNull(cert, "cert");
 
-    Integer issuerId = issuerStore.getIdForCert(notNull(issuer, "issuer").getEncoded());
+    Integer issuerId = issuerStore.getIdForCert(Args.notNull(issuer, "issuer").getEncoded());
     if (issuerId == null) {
       return;
     }
@@ -377,9 +376,9 @@ class OcspStoreQueryExecutor {
   } // method removeCert
 
   void revokeCa(X509Cert caCert, CertRevocationInfo revInfo) throws DataAccessException {
-    notNull(revInfo, "revInfo");
+    Args.notNull(revInfo, "revInfo");
 
-    int issuerId = getIssuerId(notNull(caCert, "caCert"));
+    int issuerId = getIssuerId(Args.notNull(caCert, "caCert"));
     final String sql = "UPDATE ISSUER SET REV_INFO=? WHERE ID=?";
     PreparedStatement ps = datasource.prepareStatement(sql);
 
@@ -411,8 +410,7 @@ class OcspStoreQueryExecutor {
   } // method unrevokeCa
 
   private int getIssuerId(X509Cert issuerCert) {
-    notNull(issuerCert, "issuerCert");
-    Integer id = issuerStore.getIdForCert(issuerCert.getEncoded());
+    Integer id = issuerStore.getIdForCert(Args.notNull(issuerCert, "issuerCert").getEncoded());
     if (id == null) {
       throw new IllegalStateException("could not find issuer, "
           + "please start XiPKI in master mode first the restart this XiPKI system");

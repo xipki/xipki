@@ -59,7 +59,7 @@ public class DigestDiffWorker extends DbWorker {
 
     File file = new File(reportDirName);
     if (!file.exists()) {
-      file.mkdirs();
+      IoUtil.mkdirs(file);
     } else {
       if (!file.isDirectory()) {
         throw new IOException(reportDirName + " is not a folder");

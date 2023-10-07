@@ -33,9 +33,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static org.xipki.util.DateUtil.toEpochSecond;
-import static org.xipki.util.SqlUtil.buildInsertSql;
-
 /**
  * Database importer of CA CertStore.
  *
@@ -47,11 +44,11 @@ class CaCertstoreDbImporter extends DbPorter {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaCertstoreDbImporter.class);
 
-  private static final String SQL_ADD_CERT = buildInsertSql("CERT",
+  private static final String SQL_ADD_CERT = SqlUtil.buildInsertSql("CERT",
       "ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,FP_SAN,NBEFORE,NAFTER,REV,RR,RT,RIT,"
       + "PID,CA_ID,RID,EE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT,PRIVATE_KEY");
 
-  private static final String SQL_ADD_CRL = buildInsertSql("CRL",
+  private static final String SQL_ADD_CRL = SqlUtil.buildInsertSql("CRL",
       "ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL_SCOPE,SHA1,CRL");
 
   private final int numCertsPerCommit;
@@ -82,7 +79,7 @@ class CaCertstoreDbImporter extends DbPorter {
   private void importProfile(List<CaCertstore.IdNameTypeConf> profiles) throws DataAccessException {
     System.out.print("    importing table PROFILE ... ");
     boolean succ = false;
-    final String sql = buildInsertSql("PROFILE", "ID,NAME");
+    final String sql = SqlUtil.buildInsertSql("PROFILE", "ID,NAME");
     PreparedStatement ps = null;
     try {
       ps = prepareStatement(sql);
@@ -106,7 +103,7 @@ class CaCertstoreDbImporter extends DbPorter {
 
   private void importRequestor(List<CaCertstore.IdNameTypeConf> requestors) throws DataAccessException {
     System.out.print("    importing table REQUESTOR ... ");
-    final String sql = buildInsertSql("REQUESTOR", "ID,NAME");
+    final String sql = SqlUtil.buildInsertSql("REQUESTOR", "ID,NAME");
     boolean succ = false;
     PreparedStatement ps = null;
     try {
@@ -135,7 +132,7 @@ class CaCertstoreDbImporter extends DbPorter {
     System.out.print("    importing table CA ... ");
     boolean succ = false;
 
-    final String sql = buildInsertSql("CA", "ID,NAME,SUBJECT,REV_INFO,CERT");
+    final String sql = SqlUtil.buildInsertSql("CA", "ID,NAME,SUBJECT,REV_INFO,CERT");
 
     PreparedStatement ps = null;
     try {
@@ -438,8 +435,8 @@ class CaCertstoreDbImporter extends DbPorter {
             stmt.setNull(idx++, Types.BIGINT);
           }
 
-          stmt.setLong(idx++, toEpochSecond(tbsCert.getStartDate().getDate()));
-          stmt.setLong(idx++, toEpochSecond(tbsCert.getEndDate().getDate()));
+          stmt.setLong(idx++, DateUtil.toEpochSecond(tbsCert.getStartDate().getDate()));
+          stmt.setLong(idx++, DateUtil.toEpochSecond(tbsCert.getEndDate().getDate()));
           setInt(stmt, idx++, cert.getRev());
           setInt(stmt, idx++, cert.getRr());
           setLong(stmt, idx++, cert.getRt());
@@ -587,9 +584,9 @@ class CaCertstoreDbImporter extends DbPorter {
           stmt.setLong(idx++, crl.getId());
           stmt.setInt(idx++, crl.getCaId());
           stmt.setLong(idx++, crlNumber.longValue());
-          stmt.setLong(idx++, toEpochSecond(x509crl.getThisUpdate()));
+          stmt.setLong(idx++, DateUtil.toEpochSecond(x509crl.getThisUpdate()));
           if (x509crl.getNextUpdate() != null) {
-            stmt.setLong(idx++, toEpochSecond(x509crl.getNextUpdate()));
+            stmt.setLong(idx++, DateUtil.toEpochSecond(x509crl.getNextUpdate()));
           } else {
             stmt.setNull(idx++, Types.INTEGER);
           }

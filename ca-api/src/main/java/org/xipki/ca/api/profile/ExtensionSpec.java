@@ -276,8 +276,8 @@ public abstract class ExtensionSpec {
   private static class Rfc5280EndEntity extends Rfc5280 {
 
     private static final Set<ASN1ObjectIdentifier> REQUIRED_EXTENSIONS =
-        Collections.unmodifiableSet(new HashSet<>(Collections.singletonList(
-                Extension.subjectKeyIdentifier)));
+        Set.copyOf(Collections.singletonList(
+            Extension.subjectKeyIdentifier));
 
     private static final Set<ASN1ObjectIdentifier> NON_PERMITTED_EXTENSIONS =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(

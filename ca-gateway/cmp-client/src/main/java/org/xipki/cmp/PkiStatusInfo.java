@@ -4,8 +4,7 @@
 package org.xipki.cmp;
 
 import org.bouncycastle.asn1.cmp.PKIFreeText;
-
-import static org.xipki.util.Args.notNull;
+import org.xipki.util.Args;
 
 /**
  * PKIStatus.
@@ -35,9 +34,7 @@ public class PkiStatusInfo {
   }
 
   public PkiStatusInfo(org.bouncycastle.asn1.cmp.PKIStatusInfo bcPkiStatusInfo) {
-    notNull(bcPkiStatusInfo, "bcPkiStatusInfo");
-
-    this.status = bcPkiStatusInfo.getStatus().intValue();
+    this.status = Args.notNull(bcPkiStatusInfo, "bcPkiStatusInfo").getStatus().intValue();
     this.pkiFailureInfo = (bcPkiStatusInfo.getFailInfo() == null) ? 0 : bcPkiStatusInfo.getFailInfo().intValue();
     PKIFreeText text = bcPkiStatusInfo.getStatusString();
     this.statusMessage = (text == null) ? null : text.getStringAtUTF8(0).getString();
