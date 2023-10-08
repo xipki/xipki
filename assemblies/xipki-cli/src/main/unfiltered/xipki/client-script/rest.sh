@@ -14,8 +14,19 @@ elif [[ "$1" == "ocsp" ]] ; then
 fi
 
 # Please adapt the URL
+## URL pattern: https://<host>:<port>/rest/<CA-name>. To enroll certificate, the
+## profile parameter shall be specified. e.g.
+## https://localhost:8445/rest/myca/enroll-cert?profile=smime
+#
 CA_URL="https://localhost:8445/rest/myca"
 echo "CA URL: ${CA_URL}"
+
+## Short URL is possible (without the "profile" parameter)
+##   For all aliases:     https://<host>:<port>/rest/<alias>
+##   For alias "default": https://<host>:<port>/rest/
+##
+## To use the short URL, you need to configure the "CaProfiles" field
+## in the REST proxy (rest-proxy.conf) with given alias.
 
 OCSP_URL="http://localhost:8080/ocsp/"
 

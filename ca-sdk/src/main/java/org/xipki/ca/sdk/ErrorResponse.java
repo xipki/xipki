@@ -11,7 +11,6 @@ import org.xipki.util.exception.ErrorCode;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Optional;
 
 /**
  * Error response.

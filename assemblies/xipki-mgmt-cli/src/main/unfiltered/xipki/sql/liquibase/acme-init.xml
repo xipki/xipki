@@ -63,7 +63,7 @@
       </column>
       <column name="CERT_NAFTER" type="BIGINT"/>
       <column name="CERT_SHA256" type="CHAR(43)"/>
-      <column name="AUTHZS" type="VArCHAR(2000)">
+      <column name="AUTHZS" type="VARCHAR(2000)">
         <constraints nullable="false"/>
       </column>
       <column name="CERTREQ_META" type="VARCHAR(200)"/>

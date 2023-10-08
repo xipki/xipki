@@ -3,8 +3,6 @@
 
 package org.xipki.ca.sdk;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.xipki.security.util.JSON;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.EncodeException;
 

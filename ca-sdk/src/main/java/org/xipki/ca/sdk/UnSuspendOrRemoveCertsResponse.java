@@ -10,7 +10,6 @@ import org.xipki.util.exception.EncodeException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Optional;
 
 /**
  * Response for the operations unrevoking certificates and removing certificates.

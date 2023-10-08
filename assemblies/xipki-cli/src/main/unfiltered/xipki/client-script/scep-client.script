@@ -1,7 +1,17 @@
 HASH = SHA256
 
+## URL pattern: https://<host>:<port>/scep/<CA-name>/<certprofile-name>/pkiclient.exe
 URL = http://localhost:8082/scep/myca/tls/pkiclient.exe
 SMIME_URL = http://localhost:8082/scep/myca/smime/pkiclient.exe
+
+## Short URL is possible
+##   For all aliases:     https://<host>:<port>/scep/<alias>/pkiclient.exe
+##   For alias "default": https://<host>:<port>/scep/pkiclient.exe
+## To use the short URL, you need to configure the "CaProfiles" field
+## in the SCEP proxy (scep-proxy.conf) with given alias.
+#
+# URL = http://localhost:8082/scep/pkiclient.exe
+# SMIME_URL = http://localhost:8082/scep/smime/pkiclient.exe
 
 echo "#################################################################"
 echo "#               Enroll Certificate via SCEP                     #"

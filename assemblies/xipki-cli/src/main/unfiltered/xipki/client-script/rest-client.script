@@ -17,7 +17,19 @@ if { $printUsage equals "true" } then {
   echo "    ocsp:      Also test the OCSP status"
 } else {
 HASH = SHA256
+
+## URL pattern: https://<host>:<port>/rest/<CA-name>. To enroll certificate, the
+## profile parameter shall be specified. e.g.
+## https://localhost:8445/rest/myca/enroll-cert?profile=smime
+#
 BASE_URL = https://localhost:8445/rest/myca
+
+## Short URL is possible (without the "profile" parameter)
+##   For all aliases:     https://<host>:<port>/rest/<alias>
+##   For alias "default": https://<host>:<port>/rest/
+##
+## To use the short URL, you need to configure the "CaProfiles" field
+## in the REST proxy (rest-proxy.conf) with given alias.
 
 echo "#################################################################"
 echo "#               Manage certificate via REST API                 #"
