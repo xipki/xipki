@@ -46,8 +46,8 @@ public class SingleCertSerialEntry implements CborEncodable {
       encoder.writeArrayStart(2);
       encoder.writeByteString(serialNumber);
       encoder.writeObject(error);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
@@ -60,7 +60,7 @@ public class SingleCertSerialEntry implements CborEncodable {
       return new SingleCertSerialEntry(
           decoder.readBigInt(),
           ErrorEntry.decode(decoder));
-    } catch (IOException | IllegalArgumentException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + SingleCertSerialEntry.class.getName(), ex);
     }
   }

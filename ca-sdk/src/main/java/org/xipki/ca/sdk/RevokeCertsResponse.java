@@ -10,6 +10,7 @@ import org.xipki.util.exception.EncodeException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Response for the operation revoking certificates.
@@ -35,20 +36,20 @@ public class RevokeCertsResponse extends SdkResponse {
     try {
       encoder.writeArrayStart(1);
       encoder.writeObjects(entries);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
   public static RevokeCertsResponse decode(byte[] encoded) throws DecodeException {
     try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
       if (decoder.readNullOrArrayLength(1)) {
-        return null;
+        throw new DecodeException("RevokeCertsResponse could not be null.");
       }
 
       return new RevokeCertsResponse(
           SingleCertSerialEntry.decodeArray(decoder));
-    } catch (IOException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + RevokeCertsResponse.class.getName(), ex);
     }
   }

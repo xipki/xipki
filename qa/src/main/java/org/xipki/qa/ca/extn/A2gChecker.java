@@ -425,7 +425,8 @@ class A2gChecker extends ExtensionChecker {
 
       for (GeneralName name : names) {
         if (name.getTagNo() != GeneralName.uniformResourceIdentifier) {
-          addViolation(failureMsg, "tag of URL of " + type, name.getTagNo(), GeneralName.uniformResourceIdentifier);
+          addViolation(failureMsg, "tag of URL of " + type, name.getTagNo(),
+              GeneralName.uniformResourceIdentifier);
         } else {
           String uri = ((ASN1String) name.getName()).getString();
           isCrlUrls.add(uri);
@@ -466,7 +467,9 @@ class A2gChecker extends ExtensionChecker {
     }
 
     Set<ExtKeyUsageControl> optionalExtKeyusage = caller.getExtKeyusage(false);
-    if (requestedExtns != null && extnControl.isPermittedInRequest() && CollectionUtil.isNotEmpty(optionalExtKeyusage)) {
+    if (requestedExtns != null
+        && extnControl.isPermittedInRequest()
+        && CollectionUtil.isNotEmpty(optionalExtKeyusage)) {
       Extension extension = requestedExtns.getExtension(Extension.extendedKeyUsage);
       if (extension != null) {
         org.bouncycastle.asn1.x509.ExtendedKeyUsage reqKeyUsage =

@@ -35,20 +35,20 @@ public class CertChainResponse extends SdkResponse {
     try {
       encoder.writeArrayStart(1);
       encoder.writeByteStrings(certificates);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
   public static CertChainResponse decode(byte[] encoded) throws DecodeException {
     try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
       if (decoder.readNullOrArrayLength(1)) {
-        return null;
+        throw new DecodeException("CertChainResponse could not be null.");
       }
 
       return new CertChainResponse(
           decoder.readByteStrings());
-    } catch (IOException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + CertChainResponse.class.getName(), ex);
     }
   }

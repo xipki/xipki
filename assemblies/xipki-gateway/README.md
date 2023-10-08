@@ -63,10 +63,11 @@ dnsjava-*.jar,\
 *-gateway-*.jar,\
 gateway-common-*.jar,\
 HikariCP-*.jar,\
-ipkcs11wrapper-*.jar,\
+*pkcs11wrapper-*.jar,\
 jackson-*.jar,\
 jose4j-*.jar,\
-mariadb-java-client-*.jar,\
+mariadb-*.jar,\
+mysql-*.jar,\
 password-*.jar,\
 postgresql-*.jar,\
 security-*.jar,\

@@ -207,7 +207,11 @@ public class DbToolBase implements Closeable {
     if (children != null) {
       for (File child : children) {
         if (child.getName().startsWith(prefix)) {
-          child.delete();
+          try {
+            IoUtil.deleteFile0(child);
+          } catch (IOException ex) {
+            LOG.warn("error deleting temporary file " + child.getPath(), ex);
+          }
         }
       }
     }

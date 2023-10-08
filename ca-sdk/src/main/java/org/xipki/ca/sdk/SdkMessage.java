@@ -3,6 +3,8 @@
 
 package org.xipki.ca.sdk;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.xipki.security.util.JSON;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.EncodeException;
 
@@ -25,8 +27,8 @@ public abstract class SdkMessage {
       encode(encoder);
       bout.flush();
       return bout.toByteArray();
-    } catch (IOException e) {
-      throw new EncodeException("error encoding " + getClass().getName(), e);
+    } catch (IOException ex) {
+      throw new EncodeException("IOException encoding " + getClass().getName(), ex);
     }
   }
 

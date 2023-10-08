@@ -334,8 +334,7 @@ public final class CmpClientImpl implements CmpClient {
     return parseRevokeCertResult(agent.unrevokeCertificate(caName, requestor, request, debug));
   } // method unrevokeCerts
 
-  private EnrollCertResult parseEnrollCertResult(EnrollCertResponse result)
-      throws CmpClientException {
+  private EnrollCertResult parseEnrollCertResult(EnrollCertResponse result) {
     Map<String, EnrollCertResult.CertifiedKeyPairOrError> certOrErrors = new HashMap<>();
     for (ResultEntry resultEntry : result.getResultEntries()) {
       EnrollCertResult.CertifiedKeyPairOrError certOrError;

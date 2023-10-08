@@ -28,10 +28,10 @@ import java.util.List;
 public class OcspRequest {
 
   static class Header {
-    int tagIndex;
-    byte tag;
-    int len;
-    int readerIndex;
+    final int tagIndex;
+    final byte tag;
+    final int len;
+    final int readerIndex;
 
     Header(int tagIndex, byte tag, int len, int readerIndex) {
       this.tagIndex = tagIndex;

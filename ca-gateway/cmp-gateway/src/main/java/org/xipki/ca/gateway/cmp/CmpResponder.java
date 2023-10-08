@@ -411,6 +411,9 @@ public class CmpResponder extends BaseCmpResponder {
       RevReqContent rr, boolean revoke, AuditEvent event)
       throws IOException, SdkErrorResponseException {
     RevDetails[] revContent = rr.toRevDetailsArray();
+    if (revContent == null || revContent.length == 0) {
+      return buildErrorMsgPkiBody(rejection, badRequest, "no entry is specified");
+    }
 
     List<RevokeCertRequestEntry> revokeEntries = revoke ? new ArrayList<>(revContent.length) : null;
     List<BigInteger> unrevokeEntries = revoke ? null : new ArrayList<>(revContent.length);
@@ -426,7 +429,7 @@ public class CmpResponder extends BaseCmpResponder {
 
       if (issuer == null) {
         issuer = tIssuer;
-      } else if (issuer.equals(tIssuer)) {
+      } else if (!issuer.equals(tIssuer)) {
         return buildErrorMsgPkiBody(rejection, badCertTemplate, "not all issuers are of the same");
       }
 
@@ -657,11 +660,14 @@ public class CmpResponder extends BaseCmpResponder {
       String caName, PKIMessage request, PKIHeaderBuilder respHeader,
       PKIHeader reqHeader, PKIBody reqBody, Requestor requestor, AuditEvent event)
       throws SdkErrorResponseException {
-    Integer requiredPermission = null;
-    boolean allRevdetailsOfSameType = true;
-
     RevReqContent rr = RevReqContent.getInstance(reqBody.getContent());
     RevDetails[] revContent = rr.toRevDetailsArray();
+    if (revContent == null || revContent.length == 0) {
+      return buildErrorMsgPkiBody(rejection, badRequest, "no entry is specified");
+    }
+
+    Integer requiredPermission = null;
+    boolean allRevdetailsOfSameType = true;
 
     for (RevDetails revDetails : revContent) {
       Extensions crlDetails = revDetails.getCrlEntryDetails();

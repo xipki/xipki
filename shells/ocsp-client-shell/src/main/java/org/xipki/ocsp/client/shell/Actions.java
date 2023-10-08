@@ -398,7 +398,7 @@ public class Actions {
     protected void checkParameters(
         X509Cert respIssuer, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
         throws Exception {
-      Args.notEmpty(serialNumbers, "serialNunmbers");
+      Args.notEmpty(serialNumbers, "serialNumbers");
     }
 
     @Override

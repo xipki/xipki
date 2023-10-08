@@ -10,6 +10,7 @@ import org.xipki.util.exception.EncodeException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  *
@@ -45,15 +46,15 @@ public class PollCertRequest extends CaIdentifierRequest {
       super.encode(encoder, 2);
       encoder.writeTextString(transactionId);
       encoder.writeObjects(entries);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
   public static PollCertRequest decode(byte[] encoded) throws DecodeException {
     try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
       if (decoder.readNullOrArrayLength(5)) {
-        return null;
+        throw new DecodeException("PollCertRequest could not be null.");
       }
 
       PollCertRequest ret = new PollCertRequest();
@@ -63,7 +64,7 @@ public class PollCertRequest extends CaIdentifierRequest {
       ret.setTransactionId(decoder.readTextString());
       ret.setEntries(PollCertRequestEntry.decodeArray(decoder));
       return ret;
-    } catch (IOException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + PollCertRequest.class.getName(), ex);
     }
   }

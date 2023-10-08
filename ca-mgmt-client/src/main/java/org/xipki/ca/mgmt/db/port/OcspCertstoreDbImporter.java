@@ -77,7 +77,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
         importIssuer(certstore.getIssuers());
       }
       importCert(certstore, processLogFile);
-      processLogFile.delete();
+      IoUtil.deleteFile0(processLogFile);
     } catch (Exception ex) {
       System.err.println("could not import OCSP certstore to database");
       throw ex;

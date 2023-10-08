@@ -46,8 +46,8 @@ public class PollCertRequestEntry implements CborEncodable {
       encoder.writeArrayStart(2);
       encoder.writeByteString(id);
       encoder.writeObject(subject);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
@@ -60,7 +60,7 @@ public class PollCertRequestEntry implements CborEncodable {
       return new PollCertRequestEntry(
           decoder.readBigInt(),
           X500NameType.decode(decoder));
-    } catch (IOException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + PollCertRequestEntry.class.getName(), ex);
     }
   }

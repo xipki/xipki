@@ -179,8 +179,8 @@ public class EnrollCertRequestEntry implements CborEncodable {
       encoder.writeIntObj(notAfter);
       encoder.writeObject(oldCertIsn);
       encoder.writeObject(oldCertSubject);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
@@ -202,7 +202,7 @@ public class EnrollCertRequestEntry implements CborEncodable {
       ret.setOldCertIsn(OldCertInfoByIssuerAndSerial.decode(decoder));
       ret.setOldCertSubject(OldCertInfoBySubject.decode(decoder));
       return ret;
-    } catch (IOException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + EnrollCertRequestEntry.class.getName(), ex);
     }
   }

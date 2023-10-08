@@ -59,8 +59,8 @@ public class EnrollOrPullCertResponseEntry implements CborEncodable {
       encoder.writeObject(error);
       encoder.writeByteString(cert);
       encoder.writeByteString(privateKey);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
@@ -75,7 +75,7 @@ public class EnrollOrPullCertResponseEntry implements CborEncodable {
           ErrorEntry.decode(decoder),
           decoder.readByteString(),
           decoder.readByteString());
-    } catch (IOException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + EnrollOrPullCertResponseEntry.class.getName(), ex);
     }
   }

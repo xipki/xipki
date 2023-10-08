@@ -11,6 +11,7 @@ import org.xipki.util.exception.EncodeException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Optional;
 
 /**
  *
@@ -46,21 +47,21 @@ public class GetCertRequest extends SdkRequest {
       encoder.writeArrayStart(2);
       encoder.writeByteString(serialNumber);
       encoder.writeObject(issuer);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
   public static GetCertRequest decode(byte[] encoded) throws DecodeException {
     try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
       if (decoder.readNullOrArrayLength(2)) {
-        return null;
+        throw new DecodeException("GetCertRequest could not be null.");
       }
 
       return new GetCertRequest(
           decoder.readBigInt(),
           X500NameType.decode(decoder));
-    } catch (IOException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + GetCertRequest.class.getName(), ex);
     }
   }

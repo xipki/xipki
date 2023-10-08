@@ -11,6 +11,7 @@ import org.xipki.util.exception.ErrorCode;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Error response.
@@ -65,15 +66,15 @@ public class ErrorResponse extends SdkResponse {
       encoder.writeTextString(transactionId);
       encoder.writeEnumObj(code);
       encoder.writeTextString(message);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
   public static ErrorResponse decode(byte[] encoded) throws DecodeException {
     try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
       if (decoder.readNullOrArrayLength(3)) {
-        return null;
+        throw new DecodeException("ErrorResponse could not be null.");
       }
 
       String tid = decoder.readTextString();
@@ -83,7 +84,7 @@ public class ErrorResponse extends SdkResponse {
       return new ErrorResponse(
           tid, errorCode,
           decoder.readTextString());
-    } catch (IOException | IllegalArgumentException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + ErrorResponse.class.getName(), ex);
     }
   }

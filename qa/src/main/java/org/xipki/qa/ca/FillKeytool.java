@@ -163,13 +163,15 @@ public class FillKeytool implements AutoCloseable {
         String fn = "/keypool/" + keyspec.replace('/', '_') + ".txt";
 
         try (InputStream in = FillKeytool.class.getResourceAsStream(fn)) {
-          BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-          List<byte[]> keys = new ArrayList<>(100);
-          rsaKeysMap.put(keyspec, keys);
-          String line;
-          while ((line = reader.readLine()) != null) {
-            if (StringUtil.isNotBlank(line)) {
-              keys.add(Base64.decodeFast(line));
+          if (in != null) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            List<byte[]> keys = new ArrayList<>(100);
+            rsaKeysMap.put(keyspec, keys);
+            String line;
+            while ((line = reader.readLine()) != null) {
+              if (StringUtil.isNotBlank(line)) {
+                keys.add(Base64.decodeFast(line));
+              }
             }
           }
         }

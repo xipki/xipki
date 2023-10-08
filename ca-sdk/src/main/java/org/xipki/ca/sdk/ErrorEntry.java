@@ -63,8 +63,8 @@ public class ErrorEntry implements CborEncodable {
       encoder.writeArrayStart(2);
       encoder.writeInt(code);
       encoder.writeTextString(message);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
@@ -77,7 +77,7 @@ public class ErrorEntry implements CborEncodable {
       return new ErrorEntry(
           decoder.readInt(),
           decoder.readTextString());
-    } catch (IOException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + ErrorEntry.class.getName(), ex);
     }
   }

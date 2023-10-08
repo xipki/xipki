@@ -10,6 +10,7 @@ import org.xipki.util.exception.EncodeException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  *
@@ -34,20 +35,20 @@ public class TransactionIdRequest extends SdkRequest {
     try {
       encoder.writeArrayStart(1);
       encoder.writeTextString(tid);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
   public static TransactionIdRequest decode(byte[] encoded) throws DecodeException {
     try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
       if (decoder.readNullOrArrayLength(1)) {
-        return null;
+        throw new DecodeException("TransactionIdRequest could not be null.");
       }
 
       return new TransactionIdRequest(
           decoder.readTextString());
-    } catch (IOException | IllegalArgumentException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + TransactionIdRequest.class.getName(), ex);
     }
   }

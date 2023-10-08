@@ -43,8 +43,8 @@ public class OldCertInfoBySubject extends OldCertInfo {
       encoder.writeBoolean(isReusePublicKey());
       encoder.writeByteString(subject);
       encoder.writeByteString(san);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
@@ -58,7 +58,7 @@ public class OldCertInfoBySubject extends OldCertInfo {
           decoder.readBoolean(),
           decoder.readByteString(),
           decoder.readByteString());
-    } catch (IOException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + OldCertInfoBySubject.class.getName(), ex);
     }
   }

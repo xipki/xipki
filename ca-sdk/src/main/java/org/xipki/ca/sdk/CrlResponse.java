@@ -10,6 +10,7 @@ import org.xipki.util.exception.EncodeException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Response containing the CRL.
@@ -34,20 +35,19 @@ public class CrlResponse extends SdkResponse {
     try {
       encoder.writeArrayStart(1);
       encoder.writeByteString(crl);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
   public static CrlResponse decode(byte[] encoded) throws DecodeException {
     try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
       if (decoder.readNullOrArrayLength(1)) {
-        return null;
+        throw new DecodeException("CrlResponse could not be null.");
       }
 
-      return new CrlResponse(
-          decoder.readByteString());
-    } catch (IOException ex) {
+      return new CrlResponse(decoder.readByteString());
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + CrlResponse.class.getName(), ex);
     }
   }

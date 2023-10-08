@@ -52,18 +52,17 @@ ca-*.jar,\
 certprofile-*.jar,\
 datasource-*.jar,\
 HikariCP-*.jar,\
-ipkcs11wrapper-*.jar,\
+*pkcs11wrapper-*.jar,\
 jackson-*.jar,\
 license-*.jar,\
-mariadb-java-client-*.jar,\
+mariadb-*.jar,\
+mysql-*.jar,\
 password-*.jar,\
 postgresql-*.jar,\
 security-*.jar,\
-servlet3-common-*.jar,\
-servlet5-common-*.jar,\
+servlet*-common-*.jar,\
 util-*.jar,\
 xipki-tomcat-password-*.jar
-
 ```
 9. (optional) If you encrypt the passwords in the conf/server.xml with XiPKI solution, replace 
   `org.apache.coyote.http11.Http11Nio2Protocol` by `org.xipki.tomcat.XiHttp11Nio2Protocol`

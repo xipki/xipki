@@ -47,8 +47,8 @@ public class OldCertInfoByIssuerAndSerial extends OldCertInfo {
       encoder.writeBoolean(isReusePublicKey());
       encoder.writeObject(issuer);
       encoder.writeByteString(serialNumber);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
@@ -62,7 +62,7 @@ public class OldCertInfoByIssuerAndSerial extends OldCertInfo {
           decoder.readBoolean(),
           X500NameType.decode(decoder),
           decoder.readBigInt());
-    } catch (IOException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + OldCertInfoByIssuerAndSerial.class.getName(), ex);
     }
   }

@@ -33,8 +33,8 @@ public class XiOCSPReqBuilder {
   private Extensions requestExtensions = null;
 
   private static class RequestObject {
-    CertID certId;
-    Extensions  extensions;
+    private final CertID certId;
+    private final Extensions extensions;
 
     public RequestObject(CertID certId, Extensions  extensions) {
       this.certId = certId;

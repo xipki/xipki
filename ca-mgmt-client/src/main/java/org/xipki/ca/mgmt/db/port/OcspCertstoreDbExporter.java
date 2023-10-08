@@ -386,7 +386,7 @@ class OcspCertstoreDbExporter extends DbPorter {
         processLog.addNumProcessed(numCertInCurrentFile);
       } else {
         currentCertsZip.close();
-        currentCertsZipFile.delete();
+        IoUtil.deleteFile0(currentCertsZipFile);
       }
     } catch (SQLException ex) {
       throw translate(sql, ex);
@@ -396,7 +396,7 @@ class OcspCertstoreDbExporter extends DbPorter {
 
     processLog.printTrailer();
     // all successful, delete the processLogFile
-    processLogFile.delete();
+    IoUtil.deleteFile0(processLogFile);
 
     System.out.println(" exported " + processLog.numProcessed() + " certificates from tables CERT");
   } // method exportCert0

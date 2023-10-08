@@ -69,7 +69,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
       inProcess = true;
       try {
-        SystemEvent event = queryExecutor.getSystemEvent(EVENT_CACHAGNE);
+        SystemEvent event = queryExecutor.getSystemEvent(EVENT_CACHANGE);
         long caChangedTime = (event == null) ? 0 : event.getEventTime();
 
         LOG.info("check the restart CA system event: changed at={}, lastStartTime={}",
@@ -94,7 +94,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   private static final String EVENT_LOCK = "LOCK";
 
-  private static final String EVENT_CACHAGNE = "CA_CHANGE";
+  private static final String EVENT_CACHANGE = "CA_CHANGE";
 
   final CaIdNameMap idNameMap = new CaIdNameMap();
 
@@ -328,12 +328,12 @@ public class CaManagerImpl implements CaManager, Closeable {
         }
       }
 
-      certstoreDatasource = datasourceMap.get("ca");
+      certstoreDatasource = datasourceMap.remove("ca");
       if (certstoreDatasource == null) {
         throw new CaMgmtException("no datasource named 'ca' configured");
       }
 
-      caconfDatasource = datasourceMap.get("caconf");
+      caconfDatasource = datasourceMap.remove("caconf");
       if (caconfDatasource == null) {
         caconfDatasource = certstoreDatasource;
       }
@@ -342,19 +342,11 @@ public class CaManagerImpl implements CaManager, Closeable {
       int dbSchemaVersion = queryExecutor.getDbSchemaVersion();
       LOG.info("dbSchemaVersion: {}", dbSchemaVersion);
 
-      if (dbSchemaVersion < 8) {
-        if (datasourceMap.containsKey("caconf")) {
-          LOG.warn("ignore datasource named 'caconf'");
-        }
-        this.caconfDatasource = certstoreDatasource;
-      } else {
-        if (!datasourceMap.containsKey("caconf")) {
+      if (dbSchemaVersion >= 8) {
+        if (caconfDatasource == certstoreDatasource) {
           throw new CaMgmtException("no datasource named 'caconf' configured");
         }
       }
-
-      datasourceMap.remove("ca");
-      datasourceMap.remove("caconf");
 
       this.datasourceMap = datasourceMap;
     }
@@ -575,7 +567,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void notifyCaChange() throws CaMgmtException {
     try {
-      SystemEvent systemEvent = new SystemEvent(EVENT_CACHAGNE, lockInstanceId, Instant.now().getEpochSecond());
+      SystemEvent systemEvent = new SystemEvent(EVENT_CACHANGE, lockInstanceId, Instant.now().getEpochSecond());
       queryExecutor.changeSystemEvent(systemEvent);
       LOG.info("notified the change of CA system");
     } catch (CaMgmtException ex) {
@@ -803,7 +795,9 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     File caLockFile = new File("calock");
     if (caLockFile.exists()) {
-      caLockFile.delete();
+      if (!caLockFile.delete()) {
+        LOG.warn("could not delete file " + caLockFile.getAbsolutePath());
+      }
     }
 
     auditLogPciEvent(true, "SHUTDOWN");

@@ -237,7 +237,7 @@ class CaCertstoreDbImporter extends DbPorter {
         }
       }
 
-      processLogFile.delete();
+      IoUtil.deleteFile0(processLogFile);
     } catch (Exception ex) {
       System.err.println("could not import CA certstore to database");
       throw ex;

@@ -10,6 +10,7 @@ import org.xipki.util.exception.EncodeException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  *
@@ -42,21 +43,21 @@ public class CaNameResponse extends SdkResponse {
       encoder.writeArrayStart(2);
       encoder.writeTextString(name);
       encoder.writeTextStrings(aliases);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
   public static CaNameResponse decode(byte[] encoded) throws DecodeException {
     try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
       if (decoder.readNullOrArrayLength(2)) {
-        return null;
+        throw new DecodeException("CaNameResponse could not be null.");
       }
 
       return new CaNameResponse(
           decoder.readTextString(),
           decoder.readTextStrings());
-    } catch (IOException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + CaNameResponse.class.getName(), ex);
     }
   }

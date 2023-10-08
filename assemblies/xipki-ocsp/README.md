@@ -50,10 +50,11 @@ bcprov-*.jar,\
 bcutil-*.jar,\
 datasource-*.jar,\
 HikariCP-*.jar,\
-ipkcs11wrapper-*.jar,\
+*pkcs11wrapper-*.jar,\
 jackson-*.jar,\
 license-*.jar,\
-mariadb-java-client-*.jar,\
+mariadb-*.jar,\
+mysql-*.jar,\
 ocsp-api-*.jar,\
 ocsp-server-*.jar,\
 password-*.jar,\

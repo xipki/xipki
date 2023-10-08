@@ -11,6 +11,7 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Extension specification.
@@ -38,19 +39,7 @@ public abstract class ExtensionSpec {
 
   private static final Map<CertLevel, ExtensionSpec> browserForumInstances = new HashMap<>();
 
-  static {
-    rfc5280Instances.put(CertLevel.RootCA, new Rfc5280RootCA());
-    Rfc5280SubCA subCA = new Rfc5280SubCA();
-    rfc5280Instances.put(CertLevel.SubCA, subCA);
-    rfc5280Instances.put(CertLevel.CROSS, subCA);
-    rfc5280Instances.put(CertLevel.EndEntity, new Rfc5280EndEntity());
-
-    browserForumInstances.put(CertLevel.RootCA, new BrowserForumBRRootCA());
-    BrowserForumBRSubCA brSubCA = new BrowserForumBRSubCA();
-    browserForumInstances.put(CertLevel.SubCA, brSubCA);
-    browserForumInstances.put(CertLevel.CROSS, brSubCA);
-    browserForumInstances.put(CertLevel.EndEntity, new BrowserForumBREndEntity());
-  }
+  private static final AtomicBoolean instancesInitialized = new AtomicBoolean(false);
 
   public abstract Set<ASN1ObjectIdentifier> getRequiredExtensions();
 
@@ -97,6 +86,24 @@ public abstract class ExtensionSpec {
   } // method isValidPublicIPv4Address
 
   public static ExtensionSpec getExtensionSpec(CertDomain domain, CertLevel certLevel) {
+    if (!instancesInitialized.get()) {
+      synchronized (instancesInitialized) {
+        rfc5280Instances.put(CertLevel.RootCA, new Rfc5280RootCA());
+        Rfc5280SubCA subCA = new Rfc5280SubCA();
+        rfc5280Instances.put(CertLevel.SubCA, subCA);
+        rfc5280Instances.put(CertLevel.CROSS, subCA);
+        rfc5280Instances.put(CertLevel.EndEntity, new Rfc5280EndEntity());
+
+        browserForumInstances.put(CertLevel.RootCA, new BrowserForumBRRootCA());
+        BrowserForumBRSubCA brSubCA = new BrowserForumBRSubCA();
+        browserForumInstances.put(CertLevel.SubCA, brSubCA);
+        browserForumInstances.put(CertLevel.CROSS, brSubCA);
+        browserForumInstances.put(CertLevel.EndEntity, new BrowserForumBREndEntity());
+
+        instancesInitialized.set(true);
+      }
+    }
+
     return domain == CertDomain.CABForumBR ? browserForumInstances.get(certLevel) : rfc5280Instances.get(certLevel);
   } // method getExtensionSpec
 

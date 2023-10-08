@@ -133,7 +133,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
       File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);
       importCert(certstore, revokedOnly, relatedCertStoreCaIds, processLogFile);
-      processLogFile.delete();
+      IoUtil.deleteFile0(processLogFile);
     } catch (Exception ex) {
       System.err.println("could not import OCSP certstore to database");
       throw ex;
@@ -334,7 +334,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
         CaCertstore.Cert cert = list.get(i);
 
-        long id = cert.getId();
+        final long id = cert.getId();
         lastSuccessfulCertId = id;
         if (id < minId) {
           continue;
@@ -407,7 +407,6 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
             }
           }
 
-          lastSuccessfulCertId = id;
           processLog.addNumProcessed(numProcessedEntriesInBatch);
           importLog.addNumProcessed(numImportedEntriesInBatch);
           numProcessedEntriesInBatch = 0;
@@ -416,7 +415,6 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
           echoToFile(filename, processLogFile);
           processLog.printStatus();
         } else if (isLastBlock) {
-          lastSuccessfulCertId = id;
           processLog.addNumProcessed(numProcessedEntriesInBatch);
           importLog.addNumProcessed(numImportedEntriesInBatch);
           numProcessedEntriesInBatch = 0;

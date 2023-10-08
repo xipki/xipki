@@ -1063,11 +1063,7 @@ public class XijsonCertprofile extends BaseCertprofile {
   }
 
   private static boolean booleanValue(Boolean boolObj, boolean dfltValue) {
-    if (boolObj == null) {
-      return dfltValue;
-    } else {
-      return boolObj;
-    }
+    return Objects.requireNonNullElse(boolObj, dfltValue);
   }
 
 }

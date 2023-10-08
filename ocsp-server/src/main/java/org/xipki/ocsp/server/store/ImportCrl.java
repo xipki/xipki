@@ -607,7 +607,7 @@ class ImportCrl {
         }
         IoUtil.save(new File(generatedDir, "ca.crl.info"), info.getBytes(StandardCharsets.UTF_8));
         if (newCrlFpFile.exists()) {
-          newCrlFpFile.delete();
+          IoUtil.deleteFile0(newCrlFpFile);
         }
       }
 

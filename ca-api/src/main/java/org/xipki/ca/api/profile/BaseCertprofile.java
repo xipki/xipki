@@ -564,10 +564,8 @@ public abstract class BaseCertprofile extends Certprofile {
 
     tmpText = tmpText.trim();
 
-    Boolean isPrintableString;
     if (stringType == null) {
-      isPrintableString = isPrintableString(tmpText);
-      stringType = isPrintableString ? StringType.printableString : StringType.utf8String;
+      stringType = isPrintableString(tmpText) ? StringType.printableString : StringType.utf8String;
     } else if (stringType == StringType.printableString) {
       if (!isPrintableString(tmpText)) {
         throw new BadCertTemplateException("'" + tmpText + "' contains non-printableString chars.");

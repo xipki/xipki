@@ -159,7 +159,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     this.sourceConf = Args.notNull(sourceConf, "sourceConf");
 
     // check the dir
-    this.dir = IoUtil.expandFilepath(getStrValue(sourceConf, "dir", true), true);
+    this.dir = IoUtil.expandFilepath(getNonNullStrValue(sourceConf, "dir"), true);
     File dirObj = new File(this.dir);
     if (!dirObj.exists()) {
       throw new OcspStoreException("the dir " + this.dir + " does not exist");
@@ -189,15 +189,15 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       LOG.warn("Found no sub-directory starting with 'crl-' in " + dir);
     }
 
-    String value = getStrValue(sourceConf, "sqlBatchCommit", false);
+    String value = getOptionalStrValue(sourceConf, "sqlBatchCommit");
     this.sqlBatchCommit = StringUtil.isBlank(value) ? 1000 : (int) Double.parseDouble(value);
 
-    value = getStrValue(sourceConf, "ignoreExpiredCrls", false);
+    value = getOptionalStrValue(sourceConf, "ignoreExpiredCrls");
     this.ignoreExpiredCrls = StringUtil.isBlank(value) || Boolean.parseBoolean(value);
 
     super.datasource = datasource;
 
-    value = getStrValue(sourceConf, "startupDelay", false);
+    value = getOptionalStrValue(sourceConf, "startupDelay");
     int startupDelaySeconds = value == null ? 5 : (int) Double.parseDouble(value);
     // so that the ocsp service (tomcat) can start without blocking.
     Runnable runnable = this :: updateStore;
@@ -206,14 +206,19 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     executor.shutdown();
   } // method init
 
-  private static String getStrValue(Map<String, ?> sourceConf, String confName, boolean mandatory) {
+  private static String getNonNullStrValue(Map<String, ?> sourceConf, String confName) {
     Object objVal = sourceConf.get(confName);
     if (objVal == null) {
-      if (mandatory) {
-        throw new IllegalArgumentException("mandatory " + confName + " is not specified in sourceConf");
-      } else {
-        return null;
-      }
+      throw new IllegalArgumentException("mandatory " + confName + " is not specified in sourceConf");
+    }
+
+    return (objVal instanceof String) ? (String) objVal : objVal.toString();
+  } // method getStrValue
+
+  private static String getOptionalStrValue(Map<String, ?> sourceConf, String confName) {
+    Object objVal = sourceConf.get(confName);
+    if (objVal == null) {
+      return null;
     }
 
     return (objVal instanceof String) ? (String) objVal : objVal.toString();
@@ -481,7 +486,11 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     boolean useNewCrl = crlNumber == null || newCrlNumber.compareTo(crlNumber) > 0;
     if (useNewCrl) {
       if (hashAlgo != null) {
-        String hashProp = hashAlgo + " " + Hex.encode(crlStream.getHashValue());
+        byte[] crlHashValue = crlStream.getHashValue();
+        if (crlHashValue == null) {
+          throw new IllegalStateException("should not reach here, crlHashValue is null");
+        }
+        String hashProp = hashAlgo + " " + Hex.encode(crlHashValue);
         IoUtil.save(new File(generatedDir, "new-ca.crl.fp"), hashProp.getBytes(StandardCharsets.UTF_8));
       }
       IoUtil.renameTo(tmpCrlFile, new File(generatedDir, "new-ca.crl"));
@@ -489,11 +498,11 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       // notify the change
       updatemeFile.createNewFile();
     } else {
-      tmpCrlFile.delete();
+      IoUtil.deleteFile0(tmpCrlFile);
       LOG.info("Downloaded CRL is not newer than existing one");
     }
 
-    updateMeNowFile.delete();
+    IoUtil.deleteFile0(updateMeNowFile);
   }
 
   static Properties loadProperties(File file) throws IOException {

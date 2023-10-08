@@ -42,7 +42,7 @@ class ConfLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(ConfLoader.class);
 
-  CaManagerImpl manager;
+ private final CaManagerImpl manager;
 
   ConfLoader(CaManagerImpl manager) {
     this.manager = Args.notNull(manager, "manager");

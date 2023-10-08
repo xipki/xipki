@@ -11,6 +11,7 @@ import org.xipki.util.exception.EncodeException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Optional;
 
 /**
  *
@@ -61,7 +62,7 @@ public class GetCRLRequest extends SdkRequest {
       encoder.writeByteString(crlNumber);
       encoder.writeIntObj(thisUpdate);
       encoder.writeTextString(crlDp);
-    } catch (IOException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new EncodeException("error decoding " + getClass().getName(), ex);
     }
   }
@@ -69,14 +70,14 @@ public class GetCRLRequest extends SdkRequest {
   public static GetCRLRequest decode(byte[] encoded) throws DecodeException {
     try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
       if (decoder.readNullOrArrayLength(3)) {
-        return null;
+        throw new DecodeException("GetCRLRequest could not be null.");
       }
 
       return new GetCRLRequest(
           decoder.readBigInt(),
           decoder.readLongObj(),
           decoder.readTextString());
-    } catch (IOException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + GetCRLRequest.class.getName(), ex);
     }
   }

@@ -237,12 +237,7 @@ public class Actions {
     @Override
     protected Object execute0() throws Exception {
       CaIdentifier tmpCaId = new CaIdentifier(url, caId);
-      CaCertValidator caCertValidator = new CaCertValidator() {
-        @Override
-        public boolean isTrusted(X509Cert cert) {
-          return true;
-        }
-      };
+      CaCertValidator caCertValidator = cert -> true;
 
       ScepClient client = new ScepClient(tmpCaId, caCertValidator);
       client.init();

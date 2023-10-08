@@ -58,8 +58,8 @@ public class RevokeCertRequestEntry implements CborEncodable {
       encoder.writeByteString(serialNumber);
       encoder.writeEnumObj(reason);
       encoder.writeIntObj(invalidityTime);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
@@ -77,7 +77,7 @@ public class RevokeCertRequestEntry implements CborEncodable {
       return new RevokeCertRequestEntry(
           serialNumber, reason,
           decoder.readLongObj());
-    } catch (IOException | IllegalArgumentException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + RevokeCertRequestEntry.class.getName(), ex);
     }
   }

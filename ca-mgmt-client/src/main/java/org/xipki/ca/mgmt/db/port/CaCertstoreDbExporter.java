@@ -407,7 +407,7 @@ class CaCertstoreDbExporter extends DbPorter {
         processLog.addNumProcessed(numEntriesInCurrentFile);
       } else {
         currentEntriesZip.close();
-        currentEntriesZipFile.delete();
+        IoUtil.deleteFile0(currentEntriesZipFile);
       }
     } catch (SQLException ex) {
       throw translate(null, ex);
@@ -417,7 +417,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
     processLog.printTrailer();
     // all successful, delete the processLogFile
-    processLogFile.delete();
+    IoUtil.deleteFile0(processLogFile);
     System.out.println(" exported " + sum + " entries from " + tablesText);
   } // method exportEntries
 

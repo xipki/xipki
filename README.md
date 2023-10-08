@@ -75,17 +75,17 @@ they MUST be replaced.**
 ## Install CA Server
 
 1. Unpack tomcat to a new folder
-2. Install CA as described in the `xipki-install/xipki-ca/README` file.
+2. Install CA as described in the `xipki-install/xipki-ca/README.md` file.
 
 ## Install OCSP Responder
 
 1. Unpack tomcat to a new folder
-2. Install CA as described in the `xipki-install/xipki-ocsp/README` file.
+2. Install CA as described in the `xipki-install/xipki-ocsp/README.md` file.
 
 ## Install Protocol Gateway
 
 1. Unpack tomcat to a new folder.
-2. Install protocol gateway as described in the `xipki-install/xipki-gateway/README` file.
+2. Install protocol gateway as described in the `xipki-install/xipki-gateway/README.md` file.
 
 ## Install Management Command Line Interface
    void

@@ -42,8 +42,8 @@ public class KeyType implements CborEncodable {
       encoder.writeArrayStart(2);
       encoder.writeTextString(keyType);
       encoder.writeTextStrings(ecCurves);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
@@ -56,7 +56,7 @@ public class KeyType implements CborEncodable {
       return new KeyType(
           decoder.readTextString(),
           decoder.readTextStrings());
-    } catch (IOException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + KeyType.class.getName(), ex);
     }
   }

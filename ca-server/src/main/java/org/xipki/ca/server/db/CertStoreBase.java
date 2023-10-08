@@ -217,11 +217,8 @@ public class CertStoreBase extends QueryExecutor {
   } // method borrowPrepStatement
 
   protected static String buildArraySql(DataSourceWrapper datasource, String prefix, int num) {
-    StringBuilder sb = new StringBuilder(prefix.length() + num * 2);
-    sb.append(prefix).append(" IN (?");
-    sb.append(",?".repeat(Math.max(0, num - 1)));
-    sb.append(")");
-    return datasource.buildSelectFirstSql(num, sb.toString());
+    String sql = prefix + " IN (?" + ",?".repeat(Math.max(0, num - 1)) + ")";
+    return datasource.buildSelectFirstSql(num, sql);
   }
 
   protected static X509Cert parseCert(byte[] encodedCert) throws OperationException {

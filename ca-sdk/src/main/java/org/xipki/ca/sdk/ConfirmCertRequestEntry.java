@@ -54,8 +54,8 @@ public class ConfirmCertRequestEntry implements CborEncodable {
       encoder.writeBoolean(accept);
       encoder.writeByteString(certReqId);
       encoder.writeByteString(certhash);
-    } catch (IOException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
+    } catch (IOException | RuntimeException ex) {
+      throw new EncodeException("error encoding " + getClass().getName(), ex);
     }
   }
 
@@ -69,7 +69,7 @@ public class ConfirmCertRequestEntry implements CborEncodable {
           decoder.readBoolean(),
           decoder.readBigInt(),
           decoder.readByteString());
-    } catch (IOException ex) {
+    } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + ConfirmCertRequestEntry.class.getName(), ex);
     }
   }
