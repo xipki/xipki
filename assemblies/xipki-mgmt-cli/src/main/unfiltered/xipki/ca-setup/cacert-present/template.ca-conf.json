@@ -54,16 +54,16 @@
 			"file":"${profiles.dir}/certprofile-tls-c.json"
 		}
 	},{
-		"name":"sm2-tls",
+		"name":"tls-sm2",
 		"type":"xijson",
 		"conf":{
-			"file":"${profiles.dir}/certprofile-sm2-tls.json"
+			"file":"${profiles.dir}/certprofile-tls-sm2.json"
 		}
 	},{
-		"name":"sm2-tls-enc",
+		"name":"tls-sm2-enc",
 		"type":"xijson",
 		"conf":{
-			"file":"${profiles.dir}/certprofile-sm2-tls-enc.json"
+			"file":"${profiles.dir}/certprofile-tls-sm2-enc.json"
 		}
 	}],
 	"cas":[{
@@ -112,8 +112,8 @@
 			"smime",
 			"tls",
 			"tls-c",
-			"sm2-tls",
-			"sm2-tls-enc"
+			"tls-sm2",
+			"tls-sm2-enc"
 		],
 		"publishers":[
 //	        "ocsp-publisher"

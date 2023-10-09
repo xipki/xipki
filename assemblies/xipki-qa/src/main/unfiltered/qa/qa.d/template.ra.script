@@ -92,7 +92,9 @@ source qa/qa.d/ra-serverkeygen.script
 ## Revocate certificates
 xi:cmp-revoke \
   --ca subcawithcrl --ca-cert output/subcawithcrl1.crt \
-  --cert output/ocsp2.crt --reason keyCompromise \
+  --cert output/ocsp2.crt \
+  --cert output/${CN}.crt \
+  --reason keyCompromise \
   --signer-password 1234 --signer-p12 ${SIGNER_P12}
 
 # Certificate multiple-ous

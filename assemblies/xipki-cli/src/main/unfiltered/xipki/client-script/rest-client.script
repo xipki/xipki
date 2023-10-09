@@ -130,7 +130,7 @@ xi:curl --out ${OUT_DIR}/rest-myca-get.crl $BASE_URL/crl
 
 echo "=====REST: Enroll Chinese SM2 Twin TLS Certificates (CA generates all keypairs)====="
 
-CN = rest-sm2-tls-twin-genkey-${CUR_TIME}
+CN = rest-tls-sm2-twin-genkey-${CUR_TIME}
 
 xi:curl --out ${OUT_DIR}/${CN}.pem \
   --data "subject=C=CN,O=myorg,CN=${CN}.myorg.org" \
@@ -139,7 +139,7 @@ xi:curl --out ${OUT_DIR}/${CN}.pem \
 
 echo "=====REST: Enroll Chinese SM2 Twin TLS Certificates (CA generates only keypair for the encryption)====="
 
-CN = rest-sm2-tls-twin-${CUR_TIME}
+CN = rest-tls-sm2-twin-${CUR_TIME}
 
 xi:sm2-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
 
