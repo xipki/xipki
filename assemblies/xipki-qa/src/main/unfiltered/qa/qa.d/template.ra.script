@@ -93,7 +93,6 @@ source qa/qa.d/ra-serverkeygen.script
 xi:cmp-revoke \
   --ca subcawithcrl --ca-cert output/subcawithcrl1.crt \
   --cert output/ocsp2.crt \
-  --cert output/${CN}.crt \
   --reason keyCompromise \
   --signer-password 1234 --signer-p12 ${SIGNER_P12}
 
@@ -396,11 +395,15 @@ xi:update-cert-p12 --p12 output/tls2.p12 --password 1234 \
   --ca-cert output/rootca1.crt
 
 ## Suspend certificates
-xi:cmp-revoke --ca subca1 --cert output/tls2.crt \
+xi:cmp-revoke --ca subca1 \
+  --cert output/tls1.crt \
+  --cert output/tls2.crt \
   --ca-cert output/subca1.crt --reason certificateHold \
   --signer-password 1234 --signer-p12 ${SIGNER_P12}
 
-xi:cmp-unsuspend --ca subca1 --cert output/tls2.crt \
+xi:cmp-unsuspend --ca subca1 \
+  --cert output/tls1.crt \
+  --cert output/tls2.crt \
   --ca-cert output/subca1.crt \
   --signer-password 1234 --signer-p12 ${SIGNER_P12}
 
