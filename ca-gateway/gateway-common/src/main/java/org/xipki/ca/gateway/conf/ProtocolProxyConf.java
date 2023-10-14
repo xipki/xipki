@@ -35,6 +35,16 @@ public abstract class ProtocolProxyConf {
    */
   protected CaNameSignersConf signers;
 
+  private final boolean ignoreAuthennticator;
+
+  protected ProtocolProxyConf() {
+    this.ignoreAuthennticator = false;
+  }
+
+  protected ProtocolProxyConf(boolean ignoreAuthennticator) {
+    this.ignoreAuthennticator = ignoreAuthennticator;
+  }
+
   public boolean isLogReqResp() {
     return logReqResp;
   }
@@ -101,7 +111,9 @@ public abstract class ProtocolProxyConf {
 
   public void validate() throws InvalidConfException {
     notNull(audit, "audit");
-    notNull(authenticator, "authenticator");
+    if (!ignoreAuthennticator) {
+      notNull(authenticator, "authenticator");
+    }
     notNull(pop, "pop");
     notNull(sdkClient, "sdkClient");
     notNull(security, "security");

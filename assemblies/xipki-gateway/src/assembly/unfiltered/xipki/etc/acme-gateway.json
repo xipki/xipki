@@ -30,8 +30,6 @@
 	// To activate the logging of requests and responses, set writer.level to DEBUG
 	// in the file META-INF/classes/log4j2.properties.
 	"logReqResp":true,
-	// no authentication of requestor is needed in ACME, so Dummy is ok.
-	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
 	"pop":{
 		"sigAlgos":[
 			"SHA256withRSA", "SHA256withECDSA", "SHA256withDSA",

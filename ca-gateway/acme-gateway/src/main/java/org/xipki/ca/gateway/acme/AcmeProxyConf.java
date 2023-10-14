@@ -233,6 +233,10 @@ public class AcmeProxyConf extends ProtocolProxyConf {
 
   private Acme acme;
 
+  public AcmeProxyConf() {
+    super(true);
+  }
+
   public Acme getAcme() {
     return acme;
   }

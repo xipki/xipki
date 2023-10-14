@@ -74,12 +74,16 @@ public class ProtocolProxyConfWrapper {
     }
 
     String clazz = conf.getAuthenticator();
-    try {
-      authenticator = (RequestorAuthenticator) Class.forName(clazz).getConstructor().newInstance();
-    } catch (Exception e) {
-      String msg = "could not load RequestorAuthenticator " + clazz;
-      LOG.error(msg, e);
-      throw new InvalidConfException(msg);
+    if (clazz == null) {
+      authenticator = null;
+    } else {
+      try {
+        authenticator = (RequestorAuthenticator) Class.forName(clazz).getConstructor().newInstance();
+      } catch (Exception e) {
+        String msg = "could not load RequestorAuthenticator " + clazz;
+        LOG.error(msg, e);
+        throw new InvalidConfException(msg);
+      }
     }
 
     popControl = new PopControl(conf.getPop());
