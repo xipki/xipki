@@ -240,8 +240,8 @@ public abstract class BaseCmpResponder {
     return null;
   }
 
-  private Requestor.PasswordRequestor getPasswordRequestor(byte[] senderKID) {
-    return authenticator.getPasswordRequestorByKeyId(senderKID);
+  private Requestor.SimplePasswordRequestor getPasswordRequestor(byte[] senderKID) {
+    return authenticator.getSimplePasswordRequestorByKeyId(senderKID);
   }
 
   private Requestor.CertRequestor getCertRequestor(X509Cert senderCert) {
@@ -575,7 +575,7 @@ public abstract class BaseCmpResponder {
       }
 
       PKMACBuilder pkMacBuilder = new PKMACBuilder(new JcePKMACValuesCalculator());
-      Requestor.PasswordRequestor requestor = getPasswordRequestor(senderKID);
+      Requestor.SimplePasswordRequestor requestor = getPasswordRequestor(senderKID);
 
       if (requestor == null) {
         LOG.warn("tid={}: not authorized requestor with senderKID '{}", tid,
@@ -619,7 +619,7 @@ public abstract class BaseCmpResponder {
       if (requestor instanceof Requestor.CertRequestor) {
         return CmpUtil.addProtection(pkiMessage, signer, respSender, cmpControl.isSendResponderCert());
       } else {
-        Requestor.PasswordRequestor requestor0 = (Requestor.PasswordRequestor) requestor;
+        Requestor.SimplePasswordRequestor requestor0 = (Requestor.SimplePasswordRequestor) requestor;
         PBMParameter parameter = new PBMParameter(
             randomSalt(),
             cmpControl.getResponsePbmOwf().getAlgorithmIdentifier(),
@@ -830,7 +830,7 @@ public abstract class BaseCmpResponder {
         encKey = new EncryptedValue(intendedAlg, symmAlg,
             new DERBitString(encSymmKey), keyAlg, null, new DERBitString(encValue));
       } else {
-        Requestor.PasswordRequestor passwordRequestor = (Requestor.PasswordRequestor) requestor;
+        Requestor.SimplePasswordRequestor passwordRequestor = (Requestor.SimplePasswordRequestor) requestor;
 
         final ASN1ObjectIdentifier encAlgOid = NISTObjectIdentifiers.id_aes128_GCM;
         final int keysizeBits = 128; // one of 128, 192 and 256. Must match the encAlgOid

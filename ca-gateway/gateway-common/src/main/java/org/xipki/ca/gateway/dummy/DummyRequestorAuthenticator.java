@@ -20,9 +20,13 @@ import java.util.Map;
 
 public class DummyRequestorAuthenticator implements RequestorAuthenticator {
 
+  static {
+    System.err.println("DO NOT USE " + DummyRequestorAuthenticator.class.getName() + " IN THE PRODUCT ENVIRONMENT");
+  }
+
   @Override
-  public Requestor.PasswordRequestor getPasswordRequestorByKeyId(byte[] keyId) {
-    return DummyPasswordRequestor.ofKeyId(keyId);
+  public Requestor.SimplePasswordRequestor getSimplePasswordRequestorByKeyId(byte[] keyId) {
+    return DummySimpleasswordRequestor.ofKeyId(keyId);
   }
 
   @Override
@@ -38,10 +42,6 @@ public class DummyRequestorAuthenticator implements RequestorAuthenticator {
   private static class DummyCertRequestor implements Requestor.CertRequestor {
 
     private final X509Cert cert;
-
-    static {
-      System.err.println("DO NOT USE " + DummyCertRequestor.class.getName() + " IN THE PRODUCT ENVIRONMENT");
-    }
 
     public DummyCertRequestor(X509Cert cert) {
       this.cert = cert;
@@ -77,21 +77,17 @@ public class DummyRequestorAuthenticator implements RequestorAuthenticator {
 
     private final String user;
 
-    private final byte[] keyId;
-
     private final char[] password;
 
-    private final static Map<String, char[]> passwordMap = new HashMap<>();
+    protected final static Map<String, char[]> passwordMap = new HashMap<>();
 
     static {
-      System.err.println("DO NOT USE " + DummyPasswordRequestor.class.getName() + " IN THE PRODUCT ENVIRONMENT");
       passwordMap.put("user1", "password1".toCharArray());
       passwordMap.put("user2", "password2".toCharArray());
     }
 
     private DummyPasswordRequestor(String user, char[] password) {
       this.user = user;
-      this.keyId = user.getBytes(StandardCharsets.UTF_8);
       this.password = password;
     }
 
@@ -114,17 +110,7 @@ public class DummyRequestorAuthenticator implements RequestorAuthenticator {
 
     @Override
     public String getName() {
-      return user;
-    }
-
-    @Override
-    public byte[] getKeyId() {
-      return keyId;
-    }
-
-    @Override
-    public char[] getPassword() {
-      return password;
+      return "passwordrequestor-" + user;
     }
 
     @Override
@@ -147,6 +133,63 @@ public class DummyRequestorAuthenticator implements RequestorAuthenticator {
     public boolean isPermitted(int permission) {
       return true;
     }
+  }
+
+  private static class DummySimpleasswordRequestor implements Requestor.SimplePasswordRequestor {
+
+    private final String user;
+
+    private final char[] password;
+
+    private final byte[] keyId;
+
+    protected final static Map<String, char[]> passwordMap = new HashMap<>();
+
+    static {
+      passwordMap.put("user1", "password1".toCharArray());
+      passwordMap.put("user2", "password2".toCharArray());
+    }
+
+    private DummySimpleasswordRequestor(String user, char[] password) {
+      this.user = user;
+      this.password = password;
+      this.keyId = user.getBytes(StandardCharsets.UTF_8);
+    }
+
+    public static DummySimpleasswordRequestor ofKeyId(byte[] keyId) {
+      String user = new String(keyId, StandardCharsets.UTF_8);
+      char[] password = passwordMap.get(user);
+      if (password == null) {
+        return null;
+      }
+      return new DummySimpleasswordRequestor(user, password);
+    }
+
+    @Override
+    public String getName() {
+      return "extendedpasswordrequestor-" + user;
+    }
+
+    @Override
+    public boolean isCertprofilePermitted(String caName, String certprofile) {
+      return true;
+    }
+
+    @Override
+    public boolean isPermitted(int permissions) {
+      return true;
+    }
+
+    @Override
+    public byte[] getKeyId() {
+      return keyId;
+    }
+
+    @Override
+    public char[] getPassword() {
+      return password;
+    }
+
   }
 
 }

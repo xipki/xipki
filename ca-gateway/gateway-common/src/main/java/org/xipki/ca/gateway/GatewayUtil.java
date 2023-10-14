@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.xipki.audit.*;
 import org.xipki.security.*;
 import org.xipki.util.Args;
+import org.xipki.util.LogUtil;
 
 /**
  * Gateway Utilities.
@@ -25,6 +26,22 @@ public class GatewayUtil {
     }
 
     if (event.getStatus() == AuditStatus.FAILED) {
+      if (log.isWarnEnabled()) {
+        log.warn(event.toTextMessage());
+      }
+    } else {
+      if (log.isInfoEnabled()) {
+        log.info(event.toTextMessage());
+      }
+    }
+  }
+
+  public static void logAuditEvent(Logger log, PciAuditEvent event) {
+    if (event == null) {
+      return;
+    }
+
+    if (event.getLevel() == AuditLevel.WARN) {
       if (log.isWarnEnabled()) {
         log.warn(event.toTextMessage());
       }
@@ -61,10 +78,21 @@ public class GatewayUtil {
     return securityFactory.verifyPop(csr, popValidator, kaKeyAndCert);
   } // method verifyCsr
 
-  public static void auditLogPciEvent(String type, boolean successful, String eventType) {
+  public static void auditLogPciEvent(Logger log, String type, boolean successful, String eventType) {
     PciAuditEvent event = PciAuditEvent.newPciAuditEvent(type, eventType, "CORE",
         successful ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED, successful ? AuditLevel.INFO : AuditLevel.ERROR);
     Audits.getAuditService().logEvent(event);
+   logAuditEvent(log, event);
+  }
+
+  public static void closeAudits(Logger log) {
+    if (Audits.getAuditService() != null) {
+      try {
+        Audits.getAuditService().close();
+      } catch (Exception ex) {
+        LogUtil.error(log, ex);
+      }
+    }
   }
 
 }

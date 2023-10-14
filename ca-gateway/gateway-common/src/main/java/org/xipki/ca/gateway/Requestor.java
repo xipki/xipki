@@ -38,20 +38,30 @@ public interface Requestor {
   boolean isPermitted(int permissions);
 
   /**
-   * Password-based requestor interface.
+   * Password-based requestor interface. Used for EST, REST and SCEP gateway.
    *
    * @author Lijun Liao (xipki)
    * @since 6.4.0
    */
   interface PasswordRequestor extends Requestor {
 
-    byte[] getKeyId();
-
-    char[] getPassword();
-
     boolean authenticate(char[] password);
 
     boolean authenticate(byte[] password);
+
+  }
+
+  /**
+   * Simple password-based requestor interface, used for the CMP gateway.
+   *
+   * @author Lijun Liao (xipki)
+   * @since 6.4.0
+   */
+  interface SimplePasswordRequestor extends Requestor {
+
+    byte[] getKeyId();
+
+    char[] getPassword();
 
   }
 
@@ -62,7 +72,7 @@ public interface Requestor {
    * @since 6.4.0
    */
 
-  public interface CertRequestor extends Requestor {
+  interface CertRequestor extends Requestor {
 
     byte[] getKeyId();
 

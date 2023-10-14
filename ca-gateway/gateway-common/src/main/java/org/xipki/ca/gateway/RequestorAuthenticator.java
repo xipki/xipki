@@ -13,10 +13,26 @@ import org.xipki.security.X509Cert;
 
 public interface RequestorAuthenticator {
 
-  Requestor.PasswordRequestor getPasswordRequestorByKeyId(byte[] keyId);
+  /**
+   * Return the password-based requestor for given keyID. Used for CMP gateway.
+   * @param keyId the key ID
+   * @return the requestor.
+   */
+  Requestor.SimplePasswordRequestor getSimplePasswordRequestorByKeyId(byte[] keyId);
 
+  /**
+   * Return the password-based requestor for given user. Used for EST, REST and SCEP gateway.
+   * @param user the user
+   * @return the requestor.
+   */
   Requestor.PasswordRequestor getPasswordRequestorByUser(String user);
 
+  /**
+   * Return the certificate-based requestor for given client certificate.
+   * Used for CMP, EST, REST and SCEP gateway.
+   * @param cert the client certificate
+   * @return the requestor.
+   */
   Requestor.CertRequestor getCertRequestor(X509Cert cert);
 
 }
