@@ -802,11 +802,6 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     auditLogPciEvent(true, "SHUTDOWN");
     LOG.info("stopped CA system");
-    try {
-      Audits.getAuditService().close();
-    } catch (Exception ex) {
-      LogUtil.warn(LOG, ex, "could not close audit service");
-    }
   } // method close
 
   public ScheduledThreadPoolExecutor getScheduledThreadPoolExecutor() {

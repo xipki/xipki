@@ -55,11 +55,11 @@ public class EstHttpFilter implements XiHttpFilter {
       servlet.setLogReqResp(conf.isLogReqResp());
       servlet.setResponder(responder);
 
-      GatewayUtil.auditLogPciEvent("EST-Gateway", true, "START");
+      GatewayUtil.auditLogPciEvent(LOG, "EST-Gateway", true, "START");
     } catch (Exception e) {
       String msg = "error initializing ServletFilter";
       LOG.error(msg, e);
-      GatewayUtil.auditLogPciEvent("EST-Gateway", false, "START");
+      GatewayUtil.auditLogPciEvent(LOG, "EST-Gateway", false, "START");
       throw new ServletException0(msg);
     }
   }
@@ -71,7 +71,8 @@ public class EstHttpFilter implements XiHttpFilter {
         conf.destroy();
         conf = null;
       }
-      GatewayUtil.auditLogPciEvent("EST-Gateway", true, "SHUTDOWN");
+      GatewayUtil.auditLogPciEvent(LOG, "EST-Gateway", true, "SHUTDOWN");
+      GatewayUtil.closeAudits(LOG);
     } catch (Exception e) {
       //LOG.error("error closing audit service", e);
     }

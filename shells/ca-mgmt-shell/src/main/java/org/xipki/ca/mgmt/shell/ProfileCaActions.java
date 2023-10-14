@@ -86,11 +86,11 @@ public class ProfileCaActions {
           List<String> aliases = entry.getProfileAliases();
           sb.append("\t").append(name);
           if (aliases != null && aliases.size() > 0) {
-            sb.append(" (aliases ");
+            sb.append(aliases.size() == 1 ? " (alias " : " (aliases ");
             for (String alias : aliases) {
-              sb.append(alias).append(",");
+              sb.append(alias + ", ");
             }
-            sb.deleteCharAt(sb.length() - 1);
+            sb.deleteCharAt(sb.length() - 2);
             sb.append(")");
           }
           sb.append("\n");

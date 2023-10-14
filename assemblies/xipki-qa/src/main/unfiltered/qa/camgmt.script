@@ -479,7 +479,7 @@ if { $printUsage equals "true" } then {
 
   ca:caprofile-add --ca rootca1 --profile tls:tls-alias1,tls-alias2
   caqa:caprofile-check --ca rootca1 --profile tls:tls-alias1,tls-alias2
-  ca:caprifile-rm --force --ca rootca1 --profile tls
+  ca:caprofile-rm --force --ca rootca1 --profile tls
 
   # CA name does not exist
 

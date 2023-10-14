@@ -74,8 +74,13 @@ public class CaHasRequestorEntry extends MgmtEntry {
 
   @Override
   public String toString() {
-    return StringUtil.concatObjectsCap(200, "requestor:  ", requestorIdent,
-        "\nprofiles:   ", profiles, "\npermission: ", PermissionConstants.permissionToString(permission));
+    return toString("");
+  }
+
+  public String toString(String indent) {
+    return indent + "requestor:  " + requestorIdent +
+        "\n" + indent + "profiles:   " + profiles +
+        "\n" + indent + "permission: " + PermissionConstants.permissionToString(permission);
   }
 
   @Override

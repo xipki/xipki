@@ -55,7 +55,6 @@ import static org.xipki.util.exception.ErrorCode.*;
  * @since 2.0.0
  */
 
-// TODO: add entry to table CA with the same ID and name as in the database 'ca'.
 public class CertStore extends CertStoreBase {
 
   public enum CertStatus {

@@ -150,14 +150,6 @@ public class ProtocolProxyConfWrapper {
     if (securities != null) {
       securities.close();
     }
-
-    if (Audits.getAuditService() != null) {
-      try {
-        Audits.getAuditService().close();
-      } catch (Exception ex) {
-        LogUtil.error(LOG, ex);
-      }
-    }
   } // method destroy
 
 }

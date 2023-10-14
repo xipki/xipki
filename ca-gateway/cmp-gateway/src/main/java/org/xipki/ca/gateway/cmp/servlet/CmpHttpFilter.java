@@ -56,11 +56,11 @@ public class CmpHttpFilter implements XiHttpFilter {
       servlet.setLogReqResp(conf.isLogReqResp());
       servlet.setResponder(responder);
 
-      GatewayUtil.auditLogPciEvent("CMP-Gateway", true, "START");
+      GatewayUtil.auditLogPciEvent(LOG, "CMP-Gateway", true, "START");
     } catch (Exception e) {
       String msg = "error initializing ServletFilter";
       LOG.error(msg, e);
-      GatewayUtil.auditLogPciEvent("CMP-Gateway", false, "START");
+      GatewayUtil.auditLogPciEvent(LOG, "CMP-Gateway", false, "START");
       throw new ServletException0(msg);
     }
   }
@@ -72,7 +72,8 @@ public class CmpHttpFilter implements XiHttpFilter {
         conf.destroy();
         conf = null;
       }
-      GatewayUtil.auditLogPciEvent("CMP-Gateway", true, "SHUTDOWN");
+      GatewayUtil.auditLogPciEvent(LOG, "CMP-Gateway", true, "SHUTDOWN");
+      GatewayUtil.closeAudits(LOG);
     } catch (Exception e) {
       //LOG.error("error closing audit service", e);
     }

@@ -56,11 +56,11 @@ public class AcmeHttpFilter implements XiHttpFilter {
       servlet.setLogReqResp(conf.isLogReqResp());
       servlet.setResponder(responder);
 
-      GatewayUtil.auditLogPciEvent("ACME-Gateway", true, "START");
+      GatewayUtil.auditLogPciEvent(LOG, "ACME-Gateway", true, "START");
     } catch (Exception e) {
       String msg = "error initializing ServletFilter";
       LOG.error(msg, e);
-      GatewayUtil.auditLogPciEvent("ACME-Gateway", false, "START");
+      GatewayUtil.auditLogPciEvent(LOG, "ACME-Gateway", false, "START");
       throw new ServletException0(msg);
     }
   }
@@ -73,7 +73,8 @@ public class AcmeHttpFilter implements XiHttpFilter {
         conf.destroy();
         conf = null;
       }
-      GatewayUtil.auditLogPciEvent("ACME-Gateway", true, "SHUTDOWN");
+      GatewayUtil.auditLogPciEvent(LOG, "ACME-Gateway", true, "SHUTDOWN");
+      GatewayUtil.closeAudits(LOG);
     } catch (Exception e) {
       //LOG.error("error closing audit service", e);
     }

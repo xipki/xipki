@@ -220,7 +220,7 @@ class Ca2Manager {
     CaManagerQueryExecutor queryExecutor = manager.queryExecutor;
 
     CaInfo ca = queryExecutor.createCaInfo(name, manager.certstore);
-    LOG.info("created CA {}: {}", name, ca.toString(false));
+    LOG.info("created CA {}:\n{}", name, ca.toString(false));
     manager.caInfos.put(name, ca);
     manager.idNameMap.addCa(ca.getIdent());
     Set<CaHasRequestorEntry> caReqEntries = queryExecutor.createCaHasRequestors(ca.getIdent());
@@ -228,7 +228,7 @@ class Ca2Manager {
     if (LOG.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
       for (CaHasRequestorEntry entry : caReqEntries) {
-        sb.append("\n    ").append(entry);
+        sb.append("\n").append(entry.toString("    "));
       }
       LOG.info("CA {} is associated requestors:{}", name, sb);
     }

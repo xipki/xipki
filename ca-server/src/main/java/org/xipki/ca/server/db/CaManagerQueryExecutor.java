@@ -376,7 +376,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
 
     if (LOG.isInfoEnabled()) {
-      LOG.info("add CA '{}': {}", caEntry.getIdent(), caEntry.toString(false, true));
+      LOG.info("added CA '{}':\n{}", caEntry.getIdent(), caEntry.toString(false, true));
     }
   } // method addCa
 
@@ -405,7 +405,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       throw new CaMgmtException("could not add certprofile " + dbEntry.getIdent());
     }
 
-    LOG.info("added profile '{}': {}", dbEntry.getIdent(), dbEntry);
+    LOG.info("added profile '{}':\n{}", dbEntry.getIdent(), dbEntry);
   } // method addCertprofile
 
   public void addCertprofileToCa(NameId profile, NameId ca, List<String> aliases) throws CaMgmtException {
@@ -467,7 +467,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
 
     if (LOG.isInfoEnabled()) {
-      LOG.info("added requestor '{}': {}", dbEntry.getIdent(), dbEntry.toString(false));
+      LOG.info("added requestor '{}':\n{}", dbEntry.getIdent(), dbEntry.toString(false));
     }
   } // method addRequestor
 
@@ -522,7 +522,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       throw new CaMgmtException("could not add publisher " + dbEntry.getIdent());
     }
 
-    LOG.info("added publisher '{}': {}", dbEntry.getIdent(), dbEntry);
+    LOG.info("added publisher '{}':\n{}", dbEntry.getIdent(), dbEntry);
   } // method addPublisher
 
   public void changeCa(ChangeCaEntry changeCaEntry,
@@ -938,7 +938,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       throw new CaMgmtException("could not add keypair generation " + dbEntry.getName());
     }
 
-    LOG.info("added keypair generation: {}", dbEntry.toString(true));
+    LOG.info("added keypair generation: \n{}", dbEntry.toString(true));
   } // method addSigner
 
   public void addSigner(SignerEntry dbEntry) throws CaMgmtException {

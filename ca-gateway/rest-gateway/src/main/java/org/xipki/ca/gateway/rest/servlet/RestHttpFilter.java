@@ -5,11 +5,13 @@ package org.xipki.ca.gateway.rest.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.Audits;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.ProtocolProxyConfWrapper;
 import org.xipki.ca.gateway.rest.RestProxyConf;
 import org.xipki.ca.gateway.rest.RestResponder;
 import org.xipki.util.IoUtil;
+import org.xipki.util.LogUtil;
 import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ServletException0;
@@ -55,11 +57,11 @@ public class RestHttpFilter implements XiHttpFilter {
       servlet.setLogReqResp(conf.isLogReqResp());
       servlet.setResponder(responder);
 
-      GatewayUtil.auditLogPciEvent("REST-Gateway", true, "START");
+      GatewayUtil.auditLogPciEvent(LOG, "REST-Gateway", true, "START");
     } catch (Exception e) {
       String msg = "error initializing ServletFilter";
       LOG.error(msg, e);
-      GatewayUtil.auditLogPciEvent("REST-Gateway", false, "START");
+      GatewayUtil.auditLogPciEvent(LOG, "REST-Gateway", false, "START");
       throw new ServletException0(msg);
     }
   }
@@ -71,7 +73,9 @@ public class RestHttpFilter implements XiHttpFilter {
         conf.destroy();
         conf = null;
       }
-      GatewayUtil.auditLogPciEvent("REST-Gateway", true, "SHUTDOWN");
+
+      GatewayUtil.auditLogPciEvent(LOG, "REST-Gateway", true, "SHUTDOWN");
+      GatewayUtil.closeAudits(LOG);
     } catch (Exception e) {
       //LOG.error("error closing audit service", e);
     }

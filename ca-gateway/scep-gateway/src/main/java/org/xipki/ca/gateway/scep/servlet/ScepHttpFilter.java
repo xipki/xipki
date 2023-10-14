@@ -58,11 +58,11 @@ public class ScepHttpFilter implements XiHttpFilter {
       servlet.setLogReqResp(conf.isLogReqResp());
       servlet.setResponder(responder);
 
-      GatewayUtil.auditLogPciEvent("SCEP-Gateway", true, "START");
+      GatewayUtil.auditLogPciEvent(LOG, "SCEP-Gateway", true, "START");
     } catch (Exception e) {
       String msg = "error initializing ServletFilter";
       LOG.error(msg, e);
-      GatewayUtil.auditLogPciEvent("SCEP-Gateway", false, "START");
+      GatewayUtil.auditLogPciEvent(LOG, "SCEP-Gateway", false, "START");
       throw new ServletException0(msg);
     }
   }
@@ -74,7 +74,8 @@ public class ScepHttpFilter implements XiHttpFilter {
         conf.destroy();
         conf = null;
       }
-      GatewayUtil.auditLogPciEvent("SCEP-Gateway", true, "SHUTDOWN");
+      GatewayUtil.auditLogPciEvent(LOG, "SCEP-Gateway", true, "SHUTDOWN");
+      GatewayUtil.closeAudits(LOG);
     } catch (Exception e) {
       //LOG.error("error closing audit service", e);
     }

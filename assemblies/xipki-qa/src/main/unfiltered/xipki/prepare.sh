@@ -17,6 +17,10 @@ TOMCAT_GATEWAY_DIR=~/tools/xipki/tomcat-gateway
 DIR=`dirname $0`
 echo "working dir: ${DIR}"
 
+cp xipki/security/pkcs11.json xipki-ca/xipki/security/
+cp xipki/security/pkcs11.json xipki-ocsp/xipki/security/
+cp xipki/security/pkcs11.json xipki-gateway/xipki/security/
+
 ## CA
 
 TOMCAT_DIR=${TOMCAT_CA_DIR}
