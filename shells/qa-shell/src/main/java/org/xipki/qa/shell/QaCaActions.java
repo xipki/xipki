@@ -19,6 +19,7 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.mgmt.CaManager;
+import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.ca.mgmt.shell.*;
@@ -459,24 +460,41 @@ public class QaCaActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--profile", required = true, description = "profile name")
+    @Option(name = "--profile", required = true,
+        description = "profile name and aliases, <name>[:<\",\"-separated aliases>]")
     @Completion(CaCompleters.ProfileNameCompleter.class)
-    private String profileName;
+    private String profileNameAliases;
 
     @Override
     protected Object execute0() throws Exception {
-      println("checking CA profile CA='" + caName + "', profile='" + profileName + "'");
+      println("checking CA profile CA='" + caName + "', profile='" + profileNameAliases + "'");
 
       if (caManager.getCa(caName) == null) {
         throw new CmdFailure("could not find CA '" + caName + "'");
       }
 
-      Set<String> entries = caManager.getCertprofilesForCa(caName);
-      if (!entries.contains(profileName.toLowerCase())) {
-        throw new CmdFailure("CA is not associated with profile '" + profileName + "'");
+      CaProfileEntry expectedEntry = CaProfileEntry.decode(profileNameAliases);
+
+      Set<CaProfileEntry> entries = caManager.getCertprofilesForCa(caName);
+
+      CaProfileEntry receivedEntry = null;
+      for (CaProfileEntry entry : entries) {
+        if (entry.getProfileName().equals(expectedEntry.getProfileName())) {
+          receivedEntry = entry;
+          break;
+        }
       }
 
-      println(" checked CA profile CA='" + caName + "', profile='" + profileName + "'");
+      if (receivedEntry == null) {
+        throw new CmdFailure("CA is not associated with profile '" + expectedEntry.getProfileName() + "'");
+      }
+
+      if (expectedEntry.equals(receivedEntry)) {
+        println(" checked CA profile CA='" + caName + "', profile='" + profileNameAliases + "'");
+      } else {
+        throw new CmdFailure("CA-Profile unmatch, expected=" + expectedEntry + ", but received=" + receivedEntry);
+      }
+
       return null;
     }
 

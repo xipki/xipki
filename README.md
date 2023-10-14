@@ -100,9 +100,9 @@ they MUST be replaced.**
 
   * Copy `xipki/security/example/pkcs11-hsm.json` to `xipki/security/pkcs11.json`, and adapt the PKCS#11 configuration.
 
-## Configure how to handle SSL client certificate (optional)
+## Configure how to handle SSL client certificate behind reverse proxy
 
-  This step is only required if the tomcat is behind a reverse proxy apache httpd.
+### For reverse proxy apache httpd
 
   * Add the java property org.xipki.reverseproxy.mode
     ```sh
@@ -131,6 +131,41 @@ they MUST be replaced.**
     * [Jetty/Howto/Configure mod proxy](https://wiki.eclipse.org/Jetty/Howto/Configure_mod_proxy)
     * [Jetty: Tricks to do client certificate authentications behind a reverse proxy](http://www.zeitoun.net/articles/client-certificate-x509-authentication-behind-reverse-proxy/start)
     * [Apache Module mod_ssl](http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#envvars)
+
+### For reverse proxy apache nginx
+
+* Add the java property org.xipki.reverseproxy.mode
+  ```sh
+  -Dorg.xipki.reverseproxy.mode=NGINX
+  ```
+
+* configure the proxy to forward the headers with the following
+  configuration
+
+   ```sh
+   # Require SSL Client verification
+   ssl_verify_client on;
+
+   location / {
+     ...
+     #initialize the special headers to a blank value to avoid http header forgeries 
+     proxy_set_header set SSL_CLIENT_VERIFY  "" 
+     proxy_set_header set SSL_CLIENT_CERT  "" 
+
+     # if the client certificate verified 
+     # will have the value of 'SUCCESS' and 'NONE' otherwise
+     proxy_set_header SSL_CLIENT_VERIFY $ssl_client_verify;
+    
+     # client certificate information(DN)
+     proxy_set_header SSL_CLIENT_CERT $ssl_client_raw_cert;
+     ...
+   }
+   ...
+  ```
+
+For more details please refer to
+* [NGINX Reverse Proxy](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/)
+* [Module ngx_http_ssl_module](http://nginx.org/en/docs/http/ngx_http_ssl_module.html)
 
 ## Setup CA Server
 

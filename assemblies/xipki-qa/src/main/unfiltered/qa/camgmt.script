@@ -465,8 +465,21 @@ if { $printUsage equals "true" } then {
   caqa:caprofile-check --ca rootca1 --profile subca-complex
 
   ca:caprofile-add --ca rootca1 --profile tls
-
   caqa:caprofile-check --ca rootca1 --profile tls
+  ca:caprofile-rm --force --ca rootca1 --profile tls
+
+  ## name == alias (alias will be ignored)
+  ca:caprofile-add --ca rootca1 --profile tls:tls
+  caqa:caprofile-check --ca rootca1 --profile tls
+  ca:caprofile-rm --force --ca rootca1 --profile tls
+
+  ca:caprofile-add --ca rootca1 --profile tls:tls-alias1
+  caqa:caprofile-check --ca rootca1 --profile tls:tls-alias1
+  ca:caprofile-rm --force --ca rootca1 --profile tls
+
+  ca:caprofile-add --ca rootca1 --profile tls:tls-alias1,tls-alias2
+  caqa:caprofile-check --ca rootca1 --profile tls:tls-alias1,tls-alias2
+  ca:caprifile-rm --force --ca rootca1 --profile tls
 
   # CA name does not exist
 

@@ -233,13 +233,15 @@ class Ca2Manager {
       LOG.info("CA {} is associated requestors:{}", name, sb);
     }
 
-    Set<Integer> profileIds = queryExecutor.createCaHasProfiles(ca.getIdent());
-    Set<String> profileNames = new HashSet<>();
-    for (Integer id : profileIds) {
-      profileNames.add(manager.idNameMap.getCertprofileName(id));
+    Set<CaProfileIdAliases> profileIds = queryExecutor.createCaHasProfiles(ca.getIdent());
+    Set<CaProfileEntry> caProfileEntries = new HashSet<>();
+    for (CaProfileIdAliases id : profileIds) {
+      String profileName = manager.idNameMap.getCertprofileName(id.getId());
+      caProfileEntries.add(new CaProfileEntry(profileName,
+          StringUtil.split(id.getAliases(), ",")));
     }
-    manager.caHasProfiles.put(name, profileNames);
-    LOG.info("CA {} is associated with profiles: {}", name, profileNames);
+    manager.caHasProfiles.put(name, caProfileEntries);
+    LOG.info("CA {} is associated with profiles: {}", name, caProfileEntries);
 
     Set<Integer> publisherIds = queryExecutor.createCaHasPublishers(ca.getIdent());
     Set<String> publisherNames = new HashSet<>();

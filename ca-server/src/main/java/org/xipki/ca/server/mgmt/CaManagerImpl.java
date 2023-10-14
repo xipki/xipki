@@ -120,7 +120,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   final Map<String, KeypairGenEntry> keypairGenDbEntries = new ConcurrentHashMap<>();
 
-  final Map<String, Set<String>> caHasProfiles = new ConcurrentHashMap<>();
+  final Map<String, Set<CaProfileEntry>> caHasProfiles = new ConcurrentHashMap<>();
 
   final Map<String, Set<String>> caHasPublishers = new ConcurrentHashMap<>();
 
@@ -884,8 +884,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void addCertprofileToCa(String profileName, String caName) throws CaMgmtException {
-    certprofileManager.addCertprofileToCa(profileName, caName);
+  public void addCertprofileToCa(String profileNameAndAliases, String caName) throws CaMgmtException {
+    certprofileManager.addCertprofileToCa(profileNameAndAliases, caName);
   }
 
   @Override
@@ -899,8 +899,17 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public Set<String> getCertprofilesForCa(String caName) {
-    return caHasProfiles.get(Args.toNonBlankLower(caName, "caName"));
+  public Set<CaProfileEntry> getCertprofilesForCa(String caName) {
+    Set<CaProfileEntry> caProfileEntries = caHasProfiles.get(Args.toNonBlankLower(caName, "caName"));
+    if (CollectionUtil.isEmpty(caProfileEntries)) {
+      return Collections.emptySet();
+    }
+
+    Set<CaProfileEntry> ret = new HashSet<>();
+    for (CaProfileEntry entry : caProfileEntries) {
+      ret.add(entry);
+    }
+    return ret;
   }
 
   @Override

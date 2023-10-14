@@ -11,6 +11,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
+import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
 import org.xipki.ca.mgmt.shell.CaActions.CaAction;
 import org.xipki.shell.CmdFailure;
@@ -40,16 +41,17 @@ public class ProfileCaActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--profile", required = true, multiValued = true, description = "profile name")
+    @Option(name = "--profile", required = true, multiValued = true,
+        description = "profile name and aliases, <name>[:<\",\"-separated aliases>]")
     @Completion(CaCompleters.ProfileNameCompleter.class)
-    private List<String> profileNames;
+    private List<String> profileNameAliasesList;
 
     @Override
     protected Object execute0() throws Exception {
-      for (String profileName : profileNames) {
-        String msg = StringUtil.concat("certificate profile ", profileName, " to CA ", caName);
+      for (String profileNameAliases : profileNameAliasesList) {
+        String msg = StringUtil.concat("certificate profile ", profileNameAliases, " to CA ", caName);
         try {
-          caManager.addCertprofileToCa(profileName, caName);
+          caManager.addCertprofileToCa(profileNameAliases, caName);
           println("associated " + msg);
         } catch (CaMgmtException ex) {
           throw new CmdFailure("could not associate " + msg + ", error: " + ex.getMessage(), ex);
@@ -75,12 +77,23 @@ public class ProfileCaActions {
       }
 
       StringBuilder sb = new StringBuilder();
-      Set<String> entries = caManager.getCertprofilesForCa(caName);
+      Set<CaProfileEntry> entries = caManager.getCertprofilesForCa(caName);
       if (CollectionUtil.isNotEmpty(entries)) {
-        sb.append("certificate Profiles supported by CA ").append(caName).append("\n");
+        sb.append("certificate profiles supported by CA ").append(caName).append("\n");
 
-        for (String name: entries) {
-          sb.append("\t").append(name).append("\n");
+        for (CaProfileEntry entry: entries) {
+          String name = entry.getProfileName();
+          List<String> aliases = entry.getProfileAliases();
+          sb.append("\t").append(name);
+          if (aliases != null && aliases.size() > 0) {
+            sb.append(" (aliases ");
+            for (String alias : aliases) {
+              sb.append(alias).append(",");
+            }
+            sb.deleteCharAt(sb.length() - 1);
+            sb.append(")");
+          }
+          sb.append("\n");
         }
       } else {
         sb.append("\tno profile for CA ").append(caName).append(" is configured");

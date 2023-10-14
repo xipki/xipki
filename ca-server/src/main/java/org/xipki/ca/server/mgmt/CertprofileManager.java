@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertprofileValidator;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
+import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
@@ -92,15 +93,33 @@ class CertprofileManager {
     manager.queryExecutor.removeCertprofileFromCa(profileName, caName);
 
     if (manager.caHasProfiles.containsKey(caName)) {
-      Set<String> set = manager.caHasProfiles.get(caName);
+      Set<CaProfileEntry> set = manager.caHasProfiles.get(caName);
       if (set != null) {
-        set.remove(profileName);
+        CaProfileEntry profileEntry = null;
+        for (CaProfileEntry entry : set) {
+          if (entry.getProfileName().equals(profileName)) {
+            profileEntry = entry;
+          }
+        }
+
+        if (profileEntry != null) {
+          set.remove(profileEntry);
+        }
       }
     }
   } // method removeCertprofileFromCa
 
-  void addCertprofileToCa(String profileName, String caName) throws CaMgmtException {
+  void addCertprofileToCa(String profileNameAndAlias, String caName) throws CaMgmtException {
     manager.assertMasterMode();
+
+    CaProfileEntry caProfileEntry;
+    try {
+      caProfileEntry = CaProfileEntry.decode(profileNameAndAlias);
+    } catch (Exception ex) {
+      throw new CaMgmtException("invalid syntax of profileNameAndAlias '" + profileNameAndAlias + "'", ex);
+    }
+
+    String profileName = caProfileEntry.getProfileName();
 
     profileName = Args.toNonBlankLower(profileName, "profileName");
     caName = Args.toNonBlankLower(caName, "caName");
@@ -115,23 +134,22 @@ class CertprofileManager {
       throw manager.logAndCreateException("unknown CA " + caName);
     }
 
-    Set<String> set = manager.caHasProfiles.get(caName);
+    Set<CaProfileEntry> set = manager.caHasProfiles.get(caName);
     if (set == null) {
       set = new HashSet<>();
       manager.caHasProfiles.put(caName, set);
     } else {
-      if (set.contains(profileName)) {
-        throw manager.logAndCreateException(
-            "Certprofile '" + profileName + "' already associated with CA " + caName);
+      for (CaProfileEntry existingEntry : set) {
+        String containedNameOrAlias = existingEntry.containedNameOrAlias(caProfileEntry);
+        if (containedNameOrAlias != null) {
+          throw manager.logAndCreateException(
+              "Certprofile (name or alias) '" + containedNameOrAlias + "' already associated with CA " + caName);
+        }
       }
     }
 
-    if (!manager.certprofiles.containsKey(profileName)) {
-      throw new CaMgmtException("certprofile '" + profileName + "' is faulty");
-    }
-
-    manager.queryExecutor.addCertprofileToCa(ident, caIdent);
-    set.add(profileName);
+    manager.queryExecutor.addCertprofileToCa(ident, caIdent, caProfileEntry.getProfileAliases());
+    set.add(caProfileEntry);
   } // method addCertprofileToCa
 
   void removeCertprofile(String name) throws CaMgmtException {

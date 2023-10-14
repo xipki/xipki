@@ -3,7 +3,7 @@ Deployment in Tomcat (8, 9 and 10)
 1. Copy the war-files in `webapps` for tomcat 8/9 or `webapps-tomcat10on` for tomcat 10+,
    to the tomcat folder `${CATALINA_HOME}/webapps`:
    - In `${CATALINA_HOME}/webapps`, delete the folder `<some-app>` if the same named `<some-app>.war` file exists.
-   - Note if you do not support all protocols CMP, SCEP and RESTful API, please delete the unsupported `war`
+   - Note if you do not support all protocols (ACME, CMP, EST, SCEP and RESTful API), please delete the unsupported `war`
      files and the same named folders
      (cmp.war for CMP, scep.war for SCEP, .well-known.war for EST, acme.war for ACME, and rest.war for RESTful API)
 2. Copy (and overwrite if files already exist) the sub-folders `bin`, `xipki` and `lib `

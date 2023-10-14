@@ -205,14 +205,14 @@ public interface CaManager {
 
   /**
    * Add the certificate profile {@code profileName} the CA {@code caName}.
-   * @param profileName
-   *          Profile name. Must not be {@code null}.
+   * @param profileNameAliases
+   *          Profile name and aliases. Must not be {@code null}.
    * @param caName
    *          CA name. Must not be {@code null}.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addCertprofileToCa(String profileName, String caName) throws CaMgmtException;
+  void addCertprofileToCa(String profileNameAliases, String caName) throws CaMgmtException;
 
   /**
    * Removes publisher {@code publisherName} from the CA {@code caName}.
@@ -238,13 +238,12 @@ public interface CaManager {
 
   /**
    * Returns the Certprofile names supported by the CA {@code caName}.
-   * @param caName
-   *          CA name. Must not be {@code null}.
-   * @return the Certprofile names.
-   * @throws CaMgmtException
-   *          if error occurs.
+   *
+   * @param caName CA name. Must not be {@code null}.
+   * @return set of certprofiles name and their associated aliases.
+   * @throws CaMgmtException if error occurs.
    */
-  Set<String> getCertprofilesForCa(String caName) throws CaMgmtException;
+  Set<CaProfileEntry> getCertprofilesForCa(String caName) throws CaMgmtException;
 
   /**
    * Returns the Requests supported by the CA {@code caName}.

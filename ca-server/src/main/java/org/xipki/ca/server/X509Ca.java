@@ -20,10 +20,7 @@ import org.xipki.audit.AuditEvent;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.mgmt.CertListInfo;
-import org.xipki.ca.api.mgmt.CertListOrderBy;
-import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
-import org.xipki.ca.api.mgmt.RequestorInfo;
+import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
@@ -682,9 +679,15 @@ public class X509Ca extends X509CaModule implements Closeable {
       return null;
     }
 
-    Set<String> profileNames = caManager.getCertprofilesForCa(caIdent.getName());
-    return (profileNames == null || !profileNames.contains(certprofileName))
-        ? null : caManager.getIdentifiedCertprofile(certprofileName);
+    Set<CaProfileEntry> profileNameAndAliases = caManager.getCertprofilesForCa(caIdent.getName());
+    CaProfileEntry matchedEntry = null;
+    for (CaProfileEntry entry : profileNameAndAliases) {
+      if (entry.containsNameOrAlias(certprofileName)) {
+        matchedEntry = entry;
+        break;
+      }
+    }
+    return (matchedEntry == null) ? null : caManager.getIdentifiedCertprofile(matchedEntry.getProfileName());
   } // method getX509Certprofile
 
   public RequestorInfo.CertRequestorInfo getRequestor(X509Cert requestorCert) {

@@ -423,13 +423,21 @@ class CaconfDbImporter extends DbPorter {
       throws DataAccessException {
     System.out.print("    importing table CA_HAS_PROFILE ... ");
     boolean succ = false;
-    final String sql = SqlUtil.buildInsertSql("CA_HAS_PROFILE", "CA_ID,PROFILE_ID");
+    String columns = "CA_ID,PROFILE_ID";
+    if (dbSchemaVersion > 8) {
+      columns += ",ALIASES";
+    }
+
+    final String sql = SqlUtil.buildInsertSql("CA_HAS_PROFILE", columns);
     PreparedStatement ps = prepareStatement(sql);
     try {
       for (CaCertstore.CaHasProfile entry : caHasCertprofiles) {
         try {
           ps.setInt(1, entry.getCaId());
           ps.setInt(2, entry.getProfileId());
+          if (dbSchemaVersion > 8) {
+            ps.setString(3, entry.getAliases());
+          }
 
           ps.executeUpdate();
         } catch (SQLException ex) {

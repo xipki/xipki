@@ -294,7 +294,12 @@ class HttpMgmtServlet {
           break;
         }
         case getCertprofilesForCa: {
-          resp = new MgmtResponse.StringSet(caManager.getCertprofilesForCa(getNameFromRequest(requestStream)));
+          Set<CaProfileEntry> list = caManager.getCertprofilesForCa(getNameFromRequest(requestStream));
+          Set<String> strList = new HashSet<>();
+          for (CaProfileEntry entry : list) {
+            strList.add(entry.getEncoded());
+          }
+          resp = new MgmtResponse.StringSet(strList);
           break;
         }
         case getCrl: {

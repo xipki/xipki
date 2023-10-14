@@ -10,6 +10,7 @@ import org.xipki.ca.api.mgmt.CaConf;
 import org.xipki.ca.api.mgmt.CaConfType;
 import org.xipki.ca.api.mgmt.CaConfType.NameTypeConf;
 import org.xipki.ca.api.mgmt.CaMgmtException;
+import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
@@ -249,19 +250,14 @@ class ConfLoader {
       }
 
       if (scc.getProfileNames() != null) {
-        Set<String> profilesB = manager.caHasProfiles.get(caName);
         for (String profileName : scc.getProfileNames()) {
-          if (profilesB != null && profilesB.contains(profileName)) {
-            LOG.info("ignored adding certprofile {} to CA {}", profileName, caName);
-          } else {
-            try {
-              manager.addCertprofileToCa(profileName, caName);
-              LOG.info("added certprofile {} to CA {}", profileName, caName);
-            } catch (CaMgmtException ex) {
-              String msg = "could not add certprofile " + profileName + " to CA " + caName;
-              LogUtil.error(LOG, ex, msg);
-              throw new CaMgmtException(msg);
-            }
+          try {
+            manager.addCertprofileToCa(profileName, caName);
+            LOG.info("added certprofile {} to CA {}", profileName, caName);
+          } catch (CaMgmtException ex) {
+            String msg = "could not add certprofile " + profileName + " to CA " + caName;
+            LogUtil.error(LOG, ex, msg);
+            throw new CaMgmtException(msg);
           }
         }
       }
@@ -382,9 +378,14 @@ class ConfLoader {
             }
           }
 
-          strs = manager.caHasProfiles.get(name);
-          if (CollectionUtil.isNotEmpty(strs)) {
-            ca.setProfiles(new ArrayList<>(strs));
+          Set<CaProfileEntry> caPofileEntries = manager.caHasProfiles.get(name);
+          if (CollectionUtil.isNotEmpty(caPofileEntries)) {
+            List<String> profileNameAndAliasesList = new ArrayList<>(caPofileEntries.size());
+            for (CaProfileEntry entry : caPofileEntries) {
+              profileNameAndAliasesList.add(entry.getEncoded());
+            }
+            Collections.sort(profileNameAndAliasesList);
+            ca.setProfiles(profileNameAndAliasesList);
           }
 
           strs = manager.caHasPublishers.get(name);

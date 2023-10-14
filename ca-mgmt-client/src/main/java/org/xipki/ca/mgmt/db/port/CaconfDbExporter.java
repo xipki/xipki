@@ -488,7 +488,11 @@ class CaconfDbExporter extends DbPorter {
     boolean succ = false;
 
     List<CaCertstore.CaHasProfile> caHasProfiles = new LinkedList<>();
-    final String sql = "SELECT CA_ID,PROFILE_ID FROM CA_HAS_PROFILE";
+    String sql = "SELECT CA_ID,PROFILE_ID";
+    if (dbSchemaVersion > 8) {
+      sql += ",ALIASES";
+    }
+    sql += " FROM CA_HAS_PROFILE";
 
     PreparedStatement stmt = null;
     ResultSet rs = null;
@@ -500,6 +504,9 @@ class CaconfDbExporter extends DbPorter {
         CaCertstore.CaHasProfile caHasProfile = new CaCertstore.CaHasProfile();
         caHasProfile.setCaId(rs.getInt("CA_ID"));
         caHasProfile.setProfileId(rs.getInt("PROFILE_ID"));
+        if (dbSchemaVersion > 8) {
+          caHasProfile.setAliases(rs.getString("ALIASES"));
+        }
 
         caHasProfile.validate();
         caHasProfiles.add(caHasProfile);

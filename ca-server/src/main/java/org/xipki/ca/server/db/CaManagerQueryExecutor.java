@@ -12,6 +12,7 @@ import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
 import org.xipki.ca.server.*;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
+import org.xipki.ca.server.mgmt.CaProfileIdAliases;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -244,8 +245,19 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return ret;
   } // method createCaHasRequestors
 
-  public Set<Integer> createCaHasProfiles(NameId ca) throws CaMgmtException {
-    return createCaHasEntities("CA_HAS_PROFILE", "PROFILE_ID", ca);
+  public Set<CaProfileIdAliases> createCaHasProfiles(NameId ca) throws CaMgmtException {
+    final String sql = "SELECT PROFILE_ID,ALIASES FROM CA_HAS_PROFILE WHERE CA_ID=?";
+    List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(ca.getId()));
+
+    Set<CaProfileIdAliases> ret = new HashSet<>();
+
+    for (ResultRow row : rows) {
+      int id = getInt(row, "PROFILE_ID");
+      String encodedAliases = row.getString("ALIASES");
+      ret.add(new CaProfileIdAliases(id, encodedAliases));
+    }
+
+    return ret;
   }
 
   public Set<Integer> createCaHasPublishers(NameId ca) throws CaMgmtException {
@@ -396,11 +408,31 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     LOG.info("added profile '{}': {}", dbEntry.getIdent(), dbEntry);
   } // method addCertprofile
 
-  public void addCertprofileToCa(NameId profile, NameId ca) throws CaMgmtException {
+  public void addCertprofileToCa(NameId profile, NameId ca, List<String> aliases) throws CaMgmtException {
     notNulls(profile, "profile", ca, "ca");
+    final String sql = SqlUtil.buildInsertSql("CA_HAS_PROFILE", "CA_ID,PROFILE_ID,ALIASES");
 
-    final String sql = SqlUtil.buildInsertSql("CA_HAS_PROFILE", "CA_ID,PROFILE_ID");
-    addEntityToCa("profile", profile, ca, sql);
+    String aliasesStr;
+    if (CollectionUtil.isEmpty(aliases)) {
+      aliasesStr = null;
+    } else {
+      if (aliases.size() == 1) {
+        aliasesStr = aliases.get(0);
+      } else {
+        StringBuilder sb = new StringBuilder();
+        for (String alias : aliases) {
+          sb.append(alias).append(",");
+        }
+        aliasesStr = sb.substring(0, sb.length() - 1);
+      }
+    }
+
+    int num = execUpdatePrepStmt0(sql, col2Int(ca.getId()), col2Int(profile.getId()), col2Str(aliasesStr));
+    if (num == 0) {
+      throw new CaMgmtException("could not add profile " + profile + " (aliases " + aliases + ") to CA " +  ca);
+    }
+
+    LOG.info("added profile '{}' (aliases {}) to CA '{}'", profile, aliases, ca);
   } // method addCertprofileToCa
 
   public void addPublisherToCa(NameId publisher, NameId ca) throws CaMgmtException {

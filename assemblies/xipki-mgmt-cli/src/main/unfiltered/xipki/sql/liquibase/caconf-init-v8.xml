@@ -30,7 +30,7 @@
     </insert>
     <insert tableName="DBSCHEMA">
       <column name="NAME" value="VERSION"/>
-      <column name="VALUE2" value="9"/>
+      <column name="VALUE2" value="8"/>
     </insert>
     <insert tableName="DBSCHEMA">
       <column name="NAME" value="X500NAME_MAXLEN"/>
@@ -190,7 +190,6 @@
       <column name="PROFILE_ID" type="SMALLINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="ALIASES" type="VARCHAR(100)"/>
     </createTable>
   </changeSet>
   <!-- CA Configuration :: foreign key -->

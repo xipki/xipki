@@ -284,9 +284,9 @@ ca:caprofile-add \
   --profile qc \
   --profile ee-complex \
   --profile constant-ext \
-  --profile smime \
+  --profile smime:smime-alias \
   --profile smime-legacy \
-  --profile tls \
+  --profile tls:tls-alias1,tls-alias2 \
   --profile tls-c \
   --profile fixed-partial-subject \
   --profile tls-dsa \

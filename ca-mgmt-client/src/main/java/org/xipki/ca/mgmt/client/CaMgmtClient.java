@@ -38,11 +38,8 @@ import java.net.URL;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * CA management client via REST API.
@@ -291,10 +288,10 @@ public class CaMgmtClient implements CaManager {
   } // method removeCertprofileFromCa
 
   @Override
-  public void addCertprofileToCa(String profileName, String caName)
+  public void addCertprofileToCa(String profileNameAndAliases, String caName)
       throws CaMgmtException {
     MgmtRequest.AddCertprofileToCa req = new MgmtRequest.AddCertprofileToCa();
-    req.setProfileName(profileName);
+    req.setProfileName(profileNameAndAliases);
     req.setCaName(caName);
     voidTransmit(MgmtAction.addCertprofileToCa, req);
   } // method addCertprofileToCa
@@ -318,10 +315,19 @@ public class CaMgmtClient implements CaManager {
   } // method addPublisherToCa
 
   @Override
-  public Set<String> getCertprofilesForCa(String caName) throws CaMgmtException {
+  public Set<CaProfileEntry> getCertprofilesForCa(String caName) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(caName);
     byte[] respBytes = transmit(MgmtAction.getCertprofilesForCa, req);
-    return parse(respBytes, MgmtResponse.StringSet.class).getResult();
+    Set<String> list = parse(respBytes, MgmtResponse.StringSet.class).getResult();
+    if (list == null) {
+      return Collections.emptySet();
+    }
+
+    Set<CaProfileEntry> ret = new HashSet<>();
+    for (String m : list) {
+      ret.add(CaProfileEntry.decode(m));
+    }
+    return ret;
   } // method
 
   @Override

@@ -340,6 +340,17 @@ xi:update-cert-p12 --p12 output/smime1.p12 --password 1234 \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
 
+# Certificate smime-alias
+
+CN = smime-alias
+
+xi:cmp-enroll-serverkeygen \
+  --ca subca --profile smime-alias \
+  --p12-out output/${CN}.p12 --password 1234 \
+  --cert-outform $OUTFORM --cert-out output/${CN}.crt \
+  --subject "CN={CN},E=InFo@myorg.com,O=myorg,C=DE" \
+  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+
 # Certificate smime-legacy1
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
@@ -393,6 +404,28 @@ xi:update-cert-p12 --p12 output/tls2.p12 --password 1234 \
   --cert output/tls2.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
+
+# Certificate tls-alias1
+
+CN = tls-alias1
+
+xi:cmp-enroll-serverkeygen \
+  --ca subca --profile tls-alias1 \
+  --p12-out output/${CN}.p12 --password 1234 \
+  --cert-outform $OUTFORM --cert-out output/${CN}.crt \
+  --subject "CN=${CN}.org,O=myorg,C=DE" \
+  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+
+# Certificate tls-alias2
+
+CN = tls-alias2
+
+xi:cmp-enroll-serverkeygen \
+  --ca subca --profile tls-alias2 \
+  --p12-out output/${CN}.p12 --password 1234 \
+  --cert-outform $OUTFORM --cert-out output/${CN}.crt \
+  --subject "CN=${CN}.org,O=myorg,C=DE" \
+  --signer-password 1234 --signer-p12 ${SIGNER_P12}
 
 ## Suspend certificates
 xi:cmp-revoke --ca subca1 \
