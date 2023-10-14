@@ -13,10 +13,10 @@ import org.xipki.security.X509Cert;
 
 public interface RequestorAuthenticator {
 
-  Requestor getPasswordRequestorByKeyId(byte[] keyId);
+  Requestor.PasswordRequestor getPasswordRequestorByKeyId(byte[] keyId);
 
-  Requestor getPasswordRequestorByUser(String user);
+  Requestor.PasswordRequestor getPasswordRequestorByUser(String user);
 
-  Requestor getCertRequestor(X509Cert cert);
+  Requestor.CertRequestor getCertRequestor(X509Cert cert);
 
 }

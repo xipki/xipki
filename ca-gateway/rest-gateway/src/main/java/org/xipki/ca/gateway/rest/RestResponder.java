@@ -17,10 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
-import org.xipki.ca.gateway.GatewayUtil;
-import org.xipki.ca.gateway.PopControl;
-import org.xipki.ca.gateway.Requestor;
-import org.xipki.ca.gateway.RequestorAuthenticator;
+import org.xipki.ca.gateway.*;
 import org.xipki.ca.gateway.conf.CaProfileConf;
 import org.xipki.ca.gateway.conf.CaProfilesControl;
 import org.xipki.ca.sdk.*;
@@ -212,11 +209,11 @@ public class RestResponder {
     this.caProfilesControl = Args.notNull(caProfiles, "caProfiles");
   }
 
-  private Requestor getRequestor(String user) {
+  private Requestor.PasswordRequestor getRequestor(String user) {
     return authenticator.getPasswordRequestorByUser(user);
   }
 
-  private Requestor getRequestor(X509Cert cert) {
+  private Requestor.CertRequestor getRequestor(X509Cert cert) {
     return authenticator.getCertRequestor(cert);
   }
 
@@ -326,8 +323,10 @@ public class RestResponder {
           throw new HttpRespAuditException(UNAUTHORIZED, "invalid Authorization information", INFO, FAILED);
         }
 
-        requestor = getRequestor(user);
-        boolean authorized = requestor != null && requestor.authenticate(password);
+        Requestor.PasswordRequestor requestor0 = getRequestor(user);
+        requestor = requestor0;
+
+        boolean authorized = requestor0 != null && requestor0.authenticate(password);
         if (!authorized) {
           throw new HttpRespAuditException(UNAUTHORIZED, "could not authenticate user " + user, INFO, FAILED);
         }
@@ -487,10 +486,10 @@ public class RestResponder {
     boolean twin = CMD_enroll_cert_twin.equals(command) || CMD_enroll_serverkeygen_twin.equals(command);
     boolean caGenKeyPair = CMD_enroll_serverkeygen.equals(command) || CMD_enroll_serverkeygen_twin.equals(command);
 
-    checkProfile(requestor, profile);
+    checkProfile(requestor, caName, profile);
 
     String profileEnc = twin ? profile + "-enc" : null;
-    if (profileEnc != null && !requestor.isCertprofilePermitted(profileEnc)) {
+    if (profileEnc != null && !requestor.isCertprofilePermitted(caName, profileEnc)) {
       throw new OperationException(NOT_PERMITTED, "certprofile " + profileEnc + " is not allowed");
     }
 
@@ -642,7 +641,7 @@ public class RestResponder {
       throw new OperationException(NOT_PERMITTED, "ENROLL_CROSS is not allowed");
     }
 
-    checkProfile(requestor, profile);
+    checkProfile(requestor, caName, profile);
 
     String ct = httpRetriever.getHeader("Content-Type");
     if (!CT_pem_file.equalsIgnoreCase(ct)) {
@@ -770,14 +769,14 @@ public class RestResponder {
   }
 
   private static void checkProfile(
-      Requestor requestor, String profile) throws HttpRespAuditException, OperationException {
+      Requestor requestor, String caName, String profile) throws HttpRespAuditException, OperationException {
     if (StringUtil.isBlank(profile)) {
       throw new HttpRespAuditException(BAD_REQUEST, "certificate profile is not specified",
           INFO, FAILED);
     }
     profile = profile.toLowerCase();
 
-    if (!requestor.isCertprofilePermitted(profile)) {
+    if (!requestor.isCertprofilePermitted(caName, profile)) {
       throw new OperationException(NOT_PERMITTED, "certprofile " + profile + " is not allowed");
     }
   }

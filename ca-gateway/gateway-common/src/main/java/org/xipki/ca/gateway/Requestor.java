@@ -6,7 +6,7 @@ package org.xipki.ca.gateway;
 import org.xipki.security.X509Cert;
 
 /**
- * Requestor info interface.
+ * Requestor interface.
  *
  * @author Lijun Liao (xipki)
  * @since 6.0.0
@@ -14,20 +14,60 @@ import org.xipki.security.X509Cert;
 
 public interface Requestor {
 
+  /**
+   * Returns the name of this requestor. Will not be used internally for any authentication. Only used
+   * for internal logging.
+   * @return the name of this requestor.
+   */
   String getName();
 
-  char[] getPassword();
+  /**
+   * Returns whether the requested certificate profile for given CA is allowed.
+   * @param certprofile the certprofile name.
+   * @param caName the CA name.
+   * @return true if allowed, false otherwise.
+   */
+  boolean isCertprofilePermitted(String caName, String certprofile);
 
-  byte[] getKeyId();
+  /**
+   * Returns whether the requested permissions is allowed.
+   * @param permissions the permissions. Defined in {@link org.xipki.util.PermissionConstants},
+   *                   can be combined value of multiple permissions.
+   * @return true if all requested permissions are allowed, false otherwise.
+   */
+  boolean isPermitted(int permissions);
 
-  X509Cert getCert();
+  /**
+   * Password-based requestor interface.
+   *
+   * @author Lijun Liao (xipki)
+   * @since 6.4.0
+   */
+  interface PasswordRequestor extends Requestor {
 
-  boolean authenticate(char[] password);
+    byte[] getKeyId();
 
-  boolean authenticate(byte[] password);
+    char[] getPassword();
 
-  boolean isCertprofilePermitted(String certprofile);
+    boolean authenticate(char[] password);
 
-  boolean isPermitted(int permission);
+    boolean authenticate(byte[] password);
+
+  }
+
+  /**
+   * Certificate-based requestor interface.
+   *
+   * @author Lijun Liao (xipki)
+   * @since 6.4.0
+   */
+
+  public interface CertRequestor extends Requestor {
+
+    byte[] getKeyId();
+
+    X509Cert getCert();
+
+  }
 
 }

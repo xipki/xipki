@@ -21,21 +21,21 @@ import java.util.Map;
 public class DummyRequestorAuthenticator implements RequestorAuthenticator {
 
   @Override
-  public Requestor getPasswordRequestorByKeyId(byte[] keyId) {
+  public Requestor.PasswordRequestor getPasswordRequestorByKeyId(byte[] keyId) {
     return DummyPasswordRequestor.ofKeyId(keyId);
   }
 
   @Override
-  public Requestor getPasswordRequestorByUser(String user) {
+  public Requestor.PasswordRequestor getPasswordRequestorByUser(String user) {
     return DummyPasswordRequestor.ofUser(user);
   }
 
   @Override
-  public Requestor getCertRequestor(X509Cert cert) {
+  public Requestor.CertRequestor getCertRequestor(X509Cert cert) {
     return new DummyCertRequestor(cert);
   }
 
-  private static class DummyCertRequestor implements Requestor {
+  private static class DummyCertRequestor implements Requestor.CertRequestor {
 
     private final X509Cert cert;
 
@@ -53,11 +53,6 @@ public class DummyRequestorAuthenticator implements RequestorAuthenticator {
     }
 
     @Override
-    public char[] getPassword() {
-      throw new UnsupportedOperationException("getPassword() unsupported");
-    }
-
-    @Override
     public byte[] getKeyId() {
       return cert.getSubjectKeyId();
     }
@@ -68,17 +63,7 @@ public class DummyRequestorAuthenticator implements RequestorAuthenticator {
     }
 
     @Override
-    public boolean authenticate(char[] password) {
-      throw new UnsupportedOperationException("authenticate(byte[]) unsupported");
-    }
-
-    @Override
-    public boolean authenticate(byte[] password) {
-      throw new UnsupportedOperationException("authenticate(byte[]) unsupported");
-    }
-
-    @Override
-    public boolean isCertprofilePermitted(String certprofile) {
+    public boolean isCertprofilePermitted(String caName, String certprofile) {
       return true;
     }
 
@@ -88,7 +73,7 @@ public class DummyRequestorAuthenticator implements RequestorAuthenticator {
     }
   }
 
-  private static class DummyPasswordRequestor implements Requestor {
+  private static class DummyPasswordRequestor implements Requestor.PasswordRequestor {
 
     private final String user;
 
@@ -133,18 +118,13 @@ public class DummyRequestorAuthenticator implements RequestorAuthenticator {
     }
 
     @Override
-    public char[] getPassword() {
-      return password;
-    }
-
-    @Override
     public byte[] getKeyId() {
       return keyId;
     }
 
     @Override
-    public X509Cert getCert() {
-      throw new UnsupportedOperationException("getCert() unsupported");
+    public char[] getPassword() {
+      return password;
     }
 
     @Override
@@ -159,7 +139,7 @@ public class DummyRequestorAuthenticator implements RequestorAuthenticator {
     }
 
     @Override
-    public boolean isCertprofilePermitted(String certprofile) {
+    public boolean isCertprofilePermitted(String caName, String certprofile) {
       return true;
     }
 

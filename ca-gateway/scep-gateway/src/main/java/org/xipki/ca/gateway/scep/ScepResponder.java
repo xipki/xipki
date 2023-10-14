@@ -20,10 +20,7 @@ import org.bouncycastle.cms.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
-import org.xipki.ca.gateway.GatewayUtil;
-import org.xipki.ca.gateway.PopControl;
-import org.xipki.ca.gateway.Requestor;
-import org.xipki.ca.gateway.RequestorAuthenticator;
+import org.xipki.ca.gateway.*;
 import org.xipki.ca.gateway.conf.CaProfileConf;
 import org.xipki.ca.gateway.conf.CaProfilesControl;
 import org.xipki.ca.sdk.*;
@@ -144,11 +141,11 @@ public class ScepResponder {
     return caCaps;
   }
 
-  private Requestor getRequestor(String user) {
+  private Requestor.PasswordRequestor getRequestor(String user) {
     return authenticator.getPasswordRequestorByUser(user);
   }
 
-  private Requestor getRequestor(X509Cert cert) {
+  private Requestor.CertRequestor getRequestor(X509Cert cert) {
     return authenticator.getCertRequestor(cert);
   }
 
@@ -516,8 +513,11 @@ public class ScepResponder {
 
             String user = strs[0];
             String password = strs[1];
-            requestor = getRequestor(user);
-            boolean authorized = requestor != null && requestor.authenticate(password.getBytes(StandardCharsets.UTF_8));
+            Requestor.PasswordRequestor requestor0 = getRequestor(user);
+            requestor = requestor0;
+
+            boolean authorized =
+                requestor0 != null && requestor0.authenticate(password.getBytes(StandardCharsets.UTF_8));
             if (!authorized) {
               LOG.warn("tid={}: could not authenticate user {}", tid, user);
               throw FailInfoException.BAD_REQUEST;
@@ -548,7 +548,7 @@ public class ScepResponder {
             } // end if
           } // end if
 
-          checkUserPermission(requestor, certprofileName);
+          checkUserPermission(requestor, caName, certprofileName);
 
           Extensions extensions = X509Util.getExtensions(csrReqInfo);
           // need to remove the password
@@ -750,7 +750,7 @@ public class ScepResponder {
   } // method encodeResponse
 
   private static void checkUserPermission(
-      Requestor requestor, String certprofile)
+      Requestor requestor, String caName, String certprofile)
       throws OperationException {
     int permission = PermissionConstants.ENROLL_CERT;
     if (!requestor.isPermitted(permission)) {
@@ -758,7 +758,7 @@ public class ScepResponder {
           PermissionConstants.getTextForCode(permission) + " is not permitted for user " + requestor.getName());
     }
 
-    if (!requestor.isCertprofilePermitted(certprofile)) {
+    if (!requestor.isCertprofilePermitted(caName, certprofile)) {
       throw new OperationException(NOT_PERMITTED,
           "Certificate profile " + certprofile + " is not permitted for user " + requestor.getName());
     }

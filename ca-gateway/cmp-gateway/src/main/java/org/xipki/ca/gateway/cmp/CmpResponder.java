@@ -172,7 +172,7 @@ public class CmpResponder extends BaseCmpResponder {
       } // end if(reenroll)
 
       String certprofileName = certprofileNames[i];
-      if (StringUtil.isNotBlank(certprofileName) && !requestor.isCertprofilePermitted(certprofileName)) {
+      if (StringUtil.isNotBlank(certprofileName) && !requestor.isCertprofilePermitted(caName, certprofileName)) {
         addErrCertResp(failureResps, i, certReqId, notAuthorized,
             "certprofile " + certprofileName + " is not allowed");
         continue;
@@ -301,7 +301,7 @@ public class CmpResponder extends BaseCmpResponder {
         certResp = buildErrCertResp(certReqId, badCertTemplate, "badCertTemplate");
       } else {
         certprofileName = certprofileName.toLowerCase();
-        if (!requestor.isCertprofilePermitted(certprofileName)) {
+        if (!requestor.isCertprofilePermitted(caName, certprofileName)) {
           String msg = "certprofile " + certprofileName + " is not allowed";
           certResp = buildErrCertResp(certReqId, notAuthorized, msg);
         } else {

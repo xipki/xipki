@@ -32,10 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
-import org.xipki.ca.gateway.CaNameSigners;
-import org.xipki.ca.gateway.PopControl;
-import org.xipki.ca.gateway.Requestor;
-import org.xipki.ca.gateway.RequestorAuthenticator;
+import org.xipki.ca.gateway.*;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.ErrorResponse;
 import org.xipki.ca.sdk.SdkClient;
@@ -221,7 +218,8 @@ public abstract class BaseCmpResponder {
   protected abstract PKIBody revokePendingCertificates(String caName, ASN1OctetString transactionId)
       throws SdkErrorResponseException;
 
-  private Requestor getCertRequestor(X500Name requestorSender, byte[] senderKID, CMPCertificate[] extraCerts) {
+  private Requestor.CertRequestor getCertRequestor(
+      X500Name requestorSender, byte[] senderKID, CMPCertificate[] extraCerts) {
     if (extraCerts == null) {
       return null;
     }
@@ -242,11 +240,11 @@ public abstract class BaseCmpResponder {
     return null;
   }
 
-  private Requestor getPasswordRequestor(byte[] senderKID) {
+  private Requestor.PasswordRequestor getPasswordRequestor(byte[] senderKID) {
     return authenticator.getPasswordRequestorByKeyId(senderKID);
   }
 
-  private Requestor getCertRequestor(X509Cert senderCert) {
+  private Requestor.CertRequestor getCertRequestor(X509Cert senderCert) {
     return authenticator.getCertRequestor(senderCert);
   }
 
@@ -577,7 +575,7 @@ public abstract class BaseCmpResponder {
       }
 
       PKMACBuilder pkMacBuilder = new PKMACBuilder(new JcePKMACValuesCalculator());
-      Requestor requestor = getPasswordRequestor(senderKID);
+      Requestor.PasswordRequestor requestor = getPasswordRequestor(senderKID);
 
       if (requestor == null) {
         LOG.warn("tid={}: not authorized requestor with senderKID '{}", tid,
@@ -595,7 +593,7 @@ public abstract class BaseCmpResponder {
       }
 
       X500Name x500Sender = getX500Name(header.getSender());
-      Requestor requestor = (x500Sender == null) ? null
+      Requestor.CertRequestor requestor = (x500Sender == null) ? null
           : getCertRequestor(x500Sender, senderKID, pkiMessage.toASN1Structure().getExtraCerts());
       if (requestor == null) {
         LOG.warn("tid={}: not authorized requestor '{}'", tid, header.getSender());
@@ -618,13 +616,17 @@ public abstract class BaseCmpResponder {
       ConcurrentContentSigner signer, PKIMessage pkiMessage, AuditEvent event, Requestor requestor) {
     GeneralName respSender = pkiMessage.getHeader().getSender();
     try {
-      if (requestor.getCert() != null) {
+      if (requestor instanceof Requestor.CertRequestor) {
         return CmpUtil.addProtection(pkiMessage, signer, respSender, cmpControl.isSendResponderCert());
       } else {
+        Requestor.PasswordRequestor requestor0 = (Requestor.PasswordRequestor) requestor;
         PBMParameter parameter = new PBMParameter(
-            randomSalt(), cmpControl.getResponsePbmOwf().getAlgorithmIdentifier(),
-            cmpControl.getResponsePbmIterationCount(), cmpControl.getResponsePbmMac().getAlgorithmIdentifier());
-        return CmpUtil.addProtection(pkiMessage, requestor.getPassword(), parameter, respSender, requestor.getKeyId());
+            randomSalt(),
+            cmpControl.getResponsePbmOwf().getAlgorithmIdentifier(),
+            cmpControl.getResponsePbmIterationCount(),
+            cmpControl.getResponsePbmMac().getAlgorithmIdentifier());
+        return CmpUtil.addProtection(pkiMessage, requestor0.getPassword(),
+                  parameter, respSender, requestor0.getKeyId());
       }
     } catch (Exception ex) {
       LogUtil.error(LOG, ex, "could not add protection to the PKI message");
@@ -768,9 +770,10 @@ public abstract class BaseCmpResponder {
     EncryptedValue encKey;
 
     try {
-      if (requestor.getCert() != null) {
+      if (requestor instanceof Requestor.CertRequestor) {
+        Requestor.CertRequestor certRequestor = (Requestor.CertRequestor) requestor;
         // use private key of the requestor to encrypt the private key
-        PublicKey reqPub = requestor.getCert().getPublicKey();
+        PublicKey reqPub = certRequestor.getCert().getPublicKey();
         CrmfKeyWrapper wrapper;
         if (reqPub instanceof RSAPublicKey) {
           wrapper = new CrmfKeyWrapper.RSAOAEPAsymmetricKeyWrapper(reqPub);
@@ -827,6 +830,8 @@ public abstract class BaseCmpResponder {
         encKey = new EncryptedValue(intendedAlg, symmAlg,
             new DERBitString(encSymmKey), keyAlg, null, new DERBitString(encValue));
       } else {
+        Requestor.PasswordRequestor passwordRequestor = (Requestor.PasswordRequestor) requestor;
+
         final ASN1ObjectIdentifier encAlgOid = NISTObjectIdentifiers.id_aes128_GCM;
         final int keysizeBits = 128; // one of 128, 192 and 256. Must match the encAlgOid
         final int iterCount = 10240; // >= 1000
@@ -851,7 +856,7 @@ public abstract class BaseCmpResponder {
 
         SecretKey key;
         try {
-          key = keyFact.generateSecret(new PBKDF2KeySpec(requestor.getPassword(), pbkdfSalt,
+          key = keyFact.generateSecret(new PBKDF2KeySpec(passwordRequestor.getPassword(), pbkdfSalt,
                   iterCount, keysizeBits, prf_hmacWithSHA256));
           key = new SecretKeySpec(key.getEncoded(), "AES");
         } finally {

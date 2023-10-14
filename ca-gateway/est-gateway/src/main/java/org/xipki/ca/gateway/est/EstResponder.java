@@ -22,10 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
-import org.xipki.ca.gateway.GatewayUtil;
-import org.xipki.ca.gateway.PopControl;
-import org.xipki.ca.gateway.Requestor;
-import org.xipki.ca.gateway.RequestorAuthenticator;
+import org.xipki.ca.gateway.*;
 import org.xipki.ca.gateway.conf.CaProfileConf;
 import org.xipki.ca.gateway.conf.CaProfilesControl;
 import org.xipki.ca.sdk.*;
@@ -208,11 +205,11 @@ public class EstResponder {
     this.caProfilesControl = Args.notNull(caProfiles, "caProfiles");
   }
 
-  private Requestor getRequestor(String user) {
+  private Requestor.PasswordRequestor getRequestor(String user) {
     return authenticator.getPasswordRequestorByUser(user);
   }
 
-  private Requestor getRequestor(X509Cert cert) {
+  private Requestor.CertRequestor getRequestor(X509Cert cert) {
     return authenticator.getCertRequestor(cert);
   }
 
@@ -346,8 +343,10 @@ public class EstResponder {
               AuditLevel.INFO, AuditStatus.FAILED);
         }
 
-        requestor = getRequestor(user);
-        boolean authorized = requestor != null && requestor.authenticate(password);
+        Requestor.PasswordRequestor requestor0 = getRequestor(user);
+        requestor = requestor0;
+
+        boolean authorized = requestor0 != null && requestor0.authenticate(password);
         if (!authorized) {
           throw new HttpRespAuditException(UNAUTHORIZED, "could not authenticate user " + user,
               AuditLevel.INFO, AuditStatus.FAILED);
@@ -376,7 +375,7 @@ public class EstResponder {
         throw new OperationException(ErrorCode.NOT_PERMITTED, "ENROLL_CERT is not allowed");
       }
 
-      if (!requestor.isCertprofilePermitted(profile)) {
+      if (!requestor.isCertprofilePermitted(caName, profile)) {
         throw new OperationException(ErrorCode.NOT_PERMITTED, "certprofile " + profile + " is not allowed");
       }
 
