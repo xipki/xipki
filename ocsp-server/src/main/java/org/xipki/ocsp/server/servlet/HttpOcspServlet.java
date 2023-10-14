@@ -113,9 +113,7 @@ class HttpOcspServlet {
   } // method doPosts
 
   private HttpResponse doGet(XiHttpRequest req) {
-    LOG.info("LIAO-0");
     String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
-    LOG.info("LIAO-1 path={}", path);
     ResponderAndPath responderAndPath = server.getResponderForPath(path);
     if (responderAndPath == null) {
       return new HttpResponse(HttpStatusCode.SC_NOT_FOUND);
