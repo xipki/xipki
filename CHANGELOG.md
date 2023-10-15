@@ -2,8 +2,11 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-##s 6.4.0
+##s 6.4.1
 - Release date: 2023/mm/dd
+
+##s 6.4.0
+- Release date: 2023/10/15
 - CA
   - Feature: encode the requests and responses between gateway and ca-server in CBOR format (was JSON).
   - Feature: extend Properties to use the place-holder ${env:name} for environment and ${sys:name} for system property.
@@ -28,10 +31,11 @@ See also <https://github.com/xipki/xipki/releases>
 - Dependencies
   - Replace JSON parser gson with jackson.
   - Bouncycaste: 1.73 -> 1.76
-  - ipkcs11wrapper: 1.0.5 -> 1.0.6
+  - ipkcs11wrapper: 1.0.5 -> 1.0.7
   - log4j: 2.19.0 -> 2.20.0
   - mariadb-java-client: 3.1.4 -> 3.2.0
-  - slf4j: 1.7.32 -> 1.7.36 
+  - slf4j: 1.7.32 -> 1.7.36
+
 ## 6.3.0
 - Release date: 2023/04/29
 - CA
