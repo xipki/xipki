@@ -36,9 +36,10 @@ public class CaConfs {
    * @param root the object to be serialized.
    * @param out the output stream.
    * @throws InvalidConfException if the configuration is not valid.
+   * @throws IOException if IO error occurs while writing to the output stream.
    */
   public static void marshal(CaConfType.CaSystem root, OutputStream out)
-      throws InvalidConfException {
+      throws InvalidConfException, IOException {
     Args.notNull(root, "root");
     Args.notNull(out, "out");
     root.validate();
