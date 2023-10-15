@@ -66,9 +66,9 @@ public final class AcmeJson {
     /**
      * Parses JSON from byte[].
      *
-     * @param bytes
-     *            Bytes.
+     * @param bytes Bytes.
      * @return {@link AcmeJson} of the read content.
+     * @throws AcmeProtocolException if error while parsing the object.
      */
     public static AcmeJson parse(byte[] bytes) throws AcmeProtocolException {
         return parse(new String(bytes, StandardCharsets.UTF_8));
@@ -77,9 +77,9 @@ public final class AcmeJson {
     /**
      * Parses JSON from a String.
      *
-     * @param json
-     *            JSON string
+     * @param json JSON string
      * @return {@link AcmeJson} of the read content.
+     * @throws AcmeProtocolException if error while parsing the object.
      */
     public static AcmeJson parse(String json) throws AcmeProtocolException {
         try {
@@ -93,7 +93,7 @@ public final class AcmeJson {
     /**
      * Returns a set of all keys of this object.
      *
-     * @return {@link Set} of keys
+     * @return {@link Set} of keys.
      */
     public Set<String> keySet() {
         return Collections.unmodifiableSet(data.keySet());
@@ -161,7 +161,7 @@ public final class AcmeJson {
         }
 
         /**
-         * Returns {@code true} if the array is empty.
+         * @return {@code true} if the array is empty, {@code false} otherwise.
          */
         public boolean isEmpty() {
             return data.isEmpty();
@@ -240,6 +240,8 @@ public final class AcmeJson {
 
         /**
          * Returns the value as {@link String}.
+         * @return the value as {@link String}.
+         * @throws AcmeProtocolException if the value is {@code null}.
          */
         public String asString() throws AcmeProtocolException {
             required();
@@ -248,6 +250,8 @@ public final class AcmeJson {
 
         /**
          * Returns the value as JSON object.
+         * @return the value as JSON object.
+         * @throws AcmeProtocolException if the value is not an instance of Map&lt;String, Object&gt;.
          */
         public AcmeJson asObject() throws AcmeProtocolException {
             required();
@@ -261,8 +265,8 @@ public final class AcmeJson {
         }
 
         /**
-         * Checks if the value is present. An {@link AcmeProtocolException} is thrown if
-         * the value is {@code null}.
+         * Assert the value is present.
+         * @throws AcmeProtocolException if the value is {@code null}.
          */
         private void required() throws AcmeProtocolException {
             if (!isPresent()) {

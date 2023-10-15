@@ -227,7 +227,15 @@ public class CaUtil {
   } // method canonicalizeSignerConf
 
   /**
+   * If the content has less than 256 chars, then returns a {@link FileOrValue} with text content,
+   * otherwise, the content is written to the zipStream and a {@link FileOrValue}, with file name
+   * pointing to the location in the ZIP file, is returned.
    * The specified stream remains open after this method returns.
+   * @param content the content
+   * @param zipStream the ZIP output stream
+   * @param fileName the file name in the ZIP stream when writing to the ZIp stream.
+   * @return a {@link FileOrBinary} with the content or fileName as value.
+   * @throws IOException if IO error occurs when writing to the ZIP output stream.
    */
   public static FileOrValue createFileOrValue(ZipOutputStream zipStream, String content, String fileName)
       throws IOException {
@@ -252,7 +260,15 @@ public class CaUtil {
   } // method createFileOrValue
 
   /**
+   * If the content of the decoded b64Content is less than 256 bytes, then returns a {@link FileOrBinary}
+   * with binary content, otherwise, the content is written to the zipStream and a {@link FileOrBinary},
+   * with file name pointing to the location in the ZIP file, is returned.
    * The specified stream remains open after this method returns.
+   * @param b64Content the BASE64-encoded content
+   * @param zipStream the ZIP output stream
+   * @param fileName the file name in the ZIP stream when writing to the ZIp stream.
+   * @return a {@link FileOrBinary} with the content or fileName as value.
+   * @throws IOException if IO error occurs when writing to the ZIP output stream.
    */
   public static FileOrBinary createFileOrBase64Value(ZipOutputStream zipStream, String b64Content, String fileName)
       throws IOException {
@@ -264,7 +280,15 @@ public class CaUtil {
   } // method createFileOrBase64Value
 
   /**
+   * If the content is less than 256 bytes, then returns a {@link FileOrBinary} with binary content,
+   * otherwise, the content is written to the zipStream and a {@link FileOrBinary}, with file name
+   * pointing to the location in the ZIP file, is returned.
    * The specified stream remains open after this method returns.
+   * @param content the content
+   * @param zipStream the ZIP output stream
+   * @param fileName the file name in the ZIP stream when writing to the ZIp stream.
+   * @return a {@link FileOrBinary} with the content or fileName as value.
+   * @throws IOException if IO error occurs when writing to the ZIP output stream.
    */
   public static FileOrBinary createFileOrBinary(ZipOutputStream zipStream, byte[] content, String fileName)
       throws IOException {

@@ -28,6 +28,8 @@ public interface CmpClient extends Closeable {
    *
    * @param caName
    *          CA name. Must not be {@code null}.
+   * @param requestor
+   *          Requestor, the actor which requests the operation. Must not be {@code null}.
    * @param csr
    *          CSR. Must not be{@code null}.
    * @param profile
@@ -54,6 +56,8 @@ public interface CmpClient extends Closeable {
    *
    * @param caName
    *          CA name. Must not be {@code null}.
+   * @param requestor
+   *          Requestor, the actor which requests the operation. Must not be {@code null}.
    * @param request
    *          Request. Must not be {@code null}.
    * @param debug
@@ -72,6 +76,8 @@ public interface CmpClient extends Closeable {
    * Revokes a certificate.
    * @param caName
    *          CA name. Must not be {@code null}.
+   * @param requestor
+   *          Requestor, the actor which requests the operation. Must not be {@code null}.
    * @param issuerCert
    *          Issuer's certificate. Must not be {@code null}.
    * @param serial
@@ -98,6 +104,8 @@ public interface CmpClient extends Closeable {
    *
    * @param caName
    *          CA name. Must not be {@code null}.
+   * @param requestor
+   *          Requestor, the actor which requests the operation. Must not be {@code null}.
    * @param issuerCert
    *          Issuer's certificate. Must not be {@code null}.
    * @param cert
@@ -122,6 +130,10 @@ public interface CmpClient extends Closeable {
   /**
    * Revoke a set of certificates.
    *
+   * @param caName
+   *          CA name. Must not be {@code null}.
+   * @param requestor
+   *          Requestor, the actor which requests the operation. Must not be {@code null}.
    * @param request
    *          Request. Must not be {@code null}.
    * @param debug
@@ -156,6 +168,8 @@ public interface CmpClient extends Closeable {
    * Unsuspends a certificate.
    * @param caName
    *          CA name. Must not be {@code null}.
+   * @param requestor
+   *          Requestor, the actor which requests the operation. Must not be {@code null}.
    * @param issuerCert
    *          Issuer's certificate. Must not be {@code null}.
    * @param serial
@@ -177,6 +191,8 @@ public interface CmpClient extends Closeable {
    *
    * @param caName
    *          CA name. Must not be {@code null}.
+   * @param requestor
+   *          Requestor, the actor which requests the operation. Must not be {@code null}.
    * @param issuerCert
    *          Issuer's certificate. Must not be {@code null}.
    * @param cert
@@ -198,6 +214,8 @@ public interface CmpClient extends Closeable {
    *
    * @param caName
    *          CA name. Must not be {@code null}.
+   * @param requestor
+   *          Requestor, the actor which requests the operation. Must not be {@code null}.
    * @param request
    *          Request. Must not be {@code null}.
    * @param debug
@@ -216,7 +234,11 @@ public interface CmpClient extends Closeable {
    * Returns the CA certificate.
    * @param caName
    *          the CA name
+   * @param debug
+   *          Request/response debug control. Could be {@code null}.
    * @return the CA certificate
+   * @throws PkiErrorException
+   *          if the response returns none-success status.
    * @throws CmpClientException
    *          if client error occurs.
    */
@@ -226,7 +248,11 @@ public interface CmpClient extends Closeable {
    * Returns the CA certificate chain.
    * @param caName
    *          the CA name
+   * @param debug
+   *          Request/response debug control. Could be {@code null}.
    * @return the CA certificate
+   * @throws PkiErrorException
+   *          if the response returns none-success status.
    * @throws CmpClientException
    *          if client error occurs.
    */

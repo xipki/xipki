@@ -31,7 +31,11 @@ public class CaConfs {
   }
 
   /**
+   * Serialize a {#CaConfType.CaSystem} object to the output stream.
    * The specified stream remains open after this method returns.
+   * @param root the object to be serialized.
+   * @param out the output stream.
+   * @throws InvalidConfException if the configuration is not valid.
    */
   public static void marshal(CaConfType.CaSystem root, OutputStream out)
       throws InvalidConfException {

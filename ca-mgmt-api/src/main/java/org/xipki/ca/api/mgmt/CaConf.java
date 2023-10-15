@@ -174,7 +174,13 @@ public class CaConf {
   }
 
   /**
+   * Constructor from ZIP input stream.
    * The specified stream is closed after this method call.
+   * @param confFileZipStream the input stream containing the zipped CA configuration.
+   * @param securityFactory An {@link SecurityFactory} with helper methods.
+   * @throws IOException if IO error occurs while reading the input stream.
+   * @throws InvalidConfException if the CA configuration is not valid.
+   * @throws CaMgmtException if other non-RuntimeException error occurs.
    */
   public CaConf(InputStream confFileZipStream, SecurityFactory securityFactory)
       throws IOException, InvalidConfException, CaMgmtException {

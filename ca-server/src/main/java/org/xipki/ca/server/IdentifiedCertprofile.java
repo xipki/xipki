@@ -275,6 +275,9 @@ public class IdentifiedCertprofile implements Closeable {
    * @param notAfter
    *          NotAfter. Must not be {@code null}.
    * @return the extensions of the certificate to be issued.
+   * @throws BadCertTemplateException if the requestedSubject, requestedExtensions and publicKeyInfo
+   *         does not match the requested certificate profile.
+   * @throws CertprofileException if any error occurs.
    */
   public ExtensionValues getExtensions(
       X500Name requestedSubject, X500Name grantedSubject, Extensions requestedExtensions,
