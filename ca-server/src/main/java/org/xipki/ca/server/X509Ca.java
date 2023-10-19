@@ -585,7 +585,7 @@ public class X509Ca extends X509CaModule implements Closeable {
       if (addCtlog) {
         certBuilder.addExtension(Extn.id_precertificate, true, DERNull.INSTANCE);
 
-        ConcurrentBagEntrySigner signer0;
+        ConcurrentBag.BagEntry<XiContentSigner> signer0;
         try {
           signer0 = gct.signer.borrowSigner();
         } catch (NoIdleSignerException ex) {
@@ -620,7 +620,7 @@ public class X509Ca extends X509CaModule implements Closeable {
         certBuilder.addExtension(new Extension(Extn.id_SCTs, extnSctCtrl.isCritical(), extnValue));
       }
 
-      ConcurrentBagEntrySigner signer0;
+      ConcurrentBag.BagEntry<XiContentSigner> signer0;
       try {
         signer0 = gct.signer.borrowSigner();
       } catch (NoIdleSignerException ex) {

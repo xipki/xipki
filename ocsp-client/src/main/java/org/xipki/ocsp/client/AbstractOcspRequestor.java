@@ -338,7 +338,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
           certChain[i] = certChain0[i].toBcCert().toASN1Structure();
         }
 
-        ConcurrentBagEntrySigner signer0;
+        ConcurrentBag.BagEntry<XiContentSigner> signer0;
         try {
           signer0 = signer.borrowSigner();
         } catch (NoIdleSignerException ex) {

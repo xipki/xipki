@@ -5,10 +5,10 @@ package org.xipki.ocsp.server;
 
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.xipki.ocsp.server.type.*;
-import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.XiContentSigner;
+import org.xipki.util.ConcurrentBag;
 import org.xipki.util.Hex;
 
 import java.io.IOException;
@@ -73,7 +73,7 @@ public class OCSPRespBuilder {
     byte[] tbs = new byte[responseData.getEncodedLength()];
     responseData.write(tbs, 0);
 
-    ConcurrentBagEntrySigner signer0 = signer.borrowSigner();
+    ConcurrentBag.BagEntry<XiContentSigner> signer0 = signer.borrowSigner();
 
     byte[] signature;
     byte[] sigAlgId;

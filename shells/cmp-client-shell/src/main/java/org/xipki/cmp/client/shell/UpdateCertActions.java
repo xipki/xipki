@@ -349,7 +349,7 @@ public class UpdateCertActions {
       ConcurrentContentSigner signer = getSigner();
 
       ProofOfPossessionSigningKeyBuilder popBuilder = new ProofOfPossessionSigningKeyBuilder(certRequest);
-      ConcurrentBagEntrySigner signer0 = signer.borrowSigner();
+      ConcurrentBag.BagEntry<XiContentSigner> signer0 = signer.borrowSigner();
       POPOSigningKey popSk;
       try {
         popSk = popBuilder.build(signer0.value());

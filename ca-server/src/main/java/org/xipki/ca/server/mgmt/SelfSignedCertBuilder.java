@@ -220,7 +220,7 @@ class SelfSignedCertBuilder {
           null, publicKeyInfo, publicCaInfo, null, notBefore, notAfter);
       CaUtil.addExtensions(extensionTuples, certBuilder);
 
-      ConcurrentBagEntrySigner signer0 = signer.borrowSigner();
+      ConcurrentBag.BagEntry<XiContentSigner> signer0 = signer.borrowSigner();
       X509CertificateHolder certHolder;
       try {
         certHolder = certBuilder.build(signer0.value());

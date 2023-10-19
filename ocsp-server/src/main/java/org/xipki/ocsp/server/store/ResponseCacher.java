@@ -17,8 +17,8 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
-import org.xipki.util.concurrent.ConcurrentBag;
-import org.xipki.util.concurrent.ConcurrentBagEntry;
+import org.xipki.util.ConcurrentBag;
+import org.xipki.util.ConcurrentBag.BagEntry;
 
 import java.io.Closeable;
 import java.math.BigInteger;
@@ -62,7 +62,7 @@ public class ResponseCacher implements Closeable {
 
   private static final String SQL_UPDATE_RESP = "UPDATE OCSP SET GENERATED_AT=?,NEXT_UPDATE=?,RESP=? WHERE ID=?";
 
-  private final ConcurrentBag<ConcurrentBagEntry<Digest>> idDigesters;
+  private final ConcurrentBag<Digest> idDigesters;
 
   private class IssuerUpdater implements Runnable {
 
@@ -147,7 +147,7 @@ public class ResponseCacher implements Closeable {
 
     this.idDigesters = new ConcurrentBag<>();
     for (int i = 0; i < 20; i++) {
-      idDigesters.add(new ConcurrentBagEntry<>(HashAlgo.SHA1.createDigest()));
+      idDigesters.add(new BagEntry<>(HashAlgo.SHA1.createDigest()));
     }
   }
 
@@ -482,7 +482,7 @@ public class ResponseCacher implements Closeable {
   }
 
   private long deriveId(int issuerId, byte[] identBytes) {
-    ConcurrentBagEntry<Digest> digest0 = null;
+    BagEntry<Digest> digest0 = null;
     try {
       digest0 = idDigesters.borrow(2, TimeUnit.SECONDS);
     } catch (InterruptedException ex) {
@@ -491,7 +491,7 @@ public class ResponseCacher implements Closeable {
 
     boolean newDigest = (digest0 == null);
     if (newDigest) {
-      digest0 = new ConcurrentBagEntry<>(HashAlgo.SHA1.createDigest());
+      digest0 = new BagEntry<>(HashAlgo.SHA1.createDigest());
     }
 
     byte[] hash = new byte[20];

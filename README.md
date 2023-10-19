@@ -391,4 +391,3 @@ Use OCSP with customized Certificate Status Source (OcspStore)
 -----
   - See the example modules
     - `ocsp-store-example`: implementation of a customized OcspStore.
-    - `ocsp-store-example-assembly`: assembly the binaries.

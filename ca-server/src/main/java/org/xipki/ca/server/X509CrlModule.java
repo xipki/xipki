@@ -568,7 +568,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       ConcurrentContentSigner concurrentSigner = (crlSigner == null)
           ? caInfo.getSigner(null) : crlSigner.getSigner();
 
-      ConcurrentBagEntrySigner signer0;
+      ConcurrentBag.BagEntry<XiContentSigner> signer0;
       try {
         signer0 = concurrentSigner.borrowSigner();
       } catch (NoIdleSignerException ex) {

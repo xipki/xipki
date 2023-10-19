@@ -15,11 +15,12 @@ import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
 import org.bouncycastle.cert.crmf.CRMFException;
 import org.bouncycastle.cert.crmf.PKMACBuilder;
 import org.bouncycastle.cert.crmf.jcajce.JcePKMACValuesCalculator;
-import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.XiContentSigner;
 import org.xipki.util.Args;
+import org.xipki.util.ConcurrentBag;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class CmpUtil {
       builder.addCMPCertificate(signerCert);
     }
 
-    ConcurrentBagEntrySigner signer0 = signer.borrowSigner();
+    ConcurrentBag.BagEntry<XiContentSigner> signer0 = signer.borrowSigner();
     ProtectedPKIMessage signedMessage;
     try {
       signedMessage = builder.build(signer0.value());

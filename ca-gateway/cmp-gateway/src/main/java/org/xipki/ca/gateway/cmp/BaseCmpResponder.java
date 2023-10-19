@@ -42,8 +42,8 @@ import org.xipki.cmp.ProtectionResult;
 import org.xipki.cmp.ProtectionVerificationResult;
 import org.xipki.security.*;
 import org.xipki.util.*;
-import org.xipki.util.concurrent.ConcurrentBag;
-import org.xipki.util.concurrent.ConcurrentBagEntry;
+import org.xipki.util.ConcurrentBag;
+import org.xipki.util.ConcurrentBag.BagEntry;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.InsufficientPermissionException;
 import org.xipki.util.exception.OperationException;
@@ -106,9 +106,9 @@ public abstract class BaseCmpResponder {
 
   private static final AlgorithmIdentifier prf_hmacWithSHA256 = SignAlgo.HMAC_SHA256.getAlgorithmIdentifier();
 
-  private static final ConcurrentBag<ConcurrentBagEntry<Cipher>> aesGcm_ciphers;
+  private static final ConcurrentBag<Cipher> aesGcm_ciphers;
 
-  private static final ConcurrentBag<ConcurrentBagEntry<SecretKeyFactory>> pbkdf2_kdfs;
+  private static final ConcurrentBag<SecretKeyFactory> pbkdf2_kdfs;
 
   private static final Map<ErrorCode, Integer> errorCodeToPkiFailureMap = new HashMap<>(20);
 
@@ -143,7 +143,7 @@ public abstract class BaseCmpResponder {
         LogUtil.error(LOG, ex, "could not get Cipher of " + oid);
         break;
       }
-      aesGcm_ciphers.add(new ConcurrentBagEntry<>(cipher));
+      aesGcm_ciphers.add(new BagEntry<>(cipher));
     }
     int size = aesGcm_ciphers.size();
     aesGcm_ciphers_initialized = size > 0;
@@ -163,7 +163,7 @@ public abstract class BaseCmpResponder {
         LogUtil.error(LOG, ex, "could not get SecretKeyFactory of " + oid);
         break;
       }
-      pbkdf2_kdfs.add(new ConcurrentBagEntry<>(keyFact));
+      pbkdf2_kdfs.add(new BagEntry<>(keyFact));
     }
 
     size = pbkdf2_kdfs.size();
@@ -799,7 +799,7 @@ public abstract class BaseCmpResponder {
         ASN1ObjectIdentifier symmAlgOid = NISTObjectIdentifiers.id_aes128_GCM;
         byte[] nonce = randomBytes(aesGcmNonceLen);
 
-        ConcurrentBagEntry<Cipher> cipher0 = null;
+        BagEntry<Cipher> cipher0 = null;
         if (aesGcm_ciphers_initialized) {
           try {
             cipher0 = aesGcm_ciphers.borrow(5, TimeUnit.SECONDS);
@@ -843,7 +843,7 @@ public abstract class BaseCmpResponder {
         // use password of the requestor to encrypt the private key
         byte[] pbkdfSalt = randomBytes(keysizeBits / 8);
 
-        ConcurrentBagEntry<SecretKeyFactory> keyFact0 = null;
+        BagEntry<SecretKeyFactory> keyFact0 = null;
         if (pbkdf2_kdfs_initialized) {
           try {
             keyFact0 = pbkdf2_kdfs.borrow(5, TimeUnit.SECONDS);
@@ -867,7 +867,7 @@ public abstract class BaseCmpResponder {
 
         GCMParameterSpec gcmParamSpec = new GCMParameterSpec(tagByteLen * 8, nonce);
 
-        ConcurrentBagEntry<Cipher> cipher0 = null;
+        BagEntry<Cipher> cipher0 = null;
         if (aesGcm_ciphers_initialized) {
           try {
             cipher0 = aesGcm_ciphers.borrow(5, TimeUnit.SECONDS);
