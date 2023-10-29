@@ -1,0 +1,20 @@
+{
+	// To activate the logging of requests and responses, set writer.level to DEBUG
+	// in the file META-INF/classes/log4j2.properties.
+	"logReqResp":true,
+	// valid values are NO, APACHE, NGINX, GENERAL
+	//"reverseProxyMode":"GENERAL",
+	"clientCerts":[
+		{
+			"file": "keycerts/tlskeys/client/tls-client-cert.pem"
+		}
+	],
+	"security":{
+		"pkcs11Conf":{
+			"file":"security/pkcs11.json"
+		},
+		"password":{
+			"masterPasswordCallback":"FILE file=security/masterpassword.secret"
+		}
+	}
+}

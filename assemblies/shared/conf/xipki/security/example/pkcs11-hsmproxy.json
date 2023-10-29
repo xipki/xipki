@@ -1,0 +1,22 @@
+{
+	"modules":[{
+		"name":"default",
+		"readonly":false,
+		"type":"hsmproxy",
+		"nativeLibraries":[
+			{
+				"path":"https://localhost:8446/hsmproxy",
+				"properties": {
+					"ssl.storeType": "PKCS12",
+					"ssl.keystore": "keycerts/tlskeys/client/tls-client.p12",
+					"ssl.keystorePassword": "1234",
+					"ssl.truststore": "keycerts/tlskeys/ca/tls-ca-cert.p12",
+					"ssl.truststorePassword": "1234",
+					// hostnameVerifier: no_op, default or java:class-name
+					"ssl.hostnameVerifier": "default"
+				}
+			}
+		]
+	}]
+}
+
