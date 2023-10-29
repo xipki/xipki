@@ -214,7 +214,7 @@ public class RestResponder {
     String auditMessage = null;
 
     try {
-      if (path.length() == 0) {
+      if (path.isEmpty()) {
         String message = "blank path is not allowed";
         LOG.error(message);
         throw new HttpRespAuditException(HttpStatusCode.SC_NOT_FOUND, message, ERROR, FAILED);
@@ -228,6 +228,9 @@ public class RestResponder {
       String coreUri = path.substring(1);
       String[] tokens = StringUtil.splitAsArray(coreUri, "/");
       if (tokens.length == 1) {
+        // URL: host:port/rest/<command>
+        command = tokens[0];
+
         CaProfileConf caProfileConf = caProfilesControl.getCaProfile("default");
         if (caProfileConf == null) {
           String message = "unknown alias default";
@@ -237,17 +240,20 @@ public class RestResponder {
 
         caName = caProfileConf.getCa();
         certProfile = caProfileConf.getCertprofile();
-        command = tokens[tokens.length - 1];
       } else if (tokens.length == 2) {
-        CaProfileConf caProfileConf = caProfilesControl.getCaProfile("default");
+        // URL: host:port/rest/<alias or CA-name>/<command>
+        command = tokens[1];
+        String alias = tokens[0];
+        CaProfileConf caProfileConf = caProfilesControl.getCaProfile(alias);
         if (caProfileConf == null) {
-          caName = tokens[1];
+          // URL: host:port/rest/<CA-name>/<command>?pofile=<cert profile name>
+          caName = alias;
           certProfile = httpRetriever.getParameter(PARAM_profile);
         } else {
+          // URL: host:port/rest/<alias>/<command>
           caName = caProfileConf.getCa();
           certProfile = caProfileConf.getCertprofile();
         }
-        command = tokens[tokens.length - 1];
       } else {
         caName = null;
         certProfile = null;
@@ -273,6 +279,19 @@ public class RestResponder {
         String message = "invalid command '" + command + "'";
         LOG.error(message);
         throw new HttpRespAuditException(HttpStatusCode.SC_NOT_FOUND, message, INFO, FAILED);
+      }
+
+      if ((StringUtil.isBlank(certProfile))) {
+        switch (command) {
+          case CMD_enroll_cross_cert:
+          case CMD_enroll_cert:
+          case CMD_enroll_serverkeygen:
+          case CMD_enroll_cert_twin:
+          case CMD_enroll_serverkeygen_twin:
+            String message = "certprofile is not specified";
+            LOG.warn(message);
+            throw new HttpRespAuditException(HttpStatusCode.SC_NOT_FOUND, message, INFO, FAILED);
+        }
       }
 
       switch (command) {
