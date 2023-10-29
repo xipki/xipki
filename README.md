@@ -113,7 +113,7 @@ they MUST be replaced.**
 
 ### For reverse proxy apache httpd
 
-* Set the `reverseProxyMode` field in the json configuration file to `NGINX`:
+* Set the `reverseProxyMode` field in the json configuration file to `APACHE`:
   - CA: `xipki/etc/ca/ca.json`
   - OCSP: `xipki/etc/ocsp/ocsp.json`
   - HSM Proxy: `xipki/etc/hsmproxy.json`

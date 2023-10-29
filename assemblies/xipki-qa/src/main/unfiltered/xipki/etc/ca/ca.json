@@ -5,6 +5,8 @@
 	// To activate the logging of requests and responses, set writer.level to DEBUG
 	// in the file META-INF/classes/log4j2.properties.
 	"logReqResp": true,
+	// valid values are NO, APACHE, NGINX, GENERAL
+	//"reverseProxyMode":"GENERAL",
 	// shard id, between 0 and 127. CA systems using same database must have
 	// different shard ids.
 	"shardId":0,
