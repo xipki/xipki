@@ -49,7 +49,7 @@ public class EstHttpFilter implements XiHttpFilter {
       conf = new ProtocolProxyConfWrapper(conf0);
 
       EstResponder responder = new EstResponder(conf.getSdkClient(), conf.getSecurities().getSecurityFactory(),
-          conf.getAuthenticator(), conf.getPopControl(), conf.getCaProfiles(), conf.getReverseProxyMode());
+          conf.getAuthenticator(), conf.getPopControl(), conf.getCaProfiles(), conf0.getReverseProxyMode());
 
       servlet = new EstHttpServlet(conf.isLogReqResp(), responder);
 

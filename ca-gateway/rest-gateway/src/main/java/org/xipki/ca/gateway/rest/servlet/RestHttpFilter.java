@@ -49,7 +49,7 @@ public class RestHttpFilter implements XiHttpFilter {
       conf = new ProtocolProxyConfWrapper(conf0);
 
       RestResponder responder = new RestResponder(conf.getSdkClient(), conf.getSecurities().getSecurityFactory(),
-          conf.getAuthenticator(), conf.getPopControl(), conf.getCaProfiles(), conf.getReverseProxyMode());
+          conf.getAuthenticator(), conf.getPopControl(), conf.getCaProfiles(), conf0.getReverseProxyMode());
 
       servlet = new RestHttpServlet(conf.isLogReqResp(), responder);
 

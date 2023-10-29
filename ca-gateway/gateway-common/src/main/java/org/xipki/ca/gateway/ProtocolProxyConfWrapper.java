@@ -36,8 +36,6 @@ public class ProtocolProxyConfWrapper {
 
   private final boolean logReqResp;
 
-  private final String reverseProxyMode;
-
   private final SdkClient sdkClient;
 
   private final CaNameSigners signers;
@@ -53,8 +51,7 @@ public class ProtocolProxyConfWrapper {
     XipkiBaseDir.init();
 
     logReqResp = conf.isLogReqResp();
-    reverseProxyMode = conf.getReverseProxyMode();
-    LOG.info("logReqResp: {}, reverseProxyMode: {}", logReqResp, reverseProxyMode);
+    LOG.info("logReqResp: {}", logReqResp);
 
     AuditConf audit = conf.getAudit();
     String auditType = audit.getType();
@@ -126,10 +123,6 @@ public class ProtocolProxyConfWrapper {
 
   public boolean isLogReqResp() {
     return logReqResp;
-  }
-
-  public String getReverseProxyMode() {
-    return reverseProxyMode;
   }
 
   public SdkClient getSdkClient() {

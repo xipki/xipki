@@ -52,7 +52,7 @@ public class CmpHttpFilter implements XiHttpFilter {
       CmpResponder responder = new CmpResponder(cmpControl, conf.getSdkClient(),
           conf.getSecurities().getSecurityFactory(), conf.getSigners(), conf.getAuthenticator(), conf.getPopControl());
 
-      servlet = new CmpHttpServlet(conf.isLogReqResp(), conf.getReverseProxyMode(), responder);
+      servlet = new CmpHttpServlet(conf.isLogReqResp(), conf0.getReverseProxyMode(), responder);
 
       GatewayUtil.auditLogPciEvent(LOG, "CMP-Gateway", true, "START");
     } catch (Exception e) {
