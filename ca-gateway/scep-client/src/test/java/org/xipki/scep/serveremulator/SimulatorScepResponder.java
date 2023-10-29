@@ -34,9 +34,9 @@ import java.time.Instant;
  * @author Lijun Liao (xipki)
  */
 
-public class ScepResponder {
+public class SimulatorScepResponder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ScepResponder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SimulatorScepResponder.class);
 
   private static final long DFLT_MAX_SIGNINGTIME_BIAS = 5L * 60 * 1000; // 5 minutes
 
@@ -52,8 +52,8 @@ public class ScepResponder {
 
   private long maxSigningTimeBiasInMs = DFLT_MAX_SIGNINGTIME_BIAS;
 
-  public ScepResponder(CaCaps caCaps, CaEmulator caEmulator, RaEmulator raEmulator,
-                       NextCaAndRa nextCaAndRa, ScepControl control) {
+  public SimulatorScepResponder(CaCaps caCaps, CaEmulator caEmulator, RaEmulator raEmulator,
+                                NextCaAndRa nextCaAndRa, ScepControl control) {
     this.caCaps = Args.notNull(caCaps, "caCaps");
     this.caEmulator = Args.notNull(caEmulator, "caEmulator");
     this.control = Args.notNull(control, "control");

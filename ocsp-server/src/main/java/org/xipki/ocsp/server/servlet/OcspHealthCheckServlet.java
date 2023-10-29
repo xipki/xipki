@@ -25,13 +25,13 @@ import java.util.Map;
  * @since 3.0.1
  */
 
-class HealthCheckServlet {
+class OcspHealthCheckServlet {
 
-  private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OcspHealthCheckServlet.class);
 
-  private OcspServer server;
+  private final OcspServer server;
 
-  public void setServer(OcspServer server) {
+  public OcspHealthCheckServlet(OcspServer server) {
     this.server = Args.notNull(server, "server");
   }
 

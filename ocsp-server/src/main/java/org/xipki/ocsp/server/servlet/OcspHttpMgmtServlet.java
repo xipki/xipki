@@ -19,10 +19,7 @@ import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * REST management servlet of OCSP server.
@@ -31,7 +28,7 @@ import java.util.Set;
  * @since 3.0.1
  */
 
-class HttpMgmtServlet {
+class OcspHttpMgmtServlet {
 
   private static final class MyException extends Exception {
 
@@ -48,20 +45,20 @@ class HttpMgmtServlet {
 
   } // class MyException
 
-  private static final Logger LOG = LoggerFactory.getLogger(HttpMgmtServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OcspHttpMgmtServlet.class);
 
   private static final String CT_RESPONSE = "application/json";
 
-  private Set<X509Cert> mgmtCerts;
+  private final Set<X509Cert> mgmtCerts;
 
-  private OcspServerImpl ocspServer;
+  private final OcspServerImpl ocspServer;
 
-  public void setMgmtCerts(Set<X509Cert> mgmtCerts) {
+  private final String reverseProxyMode;
+
+  public OcspHttpMgmtServlet(Set<X509Cert> mgmtCerts, OcspServerImpl ocspServer, String reverseProxyMode) {
     this.mgmtCerts = new HashSet<>(Args.notEmpty(mgmtCerts, "mgmtCerts"));
-  }
-
-  public void setOcspServer(OcspServerImpl ocspServer) {
     this.ocspServer = Args.notNull(ocspServer, "ocspServer");
+    this.reverseProxyMode = reverseProxyMode;
   }
 
   public void service(XiHttpRequest req, XiHttpResponse resp) throws IOException {
@@ -74,11 +71,9 @@ class HttpMgmtServlet {
 
   private HttpResponse doPost(XiHttpRequest req) {
     try {
-      X509Cert clientCert = TlsHelper.getTlsClientCert(req);
-      if (clientCert == null) {
-        throw new MyException(HttpStatusCode.SC_UNAUTHORIZED,
-            "remote management is not permitted if TLS client certificate is not present");
-      }
+      X509Cert clientCert = Optional.ofNullable(TlsHelper.getTlsClientCert(req, reverseProxyMode)).orElseThrow(() ->
+          new MyException(HttpStatusCode.SC_UNAUTHORIZED,
+            "remote management is not permitted if TLS client certificate is not present"));
 
       if (!mgmtCerts.contains(clientCert)) {
         throw new MyException(HttpStatusCode.SC_UNAUTHORIZED,
@@ -92,10 +87,8 @@ class HttpMgmtServlet {
       }
 
       String actionStr = path.substring(1);
-      MgmtAction action = MgmtAction.ofName(actionStr);
-      if (action == null) {
-        throw new MyException(HttpStatusCode.SC_NOT_FOUND, "unknown action '" + actionStr + "'");
-      }
+      MgmtAction action = Optional.ofNullable(MgmtAction.ofName(actionStr)).orElseThrow(() ->
+        new MyException(HttpStatusCode.SC_NOT_FOUND, "unknown action '" + actionStr + "'"));
 
       if (action == MgmtAction.restartServer) {
         try {

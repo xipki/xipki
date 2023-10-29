@@ -38,7 +38,7 @@ import java.util.Map.Entry;
  * @since 3.0.1
  */
 
-class HttpMgmtServlet {
+class CaHttpMgmtServlet {
 
   private static final class MyException extends Exception {
 
@@ -55,20 +55,20 @@ class HttpMgmtServlet {
 
   }
 
-  private static final Logger LOG = LoggerFactory.getLogger(HttpMgmtServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CaHttpMgmtServlet.class);
 
   private static final String CT_RESPONSE = "application/json";
 
-  private Set<X509Cert> mgmtCerts;
+  private final Set<X509Cert> mgmtCerts;
 
-  private CaManager caManager;
+  private final CaManager caManager;
 
-  public void setMgmtCerts(Set<X509Cert> mgmtCerts) {
-    this.mgmtCerts = new HashSet<>(Args.notEmpty(mgmtCerts, "mgmtCerts"));
-  }
+  private final String reverseProxyMode;
 
-  public void setCaManager(CaManager caManager) {
+  public CaHttpMgmtServlet(CaManager caManager, String reverseProxyMode, Collection<X509Cert> mgmtCerts) {
     this.caManager = Args.notNull(caManager, "caManager");
+    this.reverseProxyMode = reverseProxyMode;
+    this.mgmtCerts = new HashSet<>(Args.notEmpty(mgmtCerts, "mgmtCerts"));
   }
 
   public void service(XiHttpRequest request, XiHttpResponse response) throws IOException {
@@ -78,11 +78,9 @@ class HttpMgmtServlet {
     }
 
     try {
-      X509Cert clientCert = TlsHelper.getTlsClientCert(request);
-      if (clientCert == null) {
-        throw new MyException(HttpStatusCode.SC_UNAUTHORIZED,
-            "remote management is not permitted if TLS client certificate is not present");
-      }
+      X509Cert clientCert = Optional.ofNullable(TlsHelper.getTlsClientCert(request, reverseProxyMode))
+          .orElseThrow(() -> new MyException(HttpStatusCode.SC_UNAUTHORIZED,
+            "remote management is not permitted if TLS client certificate is not present"));
 
       if (!mgmtCerts.contains(clientCert)) {
         throw new MyException(HttpStatusCode.SC_UNAUTHORIZED,
@@ -96,10 +94,8 @@ class HttpMgmtServlet {
       }
 
       String actionStr = path.substring(1);
-      MgmtAction action = MgmtAction.ofName(actionStr);
-      if (action == null) {
-        throw new MyException(HttpStatusCode.SC_NOT_FOUND, "unknown action '" + actionStr + "'");
-      }
+      MgmtAction action = Optional.ofNullable(MgmtAction.ofName(actionStr)).orElseThrow(
+          () -> new MyException(HttpStatusCode.SC_NOT_FOUND, "unknown action '" + actionStr + "'"));
 
       MgmtResponse resp = null;
 
@@ -239,10 +235,8 @@ class HttpMgmtServlet {
         }
         case getCa: {
           String name = getNameFromRequest(requestStream);
-          CaEntry caEntry = caManager.getCa(name);
-          if (caEntry == null) {
-            throw new CaMgmtException("Unknown CA " + name);
-          }
+          CaEntry caEntry = Optional.ofNullable(caManager.getCa(name)).orElseThrow(
+              () -> new CaMgmtException("Unknown CA " + name));
           resp = new MgmtResponse.GetCa(new CaEntryWrapper(caEntry));
           break;
         }
@@ -282,10 +276,8 @@ class HttpMgmtServlet {
         }
         case getCertprofile: {
           String name = getNameFromRequest(requestStream);
-          CertprofileEntry result = caManager.getCertprofile(name);
-          if (result == null) {
-            throw new CaMgmtException("Unknown Certprofile " + name);
-          }
+          CertprofileEntry result = Optional.ofNullable(caManager.getCertprofile(name))
+              .orElseThrow(() -> new CaMgmtException("Unknown Certprofile " + name));
           resp = new MgmtResponse.GetCertprofile(result);
           break;
         }
@@ -304,20 +296,16 @@ class HttpMgmtServlet {
         }
         case getCrl: {
           MgmtRequest.GetCrl req = parse(requestStream, MgmtRequest.GetCrl.class);
-          X509CRLHolder crl = caManager.getCrl(req.getCaName(), req.getCrlNumber());
-          if (crl == null) {
-            throw new CaMgmtException("Found no CRL for CA " + req.getCaName()
-                        + " with CRL number 0x" + req.getCrlNumber().toString(16));
-          }
+          X509CRLHolder crl = Optional.ofNullable(caManager.getCrl(req.getCaName(), req.getCrlNumber()))
+              .orElseThrow(() -> new CaMgmtException("Found no CRL for CA " + req.getCaName()
+                        + " with CRL number 0x" + req.getCrlNumber().toString(16)));
           resp = toByteArray(action, crl);
           break;
         }
         case getCurrentCrl: {
           String caName = getNameFromRequest(requestStream);
-          X509CRLHolder crl = caManager.getCurrentCrl(caName);
-          if (crl == null) {
-            throw new CaMgmtException("No current CRL for CA " + caName);
-          }
+          X509CRLHolder crl = Optional.ofNullable(caManager.getCurrentCrl(caName)).orElseThrow(
+              () -> new CaMgmtException("No current CRL for CA " + caName));
           resp = toByteArray(action, crl);
           break;
         }
@@ -331,10 +319,8 @@ class HttpMgmtServlet {
         }
         case getPublisher: {
           String name = getNameFromRequest(requestStream);
-          PublisherEntry result = caManager.getPublisher(name);
-          if (result == null) {
-            throw new CaMgmtException("Unknown publisher " + name);
-          }
+          PublisherEntry result = Optional.ofNullable(caManager.getPublisher(name)).orElseThrow(
+              () -> new CaMgmtException("Unknown publisher " + name));
           resp = new MgmtResponse.GetPublisher(result);
           break;
         }
@@ -348,10 +334,8 @@ class HttpMgmtServlet {
         }
         case getRequestor: {
           String name = getNameFromRequest(requestStream);
-          RequestorEntry result = caManager.getRequestor(name);
-          if (result == null) {
-            throw new CaMgmtException("Unknown requestor " + name);
-          }
+          RequestorEntry result = Optional.ofNullable(caManager.getRequestor(name))
+              .orElseThrow(() -> new CaMgmtException("Unknown requestor " + name));
           resp = new MgmtResponse.GetRequestor(result);
           break;
         }
@@ -365,10 +349,8 @@ class HttpMgmtServlet {
         }
         case getSigner: {
           String name = getNameFromRequest(requestStream);
-          SignerEntry result = caManager.getSigner(name);
-          if (result == null) {
-            throw new CaMgmtException("Unknown signer " + name);
-          }
+          SignerEntry result = Optional.ofNullable(caManager.getSigner(name)).orElseThrow(
+            () -> new CaMgmtException("Unknown signer " + name));
           resp = new MgmtResponse.GetSigner(new SignerEntryWrapper(result));
           break;
         }
@@ -548,10 +530,8 @@ class HttpMgmtServlet {
         }
         case getKeypairGen: {
           String name = getNameFromRequest(requestStream);
-          KeypairGenEntry result = caManager.getKeypairGen(name);
-          if (result == null) {
-            throw new CaMgmtException("Unknown KeypairGen " + name);
-          }
+          KeypairGenEntry result = Optional.ofNullable(caManager.getKeypairGen(name))
+              .orElseThrow(() -> new CaMgmtException("Unknown KeypairGen " + name));
           resp = new MgmtResponse.GetKeypairGen(result);
           break;
         }
