@@ -22,6 +22,7 @@
     <module>xipki-ocsp</module>
     <module>xipki-ca</module>
     <module>xipki-gateway</module>
+    <module>xipki-hsmproxy</module>
     <module>xipki-qa</module>
     <module>xipki-setup</module>
   </modules>

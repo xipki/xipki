@@ -42,15 +42,15 @@ class CmpHttpServlet {
 
   private static final String CT_RESPONSE = "application/pkixcmp";
 
-  private boolean logReqResp;
+  private final boolean logReqResp;
 
-  private CmpResponder responder;
+  private final String reverseProxyMode;
 
-  public void setLogReqResp(boolean logReqResp) {
+  private final CmpResponder responder;
+
+  CmpHttpServlet(boolean logReqResp, String reverseProxyMode, CmpResponder responder) {
     this.logReqResp = logReqResp;
-  }
-
-  public void setResponder(CmpResponder responder) {
+    this.reverseProxyMode = reverseProxyMode;
     this.responder = Args.notNull(responder, "responder");
   }
 
@@ -64,7 +64,7 @@ class CmpHttpServlet {
   }
 
   private HttpResponse doPost(XiHttpRequest req) throws IOException {
-    X509Cert clientCert = TlsHelper.getTlsClientCert(req);
+    X509Cert clientCert = TlsHelper.getTlsClientCert(req, reverseProxyMode);
     AuditService auditService = Audits.getAuditService();
     AuditEvent event = new AuditEvent();
     event.setApplicationName("cmp-gw");

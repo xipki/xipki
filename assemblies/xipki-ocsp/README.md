@@ -42,6 +42,7 @@ Deployment in Tomcat (8, 9 and 10)
   `Connector`-element in the file `conf/server.xml`
 8. (optional) To accelerate the start process, append the following block to the property
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
+9. If you have multiple tomcat instances, change the listing port for SHUTDOW to be unique.
 
 ```
 audit-*.jar,\

@@ -100,11 +100,9 @@ public class CtLogClient {
         throw new OperationException(ErrorCode.SYSTEM_FAILURE, "error while calling " + url + ": " + ex.getMessage());
       }
 
-      byte[] respContent = res.getContent();
-      if (respContent == null) {
-        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-            "server does not return any content while responding " + url);
-      }
+      byte[] respContent = Optional.ofNullable(res.getContent()).orElseThrow(
+          () -> new OperationException(ErrorCode.SYSTEM_FAILURE,
+                  "server does not return any content while responding " + url));
 
       if (LOG.isDebugEnabled()) {
         LOG.debug("CTLog Response: {}", StringUtil.toUtf8String(respContent));

@@ -28,10 +28,7 @@ import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
 
 import java.io.IOException;
-import java.security.cert.CertificateException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * CA ServletFilter.
@@ -58,7 +55,7 @@ public class CaHttpFilter implements XiHttpFilter {
 
   private final boolean remoteMgmtEnabled;
 
-  private HttpMgmtServlet mgmtServlet;
+  private CaHttpMgmtServlet mgmtServlet;
 
   public CaHttpFilter(String licenseFactoryClazz) throws ServletException0 {
     XipkiBaseDir.init();
@@ -94,7 +91,7 @@ public class CaHttpFilter implements XiHttpFilter {
 
     Audits.init(auditType, auditConf, securities.getSecurityFactory().getPasswordResolver());
     if (Audits.getAuditService() == null) {
-      throw new ServletException0("could not AuditService");
+      throw new ServletException0("could not init AuditService");
     }
 
     LOG.info("Use licenseFactory: {}", licenseFactoryClazz);
@@ -122,11 +119,8 @@ public class CaHttpFilter implements XiHttpFilter {
     LOG.info("ca.noRA: {}", conf.isNoRA());
 
     if (!conf.isNoRA()) {
-      this.responder = new SdkResponder(caManager);
-
-      raServlet = new HttpRaServlet();
-      raServlet.setResponder(responder);
-      raServlet.setLogReqResp(logReqResp);
+      this.responder = new SdkResponder(conf.getReverseProxyMode(), caManager);
+      raServlet = new HttpRaServlet(logReqResp, responder);
     }
 
     RemoteMgmt remoteMgmt = conf.getRemoteMgmt();
@@ -138,27 +132,17 @@ public class CaHttpFilter implements XiHttpFilter {
       if (CollectionUtil.isEmpty(certFiles)) {
         LOG.error("no client certificate is configured, disable the remote management");
       } else {
-        Set<X509Cert> certs = new HashSet<>();
-        for (FileOrBinary m : certFiles) {
-          try {
-            X509Cert cert = X509Util.parseCert(m.readContent());
-            certs.add(cert);
-          } catch (CertificateException | IOException ex) {
-            String msg = "could not parse the client certificate";
-            if (m.getFile() != null) {
-              msg += " " + m.getFile();
-            }
-            LogUtil.error(LOG, ex, msg);
-          }
-
+        List<X509Cert> certs = null;
+        try {
+          certs = X509Util.parseCerts(certFiles);
+        } catch (InvalidConfException ex) {
+          LOG.error("error parsing remote management's client certificates", ex);
         }
 
-        if (certs.isEmpty()) {
+        if (CollectionUtil.isEmpty(certs)) {
           LOG.error("could not find any valid client certificates, disable the remote management");
         } else {
-          mgmtServlet = new HttpMgmtServlet();
-          mgmtServlet.setCaManager(caManager);
-          mgmtServlet.setMgmtCerts(certs);
+          mgmtServlet = new CaHttpMgmtServlet(caManager, conf.getReverseProxyMode(), certs);
         }
       }
     }

@@ -29,15 +29,12 @@ class AcmeHttpServlet {
 
   private static final Logger LOG = LoggerFactory.getLogger(AcmeHttpServlet.class);
 
-  private boolean logReqResp;
+  private final boolean logReqResp;
 
-  private AcmeResponder responder;
+  private final AcmeResponder responder;
 
-  public void setLogReqResp(boolean logReqResp) {
+  public AcmeHttpServlet(boolean logReqResp, AcmeResponder responder) {
     this.logReqResp = logReqResp;
-  }
-
-  void setResponder(AcmeResponder responder) {
     this.responder = Args.notNull(responder, "responder");
   }
 

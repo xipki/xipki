@@ -13,7 +13,6 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.Securities;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
@@ -37,6 +36,8 @@ public class ProtocolProxyConfWrapper {
 
   private final boolean logReqResp;
 
+  private final String reverseProxyMode;
+
   private final SdkClient sdkClient;
 
   private final CaNameSigners signers;
@@ -52,7 +53,8 @@ public class ProtocolProxyConfWrapper {
     XipkiBaseDir.init();
 
     logReqResp = conf.isLogReqResp();
-    LOG.info("logReqResp: {}", logReqResp);
+    reverseProxyMode = conf.getReverseProxyMode();
+    LOG.info("logReqResp: {}, reverseProxyMode: {}", logReqResp, reverseProxyMode);
 
     AuditConf audit = conf.getAudit();
     String auditType = audit.getType();
@@ -70,7 +72,7 @@ public class ProtocolProxyConfWrapper {
     String auditConf = audit.getConf();
     Audits.init(auditType, auditConf, securities.getSecurityFactory().getPasswordResolver());
     if (Audits.getAuditService() == null) {
-      throw new InvalidConfException("could not AuditService");
+      throw new InvalidConfException("could not init AuditService");
     }
 
     String clazz = conf.getAuthenticator();
@@ -124,6 +126,10 @@ public class ProtocolProxyConfWrapper {
 
   public boolean isLogReqResp() {
     return logReqResp;
+  }
+
+  public String getReverseProxyMode() {
+    return reverseProxyMode;
   }
 
   public SdkClient getSdkClient() {

@@ -33,6 +33,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Self-signed certificate builder.
@@ -89,10 +90,8 @@ class SelfSignedCertBuilder {
 
     if (StringUtil.orEqualsIgnoreCase(signerType, "PKCS12", "JCEKS")) {
       ConfPairs keyValues = new ConfPairs(signerConf);
-      String keystoreConf = keyValues.value("keystore");
-      if (keystoreConf == null) {
-        throw new InvalidConfException("required parameter 'keystore' for types PKCS12 and JCEKS, is not specified");
-      }
+      Optional.ofNullable(keyValues.value("keystore")).orElseThrow(() ->
+          new InvalidConfException("required parameter 'keystore' for types PKCS12 and JCEKS, is not specified"));
     }
 
     ConcurrentContentSigner signer;
@@ -193,11 +192,9 @@ class SelfSignedCertBuilder {
       notBefore = Instant.now();
     }
 
-    Validity validity = certprofile.getValidity();
-    if (validity == null) {
-      throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
-          "no validity specified in the profile " + certprofile.getIdent());
-    }
+    Validity validity = Optional.ofNullable(certprofile.getValidity())
+        .orElseThrow(() -> new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+            "no validity specified in the profile " + certprofile.getIdent()));
 
     Instant maxNotAfter = validity.add(notBefore);
     if (notAfter == null) {

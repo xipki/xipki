@@ -134,10 +134,8 @@ class OcspStoreQueryExecutor {
     ResultSet rs = null;
 
     try {
-      stmt = datasource.prepareStatement(sql);
-      if (stmt == null) {
-        throw new DataAccessException("could not create statement");
-      }
+      stmt = Optional.ofNullable(datasource.prepareStatement(sql)).orElseThrow(
+          () -> new DataAccessException("could not create statement"));
 
       rs = stmt.executeQuery();
       while (rs.next()) {
@@ -410,13 +408,10 @@ class OcspStoreQueryExecutor {
   } // method unrevokeCa
 
   private int getIssuerId(X509Cert issuerCert) {
-    Integer id = issuerStore.getIdForCert(Args.notNull(issuerCert, "issuerCert").getEncoded());
-    if (id == null) {
-      throw new IllegalStateException("could not find issuer, "
-          + "please start XiPKI in master mode first the restart this XiPKI system");
-    }
-    return id;
-  } // method getIssuerId
+    return Optional.ofNullable(issuerStore.getIdForCert(Args.notNull(issuerCert, "issuerCert").getEncoded()))
+        .orElseThrow(() -> new IllegalStateException("could not find issuer, "
+              + "please start XiPKI in master mode first the restart this XiPKI system"));
+  }
 
   void addIssuer(X509Cert issuerCert) throws DataAccessException {
     if (issuerStore.getIdForCert(issuerCert.getEncoded()) != null) {

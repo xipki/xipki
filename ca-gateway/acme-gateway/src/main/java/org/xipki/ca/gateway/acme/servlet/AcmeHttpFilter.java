@@ -52,9 +52,7 @@ public class AcmeHttpFilter implements XiHttpFilter {
           conf.getSdkClient(), conf.getSecurities().getSecurityFactory(), conf.getPopControl(), conf0.getAcme());
       responder.start();
 
-      servlet = new AcmeHttpServlet();
-      servlet.setLogReqResp(conf.isLogReqResp());
-      servlet.setResponder(responder);
+      servlet = new AcmeHttpServlet(conf.isLogReqResp(), responder);
 
       GatewayUtil.auditLogPciEvent(LOG, "ACME-Gateway", true, "START");
     } catch (Exception e) {

@@ -7,6 +7,7 @@ import org.xipki.audit.Audits.AuditConf;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.security.Securities.SecurityConf;
 import org.xipki.security.util.JSON;
+import org.xipki.security.util.TlsHelper;
 import org.xipki.util.Args;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.ValidatableConf;
@@ -138,6 +139,8 @@ public class CaServerConf extends ValidatableConf {
 
   private boolean logReqResp;
 
+  private String reverseProxyMode;
+
   private List<DataSourceConf> datasources;
 
   private List<SslContext> sslContexts;
@@ -188,6 +191,14 @@ public class CaServerConf extends ValidatableConf {
 
   public void setLogReqResp(boolean logReqResp) {
     this.logReqResp = logReqResp;
+  }
+
+  public String getReverseProxyMode() {
+    return reverseProxyMode;
+  }
+
+  public void setReverseProxyMode(String reverseProxyMode) {
+    this.reverseProxyMode = reverseProxyMode;
   }
 
   public int getShardId() {
@@ -300,6 +311,7 @@ public class CaServerConf extends ValidatableConf {
 
     notEmpty(datasources, "datasources");
     validate(remoteMgmt, security);
+    TlsHelper.checkReverseProxyMode(reverseProxyMode);
   }
 
 }

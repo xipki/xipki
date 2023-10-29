@@ -126,21 +126,15 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method createCaAliases
 
   public CertprofileEntry createCertprofile(String name) throws CaMgmtException {
-    ResultRow rs = execQuery1PrepStmt0(sqlSelectProfile, col2Str(name));
-
-    if (rs == null) {
-      throw new CaMgmtException("unknown CA " + name);
-    }
+    ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectProfile, col2Str(name)))
+        .orElseThrow(() -> new CaMgmtException("unknown CA " + name));
 
     return new CertprofileEntry(new NameId(getInt(rs, "ID"), name), rs.getString("TYPE"), rs.getString("CONF"));
   } // method createCertprofile
 
   public PublisherEntry createPublisher(String name) throws CaMgmtException {
-    ResultRow rs = execQuery1PrepStmt0(sqlSelectPublisher, col2Str(name));
-
-    if (rs == null) {
-      throw new CaMgmtException("unkown Publisher " + name);
-    }
+    ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectPublisher, col2Str(name))).orElseThrow(
+        () -> new CaMgmtException("unkown Publisher " + name));
 
     return new PublisherEntry(new NameId(getInt(rs, "ID"), name), rs.getString("TYPE"), rs.getString("CONF"));
   } // method createPublisher
@@ -151,40 +145,29 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method getRequestorId
 
   public RequestorEntry createRequestor(String name) throws CaMgmtException {
-    ResultRow rs = execQuery1PrepStmt0(sqlSelectRequestor, col2Str(name));
-
-    if (rs == null) {
-      throw new CaMgmtException("unknown Requestor " + name);
-    }
+    ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectRequestor, col2Str(name)))
+        .orElseThrow(() -> new CaMgmtException("unknown Requestor " + name));
 
     return new RequestorEntry(new NameId(getInt(rs, "ID"), name), rs.getString("TYPE"), rs.getString("CONF"));
   } // method createRequestor
 
   public SignerEntry createSigner(String name) throws CaMgmtException {
-    ResultRow rs = execQuery1PrepStmt0(sqlSelectSigner, col2Str(name));
-
-    if (rs == null) {
-      throw new CaMgmtException("unknown signer " + name);
-    }
+    ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectSigner, col2Str(name)))
+        .orElseThrow(() -> new CaMgmtException("unknown signer " + name));
 
     return new SignerEntry(name, rs.getString("TYPE"), rs.getString("CONF"), rs.getString("CERT"));
   } // method createSigner
 
   public KeypairGenEntry createKeypairGen(String name) throws CaMgmtException {
-    ResultRow rs = execQuery1PrepStmt0(sqlSelectKeypairGen, col2Str(name));
-
-    if (rs == null) {
-      throw new CaMgmtException("unknown keypair generation " + name);
-    }
+    ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectKeypairGen, col2Str(name)))
+        .orElseThrow(() -> new CaMgmtException("unknown keypair generation " + name));
 
     return new KeypairGenEntry(name, rs.getString("TYPE"), rs.getString("CONF"));
   } // method createSigner
 
   public CaInfo createCaInfo(String name, CertStore certstore) throws CaMgmtException {
-    ResultRow rs = execQuery1PrepStmt0(sqlSelectCa, col2Str(name));
-    if (rs == null) {
-      throw new CaMgmtException("unknown CA " + name);
-    }
+    ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectCa, col2Str(name)))
+        .orElseThrow(() -> new CaMgmtException("unknown CA " + name));
 
     String encodedConf = rs.getString("CONF");
     CaConfColumn conf = CaConfColumn.decode(encodedConf);
@@ -557,10 +540,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       } else {
         final String sql = "SELECT CERT FROM CA WHERE ID=?";
 
-        ResultRow rs = execQuery1PrepStmt0(sql, col2Int(changeCaEntry.getIdent().getId()));
-        if (rs == null) {
-          throw new CaMgmtException("unknown CA '" + changeCaEntry.getIdent());
-        }
+        ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sql, col2Int(changeCaEntry.getIdent().getId())))
+            .orElseThrow(() -> new CaMgmtException("unknown CA '" + changeCaEntry.getIdent()));
 
         caCert = parseCert(Base64.decode(rs.getString("CERT")));
       }
@@ -569,21 +550,16 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         // validate the signer configuration
         final String sql = "SELECT SIGNER_TYPE,SIGNER_CONF FROM CA WHERE ID=?";
 
-        ResultRow rs = execQuery1PrepStmt0(sql, col2Int(changeCaEntry.getIdent().getId()));
-
-        if (rs == null) {
-          throw new CaMgmtException("unknown CA '" + changeCaEntry.getIdent());
-        }
+        ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sql, col2Int(changeCaEntry.getIdent().getId())))
+            .orElseThrow(() -> new CaMgmtException("unknown CA '" + changeCaEntry.getIdent()));
 
         if (signerType == null) {
           signerType = rs.getString("SIGNER_TYPE");
         }
 
-        if (signerConf == null) {
-          signerConf = rs.getString("SIGNER_CONF");
-        } else {
-          signerConf = CaUtil.canonicalizeSignerConf(signerConf);
-        }
+        signerConf = (signerConf == null)
+            ? rs.getString("SIGNER_CONF")
+            : CaUtil.canonicalizeSignerConf(signerConf);
 
         try {
           List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(signerConf);
@@ -770,10 +746,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     CertprofileEntry newDbEntry = new CertprofileEntry(currentDbEntry.getIdent(),
         str(type, currentDbEntry.getType()), str(conf, currentDbEntry.getConf()));
 
-    IdentifiedCertprofile profile = certprofileManager.createCertprofile(newDbEntry);
-    if (profile == null) {
-      throw new CaMgmtException("could not create certprofile object");
-    }
+    IdentifiedCertprofile profile = Optional.ofNullable(certprofileManager.createCertprofile(newDbEntry))
+        .orElseThrow(() -> new CaMgmtException("could not create certprofile object"));
 
     boolean failed = true;
     try {
@@ -905,13 +879,10 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
   private void removeEntityFromCa(String desc, String name, String caName, String sqlSelectId, String sqlRemove)
       throws CaMgmtException {
-    Integer id = getIdForName(sqlSelectId, name);
-    if (id == null) {
-      throw new CaMgmtException(String.format("unknown %s %s ", desc, name));
-    }
+    Integer id = Optional.ofNullable(getIdForName(sqlSelectId, name))
+        .orElseThrow(() -> new CaMgmtException(String.format("unknown %s %s ", desc, name)));
 
     int caId = getNonNullIdForName(sqlSelectCaId, caName);
-
     int num = execUpdatePrepStmt0(sqlRemove, col2Int(caId), col2Int(id));
     if (num == 0) {
       throw new CaMgmtException(String.format("could not remove %s from CA %s", name, caName));

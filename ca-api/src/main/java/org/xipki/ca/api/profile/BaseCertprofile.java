@@ -80,8 +80,7 @@ public abstract class BaseCertprofile extends Certprofile {
   }
 
   @Override
-  public SubjectInfo getSubject(X500Name requestedSubject)
-          throws CertprofileException, BadCertTemplateException {
+  public SubjectInfo getSubject(X500Name requestedSubject) throws CertprofileException, BadCertTemplateException {
     return doGetSubject(requestedSubject, null);
   }
 
@@ -306,14 +305,11 @@ public abstract class BaseCertprofile extends Certprofile {
       }
     } else if (keyParamsOption instanceof DSAParametersOption) {
       DSAParametersOption dsaOption = (DSAParametersOption) keyParamsOption;
-      ASN1Encodable params = publicKey.getAlgorithm().getParameters();
-      if (params == null) {
-        throw new BadCertTemplateException("null Dss-Params is not permitted");
-      }
+      ASN1Encodable params = Optional.ofNullable(publicKey.getAlgorithm().getParameters())
+          .orElseThrow(() -> new BadCertTemplateException("null Dss-Params is not permitted"));
 
       int plength;
       int qlength;
-
       try {
         ASN1Sequence seq = ASN1Sequence.getInstance(params);
         ASN1Integer rsaP = ASN1Integer.getInstance(seq.getObjectAt(0));

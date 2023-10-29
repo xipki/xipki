@@ -17,10 +17,7 @@ import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Actions to manage Keypair generation entries.
@@ -97,12 +94,9 @@ public class KeypairGenActions {
         }
         println(sb.toString());
       } else {
-        KeypairGenEntry entry = caManager.getKeypairGen(name);
-        if (entry == null) {
-          throw new CmdFailure("\tno keypair generation named '" + name + "' is configured");
-        } else {
-          println(entry.toString());
-        }
+        KeypairGenEntry entry = Optional.ofNullable(caManager.getKeypairGen(name)).orElseThrow(
+            () -> new CmdFailure("\tno keypair generation named '" + name + "' is configured"));
+        println(entry.toString());
       }
 
       return null;

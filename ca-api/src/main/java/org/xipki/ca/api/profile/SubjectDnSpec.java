@@ -403,10 +403,8 @@ public class SubjectDnSpec {
         throw new IllegalStateException("could not access non-existing file " + confFile);
       }
     } else {
-      InputStream confStream = SubjectDnSpec.class.getResourceAsStream(fallbackResource);
-      if (confStream == null) {
-        throw new IllegalStateException("could not access non-existing resource " + fallbackResource);
-      }
+      InputStream confStream = Optional.ofNullable(SubjectDnSpec.class.getResourceAsStream(fallbackResource))
+          .orElseThrow(() -> new IllegalStateException("could not access non-existing resource " + fallbackResource));
       LOG.info("read from resource " + fallbackResource);
       return new BufferedReader(new InputStreamReader(confStream, StandardCharsets.UTF_8));
     }

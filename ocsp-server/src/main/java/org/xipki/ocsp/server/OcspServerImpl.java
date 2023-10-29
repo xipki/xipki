@@ -119,6 +119,8 @@ public class OcspServerImpl implements OcspServer {
   private final AtomicBoolean initialized = new AtomicBoolean(false);
 
   static {
+    LOG.info("XiPKI OCSP Responder version {}", StringUtil.getVersion(OcspServerImpl.class));
+
     unsuccesfulOCSPRespMap = new HashMap<>(10);
     for (OcspResponseStatus status : OcspResponseStatus.values()) {
       if (status == OcspResponseStatus.successful) {
@@ -145,7 +147,6 @@ public class OcspServerImpl implements OcspServer {
   } // method static
 
   public OcspServerImpl(OcspLicense license) {
-    LOG.info("XiPKI OCSP Responder version {}", StringUtil.getVersion(getClass()));
     this.datasourceFactory = new DataSourceFactory();
     this.license = Args.notNull(license, "license");
   }

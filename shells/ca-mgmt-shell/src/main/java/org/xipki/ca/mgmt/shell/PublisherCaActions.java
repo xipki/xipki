@@ -18,10 +18,7 @@ import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Actions to manage publishers.
@@ -174,10 +171,8 @@ public class PublisherCaActions {
 
     @Override
     protected Object execute0() throws Exception {
-      PublisherEntry entry = caManager.getPublisher(name);
-      if (entry == null) {
-        throw new IllegalCmdParamException("no publisher named " + name + " is defined");
-      }
+      PublisherEntry entry = Optional.ofNullable(caManager.getPublisher(name)).orElseThrow(
+          () -> new IllegalCmdParamException("no publisher named " + name + " is defined"));
 
       if (StringUtil.isBlank(entry.getConf())) {
         println("publisher does not have conf");
@@ -218,12 +213,9 @@ public class PublisherCaActions {
         }
         println(sb.toString());
       } else {
-        PublisherEntry entry = caManager.getPublisher(name);
-        if (entry == null) {
-          throw new CmdFailure("\tno publisher named '" + name + "' is configured");
-        } else {
-          println(entry.toString());
-        }
+        PublisherEntry entry = Optional.ofNullable(caManager.getPublisher(name)).orElseThrow(
+            () -> new CmdFailure("\tno publisher named '" + name + "' is configured"));
+        println(entry.toString());
       }
 
       return null;

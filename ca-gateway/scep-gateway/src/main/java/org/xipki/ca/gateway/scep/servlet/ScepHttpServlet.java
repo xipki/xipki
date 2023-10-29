@@ -30,15 +30,12 @@ class ScepHttpServlet {
 
   private static final Logger LOG = LoggerFactory.getLogger(ScepHttpServlet.class);
 
-  private boolean logReqResp;
+  private final boolean logReqResp;
 
-  private ScepResponder responder;
+  private final ScepResponder responder;
 
-  public void setLogReqResp(boolean logReqResp) {
+  public ScepHttpServlet(boolean logReqResp, ScepResponder responder) {
     this.logReqResp = logReqResp;
-  }
-
-  public void setResponder(ScepResponder responder) {
     this.responder = Args.notNull(responder, "responder");
   }
 

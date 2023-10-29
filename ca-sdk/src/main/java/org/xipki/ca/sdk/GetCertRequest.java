@@ -3,12 +3,12 @@
 
 package org.xipki.ca.sdk;
 
+import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 
@@ -52,7 +52,7 @@ public class GetCertRequest extends SdkRequest {
   }
 
   public static GetCertRequest decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
       if (decoder.readNullOrArrayLength(2)) {
         throw new DecodeException("GetCertRequest could not be null.");
       }

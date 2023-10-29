@@ -17,7 +17,10 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
-import org.xipki.ca.gateway.*;
+import org.xipki.ca.gateway.GatewayUtil;
+import org.xipki.ca.gateway.PopControl;
+import org.xipki.ca.gateway.Requestor;
+import org.xipki.ca.gateway.RequestorAuthenticator;
 import org.xipki.ca.gateway.conf.CaProfileConf;
 import org.xipki.ca.gateway.conf.CaProfilesControl;
 import org.xipki.ca.sdk.*;
@@ -90,22 +93,6 @@ public class RestResponder {
     }
 
   } // class HttpRespAuditException
-
-  private static final int OK = 200;
-
-  private static final int BAD_REQUEST = 400;
-
-  private static final int UNAUTHORIZED = 401;
-
-  private static final int NOT_FOUND = 404;
-
-  private static final int CONFLICT = 409;
-
-  private static final int UNSUPPORTED_MEDIA_TYPE = 415;
-
-  private static final int INTERNAL_SERVER_ERROR = 500;
-
-  private static final int SERVICE_UNAVAILABLE = 503;
 
   private static final String CT_pkcs10 = "application/pkcs10";
 
@@ -190,9 +177,12 @@ public class RestResponder {
 
   private final RequestorAuthenticator authenticator;
 
+  private final String reverseProxyMode;
+
   private static final Set<String> knownCommands;
 
   static {
+    LOG.info("XiPKI REST-Gateway version {}", StringUtil.getVersion(RestResponder.class));
     knownCommands = CollectionUtil.asUnmodifiableSet(
         CMD_cacert, CMD_cacerts, CMD_revoke_cert, CMD_unsuspend_cert, CMD_unrevoke_cert, CMD_enroll_cert,
         CMD_enroll_cross_cert, CMD_enroll_serverkeygen, CMD_enroll_cert_twin, CMD_enroll_serverkeygen_twin, CMD_crl);
@@ -200,13 +190,13 @@ public class RestResponder {
 
   public RestResponder(SdkClient sdk, SecurityFactory securityFactory,
                        RequestorAuthenticator authenticator, PopControl popControl,
-                       CaProfilesControl caProfiles) {
-    LOG.info("XiPKI REST-Gateway version {}", StringUtil.getVersion(getClass()));
+                       CaProfilesControl caProfiles, String reverseProxyMode) {
     this.sdk = Args.notNull(sdk, "sdk");
     this.securityFactory = Args.notNull(securityFactory, "securityFactory");
     this.authenticator = Args.notNull(authenticator, "authenticator");
     this.popControl = Args.notNull(popControl, "popControl");
     this.caProfilesControl = Args.notNull(caProfiles, "caProfiles");
+    this.reverseProxyMode = reverseProxyMode;
   }
 
   private Requestor.PasswordRequestor getRequestor(String user) {
@@ -227,7 +217,7 @@ public class RestResponder {
       if (path.length() == 0) {
         String message = "blank path is not allowed";
         LOG.error(message);
-        throw new HttpRespAuditException(NOT_FOUND, message, ERROR, FAILED);
+        throw new HttpRespAuditException(HttpStatusCode.SC_NOT_FOUND, message, ERROR, FAILED);
       }
 
       String caName;
@@ -267,13 +257,13 @@ public class RestResponder {
       if (StringUtil.isBlank(command)) {
         String message = "command is not specified";
         LOG.warn(message);
-        throw new HttpRespAuditException(NOT_FOUND, message, INFO, FAILED);
+        throw new HttpRespAuditException(HttpStatusCode.SC_NOT_FOUND, message, INFO, FAILED);
       }
 
       if (StringUtil.isBlank(caName)) {
         String message = "CA is not specified";
         LOG.warn(message);
-        throw new HttpRespAuditException(NOT_FOUND, message, INFO, FAILED);
+        throw new HttpRespAuditException(HttpStatusCode.SC_NOT_FOUND, message, INFO, FAILED);
       }
 
       event.addEventData(CaAuditConstants.NAME_ca, caName);
@@ -282,7 +272,7 @@ public class RestResponder {
       if (!knownCommands.contains(command)) {
         String message = "invalid command '" + command + "'";
         LOG.error(message);
-        throw new HttpRespAuditException(NOT_FOUND, message, INFO, FAILED);
+        throw new HttpRespAuditException(HttpStatusCode.SC_NOT_FOUND, message, INFO, FAILED);
       }
 
       switch (command) {
@@ -320,7 +310,8 @@ public class RestResponder {
         }
 
         if (user == null) {
-          throw new HttpRespAuditException(UNAUTHORIZED, "invalid Authorization information", INFO, FAILED);
+          throw new HttpRespAuditException(HttpStatusCode.SC_UNAUTHORIZED,
+              "invalid Authorization information", INFO, FAILED);
         }
 
         Requestor.PasswordRequestor requestor0 = getRequestor(user);
@@ -328,18 +319,16 @@ public class RestResponder {
 
         boolean authorized = requestor0 != null && requestor0.authenticate(password);
         if (!authorized) {
-          throw new HttpRespAuditException(UNAUTHORIZED, "could not authenticate user " + user, INFO, FAILED);
+          throw new HttpRespAuditException(HttpStatusCode.SC_UNAUTHORIZED,
+              "could not authenticate user " + user, INFO, FAILED);
         }
       } else {
-        X509Cert clientCert = TlsHelper.getTlsClientCert(httpRetriever);
-        if (clientCert == null) {
-          throw new HttpRespAuditException(UNAUTHORIZED, "no client certificate", INFO, FAILED);
-        }
-        requestor = getRequestor(clientCert);
+        X509Cert clientCert = Optional.ofNullable(TlsHelper.getTlsClientCert(httpRetriever, reverseProxyMode))
+            .orElseThrow(() -> new HttpRespAuditException(
+                                  HttpStatusCode.SC_UNAUTHORIZED, "no client certificate", INFO, FAILED));
 
-        if (requestor == null) {
-          throw new OperationException(NOT_PERMITTED, "no requestor specified");
-        }
+        requestor = Optional.ofNullable(getRequestor(clientCert))
+            .orElseThrow(() -> new OperationException(NOT_PERMITTED, "no requestor specified"));
       }
 
       event.addEventData(CaAuditConstants.NAME_requestor, requestor.getName());
@@ -383,43 +372,43 @@ public class RestResponder {
         case INVALID_EXTENSION:
         case UNKNOWN_CERT_PROFILE:
         case CERT_UNREVOKED:
-          sc = BAD_REQUEST;
+          sc = HttpStatusCode.SC_BAD_REQUEST;
           failureInfo = FAILINFO_badRequest;
           break;
         case BAD_CERT_TEMPLATE:
-          sc = BAD_REQUEST;
+          sc = HttpStatusCode.SC_BAD_REQUEST;
           failureInfo = FAILINFO_badCertTemplate;
           break;
         case CERT_REVOKED:
-          sc = CONFLICT;
+          sc = HttpStatusCode.SC_CONFLICT;
           failureInfo = FAILINFO_certRevoked;
           break;
         case NOT_PERMITTED:
         case UNAUTHORIZED:
-          sc = UNAUTHORIZED;
+          sc = HttpStatusCode.SC_UNAUTHORIZED;
           failureInfo = FAILINFO_notAuthorized;
           break;
         case SYSTEM_UNAVAILABLE:
-          sc = SERVICE_UNAVAILABLE;
+          sc = HttpStatusCode.SC_SERVICE_UNAVAILABLE;
           failureInfo = FAILINFO_systemUnavail;
           break;
         case UNKNOWN_CERT:
-          sc = BAD_REQUEST;
+          sc = HttpStatusCode.SC_BAD_REQUEST;
           failureInfo = FAILINFO_badCertId;
           break;
         case BAD_POP:
-          sc = BAD_REQUEST;
+          sc = HttpStatusCode.SC_BAD_REQUEST;
           failureInfo = FAILINFO_badPOP;
           break;
         case PATH_NOT_FOUND:
-          sc = NOT_FOUND;
+          sc = HttpStatusCode.SC_NOT_FOUND;
           failureInfo = FAILINFO_systemUnavail;
           break;
         case CRL_FAILURE:
         case DATABASE_FAILURE:
         case SYSTEM_FAILURE:
         default:
-          sc = INTERNAL_SERVER_ERROR;
+          sc = HttpStatusCode.SC_INTERNAL_SERVER_ERROR;
           failureInfo = FAILINFO_systemFailure;
           break;
       } // end switch (code)
@@ -453,7 +442,7 @@ public class RestResponder {
       auditLevel = ERROR;
       auditStatus = FAILED;
       auditMessage = "internal error";
-      return new HttpResponse(INTERNAL_SERVER_ERROR, null, null, null);
+      return new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR, null, null, null);
     } finally {
       event.setStatus(auditStatus);
       event.setLevel(auditLevel);
@@ -468,10 +457,10 @@ public class RestResponder {
     headers.put(HEADER_PKISTATUS, PKISTATUS_accepted);
 
     if (respContent == null) {
-      return new HttpResponse(OK, null, headers, null);
+      return new HttpResponse(HttpStatusCode.SC_OK, null, headers, null);
     }
 
-    return new HttpResponse(OK, respContent.getContentType(), headers,
+    return new HttpResponse(HttpStatusCode.SC_OK, respContent.getContentType(), headers,
         respContent.isBase64(), respContent.getContent());
   }
 
@@ -512,10 +501,8 @@ public class RestResponder {
         try (InputStream is = new ByteArrayInputStream(request)) {
           props.load(is);
         }
-        String strSubject = props.getProperty("subject");
-        if (strSubject == null) {
-          throw new OperationException(BAD_CERT_TEMPLATE, "subject is not specified");
-        }
+        String strSubject = Optional.ofNullable(props.getProperty("subject"))
+            .orElseThrow(() -> new OperationException(BAD_CERT_TEMPLATE, "subject is not specified"));
 
         try {
           subject = new X500Name(strSubject);
@@ -531,11 +518,13 @@ public class RestResponder {
         subject = certTemp.getSubject();
         extensions = X509Util.getExtensions(certTemp);
       } else {
-        throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, "unsupported media type " + ct, INFO, FAILED);
+        throw new HttpRespAuditException(HttpStatusCode.SC_UNSUPPORTED_MEDIA_TYPE,
+            "unsupported media type " + ct, INFO, FAILED);
       }
     } else {
       if (!CT_pkcs10.equalsIgnoreCase(ct)) {
-        throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, "unsupported media type " + ct, INFO, FAILED);
+        throw new HttpRespAuditException(HttpStatusCode.SC_UNSUPPORTED_MEDIA_TYPE,
+            "unsupported media type " + ct, INFO, FAILED);
       }
 
       CertificationRequest csr = X509Util.parseCsrInRequest(request);
@@ -567,14 +556,14 @@ public class RestResponder {
       template.extensions(extensions);
     } catch (IOException e) {
       String message  ="could not encode extensions";
-      throw new HttpRespAuditException(BAD_REQUEST, message, INFO, FAILED);
+      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, message, INFO, FAILED);
     }
 
     try {
       template.subjectPublicKey(subjectPublicKeyInfo);
     } catch (IOException e) {
       String message  ="could not encode SubjectPublicKeyInfo";
-      throw new HttpRespAuditException(BAD_REQUEST, message, INFO, FAILED);
+      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, message, INFO, FAILED);
     }
 
     List<EnrollCertRequestEntry> templates = new ArrayList<>(twin ? 2 : 1);
@@ -595,7 +584,7 @@ public class RestResponder {
         template.extensions(extensions);
       } catch (IOException e) {
         String message  ="could not encode extensions";
-        throw new HttpRespAuditException(BAD_REQUEST, message, INFO, FAILED);
+        throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, message, INFO, FAILED);
       }
 
       templates.add(template);
@@ -646,7 +635,7 @@ public class RestResponder {
     String ct = httpRetriever.getHeader("Content-Type");
     if (!CT_pem_file.equalsIgnoreCase(ct)) {
       String message = "unsupported media type " + ct;
-      throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, INFO, FAILED);
+      throw new HttpRespAuditException(HttpStatusCode.SC_UNSUPPORTED_MEDIA_TYPE, message, INFO, FAILED);
     }
 
     String strNotBefore = httpRetriever.getParameter(PARAM_not_before);
@@ -668,26 +657,28 @@ public class RestResponder {
         String type = pemObject.getType();
         if (PemLabel.CERTIFICATE_REQUEST.getType().equals(type)) {
           if (csrBytes != null) {
-            throw new HttpRespAuditException(BAD_REQUEST, "duplicated PEM CSRs", INFO, FAILED);
+            throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, "duplicated PEM CSRs", INFO, FAILED);
           }
           csrBytes = pemObject.getContent();
         } else if (PemLabel.CERTIFICATE.getType().equals(type)) {
           if (targetCertBytes != null) {
-            throw new HttpRespAuditException(BAD_REQUEST, "duplicated PEM certificates", INFO, FAILED);
+            throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,
+                "duplicated PEM certificates", INFO, FAILED);
           }
           targetCertBytes = pemObject.getContent();
         } else {
-          throw new HttpRespAuditException(BAD_REQUEST, "unknown PEM object type " + type, INFO, FAILED);
+          throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,
+              "unknown PEM object type " + type, INFO, FAILED);
         }
       }
     }
 
     if (csrBytes == null) {
-      throw new HttpRespAuditException(BAD_REQUEST, "PEM CSR is not specified", INFO, FAILED);
+      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, "PEM CSR is not specified", INFO, FAILED);
     }
 
     if (targetCertBytes == null) {
-      throw new HttpRespAuditException(BAD_REQUEST, "PEM CERTIFICATE is not specified", INFO, FAILED);
+      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, "PEM CERTIFICATE is not specified", INFO, FAILED);
     }
 
     CertificationRequest csr = X509Util.parseCsrInRequest(csrBytes);
@@ -699,7 +690,7 @@ public class RestResponder {
     try {
       X509Util.assertCsrAndCertMatch(csr, targetCert, true);
     } catch (XiSecurityException ex) {
-      throw new HttpRespAuditException(BAD_REQUEST, ex.getMessage(), INFO, FAILED);
+      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, ex.getMessage(), INFO, FAILED);
     }
 
     SubjectPublicKeyInfo subjectPublicKeyInfo = targetCert.getSubjectPublicKeyInfo();
@@ -726,14 +717,14 @@ public class RestResponder {
       template.extensions(extensions);
     } catch (IOException e) {
       String message  ="could not encode extensions";
-      throw new HttpRespAuditException(BAD_REQUEST, message, INFO, FAILED);
+      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, message, INFO, FAILED);
     }
 
     try {
       template.subjectPublicKey(subjectPublicKeyInfo);
     } catch (IOException e) {
       String message  ="could not encode SubjectPublicKeyInfo";
-      throw new HttpRespAuditException(BAD_REQUEST, message, INFO, FAILED);
+      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, message, INFO, FAILED);
     }
 
     EnrollCertRequestEntry[] templates = new EnrollCertRequestEntry[]{template};
@@ -756,23 +747,24 @@ public class RestResponder {
     if (entries != null) {
       for (EnrollOrPullCertResponseEntry entry : entries) {
         if (entry.getError() != null) {
-          throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, entry.getError().toString(), INFO, FAILED);
+          throw new HttpRespAuditException(HttpStatusCode.SC_INTERNAL_SERVER_ERROR,
+              entry.getError().toString(), INFO, FAILED);
         }
       }
     }
 
     int n = entries == null ? 0 : entries.length;
     if (n != expectedSize) {
-      throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, "expected " + expectedSize + " cert, but received " + n,
-          INFO, FAILED);
+      throw new HttpRespAuditException(HttpStatusCode.SC_INTERNAL_SERVER_ERROR,
+          "expected " + expectedSize + " cert, but received " + n, INFO, FAILED);
     }
   }
 
   private static void checkProfile(
       Requestor requestor, String caName, String profile) throws HttpRespAuditException, OperationException {
     if (StringUtil.isBlank(profile)) {
-      throw new HttpRespAuditException(BAD_REQUEST, "certificate profile is not specified",
-          INFO, FAILED);
+      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,
+          "certificate profile is not specified", INFO, FAILED);
     }
     profile = profile.toLowerCase();
 
@@ -789,7 +781,8 @@ public class RestResponder {
         return m;
       }
     }
-    throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, "found no response entry with certReqId " + certReqId,
+    throw new HttpRespAuditException(HttpStatusCode.SC_INTERNAL_SERVER_ERROR,
+        "found no response entry with certReqId " + certReqId,
         INFO, FAILED);
   }
 
@@ -804,15 +797,15 @@ public class RestResponder {
 
     String strCaSha1 = httpRetriever.getParameter(PARAM_ca_sha1);
     if (StringUtil.isBlank(strCaSha1)) {
-      throw new HttpRespAuditException(BAD_REQUEST, "required parameter " + PARAM_ca_sha1 + " not specified",
-          INFO, FAILED);
+      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,
+          "required parameter " + PARAM_ca_sha1 + " not specified", INFO, FAILED);
     }
     byte[] caSha1 = Hex.decode(strCaSha1);
 
     String strSerialNumber = httpRetriever.getParameter(PARAM_serial_number);
     if (StringUtil.isBlank(strSerialNumber)) {
-      throw new HttpRespAuditException(BAD_REQUEST, "required parameter " + PARAM_serial_number + " not specified",
-          INFO, FAILED);
+      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,
+          "required parameter " + PARAM_serial_number + " not specified", INFO, FAILED);
     }
 
     BigInteger serialNumber;
@@ -864,7 +857,7 @@ public class RestResponder {
       } catch (NumberFormatException ex) {
         String message = "invalid crlNumber '" + strCrlNumber + "'";
         LOG.warn(message);
-        throw new HttpRespAuditException(BAD_REQUEST, message, INFO, FAILED);
+        throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, message, INFO, FAILED);
       }
     }
 
@@ -872,7 +865,7 @@ public class RestResponder {
     if (respBytes == null) {
       String message = "could not get CRL";
       LOG.warn(message);
-      throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, message, INFO, FAILED);
+      throw new HttpRespAuditException(HttpStatusCode.SC_INTERNAL_SERVER_ERROR, message, INFO, FAILED);
     }
 
     return HttpRespContent.ofOk(CT_pkix_crl, respBytes);

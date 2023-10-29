@@ -23,10 +23,7 @@ import org.xipki.util.Args;
 import org.xipki.util.ConcurrentBag;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * CMP utility class.
@@ -50,10 +47,9 @@ public class CmpUtil {
     if (signerName != null) {
       tmpSignerName = signerName;
     } else {
-      if (signer.getCertificate() == null) {
-        throw new IllegalArgumentException("signer without certificate is not allowed");
-      }
-      X500Name x500Name = signer.getCertificate().getSubject();
+      X500Name x500Name = Optional.ofNullable(signer.getCertificate())
+          .orElseThrow(() -> new IllegalArgumentException("signer without certificate is not allowed"))
+          .getSubject();
       tmpSignerName = new GeneralName(x500Name);
     }
 

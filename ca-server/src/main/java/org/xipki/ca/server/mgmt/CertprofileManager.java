@@ -212,10 +212,8 @@ class CertprofileManager {
     }
 
     certprofileEntry.setFaulty(true);
-    IdentifiedCertprofile profile = createCertprofile(certprofileEntry);
-    if (profile == null) {
-      throw new CaMgmtException("could not create Certprofile object");
-    }
+    IdentifiedCertprofile profile = Optional.ofNullable(createCertprofile(certprofileEntry)).orElseThrow(
+        () -> new CaMgmtException("could not create Certprofile object"));
 
     certprofileEntry.setFaulty(false);
     manager.certprofiles.put(name, profile);
@@ -225,10 +223,8 @@ class CertprofileManager {
   } // method addCertprofile
 
   CertprofileInfoResponse getCertprofileInfo(String profileName) throws OperationException {
-    IdentifiedCertprofile profile0 = manager.getIdentifiedCertprofile(profileName);
-    if (profile0 == null) {
-      throw new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE);
-    }
+    IdentifiedCertprofile profile0 = Optional.ofNullable(manager.getIdentifiedCertprofile(profileName))
+        .orElseThrow(() -> new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE));
 
     Certprofile profile = profile0.getCertprofile();
     Map<ASN1ObjectIdentifier, Certprofile.ExtensionControl> extnControls = profile.getExtensionControls();

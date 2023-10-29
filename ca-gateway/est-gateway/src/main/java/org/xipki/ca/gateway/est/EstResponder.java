@@ -22,7 +22,10 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
-import org.xipki.ca.gateway.*;
+import org.xipki.ca.gateway.GatewayUtil;
+import org.xipki.ca.gateway.PopControl;
+import org.xipki.ca.gateway.Requestor;
+import org.xipki.ca.gateway.RequestorAuthenticator;
 import org.xipki.ca.gateway.conf.CaProfileConf;
 import org.xipki.ca.gateway.conf.CaProfilesControl;
 import org.xipki.ca.sdk.*;
@@ -173,6 +176,8 @@ public class EstResponder {
 
   private static final Logger LOG = LoggerFactory.getLogger(EstResponder.class);
 
+  private final String reverseProxyMode;
+
   private final SdkClient sdk;
 
   private final SecurityFactory securityFactory;
@@ -188,6 +193,7 @@ public class EstResponder {
   private static final Set<String> knownCommands;
 
   static {
+    LOG.info("XiPKI EST-Gateway version {}", StringUtil.getVersion(EstResponder.class));
     knownCommands = CollectionUtil.asUnmodifiableSet(
         CMD_cacerts, CMD_simpleenroll, CMD_simplereenroll, CMD_serverkeygen, CMD_cacerts, CMD_csrattrs, CMD_fullcmc,
         CMD_ucacerts, CMD_ucacert, CMD_ucrl, CMD_usimpleenroll, CMD_usimplereenroll, CMD_userverkeygen);
@@ -195,14 +201,13 @@ public class EstResponder {
 
   public EstResponder(
       SdkClient sdk, SecurityFactory securityFactory, RequestorAuthenticator authenticator,
-      PopControl popControl, CaProfilesControl caProfiles) {
-    LOG.info("XiPKI EST-Gateway version {}", StringUtil.getVersion(getClass()));
-
+      PopControl popControl, CaProfilesControl caProfiles, String reverseProxyMode) {
     this.sdk = Args.notNull(sdk, "sdk");
     this.securityFactory = Args.notNull(securityFactory, "securityFactory");
     this.authenticator = Args.notNull(authenticator, "authenticator");
     this.popControl = Args.notNull(popControl, "popControl");
     this.caProfilesControl = Args.notNull(caProfiles, "caProfiles");
+    this.reverseProxyMode = reverseProxyMode;
   }
 
   private Requestor.PasswordRequestor getRequestor(String user) {
@@ -352,15 +357,12 @@ public class EstResponder {
               AuditLevel.INFO, AuditStatus.FAILED);
         }
       } else {
-        X509Cert clientCert = TlsHelper.getTlsClientCert(httpRequest);
-        if (clientCert == null) {
-          throw new HttpRespAuditException(UNAUTHORIZED, "no client certificate", AuditLevel.INFO, AuditStatus.FAILED);
-        }
-        requestor = getRequestor(clientCert);
+        X509Cert clientCert = Optional.ofNullable(TlsHelper.getTlsClientCert(httpRequest, reverseProxyMode))
+            .orElseThrow(() -> new HttpRespAuditException(
+                                UNAUTHORIZED, "no client certificate", AuditLevel.INFO, AuditStatus.FAILED));
 
-        if (requestor == null) {
-          throw new OperationException(ErrorCode.NOT_PERMITTED, "no requestor specified");
-        }
+        requestor = Optional.ofNullable(getRequestor(clientCert))
+            .orElseThrow(() -> new OperationException(ErrorCode.NOT_PERMITTED, "no requestor specified"));
       }
 
       event.addEventData(CaAuditConstants.NAME_requestor, requestor.getName());
@@ -470,12 +472,10 @@ public class EstResponder {
   } // method service
 
   private HttpResponse toHttpResponse(HttpRespContent respContent) {
-    if (respContent == null) {
-      return new HttpResponse(OK);
-    } else {
-      return new HttpResponse(OK, respContent.getContentType(), null,
-          respContent.isBase64(), respContent.getContent());
-    }
+    return respContent == null
+        ? new HttpResponse(OK)
+        : new HttpResponse(OK, respContent.getContentType(), null,
+              respContent.isBase64(), respContent.getContent());
   }
 
   private HttpRespContent enrollCert(

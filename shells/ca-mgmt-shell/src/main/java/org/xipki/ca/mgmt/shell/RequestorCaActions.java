@@ -20,10 +20,7 @@ import org.xipki.shell.CmdFailure;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Actions to manage requestors.
@@ -199,12 +196,9 @@ public class RequestorCaActions {
           sb.append("\t").append(entry).append("\n");
         }
       } else {
-        RequestorEntry entry = caManager.getRequestor(name);
-        if (entry == null) {
-          throw new CmdFailure("could not find requestor '" + name + "'");
-        } else {
-          sb.append(entry.toString(verbose));
-        }
+        RequestorEntry entry = Optional.ofNullable(caManager.getRequestor(name))
+            .orElseThrow(() -> new CmdFailure("could not find requestor '" + name + "'"));
+        sb.append(entry.toString(verbose));
       }
 
       println(sb.toString());

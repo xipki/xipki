@@ -160,9 +160,9 @@ Security Commands
 
      import secret key with given value in PKCS#11 device
 
-   * `xi:key-exists-p11`
+   * `xi:object-exists-p11`
 
-     return whether key and certs exist in PKCS#11 device
+     return whether objects exist in PKCS#11 device
 
    * `xi:obfuscate`
 

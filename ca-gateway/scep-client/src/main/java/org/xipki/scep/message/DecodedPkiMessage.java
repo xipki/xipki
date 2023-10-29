@@ -30,6 +30,7 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.xipki.scep.util.ScepConstants.*;
@@ -156,10 +157,8 @@ public class DecodedPkiMessage extends PkiMessage {
       throw new MessageDecodingException("could not find embedded certificate to verify the signature");
     }
 
-    AttributeTable signedAttrs = signerInfo.getSignedAttributes();
-    if (signedAttrs == null) {
-      throw new MessageDecodingException("missing SCEP attributes");
-    }
+    AttributeTable signedAttrs = Optional.ofNullable(signerInfo.getSignedAttributes()).orElseThrow(
+        () -> new MessageDecodingException("missing SCEP attributes"));
 
     // signingTime
     ASN1Encodable attrValue = ScepUtil.getFirstAttrValue(signedAttrs, CMSAttributes.signingTime);

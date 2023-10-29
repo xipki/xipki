@@ -22,10 +22,7 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Actions to manage signers.
@@ -109,12 +106,9 @@ public class SignerCaActions {
           sb.append("\t").append(entry).append("\n");
         }
       } else {
-        SignerEntry entry = caManager.getSigner(name);
-        if (entry == null) {
-          throw new CmdFailure("could not find signer " + name);
-        } else {
-          sb.append(entry.toString(verbose));
-        }
+        SignerEntry entry = Optional.ofNullable(caManager.getSigner(name)).orElseThrow(
+            () -> new CmdFailure("could not find signer " + name));
+        sb.append(entry.toString(verbose));
       }
 
       println(sb.toString());
@@ -175,10 +169,8 @@ public class SignerCaActions {
       }
       String tmpType = type;
       if (tmpType == null) {
-        SignerEntry entry = caManager.getSigner(name);
-        if (entry == null) {
-          throw new IllegalCmdParamException("please specify the type");
-        }
+        SignerEntry entry = Optional.ofNullable(caManager.getSigner(name)).orElseThrow(
+            () -> new IllegalCmdParamException("please specify the type"));
         tmpType = entry.getType();
       }
 

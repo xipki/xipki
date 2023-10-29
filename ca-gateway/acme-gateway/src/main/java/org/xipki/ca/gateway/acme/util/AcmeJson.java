@@ -25,8 +25,6 @@ import org.xipki.util.LogUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * A model containing a JSON result. The content is immutable.
@@ -176,15 +174,6 @@ public final class AcmeJson {
          */
         public Value get(int index) {
             return new Value(path + '[' + index + ']', data.get(index));
-        }
-
-        /**
-         * Returns a stream of values.
-         *
-         * @return {@link Stream} of all {@link Value} of this array
-         */
-        public Stream<Value> stream() {
-            return StreamSupport.stream(spliterator(), false);
         }
 
         /**

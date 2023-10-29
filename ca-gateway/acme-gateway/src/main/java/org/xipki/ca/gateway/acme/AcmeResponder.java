@@ -151,6 +151,7 @@ public class AcmeResponder {
   private final AtomicLong lastOrdersCleaned = new AtomicLong(0);
 
   static {
+    LOG.info("XiPKI ACME-Gateway version {}", StringUtil.getVersion(AcmeResponder.class));
     knownCommands = CollectionUtil.asUnmodifiableSet(
         CMD_directory, CMD_newNonce, CMD_newAccount, CMD_newOrder, CMD_revokeCert, CMD_keyChange,
         CMD_account, CMD_order, CMD_orders, CMD_authz, CMD_chall, CMD_finalize, CMD_cert);
@@ -158,8 +159,6 @@ public class AcmeResponder {
 
   public AcmeResponder(SdkClient sdk, SecurityFactory securityFactory, PopControl popControl, AcmeProxyConf.Acme conf)
       throws InvalidConfException {
-    LOG.info("XiPKI ACME-Gateway version {}", getClass());
-
     this.sdk = Args.notNull(sdk, "sdk");
     this.popControl = Args.notNull(popControl, "popControl");
     this.securityFactory = Args.notNull(securityFactory, "securityFactory");
@@ -709,11 +708,9 @@ public class AcmeResponder {
           }
         }
 
-        AcmeOrder order = repo.getOrderForCert(certBytes);
-        if (order == null) {
-          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.unauthorized,
-              "certificate not enrolled through this ACME server");
-        }
+        AcmeOrder order = Optional.ofNullable(repo.getOrderForCert(certBytes)).orElseThrow(
+            () -> new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.unauthorized,
+              "certificate not enrolled through this ACME server"));
 
         if (jwk == null) {
           // account is non-null here.
@@ -953,10 +950,9 @@ public class AcmeResponder {
 
         String keyAlgOid =
             csr.getCertificationRequestInfo().getSubjectPublicKeyInfo().getAlgorithm().getAlgorithm().getId();
-        AcmeProxyConf.CaProfile caProfile = getCaProfile(keyAlgOid);
-        if (caProfile == null) {
-          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badCSR, "unsupported key type " + keyAlgOid);
-        }
+        AcmeProxyConf.CaProfile caProfile = Optional.ofNullable(getCaProfile(keyAlgOid))
+            .orElseThrow(() ->
+                new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badCSR, "unsupported key type " + keyAlgOid));
 
         // verify the CSR
         Set<Identifier> identifiers = new HashSet<>();
@@ -1057,10 +1053,8 @@ public class AcmeResponder {
       case CMD_cert: {
         String id = tokens[1];
         AcmeOrder order = getOrder(id);
-        byte[] certBytes = order.getCert();
-        if (certBytes == null) {
-          throw new AcmeProtocolException(SC_NOT_FOUND, AcmeError.orderNotReady, "found no certificate");
-        }
+        byte[] certBytes = Optional.ofNullable(order.getCert()).orElseThrow(
+            () -> new AcmeProtocolException(SC_NOT_FOUND, AcmeError.orderNotReady, "found no certificate"));
 
         byte[] encodedIssuer = X509Util.extractCertIssuer(certBytes);
         String hexIssuer = Hex.encode(encodedIssuer);
@@ -1097,10 +1091,8 @@ public class AcmeResponder {
         }
 
         AuthzId id = new AuthzId(Base64Url.decodeFast(tokens[1]));
-        AcmeAuthz authz = repo.getAuthz(id);
-        if (authz == null) {
-          throw new HttpRespAuditException(SC_NOT_FOUND, "unknown authz", AuditLevel.ERROR, AuditStatus.FAILED);
-        }
+        AcmeAuthz authz = Optional.ofNullable(repo.getAuthz(id)).orElseThrow(
+            () -> new HttpRespAuditException(SC_NOT_FOUND, "unknown authz", AuditLevel.ERROR, AuditStatus.FAILED));
 
         if (LOG.isInfoEnabled()) {
           LOG.info("downloaded authz {}: {}", id, JSON.toJson(authz.toResponse(baseUrl, id.getOrderId())));
@@ -1113,10 +1105,8 @@ public class AcmeResponder {
         }
 
         ChallId challId = new ChallId(Base64Url.decodeFast(tokens[1]));
-        AcmeChallenge2 chall2 = repo.getChallenge(challId);
-        if (chall2 == null) {
-          throw new HttpRespAuditException(SC_NOT_FOUND, "unknown challenge", AuditLevel.ERROR, AuditStatus.FAILED);
-        }
+        AcmeChallenge2 chall2 = Optional.ofNullable(repo.getChallenge(challId)).orElseThrow(
+            () -> new HttpRespAuditException(SC_NOT_FOUND, "unknown challenge", AuditLevel.ERROR, AuditStatus.FAILED));
 
         AcmeChallenge chall = chall2.getChallenge();
 
@@ -1140,21 +1130,16 @@ public class AcmeResponder {
   } // method service
 
   private HttpResponse toHttpResponse(HttpRespContent respContent) {
-    if (respContent == null) {
-      return new HttpResponse(SC_OK);
-    }
-
-    return new HttpResponse(respContent.getStatusCode(), respContent.getContentType(), null,
-        respContent.isBase64(), respContent.getContent());
+    return (respContent == null)
+        ? new HttpResponse(SC_OK)
+        : new HttpResponse(respContent.getStatusCode(), respContent.getContentType(), null,
+            respContent.isBase64(), respContent.getContent());
   }
 
   private AcmeOrder getOrder(String id) throws HttpRespAuditException, AcmeSystemException {
     Long lLabel = toLongId(id);
-    AcmeOrder order = lLabel == null ? null : repo.getOrder(lLabel);
-    if (order == null) {
-      throw new HttpRespAuditException(SC_NOT_FOUND, "unknown order", AuditLevel.ERROR, AuditStatus.FAILED);
-    }
-    return order;
+    return Optional.ofNullable(lLabel == null ? null : repo.getOrder(lLabel)).orElseThrow(
+        () -> new HttpRespAuditException(SC_NOT_FOUND, "unknown order", AuditLevel.ERROR, AuditStatus.FAILED));
   }
 
   private HttpResponse buildSuccJsonResp(int statusCode, Object body) {
@@ -1244,10 +1229,7 @@ public class AcmeResponder {
   }
 
   private static Long toLongId(String id) {
-    if (id.length() != 11) {
-      return null;
-    }
-    return Pack.littleEndianToLong(Base64Url.decodeFast(id), 0);
+    return (id.length() != 11) ? null : Pack.littleEndianToLong(Base64Url.decodeFast(id), 0);
   }
 
   private AcmeProxyConf.CaProfile getCaProfile(String keyAlgId) {

@@ -990,13 +990,9 @@ public class XijsonExtensions {
 
   private static ExtensionType getExtension(
       ASN1ObjectIdentifier type, Map<String, ExtensionType> extensions) {
-    ExtensionType extension = extensions.get(type.getId());
-    if (extension == null) {
-      throw new IllegalStateException("should not reach here: undefined extension "
-          + ObjectIdentifiers.oidToDisplayName(type));
-    }
-
-    return extension;
+    return Optional.ofNullable(extensions.get(type.getId())).orElseThrow(() ->
+        new IllegalStateException("should not reach here: undefined extension "
+          + ObjectIdentifiers.oidToDisplayName(type)));
   } // method getExtension
 
   private static ASN1Encodable readAsn1Encodable(byte[] encoded) throws CertprofileException {

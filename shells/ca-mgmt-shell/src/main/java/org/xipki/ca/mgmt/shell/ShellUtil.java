@@ -7,6 +7,7 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.*;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -34,11 +35,8 @@ public class ShellUtil {
 
     ConfPairs pairs = new ConfPairs(signerConf);
     String keystoreConf = pairs.value("keystore");
-    String passwordHint = pairs.value("password");
-
-    if (passwordHint == null) {
-      throw new IllegalArgumentException("password is not set in " + signerConf);
-    }
+    Optional.ofNullable(pairs.value("password")).orElseThrow(
+        () -> new IllegalArgumentException("password is not set in " + signerConf));
 
     byte[] keystoreBytes;
     if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {
@@ -57,10 +55,8 @@ public class ShellUtil {
   public static int getPermission(Set<String> permissions) throws IllegalCmdParamException {
     int ret = 0;
     for (String permission : permissions) {
-      Integer code = PermissionConstants.getPermissionForText(permission);
-      if (code == null) {
-        throw new IllegalCmdParamException("invalid permission '" + permission + "'");
-      }
+      int code = Optional.ofNullable(PermissionConstants.getPermissionForText(permission))
+          .orElseThrow(() -> new IllegalCmdParamException("invalid permission '" + permission + "'"));
       ret |= code;
     }
     return ret;

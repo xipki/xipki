@@ -49,11 +49,9 @@ public class EstHttpFilter implements XiHttpFilter {
       conf = new ProtocolProxyConfWrapper(conf0);
 
       EstResponder responder = new EstResponder(conf.getSdkClient(), conf.getSecurities().getSecurityFactory(),
-          conf.getAuthenticator(), conf.getPopControl(), conf.getCaProfiles());
+          conf.getAuthenticator(), conf.getPopControl(), conf.getCaProfiles(), conf.getReverseProxyMode());
 
-      servlet = new EstHttpServlet();
-      servlet.setLogReqResp(conf.isLogReqResp());
-      servlet.setResponder(responder);
+      servlet = new EstHttpServlet(conf.isLogReqResp(), responder);
 
       GatewayUtil.auditLogPciEvent(LOG, "EST-Gateway", true, "START");
     } catch (Exception e) {

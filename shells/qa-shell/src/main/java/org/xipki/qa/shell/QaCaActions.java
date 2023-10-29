@@ -121,10 +121,8 @@ public class QaCaActions {
 
       IssuerInfo issuerInfo = qaSystemManager.getIssuer(issuerName);
 
-      CertprofileQa qa = qaSystemManager.getCertprofile(profileName);
-      if (qa == null) {
-        throw new IllegalCmdParamException("found no certificate profile named '" + profileName + "'");
-      }
+      CertprofileQa qa = Optional.ofNullable(qaSystemManager.getCertprofile(profileName)).orElseThrow(() ->
+          new IllegalCmdParamException("found no certificate profile named '" + profileName + "'"));
 
       CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
       Extensions extensions = null;
@@ -192,10 +190,8 @@ public class QaCaActions {
     @Override
     protected Object execute0() throws Exception {
       println("checking CA alias='" + aliasName + "', CA='" + caName + "'");
-      String tmpCaName = caManager.getCaNameForAlias(aliasName);
-      if (tmpCaName == null) {
-        throw new CmdFailure("alias '" + aliasName + "' is not configured");
-      }
+      String tmpCaName = Optional.ofNullable(caManager.getCaNameForAlias(aliasName)).orElseThrow(() ->
+        new CmdFailure("alias '" + aliasName + "' is not configured"));
 
       assertEquals("CA name", caName, tmpCaName);
       println(" checked CA alias='" + aliasName + "', CA='" + caName + "'");
@@ -250,10 +246,8 @@ public class QaCaActions {
 
       RandomDn randomDn = null;
       if (randomDnStr != null) {
-        randomDn = RandomDn.getInstance(randomDnStr);
-        if (randomDn == null) {
-          throw new IllegalCmdParamException("invalid randomDn " + randomDnStr);
-        }
+        randomDn = Optional.ofNullable(RandomDn.getInstance(randomDnStr)).orElseThrow(() ->
+          new IllegalCmdParamException("invalid randomDn " + randomDnStr));
       }
 
       CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(certprofile, null, subjectTemplate, randomDn);
@@ -298,10 +292,8 @@ public class QaCaActions {
 
       RandomDn randomDn = null;
       if (randomDnStr != null) {
-        randomDn = RandomDn.getInstance(randomDnStr);
-        if (randomDn == null) {
-          throw new IllegalCmdParamException("invalid randomDn " + randomDnStr);
-        }
+        randomDn = Optional.ofNullable(RandomDn.getInstance(randomDnStr)).orElseThrow(() ->
+          new IllegalCmdParamException("invalid randomDn " + randomDnStr));
       }
 
       CaEnrollBenchKeyEntry keyEntry;
@@ -339,10 +331,8 @@ public class QaCaActions {
       String caName = ey.getIdent().getName();
       println("checking CA " + caName);
 
-      CaEntry ca = caManager.getCa(caName);
-      if (ca == null) {
-        throw new CmdFailure("could not find CA '" + caName + "'");
-      }
+      CaEntry ca = Optional.ofNullable(caManager.getCa(caName)).orElseThrow(() ->
+        new CmdFailure("could not find CA '" + caName + "'"));
 
       CaUris eyUris = ey.getCaUris();
       // CA cert uris
@@ -621,10 +611,8 @@ public class QaCaActions {
         conf = StringUtil.toUtf8String(IoUtil.read(confFile));
       }
 
-      CertprofileEntry cp = caManager.getCertprofile(name);
-      if (cp == null) {
-        throw new CmdFailure("certificate profile named '" + name + "' is not configured");
-      }
+      CertprofileEntry cp = Optional.ofNullable(caManager.getCertprofile(name)).orElseThrow(() ->
+        new CmdFailure("certificate profile named '" + name + "' is not configured"));
 
       assertTypeEquals("type", type == null ? "xijson" : type, cp.getType());
       assertEquals("conf", conf, cp.getConf());
@@ -642,10 +630,8 @@ public class QaCaActions {
     protected Object execute0() throws Exception {
       println("checking publisher " + name);
 
-      PublisherEntry cp = caManager.getPublisher(name);
-      if (cp == null) {
-        throw new CmdFailure("publisher named '" + name + "' is not configured");
-      }
+      PublisherEntry cp = Optional.ofNullable(caManager.getPublisher(name)).orElseThrow(() ->
+        new CmdFailure("publisher named '" + name + "' is not configured"));
 
       if (cp.getType() != null) {
         assertTypeEquals("type", type, cp.getType());
@@ -669,10 +655,8 @@ public class QaCaActions {
     protected Object execute0() throws Exception {
       println("checking requestor " + name);
 
-      RequestorEntry cr = caManager.getRequestor(name);
-      if (cr == null) {
-        throw new CmdFailure("requestor named '" + name + "' is not configured");
-      }
+      RequestorEntry cr = Optional.ofNullable(caManager.getRequestor(name)).orElseThrow(() ->
+        new CmdFailure("requestor named '" + name + "' is not configured"));
 
       byte[] ex = IoUtil.read(certFile);
       String expType = RequestorEntry.TYPE_CERT;
@@ -680,10 +664,8 @@ public class QaCaActions {
         throw new CmdFailure("IdNameTypeConf type is not " + expType);
       }
 
-      String conf = cr.getConf();
-      if (conf == null) {
-        throw new CmdFailure("CaCert: is not configured explicitly as expected");
-      }
+      String conf = Optional.ofNullable(cr.getConf()).orElseThrow(() ->
+        new CmdFailure("CaCert: is not configured explicitly as expected"));
 
       if (!certEquals(ex, Base64.decode(conf))) {
         throw new CmdFailure("CaCert: the expected one and the actual one differ");
@@ -703,10 +685,8 @@ public class QaCaActions {
     protected Object execute0() throws Exception {
       println("checking signer " + name);
 
-      SignerEntry cr = caManager.getSigner(name);
-      if (cr == null) {
-        throw new CmdFailure("signer named '" + name + "' is not configured");
-      }
+      SignerEntry cr = Optional.ofNullable(caManager.getSigner(name)).orElseThrow(() ->
+        new CmdFailure("signer named '" + name + "' is not configured"));
 
       if (CaManager.NULL.equalsIgnoreCase(certFile)) {
         if (cr.getBase64Cert() != null) {

@@ -497,8 +497,7 @@ public abstract class MgmtMessage {
       this.revocationInfo = revocationInfo;
     }
 
-    public CaEntry toCaEntry()
-        throws CertificateException, CaMgmtException, InvalidConfException {
+    public CaEntry toCaEntry() throws CertificateException, CaMgmtException, InvalidConfException {
       CaEntry rv = new CaEntry(ident, serialNoLen, nextCrlNumber,
                           signerType, signerConf, caUris, numCrls, expirationPeriod);
       if (certBytes != null) {

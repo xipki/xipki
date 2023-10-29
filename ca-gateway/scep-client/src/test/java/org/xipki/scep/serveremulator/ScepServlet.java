@@ -39,9 +39,9 @@ public class ScepServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = ScepConstants.CT_PKI_MESSAGE;
 
-  private final ScepResponder responder;
+  private final SimulatorScepResponder responder;
 
-  public ScepServlet(ScepResponder responder) {
+  public ScepServlet(SimulatorScepResponder responder) {
     this.responder = Args.notNull(responder, "responder");
   }
 

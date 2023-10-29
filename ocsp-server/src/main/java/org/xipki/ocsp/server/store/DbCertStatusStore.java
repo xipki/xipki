@@ -605,12 +605,10 @@ public class DbCertStatusStore extends OcspStore {
   public static HashAlgo getCertHashAlgo(DataSourceWrapper datasource)
       throws DataAccessException, NoSuchAlgorithmException {
     // analyze the database
-    String certHashAlgoStr = datasource.getFirstStringValue(null, "DBSCHEMA", "VALUE2",
-        "NAME='CERTHASH_ALGO'");
-
-    if (certHashAlgoStr == null) {
-      throw new DataAccessException("Column with NAME='CERTHASH_ALGO' is not defined in table DBSCHEMA");
-    }
+    String certHashAlgoStr = Optional.ofNullable(
+        datasource.getFirstStringValue(null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'"))
+        .orElseThrow(() ->
+            new DataAccessException("Column with NAME='CERTHASH_ALGO' is not defined in table DBSCHEMA"));
 
     return HashAlgo.getInstance(certHashAlgoStr);
   }

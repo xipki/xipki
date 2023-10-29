@@ -366,12 +366,9 @@ public class X509Ca extends X509CaModule implements Closeable {
     for (int i = 0; i < n; i++) {
       CertTemplateData certTemplate = certTemplates.get(i);
       try {
-        IdentifiedCertprofile certprofile = getX509Certprofile(certTemplate.getCertprofileName());
-
-        if (certprofile == null) {
-          throw new OperationException(UNKNOWN_CERT_PROFILE,
-              "unknown cert profile " + certTemplate.getCertprofileName());
-        }
+        IdentifiedCertprofile certprofile = Optional.ofNullable(getX509Certprofile(certTemplate.getCertprofileName()))
+            .orElseThrow(() -> new OperationException(UNKNOWN_CERT_PROFILE,
+                                  "unknown cert profile " + certTemplate.getCertprofileName()));
 
         GrantedCertTemplate gct = grandCertTemplateBuilder.create(batch, certprofile, certTemplate, keypairGenerators);
         gct.audit(event);
@@ -600,10 +597,8 @@ public class X509Ca extends X509CaModule implements Closeable {
           gct.signer.requiteSigner(signer0);
         }
 
-        CtLogPublicKeyFinder finder = caManager.getCtLogPublicKeyFinder();
-        if (finder == null) {
-          throw new OperationException(SYSTEM_FAILURE, "ctLog not configured for CA " + caInfo.getIdent().getName());
-        }
+        CtLogPublicKeyFinder finder = Optional.ofNullable(caManager.getCtLogPublicKeyFinder()).orElseThrow(() ->
+            new OperationException(SYSTEM_FAILURE, "ctLog not configured for CA " + caInfo.getIdent().getName()));
 
         SignedCertificateTimestampList scts = ctlogClient.getCtLogScts(precert, caCert, caInfo.getCertchain(), finder);
 

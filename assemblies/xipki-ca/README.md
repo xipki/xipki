@@ -38,6 +38,7 @@ Adapt the database configurations `${CONTAINER_ROOT}/xipki/etc/ca/database/ca-db
         </SSLHostConfig>
     </Connector>
   ```
+8. If you have multiple tomcat instances, change the listing port for SHUTDOW to be unique.
 
 8. (optional) To accelerate the start process, append the following block to the property
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`

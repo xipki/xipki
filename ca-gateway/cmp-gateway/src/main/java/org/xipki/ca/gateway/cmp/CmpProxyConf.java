@@ -5,6 +5,7 @@ package org.xipki.ca.gateway.cmp;
 
 import org.xipki.ca.gateway.conf.ProtocolProxyConf;
 import org.xipki.security.util.JSON;
+import org.xipki.security.util.TlsHelper;
 import org.xipki.util.Args;
 import org.xipki.util.exception.InvalidConfException;
 
@@ -21,12 +22,21 @@ public class CmpProxyConf extends ProtocolProxyConf {
 
   private CmpControlConf cmp;
 
-  public static CmpProxyConf readConfFromFile(String fileName)
-      throws IOException, InvalidConfException {
+  private String reverseProxyMode;
+
+  public static CmpProxyConf readConfFromFile(String fileName) throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");
     CmpProxyConf conf = JSON.parseObject(new File(fileName), CmpProxyConf.class);
     conf.validate();
     return conf;
+  }
+
+  public String getReverseProxyMode() {
+    return reverseProxyMode;
+  }
+
+  public void setReverseProxyMode(String reverseProxyMode) {
+    this.reverseProxyMode = reverseProxyMode;
   }
 
   public CmpControlConf getCmp() {
@@ -41,6 +51,7 @@ public class CmpProxyConf extends ProtocolProxyConf {
   public void validate() throws InvalidConfException {
     super.validate();
     notNull(cmp, "cmp");
+    TlsHelper.checkReverseProxyMode(reverseProxyMode);
   }
 
 }

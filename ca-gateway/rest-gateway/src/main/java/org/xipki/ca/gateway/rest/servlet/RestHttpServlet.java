@@ -29,15 +29,12 @@ class RestHttpServlet {
 
   private static final Logger LOG = LoggerFactory.getLogger(RestHttpServlet.class);
 
-  private boolean logReqResp;
+  private final boolean logReqResp;
 
-  private RestResponder responder;
+  private final RestResponder responder;
 
-  public void setLogReqResp(boolean logReqResp) {
+  public RestHttpServlet(boolean logReqResp, RestResponder responder) {
     this.logReqResp = logReqResp;
-  }
-
-  public void setResponder(RestResponder responder) {
     this.responder = Args.notNull(responder, "responder");
   }
 

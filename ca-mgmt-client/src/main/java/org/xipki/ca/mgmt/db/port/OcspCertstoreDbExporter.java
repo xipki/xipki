@@ -26,6 +26,7 @@ import java.sql.SQLException;
 import java.time.Clock;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -104,11 +105,8 @@ class OcspCertstoreDbExporter extends DbPorter {
   } // method export
 
   private void exportHashAlgo(OcspCertstore certstore) throws DataAccessException {
-    String certHashAlgoStr = dbSchemaInfo.getVariableValue("CERTHASH_ALGO");
-    if (certHashAlgoStr == null) {
-      throw new DataAccessException("CERTHASH_ALGO is not defined in table DBSCHEMA");
-    }
-
+    String certHashAlgoStr = Optional.ofNullable(dbSchemaInfo.getVariableValue("CERTHASH_ALGO"))
+        .orElseThrow(() -> new DataAccessException("CERTHASH_ALGO is not defined in table DBSCHEMA"));
     certstore.setCerthashAlgo(certHashAlgoStr);
   } // method exportHashAlgo
 

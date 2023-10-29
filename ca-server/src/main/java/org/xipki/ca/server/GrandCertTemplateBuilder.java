@@ -43,6 +43,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import static org.xipki.util.exception.ErrorCode.*;
 
@@ -83,11 +84,9 @@ class GrandCertTemplateBuilder {
       throw new OperationException(UNKNOWN_CERT_PROFILE, "unknown cert profile " + certTemplate.getCertprofileName());
     }
 
-    ConcurrentContentSigner signer = caInfo.getSigner(certprofile.getSignatureAlgorithms());
-    if (signer == null) {
-      throw new OperationException(SYSTEM_FAILURE,
-          "CA does not support any signature algorithm restricted by the cert profile");
-    }
+    ConcurrentContentSigner signer = Optional.ofNullable(caInfo.getSigner(certprofile.getSignatureAlgorithms()))
+        .orElseThrow(() -> new OperationException(SYSTEM_FAILURE,
+                              "CA does not support any signature algorithm restricted by the cert profile"));
 
     final NameId certprofileIdent = certprofile.getIdent();
     if (certprofile.getVersion() != Certprofile.X509CertVersion.v3) {

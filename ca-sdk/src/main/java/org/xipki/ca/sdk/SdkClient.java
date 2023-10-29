@@ -18,6 +18,7 @@ import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.time.Instant;
+import java.util.Optional;
 
 import static org.xipki.ca.sdk.SdkConstants.*;
 
@@ -220,11 +221,8 @@ public class SdkClient {
     }
 
     EnrollOrPullCertResponseEntry rEntry = resp.getEntries()[0];
-    byte[] cert = rEntry.getCert();
-    if (cert == null) {
-      throw new SdkErrorResponseException(ErrorCode.SYSTEM_FAILURE, "error " + func);
-    }
-    return cert;
+    return Optional.ofNullable(rEntry.getCert()).orElseThrow(() ->
+        new SdkErrorResponseException(ErrorCode.SYSTEM_FAILURE, "error " + func));
   }
 
   private KeyCertBytesPair enrollCertCaGenKeypair0(String func, String cmd, String ca, EnrollCertRequestEntry reqEntry)

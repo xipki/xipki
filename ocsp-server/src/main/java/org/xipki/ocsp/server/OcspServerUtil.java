@@ -179,10 +179,8 @@ public class OcspServerUtil {
     String datasourceName = conf.getSource().getDatasource();
     DataSourceWrapper datasource = null;
     if (datasourceName != null) {
-      datasource = datasources.get(datasourceName);
-      if (datasource == null) {
-        throw new InvalidConfException("datasource named '" + datasourceName + "' not defined");
-      }
+      datasource = Optional.ofNullable(datasources.get(datasourceName)).orElseThrow(() ->
+        new InvalidConfException("datasource named '" + datasourceName + "' not defined"));
     }
     try {
       Map<String, ?> sourceConf = conf.getSource().getConf();

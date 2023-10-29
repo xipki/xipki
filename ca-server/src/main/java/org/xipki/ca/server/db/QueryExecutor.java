@@ -99,10 +99,8 @@ class QueryExecutor {
       ResultSet rs = null;
 
       try {
-        stmt = datasource.prepareStatement(sql);
-        if (stmt == null) {
-          throw new DataAccessException("could not create statement");
-        }
+        stmt = Optional.ofNullable(datasource.prepareStatement(sql))
+            .orElseThrow(() -> new DataAccessException("could not create statement"));
 
         rs = stmt.executeQuery();
         while (rs.next()) {

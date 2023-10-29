@@ -19,6 +19,7 @@ import org.xipki.util.exception.BadCertTemplateException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -252,12 +253,8 @@ public class CertprofileUtil {
     for (int i = 0; i < size; i++) {
       AccessDescription ad = AccessDescription.getInstance(reqSeq.getObjectAt(i));
       ASN1ObjectIdentifier accessMethod = ad.getAccessMethod();
-      Set<GeneralNameMode> generalNameModes = modes.get(accessMethod);
-
-      if (generalNameModes == null) {
-        throw new BadCertTemplateException(
-            "subjectInfoAccess.accessMethod " + accessMethod.getId() + " is not allowed");
-      }
+      Set<GeneralNameMode> generalNameModes = Optional.ofNullable(modes.get(accessMethod)).orElseThrow(() ->
+          new BadCertTemplateException("subjectInfoAccess.accessMethod " + accessMethod.getId() + " is not allowed"));
 
       GeneralName accessLocation = BaseCertprofile.createGeneralName(ad.getAccessLocation(), generalNameModes);
       vec.add(new AccessDescription(accessMethod, accessLocation));

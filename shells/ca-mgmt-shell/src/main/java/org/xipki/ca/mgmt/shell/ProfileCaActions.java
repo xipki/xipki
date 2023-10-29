@@ -20,10 +20,7 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Actions to manage certificate profiles.
@@ -189,10 +186,8 @@ public class ProfileCaActions {
 
     @Override
     protected Object execute0() throws Exception {
-      CertprofileEntry entry = caManager.getCertprofile(name);
-      if (entry == null) {
-        throw new IllegalCmdParamException("no certificate profile named " + name + " is defined");
-      }
+      CertprofileEntry entry = Optional.ofNullable(caManager.getCertprofile(name)).orElseThrow(
+          () -> new IllegalCmdParamException("no certificate profile named " + name + " is defined"));
 
       if (StringUtil.isBlank(entry.getConf())) {
         println("cert profile does not have conf");
@@ -237,12 +232,9 @@ public class ProfileCaActions {
           sb.append("\t").append(entry).append("\n");
         }
       } else {
-        CertprofileEntry entry = caManager.getCertprofile(name);
-        if (entry == null) {
-          throw new CmdFailure("\tno certificate profile named '" + name + "' is configured");
-        } else {
-          sb.append(entry.toString(verbose));
-        }
+        CertprofileEntry entry = Optional.ofNullable(caManager.getCertprofile(name))
+            .orElseThrow(() -> new CmdFailure("\tno certificate profile named '" + name + "' is configured"));
+        sb.append(entry.toString(verbose));
       }
 
       println(sb.toString());

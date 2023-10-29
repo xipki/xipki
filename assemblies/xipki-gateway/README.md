@@ -80,6 +80,8 @@ util-*.jar
 7. (optional) If you encrypt the passwords in the conf/server.xml with XiPKI solution, replace
    `org.apache.coyote.http11.Http11Nio2Protocol` by `org.xipki.tomcat.XiHttp11Nio2Protocol`.
 
+8. If you have multiple tomcat instances, change the listing port for SHUTDOW to be unique.
+
 - Start tomcat
 
 ```sh

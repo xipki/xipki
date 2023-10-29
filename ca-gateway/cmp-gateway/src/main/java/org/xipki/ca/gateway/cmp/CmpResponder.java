@@ -48,12 +48,15 @@ public class CmpResponder extends BaseCmpResponder {
 
   private static final Logger LOG = LoggerFactory.getLogger(BaseCmpResponder.class);
 
+  static {
+    LOG.info("XiPKI CMP-Gateway version {}", StringUtil.getVersion(CmpResponder.class));
+  }
+
   public CmpResponder(
       CmpControl cmpControl, SdkClient sdk, SecurityFactory securityFactory,
       CaNameSigners signers, RequestorAuthenticator authenticator, PopControl popControl)
       throws NoSuchAlgorithmException {
     super(cmpControl, sdk, securityFactory, signers, authenticator, popControl);
-    LOG.info("XiPKI CMP-Gateway version {}", StringUtil.getVersion(getClass()));
   }
 
   private CertRepMessage processCertReqMessages(

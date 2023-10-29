@@ -94,6 +94,8 @@ public class SdkResponder {
 
   private static final Set<String> reenrollCertExtnIds;
 
+  private final String reverseProxyMode;
+
   private final CaManagerImpl caManager;
 
   private ScheduledThreadPoolExecutor threadPoolExecutor;
@@ -105,7 +107,8 @@ public class SdkResponder {
         Extension.subjectAlternativeName.getId(), Extension.subjectInfoAccess.getId());
   }
 
-  public SdkResponder(CaManagerImpl caManager) {
+  public SdkResponder(String reverseProxyMode, CaManagerImpl caManager) {
+    this.reverseProxyMode = reverseProxyMode;
     this.caManager = Args.notNull(caManager, "caManager");
     this.pendingCertPool = new PendingCertificatePool();
 
@@ -116,6 +119,8 @@ public class SdkResponder {
 
   public SdkResponse service(String path, byte[] request, XiHttpRequest httpRequest) {
     try {
+      TlsHelper.getTlsClientCert(httpRequest, reverseProxyMode);
+
       SdkResponse resp = service0(path, request, httpRequest);
       if (resp instanceof ErrorResponse) {
         LOG.warn("returned ErrorResponse: {}", resp);
@@ -215,7 +220,7 @@ public class SdkResponder {
 
       X509Cert clientCert;
       try {
-        clientCert = TlsHelper.getTlsClientCert(httpRequest);
+        clientCert = TlsHelper.getTlsClientCert(httpRequest, reverseProxyMode);
       } catch (IOException ex) {
         LogUtil.error(LOG, ex, "error getTlsClientCert");
         return new ErrorResponse(null, UNAUTHORIZED, "error retrieving client certificate");
@@ -303,10 +308,8 @@ public class SdkResponder {
   } // method service
 
   private static byte[] requireNonNullRequest(byte[] reqBytes) throws DecodeException {
-    if (reqBytes == null) {
-      throw new DecodeException("request must no be null");
-    }
-    return reqBytes;
+    return Optional.ofNullable(reqBytes).orElseThrow(
+        () -> new DecodeException("request must no be null"));
   }
 
   private CertChainResponse buildCertChainResponse(X509Cert cert, List<X509Cert> certchain) {
@@ -467,10 +470,8 @@ public class SdkResponder {
       }
 
       if (crossCert) {
-        IdentifiedCertprofile idProfile = caManager.getIdentifiedCertprofile(profile);
-        if (idProfile == null) {
-          throw new OperationException(UNKNOWN_CERT_PROFILE, "unknown cert profile " + profile);
-        }
+        IdentifiedCertprofile idProfile = Optional.ofNullable(caManager.getIdentifiedCertprofile(profile))
+            .orElseThrow(() -> new OperationException(UNKNOWN_CERT_PROFILE, "unknown cert profile " + profile));
 
         if (Certprofile.CertLevel.CROSS != idProfile.getCertLevel()) {
           throw new OperationException(BAD_CERT_TEMPLATE, "cert profile " + profile + " is not for CROSS certificate");
@@ -491,29 +492,29 @@ public class SdkResponder {
         generateCertificates(requestor, ca, certTemplates, req, waitForConfirmUtil);
     if (rentries == null) {
       return new ErrorResponse(req.getTransactionId(), SYSTEM_FAILURE, null);
-    } else {
-      EnrollOrPollCertsResponse resp = new EnrollOrPollCertsResponse();
-      resp.setTransactionId(req.getTransactionId());
-
-      resp.setEntries(rentries);
-      if (explicitConform) {
-        resp.setConfirmWaitTime(waitForConfirmUtil);
-      }
-
-      CertsMode caCertMode = req.getCaCertMode();
-      if (caCertMode == CertsMode.CERT) {
-        resp.setExtraCerts(new byte[][] {ca.getCaCert().getEncoded()});
-      } else if (caCertMode == CertsMode.CHAIN) {
-        List<X509Cert> chain = ca.getCaInfo().getCertchain();
-        if (CollectionUtil.isEmpty(chain)) {
-          resp.setExtraCerts(new byte[][] {ca.getCaCert().getEncoded()});
-        } else {
-          resp.setExtraCerts(ca.getEncodedCaCertChain().toArray(new byte[0][0]));
-        }
-      }
-
-      return resp;
     }
+
+    EnrollOrPollCertsResponse resp = new EnrollOrPollCertsResponse();
+    resp.setTransactionId(req.getTransactionId());
+
+    resp.setEntries(rentries);
+    if (explicitConform) {
+      resp.setConfirmWaitTime(waitForConfirmUtil);
+    }
+
+    CertsMode caCertMode = req.getCaCertMode();
+    if (caCertMode == CertsMode.CERT) {
+      resp.setExtraCerts(new byte[][] {ca.getCaCert().getEncoded()});
+    } else if (caCertMode == CertsMode.CHAIN) {
+      List<X509Cert> chain = ca.getCaInfo().getCertchain();
+      if (CollectionUtil.isEmpty(chain)) {
+        resp.setExtraCerts(new byte[][] {ca.getCaCert().getEncoded()});
+      } else {
+        resp.setExtraCerts(ca.getEncodedCaCertChain().toArray(new byte[0][0]));
+      }
+    }
+
+    return resp;
   } // enroll
 
   private SdkResponse poll(X509Ca ca, PollCertRequest req, boolean caReqMatchChecked) throws OperationException {

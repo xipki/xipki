@@ -22,6 +22,7 @@ import java.security.cert.CertificateException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * This is just an example that demonstrates how to use the custom OcspStore.
@@ -125,10 +126,8 @@ public class DummyStore extends OcspStore {
    */
   @Override
   public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource) throws OcspStoreException {
-    Object objVal = sourceConf.get("caCert");
-    if (objVal == null) {
-      throw new IllegalArgumentException("mandatory caCert is not specified in sourceConf");
-    }
+    Object objVal = Optional.ofNullable(sourceConf.get("caCert")).orElseThrow(
+        () -> new IllegalArgumentException("mandatory caCert is not specified in sourceConf"));
 
     if (!(objVal instanceof String)) {
       throw new IllegalArgumentException(

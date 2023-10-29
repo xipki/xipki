@@ -22,6 +22,7 @@ import org.xipki.util.exception.BadCertTemplateException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Example Certprofile.
@@ -68,10 +69,8 @@ public class DemoCertprofile extends XijsonCertprofile {
       this.addExtraWithoutConf = true;
       return true;
     } else if (id_demo_with_conf.equals(extnId)) {
-      Object customObj = extn.getCustom();
-      if (customObj == null) {
-        throw new CertprofileException("ExtensionType.custom is not specified");
-      }
+      Object customObj = Optional.ofNullable(extn.getCustom()).orElseThrow(() ->
+        new CertprofileException("ExtensionType.custom is not specified"));
 
       // we need to first serialize the configuration
       byte[] serializedConf = JSON.toJSONBytes(customObj);

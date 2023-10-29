@@ -20,7 +20,10 @@ import org.bouncycastle.cms.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
-import org.xipki.ca.gateway.*;
+import org.xipki.ca.gateway.GatewayUtil;
+import org.xipki.ca.gateway.PopControl;
+import org.xipki.ca.gateway.Requestor;
+import org.xipki.ca.gateway.RequestorAuthenticator;
 import org.xipki.ca.gateway.conf.CaProfileConf;
 import org.xipki.ca.gateway.conf.CaProfilesControl;
 import org.xipki.ca.sdk.*;
@@ -47,6 +50,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.Optional;
 
 import static org.xipki.util.exception.ErrorCode.*;
 
@@ -116,11 +120,14 @@ public class ScepResponder {
 
   private final CaNameScepSigners signers;
 
+  static {
+    LOG.info("XiPKI SCEP-Gateway version {}", StringUtil.getVersion(ScepResponder.class));
+
+  }
+
   public ScepResponder(ScepControl control, SdkClient sdk, SecurityFactory securityFactory, CaNameScepSigners signers,
                        RequestorAuthenticator authenticator, PopControl popControl,
                        CaProfilesControl caProfiles) {
-    LOG.info("XiPKI SCEP-Gateway version {}", StringUtil.getVersion(getClass()));
-
     this.control = Args.notNull(control, "control");
     this.sdk = Args.notNull(sdk, "sdk");
     this.securityFactory = Args.notNull(securityFactory, "securityFactory");
@@ -338,15 +345,11 @@ public class ScepResponder {
 
   private byte[] getCaCertResp(String caName) throws OperationException, SdkErrorResponseException {
     try {
-      ScepSigner signer = signers.getSigner(caName);
-      if (signer == null) {
-        throw new OperationException(PATH_NOT_FOUND, "found na signer for CA " + caName);
-      }
+      ScepSigner signer = Optional.ofNullable(signers.getSigner(caName)).orElseThrow(
+          () -> new OperationException(PATH_NOT_FOUND, "found na signer for CA " + caName));
 
-      byte[] cacert = sdk.cacert(caName);
-      if (cacert == null) {
-        throw new OperationException(PATH_NOT_FOUND, "unknown CA " + caName);
-      }
+      byte[] cacert = Optional.ofNullable(sdk.cacert(caName)).orElseThrow(
+          () -> new OperationException(PATH_NOT_FOUND, "unknown CA " + caName));
 
       CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
       try {
@@ -666,10 +669,8 @@ public class ScepResponder {
     }
 
     EnrollOrPullCertResponseEntry entry = entries[0];
-    byte[] cert = entry.getCert();
-    if (cert == null) {
-      throw new OperationException(ErrorCode.ofCode(entry.getError().getCode()), "expected 1 cert, but received none");
-    }
+    byte[] cert = Optional.ofNullable(entry.getCert()).orElseThrow(() ->
+        new OperationException(ErrorCode.ofCode(entry.getError().getCode()), "expected 1 cert, but received none"));
 
     return buildSignedData(cert, sdkResp.getExtraCerts());
   }
@@ -722,8 +723,7 @@ public class ScepResponder {
   } // method getCrl
 
   private ContentInfo encodeResponse(
-      ScepSigner signer, PkiMessage response, DecodedPkiMessage request)
-      throws OperationException {
+      ScepSigner signer, PkiMessage response, DecodedPkiMessage request) throws OperationException {
     Args.notNull(response, "response");
     Args.notNull(request, "request");
 
@@ -749,8 +749,7 @@ public class ScepResponder {
     return ci;
   } // method encodeResponse
 
-  private static void checkUserPermission(
-      Requestor requestor, String caName, String certprofile)
+  private static void checkUserPermission(Requestor requestor, String caName, String certprofile)
       throws OperationException {
     int permission = PermissionConstants.ENROLL_CERT;
     if (!requestor.isPermitted(permission)) {

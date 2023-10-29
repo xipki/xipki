@@ -5,13 +5,11 @@ package org.xipki.ca.gateway.rest.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.Audits;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.ProtocolProxyConfWrapper;
 import org.xipki.ca.gateway.rest.RestProxyConf;
 import org.xipki.ca.gateway.rest.RestResponder;
 import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
 import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ServletException0;
@@ -51,11 +49,9 @@ public class RestHttpFilter implements XiHttpFilter {
       conf = new ProtocolProxyConfWrapper(conf0);
 
       RestResponder responder = new RestResponder(conf.getSdkClient(), conf.getSecurities().getSecurityFactory(),
-          conf.getAuthenticator(), conf.getPopControl(), conf.getCaProfiles());
+          conf.getAuthenticator(), conf.getPopControl(), conf.getCaProfiles(), conf.getReverseProxyMode());
 
-      servlet = new RestHttpServlet();
-      servlet.setLogReqResp(conf.isLogReqResp());
-      servlet.setResponder(responder);
+      servlet = new RestHttpServlet(conf.isLogReqResp(), responder);
 
       GatewayUtil.auditLogPciEvent(LOG, "REST-Gateway", true, "START");
     } catch (Exception e) {

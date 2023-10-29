@@ -440,17 +440,14 @@ public class CaActions {
         sb.append("inactive CAs:\n");
         printCaNames(sb, caManager.getInactiveCaNames(), prefix);
       } else {
-        CaEntry entry = caManager.getCa(name);
-        if (entry == null) {
-          throw new CmdFailure("could not find CA '" + name + "'");
-        } else {
-          if (CaStatus.ACTIVE == entry.getStatus()) {
-            boolean started = caManager.getSuccessfulCaNames().contains(entry.getIdent().getName());
-            sb.append("started:              ").append(started).append("\n");
-          }
-          Set<String> aliases = caManager.getAliasesForCa(name);
-          sb.append("aliases:              ").append(toString(aliases)).append("\n").append(entry.toString(verbose));
+        CaEntry entry = Optional.ofNullable(caManager.getCa(name)).orElseThrow(
+            () -> new CmdFailure("could not find CA '" + name + "'"));
+        if (CaStatus.ACTIVE == entry.getStatus()) {
+          boolean started = caManager.getSuccessfulCaNames().contains(entry.getIdent().getName());
+          sb.append("started:              ").append(started).append("\n");
         }
+        Set<String> aliases = caManager.getAliasesForCa(name);
+        sb.append("aliases:              ").append(toString(aliases)).append("\n").append(entry.toString(verbose));
       }
 
       println(sb.toString());
@@ -698,10 +695,8 @@ public class CaActions {
       if (signerConf != null) {
         String tmpSignerType = signerType;
         if (tmpSignerType == null) {
-          CaEntry caEntry = caManager.getCa(caName);
-          if (caEntry == null) {
-            throw new IllegalCmdParamException("please specify the signerType");
-          }
+          CaEntry caEntry = Optional.ofNullable(caManager.getCa(caName)).orElseThrow(
+              () -> new IllegalCmdParamException("please specify the signerType"));
           tmpSignerType = caEntry.getSignerType();
         }
 

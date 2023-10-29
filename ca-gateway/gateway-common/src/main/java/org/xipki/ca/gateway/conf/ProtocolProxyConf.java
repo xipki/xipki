@@ -6,6 +6,7 @@ package org.xipki.ca.gateway.conf;
 import org.xipki.audit.Audits;
 import org.xipki.ca.sdk.SdkClientConf;
 import org.xipki.security.Securities;
+import org.xipki.security.util.TlsHelper;
 import org.xipki.util.exception.InvalidConfException;
 
 /**
@@ -35,14 +36,14 @@ public abstract class ProtocolProxyConf {
    */
   protected CaNameSignersConf signers;
 
-  private final boolean ignoreAuthennticator;
+  private final boolean ignoreAuthenticator;
 
   protected ProtocolProxyConf() {
-    this.ignoreAuthennticator = false;
+    this.ignoreAuthenticator = false;
   }
 
-  protected ProtocolProxyConf(boolean ignoreAuthennticator) {
-    this.ignoreAuthennticator = ignoreAuthennticator;
+  protected ProtocolProxyConf(boolean ignoreAuthenticator) {
+    this.ignoreAuthenticator = ignoreAuthenticator;
   }
 
   public boolean isLogReqResp() {
@@ -111,7 +112,7 @@ public abstract class ProtocolProxyConf {
 
   public void validate() throws InvalidConfException {
     notNull(audit, "audit");
-    if (!ignoreAuthennticator) {
+    if (!ignoreAuthenticator) {
       notNull(authenticator, "authenticator");
     }
     notNull(pop, "pop");

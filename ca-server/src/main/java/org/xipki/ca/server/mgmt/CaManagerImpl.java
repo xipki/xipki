@@ -192,13 +192,20 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   private final KeypairGenManager keypairGenManager;
 
-  public CaManagerImpl(CmLicense license) {
-    LOG.info("XiPKI CA version {}", StringUtil.getVersion(getClass()));
+  private final String calockFilePath;
 
+  static {
+    LOG.info("XiPKI CA version {}", StringUtil.getVersion(
+        X509Ca.class)); // any class in the package org.xipki.ca.server
+  }
+
+  public CaManagerImpl(CmLicense license) {
     this.license = Args.notNull(license, "license");
     this.datasourceFactory = new DataSourceFactory();
+    this.calockFilePath = IoUtil.expandFilepath("calock", true);
     String calockId = null;
-    File calockFile = new File("calock");
+
+    File calockFile = new File(calockFilePath);
     if (calockFile.exists()) {
       try {
         calockId = StringUtil.toUtf8String(IoUtil.read(calockFile));
@@ -793,7 +800,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     publisherManager.close();
     certprofileManager.close();
 
-    File caLockFile = new File("calock");
+    File caLockFile = new File(calockFilePath);
     if (caLockFile.exists()) {
       if (!caLockFile.delete()) {
         LOG.warn("could not delete file " + caLockFile.getAbsolutePath());

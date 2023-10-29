@@ -46,13 +46,13 @@ public class OcspHttpFilter implements XiHttpFilter {
 
   private final OcspServerImpl server;
 
-  private final HealthCheckServlet healthServlet;
+  private final OcspHealthCheckServlet healthServlet;
 
   private final HttpOcspServlet ocspServlet;
 
   private final boolean remoteMgmtEnabled;
 
-  private HttpMgmtServlet mgmtServlet;
+  private OcspHttpMgmtServlet mgmtServlet;
 
   public OcspHttpFilter(String licenseFactoryClazz) throws ServletException0 {
     XipkiBaseDir.init();
@@ -95,12 +95,8 @@ public class OcspHttpFilter implements XiHttpFilter {
     }
 
     this.server = ocspServer;
-    healthServlet = new HealthCheckServlet();
-    healthServlet.setServer(this.server);
-
-    ocspServlet = new HttpOcspServlet();
-    ocspServlet.setServer(this.server);
-    ocspServlet.setLogReqResp(logReqResp);
+    healthServlet = new OcspHealthCheckServlet(this.server);
+    ocspServlet = new HttpOcspServlet(logReqResp, this.server);
 
     RemoteMgmt remoteMgmt = conf.getRemoteMgmt();
     this.remoteMgmtEnabled = remoteMgmt != null && remoteMgmt.isEnabled();
@@ -118,9 +114,7 @@ public class OcspHttpFilter implements XiHttpFilter {
         if (CollectionUtil.isEmpty(certs)) {
           LOG.error("could not find any valid client certificates, disable the remote management");
         } else {
-          mgmtServlet = new HttpMgmtServlet();
-          mgmtServlet.setMgmtCerts(CollectionUtil.listToSet(certs));
-          mgmtServlet.setOcspServer(server);
+          mgmtServlet = new OcspHttpMgmtServlet(CollectionUtil.listToSet(certs), server, conf.getReverseProxyMode());
         }
       }
     }

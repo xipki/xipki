@@ -54,9 +54,7 @@ public class ScepHttpFilter implements XiHttpFilter {
           conf.getSecurities().getSecurityFactory(), signers, conf.getAuthenticator(),
           conf.getPopControl(), conf.getCaProfiles());
 
-      servlet = new ScepHttpServlet();
-      servlet.setLogReqResp(conf.isLogReqResp());
-      servlet.setResponder(responder);
+      servlet = new ScepHttpServlet(conf.isLogReqResp(), responder);
 
       GatewayUtil.auditLogPciEvent(LOG, "SCEP-Gateway", true, "START");
     } catch (Exception e) {

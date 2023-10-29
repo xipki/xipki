@@ -255,8 +255,7 @@ public class AcmeProxyConf extends ProtocolProxyConf {
     }
   }
 
-  public static AcmeProxyConf readConfFromFile(String fileName)
-      throws IOException, InvalidConfException {
+  public static AcmeProxyConf readConfFromFile(String fileName) throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");
     AcmeProxyConf conf = JSON.parseObject(new File(fileName), AcmeProxyConf.class);
     conf.validate();

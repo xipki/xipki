@@ -130,7 +130,7 @@ public class ScepServer {
       nextCaAndRa = new NextCaAndRa(this.nextCaCert, this.nextRaCert);
     } // end if(withNextCA)
 
-    ScepResponder scepResponder = new ScepResponder(caCaps, ca, ra, nextCaAndRa, control);
+    SimulatorScepResponder scepResponder = new SimulatorScepResponder(caCaps, ca, ra, nextCaAndRa, control);
     if (maxSigningTimeBiasInMs != null) {
       scepResponder.setMaxSigningTimeBias(maxSigningTimeBiasInMs);
     }

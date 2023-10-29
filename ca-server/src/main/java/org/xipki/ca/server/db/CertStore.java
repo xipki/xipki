@@ -526,10 +526,8 @@ public class CertStore extends CertStoreBase {
       return null;
     }
 
-    CertRevocationInfo currentRevInfo = certWithRevInfo.getRevInfo();
-    if (currentRevInfo == null) {
-      throw new OperationException(CERT_UNREVOKED, "certificate is not revoked");
-    }
+    CertRevocationInfo currentRevInfo = Optional.ofNullable(certWithRevInfo.getRevInfo())
+        .orElseThrow(() -> new OperationException(CERT_UNREVOKED, "certificate is not revoked"));
 
     CrlReason currentReason = currentRevInfo.getReason();
     if (currentReason != CrlReason.CERTIFICATE_HOLD) {
@@ -563,10 +561,8 @@ public class CertStore extends CertStoreBase {
       return null;
     }
 
-    CertRevocationInfo currentRevInfo = certWithRevInfo.getRevInfo();
-    if (currentRevInfo == null) {
-      throw new OperationException(CERT_UNREVOKED, "certificate is not revoked");
-    }
+    CertRevocationInfo currentRevInfo = Optional.ofNullable(certWithRevInfo.getRevInfo())
+        .orElseThrow(() -> new OperationException(CERT_UNREVOKED, "certificate is not revoked"));
 
     CrlReason currentReason = currentRevInfo.getReason();
     if (!force) {

@@ -49,6 +49,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Actions to management certificates and CRLs.
@@ -105,10 +106,8 @@ public class CertActions {
 
     @Override
     protected Object execute0() throws Exception {
-      CaEntry ca = caManager.getCa(caName);
-      if (ca == null) {
-        throw new CmdFailure("CA " + caName + " not available");
-      }
+      CaEntry ca = Optional.ofNullable(caManager.getCa(caName)).orElseThrow(
+          () -> new CmdFailure("CA " + caName + " not available"));
 
       X509CRLHolder crl;
       try {
@@ -177,10 +176,8 @@ public class CertActions {
 
     @Override
     protected Object execute0() throws Exception {
-      CaEntry ca = caManager.getCa(caName);
-      if (ca == null) {
-        throw new CmdFailure("CA " + caName + " not available");
-      }
+      CaEntry ca = Optional.ofNullable(caManager.getCa(caName)).orElseThrow(
+          () -> new CmdFailure("CA " + caName + " not available"));
 
       if (StringUtil.isBlank(subject) == StringUtil.isBlank(csrFile)) {
         throw new IllegalCmdParamException(
@@ -276,10 +273,8 @@ public class CertActions {
 
     @Override
     protected Object execute0() throws Exception {
-      CaEntry ca = caManager.getCa(caName);
-      if (ca == null) {
-        throw new CmdFailure("CA " + caName + " not available");
-      }
+      CaEntry ca = Optional.ofNullable(caManager.getCa(caName)).orElseThrow(
+          () -> new CmdFailure("CA " + caName + " not available"));
 
       Instant notBefore = parseDate(notBeforeS);
       Instant notAfter = parseDate(notAfterS);
@@ -373,10 +368,8 @@ public class CertActions {
 
     @Override
     protected Object execute0() throws Exception {
-      CaEntry ca = caManager.getCa(caName);
-      if (ca == null) {
-        throw new CmdFailure("CA " + caName + " not available");
-      }
+      CaEntry ca = Optional.ofNullable(caManager.getCa(caName)).orElseThrow(
+          () -> new CmdFailure("CA " + caName + " not available"));
 
       X509CRLHolder crl;
       try {

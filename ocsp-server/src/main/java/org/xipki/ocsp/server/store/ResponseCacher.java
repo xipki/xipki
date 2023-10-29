@@ -17,7 +17,6 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
-import org.xipki.util.ConcurrentBag;
 import org.xipki.util.ConcurrentBag.BagEntry;
 
 import java.io.Closeable;

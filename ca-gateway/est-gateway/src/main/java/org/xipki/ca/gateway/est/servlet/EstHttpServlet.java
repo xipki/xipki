@@ -29,15 +29,12 @@ class EstHttpServlet {
 
   private static final Logger LOG = LoggerFactory.getLogger(EstHttpServlet.class);
 
-  private boolean logReqResp;
+  private final boolean logReqResp;
 
-  private EstResponder responder;
+  private final EstResponder responder;
 
-  public void setLogReqResp(boolean logReqResp) {
+  public EstHttpServlet(boolean logReqResp, EstResponder responder) {
     this.logReqResp = logReqResp;
-  }
-
-  public void setResponder(EstResponder responder) {
     this.responder = Args.notNull(responder, "responder");
   }
 

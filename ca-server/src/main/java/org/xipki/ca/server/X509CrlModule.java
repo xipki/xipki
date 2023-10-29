@@ -308,10 +308,8 @@ public class X509CrlModule extends X509CaModule implements Closeable {
   }
 
   public X509CRLHolder generateCrlOnDemand(RequestorInfo requestor) throws OperationException {
-    CrlControl control = caInfo.getCrlControl();
-    if (control == null) {
-      throw new OperationException(NOT_PERMITTED, "CA could not generate CRL");
-    }
+    CrlControl control = Optional.ofNullable(caInfo.getCrlControl()).orElseThrow(
+        () -> new OperationException(NOT_PERMITTED, "CA could not generate CRL"));
 
     if (crlGenInProcess.get()) {
       throw new OperationException(SYSTEM_UNAVAILABLE, "TRY_LATER");
@@ -369,18 +367,14 @@ public class X509CrlModule extends X509CaModule implements Closeable {
   private X509CRLHolder generateCrl0(boolean scheduled, boolean deltaCrl,
                                      Instant thisUpdate, Instant nextUpdate, AuditEvent event)
       throws OperationException {
-    CrlControl control = caInfo.getCrlControl();
-    if (control == null) {
-      throw new OperationException(NOT_PERMITTED, "CRL generation is not allowed");
-    }
+    CrlControl control = Optional.ofNullable(caInfo.getCrlControl()).orElseThrow(
+        () -> new OperationException(NOT_PERMITTED, "CRL generation is not allowed"));
 
     BigInteger baseCrlNumber = null;
     if (deltaCrl) {
-      baseCrlNumber = caInfo.getMaxFullCrlNumber();
-      if (baseCrlNumber == null) {
-        throw new OperationException(SYSTEM_FAILURE,
-            "Should not happen. No FullCRL is available while generating DeltaCRL");
-      }
+      baseCrlNumber = Optional.ofNullable(caInfo.getMaxFullCrlNumber()).orElseThrow(() ->
+          new OperationException(SYSTEM_FAILURE,
+              "Should not happen. No FullCRL is available while generating DeltaCRL"));
     }
 
     LOG.info("     START generateCrl: ca={}, deltaCRL={}, thisUpdate={}, nextUpdate={}, baseCRLNumber={}",
@@ -653,11 +647,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     }
 
     String crlSignerName = caInfo.getCrlSignerName();
-    if (crlSignerName == null) {
-      return null;
-    }
-
-    return caManager.getSignerWrapper(crlSignerName);
+    return (crlSignerName == null) ? null : caManager.getSignerWrapper(crlSignerName);
   }
 
   boolean healthy() {

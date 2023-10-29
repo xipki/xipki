@@ -10,10 +10,7 @@ import org.xipki.util.Args;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Database Schema Information. It contains the content of the table DBSCHEMA.
@@ -35,10 +32,8 @@ public class DbSchemaInfo {
     ResultSet rs = null;
 
     try {
-      stmt = datasource.prepareStatement(sql);
-      if (stmt == null) {
-        throw new DataAccessException("could not create statement");
-      }
+      stmt = Optional.ofNullable(datasource.prepareStatement(sql))
+          .orElseThrow(() -> new DataAccessException("could not create statement"));
 
       rs = stmt.executeQuery();
       while (rs.next()) {

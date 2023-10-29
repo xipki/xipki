@@ -3,13 +3,13 @@
 
 package org.xipki.ca.sdk;
 
+import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
 import org.xipki.util.exception.ErrorCode;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 /**
@@ -71,7 +71,7 @@ public class ErrorResponse extends SdkResponse {
   }
 
   public static ErrorResponse decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new CborDecoder(new ByteArrayInputStream(encoded))){
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
       if (decoder.readNullOrArrayLength(3)) {
         throw new DecodeException("ErrorResponse could not be null.");
       }

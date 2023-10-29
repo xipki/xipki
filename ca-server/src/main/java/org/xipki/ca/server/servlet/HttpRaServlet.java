@@ -32,15 +32,12 @@ class HttpRaServlet {
 
   private static final Logger LOG = LoggerFactory.getLogger(HttpRaServlet.class);
 
-  private boolean logReqResp;
+  private final boolean logReqResp;
 
-  private SdkResponder responder;
+  private final SdkResponder responder;
 
-  public void setLogReqResp(boolean logReqResp) {
+  public HttpRaServlet(boolean logReqResp, SdkResponder responder) {
     this.logReqResp = logReqResp;
-  }
-
-  public void setResponder(SdkResponder responder) {
     this.responder = Args.notNull(responder, "responder");
   }
 

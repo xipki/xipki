@@ -16,6 +16,8 @@ import org.xipki.shell.Completers;
 import org.xipki.shell.XiAction;
 import org.xipki.util.ReqRespDebug;
 
+import java.util.Optional;
+
 /**
  * CMP client actions related to CRL.
  *
@@ -42,13 +44,9 @@ public class CrlActions {
     protected Object execute0() throws Exception {
       X509CRLHolder crl;
       try {
-        crl = retrieveCrl();
+        crl = Optional.ofNullable(retrieveCrl()).orElseThrow(() -> new CmdFailure("received no CRL from server"));
       } catch (PkiErrorException ex) {
         throw new CmdFailure("received no CRL from server: " + ex.getMessage());
-      }
-
-      if (crl == null) {
-        throw new CmdFailure("received no CRL from server");
       }
 
       saveVerbose("saved CRL to file", outFile, XiAction.encodeCrl(crl.getEncoded(), outform));
@@ -73,13 +71,9 @@ public class CrlActions {
     protected Object execute0() throws Exception {
       X509CRLHolder crl;
       try {
-        crl = retrieveCrl();
+        crl = Optional.ofNullable(retrieveCrl()).orElseThrow(() -> new CmdFailure("received no CRL from server"));
       } catch (PkiErrorException ex) {
         throw new CmdFailure("received no CRL from server: " + ex.getMessage());
-      }
-
-      if (crl == null) {
-        throw new CmdFailure("received no CRL from server");
       }
 
       saveVerbose("saved CRL to file", outFile, encodeCrl(crl.getEncoded(), outform));

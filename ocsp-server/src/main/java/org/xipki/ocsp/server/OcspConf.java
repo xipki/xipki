@@ -5,6 +5,7 @@ package org.xipki.ocsp.server;
 
 import org.xipki.security.Securities.SecurityConf;
 import org.xipki.security.util.JSON;
+import org.xipki.security.util.TlsHelper;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ValidatableConf;
@@ -53,6 +54,8 @@ public class OcspConf extends ValidatableConf {
 
   private boolean logReqResp;
 
+  private String reverseProxyMode;
+
   private String serverConf;
 
   private RemoteMgmt remoteMgmt;
@@ -72,6 +75,14 @@ public class OcspConf extends ValidatableConf {
 
   public void setLogReqResp(boolean logReqResp) {
     this.logReqResp = logReqResp;
+  }
+
+  public String getReverseProxyMode() {
+    return reverseProxyMode;
+  }
+
+  public void setReverseProxyMode(String reverseProxyMode) {
+    this.reverseProxyMode = reverseProxyMode;
   }
 
   public String getServerConf() {
@@ -101,6 +112,7 @@ public class OcspConf extends ValidatableConf {
   @Override
   public void validate() throws InvalidConfException {
     validate(remoteMgmt, security);
+    TlsHelper.checkReverseProxyMode(reverseProxyMode);
   }
 
 }

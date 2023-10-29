@@ -164,16 +164,10 @@ public class EnrollCertActions {
         throw new CmdFailure(certOrError.getError().toString());
       }
 
-      X509Cert cert = certOrError.getCertificate();
-      PrivateKeyInfo privateKeyInfo = certOrError.getPrivateKeyInfo();
-
-      if (cert == null) {
-        throw new CmdFailure("no certificate received from the server");
-      }
-
-      if (privateKeyInfo == null) {
-        throw new CmdFailure("no private key received from the server");
-      }
+      X509Cert cert = Optional.ofNullable(certOrError.getCertificate()).orElseThrow(
+          () -> new CmdFailure("no certificate received from the server"));
+      PrivateKeyInfo privateKeyInfo = Optional.ofNullable(certOrError.getPrivateKeyInfo()).orElseThrow(
+          () -> new CmdFailure("no private key received from the server"));
 
       if (StringUtil.isNotBlank(certOutputFile)) {
         saveVerbose("saved certificate to file", certOutputFile, encodeCert(cert.getEncoded(), certOutform));

@@ -39,15 +39,12 @@ class HttpOcspServlet {
 
   private static final String CT_RESPONSE = "application/ocsp-response";
 
-  private boolean logReqResp;
+  private final boolean logReqResp;
 
-  private OcspServer server;
+  private final OcspServer server;
 
-  public void setLogReqResp(boolean logReqResp) {
+  public HttpOcspServlet(boolean logReqResp, OcspServer server) {
     this.logReqResp = logReqResp;
-  }
-
-  public void setServer(OcspServer server) {
     this.server = Args.notNull(server, "server");
   }
 
