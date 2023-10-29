@@ -303,6 +303,8 @@
                    dest="${project.build.directory}"/>
                 <unzip src="../xipki-gateway/target/xipki-gateway-${project.version}.zip"
                        dest="${project.build.directory}"/>
+                <unzip src="../xipki-hsmproxy/target/xipki-hsmproxy-${project.version}.zip"
+                       dest="${project.build.directory}"/>
 
                 <!-- Fix bug introduced from karaf 4.3.8 and 4.4.2: remove this block if no exception
                      presented in the log file-->

@@ -8,11 +8,13 @@ else
     echo "TOMCAT 8/9"
 fi
 
-TOMCAT_CA_DIR=~/tools/xipki/tomcat-ca
+TOMCAT_CA_DIR=~/tools/xipki/ca-tomcat
 
-TOMCAT_OCSP_DIR=~/tools/xipki/tomcat-ocsp
+TOMCAT_OCSP_DIR=~/tools/xipki/ocsp-tomcat
 
-TOMCAT_GATEWAY_DIR=~/tools/xipki/tomcat-gateway
+TOMCAT_GATEWAY_DIR=~/tools/xipki/gateway-tomcat
+
+TOMCAT_HSMPROXY_DIR=~/tools/xipki/hsmproxy-tomcat
 
 DIR=`dirname $0`
 echo "working dir: ${DIR}"
@@ -125,3 +127,28 @@ rm ${TOMCAT_DIR}/webapps/acme.war
 cp -r ${DIR}/tomcat/gateway/* ${TOMCAT_DIR}/
 cp ${DIR}/etc/*-gateway.json ${XIPKI_DIR}/etc
 cp ${DIR}/../qa/keys/dhpop.p12 ${XIPKI_DIR}/keycerts
+
+## HSM Proxy
+
+TOMCAT_DIR=${TOMCAT_HSMPROXY_DIR}
+echo "tomcat dir: ${TOMCAT_DIR}"
+
+XIPKI_DIR=${TOMCAT_DIR}/xipki
+
+rm -rf ${TOMCAT_DIR}/webapps ${TOMCAT_DIR}/logs/* ${TOMCAT_DIR}/xipki
+mkdir ${TOMCAT_DIR}/webapps
+
+rm -rf ${TOMCAT_DIR}/lib/bc*.jar \
+    ${TOMCAT_DIR}/lib/*pkcs11wrapper-*.jar \
+    ${TOMCAT_DIR}/lib/password-*.jar \
+    ${TOMCAT_DIR}/lib/xipki-tomcat-password-*.jar
+
+cp -r xipki-hsmproxy/bin xipki-hsmproxy/lib xipki-hsmproxy/xipki ${TOMCAT_DIR}/
+
+if [ -f "$T10FILE" ]; then
+    cp -r xipki-hsmproxy/webapps-tomcat10on/* ${TOMCAT_DIR}/webapps
+else
+    cp -r xipki-hsmproxy/webapps/* ${TOMCAT_DIR}/webapps
+fi
+
+cp -r ${DIR}/tomcat/hsmproxy/* ${TOMCAT_DIR}/

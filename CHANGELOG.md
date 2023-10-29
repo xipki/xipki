@@ -2,10 +2,22 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-##s 6.4.1
+## 6.4.1
 - Release date: 2023/mm/dd
+- CA
+  - Change the location of file 'calock'.
+  - Add configuration of reverseProxyMode.
+- OCSP
+  - Add configuration of reverseProxyMode.
+- Gateway
+    - Add configuration of reverseProxyMode.
+- HSM Proxy
+  - New component introduced in this version.
+- Dependencies
+  - ipkics11wrapper: 1.0.7 -> 1.0.8
+  - xipki commons: 6.3.1 -> 6.3.2
 
-##s 6.4.0
+## 6.4.0
 - Release date: 2023/10/15
 - CA
   - Feature: encode the requests and responses between gateway and ca-server in CBOR format (was JSON).

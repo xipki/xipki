@@ -29,6 +29,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.1</version>
         <executions>
           <execution>
             <id>filter</id>
@@ -41,6 +42,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.1.0</version>
         <executions>
           <execution>
             <phase>prepare-package</phase>
@@ -64,6 +66,11 @@
                 <move file="${project.build.directory}/t/xipki-gateway-${project.version}"
                       tofile="${project.build.directory}/t/xipki-gateway"/>
 
+                <unzip src="../xipki-hsmproxy/target/xipki-hsmproxy-${project.version}.zip"
+                       dest="${project.build.directory}/t"/>
+                <move file="${project.build.directory}/t/xipki-hsmproxy-${project.version}"
+                      tofile="${project.build.directory}/t/xipki-hsmproxy"/>
+
                 <untar src="../xipki-cli/target/xipki-cli-${project.version}.tar.gz"
                        dest="${project.build.directory}/t" compression="gzip"/>
                 <move file="${project.build.directory}/t/xipki-cli-${project.version}"
@@ -79,6 +86,7 @@
                   <arg value="${project.build.directory}/t"/>
                   <arg value="${project.build.directory}/t2"/>
                 </java>
+                <delete dir="${project.build.directory}/t" />
               </target>
             </configuration>
             <goals>
@@ -90,6 +98,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.6.0</version>
         <executions>
           <execution>
             <id>jdk11on</id>
@@ -103,6 +112,7 @@
               </descriptors>
               <appendAssemblyId>false</appendAssemblyId>
               <tarLongFileMode>posix</tarLongFileMode>
+              <recompressZippedFiles>true</recompressZippedFiles>
               <!-- Don't install/publish the result -->
               <attach>false</attach>
             </configuration>

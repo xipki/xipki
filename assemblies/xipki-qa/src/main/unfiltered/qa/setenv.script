@@ -1,5 +1,5 @@
-CA_XIPKI_DIR=~/tools/xipki/tomcat-ca/xipki
-OCSP_XIPKI_DIR=~/tools/xipki/tomcat-ocsp/xipki
-GATEWAY_TOMCAT_DIR=~/tools/xipki/tomcat-gateway
+CA_XIPKI_DIR=~/tools/xipki/ca-tomcat/xipki
+OCSP_XIPKI_DIR=~/tools/xipki/ocsp-tomcat/xipki
+GATEWAY_TOMCAT_DIR=~/tools/xipki/gateway-tomcat
 GATEWAY_XIPKI_DIR=${GATEWAY_TOMCAT_DIR}/xipki
 

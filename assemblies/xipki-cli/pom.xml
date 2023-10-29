@@ -100,7 +100,7 @@
                   <type>zip</type>
                 </artifactItem>
               </artifactItems>
-              <includes>server/tls-server-cert.der,server/tls-server.p12,client/*,client2/*,client3/*</includes>
+              <includes>ca/tls-ca-cert*, server/tls-server-cert.der,server/tls-server.p12,client/*,client2/*,client3/*</includes>
             </configuration>
           </execution>
           <!-- Patch Karaf -->

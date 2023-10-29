@@ -87,6 +87,11 @@ they MUST be replaced.**
 1. Unpack tomcat to a new folder.
 2. Install protocol gateway as described in the `xipki-install/xipki-gateway/README.md` file.
 
+## Install HSM Proxy Server
+
+1. Unpack tomcat to a new folder
+2. Install CA as described in the `xipki-install/xipki-hsmproxy/README.md` file.
+
 ## Install Management Command Line Interface
    void
 
@@ -98,19 +103,27 @@ they MUST be replaced.**
    This step is only required if the real PKCS#11 device instead of the emulator
    is used. **Note that this step should be applied to all components (tomcat, xipki-mgmt-cli, and xipki-cli)**.
 
-  * Copy `xipki/security/example/pkcs11-hsm.json` to `xipki/security/pkcs11.json`, and adapt the PKCS#11 configuration.
+  * Copy the corresponding configuration file in the folder `xipki/security/example/` to `xipki/security/pkcs11.json`,
+    and adapt the PKCS#11 configuration.
+    - For HSM device: `pkcs11-hsm.json`
+    - For HSM proxy client: `pkcs11-hsmproxy.json`
+    - For HSM emulaor: `pkcs11-emulator.json`
 
 ## Configure how to handle SSL client certificate behind reverse proxy
 
 ### For reverse proxy apache httpd
 
-  * Add the java property org.xipki.reverseproxy.mode
-    ```sh
-    -Dorg.xipki.reverseproxy.mode=APACHE
-    ```
+* Set the `reverseProxyMode` field in the json configuration file to `NGINX`:
+  - CA: `xipki/etc/ca/ca.json`
+  - OCSP: `xipki/etc/ocsp/ocsp.json`
+  - HSM Proxy: `xipki/etc/hsmproxy.json`
+  - CA Gateway
+    - CMP: `xipki/gatway/cmp-gateway.json`
+    - EST: `xipki/gatway/est-gateway.json`
+    - REST: `xipki/gatway/restd-gateway.json`
 
-  * configure the proxy to forward the headers via mod_proxy with the following
-    configuration
+* configure the proxy to forward the headers via mod_proxy with the following
+  configuration
 
    ```sh
    # Require SSL Client verification
@@ -134,10 +147,7 @@ they MUST be replaced.**
 
 ### For reverse proxy apache nginx
 
-* Add the java property org.xipki.reverseproxy.mode
-  ```sh
-  -Dorg.xipki.reverseproxy.mode=NGINX
-  ```
+* Set the `reverseProxyMode` in the json configuration file (e.g. `ca.json`) to `NGINX`.
 
 * configure the proxy to forward the headers with the following
   configuration
@@ -163,9 +173,9 @@ they MUST be replaced.**
    ...
   ```
 
-For more details please refer to
-* [NGINX Reverse Proxy](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/)
-* [Module ngx_http_ssl_module](http://nginx.org/en/docs/http/ngx_http_ssl_module.html)
+  For more details please refer to
+  * [NGINX Reverse Proxy](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/)
+  * [Module ngx_http_ssl_module](http://nginx.org/en/docs/http/ngx_http_ssl_module.html)
 
 ## Setup CA Server
 
