@@ -2,6 +2,8 @@
 	// To activate the logging of requests and responses, set writer.level to DEBUG
 	// in the file META-INF/classes/log4j2.properties.
 	"logReqResp":true,
+	// valid values are NO, APACHE, NGINX, GENERAL
+	//"reverseProxyMode":"GENERAL",
 	// WARNING: Replace the dummy authenticator with your own.
 	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
 	// When "caProfiles" is configured, short URL is possible
