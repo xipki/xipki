@@ -3,6 +3,7 @@
 
 package org.xipki.ca.sdk;
 
+import org.xipki.util.Args;
 import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
@@ -29,7 +30,7 @@ public class ErrorResponse extends SdkResponse {
 
   public ErrorResponse(String transactionId, ErrorCode code, String message) {
     this.transactionId = transactionId;
-    this.code = code;
+    this.code = Args.notNull(code, "code");
     this.message = message;
   }
 
@@ -63,7 +64,7 @@ public class ErrorResponse extends SdkResponse {
     try {
       encoder.writeArrayStart(3);
       encoder.writeTextString(transactionId);
-      encoder.writeEnumObj(code);
+      encoder.writeInt(code.getCode());
       encoder.writeTextString(message);
     } catch (IOException | RuntimeException ex) {
       throw new EncodeException("error encoding " + getClass().getName(), ex);
@@ -71,17 +72,17 @@ public class ErrorResponse extends SdkResponse {
   }
 
   public static ErrorResponse decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(3)) {
-        throw new DecodeException("ErrorResponse could not be null.");
-      }
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("ErrorResponse", decoder, 3);
 
       String tid = decoder.readTextString();
-      String str = decoder.readTextString();
-      ErrorCode errorCode = str == null ? null : ErrorCode.valueOf(str);
+      int code = decoder.readInt();
+      ErrorCode errorCode = ErrorCode.ofCode(code);
+      if (errorCode == null) {
+        throw new DecodeException("unknown ErrorCode '" + code + "'");
+      }
 
-      return new ErrorResponse(
-          tid, errorCode,
+      return new ErrorResponse(tid, errorCode,
           decoder.readTextString());
     } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + ErrorResponse.class.getName(), ex);

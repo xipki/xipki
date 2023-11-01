@@ -55,7 +55,7 @@ public class RevokeCertRequestEntry implements CborEncodable {
   public void encode(CborEncoder encoder) throws EncodeException {
     try {
       encoder.writeArrayStart(3);
-      encoder.writeByteString(serialNumber);
+      encoder.writeBigInt(serialNumber);
       encoder.writeEnumObj(reason);
       encoder.writeIntObj(invalidityTime);
     } catch (IOException | RuntimeException ex) {

@@ -48,11 +48,8 @@ public class CaNameResponse extends SdkResponse {
   }
 
   public static CaNameResponse decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(2)) {
-        throw new DecodeException("CaNameResponse could not be null.");
-      }
-
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("CaNameResponse", decoder, 2);
       return new CaNameResponse(
           decoder.readTextString(),
           decoder.readTextStrings());

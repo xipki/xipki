@@ -58,7 +58,7 @@ public class GetCRLRequest extends SdkRequest {
   public void encode(CborEncoder encoder) throws EncodeException {
     try {
       encoder.writeArrayStart(3);
-      encoder.writeByteString(crlNumber);
+      encoder.writeBigInt(crlNumber);
       encoder.writeIntObj(thisUpdate);
       encoder.writeTextString(crlDp);
     } catch (IOException | RuntimeException ex) {
@@ -67,11 +67,8 @@ public class GetCRLRequest extends SdkRequest {
   }
 
   public static GetCRLRequest decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(3)) {
-        throw new DecodeException("GetCRLRequest could not be null.");
-      }
-
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("GetCRLRequest", decoder, 3);
       return new GetCRLRequest(
           decoder.readBigInt(),
           decoder.readLongObj(),

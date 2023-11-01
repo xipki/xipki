@@ -169,7 +169,7 @@ public class EnrollCertRequestEntry implements CborEncodable {
   public void encode(CborEncoder encoder) throws EncodeException {
     try {
       encoder.writeArrayStart(10);
-      encoder.writeByteString(certReqId);
+      encoder.writeBigInt(certReqId);
       encoder.writeTextString(certprofile);
       encoder.writeByteString(p10req);
       encoder.writeObject(subject);

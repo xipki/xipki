@@ -5,6 +5,7 @@ package org.xipki.ca.sdk;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
@@ -23,34 +24,28 @@ public class CaIdentifierRequest extends SdkRequest{
   /**
    * SHA-1 fingerprint of the DER-encoded issuer's certificate
    */
-  private byte[] issuerCertSha1Fp;
+  private final byte[] issuerCertSha1Fp;
 
-  private X500NameType issuer;
+  private final X500NameType issuer;
 
-  private byte[] authorityKeyIdentifier;
+  private final byte[] authorityKeyIdentifier;
+
+  protected CaIdentifierRequest(byte[] issuerCertSha1Fp, X500NameType issuer, byte[] authorityKeyIdentifier) {
+    this.issuerCertSha1Fp = issuerCertSha1Fp;
+    this.issuer = Args.notNull(issuer, "issuer");
+    this.authorityKeyIdentifier = authorityKeyIdentifier;
+  }
 
   public byte[] getIssuerCertSha1Fp() {
     return issuerCertSha1Fp;
-  }
-
-  public void setIssuerCertSha1Fp(byte[] issuerCertSha1Fp) {
-    this.issuerCertSha1Fp = issuerCertSha1Fp;
   }
 
   public X500NameType getIssuer() {
     return issuer;
   }
 
-  public void setIssuer(X500NameType issuer) {
-    this.issuer = issuer;
-  }
-
   public byte[] getAuthorityKeyIdentifier() {
     return authorityKeyIdentifier;
-  }
-
-  public void setAuthorityKeyIdentifier(byte[] authorityKeyIdentifier) {
-    this.authorityKeyIdentifier = authorityKeyIdentifier;
   }
 
   public String idText() {
@@ -97,16 +92,12 @@ public class CaIdentifierRequest extends SdkRequest{
   }
 
   public static CaIdentifierRequest decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(3)) {
-        throw new DecodeException("CaIdentifierRequest could not be null.");
-      }
-
-      CaIdentifierRequest ret = new CaIdentifierRequest();
-      ret.setIssuerCertSha1Fp(decoder.readByteString());
-      ret.setIssuer(X500NameType.decode(decoder));
-      ret.setAuthorityKeyIdentifier(decoder.readByteString());
-      return ret;
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("CaIdentifierRequest", decoder, 3);
+      return new CaIdentifierRequest(
+          decoder.readByteString(),
+          X500NameType.decode(decoder),
+          decoder.readByteString());
     } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + CaIdentifierRequest.class.getName(), ex);
     }

@@ -20,9 +20,11 @@ import java.math.BigInteger;
 
 public class UnsuspendOrRemoveRequest extends CaIdentifierRequest {
 
-  private BigInteger[] entries;
+  private final BigInteger[] entries;
 
-  public void setEntries(BigInteger[] entries) {
+  public UnsuspendOrRemoveRequest(byte[] issuerCertSha1Fp, X500NameType issuer,
+                                  byte[] authorityKeyIdentifier, BigInteger[] entries) {
+    super(issuerCertSha1Fp, issuer, authorityKeyIdentifier);
     this.entries = entries;
   }
 
@@ -34,31 +36,20 @@ public class UnsuspendOrRemoveRequest extends CaIdentifierRequest {
   public void encode(CborEncoder encoder) throws EncodeException {
     super.encode(encoder, 1);
     try {
-      if (entries == null) {
-        encoder.writeNull();
-      } else {
-        encoder.writeArrayStart(entries.length);
-        for (BigInteger v : entries) {
-          encoder.writeByteString(v);
-        }
-      }
+      encoder.writeBigInts(entries);
     } catch (IOException | RuntimeException ex) {
       throw new EncodeException("error decoding " + getClass().getName(), ex);
     }
   }
 
   public static UnsuspendOrRemoveRequest decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(4)) {
-        throw new DecodeException("UnsuspendOrRemoveRequest could not be null.");
-      }
-
-      UnsuspendOrRemoveRequest ret = new UnsuspendOrRemoveRequest();
-      ret.setIssuerCertSha1Fp(decoder.readByteString());
-      ret.setIssuer(X500NameType.decode(decoder));
-      ret.setAuthorityKeyIdentifier(decoder.readByteString());
-      ret.setEntries(decoder.readBigInts());
-      return ret;
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("UnsuspendOrRemoveRequest", decoder, 3 + 1); // 3 fields defined in the pararent class.
+      return new UnsuspendOrRemoveRequest(
+          decoder.readByteString(),
+          X500NameType.decode(decoder),
+          decoder.readByteString(),
+          decoder.readBigInts());
     } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + UnsuspendOrRemoveRequest.class.getName(), ex);
     }

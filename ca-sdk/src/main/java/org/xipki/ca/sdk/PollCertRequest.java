@@ -19,15 +19,14 @@ import java.io.IOException;
 
 public class PollCertRequest extends CaIdentifierRequest {
 
-  private String transactionId;
+  private final String transactionId;
 
-  private PollCertRequestEntry[] entries;
+  private final PollCertRequestEntry[] entries;
 
-  public void setTransactionId(String transactionId) {
+  public PollCertRequest(byte[] issuerCertSha1Fp, X500NameType issuer, byte[] authorityKeyIdentifier,
+                         String transactionId, PollCertRequestEntry[] entries) {
+    super(issuerCertSha1Fp, issuer, authorityKeyIdentifier);
     this.transactionId = transactionId;
-  }
-
-  public void setEntries(PollCertRequestEntry[] entries) {
     this.entries = entries;
   }
 
@@ -51,18 +50,14 @@ public class PollCertRequest extends CaIdentifierRequest {
   }
 
   public static PollCertRequest decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(5)) {
-        throw new DecodeException("PollCertRequest could not be null.");
-      }
-
-      PollCertRequest ret = new PollCertRequest();
-      ret.setIssuerCertSha1Fp(decoder.readByteString());
-      ret.setIssuer(X500NameType.decode(decoder));
-      ret.setAuthorityKeyIdentifier(decoder.readByteString());
-      ret.setTransactionId(decoder.readTextString());
-      ret.setEntries(PollCertRequestEntry.decodeArray(decoder));
-      return ret;
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("PollCertRequest", decoder, 5);
+      return new PollCertRequest(
+          decoder.readByteString(),
+          X500NameType.decode(decoder),
+          decoder.readByteString(),
+          decoder.readTextString(),
+          PollCertRequestEntry.decodeArray(decoder));
     } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + PollCertRequest.class.getName(), ex);
     }

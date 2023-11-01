@@ -118,11 +118,9 @@ public class SdkClient {
     return resp.getCertificates();
   }
 
-  public byte[] cacertBySubject(byte[] subject)
-      throws IOException, SdkErrorResponseException {
+  public byte[] cacertBySubject(byte[] subject) throws IOException, SdkErrorResponseException {
     X500NameType issuer = new X500NameType(subject);
-    CaIdentifierRequest req = new CaIdentifierRequest();
-    req.setIssuer(issuer);
+    CaIdentifierRequest req = new CaIdentifierRequest(null, issuer, null);
 
     byte[] respBytes = send(null, CMD_cacert2, req);
     CertChainResponse resp;
@@ -135,11 +133,9 @@ public class SdkClient {
     return certs == null || certs.length == 0 ? null : certs[0];
   }
 
-  public byte[][] cacertsBySubject(byte[] subject)
-      throws IOException, SdkErrorResponseException {
+  public byte[][] cacertsBySubject(byte[] subject) throws IOException, SdkErrorResponseException {
     X500NameType issuer = new X500NameType(subject);
-    CaIdentifierRequest req = new CaIdentifierRequest();
-    req.setIssuer(issuer);
+    CaIdentifierRequest req = new CaIdentifierRequest(null, issuer, null);
     byte[] respBytes = send(null, CMD_cacerts2, req);
     CertChainResponse resp;
     try {
@@ -150,11 +146,9 @@ public class SdkClient {
     return resp.getCertificates();
   }
 
-  public CaNameResponse caNameBySubject(byte[] subject)
-      throws IOException, SdkErrorResponseException {
+  public CaNameResponse caNameBySubject(byte[] subject) throws IOException, SdkErrorResponseException {
     X500NameType issuer = new X500NameType(subject);
-    CaIdentifierRequest req = new CaIdentifierRequest();
-    req.setIssuer(issuer);
+    CaIdentifierRequest req = new CaIdentifierRequest(null, issuer, null);
     byte[] respBytes = send(null, CMD_caname, req);
     try {
       return CaNameResponse.decode(respBytes);
@@ -174,8 +168,7 @@ public class SdkClient {
     }
   }
 
-  public byte[] generateCrl(String ca, String crldp)
-      throws IOException, SdkErrorResponseException {
+  public byte[] generateCrl(String ca, String crldp) throws IOException, SdkErrorResponseException {
     GenCRLRequest req = new GenCRLRequest(crldp);
     byte[] respBytes = send(ca, CMD_gen_crl, req);
     CrlResponse resp;
@@ -320,19 +313,16 @@ public class SdkClient {
     return resp;
   }
 
-  public void confirmCerts(String ca, ConfirmCertsRequest req)
-      throws IOException, SdkErrorResponseException {
+  public void confirmCerts(String ca, ConfirmCertsRequest req) throws IOException, SdkErrorResponseException {
     send(ca, CMD_confirm_enroll, req);
   }
 
-  public void revokePendingCerts(String ca, String tid)
-      throws IOException, SdkErrorResponseException {
+  public void revokePendingCerts(String ca, String tid) throws IOException, SdkErrorResponseException {
     TransactionIdRequest req = new TransactionIdRequest(tid);
     send(ca, CMD_revoke_pending_cert, req);
   }
 
-  public EnrollOrPollCertsResponse pollCerts(PollCertRequest req)
-      throws IOException, SdkErrorResponseException {
+  public EnrollOrPollCertsResponse pollCerts(PollCertRequest req) throws IOException, SdkErrorResponseException {
     byte[] respBytes = send(null, CMD_poll_cert, req);
     try {
       return EnrollOrPollCertsResponse.decode(respBytes);
@@ -341,8 +331,7 @@ public class SdkClient {
     }
   }
 
-  public RevokeCertsResponse revokeCerts(RevokeCertsRequest req)
-      throws IOException, SdkErrorResponseException {
+  public RevokeCertsResponse revokeCerts(RevokeCertsRequest req) throws IOException, SdkErrorResponseException {
     byte[] respBytes = send(null, CMD_revoke_cert, req);
     try {
       return RevokeCertsResponse.decode(respBytes);

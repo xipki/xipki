@@ -19,9 +19,11 @@ import java.io.IOException;
 
 public class RevokeCertsRequest extends CaIdentifierRequest {
 
-  private RevokeCertRequestEntry[] entries;
+  private final RevokeCertRequestEntry[] entries;
 
-  public void setEntries(RevokeCertRequestEntry[] entries) {
+  public RevokeCertsRequest(byte[] issuerCertSha1Fp, X500NameType issuer,
+                            byte[] authorityKeyIdentifier, RevokeCertRequestEntry[] entries) {
+    super(issuerCertSha1Fp, issuer, authorityKeyIdentifier);
     this.entries = entries;
   }
 
@@ -39,17 +41,13 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
   }
 
   public static RevokeCertsRequest decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(4)) {
-        throw new DecodeException("RevokeCertsRequest could not be null.");
-      }
-
-      RevokeCertsRequest ret = new RevokeCertsRequest();
-      ret.setIssuerCertSha1Fp(decoder.readByteString());
-      ret.setIssuer(X500NameType.decode(decoder));
-      ret.setAuthorityKeyIdentifier(decoder.readByteString());
-      ret.setEntries(RevokeCertRequestEntry.decodeArray(decoder));
-      return ret;
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("RevokeCertsRequest", decoder, 4);
+      return new RevokeCertsRequest(
+          decoder.readByteString(),
+          X500NameType.decode(decoder),
+          decoder.readByteString(),
+          RevokeCertRequestEntry.decodeArray(decoder));
     } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + RevokeCertsRequest.class.getName(), ex);
     }

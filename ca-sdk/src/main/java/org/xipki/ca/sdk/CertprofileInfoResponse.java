@@ -56,11 +56,8 @@ public class CertprofileInfoResponse extends SdkResponse {
   }
 
   public static CertprofileInfoResponse decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(3)) {
-        throw new DecodeException("CertprofileInfoResponse could not be null.");
-      }
-
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("CertprofileInfoResponse", decoder, 3);
       return new CertprofileInfoResponse(
           decoder.readTextStrings(),
           decoder.readTextStrings(),

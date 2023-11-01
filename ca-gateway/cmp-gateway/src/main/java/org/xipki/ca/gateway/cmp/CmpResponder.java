@@ -516,17 +516,13 @@ public class CmpResponder extends BaseCmpResponder {
     SingleCertSerialEntry[] respEntries;
 
     if (revoke) {
-      RevokeCertsRequest req = new RevokeCertsRequest();
-      req.setEntries(revokeEntries.toArray(new RevokeCertRequestEntry[0]));
-      req.setIssuer(new X500NameType(issuer));
-      req.setAuthorityKeyIdentifier(aki);
+      RevokeCertsRequest req = new RevokeCertsRequest(
+          null, new X500NameType(issuer), aki, revokeEntries.toArray(new RevokeCertRequestEntry[0]));
       RevokeCertsResponse resp = sdk.revokeCerts(req);
       respEntries = resp.getEntries();
     } else {
-      UnsuspendOrRemoveRequest req = new UnsuspendOrRemoveRequest();
-      req.setEntries(unrevokeEntries.toArray(new BigInteger[0]));
-      req.setIssuer(new X500NameType(issuer));
-      req.setAuthorityKeyIdentifier(aki);
+      UnsuspendOrRemoveRequest req = new UnsuspendOrRemoveRequest(
+          null, new X500NameType(issuer), aki, unrevokeEntries.toArray(new BigInteger[0]));
       UnSuspendOrRemoveCertsResponse resp = sdk.unsuspendCerts(req);
       respEntries = resp.getEntries();
     }

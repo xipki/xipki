@@ -43,11 +43,8 @@ public class PayloadResponse extends SdkResponse {
   }
 
   public static PayloadResponse decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(1)) {
-        throw new DecodeException("PayloadResponse could not be null.");
-      }
-
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("PayloadResponse", decoder, 1);
       return new PayloadResponse(decoder.readByteString());
     } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + PayloadResponse.class.getName(), ex);

@@ -44,7 +44,7 @@ public class SingleCertSerialEntry implements CborEncodable {
   public void encode(CborEncoder encoder) throws EncodeException {
     try {
       encoder.writeArrayStart(2);
-      encoder.writeByteString(serialNumber);
+      encoder.writeBigInt(serialNumber);
       encoder.writeObject(error);
     } catch (IOException | RuntimeException ex) {
       throw new EncodeException("error encoding " + getClass().getName(), ex);

@@ -7,7 +7,6 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pkcs11.wrapper.MechanismInfo;
-import org.xipki.pkcs11.wrapper.PKCS11Exception;
 import org.xipki.pkcs11.wrapper.PKCS11KeyId;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.X509Cert;
@@ -90,9 +89,9 @@ public class HsmProxyResponder {
         }
         modules.put(moduleName, p11Service.getModule());
 
-        String msg = "module access path: https://<host>:<port>/hsmproxy/{}'";
+        String msg = "module access path: 'https://<host>:<port>/hsmproxy/{}'";
         if ("default".equals(moduleName)) {
-          msg += "and https://<host>:<port>/hsmproxy'";
+          msg += "or 'https://<host>:<port>/hsmproxy'";
         }
         LOG.info(msg, moduleName);
       }
@@ -114,18 +113,9 @@ public class HsmProxyResponder {
 
     String path = req.getServletPath();
     byte[] requestBytes = IoUtil.readAllBytes(req.getInputStream());
-
-    HttpResponse httpResp;
-    try {
-      httpResp = service(path, requestBytes, req);
-    } catch (RuntimeException ex) {
-      LOG.error("RuntimeException thrown, this should not happen!", ex);
-      httpResp = new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
-    }
-
+    HttpResponse httpResp = service(path, requestBytes, req);
     LogUtil.logReqResp("REST Gateway path=" + req.getServletPath(), LOG, logReqResp,
         true, req.getRequestURI(), requestBytes, httpResp.getBody());
-
     httpResp.fillResponse(resp);
   }
 
@@ -156,16 +146,14 @@ public class HsmProxyResponder {
 
       P11Module module = modules.get(moduleName);
       if (module == null) {
-        String message = "found no module named " + moduleName;
-        LOG.warn(message);
+        LOG.warn("found no module named {}", moduleName);
         return new HttpResponse(HttpStatusCode.SC_NOT_FOUND);
       }
 
       ProxyAction action = ProxyAction.ofNameIgnoreCase(command);
 
       if (action == null) {
-        String message = "unknown action " + command;
-        LOG.warn(message);
+        LOG.warn("unknown action {}", command);
         return new HttpResponse(HttpStatusCode.SC_NOT_FOUND);
       }
 
@@ -174,16 +162,7 @@ public class HsmProxyResponder {
         respMessage = processRequest(action, module, requestBytes);
       } catch (Exception ex) {
         LOG.debug("error while processing request", ex);
-        if (ex instanceof PKCS11Exception) {
-          respMessage = new ErrorResponse(pkcs11Exception,
-              Long.toString(((PKCS11Exception) ex).getErrorCode()));
-        } else if (ex instanceof TokenException) {
-          respMessage = new ErrorResponse(tokenException, ex.getMessage());
-        } else if (ex instanceof DecodeException) {
-          respMessage = new ErrorResponse(badRequest, ex.getMessage());
-        } else {
-          respMessage = new ErrorResponse(internalError, ex.getMessage());
-        }
+        respMessage = new ErrorResponse(ex);
       }
 
       ByteArrayCborEncoder cborEncoder = new ByteArrayCborEncoder();
@@ -269,92 +248,70 @@ public class HsmProxyResponder {
           int numObjects = slot.destroyObjectsByIdLabel(req.getId(), req.getLabel());
           return new IntMessage(numObjects);
         }
-        case genDSAKeypair:
-        case genDSAKeypair2: // by key size
-        case genECKeypair:
-        case genRSAKeypair:
-        case genSM2Keypair:
-        case genSecretKey: {
-          PKCS11KeyId generatedKeyId;
-          switch (action) {
-            case genDSAKeypair2: {
-              GenerateDSAKeyPairByKeysizeRequest req = GenerateDSAKeyPairByKeysizeRequest.decode(reqDecoder);
-              generatedKeyId = slot.generateDSAKeypair(req.getPlength(), req.getQlength(), req.getNewKeyControl());
-              break;
-            }
-            case genDSAKeypair: {
-              GenerateDSAKeyPairRequest req = GenerateDSAKeyPairRequest.decode(reqDecoder);
-              generatedKeyId = slot.generateDSAKeypair(req.getP(), req.getQ(), req.getG(), req.getNewKeyControl());
-              break;
-            }
-            case genECKeypair: {
-              GenerateECKeyPairRequest req = GenerateECKeyPairRequest.decode(reqDecoder);
-              generatedKeyId = slot.generateECKeypair(req.getCurveOid(), req.getNewKeyControl());
-              break;
-            }
-            case genRSAKeypair: {
-              GenerateRSAKeyPairRequest req = GenerateRSAKeyPairRequest.decode(reqDecoder);
-              generatedKeyId = slot.generateRSAKeypair(
-                                req.getKeySize(), req.getPublicExponent(), req.getNewKeyControl());
-              break;
-            }
-            case genSM2Keypair: {
-              GenerateSM2KeyPairRequest req = GenerateSM2KeyPairRequest.decode(reqDecoder);
-              generatedKeyId = slot.generateSM2Keypair(req.getNewKeyControl());
-              break;
-            }
-            default: { // case generateSecretKey
-              GenerateSecretKeyRequest req = GenerateSecretKeyRequest.decode(reqDecoder);
-              generatedKeyId = slot.generateSecretKey(req.getKeyType(), req.getKeySize(), req.getNewOKeyControl());
-              break;
-            }
-          }
-
-          return generatedKeyId == null ? NULL_MESSAGE :  new KeyIdMessage(generatedKeyId);
+        case genDSAKeypair: {
+          GenerateDSAKeyPairRequest req = GenerateDSAKeyPairRequest.decode(reqDecoder);
+          return toProxyMessage(
+              slot.generateDSAKeypair(req.getP(), req.getQ(), req.getG(), req.getNewKeyControl()));
         }
-        case genDSAKeypairOtf:
-        case genECKeypairOtf:
-        case genRSAKeypairOtf:
+        case genDSAKeypair2: { // by key size
+          GenerateDSAKeyPairByKeysizeRequest req = GenerateDSAKeyPairByKeysizeRequest.decode(reqDecoder);
+          return toProxyMessage(
+              slot.generateDSAKeypair(req.getPlength(), req.getQlength(), req.getNewKeyControl()));
+        }
+        case genECKeypair: {
+          GenerateECKeyPairRequest req = GenerateECKeyPairRequest.decode(reqDecoder);
+          return toProxyMessage(
+              slot.generateECKeypair(req.getCurveOid(), req.getNewKeyControl()));
+        }
+        case genRSAKeypair: {
+          GenerateRSAKeyPairRequest req = GenerateRSAKeyPairRequest.decode(reqDecoder);
+          return toProxyMessage(
+              slot.generateRSAKeypair(req.getKeySize(), req.getPublicExponent(), req.getNewKeyControl()));
+        }
+        case genSM2Keypair: {
+          GenerateSM2KeyPairRequest req = GenerateSM2KeyPairRequest.decode(reqDecoder);
+          return toProxyMessage(
+              slot.generateSM2Keypair(req.getNewKeyControl()));
+        }
+        case genSecretKey: {
+          GenerateSecretKeyRequest req = GenerateSecretKeyRequest.decode(reqDecoder);
+          return toProxyMessage(
+              slot.generateSecretKey(req.getKeyType(), req.getKeySize(), req.getNewOKeyControl()));
+        }
+        case genDSAKeypairOtf: {
+          GenerateDSAKeyPairOtfRequest req = GenerateDSAKeyPairOtfRequest.decode(reqDecoder);
+          return toProxyMessage(
+              slot.generateDSAKeypairOtf(req.getP(), req.getQ(), req.getG()));
+        }
+        case genECKeypairOtf: {
+          GenerateECKeyPairOtfRequest req = GenerateECKeyPairOtfRequest.decode(reqDecoder);
+          return toProxyMessage(
+              slot.generateECKeypairOtf(req.getCurveOid()));
+        }
+        case genRSAKeypairOtf: {
+          GenerateRSAKeyPairOtfRequest req = GenerateRSAKeyPairOtfRequest.decode(reqDecoder);
+          return toProxyMessage(
+              slot.generateRSAKeypairOtf(req.getKeySize(), req.getPublicExponent()));
+        }
         case genSM2KeypairOtf: {
-          PrivateKeyInfo privateKeyInfo;
-          switch (action) {
-            case genDSAKeypairOtf: {
-              GenerateDSAKeyPairOtfRequest req = GenerateDSAKeyPairOtfRequest.decode(reqDecoder);
-              privateKeyInfo = slot.generateDSAKeypairOtf(req.getP(), req.getQ(), req.getG());
-              break;
-            }
-            case genECKeypairOtf: {
-              GenerateECKeyPairOtfRequest req = GenerateECKeyPairOtfRequest.decode(reqDecoder);
-              privateKeyInfo = slot.generateECKeypairOtf(req.getCurveOid());
-              break;
-            }
-            case genRSAKeypairOtf: {
-              GenerateRSAKeyPairOtfRequest req = GenerateRSAKeyPairOtfRequest.decode(reqDecoder);
-              privateKeyInfo = slot.generateRSAKeypairOtf(req.getKeySize(), req.getPublicExponent());
-              break;
-            }
-            default: { // case generateSM2KeypairOtf:
-              reqDecoder.readNull();
-              privateKeyInfo = slot.generateSM2KeypairOtf();
-            }
-          }
-
-          return privateKeyInfo == null ? NULL_MESSAGE : new ByteArrayMessage(privateKeyInfo.getEncoded());
+          reqDecoder.readNull();
+          return toProxyMessage(
+              slot.generateSM2KeypairOtf());
         }
         case keyByIdLabel: {
           IdLabelMessage req = IdLabelMessage.decode(reqDecoder);
-          P11Key key = slot.getKey(req.getId(), req.getLabel());
-          return key == null ? NULL_MESSAGE : new P11KeyResponse(key);
+          return toProxyMessage(
+              slot.getKey(req.getId(), req.getLabel()));
         }
         case keyByKeyId: {
           KeyIdMessage req = KeyIdMessage.decode(reqDecoder);
-          P11Key key = slot.getKey(req.getKeyId());
-          return key == null ? NULL_MESSAGE :  new P11KeyResponse(key);
+          return toProxyMessage(
+              slot.getKey(req.getKeyId()));
         }
         case keyIdByIdLabel: {
           IdLabelMessage req = IdLabelMessage.decode(reqDecoder);
-          PKCS11KeyId keyId = slot.getKeyId(req.getId(), req.getLabel());
-          return keyId == null ? NULL_MESSAGE : new KeyIdMessage(keyId);
+          return toProxyMessage(
+              slot.getKeyId(req.getId(), req.getLabel()));
         }
         case mechInfos: {
           reqDecoder.readNull();
@@ -363,24 +320,24 @@ public class HsmProxyResponder {
         }
         case publicKeyByHandle: {
           LongMessage req = LongMessage.decode(reqDecoder);
-          byte[] encodedPublicKey = slot.getPublicKey(req.getValue()).getEncoded();
-          return encodedPublicKey == null ? NULL_MESSAGE : new ByteArrayMessage(encodedPublicKey);
+          return toProxyMessage(
+              slot.getPublicKey(req.getValue()).getEncoded());
         }
         case digestSecretKey: {
           DigestSecretKeyRequest req = DigestSecretKeyRequest.decode(reqDecoder);
-          byte[] hashValue = slot.digestSecretKey(req.getMechanism(), req.getObjectHandle());
-          return hashValue == null ? NULL_MESSAGE : new ByteArrayMessage(hashValue);
+          return toProxyMessage(
+              slot.digestSecretKey(req.getMechanism(), req.getObjectHandle()));
         }
         case sign: {
           SignRequest req = SignRequest.decode(reqDecoder);
-          byte[] signatureValue = slot.sign(req.getMechanism(), req.getP11params(),
-              req.getExtraParams(), req.getKeyHandle(), req.getContent());
-          return signatureValue == null ? NULL_MESSAGE :  new ByteArrayMessage(signatureValue);
+          return toProxyMessage(
+              slot.sign(req.getMechanism(), req.getP11params(),
+                req.getExtraParams(), req.getKeyHandle(), req.getContent()));
         }
         case importSecretKey: {
           ImportSecretKeyRequest req = ImportSecretKeyRequest.decode(reqDecoder);
-          PKCS11KeyId keyId = slot.importSecretKey(req.getKeyType(), req.getKeyValue(), req.getNewKeyControl());
-          return keyId == null ? NULL_MESSAGE :  new KeyIdMessage(keyId);
+          return toProxyMessage(
+              slot.importSecretKey(req.getKeyType(), req.getKeyValue(), req.getNewKeyControl()));
         }
         case objectExistsByIdLabel: {
           IdLabelMessage req = IdLabelMessage.decode(reqDecoder);
@@ -403,6 +360,22 @@ public class HsmProxyResponder {
         }
       }
     }
+  }
+
+  private static ProxyMessage toProxyMessage(PKCS11KeyId keyId) {
+    return keyId == null ? NULL_MESSAGE : new KeyIdMessage(keyId);
+  }
+
+  private static ProxyMessage toProxyMessage(P11Key key) {
+    return key == null ? NULL_MESSAGE : new P11KeyResponse(key);
+  }
+
+  private static ProxyMessage toProxyMessage(PrivateKeyInfo key) throws IOException {
+    return key == null ? NULL_MESSAGE : new ByteArrayMessage(key.getEncoded());
+  }
+
+  private static ProxyMessage toProxyMessage(byte[] bytes) {
+    return bytes == null ? NULL_MESSAGE : new ByteArrayMessage(bytes);
   }
 
 }

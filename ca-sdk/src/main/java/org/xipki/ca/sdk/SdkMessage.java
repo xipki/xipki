@@ -3,7 +3,9 @@
 
 package org.xipki.ca.sdk;
 
+import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
+import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
 
 import java.io.ByteArrayOutputStream;
@@ -27,6 +29,13 @@ public abstract class SdkMessage {
       return bout.toByteArray();
     } catch (IOException ex) {
       throw new EncodeException("IOException encoding " + getClass().getName(), ex);
+    }
+  }
+
+  protected static void assertArrayStart(String name, CborDecoder decoder, int size)
+      throws IOException, DecodeException {
+    if (decoder.readNullOrArrayLength(size)) {
+      throw new DecodeException(name + " must not be null.");
     }
   }
 

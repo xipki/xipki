@@ -47,11 +47,8 @@ public class ConfirmCertsRequest extends SdkRequest {
   }
 
   public static ConfirmCertsRequest decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(2)) {
-        throw new DecodeException("ConfirmCertsRequest could not be null.");
-      }
-
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("ConfirmCertsRequest", decoder, 2);
       return new ConfirmCertsRequest(
           decoder.readTextString(),
           ConfirmCertRequestEntry.decodeArray(decoder));

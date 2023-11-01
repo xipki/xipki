@@ -52,7 +52,7 @@ public class ConfirmCertRequestEntry implements CborEncodable {
     try {
       encoder.writeArrayStart(3);
       encoder.writeBoolean(accept);
-      encoder.writeByteString(certReqId);
+      encoder.writeBigInt(certReqId);
       encoder.writeByteString(certhash);
     } catch (IOException | RuntimeException ex) {
       throw new EncodeException("error encoding " + getClass().getName(), ex);

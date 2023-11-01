@@ -41,13 +41,9 @@ public class CertChainResponse extends SdkResponse {
   }
 
   public static CertChainResponse decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(1)) {
-        throw new DecodeException("CertChainResponse could not be null.");
-      }
-
-      return new CertChainResponse(
-          decoder.readByteStrings());
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("CertChainResponse", decoder, 1);
+      return new CertChainResponse(decoder.readByteStrings());
     } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + CertChainResponse.class.getName(), ex);
     }

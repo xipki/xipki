@@ -46,7 +46,7 @@ public class OldCertInfoByIssuerAndSerial extends OldCertInfo {
       encoder.writeArrayStart(3);
       encoder.writeBoolean(isReusePublicKey());
       encoder.writeObject(issuer);
-      encoder.writeByteString(serialNumber);
+      encoder.writeBigInt(serialNumber);
     } catch (IOException | RuntimeException ex) {
       throw new EncodeException("error encoding " + getClass().getName(), ex);
     }

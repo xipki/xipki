@@ -837,9 +837,7 @@ public class RestResponder {
     event.addEventData(CaAuditConstants.NAME_serial, LogUtil.formatCsn(serialNumber));
 
     if (!revoke) {
-      UnsuspendOrRemoveRequest sdkReq = new UnsuspendOrRemoveRequest();
-      sdkReq.setIssuerCertSha1Fp(caSha1);
-      sdkReq.setEntries(new BigInteger[]{serialNumber});
+      UnsuspendOrRemoveRequest sdkReq = new UnsuspendOrRemoveRequest(caSha1, null, null, new BigInteger[]{serialNumber});
       sdk.unsuspendCerts(sdkReq);
     } else {
       String strReason = httpRetriever.getParameter(PARAM_reason);
@@ -859,9 +857,7 @@ public class RestResponder {
       RevokeCertRequestEntry entry = new RevokeCertRequestEntry(serialNumber, reason,
           invalidityTime == null ? null : invalidityTime.getEpochSecond());
 
-      RevokeCertsRequest sdkReq = new RevokeCertsRequest();
-      sdkReq.setIssuerCertSha1Fp(caSha1);
-      sdkReq.setEntries(new RevokeCertRequestEntry[]{entry});
+      RevokeCertsRequest sdkReq = new RevokeCertsRequest(caSha1, null, null, new RevokeCertRequestEntry[]{entry});
       sdk.revokeCerts(sdkReq);
     }
   }

@@ -41,11 +41,8 @@ public class RevokeCertsResponse extends SdkResponse {
   }
 
   public static RevokeCertsResponse decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(1)) {
-        throw new DecodeException("RevokeCertsResponse could not be null.");
-      }
-
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("RevokeCertsResponse", decoder, 1);
       return new RevokeCertsResponse(
           SingleCertSerialEntry.decodeArray(decoder));
     } catch (IOException | RuntimeException ex) {

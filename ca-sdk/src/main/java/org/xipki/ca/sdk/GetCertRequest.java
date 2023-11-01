@@ -44,7 +44,7 @@ public class GetCertRequest extends SdkRequest {
   public void encode(CborEncoder encoder) throws EncodeException {
     try {
       encoder.writeArrayStart(2);
-      encoder.writeByteString(serialNumber);
+      encoder.writeBigInt(serialNumber);
       encoder.writeObject(issuer);
     } catch (IOException | RuntimeException ex) {
       throw new EncodeException("error encoding " + getClass().getName(), ex);
@@ -52,11 +52,8 @@ public class GetCertRequest extends SdkRequest {
   }
 
   public static GetCertRequest decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(2)) {
-        throw new DecodeException("GetCertRequest could not be null.");
-      }
-
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("GetCertRequest", decoder, 2);
       return new GetCertRequest(
           decoder.readBigInt(),
           X500NameType.decode(decoder));

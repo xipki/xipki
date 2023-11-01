@@ -55,7 +55,7 @@ public class EnrollOrPullCertResponseEntry implements CborEncodable {
   public void encode(CborEncoder encoder) throws EncodeException {
     try {
       encoder.writeArrayStart(4);
-      encoder.writeByteString(id);
+      encoder.writeBigInt(id);
       encoder.writeObject(error);
       encoder.writeByteString(cert);
       encoder.writeByteString(privateKey);

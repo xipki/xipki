@@ -43,11 +43,8 @@ public class GenCRLRequest extends SdkRequest {
   }
 
   public static GenCRLRequest decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(1)) {
-        throw new DecodeException("GenCRLRequest could not be null.");
-      }
-
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("GenCRLRequest", decoder, 1);
       return new GenCRLRequest(
           decoder.readTextString());
     } catch (IOException | RuntimeException ex) {

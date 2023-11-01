@@ -40,13 +40,9 @@ public class CertprofileInfoRequest extends SdkRequest {
   }
 
   public static CertprofileInfoRequest decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(1)) {
-        throw new DecodeException("CertprofileInfoRequest could not be null.");
-      }
-
-      return new CertprofileInfoRequest(
-          decoder.readTextString());
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("CertprofileInfoRequest", decoder, 1);
+      return new CertprofileInfoRequest(decoder.readTextString());
     } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + CertprofileInfoRequest.class.getName(), ex);
     }

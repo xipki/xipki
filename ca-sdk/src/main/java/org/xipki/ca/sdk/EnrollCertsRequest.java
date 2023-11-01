@@ -108,11 +108,8 @@ public class EnrollCertsRequest extends SdkRequest {
   }
 
   public static EnrollCertsRequest decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(6)) {
-        throw new DecodeException("EnrollCertsRequest could not be null.");
-      }
-
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("EnrollCertsRequest", decoder, 6);
       EnrollCertsRequest ret = new EnrollCertsRequest();
       ret.setTransactionId(decoder.readTextString());
       ret.setGroupEnroll(decoder.readBooleanObj());

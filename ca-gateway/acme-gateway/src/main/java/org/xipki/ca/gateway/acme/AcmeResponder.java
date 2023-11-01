@@ -1179,7 +1179,7 @@ public class AcmeResponder {
       if (rc == ContactVerifier.unsupportedContact) {
         throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.unsupportedContact,
             "unsupported contact '" + contact + "'");
-      } else if (rc == ContactVerifier.invalidContact){
+      } else if (rc == ContactVerifier.invalidContact) {
         throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.invalidContact,
             "invalid contact '" + contact + "'");
       }

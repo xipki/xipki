@@ -74,11 +74,8 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
   }
 
   public static EnrollOrPollCertsResponse decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(4)) {
-        throw new DecodeException("EnrollOrPollCertsResponse could not be null.");
-      }
-
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("EnrollOrPollCertsResponse", decoder, 4);
       EnrollOrPollCertsResponse ret = new EnrollOrPollCertsResponse();
       ret.setTransactionId(decoder.readTextString());
       ret.setConfirmWaitTime(decoder.readLongObj());

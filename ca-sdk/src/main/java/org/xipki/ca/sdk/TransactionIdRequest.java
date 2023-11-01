@@ -40,13 +40,9 @@ public class TransactionIdRequest extends SdkRequest {
   }
 
   public static TransactionIdRequest decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(1)) {
-        throw new DecodeException("TransactionIdRequest could not be null.");
-      }
-
-      return new TransactionIdRequest(
-          decoder.readTextString());
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("TransactionIdRequest", decoder, 1);
+      return new TransactionIdRequest(decoder.readTextString());
     } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + TransactionIdRequest.class.getName(), ex);
     }

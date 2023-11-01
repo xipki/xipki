@@ -41,11 +41,8 @@ public class UnSuspendOrRemoveCertsResponse extends SdkResponse {
   }
 
   public static UnSuspendOrRemoveCertsResponse decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(1)) {
-        throw new DecodeException("UnSuspendOrRemoveCertsResponse could not be null.");
-      }
-
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("UnSuspendOrRemoveCertsResponse", decoder, 1);
       return new UnSuspendOrRemoveCertsResponse(
           SingleCertSerialEntry.decodeArray(decoder));
     } catch (IOException | RuntimeException ex) {

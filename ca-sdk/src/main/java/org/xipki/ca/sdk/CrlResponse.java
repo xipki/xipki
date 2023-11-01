@@ -40,11 +40,8 @@ public class CrlResponse extends SdkResponse {
   }
 
   public static CrlResponse decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)){
-      if (decoder.readNullOrArrayLength(1)) {
-        throw new DecodeException("CrlResponse could not be null.");
-      }
-
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      assertArrayStart("CrlResponse", decoder, 1);
       return new CrlResponse(decoder.readByteString());
     } catch (IOException | RuntimeException ex) {
       throw new DecodeException("error decoding " + CrlResponse.class.getName(), ex);
