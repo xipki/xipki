@@ -837,7 +837,8 @@ public class RestResponder {
     event.addEventData(CaAuditConstants.NAME_serial, LogUtil.formatCsn(serialNumber));
 
     if (!revoke) {
-      UnsuspendOrRemoveRequest sdkReq = new UnsuspendOrRemoveRequest(caSha1, null, null, new BigInteger[]{serialNumber});
+      UnsuspendOrRemoveRequest sdkReq =
+          new UnsuspendOrRemoveRequest(caSha1, null, null, new BigInteger[]{serialNumber});
       sdk.unsuspendCerts(sdkReq);
     } else {
       String strReason = httpRetriever.getParameter(PARAM_reason);

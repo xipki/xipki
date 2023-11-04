@@ -29,7 +29,6 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 import org.xipki.util.exception.ErrorCode;
@@ -726,9 +725,8 @@ public class AcmeResponder {
         RevokeCertRequestEntry sdkEntry = new RevokeCertRequestEntry(
             cert.getSerialNumber().getPositiveValue(), reason, null);
 
-        RevokeCertsRequest sdkReq = new RevokeCertsRequest();
-        sdkReq.setIssuer(new X500NameType(encodedIssuer));
-        sdkReq.setEntries(new RevokeCertRequestEntry[]{sdkEntry});
+        RevokeCertsRequest sdkReq = new RevokeCertsRequest(null, new X500NameType(encodedIssuer),
+            null, new RevokeCertRequestEntry[]{sdkEntry});
 
         RevokeCertsResponse sdkResp;
         try {

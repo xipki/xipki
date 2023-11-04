@@ -597,10 +597,8 @@ public class ScepResponder {
           audit(event, CaAuditConstants.NAME_subject, "\"" + X509Util.x500NameText(is.getSubject()) + "\"");
           PollCertRequestEntry template = new PollCertRequestEntry(null, new X500NameType(is.getSubject()));
 
-          PollCertRequest sdkReq = new PollCertRequest();
-          sdkReq.setIssuer(new X500NameType(is.getIssuer()));
-          sdkReq.setTransactionId(req.getTransactionId().getId());
-          sdkReq.setEntries(new PollCertRequestEntry[]{template});
+          PollCertRequest sdkReq = new PollCertRequest(null, new X500NameType(is.getIssuer()),
+              null, req.getTransactionId().getId(), new PollCertRequestEntry[]{template});
 
           EnrollOrPollCertsResponse sdkResp;
           try {
