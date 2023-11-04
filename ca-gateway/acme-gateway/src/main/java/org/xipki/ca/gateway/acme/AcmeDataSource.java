@@ -9,11 +9,11 @@ import org.xipki.ca.gateway.acme.type.*;
 import org.xipki.ca.gateway.acme.util.AcmeUtils;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Base64Url;
 import org.xipki.util.CompareUtil;
+import org.xipki.util.JSON;
 
 import java.security.SecureRandom;
 import java.sql.PreparedStatement;

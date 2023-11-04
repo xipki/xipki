@@ -22,7 +22,7 @@ import org.xipki.security.ctlog.CtLog.SignatureAlgorithm;
 import org.xipki.security.ctlog.CtLog.SignatureAndHashAlgorithm;
 import org.xipki.security.ctlog.CtLogMessages.AddPreChainRequest;
 import org.xipki.security.ctlog.CtLogMessages.AddPreChainResponse;
-import org.xipki.security.util.JSON;
+import org.xipki.util.JSON;
 import org.xipki.util.LogUtil;
 
 import java.io.IOException;

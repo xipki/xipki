@@ -4,10 +4,10 @@
 package org.xipki.ocsp.server;
 
 import org.xipki.security.Securities.SecurityConf;
-import org.xipki.security.util.JSON;
 import org.xipki.security.util.TlsHelper;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.IoUtil;
+import org.xipki.util.JSON;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
 

@@ -30,9 +30,9 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.security.util.JSON;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.IoUtil;
+import org.xipki.util.JSON;
 import org.xipki.util.StringUtil;
 
 import java.io.OutputStream;

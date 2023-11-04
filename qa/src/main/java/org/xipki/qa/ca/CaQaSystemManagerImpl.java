@@ -6,9 +6,9 @@ package org.xipki.qa.ca;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.security.util.JSON;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
+import org.xipki.util.JSON;
 import org.xipki.util.StringUtil;
 
 import java.io.File;

@@ -9,7 +9,6 @@ import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.Securities;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.JSON;
 import org.xipki.security.util.TlsHelper;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;

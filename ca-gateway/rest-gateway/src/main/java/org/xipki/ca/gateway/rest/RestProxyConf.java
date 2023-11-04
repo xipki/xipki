@@ -4,9 +4,9 @@
 package org.xipki.ca.gateway.rest;
 
 import org.xipki.ca.gateway.conf.ProtocolProxyConf;
-import org.xipki.security.util.JSON;
 import org.xipki.security.util.TlsHelper;
 import org.xipki.util.Args;
+import org.xipki.util.JSON;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.io.File;

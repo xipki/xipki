@@ -4,8 +4,8 @@
 package org.xipki.ca.gateway.acme;
 
 import org.xipki.ca.gateway.conf.ProtocolProxyConf;
-import org.xipki.security.util.JSON;
 import org.xipki.util.Args;
+import org.xipki.util.JSON;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.io.File;

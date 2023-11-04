@@ -3,7 +3,6 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.xipki.security.util.JSON;
 import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
 

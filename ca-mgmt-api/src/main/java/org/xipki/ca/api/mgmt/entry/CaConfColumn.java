@@ -5,8 +5,8 @@ package org.xipki.ca.api.mgmt.entry;
 
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.mgmt.*;
-import org.xipki.security.util.JSON;
 import org.xipki.util.ConfPairs;
+import org.xipki.util.JSON;
 import org.xipki.util.Validity;
 import org.xipki.util.exception.InvalidConfException;
 

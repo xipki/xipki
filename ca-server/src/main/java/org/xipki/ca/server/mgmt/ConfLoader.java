@@ -16,7 +16,6 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.JSON;
 import org.xipki.util.Base64;
 import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
