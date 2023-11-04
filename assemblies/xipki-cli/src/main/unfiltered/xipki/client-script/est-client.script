@@ -21,7 +21,7 @@ OUT_DIR = output/est-${CUR_TIME}
 
 #####
 echo "generate example PKCS#12 file"
-xi:rsa-p12 --password 1234 --out ${OUT_DIR}/demo.p12 --subject "CN=dummy"
+xi:rsa-p12 --password CHANGEME --out ${OUT_DIR}/demo.p12 --subject "CN=dummy"
 
 #####
 CMD = cacerts
@@ -48,7 +48,7 @@ echo "=====EST /${CMD}====="
 
 FILE = ${OUT_DIR}/${CMD}
 
-xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password 1234 --out ${FILE}.csr \
+xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password CHANGEME --out ${FILE}.csr \
   --subject "CN=${CUR_TIME}-est-${CMD}.myorg.org,O=myorg,C=DE"
 
 xi:curl --base64 --header "${CT_PKCS10}" --out ${FILE}.p7m --data-file ${FILE}.csr "$BASE_URL/${CMD}"
@@ -63,7 +63,7 @@ echo "=====EST /${CMD}====="
 OLD_FILE = ${FILE}
 FILE = ${OUT_DIR}/${CMD}
 
-xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password 1234 --out ${FILE}.csr \
+xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password CHANGEME --out ${FILE}.csr \
   --subject "CN=${CUR_TIME}-est-${CMD}.myorg.org,O=myorg,C=DE" \
   --old-cert ${OLD_FILE}.crt
 
@@ -78,7 +78,7 @@ echo "=====EST /${CMD}====="
 
 FILE = ${OUT_DIR}/${CMD}
 
-xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password 1234 --out ${FILE}.csr \
+xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password CHANGEME --out ${FILE}.csr \
   --subject "CN=${CUR_TIME}-est-${CMD}.myorg.org,O=myorg,C=DE"
 
 xi:curl --base64 --header "${CT_PKCS10}" --out ${FILE}.p7m --data-file ${FILE}.csr "$BASE_URL/${CMD}"
@@ -127,7 +127,7 @@ echo "=====EST /${CMD}====="
 
 FILE = ${OUT_DIR}/${CMD}
 
-xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password 1234 --out ${FILE}.csr \
+xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password CHANGEME --out ${FILE}.csr \
   --subject "CN=${CUR_TIME}-est-${CMD}.myorg.org,O=myorg,C=DE"
 
 xi:curl --base64 --header "${CT_PKCS10}" --out ${FILE}.crt.b64 --data-file ${FILE}.csr "$BASE_URL/${CMD}"
@@ -142,7 +142,7 @@ echo "=====EST /${CMD}====="
 OLD_FILE = ${FILE}
 FILE = ${OUT_DIR}/${CMD}
 
-xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password 1234 --out ${FILE}.csr \
+xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password CHANGEME --out ${FILE}.csr \
   --subject "CN=${CUR_TIME}-est-${CMD}.myorg.org,O=myorg,C=DE" \
   --old-cert ${OLD_FILE}.crt
 
@@ -157,7 +157,7 @@ echo "=====EST /${CMD}====="
 
 FILE = ${OUT_DIR}/${CMD}
 
-xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password 1234  --out ${FILE}.csr \
+xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password CHANGEME  --out ${FILE}.csr \
   --subject "CN=${CUR_TIME}-est-${CMD}.myorg.org,O=myorg,C=DE"
 
 xi:curl --base64 --header "${CT_PKCS10}" --out ${FILE}.p7m --data-file ${FILE}.csr "$BASE_URL/${CMD}"

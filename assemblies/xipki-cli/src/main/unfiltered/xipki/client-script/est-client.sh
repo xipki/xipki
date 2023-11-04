@@ -24,10 +24,10 @@ echo "working dir: ${DIR}"
 OPTS="--insecure --user user1:password1"
 
 # Use TLS client certificate to authorize in Linux
-#OPTS="--insecure --cert ${DIR}/../keycerts/tlskeys/client/tls-client-cert.pem --key ${DIR}/../keycerts/tlskeys/client/tls-client-key.pem"
+#OPTS="--insecure --cert ${DIR}/../keycerts/est-client-cert.pem --key ${DIR}/../keycerts/est-client-key.pem"
 
 # Use TLS client certificate to authorize in Mac
-#OPTS="--insecure --cert-type PKCS#12 --cert ${DIR}/../keycerts/tlskeys/client/tls-client.p12:1234"
+#OPTS="--insecure --cert-type PKCS#12 --cert ${DIR}/../keycerts/est-client.p12:CHANGEME"
 
 CUR_TIME=`date +%Y%m%d-%H%M%S`
 
