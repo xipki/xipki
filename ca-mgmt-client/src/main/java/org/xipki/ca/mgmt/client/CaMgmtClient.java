@@ -14,15 +14,12 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.KeyCertBytesPair;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.HttpConstants;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.SslContextConf;
+import org.xipki.util.http.SslContextConfWrapper;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -65,8 +62,11 @@ public class CaMgmtClient implements CaManager {
 
   private CaMgmtException initException;
 
-  public CaMgmtClient(SslContextConf sslContextConf) {
-    this.sslContextConf = sslContextConf;
+  public CaMgmtClient(SslContextConfWrapper sslContextConfWrapper) throws ObjectCreationException {
+    this.sslContextConf = sslContextConfWrapper == null ? null : sslContextConfWrapper.toSslContextConf();
+    if (this.sslContextConf != null) {
+      this.sslContextConf.init();
+    }
   }
 
   public synchronized void initIfNotDone() throws CaMgmtException {
@@ -78,17 +78,17 @@ public class CaMgmtClient implements CaManager {
       return;
     }
 
-    if (sslContextConf != null && sslContextConf.isUseSslConf()) {
-      try {
+    try {
+      if (sslContextConf != null) {
         sslSocketFactory = sslContextConf.getSslSocketFactory();
-        hostnameVerifier = sslContextConf.buildHostnameVerifier();
-      } catch (ObjectCreationException ex) {
-        initException = new CaMgmtException("could not initialize CaMgmtClient: " + ex.getMessage(), ex);
-        throw initException;
+        hostnameVerifier = sslContextConf.getHostnameVerifier();
       }
+    } catch (Exception ex) {
+      initException = new CaMgmtException("could not initialize CaMgmtClient: " + ex.getMessage(), ex);
+      throw initException;
+    } finally {
+      initialized = true;
     }
-
-    initialized = true;
   } // method initIfNotDone
 
   public void setServerUrl(String serverUrl) throws MalformedURLException {

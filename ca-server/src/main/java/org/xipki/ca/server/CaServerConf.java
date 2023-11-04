@@ -6,10 +6,10 @@ package org.xipki.ca.server;
 import org.xipki.audit.Audits.AuditConf;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.security.Securities.SecurityConf;
-import org.xipki.security.util.JSON;
 import org.xipki.security.util.TlsHelper;
 import org.xipki.util.Args;
 import org.xipki.util.FileOrBinary;
+import org.xipki.util.JSON;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
@@ -286,11 +286,9 @@ public class CaServerConf extends ValidatableConf {
 
     if (sslContextConfMap.isEmpty()) {
       for (SslContext m : sslContexts) {
-        SslContextConf conf = new SslContextConf();
-        conf.setSslHostnameVerifier(m.getHostverifier());
-        conf.setSslTrustanchors(m.trustanchors);
+        SslContextConf conf = new SslContextConf(m.trustanchors, m.getHostverifier());
         try {
-          conf.getSslContext();
+          conf.init();
         } catch (ObjectCreationException e) {
           throw new RuntimeException(e);
         }

@@ -10,7 +10,6 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
 import org.xipki.security.*;
-import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.*;
@@ -246,7 +245,17 @@ public class CaConf {
         if (m.getConf() != null) {
           conf = getValue(m.getConf(), zipEntries);
         } else {
-          conf = getBase64Binary(m.getBinaryConf(), zipEntries);
+          if ("cert".equalsIgnoreCase(m.getType())) {
+            byte[] binary = getBinary(m.getBinaryConf(), zipEntries);
+            if (binary == null) {
+              conf = null;
+            } else {
+              binary = X509Util.toDerEncoded(binary);
+              conf = Base64.encodeToString(binary);
+            }
+          } else {
+            conf = getBase64Binary(m.getBinaryConf(), zipEntries);
+          }
         }
 
         RequestorEntry en = new RequestorEntry(new NameId(null, m.getName()), m.getType(), conf);

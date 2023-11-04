@@ -15,7 +15,7 @@
 
   <reference id="passwordResolver" interface="org.xipki.password.PasswordResolver"/>
 
-  <bean id="sslContextConf" class="org.xipki.util.http.SslContextConf">
+  <bean id="sslContextConf" class="org.xipki.util.http.SslContextConfWrapper">
     <property name="useSslConf" value="${useSslConf}"/>
     <property name="sslStoreType" value="${ssl.storeType}"/>
     <property name="sslKeystore" value="${ssl.keystore}"/>

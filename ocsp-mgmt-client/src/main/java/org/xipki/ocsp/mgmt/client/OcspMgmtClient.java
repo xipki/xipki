@@ -7,13 +7,10 @@ import org.xipki.ocsp.api.mgmt.MgmtMessage.MgmtAction;
 import org.xipki.ocsp.api.mgmt.MgmtRequest;
 import org.xipki.ocsp.api.mgmt.OcspManager;
 import org.xipki.ocsp.api.mgmt.OcspMgmtException;
-import org.xipki.security.util.JSON;
-import org.xipki.util.Args;
-import org.xipki.util.HttpConstants;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.*;
 import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.SslContextConf;
+import org.xipki.util.http.SslContextConfWrapper;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -51,8 +48,11 @@ public class OcspMgmtClient implements OcspManager {
 
   private OcspMgmtException initException;
 
-  public OcspMgmtClient(SslContextConf sslContextConf) {
-    this.sslContextConf = sslContextConf;
+  public OcspMgmtClient(SslContextConfWrapper sslContextConfWrapper) throws ObjectCreationException {
+    this.sslContextConf = sslContextConfWrapper == null ? null : sslContextConfWrapper.toSslContextConf();
+    if (this.sslContextConf != null) {
+      this.sslContextConf.init();
+    }
   }
 
   public void setServerUrl(String serverUrl) throws MalformedURLException {
@@ -75,10 +75,10 @@ public class OcspMgmtClient implements OcspManager {
       return;
     }
 
-    if (sslContextConf != null && sslContextConf.isUseSslConf()) {
+    if (sslContextConf != null) {
       try {
         sslSocketFactory = sslContextConf.getSslSocketFactory();
-        hostnameVerifier = sslContextConf.buildHostnameVerifier();
+        hostnameVerifier = sslContextConf.getHostnameVerifier();
       } catch (ObjectCreationException ex) {
         initException = new OcspMgmtException("could not initialize CaMgmtClient: " + ex.getMessage(), ex);
         throw initException;

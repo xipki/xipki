@@ -12,7 +12,6 @@ import org.xipki.security.ctlog.CtLog;
 import org.xipki.security.ctlog.CtLog.*;
 import org.xipki.security.ctlog.CtLogMessages.AddPreChainRequest;
 import org.xipki.security.ctlog.CtLogMessages.AddPreChainResponse;
-import org.xipki.security.util.JSON;
 import org.xipki.util.*;
 import org.xipki.util.Curl.CurlResult;
 import org.xipki.util.exception.ErrorCode;
@@ -40,7 +39,8 @@ public class CtLogClient {
   public CtLogClient(List<String> serverUrls, SslContextConf sslContextConf) {
     Args.notEmpty(serverUrls, "serverUrls");
 
-    this.curl  = new DefaultCurl(sslContextConf);
+    this.curl  = new DefaultCurl();
+    ((DefaultCurl) this.curl).setSslContextConf(sslContextConf);
     this.addPreChainUrls = new ArrayList<>(serverUrls.size());
     for (String m : serverUrls) {
       String addPreChainUrl = m.endsWith("/") ? m + "ct/v1/add-pre-chain" : m + "/ct/v1/add-pre-chain";

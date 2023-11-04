@@ -428,15 +428,16 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       }
 
       if (curl == null) {
-        SslContextConf sslContextConf = new SslContextConf();
-        sslContextConf.setSslTrustanchors(trustanchorFile.getPath());
-        curl = new DefaultCurl(sslContextConf);
+        SslContextConf sslContextConf = new SslContextConf(
+            new FileOrBinary[] {FileOrBinary.ofFile(trustanchorFile.getPath())}, null);
+        curl = new DefaultCurl();
+        ((DefaultCurl) curl).setSslContextConf(sslContextConf);
         curls.put(subDirPath, curl);
         curlsConfLastModified.put(subDirPath, trustanchorFile.lastModified());
       }
     } else {
       if (curl == null) {
-        curl = new DefaultCurl(null);
+        curl = new DefaultCurl();
         curls.put(subDirPath, curl);
         curlsConfLastModified.put(subDirPath, 0L);
       }

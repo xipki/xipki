@@ -697,6 +697,10 @@ public class X509Ca extends X509CaModule implements Closeable {
         continue;
       }
 
+      if (entry.getDbEntry().faulty()) {
+        continue;
+      }
+
       if (entry.getCert().getCert().equals(requestorCert)) {
         return new RequestorInfo.CertRequestorInfo(m, entry.getCert());
       }

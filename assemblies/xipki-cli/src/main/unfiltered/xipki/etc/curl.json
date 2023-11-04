@@ -1,0 +1,47 @@
+{
+  "hostConfs": [
+    {
+      "urlPattern": ["*:*/cmp"],
+      "sslContext": {
+        "storeType": "PKCS12",
+        "keystore": {
+          "file":"xipki/keycerts/cmp-client.p12"
+        },
+        "keystorePassword":  "CHANGEIT",
+        // Valid values are 'no_op', 'default' or java:<class name>. Default to 'default'
+        "hostnameVerifier":"default",
+        "trustanchors":[{
+          "file":"xipki/keycerts/gateway-server-cert.pem"
+        }]
+      }
+    }, {
+      "urlPattern": ["*:*/.well-known/est"],
+      "sslContext": {
+        "storeType": "PKCS12",
+        "keystore": {
+          "file":"xipki/keycerts/est-client.p12"
+        },
+        "keystorePassword":  "CHANGEIT",
+        // Valid values are 'no_op', 'default' or java:<class name>. Default to 'default'
+        "hostnameVerifier":"default",
+        "trustanchors":[{
+          "file":"xipki/keycerts/gateway-server-cert.pem"
+        }]
+      }
+    }, {
+      "urlPattern": ["*:*/rest"],
+      "sslContext": {
+        "storeType": "PKCS12",
+        "keystore": {
+          "file":"xipki/keycerts/rest-client.p12"
+        },
+        "keystorePassword":  "CHANGEIT",
+        // Valid values are 'no_op', 'default' or java:<class name>. Default to 'default'
+        "hostnameVerifier":"default",
+        "trustanchors":[{
+          "file":"xipki/keycerts/gateway-server-cert.pem"
+        }]
+      }
+    }
+  ]
+}

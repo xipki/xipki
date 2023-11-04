@@ -17,12 +17,8 @@ import org.xipki.security.CollectionAlgorithmValidator;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.JSON;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.IoUtil;
-import org.xipki.util.ReqRespDebug;
+import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.SslContextConf;
 
@@ -95,7 +91,7 @@ public final class CmpClientImpl implements CmpClient {
     SslContextConf sslCc = SslContextConf.ofSslConf(conf.getSsl());
 
     SSLSocketFactory sslSocketFactory = sslCc.getSslSocketFactory();
-    HostnameVerifier hostnameVerifier = sslCc.buildHostnameVerifier();
+    HostnameVerifier hostnameVerifier = sslCc.getHostnameVerifier();
 
     // Responder configuration
     CmpClientConf.Responder responderConf = conf.getResponder();

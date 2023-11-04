@@ -40,7 +40,7 @@ public class SdkClient {
   public SdkClient(SdkClientConf conf) throws ObjectCreationException {
     this.serverUrl = conf.getServerUrl();
     SslContextConf sdkSslConf = SslContextConf.ofSslConf(conf.getSsl());
-    this.client = new XiHttpClient(sdkSslConf.getSslSocketFactory(), sdkSslConf.buildHostnameVerifier());
+    this.client = new XiHttpClient(sdkSslConf.getSslSocketFactory(), sdkSslConf.getHostnameVerifier());
   }
 
   public SdkClient(String serverUrl, SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
