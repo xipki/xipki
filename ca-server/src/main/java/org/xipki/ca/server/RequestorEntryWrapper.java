@@ -39,8 +39,8 @@ public class RequestorEntryWrapper {
     dbEntry.faulty(true);
     if (RequestorEntry.TYPE_CERT.equalsIgnoreCase(type)) {
       try {
-        dbEntry.faulty(false);
         this.cert = new CertWithDbId(X509Util.parseCert(StringUtil.toUtf8Bytes(conf)));
+        dbEntry.faulty(false);
       } catch (CertificateException ex) {
         LogUtil.error(LOG, ex, "error while parsing certificate of requestor" + dbEntry.getIdent());
       }

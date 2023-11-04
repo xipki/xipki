@@ -8,6 +8,7 @@ import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
+import org.xipki.util.Base64;
 import org.xipki.util.StringUtil;
 
 import java.security.cert.CertificateException;
@@ -47,6 +48,7 @@ public class RequestorEntry extends MgmtEntry {
 
     this.type = Args.notBlank(type, "type");
     this.conf = Args.notBlank(conf, "conf");
+    makeConform();
   }
 
   public void setIdent(NameId ident) {
@@ -59,10 +61,12 @@ public class RequestorEntry extends MgmtEntry {
 
   public void setType(String type) {
     this.type = Args.notBlank(type, "type");
+    makeConform();
   }
 
   public void setConf(String conf) {
     this.conf = Args.notBlank(conf, "conf");
+    makeConform();
   }
 
   public NameId getIdent() {
@@ -75,6 +79,23 @@ public class RequestorEntry extends MgmtEntry {
 
   public String getConf() {
     return conf;
+  }
+
+  private void makeConform() {
+    if (conf == null || !"cert".equalsIgnoreCase(type)) {
+      return;
+    }
+
+    if (!conf.startsWith("LS0t")) {
+      return;
+    }
+
+    try {
+      byte[] binary = X509Util.toDerEncoded(Base64.decode(conf));
+      conf = Base64.encodeToString(binary);
+    } catch (Exception ex) {
+      // do nothing
+    }
   }
 
   public void faulty(boolean faulty) {
