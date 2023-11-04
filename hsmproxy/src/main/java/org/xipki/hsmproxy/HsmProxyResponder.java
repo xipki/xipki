@@ -35,7 +35,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.*;
 
-import static org.xipki.security.pkcs11.hsmproxy.ProxyMessage.ProxyErrorCode.*;
+import static org.xipki.security.pkcs11.hsmproxy.ProxyMessage.ProxyErrorCode.badRequest;
 
 /**
  * The responder of HSM proxy.

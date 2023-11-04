@@ -5,7 +5,6 @@ package org.xipki.ca.sdk;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
@@ -32,7 +31,7 @@ public class CaIdentifierRequest extends SdkRequest{
 
   protected CaIdentifierRequest(byte[] issuerCertSha1Fp, X500NameType issuer, byte[] authorityKeyIdentifier) {
     this.issuerCertSha1Fp = issuerCertSha1Fp;
-    this.issuer = Args.notNull(issuer, "issuer");
+    this.issuer = issuer;
     this.authorityKeyIdentifier = authorityKeyIdentifier;
   }
 
