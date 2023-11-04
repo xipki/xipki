@@ -13,7 +13,7 @@ Deployment in Tomcat (8, 9 and 10)
    - In `${CATALINA_HOME}/lib`, if an old version of a jar file exists, remove it first.
 3. If SCEP is supported, you need to have a SCEP server certificate with private key. For the demo you may generate this
    certificate in the `xipki-mgmt-cli` via the command 
-   `enroll-cert --ca myca1 --subject "CN=scep responder" --profile scep --key-password 1234 --out output/scep1.der`,
+   `enroll-cert --ca myca1 --subject "CN=scep responder" --profile scep --key-password CHANGEIT --out output/scep1.der`,
    and then copy the generated file `scep1.p12` to the folder `xipki/keycerts`.
 4. If ACME is supported
    1. (Optional) If you use database other than H2, PostgreSQL, MariaDB and MySQL, you need to
@@ -36,12 +36,12 @@ Deployment in Tomcat (8, 9 and 10)
                 certificateVerification="optional"
                 protocols="TLSv1.2+TLSv1.3"
                 ciphers="TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POLY1305_SHA256,TLS_AES_128_GCM_SHA256,TLS_AES_128_CCM_8_SHA256,TLS_AES_128_CCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256, TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
-                truststoreFile="${XIPKI_BASE}/keycerts/tlskeys/ca/tls-ca-cert.p12"
-                truststorePassword="1234"
+                truststoreFile="${XIPKI_BASE}/keycerts/gateway-client-ca-certstore.p12"
+                truststorePassword="CHANGEIT"
                 truststoreType="PKCS12">
             <Certificate
-                         certificateKeystoreFile="${XIPKI_BASE}/keycerts/tlskeys/server/tls-server.p12"
-                         certificateKeystorePassword="1234"
+                         certificateKeystoreFile="${XIPKI_BASE}/keycerts/gateway-server.p12"
+                         certificateKeystorePassword="CHANGEIT"
                          certificateKeystoreType="PKCS12"/>
         </SSLHostConfig>
    </Connector>
@@ -80,7 +80,7 @@ util-*.jar
 7. (optional) If you encrypt the passwords in the conf/server.xml with XiPKI solution, replace
    `org.apache.coyote.http11.Http11Nio2Protocol` by `org.xipki.tomcat.XiHttp11Nio2Protocol`.
 
-8. If you have multiple tomcat instances, change the listing port for SHUTDOW to be unique.
+8. If you have multiple tomcat instances, change the listing port for SHUTDOWN to be unique.
 
 - Start tomcat
 

@@ -25,9 +25,10 @@
     </fileSet>
     <fileSet>
       <directory>src/assembly/unfiltered</directory>
-      <excludes>
-        <exclude>bin/*.sh</exclude>
-      </excludes>
+      <includes>
+        <include>README</include>
+        <include>bin/*.bat</include>
+      </includes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>

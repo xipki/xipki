@@ -10,7 +10,7 @@
 		"name":"requestor1",
 		"type":"cert",
 		"binaryConf":{
-			"file":"xipki/keycerts/tlskeys/client/tls-client-cert.der"
+			"file":"xipki/keycerts/ra-sdk-client-cert.pem"
 		}
 	}],
 	"publishers":[],

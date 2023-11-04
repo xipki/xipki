@@ -12,7 +12,7 @@
 		"name":"requestor1",
 		"type":"cert",
 		"binaryConf":{
-			"file":"${keycerts.dir}/tlskeys/client/tls-client-cert.der"
+			"file":"${keycerts.dir}/ra-sdk-client-cert.pem"
 		}
 	}],
 	"publishers":[{

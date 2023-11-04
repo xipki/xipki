@@ -1,0 +1,135 @@
+{
+	"keycerts": [
+		{
+			"name": "ca-server",
+			"certType": "TLS-Server",
+			"keyType": "EC/P-256",
+			"subject": "OU=CA server, CN=localhost",
+			"validity": "20y",
+			"p12Password": "CHANGEIT"
+	  	},{
+			"name": "ca-mgmt-client",
+			"certType": "TLS-Client",
+			"keyType": "EC/P-256",
+			"subject": "CN=CA management client",
+			"validity": "20y",
+			"p12Password": "CHANGEIT"
+	  	},{
+			"name": "ra-sdk-client",
+			"certType": "TLS-Client",
+			"keyType": "EC/P-256",
+			"subject": "CN=RA SDK client",
+			"validity": "20y",
+			"p12Password": "CHANGEIT"
+	  	},{
+			"name": "ocsp-server",
+			"certType": "TLS-Server",
+			"keyType": "EC/P-256",
+			"subject": "OU=OCSP server, CN=localhost",
+			"validity": "20y",
+			"p12Password": "CHANGEIT"
+	  	},{
+			"name": "ocsp-mgmt-client",
+			"certType": "TLS-Client",
+			"keyType": "EC/P-256",
+			"subject": "CN=OCSP management client",
+			"validity": "20y",
+			"p12Password": "CHANGEIT"
+		},{
+			"name": "ocsp-client",
+			"certType": "TLS-Client",
+			"keyType": "EC/P-256",
+			"subject": "CN=OCSP client",
+			"validity": "20y",
+			"p12Password": "CHANGEIT"
+		},{
+			"name": "hsmproxy-server",
+			"certType": "TLS-Server",
+			"keyType": "EC/P-256",
+			"subject": "OU=HSM proxy server, CN=localhost",
+			"validity": "20y",
+			"p12Password": "CHANGEIT"
+		},{
+			"name": "hsmproxy-client",
+			"certType": "TLS-Client",
+			"keyType": "EC/P-256",
+			"subject": "CN=HSM proxy client",
+			"validity": "20y",
+			"p12Password": "CHANGEIT"
+	  	},{
+			"name": "gateway-server",
+			"certType": "TLS-Server",
+			"keyType": "EC/P-256",
+			"subject": "OU=Gateway server,CN=localhost",
+			"validity": "20y",
+			"p12Password": "CHANGEIT"
+	  	},{
+			"name": "cmp-client-ca",
+			"certType": "CA",
+			"keyType": "EC/P-256",
+			"subject": "CN=CMP client CA",
+			"validity": "20y",
+			"p12Password": "CHANGEIT"
+	  	},{
+			"name": "cmp-client",
+			"certType": "TLS-Client",
+			"keyType": "EC/P-256",
+			"subject": "CN=CMP client",
+			"validity": "20y",
+			"p12Password": "CHANGEIT",
+			"issuerName": "cmp-client-ca"
+	  	},{
+			"name": "est-client-ca",
+			"certType": "CA",
+			"keyType": "EC/P-256",
+			"subject": "CN=EST client CA",
+			"validity": "20y",
+			"p12Password": "CHANGEIT"
+	  	},{
+			"name": "est-client",
+			"certType": "TLS-Client",
+			"keyType": "EC/P-256",
+			"subject": "CN=EST client",
+			"validity": "20y",
+			"p12Password": "CHANGEIT",
+			"issuerName": "est-client-ca"
+	  	},{
+			"name": "rest-client-ca",
+			"certType": "CA",
+			"keyType": "EC/P-256",
+			"subject": "CN=REST client CA",
+			"validity": "20y",
+			"p12Password": "CHANGEIT"
+	  	},{
+			"name": "rest-client",
+			"certType": "TLS-Client",
+			"keyType": "EC/P-256",
+			"subject": "CN=REST client",
+			"validity": "20y",
+			"p12Password": "CHANGEIT",
+			"issuerName": "rest-client-ca"
+	  	}
+	],
+	"certstores": [
+		{
+			"name": "gateway-client-ca",
+			"p12Password":"CHANGEIT",
+			"keyCertNames": ["cmp-client-ca", "est-client-ca", "rest-client-ca"]
+		},
+		{
+			"name": "ca-client",
+			"p12Password":"CHANGEIT",
+			"keyCertNames": ["ca-mgmt-client", "ra-sdk-client"]
+		},
+		{
+			"name": "ocsp-client",
+			"p12Password":"CHANGEIT",
+			"keyCertNames": ["ocsp-mgmt-client"]
+		},
+		{
+			"name": "hsmproxy-client",
+			"p12Password":"CHANGEIT",
+			"keyCertNames": ["hsmproxy-client"]
+		}
+	]
+}

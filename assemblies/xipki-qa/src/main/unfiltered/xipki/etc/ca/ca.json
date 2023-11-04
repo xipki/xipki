@@ -35,7 +35,7 @@
 		"enabled":true,
 		"certs":[
 			{
-				"file":"keycerts/tlskeys/client2/tls-client2-cert.der"
+				"file":"keycerts/ca-mgmt-client-cert.pem"
 			}
 		]
 	},
@@ -65,9 +65,9 @@
 		"conf": "file=${sys:catalina.home}/logs/ca-audit.log"
 	},
 	"sslContexts":[{
-		"name":"localhost",
+		"name":"ctlog1",
 		"trustanchors":[{
-			"file":"keycerts/tlskeys/ca/tls-ca-cert.pem"
+			"file":"keycerts/ca-server-cert.pem"
 		}]
 	}],
 	"ctLog":{

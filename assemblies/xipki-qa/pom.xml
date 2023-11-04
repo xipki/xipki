@@ -68,6 +68,13 @@
       <resource>
         <directory>../xipki-cli/src/main/unfiltered</directory>
         <filtering>false</filtering>
+        <includes>
+          <include>xipki/etc/curl.json</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>../xipki-cli/src/main/unfiltered</directory>
+        <filtering>false</filtering>
         <excludes>
           <exclude>xipki/**</exclude>
         </excludes>
@@ -212,26 +219,6 @@
                   <artifactId>apache-karaf-minimal</artifactId>
                   <version>${karaf.version}</version>
                   <type>tar.gz</type>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- Extract the TLS keys -->
-            <id>unpack-tlskeys</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/classes/xipki/keycerts/tlskeys</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki.tools</groupId>
-                  <artifactId>tlskeys-example</artifactId>
-                  <classifier>ec</classifier>
-                  <version>${xipki.tools.version}</version>
-                  <type>zip</type>
                 </artifactItem>
               </artifactItems>
             </configuration>

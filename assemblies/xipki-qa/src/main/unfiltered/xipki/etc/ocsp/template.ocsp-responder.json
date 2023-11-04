@@ -30,7 +30,7 @@
 		"name":"request1",
 //		"certpathValidation":{
 //			"trustanchors":[{
-//				"file":"keycerts/tlskeys/ca/tls-ca-cert.der"
+//				"file":"keycerts/ocsp-server-cert.pem"
 //			}],
 //			"validationModel":"PKIX"
 //		},

@@ -20,7 +20,7 @@
 	"remoteMgmt":{
 		"enabled":true,
 		"certs":[{
-			"file":"keycerts/tlskeys/client2/tls-client2-cert.der"
+			"file":"keycerts/ocsp-mgmt-client-cert.pem"
 		}]
 	}
 }

@@ -7,7 +7,7 @@
 	"logReqResp":true,
 	// valid values are NO, APACHE, NGINX, GENERAL
 	//"reverseProxyMode":"GENERAL",
-s	// shard id, between 0 and 127. CA systems using same database must have
+	// shard id, between 0 and 127. CA systems using same database must have
 	// different shard ids.
 	"shardId":0,
 	"datasources":[{
@@ -38,7 +38,7 @@ s	// shard id, between 0 and 127. CA systems using same database must have
 		"enabled":true,
 		"certs":[
 			{
-				"file":"keycerts/tlskeys/client2/tls-client2-cert.der"
+				"file":"keycerts/ca-mgmt-client-cert.pem"
 			}
 		]
 	},
@@ -82,9 +82,9 @@ s	// shard id, between 0 and 127. CA systems using same database must have
 		"conf": "file=${sys:catalina.home}/logs/ca-audit.log"
 	}
 	//,"sslContexts":[{
-	//	"name":"localhost",
+	//	"name":"ctlog1",
 	//	"trustanchors": [{
-	//		"file":"keycerts/tlskeys/ca/tls-ca-cert.pem"
+	//		"file":"keycerts/ctlog-ca-cert.pem"
 	//	}]
 	//}]
 }

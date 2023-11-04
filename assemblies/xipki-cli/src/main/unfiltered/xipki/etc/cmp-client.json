@@ -9,7 +9,7 @@
 		"signature":{
 			"signatureAlgos":["SHA256WITHECDSA"],
 			"cert":{
-				"file":"xipki/keycerts/tlskeys/server/tls-server-cert.der"
+				"file":"xipki/keycerts/gateway-server-cert.pem"
 			}
 		}
 	},
@@ -19,7 +19,7 @@
 		// 'java:'<class implements javax.net.ssl.HostnameVerifier>
 		"hostnameVerifier":"default",
 		"trustanchors":[{
-			"file":"xipki/keycerts/tlskeys/server/tls-server-cert.der"
+			"file":"xipki/keycerts/gateway-server-cert.pem"
 		}]
 	}
 }

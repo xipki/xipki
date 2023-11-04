@@ -67,10 +67,15 @@ follows.
 1. Unpack the binary `xipki-setup-<version>.zip`. To restore the files to a destination 
    folder, run the script `bin/restore.sh /path/to/destination-dir` (or `bin\restore.bat` in Windows).
 
-**Note that all keys and certificates in the binary are only for demo purpose. In production environment
-they MUST be replaced.**
-
 **In the following sections, we assume the destination directory (`destination-dir`) is `xipki-install`**.
+
+## Prepare Keys and certificates for the Communication between XiPKI Components
+
+1. Change the password (`"CHANGEIT"`), and common name (CN) in `xipki-install/setup/keycerts.json` and the XiPKI components.
+2. Generate keys and certificates:  
+  `xipki-install/setup/generate-keycerts.sh`.
+3. Copy the keys and certificates to the target components:  
+   `xipki-install/setup/provision-keycerts.sh`.
 
 ## Install CA Server
 
@@ -159,15 +164,15 @@ they MUST be replaced.**
    location / {
      ...
      #initialize the special headers to a blank value to avoid http header forgeries 
-     proxy_set_header set SSL_CLIENT_VERIFY  "" 
-     proxy_set_header set SSL_CLIENT_CERT  "" 
+     proxy_set_header set SSL_CLIENT_VERIFY  "";
+     proxy_set_header set SSL_CLIENT_CERT  "";
 
      # if the client certificate verified 
      # will have the value of 'SUCCESS' and 'NONE' otherwise
      proxy_set_header SSL_CLIENT_VERIFY $ssl_client_verify;
     
-     # client certificate information(DN)
-     proxy_set_header SSL_CLIENT_CERT $ssl_client_raw_cert;
+     # client certificate
+     proxy_set_header SSL_CLIENT_CERT $ssl_client_escaped_cert;
      ...
    }
    ...
@@ -203,6 +208,9 @@ they MUST be replaced.**
       * If you wish to generate the signing key and certificate for the OCSP responder, in the Management CLI:  
          `source xipki/ca-setup/setup-ocsp-*.script`.
 
+     * If you wish to generate the signing key and certificate for the SCEP gateway, in the Management CLI:  
+       `source xipki/ca-setup/setup-scep-p12.script`.
+
    * Verify the installation, execute the command in the Management CLI:  
      `ca-info myca1`
 
@@ -223,10 +231,13 @@ they MUST be replaced.**
 
   You may access the CLI via SSH (details see the last text block in the previous section).
 
+* ACME
+  Use any ACME client.
+
 * EST  
   Use any EST client.
 
-  The shell script `xipki/client-script/est.sh` demonstrates the use of EST API.
+  The shell script `xipki/client-script/est-client.sh` demonstrates the use of EST API.
 
   An example script in available under `xipki/client-script/est-client.script`.
   It can be executed in the CLI as follows:
@@ -247,7 +258,7 @@ they MUST be replaced.**
   - `source xipki/client-script/cmp-client.script` (use argument 'help' to print the usage)
 
 * REST API  
-  The shell script `xipki/client-script/rest.sh` demonstrates the use of REST API.
+  The shell script `xipki/client-script/rest-client.sh` demonstrates the use of REST API.
 
   An example script in available under `xipki/client-script/rest-client.script`.
   It can be executed in the CLI as follows:  
@@ -376,19 +387,25 @@ Features
   - High performance
   - Support of health check
 
-- CLI
+- Mgmt CLI (Management Client)
   - Configuring CA
-  - Client to enroll, revoke, unrevoke and remove certificates, to generate and download CRLs
-  - Client to send OCSP request
   - Generating keypairs of RSA, EC and DSA in token
   - Deleting keypairs and certificates from token
   - Updating certificates in token
   - Generating CSR (PKCS#10 request)
   - Exporting certificate from token
-  - High performance
-  - Support of health check
 
-- For CA, OCSP Responder, Protocol Gateway and CLI
+- CLI (CA/OCSP Client)
+  - Client to enroll, revoke, unrevoke and remove certificates, to generate and download CRLs
+  - Client to send OCSP request
+  - Updating certificates in token
+  - Generating CSR (PKCS#10 request)
+  - Exporting certificate from token
+
+- HSM Proxy
+  - Provide service to access to the HSM remotely.
+
+- For CA, OCSP Responder, Protocol Gateway, Mgmt CLI, and CLI
   - Support of PKCS#12 and JCEKS keystore
   - Support of PKCS#11 devices, e.g. HSM
   - API to use customized key types, e.g. smart card

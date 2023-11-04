@@ -22,6 +22,10 @@
     <resources>
       <resource>
         <directory>src/assembly/unfiltered</directory>
+        <filtering>false</filtering>
+      </resource>
+      <resource>
+        <directory>src/assembly/filtered</directory>
         <filtering>true</filtering>
       </resource>
     </resources>
@@ -41,6 +45,31 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.1.1</version>
+        <executions>
+          <execution>
+            <id>copy-jar</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/t/setup/lib</outputDirectory>
+              <stripVersion>true</stripVersion>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.slf4j</groupId>
+                  <artifactId>slf4j-api</artifactId>
+                  <version>${slf4j.version}</version>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <version>3.1.0</version>
         <executions>
@@ -50,6 +79,11 @@
               <target>
                 <copy file="${project.basedir}/../../README.md"
                       todir="${project.build.directory}/t"/>
+                <copy todir="${project.build.directory}/t" >
+                  <fileset dir="${project.build.outputDirectory}">
+                    <include name="setup/**"/>
+                  </fileset>
+                </copy>
 
                 <unzip src="../xipki-ca/target/xipki-ca-${project.version}.zip"
                    dest="${project.build.directory}/t"/>
@@ -86,7 +120,7 @@
                   <arg value="${project.build.directory}/t"/>
                   <arg value="${project.build.directory}/t2"/>
                 </java>
-                <delete dir="${project.build.directory}/t" />
+                <delete dir="${project.build.directory}/t"/>
               </target>
             </configuration>
             <goals>

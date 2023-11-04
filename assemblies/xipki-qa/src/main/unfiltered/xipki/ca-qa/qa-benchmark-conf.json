@@ -2,12 +2,12 @@
 	"serverUrl":"https://localhost:8444/ca/ra/",
 	"ssl":{
 		"storeType":"pkcs12",
-		"keystorePassword":"1234",
+		"keystorePassword":"CHANGEIT",
 		"keystore":{
-			"file":"xipki/keycerts/tlskeys/client/tls-client.p12"
+			"file":"xipki/keycerts/ra-sdk-client.p12"
 		},
 		"trustanchors": [{
-			"file":"xipki/keycerts/tlskeys/ca/tls-ca-cert.pem"
+			"file":"xipki/keycerts/ca-server-cert.pem"
 		}]
 	}
 }

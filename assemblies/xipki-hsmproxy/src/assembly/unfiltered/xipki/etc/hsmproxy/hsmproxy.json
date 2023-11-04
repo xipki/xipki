@@ -6,7 +6,7 @@
 	//"reverseProxyMode":"GENERAL",
 	"clientCerts":[
 		{
-			"file": "keycerts/tlskeys/client/tls-client-cert.pem"
+			"file": "keycerts/hsmproxy-client-cert.pem"
 		}
 	],
 	"security":{

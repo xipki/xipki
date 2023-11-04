@@ -4,6 +4,8 @@ See also <https://github.com/xipki/xipki/releases>
 
 ## 6.4.1
 - Release date: 2023/mm/dd
+- All Components
+  - No demo keys and certificates will be delivered.
 - CA
   - Change the location of file 'calock'.
   - Add configuration of reverseProxyMode.

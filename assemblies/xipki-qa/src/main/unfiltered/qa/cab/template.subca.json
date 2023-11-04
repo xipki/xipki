@@ -31,7 +31,7 @@
 			"ctlogControl":{
 				"enabled":true,
 				"servers":"https://localhost:8444/ctlog/ctlogrsa;https://localhost:8444/ctlog/ctlogec",
-				"sslcontext.name":"localhost"
+				"sslcontext.name":"ctlog1"
 			},
 			"expirationPeriod":365,
 			"revokeSuspendedControl":{

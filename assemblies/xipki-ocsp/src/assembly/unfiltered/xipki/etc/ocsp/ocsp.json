@@ -17,12 +17,5 @@
 		},
 		"signerFactories": []
 	}
-	//,
-	//"remoteMgmt":{
-	//	"enabled":true,
-	//	"certs":[{
-	//		"file":"keycerts/tlskeys/client2/tls-client2-cert.der"
-	//	}]
-	//}
 }
 

@@ -36,12 +36,12 @@
 		"serverUrl":"https://localhost:8444/ca/ra/",
 		"ssl":{
 			"storeType":"pkcs12",
-			"keystorePassword":"1234",
+			"keystorePassword":"CHANGEIT",
 			"keystore":{
-				"file":"keycerts/tlskeys/client/tls-client.p12"
+				"file":"keycerts/ra-sdk-client.p12"
 			},
-			"trustanchors":[{
-				"file": "keycerts/tlskeys/ca/tls-ca-cert.pem"
+			"trustanchors": [{
+				"file":"keycerts/ca-server-cert.pem"
 			}],
 			// valid values: 'default' for standard verification, 'no_op' for no-operation, or
 			// 'java:'<class implements javax.net.ssl.HostnameVerifier>
@@ -57,7 +57,7 @@
 			"names":["myca"],
 			"signer":{
 				"type":"pkcs12",
-				"conf":"password=1234,keystore=file:keycerts/scep1.p12,algo=SHA256withRSA"
+				"conf":"password=CHANGEIT,keystore=file:keycerts/scep1.p12,algo=SHA256withRSA"
 			}
 		}]
 	},

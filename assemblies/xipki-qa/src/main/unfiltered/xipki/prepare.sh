@@ -1,5 +1,79 @@
 #!/bin/sh
 
+DIR=`dirname $0`
+echo "working dir: ${DIR}"
+
+
+# Copy the keys and certificates
+KC_DIR=$DIR/setup/keycerts
+KS_DIR=$DIR/setup/keycerts/certstore
+RDIR=$DIR/..
+
+# CA
+TDIR=$RDIR/xipki-ca/xipki/keycerts
+
+mkdir -p $TDIR
+
+cp $KC_DIR/hsmproxy-client/*\
+   $KC_DIR/ca-server/* \
+   $KC_DIR/hsmproxy-server/hsmproxy-server-cert.pem \
+   $KC_DIR/ca-mgmt-client/ca-mgmt-client-cert.pem \
+   $KS_DIR/ca-client-certstore.p12 \
+   $TDIR
+
+# OCSP
+TDIR=$RDIR/xipki-ocsp/xipki/keycerts
+
+mkdir -p $TDIR
+
+cp $KC_DIR/hsmproxy-client/* \
+   $KC_DIR/ocsp-server/* \
+   $KC_DIR/hsmproxy-server/hsmproxy-server-cert.pem \
+   $KC_DIR/ocsp-mgmt-client/ocsp-mgmt-client-cert.pem \
+   $KS_DIR/ocsp-client-certstore.p12 \
+   $TDIR
+
+# Gateway
+TDIR=$RDIR/xipki-gateway/xipki/keycerts
+
+mkdir -p $TDIR
+
+cp $KC_DIR/hsmproxy-client/* \
+   $KC_DIR/gateway-server/* \
+   $KC_DIR/ra-sdk-client/* \
+   $KC_DIR/hsmproxy-server/hsmproxy-server-cert.pem \
+   $KC_DIR/ca-server/ca-server-cert.pem \
+   $KS_DIR/gateway-client-ca-certstore.p12 \
+   $TDIR
+
+# HSM proxy
+TDIR=$RDIR/xipki-hsmproxy/xipki/keycerts
+
+mkdir -p $TDIR
+
+cp $KC_DIR/hsmproxy-server/* \
+   $KS_DIR/hsmproxy-client-certstore.p12 \
+   $TDIR
+
+# QA
+TDIR=$RDIR/xipki/keycerts
+
+mkdir -p $TDIR
+
+cp $KC_DIR/hsmproxy-client/* \
+   $KC_DIR/ca-mgmt-client/* \
+   $KC_DIR/ocsp-mgmt-client/* \
+   $KC_DIR/cmp-client/* \
+   $KC_DIR/est-client/* \
+   $KC_DIR/rest-client/* \
+   $KC_DIR/ocsp-client/* \
+   $KC_DIR/hsmproxy-server/hsmproxy-server-cert.pem \
+   $KC_DIR/ca-server/ca-server-cert.pem \
+   $KC_DIR/ocsp-server/ocsp-server-cert.pem \
+   $KC_DIR/gateway-server/gateway-server-cert.pem \
+   $KC_DIR/ra-sdk-client/ra-sdk-client-cert.pem* \
+   $TDIR
+
 T10FILE=~/tools/xipki/tomcat10
 
 if [ -f "$T10FILE" ]; then
@@ -15,9 +89,6 @@ TOMCAT_OCSP_DIR=~/tools/xipki/ocsp-tomcat
 TOMCAT_GATEWAY_DIR=~/tools/xipki/gateway-tomcat
 
 TOMCAT_HSMPROXY_DIR=~/tools/xipki/hsmproxy-tomcat
-
-DIR=`dirname $0`
-echo "working dir: ${DIR}"
 
 cp xipki/security/pkcs11.json xipki-ca/xipki/security/
 cp xipki/security/pkcs11.json xipki-ocsp/xipki/security/
@@ -83,10 +154,6 @@ else
 fi
 
 cp -r ${DIR}/tomcat/ocsp/* ${TOMCAT_DIR}/
-
-# For the QA, we need to restart the OCSP remotely, and this requires the HTTPS
-mkdir -p ${TOMCAT_OCSP_DIR}/xipki/keycerts/tlskeys
-cp -r ${DIR}/../xipki-ca/xipki/keycerts/tlskeys/* ${TOMCAT_OCSP_DIR}/xipki/keycerts/tlskeys
 
 cp ${XIPKI_DIR}/etc/ocsp/database/mariadb/*.properties ${XIPKI_DIR}/etc/ocsp/database/
 

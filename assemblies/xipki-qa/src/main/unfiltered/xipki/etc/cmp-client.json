@@ -9,7 +9,7 @@
 		"signature":{
 			"signatureAlgos":["SHA256WITHECDSA"],
 			"cert":{
-				"file":"xipki/keycerts/tlskeys/server/tls-server-cert.der"
+				"file":"xipki/keycerts/gateway-server-cert.pem"
 			}
 		},
 		"dhPopCerts":{
@@ -20,7 +20,7 @@
 		"name":"ssl1",
 		"hostnameVerifier":"default",
 		"trustanchors":[{
-			"file":"xipki/keycerts/tlskeys/server/tls-server-cert.der"
+			"file":"xipki/keycerts/gateway-server-cert.pem"
 		}]
 	}
 }

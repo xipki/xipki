@@ -149,26 +149,6 @@
               </artifactItems>
             </configuration>
           </execution>
-          <execution>
-            <id>unpack-tlskeys</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/xipki/keycerts/tlskeys</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki.tools</groupId>
-                  <artifactId>tlskeys-example</artifactId>
-                  <classifier>ec</classifier>
-                  <version>${xipki.tools.version}</version>
-                  <type>zip</type>
-                </artifactItem>
-              </artifactItems>
-              <includes>ca/tls-ca-cert.p12,ca/tls-ca-cert.pem,server/*,client/tls-client.p12,client2/tls-client2-cert.der</includes>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
       <plugin>

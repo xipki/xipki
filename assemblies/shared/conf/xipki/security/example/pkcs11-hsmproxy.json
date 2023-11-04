@@ -8,10 +8,10 @@
 				"path":"https://localhost:8446/hsmproxy",
 				"properties": {
 					"ssl.storeType": "PKCS12",
-					"ssl.keystore": "keycerts/tlskeys/client/tls-client.p12",
-					"ssl.keystorePassword": "1234",
-					"ssl.truststore": "keycerts/tlskeys/ca/tls-ca-cert.p12",
-					"ssl.truststorePassword": "1234",
+					"ssl.keystore": "keycerts/hsmproxy-client.p12",
+					"ssl.keystorePassword": "CHANGEIT",
+					"ssl.truststore": "keycerts/hsmproxy-server-cert.p12",
+					"ssl.truststorePassword": "CHANGEIT",
 					// hostnameVerifier: no_op, default or java:class-name
 					"ssl.hostnameVerifier": "default"
 				}

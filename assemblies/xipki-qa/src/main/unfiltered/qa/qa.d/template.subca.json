@@ -26,7 +26,7 @@
 			}],
 			"ctlogControl":{
 				"enabled":true,
-				"sslcontext.name":"localhost",
+				"sslcontext.name":"ctlog1",
 				"servers":"https://localhost/ctlog/"
 			},
 			"keypairGenNames":["software"],
