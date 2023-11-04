@@ -39,12 +39,12 @@ ca:keypairgen-add \
 ca:keypairgen-add \
   --name keypool \
   --type keypool \
-  --conf datasource=keypool,password=CHANGEME,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448
+  --conf datasource=keypool,password=CHANGEIT,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448
 
 # CMP Requestors
 ca:requestor-add \
   --name requestor1 \
-  --cert xipki/keycerts/tlskeys/client/tls-client-cert.der
+  --cert xipki/keycerts/ra-sdk-client-cert.pem
 
 echo "Sleeping 1 second"
 sleep 1
@@ -62,7 +62,7 @@ ca:profile-add \
 if { $TOKEN_TYPE equals "pkcs11" } then {
   CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rootca1"
 } else {
-  CA_SIGNER_CONF = "algo=$SIGALGO,keystore=file:output/rootca1.p12,password=1234"
+  CA_SIGNER_CONF = "algo=$SIGALGO,keystore=file:output/rootca1.p12,password=CHANGEIT"
 }
 
 ca:gen-rootca \
@@ -94,7 +94,7 @@ ca:profile-rm -f rootca
 if { $TOKEN_TYPE equals "pkcs12" } then {
   xi:update-cert-p12 \
     --p12 output/rootca1.p12 \
-    --password 1234 \
+    --password CHANGEIT \
     --cert output/rootca1.crt
 }
 
@@ -135,7 +135,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:csr-p12 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
     --p12 output/subca1.p12 \
-    --password 1234 \
+    --password CHANGEIT \
     --outform $OUTFORM \
     --out output/subca1.csr \
     --subject "CN=subca1,O=myorg,C=DE"
@@ -151,7 +151,7 @@ ca:enroll-cert \
 if { $TOKEN_TYPE equals "pkcs12" } then {
   xi:update-cert-p12 \
     --p12 output/subca1.p12 \
-    --password 1234 \
+    --password CHANGEIT \
     --cert output/subca1.crt \
     --ca-cert output/rootca1.crt
 }
@@ -177,7 +177,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:csr-p12 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
     --p12 output/subcawithcrl1.p12 \
-    --password 1234 \
+    --password CHANGEIT \
     --outform $OUTFORM \
     --out output/subcawithcrl1.csr \
     --subject "CN=subcawithcrl1, O=myorg, C=DE" \
@@ -202,7 +202,7 @@ ca:enroll-cert \
 if { $TOKEN_TYPE equals "pkcs12" } then {
   xi:update-cert-p12 \
     --p12 output/subcawithcrl1.p12 \
-    --password 1234 \
+    --password CHANGEIT \
     --cert output/subcawithcrl1.crt \
     --ca-cert output/rootca1.crt
 }
@@ -215,12 +215,12 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --label ocsp99 \
     --outform $OUTFORM \
     --out output/ocsp99.csr \
-    --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=myorg,C=DE"
+    --subject "CN=ocsp99,2.5.4.97=VATDE-CHANGEIT56789,O=myorg,C=DE"
 } else {
   xi:csr-p12 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
     --p12 output/ocsp99.p12 \
-    --password 1234 \
+    --password CHANGEIT \
     --outform $OUTFORM \
     --out output/ocsp99.csr \
     --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=myorg,C=DE"
@@ -236,7 +236,7 @@ ca:enroll-cert \
 if { $TOKEN_TYPE equals "pkcs12" } then {
   xi:update-cert-p12 \
     --p12 output/ocsp99.p12 \
-    --password 1234 \
+    --password CHANGEIT \
     --cert output/ocsp99.crt \
     --ca-cert output/rootca1.crt
 }
@@ -253,7 +253,7 @@ echo "#################################################################"
 if { $TOKEN_TYPE equals "pkcs11" } then {
   CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subca1"
 } else {
-  CA_SIGNER_CONF = "password=1234,keystore=file:output/subca1.p12,algo=$SIGALGO"
+  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subca1.p12,algo=$SIGALGO"
 }
 
 ca:ca-add \
@@ -272,7 +272,7 @@ ca:ca-add \
   --revoke-suspended-control enabled=true,targetReason=cessationOfOperation,unchangedSince=15d \
   --cert output/subca1.crt \
   --certchain output/rootca1.crt \
-  --ctlog-control "enabled=true,sslcontext.name=localhost,servers=https://localhost/ctlog/"
+  --ctlog-control "enabled=true,sslcontext.name=ctlog1,servers=https://localhost/ctlog/"
 
 ca:caalias-add \
   --ca subca1 \
@@ -318,7 +318,7 @@ echo "#################################################################"
 if { $TOKEN_TYPE equals "pkcs11" } then {
   CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subcawithcrl1"
 } else {
-  CA_SIGNER_CONF = "password=1234,keystore=file:output/subcawithcrl1.p12,algo=$SIGALGO"
+  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subcawithcrl1.p12,algo=$SIGALGO"
 }
 
 ca:ca-add \

@@ -82,17 +82,17 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 
 } elif { $TOKEN_TYPE equals "pkcs12" } then {
 
-  OCSP_KEYCONF = "password=1234,keystore=file:keycerts/ocsp99.p12"
+  OCSP_KEYCONF = "password=CHANGEIT,keystore=file:keycerts/ocsp99.p12"
 
   each ($list) {
     if { $KEY_TYPE equals "rsa" } then {
-      xi:rsa-p12 --password 1234 --key-size $KEYSPEC --out output/${it}.p12
+      xi:rsa-p12 --password CHANGEIT --key-size $KEYSPEC --out output/${it}.p12
     } elif { $KEY_TYPE equals "dsa" } then {
-      xi:dsa-p12 --password 1234 --plen $KEYSPEC --out output/${it}.p12
+      xi:dsa-p12 --password CHANGEIT --plen $KEYSPEC --out output/${it}.p12
     } elif { $KEY_TYPE equals "ec" } then {
-      xi:ec-p12 --curve $KEYSPEC --password 1234 --out output/${it}.p12
+      xi:ec-p12 --curve $KEYSPEC --password CHANGEIT --out output/${it}.p12
     } elif { $KEY_TYPE equals "sm2" } then {
-      xi:sm2-p12 --password 1234 --out output/${it}.p12
+      xi:sm2-p12 --password CHANGEIT --out output/${it}.p12
     }
   }
 

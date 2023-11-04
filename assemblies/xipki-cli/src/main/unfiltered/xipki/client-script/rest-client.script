@@ -55,9 +55,9 @@ echo "=====REST: Enroll====="
 
 CN = rest-smime-${CUR_TIME}
 
-xi:rsa-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
+xi:rsa-p12 --password CHANGEIT --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
 
-xi:csr-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+xi:csr-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
   --subject "C=DE,O=myorg,E=info@myorg.com,CN=${CN}" \
   --out ${OUT_DIR}/${CN}.csr
 
@@ -80,9 +80,9 @@ echo "=====REST: Enroll====="
 
 CN = rest-tls-${CUR_TIME}
 
-xi:rsa-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
+xi:rsa-p12 --password CHANGEIT --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
 
-xi:csr-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+xi:csr-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
   --subject "C=DE,O=myorg,CN=${CN}.myorg.org" \
   --out ${OUT_DIR}/${CN}.csr
 
@@ -141,9 +141,9 @@ echo "=====REST: Enroll Chinese SM2 Twin TLS Certificates (CA generates only key
 
 CN = rest-tls-sm2-twin-${CUR_TIME}
 
-xi:sm2-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
+xi:sm2-p12 --password CHANGEIT --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
 
-xi:csr-p12 --hash SM3 --gm --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+xi:csr-p12 --hash SM3 --gm --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
   --subject "C=CN,O=myorg,CN=${CN}.myorg.org" \
   --out ${OUT_DIR}/${CN}.csr
 

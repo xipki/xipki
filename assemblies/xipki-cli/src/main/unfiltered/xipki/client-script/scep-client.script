@@ -34,20 +34,20 @@ echo "=====SCEP: Enroll (self-signed identity cert) ====="
 CN = scep-smime-${CUR_TIME}
 
 # Must use the same CN as in the CSR
-xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" \
+xi:rsa-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}.p12" \
   --subject "C=DE,O=myorg,E=info@myorg.com,CN=${CN}"
 
-xi:csr-p12  --hash ${HASH} --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+xi:csr-p12  --hash ${HASH} --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
   --challenge-password user1:password1 \
   --out ${OUT_DIR}/${CN}.csr
 
 echo "# Enroll certificate via PKCSReq"
 xi:scep-enroll --method pkcs --url ${SMIME_URL} --ca-cert ${CACERT} \
-  --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
   --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der
 
 echo "# Update the certificate in PKCS#12 file"
-xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
   --cert ${OUT_DIR}/${CN}.der --ca-cert ${CACERT}
 
 # Enroll certificate of profile tls
@@ -57,21 +57,21 @@ echo "=====SCEP: Enroll (self-signed identity cert) ====="
 CN = scep-tls-${CUR_TIME}
 
 # Must use the same CN as in the CSR
-xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" \
+xi:rsa-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}.p12" \
   --subject "C=DE,O=myorg,CN=${CN}.myorg.org"
 
-xi:csr-p12  --hash ${HASH} --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+xi:csr-p12  --hash ${HASH} --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
   --challenge-password user1:password1 \
   --subject "C=DE,O=myorg,CN=${CN}.myorg.org" --out ${OUT_DIR}/${CN}.csr
 
 echo "# Enroll certificate via PKCSReq"
 xi:scep-enroll --method pkcs --url ${URL} --ca-cert ${CACERT} \
-  --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
   --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der
 
 echo "# Poll Cert"
 xi:scep-certpoll --url ${URL} --ca-cert ${CACERT} \
-  --p12 ${OUT_DIR}/${CN}.p12 --password 1234 --csr ${OUT_DIR}/${CN}.csr \
+  --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT --csr ${OUT_DIR}/${CN}.csr \
   --out ${OUT_DIR}/${CN}-certpoll.der
 
 echo "# Get Cert"
@@ -79,43 +79,43 @@ echo "# Get Cert"
 SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${CN}-certpoll.der)
 
 xi:scep-get-cert --url ${URL} --ca-cert ${CACERT} \
-  --p12 ${OUT_DIR}/${CN}.p12 --password 1234 --out ${OUT_DIR}/${CN}-getcert.der \
+  --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT --out ${OUT_DIR}/${CN}-getcert.der \
   --serial ${SERIAL}
 
 echo "# Update the certificate in PKCS#12 file"
-xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
   --cert ${OUT_DIR}/${CN}.der --ca-cert ${CACERT}
 
 echo "# Get CRL"
 xi:scep-get-crl --url ${URL} --ca-cert ${CACERT} --cert ${OUT_DIR}/${CN}.der \
-  --p12 ${OUT_DIR}/${CN}.p12 --password 1234 --out ${OUT_DIR}/myca1-scep.crl
+  --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT --out ${OUT_DIR}/myca1-scep.crl
 
 echo "# Renewal"
-xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}-2.p12" --subject "CN=dummy"
+xi:rsa-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}-2.p12" --subject "CN=dummy"
 
-xi:csr-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-2.p12 --password 1234 \
+xi:csr-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-2.p12 --password CHANGEIT \
   --subject "C=DE,O=myorg,CN=${CN}-2.myorg.org" --out ${OUT_DIR}/${CN}-2.csr
 
 echo "# Enroll certificate via Renewal, hence signed by the old key ${CN}.p12"
 xi:scep-enroll --method renewal --url ${URL} --ca-cert ${CACERT} \
-  --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
   --csr ${OUT_DIR}/${CN}-2.csr --out ${OUT_DIR}/${CN}-2.der
 
 echo "# Update the certificate in PKCS#12 file"
-xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}-2.p12 --password 1234 \
+xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}-2.p12 --password CHANGEIT \
   --cert ${OUT_DIR}/${CN}-2.der --ca-cert ${CACERT}
 
 echo "# Renewal with different CommonName"
-xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}-3.p12" --subject "CN=dummy"
+xi:rsa-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}-3.p12" --subject "CN=dummy"
 
-xi:csr-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-3.p12 --password 1234 \
+xi:csr-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-3.p12 --password CHANGEIT \
   --subject "C=DE,O=myorg,CN=${CN}-3.myorg.org" --out ${OUT_DIR}/${CN}-3.csr
 
 echo "# Enroll certificate via Renewal, hence signed by the old key ${CN}.p12"
 xi:scep-enroll --method renewal --url ${URL} --ca-cert ${CACERT} --p12 ${OUT_DIR}/${CN}.p12 \
-  --password 1234 --csr ${OUT_DIR}/${CN}-3.csr --out ${OUT_DIR}/${CN}-3.der
+  --password CHANGEIT --csr ${OUT_DIR}/${CN}-3.csr --out ${OUT_DIR}/${CN}-3.der
 
 echo "# Update the certificate in PKCS#12 file"
-xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}-3.p12 --password 1234 \
+xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}-3.p12 --password CHANGEIT \
   --cert ${OUT_DIR}/${CN}-3.der --ca-cert ${CACERT}
 

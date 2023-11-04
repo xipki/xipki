@@ -12,7 +12,7 @@ echo "#################################################################"
 if { $TOKEN_TYPE equals "pkcs11" } then {
   CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rootca1"
 } else {
-  CA_SIGNER_CONF = "password=1234,keystore=file:output/rootca1.p12,algo=$SIGALGO"
+  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/rootca1.p12,algo=$SIGALGO"
 }
 
 xi:copy-file -f qa/cab/template.rootca.json qa/cab/rootca.json
@@ -42,7 +42,7 @@ xi:move-file output/ca-rootca1.crt output/rootca1.crt
 
 ## Update the certificate in the device
 if { $TOKEN_TYPE equals "pkcs12" } then {
-  xi:update-cert-p12 --p12 output/rootca1.p12 --password 1234 --cert output/rootca1.crt
+  xi:update-cert-p12 --p12 output/rootca1.p12 --password CHANGEIT --cert output/rootca1.crt
 }
 
 ## Generate keys and CSR for subca1
@@ -53,7 +53,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --subject "C=DE,O=myorg,CN=subca1"
 } else {
   xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
-    --p12 output/subca1.p12 --password 1234 \
+    --p12 output/subca1.p12 --password CHANGEIT \
     --out output/subca1.csr \
     --subject "C=DE,O=myorg,CN=subca1"
 }
@@ -62,7 +62,7 @@ ca:enroll-cert --ca rootca1 --csr output/subca1.csr \
   --out output/subca1.crt --profile cab-subca
 
 if { $TOKEN_TYPE equals "pkcs12" } then {
-  xi:update-cert-p12 --p12 output/subca1.p12 --password 1234 \
+  xi:update-cert-p12 --p12 output/subca1.p12 --password CHANGEIT \
     --cert output/subca1.crt --ca-cert output/rootca1.crt
 }
 
@@ -74,7 +74,7 @@ echo "#################################################################"
 if { $TOKEN_TYPE equals "pkcs11" } then {
   CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subca1"
 } else {
-  CA_SIGNER_CONF = "password=1234,keystore=file:output/subca1.p12,algo=$SIGALGO"
+  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subca1.p12,algo=$SIGALGO"
 }
 
 xi:copy-file -f qa/cab/template.subca.json qa/cab/subca.json

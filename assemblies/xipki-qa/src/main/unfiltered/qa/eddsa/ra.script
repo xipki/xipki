@@ -4,10 +4,10 @@ echo "#################################################################"
 
 list = [ "2" "3" "4" ]
 each ($list) {
-  xi:ec-p12 --curve ed25519 --password 1234 --out output/ed25519-${it}.p12
-  xi:ec-p12 --curve x25519   --password 1234 --out output/x25519-${it}.p12
-  xi:ec-p12 --curve ed448   --password 1234 --out output/ed448-${it}.p12
-  xi:ec-p12 --curve x448     --password 1234 --out output/x448-${it}.p12
+  xi:ec-p12 --curve ed25519 --password CHANGEIT --out output/ed25519-${it}.p12
+  xi:ec-p12 --curve x25519   --password CHANGEIT --out output/x25519-${it}.p12
+  xi:ec-p12 --curve ed448   --password CHANGEIT --out output/ed448-${it}.p12
+  xi:ec-p12 --curve x448     --password CHANGEIT --out output/x448-${it}.p12
 }
 
 # Enroll Certificate (CA generate keypair)
@@ -17,13 +17,13 @@ each ($list) {
   type = $it
 
   xi:cmp-enroll-serverkeygen --ca subca \
-    --p12-out output/${type}-1.p12 --password 1234 \
+    --p12-out output/${type}-1.p12 --password CHANGEIT \
     --cert-out output/${type}-1.crt --profile ${type} \
     --subject "C=DE,CN=${type}-1.myorg.org" \
-    --signer-password 1234 --signer-p12 xipki/keycerts/tlskeys/client/tls-client.p12
+    --signer-password CHANGEIT --signer-p12 xipki/keycerts/cmp-client.p12
 
 
-  xi:update-cert-p12 --p12 output/${type}-1.p12 --password 1234 \
+  xi:update-cert-p12 --p12 output/${type}-1.p12 --password CHANGEIT \
     --cert output/${type}-1.crt \
     --ca-cert output/subca1.crt \
     --ca-cert output/rootca1.crt
@@ -36,12 +36,12 @@ each ($list) {
   type = $it
 
   xi:cmp-enroll-p12 --ca subca \
-    --p12 output/${type}-2.p12 --password 1234 \
+    --p12 output/${type}-2.p12 --password CHANGEIT \
     --out output/${type}-2.crt --profile ${type} \
     --subject "C=DE,CN=${type}-2.myorg.org" \
-    --signer-password 1234 --signer-p12 xipki/keycerts/tlskeys/client/tls-client.p12
+    --signer-password CHANGEIT --signer-p12 xipki/keycerts/cmp-client.p12
 
-  xi:update-cert-p12 --p12 output/${type}-2.p12 --password 1234 \
+  xi:update-cert-p12 --p12 output/${type}-2.p12 --password CHANGEIT \
     --cert output/${type}-2.crt \
     --ca-cert output/subca1.crt \
     --ca-cert output/rootca1.crt
@@ -54,7 +54,7 @@ each ($list) {
   type = $it
 
   xi:csr-p12 \
-    --p12 output/${type}-3.p12 --password 1234 \
+    --p12 output/${type}-3.p12 --password CHANGEIT \
     --subject "C=DE,CN=${type}-3.myorg.org" \
     --out output/${type}-3.csr
 }
@@ -64,7 +64,7 @@ each ($list) {
   type = $it
 
   xi:csr-p12 \
-    --p12 output/${type}-3.p12 --password 1234 \
+    --p12 output/${type}-3.p12 --password CHANGEIT \
     --subject "C=DE,CN=${type}-3.myorg.org" \
     --peer-certs qa/keys/dhpop-certs.pem \
     --out output/${type}-3.csr
@@ -76,9 +76,9 @@ each ($list) {
 
   xi:cmp-csr-enroll --ca subca --csr output/${type}-3.csr \
     --out output/${type}-3.crt --profile ${type} \
-    --signer-password 1234 --signer-p12 xipki/keycerts/tlskeys/client/tls-client.p12
+    --signer-password CHANGEIT --signer-p12 xipki/keycerts/cmp-client.p12
 
-  xi:update-cert-p12 --p12 output/${type}-3.p12 --password 1234 \
+  xi:update-cert-p12 --p12 output/${type}-3.p12 --password CHANGEIT \
     --cert output/${type}-3.crt \
     --ca-cert output/subca1.crt \
     --ca-cert output/rootca1.crt
@@ -102,7 +102,7 @@ each ($list) {
   type = $it
 
   xi:csr-p12 \
-    --p12 output/${type}-4.p12 --password 1234 \
+    --p12 output/${type}-4.p12 --password CHANGEIT \
     --subject "C=DE,CN=${type}-4.myorg.org" \
     --out output/${type}-4.csr
 }
@@ -112,7 +112,7 @@ each ($list) {
   type = $it
 
   xi:csr-p12 \
-    --p12 output/${type}-4.p12 --password 1234 \
+    --p12 output/${type}-4.p12 --password CHANGEIT \
     --subject "C=DE,CN=${type}-4.myorg.org" \
     --peer-certs qa/keys/dhpop-certs.pem \
     --out output/${type}-4.csr
@@ -127,7 +127,7 @@ each ($list) {
     --header "Content-Type: application/pkcs10" \
     "$BASE_URL/enroll-cert?profile=${type}"
 
-  xi:update-cert-p12 --p12 output/${type}-4.p12 --password 1234 \
+  xi:update-cert-p12 --p12 output/${type}-4.p12 --password CHANGEIT \
     --cert output/${type}-4.crt \
     --ca-cert output/subca1.crt \
     --ca-cert output/rootca1.crt

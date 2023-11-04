@@ -21,7 +21,7 @@ ca:get-crl --ca subcawithcrl1 \
   --out output/subcawithcrl1-camgmt-get.crl
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/cross1.p12 --password 1234 \
+  --p12 output/cross1.p12 --password CHANGEIT \
   --subject "CN=cross1,O=myorg,C=DE" \
   --outform $OUTFORM \
   --out output/cross1.csr
@@ -35,25 +35,25 @@ echo "#################################################################"
 echo "#              Manage certificate with RA Client                #"
 echo "#################################################################"
 
-SIGNER_P12 = xipki/keycerts/tlskeys/client/tls-client.p12
+SIGNER_P12 = xipki/keycerts/cmp-client.p12
 
 ## Enroll certificates
 # Certificate ocsp1
 
 ## Create the CSR for the command caqa:check-cert in QA
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/ocsp1.p12 --password 1234 \
+  --p12 output/ocsp1.p12 --password CHANGEIT \
   --outform $OUTFORM \
   --out output/ocsp1.csr \
   --subject "CN=ocsp1,2.5.4.97=VATDE-123456789,O=myorg,C=DE"
 
 xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
   --ca subcawithcrl --profile OCSP \
-  --p12 output/ocsp1.p12 --password 1234 --outform $OUTFORM --out output/ocsp1.crt \
+  --p12 output/ocsp1.p12 --password CHANGEIT --outform $OUTFORM --out output/ocsp1.crt \
   --subject "CN=ocsp1,2.5.4.97=VATDE-123456789,O=myorg,C=DE" \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/ocsp1.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/ocsp1.p12 --password CHANGEIT \
   --cert output/ocsp1.crt \
   --ca-cert output/subcawithcrl1.crt \
   --ca-cert output/rootca1.crt
@@ -62,18 +62,18 @@ xi:update-cert-p12 --p12 output/ocsp1.p12 --password 1234 \
 
 ## Create the CSR for the command caqa:check-cert in QA
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/ocsp2.p12 --password 1234 \
+  --p12 output/ocsp2.p12 --password CHANGEIT \
   --outform $OUTFORM \
   --out output/ocsp2.csr \
   --subject "CN=ocsp2,2.5.4.97=VATDE-123456789,O=myorg,C=DE"
 
 xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
   --ca subcawithcrl --profile OCSP \
-  --p12 output/ocsp2.p12 --password 1234 --outform $OUTFORM --out output/ocsp2.crt \
+  --p12 output/ocsp2.p12 --password CHANGEIT --outform $OUTFORM --out output/ocsp2.crt \
   --subject "CN=ocsp2,2.5.4.97=VATDE-123456789,O=myorg,C=DE" \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/ocsp2.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/ocsp2.p12 --password CHANGEIT \
   --cert output/ocsp2.crt --ca-cert output/subcawithcrl1.crt \
   --ca-cert output/rootca1.crt
 
@@ -82,10 +82,10 @@ CN = cmp-crmf-ca-genkey-tls
 
 xi:cmp-enroll-serverkeygen \
   --ca subca --profile tls \
-  --p12-out output/${CN}.p12 --password 1234 \
+  --p12-out output/${CN}.p12 --password CHANGEIT \
   --cert-outform $OUTFORM --cert-out output/${CN}.crt \
   --subject "CN=${CN}.myorg.org,O=myorg,C=DE" \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
 source qa/qa.d/ra-serverkeygen.script
 
@@ -94,44 +94,44 @@ xi:cmp-revoke \
   --ca subcawithcrl --ca-cert output/subcawithcrl1.crt \
   --cert output/ocsp2.crt \
   --reason keyCompromise \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
 # Certificate multiple-ous
 
 ## Create the CSR for the command caqa:check-cert in QA
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/multiple-ous1.p12 --password 1234 \
+  --p12 output/multiple-ous1.p12 --password CHANGEIT \
   --outform $OUTFORM \
   --out output/multiple-ous1.csr \
   --subject "CN=multiple-ous1,OU=A12345,OU=54321,O=myorg,C=DE"
 
 xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
   --ca subcawithcrl --profile multiple-ous \
-  --p12 output/multiple-ous1.p12 --password 1234 \
+  --p12 output/multiple-ous1.p12 --password CHANGEIT \
   --outform $OUTFORM  --out output/multiple-ous1.crt \
   --subject "CN=multiple-ous1,OU=A12345,OU=54321,O=myorg,C=DE" \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/multiple-ous1.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/multiple-ous1.p12 --password CHANGEIT \
   --cert output/multiple-ous1.crt \
   --ca-cert output/subcawithcrl1.crt \
   --ca-cert output/rootca1.crt
 
 ## Create the CSR for the command caqa:check-cert in QA
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/multiple-ous2.p12 --password 1234 \
+  --p12 output/multiple-ous2.p12 --password CHANGEIT \
   --outform $OUTFORM \
   --out output/multiple-ous2.csr \
   --subject "CN=multiple-ous2,OU=54321,OU=A12345,O=myorg,C=DE"
 
 xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
   --ca subcawithcrl --profile multiple-ous \
-  --p12 output/multiple-ous2.p12 --password 1234 \
+  --p12 output/multiple-ous2.p12 --password CHANGEIT \
   --outform $OUTFORM --out output/multiple-ous2.crt \
   --subject "CN=multiple-ous2,OU=54321,OU=A12345,O=myorg,C=DE" \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/multiple-ous2.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/multiple-ous2.p12 --password CHANGEIT \
   --cert output/multiple-ous2.crt \
   --ca-cert output/subcawithcrl1.crt \
   --ca-cert output/rootca1.crt
@@ -140,18 +140,18 @@ xi:update-cert-p12 --p12 output/multiple-ous2.p12 --password 1234 \
 
 ## Create the CSR for the command caqa:check-cert in QA
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/multi-valued-rdn1.p12 --password 1234 \
+  --p12 output/multi-valued-rdn1.p12 --password CHANGEIT \
   --out output/multi-valued-rdn1.csr \
   --subject "CN=multi-valued-rdn1,OU=A12345,O=myorg,C=DE"
 
 xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
   --ca subcawithcrl --profile multi-valued-rdn \
-  --p12 output/multi-valued-rdn1.p12  --password 1234 \
+  --p12 output/multi-valued-rdn1.p12  --password CHANGEIT \
   --outform $OUTFORM --out output/multi-valued-rdn1.crt \
   --subject "CN=multi-valued-rdn1,OU=A12345,O=myorg,C=DE" \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/multi-valued-rdn1.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/multi-valued-rdn1.p12 --password CHANGEIT \
   --cert output/multi-valued-rdn1.crt \
   --ca-cert output/subcawithcrl1.crt \
   --ca-cert output/rootca1.crt
@@ -159,18 +159,18 @@ xi:update-cert-p12 --p12 output/multi-valued-rdn1.p12 --password 1234 \
 # Certificate qc
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/qc1.p12 --password 1234 \
+  --p12 output/qc1.p12 --password CHANGEIT \
   --out output/qc1.csr \
   --subject "CN=qc1,2.5.4.97=VATDE-123456789,O=myorg,C=DE"
 
 xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
   --ca subca --profile qc \
-  --p12 output/qc1.p12 --password 1234 \
+  --p12 output/qc1.p12 --password CHANGEIT \
   --outform $OUTFORM --out output/qc1.crt \
   --subject "CN=qc1,2.5.4.97=VATDE-123456789,O=myorg,C=DE" \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/qc1.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/qc1.p12 --password CHANGEIT \
   --cert output/qc1.crt \
   --ca-cert output/subcawithcrl1.crt \
   --ca-cert output/rootca1.crt
@@ -178,18 +178,18 @@ xi:update-cert-p12 --p12 output/qc1.p12 --password 1234 \
 # Certificate fixed-partial-subject1
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/fixed-partial-subject1.p12 --password 1234 \
+  --p12 output/fixed-partial-subject1.p12 --password CHANGEIT \
   --out output/fixed-partial-subject1.csr \
   --subject "CN=fixed-partial-subject1"
 
 xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
   --ca subca --profile fixed-partial-subject \
-  --p12 output/fixed-partial-subject1.p12 --password 1234 \
+  --p12 output/fixed-partial-subject1.p12 --password CHANGEIT \
   --outform $OUTFORM --out output/fixed-partial-subject1.crt \
   --subject "CN=fixed-partial-subject1" \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/fixed-partial-subject1.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/fixed-partial-subject1.p12 --password CHANGEIT \
   --cert output/fixed-partial-subject1.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
@@ -197,18 +197,18 @@ xi:update-cert-p12 --p12 output/fixed-partial-subject1.p12 --password 1234 \
 # Certificate fixed-partial-subject2
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/fixed-partial-subject2.p12 --password 1234 \
+  --p12 output/fixed-partial-subject2.p12 --password CHANGEIT \
   --out output/fixed-partial-subject2.csr \
   --subject "CN=fixed-partial-subject2,C=FR"
 
 xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
   --ca subca --profile fixed-partial-subject \
-  --p12 output/fixed-partial-subject2.p12 --password 1234 \
+  --p12 output/fixed-partial-subject2.p12 --password CHANGEIT \
   --outform $OUTFORM --out output/fixed-partial-subject2.crt \
   --subject "CN=fixed-partial-subject2,C=FR" \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/fixed-partial-subject2.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/fixed-partial-subject2.p12 --password CHANGEIT \
   --cert output/fixed-partial-subject2.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
@@ -216,7 +216,7 @@ xi:update-cert-p12 --p12 output/fixed-partial-subject2.p12 --password 1234 \
 # Certificate ee-complex1 with complex subject (parsable in openssl)
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/ee-complex1.p12 --password 1234 \
+  --p12 output/ee-complex1.p12 --password CHANGEIT \
   --outform $OUTFORM \
   --out output/ee-complex1.csr \
   --subject "UID=abc-def,CN=ee-complex1,O=myorg,C=DE,1.3.6.1.4.1.311.60.2.1.3=CN,1.3.6.1.4.1.311.60.2.1.2=Guandong,1.3.6.1.4.1.311.60.2.1.1=Shenzhen,1.3.36.8.3.3=registrationNumber\=aaab" \
@@ -247,9 +247,9 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
 xi:cmp-csr-enroll --csr output/ee-complex1.csr \
   --ca subca --profile ee-complex \
   --outform $OUTFORM --out output/ee-complex1.crt \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/ee-complex1.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/ee-complex1.p12 --password CHANGEIT \
   --cert output/ee-complex1.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
@@ -257,7 +257,7 @@ xi:update-cert-p12 --p12 output/ee-complex1.p12 --password 1234 \
 # Certificate ee-complex2 with complex subject (not parsable in openssl due to complex subject)
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/ee-complex2.p12 --password 1234 \
+  --p12 output/ee-complex2.p12 --password CHANGEIT \
   --outform $OUTFORM \
   --out output/ee-complex2.csr \
   --subject "UID=abc-def,CN=ee-complex2,O=myorg,C=DE,1.3.6.1.4.1.311.60.2.1.3=CN,1.3.6.1.4.1.311.60.2.1.2=Guandong,1.3.6.1.4.1.311.60.2.1.1=Shenzhen,1.3.36.8.3.3=registrationNumber\=aaab" \
@@ -291,9 +291,9 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
 xi:cmp-csr-enroll --csr output/ee-complex2.csr \
   --ca subca --profile ee-complex \
   --outform $OUTFORM --out output/ee-complex2.crt \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/ee-complex2.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/ee-complex2.p12 --password CHANGEIT \
   --cert output/ee-complex2.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
@@ -307,16 +307,16 @@ each ($list) {
 
   xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
     --subject "CN=${certname}1,O=myorg,C=DE" \
-    --p12 output/${certname}1.p12 --password 1234 \
+    --p12 output/${certname}1.p12 --password CHANGEIT \
     --outform $OUTFORM \
     --out output/${certname}1.csr
 
   xi:cmp-csr-enroll --csr output/${certname}1.csr \
     --ca subca --profile ${certname} \
     --outform $OUTFORM --out output/${certname}1.crt \
-    --signer-password 1234 --signer-p12 ${SIGNER_P12}
+    --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-  xi:update-cert-p12 --p12 output/${certname}1.p12 --password 1234 \
+  xi:update-cert-p12 --p12 output/${certname}1.p12 --password CHANGEIT \
     --cert output/${certname}1.crt \
     --ca-cert output/subca1.crt \
     --ca-cert output/rootca1.crt
@@ -325,7 +325,7 @@ each ($list) {
 # Certificate smime1
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/smime1.p12 --password 1234 \
+  --p12 output/smime1.p12 --password CHANGEIT \
   --subject "CN=smime1,E=InFo@myorg.com,O=myorg,C=DE" \
   --outform $OUTFORM \
   --out output/smime1.csr \
@@ -333,9 +333,9 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
 xi:cmp-csr-enroll --csr output/smime1.csr \
   --ca subca --profile smime \
   --outform $OUTFORM --out output/smime1.crt \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/smime1.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/smime1.p12 --password CHANGEIT \
   --cert output/smime1.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
@@ -346,15 +346,15 @@ CN = smime-alias
 
 xi:cmp-enroll-serverkeygen \
   --ca subca --profile smime-alias \
-  --p12-out output/${CN}.p12 --password 1234 \
+  --p12-out output/${CN}.p12 --password CHANGEIT \
   --cert-outform $OUTFORM --cert-out output/${CN}.crt \
   --subject "CN={CN},E=InFo@myorg.com,O=myorg,C=DE" \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
 # Certificate smime-legacy1
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/smime-legacy1.p12 --password 1234 \
+  --p12 output/smime-legacy1.p12 --password CHANGEIT \
   --subject "CN=smime-legacy1,E=InFo@myorg.com,O=myorg,C=DE" \
   --outform $OUTFORM \
   --out output/smime-legacy1.csr \
@@ -362,9 +362,9 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
 xi:cmp-csr-enroll --csr output/smime-legacy1.csr \
   --ca subca --profile smime-legacy \
   --outform $OUTFORM --out output/smime-legacy1.crt \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/smime-legacy1.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/smime-legacy1.p12 --password CHANGEIT \
   --cert output/smime-legacy1.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
@@ -372,7 +372,7 @@ xi:update-cert-p12 --p12 output/smime-legacy1.p12 --password 1234 \
 # Certificate tls1
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/tls1.p12 --password 1234 \
+  --p12 output/tls1.p12 --password CHANGEIT \
   --subject "CN=tls1.myorg.org,O=myorg,C=DE" \
   --outform $OUTFORM \
   --out output/tls1.csr \
@@ -380,9 +380,9 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
 xi:cmp-csr-enroll --csr output/tls1.csr \
   --ca subca --profile tls \
   --outform $OUTFORM --out output/tls1.crt \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/tls1.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/tls1.p12 --password CHANGEIT \
   --cert output/tls1.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
@@ -390,7 +390,7 @@ xi:update-cert-p12 --p12 output/tls1.p12 --password 1234 \
 # Certificate tls2
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/tls2.p12 --password 1234 \
+  --p12 output/tls2.p12 --password CHANGEIT \
   --subject "CN=tls2.myorg.org,O=myorg,C=DE" \
   --outform $OUTFORM \
   --out output/tls2.csr
@@ -398,9 +398,9 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
 xi:cmp-csr-enroll --csr output/tls2.csr \
   --ca subca --profile tls \
   --outform $OUTFORM --out output/tls2.crt \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/tls2.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/tls2.p12 --password CHANGEIT \
   --cert output/tls2.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
@@ -411,10 +411,10 @@ CN = tls-alias1
 
 xi:cmp-enroll-serverkeygen \
   --ca subca --profile tls-alias1 \
-  --p12-out output/${CN}.p12 --password 1234 \
+  --p12-out output/${CN}.p12 --password CHANGEIT \
   --cert-outform $OUTFORM --cert-out output/${CN}.crt \
   --subject "CN=${CN}.org,O=myorg,C=DE" \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
 # Certificate tls-alias2
 
@@ -422,35 +422,35 @@ CN = tls-alias2
 
 xi:cmp-enroll-serverkeygen \
   --ca subca --profile tls-alias2 \
-  --p12-out output/${CN}.p12 --password 1234 \
+  --p12-out output/${CN}.p12 --password CHANGEIT \
   --cert-outform $OUTFORM --cert-out output/${CN}.crt \
   --subject "CN=${CN}.org,O=myorg,C=DE" \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
 ## Suspend certificates
 xi:cmp-revoke --ca subca1 \
   --cert output/tls1.crt \
   --cert output/tls2.crt \
   --ca-cert output/subca1.crt --reason certificateHold \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
 xi:cmp-unsuspend --ca subca1 \
   --cert output/tls1.crt \
   --cert output/tls2.crt \
   --ca-cert output/subca1.crt \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
 ## Revoke certificates
 xi:cmp-revoke --ca subca1 --cert output/tls2.crt \
   --ca-cert output/subca1.crt --reason affiliationChanged \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
 ## Enroll certificates
 
 # Certificate tls-c1
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/tls-c1.p12 --password 1234 \
+  --p12 output/tls-c1.p12 --password CHANGEIT \
   --subject "CN=tls-c1,O=myorg,C=DE" \
   --outform $OUTFORM \
   --out output/tls-c1.csr
@@ -458,9 +458,9 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
 xi:cmp-csr-enroll --csr output/tls-c1.csr \
   --ca subca --profile tls-c \
   --outform $OUTFORM --out output/tls-c1.crt \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/tls-c1.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/tls-c1.p12 --password CHANGEIT \
   --cert output/tls-c1.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
@@ -468,7 +468,7 @@ xi:update-cert-p12 --p12 output/tls-c1.p12 --password 1234 \
 # Certificate tls-c2
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/tls-c2.p12 --password 1234 \
+  --p12 output/tls-c2.p12 --password CHANGEIT \
   --subject "CN=tls-c2,O=myorg,C=DE" \
   --outform $OUTFORM \
   --out output/tls-c2.csr
@@ -476,9 +476,9 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
 xi:cmp-csr-enroll --csr output/tls-c2.csr \
   --ca subca --profile tls-c \
   --outform $OUTFORM --out output/tls-c2.crt \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/tls-c2.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/tls-c2.p12 --password CHANGEIT \
   --cert output/tls-c2.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
@@ -486,12 +486,12 @@ xi:update-cert-p12 --p12 output/tls-c2.p12 --password 1234 \
 ## Revocate certificates
 xi:cmp-revoke --ca subca1 --cert output/tls-c2.crt \
   --ca-cert output/subca1.crt --reason affiliationChanged \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
 # Certificate max-time1
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/max-time1.p12 --password 1234 \
+  --p12 output/max-time1.p12 --password CHANGEIT \
   --subject "CN=max-time1.myorg.org,O=myorg,C=DE" \
   --outform $OUTFORM \
   --out output/max-time1.csr
@@ -499,9 +499,9 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
 xi:cmp-csr-enroll --csr output/max-time1.csr \
   --ca subcawithcrl --profile max-time \
   --outform $OUTFORM --out output/max-time1.crt \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/max-time1.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/max-time1.p12 --password CHANGEIT \
   --cert output/max-time1.crt \
   --ca-cert output/subcawithcrl1.crt \
   --ca-cert output/rootca1.crt
@@ -509,7 +509,7 @@ xi:update-cert-p12 --p12 output/max-time1.p12 --password 1234 \
 # Certificate gmt0015_1
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/gmt0015_1.p12 --password 1234 \
+  --p12 output/gmt0015_1.p12 --password CHANGEIT \
   --subject "CN=gmt0015_1,OU=my OU,O=my O,C=CN" \
   --outform $OUTFORM --out output/gmt0015_1.csr \
   --extensions-file qa/extensions/extensions-gmt0015.der
@@ -517,9 +517,9 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
 xi:cmp-csr-enroll --csr output/gmt0015_1.csr \
   --ca subcawithcrl --profile gmt0015 \
   --outform $OUTFORM --out output/gmt0015_1.crt \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/gmt0015_1.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/gmt0015_1.p12 --password CHANGEIT \
   --cert output/gmt0015_1.crt \
   --ca-cert output/subcawithcrl1.crt \
   --ca-cert output/rootca1.crt
@@ -527,16 +527,16 @@ xi:update-cert-p12 --p12 output/gmt0015_1.p12 --password 1234 \
 # Certificate gmt0015_2
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/gmt0015_2.p12 --password 1234 \
+  --p12 output/gmt0015_2.p12 --password CHANGEIT \
   --subject "CN=gmt0015_2,OU=my OU,O=my O,C=CN,1.2.156.10260.4.1.1=[0]362323880212651,1.2.156.10260.4.1.2=insurance123,1.2.156.10260.4.1.3=cor1234,1.2.156.10260.4.1.4=orgcode1234,1.2.156.10260.4.1.5=taxcode1234" \
   --outform $OUTFORM --out output/gmt0015_2.csr
 
 xi:cmp-csr-enroll --csr output/gmt0015_2.csr \
   --ca subcawithcrl --profile gmt0015 \
   --outform $OUTFORM --out output/gmt0015_2.crt \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/gmt0015_2.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/gmt0015_2.p12 --password CHANGEIT \
   --cert output/gmt0015_2.crt \
   --ca-cert output/subcawithcrl1.crt \
   --ca-cert output/rootca1.crt

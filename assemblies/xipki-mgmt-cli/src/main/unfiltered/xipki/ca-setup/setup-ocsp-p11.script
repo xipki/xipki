@@ -55,6 +55,6 @@ if { $printUsage equals "true" } then {
   echo "Please"
   echo "  1. Modify <tomcat.dir>/xipki/etc/ocsp/ocsp-responder.json"
   echo "     - replace signer\'s type \'pkcs12\' with \'pkcs11\'"
-  echo "     - replace signer\'s key \'password=1234,keystore=file:keycerts/ocsp1.p12\' with \'slot=${SLOT},key-label=${P11_LABEL}\'"
+  echo "     - replace signer\'s key \'password=CHANGEIT,keystore=file:keycerts/ocsp1.p12\' with \'slot=${SLOT},key-label=${P11_LABEL}\'"
   echo "  2. Restart tomcat."
 }

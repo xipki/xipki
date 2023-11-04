@@ -10,10 +10,10 @@ echo "#################################################################"
 
 echo "# Generate PKCS#12 key and certificate for SCEP Responder"
 
-xi:rsa-p12 --key-size 2048 --password 1234 \
+xi:rsa-p12 --key-size 2048 --password CHANGEIT \
   --out ${KEYCERTS_DIR}/scep-subcawithcrl.p12
 
-xi:csr-p12 --password 1234 \
+xi:csr-p12 --password CHANGEIT \
   --p12 ${KEYCERTS_DIR}/scep-subcawithcrl.p12 \
   --out ${KEYCERTS_DIR}/scep-subcawithcrl.csr \
   --subject "${SUBJECT}"
@@ -23,7 +23,7 @@ ca:enroll-cert --ca subcawithcrl1 --profile scep \
   --out ${KEYCERTS_DIR}/scep-subcawithcrl.der
 
 echo "# Update the certificate in the PKCS#12 file"
-xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/scep-subcawithcrl.p12 --password 1234 \
+xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/scep-subcawithcrl.p12 --password CHANGEIT \
   --cert ${KEYCERTS_DIR}/scep-subcawithcrl.der --ca-cert ${CACERT_FILE}
 
 xi:copy-file -f ${KEYCERTS_DIR}/scep-subcawithcrl.p12 \

@@ -12,7 +12,7 @@ xi:replace --old "REPLACEME-TOKEN_TYPE" --new "PKCS12" \
   xipki/ca-setup/cacert-present/ca-conf.json
 
 xi:replace --old "REPLACEME-CA_SIGNERCONF" \
-  --new "algo=${HASH}withECDSA,password=1234,keystore=file:xipki/ca-setup/keycerts/myca1.p12" \
+  --new "algo=${HASH}withECDSA,password=CHANGEIT,keystore=file:xipki/ca-setup/keycerts/myca1.p12" \
   xipki/ca-setup/cacert-present/ca-conf.json
 
-ca:load-conf --conf-file xipki/ca-setup/cacert-present/ca-conf.json
+ca:load-conf --conf-file xipki/ca-setup/cacert-present/ca-conf.jsons

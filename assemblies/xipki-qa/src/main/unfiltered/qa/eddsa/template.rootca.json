@@ -11,14 +11,14 @@
 		"name":"responder1",
 		"type":"pkcs12",
 		"conf":{
-			"value":"password=1234,keystore=file:${keycerts.dir}/tlskeys/server/tls-server.p12,algo=SHA256withECDSA"
+			"value":"password=CHANGEIT,keystore=file:${keycerts.dir}/ca-server.p12,algo=SHA256withECDSA"
 		}
 	}],
 	"requestors":[{
 		"name":"requestor1",
 		"type":"cert",
 		"binaryConf":{
-			"file":"${keycerts.dir}/tlskeys/client/tls-client-cert.der"
+			"file":"${keycerts.dir}/ra-sdk-client-cert.pem"
 		}
 	}],
 	"publishers":[{

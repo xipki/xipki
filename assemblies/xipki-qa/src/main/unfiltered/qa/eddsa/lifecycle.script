@@ -68,7 +68,7 @@ if { $printUsage equals "true" } then {
   xi:replace --old "REPLACEME-TOKENTYPE" --new "PKCS12" \
     xipki/etc/ocsp/ocsp-responder.json
 
-  xi:replace --old "REPLACEME-TOKENKEY" --new "password=1234,keystore=file:keycerts/ocsp99.p12" \
+  xi:replace --old "REPLACEME-TOKENKEY" --new "password=CHANGEIT,keystore=file:keycerts/ocsp99.p12" \
     xipki/etc/ocsp/ocsp-responder.json
 
   xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
@@ -87,8 +87,8 @@ if { $printUsage equals "true" } then {
 
   cmp-enroll-serverkeygen --ca subca \
     --subject "C=DE,O=example org,CN=ocsp99" --profile ocsp \
-    --p12-out output/ocsp99.p12 --cert-out output/ocsp99.crt --password 1234 \
-    --signer-password 1234 --signer-p12 xipki/keycerts/tlskeys/client/tls-client.p12
+    --p12-out output/ocsp99.p12 --cert-out output/ocsp99.crt --password CHANGEIT \
+    --signer-password CHANGEIT --signer-p12 xipki/keycerts/cmp-client.p12
 
   ## Copy the configuration of OCSP responder
   #xi:copy-file -f \

@@ -12,7 +12,7 @@ CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in output/subcawithcrl1.c
 
 xi:csr-p12 \
   --hash $HASH REPLACEME-GM REPLACEME-RSAPSS \
-  --p12 output/rest-tls1.p12 --password 1234 \
+  --p12 output/rest-tls1.p12 --password CHANGEIT \
   --subject "CN=rest-tls1.myorg.org,O=myorg,C=DE" \
   --out $OUT_DIR/rest-tls1.csr
 
@@ -83,10 +83,10 @@ echo "=====REST: Enroll Twin TLS Certificates (CA generates only keypair for the
 
 CN = rest-tls-twin
 
-xi:ec-p12 --password 1234 --out $OUT_DIR/twin/${CN}.p12 --subject "CN=${CN}"
+xi:ec-p12 --password CHANGEIT --out $OUT_DIR/twin/${CN}.p12 --subject "CN=${CN}"
 
 xi:csr-p12 \
-  --p12 $OUT_DIR/twin/${CN}.p12 --password 1234 \
+  --p12 $OUT_DIR/twin/${CN}.p12 --password CHANGEIT \
   --subject "C=CN,O=myorg,CN=${CN}.myorg.org" \
   --out $OUT_DIR/twin/${CN}.csr
 

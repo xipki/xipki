@@ -13,7 +13,7 @@ echo "#################################################################"
 echo "#                     Generate Key and CSR                      #"
 echo "#################################################################"
 
-xi:ec-p12 --password 1234 --out ${KEYCERTS_DIR}/myca1.p12 --curve ${CURVE}
+xi:ec-p12 --password CHANGEIT --out ${KEYCERTS_DIR}/myca1.p12 --curve ${CURVE}
 
 echo "#################################################################"
 echo "#                       Load ca-conf.json                       #"
@@ -29,7 +29,7 @@ xi:replace --old "REPLACEME-TOKEN_TYPE" --new "pkcs12" \
   xipki/ca-setup/cacert-none/ca-conf.json
 
 xi:replace --old "REPLACEME-CA_SIGNERCONF" \
-  --new "algo=${HASH}withECDSA,password=1234,keystore=file:xipki/ca-setup/keycerts/myca1.p12" \
+  --new "algo=${HASH}withECDSA,password=CHANGEIT,keystore=file:xipki/ca-setup/keycerts/myca1.p12" \
   xipki/ca-setup/cacert-none/ca-conf.json
 
 ca:load-conf --conf-file xipki/ca-setup/cacert-none/ca-conf.json \
@@ -40,5 +40,5 @@ ca:profile-rm --force rootca
 xi:move-file ${KEYCERTS_DIR}/ca-myca1.crt ${KEYCERTS_DIR}/myca1.der
 
 echo "# Update the certificate in the device"
-xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/myca1.p12 --password 1234 \
+xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/myca1.p12 --password CHANGEIT \
   --cert ${KEYCERTS_DIR}/myca1.der

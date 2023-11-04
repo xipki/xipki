@@ -11,9 +11,9 @@ TLS_PROFILE=certprofile-tls-dsa-ec.json
 
 OUT_DIR=output/dsa
 
-SIGNER_CONF="algo=SHA256withDSA,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
+SIGNER_CONF="algo=SHA256withDSA,password=CHANGEIT,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
 
-xi:dsa-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --plen 2048
+xi:dsa-p12 --password CHANGEIT --out ${OUT_DIR}/ca/tls-ca.p12 --plen 2048
 
 source qa/tools/gencerts.script
 
@@ -26,9 +26,9 @@ TLS_PROFILE=certprofile-tls-dsa-ec.json
 
 OUT_DIR=output/ec
 
-SIGNER_CONF="algo=SHA256withECDSA,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
+SIGNER_CONF="algo=SHA256withECDSA,password=CHANGEIT,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
 
-xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve secp256r1
+xi:ec-p12 --password CHANGEIT --out ${OUT_DIR}/ca/tls-ca.p12 --curve secp256r1
 
 source qa/tools/gencerts.script
 
@@ -41,9 +41,9 @@ TLS_PROFILE=certprofile-tls-rsa.json
 
 OUT_DIR=output/rsa
 
-SIGNER_CONF="algo=SHA256withRSA,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
+SIGNER_CONF="algo=SHA256withRSA,password=CHANGEIT,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
 
-xi:rsa-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --key-size 2048
+xi:rsa-p12 --password CHANGEIT --out ${OUT_DIR}/ca/tls-ca.p12 --key-size 2048
 
 source qa/tools/gencerts.script
 
@@ -56,9 +56,9 @@ TLS_PROFILE=certprofile-tls-dsa-ec.json
 
 OUT_DIR=output/sm2
 
-SIGNER_CONF="algo=SM3withSM2,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
+SIGNER_CONF="algo=SM3withSM2,password=CHANGEIT,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
 
-xi:sm2-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12
+xi:sm2-p12 --password CHANGEIT --out ${OUT_DIR}/ca/tls-ca.p12
 
 source qa/tools/gencerts.script
 
@@ -71,9 +71,9 @@ TLS_PROFILE=certprofile-tls-x25519.json
 
 OUT_DIR=output/x25519
 
-SIGNER_CONF="algo=Ed25519,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
+SIGNER_CONF="algo=Ed25519,password=CHANGEIT,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
 
-xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve ed25519
+xi:ec-p12 --password CHANGEIT --out ${OUT_DIR}/ca/tls-ca.p12 --curve ed25519
 
 source qa/tools/gencerts.script
 
@@ -86,9 +86,9 @@ TLS_PROFILE=certprofile-tls-ed25519.json
 
 OUT_DIR=output/ed25519
 
-SIGNER_CONF="algo=Ed25519,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
+SIGNER_CONF="algo=Ed25519,password=CHANGEIT,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
 
-xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve ed25519
+xi:ec-p12 --password CHANGEIT --out ${OUT_DIR}/ca/tls-ca.p12 --curve ed25519
 
 source qa/tools/gencerts.script
 
@@ -101,9 +101,9 @@ TLS_PROFILE=certprofile-tls-x448.json
 
 OUT_DIR=output/x448
 
-SIGNER_CONF="algo=Ed448,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
+SIGNER_CONF="algo=Ed448,password=CHANGEIT,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
 
-xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve ed448
+xi:ec-p12 --password CHANGEIT --out ${OUT_DIR}/ca/tls-ca.p12 --curve ed448
 
 source qa/tools/gencerts.script
 
@@ -116,8 +116,8 @@ TLS_PROFILE=certprofile-tls-ed448.json
 
 OUT_DIR=output/ed448
 
-SIGNER_CONF="algo=Ed448,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
+SIGNER_CONF="algo=Ed448,password=CHANGEIT,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
 
-xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve ed448
+xi:ec-p12 --password CHANGEIT --out ${OUT_DIR}/ca/tls-ca.p12 --curve ed448
 
 source qa/tools/gencerts.script

@@ -1,16 +1,16 @@
 echo " ----- generate SCEP keys (RSA only) -----"
 
 ## SCEP responder
-xi:rsa-p12 --password 1234 --out p12/shared/scep1.p12
+xi:rsa-p12 --password CHANGEIT --out p12/shared/scep1.p12
 
 ## SCEP
 
-xi:rsa-p12 --password 1234 --out p12/shared/scep-ocsp1.p12 \
+xi:rsa-p12 --password CHANGEIT --out p12/shared/scep-ocsp1.p12 \
   --subject "CN=scep-ocsp1,O=myorg,C=DE"
 
-xi:rsa-p12 --password 1234 --out p12/shared/scep-ocsp1-2.p12
+xi:rsa-p12 --password CHANGEIT --out p12/shared/scep-ocsp1-2.p12
 
-xi:rsa-p12 --password 1234 --out p12/shared/scep-ocsp2.p12
+xi:rsa-p12 --password CHANGEIT --out p12/shared/scep-ocsp2.p12
 
 list = [ cross1 ocsp1 ocsp2 multiple-ous1 multiple-ous2 multi-valued-rdn1 qc1 \
   ee-complex1 ee-complex2 smime1 smime-legacy1 tls1 tls-neg \
@@ -22,11 +22,11 @@ list = [ cross1 ocsp1 ocsp2 multiple-ous1 multiple-ous2 multi-valued-rdn1 qc1 \
 each ($list) {
   filename = $it
 
-  xi:rsa-p12 --password 1234 --out p12/rsa/${filename}.p12
+  xi:rsa-p12 --password CHANGEIT --out p12/rsa/${filename}.p12
 
-  xi:dsa-p12 --password 1234 --out p12/dsa/${filename}.p12
+  xi:dsa-p12 --password CHANGEIT --out p12/dsa/${filename}.p12
 
-  xi:ec-p12  --password 1234 --out p12/ec/${filename}.p12
+  xi:ec-p12  --password CHANGEIT --out p12/ec/${filename}.p12
 
-  xi:sm2-p12 --password 1234 --out p12/sm2/${filename}.p12
+  xi:sm2-p12 --password CHANGEIT --out p12/sm2/${filename}.p12
 }

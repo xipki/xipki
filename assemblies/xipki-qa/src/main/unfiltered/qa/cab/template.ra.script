@@ -2,21 +2,21 @@ echo "#################################################################"
 echo "#              Manage certificate with RA Client                #"
 echo "#################################################################"
 
-SIGNER_P12 = xipki/keycerts/tlskeys/client/tls-client.p12
+SIGNER_P12 = xipki/keycerts/cmp-client.p12
 
 # Certificate cab-domain-validated1
 
 xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
-  --p12 output/cab-domain-validated1.p12 --password 1234 \
+  --p12 output/cab-domain-validated1.p12 --password CHANGEIT \
   --subject "C=DE,CN=abc.domain-validated.myorg.org" \
   --out output/cab-domain-validated1.csr
 
 xi:cmp-csr-enroll --ca subca \
   --csr output/cab-domain-validated1.csr \
   --out output/cab-domain-validated1.crt --profile cab-domain-validated \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/cab-domain-validated1.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/cab-domain-validated1.p12 --password CHANGEIT \
   --cert output/cab-domain-validated1.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
@@ -24,16 +24,16 @@ xi:update-cert-p12 --p12 output/cab-domain-validated1.p12 --password 1234 \
 # Certificate cab-domain-validated2 (wildcard domain)
 
 xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
-  --p12 output/cab-domain-validated2.p12 --password 1234 \
+  --p12 output/cab-domain-validated2.p12 --password CHANGEIT \
   --subject "C=DE,CN=*.domain-validated.myorg.org" \
   --out output/cab-domain-validated2.csr
 
 xi:cmp-csr-enroll --ca subca \
   --csr output/cab-domain-validated2.csr \
   --out output/cab-domain-validated2.crt --profile cab-domain-validated \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/cab-domain-validated2.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/cab-domain-validated2.p12 --password CHANGEIT \
   --cert output/cab-domain-validated2.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
@@ -41,16 +41,16 @@ xi:update-cert-p12 --p12 output/cab-domain-validated2.p12 --password 1234 \
 # Certificate cab-org-validated1
 
 xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
-  --p12 output/cab-org-validated1.p12 --password 1234 \
+  --p12 output/cab-org-validated1.p12 --password CHANGEIT \
   --subject "C=DE,L=Frankfurt,O=myorg.org,CN=abc.org-validated.myorg.org" \
   --out output/cab-org-validated1.csr
 
 xi:cmp-csr-enroll --ca subca \
   --csr output/cab-org-validated1.csr \
   --out output/cab-org-validated1.crt --profile cab-org-validated \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/cab-org-validated1.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/cab-org-validated1.p12 --password CHANGEIT \
   --cert output/cab-org-validated1.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
@@ -58,15 +58,15 @@ xi:update-cert-p12 --p12 output/cab-org-validated1.p12 --password 1234 \
 # Certificate cab-org-validated2 (wildcard domain)
 
 xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
-  --p12 output/cab-org-validated2.p12 --password 1234 \
+  --p12 output/cab-org-validated2.p12 --password CHANGEIT \
   --subject "C=DE,L=Frankfurt,O=myorg.org,CN=*.org-validated.myorg.org" \
   --out output/cab-org-validated2.csr
 
 xi:cmp-csr-enroll --ca subca --csr output/cab-org-validated2.csr \
   --out output/cab-org-validated2.crt --profile cab-org-validated \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/cab-org-validated2.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/cab-org-validated2.p12 --password CHANGEIT \
   --cert output/cab-org-validated2.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
@@ -74,15 +74,15 @@ xi:update-cert-p12 --p12 output/cab-org-validated2.p12 --password 1234 \
 # Certificate cab-individual-validated1
 
 xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
-  --p12 output/cab-individual-validated1.p12 --password 1234 \
+  --p12 output/cab-individual-validated1.p12 --password CHANGEIT \
   --subject "C=DE,L=Frankfurt,surName=mysurname,givenName=alice,CN=abc.individual-validated.myorg.org" \
   --out output/cab-individual-validated1.csr
 
 xi:cmp-csr-enroll --ca subca --csr output/cab-individual-validated1.csr \
   --out output/cab-individual-validated1.crt --profile cab-individual-validated \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/cab-individual-validated1.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/cab-individual-validated1.p12 --password CHANGEIT \
   --cert output/cab-individual-validated1.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
@@ -90,15 +90,15 @@ xi:update-cert-p12 --p12 output/cab-individual-validated1.p12 --password 1234 \
 # Certificate cab-individual-validated2 (wildcard domain)
 
 xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
-  --p12 output/cab-individual-validated2.p12 --password 1234 \
+  --p12 output/cab-individual-validated2.p12 --password CHANGEIT \
   --subject "C=DE,L=Frankfurt,surName=mysurname,givenName=alice,CN=*.individual-validated.myorg.org" \
   --out output/cab-individual-validated2.csr
 
 xi:cmp-csr-enroll --ca subca --csr output/cab-individual-validated2.csr \
   --out output/cab-individual-validated2.crt --profile cab-individual-validated \
-  --signer-password 1234 --signer-p12 ${SIGNER_P12}
+  --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
 
-xi:update-cert-p12 --p12 output/cab-individual-validated2.p12 --password 1234 \
+xi:update-cert-p12 --p12 output/cab-individual-validated2.p12 --password CHANGEIT \
   --cert output/cab-individual-validated2.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt

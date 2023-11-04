@@ -21,14 +21,14 @@
 		"name":"keypool",
 		"type":"keypool",
 		"conf":{
-			"value":"datasource=keypool,password=CHANGEME,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448"
+			"value":"datasource=keypool,password=CHANGEIT,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448"
 		}
 	}],
 	"requestors":[{
 		"name":"requestor1",
 		"type":"cert",
 		"binaryConf":{
-			"file":"${keycerts.dir}/tlskeys/client/tls-client-cert.der"
+			"file":"${keycerts.dir}/ra-sdk-client-cert.pem"
 		}
 	}],
 	"publishers":[{

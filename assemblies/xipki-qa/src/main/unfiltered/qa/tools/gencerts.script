@@ -1,4 +1,4 @@
-SIGNER_P12 = xipki/keycerts/tlskeys/client/tls-client.p12
+SIGNER_P12 = xipki/keycerts/cmp-client.p12
 
 sleep 1
 
@@ -27,20 +27,20 @@ xi:move-file -f ${OUT_DIR}/ca/ca-tls-ca.crt ${OUT_DIR}/ca/tls-ca-cert.der
 ############## RA ###################
 ## Server
 
-xi:cmp-enroll-serverkeygen --ca tls-ca --password 1234 --profile tls \
+xi:cmp-enroll-serverkeygen --ca tls-ca --password CHANGEIT --profile tls \
   --p12-out ${OUT_DIR}/server/tls-server.p12 \
   --cert-out ${OUT_DIR}/server/tls-server-cert.der \
   --subject "CN=localhost,OU=${CA_TYPE},O=myorg demo,C=DE" \
-  --signer-password 1234 --signer-p12 xipki/keycerts/tlskeys/client/tls-client.p12
+  --signer-password CHANGEIT --signer-p12 $SIGNER_P12
 
 list = [client client2 client3]
 each ($list) {
   name = $it
-  xi:cmp-enroll-serverkeygen --ca tls-ca --password 1234 --profile tls \
+  xi:cmp-enroll-serverkeygen --ca tls-ca --password CHANGEIT --profile tls \
     --p12-out ${OUT_DIR}/${name}/tls-${name}.p12 \
     --cert-out ${OUT_DIR}/${name}/tls-${name}-cert.der \
     --subject "CN=${name},OU=${CA_TYPE},O=myorg demo,C=DE" \
-    --signer-password 1234 --signer-p12 xipki/keycerts/tlskeys/client/tls-client.p12
+    --signer-password CHANGEIT --signer-p12 $SIGNER_P12
 
 }
 
@@ -49,14 +49,14 @@ list = [ca server client client2 client3]
 each ($list) {
   name = $it
 
-  xi:update-cert-p12 --p12 ${OUT_DIR}/${name}/tls-${name}.p12 --password 1234 \
+  xi:update-cert-p12 --p12 ${OUT_DIR}/${name}/tls-${name}.p12 --password CHANGEIT \
     --cert ${OUT_DIR}/${name}/tls-${name}-cert.der \
     --ca-cert ${OUT_DIR}/ca/tls-ca-cert.der
 
-  xi:import-cert --type pkcs12 --keystore ${OUT_DIR}/${name}/tls-${name}-cert.p12 --password 1234 \
+  xi:import-cert --type pkcs12 --keystore ${OUT_DIR}/${name}/tls-${name}-cert.p12 --password CHANGEIT \
     --cert ${OUT_DIR}/${name}/tls-${name}-cert.der
 
-  xi:pkcs12 --p12 ${OUT_DIR}/${name}/tls-${name}.p12 --password 1234 \
+  xi:pkcs12 --p12 ${OUT_DIR}/${name}/tls-${name}.p12 --password CHANGEIT \
     --key-out ${OUT_DIR}/${name}/tls-${name}-key.pem \
     --cert-out ${OUT_DIR}/${name}/tls-${name}-cert.pem
 }

@@ -37,4 +37,4 @@ ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ocsp-init.sql
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/keypool-db.properties"
 ca:sql --force --db-conf "${DB_CONF}" xipki/sql/keypool-init.sql
 
-qa:fill-keypool --db-conf "${DB_CONF}" --password CHANGEME
+qa:fill-keypool --db-conf "${DB_CONF}" --password CHANGEIT

@@ -27,7 +27,7 @@ OPTS="--insecure --user user1:password1"
 #OPTS="--insecure --cert ${DIR}/../keycerts/est-client-cert.pem --key ${DIR}/../keycerts/est-client-key.pem"
 
 # Use TLS client certificate to authorize in Mac
-#OPTS="--insecure --cert-type PKCS#12 --cert ${DIR}/../keycerts/est-client.p12:CHANGEME"
+#OPTS="--insecure --cert-type PKCS#12 --cert ${DIR}/../keycerts/est-client.p12:CHANGEIT"
 
 CUR_TIME=`date +%Y%m%d-%H%M%S`
 
