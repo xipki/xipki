@@ -65,8 +65,8 @@ TDIR=$RDIR/xipki-cli/xipki/keycerts
 
 mkdir -p $TDIR
 
-cp $KC_DIR/hsmproxy-server/*.p12 \
-   $KC_DIR/hsmproxy-server/*-cert.pem \
+cp $KC_DIR/hsmproxy-client/*.p12 \
+   $KC_DIR/hsmproxy-client/*-cert.pem \
    $KC_DIR/cmp-client/* \
    $KC_DIR/est-client/* \
    $KC_DIR/rest-client/* \
@@ -81,8 +81,8 @@ TDIR=$RDIR/xipki-mgmt-cli/xipki/keycerts
 
 mkdir -p $TDIR
 
-cp $KC_DIR/hsmproxy-server/*.p12 \
-   $KC_DIR/hsmproxy-server/*-cert.pem \
+cp $KC_DIR/hsmproxy-client/*.p12 \
+   $KC_DIR/hsmproxy-client/*-cert.pem \
    $KC_DIR/ca-mgmt-client/*.p12 \
    $KC_DIR/ca-mgmt-client/*-cert.pem \
    $KC_DIR/ocsp-mgmt-client/*.p12 \
