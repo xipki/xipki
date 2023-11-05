@@ -24,7 +24,7 @@ import java.util.Map;
  * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
-class CaManagerQueryExecutorBase extends QueryExecutor {
+abstract class CaManagerQueryExecutorBase extends QueryExecutor {
 
   protected enum Table {
     // SMALLINT or INT
@@ -54,10 +54,6 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     if (dbSchemaVersion < 7) {
       throw new CaMgmtException("DB version < 7 is not supported: " + dbSchemaVersion);
     }
-  }
-
-  public int getDbSchemaVersion() {
-    return dbSchemaVersion;
   }
 
   public int getMaxX500nameLen() {

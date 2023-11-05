@@ -68,7 +68,7 @@ class CertprofileManager {
     manager.idNameMap.clearCertprofile();
     manager.certprofiles.clear();
 
-    List<String> names = manager.queryExecutor.namesFromTable("PROFILE");
+    List<String> names = manager.queryExecutor.getProfileNames();
     for (String name : names) {
       CertprofileEntry dbEntry = manager.queryExecutor.createCertprofile(name);
       manager.idNameMap.addCertprofile(dbEntry.getIdent());
@@ -163,7 +163,7 @@ class CertprofileManager {
       }
     }
 
-    boolean bo = manager.queryExecutor.deleteRowWithName(name, "PROFILE");
+    boolean bo = manager.queryExecutor.deleteProfile(name);
     if (!bo) {
       throw new CaMgmtException("unknown profile " + name);
     }

@@ -54,7 +54,7 @@ class SignerManager {
     manager.signerDbEntries.clear();
     manager.signers.clear();
 
-    List<String> names = manager.queryExecutor.namesFromTable("SIGNER");
+    List<String> names = manager.queryExecutor.getSignerNames();
     for (String name : names) {
       SignerEntry entry = manager.queryExecutor.createSigner(name);
       entry.setConfFaulty(true);
@@ -95,7 +95,7 @@ class SignerManager {
     manager.assertMasterMode();
 
     name = Args.toNonBlankLower(name, "name");
-    boolean bo = manager.queryExecutor.deleteRowWithName(name, "SIGNER");
+    boolean bo = manager.queryExecutor.deleteSigner(name);
     if (!bo) {
       throw new CaMgmtException("unknown signer " + name);
     }

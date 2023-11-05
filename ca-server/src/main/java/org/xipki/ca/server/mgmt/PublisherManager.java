@@ -67,7 +67,7 @@ class PublisherManager {
     manager.publisherDbEntries.clear();
     manager.idNameMap.clearPublisher();
 
-    List<String> names = manager.queryExecutor.namesFromTable("PUBLISHER");
+    List<String> names = manager.queryExecutor.getPublisherNames();
     for (String name : names) {
       PublisherEntry dbEntry = manager.queryExecutor.createPublisher(name);
 
@@ -185,7 +185,7 @@ class PublisherManager {
       }
     }
 
-    boolean bo = manager.queryExecutor.deleteRowWithName(name, "PUBLISHER");
+    boolean bo = manager.queryExecutor.deletePublisher(name);
     if (!bo) {
       throw new CaMgmtException("unknown publisher " + name);
     }

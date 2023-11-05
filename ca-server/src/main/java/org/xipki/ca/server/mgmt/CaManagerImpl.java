@@ -22,7 +22,7 @@ import org.xipki.ca.sdk.X500NameType;
 import org.xipki.ca.server.*;
 import org.xipki.ca.server.db.CaManagerQueryExecutor;
 import org.xipki.ca.server.db.CertStore;
-import org.xipki.ca.server.db.SystemEvent;
+import org.xipki.ca.server.SystemEvent;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.datasource.DataSourceFactory;
@@ -152,7 +152,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   P11CryptServiceFactory p11CryptServiceFactory;
 
-  CaManagerQueryExecutor queryExecutor;
+  CaConfStore queryExecutor;
 
   private final CmLicense license;
 
@@ -367,7 +367,7 @@ public class CaManagerImpl implements CaManager, Closeable {
         lockCa();
       }
 
-      List<String> names = queryExecutor.namesFromTable("REQUESTOR");
+      List<String> names = queryExecutor.getRequestorNames();
       final String[] embeddedNames = {RequestorInfo.NAME_BY_CA};
       for (String embeddedName : embeddedNames) {
         boolean contained = false;

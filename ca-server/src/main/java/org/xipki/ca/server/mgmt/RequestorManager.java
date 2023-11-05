@@ -47,7 +47,7 @@ class RequestorManager {
     manager.idNameMap.clearRequestor();
     manager.requestorDbEntries.clear();
     manager.requestors.clear();
-    List<String> names = manager.queryExecutor.namesFromTable("REQUESTOR");
+    List<String> names = manager.queryExecutor.getRequestorNames();
     for (String name : names) {
       if (RequestorInfo.NAME_BY_CA.equalsIgnoreCase(name)) {
         Integer id = manager.queryExecutor.getRequestorId(name);
@@ -105,7 +105,7 @@ class RequestorManager {
       }
     }
 
-    if (!manager.queryExecutor.deleteRowWithName(name, "REQUESTOR")) {
+    if (!manager.queryExecutor.deleteRequestor(name)) {
       throw new CaMgmtException("unknown requestor " + name);
     }
 

@@ -26,7 +26,6 @@ import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.server.*;
-import org.xipki.ca.server.db.CaManagerQueryExecutor;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.mgmt.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.datasource.DataAccessException;
@@ -199,7 +198,7 @@ class Ca2Manager {
     manager.caHasProfiles.clear();
     manager.idNameMap.clearCa();
 
-    List<String> names = manager.queryExecutor.namesFromTable("CA");
+    List<String> names = manager.queryExecutor.getCaNames();
     for (String name : names) {
       createCa(name);
     }
@@ -217,7 +216,7 @@ class Ca2Manager {
       oldCa.close();
     }
 
-    CaManagerQueryExecutor queryExecutor = manager.queryExecutor;
+    CaConfStore queryExecutor = manager.queryExecutor;
 
     CaInfo ca = queryExecutor.createCaInfo(name, manager.certstore);
     LOG.info("created CA {}:\n{}", name, ca.toString(false));
@@ -395,7 +394,7 @@ class Ca2Manager {
 
     name = Args.toNonBlankLower(name, "name");
 
-    manager.queryExecutor.removeCa(name);
+    manager.queryExecutor.deleteCa(name);
 
     LOG.info("removed CA '{}'", name);
     manager.caInfos.remove(name);

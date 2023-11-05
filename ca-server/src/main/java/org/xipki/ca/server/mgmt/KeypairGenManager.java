@@ -67,7 +67,7 @@ class KeypairGenManager {
       throw new CaMgmtException("dbSchemaVersion < 7 unsupported: " + dbSchemaVersion);
     }
 
-    List<String> names = manager.queryExecutor.namesFromTable("KEYPAIR_GEN");
+    List<String> names = manager.queryExecutor.getKeyPairGenNames();
     entries = new ArrayList<>(names.size());
     for (String name : names) {
       entries.add(manager.queryExecutor.createKeypairGen(name));
@@ -109,7 +109,7 @@ class KeypairGenManager {
     manager.assertMasterMode();
 
     name = Args.toNonBlankLower(name, "name");
-    boolean bo = manager.queryExecutor.deleteRowWithName(name, "KEYPAIR_GEN");
+    boolean bo = manager.queryExecutor.deleteKeyPairGen(name);
     if (!bo) {
       throw new CaMgmtException("unknown keypair generation " + name);
     }

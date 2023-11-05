@@ -37,7 +37,7 @@ import static org.xipki.ca.server.CaUtil.*;
  * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
-public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
+public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase implements CaConfStore {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaManagerQueryExecutor.class);
 
@@ -110,11 +110,18 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     LOG.info("added system event {}", systemEvent.getName());
   } // method addSystemEvent
 
+  @Override
+  public int getDbSchemaVersion() {
+    return dbSchemaVersion;
+  }
+
+  @Override
   public void changeSystemEvent(SystemEvent systemEvent) throws CaMgmtException {
     deleteSystemEvent(systemEvent.getName());
     addSystemEvent(systemEvent);
   } // method changeSystemEvent
 
+  @Override
   public Map<String, Integer> createCaAliases() throws CaMgmtException {
     Map<String, Integer> map = new HashMap<>();
 
@@ -125,6 +132,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return map;
   } // method createCaAliases
 
+  @Override
   public CertprofileEntry createCertprofile(String name) throws CaMgmtException {
     ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectProfile, col2Str(name)))
         .orElseThrow(() -> new CaMgmtException("unknown CA " + name));
@@ -132,6 +140,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return new CertprofileEntry(new NameId(getInt(rs, "ID"), name), rs.getString("TYPE"), rs.getString("CONF"));
   } // method createCertprofile
 
+  @Override
   public PublisherEntry createPublisher(String name) throws CaMgmtException {
     ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectPublisher, col2Str(name))).orElseThrow(
         () -> new CaMgmtException("unkown Publisher " + name));
@@ -139,11 +148,13 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return new PublisherEntry(new NameId(getInt(rs, "ID"), name), rs.getString("TYPE"), rs.getString("CONF"));
   } // method createPublisher
 
+  @Override
   public Integer getRequestorId(String requestorName) throws CaMgmtException {
     ResultRow rs = execQuery1PrepStmt0(sqlSelectRequestorId, col2Str(requestorName));
     return (rs == null) ? null : getInt(rs, "ID");
   } // method getRequestorId
 
+  @Override
   public RequestorEntry createRequestor(String name) throws CaMgmtException {
     ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectRequestor, col2Str(name)))
         .orElseThrow(() -> new CaMgmtException("unknown Requestor " + name));
@@ -151,6 +162,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return new RequestorEntry(new NameId(getInt(rs, "ID"), name), rs.getString("TYPE"), rs.getString("CONF"));
   } // method createRequestor
 
+  @Override
   public SignerEntry createSigner(String name) throws CaMgmtException {
     ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectSigner, col2Str(name)))
         .orElseThrow(() -> new CaMgmtException("unknown signer " + name));
@@ -158,6 +170,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return new SignerEntry(name, rs.getString("TYPE"), rs.getString("CONF"), rs.getString("CERT"));
   } // method createSigner
 
+  @Override
   public KeypairGenEntry createKeypairGen(String name) throws CaMgmtException {
     ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectKeypairGen, col2Str(name)))
         .orElseThrow(() -> new CaMgmtException("unknown keypair generation " + name));
@@ -165,6 +178,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return new KeypairGenEntry(name, rs.getString("TYPE"), rs.getString("CONF"));
   } // method createSigner
 
+  @Override
   public CaInfo createCaInfo(String name, CertStore certstore) throws CaMgmtException {
     ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectCa, col2Str(name)))
         .orElseThrow(() -> new CaMgmtException("unknown CA " + name));
@@ -204,6 +218,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
   } // method createCaInfo
 
+  @Override
   public Set<CaHasRequestorEntry> createCaHasRequestors(NameId ca) throws CaMgmtException {
     Map<Integer, String> idNameMap = getIdNameMap("REQUESTOR");
 
@@ -228,6 +243,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return ret;
   } // method createCaHasRequestors
 
+  @Override
   public Set<CaProfileIdAliases> createCaHasProfiles(NameId ca) throws CaMgmtException {
     final String sql = "SELECT PROFILE_ID,ALIASES FROM CA_HAS_PROFILE WHERE CA_ID=?";
     List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(ca.getId()));
@@ -243,6 +259,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return ret;
   }
 
+  @Override
   public Set<Integer> createCaHasPublishers(NameId ca) throws CaMgmtException {
     return createCaHasEntities("CA_HAS_PUBLISHER", "PUBLISHER_ID", ca);
   }
@@ -273,6 +290,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
   } // method getNextId
 
+  @Override
   public void addCa(CaEntry caEntry) throws CaMgmtException {
     Args.notNull(caEntry, "caEntry");
 
@@ -363,6 +381,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
   } // method addCa
 
+  @Override
   public void addCaAlias(String aliasName, NameId ca) throws CaMgmtException {
     notNulls(aliasName, "aliasName", ca, "ca");
     final String sql = SqlUtil.buildInsertSql("CAALIAS", "NAME,CA_ID");
@@ -374,6 +393,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     LOG.info("added CA alias '{}' for CA '{}'", aliasName, ca);
   } // method addCaAlias
 
+  @Override
   public void addCertprofile(CertprofileEntry dbEntry) throws CaMgmtException {
     Args.notNull(dbEntry, "dbEntry");
     final String sql = SqlUtil.buildInsertSql("PROFILE", "ID,NAME,TYPE,CONF");
@@ -391,6 +411,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     LOG.info("added profile '{}':\n{}", dbEntry.getIdent(), dbEntry);
   } // method addCertprofile
 
+  @Override
   public void addCertprofileToCa(NameId profile, NameId ca, List<String> aliases) throws CaMgmtException {
     notNulls(profile, "profile", ca, "ca");
     final String sql = SqlUtil.buildInsertSql("CA_HAS_PROFILE", "CA_ID,PROFILE_ID,ALIASES");
@@ -418,6 +439,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     LOG.info("added profile '{}' (aliases {}) to CA '{}'", profile, aliases, ca);
   } // method addCertprofileToCa
 
+  @Override
   public void addPublisherToCa(NameId publisher, NameId ca) throws CaMgmtException {
     notNulls(publisher, "publisher", ca, "ca");
 
@@ -435,6 +457,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     LOG.info("added {} '{}' to CA '{}'", desc, entity, ca);
   } // method addPublisherToCa
 
+  @Override
   public void addRequestor(RequestorEntry dbEntry) throws CaMgmtException {
     Args.notNull(dbEntry, "dbEntry");
 
@@ -454,6 +477,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
   } // method addRequestor
 
+  @Override
   public NameId addEmbeddedRequestor(String requestorName) throws CaMgmtException {
     requestorName = requestorName.toLowerCase();
 
@@ -472,6 +496,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return new NameId(nextId, name);
   } // method addEmbeddedRequestor
 
+  @Override
   public void addRequestorToCa(CaHasRequestorEntry requestor, NameId ca) throws CaMgmtException {
     notNulls(requestor, "requestor", ca, "ca");
 
@@ -491,6 +516,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         requestorIdent, ca, requestor.getPermission(), profilesText);
   } // method addRequestorToCa
 
+  @Override
   public void addPublisher(PublisherEntry dbEntry) throws CaMgmtException {
     Args.notNull(dbEntry, "dbEntry");
     final String sql = SqlUtil.buildInsertSql("PUBLISHER", "ID,NAME,TYPE,CONF");
@@ -508,6 +534,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     LOG.info("added publisher '{}':\n{}", dbEntry.getIdent(), dbEntry);
   } // method addPublisher
 
+  @Override
   public void changeCa(ChangeCaEntry changeCaEntry,
                        CaConfColumn currentCaConfColumn, SecurityFactory securityFactory)
       throws CaMgmtException {
@@ -730,6 +757,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return colStr("CONF", encodedConf, confIsSensitive, false);
   }
 
+  @Override
   public void commitNextCrlNoIfLess(NameId ca, long nextCrlNo) throws CaMgmtException {
     ResultRow rs = execQuery1PrepStmt0(sqlNextSelectCrlNo, col2Int(ca.getId()));
     long nextCrlNoInDb = getLong(rs, "NEXT_CRLNO");
@@ -739,6 +767,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
   } // method commitNextCrlNoIfLess
 
+  @Override
   public IdentifiedCertprofile changeCertprofile(
       NameId nameId, String type, String conf, CaManagerImpl certprofileManager)
       throws CaMgmtException {
@@ -761,6 +790,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
   } // method changeCertprofile
 
+  @Override
   public RequestorEntryWrapper changeRequestor(
       NameId nameId, String type, String conf, PasswordResolver passwordResolver)
       throws CaMgmtException {
@@ -777,6 +807,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return requestor;
   } // method changeRequestor
 
+  @Override
   public SignerEntryWrapper changeSigner(
       String name, String type, String conf, String base64Cert, CaManagerImpl signerManager)
       throws CaMgmtException {
@@ -797,6 +828,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return signer;
   } // method changeSigner
 
+  @Override
   public KeypairGenEntryWrapper changeKeypairGen(String name, String type, String conf, CaManagerImpl manager)
       throws CaMgmtException {
     Args.notNull(manager, "manager");
@@ -812,6 +844,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return wrapper;
   } // method changeKeypairGen
 
+  @Override
   public IdentifiedCertPublisher changePublisher(String name, String type, String conf, CaManagerImpl publisherManager)
       throws CaMgmtException {
     Args.notNull(publisherManager, "publisherManager");
@@ -825,16 +858,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return publisher;
   } // method changePublisher
 
-  public void removeCa(String caName) throws CaMgmtException {
-    Args.notBlank(caName, "caName");
-    final String sql = "DELETE FROM CA WHERE NAME=?";
-
-    int num = execUpdatePrepStmt0(sql, col2Str(caName));
-    if (num == 0) {
-      throw new CaMgmtException("could not delete CA " + caName);
-    }
-  } // method removeCa
-
+  @Override
   public void removeCaAlias(String aliasName) throws CaMgmtException {
     Args.notBlank(aliasName, "aliasName");
     int num = execUpdatePrepStmt0("DELETE FROM CAALIAS WHERE NAME=?", col2Str(aliasName));
@@ -843,6 +867,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
   } // method removeCaAlias
 
+  @Override
   public void removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException {
     Args.notBlank(profileName, "profileName");
     Args.notBlank(caName, "caName");
@@ -851,6 +876,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         "DELETE FROM CA_HAS_PROFILE WHERE CA_ID=? AND PROFILE_ID=?");
   } // method removeCertprofileFromCa
 
+  @Override
   public void removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException {
     Args.notBlank(requestorName, "requestorName");
     Args.notBlank(caName, "caName");
@@ -859,6 +885,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         "DELETE FROM CA_HAS_REQUESTOR WHERE CA_ID=? AND REQUESTOR_ID=?");
   } // method removeRequestorFromCa
 
+  @Override
   public void removePublisherFromCa(String publisherName, String caName) throws CaMgmtException {
     removeEntityFromCa("publisher",
         Args.notBlank(publisherName, "publisherName"),
@@ -867,6 +894,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         "DELETE FROM CA_HAS_PUBLISHER WHERE CA_ID=? AND PUBLISHER_ID=?");
   } // method removePublisherFromCa
 
+  @Override
   public void removeDbSchema(String name) throws CaMgmtException {
     Args.notBlank(name, "name");
     final String sql = "DELETE FROM DBSCHEMA WHERE NAME=?";
@@ -889,6 +917,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
   } // method removeEntityFromCa
 
+  @Override
   public void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {
     Args.notBlank(caName, "caName");
     Args.notNull(revocationInfo, "revocationInfo");
@@ -899,6 +928,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
   } // method revokeCa
 
+  @Override
   public void addKeypairGen(KeypairGenEntry dbEntry) throws CaMgmtException {
     Args.notNull(dbEntry, "dbEntry");
 
@@ -912,6 +942,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     LOG.info("added keypair generation: \n{}", dbEntry.toString(true));
   } // method addSigner
 
+  @Override
   public void addSigner(SignerEntry dbEntry) throws CaMgmtException {
     Args.notNull(dbEntry, "dbEntry");
 
@@ -926,6 +957,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     LOG.info("added signer: {}", dbEntry.toString(false, true));
   } // method addSigner
 
+  @Override
   public void unlockCa() throws CaMgmtException {
     int num;
     try {
@@ -941,6 +973,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
   } // method unlockCa
 
+  @Override
   public void unrevokeCa(String caName) throws CaMgmtException {
     Args.notBlank(caName, "caName");
     LOG.info("Unrevoking of CA '{}'", caName);
@@ -951,6 +984,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
   } // method unrevokeCa
 
+  @Override
   public void addDbSchema(String name, String value) throws CaMgmtException {
     final String sql = SqlUtil.buildInsertSql("DBSCHEMA", "NAME,VALUE2");
     int num = execUpdatePrepStmt0(sql, col2Str(name), col2Str(value));
@@ -960,6 +994,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     LOG.info("added DBSCHEMA '{}'", name);
   }
 
+  @Override
   public void changeDbSchema(String name, String value) throws CaMgmtException {
     String sql = "UPDATE DBSCHEMA SET VALUE2=? WHERE NAME=?";
     int num = execUpdatePrepStmt0(sql, col2Str(value), col2Str(name));
@@ -970,6 +1005,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     LOG.info("added DBSCHEMA '{}'", name);
   }
 
+  @Override
   public Map<String, String> getDbSchemas() throws CaMgmtException {
     DbSchemaInfo dbi;
     try {
@@ -983,6 +1019,66 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       ret.put(name, dbi.variableValue(name));
     }
     return ret;
+  }
+
+  @Override
+  public List<String> getCaNames() throws CaMgmtException {
+    return namesFromTable("CA");
+  }
+
+  @Override
+  public boolean deleteCa(String name) throws CaMgmtException {
+    return deleteRowWithName(name, "CA");
+  }
+
+  @Override
+  public List<String> getKeyPairGenNames() throws CaMgmtException {
+    return namesFromTable("KEYPAIR_GEN");
+  }
+
+  @Override
+  public boolean deleteKeyPairGen(String name) throws CaMgmtException {
+    return deleteRowWithName(name, "KEYPAIR_GEN");
+  }
+
+  @Override
+  public List<String> getProfileNames() throws CaMgmtException {
+    return namesFromTable("PROFILE");
+  }
+
+  @Override
+  public boolean deleteProfile(String name) throws CaMgmtException {
+    return deleteRowWithName(name, "PROFILE");
+  }
+
+  @Override
+  public List<String> getPublisherNames() throws CaMgmtException {
+    return namesFromTable("PUBLISHER");
+  }
+
+  @Override
+  public boolean deletePublisher(String name) throws CaMgmtException {
+    return deleteRowWithName(name, "PUBLISHER");
+  }
+
+  @Override
+  public List<String> getRequestorNames() throws CaMgmtException {
+    return namesFromTable("REQUESTOR");
+  }
+
+  @Override
+  public boolean deleteRequestor(String name) throws CaMgmtException {
+    return deleteRowWithName(name, "REQUESTOR");
+  }
+
+  @Override
+  public List<String> getSignerNames() throws CaMgmtException {
+    return namesFromTable("SIGNER");
+  }
+
+  @Override
+  public boolean deleteSigner(String name) throws CaMgmtException {
+    return deleteRowWithName(name, "SIGNER");
   }
 
   private static X509Cert generateCert(String b64Cert) throws CaMgmtException {
