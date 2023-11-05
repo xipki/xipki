@@ -566,25 +566,15 @@ public class CmpResponder extends BaseCmpResponder {
 
     ConfirmCertsRequest sdkReq = new ConfirmCertsRequest(Hex.encode(transactionId.getOctets()), entries);
 
-    try {
-      sdk.confirmCerts(caName, sdkReq);
-      return new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
-    } catch (IOException e) {
-      return new PKIBody(PKIBody.TYPE_ERROR,
-          new ErrorMsgContent(new PKIStatusInfo(rejection, null, new PKIFailureInfo(systemFailure))));
-    }
+    sdk.confirmCerts(caName, sdkReq);
+    return new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
   } // method confirmCertificates
 
   @Override
   protected PKIBody revokePendingCertificates(String caName, ASN1OctetString transactionId)
       throws SdkErrorResponseException {
-    try {
-      sdk.revokePendingCerts(caName, Hex.encode(transactionId.getOctets()));
-      return new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
-    } catch (IOException e) {
-      return new PKIBody(PKIBody.TYPE_ERROR,
-          new ErrorMsgContent(new PKIStatusInfo(rejection, null, new PKIFailureInfo(systemFailure))));
-    }
+    sdk.revokePendingCerts(caName, Hex.encode(transactionId.getOctets()));
+    return new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
   } // method revokePendingCertificates
 
   @Override

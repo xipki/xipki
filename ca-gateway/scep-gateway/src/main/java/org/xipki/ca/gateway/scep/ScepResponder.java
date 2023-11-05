@@ -360,7 +360,7 @@ public class ScepResponder {
       } catch (IOException ex) {
         throw new CMSException("could not build CMS SignedDta");
       }
-    } catch (CMSException | IOException ex) {
+    } catch (CMSException ex) {
       throw new OperationException(SYSTEM_FAILURE, ex.getMessage());
     }
   }
@@ -581,14 +581,8 @@ public class ScepResponder {
               : control.isIncludeCaCert() ? CertsMode.CERT : CertsMode.NONE;
           sdkReq.setCaCertMode(certsMode);
 
-          EnrollOrPollCertsResponse sdkResp;
-          try {
-            sdkResp = sdk.enrollCerts(caName, sdkReq);
-          } catch (IOException e) {
-            LOG.error("error enrollCerts", e);
-            throw new OperationException(SYSTEM_FAILURE, e.getMessage());
-          }
-          signedData = buildSignedData(sdkResp);
+          signedData = buildSignedData(
+                          sdk.enrollCerts(caName, sdkReq));
           break;
         }
         case CertPoll: {
@@ -600,15 +594,8 @@ public class ScepResponder {
           PollCertRequest sdkReq = new PollCertRequest(null, new X500NameType(is.getIssuer()),
               null, req.getTransactionId().getId(), new PollCertRequestEntry[]{template});
 
-          EnrollOrPollCertsResponse sdkResp;
-          try {
-            sdkResp = sdk.pollCerts(sdkReq);
-          } catch (IOException e) {
-            LOG.error("error pollCerts", e);
-            throw new OperationException(SYSTEM_FAILURE, e.getMessage());
-          }
-
-          signedData = buildSignedData(sdkResp);
+          signedData = buildSignedData(
+                        sdk.pollCerts(sdkReq));
           break;
         }
         case GetCert:
@@ -641,16 +628,7 @@ public class ScepResponder {
 
   private SignedData getCert(String caName, X500Name issuer, BigInteger serialNumber)
       throws FailInfoException, OperationException, SdkErrorResponseException {
-    byte[] encodedCert;
-    try {
-      encodedCert = sdk.getCert(caName, issuer, serialNumber);
-    } catch (IOException ex) {
-      final String message = "could not get certificate for CA '" + caName
-          + "' and serialNumber=" + LogUtil.formatCsn(serialNumber) + ")";
-      LogUtil.error(LOG, ex, message);
-      throw new OperationException(SYSTEM_FAILURE, ex);
-    }
-
+    byte[] encodedCert = sdk.getCert(caName, issuer, serialNumber);
     if (encodedCert == null) {
       throw FailInfoException.BAD_CERTID;
     }
@@ -696,13 +674,7 @@ public class ScepResponder {
       throw FailInfoException.BAD_REQUEST;
     }
 
-    byte[] crl;
-    try {
-      crl = sdk.currentCrl(caName);
-    } catch (IOException e) {
-      throw new OperationException(SYSTEM_FAILURE, e.getMessage());
-    }
-
+    byte[] crl = sdk.currentCrl(caName);
     if (crl == null) {
       LOG.error("found no CRL");
       throw FailInfoException.BAD_REQUEST;

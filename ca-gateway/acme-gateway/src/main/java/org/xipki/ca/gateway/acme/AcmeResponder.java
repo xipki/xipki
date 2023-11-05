@@ -732,7 +732,7 @@ public class AcmeResponder {
         try {
           sdkResp = sdk.revokeCerts(sdkReq);
           LOG.info("revoked certificate");
-        } catch (IOException | SdkErrorResponseException e) {
+        } catch (SdkErrorResponseException e) {
           LogUtil.error(LOG, e, "sdk.revokeCerts");
           throw new AcmeProtocolException(SC_INTERNAL_SERVER_ERROR, AcmeError.serverInternal,
               "error revoking the certificate");
@@ -1061,7 +1061,7 @@ public class AcmeResponder {
         if (cacerts == null) {
           try {
             cacerts = sdk.cacertsBySubject(encodedIssuer);
-          } catch (IOException | SdkErrorResponseException e) {
+          } catch (SdkErrorResponseException e) {
             throw new AcmeProtocolException(SC_INTERNAL_SERVER_ERROR, AcmeError.serverInternal,
                 "could not retrieve CA certificate chain");
           }

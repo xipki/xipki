@@ -931,33 +931,27 @@ public abstract class BaseCmpResponder {
     InfoTypeAndValue itvResp;
     ASN1ObjectIdentifier infoType = itv.getInfoType();
 
-    try {
-      if (CMPObjectIdentifiers.it_currentCRL.equals(infoType)) {
-        event.addEventType(TYPE_genm_current_crl);
-        byte[] encodedCrl = sdk.currentCrl(caName);
-        if (encodedCrl == null) {
-          return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure, "no CRL is available");
-        }
-
-        CertificateList crl = CertificateList.getInstance(encodedCrl);
-        itvResp = new InfoTypeAndValue(infoType, crl);
-      } else { // if (CMPObjectIdentifiers.id_it_caCerts.equals(infoType)) {
-        event.addEventType(TYPE_genm_cacerts);
-        byte[][] certchain = sdk.cacerts(caName);
-        if (certchain == null || certchain.length == 0) {
-          return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure, "no certchain is available");
-        }
-
-        ASN1EncodableVector vec = new ASN1EncodableVector();
-        for (byte[] cert : certchain) {
-          vec.add(new CMPCertificate(Certificate.getInstance(cert)));
-        }
-        itvResp = new InfoTypeAndValue(infoType, new DERSequence(vec));
+    if (CMPObjectIdentifiers.it_currentCRL.equals(infoType)) {
+      event.addEventType(TYPE_genm_current_crl);
+      byte[] encodedCrl = sdk.currentCrl(caName);
+      if (encodedCrl == null) {
+        return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure, "no CRL is available");
       }
-    } catch (IOException e) {
-      LogUtil.error(LOG, e);
-      return new PKIBody(PKIBody.TYPE_ERROR,
-          buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure, null));
+
+      CertificateList crl = CertificateList.getInstance(encodedCrl);
+      itvResp = new InfoTypeAndValue(infoType, crl);
+    } else { // if (CMPObjectIdentifiers.id_it_caCerts.equals(infoType)) {
+      event.addEventType(TYPE_genm_cacerts);
+      byte[][] certchain = sdk.cacerts(caName);
+      if (certchain == null || certchain.length == 0) {
+        return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure, "no certchain is available");
+      }
+
+      ASN1EncodableVector vec = new ASN1EncodableVector();
+      for (byte[] cert : certchain) {
+        vec.add(new CMPCertificate(Certificate.getInstance(cert)));
+      }
+      itvResp = new InfoTypeAndValue(infoType, new DERSequence(vec));
     }
 
     GenRepContent genRepContent = new GenRepContent(itvResp);
