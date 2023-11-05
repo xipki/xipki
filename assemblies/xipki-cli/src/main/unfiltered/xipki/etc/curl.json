@@ -15,7 +15,7 @@
         }]
       }
     }, {
-      "urlPattern": ["*:*/.well-known/est"],
+      "urlPattern": ["*:*/.well-known/est", "*:*/est"],
       "sslContext": {
         "storeType": "PKCS12",
         "keystore": {

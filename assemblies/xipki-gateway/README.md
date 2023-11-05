@@ -82,6 +82,21 @@ util-*.jar
 
 8. If you have multiple tomcat instances, change the listing port for SHUTDOWN to be unique.
 
+9. Optional. Configure the Rewrite Rules to forward /.well-known/est/ to /est/, and /.well-known/cmp/ to cmp/.
+   Add the Valve org.apache.catalina.valves.rewrite.RewriteValve to the Host element in conf/server.xml
+   ```
+   <Host name="localhost"  appBase="webapps"
+            unpackWARs="true" autoDeploy="true">
+     <Valve className="org.apache.catalina.valves.rewrite.RewriteValve"/>
+     ...
+   </Host>
+   ```
+   Create a new file in the file conf/Catalina/localhost/rewrite.config with the following content:
+   ```
+   RewriteRule ^/.well-known/est/(.*) /est/$1
+   RewriteRule ^/.well-known/cmp/(.*) /cmp/$1
+   ```
+
 - Start tomcat
 
 ```sh

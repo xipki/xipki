@@ -73,13 +73,13 @@
     <file>
       <source>${project.build.directory}/webapps/est-servlet3.war</source>
       <outputDirectory>webapps</outputDirectory>
-      <destName>.well-known.war</destName>
+      <destName>est.war</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
       <source>${project.build.directory}/webapps/est-servlet5.war</source>
       <outputDirectory>webapps-tomcat10on</outputDirectory>
-      <destName>.well-known.war</destName>
+      <destName>est.war</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>

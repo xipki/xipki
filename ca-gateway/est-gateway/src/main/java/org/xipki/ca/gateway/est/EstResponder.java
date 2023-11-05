@@ -225,14 +225,8 @@ public class EstResponder {
     String auditMessage = null;
 
     try {
-      if (!path.startsWith("/est/")) {
-        String message = "invalid path " + path;
-        LOG.error(message);
-        throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.ERROR, AuditStatus.FAILED);
-      }
-
       // the first char is always '/'
-      String coreUri = path.substring("/est/".length());
+      String coreUri = path.substring(1);
       String[] tokens = StringUtil.splitAsArray(coreUri, "/");
 
       String caName;

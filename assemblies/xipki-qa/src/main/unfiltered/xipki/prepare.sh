@@ -3,7 +3,6 @@
 DIR=`dirname $0`
 echo "working dir: ${DIR}"
 
-
 # Copy the keys and certificates
 KC_DIR=$DIR/setup/keycerts
 KS_DIR=$DIR/setup/keycerts/certstore
@@ -183,10 +182,8 @@ cp -r xipki-gateway/bin xipki-gateway/lib xipki-gateway/xipki ${TOMCAT_DIR}/
 
 if [ -f "$T10FILE" ]; then
     cp -r xipki-gateway/webapps-tomcat10on/* ${TOMCAT_DIR}/webapps
-    cp -r xipki-gateway/webapps-tomcat10on/.well-known.war ${TOMCAT_DIR}/webapps
 else
     cp -r xipki-gateway/webapps/* ${TOMCAT_DIR}/webapps
-    cp -r xipki-gateway/webapps/.well-known.war ${TOMCAT_DIR}/webapps
 fi
 
 rm ${TOMCAT_DIR}/webapps/acme.war
