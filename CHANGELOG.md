@@ -2,7 +2,7 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 6.4.1
+## 6.5.0
 - Release date: 2023/mm/dd
 - All Components
   - No demo keys and certificates will be delivered.
