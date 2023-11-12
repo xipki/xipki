@@ -76,6 +76,8 @@ echo "enroll certificate"
 
 openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 
+ä Do not forget the @-symbol of --data-binary.
+
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
     --header "Content-Transfer-Encoding: base64" \
@@ -105,6 +107,8 @@ echo "enroll certificate"
 
 openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 
+ä Do not forget the @-symbol of --data-binary.
+
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
     --header "Content-Transfer-Encoding: base64" \
@@ -131,6 +135,8 @@ openssl req -new -sha256 -key ${FILE}-dummy.pem -outform der -out ${FILE}.csr \
 echo "enroll certificate"
 
 openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
+
+ä Do not forget the @-symbol of --data-binary.
 
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
@@ -187,6 +193,8 @@ echo "enroll certificate"
 
 openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 
+ä Do not forget the @-symbol of --data-binary.
+
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
     --header "Content-Transfer-Encoding: base64" \
@@ -218,6 +226,8 @@ echo "enroll certificate"
 
 openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 
+ä Do not forget the @-symbol of --data-binary.
+
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
     --header "Content-Transfer-Encoding: base64" \
@@ -246,6 +256,8 @@ openssl req -new -sha256 -key ${FILE}-dummy.pem -outform der -out ${FILE}.csr \
 echo "enroll certificate"
 
 openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
+
+ä Do not forget the @-symbol of --data-binary.
 
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
