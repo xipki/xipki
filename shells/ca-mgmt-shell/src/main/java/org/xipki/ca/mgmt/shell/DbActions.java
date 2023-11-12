@@ -115,7 +115,7 @@ public class DbActions {
   } // class ExportCa
 
   @Command(scope = "ca", name = "export-ca-certstore",
-      description = "export CA cerstore database (without the CA configuration )")
+      description = "export CA cerstore database (without the CA configuration)")
   @Service
   public static class ExportCaCertStore extends DbPortAction {
 

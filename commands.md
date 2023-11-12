@@ -34,6 +34,10 @@ Basic Commands
 
      return whether a file or dir exists
 
+   * `xi:exec`
+
+     execute terminal command
+
    * `xi:mkdir`
 
      make directories
@@ -69,6 +73,10 @@ Database Commands
 
      export CA database
 
+   * `ca:export-ca`
+
+     export CA cerstore database (without the CA configuration)
+
    * `ca:export-ocsp`
 
      export OCSP database
@@ -76,6 +84,10 @@ Database Commands
    * `ca:import-ca`
 
      import CA database
+
+   * `ca:import-ca-certstore`
+
+     import CA certstore database only (without the CA configuration)
 
    * `ca:import-ocsp`
 
