@@ -6,7 +6,7 @@ package org.xipki.ca.certprofile.xijson.conf;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.CertPolicyId;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.LinkedList;
@@ -19,9 +19,9 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 
-public class PolicyMappings extends ValidatableConf {
+public class PolicyMappings extends ValidableConf {
 
-  public static class PolicyIdMappingType extends ValidatableConf {
+  public static class PolicyIdMappingType extends ValidableConf {
 
     private DescribableOid issuerDomainPolicy;
 

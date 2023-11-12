@@ -5,7 +5,7 @@ package org.xipki.ca.certprofile.xijson.conf;
 
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableBinary;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.math.BigInteger;
@@ -18,9 +18,9 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 
-public class SmimeCapabilities extends ValidatableConf {
+public class SmimeCapabilities extends ValidableConf {
 
-  public static class SmimeCapability extends ValidatableConf {
+  public static class SmimeCapability extends ValidableConf {
 
     private DescribableOid capabilityId;
 
@@ -50,7 +50,7 @@ public class SmimeCapabilities extends ValidatableConf {
 
   } // class SmimeCapability
 
-  public static class SmimeCapabilityParameter extends ValidatableConf {
+  public static class SmimeCapabilityParameter extends ValidableConf {
 
     private BigInteger integer;
 

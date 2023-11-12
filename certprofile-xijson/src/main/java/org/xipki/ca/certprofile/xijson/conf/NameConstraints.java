@@ -10,7 +10,7 @@ import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.math.BigInteger;
@@ -22,7 +22,7 @@ import java.util.List;
  * Only for CA, at least one of permittedSubtrees and excludedSubtrees must be present.
  * @author Lijun Liao (xipki)
  */
-public class NameConstraints extends ValidatableConf {
+public class NameConstraints extends ValidableConf {
 
   private List<GeneralSubtreeType> permittedSubtrees;
 

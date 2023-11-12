@@ -32,7 +32,7 @@ import java.util.List;
 
 public class HsmProxyServletFilter implements XiHttpFilter {
 
-  private static class P11ProxyConf extends ValidatableConf {
+  private static class P11ProxyConf extends ValidableConf {
 
     private boolean logReqResp;
 

@@ -7,7 +7,7 @@ import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.HashSet;
@@ -21,9 +21,9 @@ import java.util.List;
  * @since 2.0.0
  */
 
-public class KeyParametersType extends ValidatableConf {
+public class KeyParametersType extends ValidableConf {
 
-  public static class DsaParametersType extends ValidatableConf {
+  public static class DsaParametersType extends ValidableConf {
 
     private List<Integer> p;
 
@@ -75,7 +75,7 @@ public class KeyParametersType extends ValidatableConf {
 
   } // class DsaParametersType
 
-  public static class EcParametersType extends ValidatableConf {
+  public static class EcParametersType extends ValidableConf {
 
     private List<DescribableOid> curves;
 
@@ -110,7 +110,7 @@ public class KeyParametersType extends ValidatableConf {
 
   } // class EcParametersType
 
-  public static class RsaParametersType extends ValidatableConf {
+  public static class RsaParametersType extends ValidableConf {
 
     private List<Integer> modulus;
 

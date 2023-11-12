@@ -8,7 +8,7 @@ import org.xipki.security.util.TlsHelper;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.IoUtil;
 import org.xipki.util.JSON;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;
@@ -20,9 +20,9 @@ import java.util.List;
  *
  * @author Lijun Liao (xipki)
  */
-public class OcspConf extends ValidatableConf {
+public class OcspConf extends ValidableConf {
 
-  public static class RemoteMgmt extends ValidatableConf {
+  public static class RemoteMgmt extends ValidableConf {
 
     private boolean enabled;
 

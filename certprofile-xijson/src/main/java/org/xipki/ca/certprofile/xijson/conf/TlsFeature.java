@@ -4,7 +4,7 @@
 package org.xipki.ca.certprofile.xijson.conf;
 
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.LinkedList;
@@ -16,7 +16,7 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 
-public class TlsFeature extends ValidatableConf {
+public class TlsFeature extends ValidableConf {
 
   private List<DescribableInt> features;
 

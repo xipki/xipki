@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.profile;
 
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 /**
@@ -12,7 +12,7 @@ import org.xipki.util.exception.InvalidConfException;
  * @author Lijun Liao (xipki)
  */
 
-public class SubjectKeyIdentifierControl extends ValidatableConf {
+public class SubjectKeyIdentifierControl extends ValidableConf {
 
   public enum SubjectKeyIdentifierMethod {
     // RFC5280, 4.2.1.2 Method 1: 160 bit SHA1

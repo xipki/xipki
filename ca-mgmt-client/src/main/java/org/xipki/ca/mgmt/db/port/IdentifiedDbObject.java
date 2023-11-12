@@ -3,7 +3,7 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 /**
@@ -12,7 +12,7 @@ import org.xipki.util.exception.InvalidConfException;
  * @author Lijun Liao (xipki)
  */
 
-public abstract class IdentifiedDbObject extends ValidatableConf {
+public abstract class IdentifiedDbObject extends ValidableConf {
 
   private Long id;
 

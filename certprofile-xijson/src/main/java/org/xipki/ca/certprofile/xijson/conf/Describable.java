@@ -4,7 +4,7 @@
 package org.xipki.ca.certprofile.xijson.conf;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 /**
@@ -14,7 +14,7 @@ import org.xipki.util.exception.InvalidConfException;
  * @since 2.0.0
  */
 
-public abstract class Describable extends ValidatableConf {
+public abstract class Describable extends ValidableConf {
 
   private String description;
 

@@ -4,7 +4,7 @@
 package org.xipki.cmp.client;
 
 import org.xipki.util.FileOrBinary;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.SslConf;
 
@@ -17,9 +17,9 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 
-public class CmpClientConf extends ValidatableConf {
+public class CmpClientConf extends ValidableConf {
 
-  public static class Responder extends ValidatableConf {
+  public static class Responder extends ValidableConf {
 
     private String url;
 
@@ -69,7 +69,7 @@ public class CmpClientConf extends ValidatableConf {
       validate(pbmMac, signature);
     }
 
-    public static class PbmMac extends ValidatableConf {
+    public static class PbmMac extends ValidableConf {
 
       private List<String> owfAlgos;
 
@@ -105,7 +105,7 @@ public class CmpClientConf extends ValidatableConf {
 
     } // class PbmMac
 
-    public static class Signature extends ValidatableConf {
+    public static class Signature extends ValidableConf {
 
       private FileOrBinary cert;
 

@@ -3,7 +3,7 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.LinkedList;
@@ -15,7 +15,7 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 
-public class CaCertstore extends ValidatableConf {
+public class CaCertstore extends ValidableConf {
 
   public static class Cert extends IdentifiedDbObject {
 
@@ -230,7 +230,7 @@ public class CaCertstore extends ValidatableConf {
 
   } // method Cert
 
-  public static class Certs extends ValidatableConf {
+  public static class Certs extends ValidableConf {
 
     private List<Cert> certs;
 
@@ -309,7 +309,7 @@ public class CaCertstore extends ValidatableConf {
 
   } // class CaHasEntry
 
-  public static class Crls extends ValidatableConf {
+  public static class Crls extends ValidableConf {
 
     private List<Crl> crls;
 
@@ -335,7 +335,7 @@ public class CaCertstore extends ValidatableConf {
 
   } // class Crls
 
-  public static class IdName extends ValidatableConf {
+  public static class IdName extends ValidableConf {
     private int id;
     private String name;
 

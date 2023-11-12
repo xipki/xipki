@@ -16,7 +16,7 @@ import org.xipki.ca.certprofile.xijson.CertificatePolicyQualifier;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.ArrayList;
@@ -29,14 +29,14 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 
-public class CertificatePolicies extends ValidatableConf {
+public class CertificatePolicies extends ValidableConf {
 
   public enum PolicyQualfierType {
     cpsUri,
     userNotice
   } // class PolicyQualfierType
 
-  public static class PolicyQualifier extends ValidatableConf {
+  public static class PolicyQualifier extends ValidableConf {
 
     private PolicyQualfierType type;
 
@@ -66,7 +66,7 @@ public class CertificatePolicies extends ValidatableConf {
 
   } // class PolicyQualifier
 
-  public static class CertificatePolicyInformationType extends ValidatableConf {
+  public static class CertificatePolicyInformationType extends ValidableConf {
 
     private DescribableOid policyIdentifier;
 

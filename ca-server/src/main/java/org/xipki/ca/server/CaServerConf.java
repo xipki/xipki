@@ -10,7 +10,7 @@ import org.xipki.security.Securities.SecurityConf;
 import org.xipki.security.util.TlsHelper;
 import org.xipki.util.Args;
 import org.xipki.util.FileOrBinary;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.SslContextConf;
@@ -26,9 +26,9 @@ import java.util.Map;
  *
  * @author Lijun Liao (xipki)
  */
-public class CaServerConf extends ValidatableConf {
+public class CaServerConf extends ValidableConf {
 
-  public static class SslContext extends ValidatableConf {
+  public static class SslContext extends ValidableConf {
 
     private String name;
 
@@ -67,7 +67,7 @@ public class CaServerConf extends ValidatableConf {
 
   } // class SslContext
 
-  public static class RemoteMgmt extends ValidatableConf {
+  public static class RemoteMgmt extends ValidableConf {
 
     private boolean enabled;
 

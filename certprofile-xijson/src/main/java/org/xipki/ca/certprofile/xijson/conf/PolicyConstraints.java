@@ -5,7 +5,7 @@ package org.xipki.ca.certprofile.xijson.conf;
 
 import org.bouncycastle.asn1.*;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.math.BigInteger;
@@ -16,7 +16,7 @@ import java.math.BigInteger;
  * @author Lijun Liao (xipki)
  */
 
-public class PolicyConstraints extends ValidatableConf {
+public class PolicyConstraints extends ValidableConf {
 
   private Integer requireExplicitPolicy;
 

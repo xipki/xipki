@@ -4,7 +4,7 @@
 package org.xipki.ca.certprofile.xijson.conf;
 
 import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.*;
@@ -15,7 +15,7 @@ import java.util.*;
  * @author Lijun Liao (xipki)
  */
 
-public class KeyUsage extends ValidatableConf {
+public class KeyUsage extends ValidableConf {
 
   private List<Usage> usages;
 
@@ -47,7 +47,7 @@ public class KeyUsage extends ValidatableConf {
     return Collections.unmodifiableSet(controls);
   } // method toXiKeyUsageOptions
 
-  public static class Usage extends ValidatableConf {
+  public static class Usage extends ValidableConf {
 
     private String value;
 

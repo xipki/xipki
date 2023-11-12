@@ -3,7 +3,7 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 /**
@@ -12,7 +12,7 @@ import org.xipki.util.exception.InvalidConfException;
  * @author Lijun Liao (xipki)
  */
 
-public class BasicConstraints extends ValidatableConf {
+public class BasicConstraints extends ValidableConf {
 
   private int pathLen;
 

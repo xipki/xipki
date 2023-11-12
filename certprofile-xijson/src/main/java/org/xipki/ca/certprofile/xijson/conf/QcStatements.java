@@ -6,7 +6,7 @@ package org.xipki.ca.certprofile.xijson.conf;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableBinary;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.LinkedList;
@@ -18,9 +18,9 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 
-public class QcStatements extends ValidatableConf {
+public class QcStatements extends ValidableConf {
 
-  public static class Range2Type extends ValidatableConf {
+  public static class Range2Type extends ValidableConf {
 
     private int min;
 
@@ -48,7 +48,7 @@ public class QcStatements extends ValidatableConf {
 
   } // method Range2Type
 
-  public static class QcEuLimitValueType extends ValidatableConf {
+  public static class QcEuLimitValueType extends ValidableConf {
 
     private String currency;
 
@@ -90,7 +90,7 @@ public class QcStatements extends ValidatableConf {
 
   } // class QcEuLimitValueType
 
-  public static class PdsLocationType extends ValidatableConf {
+  public static class PdsLocationType extends ValidableConf {
 
     private String url;
 
@@ -120,7 +120,7 @@ public class QcStatements extends ValidatableConf {
 
   } // class QcEuLimitValueType
 
-  public static class QcStatementValueType extends ValidatableConf {
+  public static class QcStatementValueType extends ValidableConf {
 
     private DescribableBinary constant;
 
@@ -192,7 +192,7 @@ public class QcStatements extends ValidatableConf {
 
   } // class QcStatementValueType
 
-  public static class QcStatementType extends ValidatableConf {
+  public static class QcStatementType extends ValidableConf {
 
     private DescribableOid statementId;
 

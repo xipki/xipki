@@ -5,7 +5,7 @@ package org.xipki.ca.certprofile.xijson.conf;
 
 import org.xipki.ca.api.profile.Certprofile.StringType;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.LinkedList;
@@ -18,7 +18,7 @@ import java.util.List;
  * @since 2.0.0
  */
 
-public class Subject extends ValidatableConf {
+public class Subject extends ValidableConf {
 
   /**
    * whether the RDNs occurs as in the defined ASN.1 order.
@@ -57,7 +57,7 @@ public class Subject extends ValidatableConf {
     validate(rdns);
   }
 
-  public static class ValueType extends ValidatableConf {
+  public static class ValueType extends ValidableConf {
 
     private String text;
 
@@ -89,7 +89,7 @@ public class Subject extends ValidatableConf {
 
   } // class ValueType
 
-  public static class RdnType extends ValidatableConf {
+  public static class RdnType extends ValidableConf {
 
     private DescribableOid type;
 

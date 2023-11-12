@@ -4,7 +4,7 @@
 package org.xipki.ca.certprofile.xijson.conf;
 
 import org.xipki.ca.certprofile.xijson.DirectoryStringType;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 /**
@@ -13,7 +13,7 @@ import org.xipki.util.exception.InvalidConfException;
  * @author Lijun Liao (xipki)
  */
 
-public class Restriction extends ValidatableConf {
+public class Restriction extends ValidableConf {
 
   private DirectoryStringType type;
 

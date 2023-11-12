@@ -4,7 +4,7 @@
 package org.xipki.ca.certprofile.xijson.conf;
 
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.LinkedList;
@@ -17,7 +17,7 @@ import java.util.List;
  * @since 2.0.0
  */
 
-public class AlgorithmType extends ValidatableConf {
+public class AlgorithmType extends ValidableConf {
 
   private List<DescribableOid> algorithms;
 

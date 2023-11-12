@@ -5,7 +5,7 @@ package org.xipki.ca.certprofile.xijson.conf;
 
 import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.Arrays;
@@ -18,7 +18,7 @@ import java.util.List;
  * @since 2.0.0
  */
 
-public class SubjectToSubjectAltNameType extends ValidatableConf {
+public class SubjectToSubjectAltNameType extends ValidableConf {
 
   private static final List<GeneralNameTag> allowedTargets = Arrays.asList(
       GeneralNameTag.rfc822Name,                GeneralNameTag.DNSName,   GeneralNameTag.directoryName,

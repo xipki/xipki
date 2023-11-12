@@ -6,7 +6,7 @@ package org.xipki.ca.certprofile.xijson.conf;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.util.TripleState;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.LinkedList;
@@ -18,9 +18,9 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 
-public class BiometricInfo extends ValidatableConf {
+public class BiometricInfo extends ValidableConf {
 
-  public static class BiometricTypeType extends ValidatableConf {
+  public static class BiometricTypeType extends ValidableConf {
 
     private DescribableInt predefined;
 

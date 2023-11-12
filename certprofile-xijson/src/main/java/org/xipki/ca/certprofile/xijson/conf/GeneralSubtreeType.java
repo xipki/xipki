@@ -3,7 +3,7 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 /**
@@ -13,9 +13,9 @@ import org.xipki.util.exception.InvalidConfException;
  * @since 2.0.0
  */
 
-public class GeneralSubtreeType extends ValidatableConf {
+public class GeneralSubtreeType extends ValidableConf {
 
-  public static class Base extends ValidatableConf {
+  public static class Base extends ValidableConf {
     private String rfc822Name;
 
     private String dnsName;

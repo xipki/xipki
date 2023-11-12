@@ -5,7 +5,7 @@ package org.xipki.qa.ca;
 
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.FileOrValue;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.LinkedList;
@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Lijun Liao (xipki)
  */
-public class QaconfType extends ValidatableConf {
+public class QaconfType extends ValidableConf {
 
   public static class Certprofile extends FileOrValue {
 
@@ -38,7 +38,7 @@ public class QaconfType extends ValidatableConf {
 
   } // class class
 
-  public static class Issuer extends ValidatableConf {
+  public static class Issuer extends ValidableConf {
 
     private FileOrBinary cert;
 

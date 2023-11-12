@@ -6,7 +6,7 @@ package org.xipki.ca.certprofile.xijson.conf;
 import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.util.TripleState;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 /**
@@ -16,7 +16,7 @@ import org.xipki.util.exception.InvalidConfException;
  * @since 2.0.0
  */
 
-public class ExtensionType extends ValidatableConf {
+public class ExtensionType extends ValidableConf {
 
   private DescribableOid type;
 

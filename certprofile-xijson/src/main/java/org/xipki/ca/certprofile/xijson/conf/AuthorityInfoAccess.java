@@ -3,7 +3,7 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.Set;
@@ -14,7 +14,7 @@ import java.util.Set;
  * @author Lijun Liao (xipki)
  */
 
-public class AuthorityInfoAccess extends ValidatableConf {
+public class AuthorityInfoAccess extends ValidableConf {
 
   private boolean includeCaIssuers;
 

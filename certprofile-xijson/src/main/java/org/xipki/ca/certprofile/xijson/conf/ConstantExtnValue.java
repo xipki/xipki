@@ -6,7 +6,7 @@ package org.xipki.ca.certprofile.xijson.conf;
 import org.bouncycastle.asn1.*;
 import org.xipki.util.Base64;
 import org.xipki.util.StringUtil;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.Locale;
@@ -15,7 +15,7 @@ import java.util.Locale;
  * Configure extension with given (constant) extension value.
  * @author Lijun Liao (xipki)
  */
-public class ConstantExtnValue extends ValidatableConf {
+public class ConstantExtnValue extends ValidableConf {
 
   public static final String TYPE_ASN1 = "ASN1";
 

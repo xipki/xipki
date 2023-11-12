@@ -13,7 +13,7 @@ import org.xipki.ca.certprofile.xijson.AdmissionExtension;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;
@@ -26,9 +26,9 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 
-public class AdmissionSyntax extends ValidatableConf {
+public class AdmissionSyntax extends ValidableConf {
 
-  public static class RegistrationNumber extends ValidatableConf {
+  public static class RegistrationNumber extends ValidableConf {
 
     private String regex;
 
@@ -57,7 +57,7 @@ public class AdmissionSyntax extends ValidatableConf {
 
   } // class RegistrationNumber
 
-  public static class NamingAuthorityType extends ValidatableConf {
+  public static class NamingAuthorityType extends ValidableConf {
 
     private DescribableOid oid;
 
@@ -99,7 +99,7 @@ public class AdmissionSyntax extends ValidatableConf {
 
   } // class NamingAuthorityType
 
-  public static class ProfessionInfoType extends ValidatableConf {
+  public static class ProfessionInfoType extends ValidableConf {
 
     private NamingAuthorityType namingAuthority;
 
@@ -165,7 +165,7 @@ public class AdmissionSyntax extends ValidatableConf {
 
   } // class ProfessionInfoType
 
-  public static class AdmissionsType extends ValidatableConf {
+  public static class AdmissionsType extends ValidableConf {
 
     private byte[] admissionAuthority;
 

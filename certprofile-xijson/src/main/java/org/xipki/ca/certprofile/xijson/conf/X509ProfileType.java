@@ -33,7 +33,7 @@ import java.util.*;
  * @since 2.0.0
  */
 
-public class X509ProfileType extends ValidatableConf {
+public class X509ProfileType extends ValidableConf {
 
   private static final Logger LOG = LoggerFactory.getLogger(X509ProfileType.class);
 

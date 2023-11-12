@@ -5,7 +5,7 @@ package org.xipki.ca.certprofile.xijson.conf;
 
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.security.EdECConstants;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.Map;
@@ -17,7 +17,7 @@ import java.util.Map;
  * @since 2.0.0
  */
 
-public class KeypairGenerationType extends ValidatableConf {
+public class KeypairGenerationType extends ValidableConf {
 
   public static final String PARAM_keysize = "keysize";
 

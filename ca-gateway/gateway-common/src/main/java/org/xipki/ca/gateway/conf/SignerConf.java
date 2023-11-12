@@ -4,7 +4,7 @@
 package org.xipki.ca.gateway.conf;
 
 import org.xipki.util.FileOrBinary;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.List;
  * @since 6.0.0
  */
 
-public class SignerConf extends ValidatableConf {
+public class SignerConf extends ValidableConf {
 
   private List<FileOrBinary> certs;
 

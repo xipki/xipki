@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 /**
@@ -12,7 +12,7 @@ import org.xipki.util.exception.InvalidConfException;
  * @author Lijun Liao (xipki)
  *
  */
-public abstract class MgmtEntry extends ValidatableConf {
+public abstract class MgmtEntry extends ValidableConf {
 
   @Override
   public void validate() throws InvalidConfException {

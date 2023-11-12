@@ -9,7 +9,7 @@ import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
 import org.xipki.security.CertpathValidationModel;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.JSON;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.Validity;
 import org.xipki.util.Validity.Unit;
 import org.xipki.util.exception.InvalidConfException;
@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @author Lijun Liao (xipki)
  */
-public class OcspServerConf extends ValidatableConf {
+public class OcspServerConf extends ValidableConf {
 
   public enum EmbedCertsMode {
     NONE,
@@ -33,7 +33,7 @@ public class OcspServerConf extends ValidatableConf {
     SIGNER_AND_CA
   } // class EmbedCertsMode
 
-  public static class CertCollection extends ValidatableConf {
+  public static class CertCollection extends ValidableConf {
 
     private String dir;
 
@@ -62,7 +62,7 @@ public class OcspServerConf extends ValidatableConf {
 
   } // class CertCollection
 
-  public static class Nonce extends ValidatableConf {
+  public static class Nonce extends ValidableConf {
 
     /**
      * valid values are ignore, forbidden, optional and required.
@@ -104,7 +104,7 @@ public class OcspServerConf extends ValidatableConf {
 
   } // class Nonce
 
-  public static class RequestOption extends ValidatableConf {
+  public static class RequestOption extends ValidableConf {
 
     /**
      * Whether to support HTTP GET for small request.
@@ -231,7 +231,7 @@ public class OcspServerConf extends ValidatableConf {
 
   } // class RequestOption
 
-  public static class CertpathValidation extends ValidatableConf {
+  public static class CertpathValidation extends ValidableConf {
 
     private CertpathValidationModel validationModel;
 
@@ -272,7 +272,7 @@ public class OcspServerConf extends ValidatableConf {
 
   } // class CertpathValidation
 
-  public static class Responder extends ValidatableConf {
+  public static class Responder extends ValidableConf {
 
     /**
      * To answer OCSP request via URI http://myorg.com/foo/abc, you can use the combination
@@ -383,7 +383,7 @@ public class OcspServerConf extends ValidatableConf {
 
   } // class Responder
 
-  public static class ResponseCache extends ValidatableConf {
+  public static class ResponseCache extends ValidableConf {
 
     private DataSourceConf datasource;
 
@@ -416,7 +416,7 @@ public class OcspServerConf extends ValidatableConf {
 
   } // class ResponseCache
 
-  public static class ResponseOption extends ValidatableConf {
+  public static class ResponseOption extends ValidableConf {
 
     private boolean responderIdByName = true;
 
@@ -495,7 +495,7 @@ public class OcspServerConf extends ValidatableConf {
 
   } // class ResponseOption
 
-  public static class Signer extends ValidatableConf {
+  public static class Signer extends ValidableConf {
 
     private String name;
 
@@ -573,7 +573,7 @@ public class OcspServerConf extends ValidatableConf {
 
   } // class Signer
 
-  public static class Store extends ValidatableConf {
+  public static class Store extends ValidableConf {
 
     private Source source;
 
@@ -710,7 +710,7 @@ public class OcspServerConf extends ValidatableConf {
 
   } // class Store
 
-  public static class Source extends ValidatableConf {
+  public static class Source extends ValidableConf {
 
     private String type;
 
@@ -749,7 +749,7 @@ public class OcspServerConf extends ValidatableConf {
 
   } // class Source
 
-  public static class CaCerts extends ValidatableConf {
+  public static class CaCerts extends ValidableConf {
 
     /**
      * Files of CA certificates to be considered.<br/>

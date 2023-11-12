@@ -7,7 +7,7 @@ import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.FileOrValue;
 import org.xipki.util.StringUtil;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.HashMap;
@@ -23,7 +23,7 @@ import java.util.Map;
  */
 public class CaConfType {
 
-  public static class CaSystem extends ValidatableConf {
+  public static class CaSystem extends ValidableConf {
 
     /**
      * Specify the base directory for relative path specified in this
@@ -160,7 +160,7 @@ public class CaConfType {
 
   } // class CaSystem
 
-  public static class CaHasRequestor extends ValidatableConf {
+  public static class CaHasRequestor extends ValidableConf {
 
     private String requestorName;
 
@@ -324,7 +324,7 @@ public class CaConfType {
 
   } // class CaInfo
 
-  public static class IdNameConf extends ValidatableConf {
+  public static class IdNameConf extends ValidableConf {
 
     private Integer id;
 
@@ -431,7 +431,7 @@ public class CaConfType {
 
   } // class Ca
 
-  public static class GenSelfIssued extends ValidatableConf {
+  public static class GenSelfIssued extends ValidableConf {
 
     private String subject;
 

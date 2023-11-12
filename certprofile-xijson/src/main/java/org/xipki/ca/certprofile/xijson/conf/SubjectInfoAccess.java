@@ -4,7 +4,7 @@
 package org.xipki.ca.certprofile.xijson.conf;
 
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.LinkedList;
@@ -16,7 +16,7 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 
-public class SubjectInfoAccess extends ValidatableConf {
+public class SubjectInfoAccess extends ValidableConf {
 
   private List<Access> accesses;
 
@@ -37,7 +37,7 @@ public class SubjectInfoAccess extends ValidatableConf {
     validate(accesses);
   }
 
-  public static class Access extends ValidatableConf {
+  public static class Access extends ValidableConf {
 
     private DescribableOid accessMethod;
 
