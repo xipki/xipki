@@ -1,0 +1,108 @@
+{
+	"dbSchemas": {
+		"KEYPAIR_ENC_KEY":"00112233445566778899AABBCCDDEEFF"
+	},
+	"signers":[],
+	"keypairGens":[{
+		"name":"pkcs11",
+		"type":"pkcs11",
+		"conf":{
+			"value":"slot=0,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448"
+		}
+	}],
+	"requestors":[{
+		"id": 2,
+		"name":"requestor1",
+		"type":"cert",
+		"binaryConf":{
+			"file":"keycerts/ra-sdk-client-cert.pem"
+		}
+	}],
+	"profiles":[{
+		"id": 1,
+		"name":"rootca",
+		"type":"xijson",
+		"conf":{
+			"file":"profiles/certprofile-rootca.json"
+		}
+	},{
+		"id": 2,
+		"name":"subca",
+		"type":"xijson",
+		"conf":{
+			"file":"profiles/certprofile-subca.json"
+		}
+	},{
+		"id": 3,
+		"name":"tls",
+		"type":"xijson",
+		"conf":{
+			"file":"profiles/certprofile-tls.json"
+		}
+	},{
+		"id": 4,
+		"name":"tls-c",
+		"type":"xijson",
+		"conf":{
+			"file":"profiles/certprofile-tls-c.json"
+		}
+	}],
+	"cas":[{
+		"id": 1,
+		"name":"rootca1",
+		"aliases":[
+			"rootca"
+		],
+		"caInfo":{
+			"caUris":{
+				"cacertUris":[
+					"http://myorg.org/rootca1.der"
+				],
+				"crlUris":[
+					"http://localhost:8081/crl/?type=crl&name=rootca1"
+				],
+				"ocspUris":[
+					"http://localhost:8080/ocsp/responder1"
+				]
+			},
+			"crlControl":{
+				"interval.hours": 24,
+				"fullcrl.intervals":90,
+				"overlap":"90d",
+				"interval.time":"01:00"
+			},
+			"keypairGenNames": ["software"],
+			"expirationPeriod":365,
+			"genSelfIssued":{
+				"subject":"C=DE,CN=RootCA,O=myorg",
+				"profile":"rootca",
+				"serialNumber":"1"
+			},
+			"keepExpiredCertDays":-1,
+			"maxValidity":"10y",
+			"nextCrlNo":2,
+			"permissions":["all"],
+			"saveCert":true,
+			"saveKeypair":false,
+			"signerType":"PKCS12",
+			"signerConf":{
+				"value":"password=CHANGEIT,keystore=file:${basedir}/keycerts/rootca1.p12,algo=SHA256WITHECDSA"
+			},
+			"snSize":20,
+			"status":"active",
+			"validityMode":"cutoff"
+		},
+		"profiles":[
+			"subca"
+		],
+		"requestors":[{
+			"requestorName":"requestor1",
+			"permissions":[
+				"all"
+			],
+			"profiles":[
+				"all"
+			]
+		}]
+	}]
+}

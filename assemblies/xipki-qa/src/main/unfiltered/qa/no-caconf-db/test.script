@@ -1,0 +1,44 @@
+SRC_DIR = qa/no-caconf-db
+CA_DIR = ~/tools/xipki/ca-tomcat/xipki/etc/ca
+
+xi:confirm "Shutdown tomcat for CA server"
+
+// initialize database
+ca:sql --force --db-conf "$CA_DIR/database/ca-db.properties" \
+    xipki/sql/ca-init.sql
+
+xi:rm -r -f ${CA_DIR}/caconf
+
+xi:copy-dir $SRC_DIR/caconf $CA_DIR/caconf
+
+xi:copy-file xipki/keycerts/ra-sdk-client-cert.pem ${CA_DIR}/caconf/keycerts
+
+xi:mkdir ${CA_DIR}/caconf/profiles
+
+xi:copy-file -f \
+    $SRC_DIR/../certprofile/certprofile-rootca.json \
+    $SRC_DIR/../certprofile/certprofile-subca.json \
+    $SRC_DIR/../certprofile/certprofile-tls.json \
+    $SRC_DIR/../certprofile/certprofile-tls-c.json \
+    $CA_DIR/caconf/profiles
+
+xi:copy-file -f $SRC_DIR/ca-rootca.json \
+    $CA_DIR/ca.json
+
+xi:confirm "Start tomcat for CA server"
+
+ca:enroll-cert --ca rootca1 --csr $SRC_DIR/csr/subca1.csr \
+  --outform PEM --out output/subca1.pem --profile subca
+
+xi:copy-file -f output/subca1.pem \
+    $CA_DIR/caconf/keycerts
+
+xi:copy-file -f $SRC_DIR/ca.json \
+    $CA_DIR/ca.json
+
+xi:confirm "Re-start tomcat for CA server"
+
+echo "Test CA"
+
+ca:enroll-cert --ca subca1 --csr $SRC_DIR/csr/tls.csr \
+  --outform PEM --out output/tls.pem --profile tls

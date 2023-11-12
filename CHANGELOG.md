@@ -9,6 +9,8 @@ See also <https://github.com/xipki/xipki/releases>
 - CA
   - Change the location of file 'calock'.
   - Add configuration of reverseProxyMode.
+  - Add support of file-based CA configuraion.
+  - Unified message format of CA configuration in CA management API and Database Ex-/Import.
 - OCSP
   - Add configuration of reverseProxyMode.
 - Gateway
