@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
- XiPKI version 5.3.10
+ v6: XiPKI version 5.3.10, changes compared to v5 (XiPKI 5.3.180)
+   - Remove table DELTACRL_CACHE
+
  Maximal column size: 4k
   - DB2: PAGESIZE 4 k
 -->

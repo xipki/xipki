@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
- v8: XiPKI version 6.3.0, changes compared to v7
-   - ca-init.xml is split to ca-init.xml and caconf-init.xml.
+ v9: XiPKI version 6.4.0, changes compared to v8 (XiPKI 6.3.0)
+   - add column ALIASES to table CA_HAS_PROFILE.
 
  Maximal column size: 4k
   - DB2: PAGESIZE 4 k

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
- v5: introduced in XiPKI version 5.3.8, change compared to v4
+ v5: introduced in XiPKI version 5.3.8, change compared to v4 (XiPKI 5.3.0)
    - Delete columns DUPLICATE_KEY and DUPLICATE_SUBJECT from table CA
    - Delete column FP_K from table CERT
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
- v7: XiPKI version 6.0.0, changes compared to v6
+ v7: XiPKI version 6.0.0, changes compared to v6 (XiPKI 5.3.10)
    - Table CRL:  add column SHA1
    - Table CA:   merge columns to a new column CONF, remove columns
    -             CMP_SIGNER_NAME, SCEP_SIGNER_NAME, PROTOCOL_SUPPORT

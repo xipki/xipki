@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
- v8: XiPKI version 6.3.0, changes compared to v7
+ v8: XiPKI version 6.3.0, changes compared to v7 (XiPKI 6.0.0)
    - ca-init.xml is split to ca-init.xml and caconf-init.xml.
 
  Maximal column size: 4k
