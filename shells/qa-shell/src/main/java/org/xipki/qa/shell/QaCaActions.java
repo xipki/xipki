@@ -369,7 +369,7 @@ public class QaCaActions {
 
       // SN size
       if (ey.getSerialNoLen() != null) {
-        assertObjEquals("serial number length", ey.getSerialNoLen(), ca.getSerialNoLen());
+        assertObjEquals("serial number length", ey.getSerialNoLen(), ca.getSnSize());
       }
 
       // CRL control name
@@ -398,8 +398,8 @@ public class QaCaActions {
       }
 
       // Keep expired certificate
-      if (ey.getKeepExpiredCertInDays() != null) {
-        assertObjEquals("keepExpiredCertInDays", ey.getKeepExpiredCertInDays(), ca.getKeepExpiredCertInDays());
+      if (ey.getKeepExpiredCertDays() != null) {
+        assertObjEquals("keepExpiredCertDays", ey.getKeepExpiredCertDays(), ca.getKeepExpiredCertDays());
       }
 
       // Num CRLs
@@ -596,7 +596,7 @@ public class QaCaActions {
 
   @Command(scope = "caqa", name = "profile-check", description = "check information of profiles (QA)")
   @Service
-  public static class ProfileCheck extends ProfileCaActions.ProfileUp {
+  public static class ProfileCheck extends ProfileActions.ProfileUp {
 
     @Override
     protected Object execute0() throws Exception {
@@ -624,7 +624,7 @@ public class QaCaActions {
 
   @Command(scope = "caqa", name = "publisher-check", description = "check information of publishers (QA)")
   @Service
-  public static class PublisherCheck extends PublisherCaActions.PublisherUp {
+  public static class PublisherCheck extends PublisherActions.PublisherUp {
 
     @Override
     protected Object execute0() throws Exception {
@@ -649,7 +649,7 @@ public class QaCaActions {
 
   @Command(scope = "caqa", name = "requestor-check", description = "check information of requestors (QA)")
   @Service
-  public static class RequestorCheck extends RequestorCaActions.RequestorUp {
+  public static class RequestorCheck extends RequestorActions.RequestorUp {
 
     @Override
     protected Object execute0() throws Exception {
@@ -679,7 +679,7 @@ public class QaCaActions {
 
   @Command(scope = "caqa", name = "signer-check", description = "check information of signer (QA)")
   @Service
-  public static class SignerCheck extends SignerCaActions.SignerUp {
+  public static class SignerCheck extends SignerActions.SignerUp {
 
     @Override
     protected Object execute0() throws Exception {
@@ -689,15 +689,15 @@ public class QaCaActions {
         new CmdFailure("signer named '" + name + "' is not configured"));
 
       if (CaManager.NULL.equalsIgnoreCase(certFile)) {
-        if (cr.getBase64Cert() != null) {
+        if (cr.base64Cert() != null) {
           throw new CmdFailure("CaCert: is configured but expected is none");
         }
       } else if (certFile != null) {
         byte[] ex = IoUtil.read(certFile);
-        if (cr.getBase64Cert() == null) {
+        if (cr.base64Cert() == null) {
           throw new CmdFailure("CaCert: is not configured explicitly as expected");
         }
-        if (!certEquals(ex, Base64.decode(cr.getBase64Cert()))) {
+        if (!certEquals(ex, Base64.decode(cr.base64Cert()))) {
           throw new CmdFailure("CaCert: the expected one and the actual one differ");
         }
       }

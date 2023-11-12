@@ -33,7 +33,7 @@ import java.util.Map.Entry;
  * @author Lijun Liao (xipki)
  *
  */
-public class MiscCaActions {
+public class MiscActions {
 
   @Command(scope = "ca", name = "export-conf", description = "export configuration to zip file")
   @Service

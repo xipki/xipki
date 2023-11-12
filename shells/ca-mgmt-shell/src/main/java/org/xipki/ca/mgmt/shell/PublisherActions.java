@@ -26,7 +26,7 @@ import java.util.*;
  * @author Lijun Liao (xipki)
  *
  */
-public class PublisherCaActions {
+public class PublisherActions {
 
   @Command(scope = "ca", name = "capub-add", description = "add publisher to CA")
   @Service

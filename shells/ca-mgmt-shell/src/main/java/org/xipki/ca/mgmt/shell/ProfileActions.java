@@ -28,7 +28,7 @@ import java.util.*;
  * @author Lijun Liao (xipki)
  *
  */
-public class ProfileCaActions {
+public class ProfileActions {
 
   @Command(scope = "ca", name = "caprofile-add", description = "add certificate profile to CA")
   @Service

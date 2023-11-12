@@ -30,7 +30,7 @@ import java.util.*;
  * @author Lijun Liao (xipki)
  *
  */
-public class SignerCaActions {
+public class SignerActions {
 
   @Command(scope = "ca", name = "signer-add", description = "add signer")
   @Service
