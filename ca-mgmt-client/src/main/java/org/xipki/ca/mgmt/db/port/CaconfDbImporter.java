@@ -458,10 +458,7 @@ class CaconfDbImporter extends DbPorter {
   private void importCaHasCertprofile(CaConfType.CaSystem root) throws DataAccessException {
     System.out.print("    importing table CA_HAS_PROFILE ... ");
     boolean succ = false;
-    String columns = "CA_ID,PROFILE_ID";
-    if (dbSchemaVersion > 8) {
-      columns += ",ALIASES";
-    }
+    String columns = "CA_ID,PROFILE_ID,ALIASES";
 
     final String sql = SqlUtil.buildInsertSql("CA_HAS_PROFILE", columns);
     PreparedStatement ps = prepareStatement(sql);
@@ -475,9 +472,7 @@ class CaconfDbImporter extends DbPorter {
             ps.setInt(1, ca.getId());
 
             ps.setInt(2, profileNameToIdMap.get((entry.getProfileName())));
-            if (dbSchemaVersion > 8) {
-              ps.setString(3, StringUtil.collectionAsString(entry.getProfileAliases(), ","));
-            }
+            ps.setString(3, StringUtil.collectionAsString(entry.getProfileAliases(), ","));
 
             ps.executeUpdate();
           } catch (SQLException ex) {

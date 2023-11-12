@@ -87,8 +87,8 @@ public class CertStoreBase extends QueryExecutor {
     }
 
     this.dbSchemaVersion = Integer.parseInt(caConfDbSchemaInfo.get("VERSION"));
-    if (this.dbSchemaVersion < 7) {
-      throw new CaMgmtException("dbSchemaVersion < 7 unsupported: " + dbSchemaVersion);
+    if (this.dbSchemaVersion < 9) {
+      throw new CaMgmtException("dbSchemaVersion < 9 unsupported: " + dbSchemaVersion);
     }
 
     String str = caConfDbSchemaInfo.get("X500NAME_MAXLEN");

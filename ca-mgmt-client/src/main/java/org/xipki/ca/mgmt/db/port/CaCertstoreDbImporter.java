@@ -53,8 +53,7 @@ class CaCertstoreDbImporter extends DbPorter {
   private final int numCertsPerCommit;
 
   CaCertstoreDbImporter(DataSourceWrapper datasource, String srcDir, int numCertsPerCommit,
-      boolean resume, AtomicBoolean stopMe)
-      throws Exception {
+      boolean resume, AtomicBoolean stopMe) throws Exception {
     super(datasource, srcDir, stopMe);
 
     this.numCertsPerCommit = Args.positive(numCertsPerCommit, "numCertsPerCommit");
@@ -145,11 +144,9 @@ class CaCertstoreDbImporter extends DbPorter {
       throw new Exception("could not import Certstore greater than " + VERSION_V2 + ": " + certstore.getVersion());
     }
 
-    if (dbSchemaVersion >= 8) {
-      importRequestorOrProfile(certstore.getProfiles(), "PROFILE");
-      importRequestorOrProfile(certstore.getRequestors(), "REQUESTOR");
-      importCa(certstore.getCas());
-    }
+    importRequestorOrProfile(certstore.getProfiles(), "PROFILE");
+    importRequestorOrProfile(certstore.getRequestors(), "REQUESTOR");
+    importCa(certstore.getCas());
 
     File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
     System.out.println("importing CA certstore to database");

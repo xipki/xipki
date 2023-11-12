@@ -275,7 +275,7 @@ class PublisherManager {
       }
 
       ret = new IdentifiedCertPublisher(entry, publisher);
-      ret.initialize(manager.securityFactory.getPasswordResolver(), manager.datasourceMap);
+      ret.initialize(manager.securityFactory.getPasswordResolver(), manager.getDataSourceMap());
       return ret;
     } catch (ObjectCreationException | CertPublisherException | RuntimeException ex) {
       String msg = "invalid configuration for the publisher " + entry.getIdent();

@@ -11,6 +11,8 @@ See also <https://github.com/xipki/xipki/releases>
   - Add configuration of reverseProxyMode.
   - Add support of file-based CA configuraion.
   - Unified message format of CA configuration in CA management API and Database Ex-/Import.
+  - Remove support of database with DBSCHEMA.VERSION <= 8 (XiPKI v6.3.0 and less).  
+    Use MGMT-CLI to export-then-import databases.
 - OCSP
   - Add configuration of reverseProxyMode.
 - Gateway

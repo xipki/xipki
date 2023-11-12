@@ -145,7 +145,7 @@ public abstract class DbPortWorker extends DbWorker {
                       String caConfDbFile, String caDbFile,
                       boolean resume, String srcFolder, int batchEntriesPerCommit, char[] password)
         throws PasswordResolverException, IOException {
-      super(datasourceFactory, passwordResolver, (caConfDbFile == null ? caDbFile : caConfDbFile), password);
+      super(datasourceFactory, passwordResolver, caConfDbFile, password);
       this.resume = resume;
       this.srcFolder = IoUtil.expandFilepath(srcFolder);
       this.batchEntriesPerCommit = batchEntriesPerCommit;
@@ -182,14 +182,6 @@ public abstract class DbPortWorker extends DbWorker {
           decrypt(srcFolder);
         }
 
-        CaCertstoreDbImporter certStoreImporter = new CaCertstoreDbImporter(caDataSource,
-            srcFolder, batchEntriesPerCommit, resume, stopMe);
-        if (certStoreImporter.dbSchemaVersion >= 8) {
-          if (caConfDbFile == null) {
-            throw new IllegalArgumentException("The caConfDbFile (--caconf-db-conf) is not specified.");
-          }
-        }
-
         CaconfDbImporter caConfImporter = new CaconfDbImporter(datasource, srcFolder, stopMe);
         if (!resume) {
           // CAConfiguration
@@ -198,6 +190,8 @@ public abstract class DbPortWorker extends DbWorker {
         }
 
         // CertStore
+        CaCertstoreDbImporter certStoreImporter = new CaCertstoreDbImporter(caDataSource,
+            srcFolder, batchEntriesPerCommit, resume, stopMe);
         certStoreImporter.importToDb();
         certStoreImporter.close();
       } finally {

@@ -156,10 +156,6 @@ public class CertStore extends CertStoreBase {
   }
 
   private void removeEntry(String name, String table) throws CaMgmtException {
-    if (dbSchemaVersion < 8) {
-      return;
-    }
-
     Args.notBlank(name, "name");
     final String sql = "DELETE FROM " + table + " WHERE NAME=?";
 
@@ -179,10 +175,6 @@ public class CertStore extends CertStoreBase {
   }
 
   private void addNameId(NameId ident, String table) throws CaMgmtException {
-    if (dbSchemaVersion < 8) {
-      return;
-    }
-
     Args.notNull(ident, "ident");
 
     if (existsIdent(ident, table)) {
@@ -207,10 +199,6 @@ public class CertStore extends CertStoreBase {
   } // method addRequestor
 
   public void addCa(NameId ident, X509Cert caCert, CertRevocationInfo caRevInfo) throws CaMgmtException {
-    if (dbSchemaVersion < 8) {
-      return;
-    }
-
     Args.notNull(ident, "ident");
     Args.notNull(caCert, "caCert");
 
@@ -270,10 +258,6 @@ public class CertStore extends CertStoreBase {
   }
 
   public void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {
-    if (dbSchemaVersion < 8) {
-      return;
-    }
-
     try {
       execUpdatePrepStmt0("UPDATE CA SET REV_INFO=? WHERE NAME=?",
           col2Str(revocationInfo.encode()), col2Str(caName));
@@ -283,10 +267,6 @@ public class CertStore extends CertStoreBase {
   }
 
   public void unrevokeCa(String caName) throws CaMgmtException {
-    if (dbSchemaVersion < 8) {
-      return;
-    }
-
     try {
       execUpdatePrepStmt0("UPDATE CA SET REV_INFO=? WHERE NAME=?", col2Str(null), col2Str(caName));
     } catch (OperationException ex) {
@@ -438,8 +418,7 @@ public class CertStore extends CertStoreBase {
       throw new CRLException(ex.getMessage(), ex);
     }
 
-    boolean withSha1Column = dbSchemaVersion >= 7;
-    String b64Sha1 = withSha1Column ? HashAlgo.SHA1.base64Hash(encodedCrl) : null;
+    String b64Sha1 = HashAlgo.SHA1.base64Hash(encodedCrl);
     String b64Crl = Base64.encodeToString(encodedCrl);
 
     List<SqlColumn2> columns = new ArrayList<>(10);
@@ -452,9 +431,7 @@ public class CertStore extends CertStoreBase {
     columns.add(col2Long(baseCrlNumber));
     // in this version we set CRL_SCOPE to fixed value 0
     columns.add(col2Int(0));
-    if (withSha1Column) {
-      columns.add(col2Str(b64Sha1));
-    }
+    columns.add(col2Str(b64Sha1));
     columns.add(col2Str(b64Crl));
 
     execUpdatePrepStmt0(SQL_ADD_CRL, columns.toArray(new SqlColumn2[0]));

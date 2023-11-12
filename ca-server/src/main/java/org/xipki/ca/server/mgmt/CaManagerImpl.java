@@ -57,6 +57,26 @@ import java.util.concurrent.TimeUnit;
 
 public class CaManagerImpl implements CaManager, Closeable {
 
+  private static class MyDataSourceMap implements DataSourceMap {
+
+    private final Map<String, DataSourceWrapper> underlying;
+
+    public MyDataSourceMap(Map<String, DataSourceWrapper> underlying) {
+      this.underlying = underlying;
+    }
+
+    public DataSourceWrapper getDataSource(String name) {
+      if (underlying == null) {
+        return null;
+      } else if ("ca".equalsIgnoreCase(name) || "caconf".equalsIgnoreCase(name)) {
+        return null;
+      } else {
+        return underlying.get(name.toLowerCase());
+      }
+    }
+
+  }
+
   private class CaRestarter implements Runnable {
 
     private boolean inProcess;

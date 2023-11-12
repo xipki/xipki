@@ -317,7 +317,23 @@ public class CaServerConf extends ValidatableConf {
       throw new InvalidConfException("shardId is not in [0, 127]");
     }
 
-    //notEmpty(datasources, "datasources");
+    boolean withCaconfDb = false;
+    for (DataSourceConf dsConf : datasources) {
+      if ("caconf".equals(dsConf.getName())) {
+        withCaconfDb = true;
+        break;
+      }
+    }
+
+    if (caConfFiles == null) {
+      if (!withCaconfDb) {
+        throw new InvalidConfException("datasource 'caconf' is required but is not configured.");
+      }
+    } else {
+      if (withCaconfDb) {
+        throw new InvalidConfException("datasource 'caconf' is not allowed but is configured.");
+      }
+    }
     validate(remoteMgmt, security);
     TlsHelper.checkReverseProxyMode(reverseProxyMode);
   }

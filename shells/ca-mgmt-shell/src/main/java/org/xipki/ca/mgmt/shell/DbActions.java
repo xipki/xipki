@@ -318,7 +318,7 @@ public class DbActions {
   @Service
   public static class ImportCa extends DbPortAction {
 
-    @Option(name = "--caconf-db-conf", description = "CA configuration database file")
+    @Option(name = "--caconf-db-conf", required = true, description = "CA configuration database file")
     @Completion(FileCompleter.class)
     private String caconfDbFile;
 

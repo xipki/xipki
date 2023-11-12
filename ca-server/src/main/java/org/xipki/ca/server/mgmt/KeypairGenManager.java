@@ -63,8 +63,8 @@ class KeypairGenManager {
     int dbSchemaVersion = manager.getDbSchemaVersion();
 
     List<KeypairGenEntry> entries;
-    if (dbSchemaVersion < 7) {
-      throw new CaMgmtException("dbSchemaVersion < 7 unsupported: " + dbSchemaVersion);
+    if (dbSchemaVersion < 9) {
+      throw new CaMgmtException("dbSchemaVersion < 9 unsupported: " + dbSchemaVersion);
     }
 
     List<String> names = manager.caConfStore.getKeyPairGenNames();
@@ -160,7 +160,7 @@ class KeypairGenManager {
     ret.setDbEntry(entry);
 
     try {
-      ret.init(manager.securityFactory, manager.shardId, manager.datasourceMap);
+      ret.init(manager.securityFactory, manager.shardId, manager.getDataSourceMap());
     } catch (ObjectCreationException ex) {
       final String message = "error createKeypairGen";
       LOG.debug(message, ex);
