@@ -11,6 +11,7 @@ import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
 import org.xipki.audit.Audits;
 import org.xipki.audit.PciAuditEvent;
+import org.xipki.ca.api.DataSourceMap;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.*;
@@ -137,9 +138,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   int shardId;
 
-  Map<String, DataSourceWrapper> datasourceMap;
-
-  private Map<String, DataSourceWrapper> allDatasourceMap;
+  private Map<String, DataSourceWrapper> allDataSources;
 
   CaServerConf caServerConf;
 
@@ -156,8 +155,6 @@ public class CaManagerImpl implements CaManager, Closeable {
   CaConfStore caConfStore;
 
   private final CmLicense license;
-
-  private DataSourceWrapper _caconfDatasource;
 
   private DataSourceWrapper certstoreDatasource;
 
@@ -322,23 +319,27 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
 
-    if (this.datasourceMap == null) {
-      ConcurrentHashMap<String, DataSourceWrapper> datasourceMap = new ConcurrentHashMap<>();
-      List<DataSourceConf> datasourceList = caServerConf.getDatasources();
-      for (DataSourceConf datasource : datasourceList) {
-        String name = datasource.getName();
+    if (this.allDataSources == null) {
+      allDataSources = new HashMap<>();
+
+      final String caDataSourceName = "ca";
+      FileOrValue caDataSourceConf = null;
+      for (DataSourceConf datasource : caServerConf.getDatasources()) {
+        String name = datasource.getName().toLowerCase(Locale.ROOT);
         FileOrValue conf = datasource.getConf();
-        datasourceMap.put(name, loadDatasource(name, conf));
-        if (conf.getFile() != null) {
-          LOG.info("associate datasource {} to the file {}", name, conf.getFile());
+
+        if (caDataSourceName.equals(name)) {
+          caDataSourceConf = conf;
         } else {
-          LOG.info("associate datasource {} to text value", name);
+          addDataSource(name, conf);
         }
       }
 
-      certstoreDatasource = datasourceMap.get("ca");
-
-      if (caServerConf.getCaConfFiles() != null) {
+      if (caServerConf.getCaConfFiles() == null) {
+        LOG.info("loading CAConf from database");
+        DataSourceWrapper caconfDatasource = allDataSources.get("caconf");
+        caConfStore = new DbCaConfStore(caconfDatasource);
+      } else {
         LOG.info("loading CAConf from files {]", caServerConf.getCaConfFiles());
         try {
           caConfStore = new FileCaConfStore(securityFactory, certprofileFactoryRegister, caServerConf.getCaConfFiles());
@@ -347,40 +348,20 @@ public class CaManagerImpl implements CaManager, Closeable {
         } catch (InvalidConfException ex) {
           throw new CaMgmtException("Invalid Configuration: " + ex.getMessage(), ex);
         }
-      } else {
-        LOG.info("loading CAConf from database");
-
-        DataSourceWrapper caconfDatasource = datasourceMap.get("caconf");
-        if (caconfDatasource == null) {
-          caconfDatasource = certstoreDatasource;
-        }
-
-        caConfStore = new DbCaConfStore(caconfDatasource);
-
-        int dbSchemaVersion = caConfStore.getDbSchemaVersion();
-        if (dbSchemaVersion >= 8) {
-          if (caconfDatasource == certstoreDatasource) {
-            throw new CaMgmtException("no datasource named 'caconf' configured");
-          }
-        }
       }
 
       boolean needsCertStore = caConfStore.needsCertStore();
       LOG.info("needsCertStore: {}", needsCertStore);
       if (needsCertStore) {
-        if (certstoreDatasource == null) {
-          throw new CaMgmtException("no datasource named 'ca' configured");
+        if (caDataSourceConf == null) {
+          throw new CaMgmtException("no datasource named '" + caDataSourceName + "' configured");
         }
-      } else {
-        certstoreDatasource = null;
+
+        addDataSource(caDataSourceName, caDataSourceConf);
+        certstoreDatasource = allDataSources.get(caDataSourceName);
       }
 
       LOG.info("dbSchemaVersion: {}", caConfStore.getDbSchemaVersion());
-      this.allDatasourceMap = datasourceMap;
-
-      this.datasourceMap = new HashMap<>(datasourceMap);
-      this.datasourceMap.remove("ca");
-      this.datasourceMap.remove("caconf");
     }
 
     // 2010-01-01T00:00:00.000 UTC
@@ -492,28 +473,32 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
   } // method init
 
-  public int getDbSchemaVersion() {
-    return caConfStore.getDbSchemaVersion();
-  }
-
-  private DataSourceWrapper loadDatasource(String datasourceName, FileOrValue datasourceConf)
-      throws CaMgmtException {
+  private void addDataSource(String name, FileOrValue conf) throws CaMgmtException {
+    DataSourceWrapper datasource;
     try {
-      DataSourceWrapper datasource = datasourceFactory.createDataSource(
-          datasourceName, datasourceConf, securityFactory.getPasswordResolver());
+      datasource = datasourceFactory.createDataSource(name, conf, securityFactory.getPasswordResolver());
 
       // test the datasource
       Connection conn = datasource.getConnection();
       datasource.returnConnection(conn);
 
-      LOG.info("loaded datasource.{}", datasourceName);
-      return datasource;
+      LOG.info("loaded datasource.{}", name);
     } catch (DataAccessException | PasswordResolverException | IOException | RuntimeException ex) {
       throw new CaMgmtException(
-          ex.getClass().getName() + " while parsing datasource " + datasourceName + ": " + ex.getMessage(),
-          ex);
+          ex.getClass().getName() + " while parsing datasource " + name + ": " + ex.getMessage(), ex);
     }
-  } // method loadDatasource
+
+    allDataSources.put(name, datasource);
+    if (conf.getFile() != null) {
+      LOG.info("associate datasource {} to the file {}", name, conf.getFile());
+    } else {
+      LOG.info("associate datasource {} to text value", name);
+    }
+  }
+
+  public int getDbSchemaVersion() {
+    return caConfStore.getDbSchemaVersion();
+  }
 
   @Override
   public CaSystemStatus getCaSystemStatus() {
@@ -807,7 +792,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
 
-    for (Entry<String, DataSourceWrapper> m : datasourceMap.entrySet()) {
+    for (Entry<String, DataSourceWrapper> m : allDataSources.entrySet()) {
       try {
         m.getValue().close();
       } catch (Exception ex) {
@@ -1152,6 +1137,10 @@ public class CaManagerImpl implements CaManager, Closeable {
     scheduledThreadPoolExecutor.shutdown();
     scheduledThreadPoolExecutor = null;
   } // method shutdownScheduledThreadPoolExecutor
+
+  protected DataSourceMap getDataSourceMap() {
+    return new MyDataSourceMap(allDataSources);
+  }
 
   @Override
   public void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason, Instant invalidityTime)

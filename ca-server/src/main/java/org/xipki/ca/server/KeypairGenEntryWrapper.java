@@ -3,16 +3,14 @@
 
 package org.xipki.ca.server;
 
+import org.xipki.ca.api.DataSourceMap;
 import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
 import org.xipki.ca.server.keypool.KeypoolKeypairGenerator;
-import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.KeypairGenerator;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
 import org.xipki.util.exception.ObjectCreationException;
-
-import java.util.Map;
 
 /**
  * Wrapper of keypair generation database entry.
@@ -33,7 +31,7 @@ public class KeypairGenEntryWrapper {
     this.dbEntry = Args.notNull(dbEntry, "dbEntry");
   }
 
-  public void init(SecurityFactory securityFactory, int shardId, Map<String, DataSourceWrapper> datasources)
+  public void init(SecurityFactory securityFactory, int shardId, DataSourceMap dataSourceMap)
       throws ObjectCreationException {
     Args.notNull(securityFactory, "securityFactory");
     dbEntry.faulty(true);
@@ -41,7 +39,7 @@ public class KeypairGenEntryWrapper {
       generator = new KeypoolKeypairGenerator();
 
       ((KeypoolKeypairGenerator) generator).setShardId(shardId);
-      ((KeypoolKeypairGenerator) generator).setDatasources(datasources);
+      ((KeypoolKeypairGenerator) generator).setDatasources(dataSourceMap);
 
       try {
         generator.initialize(dbEntry.getConf(), securityFactory.getPasswordResolver());

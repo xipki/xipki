@@ -6,6 +6,7 @@ package org.xipki.ca.api.publisher;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
+import org.xipki.ca.api.DataSourceMap;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
@@ -40,7 +41,7 @@ public abstract class CertPublisher implements Closeable {
    *         If error during the initialization occurs.
    */
   public abstract void initialize(
-      String conf, PasswordResolver passwordResolver, Map<String, DataSourceWrapper> datasourceConfs)
+      String conf, PasswordResolver passwordResolver, DataSourceMap datasourceConfs)
       throws CertPublisherException;
 
   @Override

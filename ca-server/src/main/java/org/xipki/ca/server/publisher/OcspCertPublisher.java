@@ -12,6 +12,7 @@ import org.xipki.audit.AuditStatus;
 import org.xipki.audit.Audits;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
+import org.xipki.ca.api.DataSourceMap;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.datasource.DataAccessException;
@@ -46,7 +47,7 @@ public class OcspCertPublisher extends CertPublisher {
   }
 
   @Override
-  public void initialize(String conf, PasswordResolver passwordResolver, Map<String, DataSourceWrapper> datasourceConfs)
+  public void initialize(String conf, PasswordResolver passwordResolver, DataSourceMap datasourceConfs)
       throws CertPublisherException {
     Args.notNull(conf, "conf");
 
@@ -59,7 +60,7 @@ public class OcspCertPublisher extends CertPublisher {
 
     DataSourceWrapper datasource = null;
     if (datasourceName != null) {
-      datasource = datasourceConfs.get(datasourceName);
+      datasource = datasourceConfs.getDataSource(datasourceName);
     }
 
     if (datasource == null) {

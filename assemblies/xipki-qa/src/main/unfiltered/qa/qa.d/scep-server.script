@@ -29,4 +29,8 @@ xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/scep-subcawithcrl.p12 --password CHANGE
 xi:copy-file -f ${KEYCERTS_DIR}/scep-subcawithcrl.p12 \
   ${GATEWAY_XIPKI_DIR}/keycerts/scep-subcawithcrl.p12
 
-xi:confirm "PLEASE RESTART TOMCAT ${GATEWAY_TOMCAT_DIR}!"
+echo "restart gateway tomcat!"
+xi:exec '~/tools/xipki/gateway-tomcat/bin/shutdown.sh'
+xi:exec '~/tools/xipki/gateway-tomcat/bin/startup.sh'
+sleep 3
+

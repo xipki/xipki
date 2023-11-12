@@ -4,6 +4,7 @@
 package org.xipki.ca.server.keypool;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.xipki.ca.api.DataSourceMap;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -54,7 +55,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
 
   private Cipher cipher;
 
-  private Map<String, DataSourceWrapper> datasources;
+  private DataSourceMap datasources;
 
   private final Map<String, Integer> keyspecToId = new HashMap<>();
 
@@ -66,7 +67,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     return shardId;
   }
 
-  public void setDatasources(Map<String, DataSourceWrapper> datasources) {
+  public void setDatasources(DataSourceMap datasources) {
     this.datasources = datasources;
   }
 
@@ -78,7 +79,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     String datasourceName = conf.value("datasource");
     DataSourceWrapper datasource = null;
     if (datasourceName != null) {
-      datasource = datasources.get(datasourceName);
+      datasource = datasources.getDataSource(datasourceName);
     }
 
     if (datasource == null) {

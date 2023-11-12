@@ -197,13 +197,18 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
         throw new CertificateException(ex.getMessage(), ex);
       }
 
+      String revInfoStr = null;
+      if (issuer.getCaInfo().getRevocationInfo() != null) {
+        revInfoStr = issuer.getCaInfo().getRevocationInfo().encode();
+      }
+
       int idx = 1;
       ps.setInt(idx++, issuer.getId());
       ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
       ps.setLong(idx++, DateUtil.toEpochSecond(cert.getTBSCertificate().getStartDate().getDate()));
       ps.setLong(idx++, DateUtil.toEpochSecond(cert.getTBSCertificate().getEndDate().getDate()));
       ps.setString(idx++, HashAlgo.SHA1.base64Hash(encodedCert));
-      ps.setString(idx++, issuer.getCaInfo().getRevocationInfo().encode());
+      ps.setString(idx++, revInfoStr);
       ps.setString(idx++, Base64.encodeToString(encodedCert));
       ps.setNull(idx, Types.INTEGER); // CRL_ID
 

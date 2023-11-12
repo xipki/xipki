@@ -6,18 +6,17 @@ package org.xipki.ca.server;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
+import org.xipki.ca.api.DataSourceMap;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
-import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 import java.io.Closeable;
-import java.util.Map;
 
 /**
  * CertPublisher with identifier.
@@ -37,7 +36,7 @@ public class IdentifiedCertPublisher implements Closeable {
     this.certPublisher = Args.notNull(certPublisher, "certPublisher");
   }
 
-  public void initialize(PasswordResolver passwordResolver, Map<String, DataSourceWrapper> datasourceConfs)
+  public void initialize(PasswordResolver passwordResolver, DataSourceMap datasourceConfs)
       throws CertPublisherException {
     certPublisher.initialize(entry.getConf(), passwordResolver, datasourceConfs);
   }

@@ -110,7 +110,7 @@ class CaCertstoreDbExporter extends DbPorter {
             entry.setName(name);
 
             if ("CA".equalsIgnoreCase(tblName)) {
-              ((CaCertstore.Ca) entry).setCert(rs.getBytes("CERT"));
+              ((CaCertstore.Ca) entry).setCert(Base64.decode(rs.getString("CERT")));
             }
             entry.validate();
             entries.add(entry);

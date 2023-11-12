@@ -316,11 +316,19 @@ class CaconfDbImporter extends DbPorter {
           byte[] certBytes = readContent(caInfo.getCert());
           X509Cert cert = X509Util.parseCert(certBytes);
 
-          byte[][] certchainBytes = new byte[caInfo.getCertchain().size()][];
-          for (int i = 0; i < certchainBytes.length; i++) {
-            certchainBytes[i] = readContent(caInfo.getCertchain().get(i));
+          String certchainStr = null;
+          if (caInfo.getCertchain() != null) {
+            byte[][] certchainBytes = new byte[caInfo.getCertchain().size()][];
+            for (int i = 0; i < certchainBytes.length; i++) {
+              certchainBytes[i] = readContent(caInfo.getCertchain().get(i));
+            }
+            certchainStr = X509Util.encodeCertificates(certchainBytes);
           }
-          String certchainStr = X509Util.encodeCertificates(certchainBytes);
+
+          String revInfoStr = null;
+          if (caInfo.getRevocationInfo() != null) {
+            revInfoStr = caInfo.getRevocationInfo().encode();
+          }
 
           int idx = 1;
           ps.setInt(   idx++, ca.getId());
@@ -329,7 +337,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setLong(  idx++, caInfo.getNextCrlNo());
           ps.setString(idx++, caInfo.getCrlSignerName());
           ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
-          ps.setString(idx++, caInfo.getRevocationInfo().encode());
+          ps.setString(idx++, revInfoStr);
           ps.setString(idx++, caInfo.getSignerType());
           ps.setString(idx++, readContent(caInfo.getSignerConf()));
           ps.setString(idx++, Base64.encodeToString(certBytes));

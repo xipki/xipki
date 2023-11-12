@@ -91,6 +91,12 @@ if { $printUsage equals "true" } then {
   xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
     qa/cab/ra.script
 
+  xi:exec '~/tools/xipki/ca-tomcat/bin/shutdown.sh'
+  sleep 2
+
+  xi:exec '~/tools/xipki/ca-tomcat/bin/startup.sh'
+  sleep 5
+
   source file:./qa/cab/ca-load.script
 
   echo "#################################################################"

@@ -1,7 +1,9 @@
 SRC_DIR = qa/no-caconf-db
 CA_DIR = ~/tools/xipki/ca-tomcat/xipki/etc/ca
 
-xi:confirm "Shutdown tomcat for CA server"
+echo "Shutdown tomcat for CA server"
+
+xi:exec '~/tools/xipki/ca-tomcat/bin/shutdown.sh'
 
 // initialize database
 ca:sql --force --db-conf "$CA_DIR/database/ca-db.properties" \
@@ -25,7 +27,9 @@ xi:copy-file -f \
 xi:copy-file -f $SRC_DIR/ca-rootca.json \
     $CA_DIR/ca.json
 
-xi:confirm "Start tomcat for CA server"
+echo "Start tomcat for CA server"
+xi:exec '~/tools/xipki/ca-tomcat/bin/startup.sh'
+sleep 5
 
 ca:enroll-cert --ca rootca1 --csr $SRC_DIR/csr/subca1.csr \
   --outform PEM --out output/subca1.pem --profile subca
@@ -36,7 +40,12 @@ xi:copy-file -f output/subca1.pem \
 xi:copy-file -f $SRC_DIR/ca.json \
     $CA_DIR/ca.json
 
-xi:confirm "Re-start tomcat for CA server"
+echo "Re-start tomcat for CA server"
+
+xi:exec '~/tools/xipki/ca-tomcat/bin/shutdown.sh'
+sleep 2
+xi:exec '~/tools/xipki/ca-tomcat/bin/startup.sh'
+sleep 5
 
 echo "Test CA"
 
