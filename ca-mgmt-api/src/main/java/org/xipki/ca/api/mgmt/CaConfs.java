@@ -42,7 +42,7 @@ public class CaConfs {
     Args.notNull(root, "root");
     Args.notNull(out, "out");
     root.validate();
-    JSON.writePrettyJSON(root, out);
+    CaJson.writePrettyJSON(root, out);
   } // method marshal
 
   public static InputStream convertFileConfToZip(String confFilename)
@@ -58,7 +58,7 @@ public class CaConfs {
       File confFile = new File(confFilename);
       confFile = IoUtil.expandFilepath(confFile, false);
 
-      CaConfType.CaSystem root = JSON.parseObject(confFile, CaConfType.CaSystem.class);
+      CaConfType.CaSystem root = CaJson.parseObject(confFile, CaConfType.CaSystem.class);
 
       baseDir = root.getBasedir();
       if (StringUtil.isBlank(baseDir)) {
@@ -241,13 +241,13 @@ public class CaConfs {
     }
   } // method createFileOrBinary
 
-  private static String getValue(String fileName, Map<String, String> properties, String baseDir)
+  public static String getValue(String fileName, Map<String, String> properties, String baseDir)
       throws IOException {
     byte[] binary = getBinary(fileName, properties, baseDir);
     return StringUtil.toUtf8String(binary);
   } // method getValue
 
-  private static byte[] getBinary(String fileName, Map<String, String> properties, String baseDir)
+  public static byte[] getBinary(String fileName, Map<String, String> properties, String baseDir)
       throws IOException {
     fileName = expandConf(fileName, properties);
     return IoUtil.read(Paths.get(resolveFilePath(fileName, baseDir)).toFile());
@@ -274,7 +274,7 @@ public class CaConfs {
     return file.isAbsolute() ? filePath : new File(baseDir, filePath).getPath();
   } // method resolveFilePath
 
-  private static String convertSignerConf(FileOrValue confFv, Map<String, String> properties, String baseDir)
+  public static String convertSignerConf(FileOrValue confFv, Map<String, String> properties, String baseDir)
       throws IOException {
     String conf;
     if (confFv.getValue() != null) {

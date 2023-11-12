@@ -5,9 +5,13 @@ package org.xipki.ca.mgmt.db.port;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.mgmt.CaJson;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.util.*;
+import org.xipki.util.Args;
+import org.xipki.util.IoUtil;
+import org.xipki.util.ProcessLog;
+import org.xipki.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,7 +71,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     OcspCertstore certstore;
     Path path = Paths.get(baseDir, FILENAME_OCSP_CERTSTORE);
     if (resume) {
-      certstore = JSON.parseObject(path, OcspCertstore.class);
+      certstore = CaJson.parseObject(path, OcspCertstore.class);
       certstore.validate();
 
       if (certstore.getVersion() > VERSION_V2) {
@@ -90,7 +94,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     Exception exception = exportCert(certstore, processLogFile);
 
     try (OutputStream os = Files.newOutputStream(path)) {
-      JSON.writeJSON(certstore, os);
+      CaJson.writeJSON(certstore, os);
     }
 
     if (exception == null) {
@@ -399,7 +403,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     ZipEntry certZipEntry = new ZipEntry("certs.json");
     zipOutStream.putNextEntry(certZipEntry);
     try {
-      JSON.writeJSON(certs, zipOutStream);
+      CaJson.writeJSON(certs, zipOutStream);
     } finally {
       zipOutStream.closeEntry();
     }

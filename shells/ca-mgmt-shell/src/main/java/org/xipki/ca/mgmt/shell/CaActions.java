@@ -165,7 +165,7 @@ public class CaActions {
     private String maxValidity;
 
     @Option(name = "--keep-expired-certs", description = "days to keep expired certificates")
-    private Integer keepExpiredCertInDays = -1;
+    private Integer keepExpiredCertDays = -1;
 
     @Option(name = "--crl-signer", description = "CRL signer name")
     @Completion(CaCompleters.SignerNameCompleter.class)
@@ -236,7 +236,7 @@ public class CaActions {
       CaEntry entry = new CaEntry(new NameId(null, caName), snLen, nextCrlNumber,
           signerType, signerConf, caUris, numCrls, expirationPeriod);
 
-      entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
+      entry.setKeepExpiredCertDays(keepExpiredCertDays);
       entry.setSaveCert(isEnabled(saveCertS, true, "save-cert"));
       entry.setSaveKeypair(isEnabled(saveKeypairS, false, "save-keypair"));
       entry.setValidityMode(ValidityMode.forName(validityModeS));
@@ -263,7 +263,7 @@ public class CaActions {
       }
 
       entry.setMaxValidity(Validity.getInstance(maxValidity));
-      entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
+      entry.setKeepExpiredCertDays(keepExpiredCertDays);
       entry.setPermission(ShellUtil.getPermission(permissions));
 
       if (extraControl != null) {
@@ -442,7 +442,7 @@ public class CaActions {
       } else {
         CaEntry entry = Optional.ofNullable(caManager.getCa(name)).orElseThrow(
             () -> new CmdFailure("could not find CA '" + name + "'"));
-        if (CaStatus.ACTIVE == entry.getStatus()) {
+        if (CaStatus.active == entry.getStatus()) {
           boolean started = caManager.getSuccessfulCaNames().contains(entry.getIdent().getName());
           sb.append("started:              ").append(started).append("\n");
         }
@@ -601,7 +601,7 @@ public class CaActions {
     private Integer expirationPeriod;
 
     @Option(name = "--keep-expired-certs", description = "days to keep expired certificates")
-    private Integer keepExpiredCertInDays;
+    private Integer keepExpiredCertDays;
 
     @Option(name = "--crl-signer", description = "CRL signer name or 'null'")
     @Completion(CaCompleters.SignerNamePlusNullCompleter.class)
@@ -671,8 +671,8 @@ public class CaActions {
         entry.setExpirationPeriod(expirationPeriod);
       }
 
-      if (keepExpiredCertInDays != null) {
-        entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
+      if (keepExpiredCertDays != null) {
+        entry.setKeepExpiredCertDays(keepExpiredCertDays);
       }
 
       if (certFile != null) {

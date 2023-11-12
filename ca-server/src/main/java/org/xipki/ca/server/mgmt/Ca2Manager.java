@@ -27,13 +27,11 @@ import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.server.*;
 import org.xipki.ca.server.db.CertStore;
-import org.xipki.ca.server.mgmt.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
-import org.xipki.util.RandomUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.InvalidConfException;
@@ -97,7 +95,7 @@ class Ca2Manager {
 
     if (createCa(name)) {
       CaInfo caInfo = manager.caInfos.get(name);
-      if (CaStatus.ACTIVE != caInfo.getStatus()) {
+      if (CaStatus.active != caInfo.getStatus()) {
         return;
       }
 
@@ -147,7 +145,7 @@ class Ca2Manager {
   Set<String> getSuccessfulCaNames() {
     Set<String> ret = new HashSet<>();
     for (String name : manager.x509cas.keySet()) {
-      if (CaStatus.ACTIVE == manager.caInfos.get(name).getStatus()) {
+      if (CaStatus.active == manager.caInfos.get(name).getStatus()) {
         ret.add(name);
       }
     }
@@ -157,7 +155,7 @@ class Ca2Manager {
   Set<String> getFailedCaNames() {
     Set<String> ret = new HashSet<>();
     for (String name : manager.caInfos.keySet()) {
-      if (CaStatus.ACTIVE == manager.caInfos.get(name).getStatus() && !manager.x509cas.containsKey(name)) {
+      if (CaStatus.active == manager.caInfos.get(name).getStatus() && !manager.x509cas.containsKey(name)) {
         ret.add(name);
       }
     }
@@ -167,7 +165,7 @@ class Ca2Manager {
   Set<String> getInactiveCaNames() {
     Set<String> ret = new HashSet<>();
     for (String name : manager.caInfos.keySet()) {
-      if (CaStatus.INACTIVE == manager.caInfos.get(name).getStatus()) {
+      if (CaStatus.inactive == manager.caInfos.get(name).getStatus()) {
         ret.add(name);
       }
     }
@@ -179,7 +177,7 @@ class Ca2Manager {
       return;
     }
 
-    Map<String, Integer> map = manager.queryExecutor.createCaAliases();
+    Map<String, Integer> map = manager.caConfStore.createCaAliases();
     manager.caAliases.clear();
     manager.caAliases.putAll(map);
 
@@ -198,7 +196,7 @@ class Ca2Manager {
     manager.caHasProfiles.clear();
     manager.idNameMap.clearCa();
 
-    List<String> names = manager.queryExecutor.getCaNames();
+    List<String> names = manager.caConfStore.getCaNames();
     for (String name : names) {
       createCa(name);
     }
@@ -216,7 +214,7 @@ class Ca2Manager {
       oldCa.close();
     }
 
-    CaConfStore queryExecutor = manager.queryExecutor;
+    CaConfStore queryExecutor = manager.caConfStore;
 
     CaInfo ca = queryExecutor.createCaInfo(name, manager.certstore);
     LOG.info("created CA {}:\n{}", name, ca.toString(false));
@@ -289,8 +287,8 @@ class Ca2Manager {
       throw new CaMgmtException("could not create signer for new CA " + name + ": " + ex.getMessage(), ex);
     }
 
-    manager.queryExecutor.addCa(caEntry);
-    certstore.addCa(caEntry.getIdent(), caEntry.getCert());
+    manager.caConfStore.addCa(caEntry);
+    certstore.addCa(caEntry.getIdent(), caEntry.getCert(), caEntry.getRevocationInfo());
     if (createCa(name)) {
       if (startCa(name)) {
         LOG.info("started CA {}", name);
@@ -314,11 +312,11 @@ class Ca2Manager {
     entry.getIdent().setId(ident.getId());
 
     CaInfo caInfo0 = manager.caInfos.get(name);
-    manager.queryExecutor.changeCa(entry, caInfo0.getCaConfColumn(), manager.securityFactory);
+    manager.caConfStore.changeCa(entry, caInfo0.getCaConfColumn(), manager.securityFactory);
 
     if (createCa(name)) {
       CaInfo caInfo = manager.caInfos.get(name);
-      if (CaStatus.ACTIVE != caInfo.getStatus()) {
+      if (CaStatus.active != caInfo.getStatus()) {
         return;
       }
 
@@ -345,7 +343,7 @@ class Ca2Manager {
       throw new CaMgmtException("unknown CA alias " + aliasName);
     }
 
-    manager.queryExecutor.addCaAlias(aliasName, ca.getCaIdent());
+    manager.caConfStore.addCaAlias(aliasName, ca.getCaIdent());
     manager.caAliases.put(aliasName, ca.getCaIdent().getId());
   } // method addCaAlias
 
@@ -353,7 +351,7 @@ class Ca2Manager {
     assertMasterMode();
 
     name = Args.toNonBlankLower(name, "name");
-    manager.queryExecutor.removeCaAlias(name);
+    manager.caConfStore.removeCaAlias(name);
     manager.caAliases.remove(name);
   } // method removeCaAlias
 
@@ -394,7 +392,7 @@ class Ca2Manager {
 
     name = Args.toNonBlankLower(name, "name");
 
-    manager.queryExecutor.deleteCa(name);
+    manager.caConfStore.deleteCa(name);
 
     LOG.info("removed CA '{}'", name);
     manager.caInfos.remove(name);
@@ -430,7 +428,7 @@ class Ca2Manager {
       }
     }
 
-    manager.queryExecutor.revokeCa(caName, revocationInfo);
+    manager.caConfStore.revokeCa(caName, revocationInfo);
 
     try {
       ca.revokeCa(manager.byCaRequestor, revocationInfo);
@@ -452,7 +450,7 @@ class Ca2Manager {
 
     LOG.info("unrevoking of CA '{}'", caName);
 
-    manager.queryExecutor.unrevokeCa(caName);
+    manager.caConfStore.unrevokeCa(caName);
 
     X509Ca ca = manager.x509cas.get(caName);
     try {
@@ -474,31 +472,11 @@ class Ca2Manager {
     return ca;
   } // method getX509Ca
 
-  X509Ca getX509Ca(NameId ident) throws CaMgmtException {
-    Args.notNull(ident, "ident");
-    X509Ca ca = manager.x509cas.get(ident.getName());
-    if (ca == null) {
-      throw new CaMgmtException("unknown CA " + ident);
-    }
-    return ca;
-  } // method getX509Ca
-
   X509Cert generateRootCa(CaEntry caEntry, String profileName, String subject,
                           String serialNumber, Instant notBefore, Instant notAfter, CertStore certstore)
       throws CaMgmtException {
     assertMasterModeAndSetuped();
-
-    Args.notNull(caEntry, "caEntry");
     profileName = Args.toNonBlankLower(profileName, "profileName");
-    Args.notBlank(subject, "subject");
-
-    int numCrls = caEntry.getNumCrls();
-    String signerType = caEntry.getSignerType();
-
-    if (numCrls < 0) {
-      LOG.warn("invalid numCrls: {}", numCrls);
-      return null;
-    }
 
     if (caEntry.getExpirationPeriod() < 0) {
       LOG.warn("invalid expirationPeriod: {}", caEntry.getExpirationPeriod());
@@ -510,45 +488,17 @@ class Ca2Manager {
       throw new CaMgmtException("unknown certprofile " + profileName);
     }
 
-    BigInteger serialOfThisCert;
-    if (serialNumber == null) {
-      serialOfThisCert = BigInteger.ONE;
-    } else if (StringUtil.startsWithIgnoreCase(serialNumber, "RANDOM:")) {
-      int numBytes = -1;
-      try {
-        numBytes = Integer.parseUnsignedInt(serialNumber.substring("RANDOM:".length()));
-      } catch (NumberFormatException ex) {
-        LogUtil.error(LOG, ex, "cannot parse int in " + serialNumber);
-      }
-
-      if (numBytes < 1 || numBytes > 20) {
-        throw new CaMgmtException("invalid SerialNumber for SelfSigned " + profileName + ": " + serialNumber);
-      }
-      byte[] bytes = RandomUtil.nextBytes(numBytes);
-      // clear the highest bit
-      bytes[0] &= 0x7F;
-      serialOfThisCert = new BigInteger(bytes);
-    } else {
-      if (StringUtil.startsWithIgnoreCase(serialNumber, "0x")) {
-        serialOfThisCert = new BigInteger(serialNumber.substring(2), 16);
-      } else {
-        serialOfThisCert = new BigInteger(serialNumber);
-      }
-    }
-
-    GenerateSelfSignedResult result;
+    X509Cert caCert;
     try {
-      result = SelfSignedCertBuilder.generateSelfSigned(manager.securityFactory, signerType,
-          caEntry.getSignerConf(), certprofile, subject, serialOfThisCert, caEntry.getCaUris(),
-          caEntry.getExtraControl(), notBefore, notAfter);
+      caCert = SelfSignedCertBuilder.generateSelfSigned(manager.securityFactory,
+          caEntry.getSignerType(), caEntry.getSignerConf(), certprofile,
+          subject, serialNumber, notBefore, notAfter);
     } catch (OperationException | InvalidConfException ex) {
       throw new CaMgmtException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
     }
 
-    String signerConf = result.getSignerConf();
-    X509Cert caCert = result.getCert();
-
-    if (StringUtil.orEqualsIgnoreCase(signerType, "PKCS12", "JCEKS")) {
+    String signerConf = caEntry.getSignerConf();
+    if (StringUtil.orEqualsIgnoreCase(caEntry.getSignerType(), "PKCS12", "JCEKS")) {
       try {
         signerConf = CaUtil.canonicalizeSignerConf(signerConf);
       } catch (Exception ex) {
@@ -559,11 +509,9 @@ class Ca2Manager {
     CaEntry entry = caEntry.copy();
     entry.setSignerConf(signerConf);
     entry.setCert(caCert);
-
     addCa(entry, certstore);
-
     return caCert;
-  } // method generateRootCa
+  }
 
   X509Cert generateCrossCertificate(String caName, String profileName, byte[] encodedCsr,
                                     byte[] encodedTargetCert, Instant notBefore, Instant notAfter)
@@ -851,7 +799,7 @@ class Ca2Manager {
 
   void commitNextCrlNo(NameId ca, long nextCrlNo) throws OperationException {
     try {
-      manager.queryExecutor.commitNextCrlNoIfLess(ca, nextCrlNo);
+      manager.caConfStore.commitNextCrlNoIfLess(ca, nextCrlNo);
     } catch (CaMgmtException ex) {
       if (ex.getCause() instanceof DataAccessException) {
         throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());

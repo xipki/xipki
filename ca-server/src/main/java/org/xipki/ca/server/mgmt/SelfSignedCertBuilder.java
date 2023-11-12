@@ -10,7 +10,6 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
@@ -42,44 +41,29 @@ import java.util.Optional;
  * @since 2.0.0
  */
 
-class SelfSignedCertBuilder {
-
-  static class GenerateSelfSignedResult {
-
-    private final String signerConf;
-
-    private final X509Cert cert;
-
-    GenerateSelfSignedResult(String signerConf, X509Cert cert) {
-      this.signerConf = signerConf;
-      this.cert = cert;
-    }
-
-    String getSignerConf() {
-      return signerConf;
-    }
-
-    X509Cert getCert() {
-      return cert;
-    }
-
-  } // class GenerateSelfSignedResult
+public class SelfSignedCertBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(SelfSignedCertBuilder.class);
 
   private SelfSignedCertBuilder() {
   }
 
-  public static GenerateSelfSignedResult generateSelfSigned(
+  public static X509Cert generateSelfSigned(
       SecurityFactory securityFactory, String signerType, String signerConf, IdentifiedCertprofile certprofile,
-      String subject, BigInteger serialNumber, CaUris caUris, ConfPairs extraControl,
-      Instant notBefore, Instant notAfter)
+      String subject, String serialNumber, Instant notBefore, Instant notAfter)
       throws OperationException, InvalidConfException {
     Args.notNull(securityFactory, "securityFactory");
     Args.notBlank(signerType, "signerType");
     Args.notBlank(subject, "subject");
 
-    if (Args.notNull(serialNumber, "serialNumber").signum() != 1) {
+    BigInteger serialOfThisCert;
+    if (StringUtil.startsWithIgnoreCase(serialNumber, "0x")) {
+      serialOfThisCert = new BigInteger(serialNumber.substring(2), 16);
+    } else {
+      serialOfThisCert = new BigInteger(serialNumber);
+    }
+
+    if (serialOfThisCert.signum() != 1) {
       throw new IllegalArgumentException("serialNumber may not be non-positive: " + serialNumber);
     }
 
@@ -127,15 +111,12 @@ class SelfSignedCertBuilder {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
     }
 
-    X509Cert newCert = generateCertificate(signer, certprofile, subject, serialNumber,
-        caUris, extraControl, notBefore, notAfter);
-
-    return new GenerateSelfSignedResult(signerConf, newCert);
-  } // method generateSelfSigned
+    return generateCertificate(signer, certprofile, subject, serialOfThisCert, notBefore, notAfter);
+  }
 
   private static X509Cert generateCertificate(
-      ConcurrentContentSigner signer, IdentifiedCertprofile certprofile, String subject, BigInteger serialNumber,
-      CaUris caUris, ConfPairs extraControl, Instant notBefore, Instant notAfter)
+      ConcurrentContentSigner signer, IdentifiedCertprofile certprofile,
+      String subject, BigInteger serialNumber, Instant notBefore, Instant notAfter)
       throws OperationException {
     SubjectPublicKeyInfo publicKeyInfo;
     try {
@@ -211,7 +192,7 @@ class SelfSignedCertBuilder {
     try {
       SubjectKeyIdentifier ski = certprofile.getSubjectKeyIdentifier(publicKeyInfo);
       PublicCaInfo publicCaInfo = new PublicCaInfo(grantedSubject, grantedSubject, serialNumber,
-          null, ski.getKeyIdentifier(), caUris, extraControl);
+          null, ski.getKeyIdentifier(), null, null);
 
       ExtensionValues extensionTuples = certprofile.getExtensions(requestedSubject, grantedSubject,
           null, publicKeyInfo, publicCaInfo, null, notBefore, notAfter);

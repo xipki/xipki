@@ -7,7 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.mgmt.*;
+import org.xipki.ca.api.mgmt.CaManager;
+import org.xipki.ca.api.mgmt.CaMgmtException;
+import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
 import org.xipki.ca.server.*;
@@ -25,6 +27,9 @@ import org.xipki.util.exception.OperationException;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -37,9 +42,9 @@ import static org.xipki.ca.server.CaUtil.*;
  * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
-public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase implements CaConfStore {
+public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CaManagerQueryExecutor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DbCaConfStore.class);
 
   private final String sqlSelectProfileId;
   private final String sqlSelectProfile;
@@ -55,7 +60,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase implement
   private final String sqlSelectSystemEvent;
   private final Map<Table, AtomicLong> cachedIdMap = new HashMap<>();
 
-  public CaManagerQueryExecutor(DataSourceWrapper datasource) throws CaMgmtException {
+  public DbCaConfStore(DataSourceWrapper datasource) throws CaMgmtException {
     super(datasource);
 
     for (Table m : Table.values()) {
@@ -77,9 +82,12 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase implement
         "SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN,CONF FROM CA WHERE NAME=?");
     this.sqlNextSelectCrlNo = buildSelectFirstSql("NEXT_CRLNO FROM CA WHERE ID=?");
     this.sqlSelectSystemEvent = buildSelectFirstSql("EVENT_TIME,EVENT_OWNER FROM SYSTEM_EVENT WHERE NAME=?");
-
-    this.dbSchemaVersion = getDbSchemaVersion();
   } // constructor
+
+  @Override
+  public boolean needsCertStore() {
+    return true;
+  }
 
   /**
    * Retrieve the system event.
@@ -135,7 +143,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase implement
   @Override
   public CertprofileEntry createCertprofile(String name) throws CaMgmtException {
     ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectProfile, col2Str(name)))
-        .orElseThrow(() -> new CaMgmtException("unknown CA " + name));
+        .orElseThrow(() -> new CaMgmtException("unknown Certprofile " + name));
 
     return new CertprofileEntry(new NameId(getInt(rs, "ID"), name), rs.getString("TYPE"), rs.getString("CONF"));
   } // method createCertprofile
@@ -143,7 +151,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase implement
   @Override
   public PublisherEntry createPublisher(String name) throws CaMgmtException {
     ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectPublisher, col2Str(name))).orElseThrow(
-        () -> new CaMgmtException("unkown Publisher " + name));
+        () -> new CaMgmtException("unknown Publisher " + name));
 
     return new PublisherEntry(new NameId(getInt(rs, "ID"), name), rs.getString("TYPE"), rs.getString("CONF"));
   } // method createPublisher
@@ -296,7 +304,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase implement
 
     caEntry.getIdent().setId((int) getNextId(Table.CA));
 
-    String colNames ="ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,SUBJECT,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN,CONF";
+    String colNames ="ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,SUBJECT,REV_INFO," +
+        "SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN,CONF";
 
     String sql = SqlUtil.buildInsertSql("CA", colNames);
 
@@ -305,70 +314,26 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase implement
     String certchainStr = CollectionUtil.isEmpty(certchain) ? null
         : encodeCertchain(buildCertChain(caEntry.getCert(), certchain));
 
+    CaConfColumn cc = CaConfColumn.fromCaEntry(caEntry);
+
+    String revInfoStr = null;
+    if (caEntry.getRevocationInfo() != null) {
+      revInfoStr = caEntry.getRevocationInfo().encode();
+    }
+
     List<SqlColumn2> cols = CaUtil.asModifiableList(
         col2Int(caEntry.getIdent().getId()), // ID
         col2Str(caEntry.getIdent().getName()), // NAME
         col2Str(caEntry.getStatus().getStatus()), // STATUS
-        col2Long(caEntry.getNextCrlNumber()), // NEXT_CRLNO
+        col2Long(caEntry.getNextCrlNo()), // NEXT_CRLNO
         col2Str(caEntry.getCrlSignerName()), // CRL_SIGNER_NAME
-        col2Str(X509Util.cutText(caEntry.getSubject(), getMaxX500nameLen())), // SUBJECT
+        col2Str(X509Util.cutText(caEntry.subject(), getMaxX500nameLen())), // SUBJECT
+        col2Str(revInfoStr), // REV_INFO
         col2Str(caEntry.getSignerType()), // SIGNER_TYPE
         col2Str(caEntry.getSignerConf()),  // SIGNER_CONF
         col2Str(Base64.encodeToString(encodedCert)), // CERT
-        col2Str(certchainStr)); // CERTCHAIN
-
-    // START DB Schema Version 7
-    CaConfColumn cc = new CaConfColumn();
-
-    // CA URIS
-    CaUris caUris = caEntry.getCaUris();
-    if (caUris != null) {
-      cc.setCacertUris(caUris.getCacertUris());
-      cc.setCrlUris(caUris.getCrlUris());
-      cc.setDeltaCrlUris(caUris.getDeltaCrlUris());
-      cc.setOcspUris(caUris.getOcspUris());
-    }
-
-    // CRL Control
-    CrlControl crlControl = caEntry.getCrlControl();
-    if (crlControl != null) {
-      cc.setCrlControl(crlControl.getConfPairs().asMap());
-    }
-
-    // CTLog Control
-    CtlogControl ctlogControl = caEntry.getCtlogControl();
-    if (ctlogControl != null) {
-      cc.setCtlogControl(ctlogControl.getConfPairs().asMap());
-    }
-
-    ConfPairs extraControl = caEntry.getExtraControl();
-    if (extraControl != null) {
-      cc.setExtraControl(extraControl.asMap());
-    }
-
-    RevokeSuspendedControl revokeSuspended = caEntry.getRevokeSuspendedControl();
-    if (revokeSuspended != null) {
-      cc.setRevokeSuspendedControl(revokeSuspended.getConfPairs().asMap());
-    }
-
-    cc.setSnSize(caEntry.getSerialNoLen());
-    if (caEntry.getMaxValidity() != null) {
-      cc.setMaxValidity(caEntry.getMaxValidity().toString());
-    }
-    cc.setKeypairGenNames(caEntry.getKeypairGenNames());
-
-    cc.setSaveCert(caEntry.isSaveCert());
-    cc.setSaveKeypair(caEntry.isSaveKeypair());
-    cc.setPermission(caEntry.getPermission());
-    cc.setNumCrls(caEntry.getNumCrls());
-    cc.setExpirationPeriod(caEntry.getExpirationPeriod());
-    cc.setKeepExpiredCertDays(caEntry.getKeepExpiredCertInDays());
-    if (caEntry.getValidityMode() != null) {
-      cc.setValidityMode(caEntry.getValidityMode().name());
-    }
-
-    // add to cols
-    cols.add(col2Str(cc.encode()));
+        col2Str(certchainStr), // CERTCHAIN
+        col2Str(cc.encode())); // CONFCOLUMN
 
     // insert to table ca
     int num = execUpdatePrepStmt0(sql, cols.toArray(new SqlColumn2[0]));
@@ -646,19 +611,14 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase implement
   private SqlColumn buildChangeCaConfColumn(
       ChangeCaEntry changeCaEntry, CaConfColumn currentCaConfColumn) {
     CaConfColumn newCC = currentCaConfColumn.copy();
-
-    if (changeCaEntry.getMaxValidity() != null) {
-      newCC.setMaxValidity(changeCaEntry.getMaxValidity().toString());
-    }
+    newCC.setMaxValidity(changeCaEntry.getMaxValidity());
 
     String str = changeCaEntry.getExtraControl();
     if (str != null) {
       newCC.setExtraControl(CaManager.NULL.equalsIgnoreCase(str) ? null : new ConfPairs(str).asMap());
     }
 
-    if (changeCaEntry.getValidityMode() != null) {
-      newCC.setValidityMode(changeCaEntry.getValidityMode().name());
-    }
+    newCC.setValidityMode(changeCaEntry.getValidityMode());
 
     CaUris changeUris = changeCaEntry.getCaUris();
     if (changeUris != null) {
@@ -735,7 +695,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase implement
       newCC.setExpirationPeriod(i);
     }
 
-    i = changeCaEntry.getKeepExpiredCertInDays();
+    i = changeCaEntry.getKeepExpiredCertDays();
     if (i != null) {
       newCC.setKeepExpiredCertDays(i);
     }
@@ -808,7 +768,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase implement
   } // method changeRequestor
 
   @Override
-  public SignerEntryWrapper changeSigner(
+  public SignerEntry changeSigner(
       String name, String type, String conf, String base64Cert, CaManagerImpl signerManager)
       throws CaMgmtException {
     Args.notNull(signerManager, "signerManager");
@@ -819,9 +779,9 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase implement
       conf = CaUtil.canonicalizeSignerConf(conf);
     }
 
-    SignerEntry newDbEntry = new SignerEntry(name, tmpType, (conf == null ? dbEntry.getConf() : conf),
-        (base64Cert == null ? dbEntry.getBase64Cert() : base64Cert));
-    SignerEntryWrapper signer = signerManager.createSigner(newDbEntry);
+    SignerEntry signer = new SignerEntry(name, tmpType, (conf == null ? dbEntry.getConf() : conf),
+        (base64Cert == null ? dbEntry.base64Cert() : base64Cert));
+    signerManager.createSigner(signer);
 
     changeIfNotNull("SIGNER", colStr("NAME", name), colStr("TYPE", type),
         colStr("CERT", base64Cert), colStr("CONF", conf, false, true));
@@ -947,8 +907,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase implement
     Args.notNull(dbEntry, "dbEntry");
 
     int num = execUpdatePrepStmt0(SqlUtil.buildInsertSql("SIGNER", "NAME,TYPE,CERT,CONF"),
-            col2Str(dbEntry.getName()),       col2Str(dbEntry.getType()),
-            col2Str(dbEntry.getBase64Cert()), col2Str(dbEntry.getConf()));
+            col2Str(dbEntry.getName()),    col2Str(dbEntry.getType()),
+            col2Str(dbEntry.base64Cert()), col2Str(dbEntry.getConf()));
 
     if (num == 0) {
       throw new CaMgmtException("could not add signer " + dbEntry.getName());
@@ -1007,18 +967,31 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase implement
 
   @Override
   public Map<String, String> getDbSchemas() throws CaMgmtException {
-    DbSchemaInfo dbi;
+    Args.notNull(datasource, "datasource");
+
+    final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
+
+    Map<String, String> dbSchemas = new HashMap<>();
+    PreparedStatement stmt = null;
+    ResultSet rs = null;
+
     try {
-      dbi = new DbSchemaInfo(datasource);
+      stmt = Optional.ofNullable(datasource.prepareStatement(sql))
+          .orElseThrow(() -> new DataAccessException("could not create statement"));
+
+      rs = stmt.executeQuery();
+      while (rs.next()) {
+        dbSchemas.put(rs.getString("NAME"), rs.getString("VALUE2"));
+      }
+    } catch (SQLException ex) {
+      throw new CaMgmtException(datasource.translate(sql, ex));
     } catch (DataAccessException ex) {
       throw new CaMgmtException(ex);
+    } finally {
+      datasource.releaseResources(stmt, rs);
     }
-    Set<String> names = dbi.getVariableNames();
-    Map<String, String> ret = new HashMap<>();
-    for (String name : names) {
-      ret.put(name, dbi.variableValue(name));
-    }
-    return ret;
+
+    return dbSchemas;
   }
 
   @Override

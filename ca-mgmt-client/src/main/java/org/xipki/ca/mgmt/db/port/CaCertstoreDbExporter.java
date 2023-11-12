@@ -8,6 +8,7 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.mgmt.CaJson;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.HashAlgo;
@@ -28,6 +29,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Clock;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -64,7 +68,7 @@ class CaCertstoreDbExporter extends DbPorter {
     CaCertstore certstore;
     Path path = Paths.get(baseDir, FILENAME_CA_CERTSTORE);
     if (resume) {
-      certstore = JSON.parseObject(path, CaCertstore.class);
+      certstore = CaJson.parseObject(path, CaCertstore.class);
       certstore.validate();
 
       if (certstore.getVersion() > VERSION_V2) {
@@ -78,6 +82,61 @@ class CaCertstoreDbExporter extends DbPorter {
 
     Exception exception = null;
     System.out.println("exporting CA certstore from database");
+
+    if (dbSchemaVersion >= 8) {
+      for (String tblName : new String[]{"PROFILE", "REQUESTOR", "CA"}) {
+        String sql = "SELECT ID,NAME";
+        if ("CA".equalsIgnoreCase(tblName)) {
+          sql += ",CERT";
+        }
+        sql += " FROM " + tblName;
+
+        System.out.print("    exporting table " + tblName + " ... ");
+
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        boolean succ = false;
+        try {
+          stmt = prepareStatement(sql);
+          rs = stmt.executeQuery();
+
+          List<CaCertstore.IdName> entries = new LinkedList<>();
+          while (rs.next()) {
+            String name = rs.getString("NAME");
+
+            CaCertstore.IdName entry = "CA".equalsIgnoreCase(tblName)
+                ? new CaCertstore.Ca() : new CaCertstore.IdName();
+            entry.setId(rs.getInt("ID"));
+            entry.setName(name);
+
+            if ("CA".equalsIgnoreCase(tblName)) {
+              ((CaCertstore.Ca) entry).setCert(rs.getBytes("CERT"));
+            }
+            entry.validate();
+            entries.add(entry);
+          }
+
+          if ("REQUESTOR".equalsIgnoreCase(tblName)) {
+            certstore.setRequestors(entries);
+          } else if (("PROFILE").equalsIgnoreCase(tblName)) {
+            certstore.setProfiles(entries);
+          } else {
+            List<CaCertstore.Ca> caEntries = new ArrayList<>(entries.size());
+            for (CaCertstore.IdName entry : entries) {
+              caEntries.add((CaCertstore.Ca) entry);
+            }
+            certstore.setCas(caEntries);
+          }
+          succ = true;
+        } catch (SQLException ex) {
+          throw translate(sql, ex);
+        } finally {
+          releaseResources(stmt, rs);
+          System.out.println(succ ? "SUCCESSFUL" : "FAILED");
+        }
+      }
+    }
+
     try {
       File processLogFile = new File(baseDir, DbPorter.EXPORT_PROCESS_LOG_FILENAME);
 
@@ -112,7 +171,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
       certstore.validate();
       try (OutputStream os = Files.newOutputStream(path)) {
-        JSON.writeJSON(certstore, os);
+        CaJson.writeJSON(certstore, os);
       }
     } catch (Exception ex) {
       System.err.println("could not export CA certstore from database");
@@ -425,7 +484,7 @@ class CaCertstoreDbExporter extends DbPorter {
     ZipEntry certZipEntry = new ZipEntry(filename);
     zipOutStream.putNextEntry(certZipEntry);
     try {
-      JSON.writeJSON(container, zipOutStream);
+      CaJson.writeJSON(container, zipOutStream);
     } finally {
       zipOutStream.closeEntry();
     }

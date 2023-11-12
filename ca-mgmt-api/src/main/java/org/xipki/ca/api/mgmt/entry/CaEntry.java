@@ -5,7 +5,10 @@ package org.xipki.ca.api.mgmt.entry;
 
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.mgmt.*;
+import org.xipki.ca.api.mgmt.CaMgmtException;
+import org.xipki.ca.api.mgmt.CrlControl;
+import org.xipki.ca.api.mgmt.CtlogControl;
+import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
@@ -20,7 +23,7 @@ import java.util.List;
  *
  */
 
-public class CaEntry extends MgmtEntry {
+public class CaEntry extends BaseCaInfo {
 
   public static class CaSignerConf {
 
@@ -45,39 +48,17 @@ public class CaEntry extends MgmtEntry {
 
   private NameId ident;
 
-  private CaStatus status;
-
-  private Validity maxValidity;
-
-  private String signerType;
-
   private String signerConf;
 
   private CrlControl crlControl;
-
-  private String crlSignerName;
 
   private CtlogControl ctlogControl;
 
   private RevokeSuspendedControl revokeSuspendedControl;
 
-  private List<String> keypairGenNames;
-
-  private boolean saveKeypair;
-
-  private boolean saveCert = true;
-
-  private ValidityMode validityMode = ValidityMode.STRICT;
-
   private int permission;
 
-  private int expirationPeriod;
-
-  private int keepExpiredCertInDays;
-
   private ConfPairs extraControl;
-
-  private CaUris caUris;
 
   private X509Cert cert;
 
@@ -89,47 +70,30 @@ public class CaEntry extends MgmtEntry {
    */
   private List<X509Cert> certchain;
 
-  private int serialNoLen;
-
-  private long nextCrlNumber;
-
-  private int numCrls;
-
-  private CertRevocationInfo revocationInfo;
-
   private String subject;
 
   private String hexSha1OfCert;
 
-  // For the deserialization only
-  @SuppressWarnings("unused")
+  // for deserializer
   private CaEntry() {
   }
 
-  public CaEntry(NameId ident, int serialNoLen, long nextCrlNumber, String signerType,
+  public CaEntry(NameId ident, int serialNoLen, long nextCrlNo, String signerType,
       String signerConf, CaUris caUris, int numCrls, int expirationPeriod) {
     this.ident = Args.notNull(ident, "ident");
     this.signerType = Args.toNonBlankLower(signerType, "signerType");
     this.expirationPeriod = Args.notNegative(expirationPeriod, "expirationPeriod");
     this.signerConf = Args.notBlank(signerConf, "signerConf");
 
-    this.numCrls = Args.positive(numCrls, "numCrls");
-    this.serialNoLen = Args.range(serialNoLen, "serialNoLen",
-        CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
-    this.nextCrlNumber = Args.positive(nextCrlNumber, "nextCrlNumber");
+    setNumCrls(numCrls);
+    setSnSize(serialNoLen);
     this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
+    setNextCrlNo(nextCrlNo);
   } // constructor Ca
 
   public CaEntry copy() {
-    CaEntry ret = new CaEntry();
-    ret.ident = ident;
-    ret.serialNoLen = serialNoLen;
-    ret.nextCrlNumber = nextCrlNumber;
-    ret.signerType = signerType;
-    ret.signerConf = signerConf;
-    ret.caUris = caUris;
-    ret.numCrls = numCrls;
-    ret.expirationPeriod = expirationPeriod;
+    CaEntry ret = new CaEntry(ident, snSize, nextCrlNo, signerType, signerConf, caUris, numCrls, expirationPeriod);
+    ret.nextCrlNo = nextCrlNo;
     ret.status = status;
     ret.maxValidity = maxValidity;
     ret.crlControl = crlControl;
@@ -141,7 +105,7 @@ public class CaEntry extends MgmtEntry {
     ret.saveCert = saveCert;
     ret.validityMode = validityMode;
     ret.permission = permission;
-    ret.keepExpiredCertInDays = keepExpiredCertInDays;
+    ret.keepExpiredCertDays = keepExpiredCertDays;
     ret.extraControl = extraControl;
     ret.pathLenConstraint = pathLenConstraint;
     ret.revocationInfo = revocationInfo;
@@ -184,40 +148,12 @@ public class CaEntry extends MgmtEntry {
     return ident;
   }
 
-  public Validity getMaxValidity() {
-    return maxValidity;
-  }
-
-  public void setMaxValidity(Validity maxValidity) {
-    this.maxValidity = maxValidity;
-  }
-
-  public int getKeepExpiredCertInDays() {
-    return keepExpiredCertInDays;
-  }
-
-  public void setKeepExpiredCertInDays(int days) {
-    this.keepExpiredCertInDays = days;
-  }
-
   public void setSignerConf(String signerConf) {
     this.signerConf = Args.notBlank(signerConf, "signerConf");
   }
 
   public String getSignerConf() {
     return signerConf;
-  }
-
-  public CaStatus getStatus() {
-    return status;
-  }
-
-  public void setStatus(CaStatus status) {
-    this.status = status;
-  }
-
-  public String getSignerType() {
-    return signerType;
   }
 
   public void setCrlControl(CrlControl crlControl) {
@@ -244,46 +180,6 @@ public class CaEntry extends MgmtEntry {
     this.revokeSuspendedControl = revokeSuspendedControl;
   }
 
-  public String getCrlSignerName() {
-    return crlSignerName;
-  }
-
-  public void setCrlSignerName(String crlSignerName) {
-    this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
-  }
-
-  public List<String> getKeypairGenNames() {
-    return keypairGenNames;
-  }
-
-  public void setKeypairGenNames(List<String> keypairGenNames) {
-    this.keypairGenNames = (keypairGenNames == null) ? null : CollectionUtil.toLowerCaseList(keypairGenNames);
-  }
-
-  public boolean isSaveKeypair() {
-    return saveKeypair;
-  }
-
-  public void setSaveKeypair(boolean saveKeypair) {
-    this.saveKeypair = saveKeypair;
-  }
-
-  public boolean isSaveCert() {
-    return saveCert;
-  }
-
-  public void setSaveCert(boolean saveCert) {
-    this.saveCert = saveCert;
-  }
-
-  public ValidityMode getValidityMode() {
-    return validityMode;
-  }
-
-  public void setValidityMode(ValidityMode mode) {
-    this.validityMode = Args.notNull(mode, "mode");
-  }
-
   public int getPermission() {
     return permission;
   }
@@ -292,16 +188,16 @@ public class CaEntry extends MgmtEntry {
     this.permission = permission;
   }
 
-  public int getExpirationPeriod() {
-    return expirationPeriod;
-  }
-
   public ConfPairs getExtraControl() {
     return extraControl;
   }
 
   public void setExtraControl(ConfPairs extraControl) {
     this.extraControl = extraControl;
+  }
+
+  public void setIdent(NameId ident) {
+    this.ident = ident;
   }
 
   @Override
@@ -368,11 +264,11 @@ public class CaEntry extends MgmtEntry {
         "\nsave keypair:         ", saveKeypair,
         "\nvalidity mode:        ", validityMode,
         "\npermission:           ", permissionText,
-        "\nkeep expired certs:   ", (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),
+        "\nkeep expired certs:   ", (keepExpiredCertDays < 0 ? "forever" : keepExpiredCertDays + " days"),
         "\nextra control:        ", extraCtrlText,
-        "\nserial number length: ", serialNoLen, " bytes",
+        "\nserial number length: ", snSize, " bytes",
         "\nrevocation:           ", (revocationInfo == null ? "not revoked" : "revoked"), revInfoText,
-        "\nnext CRL number:      ", nextCrlNumber,
+        "\nnext CRL number:      ", nextCrlNo,
         "\nKeyPair generation names: ", keypairGenNames,
         "\n", caUris,
         "\nCRL control:\n", (crlControl == null ? "  null" : crlControl.toString(verbose)),
@@ -395,37 +291,21 @@ public class CaEntry extends MgmtEntry {
   } // method equals(Object)
 
   public boolean equals(CaEntry obj, boolean ignoreDynamicFields, boolean ignoreId) {
-    if (!ignoreDynamicFields) {
-      if (nextCrlNumber != obj.nextCrlNumber) {
-        return false;
-      }
-    }
-
-    return CompareUtil.equalsObject(caUris, obj.caUris)
+    return super.equals(obj, ignoreDynamicFields)
         && CompareUtil.equalsObject(cert, obj.cert)
         && CompareUtil.equalsObject(certchain, obj.certchain)
         && CompareUtil.equalsObject(crlControl, obj.crlControl)
-        && CompareUtil.equalsObject(crlSignerName, obj.crlSignerName)
         && CompareUtil.equalsObject(ctlogControl, obj.ctlogControl)
         && (expirationPeriod == obj.expirationPeriod)
         && CompareUtil.equalsObject(extraControl, obj.extraControl)
         && ident.equals(obj.ident, ignoreId)
-        && (keepExpiredCertInDays == obj.keepExpiredCertInDays)
-        && CompareUtil.equalsObject(maxValidity, obj.maxValidity)
-        // ignore dynamic field nextCrlNumber
+        && (keepExpiredCertDays == obj.keepExpiredCertDays)
         && (numCrls == obj.numCrls)
         && (permission == obj.permission)
-        && CompareUtil.equalsObject(revocationInfo, obj.revocationInfo)
         && CompareUtil.equalsObject(revokeSuspendedControl, obj.revokeSuspendedControl)
-        && (saveCert == obj.saveCert)
-        && (saveKeypair == obj.saveKeypair)
-        && CompareUtil.equalsObject(keypairGenNames, obj.keypairGenNames)
-        && (serialNoLen == obj.serialNoLen)
-        && signerType.equals(obj.signerType)
         && CompareUtil.equalsObject(signerConf, obj.signerConf)
-        && CompareUtil.equalsObject(status, obj.status)
         && CompareUtil.equalsObject(validityMode, obj.validityMode);
-  } // method equals(Ca, boolean, boolean)
+  }
 
   @Override
   public int hashCode() {
@@ -452,27 +332,6 @@ public class CaEntry extends MgmtEntry {
     }
   } // method setCert
 
-  public int getSerialNoLen() {
-    return serialNoLen;
-  }
-
-  public void setSerialNoLen(int serialNoLen) {
-    this.serialNoLen = Args.range(serialNoLen, "serialNoLen",
-        CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
-  }
-
-  public long getNextCrlNumber() {
-    return nextCrlNumber;
-  }
-
-  public void setNextCrlNumber(long crlNumber) {
-    this.nextCrlNumber = crlNumber;
-  }
-
-  public CaUris getCaUris() {
-    return caUris;
-  }
-
   public X509Cert getCert() {
     return cert;
   }
@@ -485,28 +344,15 @@ public class CaEntry extends MgmtEntry {
     this.certchain = certchain;
   }
 
-  public int getNumCrls() {
-    return numCrls;
-  }
-
-  public CertRevocationInfo getRevocationInfo() {
-    return revocationInfo;
-  }
-
-  public void setRevocationInfo(CertRevocationInfo revocationInfo) {
-    this.revocationInfo = revocationInfo;
-  }
-
-  public String getSubject() {
-    return subject;
-  }
-
-  public int getPathLenConstraint() {
+  public int pathLenConstraint() {
     return pathLenConstraint;
   }
 
-  public String getHexSha1OfCert() {
-    return hexSha1OfCert;
+  public String subject() {
+    return subject;
   }
 
+  public String hexSha1OfCert() {
+    return hexSha1OfCert;
+  }
 }

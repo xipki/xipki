@@ -201,7 +201,7 @@ public class CaConf {
         zipEntries.put(zipEntry.getName(), zipEntryBytes);
       }
 
-      CaConfType.CaSystem root = JSON.parseObject(zipEntries.get("caconf.json"), CaConfType.CaSystem.class);
+      CaConfType.CaSystem root = CaJson.parseObject(zipEntries.get("caconf.json"), CaConfType.CaSystem.class);
       root.validate();
       init0(root, zipEntries, securityFactory);
     } finally {
@@ -316,13 +316,12 @@ public class CaConf {
           if (ci.getCaUris() == null) {
             caUris = CaUris.EMPTY_INSTANCE;
           } else {
-            CaConfType.CaUris uris = ci.getCaUris();
+            CaUris uris = ci.getCaUris();
             caUris = new CaUris(uris.getCacertUris(), uris.getOcspUris(), uris.getCrlUris(), uris.getDeltaCrlUris());
           }
 
-          int exprirationPeriod = (ci.getExpirationPeriod() == null) ? 365 : ci.getExpirationPeriod();
-
-          int numCrls = (ci.getNumCrls() == null) ? 30 : ci.getNumCrls();
+          int exprirationPeriod = ci.getExpirationPeriod();
+          int numCrls = ci.getNumCrls();
 
           caEntry = new CaEntry(new NameId(null, name), ci.getSnSize(), ci.getNextCrlNo(),
               expandConf(ci.getSignerType()), getValue(ci.getSignerConf(), zipEntries), caUris,
@@ -343,11 +342,10 @@ public class CaConf {
             caEntry.setExtraControl(new ConfPairs(ci.getExtraControl()).unmodifiable());
           }
 
-          int keepExpiredCertDays = (ci.getKeepExpiredCertDays() == null) ? -1 : ci.getKeepExpiredCertDays();
-          caEntry.setKeepExpiredCertInDays(keepExpiredCertDays);
+          caEntry.setKeepExpiredCertDays(ci.getKeepExpiredCertDays());
 
-          caEntry.setMaxValidity(Validity.getInstance(ci.getMaxValidity()));
-          caEntry.setPermission(getIntPermission(ci.getPermissions()));
+          caEntry.setMaxValidity(ci.getMaxValidity());
+          caEntry.setPermission(PermissionConstants.toIntPermission(ci.getPermissions()));
 
           if (ci.getRevokeSuspendedControl() != null) {
             caEntry.setRevokeSuspendedControl(
@@ -356,10 +354,10 @@ public class CaConf {
 
           caEntry.setSaveCert(ci.isSaveCert());
           caEntry.setSaveKeypair(ci.isSaveKeypair());
-          caEntry.setStatus(CaStatus.forName(ci.getStatus()));
+          caEntry.setStatus(ci.getStatus());
 
           if (ci.getValidityMode() != null) {
-            caEntry.setValidityMode(ValidityMode.forName(ci.getValidityMode()));
+            caEntry.setValidityMode(ci.getValidityMode());
           }
 
           if (ci.getGenSelfIssued() == null) {
@@ -416,7 +414,7 @@ public class CaConf {
               en.setProfiles(new HashSet<>(req.getProfiles()));
             }
 
-            en.setPermission(getIntPermission(req.getPermissions()));
+            en.setPermission(PermissionConstants.toIntPermission(req.getPermissions()));
             caHasRequestors.add(en);
           }
         }
@@ -600,18 +598,5 @@ public class CaConf {
 
     return confStr;
   } // method expandConf
-
-  private static int getIntPermission(List<String> permissions)
-      throws InvalidConfException {
-    int ret = 0;
-    for (String permission : permissions) {
-      Integer ii = PermissionConstants.getPermissionForText(permission);
-      if (ii == null) {
-        throw new InvalidConfException("invalid permission " + permission);
-      }
-      ret |= ii;
-    }
-    return ret;
-  } // method getIntPermission
 
 }

@@ -6,6 +6,7 @@ package org.xipki.ca.mgmt.db.port;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.mgmt.CaJson;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.util.X509Util;
@@ -60,7 +61,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
   } // constructor
 
   public void importToDb() throws Exception {
-    OcspCertstore certstore = JSON.parseObject(Paths.get(baseDir, FILENAME_OCSP_CERTSTORE), OcspCertstore.class);
+    OcspCertstore certstore = CaJson.parseObject(Paths.get(baseDir, FILENAME_OCSP_CERTSTORE), OcspCertstore.class);
     certstore.validate();
 
     if (certstore.getVersion() > VERSION_V2) {
@@ -260,7 +261,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
     OcspCertstore.Certs certs;
     try {
-      certs = JSON.parseObjectAndClose(zipFile.getInputStream(certsEntry), OcspCertstore.Certs.class);
+      certs = CaJson.parseObjectAndClose(zipFile.getInputStream(certsEntry), OcspCertstore.Certs.class);
     } catch (Exception ex) {
       try {
         zipFile.close();

@@ -205,20 +205,20 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   public static class GetCa extends MgmtResponse {
 
-    private CaEntryWrapper result;
+    private CaEntry result;
 
     public GetCa() {
     }
 
-    public GetCa(CaEntryWrapper result) {
+    public GetCa(CaEntry result) {
       this.result = result;
     }
 
-    public CaEntryWrapper getResult() {
+    public CaEntry getResult() {
       return result;
     }
 
-    public void setResult(CaEntryWrapper result) {
+    public void setResult(CaEntry result) {
       this.result = result;
     }
 
@@ -394,20 +394,20 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   public static class GetSigner extends MgmtResponse {
 
-    private SignerEntryWrapper result;
+    private SignerEntry result;
 
     public GetSigner() {
     }
 
-    public GetSigner(SignerEntryWrapper result) {
+    public GetSigner(SignerEntry result) {
       this.result = result;
     }
 
-    public SignerEntryWrapper getResult() {
+    public SignerEntry getResult() {
       return result;
     }
 
-    public void setResult(SignerEntryWrapper result) {
+    public void setResult(SignerEntry result) {
       this.result = result;
     }
 

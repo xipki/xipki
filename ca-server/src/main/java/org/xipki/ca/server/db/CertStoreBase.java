@@ -4,6 +4,7 @@
 package org.xipki.ca.server.db;
 
 import org.xipki.ca.api.mgmt.CaMgmtException;
+import org.xipki.ca.server.CaConfStore;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -31,6 +32,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Base class to exec the database queries to manage CA system.
@@ -70,25 +72,27 @@ public class CertStoreBase extends QueryExecutor {
 
   protected SecretKey keypairEncKey;
 
-  protected final DataSourceWrapper caConfDatasource;
+  protected final CaConfStore  caConfStore;
 
-  protected CertStoreBase(DataSourceWrapper datasource, DataSourceWrapper caConfDatasource,
+  protected CertStoreBase(DataSourceWrapper datasource, CaConfStore caConfStore,
                           PasswordResolver passwordResolver)
       throws DataAccessException, CaMgmtException {
     super(datasource);
-    this.caConfDatasource = Args.notNull(caConfDatasource, "caConfDatasource");
+    this.caConfStore = Args.notNull(caConfStore, "caConfStore");
 
-    DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
-    String vendor = dbSchemaInfo.variableValue("VENDOR");
+    Map<String, String> caConfDbSchemaInfo = caConfStore.getDbSchemas();
+    String vendor = caConfStore.getDbSchemas().get("VENDOR");
     if (vendor != null && !vendor.equalsIgnoreCase("XIPKI")) {
       throw new CaMgmtException("unsupported vendor " + vendor);
     }
 
-    this.dbSchemaVersion = Integer.parseInt(dbSchemaInfo.variableValue("VERSION"));
+    this.dbSchemaVersion = Integer.parseInt(caConfDbSchemaInfo.get("VERSION"));
     if (this.dbSchemaVersion < 7) {
       throw new CaMgmtException("dbSchemaVersion < 7 unsupported: " + dbSchemaVersion);
     }
-    this.maxX500nameLen = Integer.parseInt(dbSchemaInfo.variableValue("X500NAME_MAXLEN"));
+
+    String str = caConfDbSchemaInfo.get("X500NAME_MAXLEN");
+    this.maxX500nameLen = str == null ? 350 : Integer.parseInt(str);
 
     String addCertSql = "ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,FP_SAN,NBEFORE,NAFTER,REV,PID,CA_ID,RID,EE,TID,SHA1," +
                     "REQ_SUBJECT,CRL_SCOPE,CERT,PRIVATE_KEY";
@@ -100,36 +104,35 @@ public class CertStoreBase extends QueryExecutor {
     updateDbInfo(passwordResolver);
   } // constructor
 
-  public void updateDbInfo(PasswordResolver passwordResolver)
-      throws DataAccessException, CaMgmtException {
-    DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(caConfDatasource);
-
+  public void updateDbInfo(PasswordResolver passwordResolver) throws DataAccessException, CaMgmtException {
     // Save keypair control
-    String str = dbSchemaInfo.variableValue("KEYPAIR_ENC_KEY");
-    if (str != null) {
-      try {
-        char[] keyChars = passwordResolver.resolvePassword(str);
-        byte[] encodedEncKey = Hex.decode(keyChars);
-        int n = encodedEncKey.length;
-        if (n != 16 && n != 24 && n != 32) {
-          throw new CaMgmtException("error resolving KEYPAIR_ENC_KEY");
-        }
-        this.keypairEncKey = new SecretKeySpec(encodedEncKey, "AES");
-        this.keypairEncKeyId = Hex.encode(Arrays.copyOf(HashAlgo.SHA1.hash(encodedEncKey), 8));
-      } catch (PasswordResolverException ex) {
-        throw new CaMgmtException("error resolving KEYPAIR_ENC_KEY", ex);
-      }
+    String str = caConfStore.getDbSchemas().get("KEYPAIR_ENC_KEY");
+    if (str == null) {
+      return;
+    }
 
+    try {
+      char[] keyChars = passwordResolver.resolvePassword(str);
+      byte[] encodedEncKey = Hex.decode(keyChars);
+      int n = encodedEncKey.length;
+      if (n != 16 && n != 24 && n != 32) {
+        throw new CaMgmtException("error resolving KEYPAIR_ENC_KEY");
+      }
+      this.keypairEncKey = new SecretKeySpec(encodedEncKey, "AES");
+      this.keypairEncKeyId = Hex.encode(Arrays.copyOf(HashAlgo.SHA1.hash(encodedEncKey), 8));
+    } catch (PasswordResolverException ex) {
+      throw new CaMgmtException("error resolving KEYPAIR_ENC_KEY", ex);
+    }
+
+    try {
+      Cipher.getInstance(keypairEncAlg, "SunJCE");
+      keypairEncProvider = "SunJCE";
+    } catch (NoSuchProviderException | NoSuchAlgorithmException | NoSuchPaddingException ex) {
       try {
-        Cipher.getInstance(keypairEncAlg, "SunJCE");
-        keypairEncProvider = "SunJCE";
-      } catch (NoSuchProviderException | NoSuchAlgorithmException | NoSuchPaddingException ex) {
-        try {
-          Cipher cipher = Cipher.getInstance(keypairEncAlg);
-          keypairEncProvider = cipher.getProvider().getName();
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException ex2) {
-          throw new IllegalStateException("Unsupported cipher " + keypairEncAlg);
-        }
+        Cipher cipher = Cipher.getInstance(keypairEncAlg);
+        keypairEncProvider = cipher.getProvider().getName();
+      } catch (NoSuchAlgorithmException | NoSuchPaddingException ex2) {
+        throw new IllegalStateException("Unsupported cipher " + keypairEncAlg);
       }
     }
   }

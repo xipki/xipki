@@ -6,17 +6,16 @@ package org.xipki.ca.mgmt.client;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.mgmt.*;
-import org.xipki.ca.api.mgmt.MgmtMessage.CaEntryWrapper;
-import org.xipki.ca.api.mgmt.MgmtMessage.MgmtAction;
-import org.xipki.ca.api.mgmt.MgmtMessage.SignerEntryWrapper;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.KeyCertBytesPair;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.*;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.Args;
+import org.xipki.util.HttpConstants;
+import org.xipki.util.IoUtil;
+import org.xipki.util.StringUtil;
 import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.SslContextConf;
 import org.xipki.util.http.SslContextConfWrapper;
@@ -250,26 +249,22 @@ public class CaMgmtClient implements CaManager {
   private Set<String> getNames(MgmtAction action) throws CaMgmtException {
     byte[] respBytes = transmit(action, null);
     return parse(respBytes, MgmtResponse.StringSet.class).getResult();
-  } // method getNames
+  }
 
   @Override
   public void addCa(CaEntry caEntry) throws CaMgmtException {
     MgmtRequest.AddCa req = new MgmtRequest.AddCa();
-    req.setCaEntry(new CaEntryWrapper(caEntry));
+    req.setCaEntry(caEntry);
     voidTransmit(MgmtAction.addCa, req);
-  } // method addCa
+  }
 
   @Override
   public CaEntry getCa(String caName) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(caName);
     byte[] respBytes = transmit(MgmtAction.getCa, req);
     MgmtResponse.GetCa resp = parse(respBytes, MgmtResponse.GetCa.class);
-    try {
-      return resp.getResult().toCaEntry();
-    } catch (CertificateException | InvalidConfException ex) {
-      throw new CaMgmtException("could not convert CaEntryWrapper to CaEntry", ex);
-    }
-  } // method getCa
+    return resp.getResult();
+  }
 
   @Override
   public void changeCa(ChangeCaEntry changeCaEntry) throws CaMgmtException {
@@ -437,7 +432,7 @@ public class CaMgmtClient implements CaManager {
   @Override
   public void addSigner(SignerEntry signerEntry) throws CaMgmtException {
     MgmtRequest.AddSigner req = new MgmtRequest.AddSigner();
-    req.setSignerEntry(new SignerEntryWrapper(signerEntry));
+    req.setSignerEntry(signerEntry);
     voidTransmit(MgmtAction.addSigner, req);
   } // method addSigner
 
@@ -450,7 +445,7 @@ public class CaMgmtClient implements CaManager {
   public SignerEntry getSigner(String name) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(name);
     byte[] respBytes = transmit(MgmtAction.getSigner, req);
-    return parse(respBytes, MgmtResponse.GetSigner.class).getResult().toSignerEntry();
+    return parse(respBytes, MgmtResponse.GetSigner.class).getResult();
   } // method getSigner
 
   @Override
@@ -593,7 +588,7 @@ public class CaMgmtClient implements CaManager {
       CaEntry caEntry, String certprofileName, String subject, String serialNumber, Instant notBefore, Instant notAfter)
       throws CaMgmtException {
     MgmtRequest.GenerateRootCa req = new MgmtRequest.GenerateRootCa();
-    req.setCaEntry(new CaEntryWrapper(caEntry));
+    req.setCaEntry(caEntry);
     req.setCertprofileName(certprofileName);
     req.setSubject(subject);
     req.setSerialNumber(serialNumber);
@@ -781,7 +776,7 @@ public class CaMgmtClient implements CaManager {
       throws CaMgmtException {
     initIfNotDone();
 
-    byte[] reqBytes = req == null ? null : JSON.toJSONBytes(req);
+    byte[] reqBytes = req == null ? null : CaJson.toJSONBytes(req);
     int size = reqBytes == null ? 0 : reqBytes.length;
 
     URL url = actionUrlMap.get(action);
@@ -853,7 +848,7 @@ public class CaMgmtClient implements CaManager {
   private static <T extends MgmtResponse> T parse(byte[] bytes, Class<T> clazz)
       throws CaMgmtException {
     try {
-      return JSON.parseObject(bytes, clazz);
+      return CaJson.parseObject(bytes, clazz);
     } catch (RuntimeException ex) {
       throw new CaMgmtException("cannot parse response " + clazz + " from byte[]", ex);
     }

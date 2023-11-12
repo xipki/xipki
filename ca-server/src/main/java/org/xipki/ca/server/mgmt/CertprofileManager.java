@@ -68,9 +68,9 @@ class CertprofileManager {
     manager.idNameMap.clearCertprofile();
     manager.certprofiles.clear();
 
-    List<String> names = manager.queryExecutor.getProfileNames();
+    List<String> names = manager.caConfStore.getProfileNames();
     for (String name : names) {
-      CertprofileEntry dbEntry = manager.queryExecutor.createCertprofile(name);
+      CertprofileEntry dbEntry = manager.caConfStore.createCertprofile(name);
       manager.idNameMap.addCertprofile(dbEntry.getIdent());
       dbEntry.setFaulty(true);
       manager.certprofileDbEntries.put(name, dbEntry);
@@ -90,7 +90,7 @@ class CertprofileManager {
     profileName = Args.toNonBlankLower(profileName, "profileName");
     caName = Args.toNonBlankLower(caName, "caName");
 
-    manager.queryExecutor.removeCertprofileFromCa(profileName, caName);
+    manager.caConfStore.removeCertprofileFromCa(profileName, caName);
 
     if (manager.caHasProfiles.containsKey(caName)) {
       Set<CaProfileEntry> set = manager.caHasProfiles.get(caName);
@@ -148,7 +148,7 @@ class CertprofileManager {
       }
     }
 
-    manager.queryExecutor.addCertprofileToCa(ident, caIdent, caProfileEntry.getProfileAliases());
+    manager.caConfStore.addCertprofileToCa(ident, caIdent, caProfileEntry.getProfileAliases());
     set.add(caProfileEntry);
   } // method addCertprofileToCa
 
@@ -163,7 +163,7 @@ class CertprofileManager {
       }
     }
 
-    boolean bo = manager.queryExecutor.deleteProfile(name);
+    boolean bo = manager.caConfStore.deleteProfile(name);
     if (!bo) {
       throw new CaMgmtException("unknown profile " + name);
     }
@@ -191,7 +191,7 @@ class CertprofileManager {
       type = type.toLowerCase();
     }
 
-    IdentifiedCertprofile profile = manager.queryExecutor.changeCertprofile(ident, type, conf, manager);
+    IdentifiedCertprofile profile = manager.caConfStore.changeCertprofile(ident, type, conf, manager);
 
     manager.certprofileDbEntries.remove(name);
     IdentifiedCertprofile oldProfile = manager.certprofiles.remove(name);
@@ -217,7 +217,7 @@ class CertprofileManager {
 
     certprofileEntry.setFaulty(false);
     manager.certprofiles.put(name, profile);
-    manager.queryExecutor.addCertprofile(certprofileEntry);
+    manager.caConfStore.addCertprofile(certprofileEntry);
     manager.idNameMap.addCertprofile(certprofileEntry.getIdent());
     manager.certprofileDbEntries.put(name, certprofileEntry);
   } // method addCertprofile

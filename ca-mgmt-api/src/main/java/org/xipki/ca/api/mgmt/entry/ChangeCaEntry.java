@@ -50,7 +50,7 @@ public class ChangeCaEntry extends MgmtEntry {
 
   private Integer permission;
 
-  private Integer keepExpiredCertInDays;
+  private Integer keepExpiredCertDays;
 
   private Integer expirationPeriod;
 
@@ -195,12 +195,12 @@ public class ChangeCaEntry extends MgmtEntry {
     this.expirationPeriod = expirationPeriod;
   }
 
-  public Integer getKeepExpiredCertInDays() {
-    return keepExpiredCertInDays;
+  public Integer getKeepExpiredCertDays() {
+    return keepExpiredCertDays;
   }
 
-  public void setKeepExpiredCertInDays(Integer days) {
-    this.keepExpiredCertInDays = days;
+  public void setKeepExpiredCertDays(Integer days) {
+    this.keepExpiredCertDays = days;
   }
 
   public String getExtraControl() {

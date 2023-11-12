@@ -6,7 +6,7 @@ package org.xipki.ca.api.mgmt.entry;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.JSON;
+import org.xipki.util.PermissionConstants;
 import org.xipki.util.Validity;
 import org.xipki.util.exception.InvalidConfException;
 
@@ -19,6 +19,12 @@ import java.util.Map;
  * @author Lijun Liao (xipki)
  */
 public class CaConfColumn {
+
+  public static final int DEFAULT_numCrls = 30;
+
+  public static final int DEFAULT_expirationPeriod = 365;
+
+  public static final int DEFAULT_keepExpiredCertDays = -1;
 
   /**
    * Syntax version.
@@ -41,7 +47,7 @@ public class CaConfColumn {
   /**
    * Not nullable. Maximal validity of the generated certificates.
    */
-  private String maxValidity;
+  private Validity maxValidity;
 
   private Map<String,String> crlControl;
 
@@ -64,19 +70,19 @@ public class CaConfColumn {
    */
   private boolean saveKeypair;
 
-  private String validityMode;
+  private ValidityMode validityMode;
 
   private int permission;
 
-  private int numCrls = 30;
+  private int numCrls = DEFAULT_numCrls;
 
-  private int expirationPeriod = 365;
+  private int expirationPeriod = DEFAULT_expirationPeriod;
 
   /**
    * How long in days should certificates be kept after the expiration.
    * Negative value for kept-for-ever.
    */
-  private int keepExpiredCertDays = -1;
+  private int keepExpiredCertDays = DEFAULT_keepExpiredCertDays;
 
   /**
    * Extra control.
@@ -131,11 +137,11 @@ public class CaConfColumn {
     this.deltaCrlUris = deltaCrlUris;
   }
 
-  public String getMaxValidity() {
+  public Validity getMaxValidity() {
     return maxValidity;
   }
 
-  public void setMaxValidity(String maxValidity) {
+  public void setMaxValidity(Validity maxValidity) {
     this.maxValidity = maxValidity;
   }
 
@@ -187,11 +193,11 @@ public class CaConfColumn {
     this.saveKeypair = saveKeypair;
   }
 
-  public String getValidityMode() {
+  public ValidityMode getValidityMode() {
     return validityMode;
   }
 
-  public void setValidityMode(String validityMode) {
+  public void setValidityMode(ValidityMode validityMode) {
     this.validityMode = validityMode;
   }
 
@@ -240,25 +246,135 @@ public class CaConfColumn {
   }
 
   public static CaConfColumn decode(String encoded) {
-    return JSON.parseObject(encoded, CaConfColumn.class);
+    return CaJson.parseObject(encoded, CaConfColumn.class);
   }
 
   public void fillCaEntry(CaEntry entry) throws CaMgmtException {
-    entry.setRevokeSuspendedControl(revokeSuspendedControl());
-    entry.setMaxValidity(maxValidity());
-    entry.setKeepExpiredCertInDays(keepExpiredCertDays);
-    entry.setKeypairGenNames(keypairGenNames);
-    entry.setExtraControl(extraControl());
+    entry.setCaUris(caUris());
     entry.setCrlControl(crlControl());
     entry.setCtlogControl(ctlogControl());
-    entry.setSaveCert((isSaveCert()));
-    entry.setSaveKeypair(isSaveKeypair());
+    entry.setExpirationPeriod(expirationPeriod);
+    entry.setExtraControl(extraControl());
+    entry.setKeepExpiredCertDays(keepExpiredCertDays);
+    entry.setKeypairGenNames(keypairGenNames);
+    entry.setMaxValidity(maxValidity());
+    entry.setNumCrls(numCrls);
     entry.setPermission(permission);
+    entry.setRevokeSuspendedControl(revokeSuspendedControl());
+    entry.setSaveCert(saveCert);
+    entry.setSnSize(snSize);
+    entry.setSaveKeypair(saveKeypair);
     entry.setValidityMode(validityMode());
   }
 
+  public void fillCaConf(CaConfType.Ca ca) {
+    CaConfType.CaInfo caInfo = ca.getCaInfo();
+    // CA URIS
+    if (cacertUris != null || crlUris != null || deltaCrlUris != null || ocspUris != null) {
+      caInfo.setCaUris(new CaUris(cacertUris, ocspUris, crlUris, deltaCrlUris));
+    }
+
+    caInfo.setCrlControl(crlControl);
+    caInfo.setCtlogControl(ctlogControl);
+    caInfo.setExpirationPeriod(expirationPeriod);
+    caInfo.setExtraControl(extraControl);
+    caInfo.setKeepExpiredCertDays(keepExpiredCertDays);
+    caInfo.setKeypairGenNames(keypairGenNames);
+    caInfo.setMaxValidity(maxValidity);
+    caInfo.setNumCrls(numCrls);
+    caInfo.setPermissions(PermissionConstants.permissionToStringSet(permission));
+    caInfo.setRevokeSuspendedControl(revokeSuspendedControl);
+    caInfo.setSaveCert(saveCert);
+    caInfo.setSaveKeypair(saveKeypair);
+    caInfo.setSnSize(snSize);
+    caInfo.setValidityMode(validityMode);
+  }
+
+  public static CaConfColumn fromCaEntry(CaEntry caEntry) {
+    CaConfColumn cc = fromBaseCaInfo(caEntry);
+
+    cc.setExpirationPeriod(caEntry.getExpirationPeriod());
+    cc.setKeepExpiredCertDays(caEntry.getKeepExpiredCertDays());
+    cc.setPermission(caEntry.getPermission());
+
+    // CRL Control
+    CrlControl crlControl = caEntry.getCrlControl();
+    if (crlControl != null) {
+      cc.setCrlControl(crlControl.getConfPairs().asMap());
+    }
+
+    // CTLog Control
+    CtlogControl ctlogControl = caEntry.getCtlogControl();
+    if (ctlogControl != null) {
+      cc.setCtlogControl(ctlogControl.getConfPairs().asMap());
+    }
+
+    ConfPairs extraControl = caEntry.getExtraControl();
+    if (extraControl != null) {
+      cc.setExtraControl(extraControl.asMap());
+    }
+
+    RevokeSuspendedControl revokeSuspendedControl = caEntry.getRevokeSuspendedControl();
+    if (revokeSuspendedControl != null) {
+      cc.setRevokeSuspendedControl(revokeSuspendedControl.getConfPairs().asMap());
+    }
+
+    return cc;
+  }
+
+  public static CaConfColumn fromCaInfo(CaConfType.CaInfo caEntry) throws InvalidConfException {
+    CaConfColumn cc = fromBaseCaInfo(caEntry);
+
+    cc.setExpirationPeriod(caEntry.getExpirationPeriod());
+    cc.setKeepExpiredCertDays(caEntry.getKeepExpiredCertDays());
+    cc.setPermission(PermissionConstants.toIntPermission(caEntry.getPermissions()));
+
+    // CRL Control
+    if (caEntry.getCrlControl() != null) {
+      cc.setCrlControl(new ConfPairs(caEntry.getCrlControl()).asMap());
+    }
+
+    // CTLog Control
+    if (caEntry.getCtlogControl() != null) {
+      cc.setCtlogControl(new ConfPairs(caEntry.getCtlogControl()).asMap());
+    }
+
+    if (caEntry.getExtraControl() != null) {
+      cc.setExtraControl(caEntry.getExtraControl());
+    }
+
+    if (caEntry.getRevokeSuspendedControl() != null) {
+      cc.setRevokeSuspendedControl(new ConfPairs(caEntry.getRevokeSuspendedControl()).asMap());
+    }
+
+    return cc;
+  }
+
+  private static CaConfColumn fromBaseCaInfo(BaseCaInfo caEntry) {
+    CaConfColumn cc = new CaConfColumn();
+
+    // CA URIS
+    CaUris caUris = caEntry.getCaUris();
+    if (caUris != null) {
+      cc.setCacertUris(caUris.getCacertUris());
+      cc.setCrlUris(caUris.getCrlUris());
+      cc.setDeltaCrlUris(caUris.getDeltaCrlUris());
+      cc.setOcspUris(caUris.getOcspUris());
+    }
+
+    cc.setKeypairGenNames(caEntry.getKeypairGenNames());
+    cc.setMaxValidity(caEntry.getMaxValidity());
+    cc.setNumCrls(caEntry.getNumCrls());
+    cc.setSaveCert(caEntry.isSaveCert());
+    cc.setSaveKeypair(caEntry.isSaveKeypair());
+    cc.setSnSize(caEntry.getSnSize());
+    cc.setValidityMode(caEntry.getValidityMode());
+
+    return cc;
+  }
+
   public String encode() {
-    return JSON.toPrettyJson(this);
+    return CaJson.toPrettyJson(this);
   }
 
   public CaUris caUris() {
@@ -278,7 +394,7 @@ public class CaConfColumn {
   }
 
   private Validity maxValidity() {
-    return maxValidity == null ? null : Validity.getInstance(maxValidity);
+    return maxValidity;
   }
 
   private CrlControl crlControl() throws CaMgmtException {
@@ -308,7 +424,7 @@ public class CaConfColumn {
   }
 
   private ValidityMode validityMode() {
-    return validityMode == null ? ValidityMode.STRICT : ValidityMode.forName(validityMode);
+    return validityMode == null ? ValidityMode.strict : validityMode;
   }
 
 }

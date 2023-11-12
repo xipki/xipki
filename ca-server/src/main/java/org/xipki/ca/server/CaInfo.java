@@ -85,7 +85,7 @@ public class CaInfo {
       throws OperationException {
     this.caEntry = Args.notNull(caEntry, "caEntry");
     this.caConfColumn = Args.notNull(caConfColumn, "caConfColumn");
-    this.certStore = Args.notNull(certStore, "certStore");
+    this.certStore = certStore;
 
     X509Cert cert = caEntry.getCert();
     this.notBefore = cert.getNotBefore();
@@ -147,11 +147,11 @@ public class CaInfo {
   }
 
   public long getNextCrlNumber() {
-    return caEntry.getNextCrlNumber();
+    return caEntry.getNextCrlNo();
   }
 
   public void setNextCrlNumber(long crlNumber) {
-    caEntry.setNextCrlNumber(crlNumber);
+    caEntry.setNextCrlNo(crlNumber);
   }
 
   public PublicCaInfo getPublicCaInfo() {
@@ -159,7 +159,7 @@ public class CaInfo {
   }
 
   public String getSubject() {
-    return caEntry.getSubject();
+    return caEntry.subject();
   }
 
   public Instant getNotBefore() {
@@ -195,7 +195,7 @@ public class CaInfo {
   }
 
   public int getPathLenConstraint() {
-    return caEntry.getPathLenConstraint();
+    return caEntry.pathLenConstraint();
   }
 
   public NameId getIdent() {
@@ -280,7 +280,7 @@ public class CaInfo {
   }
 
   public String getHexSha1OfCert() {
-    return caEntry.getHexSha1OfCert();
+    return caEntry.hexSha1OfCert();
   }
 
   public ValidityMode getValidityMode() {
@@ -303,21 +303,21 @@ public class CaInfo {
     caEntry.setRevocationInfo(revocationInfo);
   }
 
-  public int getKeepExpiredCertInDays() {
-    return caEntry.getKeepExpiredCertInDays();
+  public int getKeepExpiredCertDays() {
+    return caEntry.getKeepExpiredCertDays();
   }
 
   public BigInteger nextSerial() {
-    return randomSnGenerator.nextSerialNumber(caEntry.getSerialNoLen());
+    return randomSnGenerator.nextSerialNumber(caEntry.getSnSize());
   }
 
   public BigInteger nextCrlNumber() throws OperationException {
-    long crlNo = caEntry.getNextCrlNumber();
+    long crlNo = caEntry.getNextCrlNo();
     long currentMaxNo = certStore.getMaxCrlNumber(caEntry.getIdent());
     if (crlNo <= currentMaxNo) {
       crlNo = currentMaxNo + 1;
     }
-    caEntry.setNextCrlNumber(crlNo + 1);
+    caEntry.setNextCrlNo(crlNo + 1);
     return BigInteger.valueOf(crlNo);
   }
 

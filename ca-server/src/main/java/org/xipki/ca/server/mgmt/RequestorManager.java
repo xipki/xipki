@@ -47,15 +47,15 @@ class RequestorManager {
     manager.idNameMap.clearRequestor();
     manager.requestorDbEntries.clear();
     manager.requestors.clear();
-    List<String> names = manager.queryExecutor.getRequestorNames();
+    List<String> names = manager.caConfStore.getRequestorNames();
     for (String name : names) {
       if (RequestorInfo.NAME_BY_CA.equalsIgnoreCase(name)) {
-        Integer id = manager.queryExecutor.getRequestorId(name);
+        Integer id = manager.caConfStore.getRequestorId(name);
         NameId ident = new NameId(id, name);
         manager.byCaRequestor = new RequestorInfo.ByCaRequestorInfo(ident);
         manager.idNameMap.addRequestor(ident);
       } else {
-        RequestorEntry requestorDbEntry = manager.queryExecutor.createRequestor(name);
+        RequestorEntry requestorDbEntry = manager.caConfStore.createRequestor(name);
         manager.idNameMap.addRequestor(requestorDbEntry.getIdent());
         manager.requestorDbEntries.put(name, requestorDbEntry);
         RequestorEntryWrapper requestor = new RequestorEntryWrapper();
@@ -80,7 +80,7 @@ class RequestorManager {
     RequestorEntryWrapper requestor = new RequestorEntryWrapper();
     requestor.setDbEntry(requestorEntry);
 
-    manager.queryExecutor.addRequestor(requestorEntry);
+    manager.caConfStore.addRequestor(requestorEntry);
     manager.idNameMap.addRequestor(requestorEntry.getIdent());
     manager.requestorDbEntries.put(name, requestorEntry);
     manager.requestors.put(name, requestor);
@@ -105,7 +105,7 @@ class RequestorManager {
       }
     }
 
-    if (!manager.queryExecutor.deleteRequestor(name)) {
+    if (!manager.caConfStore.deleteRequestor(name)) {
       throw new CaMgmtException("unknown requestor " + name);
     }
 
@@ -127,7 +127,7 @@ class RequestorManager {
       throw manager.logAndCreateException("unknown requestor " + name);
     }
 
-    RequestorEntryWrapper requestor = manager.queryExecutor.changeRequestor(ident, type, conf,
+    RequestorEntryWrapper requestor = manager.caConfStore.changeRequestor(ident, type, conf,
         manager.securityFactory.getPasswordResolver());
 
     manager.requestorDbEntries.remove(name);
@@ -147,7 +147,7 @@ class RequestorManager {
       throw new CaMgmtException("removing requestor " + requestorName + " is not permitted");
     }
 
-    manager.queryExecutor.removeRequestorFromCa(requestorName, caName);
+    manager.caConfStore.removeRequestorFromCa(requestorName, caName);
     if (manager.caHasRequestors.containsKey(caName)) {
       Set<CaHasRequestorEntry> entries = manager.caHasRequestors.get(caName);
       CaHasRequestorEntry entry = null;
@@ -196,7 +196,7 @@ class RequestorManager {
     }
 
     cmpRequestors.add(requestor);
-    manager.queryExecutor.addRequestorToCa(requestor, caIdent);
+    manager.caConfStore.addRequestorToCa(requestor, caIdent);
     manager.caHasRequestors.get(caName).add(requestor);
   } // method addRequestorToCa
 

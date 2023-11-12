@@ -17,14 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.CertListInfo;
-import org.xipki.ca.api.mgmt.CertListOrderBy;
-import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
-import org.xipki.ca.server.CaIdNameMap;
-import org.xipki.ca.server.CaUtil;
-import org.xipki.ca.server.CertRevInfoWithSerial;
-import org.xipki.ca.server.UniqueIdGenerator;
+import org.xipki.ca.api.mgmt.*;
+import org.xipki.ca.server.*;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -124,10 +118,10 @@ public class CertStore extends CertStoreBase {
 
   private final long earliestNotBefore;
 
-  public CertStore(DataSourceWrapper datasource, DataSourceWrapper caConfDatasource,
+  public CertStore(DataSourceWrapper datasource, CaConfStore caConfStore,
                    UniqueIdGenerator idGenerator, PasswordResolver passwordResolver)
       throws DataAccessException, CaMgmtException {
-    super(datasource, caConfDatasource, passwordResolver);
+    super(datasource, caConfStore, passwordResolver);
 
     this.idGenerator = Args.notNull(idGenerator, "idGenerator");
 
@@ -212,7 +206,7 @@ public class CertStore extends CertStoreBase {
     }
   } // method addRequestor
 
-  public void addCa(NameId ident, X509Cert caCert) throws CaMgmtException {
+  public void addCa(NameId ident, X509Cert caCert, CertRevocationInfo caRevInfo) throws CaMgmtException {
     if (dbSchemaVersion < 8) {
       return;
     }
@@ -240,8 +234,9 @@ public class CertStore extends CertStoreBase {
     int num;
     try {
       String subjectText = X509Util.cutText(caCert.getSubjectText(), maxX500nameLen);
-      String sql = SqlUtil.buildInsertSql("CA", "ID,NAME,SUBJECT,CERT");
-      num = execUpdatePrepStmt0(sql, col2Int(ident.getId()), col2Str(ident.getName()),
+      String sql = SqlUtil.buildInsertSql("CA", "ID,NAME,REV_INFO,SUBJECT,CERT");
+      String caRevInfoStr = (caRevInfo == null) ? null : caRevInfo.encode();
+      num = execUpdatePrepStmt0(sql, col2Int(ident.getId()), col2Str(ident.getName()), col2Str(caRevInfoStr),
                 col2Str(subjectText), col2Str(Base64.encodeToString(caCert.getEncoded())));
     } catch (OperationException ex) {
       throw new CaMgmtException(ex);

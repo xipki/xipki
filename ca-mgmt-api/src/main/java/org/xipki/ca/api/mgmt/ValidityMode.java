@@ -19,9 +19,9 @@ import org.xipki.util.Args;
 
 public enum ValidityMode {
 
-  STRICT,
-  LAX,
-  CUTOFF;
+  strict,
+  lax,
+  cutoff;
 
   public static ValidityMode forName(String text) {
     Args.notNull(text, "text");

@@ -67,10 +67,10 @@ class KeypairGenManager {
       throw new CaMgmtException("dbSchemaVersion < 7 unsupported: " + dbSchemaVersion);
     }
 
-    List<String> names = manager.queryExecutor.getKeyPairGenNames();
+    List<String> names = manager.caConfStore.getKeyPairGenNames();
     entries = new ArrayList<>(names.size());
     for (String name : names) {
-      entries.add(manager.queryExecutor.createKeypairGen(name));
+      entries.add(manager.caConfStore.createKeypairGen(name));
     }
 
     for (KeypairGenEntry entry : entries) {
@@ -100,7 +100,7 @@ class KeypairGenManager {
 
     KeypairGenEntryWrapper gen = createKeypairGen(keypairGenEntry);
 
-    manager.queryExecutor.addKeypairGen(keypairGenEntry);
+    manager.caConfStore.addKeypairGen(keypairGenEntry);
     manager.keypairGens.put(name, gen);
     manager.keypairGenDbEntries.put(name, keypairGenEntry);
   } // method addKeypairGen
@@ -109,7 +109,7 @@ class KeypairGenManager {
     manager.assertMasterMode();
 
     name = Args.toNonBlankLower(name, "name");
-    boolean bo = manager.queryExecutor.deleteKeyPairGen(name);
+    boolean bo = manager.caConfStore.deleteKeyPairGen(name);
     if (!bo) {
       throw new CaMgmtException("unknown keypair generation " + name);
     }
@@ -122,7 +122,7 @@ class KeypairGenManager {
         List<String> newNames = new ArrayList<>(names);
         newNames.remove(name);
         changeCaEntry.setKeypairGenNames(newNames);
-        manager.queryExecutor.changeCa(changeCaEntry, caInfo.getCaConfColumn(), manager.securityFactory);
+        manager.caConfStore.changeCa(changeCaEntry, caInfo.getCaConfColumn(), manager.securityFactory);
 
         caInfo.getKeypairGenNames().remove(name);
       }
@@ -145,7 +145,7 @@ class KeypairGenManager {
       type = type.toLowerCase();
     }
 
-    KeypairGenEntryWrapper newKeypairGen = manager.queryExecutor.changeKeypairGen(name, type, conf, manager);
+    KeypairGenEntryWrapper newKeypairGen = manager.caConfStore.changeKeypairGen(name, type, conf, manager);
 
     manager.keypairGens.remove(name);
     manager.keypairGenDbEntries.remove(name);

@@ -40,7 +40,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
 
     @Override
     public void run() {
-      int keepDays = caInfo.getKeepExpiredCertInDays();
+      int keepDays = caInfo.getKeepExpiredCertDays();
       if (keepDays < 0) {
         return;
       }

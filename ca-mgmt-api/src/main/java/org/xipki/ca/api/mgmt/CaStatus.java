@@ -14,8 +14,8 @@ import org.xipki.util.Args;
 
 public enum CaStatus {
 
-  ACTIVE("active"),
-  INACTIVE("inactive");
+  active("active"),
+  inactive("inactive");
 
   private final String status;
 

@@ -213,7 +213,7 @@ public class SdkResponder {
         }
       }
 
-      if (ca.getCaInfo().getStatus() != CaStatus.ACTIVE) {
+      if (ca.getCaInfo().getStatus() != CaStatus.active) {
         return new ErrorResponse(null, PATH_NOT_FOUND,
             "CA '" + ca.getCaIdent().getName() + "' is out of service");
       }

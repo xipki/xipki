@@ -8,7 +8,8 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.Args;
 
 import java.sql.*;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Base class to execute the database queries to manage CA system.
@@ -87,41 +88,6 @@ class QueryExecutor {
     }
 
   } // class SqlColumn2
-
-  protected static class DbSchemaInfo {
-    private final Map<String, String> variables = new HashMap<>();
-
-    protected DbSchemaInfo(DataSourceWrapper datasource) throws DataAccessException {
-      Args.notNull(datasource, "datasource");
-      final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
-
-      PreparedStatement stmt = null;
-      ResultSet rs = null;
-
-      try {
-        stmt = Optional.ofNullable(datasource.prepareStatement(sql))
-            .orElseThrow(() -> new DataAccessException("could not create statement"));
-
-        rs = stmt.executeQuery();
-        while (rs.next()) {
-          variables.put(rs.getString("NAME"), rs.getString("VALUE2"));
-        }
-      } catch (SQLException ex) {
-        throw datasource.translate(sql, ex);
-      } finally {
-        datasource.releaseResources(stmt, rs);
-      }
-    } // constructor
-
-    public Set<String> getVariableNames() {
-      return Collections.unmodifiableSet(variables.keySet());
-    }
-
-    public String variableValue(String variableName) {
-      return variables.get(Args.notNull(variableName, "variableName"));
-    }
-
-  } // class DbSchemaInfo
 
   protected final DataSourceWrapper datasource;
 

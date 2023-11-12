@@ -6,6 +6,7 @@ package org.xipki.ca.api.mgmt.entry;
 import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.ConfPairs;
+import org.xipki.util.StringUtil;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,8 +37,20 @@ public class KeypairGenEntry extends MgmtEntry {
     this.conf = conf;
   }
 
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public void setConf(String conf) {
+    this.conf = conf;
+  }
+
   public String getName() {
-    return name;
+    return StringUtil.lowercase(name);
   }
 
   public String getType() {

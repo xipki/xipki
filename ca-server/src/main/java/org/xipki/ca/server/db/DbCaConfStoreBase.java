@@ -24,7 +24,7 @@ import java.util.Map;
  * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
-abstract class CaManagerQueryExecutorBase extends QueryExecutor {
+abstract class DbCaConfStoreBase extends QueryExecutor {
 
   protected enum Table {
     // SMALLINT or INT
@@ -36,17 +36,18 @@ abstract class CaManagerQueryExecutorBase extends QueryExecutor {
 
   private static final Logger LOG = LoggerFactory.getLogger(QueryExecutor.class);
 
-  protected int dbSchemaVersion;
+  protected final int dbSchemaVersion;
 
-  protected int maxX500nameLen;
+  protected final int maxX500nameLen;
 
-  CaManagerQueryExecutorBase(DataSourceWrapper datasource) throws CaMgmtException {
+  DbCaConfStoreBase(DataSourceWrapper datasource) throws CaMgmtException {
     super(datasource);
     try {
-      DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
-      this.dbSchemaVersion = Integer.parseInt(dbSchemaInfo.variableValue("VERSION"));
-      String str = dbSchemaInfo.variableValue("X500NAME_MAXLEN");
-      this.maxX500nameLen = str != null ? Integer.parseInt(str) : 350;
+      Integer i = datasource.getFirstIntValue(null, "DBSCHEMA", "VALUE2", "NAME='VERSION'");
+      dbSchemaVersion = i == null ? 9 : i;
+
+      i = datasource.getFirstIntValue(null, "DBSCHEMA", "VALUE2", "NAME='X500NAME_MAXLEN'");
+      this.maxX500nameLen = i != null ? i : 350;
     } catch (DataAccessException ex) {
       throw new CaMgmtException(ex);
     }

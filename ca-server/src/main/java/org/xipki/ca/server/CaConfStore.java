@@ -24,6 +24,8 @@ import java.util.Set;
  */
 public interface CaConfStore {
 
+  boolean needsCertStore();
+
   /**
    * Retrieve the system event.
    * @param eventName Event name
@@ -89,7 +91,7 @@ public interface CaConfStore {
       NameId nameId, String type, String conf, PasswordResolver passwordResolver)
       throws CaMgmtException;
 
-  SignerEntryWrapper changeSigner(
+  SignerEntry changeSigner(
       String name, String type, String conf, String base64Cert, CaManagerImpl signerManager)
       throws CaMgmtException;
 

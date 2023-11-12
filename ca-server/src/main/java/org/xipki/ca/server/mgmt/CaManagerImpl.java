@@ -20,9 +20,8 @@ import org.xipki.ca.sdk.CaIdentifierRequest;
 import org.xipki.ca.sdk.CertprofileInfoResponse;
 import org.xipki.ca.sdk.X500NameType;
 import org.xipki.ca.server.*;
-import org.xipki.ca.server.db.CaManagerQueryExecutor;
 import org.xipki.ca.server.db.CertStore;
-import org.xipki.ca.server.SystemEvent;
+import org.xipki.ca.server.db.DbCaConfStore;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.datasource.DataSourceFactory;
@@ -69,7 +68,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
       inProcess = true;
       try {
-        SystemEvent event = queryExecutor.getSystemEvent(EVENT_CACHANGE);
+        SystemEvent event = caConfStore.getSystemEvent(EVENT_CACHANGE);
         long caChangedTime = (event == null) ? 0 : event.getEventTime();
 
         LOG.info("check the restart CA system event: changed at={}, lastStartTime={}",
@@ -100,7 +99,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   final Map<String, CaInfo> caInfos = new ConcurrentHashMap<>();
 
-  final Map<String, SignerEntryWrapper> signers = new ConcurrentHashMap<>();
+  final Map<String, SignerEntry> signers = new ConcurrentHashMap<>();
 
   final Map<String, SignerEntry> signerDbEntries = new ConcurrentHashMap<>();
 
@@ -140,6 +139,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   Map<String, DataSourceWrapper> datasourceMap;
 
+  private Map<String, DataSourceWrapper> allDatasourceMap;
+
   CaServerConf caServerConf;
 
   CertprofileFactoryRegister certprofileFactoryRegister;
@@ -152,11 +153,11 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   P11CryptServiceFactory p11CryptServiceFactory;
 
-  CaConfStore queryExecutor;
+  CaConfStore caConfStore;
 
   private final CmLicense license;
 
-  private DataSourceWrapper caconfDatasource;
+  private DataSourceWrapper _caconfDatasource;
 
   private DataSourceWrapper certstoreDatasource;
 
@@ -335,27 +336,51 @@ public class CaManagerImpl implements CaManager, Closeable {
         }
       }
 
-      certstoreDatasource = datasourceMap.remove("ca");
-      if (certstoreDatasource == null) {
-        throw new CaMgmtException("no datasource named 'ca' configured");
-      }
+      certstoreDatasource = datasourceMap.get("ca");
 
-      caconfDatasource = datasourceMap.remove("caconf");
-      if (caconfDatasource == null) {
-        caconfDatasource = certstoreDatasource;
-      }
+      if (caServerConf.getCaConfFiles() != null) {
+        LOG.info("loading CAConf from files {]", caServerConf.getCaConfFiles());
+        try {
+          caConfStore = new FileCaConfStore(securityFactory, certprofileFactoryRegister, caServerConf.getCaConfFiles());
+        } catch (IOException ex) {
+          throw new CaMgmtException("IO error: " + ex.getMessage(), ex);
+        } catch (InvalidConfException ex) {
+          throw new CaMgmtException("Invalid Configuration: " + ex.getMessage(), ex);
+        }
+      } else {
+        LOG.info("loading CAConf from database");
 
-      queryExecutor = new CaManagerQueryExecutor(caconfDatasource);
-      int dbSchemaVersion = queryExecutor.getDbSchemaVersion();
-      LOG.info("dbSchemaVersion: {}", dbSchemaVersion);
+        DataSourceWrapper caconfDatasource = datasourceMap.get("caconf");
+        if (caconfDatasource == null) {
+          caconfDatasource = certstoreDatasource;
+        }
 
-      if (dbSchemaVersion >= 8) {
-        if (caconfDatasource == certstoreDatasource) {
-          throw new CaMgmtException("no datasource named 'caconf' configured");
+        caConfStore = new DbCaConfStore(caconfDatasource);
+
+        int dbSchemaVersion = caConfStore.getDbSchemaVersion();
+        if (dbSchemaVersion >= 8) {
+          if (caconfDatasource == certstoreDatasource) {
+            throw new CaMgmtException("no datasource named 'caconf' configured");
+          }
         }
       }
 
-      this.datasourceMap = datasourceMap;
+      boolean needsCertStore = caConfStore.needsCertStore();
+      LOG.info("needsCertStore: {}", needsCertStore);
+      if (needsCertStore) {
+        if (certstoreDatasource == null) {
+          throw new CaMgmtException("no datasource named 'ca' configured");
+        }
+      } else {
+        certstoreDatasource = null;
+      }
+
+      LOG.info("dbSchemaVersion: {}", caConfStore.getDbSchemaVersion());
+      this.allDatasourceMap = datasourceMap;
+
+      this.datasourceMap = new HashMap<>(datasourceMap);
+      this.datasourceMap.remove("ca");
+      this.datasourceMap.remove("caconf");
     }
 
     // 2010-01-01T00:00:00.000 UTC
@@ -367,7 +392,7 @@ public class CaManagerImpl implements CaManager, Closeable {
         lockCa();
       }
 
-      List<String> names = queryExecutor.getRequestorNames();
+      List<String> names = caConfStore.getRequestorNames();
       final String[] embeddedNames = {RequestorInfo.NAME_BY_CA};
       for (String embeddedName : embeddedNames) {
         boolean contained = false;
@@ -379,18 +404,19 @@ public class CaManagerImpl implements CaManager, Closeable {
         }
 
         if (!contained) {
-          queryExecutor.addEmbeddedRequestor(embeddedName);
+          caConfStore.addEmbeddedRequestor(embeddedName);
         }
       }
     }
 
     boolean initSucc = true;
-    try {
-      this.certstore = new CertStore(certstoreDatasource, caconfDatasource, idGen,
-          securityFactory.getPasswordResolver());
-    } catch (DataAccessException ex) {
-      initSucc = false;
-      LogUtil.error(LOG, ex, "error constructing CertStore");
+    if (caConfStore.needsCertStore()) {
+      try {
+        this.certstore = new CertStore(certstoreDatasource, caConfStore, idGen, securityFactory.getPasswordResolver());
+      } catch (DataAccessException ex) {
+        initSucc = false;
+        LogUtil.error(LOG, ex, "error constructing CertStore");
+      }
     }
 
     try {
@@ -443,7 +469,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
 
     // synchronize caconf and ca certstore databases
-    if (masterMode) {
+    if (masterMode && certstore != null) {
       for (CertprofileEntry entry : certprofileDbEntries.values()) {
         certstore.addCertProfile(entry.getIdent());
       }
@@ -457,7 +483,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
 
       for (CaInfo entry : caInfos.values()) {
-        certstore.addCa(entry.getIdent(), entry.getCert());
+        certstore.addCa(entry.getIdent(), entry.getCert(), entry.getRevocationInfo());
       }
     }
 
@@ -467,7 +493,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method init
 
   public int getDbSchemaVersion() {
-    return queryExecutor.getDbSchemaVersion();
+    return caConfStore.getDbSchemaVersion();
   }
 
   private DataSourceWrapper loadDatasource(String datasourceName, FileOrValue datasourceConf)
@@ -503,7 +529,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method getCaSystemStatus
 
   private void lockCa() throws CaMgmtException {
-    SystemEvent lockInfo = queryExecutor.getSystemEvent(EVENT_LOCK);
+    SystemEvent lockInfo = caConfStore.getSystemEvent(EVENT_LOCK);
 
     if (lockInfo != null) {
       String lockedBy = lockInfo.getOwner();
@@ -521,7 +547,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
 
     SystemEvent newLockInfo = new SystemEvent(EVENT_LOCK, lockInstanceId, Instant.now().getEpochSecond());
-    queryExecutor.changeSystemEvent(newLockInfo);
+    caConfStore.changeSystemEvent(newLockInfo);
     caLockedByMe = true;
   } // method lockCa
 
@@ -533,7 +559,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     boolean succ = false;
     try {
-      queryExecutor.unlockCa();
+      caConfStore.unlockCa();
       LOG.info("unlocked CA");
       succ = true;
     } finally {
@@ -575,7 +601,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public void notifyCaChange() throws CaMgmtException {
     try {
       SystemEvent systemEvent = new SystemEvent(EVENT_CACHANGE, lockInstanceId, Instant.now().getEpochSecond());
-      queryExecutor.changeSystemEvent(systemEvent);
+      caConfStore.changeSystemEvent(systemEvent);
       LOG.info("notified the change of CA system");
     } catch (CaMgmtException ex) {
       LogUtil.warn(LOG, ex, "could not notify slave CAs to restart");
@@ -586,7 +612,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void addDbSchema(String name, String value) throws CaMgmtException {
     checkModificationOfDbSchema(name);
-    queryExecutor.addDbSchema(name, value);
+    caConfStore.addDbSchema(name, value);
     try {
       certstore.updateDbInfo(securityFactory.getPasswordResolver());
     } catch (DataAccessException ex) {
@@ -597,7 +623,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void changeDbSchema(String name, String value) throws CaMgmtException {
     checkModificationOfDbSchema(name);
-    queryExecutor.changeDbSchema(name, value);
+    caConfStore.changeDbSchema(name, value);
     try {
       certstore.updateDbInfo(securityFactory.getPasswordResolver());
     } catch (DataAccessException ex) {
@@ -608,7 +634,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void removeDbSchema(String name) throws CaMgmtException {
     checkModificationOfDbSchema(name);
-    queryExecutor.removeDbSchema(name);
+    caConfStore.removeDbSchema(name);
     try {
       certstore.updateDbInfo(securityFactory.getPasswordResolver());
     } catch (DataAccessException ex) {
@@ -618,7 +644,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public Map<String, String> getDbSchemas() throws CaMgmtException {
-    Map<String, String> all = queryExecutor.getDbSchemas();
+    Map<String, String> all = caConfStore.getDbSchemas();
     Map<String, String> noReserved = new HashMap<>(all.size() * 5 / 4);
     for (Entry<String, String> entry : all.entrySet()) {
       switch (entry.getKey()) {
@@ -684,7 +710,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       for (Entry<String, CaInfo> entry : caInfos.entrySet()) {
         String caName = entry.getKey();
         CaStatus status = entry.getValue().getStatus();
-        if (CaStatus.ACTIVE != status) {
+        if (CaStatus.active != status) {
           continue;
         }
 
@@ -781,18 +807,11 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
 
-    Map<String, DataSourceWrapper> allDataSources = new HashMap<>(datasourceMap);
-    allDataSources.put("ca", certstoreDatasource);
-    if (certstoreDatasource != caconfDatasource) {
-      allDataSources.put("caconf", caconfDatasource);
-    }
-
-    for (String name : allDataSources.keySet()) {
-      DataSourceWrapper dataSource = allDataSources.get(name);
+    for (Entry<String, DataSourceWrapper> m : datasourceMap.entrySet()) {
       try {
-        dataSource.close();
+        m.getValue().close();
       } catch (Exception ex) {
-        LogUtil.warn(LOG, ex, "could not close datasource " + name);
+        LogUtil.warn(LOG, ex, "could not close datasource " + m.getKey());
       }
     }
 
@@ -1023,7 +1042,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     return signerDbEntries.get(Args.toNonBlankLower(name, "name"));
   }
 
-  public SignerEntryWrapper getSignerWrapper(String name) {
+  public SignerEntry getSignerWrapper(String name) {
     return signers.get(Args.toNonBlankLower(name, "name"));
   }
 
@@ -1210,8 +1229,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
   }
 
-  public SignerEntryWrapper createSigner(SignerEntry entry) throws CaMgmtException {
-    return signerManager.createSigner(entry);
+  public void createSigner(SignerEntry entry) throws CaMgmtException {
+    signerManager.createSigner(entry);
   }
 
   public IdentifiedCertprofile createCertprofile(CertprofileEntry entry) throws CaMgmtException {

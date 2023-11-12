@@ -566,10 +566,10 @@ public abstract class Client {
     X509Cert raEncCert = cs.getEncryptionCert();
     X509Cert raSignCert = cs.getSignatureCert();
     if (!X509Util.issues(caCert, raEncCert)) {
-      throw new ScepClientException("RA certificate '" + raEncCert.getSubjectText() + " is not issued by the CA");
+      throw new ScepClientException("RA certificate '" + raEncCert.getSubjectText() + "' is not issued by the CA");
     }
     if (raSignCert != raEncCert && X509Util.issues(caCert, raSignCert)) {
-      throw new ScepClientException("RA certificate '" + raSignCert.getSubjectText() + " is not issued by the CA");
+      throw new ScepClientException("RA certificate '" + raSignCert.getSubjectText() + "' is not issued by the CA");
     }
 
     return cs;

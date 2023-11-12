@@ -139,6 +139,8 @@ public abstract class DbPortWorker extends DbWorker {
 
     private final DataSourceWrapper caDataSource;
 
+    private final String caConfDbFile;
+
     public ImportCaDb(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
                       String caConfDbFile, String caDbFile,
                       boolean resume, String srcFolder, int batchEntriesPerCommit, char[] password)
@@ -147,6 +149,7 @@ public abstract class DbPortWorker extends DbWorker {
       this.resume = resume;
       this.srcFolder = IoUtil.expandFilepath(srcFolder);
       this.batchEntriesPerCommit = batchEntriesPerCommit;
+      this.caConfDbFile = caConfDbFile;
 
       ConfigurableProperties props = DbPorter.getDbConfProperties(
                             Paths.get(IoUtil.expandFilepath(caDbFile)));
@@ -179,6 +182,14 @@ public abstract class DbPortWorker extends DbWorker {
           decrypt(srcFolder);
         }
 
+        CaCertstoreDbImporter certStoreImporter = new CaCertstoreDbImporter(caDataSource,
+            srcFolder, batchEntriesPerCommit, resume, stopMe);
+        if (certStoreImporter.dbSchemaVersion >= 8) {
+          if (caConfDbFile == null) {
+            throw new IllegalArgumentException("The caConfDbFile (--caconf-db-conf) is not specified.");
+          }
+        }
+
         CaconfDbImporter caConfImporter = new CaconfDbImporter(datasource, srcFolder, stopMe);
         if (!resume) {
           // CAConfiguration
@@ -186,11 +197,7 @@ public abstract class DbPortWorker extends DbWorker {
           caConfImporter.close();
         }
 
-        CaCertstore.Caconf caconf = caConfImporter.getCaConf();
-
         // CertStore
-        CaCertstoreDbImporter certStoreImporter = new CaCertstoreDbImporter(caDataSource,
-                srcFolder, batchEntriesPerCommit, resume, stopMe, caconf);
         certStoreImporter.importToDb();
         certStoreImporter.close();
       } finally {
@@ -212,41 +219,155 @@ public abstract class DbPortWorker extends DbWorker {
 
   } // class ImportCaDb
 
-  public static class ExportCaDb extends DbPortWorker {
-
-    private final String destFolder;
+  public static class ImportCaCertStoreDb extends DbPortWorker {
 
     private final boolean resume;
 
-    private final int numCertsInBundle;
+    private final String srcFolder;
 
-    private final int numCertsPerSelect;
+    private final int batchEntriesPerCommit;
 
-    private final DataSourceWrapper caDataSource;
+    public ImportCaCertStoreDb(
+        DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String caCerStoreDbFile,
+        boolean resume, String srcFolder, int batchEntriesPerCommit, char[] password)
+        throws PasswordResolverException, IOException {
+      super(datasourceFactory, passwordResolver, caCerStoreDbFile, password);
+      this.resume = resume;
+      this.srcFolder = IoUtil.expandFilepath(srcFolder);
+      this.batchEntriesPerCommit = batchEntriesPerCommit;
+    }
+
+    @Override
+    protected void close0() {
+    }
+
+    @Override
+    protected void run0() throws Exception {
+      File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
+      if (resume) {
+        if (!processLogFile.exists()) {
+          throw new Exception("could not process with '--resume' option");
+        }
+      } else {
+        if (processLogFile.exists()) {
+          throw new Exception("please either specify '--resume' option or delete the file "
+              + processLogFile.getPath() + " first");
+        }
+      }
+
+      long start = Clock.systemUTC().millis();
+      try {
+        if (password != null) {
+          decrypt(srcFolder);
+        }
+
+        // CertStore
+        CaCertstoreDbImporter certStoreImporter = new CaCertstoreDbImporter(datasource,
+            srcFolder, batchEntriesPerCommit, resume, stopMe);
+        certStoreImporter.importToDb();
+        certStoreImporter.close();
+      } finally {
+        try {
+          datasource.close();
+        } catch (Throwable th) {
+          LOG.error("datasource.close()", th);
+        }
+
+        deleteDecryptedFiles(srcFolder);
+        printFinishedIn(start);
+      }
+    } // method run0
+
+  } // class ImportCaCertStoreDb
+
+  public static class ExportCaDb extends ExportCaCertStoreDb {
+
+    private final DataSourceWrapper caConfSource;
 
     public ExportCaDb(
         DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String caConfDbFile, String caDbFile,
         String destFolder, boolean resume, int numCertsInBundle, int numCertsPerSelect, char[] password)
         throws PasswordResolverException, IOException {
-      super(datasourceFactory, passwordResolver, caConfDbFile != null ? caConfDbFile : caDbFile, password);
-      this.destFolder = IoUtil.expandFilepath(destFolder);
-      this.resume = resume;
-      this.numCertsInBundle = numCertsInBundle;
-      this.numCertsPerSelect = numCertsPerSelect;
+      super(datasourceFactory, passwordResolver, caDbFile, destFolder,
+          resume, numCertsInBundle, numCertsPerSelect, password);
       checkDestFolder();
 
       ConfigurableProperties props = DbPorter.getDbConfProperties(
-          Paths.get(IoUtil.expandFilepath(caDbFile)));
-      this.caDataSource = datasourceFactory.createDataSource("ds-" + caDbFile,
+          Paths.get(IoUtil.expandFilepath(caConfDbFile)));
+      this.caConfSource = datasourceFactory.createDataSource("ds-" + caConfDbFile,
           props, passwordResolver);
     }
 
     @Override
     protected void close0() {
-      caDataSource.close();
+      caConfSource.close();
     }
 
-    private void checkDestFolder() throws IOException {
+    @Override
+    protected void run0() throws Exception {
+      long start = Clock.systemUTC().millis();
+      try {
+        if (!resume) {
+          // CAConfiguration
+          CaconfDbExporter caConfExporter = new CaconfDbExporter(caConfSource, destFolder, stopMe);
+          caConfExporter.export();
+          caConfExporter.close();
+        }
+
+        // CertStore
+        CaCertstoreDbExporter certStoreExporter = new CaCertstoreDbExporter(datasource, destFolder,
+            numCertsInBundle, numCertsPerSelect, resume, stopMe);
+        certStoreExporter.export();
+        certStoreExporter.close();
+
+        if (password != null) {
+          encrypt(new File(destFolder));
+        }
+      } finally {
+        try {
+          caConfSource.close();
+        } catch (Throwable th) {
+          LOG.error("caConfSource.close()", th);
+        }
+
+        try {
+          datasource.close();
+        } catch (Throwable th) {
+          LOG.error("datasource.close()", th);
+        }
+        printFinishedIn(start);
+      }
+    } // method run0
+
+  } // class ExportCaDb
+
+  public static class ExportCaCertStoreDb extends DbPortWorker {
+
+    protected final String destFolder;
+
+    protected final boolean resume;
+
+    protected final int numCertsInBundle;
+
+    protected final int numCertsPerSelect;
+
+    public ExportCaCertStoreDb(
+        DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String caDbFile,
+        String destFolder, boolean resume, int numCertsInBundle, int numCertsPerSelect, char[] password)
+        throws PasswordResolverException, IOException {
+      super(datasourceFactory, passwordResolver, caDbFile, password);
+      this.destFolder = IoUtil.expandFilepath(destFolder);
+      this.resume = resume;
+      this.numCertsInBundle = numCertsInBundle;
+      this.numCertsPerSelect = numCertsPerSelect;
+      checkDestFolder();
+    }
+
+    @Override
+    protected void close0() {
+    }
+
+    protected void checkDestFolder() throws IOException {
       File file = new File(destFolder);
       if (!file.exists()) {
         IoUtil.mkdirs(file);
@@ -277,15 +398,8 @@ public abstract class DbPortWorker extends DbWorker {
     protected void run0() throws Exception {
       long start = Clock.systemUTC().millis();
       try {
-        if (!resume) {
-          // CAConfiguration
-          CaconfDbExporter caConfExporter = new CaconfDbExporter(datasource, destFolder, stopMe);
-          caConfExporter.export();
-          caConfExporter.close();
-        }
-
         // CertStore
-        CaCertstoreDbExporter certStoreExporter = new CaCertstoreDbExporter(caDataSource, destFolder,
+        CaCertstoreDbExporter certStoreExporter = new CaCertstoreDbExporter(datasource, destFolder,
             numCertsInBundle, numCertsPerSelect, resume, stopMe);
         certStoreExporter.export();
         certStoreExporter.close();
@@ -303,7 +417,7 @@ public abstract class DbPortWorker extends DbWorker {
       }
     } // method run0
 
-  } // class ExportCaDb
+  } // class ExportCaCertStoreDb
 
   public static class ExportOcspDb extends DbPortWorker {
 

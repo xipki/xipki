@@ -67,9 +67,9 @@ class PublisherManager {
     manager.publisherDbEntries.clear();
     manager.idNameMap.clearPublisher();
 
-    List<String> names = manager.queryExecutor.getPublisherNames();
+    List<String> names = manager.caConfStore.getPublisherNames();
     for (String name : names) {
-      PublisherEntry dbEntry = manager.queryExecutor.createPublisher(name);
+      PublisherEntry dbEntry = manager.caConfStore.createPublisher(name);
 
       manager.idNameMap.addPublisher(dbEntry.getIdent());
       dbEntry.faulty(true);
@@ -90,7 +90,7 @@ class PublisherManager {
     publisherName = Args.toNonBlankLower(publisherName, "publisherName");
     caName = Args.toNonBlankLower(caName, "caName");
 
-    manager.queryExecutor.removePublisherFromCa(publisherName, caName);
+    manager.caConfStore.removePublisherFromCa(publisherName, caName);
 
     Set<String> publisherNames = manager.caHasPublishers.get(caName);
     if (publisherNames != null) {
@@ -132,7 +132,7 @@ class PublisherManager {
       throw new CaMgmtException(StringUtil.concat("publisher '", publisherName, "' is faulty"));
     }
 
-    manager.queryExecutor.addPublisherToCa(idNameMap.getPublisher(publisherName), caIdent);
+    manager.caConfStore.addPublisherToCa(idNameMap.getPublisher(publisherName), caIdent);
     publisherNames.add(publisherName);
     manager.caHasPublishers.get(caName).add(publisherName);
 
@@ -152,7 +152,7 @@ class PublisherManager {
     IdentifiedCertPublisher publisher = createPublisher(entry);
     entry.faulty(false);
 
-    manager.queryExecutor.addPublisher(entry);
+    manager.caConfStore.addPublisher(entry);
 
     manager.publishers.put(name, publisher);
     manager.idNameMap.addPublisher(entry.getIdent());
@@ -185,7 +185,7 @@ class PublisherManager {
       }
     }
 
-    boolean bo = manager.queryExecutor.deletePublisher(name);
+    boolean bo = manager.caConfStore.deletePublisher(name);
     if (!bo) {
       throw new CaMgmtException("unknown publisher " + name);
     }
@@ -208,7 +208,7 @@ class PublisherManager {
       type = type.toLowerCase();
     }
 
-    IdentifiedCertPublisher publisher = manager.queryExecutor.changePublisher(name, type, conf, manager);
+    IdentifiedCertPublisher publisher = manager.caConfStore.changePublisher(name, type, conf, manager);
 
     IdentifiedCertPublisher oldPublisher = manager.publishers.remove(name);
     shutdownPublisher(oldPublisher);

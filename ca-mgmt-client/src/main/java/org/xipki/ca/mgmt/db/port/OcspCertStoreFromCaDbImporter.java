@@ -7,6 +7,8 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.mgmt.CaConfType;
+import org.xipki.ca.api.mgmt.CaJson;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.HashAlgo;
@@ -67,26 +69,21 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
   } // constructor
 
   public void importToDb() throws Exception {
-    CaCertstore certstore = JSON.parseObject(Paths.get(baseDir, FILENAME_CA_CERTSTORE), CaCertstore.class);
+    CaCertstore certstore = CaJson.parseObject(Paths.get(baseDir, FILENAME_CA_CERTSTORE), CaCertstore.class);
     certstore.validate();
 
     if (certstore.getVersion() > VERSION_V2) {
       throw new Exception("could not import CertStore greater than " + VERSION_V2 + ": " + certstore.getVersion());
     }
 
-    CaCertstore.Caconf caconf = JSON.parseObject(Paths.get(baseDir, FILENAME_CA_CONFIGURATION),
-        CaCertstore.Caconf.class);
+    CaConfType.CaSystem caconf = CaJson.parseObject(
+        Paths.get(baseDir, FILENAME_CA_CONFIGURATION), CaConfType.CaSystem.class);
     caconf.validate();
-
-    if (caconf.getVersion() > VERSION_V2) {
-      throw new Exception("could not import CA configuration greater than "
-          + VERSION_V2 + ": " + certstore.getVersion());
-    }
 
     System.out.println("importing CA certstore to OCSP database");
     try {
-      CaCertstore.IdNameTypeConf publisherType = null;
-      for (CaCertstore.IdNameTypeConf type : caconf.getPublishers()) {
+      CaConfType.NameTypeConf publisherType = null;
+      for (CaConfType.NameTypeConf type : caconf.getPublishers()) {
         if (publisherName.equals(type.getName())) {
           publisherType = type;
           break;
@@ -110,14 +107,14 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
       }
 
       Set<Integer> relatedCaIds = new HashSet<>();
-      for (CaCertstore.CaHasPublisher ctype : caconf.getCaHasPublishers()) {
-        if (ctype.getPublisherId() == publisherType.getId()) {
-          relatedCaIds.add(ctype.getCaId());
+      for (CaConfType.Ca ca : caconf.getCas()) {
+        if (ca.getPublishers().contains(publisherName)) {
+          relatedCaIds.add(ca.getId());
         }
       }
 
-      List<CaCertstore.Ca> relatedCas = new LinkedList<>();
-      for (CaCertstore.Ca m : caconf.getCas()) {
+      List<CaConfType.Ca> relatedCas = new LinkedList<>();
+      for (CaConfType.Ca m : caconf.getCas()) {
         if (relatedCaIds.contains(m.getId())) {
           relatedCas.add(m);
         }
@@ -140,15 +137,15 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     System.out.println(" imported OCSP certstore to database");
   } // method importToDb
 
-  private List<Integer> getIssuerIds(List<CaCertstore.Ca> cas) throws IOException {
+  private List<Integer> getIssuerIds(List<CaConfType.Ca> cas) throws IOException {
     List<Integer> relatedCaIds = new LinkedList<>();
-    for (CaCertstore.Ca issuer : cas) {
-      byte[] encodedCert = issuer.getCert() == null ? null : readContent(issuer.getCert());
+    for (CaConfType.Ca issuer : cas) {
+      byte[] encodedCert = issuer.getCaInfo().getCert() == null ? null : readContent(issuer.getCaInfo().getCert());
 
       // retrieve the revocation information of the CA, if possible
-      CaCertstore.Ca ca = null;
-      for (CaCertstore.Ca caType : cas) {
-        byte[] certBytes = caType.getCert() == null ? null : readContent(caType.getCert());
+      CaConfType.Ca ca = null;
+      for (CaConfType.Ca caType : cas) {
+        byte[] certBytes = caType.getCaInfo().getCert() == null ? null : readContent(caType.getCaInfo().getCert());
         if (Arrays.equals(encodedCert, certBytes)) {
           ca = caType;
           break;
@@ -163,7 +160,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     return relatedCaIds;
   } // method getIssuerIds
 
-  private List<Integer> importIssuer(List<CaCertstore.Ca> cas)
+  private List<Integer> importIssuer(List<CaConfType.Ca> cas)
       throws DataAccessException, CertificateException, IOException {
     System.out.print("    importing table ISSUER ... ");
     boolean succ = false;
@@ -173,7 +170,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     List<Integer> relatedCaIds = new LinkedList<>();
 
     try {
-      for (CaCertstore.Ca issuer : cas) {
+      for (CaConfType.Ca issuer : cas) {
         importIssuer0(issuer, sql, ps, relatedCaIds);
       }
       succ = true;
@@ -185,10 +182,10 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     return relatedCaIds;
   } // method importIssuer
 
-  private void importIssuer0(CaCertstore.Ca issuer, String sql, PreparedStatement ps, List<Integer> relatedCaIds)
+  private void importIssuer0(CaConfType.Ca issuer, String sql, PreparedStatement ps, List<Integer> relatedCaIds)
       throws IOException, DataAccessException, CertificateException {
     try {
-      byte[] encodedCert = readContent(issuer.getCert());
+      byte[] encodedCert = readContent(issuer.getCaInfo().getCert());
       relatedCaIds.add(issuer.getId());
 
       Certificate cert;
@@ -206,7 +203,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
       ps.setLong(idx++, DateUtil.toEpochSecond(cert.getTBSCertificate().getStartDate().getDate()));
       ps.setLong(idx++, DateUtil.toEpochSecond(cert.getTBSCertificate().getEndDate().getDate()));
       ps.setString(idx++, HashAlgo.SHA1.base64Hash(encodedCert));
-      ps.setString(idx++, issuer.getRevInfo());
+      ps.setString(idx++, issuer.getCaInfo().getRevocationInfo().encode());
       ps.setString(idx++, Base64.encodeToString(encodedCert));
       ps.setNull(idx, Types.INTEGER); // CRL_ID
 
@@ -304,7 +301,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
     CaCertstore.Certs certs;
     try {
-      certs = JSON.parseObjectAndClose(zipFile.getInputStream(certsEntry), CaCertstore.Certs.class);
+      certs = CaJson.parseObjectAndClose(zipFile.getInputStream(certsEntry), CaCertstore.Certs.class);
     } catch (Exception ex) {
       try {
         zipFile.close();

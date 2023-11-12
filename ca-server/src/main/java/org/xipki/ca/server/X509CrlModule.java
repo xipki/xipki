@@ -15,6 +15,7 @@ import org.xipki.audit.AuditEvent;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.RequestorInfo;
+import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.KeyUsage;
@@ -180,7 +181,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     if (caInfo.getCrlControl() != null) {
       X509Cert crlSignerCert;
       if (caInfo.getCrlSignerName() != null) {
-        crlSignerCert = getCrlSigner().getDbEntry().getCertificate();
+        crlSignerCert = getCrlSigner().getCertificate();
       } else {
         // CA signs the CRL
         crlSignerCert = caCert;
@@ -394,11 +395,11 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     boolean successful = false;
 
     try {
-      SignerEntryWrapper crlSigner = getCrlSigner();
+      SignerEntry crlSigner = getCrlSigner();
       PublicCaInfo pci = caInfo.getPublicCaInfo();
 
       boolean indirectCrl = (crlSigner != null);
-      X500Name crlIssuer = indirectCrl ? crlSigner.getSubject() : pci.getSubject();
+      X500Name crlIssuer = indirectCrl ? crlSigner.getCertificate().getSubject() : pci.getSubject();
 
       X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(crlIssuer, Date.from(thisUpdate));
       if (nextUpdate != null) {
@@ -518,7 +519,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       try {
         // AuthorityKeyIdentifier
         byte[] akiValues = indirectCrl
-            ? crlSigner.getSigner().getCertificate().getSubjectKeyId() : pci.getSubjectKeyIdentifer();
+            ? crlSigner.getCertificate().getSubjectKeyId() : pci.getSubjectKeyIdentifer();
         AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(akiValues);
         crlBuilder.addExtension(Extension.authorityKeyIdentifier, false, aki);
 
@@ -560,7 +561,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       }
 
       ConcurrentContentSigner concurrentSigner = (crlSigner == null)
-          ? caInfo.getSigner(null) : crlSigner.getSigner();
+          ? caInfo.getSigner(null) : crlSigner.signer();
 
       ConcurrentBag.BagEntry<XiContentSigner> signer0;
       try {
@@ -641,7 +642,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     }
   }
 
-  SignerEntryWrapper getCrlSigner() {
+  SignerEntry getCrlSigner() {
     if (caInfo.getCrlControl() == null) {
       return null;
     }
@@ -651,9 +652,9 @@ public class X509CrlModule extends X509CaModule implements Closeable {
   }
 
   boolean healthy() {
-    SignerEntryWrapper signer = getCrlSigner();
-    if (signer != null && signer.getSigner() != null) {
-      return signer.isHealthy();
+    SignerEntry signer = getCrlSigner();
+    if (signer != null) {
+      return signer.signerIsHealthy();
     }
     return true;
   }

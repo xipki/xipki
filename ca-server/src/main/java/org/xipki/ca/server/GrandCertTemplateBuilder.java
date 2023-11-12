@@ -343,14 +343,14 @@ class GrandCertTemplateBuilder {
               "notAfter outside of CA's validity is not permitted by the CertProfile");
         }
 
-        if (caMode == ValidityMode.STRICT) {
+        if (caMode == ValidityMode.strict) {
           throw new OperationException(NOT_PERMITTED,
               "notAfter outside of CA's validity is not permitted by the CA");
         }
 
-        if (caMode == ValidityMode.CUTOFF) {
+        if (caMode == ValidityMode.cutoff) {
           grantedNotAfter = caInfo.getNotAfter();
-        } else if (caMode == ValidityMode.LAX) {
+        } else if (caMode == ValidityMode.lax) {
           if (profileMode == NotAfterMode.CUTOFF) {
             grantedNotAfter = caInfo.getNotAfter();
           }

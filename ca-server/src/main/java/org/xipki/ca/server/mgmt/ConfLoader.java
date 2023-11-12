@@ -5,12 +5,8 @@ package org.xipki.ca.server.mgmt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.CaUris;
-import org.xipki.ca.api.mgmt.CaConf;
-import org.xipki.ca.api.mgmt.CaConfType;
+import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.CaConfType.NameTypeConf;
-import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
@@ -94,7 +90,7 @@ class ConfLoader {
       }
     }
 
-    // Responder
+    // Signer
     for (String name : conf.getSignerNames()) {
       SignerEntry entry = conf.getSigner(name);
       SignerEntry entryB = manager.signerDbEntries.get(name);
@@ -397,15 +393,7 @@ class ConfLoader {
 
           CaEntry entry = manager.x509cas.get(name).getCaInfo().getCaEntry();
           // CA URIs
-          CaUris caUris = entry.getCaUris();
-          if (caUris != null) {
-            CaConfType.CaUris caUrisType = new CaConfType.CaUris();
-            caUrisType.setCacertUris(caUris.getCacertUris());
-            caUrisType.setOcspUris(caUris.getOcspUris());
-            caUrisType.setCrlUris(caUris.getCrlUris());
-            caUrisType.setDeltaCrlUris(caUris.getDeltaCrlUris());
-            caInfoType.setCaUris(caUrisType);
-          }
+          caInfoType.setCaUris(entry.getCaUris());
 
           // Certificate
           byte[] certBytes = entry.getCert().getEncoded();
@@ -440,9 +428,9 @@ class ConfLoader {
             caInfoType.setExtraControl(entry.getExtraControl().asMap());
           }
 
-          caInfoType.setKeepExpiredCertDays(entry.getKeepExpiredCertInDays());
-          caInfoType.setMaxValidity(entry.getMaxValidity().toString());
-          caInfoType.setNextCrlNo(entry.getNextCrlNumber());
+          caInfoType.setKeepExpiredCertDays(entry.getKeepExpiredCertDays());
+          caInfoType.setMaxValidity(entry.getMaxValidity());
+          caInfoType.setNextCrlNo(entry.getNextCrlNo());
           caInfoType.setNumCrls(entry.getNumCrls());
           caInfoType.setPermissions(getPermissions(entry.getPermission()));
 
@@ -461,10 +449,10 @@ class ConfLoader {
           caInfoType.setSignerConf(createFileOrValue(zipStream, entry.getSignerConf(),
               "files/ca-" + name + "-signerconf.conf"));
           caInfoType.setSignerType(entry.getSignerType());
-          caInfoType.setSnSize(entry.getSerialNoLen());
+          caInfoType.setSnSize(entry.getSnSize());
 
-          caInfoType.setStatus(entry.getStatus().getStatus());
-          caInfoType.setValidityMode(entry.getValidityMode().name());
+          caInfoType.setStatus(entry.getStatus());
+          caInfoType.setValidityMode(entry.getValidityMode());
 
           list.add(ca);
         }
@@ -546,7 +534,7 @@ class ConfLoader {
           conf.setName(name);
           conf.setType(entry.getType());
           conf.setConf(createFileOrValue(zipStream, entry.getConf(), "files/signer-" + name + ".conf"));
-          conf.setCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(), "files/signer-" + name + ".der"));
+          conf.setCert(createFileOrBase64Value(zipStream, entry.base64Cert(), "files/signer-" + name + ".der"));
 
           list.add(conf);
         }
@@ -578,10 +566,10 @@ class ConfLoader {
         }
       }
 
-      // add the CAConf XML file
+      // add the CAConf json file
       try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
         root.validate();
-        JSON.writePrettyJSON(root, bout);
+        CaJson.writePrettyJSON(root, bout);
 
         zipStream.putNextEntry(new ZipEntry("caconf.json"));
         try {

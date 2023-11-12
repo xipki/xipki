@@ -114,6 +114,36 @@ public class DbActions {
 
   } // class ExportCa
 
+  @Command(scope = "ca", name = "export-ca-certstore",
+      description = "export CA cerstore database (without the CA configuration )")
+  @Service
+  public static class ExportCaCertStore extends DbPortAction {
+
+    @Option(name = "--db-conf", required = true, description = "CA certstore database file")
+    @Completion(FileCompleter.class)
+    private String dbConfFile;
+
+    @Option(name = "--out-dir", required = true, description = "output directory")
+    @Completion(Completers.DirCompleter.class)
+    private String outdir;
+
+    @Option(name = "-n", description = "number of certificates in one zip file")
+    private Integer numCertsInBundle = 10000;
+
+    @Option(name = "-k", description = "number of certificates per SELECT")
+    private Integer numCertsPerCommit = 100;
+
+    @Option(name = "--resume", description = "resume from the last successful point")
+    private Boolean resume = Boolean.FALSE;
+
+    @Override
+    protected DbPortWorker getDbWorker() throws Exception {
+      return new DbPortWorker.ExportCaCertStoreDb(datasourceFactory, passwordResolver, dbConfFile,
+          outdir, resume, numCertsInBundle, numCertsPerCommit, readPassword());
+    }
+
+  } // class ExportCa
+
   public abstract static class DbPortAction extends DbAction {
 
     @Option(name = "--password", description = "password, as plaintext or PBE-encrypted.")
@@ -314,6 +344,33 @@ public class DbActions {
 
   } // class ImportCa
 
+  @Command(scope = "ca", name = "import-ca-certstore",
+      description = "import CA certstore database only (without the CA configuration)")
+  @Service
+  public static class ImportCaCertStore extends DbPortAction {
+
+    @Option(name = "--db-conf", required = true, description = "CA certstore database file")
+    @Completion(FileCompleter.class)
+    private String dbConfFile;
+
+    @Option(name = "--in-dir", required = true, description = "input directory")
+    @Completion(Completers.DirCompleter.class)
+    private String indir;
+
+    @Option(name = "-k", description = "number of certificates per commit")
+    private Integer numCertsPerCommit = 100;
+
+    @Option(name = "--resume", description = "resume from the last successful point")
+    private Boolean resume = Boolean.FALSE;
+
+    @Override
+    protected DbPortWorker getDbWorker() throws Exception {
+      return new DbPortWorker.ImportCaCertStoreDb(datasourceFactory, passwordResolver, dbConfFile,
+          resume, indir, numCertsPerCommit, readPassword());
+    }
+
+  } // class ImportCaCertStore
+
   @Command(scope = "ca", name = "import-ocsp", description = "import OCSP database")
   @Service
   public static class ImportOcsp extends DbPortAction {
@@ -334,8 +391,8 @@ public class DbActions {
 
     @Override
     protected DbPortWorker getDbWorker() throws Exception {
-      return new DbPortWorker.ImportOcspDb(datasourceFactory, passwordResolver, dbconfFile, resume,
-          indir, numCertsPerCommit, readPassword());
+      return new DbPortWorker.ImportOcspDb(datasourceFactory, passwordResolver,
+          dbconfFile, resume, indir, numCertsPerCommit, readPassword());
     }
 
   } // class ImportOcsp
@@ -343,7 +400,7 @@ public class DbActions {
   @Command(scope = "ca", name = "import-ocspfromca",
       description = "import OCSP database from CA data")
   @Service
-  public static class ImportOcspfromca extends DbPortAction {
+  public static class ImportOcspfromCa extends DbPortAction {
 
     private static final String DFLT_PUBLISHER = "ocsp-publisher";
 

@@ -3,12 +3,19 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
+import org.xipki.util.ValidatableConf;
+import org.xipki.util.exception.InvalidConfException;
+
 /**
  * CA management entry.
  *
  * @author Lijun Liao (xipki)
  *
  */
-public abstract class MgmtEntry {
+public abstract class MgmtEntry extends ValidatableConf {
+
+  @Override
+  public void validate() throws InvalidConfException {
+  }
 
 }

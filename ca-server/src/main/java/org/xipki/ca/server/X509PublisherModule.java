@@ -122,7 +122,7 @@ class X509PublisherModule extends X509CaModule {
 
     CaStatus status = caInfo.getStatus();
 
-    caInfo.setStatus(CaStatus.INACTIVE);
+    caInfo.setStatus(CaStatus.inactive);
 
     boolean onlyRevokedCerts = true;
     for (IdentifiedCertPublisher publisher : publishers) {

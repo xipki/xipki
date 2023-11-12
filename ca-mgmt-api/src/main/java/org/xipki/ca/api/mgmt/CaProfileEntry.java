@@ -5,6 +5,7 @@ package org.xipki.ca.api.mgmt;
 
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,13 +55,7 @@ public class CaProfileEntry {
     if (CollectionUtil.isEmpty(this.profileAliases)) {
       encoded = profileName;
     } else {
-      StringBuilder str = new StringBuilder(profileName + ":" + this.profileAliases.get(0));
-      if (this.profileAliases.size() > 1) {
-        for (int i = 1; i < this.profileAliases.size(); i++) {
-          str.append(",").append(this.profileAliases.get(i));
-        }
-      }
-      encoded = str.toString();
+      encoded = profileName + ":" + getEncodedAliases();
     }
   }
 
@@ -89,6 +84,10 @@ public class CaProfileEntry {
     }
 
     return null;
+  }
+
+  public String getEncodedAliases() {
+    return StringUtil.collectionAsString(profileAliases, ",");
   }
 
   public String getEncoded() {

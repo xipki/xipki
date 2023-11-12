@@ -37,7 +37,6 @@ import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.XiHttpRequest;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;

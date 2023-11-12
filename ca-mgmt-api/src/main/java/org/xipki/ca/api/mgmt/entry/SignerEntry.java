@@ -3,12 +3,16 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
+import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
+import org.xipki.util.Base64;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.exception.ObjectCreationException;
 
 /**
  * Management Entry Signer.
@@ -18,19 +22,49 @@ import org.xipki.util.StringUtil;
 
 public class SignerEntry extends MgmtEntry {
 
-  private final String name;
+  private String name;
 
-  private final String type;
+  private String type;
 
   private String conf;
 
-  private boolean certFaulty;
+  private boolean faulty;
 
-  private boolean confFaulty;
-
-  private final String base64Cert;
+  private String base64Cert;
 
   private X509Cert certificate;
+
+  private ConcurrentContentSigner signer;
+
+  public ConcurrentContentSigner signer() {
+    return signer;
+  }
+
+  public void initSigner(SecurityFactory securityFactory) throws ObjectCreationException {
+    Args.notNull(securityFactory, "securityFactory");
+    if (signer != null) {
+      return;
+    }
+
+    faulty = true;
+    signer = securityFactory.createSigner(type, new SignerConf(conf), certificate);
+    if (signer.getCertificate() == null) {
+      throw new ObjectCreationException("signer without certificate is not allowed");
+    }
+    faulty = false;
+
+    if (certificate == null) {
+      setCertificate(signer.getCertificate());
+    }
+  } // method initSigner
+
+  public boolean signerIsHealthy() {
+    return signer != null && signer.isHealthy();
+  }
+
+  // for deserializer only
+  private SignerEntry() {
+  }
 
   public SignerEntry(String name, String type, String conf, String base64Cert) {
     this.name = Args.toNonBlankLower(name, "name");
@@ -45,28 +79,8 @@ public class SignerEntry extends MgmtEntry {
     try {
       this.certificate = X509Util.parseCert(StringUtil.toUtf8Bytes(base64Cert));
     } catch (Throwable th) {
-      this.certFaulty = true;
+      this.faulty = true;
     }
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public void setConf(String conf) {
-    this.conf = conf;
-  }
-
-  public String getConf() {
-    return conf;
-  }
-
-  public X509Cert getCertificate() {
-    return certificate;
   }
 
   public void setCertificate(X509Cert certificate) {
@@ -74,18 +88,47 @@ public class SignerEntry extends MgmtEntry {
       throw new IllegalStateException("certificate is already specified by base64Cert");
     }
     this.certificate = certificate;
+    this.base64Cert = (certificate == null) ? null : Base64.encodeToString(certificate.getEncoded());
   }
 
-  public String getBase64Cert() {
-    return base64Cert;
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = StringUtil.lowercase(name);
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public String getConf() {
+    return conf;
+  }
+
+  public void setConf(String conf) {
+    this.conf = conf;
   }
 
   public boolean isFaulty() {
-    return confFaulty || certFaulty;
+    return faulty;
   }
 
-  public void setConfFaulty(boolean confFaulty) {
-    this.confFaulty = confFaulty;
+  public void setFaulty(boolean certFaulty) {
+    this.faulty = faulty;
+  }
+
+  public String base64Cert() {
+    return base64Cert;
+  }
+
+  public X509Cert getCertificate() {
+    return certificate;
   }
 
   @Override
@@ -100,7 +143,7 @@ public class SignerEntry extends MgmtEntry {
   public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
     StringBuilder sb = new StringBuilder(1000);
     sb.append("name:   ").append(name).append('\n');
-    sb.append("faulty: ").append(isFaulty()).append('\n');
+    sb.append("faulty: ").append(faulty).append('\n');
     sb.append("type:   ").append(type).append('\n');
     sb.append("conf:   ");
     if (conf == null) {

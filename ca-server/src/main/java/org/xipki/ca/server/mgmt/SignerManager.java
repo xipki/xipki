@@ -9,7 +9,6 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.CaUtil;
-import org.xipki.ca.server.SignerEntryWrapper;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11CryptService;
@@ -54,14 +53,14 @@ class SignerManager {
     manager.signerDbEntries.clear();
     manager.signers.clear();
 
-    List<String> names = manager.queryExecutor.getSignerNames();
+    List<String> names = manager.caConfStore.getSignerNames();
     for (String name : names) {
-      SignerEntry entry = manager.queryExecutor.createSigner(name);
-      entry.setConfFaulty(true);
-      manager.signerDbEntries.put(name, entry);
+      SignerEntry signer = manager.caConfStore.createSigner(name);
+      signer.setFaulty(true);
+      manager.signerDbEntries.put(name, signer);
 
-      SignerEntryWrapper signer = createSigner(entry);
-      entry.setConfFaulty(false);
+      createSigner(signer);
+      signer.setFaulty(false);
       manager.signers.put(name, signer);
       LOG.info("loaded signer {}", name);
     }
@@ -85,9 +84,9 @@ class SignerManager {
       }
     }
 
-    SignerEntryWrapper signer = createSigner(signerEntry);
-    manager.queryExecutor.addSigner(signerEntry);
-    manager.signers.put(name, signer);
+    createSigner(signerEntry);
+    manager.caConfStore.addSigner(signerEntry);
+    manager.signers.put(name, signerEntry);
     manager.signerDbEntries.put(name, signerEntry);
   } // method addSigner
 
@@ -95,7 +94,7 @@ class SignerManager {
     manager.assertMasterMode();
 
     name = Args.toNonBlankLower(name, "name");
-    boolean bo = manager.queryExecutor.deleteSigner(name);
+    boolean bo = manager.caConfStore.deleteSigner(name);
     if (!bo) {
       throw new CaMgmtException("unknown signer " + name);
     }
@@ -126,26 +125,23 @@ class SignerManager {
       type = type.toLowerCase();
     }
 
-    SignerEntryWrapper newResponder = manager.queryExecutor.changeSigner(name, type, conf, base64Cert, manager);
+    SignerEntry newSigner = manager.caConfStore.changeSigner(name, type, conf, base64Cert, manager);
 
     manager.signers.remove(name);
     manager.signerDbEntries.remove(name);
-    manager.signerDbEntries.put(name, newResponder.getDbEntry());
-    manager.signers.put(name, newResponder);
+    manager.signerDbEntries.put(name, newSigner);
+    manager.signers.put(name, newSigner);
   } // method changeSigner
 
-  SignerEntryWrapper createSigner(SignerEntry entry) throws CaMgmtException {
+  void createSigner(SignerEntry entry) throws CaMgmtException {
     Args.notNull(entry, "entry");
-    SignerEntryWrapper ret = new SignerEntryWrapper();
-    ret.setDbEntry(entry);
     try {
-      ret.initSigner(manager.securityFactory);
+      entry.initSigner(manager.securityFactory);
     } catch (ObjectCreationException ex) {
       final String message = "error createSigner";
       LOG.debug(message, ex);
       throw new CaMgmtException(ex.getMessage());
     }
-    return ret;
   } // method createSigner
 
   String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose) throws CaMgmtException {

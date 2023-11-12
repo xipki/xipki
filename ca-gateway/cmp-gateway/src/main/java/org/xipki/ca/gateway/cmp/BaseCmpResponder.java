@@ -53,7 +53,6 @@ import org.xipki.util.exception.OperationException;
 import javax.crypto.*;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
 import java.security.*;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;

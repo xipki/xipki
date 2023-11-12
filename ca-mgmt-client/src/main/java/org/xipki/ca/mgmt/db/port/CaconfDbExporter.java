@@ -4,24 +4,28 @@
 package org.xipki.ca.mgmt.db.port;
 
 import org.xipki.ca.api.CaUris;
+import org.xipki.ca.api.mgmt.CaConfType;
+import org.xipki.ca.api.mgmt.CaJson;
+import org.xipki.ca.api.mgmt.CaStatus;
+import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.ca.api.mgmt.entry.CaConfColumn;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.JSON;
-import org.xipki.util.StringUtil;
+import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.X509Cert;
+import org.xipki.security.util.X509Util;
+import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -39,8 +43,7 @@ class CaconfDbExporter extends DbPorter {
   }
 
   public void export() throws Exception {
-    CaCertstore.Caconf caconf = new CaCertstore.Caconf();
-    caconf.setVersion(VERSION_V2);
+    CaConfType.CaSystem caconf = new CaConfType.CaSystem();
 
     System.out.println("exporting CA configuration from database");
 
@@ -48,60 +51,28 @@ class CaconfDbExporter extends DbPorter {
     exportSigner(caconf);
     exportRequestor(caconf);
     exportPublisher(caconf);
-    exportCa(caconf);
     exportProfile(caconf);
-    exportCaalias(caconf);
-    exportCaHasRequestor(caconf);
-    exportCaHasPublisher(caconf);
-    exportCaHasProfile(caconf);
+
+    exportCa(caconf);
+
     if (dbSchemaVersion >= 7) {
       exportKeypairGen(caconf);
     }
 
     caconf.validate();
     try (OutputStream os = Files.newOutputStream(Paths.get(baseDir, FILENAME_CA_CONFIGURATION))) {
-      JSON.writePrettyJSON(caconf, os);
+      CaJson.writePrettyJSON(caconf, os);
     }
     System.out.println(" exported CA configuration from database");
   } // method export
 
-  private void exportCaalias(CaCertstore.Caconf caconf) throws DataAccessException, InvalidConfException {
-    System.out.print("    exporting table CAALIAS ... ");
-    List<CaCertstore.Caalias> caaliases = new LinkedList<>();
-    final String sql = "SELECT NAME,CA_ID FROM CAALIAS";
-
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
-    boolean succ = false;
-    try {
-      stmt = prepareStatement(sql);
-      rs = stmt.executeQuery();
-
-      while (rs.next()) {
-        CaCertstore.Caalias caalias = new CaCertstore.Caalias();
-        caalias.setName(rs.getString("NAME"));
-        caalias.setCaId(rs.getInt("CA_ID"));
-
-        caalias.validate();
-        caaliases.add(caalias);
-      }
-
-      caconf.setCaaliases(caaliases);
-      succ = true;
-    } catch (SQLException ex) {
-      throw translate(sql, ex);
-    } finally {
-      releaseResources(stmt, rs);
-      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
-    }
-
-  } // method exportCaalias
-
-  private void exportRequestor(CaCertstore.Caconf caconf)
+  private void exportRequestor(CaConfType.CaSystem caconf)
       throws DataAccessException, IOException, InvalidConfException {
     System.out.print("    exporting table REQUESTOR ... ");
     boolean succ = false;
-    List<CaCertstore.IdNameTypeConf> requestors = new LinkedList<>();
+    List<CaConfType.Requestor> requestors = new LinkedList<>();
+    caconf.setRequestors(requestors);
+
     final String sql = "SELECT ID,NAME,TYPE,CONF FROM REQUESTOR";
 
     PreparedStatement stmt = null;
@@ -113,7 +84,7 @@ class CaconfDbExporter extends DbPorter {
       while (rs.next()) {
         String name = rs.getString("NAME");
 
-        CaCertstore.IdNameTypeConf requestor = new CaCertstore.IdNameTypeConf();
+        CaConfType.Requestor requestor = new CaConfType.Requestor();
         requestor.setId(rs.getInt("ID"));
         requestor.setName(name);
         requestor.setType(rs.getString("TYPE"));
@@ -133,11 +104,13 @@ class CaconfDbExporter extends DbPorter {
     }
   } // method exportRequestor
 
-  private void exportDbSchema(CaCertstore.Caconf caconf) throws DataAccessException, InvalidConfException {
+  private void exportDbSchema(CaConfType.CaSystem caconf) throws DataAccessException {
     System.out.print("    exporting table DBSCHEMA ... ");
     boolean succ = false;
-    List<CaCertstore.DbSchemaEntry> entries = new LinkedList<>();
     final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
+
+    Map<String, String> dbSchemas = new HashMap<>();
+    caconf.setDbSchemas(dbSchemas);
 
     PreparedStatement stmt = null;
     ResultSet rs = null;
@@ -146,14 +119,10 @@ class CaconfDbExporter extends DbPorter {
       rs = stmt.executeQuery();
 
       while (rs.next()) {
-        CaCertstore.DbSchemaEntry entry = new CaCertstore.DbSchemaEntry();
-        entry.setName(rs.getString("NAME"));
-        entry.setValue(rs.getString("VALUE2"));
-        entry.validate();
-        entries.add(entry);
+        String name = rs.getString("NAME");
+        String value = rs.getString("VALUE2");
+        dbSchemas.put(name, value);
       }
-
-      caconf.setDbSchemas(entries);
       succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
@@ -163,11 +132,13 @@ class CaconfDbExporter extends DbPorter {
     }
   } // method exportDbSchema
 
-  private void exportSigner(CaCertstore.Caconf caconf)
+  private void exportSigner(CaConfType.CaSystem caconf)
       throws DataAccessException, IOException, InvalidConfException {
     System.out.print("    exporting table SIGNER ... ");
     boolean succ = false;
-    List<CaCertstore.Signer> signers = new LinkedList<>();
+    List<CaConfType.Signer> signers = new LinkedList<>();
+    caconf.setSigners(signers);
+
     final String sql = "SELECT NAME,TYPE,CONF,CERT FROM SIGNER";
 
     PreparedStatement stmt = null;
@@ -179,7 +150,7 @@ class CaconfDbExporter extends DbPorter {
       while (rs.next()) {
         String name = rs.getString("NAME");
 
-        CaCertstore.Signer signer = new CaCertstore.Signer();
+        CaConfType.Signer signer = new CaConfType.Signer();
         signer.setName(name);
         signer.setType(rs.getString("TYPE"));
         signer.setConf(buildFileOrValue(rs.getString("CONF"), "ca-conf/conf-signer-" + name));
@@ -199,12 +170,13 @@ class CaconfDbExporter extends DbPorter {
     }
   } // method exportSigner
 
-  private void exportKeypairGen(CaCertstore.Caconf caconf)
+  private void exportKeypairGen(CaConfType.CaSystem caconf)
       throws DataAccessException, IOException, InvalidConfException {
     System.out.print("    exporting table KEYPAIR_GEN ... ");
     boolean succ = false;
 
-    List<CaCertstore.NameTypeConf> keypairGens = new LinkedList<>();
+    List<CaConfType.NameTypeConf> keypairGens = new LinkedList<>();
+    caconf.setKeypairGens(keypairGens);
     final String sql = "SELECT NAME,TYPE,CONF FROM KEYPAIR_GEN";
 
     PreparedStatement stmt = null;
@@ -215,7 +187,7 @@ class CaconfDbExporter extends DbPorter {
 
       while (rs.next()) {
         String name = rs.getString("NAME");
-        CaCertstore.NameTypeConf entry = new CaCertstore.NameTypeConf();
+        CaConfType.NameTypeConf entry = new CaConfType.NameTypeConf();
         entry.setName(name);
         entry.setType(rs.getString("TYPE"));
         entry.setConf(buildFileOrValue(rs.getString("CONF"), "ca-conf/conf-publisher-" + name));
@@ -234,11 +206,12 @@ class CaconfDbExporter extends DbPorter {
     }
   } // method exportKeypairGen
 
-  private void exportPublisher(CaCertstore.Caconf caconf)
+  private void exportPublisher(CaConfType.CaSystem caconf)
       throws DataAccessException, IOException, InvalidConfException {
     System.out.print("    exporting table PUBLISHER ... ");
     boolean succ = false;
-    List<CaCertstore.IdNameTypeConf> publishers = new LinkedList<>();
+    List<CaConfType.NameTypeConf> publishers = new LinkedList<>();
+    caconf.setPublishers(publishers);
     final String sql = "SELECT ID,NAME,TYPE,CONF FROM PUBLISHER";
 
     PreparedStatement stmt = null;
@@ -250,7 +223,7 @@ class CaconfDbExporter extends DbPorter {
       while (rs.next()) {
         String name = rs.getString("NAME");
 
-        CaCertstore.IdNameTypeConf publisher = new CaCertstore.IdNameTypeConf();
+        CaConfType.NameTypeConf publisher = new CaConfType.NameTypeConf();
         publisher.setId(rs.getInt("ID"));
         publisher.setName(name);
         publisher.setType(rs.getString("TYPE"));
@@ -270,12 +243,13 @@ class CaconfDbExporter extends DbPorter {
     }
   } // method exportPublisher
 
-  private void exportProfile(CaCertstore.Caconf caconf)
+  private void exportProfile(CaConfType.CaSystem caconf)
       throws DataAccessException, IOException, InvalidConfException {
     System.out.print("    exporting table PROFILE ... ");
     boolean succ = false;
 
-    List<CaCertstore.IdNameTypeConf> profiles = new LinkedList<>();
+    List<CaConfType.NameTypeConf> profiles = new LinkedList<>();
+    caconf.setProfiles(profiles);
     final String sql = "SELECT ID,NAME,TYPE,CONF FROM PROFILE";
 
     PreparedStatement stmt = null;
@@ -287,7 +261,7 @@ class CaconfDbExporter extends DbPorter {
       while (rs.next()) {
         String name = rs.getString("NAME");
 
-        CaCertstore.IdNameTypeConf profile = new CaCertstore.IdNameTypeConf();
+        CaConfType.NameTypeConf profile = new CaConfType.NameTypeConf();
         profile.setId(rs.getInt("ID"));
         profile.setName(name);
         profile.setType(rs.getString("TYPE"));
@@ -307,17 +281,23 @@ class CaconfDbExporter extends DbPorter {
     }
   } // method exportProfile
 
-  private void exportCa(CaCertstore.Caconf caconf)
+  private void exportCa(CaConfType.CaSystem caconf)
       throws DataAccessException, IOException, InvalidConfException {
     System.out.print("    exporting table CA ... ");
     boolean succ = false;
 
-    List<CaCertstore.Ca> cas = new LinkedList<>();
+    caconf.setCas(new LinkedList<>());
 
-    //String columns =
-    //    "ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,"
-    //    + "SUBJECT,REV_INFO,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN,CONF "
-    //
+    // caAliases
+    Map<String, Integer> aliasToCaIdMap = getCaAliases();
+    Map<Integer, List<String>> caHassPublishersMap = getCaHasPublishers(caconf.getPublishers());
+
+    // caHasRequestors
+    Map<Integer, List<CaConfType.CaHasRequestor>> caHasRequestorsMap = getCaHasRequestors(caconf.getRequestors());
+
+    // caHasProfiles
+    Map<Integer, List<String>> caHasProfilesMap = getCaHasProfiles(caconf.getProfiles());
+
     String columns = "SELECT ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,REV_INFO,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN";
     if (dbSchemaVersion >= 7) {
       columns += ",CONF";
@@ -335,25 +315,52 @@ class CaconfDbExporter extends DbPorter {
       rs = stmt.executeQuery();
 
       while (rs.next()) {
-        CaCertstore.Ca ca = new CaCertstore.Ca();
-        ca.setId(rs.getInt("ID"));
+        CaConfType.Ca ca = new CaConfType.Ca();
+        caconf.getCas().add(ca);
+
+        int id = rs.getInt("ID");
+        ca.setId(id);
         String name = rs.getString("NAME");
         ca.setName(name);
-        ca.setNextCrlNo(rs.getLong("NEXT_CRLNO"));
-        ca.setStatus(rs.getString("STATUS"));
-        ca.setCert(buildFileOrBase64Binary(rs.getString("CERT"), "ca-conf/cert-ca-" + name + ".der"));
-        ca.setCertchain(buildFileOrValue(rs.getString("CERTCHAIN"), "ca-conf/certchain-ca-" + name + ".pem"));
-        ca.setSignerType(rs.getString("SIGNER_TYPE"));
-        ca.setSignerConf(buildFileOrValue(rs.getString("SIGNER_CONF"), "ca-conf/signerconf-ca-" + name));
-        ca.setRevInfo(rs.getString("REV_INFO"));
-        ca.setCrlSignerName(rs.getString("CRL_SIGNER_NAME"));
 
-        String confColumn;
+        CaConfType.CaInfo ci = new CaConfType.CaInfo();
+        ca.setCaInfo(ci);
+
+        ci.setNextCrlNo(rs.getLong("NEXT_CRLNO"));
+        ci.setStatus(CaStatus.forName(rs.getString("STATUS")));
+        ci.setCert(buildFileOrBase64Binary(rs.getString("CERT"), "ca-conf/cert-ca-" + name + ".der"));
+
+        String encodedCertchain = rs.getString("CERTCHAIN");
+        if (StringUtil.isNotBlank(encodedCertchain)) {
+          List<X509Cert> certchain;
+          try {
+            certchain = X509Util.listCertificates(encodedCertchain);
+          } catch (CertificateException e) {
+            throw new InvalidConfException("error parsing CERTCHAIN of CA " + name);
+          }
+          List<FileOrBinary> ccList = new ArrayList<>(certchain.size());
+          for (int i = 0; i < certchain.size(); i++) {
+            byte[] certBytes = certchain.get(i).getEncoded();
+            ccList.add(buildFileOrBinary(certBytes, "ca-conf/ca-" + name + "-certchain-" + i + ".der"));
+          }
+          ci.setCertchain(ccList);
+        }
+
+        ci.setSignerType(rs.getString("SIGNER_TYPE"));
+        ci.setSignerConf(buildFileOrValue(rs.getString("SIGNER_CONF"), "ca-conf/signerconf-ca-" + name));
+
+        String revInfoStr = rs.getString("REV_INFO");
+        if (revInfoStr != null) {
+          ci.setRevocationInfo(CertRevocationInfo.fromEncoded(revInfoStr));
+        }
+        ci.setCrlSignerName(rs.getString("CRL_SIGNER_NAME"));
+
+        CaConfColumn ccc;
         if (dbSchemaVersion >= 7) {
-          confColumn = rs.getString("CONF");
-          CaConfColumn.decode(confColumn); // validate the confColumn
+          String confColumn = rs.getString("CONF");
+          ccc = CaConfColumn.decode(confColumn); // validate the confColumn
         } else {
-          CaConfColumn ccc = new CaConfColumn();
+          ccc = new CaConfColumn();
           ccc.setSnSize(rs.getInt("SN_SIZE"));
 
           String str = rs.getString("CA_URIS");
@@ -365,7 +372,10 @@ class CaconfDbExporter extends DbPorter {
             ccc.setOcspUris(caUris.getOcspUris());
           }
 
-          ccc.setMaxValidity(rs.getString("MAX_VALIDITY"));
+          str = rs.getString("MAX_VALIDITY");
+          if (StringUtil.isNotBlank(str)) {
+            ccc.setMaxValidity(Validity.getInstance(str));
+          }
 
           str = rs.getString("CRL_CONTROL");
           if (StringUtil.isNotBlank(str)) {
@@ -380,7 +390,11 @@ class CaconfDbExporter extends DbPorter {
           ccc.setPermission(rs.getInt("PERMISSION"));
           ccc.setExpirationPeriod(rs.getInt("EXPIRATION_PERIOD"));
           ccc.setKeepExpiredCertDays(rs.getInt("KEEP_EXPIRED_CERT_DAYS"));
-          ccc.setValidityMode(rs.getString("VALIDITY_MODE"));
+
+          str = rs.getString("VALIDITY_MODE");
+          if (StringUtil.isNotBlank(str)) {
+            ccc.setValidityMode(ValidityMode.forName(str));
+          }
 
           str = rs.getString("EXTRA_CONTROL");
           if (StringUtil.isNotBlank(str)) {
@@ -397,16 +411,28 @@ class CaconfDbExporter extends DbPorter {
           ccc.setKeypairGenNames(Collections.singletonList("software"));
           ccc.setSaveCert(true);
           ccc.setSaveKeypair(false);
+        }
 
-          confColumn = ccc.encode();
+        adoptConfColumn(ca, ccc);
+
+        // CA-has-*
+        ca.setProfiles(caHasProfilesMap.get(id));
+        ca.setProfiles(caHasProfilesMap.get(id));
+        ca.setRequestors(caHasRequestorsMap.get(id));
+        ca.setPublishers(caHassPublishersMap.get(id));
+        List<String> aliases = new LinkedList<>();
+        for (Map.Entry<String, Integer> m : aliasToCaIdMap.entrySet()) {
+          if (m.getValue() == id) {
+            aliases.add(m.getKey());
+          }
+        }
+        if (!aliases.isEmpty()) {
+          ca.setAliases(aliases);
         }
 
         ca.validate();
-        ca.setConfColumn(buildFileOrValue(confColumn, "ca-conf/" + name + ".conf"));
-        cas.add(ca);
       }
 
-      caconf.setCas(cas);
       succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
@@ -416,13 +442,53 @@ class CaconfDbExporter extends DbPorter {
     }
   } // method exportCa
 
-  private void exportCaHasRequestor(CaCertstore.Caconf caconf)
-      throws DataAccessException, InvalidConfException {
-    System.out.print("    exporting table CA_HAS_REQUESTOR ... ");
-    boolean succ = false;
+  public void adoptConfColumn(CaConfType.Ca ca, CaConfColumn cc) {
+    CaConfType.CaInfo caInfo = ca.getCaInfo();
+    // CA URIS
+    if (cc.getCacertUris() != null || cc.getCrlUris() != null
+        || cc.getDeltaCrlUris() != null || cc.getOcspUris() != null) {
+      caInfo.setCaUris(new CaUris(cc.getCacertUris(), cc.getOcspUris(), cc.getCrlUris(), cc.getDeltaCrlUris()));
+    }
 
-    List<CaCertstore.CaHasRequestor> caHasRequestors = new LinkedList<>();
-    final String sql = "SELECT CA_ID,REQUESTOR_ID,PERMISSION,PROFILES FROM CA_HAS_REQUESTOR";
+    // CRL Control
+    if (cc.getCrlControl() != null) {
+      caInfo.setCrlControl(cc.getCrlControl());
+    }
+
+    // CTLog Control
+    if (cc.getCtlogControl() != null) {
+      caInfo.setCtlogControl(cc.getCtlogControl());
+    }
+
+    if (cc.getExtraControl() != null) {
+      caInfo.setExtraControl(cc.getExtraControl());
+    }
+
+    if (cc.getRevokeSuspendedControl() != null) {
+      caInfo.setRevokeSuspendedControl(cc.getRevokeSuspendedControl());
+    }
+
+    caInfo.setSnSize(cc.getSnSize());
+    if (cc.getMaxValidity() != null) {
+      caInfo.setMaxValidity(cc.getMaxValidity());
+    }
+
+    caInfo.setKeypairGenNames(cc.getKeypairGenNames());
+    caInfo.setSaveKeypair(cc.isSaveKeypair());
+    caInfo.setSaveKeypair(cc.isSaveKeypair());
+    caInfo.setPermissions(PermissionConstants.permissionToStringSet(cc.getPermission()));
+    caInfo.setNumCrls(cc.getNumCrls());
+    caInfo.setExpirationPeriod(cc.getExpirationPeriod());
+    caInfo.setKeepExpiredCertDays(cc.getKeepExpiredCertDays());
+
+    if (cc.getValidityMode() != null) {
+      cc.setValidityMode(cc.getValidityMode());
+    }
+  }
+
+  private Map<String, Integer> getCaAliases() throws DataAccessException {
+    Map<String, Integer> ret = new HashMap<>();
+    final String sql = "SELECT NAME,CA_ID FROM CAALIAS";
 
     PreparedStatement stmt = null;
     ResultSet rs = null;
@@ -431,31 +497,21 @@ class CaconfDbExporter extends DbPorter {
       rs = stmt.executeQuery();
 
       while (rs.next()) {
-        CaCertstore.CaHasRequestor caHasRequestor = new CaCertstore.CaHasRequestor();
-        caHasRequestor.setCaId(rs.getInt("CA_ID"));
-        caHasRequestor.setRequestorId(rs.getInt("REQUESTOR_ID"));
-        caHasRequestor.setPermission(rs.getInt("PERMISSION"));
-        caHasRequestor.setProfiles(rs.getString("PROFILES"));
-
-        caHasRequestor.validate();
-        caHasRequestors.add(caHasRequestor);
+        ret.put(rs.getString("NAME"), rs.getInt("CA_ID"));
       }
-
-      caconf.setCaHasRequestors(caHasRequestors);
-      succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
       releaseResources(stmt, rs);
-      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-  } // method exportCaHasRequestor
 
-  private void exportCaHasPublisher(CaCertstore.Caconf caconf)
-      throws DataAccessException, InvalidConfException {
-    System.out.print("    exporting table CA_HAS_PUBLISHER ... ");
-    boolean succ = false;
-    List<CaCertstore.CaHasPublisher> caHasPublishers = new LinkedList<>();
+    return ret;
+  }
+
+  private Map<Integer, List<String>> getCaHasPublishers(List<CaConfType.NameTypeConf> publishers)
+      throws DataAccessException {
+    Map<Integer, String> publisherIdToNameMap = idToNameMap(publishers);
+    Map<Integer, List<String>> ret = new HashMap<>();
     final String sql = "SELECT CA_ID,PUBLISHER_ID FROM CA_HAS_PUBLISHER";
 
     PreparedStatement stmt = null;
@@ -465,29 +521,26 @@ class CaconfDbExporter extends DbPorter {
       rs = stmt.executeQuery();
 
       while (rs.next()) {
-        CaCertstore.CaHasPublisher caHasPublisher = new CaCertstore.CaHasPublisher();
-        caHasPublisher.setCaId(rs.getInt("CA_ID"));
-        caHasPublisher.setPublisherId(rs.getInt("PUBLISHER_ID"));
-
-        caHasPublisher.validate();
-        caHasPublishers.add(caHasPublisher);
+        int caId = rs.getInt("CA_ID");
+        int publisherId = rs.getInt("PUBLISHER_ID");
+        List<String> publisherNames = ret.computeIfAbsent(caId, k -> new LinkedList<>());
+        publisherNames.add(publisherIdToNameMap.get(publisherId));
       }
-      caconf.setCaHasPublishers(caHasPublishers);
-      succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
       releaseResources(stmt, rs);
-      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-  } // method exportCaHasPublisher
 
-  private void exportCaHasProfile(CaCertstore.Caconf caconf)
-      throws DataAccessException, InvalidConfException {
-    System.out.print("    exporting table CA_HAS_PROFILE ... ");
-    boolean succ = false;
+    return ret;
+  }
 
-    List<CaCertstore.CaHasProfile> caHasProfiles = new LinkedList<>();
+  private Map<Integer, List<String>> getCaHasProfiles(List<CaConfType.NameTypeConf> profiles)
+      throws DataAccessException {
+    Map<Integer, String> profileIdToNameMap = idToNameMap(profiles);
+
+    Map<Integer, List<String>> ret = new HashMap<>();
+
     String sql = "SELECT CA_ID,PROFILE_ID";
     if (dbSchemaVersion > 8) {
       sql += ",ALIASES";
@@ -501,24 +554,68 @@ class CaconfDbExporter extends DbPorter {
       rs = stmt.executeQuery();
 
       while (rs.next()) {
-        CaCertstore.CaHasProfile caHasProfile = new CaCertstore.CaHasProfile();
-        caHasProfile.setCaId(rs.getInt("CA_ID"));
-        caHasProfile.setProfileId(rs.getInt("PROFILE_ID"));
+        int caId = rs.getInt("CA_ID");
+        int profileId = rs.getInt("PROFILE_ID");
+        String profileNameAndAliases = profileIdToNameMap.get(profileId);
         if (dbSchemaVersion > 8) {
-          caHasProfile.setAliases(rs.getString("ALIASES"));
+          String aliases = rs.getString("ALIASES");
+          profileNameAndAliases += ":" + aliases;
         }
 
-        caHasProfile.validate();
-        caHasProfiles.add(caHasProfile);
+        List<String> set = ret.computeIfAbsent(caId, k -> new LinkedList<>());
+        set.add(profileNameAndAliases);
       }
-      caconf.setCaHasProfiles(caHasProfiles);
-      succ = true;
     } catch (SQLException ex) {
       throw translate(sql, ex);
     } finally {
       releaseResources(stmt, rs);
-      System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
-  } // method exportCaHasProfile
+
+    return ret;
+  }
+
+  private Map<Integer, List<CaConfType.CaHasRequestor>> getCaHasRequestors(List<CaConfType.Requestor> requestors)
+      throws DataAccessException {
+    Map<Integer, String> requestorIdToNameMap = idToNameMap(requestors);
+    Map<Integer, List<CaConfType.CaHasRequestor>> ret = new HashMap<>();
+
+    final String sql = "SELECT CA_ID,REQUESTOR_ID,PERMISSION,PROFILES FROM CA_HAS_REQUESTOR";
+
+    PreparedStatement stmt = null;
+    ResultSet rs = null;
+    try {
+      stmt = prepareStatement(sql);
+      rs = stmt.executeQuery();
+
+      while (rs.next()) {
+        int caId = rs.getInt("CA_ID");
+        int requestorId = rs.getInt("REQUESTOR_ID");
+        int permission = rs.getInt("PERMISSION");
+        String profiles = rs.getString("PROFILES");
+
+        CaConfType.CaHasRequestor m = new CaConfType.CaHasRequestor();
+        m.setRequestorName(requestorIdToNameMap.get(requestorId));
+        m.setProfiles(StringUtil.split(profiles, ","));
+        m.setPermissions(PermissionConstants.permissionToStringSet(permission));
+
+        List<CaConfType.CaHasRequestor> set = ret.computeIfAbsent(caId, k -> new LinkedList<>());
+        set.add(m);
+      }
+    } catch (SQLException ex) {
+      throw translate(sql, ex);
+    } finally {
+      releaseResources(stmt, rs);
+    }
+
+    return ret;
+  }
+
+  private static Map<Integer, String> idToNameMap(List<? extends CaConfType.IdNameConf> entries) {
+    Map<Integer, String> ret = new HashMap<>();
+    for (CaConfType.IdNameConf m : entries) {
+      ret.put(m.getId(), m.getName());
+    }
+    return ret;
+  }
 
 }

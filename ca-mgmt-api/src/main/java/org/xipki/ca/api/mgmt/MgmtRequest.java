@@ -56,13 +56,13 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   public static class AddCa extends MgmtRequest {
 
-    private CaEntryWrapper caEntry;
+    private CaEntry caEntry;
 
-    public CaEntryWrapper getCaEntry() {
+    public CaEntry getCaEntry() {
       return caEntry;
     }
 
-    public void setCaEntry(CaEntryWrapper caEntry) {
+    public void setCaEntry(CaEntry caEntry) {
       this.caEntry = caEntry;
     }
 
@@ -168,13 +168,13 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   public static class AddSigner extends MgmtRequest {
 
-    private SignerEntryWrapper signerEntry;
+    private SignerEntry signerEntry;
 
-    public SignerEntryWrapper getSignerEntry() {
+    public SignerEntry getSignerEntry() {
       return signerEntry;
     }
 
-    public void setSignerEntry(SignerEntryWrapper signerEntry) {
+    public void setSignerEntry(SignerEntry signerEntry) {
       this.signerEntry = signerEntry;
     }
 
@@ -426,7 +426,7 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   public static class GenerateRootCa extends MgmtRequest {
 
-    private CaEntryWrapper caEntry;
+    private CaEntry caEntry;
 
     private String certprofileName;
 
@@ -438,11 +438,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     private Instant notAfter;
 
-    public CaEntryWrapper getCaEntry() {
+    public CaEntry getCaEntry() {
       return caEntry;
     }
 
-    public void setCaEntry(CaEntryWrapper caEntry) {
+    public void setCaEntry(CaEntry caEntry) {
       this.caEntry = caEntry;
     }
 

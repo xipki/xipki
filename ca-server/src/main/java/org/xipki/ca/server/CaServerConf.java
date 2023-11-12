@@ -4,12 +4,12 @@
 package org.xipki.ca.server;
 
 import org.xipki.audit.Audits.AuditConf;
+import org.xipki.ca.api.mgmt.CaJson;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.security.Securities.SecurityConf;
 import org.xipki.security.util.TlsHelper;
 import org.xipki.util.Args;
 import org.xipki.util.FileOrBinary;
-import org.xipki.util.JSON;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
@@ -152,11 +152,13 @@ public class CaServerConf extends ValidatableConf {
    */
   private List<String> certprofileFactories;
 
+  private List<String> caConfFiles;
+
   private final Map<String, SslContextConf> sslContextConfMap = new HashMap<>();
 
   public static CaServerConf readConfFromFile(String fileName) throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");
-    CaServerConf conf = JSON.parseObject(new File(fileName), CaServerConf.class);
+    CaServerConf conf = CaJson.parseObject(new File(fileName), CaServerConf.class);
     conf.validate();
     return conf;
   }
@@ -207,6 +209,14 @@ public class CaServerConf extends ValidatableConf {
 
   public void setShardId(int shardId) {
     this.shardId = shardId;
+  }
+
+  public List<String> getCaConfFiles() {
+    return caConfFiles;
+  }
+
+  public void setCaConfFiles(List<String> caConfFiles) {
+    this.caConfFiles = caConfFiles;
   }
 
   public List<DataSourceConf> getDatasources() {
@@ -307,7 +317,7 @@ public class CaServerConf extends ValidatableConf {
       throw new InvalidConfException("shardId is not in [0, 127]");
     }
 
-    notEmpty(datasources, "datasources");
+    //notEmpty(datasources, "datasources");
     validate(remoteMgmt, security);
     TlsHelper.checkReverseProxyMode(reverseProxyMode);
   }

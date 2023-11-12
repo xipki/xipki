@@ -3,8 +3,6 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.FileOrValue;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.exception.InvalidConfException;
 
@@ -18,421 +16,6 @@ import java.util.List;
  */
 
 public class CaCertstore extends ValidatableConf {
-
-  public static class Ca extends ValidatableConf {
-
-    private int id;
-
-    private String name;
-
-    private long nextCrlNo;
-
-    private String status;
-
-    private FileOrBinary cert;
-
-    private FileOrValue certchain;
-
-    private String signerType;
-
-    private FileOrValue signerConf;
-
-    private String revInfo;
-
-    private String crlSignerName;
-
-    private FileOrValue confColumn;
-
-    public int getId() {
-      return id;
-    }
-
-    public void setId(int id) {
-      this.id = id;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String name) {
-      this.name = name;
-    }
-
-    public long getNextCrlNo() {
-      return nextCrlNo;
-    }
-
-    public void setNextCrlNo(long nextCrlNo) {
-      this.nextCrlNo = nextCrlNo;
-    }
-
-    public String getStatus() {
-      return status;
-    }
-
-    public void setStatus(String status) {
-      this.status = status;
-    }
-
-    public FileOrBinary getCert() {
-      return cert;
-    }
-
-    public void setCert(FileOrBinary cert) {
-      this.cert = cert;
-    }
-
-    public FileOrValue getCertchain() {
-      return certchain;
-    }
-
-    public void setCertchain(FileOrValue certchain) {
-      this.certchain = certchain;
-    }
-
-    public String getSignerType() {
-      return signerType;
-    }
-
-    public void setSignerType(String signerType) {
-      this.signerType = signerType;
-    }
-
-    public FileOrValue getSignerConf() {
-      return signerConf;
-    }
-
-    public void setSignerConf(FileOrValue signerConf) {
-      this.signerConf = signerConf;
-    }
-
-    public String getRevInfo() {
-      return revInfo;
-    }
-
-    public void setRevInfo(String revInfo) {
-      this.revInfo = revInfo;
-    }
-
-    public String getCrlSignerName() {
-      return crlSignerName;
-    }
-
-    public void setCrlSignerName(String crlSignerName) {
-      this.crlSignerName = crlSignerName;
-    }
-
-    public FileOrValue getConfColumn() {
-      return confColumn;
-    }
-
-    public void setConfColumn(FileOrValue confColumn) {
-      this.confColumn = confColumn;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notBlank(name, "name");
-      notBlank(status, "status");
-
-      notNull(cert, "cert");
-      cert.validate();
-
-      notBlank(signerType, "signerType");
-
-      notNull(signerConf, "signerConf");
-      signerConf.validate();
-    }
-
-  } // class Ca
-
-  public static class Caalias extends ValidatableConf {
-
-    private int caId;
-
-    private String name;
-
-    public int getCaId() {
-      return caId;
-    }
-
-    public void setCaId(int caId) {
-      this.caId = caId;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String name) {
-      this.name = name;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notBlank(name, "name");
-    }
-
-  } // class Caalias
-
-  public static class Caconf extends ValidatableConf {
-
-    private int version;
-
-    private List<DbSchemaEntry> dbSchemas;
-
-    private List<Signer> signers;
-
-    private List<NameTypeConf> keypairGens;
-
-    private List<IdNameTypeConf> requestors;
-
-    private List<IdNameTypeConf> publishers;
-
-    private List<IdNameTypeConf> profiles;
-
-    private List<Ca> cas;
-
-    private List<Caalias> caaliases;
-
-    private List<CaHasRequestor> caHasRequestors;
-
-    private List<CaHasPublisher> caHasPublishers;
-
-    private List<CaHasProfile> caHasProfiles;
-
-    public int getVersion() {
-      return version;
-    }
-
-    public void setVersion(int version) {
-      this.version = version;
-    }
-
-    public List<DbSchemaEntry> getDbSchemas() {
-      if (dbSchemas == null) {
-        dbSchemas = new LinkedList<>();
-      }
-      return dbSchemas;
-    }
-
-    public void setDbSchemas(List<DbSchemaEntry> dbSchemas) {
-      this.dbSchemas = dbSchemas;
-    }
-
-    public List<Signer> getSigners() {
-      if (signers == null) {
-        signers = new LinkedList<>();
-      }
-      return signers;
-    }
-
-    public void setSigners(List<Signer> signers) {
-      this.signers = signers;
-    }
-
-    public List<IdNameTypeConf> getRequestors() {
-      if (requestors == null) {
-        requestors = new LinkedList<>();
-      }
-      return requestors;
-    }
-
-    public void setRequestors(List<IdNameTypeConf> requestors) {
-      this.requestors = requestors;
-    }
-
-    public List<IdNameTypeConf> getPublishers() {
-      if (publishers == null) {
-        publishers = new LinkedList<>();
-      }
-      return publishers;
-    }
-
-    public void setPublishers(List<IdNameTypeConf> publishers) {
-      this.publishers = publishers;
-    }
-
-    public List<IdNameTypeConf> getProfiles() {
-      if (profiles == null) {
-        profiles = new LinkedList<>();
-      }
-      return profiles;
-    }
-
-    public void setProfiles(List<IdNameTypeConf> profiles) {
-      this.profiles = profiles;
-    }
-
-    public List<Ca> getCas() {
-      if (cas == null) {
-        cas = new LinkedList<>();
-      }
-      return cas;
-    }
-
-    public void setCas(List<Ca> cas) {
-      this.cas = cas;
-    }
-
-    public List<Caalias> getCaaliases() {
-      if (caaliases == null) {
-        caaliases = new LinkedList<>();
-      }
-      return caaliases;
-    }
-
-    public void setCaaliases(List<Caalias> caaliases) {
-      this.caaliases = caaliases;
-    }
-
-    public List<CaHasRequestor> getCaHasRequestors() {
-      if (caHasRequestors == null) {
-        caHasRequestors = new LinkedList<>();
-      }
-      return caHasRequestors;
-    }
-
-    public void setCaHasRequestors(List<CaHasRequestor> caHasRequestors) {
-      this.caHasRequestors = caHasRequestors;
-    }
-
-    public List<CaHasPublisher> getCaHasPublishers() {
-      if (caHasPublishers == null) {
-        caHasPublishers = new LinkedList<>();
-      }
-      return caHasPublishers;
-    }
-
-    public void setCaHasPublishers(List<CaHasPublisher> caHasPublishers) {
-      this.caHasPublishers = caHasPublishers;
-    }
-
-    public List<CaHasProfile> getCaHasProfiles() {
-      if (caHasProfiles == null) {
-        caHasProfiles = new LinkedList<>();
-      }
-      return caHasProfiles;
-    }
-
-    public void setCaHasProfiles(List<CaHasProfile> caHasProfiles) {
-      this.caHasProfiles = caHasProfiles;
-    }
-
-    public List<NameTypeConf> getKeypairGens() {
-      return keypairGens;
-    }
-
-    public void setKeypairGens(List<NameTypeConf> keypairGens) {
-      this.keypairGens = keypairGens;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      validate(signers, requestors, publishers, profiles, cas, caaliases,
-          caHasRequestors, caHasPublishers, caHasProfiles, keypairGens);
-    }
-
-  } // class Caconf
-
-  public abstract static class CaHasEntry extends ValidatableConf {
-
-    private int caId;
-
-    public int getCaId() {
-      return caId;
-    }
-
-    public void setCaId(int caId) {
-      this.caId = caId;
-    }
-
-  } // class CaHasEntry
-
-  public static class CaHasPublisher extends CaHasEntry {
-
-    private int publisherId;
-
-    public int getPublisherId() {
-      return publisherId;
-    }
-
-    public void setPublisherId(int publisherId) {
-      this.publisherId = publisherId;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-    }
-
-  } // class CaHasPublisher
-
-  public static class CaHasProfile extends CaHasEntry {
-
-    private int profileId;
-
-    private String aliases;
-
-    public int getProfileId() {
-      return profileId;
-    }
-
-    public void setProfileId(int profileId) {
-      this.profileId = profileId;
-    }
-
-    public String getAliases() {
-      return aliases;
-    }
-
-    public void setAliases(String aliases) {
-      this.aliases = aliases;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-    }
-
-  } // class CaHasProfile
-
-  public static class CaHasRequestor extends CaHasEntry {
-
-    private int requestorId;
-
-    private int permission;
-
-    private String profiles;
-
-    public int getRequestorId() {
-      return requestorId;
-    }
-
-    public void setRequestorId(int requestorId) {
-      this.requestorId = requestorId;
-    }
-
-    public int getPermission() {
-      return permission;
-    }
-
-    public void setPermission(int permission) {
-      this.permission = permission;
-    }
-
-    public String getProfiles() {
-      return profiles;
-    }
-
-    public void setProfiles(String profiles) {
-      this.profiles = profiles;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-    }
-
-  } // class CaHasRequestor
 
   public static class Cert extends IdentifiedDbObject {
 
@@ -752,80 +335,9 @@ public class CaCertstore extends ValidatableConf {
 
   } // class Crls
 
-  public static class DbSchemaEntry extends ValidatableConf {
-
-    private String name;
-    private String value;
-
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String name) {
-      this.name = name;
-    }
-
-    public String getValue() {
-      return value;
-    }
-
-    public void setValue(String value) {
-      this.value = value;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notBlank(name, "name");
-      notNull(value, "value");
-    }
-  }
-
-  public static class NameTypeConf extends ValidatableConf {
-
-    private String name;
-
-    private String type;
-
-    private FileOrValue conf;
-
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String name) {
-      this.name = name;
-    }
-
-    public String getType() {
-      return type;
-    }
-
-    public void setType(String type) {
-      this.type = type;
-    }
-
-    public FileOrValue getConf() {
-      return conf;
-    }
-
-    public void setConf(FileOrValue conf) {
-      this.conf = conf;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notBlank(name, "name");
-      notBlank(type, "type");
-      if (conf != null) {
-        conf.validate();
-      }
-    }
-
-  } // class IdNameTypeConf
-
-  public static class IdNameTypeConf extends NameTypeConf {
-
+  public static class IdName extends ValidatableConf {
     private int id;
+    private String name;
 
     public int getId() {
       return id;
@@ -835,18 +347,6 @@ public class CaCertstore extends ValidatableConf {
       this.id = id;
     }
 
-  } // class IdNameTypeConf
-
-  public static class Signer extends ValidatableConf {
-
-    private String name;
-
-    private String type;
-
-    private FileOrValue conf;
-
-    private FileOrBinary cert;
-
     public String getName() {
       return name;
     }
@@ -855,46 +355,53 @@ public class CaCertstore extends ValidatableConf {
       this.name = name;
     }
 
-    public String getType() {
-      return type;
+    @Override
+    public void validate() throws InvalidConfException {
+      notBlank(name, "name");
     }
+  }
 
-    public void setType(String type) {
-      this.type = type;
-    }
+  public static class Ca extends IdName {
 
-    public FileOrValue getConf() {
-      return conf;
-    }
+    private String revInfo;
 
-    public void setConf(FileOrValue conf) {
-      this.conf = conf;
-    }
+    private byte[] cert;
 
-    public FileOrBinary getCert() {
+    public byte[] getCert() {
       return cert;
     }
 
-    public void setCert(FileOrBinary cert) {
+    public void setCert(byte[] cert) {
       this.cert = cert;
+    }
+
+    public String getRevInfo() {
+      return revInfo;
+    }
+
+    public void setRevInfo(String revInfo) {
+      this.revInfo = revInfo;
     }
 
     @Override
     public void validate() throws InvalidConfException {
-      notBlank(name, "name");
-      notBlank(type, "type");
-      notNull(conf, "conf");
-      conf.validate();
-      validate(cert);
+      super.validate();
+      notNull(cert, "cert");
     }
 
-  } // class Signer
+  }
 
   private int version;
 
   private int countCrls;
 
   private int countCerts;
+
+  private List<Ca> cas;
+
+  private List<IdName> requestors;
+
+  private List<IdName> profiles;
 
   public int getVersion() {
     return version;
@@ -918,6 +425,30 @@ public class CaCertstore extends ValidatableConf {
 
   public void setCountCerts(int countCerts) {
     this.countCerts = countCerts;
+  }
+
+  public List<Ca> getCas() {
+    return cas;
+  }
+
+  public void setCas(List<Ca> cas) {
+    this.cas = cas;
+  }
+
+  public List<IdName> getRequestors() {
+    return requestors;
+  }
+
+  public void setRequestors(List<IdName> requestors) {
+    this.requestors = requestors;
+  }
+
+  public List<IdName> getProfiles() {
+    return profiles;
+  }
+
+  public void setProfiles(List<IdName> profiles) {
+    this.profiles = profiles;
   }
 
   @Override

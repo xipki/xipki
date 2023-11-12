@@ -23,6 +23,7 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
+import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValues;
@@ -523,7 +524,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     while (true) {
       if (StringUtil.isBlank(serialNumberMode) || "CA".equalsIgnoreCase(serialNumberMode)) {
         serialNumber = caInfo.nextSerial();
-        if (caInfo.getCaEntry().getSerialNoLen() > 12) {
+        if (caInfo.getCaEntry().getSnSize() > 12) {
           // Serial number have enough entropy (at least 12 bytes), do not check the uniqueness.
           // We need 2^{48} (about 10^{16}) serial numbers to have two same serial numbers with
           // 1/2 probability.
@@ -569,8 +570,8 @@ public class X509Ca extends X509CaModule implements Closeable {
     CertificateInfo ret;
 
     try {
-      SignerEntryWrapper crlSigner = crlModule.getCrlSigner();
-      X509Cert crlSignerCert = (crlSigner == null) ? null : crlSigner.getSigner().getCertificate();
+      SignerEntry crlSigner = crlModule.getCrlSigner();
+      X509Cert crlSignerCert = (crlSigner == null) ? null : crlSigner.getCertificate();
 
       ExtensionValues extensionTuples = certprofile.getExtensions(gct.requestedSubject,
           gct.grantedSubject, gct.extensions, gct.grantedPublicKey, caInfo.getPublicCaInfo(),

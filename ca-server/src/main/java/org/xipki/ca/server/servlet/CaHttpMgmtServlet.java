@@ -8,9 +8,6 @@ import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.mgmt.*;
-import org.xipki.ca.api.mgmt.MgmtMessage.CaEntryWrapper;
-import org.xipki.ca.api.mgmt.MgmtMessage.MgmtAction;
-import org.xipki.ca.api.mgmt.MgmtMessage.SignerEntryWrapper;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.security.KeyCertBytesPair;
 import org.xipki.security.X509Cert;
@@ -18,8 +15,6 @@ import org.xipki.security.util.TlsHelper;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
-import org.xipki.util.JSON;
-import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpRequest;
@@ -27,7 +22,6 @@ import org.xipki.util.http.XiHttpResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -104,15 +98,7 @@ class CaHttpMgmtServlet {
       switch (action) {
         case addCa: {
           MgmtRequest.AddCa req = parse(requestStream, MgmtRequest.AddCa.class);
-          CaEntry caEntry;
-          try {
-            caEntry = req.getCaEntry().toCaEntry();
-          } catch (CertificateException | InvalidConfException ex) {
-            LOG.error(action + ": could not build the CaEntry", ex);
-            throw new MyException(HttpStatusCode.SC_BAD_REQUEST,
-                "could not build the CaEntry: " + ex.getMessage());
-          }
-          caManager.addCa(caEntry);
+          caManager.addCa(req.getCaEntry());
           break;
         }
         case addCaAlias: {
@@ -152,7 +138,7 @@ class CaHttpMgmtServlet {
         }
         case addSigner: {
           MgmtRequest.AddSigner req = parse(requestStream, MgmtRequest.AddSigner.class);
-          caManager.addSigner(req.getSignerEntry().toSignerEntry());
+          caManager.addSigner(req.getSignerEntry());
           break;
         }
         case changeCa: {
@@ -215,16 +201,7 @@ class CaHttpMgmtServlet {
         case generateRootCa: {
           MgmtRequest.GenerateRootCa req = parse(requestStream, MgmtRequest.GenerateRootCa.class);
 
-          CaEntry caEntry;
-          try {
-            caEntry = req.getCaEntry().toCaEntry();
-          } catch (CertificateException | InvalidConfException ex) {
-            LOG.error(action + ": could not build the CaEntry", ex);
-            throw new MyException(HttpStatusCode.SC_BAD_REQUEST,
-                "could not build the CaEntry: " + ex.getMessage());
-          }
-
-          X509Cert cert = caManager.generateRootCa(caEntry, req.getCertprofileName(), req.getSubject(),
+          X509Cert cert = caManager.generateRootCa(req.getCaEntry(), req.getCertprofileName(), req.getSubject(),
               req.getSerialNumber(), req.getNotBefore(), req.getNotAfter());
           resp = toByteArray(cert);
           break;
@@ -237,7 +214,7 @@ class CaHttpMgmtServlet {
           String name = getNameFromRequest(requestStream);
           CaEntry caEntry = Optional.ofNullable(caManager.getCa(name)).orElseThrow(
               () -> new CaMgmtException("Unknown CA " + name));
-          resp = new MgmtResponse.GetCa(new CaEntryWrapper(caEntry));
+          resp = new MgmtResponse.GetCa(caEntry);
           break;
         }
         case getCaAliasNames: {
@@ -351,7 +328,7 @@ class CaHttpMgmtServlet {
           String name = getNameFromRequest(requestStream);
           SignerEntry result = Optional.ofNullable(caManager.getSigner(name)).orElseThrow(
             () -> new CaMgmtException("Unknown signer " + name));
-          resp = new MgmtResponse.GetSigner(new SignerEntryWrapper(result));
+          resp = new MgmtResponse.GetSigner(result);
           break;
         }
         case getSignerNames: {
@@ -540,7 +517,7 @@ class CaHttpMgmtServlet {
         }
       }
 
-      byte[] respBytes = resp == null ? new byte[0] : JSON.toJSONBytes(resp);
+      byte[] respBytes = resp == null ? new byte[0] : CaJson.toJSONBytes(resp);
       new HttpResponse(HttpStatusCode.SC_OK, CT_RESPONSE, null, respBytes).fillResponse(response);
     } catch (MyException ex) {
       Map<String, String> headers = Collections.singletonMap(HttpConstants.HEADER_XIPKI_ERROR, ex.getMessage());
@@ -599,9 +576,9 @@ class CaHttpMgmtServlet {
       if (LOG.isDebugEnabled()) {
         byte[] reqBytes = IoUtil.readAllBytes(nin);
         LOG.debug("received request ({}): {}", clazz.getName(), new String(reqBytes));
-        return JSON.parseObject(reqBytes, clazz);
+        return CaJson.parseObject(reqBytes, clazz);
       } else {
-        return JSON.parseObject(nin, clazz);
+        return CaJson.parseObject(nin, clazz);
       }
     } catch (IOException | RuntimeException ex) {
       String msg = "cannot parse request " + clazz + " from InputStream";
@@ -613,7 +590,7 @@ class CaHttpMgmtServlet {
   private static <T extends MgmtRequest> T parse2(InputStream in, Class<T> clazz)
       throws CaMgmtException {
     try (InputStream nin = in) {
-      return JSON.parseObject(nin, clazz);
+      return CaJson.parseObject(nin, clazz);
     } catch (IOException | RuntimeException ex) {
       String msg = "cannot parse request " + clazz + " from InputStream";
       LOG.error(msg, ex);
