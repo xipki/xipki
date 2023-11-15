@@ -392,8 +392,7 @@ class ConfLoader {
           ca.setCaInfo(caInfoType);
 
           CaEntry entry = manager.x509cas.get(name).getCaInfo().getCaEntry();
-          // CA URIs
-          caInfoType.setCaUris(entry.getCaUris());
+          entry.copyBaseInfoTo(caInfoType);
 
           // Certificate
           byte[] certBytes = entry.getCert().getEncoded();
@@ -415,23 +414,14 @@ class ConfLoader {
             caInfoType.setCrlControl(new HashMap<>(new ConfPairs(entry.getCrlControl().getConf()).asMap()));
           }
 
-          if (entry.getCrlSignerName() != null) {
-            caInfoType.setCrlSignerName(entry.getCrlSignerName());
-          }
-
           if (entry.getCtlogControl() != null) {
             caInfoType.setCtlogControl(new HashMap<>(new ConfPairs(entry.getCtlogControl().getConf()).asMap()));
           }
 
-          caInfoType.setExpirationPeriod(entry.getExpirationPeriod());
           if (entry.getExtraControl() != null) {
             caInfoType.setExtraControl(entry.getExtraControl().asMap());
           }
 
-          caInfoType.setKeepExpiredCertDays(entry.getKeepExpiredCertDays());
-          caInfoType.setMaxValidity(entry.getMaxValidity());
-          caInfoType.setNextCrlNo(entry.getNextCrlNo());
-          caInfoType.setNumCrls(entry.getNumCrls());
           caInfoType.setPermissions(getPermissions(entry.getPermission()));
 
           if (entry.getRevokeSuspendedControl() != null) {
@@ -439,20 +429,8 @@ class ConfLoader {
                 new HashMap<>(new ConfPairs(entry.getRevokeSuspendedControl().getConf()).asMap()));
           }
 
-          caInfoType.setSaveCert(entry.isSaveCert());
-          caInfoType.setSaveKeypair(entry.isSaveKeypair());
-
-          if (entry.getKeypairGenNames() != null) {
-            caInfoType.setKeypairGenNames(entry.getKeypairGenNames());
-          }
-
           caInfoType.setSignerConf(createFileOrValue(zipStream, entry.getSignerConf(),
               "files/ca-" + name + "-signerconf.conf"));
-          caInfoType.setSignerType(entry.getSignerType());
-          caInfoType.setSnSize(entry.getSnSize());
-
-          caInfoType.setStatus(entry.getStatus());
-          caInfoType.setValidityMode(entry.getValidityMode());
 
           list.add(ca);
         }

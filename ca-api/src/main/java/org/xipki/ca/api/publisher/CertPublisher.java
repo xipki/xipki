@@ -7,13 +7,11 @@ import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.DataSourceMap;
-import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 
 import java.io.Closeable;
-import java.util.Map;
 
 /**
  * Defines how to publish the certificates and CRLs. All CertPublisher classes must extend this

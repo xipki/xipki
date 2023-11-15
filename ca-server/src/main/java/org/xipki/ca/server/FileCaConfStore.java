@@ -459,17 +459,15 @@ public class FileCaConfStore implements CaConfStore {
       ci.setCert(FileOrBinary.ofBinary(cert.getEncoded()));
     }
 
-    CaUris caUris = ci.getCaUris();
-    if (caUris == null) {
-      caUris = CaUris.EMPTY_INSTANCE;
+    CaEntry caEntry = new CaEntry(ident);
+    ci.copyBaseInfoTo(caEntry);
+
+    caEntry.setPermission(PermissionConstants.toIntPermission(ci.getPermissions()));
+    caEntry.setSignerConf(getValue(ci.getSignerConf(), baseDir));
+
+    if (caEntry.getCaUris() == null) {
+      caEntry.setCaUris(CaUris.EMPTY_INSTANCE);
     }
-
-    int exprirationPeriod = ci.getExpirationPeriod();
-    int numCrls = ci.getNumCrls();
-
-    CaEntry caEntry = new CaEntry(ident, ci.getSnSize(), ci.getNextCrlNo(),
-        ci.getSignerType(), getValue(ci.getSignerConf(), baseDir), caUris,
-        numCrls, exprirationPeriod);
 
     if (ci.getCrlControl() != null) {
       caEntry.setCrlControl(new CrlControl(new ConfPairs(ci.getCrlControl()).getEncoded()));
@@ -479,26 +477,13 @@ public class FileCaConfStore implements CaConfStore {
       caEntry.setCtlogControl(new CtlogControl(new ConfPairs(ci.getCtlogControl()).getEncoded()));
     }
 
-    caEntry.setCrlSignerName(ci.getCrlSignerName());
-    caEntry.setKeypairGenNames(ci.getKeypairGenNames());
-
     if (ci.getExtraControl() != null) {
       caEntry.setExtraControl(new ConfPairs(ci.getExtraControl()).unmodifiable());
     }
 
-    caEntry.setKeepExpiredCertDays(ci.getKeepExpiredCertDays());
-    caEntry.setMaxValidity(ci.getMaxValidity());
-    caEntry.setPermission(PermissionConstants.toIntPermission(ci.getPermissions()));
-
     if (ci.getRevokeSuspendedControl() != null) {
-      caEntry.setRevokeSuspendedControl(
-          new RevokeSuspendedControl(new ConfPairs(ci.getRevokeSuspendedControl())));
+      caEntry.setRevokeSuspendedControl(new RevokeSuspendedControl(new ConfPairs(ci.getRevokeSuspendedControl())));
     }
-
-    caEntry.setSaveCert(ci.isSaveCert());
-    caEntry.setSaveKeypair(ci.isSaveKeypair());
-    caEntry.setStatus(ci.getStatus());
-    caEntry.setValidityMode(ci.getValidityMode());
 
     X509Cert caCert;
 

@@ -9,7 +9,7 @@ import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
+import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
 
 import java.util.List;
@@ -48,7 +48,7 @@ public class ChangeCaEntry extends MgmtEntry {
 
   private ValidityMode validityMode;
 
-  private Integer permission;
+  private List<String> permission;
 
   private Integer keepExpiredCertDays;
 
@@ -152,7 +152,7 @@ public class ChangeCaEntry extends MgmtEntry {
   }
 
   public void setKeypairGenNames(List<String> keypairGenNames) {
-    this.keypairGenNames = (keypairGenNames == null) ? null : CollectionUtil.toLowerCaseList(keypairGenNames);
+    this.keypairGenNames = (keypairGenNames == null) ? null : StringUtil.lowercase(keypairGenNames);
   }
 
   public ValidityMode getValidityMode() {
@@ -179,11 +179,11 @@ public class ChangeCaEntry extends MgmtEntry {
     this.saveKeypair = saveKeypair;
   }
 
-  public Integer getPermission() {
+  public List<String> getPermission() {
     return permission;
   }
 
-  public void setPermission(Integer permission) {
+  public void setPermission(List<String> permission) {
     this.permission = permission;
   }
 

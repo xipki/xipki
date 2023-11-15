@@ -3,7 +3,6 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
-import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CrlControl;
@@ -78,36 +77,19 @@ public class CaEntry extends BaseCaInfo {
   private CaEntry() {
   }
 
-  public CaEntry(NameId ident, int serialNoLen, long nextCrlNo, String signerType,
-      String signerConf, CaUris caUris, int numCrls, int expirationPeriod) {
+  public CaEntry(NameId ident) {
     this.ident = Args.notNull(ident, "ident");
-    this.signerType = Args.toNonBlankLower(signerType, "signerType");
-    this.expirationPeriod = Args.notNegative(expirationPeriod, "expirationPeriod");
-    this.signerConf = Args.notBlank(signerConf, "signerConf");
-
-    setNumCrls(numCrls);
-    setSnSize(serialNoLen);
-    this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
-    setNextCrlNo(nextCrlNo);
-  } // constructor Ca
+  }
 
   public CaEntry copy() {
-    CaEntry ret = new CaEntry(ident, snSize, nextCrlNo, signerType, signerConf, caUris, numCrls, expirationPeriod);
-    ret.nextCrlNo = nextCrlNo;
-    ret.status = status;
-    ret.maxValidity = maxValidity;
+    CaEntry ret = new CaEntry(ident);
+    copyBaseInfoTo(ret);
     ret.crlControl = crlControl;
-    ret.crlSignerName = crlSignerName;
     ret.ctlogControl = ctlogControl;
     ret.revokeSuspendedControl = revokeSuspendedControl;
-    ret.keypairGenNames = keypairGenNames;
-    ret.saveKeypair = saveKeypair;
-    ret.saveCert = saveCert;
-    ret.validityMode = validityMode;
-    ret.permission = permission;
-    ret.keepExpiredCertDays = keepExpiredCertDays;
     ret.extraControl = extraControl;
     ret.pathLenConstraint = pathLenConstraint;
+    ret.permission = permission;
     ret.revocationInfo = revocationInfo;
     ret.cert = cert;
     ret.certchain = certchain;
@@ -239,16 +221,7 @@ public class CaEntry extends BaseCaInfo {
       certchainStr.append("null");
     }
 
-    List<String> permissionList = PermissionConstants.permissionToStringSet(permission);
-
-    String permissionText = "";
-    if (!permissionList.isEmpty()) {
-      StringBuilder buffer = new StringBuilder();
-      for (String m : permissionList) {
-        buffer.append(m).append(", ");
-      }
-      permissionText = buffer.substring(0, buffer.length() - 2);
-    }
+    String permissionText = PermissionConstants.permissionToString(permission);
 
     return StringUtil.concatObjectsCap(1500,
         "id:                   ", ident.getId(),

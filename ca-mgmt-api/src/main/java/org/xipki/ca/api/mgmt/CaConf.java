@@ -312,20 +312,11 @@ public class CaConf {
                 notBefore, notAfter);
           }
 
-          CaUris caUris;
-          if (ci.getCaUris() == null) {
-            caUris = CaUris.EMPTY_INSTANCE;
-          } else {
-            CaUris uris = ci.getCaUris();
-            caUris = new CaUris(uris.getCacertUris(), uris.getOcspUris(), uris.getCrlUris(), uris.getDeltaCrlUris());
-          }
+          caEntry = new CaEntry(new NameId(null, name));
+          ci.copyBaseInfoTo(caEntry);
 
-          int exprirationPeriod = ci.getExpirationPeriod();
-          int numCrls = ci.getNumCrls();
-
-          caEntry = new CaEntry(new NameId(null, name), ci.getSnSize(), ci.getNextCrlNo(),
-              expandConf(ci.getSignerType()), getValue(ci.getSignerConf(), zipEntries), caUris,
-              numCrls, exprirationPeriod);
+          caEntry.setSignerType(expandConf(caEntry.getSignerType()));
+          caEntry.setSignerConf(getValue(ci.getSignerConf(), zipEntries));
 
           if (ci.getCrlControl() != null) {
             caEntry.setCrlControl(new CrlControl(new ConfPairs(ci.getCrlControl()).getEncoded()));
@@ -335,29 +326,15 @@ public class CaConf {
             caEntry.setCtlogControl(new CtlogControl(new ConfPairs(ci.getCtlogControl()).getEncoded()));
           }
 
-          caEntry.setCrlSignerName(ci.getCrlSignerName());
-          caEntry.setKeypairGenNames(ci.getKeypairGenNames());
-
           if (ci.getExtraControl() != null) {
             caEntry.setExtraControl(new ConfPairs(ci.getExtraControl()).unmodifiable());
           }
 
-          caEntry.setKeepExpiredCertDays(ci.getKeepExpiredCertDays());
-
-          caEntry.setMaxValidity(ci.getMaxValidity());
           caEntry.setPermission(PermissionConstants.toIntPermission(ci.getPermissions()));
 
           if (ci.getRevokeSuspendedControl() != null) {
             caEntry.setRevokeSuspendedControl(
                 new RevokeSuspendedControl(new ConfPairs(ci.getRevokeSuspendedControl())));
-          }
-
-          caEntry.setSaveCert(ci.isSaveCert());
-          caEntry.setSaveKeypair(ci.isSaveKeypair());
-          caEntry.setStatus(ci.getStatus());
-
-          if (ci.getValidityMode() != null) {
-            caEntry.setValidityMode(ci.getValidityMode());
           }
 
           if (ci.getGenSelfIssued() == null) {

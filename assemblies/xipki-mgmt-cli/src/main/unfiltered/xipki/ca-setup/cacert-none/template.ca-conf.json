@@ -2,8 +2,6 @@
 	"basedir":"APP_DIR",
 	"properties":{
 		"profiles.dir":"xipki/ca-setup/certprofile",
-		"token.type":"REPLACEME-TOKEN_TYPE",
-		"ca.signerConf":"REPLACEME-CA_SIGNERCONF"
 	},
 	"signers":[],
 	"keypairGens":[],
@@ -105,9 +103,9 @@
 			"permissions":["all"],
 			"saveCert":true,
 			"saveKeypair":false,
-			"signerType":"${token.type}",
+			"signerType":"REPLACEME-TOKEN_TYPE",
 			"signerConf":{
-				"value":"${ca.signerConf}"
+				"value":"REPLACEME-CA_SIGNERCONF"
 			},
 			"snSize":20,
 			"status":"active",

@@ -24,6 +24,7 @@ import org.xipki.ca.server.db.CertStore;
 import org.xipki.security.*;
 import org.xipki.util.*;
 import org.xipki.util.exception.ErrorCode;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.OperationException;
 
 import java.io.IOException;

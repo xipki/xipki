@@ -250,51 +250,42 @@ public class CaConfColumn {
   }
 
   public void fillCaEntry(CaEntry entry) throws CaMgmtException {
-    entry.setCaUris(caUris());
+    fillBaseCaInfo(entry);
+
+    entry.setPermission(permission);
     entry.setCrlControl(crlControl());
     entry.setCtlogControl(ctlogControl());
-    entry.setExpirationPeriod(expirationPeriod);
     entry.setExtraControl(extraControl());
+    entry.setRevokeSuspendedControl(revokeSuspendedControl());
+  }
+
+  public void fillCaConf(CaConfType.Ca ca) {
+    CaConfType.CaInfo caInfo = ca.getCaInfo();
+    fillBaseCaInfo(caInfo);
+
+    caInfo.setPermissions(PermissionConstants.permissionToStringList(permission));
+    caInfo.setCrlControl(crlControl);
+    caInfo.setCtlogControl(ctlogControl);
+    caInfo.setExtraControl(extraControl);
+    caInfo.setRevokeSuspendedControl(revokeSuspendedControl);
+  }
+
+  private void fillBaseCaInfo(BaseCaInfo entry) {
+    entry.setCaUris(caUris());
+    entry.setExpirationPeriod(expirationPeriod);
     entry.setKeepExpiredCertDays(keepExpiredCertDays);
     entry.setKeypairGenNames(keypairGenNames);
     entry.setMaxValidity(maxValidity());
     entry.setNumCrls(numCrls);
-    entry.setPermission(permission);
-    entry.setRevokeSuspendedControl(revokeSuspendedControl());
     entry.setSaveCert(saveCert);
     entry.setSnSize(snSize);
     entry.setSaveKeypair(saveKeypair);
     entry.setValidityMode(validityMode());
   }
 
-  public void fillCaConf(CaConfType.Ca ca) {
-    CaConfType.CaInfo caInfo = ca.getCaInfo();
-    // CA URIS
-    if (cacertUris != null || crlUris != null || deltaCrlUris != null || ocspUris != null) {
-      caInfo.setCaUris(new CaUris(cacertUris, ocspUris, crlUris, deltaCrlUris));
-    }
-
-    caInfo.setCrlControl(crlControl);
-    caInfo.setCtlogControl(ctlogControl);
-    caInfo.setExpirationPeriod(expirationPeriod);
-    caInfo.setExtraControl(extraControl);
-    caInfo.setKeepExpiredCertDays(keepExpiredCertDays);
-    caInfo.setKeypairGenNames(keypairGenNames);
-    caInfo.setMaxValidity(maxValidity);
-    caInfo.setNumCrls(numCrls);
-    caInfo.setPermissions(PermissionConstants.permissionToStringSet(permission));
-    caInfo.setRevokeSuspendedControl(revokeSuspendedControl);
-    caInfo.setSaveCert(saveCert);
-    caInfo.setSaveKeypair(saveKeypair);
-    caInfo.setSnSize(snSize);
-    caInfo.setValidityMode(validityMode);
-  }
-
   public static CaConfColumn fromCaEntry(CaEntry caEntry) {
     CaConfColumn cc = fromBaseCaInfo(caEntry);
 
-    cc.setExpirationPeriod(caEntry.getExpirationPeriod());
-    cc.setKeepExpiredCertDays(caEntry.getKeepExpiredCertDays());
     cc.setPermission(caEntry.getPermission());
 
     // CRL Control
@@ -325,8 +316,6 @@ public class CaConfColumn {
   public static CaConfColumn fromCaInfo(CaConfType.CaInfo caEntry) throws InvalidConfException {
     CaConfColumn cc = fromBaseCaInfo(caEntry);
 
-    cc.setExpirationPeriod(caEntry.getExpirationPeriod());
-    cc.setKeepExpiredCertDays(caEntry.getKeepExpiredCertDays());
     cc.setPermission(PermissionConstants.toIntPermission(caEntry.getPermissions()));
 
     // CRL Control
@@ -369,6 +358,8 @@ public class CaConfColumn {
     cc.setSaveKeypair(caEntry.isSaveKeypair());
     cc.setSnSize(caEntry.getSnSize());
     cc.setValidityMode(caEntry.getValidityMode());
+    cc.setExpirationPeriod(caEntry.getExpirationPeriod());
+    cc.setKeepExpiredCertDays(caEntry.getKeepExpiredCertDays());
 
     return cc;
   }

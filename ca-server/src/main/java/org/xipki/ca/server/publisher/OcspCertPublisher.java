@@ -24,7 +24,6 @@ import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 
 /**
  * Publish certificates to XiPKI OCSP database.

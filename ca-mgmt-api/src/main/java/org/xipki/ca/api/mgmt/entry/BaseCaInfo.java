@@ -208,4 +208,26 @@ public abstract class BaseCaInfo extends MgmtEntry {
         && CompareUtil.equalsObject(validityMode, obj.validityMode);
   }
 
+  public void copyBaseInfoTo(BaseCaInfo dest) {
+    dest.nextCrlNo = nextCrlNo;
+    dest.caUris = caUris;
+    if (caUris == null) {
+      dest.caUris = CaUris.EMPTY_INSTANCE;
+    }
+
+    dest.crlSignerName = crlSignerName;
+    dest.expirationPeriod = expirationPeriod;
+    dest.keepExpiredCertDays = keepExpiredCertDays;
+    dest.keypairGenNames = keypairGenNames;
+    dest.maxValidity = maxValidity;
+    dest.numCrls = numCrls;
+    dest.revocationInfo = revocationInfo;
+    dest.saveCert = saveCert;
+    dest.saveKeypair = saveKeypair;
+    dest.signerType = signerType;
+    dest.snSize = snSize;
+    dest.status = status;
+    dest.validityMode = validityMode;
+  }
+
 }

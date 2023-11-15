@@ -22,6 +22,7 @@ import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.exception.OperationException;
 
@@ -194,10 +195,14 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
     String encodedConf = rs.getString("CONF");
     CaConfColumn conf = CaConfColumn.decode(encodedConf);
 
-    CaEntry entry = new CaEntry(new NameId(getInt(rs, "ID"), name), conf.snSize(),
-        getLong(rs, "NEXT_CRLNO"), rs.getString("SIGNER_TYPE"), rs.getString("SIGNER_CONF"),
-        conf.caUris(), conf.getNumCrls(), conf.getExpirationPeriod());
+    CaEntry entry = new CaEntry(new NameId(getInt(rs, "ID"), name));
 
+    entry.setNextCrlNo(getLong(rs, "NEXT_CRLNO"));
+    entry.setSignerType(rs.getString("SIGNER_TYPE"));
+    entry.setSignerConf(rs.getString("SIGNER_CONF"));
+    entry.setCaUris(conf.caUris());
+    entry.setNumCrls(conf.getNumCrls());
+    entry.setExpirationPeriod(conf.getExpirationPeriod());
     entry.setCert(generateCert(rs.getString("CERT")));
 
     List<X509Cert> certchain = generateCertchain(rs.getString("CERTCHAIN"));
@@ -581,7 +586,7 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
     String certchainStr = null;
     if (changeCaEntry.getEncodedCertchain() != null) {
       List<byte[]> encodedCertchain = changeCaEntry.getEncodedCertchain();
-      if (encodedCertchain.size() == 0) {
+      if (encodedCertchain.isEmpty()) {
         certchainStr = CaManager.NULL;
       } else {
         List<X509Cert> certs = new LinkedList<>();
@@ -602,14 +607,18 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
         colStr("SIGNER_CONF", signerConf, false, true),
         colStr("CERT", base64Cert),  colStr("CERTCHAIN", certchainStr));
 
-    cols.add(buildChangeCaConfColumn(changeCaEntry, currentCaConfColumn));
+    try {
+      cols.add(buildChangeCaConfColumn(changeCaEntry, currentCaConfColumn));
+    } catch (InvalidConfException ex) {
+      throw new CaMgmtException(ex.getMessage(), ex);
+    }
 
     changeIfNotNull("CA", colInt("ID", changeCaEntry.getIdent().getId()),
         cols.toArray(new SqlColumn[0]));
   } // method changeCa
 
   private SqlColumn buildChangeCaConfColumn(
-      ChangeCaEntry changeCaEntry, CaConfColumn currentCaConfColumn) {
+      ChangeCaEntry changeCaEntry, CaConfColumn currentCaConfColumn) throws InvalidConfException {
     CaConfColumn newCC = currentCaConfColumn.copy();
     newCC.setMaxValidity(changeCaEntry.getMaxValidity());
 
@@ -680,12 +689,12 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
       newCC.setSaveKeypair(b);
     }
 
-    Integer i = changeCaEntry.getPermission();
-    if (i != null) {
-      newCC.setPermission(i);
+    List<String> list = changeCaEntry.getPermission();
+    if (list != null && !list.isEmpty()) {
+      newCC.setPermission(PermissionConstants.toIntPermission(list));
     }
 
-    i = changeCaEntry.getNumCrls();
+    Integer i = changeCaEntry.getNumCrls();
     if (i != null) {
       newCC.setNumCrls(i);
     }

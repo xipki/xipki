@@ -233,9 +233,15 @@ public class CaActions {
       }
 
       CaUris caUris = new CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
-      CaEntry entry = new CaEntry(new NameId(null, caName), snLen, nextCrlNumber,
-          signerType, signerConf, caUris, numCrls, expirationPeriod);
+      CaEntry entry = new CaEntry(new NameId(null, caName));
 
+      entry.setSnSize(snLen);
+      entry.setNextCrlNo(nextCrlNumber);
+      entry.setSignerType(signerType);
+      entry.setSignerConf(signerConf);
+      entry.setCaUris(caUris);
+      entry.setNumCrls(numCrls);
+      entry.setExpirationPeriod(expirationPeriod);
       entry.setKeepExpiredCertDays(keepExpiredCertDays);
       entry.setSaveCert(isEnabled(saveCertS, true, "save-cert"));
       entry.setSaveKeypair(isEnabled(saveKeypairS, false, "save-keypair"));
@@ -592,7 +598,7 @@ public class CaActions {
 
     @Option(name = "--permission", multiValued = true, description = "permission")
     @Completion(CaCompleters.PermissionCompleter.class)
-    private Set<String> permissions;
+    private List<String> permissions;
 
     @Option(name = "--max-validity", description = "maximal validity")
     private String maxValidity;
@@ -713,7 +719,7 @@ public class CaActions {
       }
 
       if (CollectionUtil.isNotEmpty(permissions)) {
-        entry.setPermission(ShellUtil.getPermission(permissions));
+        entry.setPermission(permissions);
       }
 
       entry.setCaUris(new CaUris(getUris(caCertUris), getUris(ocspUris), getUris(crlUris), getUris(deltaCrlUris)));
