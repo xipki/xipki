@@ -66,12 +66,6 @@ util-*.jar,\
 xipki-tomcat-password-*.jar
 ```
 
-- Start tomcat
-
-```sh
-  bin/startup.sh
-```
-
 After the deployment
 -----
 You can use the openssl command to check whether the OCSP server answers as expected:

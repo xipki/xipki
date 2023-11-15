@@ -96,9 +96,3 @@ util-*.jar
    RewriteRule ^/.well-known/est/(.*) /est/$1
    RewriteRule ^/.well-known/cmp/(.*) /cmp/$1
    ```
-
-- Start tomcat
-
-```sh
-  bin/startup.sh
-```

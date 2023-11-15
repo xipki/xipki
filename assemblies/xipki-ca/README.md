@@ -15,12 +15,9 @@ Deployment in Tomcat (8, 9 and 10)
 Adapt the database configurations `${CONTAINER_ROOT}/xipki/etc/ca/database/ca-db.properties` and 
    `${CONTAINER_ROOT}/xipki/etc/ca/database/caconf-db.properties`.
 5. Create new databases configured in Step 4.
-6. Initialize the databases configured in Step 4.
-   In xipki-mgmt-cli, call `ca:sql --db-conf /path/to/ca-db.properties xipki/sql/ca-init.sql` and
-   `ca:sql --db-conf /path/to/caconf-db.properties xipki/sql/caconf-init.sql`
-7. Disable the HTTP listener, and configure the TLS listener in the file 
+6. Disable the HTTP listener, and configure the TLS listener in the file 
    `${CATALINA_HOME}conf/server.xml` (we use here the port 8444, can be changed to any other port)
-   ```sh
+```sh
     <Connector port="8444" protocol="org.apache.coyote.http11.Http11Nio2Protocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
                connectionTimeout="4000">
@@ -37,10 +34,11 @@ Adapt the database configurations `${CONTAINER_ROOT}/xipki/etc/ca/database/ca-db
                          certificateKeystoreType="PKCS12"/>
         </SSLHostConfig>
     </Connector>
-  ```
-8. If you have multiple tomcat instances, change the listing port for SHUTDOWN to be unique.
+```
 
-9. (optional) To accelerate the start process, append the following block to the property
+7. If you have multiple tomcat instances, change the listing port for SHUTDOWN to be unique.
+
+. (optional) To accelerate the start process, append the following block to the property
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`
  (",\" shall be added to the last line of existing property value).
 
@@ -65,11 +63,5 @@ servlet*-common-*.jar,\
 util-*.jar,\
 xipki-tomcat-password-*.jar
 ```
-9. (optional) If you encrypt the passwords in the conf/server.xml with XiPKI solution, replace 
+8. (optional) If you encrypt the passwords in the conf/server.xml with XiPKI solution, replace 
   `org.apache.coyote.http11.Http11Nio2Protocol` by `org.xipki.tomcat.XiHttp11Nio2Protocol`
-
-- Start tomcat
-
-```sh
-  bin/startup.sh
-```

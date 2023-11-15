@@ -1,0 +1,113 @@
+# Please adapt me
+CA_SUBJECT="C=DE,O=myorg,CN=myca1"
+
+KEYCERTS_DIR = xipki/ca-setup/keycerts
+
+printUsage = "false"
+argsValid = "false"
+errMsg = ""
+
+if { "$1" equals "" } then {
+  printUsage = "true"
+  argsValid = "true"
+} elif { "$1" equals "help" } then {
+  printUsage = "true"
+  argsValid = "true"
+} else {
+  KEY_TYPE = $1
+  TOMCAT_DIR = $2
+
+  if { "$TOMCAT_DIR" equals "" } then {
+    errMsg = "TOMCAT_DIR is not specified"
+  } else {
+    list = [rsa ec dsa sm2]; each ($list) {
+      if { "$KEY_TYPE" equals $it } then {
+        argsValid = "true"
+        break
+      }
+    }
+
+    if { "$argsValid" equals "false" } then {
+      errMsg = "invalid KEY_TYPE $KEY_TYPE"
+    }
+  }
+}
+
+if { $argsValid equals "false" } then {
+  echo "$errMsg"
+  echo ""
+  printUsage = "true"
+}
+
+if { $printUsage equals "true" } then {
+  echo "Usage: "
+  echo ""
+  echo "source file:xipki/ca-setup/cacert-none/setup-p12.script <key type> <tomcat dir>"
+  echo "    key type:  rsa, ec, dsa, sm2"
+} else {
+  echo "#################################################################"
+  echo "#                     Generate Key and CSR                      #"
+  echo "#################################################################"
+
+  if { $KEY_TYPE equals "rsa" } then {
+    SIG_ALG = SHA256WITHRSA
+    xi:rsa-p12 --password CHANGEIT --out ${KEYCERTS_DIR}/myca1.p12 --key-size 2048
+  } elif { $KEY_TYPE equals "ec" } then {
+    SIG_ALG = SHA256WITHECDSA
+    xi:ec-p12 --password CHANGEIT --out ${KEYCERTS_DIR}/myca1.p12 --curve secp256r1
+  } elif { $KEY_TYPE equals "dsa" } then {
+    SIG_ALG = SHA256WITHDSA
+    xi:dsa-p12 --password CHANGEIT --out ${KEYCERTS_DIR}/myca1.p12 --plen  2048
+  } else {
+    SIG_ALG = SM32WITHSM2
+    xi:sm2-p12 --password CHANGEIT --out ${KEYCERTS_DIR}/myca1.p12
+  }
+
+  echo "#################################################################"
+  echo "#                  Configure ca-conf.json                       #"
+  echo "#################################################################"
+
+  DIR = xipki/ca-setup/cacert-none
+  CONF_FILE = ${DIR}/ca-conf.json
+
+  xi:copy-file -f ${DIR}/template.ca-conf.json ${CONF_FILE}
+
+  xi:replace --old "REPLACEME-SUBJECT" --new "${CA_SUBJECT}" ${CONF_FILE}
+
+  xi:replace --old "REPLACEME-TOKEN_TYPE" --new "pkcs12" ${CONF_FILE}
+
+  xi:replace --old "REPLACEME-CA_SIGNERCONF" \
+    --new "algo=${SIG_ALG},password=CHANGEIT,keystore=file:${KEYCERTS_DIR}/myca1.p12" \
+    ${CONF_FILE}
+
+  echo "#################################################################"
+  echo "#                    Initialize Database                        #"
+  echo "#################################################################"
+  DB_CONF = "${TOMCAT_DIR}/xipki/etc/ca/database/ca-db.properties"
+  ca:sql --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
+
+  DB_CONF = "${TOMCAT_DIR}/xipki/etc/ca/database/caconf-db.properties"
+  ca:sql --db-conf "${DB_CONF}" xipki/sql/caconf-init.sql
+
+  echo "#################################################################"
+  echo "#                       Startup Tomcat                          #"
+  echo "#################################################################"
+  xi:exec "${TOMCAT_DIR}/bin/shutdown.sh"
+  xi:exec "${TOMCAT_DIR}/bin/startup.sh"
+  sleep 5
+
+  echo "#################################################################"
+  echo "#                       Load ca-conf.json                       #"
+  echo "#################################################################"
+
+  ca:load-conf --conf-file ${CONF_FILE} --out-dir ${KEYCERTS_DIR}
+
+  xi:move-file ${KEYCERTS_DIR}/ca-myca1.crt ${KEYCERTS_DIR}/myca1.der
+
+  echo "# Update the certificate in the p12 file"
+  xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/myca1.p12 --password CHANGEIT \
+    --cert ${KEYCERTS_DIR}/myca1.der
+
+  ca:ca-info
+
+}

@@ -47,9 +47,3 @@ xipki-tomcat-password-*.jar
 ```
 
 4. If you have multiple tomcat instances, change the listing port for SHUTDOW to be unique.
-
-- Start tomcat
-
-```sh
-  bin/startup.sh
-```

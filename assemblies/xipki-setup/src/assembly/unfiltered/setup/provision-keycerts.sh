@@ -27,7 +27,7 @@ mkdir -p $TDIR
 
 cp $KC_DIR/hsmproxy-client/*.p12 \
    $KC_DIR/hsmproxy-client/*-cert.pem \
-   $KC_DIR/ocsp-server/*.p21 \
+   $KC_DIR/ocsp-server/*.p12 \
    $KC_DIR/ocsp-server/*-cert.pem \
    $KC_DIR/hsmproxy-server/*-cert.pem \
    $KC_DIR/ocsp-mgmt-client/*-cert.pem \
