@@ -12,7 +12,6 @@ import org.xipki.ca.gateway.est.EstResponder;
 import org.xipki.util.IoUtil;
 import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.exception.ServletException0;
 import org.xipki.util.http.XiHttpFilter;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
@@ -35,15 +34,18 @@ public class EstHttpFilter implements XiHttpFilter {
 
   private ProtocolProxyConfWrapper conf;
 
-  public EstHttpFilter() throws ServletException0 {
+  public EstHttpFilter() throws Exception {
+    boolean succ = false;
     try {
       XipkiBaseDir.init();
 
       EstProxyConf conf0;
       try {
         conf0 = EstProxyConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CFG, true));
-      } catch (IOException | InvalidConfException ex) {
-        throw new IllegalArgumentException("could not parse configuration file " + DFLT_CFG, ex);
+      } catch (IOException ex) {
+        throw new IOException("could not parse configuration file " + DFLT_CFG, ex);
+      } catch (InvalidConfException ex) {
+        throw new InvalidConfException("could not parse configuration file " + DFLT_CFG, ex);
       }
 
       conf = new ProtocolProxyConfWrapper(conf0);
@@ -52,13 +54,9 @@ public class EstHttpFilter implements XiHttpFilter {
           conf.getAuthenticator(), conf.getPopControl(), conf.getCaProfiles(), conf0.getReverseProxyMode());
 
       servlet = new EstHttpServlet(conf.isLogReqResp(), responder);
-
-      GatewayUtil.auditLogPciEvent(LOG, "EST-Gateway", true, "START");
-    } catch (Exception e) {
-      String msg = "error initializing ServletFilter";
-      LOG.error(msg, e);
-      GatewayUtil.auditLogPciEvent(LOG, "EST-Gateway", false, "START");
-      throw new ServletException0(msg);
+      succ = true;
+    } finally {
+      GatewayUtil.auditLogPciEvent(LOG, "EST-Gateway", succ, "START");
     }
   }
 

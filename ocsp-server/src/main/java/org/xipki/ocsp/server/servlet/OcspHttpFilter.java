@@ -18,14 +18,12 @@ import org.xipki.util.HttpConstants;
 import org.xipki.util.LogUtil;
 import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.exception.ServletException0;
 import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpFilter;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -38,7 +36,7 @@ public class OcspHttpFilter implements XiHttpFilter {
 
   private static final Logger LOG = LoggerFactory.getLogger(OcspHttpFilter.class);
 
-  private static final String DFLT_CONF_FILE = "etc/ocsp/ocsp.json";
+  private static final String DFLT_CFG = "etc/ocsp/ocsp.json";
 
   private final Securities securities;
 
@@ -54,35 +52,26 @@ public class OcspHttpFilter implements XiHttpFilter {
 
   private OcspHttpMgmtServlet mgmtServlet;
 
-  public OcspHttpFilter(String licenseFactoryClazz) throws ServletException0 {
+  public OcspHttpFilter(String licenseFactoryClazz) throws Exception {
     XipkiBaseDir.init();
-
-    String confFile = DFLT_CONF_FILE;
 
     OcspConf conf;
     try {
-      conf = OcspConf.readConfFromFile(confFile);
-    } catch (IOException | InvalidConfException ex) {
-      throw new ServletException0("could not parse OCSP configuration file " + confFile, ex);
+      conf = OcspConf.readConfFromFile(DFLT_CFG);
+    } catch (IOException ex) {
+      throw new IOException("could not parse configuration file " + DFLT_CFG, ex);
+    } catch (InvalidConfException ex) {
+      throw new InvalidConfException("could not parse configuration file " + DFLT_CFG, ex);
     }
 
     boolean logReqResp = conf.isLogReqResp();
     LOG.info("logReqResp: {}", logReqResp);
 
     securities = new Securities();
-    try {
-      securities.init(conf.getSecurity());
-    } catch (IOException | InvalidConfException ex) {
-      throw new ServletException0("could not initialize Securities", ex);
-    }
+    securities.init(conf.getSecurity());
 
     LOG.info("Use licenseFactory: {}", licenseFactoryClazz);
-    try {
-      licenseFactory = (LicenseFactory) Class.forName(licenseFactoryClazz).getDeclaredConstructor().newInstance();
-    } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException |
-             InvocationTargetException ex) {
-      throw new ServletException0("could not initialize LicenseFactory", ex);
-    }
+    licenseFactory = (LicenseFactory) Class.forName(licenseFactoryClazz).getDeclaredConstructor().newInstance();
 
     OcspServerImpl ocspServer = new OcspServerImpl(licenseFactory.createOcspLicense());
     ocspServer.setSecurityFactory(securities.getSecurityFactory());

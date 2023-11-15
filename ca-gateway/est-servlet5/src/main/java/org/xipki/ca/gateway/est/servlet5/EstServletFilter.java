@@ -6,7 +6,6 @@ package org.xipki.ca.gateway.est.servlet5;
 import jakarta.servlet.FilterConfig;
 import org.xipki.ca.gateway.est.servlet.EstHttpFilter;
 import org.xipki.servlet5.ServletFilter;
-import org.xipki.util.exception.ServletException0;
 import org.xipki.util.http.XiHttpFilter;
 
 /**
@@ -18,7 +17,7 @@ import org.xipki.util.http.XiHttpFilter;
 public class EstServletFilter extends ServletFilter {
 
   @Override
-  protected XiHttpFilter initFilter(FilterConfig filterConfig) throws ServletException0 {
+  protected XiHttpFilter initFilter(FilterConfig filterConfig) throws Exception {
      return new EstHttpFilter();
   }
 

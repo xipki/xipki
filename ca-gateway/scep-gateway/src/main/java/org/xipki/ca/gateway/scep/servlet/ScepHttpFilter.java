@@ -13,7 +13,6 @@ import org.xipki.ca.gateway.scep.ScepResponder;
 import org.xipki.util.IoUtil;
 import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.exception.ServletException0;
 import org.xipki.util.http.XiHttpFilter;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
@@ -36,15 +35,18 @@ public class ScepHttpFilter implements XiHttpFilter {
 
   private ProtocolProxyConfWrapper conf;
 
-  public ScepHttpFilter() throws ServletException0 {
+  public ScepHttpFilter() throws Exception {
+    boolean succ = false;
     try {
       XipkiBaseDir.init();
 
       ScepProxyConf conf0;
       try {
         conf0 = ScepProxyConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CFG, true));
-      } catch (IOException | InvalidConfException ex) {
-        throw new IllegalArgumentException("could not parse configuration file " + DFLT_CFG, ex);
+      } catch (IOException ex) {
+        throw new IOException("could not parse configuration file " + DFLT_CFG, ex);
+      } catch (InvalidConfException ex) {
+        throw new InvalidConfException("could not parse configuration file " + DFLT_CFG, ex);
       }
 
       conf = new ProtocolProxyConfWrapper(conf0);
@@ -55,13 +57,9 @@ public class ScepHttpFilter implements XiHttpFilter {
           conf.getPopControl(), conf.getCaProfiles());
 
       servlet = new ScepHttpServlet(conf.isLogReqResp(), responder);
-
-      GatewayUtil.auditLogPciEvent(LOG, "SCEP-Gateway", true, "START");
-    } catch (Exception e) {
-      String msg = "error initializing ServletFilter";
-      LOG.error(msg, e);
-      GatewayUtil.auditLogPciEvent(LOG, "SCEP-Gateway", false, "START");
-      throw new ServletException0(msg);
+      succ = true;
+    } finally {
+      GatewayUtil.auditLogPciEvent(LOG, "SCEP-Gateway", succ, "START");
     }
   }
 

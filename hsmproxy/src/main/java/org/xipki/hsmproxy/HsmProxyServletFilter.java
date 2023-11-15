@@ -5,15 +5,12 @@ package org.xipki.hsmproxy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.Securities;
 import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.TlsHelper;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.exception.ServletException0;
 import org.xipki.util.http.XiHttpFilter;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
@@ -93,21 +90,22 @@ public class HsmProxyServletFilter implements XiHttpFilter {
 
   private static final Logger LOG = LoggerFactory.getLogger(HsmProxyServletFilter.class);
 
-  private static final String DFLT_SERVER_CFG = "etc/hsmproxy/hsmproxy.json";
+  private static final String DFLT_CFG = "etc/hsmproxy/hsmproxy.json";
 
   private HsmProxyResponder responder;
 
   private Securities securities;
 
-  public HsmProxyServletFilter() throws ServletException0 {
+  public HsmProxyServletFilter() throws Exception {
     XipkiBaseDir.init();
 
     P11ProxyConf conf;
     try {
-      conf = P11ProxyConf.readConfFromFile(IoUtil.expandFilepath(DFLT_SERVER_CFG, true));
-    } catch (IOException | InvalidConfException ex) {
-      throw new ServletException0(
-          "could not parse PKCS#11 Proxy configuration file " + DFLT_SERVER_CFG, ex);
+      conf = P11ProxyConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CFG, true));
+    } catch (IOException ex) {
+      throw new IOException("could not parse PKCS#11 Proxy configuration file " + DFLT_CFG, ex);
+    } catch (InvalidConfException ex) {
+      throw new InvalidConfException("could not parse PKCS#11 Proxy configuration file " + DFLT_CFG, ex);
     }
 
     boolean logReqResp = conf.isLogReqResp();
@@ -127,19 +125,10 @@ public class HsmProxyServletFilter implements XiHttpFilter {
       }
     }
 
-    List<X509Cert> clientCerts;
-    try {
-      clientCerts = X509Util.parseCerts(conf.getClientCerts());
-    } catch (InvalidConfException ex) {
-      throw new ServletException0("could not read clientCerts", ex);
-    }
+    List<X509Cert> clientCerts = X509Util.parseCerts(conf.getClientCerts());
 
-    try {
-      this.responder = new HsmProxyResponder(logReqResp, conf.getReverseProxyMode(),
-                        securities.getP11CryptServiceFactory(), clientCerts);
-    } catch (XiSecurityException | TokenException ex) {
-      throw new ServletException0("Error initializing HsmProxyResponder", ex);
-    }
+    this.responder = new HsmProxyResponder(logReqResp, conf.getReverseProxyMode(),
+        securities.getP11CryptServiceFactory(), clientCerts);
   }
 
   @Override
@@ -151,8 +140,7 @@ public class HsmProxyServletFilter implements XiHttpFilter {
   }
 
   @Override
-  public void doFilter(XiHttpRequest request, XiHttpResponse response)
-      throws IOException, ServletException0 {
+  public void doFilter(XiHttpRequest request, XiHttpResponse response) throws Exception {
     responder.service(request, response);
   }
 

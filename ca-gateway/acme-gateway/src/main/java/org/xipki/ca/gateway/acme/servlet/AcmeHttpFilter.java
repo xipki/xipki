@@ -12,7 +12,6 @@ import org.xipki.ca.gateway.acme.AcmeResponder;
 import org.xipki.util.IoUtil;
 import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.exception.ServletException0;
 import org.xipki.util.http.XiHttpFilter;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
@@ -35,15 +34,18 @@ public class AcmeHttpFilter implements XiHttpFilter {
 
   private ProtocolProxyConfWrapper conf;
 
-  public AcmeHttpFilter() throws ServletException0 {
+  public AcmeHttpFilter() throws Exception {
+    boolean succ = false;
     try {
       XipkiBaseDir.init();
 
       AcmeProxyConf conf0;
       try {
         conf0 = AcmeProxyConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CFG, true));
-      } catch (IOException | InvalidConfException ex) {
-        throw new ServletException0("could not parse configuration file " + DFLT_CFG, ex);
+      } catch (IOException ex) {
+        throw new IOException("could not parse configuration file " + DFLT_CFG, ex);
+      } catch (InvalidConfException ex) {
+        throw new InvalidConfException("could not parse configuration file " + DFLT_CFG, ex);
       }
 
       conf = new ProtocolProxyConfWrapper(conf0);
@@ -53,13 +55,9 @@ public class AcmeHttpFilter implements XiHttpFilter {
       responder.start();
 
       servlet = new AcmeHttpServlet(conf.isLogReqResp(), responder);
-
-      GatewayUtil.auditLogPciEvent(LOG, "ACME-Gateway", true, "START");
-    } catch (Exception e) {
-      String msg = "error initializing ServletFilter";
-      LOG.error(msg, e);
-      GatewayUtil.auditLogPciEvent(LOG, "ACME-Gateway", false, "START");
-      throw new ServletException0(msg);
+      succ = true;
+    } finally {
+      GatewayUtil.auditLogPciEvent(LOG, "ACME-Gateway", succ, "START");
     }
   }
 

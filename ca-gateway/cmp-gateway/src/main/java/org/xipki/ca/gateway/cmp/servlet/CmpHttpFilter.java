@@ -13,7 +13,6 @@ import org.xipki.ca.gateway.cmp.CmpResponder;
 import org.xipki.util.IoUtil;
 import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.exception.ServletException0;
 import org.xipki.util.http.XiHttpFilter;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
@@ -35,15 +34,18 @@ public class CmpHttpFilter implements XiHttpFilter {
 
   private ProtocolProxyConfWrapper conf;
 
-  public CmpHttpFilter() throws ServletException0 {
+  public CmpHttpFilter() throws Exception {
+    boolean succ = false;
     try {
       XipkiBaseDir.init();
 
       CmpProxyConf conf0;
       try {
         conf0 = CmpProxyConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CFG, true));
-      } catch (IOException | InvalidConfException ex) {
-        throw new ServletException0("could not parse configuration file " + DFLT_CFG, ex);
+      } catch (IOException ex) {
+        throw new IOException("could not parse configuration file " + DFLT_CFG, ex);
+      } catch (InvalidConfException ex) {
+        throw new InvalidConfException("could not parse configuration file " + DFLT_CFG, ex);
       }
 
       CmpControl cmpControl = new CmpControl(conf0.getCmp());
@@ -53,13 +55,9 @@ public class CmpHttpFilter implements XiHttpFilter {
           conf.getSecurities().getSecurityFactory(), conf.getSigners(), conf.getAuthenticator(), conf.getPopControl());
 
       servlet = new CmpHttpServlet(conf.isLogReqResp(), conf0.getReverseProxyMode(), responder);
-
-      GatewayUtil.auditLogPciEvent(LOG, "CMP-Gateway", true, "START");
-    } catch (Exception e) {
-      String msg = "error initializing ServletFilter";
-      LOG.error(msg, e);
-      GatewayUtil.auditLogPciEvent(LOG, "CMP-Gateway", false, "START");
-      throw new ServletException0(msg);
+      succ = true;
+    } finally {
+      GatewayUtil.auditLogPciEvent(LOG, "CMP-Gateway", succ, "START");
     }
   }
 
@@ -78,8 +76,7 @@ public class CmpHttpFilter implements XiHttpFilter {
   }
 
   @Override
-  public void doFilter(XiHttpRequest req, XiHttpResponse resp)
-      throws IOException, ServletException0 {
+  public void doFilter(XiHttpRequest req, XiHttpResponse resp) throws Exception {
     servlet.service(req, resp);
   }
 

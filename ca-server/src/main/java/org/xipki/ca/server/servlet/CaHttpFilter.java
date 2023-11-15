@@ -21,7 +21,6 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.exception.ServletException0;
 import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpFilter;
 import org.xipki.util.http.XiHttpRequest;
@@ -41,7 +40,7 @@ public class CaHttpFilter implements XiHttpFilter {
 
   private static final String XIJSON_CERTFACTORY = "org.xipki.ca.certprofile.xijson.CertprofileFactoryImpl";
 
-  private static final String DFLT_CA_SERVER_CFG = "etc/ca/ca.json";
+  private static final String DFLT_CFG = "etc/ca/ca.json";
 
   private final Securities securities;
 
@@ -57,14 +56,16 @@ public class CaHttpFilter implements XiHttpFilter {
 
   private CaHttpMgmtServlet mgmtServlet;
 
-  public CaHttpFilter(String licenseFactoryClazz) throws ServletException0 {
+  public CaHttpFilter(String licenseFactoryClazz) throws Exception {
     XipkiBaseDir.init();
 
     CaServerConf conf;
     try {
-      conf = CaServerConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CA_SERVER_CFG, true));
-    } catch (IOException | InvalidConfException ex) {
-      throw new ServletException0("could not parse CA configuration file " + DFLT_CA_SERVER_CFG, ex);
+      conf = CaServerConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CFG, true));
+    } catch (IOException ex) {
+      throw new IOException("could not parse configuration file " + DFLT_CFG, ex);
+    } catch (InvalidConfException ex) {
+      throw new InvalidConfException("could not parse configuration file " + DFLT_CFG, ex);
     }
 
     boolean logReqResp = conf.isLogReqResp();
@@ -77,11 +78,7 @@ public class CaHttpFilter implements XiHttpFilter {
     }
 
     securities = new Securities();
-    try {
-      securities.init(conf.getSecurity());
-    } catch (IOException | InvalidConfException ex) {
-      throw new ServletException0("could not initialize Securities", ex);
-    }
+    securities.init(conf.getSecurity());
 
     int shardId = conf.getShardId();
     String auditConf = audit.getConf();
@@ -91,15 +88,11 @@ public class CaHttpFilter implements XiHttpFilter {
 
     Audits.init(auditType, auditConf, securities.getSecurityFactory().getPasswordResolver());
     if (Audits.getAuditService() == null) {
-      throw new ServletException0("could not init AuditService");
+      throw new IllegalStateException("could not init AuditService");
     }
 
     LOG.info("Use licenseFactory: {}", licenseFactoryClazz);
-    try {
-      licenseFactory = (LicenseFactory) Class.forName(licenseFactoryClazz).getDeclaredConstructor().newInstance();
-    } catch (Exception ex) {
-      throw new ServletException0("could not initialize LicenseFactory", ex);
-    }
+    licenseFactory = (LicenseFactory) Class.forName(licenseFactoryClazz).getDeclaredConstructor().newInstance();
 
     caManager = new CaManagerImpl(licenseFactory.createCmLicense());
     caManager.setSecurityFactory(securities.getSecurityFactory());

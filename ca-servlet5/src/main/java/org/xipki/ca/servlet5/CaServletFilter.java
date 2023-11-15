@@ -6,7 +6,6 @@ package org.xipki.ca.servlet5;
 import jakarta.servlet.FilterConfig;
 import org.xipki.ca.server.servlet.CaHttpFilter;
 import org.xipki.servlet5.ServletFilter;
-import org.xipki.util.exception.ServletException0;
 import org.xipki.util.http.XiHttpFilter;
 
 /**
@@ -17,7 +16,7 @@ import org.xipki.util.http.XiHttpFilter;
 public class CaServletFilter extends ServletFilter {
 
   @Override
-  protected XiHttpFilter initFilter(FilterConfig filterConfig) throws ServletException0 {
+  protected XiHttpFilter initFilter(FilterConfig filterConfig) throws Exception {
     String licenseFactoryClazz = filterConfig.getInitParameter("licenseFactory");
     return new CaHttpFilter(licenseFactoryClazz);
   }
