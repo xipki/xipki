@@ -40,10 +40,6 @@ if { $printUsage equals "true" } then {
   echo "source file:xipki/ca-setup/cacert-present/setup-p12.script <key type> <tomcat dir>"
   echo "    key type:  rsa, ec, dsa, sm2"
 } else {
-  echo "#################################################################"
-  echo "#                     Generate Key and CSR                      #"
-  echo "#################################################################"
-
   if { $KEY_TYPE equals "rsa" } then {
     SIG_ALG = SHA256WITHRSA
   } elif { $KEY_TYPE equals "ec" } then {

@@ -1,7 +1,7 @@
 {
 	"basedir":"APP_DIR",
 	"properties":{
-		"profiles.dir":"xipki/ca-setup/certprofile",
+		"profiles.dir":"xipki/ca-setup/certprofile"
 	},
 	"signers":[],
 	"keypairGens":[],

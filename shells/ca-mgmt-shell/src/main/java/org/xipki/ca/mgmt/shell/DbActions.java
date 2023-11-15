@@ -275,7 +275,8 @@ public class DbActions {
           }
         }
 
-        if (force || confirm("Do you want to execute the SQL script?", 3)) {
+        if (force || confirm("Do you want to execute the SQL script " + scriptFile +
+            " on the database " + dbConfFile + "?", 3)) {
           System.out.println("Start executing script " + p);
           ScriptRunner.runScript(dataSource, p.toString());
           System.out.println("  End executing script " + p);
