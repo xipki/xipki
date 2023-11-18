@@ -18,11 +18,6 @@
       <version>${dnsjava.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.bitbucket.b_c</groupId>
-      <artifactId>jose4j</artifactId>
-      <version>${jose4j.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.xipki.commons</groupId>
       <artifactId>datasource</artifactId>
       <version>${xipki.commons.version}</version>
@@ -31,6 +26,11 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>gateway-common</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

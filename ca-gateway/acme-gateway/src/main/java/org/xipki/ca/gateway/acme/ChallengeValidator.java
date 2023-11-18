@@ -27,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -41,11 +40,11 @@ public class ChallengeValidator implements Runnable {
 
   private static final TrustManager trustAll = new X509TrustManager() {
     @Override
-    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+    public void checkClientTrusted(X509Certificate[] chain, String authType) {
     }
 
     @Override
-    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+    public void checkServerTrusted(X509Certificate[] chain, String authType) {
     }
 
     @Override
@@ -221,17 +220,17 @@ public class ChallengeValidator implements Runnable {
       if (authorizationValid) {
         LOG.info("validated challenge {}/{} for identifier {}/{}", chall.getType(), challId,
             identifier.getType(), identifier.getValue());
-        chall.validated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-        chall.status(ChallengeStatus.valid);
+        chall.setValidated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
+        chall.setStatus(ChallengeStatus.valid);
       } else {
         LOG.warn("validation failed for challenge {}/{} for identifier {}/{}: received='{}', expected='{}'",
             chall.getType(), challId, identifier.getType(), identifier.getValue(),
             receivedAuthorization, chall.getExpectedAuthorization());
-        chall.status(ChallengeStatus.invalid);
+        chall.setStatus(ChallengeStatus.invalid);
       }
 
-      if (chall.authz() != null && chall.authz().order() != null) {
-        repo.flushOrderIfNotCached(chall.authz().order());
+      if (chall.getAuthz() != null && chall.getAuthz().getOrder() != null) {
+        repo.flushOrderIfNotCached(chall.getAuthz().getOrder());
       }
     }
 

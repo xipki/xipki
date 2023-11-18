@@ -6,8 +6,8 @@ package org.xipki.ca.gateway.acme;
 import org.xipki.ca.gateway.acme.msg.AccountResponse;
 import org.xipki.ca.gateway.acme.msg.JoseMessage;
 import org.xipki.ca.gateway.acme.type.AccountStatus;
-import org.xipki.ca.gateway.acme.util.AcmeUtils;
 import org.xipki.util.Args;
+import org.xipki.util.JSON;
 
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
@@ -63,6 +63,15 @@ public class AcmeAccount {
     public void setTermsOfServiceAgreed(Boolean termsOfServiceAgreed) {
       this.termsOfServiceAgreed = termsOfServiceAgreed;
     }
+
+    public String encode() {
+      return JSON.toJson(this);
+    }
+
+    public static Data decode(String encoded) {
+      return JSON.parseObject(encoded, Data.class);
+    }
+
   }
 
   private boolean inDb;

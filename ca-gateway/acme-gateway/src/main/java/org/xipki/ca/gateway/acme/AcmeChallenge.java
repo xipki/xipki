@@ -5,10 +5,13 @@ package org.xipki.ca.gateway.acme;
 
 import org.xipki.ca.gateway.acme.msg.ChallengeResponse;
 import org.xipki.ca.gateway.acme.type.ChallengeStatus;
+import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -16,50 +19,61 @@ import java.time.temporal.ChronoUnit;
  */
 public class AcmeChallenge {
 
-  private int subId;
+  private final int subId;
 
-  private String expectedAuthorization;
+  private final String expectedAuthorization;
 
-  private ChallengeStatus status;
+  private final String type;
 
-  private String type;
-
-  private String token;
+  private final String token;
 
   private Instant validated;
 
+  private ChallengeStatus status;
+
   private AcmeAuthz authz;
 
-  /**
-   * Only for JSON deserializer.
-   */
-  private AcmeChallenge() {
-  }
-
-  public AcmeChallenge(int subId, String expectedAuthorization) {
+  public AcmeChallenge(String type, int subId, String token, String expectedAuthorization, ChallengeStatus status) {
     this.subId = subId;
-    this.expectedAuthorization = expectedAuthorization;
+    this.expectedAuthorization = Args.notBlank(expectedAuthorization, "expectedAuthorization");
+    this.type = Args.notBlank(type, "type");
+    this.token = Args.notBlank(token, "token");
+    this.status = Args.notNull(status, "status");
   }
 
-  /**
-   * Only for JSON deserializer.
-   */
-  private void setSubId(int subId) {
-    this.subId = subId;
+  public Map<String, Object> encode() {
+    Map<String, Object> map = new HashMap<>();
+    map.put("subId", subId);
+    map.put("type", type);
+    map.put("token", token);
+    map.put("expectedAuthorization", expectedAuthorization);
+    map.put("status", status.name());
+    if (validated != null) {
+      map.put("validated", validated.getEpochSecond());
+    }
+    return map;
   }
 
-  /**
-   * Only for JSON deserializer.
-   */
-  private void setExpectedAuthorization(String expectedAuthorization) {
-    this.expectedAuthorization = expectedAuthorization;
+  public static AcmeChallenge decode(Map<String, Object> encoded) {
+    int subId = AcmeUtils.getInt(encoded, "subId");
+    String type = (String) encoded.get("type");
+    String token = (String) encoded.get("token");
+    String expectedAuthorization = (String) encoded.get("expectedAuthorization");
+    ChallengeStatus status = ChallengeStatus.valueOf((String) encoded.get("status"));
+
+    AcmeChallenge chall = new AcmeChallenge(type, subId, token, expectedAuthorization, status);
+    Long l = AcmeUtils.getLong(encoded, "validated");
+    if (l != null) {
+      chall.validated = Instant.ofEpochSecond(l);
+    }
+    return chall;
   }
 
-  public AcmeAuthz authz() {
+  public AcmeAuthz getAuthz() {
     return authz;
   }
 
-  public void authz(AcmeAuthz authz) {
+  public void setAuthz(AcmeAuthz authz) {
     this.authz = authz;
   }
 
@@ -71,64 +85,26 @@ public class AcmeChallenge {
     return validated;
   }
 
-  /**
-   * Only for JSON deserializer.
-   */
-  private void setValidated(Instant validated) {
-    this.validated = validated;
-  }
-
-  public void validated(Instant validated) {
+  public void setValidated(Instant validated) {
     markOrder();
-    setValidated(validated);
+    this.validated = validated;
   }
 
   public String getType() {
     return type;
   }
 
-  /**
-   * Only for JSON deserializer.
-   */
-  private void setType(String type) {
-    this.type = type;
-  }
-
-  public void type(String type) {
-    markOrder();
-    setType(type);
-  }
-
   public String getToken() {
     return token;
-  }
-
-  /**
-   * Only for JSON deserializer.
-   */
-  private void setToken(String token) {
-    this.token = token;
-  }
-
-  public void token(String token) {
-    markOrder();
-    setToken(token);
   }
 
   public ChallengeStatus getStatus() {
     return status;
   }
 
-  /**
-   * Only for JSON deserializer.
-   */
-  private void setStatus(ChallengeStatus status) {
-    this.status = status;
-  }
-
-  public void status(ChallengeStatus status) {
+  public void setStatus(ChallengeStatus status) {
     markOrder();
-    setStatus(status);
+    this.status = status;
   }
 
   public String getExpectedAuthorization() {
@@ -156,10 +132,7 @@ public class AcmeChallenge {
   }
 
   public AcmeChallenge copy() {
-    AcmeChallenge copy = new AcmeChallenge(subId, expectedAuthorization);
-    copy.status = status;
-    copy.type = type;
-    copy.token = token;
+    AcmeChallenge copy = new AcmeChallenge(type, subId, token, expectedAuthorization, status);
     copy.validated = validated;
     return copy;
   }

@@ -5,7 +5,6 @@ package org.xipki.ca.gateway.acme;
 
 import org.xipki.ca.gateway.acme.msg.OrderResponse;
 import org.xipki.ca.gateway.acme.type.*;
-import org.xipki.ca.gateway.acme.util.AcmeUtils;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.Args;
 import org.xipki.util.Base64Url;
@@ -53,10 +52,6 @@ public class AcmeOrder {
     this.id = id;
     this.idStr = AcmeUtils.toBase64(id);
     this.dataSource = Args.notNull(dataSource, "dataSource");
-  }
-
-  public boolean isInDb() {
-    return inDb;
   }
 
   public long getAccountId() {
@@ -146,12 +141,16 @@ public class AcmeOrder {
     return authzs;
   }
 
+  public String getEncodedAuthzs() {
+    return AcmeAuthz.encodeAuthzs(authzs);
+  }
+
   public void setAuthzs(List<AcmeAuthz> authzs) {
     markMe();
     this.authzs = authzs;
     if (authzs != null) {
       for (AcmeAuthz authz : authzs) {
-        authz.order(this);
+        authz.setOrder(this);
       }
     }
   }
@@ -200,10 +199,10 @@ public class AcmeOrder {
     for (AcmeAuthz authz : authzs) {
       for (AcmeChallenge chall : authz.getChallenges()) {
         if (chall.getStatus() == ChallengeStatus.valid) {
-          authz.status(AuthzStatus.valid);
+          authz.setStatus(AuthzStatus.valid);
           break;
         } else if (chall.getStatus() == ChallengeStatus.invalid) {
-          authz.status(AuthzStatus.invalid);
+          authz.setStatus(AuthzStatus.invalid);
           status = OrderStatus.invalid;
           return;
         }

@@ -7,39 +7,22 @@ import org.xipki.ca.gateway.acme.type.Identifier;
 import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author Lijun Liao (xipki)
  */
 public class AcmeIdentifier {
 
-  private String type;
+  private final String type;
 
-  private String value;
-
-  /**
-   * Only for JSON deserializer.
-   */
-  private AcmeIdentifier() {
-  }
+  private final String value;
 
   public AcmeIdentifier(String type, String value) {
     this.type = Args.notNull(type, "type");
     this.value = Args.notNull(value, "value");
-  }
-
-  /**
-   * Only for JSON deserializer.
-   */
-  private void setType(String type) {
-    this.type = type;
-  }
-
-  /**
-   * Only for JSON deserializer.
-   */
-  private void setValue(String value) {
-    this.value = value;
   }
 
   public String getType() {
@@ -48,6 +31,18 @@ public class AcmeIdentifier {
 
   public String getValue() {
     return value;
+  }
+
+  public Map<String, String> encode() {
+    Map<String, String> map = new HashMap<>();
+    map.put("type", type);
+    map.put("value", value);
+    return map;
+  }
+
+  public static AcmeIdentifier decode(Map<String, Object> encoded) {
+    return new AcmeIdentifier(
+        (String) encoded.get("type"), (String) encoded.get("value"));
   }
 
   public boolean equals(Object other) {

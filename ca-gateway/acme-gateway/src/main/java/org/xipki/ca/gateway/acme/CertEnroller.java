@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.gateway.acme.type.CertReqMeta;
 import org.xipki.ca.gateway.acme.type.OrderStatus;
-import org.xipki.ca.gateway.acme.util.AcmeUtils;
 import org.xipki.ca.sdk.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;

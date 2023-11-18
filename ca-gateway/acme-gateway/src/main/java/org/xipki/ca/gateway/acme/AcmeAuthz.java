@@ -8,10 +8,13 @@ import org.xipki.ca.gateway.acme.msg.ChallengeResponse;
 import org.xipki.ca.gateway.acme.type.AuthzStatus;
 import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
+import org.xipki.util.JSON;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -19,9 +22,9 @@ import java.util.List;
  */
 public class AcmeAuthz {
 
-  private int subId;
+  private final int subId;
 
-  private AcmeIdentifier identifier;
+  private final AcmeIdentifier identifier;
 
   private AuthzStatus status;
   private Instant expires;
@@ -30,36 +33,63 @@ public class AcmeAuthz {
 
   private AcmeOrder order;
 
-  /**
-   * Only for the JSON deserializer
-   */
-  private AcmeAuthz() {
-  }
-
   public AcmeAuthz(int subId, AcmeIdentifier identifier) {
     this.subId = Args.notNull(subId, "subId");
     this.identifier = Args.notNull(identifier, "identifier");
   }
 
-  /**
-   * Only for JSON deserializer.
-   */
-  private void setSubId(int subId) {
-    this.subId = subId;
+  public Map<String, Object> encode() {
+    Map<String, Object> map = new HashMap<>();
+    map.put("subId", subId);
+    map.put("identifier", identifier.encode());
+    if (status != null) {
+      map.put("status", status.name());
+    }
+    if (expires != null) {
+      map.put("expires", expires.getEpochSecond());
+    }
+
+    if (challenges != null) {
+      List<Map<String, Object>> challMaps = new ArrayList<>(challenges.size());
+      for (AcmeChallenge m : challenges) {
+        challMaps.add(m.encode());
+      }
+      map.put("challenges", challMaps);
+    }
+    return map;
   }
 
-  /**
-   * Only for JSON deserializer.
-   */
-  private void setIdentifier(AcmeIdentifier identifier) {
-    this.identifier = identifier;
+  public static AcmeAuthz decode(Map<String, Object> encoded) {
+    int subId = AcmeUtils.getInt(encoded, "subId");
+    AcmeIdentifier identifier = AcmeIdentifier.decode((Map<String, Object>) encoded.get("identifier"));
+    String str = (String) encoded.get("status");
+    AuthzStatus status = (str == null) ? null : AuthzStatus.valueOf(str);
+    Long l = AcmeUtils.getLong(encoded, "expires");
+    Instant expires = (l == null) ? null : Instant.ofEpochSecond(l);
+    List<Map<String, Object>> challMaps = (List<Map<String, Object>>) encoded.get("challenges");
+
+    AcmeAuthz authz = new AcmeAuthz(subId, identifier);
+    List<AcmeChallenge> challenges = null;
+    if (challMaps != null) {
+      challenges = new ArrayList<>(challMaps.size());
+      for (Map<String, Object> m : challMaps) {
+        AcmeChallenge chall = AcmeChallenge.decode(m);
+        chall.setAuthz(authz);
+        challenges.add(chall);
+      }
+    }
+
+    authz.status = status;
+    authz.expires = expires;
+    authz.challenges = challenges;
+    return authz;
   }
 
-  public AcmeOrder order() {
+  public AcmeOrder getOrder() {
     return order;
   }
 
-  public void order(AcmeOrder order) {
+  public void setOrder(AcmeOrder order) {
     this.order = order;
   }
 
@@ -71,32 +101,18 @@ public class AcmeAuthz {
     return status;
   }
 
-  /**
-   * Only for JSON deserializer.
-   */
-  private void setStatus(AuthzStatus status) {
-    this.status = status;
-  }
-
-  public void status(AuthzStatus status) {
+  public void setStatus(AuthzStatus status) {
     markOrder();
-    setStatus(status);
+    this.status = status;
   }
 
   public Instant getExpires() {
     return expires;
   }
 
-  /**
-   * Only for JSON deserializer.
-   */
-  private void setExpires(Instant expires) {
-    this.expires = expires;
-  }
-
-  public void expires(Instant expires) {
+  public void setExpires(Instant expires) {
     markOrder();
-    setExpires(expires);
+    this.expires = expires;
   }
 
   public AcmeIdentifier getIdentifier() {
@@ -107,21 +123,14 @@ public class AcmeAuthz {
     return challenges;
   }
 
-  /**
-   * Only for JSON deserializer.
-   */
-  private void setChallenges(List<AcmeChallenge> challenges) {
+  public void setChallenges(List<AcmeChallenge> challenges) {
+    markOrder();
     this.challenges = challenges;
     if (challenges != null) {
       for (AcmeChallenge chall : challenges) {
-        chall.authz(this);
+        chall.setAuthz(this);
       }
     }
-  }
-
-  public void challenges(List<AcmeChallenge> challenges) {
-    markOrder();
-    setChallenges(challenges);
   }
 
   void markOrder() {
@@ -173,6 +182,23 @@ public class AcmeAuthz {
     }
 
     return copy;
+  }
+
+  public static String encodeAuthzs(List<AcmeAuthz> authzs) {
+    List<Map<String, Object>> maps = new ArrayList<>(authzs.size());
+    for (AcmeAuthz m : authzs) {
+      maps.add(m.encode());
+    }
+    return JSON.toJson(maps);
+  }
+
+  public static List<AcmeAuthz> decodeAuthzs(String encoded) {
+    List<Map<String, Object>> list = JSON.parseObject(encoded, List.class);
+    List<AcmeAuthz> ret = new ArrayList<>(list.size());
+    for (Map<String, Object> map : list) {
+      ret.add(AcmeAuthz.decode(map));
+    }
+    return ret;
   }
 
 }

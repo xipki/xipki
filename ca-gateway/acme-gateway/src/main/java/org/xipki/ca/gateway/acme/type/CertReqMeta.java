@@ -4,6 +4,7 @@
 package org.xipki.ca.gateway.acme.type;
 
 import org.xipki.util.CompareUtil;
+import org.xipki.util.JSON;
 
 import java.time.Instant;
 
@@ -61,6 +62,14 @@ public class CertReqMeta {
 
   public void setSubject(String subject) {
     this.subject = subject;
+  }
+
+  public String encode() {
+    return JSON.toJson(this);
+  }
+
+  public static CertReqMeta decode(String encoded) {
+    return JSON.parseObject(encoded, CertReqMeta.class);
   }
 
   @Override

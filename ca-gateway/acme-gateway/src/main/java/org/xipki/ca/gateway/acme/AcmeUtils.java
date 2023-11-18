@@ -1,18 +1,7 @@
-/*
- * #THIRDPARTY#
- * acme4j - Java ACME client
- *
- * Copyright (C) 2016 Richard "Shred" Körber
- *   http://acme4j.shredzone.org
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- */
-package org.xipki.ca.gateway.acme.util;
+// Copyright (c) 2013-2023 xipki. All rights reserved.
+// License Apache License 2.0
+
+package org.xipki.ca.gateway.acme;
 
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -25,7 +14,6 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.util.Pack;
-import org.xipki.ca.gateway.acme.AcmeProtocolException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
@@ -36,90 +24,29 @@ import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static org.xipki.util.Base64Url.decodeFast;
 
 /**
- * Contains utility methods that are frequently used for the ACME protocol.
- * <p>
- * This class is internal. You may use it in your own code, but be warned that methods may
- * change their signature or disappear without prior announcement.
- * @author ACME4J team
+ * ACME Utility classs
+ * @author Lijun Liao (xipki)
  */
-public final class AcmeUtils {
-    private static final Pattern DATE_PATTERN = Pattern.compile(
-                    "^(\\d{4})-(\\d{2})-(\\d{2})T"
-                  + "(\\d{2}):(\\d{2}):(\\d{2})"
-                  + "(?:\\.(\\d{1,3})\\d*)?"
-                  + "(Z|[+-]\\d{2}:?\\d{2})$", Pattern.CASE_INSENSITIVE);
-
-    private static final Pattern TZ_PATTERN = Pattern.compile(
-                "([+-])(\\d{2}):?(\\d{2})$");
+final class AcmeUtils {
 
     private AcmeUtils() {
         // Utility class without constructor
     }
 
-    /**
-     * Parses an RFC 3339 formatted date.
-     *
-     * @param str
-     *            Date string
-     * @return {@link Instant} that was parsed
-     * @throws IllegalArgumentException
-     *             if the date string was not RFC 3339 formatted
-     * @see <a href="https://www.ietf.org/rfc/rfc3339.txt">RFC 3339</a>
-     */
-    public static Instant parseTimestamp(String str) {
-        Matcher m = DATE_PATTERN.matcher(str);
-        if (!m.matches()) {
-            throw new IllegalArgumentException("Illegal date: " + str);
-        }
-
-        int year = Integer.parseInt(m.group(1));
-        int month = Integer.parseInt(m.group(2));
-        int dom = Integer.parseInt(m.group(3));
-        int hour = Integer.parseInt(m.group(4));
-        int minute = Integer.parseInt(m.group(5));
-        int second = Integer.parseInt(m.group(6));
-
-        StringBuilder msStr = new StringBuilder();
-        if (m.group(7) != null) {
-            msStr.append(m.group(7));
-        }
-        while (msStr.length() < 3) {
-            msStr.append('0');
-        }
-        int ms = Integer.parseInt(msStr.toString());
-
-        String tz = m.group(8);
-        if ("Z".equalsIgnoreCase(tz)) {
-            tz = "GMT";
-        } else {
-            tz = TZ_PATTERN.matcher(tz).replaceAll("GMT$1$2:$3");
-        }
-
-        return ZonedDateTime.of(
-                year, month, dom, hour, minute, second, ms * 1_000_000,
-                ZoneId.of(tz)).toInstant();
-    }
-
     public static PublicKey jwkPublicKey(Map<String, String> jwk) throws InvalidKeySpecException {
         String kty = jwk.get("kty");
         if ("RSA".equalsIgnoreCase(kty)) {
-            BigInteger n = new BigInteger(1, Base64Url.decodeFast(jwk.get("n")));
-            BigInteger e = new BigInteger(1, Base64Url.decodeFast(jwk.get("e")));
-            return KeyUtil.generateRSAPublicKey(new RSAPublicKeySpec(n, e));
+            return KeyUtil.generateRSAPublicKey(new RSAPublicKeySpec(
+                new BigInteger(1, decodeFast(jwk.get("n"))), new BigInteger(1, decodeFast(jwk.get("e")))));
         } else if ("EC".equalsIgnoreCase(kty)) {
             String curveName = jwk.get("crv");
             ASN1ObjectIdentifier curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
-            byte[] x = Base64Url.decodeFast(jwk.get("x"));
-            byte[] y = Base64Url.decodeFast(jwk.get("y"));
-            byte[] encodedPoint = buildECPublicKeyData(curveOid, x, y);
+            byte[] encodedPoint = buildECPublicKeyData(curveOid, decodeFast(jwk.get("x")), decodeFast(jwk.get("y")));
             return KeyUtil.createECPublicKey(curveOid, encodedPoint);
         } else {
             throw new InvalidKeySpecException("unsupported kty " + kty);
@@ -143,12 +70,12 @@ public final class AcmeUtils {
                 return false;
             }
 
-            BigInteger n = new BigInteger(1, Base64Url.decodeFast(jwk.get("n")));
-            BigInteger e = new BigInteger(1, Base64Url.decodeFast(jwk.get("e")));
+            BigInteger n = new BigInteger(1, decodeFast(jwk.get("n")));
+            BigInteger e = new BigInteger(1, decodeFast(jwk.get("e")));
 
             ASN1Sequence seq = ASN1Sequence.getInstance(pkInfo.getPublicKeyData().getOctets());
             BigInteger n2 = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
-            BigInteger e2 = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
+            BigInteger e2 = ASN1Integer.getInstance(seq.getObjectAt(1)).getPositiveValue();
             return n.equals(n2) && e.equals(e2);
         } else if ("EC".equalsIgnoreCase(kty)) {
             if (!X9ObjectIdentifiers.id_ecPublicKey.equals(pkKeyAlgo)) {
@@ -168,9 +95,7 @@ public final class AcmeUtils {
                 return false;
             }
 
-            byte[] x = Base64Url.decodeFast(jwk.get("x"));
-            byte[] y = Base64Url.decodeFast(jwk.get("y"));
-            byte[] encodedPoint = buildECPublicKeyData(curveOid, x, y);
+            byte[] encodedPoint = buildECPublicKeyData(curveOid, decodeFast(jwk.get("x")), decodeFast(jwk.get("y")));
             return Arrays.equals(pkInfo.getPublicKeyData().getBytes(), encodedPoint);
         } else {
             throw new RuntimeException("unsupported kty " + kty);
@@ -233,14 +158,6 @@ public final class AcmeUtils {
         return res;
     }
 
-    public static Map<String, String> jsonToMap(AcmeJson json) throws AcmeProtocolException {
-        Map<String, String> map = new HashMap<>();
-        for (String name : json.keySet()) {
-            map.put(name, json.get(name).asString());
-        }
-        return map;
-    }
-
     public static String toBase64(long label) {
         return Base64Url.encodeToStringNoPadding(Pack.longToLittleEndian(label));
     }
@@ -259,6 +176,34 @@ public final class AcmeUtils {
 
         return Base64Url.encodeToStringNoPadding(
             HashAlgo.SHA256.hash(canonJwk.toString().getBytes(StandardCharsets.UTF_8)));
+    }
+
+    public static Long getLong(Map<String, Object> map, String name) {
+        Object obj = map.get(name);
+        if (obj == null) {
+            return null;
+        }
+        if (obj instanceof Integer){
+            return (long) ((int) obj);
+        } else {
+            return (Long) obj;
+        }
+    }
+
+    public static Integer getInt(Map<String, Object> map, String name) {
+        Object obj = map.get(name);
+        if (obj == null) {
+            return null;
+        }
+        if (obj instanceof Long){
+            long l = (long) obj;
+            if (l > Integer.MAX_VALUE || l < Integer.MIN_VALUE) {
+                throw new IllegalStateException("value of " + name + " is outside the integer range");
+            }
+            return (int) l;
+        } else {
+            return (Integer) obj;
+        }
     }
 
 }

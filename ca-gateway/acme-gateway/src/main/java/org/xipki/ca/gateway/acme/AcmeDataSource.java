@@ -6,14 +6,12 @@ package org.xipki.ca.gateway.acme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.gateway.acme.type.*;
-import org.xipki.ca.gateway.acme.util.AcmeUtils;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Base64Url;
 import org.xipki.util.CompareUtil;
-import org.xipki.util.JSON;
 
 import java.security.SecureRandom;
 import java.sql.PreparedStatement;
@@ -22,7 +20,10 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -106,7 +107,7 @@ public class AcmeDataSource {
       ps.setLong(index++, Instant.now().getEpochSecond());
       ps.setInt(index++, account.getStatus().getCode());
       ps.setString(index++, account.getJwkSha256());
-      ps.setString(index, JSON.toJson(account.getData()));
+      ps.setString(index, account.getData().encode());
       ps.executeUpdate();
       LOG.info("Database: added account " + account.getId());
     } catch (SQLException ex) {
@@ -154,8 +155,8 @@ public class AcmeDataSource {
 
     boolean updateJwkFp = oldAccount.getJwkSha256().equals(newAccount.getJwkSha256());
     boolean updateStatus = oldAccount.getStatus() != newAccount.getStatus();
-    String oldData = JSON.toJson(oldAccount.getData());
-    String newData = JSON.toJson(newAccount.getData());
+    String oldData = oldAccount.getData().encode();
+    String newData = newAccount.getData().encode();
     boolean updateData = !oldData.equals(newData);
 
     if (!(updateJwkFp || updateStatus || updateData)) {
@@ -230,7 +231,7 @@ public class AcmeDataSource {
       }
 
       AccountStatus status = AccountStatus.ofCode(rs.getInt("STATUS"));
-      AcmeAccount.Data data = JSON.parseObject(rs.getString("DATA"), AcmeAccount.Data.class);
+      AcmeAccount.Data data = AcmeAccount.Data.decode(rs.getString("DATA"));
       long id = rs.getLong("ID");
       AcmeAccount ret = new AcmeAccount(id, this);
       ret.setData(data);
@@ -273,7 +274,7 @@ public class AcmeDataSource {
       if (order.getCertReqMeta() == null) {
         ps.setNull(index, Types.VARCHAR);
       } else {
-        ps.setString(index, JSON.toJson(order.getCertReqMeta()));
+        ps.setString(index, order.getCertReqMeta().encode());
       }
       index++;
 
@@ -291,7 +292,7 @@ public class AcmeDataSource {
       }
       index++;
 
-      ps.setString(index, JSON.toJson(order.getAuthzs()));
+      ps.setString(index, order.getEncodedAuthzs());
 
       ps.executeUpdate();
       LOG.info("Database: added order " + order.getId());
@@ -371,7 +372,7 @@ public class AcmeDataSource {
         if (newOrder.getAuthzs() == null) {
           ps.setNull(index, Types.VARCHAR);
         } else {
-          ps.setString(index, JSON.toJson(newOrder.getAuthzs()));
+          ps.setString(index, newOrder.getEncodedAuthzs());
         }
         index++;
       }
@@ -380,7 +381,7 @@ public class AcmeDataSource {
         if (newOrder.getCertReqMeta() == null) {
           ps.setNull(index, Types.VARCHAR);
         } else {
-          ps.setString(index, JSON.toJson(newOrder.getCertReqMeta()));
+          ps.setString(index, newOrder.getCertReqMeta().encode());
         }
         index++;
       }
@@ -451,7 +452,6 @@ public class AcmeDataSource {
 
   private AcmeOrder buildOrder(ResultSet rs, Long id) throws SQLException {
     // ACCOUNT_ID,STATUS,EXPIRES,CSR,CERT,AUTHZS
-    String authzsStr = rs.getString("AUTHZS");
     long accountId = rs.getLong("ACCOUNT_ID");
     if (id == null) {
       id = rs.getLong("ID");
@@ -463,13 +463,11 @@ public class AcmeDataSource {
     order.setExpires(Instant.ofEpochSecond(rs.getLong("EXPIRES")));
     String str = rs.getString("CERTREQ_META");
     if (str != null) {
-      order.setCertReqMeta(JSON.parseObject(str, CertReqMeta.class));
+      order.setCertReqMeta(CertReqMeta.decode(str));
     }
 
-    AcmeAuthz[] authzs = JSON.parseObject(authzsStr, AcmeAuthz[].class);
-    List<AcmeAuthz> list = new ArrayList<>(authzs.length);
-    Collections.addAll(list, authzs);
-    order.setAuthzs(list);
+    String authzsStr = rs.getString("AUTHZS");
+    order.setAuthzs(AcmeAuthz.decodeAuthzs(authzsStr));
 
     return order;
   }
@@ -518,7 +516,7 @@ public class AcmeDataSource {
 
       List<ChallId> ids =  new LinkedList<>();
       while (rs.next()) {
-        AcmeAuthz[] authzs = JSON.parseObject(rs.getString("AUTHZS"), AcmeAuthz[].class);
+        List<AcmeAuthz> authzs = AcmeAuthz.decodeAuthzs(rs.getString("AUTHZS"));
         addChallengesToValidate(ids, rs.getLong("ID"), authzs);
       }
       return ids;
@@ -589,7 +587,7 @@ public class AcmeDataSource {
     return sum;
   }
 
-  private static void addChallengesToValidate(List<ChallId> res, long orderId, AcmeAuthz[] authzs) {
+  private static void addChallengesToValidate(List<ChallId> res, long orderId, List<AcmeAuthz> authzs) {
     for (AcmeAuthz authz : authzs) {
       if (authz.getStatus() != AuthzStatus.pending) {
         continue;
