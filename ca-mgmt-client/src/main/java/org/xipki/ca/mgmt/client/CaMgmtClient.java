@@ -31,11 +31,11 @@ import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.time.Instant;
 import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * CA management client via REST API.
@@ -256,6 +256,18 @@ public class CaMgmtClient implements CaManager {
     MgmtRequest.AddCa req = new MgmtRequest.AddCa();
     req.setCaEntry(caEntry);
     voidTransmit(MgmtAction.addCa, req);
+  }
+
+  @Override
+  public List<X509Cert> getCaCerts(String caName) throws CaMgmtException {
+    MgmtRequest.Name req = new MgmtRequest.Name(caName);
+    byte[] respBytes = transmit(MgmtAction.getCaCerts, req);
+    try {
+      String str = parse(respBytes, MgmtResponse.StringResponse.class).getResult();
+      return X509Util.parseCerts(str.getBytes(StandardCharsets.UTF_8));
+    } catch (IOException | CertificateException ex) {
+      throw new CaMgmtException(ex);
+    }
   }
 
   @Override
@@ -657,32 +669,19 @@ public class CaMgmtClient implements CaManager {
   } // method getCert
 
   @Override
-  public Map<String, X509Cert> loadConf(byte[] zippedConfBytes) throws CaMgmtException, IOException {
+  public void loadConf(byte[] zippedConfBytes) throws CaMgmtException, IOException {
     try (InputStream is = new ByteArrayInputStream(zippedConfBytes)) {
-      return loadConfAndClose(is);
+      loadConfAndClose(is);
     }
   }
 
   @Override
-  public Map<String, X509Cert> loadConfAndClose(InputStream zippedConfStream)
+  public void loadConfAndClose(InputStream zippedConfStream)
       throws CaMgmtException, IOException {
     MgmtRequest.LoadConf req = new MgmtRequest.LoadConf();
     req.setConfBytes(IoUtil.readAllBytes(zippedConfStream));
-    byte[] respBytes = transmit(MgmtAction.loadConf, req);
-
-    MgmtResponse.LoadConf resp = parse(respBytes, MgmtResponse.LoadConf.class);
-    Map<String, byte[]> nameCertMap = resp.getResult();
-
-    if (nameCertMap == null) {
-      return null;
-    } else {
-      Map<String, X509Cert> result = new HashMap<>(nameCertMap.size());
-      for (Entry<String, byte[]> entry : nameCertMap.entrySet()) {
-        result.put(entry.getKey(), parseCert(entry.getValue()));
-      }
-      return result;
-    }
-  } // method loadConf
+    voidTransmit(MgmtAction.loadConf, req);
+  }
 
   @Override
   public InputStream exportConf(List<String> caNames) throws CaMgmtException {

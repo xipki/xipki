@@ -71,6 +71,12 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
+    <fileSet>
+      <directory>../xipki-ca/src/assembly/unfiltered/xipki/etc/ca/example</directory>
+      <outputDirectory>xipki/ca-setup</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
     <!-- Copy over start scripts -->
     <fileSet>
       <directory>${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin</directory>

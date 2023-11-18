@@ -262,6 +262,14 @@ CA Management Commands
 
      update CA
 
+   * `ca:cacert`
+
+     get CA's certificate
+
+   * `ca:cacerts`
+
+     get CA's certificate chain.
+
    * `ca:caalias-add`
 
      add CA alias

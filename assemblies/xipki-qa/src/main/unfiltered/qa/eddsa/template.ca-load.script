@@ -1,9 +1,10 @@
 source file:./qa/eddsa/initdb.script
 
-echo "Sleeping 1 second"
-sleep 1
+echo "Restart CA (tomcat) server!"
 
-ca:restart
+xi:exec '~/tools/xipki/ca-tomcat/bin/shutdown.sh'
+xi:exec '~/tools/xipki/ca-tomcat/bin/startup.sh'
+sleep 5
 
 echo "#################################################################"
 echo "#                        Load rootca.json                       #"
@@ -26,10 +27,9 @@ xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
 xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
   qa/eddsa/rootca.json
 
-ca:load-conf --conf-file qa/eddsa/rootca.json \
-  --out-dir output
+ca:load-conf qa/eddsa/rootca.json
 
-xi:move-file output/ca-rootca1.crt output/rootca1.crt
+ca:cacert --outform pem --out output/rootca1.crt rootca1
 
 ## Update the certificate in the device
 if { $TOKEN_TYPE equals "pkcs12" } then {
@@ -76,11 +76,8 @@ xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
 xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
   qa/eddsa/subca.json
 
-ca:load-conf --conf-file qa/eddsa/subca.json
+ca:load-conf qa/eddsa/subca.json
 
 # Remove CertProfile rootca
 
 ca:profile-rm -f rootca
-
-## Restart the CA
-#ca:restart

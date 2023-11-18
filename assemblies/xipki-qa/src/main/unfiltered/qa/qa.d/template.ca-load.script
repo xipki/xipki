@@ -1,9 +1,9 @@
 source file:./qa/qa.d/initdb.script
 
-echo "Sleeping 1 second"
-sleep 1
-
-ca:restart
+echo "Restart CA (tomcat) server!"
+xi:exec '~/tools/xipki/ca-tomcat/bin/shutdown.sh'
+xi:exec '~/tools/xipki/ca-tomcat/bin/startup.sh'
+sleep 5
 
 echo "#################################################################"
 echo "#                        Load rootca.json                       #"
@@ -35,11 +35,9 @@ xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
 xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
   qa/qa.d/rootca.json
 
-ca:load-conf --conf-file qa/qa.d/rootca.json \
-  --outform $OUTFORM \
-  --out-dir output
+ca:load-conf qa/qa.d/rootca.json
 
-xi:move-file output/ca-rootca1.crt output/rootca1.crt
+ca:cacert --out output/rootca1.crt rootca1
 
 ## Update the certificate in the device
 if { $TOKEN_TYPE equals "pkcs12" } then {
@@ -170,7 +168,7 @@ xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
 xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
   qa/qa.d/subca.json
 
-ca:load-conf --conf-file qa/qa.d/subca.json
+ca:load-conf qa/qa.d/subca.json
 
 # Remove CertProfile rootca
 
@@ -208,4 +206,4 @@ xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
 xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
   qa/qa.d/subcawithcrl.json
 
-ca:load-conf --conf-file qa/qa.d/subcawithcrl.json
+ca:load-conf qa/qa.d/subcawithcrl.json

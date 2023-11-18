@@ -44,7 +44,7 @@ class ConfLoader {
     this.manager = Args.notNull(manager, "manager");
   } // constructor
 
-  Map<String, X509Cert> loadConf(InputStream zippedConfStream) throws CaMgmtException {
+  void loadConf(InputStream zippedConfStream) throws CaMgmtException {
     manager.assertMasterModeAndSetuped();
 
     Args.notNull(zippedConfStream, "zippedConfStream");
@@ -59,8 +59,6 @@ class ConfLoader {
     } catch (RuntimeException ex) {
       throw new CaMgmtException("caught RuntimeException while parsing the CA configuration", ex);
     }
-
-    Map<String, X509Cert> generatedRootCerts = new HashMap<>(2);
 
     // DBSCHEMA
     for (String dbSchemaName : conf.getDbSchemaNames()) {
@@ -209,10 +207,9 @@ class ConfLoader {
           }
         } else {
           if (genSelfIssued != null) {
-            X509Cert cert = manager.generateRootCa(caEntry, genSelfIssued.getProfile(), genSelfIssued.getSubject(),
+            manager.generateRootCa(caEntry, genSelfIssued.getProfile(), genSelfIssued.getSubject(),
                 genSelfIssued.getSerialNumber(), genSelfIssued.getNotBefore(), genSelfIssued.getNotAfter());
             LOG.info("generated root CA {}", caName);
-            generatedRootCerts.put(caName, cert);
           } else {
             try {
               manager.addCa(caEntry);
@@ -309,8 +306,6 @@ class ConfLoader {
         }
       } // scc.getRequestors()
     } // cas
-
-    return generatedRootCerts.isEmpty() ? null : generatedRootCerts;
   } // method loadConf
 
   InputStream exportConf(List<String> caNames) throws CaMgmtException, IOException {

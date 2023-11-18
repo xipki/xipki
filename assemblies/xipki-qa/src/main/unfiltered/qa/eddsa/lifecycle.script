@@ -77,6 +77,11 @@ if { $printUsage equals "true" } then {
   xi:copy-file -f qa/eddsa/template.ca-load.script \
     qa/eddsa/ca-load.script
 
+  echo "Restart Gateway (tomcat) server!"
+  xi:exec '~/tools/xipki/gateway-tomcat/bin/shutdown.sh'
+  xi:exec '~/tools/xipki/gateway-tomcat/bin/startup.sh'
+  sleep 5
+
   source file:./qa/eddsa/ca-load.script
 
   echo "#################################################################"
@@ -89,22 +94,6 @@ if { $printUsage equals "true" } then {
     --subject "C=DE,O=example org,CN=ocsp99" --profile ocsp \
     --p12-out output/ocsp99.p12 --cert-out output/ocsp99.crt --password CHANGEIT \
     --signer-password CHANGEIT --signer-p12 xipki/keycerts/cmp-client.p12
-
-  ## Copy the configuration of OCSP responder
-  #xi:copy-file -f \
-  #  xipki/etc/ocsp/ocsp-responder.json \
-  #  ${XIPKI_DIR}/etc/ocsp/ocsp-responder.json
-
-  #if { "$TOKEN_TYPE" equals "pkcs12" } then {
-  #  xi:copy-file -f output/ocsp99.p12 \
-  #    ${XIPKI_DIR}/keycerts/ocsp99.p12
-  #}
-
-  ## Restart OCSP server
-  #ocsp:restart-server
-
-  #echo "Sleeping 1 second"
-  #sleep 1
 
   source file:./qa/eddsa/qa.script
 

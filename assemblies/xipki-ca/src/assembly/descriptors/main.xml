@@ -84,5 +84,11 @@
       <destName>pkcs11.json</destName>
       <fileMode>0644</fileMode>
     </file>
+    <file>
+      <source>${project.build.directory}/xipki/etc/ca/example/dbbased-ca.json</source>
+      <outputDirectory>xipki/etc/ca</outputDirectory>
+      <destName>ca.json</destName>
+      <fileMode>0644</fileMode>
+    </file>
   </files>
 </assembly>

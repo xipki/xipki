@@ -13,10 +13,7 @@ import org.xipki.ca.api.mgmt.CaConfs;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaSystemStatus;
 import org.xipki.ca.mgmt.shell.CaActions.CaAction;
-import org.xipki.security.X509Cert;
 import org.xipki.shell.CmdFailure;
-import org.xipki.shell.Completers;
-import org.xipki.util.CollectionUtil;
 import org.xipki.util.IoUtil;
 
 import java.io.File;
@@ -24,8 +21,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * Misc actions to manage CA.
@@ -66,17 +61,9 @@ public class MiscActions {
   @Service
   public static class LoadConf extends CaAction {
 
-    @Option(name = "--conf-file", required = true, description = "CA system configuration file (JSON or zip file)")
+    @Argument(name = "conf-file", required = true, description = "CA system configuration file (JSON or zip file)")
     @Completion(FileCompleter.class)
     private String confFile;
-
-    @Option(name = "--outform", description = "output format of the root certificates")
-    @Completion(Completers.DerPemCompleter.class)
-    protected String outform = "der";
-
-    @Option(name = "--out-dir", description = "directory to save the root certificates")
-    @Completion(FileCompleter.class)
-    private String outDir = ".";
 
     @Override
     protected Object execute0() throws Exception {
@@ -84,23 +71,13 @@ public class MiscActions {
       try {
         InputStream confStream = confFile.endsWith(".json")
             ? CaConfs.convertFileConfToZip(confFile) : Files.newInputStream(Paths.get(confFile));
-        Map<String, X509Cert> rootCerts = caManager.loadConfAndClose(confStream);
-        if (CollectionUtil.isEmpty(rootCerts)) {
-          println("loaded " + msg);
-        } else {
-          println("loaded " + msg);
-          for (Entry<String, X509Cert> entry : rootCerts.entrySet()) {
-            String caname = entry.getKey();
-            String filename = "ca-" + caname + ".crt";
-            saveVerbose("saved certificate of root CA " + caname + " to",
-                new File(outDir, filename), encodeCert(entry.getValue().getEncoded(), outform));
-          }
-        }
-        return null;
+        caManager.loadConfAndClose(confStream);
+        println("loaded " + msg);
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not load " + msg + ", error: " + ex.getMessage(), ex);
       }
-    } // method execute0
+      return null;
+    }
 
   } // class LoadConf
 

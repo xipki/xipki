@@ -433,28 +433,6 @@ public abstract class MgmtResponse extends MgmtMessage {
     }
 
   } // class ListCertificates
-
-  public static class LoadConf extends MgmtResponse {
-
-    private Map<String, byte[]> result;
-
-    public LoadConf() {
-    }
-
-    public LoadConf(Map<String, byte[]> result) {
-      this.result = result;
-    }
-
-    public Map<String, byte[]> getResult() {
-      return result;
-    }
-
-    public void setResult(Map<String, byte[]> result) {
-      this.result = result;
-    }
-
-  } // class LoadConf
-
   public static class StringResponse extends MgmtResponse {
 
     private String result;

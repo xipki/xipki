@@ -685,6 +685,16 @@ public interface CaManager {
   X509CRLHolder getCurrentCrl(String caName) throws CaMgmtException;
 
   /**
+   * Returns CA certificate chain, starting with the CA's certificate,  for the CA {@code caName}.
+   * @param caName
+   *          CA name. Must not be {@code null}.
+   * @return the certificate chain.
+   * @throws CaMgmtException
+   *          if error occurs.
+   */
+  List<X509Cert> getCaCerts(String caName) throws CaMgmtException;
+
+  /**
    * Returns certificate with status information for the CA {@code caName}
    * and with serial number {@code serialNumber}.
    * @param caName
@@ -695,8 +705,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  CertWithRevocationInfo getCert(String caName, BigInteger serialNumber)
-      throws CaMgmtException;
+  CertWithRevocationInfo getCert(String caName, BigInteger serialNumber) throws CaMgmtException;
 
   /**
    * Returns certificate with revocation information for the {@code issuer}
@@ -709,36 +718,31 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  CertWithRevocationInfo getCert(X500Name issuer, BigInteger serialNumber)
-      throws CaMgmtException;
+  CertWithRevocationInfo getCert(X500Name issuer, BigInteger serialNumber) throws CaMgmtException;
 
   /**
    * Loads the CA system configuration.
    * The specified stream is closed after this method call.
    * @param zippedConfBytes
    *          Byte array of the zipped Configuration the CA system. Must not be {@code null}.
-   * @return map of generated root certificates, if newly generated. The key is the CA name.
    * @throws IOException
    *          If read the ZIP stream fails.
    * @throws CaMgmtException
    *          if other error occurs.
    */
-  Map<String, X509Cert> loadConf(byte[] zippedConfBytes)
-      throws CaMgmtException, IOException;
+  void loadConf(byte[] zippedConfBytes) throws CaMgmtException, IOException;
 
   /**
    * Loads the CA system configuration.
    * The specified stream is closeds after this method call.
    * @param zippedConfStream
    *          Inputstream of the zipped Configuration the CA system. Must not be {@code null}.
-   * @return map of generated root certificates, if newly generated. The key is the CA name.
    * @throws IOException
    *          If read the ZIP stream fails.
    * @throws CaMgmtException
    *          if other error occurs.
    */
-  Map<String, X509Cert> loadConfAndClose(InputStream zippedConfStream)
-      throws CaMgmtException, IOException;
+  void loadConfAndClose(InputStream zippedConfStream) throws CaMgmtException, IOException;
 
   /**
    * Exports the CA system configuration to a zip-stream.
@@ -798,7 +802,6 @@ public interface CaManager {
    */
   Set<String> getSupportedPublisherTypes() throws CaMgmtException;
 
-  String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose)
-      throws CaMgmtException;
+  String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose) throws CaMgmtException;
 
 }

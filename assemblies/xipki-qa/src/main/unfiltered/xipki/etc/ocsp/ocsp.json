@@ -2,8 +2,6 @@
 	// To activate the logging of requests and responses, set writer.level to DEBUG
 	// in the file META-INF/classes/log4j2.properties.
 	"logReqResp": true,
-	// valid values are NO, APACHE, NGINX, GENERAL
-	//"reverseProxyMode":"GENERAL",
 	"serverConf":"etc/ocsp/ocsp-responder.json",
 	"security":{
 		"keyStrongrandomEnabled":false,
@@ -15,13 +13,6 @@
 		"password":{
 			"masterPasswordCallback":"FILE file=security/masterpassword.secret"
 		}
-	}
-	,
-	"remoteMgmt":{
-		"enabled":true,
-		"certs":[{
-			"file":"keycerts/ocsp-mgmt-client-cert.pem"
-		}]
 	}
 }
 

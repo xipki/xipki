@@ -1,0 +1,2 @@
+Scripts to setup CA using present CA key and certificate pair.
+No database for caconf is used here. Database to store certificates and CRLs is still needed.

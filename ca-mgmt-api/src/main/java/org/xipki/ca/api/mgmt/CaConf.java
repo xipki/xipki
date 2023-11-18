@@ -5,7 +5,6 @@ package org.xipki.ca.api.mgmt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;

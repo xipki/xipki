@@ -223,16 +223,6 @@ if { $printUsage equals "true" } then {
   xi:replace --old "REPLACEME-GM" --new "${gm}" \
     qa/qa.d/ra.script
 
-  echo "Restart ca, ocsp (tomcat) server!"
-  xi:exec '~/tools/xipki/ca-tomcat/bin/shutdown.sh'
-  xi:exec '~/tools/xipki/ocsp-tomcat/bin/shutdown.sh'
-  xi:exec '~/tools/xipki/gateway-tomcat/bin/shutdown.sh'
-  sleep 2
-
-  xi:exec '~/tools/xipki/ca-tomcat/bin/startup.sh'
-  xi:exec '~/tools/xipki/ocsp-tomcat/bin/startup.sh'
-  sleep 5
-
   if { "$1" equals "-l" } then {
     source file:./qa/qa.d/ca-load.script
   } else {
@@ -301,8 +291,10 @@ if { $printUsage equals "true" } then {
   xi:copy-file -f qa/qa.d/rootca.crl.download \
     ${OCSP_XIPKI_DIR}/crls/example-crls/crl-download-mycrl2/crl.download
 
-  # Restart OCSP server
-  ocsp:restart-server
+  echo "Restart ocsp (tomcat) server!"
+  xi:exec '~/tools/xipki/ocsp-tomcat/bin/shutdown.sh'
+  xi:exec '~/tools/xipki/ocsp-tomcat/bin/startup.sh'
+  sleep 5
 
   source file:./qa/ocsp.script
 

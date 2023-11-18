@@ -7,24 +7,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.license.api.LicenseFactory;
 import org.xipki.ocsp.server.OcspConf;
-import org.xipki.ocsp.server.OcspConf.RemoteMgmt;
 import org.xipki.ocsp.server.OcspServerImpl;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.Securities;
-import org.xipki.security.X509Cert;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.LogUtil;
 import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpFilter;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * The Servlet Filter of OCSP servlets.
@@ -47,10 +41,6 @@ public class OcspHttpFilter implements XiHttpFilter {
   private final OcspHealthCheckServlet healthServlet;
 
   private final HttpOcspServlet ocspServlet;
-
-  private final boolean remoteMgmtEnabled;
-
-  private OcspHttpMgmtServlet mgmtServlet;
 
   public OcspHttpFilter(String licenseFactoryClazz) throws Exception {
     XipkiBaseDir.init();
@@ -86,27 +76,6 @@ public class OcspHttpFilter implements XiHttpFilter {
     this.server = ocspServer;
     healthServlet = new OcspHealthCheckServlet(this.server);
     ocspServlet = new HttpOcspServlet(logReqResp, this.server);
-
-    RemoteMgmt remoteMgmt = conf.getRemoteMgmt();
-    this.remoteMgmtEnabled = remoteMgmt != null && remoteMgmt.isEnabled();
-    LOG.info("remote management is {}", remoteMgmtEnabled ? "enabled" : "disabled");
-
-    if (remoteMgmtEnabled) {
-      if (CollectionUtil.isNotEmpty(remoteMgmt.getCerts())) {
-        List<X509Cert> certs = null;
-        try {
-          certs = X509Util.parseCerts(remoteMgmt.getCerts());
-        } catch (InvalidConfException ex) {
-          LogUtil.error(LOG, ex, "could not parse client certificates, disable the remote management");
-        }
-
-        if (CollectionUtil.isEmpty(certs)) {
-          LOG.error("could not find any valid client certificates, disable the remote management");
-        } else {
-          mgmtServlet = new OcspHttpMgmtServlet(CollectionUtil.listToSet(certs), server, conf.getReverseProxyMode());
-        }
-      }
-    }
   } // method init
 
   @Override
@@ -145,13 +114,6 @@ public class OcspHttpFilter implements XiHttpFilter {
       String servletPath = path.substring(7); // 7 = "/health".length()
       req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, servletPath);
       healthServlet.service(req, resp);
-    } else if (path.startsWith("/mgmt/")) {
-      if (mgmtServlet != null) {
-        req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/mgmt".length()
-        mgmtServlet.service(req, resp);
-      } else {
-        resp.sendError(HttpStatusCode.SC_FORBIDDEN);
-      }
     } else {
       req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path);
       ocspServlet.service(req, resp);

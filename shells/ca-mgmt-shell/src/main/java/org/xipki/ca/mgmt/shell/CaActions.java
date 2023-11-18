@@ -27,6 +27,7 @@ import org.xipki.shell.XiAction;
 import org.xipki.util.*;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.*;
@@ -420,6 +421,62 @@ public class CaActions {
     } // method execute0
 
   } // class GenRootca
+
+  @Command(scope = "ca", name = "cacert", description = "get CA's certificate")
+  @Service
+  public static class CaCert extends CaAction {
+
+    @Argument(name = "name", required = true, description = "CA name")
+    @Completion(CaCompleters.CaNameCompleter.class)
+    private String name;
+
+    @Option(name = "--outform", description = "output format of the certificate")
+    @Completion(Completers.DerPemCompleter.class)
+    protected String outform = "der";
+
+    @Option(name = "--out", aliases = "-o", required = true,
+        description = "where to save the certificate file")
+    @Completion(FileCompleter.class)
+    protected String outFile;
+
+    @Override
+    protected Object execute0() throws Exception {
+      List<X509Cert> certs = caManager.getCaCerts(name);
+      if ("der".equalsIgnoreCase(outform)) {
+        IoUtil.save(outFile, certs.get(0).getEncoded());
+      } else if ("pem".equalsIgnoreCase(outform)) {
+        IoUtil.save(outFile, X509Util.toPemCert(certs.get(0)).getBytes(StandardCharsets.UTF_8));
+      } else {
+        throw new IllegalCmdParamException("invalid outform " + outform);
+      }
+
+      return null;
+    }
+
+  }
+
+  @Command(scope = "ca", name = "cacerts", description = "get CA's certificate chain")
+  @Service
+  public static class CaCerts extends CaAction {
+
+    @Argument(name = "name", required = true, description = "CA name")
+    @Completion(CaCompleters.CaNameCompleter.class)
+    private String name;
+
+    @Option(name = "--out", aliases = "-o", required = true,
+        description = "where to save the certificate chain (PEM file)")
+    @Completion(FileCompleter.class)
+    protected String outFile;
+
+    @Override
+    protected Object execute0() throws Exception {
+      List<X509Cert> certs = caManager.getCaCerts(name);
+      IoUtil.save(outFile,
+          X509Util.encodeCertificates(certs.toArray(new X509Cert[0])).getBytes(StandardCharsets.UTF_8));
+      return null;
+    }
+
+  }
 
   @Command(scope = "ca", name = "ca-info", description = "show information of CA")
   @Service

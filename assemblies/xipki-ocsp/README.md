@@ -25,7 +25,7 @@ Deployment in Tomcat (8, 9 and 10)
     - The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
       `setenv.sh` and `setenv.bat` must be adapted to point to the new position.
     - In `${CATALINA_HOME}/lib`, if an old version of a jar file exists, remove it first.
-3. (Optional) If you use database other than H2, PostgreSQL, MariaDB and MySQL, you need to download
+3. (Optional) If you use database other than PostgreSQL, MariaDB and MySQL, you need to download
    the JDBC driver to the folder `${CATALINA_HOME}/lib`.
 4. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
    configuration files `ca-db.properties`, `ocsp-db.properties` with those in the corresponding sub

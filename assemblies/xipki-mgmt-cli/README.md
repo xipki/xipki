@@ -8,19 +8,28 @@
 
   `bin/karaf`
 
-* Setup CA (for the scripts `setup-p11.scrip` and `setup-p11.scrip`, MGMT-CLI shall be on the same
-  machine as the tomcat CA server)
-    * In case of using new keys and certificates, in the Management CLI:  
-      `source xipki/ca-setup/cacert-none/setup-{p11|p12}.script {rsa|ec|dsa|sm2} <tomcat dir>`
-      where * is placeholder.
+* Setup CA (MGMT-CLI shall be on the same machine as the tomcat CA server)  
+    `source xipki/ca-setup/<folder>/setup-{p11|p12}.script {rsa|ec|dsa|sm2|eddsa} <tomcat-dir> [<xipki-dir>]`,  
+  `xipki-dir` is optional and has default value `<tomca-dir>/xipki`.
+  And `<folder>` is:
+    * If the CA configuration is saved in the database (2 database instances are needed, 
+      as specified in `caconf-db.properties` and `ca-db.properties`):
+      * In case of using new keys and certificates, in the Management CLI:  
+        `cacert-none`
+      * In case of using existing keys and certificates, in the Management CLI:  
+        `cacert-present`
+  * If the CA configuration is read from configuration files (CA itself is not configurable, only 1
+    database instance is needed, as specified in `ca-db.properties`):
+      * In case of using new keys and certificates, in the Management CLI:  
+        `cacert-none-filebased`
+      * In case of using existing keys and certificates, in the Management CLI:  
+        `cacert-present-filebased`
 
-    * In case of using existing keys and certificates, in the Management CLI:  
-      `source xipki/ca-setup/cacert-present/setup-{p11|p12}.script {rsa|ec|dsa|sm2} <tomcat dir>`
-      where * is placeholder.
-
+* (Optional) Generate Key and Certificate for OCSP Responder
     * If you wish to generate the signing key and certificate for the OCSP responder, in the Management CLI:  
       `source xipki/ca-setup/setup-ocsp-{p11|p12}.script`.
 
+* (Optional) Generate Key and Certificate for SCEP Gateway
     * If you wish to generate the signing key and certificate for the SCEP gateway, in the Management CLI:  
       `source xipki/ca-setup/setup-scep-p12.script`.
 

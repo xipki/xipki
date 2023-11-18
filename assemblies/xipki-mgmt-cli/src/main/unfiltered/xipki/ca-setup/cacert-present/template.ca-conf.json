@@ -87,7 +87,7 @@
 			},
 			"expirationPeriod":365,
 			"cert":{
-				"file":"xipki/ca-setup/keycerts/myca1.der"
+				"file":"xipki/ca-setup/keycerts/myca1.pem"
 			},
 			"certchain":[],
 			"keepExpiredCertDays":-1,

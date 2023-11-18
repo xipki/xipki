@@ -900,6 +900,21 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
+  public List<X509Cert> getCaCerts(String name) {
+    CaInfo caInfo = caInfos.get(Args.toNonBlankLower(name, "name"));
+    if (caInfo == null) {
+      return null;
+    }
+
+    List<X509Cert> ret = new LinkedList<>();
+    ret.add(caInfo.getCert());
+    if (caInfo.getCertchain() != null) {
+      ret.addAll(caInfo.getCertchain());
+    }
+    return ret;
+  }
+
+  @Override
   public void changeCa(ChangeCaEntry entry) throws CaMgmtException {
     ca2Manager.changeCa(entry);
   }
@@ -1291,17 +1306,17 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public Map<String, X509Cert> loadConf(byte[] zippedConfBytes) throws CaMgmtException {
+  public void loadConf(byte[] zippedConfBytes) throws CaMgmtException {
     try (InputStream is = new ByteArrayInputStream(zippedConfBytes)) {
-      return confLoader.loadConf(is);
+      confLoader.loadConf(is);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
   @Override
-  public Map<String, X509Cert> loadConfAndClose(InputStream zippedConfStream) throws CaMgmtException {
-    return confLoader.loadConf(zippedConfStream);
+  public void loadConfAndClose(InputStream zippedConfStream) throws CaMgmtException {
+    confLoader.loadConf(zippedConfStream);
   }
 
   @Override

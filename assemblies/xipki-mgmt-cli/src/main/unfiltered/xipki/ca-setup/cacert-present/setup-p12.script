@@ -1,3 +1,7 @@
+CA_P12 = ${KEYCERTS_DIR}/myca1.p12
+CA_P12_PWD = CHANGEIT
+CA_CERT = ${KEYCERTS_DIR}/myca1.pem
+
 printUsage = "false"
 argsValid = "false"
 errMsg = ""
@@ -11,11 +15,12 @@ if { "$1" equals "" } then {
 } else {
   KEY_TYPE = $1
   TOMCAT_DIR = $2
+  XIPKI_DIR = $3
 
   if { "$TOMCAT_DIR" equals "" } then {
     errMsg = "TOMCAT_DIR is not specified"
   } else {
-    list = [rsa ec dsa sm2]; each ($list) {
+    list = [rsa ec dsa sm2 ed25519]; each ($list) {
       if { "$KEY_TYPE" equals $it } then {
         argsValid = "true"
         break
@@ -34,45 +39,58 @@ if { $argsValid equals "false" } then {
   printUsage = "true"
 }
 
+THIS_DIR = xipki/ca-setup/cacert-present
+
 if { $printUsage equals "true" } then {
   echo "Usage: "
   echo ""
-  echo "source file:xipki/ca-setup/cacert-present/setup-p12.script <key type> <tomcat dir>"
-  echo "    key type:  rsa, ec, dsa, sm2"
+  echo "source ${THIS_DIR}/setup-p12.script <key type> <tomcat dir> [<xipki dir>]"
+  echo "    key type:  rsa, ec, dsa, sm2, ed25519"
+  echo "    xipki dir: optional, required if is not <tomcat dir>/xipki"
 } else {
+  if { "$XIPKI_DIR" equals "" } then {
+    XIPKI_DIR = ${TOMCAT_DIR}/xipki
+  }
+
   if { $KEY_TYPE equals "rsa" } then {
     SIG_ALG = SHA256WITHRSA
   } elif { $KEY_TYPE equals "ec" } then {
     SIG_ALG = SHA256WITHECDSA
+  } elif { $KEY_TYPE equals "ed25519" } then {
+    SIG_ALG = ED25519
   } elif { $KEY_TYPE equals "dsa" } then {
     SIG_ALG = SHA256WITHDSA
   } else {
-    SIG_ALG = SM32WITHSM2
+    SIG_ALG = SM3WITHSM2
   }
 
   echo "#################################################################"
   echo "#                  Configure ca-conf.json                       #"
   echo "#################################################################"
 
-  DIR = xipki/ca-setup/cacert-present
-  CONF_FILE = ${DIR}/ca-conf.json
+  CONF_FILE = ${THIS_DIR}/ca-conf.json
 
-  xi:copy-file -f ${DIR}/template.ca-conf.json ${CONF_FILE}
+  xi:copy-file -f ${THIS_DIR}/template.ca-conf.json ${CONF_FILE}
 
   xi:replace --old "REPLACEME-TOKEN_TYPE" --new "PKCS12" ${CONF_FILE}
 
   xi:replace --old "REPLACEME-CA_SIGNERCONF" \
-    --new "algo=${SIG_ALG},password=CHANGEIT,keystore=file:xipki/ca-setup/keycerts/myca1.p12" \
+    --new "algo=${SIG_ALG},password=${CA_P12_PWD},keystore=file:${CA_P12}" \
     ${CONF_FILE}
 
   echo "#################################################################"
   echo "#                    Initialize Database                        #"
   echo "#################################################################"
-  DB_CONF = "${TOMCAT_DIR}/xipki/etc/ca/database/ca-db.properties"
+  DB_CONF = "${XIPKI_DIR}/etc/ca/database/ca-db.properties"
   ca:sql --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
 
-  DB_CONF = "${TOMCAT_DIR}/xipki/etc/ca/database/caconf-db.properties"
+  DB_CONF = "${XIPKI_DIR}/etc/ca/database/caconf-db.properties"
   ca:sql --db-conf "${DB_CONF}" xipki/sql/caconf-init.sql
+
+  echo "#################################################################"
+  echo "#                      Configure ca.json                        #"
+  echo "#################################################################"
+  xi:copy-file -f ${THIS_DIR}/../dbbased-ca.json ${XIPKI_DIR}/etc/ca/ca.json
 
   echo "#################################################################"
   echo "#                       Startup Tomcat                          #"
@@ -85,7 +103,7 @@ if { $printUsage equals "true" } then {
   echo "#                       Load ca-conf.json                       #"
   echo "#################################################################"
 
-  ca:load-conf --conf-file ${CONF_FILE}
+  ca:load-conf ${CONF_FILE}
 
   ca:ca-info
 }

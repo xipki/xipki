@@ -111,22 +111,6 @@
         </SSLHostConfig>
     </Connector>
     -->
-    <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
-               maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
-               connectionTimeout="4000" maxKeepAliveRequests="-1">
-        <SSLHostConfig
-                certificateVerification="required"
-                protocols="TLSv1.2"
-                ciphers="TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
-                truststoreFile="${XIPKI_BASE}/keycerts/ocsp-client-certstore.p12"
-                truststorePassword="CHANGEIT"
-                truststoreType="PKCS12">
-            <Certificate
-                         certificateKeystoreFile="${XIPKI_BASE}/keycerts/ocsp-server.p12"
-                         certificateKeystorePassword="CHANGEIT"
-                         certificateKeystoreType="PKCS12"/>
-        </SSLHostConfig>
-    </Connector>
 
     <!-- Define an AJP 1.3 Connector on port 8009 -->
     <!--

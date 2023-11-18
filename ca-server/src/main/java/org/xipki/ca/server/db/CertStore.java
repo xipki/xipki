@@ -197,7 +197,7 @@ public class CertStore extends CertStoreBase {
     }
 
     if (LOG.isInfoEnabled()) {
-      LOG.info("added requestor '{}'", ident);
+      LOG.info("added {} '{}'", table, ident);
     }
   } // method addRequestor
 
@@ -257,7 +257,7 @@ public class CertStore extends CertStoreBase {
 
     // an entry with given id exists, but the name differs.
     throw new CaMgmtException("an entry in table " + table + " with ID=" + ident.getId() +
-        " exists, but the name differs (expected " + ident.getName() + ", is " + existingName);
+        " exists, but the name differs (expected " + ident.getName() + ", is " + existingName + ")");
   }
 
   public void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {

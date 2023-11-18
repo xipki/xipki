@@ -20,18 +20,6 @@ cp $KC_DIR/hsmproxy-client/*\
    $KS_DIR/ca-client-certstore.p12 \
    $TDIR
 
-# OCSP
-TDIR=$RDIR/xipki-ocsp/xipki/keycerts
-
-mkdir -p $TDIR
-
-cp $KC_DIR/hsmproxy-client/* \
-   $KC_DIR/ocsp-server/* \
-   $KC_DIR/hsmproxy-server/hsmproxy-server-cert.pem \
-   $KC_DIR/ocsp-mgmt-client/ocsp-mgmt-client-cert.pem \
-   $KS_DIR/ocsp-client-certstore.p12 \
-   $TDIR
-
 # Gateway
 TDIR=$RDIR/xipki-gateway/xipki/keycerts
 
@@ -61,14 +49,12 @@ mkdir -p $TDIR
 
 cp $KC_DIR/hsmproxy-client/* \
    $KC_DIR/ca-mgmt-client/* \
-   $KC_DIR/ocsp-mgmt-client/* \
    $KC_DIR/cmp-client/* \
    $KC_DIR/est-client/* \
    $KC_DIR/rest-client/* \
    $KC_DIR/ocsp-client/* \
    $KC_DIR/hsmproxy-server/hsmproxy-server-cert.pem \
    $KC_DIR/ca-server/ca-server-cert.pem \
-   $KC_DIR/ocsp-server/ocsp-server-cert.pem \
    $KC_DIR/gateway-server/gateway-server-cert.pem \
    $KC_DIR/ra-sdk-client/ra-sdk-client-cert.pem* \
    $TDIR

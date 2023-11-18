@@ -3,9 +3,6 @@ echo "#                              OCSP                             #"
 echo "#################################################################"
 URL_CRL = http://localhost:8080/ocsp/responder2
 
-echo "Sleeping 5 seconds"
-sleep 5
-
 list = [http://localhost:8080/ocsp/responder1 http://localhost:8080/ocsp/responder3]; each ($list) {
 
 URL = $it
@@ -278,6 +275,9 @@ xiqa:qa-ocsp-status \
 
 echo "=====QA : OCSP responder====="
 echo "URL: $URL_CRL"
+
+echo "Wait 5 seconds"
+sleep 5
 
 echo "QA: Good (POST, CRL)"
 xiqa:qa-ocsp-status \

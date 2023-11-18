@@ -24,21 +24,4 @@
     <bundle>mvn:org.xipki/ca-mgmt-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/ca-mgmt-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-ocsp-mgmt" version="${project.version}" description="OCSP management">
-    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${jackson.version}</bundle>
-    <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
-    <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
-    <bundle>mvn:org.xipki.commons/password/${xipki.commons.version}</bundle>
-    <bundle>mvn:org.xipki.commons/util/${xipki.commons.version}</bundle>
-    <bundle>mvn:org.xipki.commons/security/${xipki.commons.version}</bundle>
-    <bundle>mvn:org.xipki.commons/shell-base/${xipki.commons.version}</bundle>
-    <bundle>mvn:org.xipki.commons/security-shell/${xipki.commons.version}</bundle>
-    <bundle>mvn:org.xipki/ipkcs11wrapper/${pkcs11wrapper.version}</bundle>
-    <bundle>mvn:org.xipki/ocsp-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ocsp-mgmt-client/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shell/ocsp-mgmt-shell/${project.version}</bundle>
-  </feature>
 </features>

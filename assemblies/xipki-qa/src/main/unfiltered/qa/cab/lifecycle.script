@@ -74,6 +74,11 @@ if { $printUsage equals "true" } then {
   STDHASH = $HASH
   source file:./qa/qa.d/prepare-keys.script
 
+  echo "Restart Gateway (tomcat) server!"
+  xi:exec '~/tools/xipki/gateway-tomcat/bin/shutdown.sh'
+  xi:exec '~/tools/xipki/gateway-tomcat/bin/startup.sh'
+  sleep 5
+
   xi:copy-file -f qa/cab/template.ca-load.script \
     qa/cab/ca-load.script
 

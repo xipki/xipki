@@ -10,7 +10,11 @@ ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/caconf-db.properties"
 ca:sql --force --db-conf "${DB_CONF}" xipki/sql/caconf-init.sql
 
-ca:restart
+echo "Restart CA (tomcat) server!"
+xi:exec '~/tools/xipki/ca-tomcat/bin/shutdown.sh'
+sleep 1
+xi:exec '~/tools/xipki/ca-tomcat/bin/startup.sh'
+sleep 5
 
 xi:copy-file -f qa/tools/template.ca-conf.json qa/tools/ca-conf.json
 
@@ -20,9 +24,9 @@ xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "${SIGNER_CONF}" qa/tools/ca-co
 
 xi:replace --old "REPLACEME-TLS_PROFILE" --new "${TLS_PROFILE}" qa/tools/ca-conf.json
 
-ca:load-conf --conf-file qa/tools/ca-conf.json --out-dir ${OUT_DIR}/ca
+ca:load-conf qa/tools/ca-conf.json
 
-xi:move-file -f ${OUT_DIR}/ca/ca-tls-ca.crt ${OUT_DIR}/ca/tls-ca-cert.der
+ca:cacert --out ${OUT_DIR}/ca/tls-ca-cert.der tls-ca
 
 ############## RA ###################
 ## Server

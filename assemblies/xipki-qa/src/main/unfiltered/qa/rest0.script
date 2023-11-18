@@ -1,0 +1,98 @@
+echo "#################################################################"
+echo "#             Manage certificate via REST interface             #"
+echo "# BASE_URL: $BASE_URL"
+echo "# OUT_DIR:  $OUT_DIR"
+echo "# CERTPROFILE: $CERTPROFILE"
+echo "#################################################################"
+
+xi:rm --force --recursive $OUT_DIR
+xi:mkdir $OUT_DIR
+
+CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in output/subcawithcrl1.crt)
+
+xi:csr-p12 \
+  --hash $HASH   \
+  --p12 output/rest-tls1.p12 --password CHANGEIT \
+  --subject "CN=rest-tls1.myorg.org,O=myorg,C=DE" \
+  --out $OUT_DIR/rest-tls1.csr
+
+echo "REST cacert"
+
+xi:curl \
+  --out $OUT_DIR/cacert-subcawithcrl1.der \
+  $BASE_URL/cacert
+
+echo "REST cacerts"
+
+xi:curl \
+  --out $OUT_DIR/cacerts-subcawithcrl1.pem \
+  $BASE_URL/cacerts
+
+echo "REST enroll (CA generate keypair)"
+
+xi:curl \
+  --out $OUT_DIR/rest-tls-genkey1.pem \
+  --data "subject=CN=rest-tls-genkey1.myorg.org,O=myorg,C=DE" \
+  --header "Content-Type: text/plain; charset=utf-8" \
+  "$BASE_URL/enroll-serverkeygen${CERTPROFILE}"
+
+echo "REST enroll"
+
+xi:curl \
+  --out $OUT_DIR/rest-tls1.der \
+  --data-file $OUT_DIR/rest-tls1.csr \
+  --header "Content-Type: application/pkcs10" \
+  "$BASE_URL/enroll-cert${CERTPROFILE}"
+
+SERIAL = $(xi:cert-info --serial --hex --in $OUT_DIR/rest-tls1.der)
+
+echo "REST revoke (suspend) "
+
+xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
+
+echo "REST unsuspend"
+
+xi:curl "$BASE_URL/unsuspend-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}"
+
+echo "REST revoke (revoke)"
+
+xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
+
+echo "REST crl"
+xi:curl --out $OUT_DIR/crl.crl $BASE_URL/crl
+
+echo "REST crl (crl-number)"
+
+CRLNUMBER = $(xi:crl-info --crlnumber --in $OUT_DIR/crl.crl)
+
+xi:curl \
+  --out $OUT_DIR/crl-number-${CRLNUMBER}.crl \
+  "$BASE_URL/crl?crl-nubmer=${CRLNUMBER}"
+
+echo "=====REST: Enroll Twin TLS Certificates (CA generates all keypairs)====="
+
+CN = rest-tls-twin-genkey
+
+xi:curl \
+  --out $OUT_DIR/twin/${CN}.pem \
+  --data "subject=C=CN,O=myorg,CN=${CN}.myorg.org" \
+  --header "Content-Type: text/plain; encoding=utf-8" \
+  "$BASE_URL/enroll-serverkeygen-twin${CERTPROFILE}"
+
+echo "=====REST: Enroll Twin TLS Certificates (CA generates only keypair for the encryption)====="
+
+CN = rest-tls-twin
+
+xi:ec-p12 --password CHANGEIT --out $OUT_DIR/twin/${CN}.p12 --subject "CN=${CN}"
+
+xi:csr-p12 \
+  --p12 $OUT_DIR/twin/${CN}.p12 --password CHANGEIT \
+  --subject "C=CN,O=myorg,CN=${CN}.myorg.org" \
+  --out $OUT_DIR/twin/${CN}.csr
+
+xi:curl \
+  --out $OUT_DIR/twin/${CN}.pem \
+  --data-file $OUT_DIR/twin/${CN}.csr \
+  --header "Content-Type: application/pkcs10" \
+  "$BASE_URL/enroll-cert-twin${CERTPROFILE}"
+

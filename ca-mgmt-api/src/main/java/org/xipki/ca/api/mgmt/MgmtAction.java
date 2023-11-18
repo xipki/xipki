@@ -38,6 +38,7 @@ public enum MgmtAction {
   getAliasesForCa,
   getCa,
   getCaAliasNames,
+  getCaCerts,
   getCaNameForAlias,
   getCaNames,
   getCaSystemStatus,

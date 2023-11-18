@@ -12,6 +12,7 @@ import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.security.KeyCertBytesPair;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.TlsHelper;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
@@ -23,7 +24,6 @@ import org.xipki.util.http.XiHttpResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * CA management servlet.
@@ -217,6 +217,13 @@ class CaHttpMgmtServlet {
           resp = new MgmtResponse.GetCa(caEntry);
           break;
         }
+        case getCaCerts: {
+          String name = getNameFromRequest(requestStream);
+          List<X509Cert> caCerts = Optional.ofNullable(caManager.getCaCerts(name)).orElseThrow(
+              () -> new CaMgmtException("Unknown CA " + name));
+          resp = new MgmtResponse.StringResponse(X509Util.encodeCertificates(caCerts.toArray(new X509Cert[0])));
+          break;
+        }
         case getCaAliasNames: {
           resp = new MgmtResponse.StringSet(caManager.getCaAliasNames());
           break;
@@ -361,20 +368,7 @@ class CaHttpMgmtServlet {
         }
         case loadConf: {
           MgmtRequest.LoadConf req = parse2(requestStream, MgmtRequest.LoadConf.class);
-
-          Map<String, X509Cert> rootcaNameCertMap = caManager.loadConf(req.getConfBytes());
-
-          if (rootcaNameCertMap == null || rootcaNameCertMap.isEmpty()) {
-            resp = new MgmtResponse.LoadConf(null);
-          } else {
-            Map<String, byte[]> result = new HashMap<>(rootcaNameCertMap.size());
-            for (Entry<String, X509Cert> entry : rootcaNameCertMap.entrySet()) {
-              byte[] encodedCert = entry.getValue().getEncoded();
-              result.put(entry.getKey(), encodedCert);
-            }
-            resp = new MgmtResponse.LoadConf(result);
-          }
-
+          caManager.loadConf(req.getConfBytes());
           break;
         }
         case notifyCaChange: {

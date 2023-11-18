@@ -21,27 +21,6 @@
 			"subject": "CN=RA SDK client",
 			"validity": "20y",
 			"p12Password": "CHANGEIT"
-	  	},{
-			"name": "ocsp-server",
-			"certType": "TLS-Server",
-			"keyType": "EC/P-256",
-			"subject": "OU=OCSP server, CN=localhost",
-			"validity": "20y",
-			"p12Password": "CHANGEIT"
-	  	},{
-			"name": "ocsp-mgmt-client",
-			"certType": "TLS-Client",
-			"keyType": "EC/P-256",
-			"subject": "CN=OCSP management client",
-			"validity": "20y",
-			"p12Password": "CHANGEIT"
-		},{
-			"name": "ocsp-client",
-			"certType": "TLS-Client",
-			"keyType": "EC/P-256",
-			"subject": "CN=OCSP client",
-			"validity": "20y",
-			"p12Password": "CHANGEIT"
 		},{
 			"name": "hsmproxy-server",
 			"certType": "TLS-Server",
@@ -120,11 +99,6 @@
 			"name": "ca-client",
 			"p12Password":"CHANGEIT",
 			"keyCertNames": ["ca-mgmt-client", "ra-sdk-client"]
-		},
-		{
-			"name": "ocsp-client",
-			"p12Password":"CHANGEIT",
-			"keyCertNames": ["ocsp-mgmt-client"]
 		},
 		{
 			"name": "hsmproxy-client",
