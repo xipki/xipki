@@ -15,8 +15,9 @@ See also <https://github.com/xipki/xipki/releases>
     Use MGMT-CLI to export-then-import databases.
 - OCSP
   - Add configuration of reverseProxyMode.
+  - Remove the management interface (not necessary)
 - Gateway
-    - Add configuration of reverseProxyMode.
+  - Add configuration of reverseProxyMode.
 - HSM Proxy
   - New component introduced in this version.
 - Dependencies
