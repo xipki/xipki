@@ -258,10 +258,14 @@ public class DbActions {
 
   public abstract static class DbPortAction extends DbAction {
 
-    @Option(name = "--password", description = "password, as plaintext or PBE-encrypted.")
+    @Option(name = "--password", description = "password, as plaintext or PBE-encrypted, or 'NO' for no password")
     private String passwordHint;
 
+    @Override
     protected char[] readPassword() throws IOException, PasswordResolverException {
+      if ("NO".equalsIgnoreCase(passwordHint)) {
+        return null;
+      }
       return readPasswordIfNotSet("Please enter password of the ZIP file", passwordHint);
     }
   } // class DbAction
