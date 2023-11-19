@@ -50,6 +50,7 @@ bcutil-*.jar,\
 ca-*.jar,\
 certprofile-*.jar,\
 datasource-*.jar,\
+h2-*.jar \
 HikariCP-*.jar,\
 *pkcs11wrapper-*.jar,\
 jackson-*.jar,\

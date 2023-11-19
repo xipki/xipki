@@ -62,10 +62,10 @@ datasource-*.jar,\
 dnsjava-*.jar,\
 *-gateway-*.jar,\
 gateway-common-*.jar,\
+h2-*.jar \
 HikariCP-*.jar,\
 *pkcs11wrapper-*.jar,\
 jackson-*.jar,\
-jose4j-*.jar,\
 mariadb-*.jar,\
 mysql-*.jar,\
 password-*.jar,\
