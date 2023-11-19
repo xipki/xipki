@@ -96,6 +96,17 @@ public class RevokeSuspendedControl {
         "\n  unchanged since: ", unchangedSince);
   }
 
+  public String toString(boolean verbose) {
+    String str = "  enabled:         " + enabled +
+        "\n  target reason:   " + targetReason +
+        "\n  unchanged since: " + unchangedSince;
+
+    if (verbose) {
+      str += "\n  Encoded:          " + getConf();
+    }
+    return str;
+  }
+
   public String getConf() {
     return getConfPairs().getEncoded();
   }

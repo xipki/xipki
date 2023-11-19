@@ -125,10 +125,17 @@ public class CtlogControl {
 
   @Override
   public String toString() {
-    return StringUtil.concatObjects(
-        "  enabled:          ", enabled,
-        "\n  SSL context name: ", sslContextName,
-        "\n  Servers:          ", servers);
+    return toString(false);
+  }
+
+  public String toString(boolean verbose) {
+    String str = "  enabled:          " + enabled +
+        "\n  SSL context name: " + sslContextName +
+        "\n  Servers:          " + servers;
+    if (verbose) {
+      str += "\n  Encoded:          " + getConf();
+    }
+    return str;
   }
 
   @Override

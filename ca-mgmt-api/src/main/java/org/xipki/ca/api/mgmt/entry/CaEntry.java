@@ -245,9 +245,9 @@ public class CaEntry extends BaseCaInfo {
         "\nKeyPair generation names: ", keypairGenNames,
         "\n", caUris,
         "\nCRL control:\n", (crlControl == null ? "  null" : crlControl.toString(verbose)),
-        "\nCTLog control:\n", (ctlogControl == null ? "  null" : ctlogControl.toString()),
+        "\nCTLog control:\n", (ctlogControl == null ? "  null" : ctlogControl.toString(verbose)),
         "\nrevoke suspended certificates control: \n",
-        (revokeSuspendedControl == null ? "  null" : revokeSuspendedControl.toString()),
+        (revokeSuspendedControl == null ? "  null" : revokeSuspendedControl.toString(verbose)),
         "\ncert: \n", X509Util.formatCert(cert, verbose),
         certchainStr.toString());
   } // method toString(boolean, boolean)
