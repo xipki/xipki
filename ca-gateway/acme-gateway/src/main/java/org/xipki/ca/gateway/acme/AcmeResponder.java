@@ -897,16 +897,12 @@ public class AcmeResponder {
 
         Instant notBefore = null;
         Instant notAfter = null;
-        try {
-          if (newOrderReq.getNotBefore() != null) {
-            notBefore = Instant.parse(newOrderReq.getNotBefore());
-          }
+        if (newOrderReq.getNotBefore() != null) {
+          notBefore = AcmeUtils.parseTimestamp(newOrderReq.getNotBefore());
+        }
 
-          if (newOrderReq.getNotAfter() != null) {
-            notAfter = Instant.parse(newOrderReq.getNotAfter());
-          }
-        } catch (DateTimeParseException ex) {
-          throw new AcmeProtocolException(HttpStatusCode.SC_BAD_REQUEST, AcmeError.malformed, "invalid timestamp ");
+        if (newOrderReq.getNotAfter() != null) {
+          notAfter = AcmeUtils.parseTimestamp(newOrderReq.getNotAfter());
         }
 
         order.setExpires(expires);
