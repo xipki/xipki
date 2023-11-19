@@ -75,10 +75,14 @@ class CertprofileManager {
       dbEntry.setFaulty(true);
       manager.certprofileDbEntries.put(name, dbEntry);
 
-      IdentifiedCertprofile profile = createCertprofile(dbEntry);
-      dbEntry.setFaulty(false);
-      manager.certprofiles.put(name, profile);
-      LOG.info("loaded certprofile {}", name);
+      try {
+        IdentifiedCertprofile profile = createCertprofile(dbEntry);
+        dbEntry.setFaulty(false);
+        manager.certprofiles.put(name, profile);
+        LOG.info("loaded certprofile {}", name);
+      } catch (Exception ex) {
+        LogUtil.error(LOG, ex, "ERROR loading certprofile " + name);
+      }
     }
 
     certprofilesInitialized = true;

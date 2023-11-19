@@ -75,10 +75,14 @@ class PublisherManager {
       dbEntry.faulty(true);
       manager.publisherDbEntries.put(name, dbEntry);
 
-      IdentifiedCertPublisher publisher = createPublisher(dbEntry);
-      dbEntry.faulty(false);
-      publishers.put(name, publisher);
-      LOG.info("loaded publisher {}", name);
+      try {
+        IdentifiedCertPublisher publisher = createPublisher(dbEntry);
+        dbEntry.faulty(false);
+        publishers.put(name, publisher);
+        LOG.info("loaded publisher {}", name);
+      } catch (Exception ex) {
+        LogUtil.error(LOG, ex, "ERROR loading publisher " + name);
+      }
     }
 
     publishersInitialized = true;

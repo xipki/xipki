@@ -77,9 +77,13 @@ class KeypairGenManager {
       String name = entry.getName();
       manager.keypairGenDbEntries.put(name, entry);
 
-      KeypairGenEntryWrapper gen = createKeypairGen(entry);
-      manager.keypairGens.put(name, gen);
-      LOG.info("loaded keypair generation {}", name);
+      try {
+        KeypairGenEntryWrapper gen = createKeypairGen(entry);
+        manager.keypairGens.put(name, gen);
+        LOG.info("loaded keypair generation {}", name);
+      } catch (Exception ex) {
+        LogUtil.error(LOG, ex, "ERROR loading keypairGen " + name);
+      }
     }
 
     keypairGenInitialized = true;

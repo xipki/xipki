@@ -12,6 +12,7 @@ import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.server.RequestorEntryWrapper;
 import org.xipki.util.Args;
+import org.xipki.util.LogUtil;
 
 import java.util.HashSet;
 import java.util.List;
@@ -49,21 +50,25 @@ class RequestorManager {
     manager.requestors.clear();
     List<String> names = manager.caConfStore.getRequestorNames();
     for (String name : names) {
-      if (RequestorInfo.NAME_BY_CA.equalsIgnoreCase(name)) {
-        Integer id = manager.caConfStore.getRequestorId(name);
-        NameId ident = new NameId(id, name);
-        manager.byCaRequestor = new RequestorInfo.ByCaRequestorInfo(ident);
-        manager.idNameMap.addRequestor(ident);
-      } else {
-        RequestorEntry requestorDbEntry = manager.caConfStore.createRequestor(name);
-        manager.idNameMap.addRequestor(requestorDbEntry.getIdent());
-        manager.requestorDbEntries.put(name, requestorDbEntry);
-        RequestorEntryWrapper requestor = new RequestorEntryWrapper();
-        requestor.setDbEntry(requestorDbEntry);
-        manager.requestors.put(name, requestor);
-      }
+      try {
+        if (RequestorInfo.NAME_BY_CA.equalsIgnoreCase(name)) {
+          Integer id = manager.caConfStore.getRequestorId(name);
+          NameId ident = new NameId(id, name);
+          manager.byCaRequestor = new RequestorInfo.ByCaRequestorInfo(ident);
+          manager.idNameMap.addRequestor(ident);
+        } else {
+          RequestorEntry requestorDbEntry = manager.caConfStore.createRequestor(name);
+          manager.idNameMap.addRequestor(requestorDbEntry.getIdent());
+          manager.requestorDbEntries.put(name, requestorDbEntry);
+          RequestorEntryWrapper requestor = new RequestorEntryWrapper();
+          requestor.setDbEntry(requestorDbEntry);
+          manager.requestors.put(name, requestor);
+        }
 
-      LOG.info("loaded requestor {}", name);
+        LOG.info("loaded requestor {}", name);
+      } catch (Exception ex) {
+        LogUtil.error(LOG, ex, "ERROR loading requestor " + name);
+      }
     }
     requestorsInitialized = true;
   } // method initRequestors
