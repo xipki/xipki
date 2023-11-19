@@ -155,6 +155,17 @@ public class X509ProfileType extends ValidableConf {
     this.version = version;
   }
 
+  /**
+   * This field is here only to make the JSON deserializer be able to parse old certprofile file.
+   * @param serialNumberInReq ignore me.
+   */
+  @Deprecated
+  private void setSerialNumberInReq(boolean serialNumberInReq) {
+    if (serialNumberInReq) {
+      LOG.warn("ignore setSerialNumberInReq with serialNumberInReq=true");
+    }
+  }
+
   public List<String> getSignatureAlgorithms() {
     if (signatureAlgorithms == null) {
       signatureAlgorithms = new LinkedList<>();
