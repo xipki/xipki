@@ -18,11 +18,14 @@ import org.xipki.datasource.DatabaseType;
 import org.xipki.datasource.ScriptRunner;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
+import org.xipki.util.Args;
 import org.xipki.util.ConfigurableProperties;
 import org.xipki.util.IoUtil;
+import org.xipki.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -44,6 +48,114 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class DbActions {
+
+  private static void printDbInfo(ConfigurableProperties dbProps) {
+    Args.notNull(dbProps, "dbProps");
+
+    String schema = dbProps.getProperty("liquibase.schema");
+    if (schema != null) {
+      schema = schema.trim();
+      if (schema.isEmpty()) {
+        schema = null;
+      }
+    }
+
+    String user = dbProps.getProperty("dataSource.user");
+    if (user == null) {
+      user = dbProps.getProperty("username");
+    }
+
+    String url = dbProps.getProperty("jdbcUrl");
+    if (url != null) {
+      printDbInfo(user, url, schema);
+      return;
+    }
+
+    String datasourceClassName = dbProps.getProperty("dataSourceClassName");
+    if (datasourceClassName == null) {
+      throw new IllegalArgumentException("unsupported configuration");
+    }
+
+    StringBuilder urlBuilder = new StringBuilder();
+
+    datasourceClassName = datasourceClassName.toLowerCase();
+
+    if (datasourceClassName.contains("org.h2.")) {
+      String dataSourceUrl = dbProps.getProperty("dataSource.url");
+      urlBuilder.append(dataSourceUrl);
+      if (schema != null) {
+        urlBuilder.append(";INIT=CREATE SCHEMA IF NOT EXISTS ").append(schema);
+      }
+    } else if (datasourceClassName.contains("mysql.")) {
+      urlBuilder.append("jdbc:mysql://")
+          .append(dbProps.getProperty("dataSource.serverName")).append(":")
+          .append(dbProps.getProperty("dataSource.port")).append("/")
+          .append(dbProps.getProperty("dataSource.databaseName"));
+    } else if (datasourceClassName.contains("mariadb.")) {
+      String str = dbProps.getProperty("dataSource.url");
+      if (StringUtil.isNotBlank(str)) {
+        urlBuilder.append(str);
+      } else {
+        urlBuilder.append("jdbc:mariadb://")
+            .append(dbProps.getProperty("dataSource.serverName")).append(":")
+            .append(dbProps.getProperty("dataSource.port")).append("/")
+            .append(dbProps.getProperty("dataSource.databaseName"));
+      }
+    } else if (datasourceClassName.contains("oracle.")) {
+      String str = dbProps.getProperty("dataSource.URL");
+      if (StringUtil.isNotBlank(str)) {
+        urlBuilder.append(str);
+      } else {
+        urlBuilder.append("jdbc:oracle:thin:@")
+            .append(dbProps.getProperty("dataSource.serverName")).append(":")
+            .append(dbProps.getProperty("dataSource.portNumber")).append(":")
+            .append(dbProps.getProperty("dataSource.databaseName"));
+      }
+    } else if (datasourceClassName.contains("com.ibm.db2.")) {
+      schema = dbProps.getProperty("dataSource.currentSchema");
+
+      urlBuilder.append("jdbc:db2://")
+          .append(dbProps.getProperty("dataSource.serverName")).append(":")
+          .append(dbProps.getProperty("dataSource.portNumber")).append("/")
+          .append(dbProps.getProperty("dataSource.databaseName"));
+    } else if (datasourceClassName.contains("postgresql.")
+        || datasourceClassName.contains("impossibl.postgres.")) {
+      String serverName;
+      String portNumber;
+      String databaseName;
+      if (datasourceClassName.contains("postgresql.")) {
+        serverName = dbProps.getProperty("dataSource.serverName");
+        portNumber = dbProps.getProperty("dataSource.portNumber");
+        databaseName = dbProps.getProperty("dataSource.databaseName");
+      } else {
+        serverName = dbProps.getProperty("dataSource.host");
+        portNumber = dbProps.getProperty("dataSource.port");
+        databaseName = dbProps.getProperty("dataSource.database");
+      }
+
+      urlBuilder.append("jdbc:postgresql://")
+          .append(serverName).append(":").append(portNumber).append("/").append(databaseName);
+    } else if (datasourceClassName.contains("hsqldb.")) {
+      String dataSourceUrl = dbProps.getProperty("dataSource.url");
+      urlBuilder.append(dataSourceUrl);
+    } else {
+      throw new IllegalArgumentException("unsupported database type " + datasourceClassName);
+    }
+
+    url = urlBuilder.toString();
+
+    printDbInfo(user, url, schema);
+  } // method getInstance
+
+  private static void printDbInfo(String username, String url, String schema) {
+    String msg = "--------------------------------------------" +
+        "\n       user: " + username +
+        "\n        URL: " + url;
+    if (schema != null) {
+      msg += "\n     schema: " + schema;
+    }
+    System.out.println(msg);
+  }
 
   public abstract static class DbAction extends XiAction {
 
@@ -275,12 +387,17 @@ public class DbActions {
           }
         }
 
-        if (force || confirm("Do you want to execute the SQL script " + scriptFile +
-            " on the database \n" + dbConfFile + "?", 3)) {
-          System.out.println("Start executing script " + p);
-          ScriptRunner.runScript(dataSource, p.toString());
-          System.out.println("  End executing script " + p);
+        printDbInfo(props);
+        println("script file: " + derivedScriptFile);
+        if (!force) {
+          if (!confirm("Do you want to execute the SQL script?", 3)) {
+            throw new CmdFailure("User cancelled");
+          }
         }
+
+        println("Start executing script " + p);
+        ScriptRunner.runScript(dataSource, p.toString());
+        println("  End executing script " + p);
         return null;
       }
     }
