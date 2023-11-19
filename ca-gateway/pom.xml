@@ -19,6 +19,7 @@
     <module>acme-servlet3</module>
     <module>acme-servlet5</module>
     <!-- CMP -->
+    <module>cmp-core</module>
     <module>cmp-client</module>
     <module>cmp-gateway</module>
     <module>cmp-servlet3</module>
@@ -32,6 +33,7 @@
     <module>rest-servlet3</module>
     <module>rest-servlet5</module>
     <!-- SCEP -->
+    <module>scep-core</module>
     <module>scep-client</module>
     <module>scep-gateway</module>
     <module>scep-servlet3</module>

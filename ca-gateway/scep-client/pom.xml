@@ -16,8 +16,9 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.commons</groupId>
-      <artifactId>security</artifactId>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>scep-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>

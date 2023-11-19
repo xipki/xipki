@@ -19,7 +19,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>scep-client</artifactId>
+      <artifactId>scep-core</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

@@ -57,7 +57,7 @@ bcprov-*.jar,\
 bcpkix-*.jar,\
 bcutil-*.jar,\
 ca-sdk-*.jar,\
-cmp-client-*.jar,\
+cmp-core-*.jar,\
 datasource-*.jar,\
 dnsjava-*.jar,\
 *-gateway-*.jar,\
@@ -71,7 +71,7 @@ mysql-*.jar,\
 password-*.jar,\
 postgresql-*.jar,\
 security-*.jar,\
-scep-client-*.jar,\
+scep-core-*.jar,\
 servlet*-common-*.jar,\
 xipki-tomcat-password-*.jar,\
 util-*.jar

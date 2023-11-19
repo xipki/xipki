@@ -8,14 +8,13 @@
     <artifactId>gateway-parent</artifactId>
     <version>6.5.0-SNAPSHOT</version>
   </parent>
-  <artifactId>cmp-client</artifactId>
+  <artifactId>cmp-core</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cmp-core</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xipki.commons</groupId>
+      <artifactId>security</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
