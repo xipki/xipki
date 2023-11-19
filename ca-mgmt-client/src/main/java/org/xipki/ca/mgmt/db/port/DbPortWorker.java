@@ -206,7 +206,7 @@ public abstract class DbPortWorker extends DbWorker {
         } catch (Throwable th) {
           LOG.error("certStoreDataSource.close()", th);
         }
-        // TODO uncommen me deleteDecryptedFiles(srcFolder);
+        deleteDecryptedFiles(srcFolder);
         printFinishedIn(start);
       }
     } // method run0
