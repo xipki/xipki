@@ -83,57 +83,55 @@ class CaCertstoreDbExporter extends DbPorter {
     Exception exception = null;
     System.out.println("exporting CA certstore from database");
 
-    if (dbSchemaVersion >= 8) {
-      for (String tblName : new String[]{"PROFILE", "REQUESTOR", "CA"}) {
-        String sql = "SELECT ID,NAME";
-        if ("CA".equalsIgnoreCase(tblName)) {
-          sql += ",CERT";
-        }
-        sql += " FROM " + tblName;
+    for (String tblName : new String[]{"PROFILE", "REQUESTOR", "CA"}) {
+      String sql = "SELECT ID,NAME";
+      if ("CA".equalsIgnoreCase(tblName)) {
+        sql += ",CERT";
+      }
+      sql += " FROM " + tblName;
 
-        System.out.print("    exporting table " + tblName + " ... ");
+      System.out.print("    exporting table " + tblName + " ... ");
 
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        boolean succ = false;
-        try {
-          stmt = prepareStatement(sql);
-          rs = stmt.executeQuery();
+      PreparedStatement stmt = null;
+      ResultSet rs = null;
+      boolean succ = false;
+      try {
+        stmt = prepareStatement(sql);
+        rs = stmt.executeQuery();
 
-          List<CaCertstore.IdName> entries = new LinkedList<>();
-          while (rs.next()) {
-            String name = rs.getString("NAME");
+        List<CaCertstore.IdName> entries = new LinkedList<>();
+        while (rs.next()) {
+          String name = rs.getString("NAME");
 
-            CaCertstore.IdName entry = "CA".equalsIgnoreCase(tblName)
-                ? new CaCertstore.Ca() : new CaCertstore.IdName();
-            entry.setId(rs.getInt("ID"));
-            entry.setName(name);
+          CaCertstore.IdName entry = "CA".equalsIgnoreCase(tblName)
+              ? new CaCertstore.Ca() : new CaCertstore.IdName();
+          entry.setId(rs.getInt("ID"));
+          entry.setName(name);
 
-            if ("CA".equalsIgnoreCase(tblName)) {
-              ((CaCertstore.Ca) entry).setCert(Base64.decode(rs.getString("CERT")));
-            }
-            entry.validate();
-            entries.add(entry);
+          if ("CA".equalsIgnoreCase(tblName)) {
+            ((CaCertstore.Ca) entry).setCert(Base64.decode(rs.getString("CERT")));
           }
-
-          if ("REQUESTOR".equalsIgnoreCase(tblName)) {
-            certstore.setRequestors(entries);
-          } else if (("PROFILE").equalsIgnoreCase(tblName)) {
-            certstore.setProfiles(entries);
-          } else {
-            List<CaCertstore.Ca> caEntries = new ArrayList<>(entries.size());
-            for (CaCertstore.IdName entry : entries) {
-              caEntries.add((CaCertstore.Ca) entry);
-            }
-            certstore.setCas(caEntries);
-          }
-          succ = true;
-        } catch (SQLException ex) {
-          throw translate(sql, ex);
-        } finally {
-          releaseResources(stmt, rs);
-          System.out.println(succ ? "SUCCESSFUL" : "FAILED");
+          entry.validate();
+          entries.add(entry);
         }
+
+        if ("REQUESTOR".equalsIgnoreCase(tblName)) {
+          certstore.setRequestors(entries);
+        } else if (("PROFILE").equalsIgnoreCase(tblName)) {
+          certstore.setProfiles(entries);
+        } else {
+          List<CaCertstore.Ca> caEntries = new ArrayList<>(entries.size());
+          for (CaCertstore.IdName entry : entries) {
+            caEntries.add((CaCertstore.Ca) entry);
+          }
+          certstore.setCas(caEntries);
+        }
+        succ = true;
+      } catch (SQLException ex) {
+        throw translate(sql, ex);
+      } finally {
+        releaseResources(stmt, rs);
+        System.out.println(succ ? "SUCCESSFUL" : "FAILED");
       }
     }
 

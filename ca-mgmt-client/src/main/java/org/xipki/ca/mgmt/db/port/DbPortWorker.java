@@ -206,7 +206,7 @@ public abstract class DbPortWorker extends DbWorker {
         } catch (Throwable th) {
           LOG.error("certStoreDataSource.close()", th);
         }
-        deleteDecryptedFiles(srcFolder);
+        // TODO uncommen me deleteDecryptedFiles(srcFolder);
         printFinishedIn(start);
       }
     } // method run0
@@ -286,15 +286,21 @@ public abstract class DbPortWorker extends DbWorker {
           resume, numCertsInBundle, numCertsPerSelect, password);
       checkDestFolder();
 
-      ConfigurableProperties props = DbPorter.getDbConfProperties(
-          Paths.get(IoUtil.expandFilepath(caConfDbFile)));
-      this.caConfSource = datasourceFactory.createDataSource("ds-" + caConfDbFile,
-          props, passwordResolver);
+      if (caConfDbFile != null) {
+        ConfigurableProperties props = DbPorter.getDbConfProperties(
+            Paths.get(IoUtil.expandFilepath(caConfDbFile)));
+        this.caConfSource = datasourceFactory.createDataSource("ds-" + caConfDbFile,
+            props, passwordResolver);
+      } else {
+        this.caConfSource = super.datasource;
+      }
     }
 
     @Override
     protected void close0() {
-      caConfSource.close();
+      if (caConfSource != super.datasource) {
+        caConfSource.close();
+      }
     }
 
     @Override

@@ -476,7 +476,7 @@ class CaconfDbExporter extends DbPorter {
     caInfo.setKeypairGenNames(cc.getKeypairGenNames());
     caInfo.setSaveKeypair(cc.isSaveKeypair());
     caInfo.setSaveKeypair(cc.isSaveKeypair());
-    caInfo.setPermissions(PermissionConstants.permissionToStringList(cc.getPermission()));
+    caInfo.setPermissions(permissionToStringList(cc.getPermission()));
     caInfo.setNumCrls(cc.getNumCrls());
     caInfo.setExpirationPeriod(cc.getExpirationPeriod());
     caInfo.setKeepExpiredCertDays(cc.getKeepExpiredCertDays());
@@ -596,7 +596,7 @@ class CaconfDbExporter extends DbPorter {
         CaConfType.CaHasRequestor m = new CaConfType.CaHasRequestor();
         m.setRequestorName(requestorIdToNameMap.get(requestorId));
         m.setProfiles(StringUtil.split(profiles, ","));
-        m.setPermissions(PermissionConstants.permissionToStringList(permission));
+        m.setPermissions(permissionToStringList(permission));
 
         List<CaConfType.CaHasRequestor> set = ret.computeIfAbsent(caId, k -> new LinkedList<>());
         set.add(m);
@@ -616,6 +616,13 @@ class CaconfDbExporter extends DbPorter {
       ret.put(m.getId(), m.getName());
     }
     return ret;
+  }
+
+  private List<String> permissionToStringList(int permissionn) {
+    if (dbSchemaVersion < 7) {
+      permissionn |= PermissionConstants.GET_CERT;
+    }
+    return PermissionConstants.permissionToStringList(permissionn);
   }
 
 }
