@@ -14,6 +14,9 @@
 				"cacertUris":[
 					"http://myorg.org/subca1.der"
 				],
+				"crlUris":[
+					"http://localhost:8081/crl/?type=crl&name=subca1"
+				],
 				"ocspUris":[
 					"http://localhost:8080/ocsp/responder1"
 				]
@@ -24,6 +27,12 @@
 			"certchain":[{
 				"file":"output/rootca1.crt"
 			}],
+			"crlControl":{
+				"interval.hours": 24,
+				"fullcrl.intervals":7,
+				"overlap":"3d",
+				"interval.time":"02:00"
+			},
 			"ctlogControl":{
 				"enabled":true,
 				"sslcontext.name":"ctlog1",

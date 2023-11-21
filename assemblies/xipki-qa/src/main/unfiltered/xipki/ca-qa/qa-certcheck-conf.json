@@ -33,7 +33,8 @@
 		},
 		"validityMode":"cutoff",
 		"caIssuerUrls":["http://myorg.org/subca1.der"],
-		"ocspUrls":["http://localhost:8080/ocsp/responder1"]
+		"ocspUrls":["http://localhost:8080/ocsp/responder1"],
+		"crlUrls":["http://localhost:8081/crl/?type=crl&name=subca1"]
 	},{
 		"name":"subcawithcrl",
 		"cert":{

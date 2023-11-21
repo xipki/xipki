@@ -141,7 +141,7 @@ if { $TOKEN_TYPE equals "pkcs12" } then {
 ca:caprofile-rm -f --ca rootca1 --profile ocsp
 
 echo "#################################################################"
-echo "#                        Add subca with OCSP                    #"
+echo "#                   Add subca with OCSP & CRL                   #"
 echo "#################################################################"
 ## Add CA
 

@@ -246,7 +246,7 @@ ca:caprofile-rm -f \
   --profile ocsp
 
 echo "#################################################################"
-echo "#                        Add subca with ocsp                    #"
+echo "#                   Add subca with OCSP & CRL                   #"
 echo "#################################################################"
 ## Add CA
 
