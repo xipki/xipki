@@ -1,0 +1,65 @@
+# Please adapt me
+TOMCAT_DIR = ~/tools/xipki/ca-tomcat
+XIPKI_BASE = ~/tools/xipki/ca-tomcat/xipki
+
+SLOT = 0
+LABEL = myca1
+KEYCERTS_DIR = xipki/ca-setup/keycerts
+
+SQL_FORCE = yes
+
+echo "+----------------------------------------------------------------------+"
+echo "| This script demonstrates the setup of CAs with all the combinations: |"
+echo "|     key-type x caconf-store-type x token-type x CAcert-presence      |"
+echo "|  - key-type:          rsa, ec, dsa, sm2, ed25519                     |"
+echo "|  - caconf-store-type: dbbased (database), filebased (file)           |"
+echo "|  - token-type:        p11, p12                                       |"
+echo "|  - CAcert-presence:   none, present                                  |"
+echo "+----------------------------------------------------------------------+"
+
+keytypes = [rsa ec dsa sm2 ed25519]; each ($keytypes) {
+  keytype = $it
+
+  storetypes = [dbbased filebased]; each ($storetypes) {
+    storetype = $it
+
+    tokentypes = [p11 p12]; each ($tokentypes) {
+      tokentype = $it
+
+      echo "+---------------------------------------------------------------+"
+      echo "|  - key-type:          $keytype"
+      echo "|  - caconf-store-type: $storetype"
+      echo "|  - token-type:        $tokentype"
+      echo "|  - CAcert-presence:   none"
+      echo "+---------------------------------------------------------------+"
+
+      echo "Delete keys and certificates"
+      if { "$tokentype" equals "p11" } then {
+        xi:delete-key-p11 --force --slot $SLOT --label $LABEL
+      }
+
+      xi:rm --force --recursive $KEYCERTS_DIR
+
+      if { "$storetype" equals "filebased" } then {
+        xi:rm --force --recursive output/ca-setup/ca-conf
+        xi:rm --force --recursive ${XIPKI_BASE}/etc/ca/ca-conf
+      }
+
+      source xipki/ca-setup/cacert-none-${storetype}/setup-${tokentype}.script $keytype $TOMCAT_DIR $XIPKI_BASE
+
+      echo "+---------------------------------------------------------------+"
+      echo "|  - key-type:          $keytype"
+      echo "|  - caconf-store-type: $storetype"
+      echo "|  - token-type:        $tokentype"
+      echo "|  - CAcert-presence:   present"
+      echo "+---------------------------------------------------------------+"
+
+      if { "$storetype" equals "filebased" } then {
+        xi:rm --force --recursive output/ca-setup/ca-conf
+        xi:rm --force --recursive ${XIPKI_BASE}/etc/ca/ca-conf
+      }
+
+      source xipki/ca-setup/cacert-present-${storetype}/setup-${tokentype}.script $keytype $TOMCAT_DIR $XIPKI_BASE
+    }
+  }
+}
