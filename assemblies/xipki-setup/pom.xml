@@ -11,6 +11,9 @@
   <artifactId>xipki-setup</artifactId>
   <packaging>pom</packaging>
   <name>XiPKI :: assembly :: ${project.artifactId}</name>
+  <properties>
+    <skipDeploy>false</skipDeploy>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xipki.tools</groupId>
@@ -77,6 +80,9 @@
             <phase>prepare-package</phase>
             <configuration>
               <target>
+                <delete dir="${project.build.directory}/t"/>
+                <delete dir="${project.build.directory}/t2"/>
+
                 <copy file="${project.basedir}/../../README.md"
                       todir="${project.build.directory}/t"/>
                 <copy todir="${project.build.directory}/t" >
@@ -147,8 +153,8 @@
               <appendAssemblyId>false</appendAssemblyId>
               <tarLongFileMode>posix</tarLongFileMode>
               <recompressZippedFiles>true</recompressZippedFiles>
-              <!-- Don't install/publish the result -->
-              <attach>false</attach>
+              <!-- Install/publish the zip file -->
+              <attach>true</attach>
             </configuration>
           </execution>
         </executions>

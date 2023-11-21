@@ -42,24 +42,34 @@ JRE/JDK, and the steps to reproduce the bug.
   Set the environment variable `JAVA_HOME` to the root directory of JRE/JDK installation.
 
 ### Binaries
+The binary `xipki-setup-<version>.zip` can be retrieved using one of the following methods
+ - Download the binary `xipki-setup-<version>.zip` from [releases](https://github.com/xipki/xipki/releases).
+ - Download the binary from the maven repositories
+   - Directly via HTTP download
+     - Release version: https://repo.maven.apache.org/maven2/org/xipki/assembly/xipki-setup/ 
+     - SNASPSHOT version: https://oss.sonatype.org/content/repositories/snapshots/org/xipki/assembly/xipki-setup/
+   - Via the `maven-dependency-plugin`
+     ```
+     <artifactItem>
+       <groupId>org.xipki.assembly</groupId>
+       <artifactId>xipki-setup</artifactId>
+       <version>..version..</version>
+       <type>zip</type>
+     </artifactItem>
+     ```
+  - Build it from source code
+    - Get a copy of project code, e.g.
+      ```sh
+      git clone https://github.com/xipki/xipki
+      ```
+    - Build the project
 
-Download the binary `xipki-setup-<version>.zip`from [releases](https://github.com/xipki/xipki/releases).
-
-Only if you want to use the development version, build it from source code as
-follows.
-
-- Get a copy of project code, e.g.
-  ```sh
-  git clone https://github.com/xipki/xipki
-  ```
-- Build the project
-
-  In folder `xipki`
-  ```sh
-  mvn clean install -DskipTests -Passembly
-  ```
+      In folder `xipki`
+      ```sh
+      mvn clean install -DskipTests -Passembly
+      ```
  
-  Then you will find the binary `assemblies/xipki-setup/target/xipki-setup-<version>.zip`
+      Then you will find the binary `assemblies/xipki-setup/target/xipki-setup-<version>.zip`
 
 
 ## Prepare
