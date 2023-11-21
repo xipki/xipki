@@ -39,7 +39,7 @@ if { $argsValid equals "false" } then {
   printUsage = "true"
 }
 
-THIS_DIR = xipki/ca-setup/cacert-present
+THIS_DIR = xipki/ca-setup/cacert-present-dbbased
 
 if { $printUsage equals "true" } then {
   echo "Usage: "
@@ -79,14 +79,8 @@ if { $printUsage equals "true" } then {
     --new "algo=${SIG_ALG},slot=${SLOT},key-label=${LABEL}" \
     ${CONF_FILE}
 
-  echo "#################################################################"
-  echo "#                    Initialize Database                        #"
-  echo "#################################################################"
-  DB_CONF = "${XIPKI_DIR}/etc/ca/database/ca-db.properties"
-  ca:sql --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
-
-  DB_CONF = "${XIPKI_DIR}/etc/ca/database/caconf-db.properties"
-  ca:sql --db-conf "${DB_CONF}" xipki/sql/caconf-init.sql
+  ## init databases
+  source xipki/ca-setup/initdb-dbbased.script
 
   echo "#################################################################"
   echo "#                      Configure ca.json                        #"

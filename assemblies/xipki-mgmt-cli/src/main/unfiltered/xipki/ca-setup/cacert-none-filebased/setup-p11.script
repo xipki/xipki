@@ -104,11 +104,8 @@ if { $printUsage equals "true" } then {
   xi:rm -r ${XIPKI_DIR}/etc/ca/ca-conf
   xi:copy-dir ${TARGET_DIR} ${XIPKI_DIR}/etc/ca/ca-conf
 
-  echo "#################################################################"
-  echo "#                    Initialize Database                        #"
-  echo "#################################################################"
-  DB_CONF = "${XIPKI_DIR}/etc/ca/database/ca-db.properties"
-  ca:sql --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
+  ## init databases
+  source xipki/ca-setup/initdb-filebased.script
 
   echo "#################################################################"
   echo "#                      Configure ca.json                        #"

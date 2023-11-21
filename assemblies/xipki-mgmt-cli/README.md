@@ -15,9 +15,9 @@
     * If the CA configuration is saved in the database (2 database instances are needed, 
       as specified in `caconf-db.properties` and `ca-db.properties`):
       * In case of using new keys and certificates, in the Management CLI:  
-        `cacert-none`
+        `cacert-none-dbbased`
       * In case of using existing keys and certificates, in the Management CLI:  
-        `cacert-present`
+        `cacert-present-dbbased`
   * If the CA configuration is read from configuration files (CA itself is not configurable, only 1
     database instance is needed, as specified in `ca-db.properties`):
       * In case of using new keys and certificates, in the Management CLI:  

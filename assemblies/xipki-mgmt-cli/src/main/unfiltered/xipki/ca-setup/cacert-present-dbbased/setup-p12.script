@@ -1,11 +1,6 @@
-# Please adapt me
-CA_SUBJECT="C=DE,O=myorg,CN=myca1"
-
-# Please adapt me
-SLOT = 0
-LABEL = myca1
-
 KEYCERTS_DIR = xipki/ca-setup/keycerts
+CA_P12 = ${KEYCERTS_DIR}/myca1.p12
+CA_P12_PWD = CHANGEIT
 CA_CERT = ${KEYCERTS_DIR}/myca1.pem
 
 printUsage = "false"
@@ -45,12 +40,12 @@ if { $argsValid equals "false" } then {
   printUsage = "true"
 }
 
-THIS_DIR = xipki/ca-setup/cacert-none
+THIS_DIR = xipki/ca-setup/cacert-present-dbbased
 
 if { $printUsage equals "true" } then {
   echo "Usage: "
   echo ""
-  echo "source ${THIS_DIR}/setup-p11.script <key type> <tomcat dir> [<xipki dir>]"
+  echo "source ${THIS_DIR}/setup-p12.script <key type> <tomcat dir> [<xipki dir>]"
   echo "    key type:  rsa, ec, dsa, sm2, ed25519"
   echo "    xipki dir: optional, required if is not <tomcat dir>/xipki"
 } else {
@@ -58,25 +53,16 @@ if { $printUsage equals "true" } then {
     XIPKI_DIR = ${TOMCAT_DIR}/xipki
   }
 
-  echo "#################################################################"
-  echo "#                     Generate CA Keypair                       #"
-  echo "#################################################################"
-
   if { $KEY_TYPE equals "rsa" } then {
     SIG_ALG = SHA256WITHRSA
-    xi:rsa-p11 --slot ${SLOT} --label ${LABEL} --key-size 2048
   } elif { $KEY_TYPE equals "ec" } then {
     SIG_ALG = SHA256WITHECDSA
-    xi:ec-p11  --slot ${SLOT} --label ${LABEL} --curve secp256r1
   } elif { $KEY_TYPE equals "ed25519" } then {
     SIG_ALG = ED25519
-    xi:ec-p11  --slot ${SLOT} --label ${LABEL} --curve ed25519
   } elif { $KEY_TYPE equals "dsa" } then {
     SIG_ALG = SHA256WITHDSA
-    xi:dsa-p11  --slot ${SLOT} --label ${LABEL} --plen 2048
   } else {
     SIG_ALG = SM3WITHSM2
-    xi:sm2-p11 --slot ${SLOT} --label ${LABEL}
   }
 
   echo "#################################################################"
@@ -87,21 +73,14 @@ if { $printUsage equals "true" } then {
 
   xi:copy-file -f ${THIS_DIR}/template.ca-conf.json ${CONF_FILE}
 
-  xi:replace --old "REPLACEME-SUBJECT" --new "${CA_SUBJECT}" ${CONF_FILE}
-
-  xi:replace --old "REPLACEME-TOKEN_TYPE" --new "pkcs11" ${CONF_FILE}
+  xi:replace --old "REPLACEME-TOKEN_TYPE" --new "PKCS12" ${CONF_FILE}
 
   xi:replace --old "REPLACEME-CA_SIGNERCONF" \
-    --new "algo=${SIG_ALG},slot=${SLOT},key-label=${LABEL}" ${CONF_FILE}
+    --new "algo=${SIG_ALG},password=${CA_P12_PWD},keystore=file:${CA_P12}" \
+    ${CONF_FILE}
 
-  echo "#################################################################"
-  echo "#                    Initialize Database                        #"
-  echo "#################################################################"
-  DB_CONF = "${XIPKI_DIR}/etc/ca/database/ca-db.properties"
-  ca:sql --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
-
-  DB_CONF = "${XIPKI_DIR}/etc/ca/database/caconf-db.properties"
-  ca:sql --db-conf "${DB_CONF}" xipki/sql/caconf-init.sql
+  ## init databases
+  source xipki/ca-setup/initdb-dbbased.script
 
   echo "#################################################################"
   echo "#                      Configure ca.json                        #"
@@ -121,8 +100,5 @@ if { $printUsage equals "true" } then {
 
   ca:load-conf ${CONF_FILE}
 
-  ca:cacert --outform pem --out ${CA_CERT} myca1
-
   ca:ca-info
-
 }

@@ -1,0 +1,11 @@
+echo "#################################################################"
+echo "#                    Initialize Database                        #"
+echo "#################################################################"
+
+CA_DB = "${XIPKI_DIR}/etc/ca/database/ca-db.properties"
+
+if { "${SQL_FORCE}" equals "yes" } then {
+  ca:sql --force --db-conf "${CA_DB}" xipki/sql/ca-init.sql
+} else {
+  ca:sql --db-conf "${CA_DB}" xipki/sql/ca-init.sql
+}
