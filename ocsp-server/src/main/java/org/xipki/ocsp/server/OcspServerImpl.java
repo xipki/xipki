@@ -119,7 +119,7 @@ public class OcspServerImpl implements OcspServer {
   private final AtomicBoolean initialized = new AtomicBoolean(false);
 
   static {
-    LOG.info("XiPKI OCSP Responder version {}", StringUtil.getVersion(OcspServerImpl.class));
+    LOG.info("XiPKI OCSP Responder version {}", StringUtil.getBundleVersion(OcspServerImpl.class));
 
     unsuccesfulOCSPRespMap = new HashMap<>(10);
     for (OcspResponseStatus status : OcspResponseStatus.values()) {

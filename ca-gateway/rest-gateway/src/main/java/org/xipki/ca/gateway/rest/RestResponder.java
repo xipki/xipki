@@ -182,7 +182,7 @@ public class RestResponder {
   private static final Set<String> knownCommands;
 
   static {
-    LOG.info("XiPKI REST-Gateway version {}", StringUtil.getVersion(RestResponder.class));
+    LOG.info("XiPKI REST-Gateway version {}", StringUtil.getBundleVersion(RestResponder.class));
     knownCommands = CollectionUtil.asUnmodifiableSet(
         CMD_cacert, CMD_cacerts, CMD_revoke_cert, CMD_unsuspend_cert, CMD_unrevoke_cert, CMD_enroll_cert,
         CMD_enroll_cross_cert, CMD_enroll_serverkeygen, CMD_enroll_cert_twin, CMD_enroll_serverkeygen_twin, CMD_crl);

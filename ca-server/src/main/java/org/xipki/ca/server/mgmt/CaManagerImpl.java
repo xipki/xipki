@@ -213,7 +213,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   private final String calockFilePath;
 
   static {
-    LOG.info("XiPKI CA version {}", StringUtil.getVersion(
+    LOG.info("XiPKI CA version {}", StringUtil.getBundleVersion(
         X509Ca.class)); // any class in the package org.xipki.ca.server
   }
 

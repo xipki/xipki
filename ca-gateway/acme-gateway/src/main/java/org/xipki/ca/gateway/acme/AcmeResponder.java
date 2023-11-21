@@ -32,7 +32,6 @@ import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.HttpResponse;
-import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpRequest;
 
 import java.net.MalformedURLException;
@@ -42,7 +41,6 @@ import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -149,7 +147,7 @@ public class AcmeResponder {
   private final AtomicLong lastOrdersCleaned = new AtomicLong(0);
 
   static {
-    LOG.info("XiPKI ACME-Gateway version {}", StringUtil.getVersion(AcmeResponder.class));
+    LOG.info("XiPKI ACME-Gateway version {}", StringUtil.getBundleVersion(AcmeResponder.class));
     knownCommands = CollectionUtil.asUnmodifiableSet(
         CMD_directory, CMD_newNonce, CMD_newAccount, CMD_newOrder, CMD_revokeCert, CMD_keyChange,
         CMD_account, CMD_order, CMD_orders, CMD_authz, CMD_chall, CMD_finalize, CMD_cert);

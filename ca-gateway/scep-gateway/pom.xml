@@ -23,16 +23,4 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
-  <build>
-    <resources>
-      <resource>
-        <directory>${basedir}/../..</directory>
-        <targetPath>org/xipki/ca/gateway/scep</targetPath>
-        <filtering>true</filtering>
-        <includes>
-          <include>version</include>
-        </includes>
-      </resource>
-    </resources>
-  </build>
 </project>

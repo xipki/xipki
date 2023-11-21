@@ -67,7 +67,7 @@ public class HsmProxyResponder {
   private final Set<X509Cert> clientCerts;
 
   static {
-    LOG.info("HSM PKCS#11 proxy version {}", StringUtil.getVersion(HsmProxyResponder.class));
+    LOG.info("HSM PKCS#11 proxy version {}", StringUtil.getBundleVersion(HsmProxyResponder.class));
   }
 
   public HsmProxyResponder(boolean logReqResp, String reverseProxyMode,

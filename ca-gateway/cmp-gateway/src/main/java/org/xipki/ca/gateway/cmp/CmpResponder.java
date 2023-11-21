@@ -49,7 +49,7 @@ public class CmpResponder extends BaseCmpResponder {
   private static final Logger LOG = LoggerFactory.getLogger(BaseCmpResponder.class);
 
   static {
-    LOG.info("XiPKI CMP-Gateway version {}", StringUtil.getVersion(CmpResponder.class));
+    LOG.info("XiPKI CMP-Gateway version {}", StringUtil.getBundleVersion(CmpResponder.class));
   }
 
   public CmpResponder(

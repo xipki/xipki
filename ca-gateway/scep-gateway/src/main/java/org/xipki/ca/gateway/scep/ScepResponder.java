@@ -121,7 +121,7 @@ public class ScepResponder {
   private final CaNameScepSigners signers;
 
   static {
-    LOG.info("XiPKI SCEP-Gateway version {}", StringUtil.getVersion(ScepResponder.class));
+    LOG.info("XiPKI SCEP-Gateway version {}", StringUtil.getBundleVersion(ScepResponder.class));
 
   }
 

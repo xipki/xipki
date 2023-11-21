@@ -193,7 +193,7 @@ public class EstResponder {
   private static final Set<String> knownCommands;
 
   static {
-    LOG.info("XiPKI EST-Gateway version {}", StringUtil.getVersion(EstResponder.class));
+    LOG.info("XiPKI EST-Gateway version {}", StringUtil.getBundleVersion(EstResponder.class));
     knownCommands = CollectionUtil.asUnmodifiableSet(
         CMD_cacerts, CMD_simpleenroll, CMD_simplereenroll, CMD_serverkeygen, CMD_cacerts, CMD_csrattrs, CMD_fullcmc,
         CMD_ucacerts, CMD_ucacert, CMD_ucrl, CMD_usimpleenroll, CMD_usimplereenroll, CMD_userverkeygen);

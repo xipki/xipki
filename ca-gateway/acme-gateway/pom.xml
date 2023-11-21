@@ -33,16 +33,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <resources>
-      <resource>
-        <directory>${basedir}/../..</directory>
-        <targetPath>org/xipki/ca/gateway/acme</targetPath>
-        <filtering>true</filtering>
-        <includes>
-          <include>version</include>
-        </includes>
-      </resource>
-    </resources>
-  </build>
 </project>
