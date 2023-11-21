@@ -5,6 +5,8 @@ package org.xipki.ca.mgmt.client;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CRLHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.security.CertRevocationInfo;
@@ -45,6 +47,8 @@ import java.util.*;
 
 public class CaMgmtClient implements CaManager {
 
+  private static final Logger LOG = LoggerFactory.getLogger(CaMgmtClient.class);
+
   private static final String REQUEST_CT = "application/json";
 
   private static final String RESPONSE_CT = "application/json";
@@ -60,6 +64,10 @@ public class CaMgmtClient implements CaManager {
   private boolean initialized;
 
   private CaMgmtException initException;
+
+  static {
+    LOG.info("XiPKI CA Management Client version {}", StringUtil.getBundleVersion(CaMgmtClient.class));
+  }
 
   public CaMgmtClient(SslContextConfWrapper sslContextConfWrapper) throws ObjectCreationException {
     this.sslContextConf = sslContextConfWrapper == null ? null : sslContextConfWrapper.toSslContextConf();

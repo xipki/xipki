@@ -53,6 +53,8 @@ public abstract class DbPortWorker extends DbWorker {
     ZipParameters zipParameters = new ZipParameters();
     zipParameters.setEncryptFiles(true);
     zipParameters.setIncludeRootFolder(false);
+    zipParameters.setFileComment("Database exported by " + StringUtil.getBundleNameVersion(DbPortWorker.class));
+    // encrypted with AES-256
     zipParameters.setEncryptionMethod(EncryptionMethod.AES);
     zipParameters.setAesKeyStrength(AesKeyStrength.KEY_STRENGTH_256);
     zipParameters.setExcludeFileFilter(excludeFileFilter);

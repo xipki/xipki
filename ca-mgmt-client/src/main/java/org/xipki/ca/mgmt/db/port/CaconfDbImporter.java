@@ -13,7 +13,6 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
-import org.xipki.util.PermissionConstants;
 import org.xipki.util.SqlUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.exception.InvalidConfException;
@@ -298,7 +297,7 @@ class CaconfDbImporter extends DbPorter {
   } // method importKeypairGen
 
   private void importCa(List<CaConfType.Ca> cas)
-      throws DataAccessException, CertificateException, IOException, InvalidConfException {
+      throws DataAccessException, CertificateException, IOException {
     System.out.print("    importing table CA ... ");
     boolean succ = false;
 
@@ -343,14 +342,14 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, Base64.encodeToString(certBytes));
           ps.setString(idx++, certchainStr);
 
-          CaConfColumn caConfColumn = CaConfColumn.fromCaInfo(ca.getCaInfo());
+          CaConfColumn caConfColumn = CaConfColumn.fromBaseCaInfo(ca.getCaInfo());
           ps.setString(idx,   caConfColumn.encode());
 
           ps.executeUpdate();
         } catch (SQLException ex) {
           System.err.println("could not import CA with NAME=" + ca.getName());
           throw translate(sql, ex);
-        } catch (CertificateException | IOException | InvalidConfException ex) {
+        } catch (CertificateException | IOException ex) {
           System.err.println("could not import CA with NAME=" + ca.getName());
           throw ex;
         }
@@ -389,8 +388,7 @@ class CaconfDbImporter extends DbPorter {
     }
   } // method importCaalias
 
-  private void importCaHasRequestor(CaConfType.CaSystem root)
-      throws DataAccessException, InvalidConfException {
+  private void importCaHasRequestor(CaConfType.CaSystem root) throws DataAccessException {
     System.out.print("    importing table CA_HAS_REQUESTOR ... ");
     boolean succ = false;
     final String sql = SqlUtil.buildInsertSql("CA_HAS_REQUESTOR", "CA_ID,REQUESTOR_ID,PERMISSION,PROFILES");
@@ -406,16 +404,13 @@ class CaconfDbImporter extends DbPorter {
             int idx = 1;
             ps.setInt(idx++, ca.getId());
             ps.setInt(idx++, requestorNameToIdMap.get(entry.getRequestorName()));
-            ps.setInt(idx++, PermissionConstants.toIntPermission(entry.getPermissions()));
-            ps.setString(idx, StringUtil.collectionAsString(entry.getProfiles(), ",")); // TODO
+            ps.setInt(idx++, entry.getPermissions().getValue());
+            ps.setString(idx, StringUtil.collectionAsString(entry.getProfiles(), ","));
 
             ps.executeUpdate();
           } catch (SQLException ex) {
             System.err.println(errMsg);
             throw translate(sql, ex);
-          } catch (InvalidConfException ex) {
-            System.err.println(errMsg);
-            throw ex;
           }
         }
       }

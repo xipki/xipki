@@ -4,11 +4,9 @@
 package org.xipki.ca.mgmt.shell;
 
 import org.xipki.security.SecurityFactory;
-import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.*;
 
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Util class.
@@ -51,15 +49,5 @@ public class ShellUtil {
     pairs.putPair("keystore", "base64:" + Base64.encodeToString(keystoreBytes));
     return pairs.getEncoded();
   } // method canonicalizeSignerConf
-
-  public static int getPermission(Set<String> permissions) throws IllegalCmdParamException {
-    int ret = 0;
-    for (String permission : permissions) {
-      int code = Optional.ofNullable(PermissionConstants.getPermissionForText(permission))
-          .orElseThrow(() -> new IllegalCmdParamException("invalid permission '" + permission + "'"));
-      ret |= code;
-    }
-    return ret;
-  } // method getPermission
 
 }

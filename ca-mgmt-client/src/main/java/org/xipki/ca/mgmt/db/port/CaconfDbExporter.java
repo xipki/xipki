@@ -4,10 +4,7 @@
 package org.xipki.ca.mgmt.db.port;
 
 import org.xipki.ca.api.CaUris;
-import org.xipki.ca.api.mgmt.CaConfType;
-import org.xipki.ca.api.mgmt.CaJson;
-import org.xipki.ca.api.mgmt.CaStatus;
-import org.xipki.ca.api.mgmt.ValidityMode;
+import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaConfColumn;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
@@ -379,15 +376,15 @@ class CaconfDbExporter extends DbPorter {
 
           str = rs.getString("CRL_CONTROL");
           if (StringUtil.isNotBlank(str)) {
-            ccc.setCrlControl(new ConfPairs(str).asMap());
+            ccc.setCrlControl(new CrlControl(str));
           }
 
           str = rs.getString("CTLOG_CONTROL");
           if (StringUtil.isNotBlank(str)) {
-            ccc.setCtlogControl(new ConfPairs(str).asMap());
+            ccc.setCtlogControl(new CtlogControl(str));
           }
 
-          ccc.setPermission(rs.getInt("PERMISSION"));
+          ccc.setPermission(new Permissions(rs.getInt("PERMISSION")));
           ccc.setExpirationPeriod(rs.getInt("EXPIRATION_PERIOD"));
           ccc.setKeepExpiredCertDays(rs.getInt("KEEP_EXPIRED_CERT_DAYS"));
 
@@ -398,14 +395,14 @@ class CaconfDbExporter extends DbPorter {
 
           str = rs.getString("EXTRA_CONTROL");
           if (StringUtil.isNotBlank(str)) {
-            ccc.setExtraControl(new ConfPairs(str).asMap());
+            ccc.setExtraControl(new ConfPairs(str));
           }
 
           ccc.setNumCrls(rs.getInt("NUM_CRLS"));
 
           str = rs.getString("REVOKE_SUSPENDED_CONTROL");
           if (StringUtil.isNotBlank(str)) {
-            ccc.setRevokeSuspendedControl(new ConfPairs(str).asMap());
+            ccc.setRevokeSuspendedControl(new RevokeSuspendedControl(str));
           }
 
           ccc.setKeypairGenNames(Collections.singletonList("software"));
@@ -450,40 +447,21 @@ class CaconfDbExporter extends DbPorter {
       caInfo.setCaUris(new CaUris(cc.getCacertUris(), cc.getOcspUris(), cc.getCrlUris(), cc.getDeltaCrlUris()));
     }
 
-    // CRL Control
-    if (cc.getCrlControl() != null) {
-      caInfo.setCrlControl(cc.getCrlControl());
-    }
-
-    // CTLog Control
-    if (cc.getCtlogControl() != null) {
-      caInfo.setCtlogControl(cc.getCtlogControl());
-    }
-
-    if (cc.getExtraControl() != null) {
-      caInfo.setExtraControl(cc.getExtraControl());
-    }
-
-    if (cc.getRevokeSuspendedControl() != null) {
-      caInfo.setRevokeSuspendedControl(cc.getRevokeSuspendedControl());
-    }
+    caInfo.setCrlControl(cc.getCrlControl());
+    caInfo.setCtlogControl(cc.getCtlogControl());
+    caInfo.setExtraControl(cc.getExtraControl());
+    caInfo.setRevokeSuspendedControl(cc.getRevokeSuspendedControl());
 
     caInfo.setSnSize(cc.getSnSize());
-    if (cc.getMaxValidity() != null) {
-      caInfo.setMaxValidity(cc.getMaxValidity());
-    }
-
+    caInfo.setMaxValidity(cc.getMaxValidity());
     caInfo.setKeypairGenNames(cc.getKeypairGenNames());
     caInfo.setSaveKeypair(cc.isSaveKeypair());
     caInfo.setSaveKeypair(cc.isSaveKeypair());
-    caInfo.setPermissions(permissionToStringList(cc.getPermission()));
+    caInfo.setPermissions(permissionToStringList(cc.getPermission().getValue()));
     caInfo.setNumCrls(cc.getNumCrls());
     caInfo.setExpirationPeriod(cc.getExpirationPeriod());
     caInfo.setKeepExpiredCertDays(cc.getKeepExpiredCertDays());
-
-    if (cc.getValidityMode() != null) {
-      cc.setValidityMode(cc.getValidityMode());
-    }
+    cc.setValidityMode(cc.getValidityMode());
   }
 
   private Map<String, Integer> getCaAliases() throws DataAccessException {
@@ -618,11 +596,11 @@ class CaconfDbExporter extends DbPorter {
     return ret;
   }
 
-  private List<String> permissionToStringList(int permissionn) {
+  private Permissions permissionToStringList(int permissionn) {
     if (dbSchemaVersion < 7) {
       permissionn |= PermissionConstants.GET_CERT;
     }
-    return PermissionConstants.permissionToStringList(permissionn);
+    return new Permissions(permissionn);
   }
 
 }

@@ -19,6 +19,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
+import org.xipki.util.Permissions;
 
 import java.util.*;
 
@@ -54,7 +55,7 @@ public class RequestorActions {
     protected Object execute0() throws Exception {
       CaHasRequestorEntry entry = new CaHasRequestorEntry(new NameId(null, requestorName));
       entry.setProfiles(profiles);
-      entry.setPermission(ShellUtil.getPermission(permissions));
+      entry.setPermissions(new Permissions(permissions));
 
       String msg = "requestor " + requestorName + " to CA " + caName;
       try {

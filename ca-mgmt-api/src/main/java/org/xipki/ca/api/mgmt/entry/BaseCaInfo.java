@@ -4,13 +4,9 @@
 package org.xipki.ca.api.mgmt.entry;
 
 import org.xipki.ca.api.CaUris;
-import org.xipki.ca.api.mgmt.CaManager;
-import org.xipki.ca.api.mgmt.CaStatus;
-import org.xipki.ca.api.mgmt.ValidityMode;
+import org.xipki.ca.api.mgmt.*;
 import org.xipki.security.CertRevocationInfo;
-import org.xipki.util.CompareUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.Validity;
+import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.List;
@@ -50,6 +46,16 @@ public abstract class BaseCaInfo extends MgmtEntry {
   protected int snSize = 20;
 
   protected CaStatus status = CaStatus.active;
+
+  protected Permissions permissions;
+
+  protected CrlControl crlControl;
+
+  protected CtlogControl ctlogControl;
+
+  protected RevokeSuspendedControl revokeSuspendedControl;
+
+  protected ConfPairs extraControl;
 
   /**
    * Valid values are strict, cutoff and lax. Default is strict
@@ -178,6 +184,46 @@ public abstract class BaseCaInfo extends MgmtEntry {
     this.validityMode = validityMode;
   }
 
+  public Permissions getPermissions() {
+    return permissions;
+  }
+
+  public void setPermissions(Permissions permissions) {
+    this.permissions = permissions;
+  }
+
+  public final CrlControl getCrlControl() {
+    return crlControl;
+  }
+
+  public final void setCrlControl(CrlControl crlControl) {
+    this.crlControl = crlControl;
+  }
+
+  public final CtlogControl getCtlogControl() {
+    return ctlogControl;
+  }
+
+  public final void setCtlogControl(CtlogControl ctlogControl) {
+    this.ctlogControl = ctlogControl;
+  }
+
+  public final RevokeSuspendedControl getRevokeSuspendedControl() {
+    return revokeSuspendedControl;
+  }
+
+  public final void setRevokeSuspendedControl(RevokeSuspendedControl revokeSuspendedControl) {
+    this.revokeSuspendedControl = revokeSuspendedControl;
+  }
+
+  public final ConfPairs getExtraControl() {
+    return extraControl;
+  }
+
+  public final void setExtraControl(ConfPairs extraControl) {
+    this.extraControl = extraControl;
+  }
+
   @Override
   public void validate() throws InvalidConfException {
     notNull(maxValidity, "maxValidity");
@@ -205,7 +251,12 @@ public abstract class BaseCaInfo extends MgmtEntry {
         && signerType.equals(obj.signerType)
         && (snSize == obj.snSize)
         && CompareUtil.equalsObject(status, obj.status)
-        && CompareUtil.equalsObject(validityMode, obj.validityMode);
+        && CompareUtil.equalsObject(validityMode, obj.validityMode)
+        && CompareUtil.equalsObject(permissions, obj.permissions)
+        && CompareUtil.equalsObject(crlControl, obj.crlControl)
+        && CompareUtil.equalsObject(ctlogControl, obj.ctlogControl)
+        && CompareUtil.equalsObject(extraControl, obj.extraControl)
+        && CompareUtil.equalsObject(revokeSuspendedControl, obj.revokeSuspendedControl);
   }
 
   public void copyBaseInfoTo(BaseCaInfo dest) {
@@ -228,6 +279,12 @@ public abstract class BaseCaInfo extends MgmtEntry {
     dest.snSize = snSize;
     dest.status = status;
     dest.validityMode = validityMode;
+
+    dest.permissions = permissions;
+    dest.crlControl = crlControl;
+    dest.ctlogControl = ctlogControl;
+    dest.revokeSuspendedControl = revokeSuspendedControl;
+    dest.extraControl = extraControl;
   }
 
 }

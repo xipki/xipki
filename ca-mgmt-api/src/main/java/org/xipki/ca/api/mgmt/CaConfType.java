@@ -4,10 +4,7 @@
 package org.xipki.ca.api.mgmt;
 
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.FileOrValue;
-import org.xipki.util.StringUtil;
-import org.xipki.util.ValidableConf;
+import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.HashMap;
@@ -164,7 +161,7 @@ public class CaConfType {
 
     private String requestorName;
 
-    private List<String> permissions;
+    private Permissions permissions;
 
     private List<String> profiles;
 
@@ -176,14 +173,11 @@ public class CaConfType {
       this.requestorName = StringUtil.lowercase(requestorName);
     }
 
-    public List<String> getPermissions() {
-      if (permissions == null) {
-        permissions = new LinkedList<>();
-      }
+    public Permissions getPermissions() {
       return permissions;
     }
 
-    public void setPermissions(List<String> permissions) {
+    public void setPermissions(Permissions permissions) {
       this.permissions = permissions;
     }
 
@@ -201,7 +195,7 @@ public class CaConfType {
     @Override
     public void validate() throws InvalidConfException {
       notBlank(requestorName, "requestorName");
-      notEmpty(permissions, "permissions");
+      notNull(permissions, "permissions");
     }
 
   } // class CaHasRequestor
@@ -218,20 +212,10 @@ public class CaConfType {
      */
     private List<FileOrBinary> certchain;
 
-    private Map<String, String> extraControl;
-
     /**
      * A new self-issued CA certificate will be generated.
      */
     private GenSelfIssued genSelfIssued;
-
-    private List<String> permissions;
-
-    private Map<String, ? extends Object> crlControl;
-
-    private Map<String, ? extends Object> ctlogControl;
-
-    private Map<String, ? extends Object> revokeSuspendedControl;
 
     private FileOrValue signerConf;
 
@@ -251,55 +235,12 @@ public class CaConfType {
       this.certchain = certchain;
     }
 
-    public Map<String, String> getExtraControl() {
-      return extraControl;
-    }
-
-    public void setExtraControl(Map<String, String> extraControl) {
-      this.extraControl = extraControl;
-    }
-
     public GenSelfIssued getGenSelfIssued() {
       return genSelfIssued;
     }
 
     public void setGenSelfIssued(GenSelfIssued genSelfIssued) {
       this.genSelfIssued = genSelfIssued;
-    }
-
-    public List<String> getPermissions() {
-      if (permissions == null) {
-        permissions = new LinkedList<>();
-      }
-      return permissions;
-    }
-
-    public void setPermissions(List<String> permissions) {
-      this.permissions = permissions;
-    }
-
-    public Map<String, ? extends Object> getCrlControl() {
-      return crlControl;
-    }
-
-    public void setCrlControl(Map<String, ? extends Object> crlControl) {
-      this.crlControl = crlControl;
-    }
-
-    public Map<String, ? extends Object> getCtlogControl() {
-      return ctlogControl;
-    }
-
-    public void setCtlogControl(Map<String, ? extends Object> ctlogControl) {
-      this.ctlogControl = ctlogControl;
-    }
-
-    public Map<String, ? extends Object> getRevokeSuspendedControl() {
-      return revokeSuspendedControl;
-    }
-
-    public void setRevokeSuspendedControl(Map<String, ? extends Object> revokeSuspendedControl) {
-      this.revokeSuspendedControl = revokeSuspendedControl;
     }
 
     public FileOrValue getSignerConf() {

@@ -7,9 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.mgmt.CaManager;
-import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.CaStatus;
+import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
 import org.xipki.ca.server.*;
@@ -222,7 +220,7 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
     CertRevocationInfo revocationInfo = (revInfo == null) ? null : CertRevocationInfo.fromEncoded(revInfo);
     entry.setRevocationInfo(revocationInfo);
 
-    conf.fillCaEntry(entry);
+    conf.fillBaseCaInfo(entry);
 
     try {
       return new CaInfo(entry, conf, certstore);
@@ -247,7 +245,7 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
       List<String> list = StringUtil.split(rs.getString("PROFILES"), ",");
       Set<String> profiles = (list == null) ? null : new HashSet<>(list);
       CaHasRequestorEntry entry = new CaHasRequestorEntry(new NameId(id, name));
-      entry.setPermission(getInt(rs, "PERMISSION"));
+      entry.setPermissions(new Permissions(getInt(rs, "PERMISSION")));
       entry.setProfiles(profiles);
 
       ret.add(entry);
@@ -319,7 +317,7 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
     String certchainStr = CollectionUtil.isEmpty(certchain) ? null
         : encodeCertchain(buildCertChain(caEntry.getCert(), certchain));
 
-    CaConfColumn cc = CaConfColumn.fromCaEntry(caEntry);
+    CaConfColumn cc = CaConfColumn.fromBaseCaInfo(caEntry);
 
     String revInfoStr = null;
     if (caEntry.getRevocationInfo() != null) {
@@ -476,14 +474,14 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
     final NameId requestorIdent = requestor.getRequestorIdent();
 
     int num = execUpdatePrepStmt0(sql, col2Int(ca.getId()), col2Int(requestorIdent.getId()),
-          col2Int(requestor.getPermission()), col2Str(profilesText));
+          col2Int(requestor.getPermissions().getValue()), col2Str(profilesText));
 
     if (num == 0) {
       throw new CaMgmtException("could not add requestor " + requestorIdent + " to CA " + ca);
     }
 
-    LOG.info("added requestor '{}' to CA '{}': permission: {}; profile: {}",
-        requestorIdent, ca, requestor.getPermission(), profilesText);
+    LOG.info("added requestor '{}' to CA '{}': permission: {} ({}); profile: {}",
+        requestorIdent, ca, requestor.getPermissions().getValue(), requestor.getPermissions(), profilesText);
   } // method addRequestorToCa
 
   @Override
@@ -624,7 +622,7 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
 
     String str = changeCaEntry.getExtraControl();
     if (str != null) {
-      newCC.setExtraControl(CaManager.NULL.equalsIgnoreCase(str) ? null : new ConfPairs(str).asMap());
+      newCC.setExtraControl(CaManager.NULL.equalsIgnoreCase(str) ? null : new ConfPairs(str));
     }
 
     newCC.setValidityMode(changeCaEntry.getValidityMode());
@@ -670,13 +668,13 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
     // CRL control
     str = changeCaEntry.getCrlControl();
     if (str != null) {
-      newCC.setCrlControl(CaManager.NULL.equalsIgnoreCase(str) ? null : new ConfPairs(str).asMap());
+      newCC.setCrlControl(CaManager.NULL.equalsIgnoreCase(str) ? null : new CrlControl(str));
     }
 
     // CTLog control
     str = changeCaEntry.getCtlogControl();
     if (str != null) {
-      newCC.setCtlogControl(CaManager.NULL.equalsIgnoreCase(str) ? null : new ConfPairs(str).asMap());
+      newCC.setCtlogControl(CaManager.NULL.equalsIgnoreCase(str) ? null : new CtlogControl(str));
     }
 
     Boolean b = changeCaEntry.getSaveCert();
@@ -691,7 +689,7 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
 
     List<String> list = changeCaEntry.getPermission();
     if (list != null && !list.isEmpty()) {
-      newCC.setPermission(PermissionConstants.toIntPermission(list));
+      newCC.setPermission(new Permissions(PermissionConstants.toIntPermission(list)));
     }
 
     Integer i = changeCaEntry.getNumCrls();
@@ -711,7 +709,7 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
 
     str = changeCaEntry.getRevokeSuspendedControl();
     if (str != null) {
-      newCC.setRevokeSuspendedControl(CaManager.NULL.equalsIgnoreCase(str) ? null : new ConfPairs(str).asMap());
+      newCC.setRevokeSuspendedControl(CaManager.NULL.equalsIgnoreCase(str) ? null : new RevokeSuspendedControl(str));
     }
 
     String encodedConf = newCC.encode();

@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
-import org.xipki.util.ConfPairs;
 import org.xipki.util.JSON;
 import org.xipki.util.exception.InvalidConfException;
 
@@ -56,7 +55,7 @@ public class CaJson {
     @Override
     public void serialize(CrlControl value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
         throws IOException {
-      jsonGenerator.writeString(value.getConf());
+      jsonGenerator.writeObject(value. getConfPairs().asMap());
     }
 
   }
@@ -67,7 +66,7 @@ public class CaJson {
     public CrlControl deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
         throws IOException {
       try {
-        return new CrlControl(jsonParser.getValueAsString());
+        return new CrlControl(JSON.deserializerConfPairs(jsonParser));
       } catch (InvalidConfException e) {
         throw new IOException("invalid CrlControl", e);
       }
@@ -80,7 +79,7 @@ public class CaJson {
     @Override
     public void serialize(CtlogControl value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
         throws IOException {
-      jsonGenerator.writeString(value.getConf());
+      jsonGenerator.writeObject(value.getConfPairs().asMap());
     }
 
   }
@@ -91,7 +90,7 @@ public class CaJson {
     public CtlogControl deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
         throws IOException {
       try {
-        return new CtlogControl(jsonParser.getValueAsString());
+        return new CtlogControl(JSON.deserializerConfPairs(jsonParser));
       } catch (InvalidConfException e) {
         throw new IOException("invalid CrlControl", e);
       }
@@ -105,7 +104,7 @@ public class CaJson {
     public void serialize(RevokeSuspendedControl value, JsonGenerator jsonGenerator,
                           SerializerProvider serializerProvider)
         throws IOException {
-      jsonGenerator.writeString(value.getConf());
+      jsonGenerator.writeObject(value.getConfPairs().asMap());
     }
 
   }
@@ -115,27 +114,7 @@ public class CaJson {
     @Override
     public RevokeSuspendedControl deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
         throws IOException {
-      return new RevokeSuspendedControl(jsonParser.getValueAsString());
-    }
-
-  }
-
-  private static class ConfPairsSerializer extends JsonSerializer<ConfPairs> {
-
-    @Override
-    public void serialize(ConfPairs value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
-        throws IOException {
-      jsonGenerator.writeString(value.getEncoded());
-    }
-
-  }
-
-  private static class ConfPairsDeserializer extends JsonDeserializer<ConfPairs> {
-
-    @Override
-    public ConfPairs deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
-        throws IOException {
-      return new ConfPairs(jsonParser.getValueAsString());
+      return new RevokeSuspendedControl(JSON.deserializerConfPairs(jsonParser));
     }
 
   }
@@ -147,17 +126,14 @@ public class CaJson {
       addSerializer  (X509Cert.class, new X509CertSerializer());
       addDeserializer(X509Cert.class, new X509CertDeserializer());
 
-      addSerializer(CrlControl.class, new CrlControlSerializer());
+      addSerializer  (CrlControl.class, new CrlControlSerializer());
       addDeserializer(CrlControl.class, new CrlControlDeserializer());
 
-      addSerializer(CtlogControl.class, new CtlogControlSerializer());
+      addSerializer  (CtlogControl.class, new CtlogControlSerializer());
       addDeserializer(CtlogControl.class, new CtlogControlDeserializer());
 
-      addSerializer(RevokeSuspendedControl.class, new RevokeSuspendedControlSerializer());
+      addSerializer  (RevokeSuspendedControl.class, new RevokeSuspendedControlSerializer());
       addDeserializer(RevokeSuspendedControl.class, new RevokeSuspendedControlDeserializer());
-
-      addSerializer(ConfPairs.class, new ConfPairsSerializer());
-      addDeserializer(ConfPairs.class, new ConfPairsDeserializer());
     }
 
   }

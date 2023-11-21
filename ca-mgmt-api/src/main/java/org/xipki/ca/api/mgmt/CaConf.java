@@ -317,25 +317,6 @@ public class CaConf {
           caEntry.setSignerType(expandConf(caEntry.getSignerType()));
           caEntry.setSignerConf(getValue(ci.getSignerConf(), zipEntries));
 
-          if (ci.getCrlControl() != null) {
-            caEntry.setCrlControl(new CrlControl(new ConfPairs(ci.getCrlControl()).getEncoded()));
-          }
-
-          if (ci.getCtlogControl() != null) {
-            caEntry.setCtlogControl(new CtlogControl(new ConfPairs(ci.getCtlogControl()).getEncoded()));
-          }
-
-          if (ci.getExtraControl() != null) {
-            caEntry.setExtraControl(new ConfPairs(ci.getExtraControl()).unmodifiable());
-          }
-
-          caEntry.setPermission(PermissionConstants.toIntPermission(ci.getPermissions()));
-
-          if (ci.getRevokeSuspendedControl() != null) {
-            caEntry.setRevokeSuspendedControl(
-                new RevokeSuspendedControl(new ConfPairs(ci.getRevokeSuspendedControl())));
-          }
-
           if (ci.getGenSelfIssued() == null) {
             X509Cert caCert;
 
@@ -390,7 +371,7 @@ public class CaConf {
               en.setProfiles(new HashSet<>(req.getProfiles()));
             }
 
-            en.setPermission(PermissionConstants.toIntPermission(req.getPermissions()));
+            en.setPermissions(req.getPermissions());
             caHasRequestors.add(en);
           }
         }

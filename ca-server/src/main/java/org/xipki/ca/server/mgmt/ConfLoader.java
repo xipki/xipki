@@ -362,7 +362,7 @@ class ConfLoader {
               CaConfType.CaHasRequestor chr = new CaConfType.CaHasRequestor();
               chr.setRequestorName(requestorName);
               chr.setProfiles(new ArrayList<>(m.getProfiles()));
-              chr.setPermissions(getPermissions(m.getPermission()));
+              chr.setPermissions(m.getPermissions());
 
               ca.getRequestors().add(chr);
             }
@@ -405,24 +405,7 @@ class ConfLoader {
             caInfoType.setCertchain(ccList);
           }
 
-          if (entry.getCrlControl() != null) {
-            caInfoType.setCrlControl(new HashMap<>(new ConfPairs(entry.getCrlControl().getConf()).asMap()));
-          }
-
-          if (entry.getCtlogControl() != null) {
-            caInfoType.setCtlogControl(new HashMap<>(new ConfPairs(entry.getCtlogControl().getConf()).asMap()));
-          }
-
-          if (entry.getExtraControl() != null) {
-            caInfoType.setExtraControl(entry.getExtraControl().asMap());
-          }
-
-          caInfoType.setPermissions(getPermissions(entry.getPermission()));
-
-          if (entry.getRevokeSuspendedControl() != null) {
-            caInfoType.setRevokeSuspendedControl(
-                new HashMap<>(new ConfPairs(entry.getRevokeSuspendedControl().getConf()).asMap()));
-          }
+          caInfoType.setPermissions(entry.getPermissions());
 
           caInfoType.setSignerConf(createFileOrValue(zipStream, entry.getSignerConf(),
               "files/ca-" + name + "-signerconf.conf"));

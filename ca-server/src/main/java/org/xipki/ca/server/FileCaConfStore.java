@@ -354,7 +354,7 @@ public class FileCaConfStore implements CaConfStore {
           for (CaConfType.CaHasRequestor c : m.getRequestors()) {
             RequestorEntry entry0 = requestorTable.get(c.getRequestorName());
             CaHasRequestorEntry entry = new CaHasRequestorEntry(entry0.getIdent());
-            entry.setPermission(PermissionConstants.toIntPermission(c.getPermissions()));
+            entry.setPermissions(c.getPermissions());
             entry.setProfiles(c.getProfiles() == null
                 ? Collections.emptySet() : new HashSet<>(c.getProfiles()));
             set.add(entry);
@@ -462,27 +462,10 @@ public class FileCaConfStore implements CaConfStore {
     CaEntry caEntry = new CaEntry(ident);
     ci.copyBaseInfoTo(caEntry);
 
-    caEntry.setPermission(PermissionConstants.toIntPermission(ci.getPermissions()));
     caEntry.setSignerConf(getValue(ci.getSignerConf(), baseDir));
 
     if (caEntry.getCaUris() == null) {
       caEntry.setCaUris(CaUris.EMPTY_INSTANCE);
-    }
-
-    if (ci.getCrlControl() != null) {
-      caEntry.setCrlControl(new CrlControl(new ConfPairs(ci.getCrlControl()).getEncoded()));
-    }
-
-    if (ci.getCtlogControl() != null) {
-      caEntry.setCtlogControl(new CtlogControl(new ConfPairs(ci.getCtlogControl()).getEncoded()));
-    }
-
-    if (ci.getExtraControl() != null) {
-      caEntry.setExtraControl(new ConfPairs(ci.getExtraControl()).unmodifiable());
-    }
-
-    if (ci.getRevokeSuspendedControl() != null) {
-      caEntry.setRevokeSuspendedControl(new RevokeSuspendedControl(new ConfPairs(ci.getRevokeSuspendedControl())));
     }
 
     X509Cert caCert;
@@ -797,7 +780,7 @@ public class FileCaConfStore implements CaConfStore {
     }
 
     try {
-      return new CaInfo(caEntry, CaConfColumn.fromCaEntry(caEntry), certstore);
+      return new CaInfo(caEntry, CaConfColumn.fromBaseCaInfo(caEntry), certstore);
     } catch (OperationException ex) {
       throw new CaMgmtException(ex);
     }

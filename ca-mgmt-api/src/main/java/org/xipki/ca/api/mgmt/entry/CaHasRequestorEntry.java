@@ -19,7 +19,7 @@ public class CaHasRequestorEntry extends MgmtEntry {
 
   private NameId requestorIdent;
 
-  private int permission;
+  private Permissions permissions;
 
   private Set<String> profiles;
 
@@ -32,12 +32,12 @@ public class CaHasRequestorEntry extends MgmtEntry {
     this.requestorIdent = Args.notNull(requestorIdent, "requestorIdent");
   }
 
-  public int getPermission() {
-    return permission;
+  public Permissions getPermissions() {
+    return permissions;
   }
 
-  public void setPermission(int permission) {
-    this.permission = permission;
+  public void setPermissions(Permissions permissions) {
+    this.permissions = permissions;
   }
 
   public NameId getRequestorIdent() {
@@ -69,7 +69,7 @@ public class CaHasRequestorEntry extends MgmtEntry {
   }
 
   public boolean isPermitted(int permission) {
-    return PermissionConstants.contains(this.permission, permission);
+    return permissions.isPermitted(permission);
   }
 
   @Override
@@ -80,7 +80,7 @@ public class CaHasRequestorEntry extends MgmtEntry {
   public String toString(String indent) {
     return indent + "requestor:  " + requestorIdent +
         "\n" + indent + "profiles:   " + profiles +
-        "\n" + indent + "permission: " + PermissionConstants.permissionToString(permission);
+        "\n" + indent + "permission: " + permissions;
   }
 
   @Override
@@ -97,7 +97,7 @@ public class CaHasRequestorEntry extends MgmtEntry {
   public boolean equals(CaHasRequestorEntry obj, boolean ignoreId) {
     return (obj != null)
         && requestorIdent.equals(obj.requestorIdent, ignoreId)
-        && (permission == obj.permission)
+        && CompareUtil.equalsObject(permissions, obj.permissions)
         && CompareUtil.equalsObject(profiles, obj.profiles);
   }
 

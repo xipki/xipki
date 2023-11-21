@@ -409,7 +409,7 @@ public class QaCaActions {
 
       // Permissions
       if (ey.getPermission() != null) {
-        assertObjEquals("permission", ey.getPermission(), ca.getPermission());
+        assertObjEquals("permission", new Permissions(ey.getPermission()), ca.getPermissions());
       }
 
       // Signer Type
@@ -569,10 +569,10 @@ public class QaCaActions {
       }
 
       if (permissions != null) {
-        int intPermission = ShellUtil.getPermission(permissions);
-
-        if (intPermission != entry.getPermission()) {
-          throw new CmdFailure("permissions: is '" + entry.getPermission() + "', but expected '" + intPermission + "'");
+        Permissions objPermissions = new Permissions(permissions);
+        if (objPermissions.getValue() != entry.getPermissions().getValue()) {
+          throw new CmdFailure("permissions: is '" + entry.getPermissions().getValue()
+              + "', but expected '" + objPermissions.getValue() + "'");
         }
       }
 

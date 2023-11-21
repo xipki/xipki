@@ -287,12 +287,12 @@ public class CaInfo {
     return caEntry.getValidityMode();
   }
 
-  public int getPermission() {
-    return caEntry.getPermission();
+  public Permissions getPermission() {
+    return caEntry.getPermissions();
   }
 
-  public void setPermission(int permission) {
-    caEntry.setPermission(permission);
+  public void setPermissions(Permissions permission) {
+    caEntry.setPermissions(permission);
   }
 
   public CertRevocationInfo getRevocationInfo() {
@@ -377,12 +377,12 @@ public class CaInfo {
   } // method initSigner
 
   public boolean isSignerRequired() {
-    int permission = caEntry.getPermission();
-    return PermissionConstants.contains(permission, PermissionConstants.ENROLL_CROSS)
-        || PermissionConstants.contains(permission, PermissionConstants.ENROLL_CERT)
-        || PermissionConstants.contains(permission, PermissionConstants.GEN_CRL)
-        || PermissionConstants.contains(permission, PermissionConstants.REENROLL_CERT);
-  } // method isSignerRequired
+    Permissions permissions = caEntry.getPermissions();
+    return permissions.isPermitted(PermissionConstants.ENROLL_CROSS)
+        || permissions.isPermitted(PermissionConstants.ENROLL_CERT)
+        || permissions.isPermitted(PermissionConstants.GEN_CRL)
+        || permissions.isPermitted(PermissionConstants.REENROLL_CERT);
+  }
 
   public RevokeSuspendedControl revokeSuspendedCertsControl() {
     return caEntry.getRevokeSuspendedControl();

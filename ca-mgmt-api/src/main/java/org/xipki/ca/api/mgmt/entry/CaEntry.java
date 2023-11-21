@@ -5,9 +5,6 @@ package org.xipki.ca.api.mgmt.entry;
 
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.CrlControl;
-import org.xipki.ca.api.mgmt.CtlogControl;
-import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
@@ -49,16 +46,6 @@ public class CaEntry extends BaseCaInfo {
 
   private String signerConf;
 
-  private CrlControl crlControl;
-
-  private CtlogControl ctlogControl;
-
-  private RevokeSuspendedControl revokeSuspendedControl;
-
-  private int permission;
-
-  private ConfPairs extraControl;
-
   private X509Cert cert;
 
   private int pathLenConstraint;
@@ -84,12 +71,7 @@ public class CaEntry extends BaseCaInfo {
   public CaEntry copy() {
     CaEntry ret = new CaEntry(ident);
     copyBaseInfoTo(ret);
-    ret.crlControl = crlControl;
-    ret.ctlogControl = ctlogControl;
-    ret.revokeSuspendedControl = revokeSuspendedControl;
-    ret.extraControl = extraControl;
     ret.pathLenConstraint = pathLenConstraint;
-    ret.permission = permission;
     ret.revocationInfo = revocationInfo;
     ret.cert = cert;
     ret.certchain = certchain;
@@ -138,46 +120,6 @@ public class CaEntry extends BaseCaInfo {
     return signerConf;
   }
 
-  public void setCrlControl(CrlControl crlControl) {
-    this.crlControl = crlControl;
-  }
-
-  public CrlControl getCrlControl() {
-    return crlControl;
-  }
-
-  public CtlogControl getCtlogControl() {
-    return ctlogControl;
-  }
-
-  public void setCtlogControl(CtlogControl ctlogControl) {
-    this.ctlogControl = ctlogControl;
-  }
-
-  public RevokeSuspendedControl getRevokeSuspendedControl() {
-    return revokeSuspendedControl;
-  }
-
-  public void setRevokeSuspendedControl(RevokeSuspendedControl revokeSuspendedControl) {
-    this.revokeSuspendedControl = revokeSuspendedControl;
-  }
-
-  public int getPermission() {
-    return permission;
-  }
-
-  public void setPermission(int permission) {
-    this.permission = permission;
-  }
-
-  public ConfPairs getExtraControl() {
-    return extraControl;
-  }
-
-  public void setExtraControl(ConfPairs extraControl) {
-    this.extraControl = extraControl;
-  }
-
   public void setIdent(NameId ident) {
     this.ident = ident;
   }
@@ -194,7 +136,7 @@ public class CaEntry extends BaseCaInfo {
   public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
     String extraCtrlText;
     if (extraControl == null) {
-      extraCtrlText = "null";
+      extraCtrlText = "-";
     } else {
       extraCtrlText = extraControl.getEncoded();
       if (!verbose && extraCtrlText.length() > 100) {
@@ -218,25 +160,23 @@ public class CaEntry extends BaseCaInfo {
         certchainStr.append(X509Util.formatCert(certchain.get(i), verbose));
       }
     } else {
-      certchainStr.append("null");
+      certchainStr.append("-");
     }
-
-    String permissionText = PermissionConstants.permissionToString(permission);
 
     return StringUtil.concatObjectsCap(1500,
         "id:                   ", ident.getId(),
         "\nname:                 ", ident.getName(),
-        "\nstatus:               ", (status == null ? "null" : status.getStatus()),
+        "\nstatus:               ", (status == null ? "-" : status.getStatus()),
         "\nmax. validity:        ", maxValidity,
         "\nexpiration period:    ", expirationPeriod, "d",
         "\nsigner type:          ", signerType,
-        "\nsigner conf:          ", (signerConf == null ? "null"
+        "\nsigner conf:          ", (signerConf == null ? "-"
             : SignerEntry.signerConfToString(signerConf, verbose, ignoreSensitiveInfo)),
         "\nCRL signer name:      ", crlSignerName,
         "\nsave certificate:     ", saveCert,
         "\nsave keypair:         ", saveKeypair,
         "\nvalidity mode:        ", validityMode,
-        "\npermission:           ", permissionText,
+        "\npermission:           ", permissions,
         "\nkeep expired certs:   ", (keepExpiredCertDays < 0 ? "forever" : keepExpiredCertDays + " days"),
         "\nextra control:        ", extraCtrlText,
         "\nserial number length: ", snSize, " bytes",
@@ -244,10 +184,10 @@ public class CaEntry extends BaseCaInfo {
         "\nnext CRL number:      ", nextCrlNo,
         "\nKeyPair generation names: ", keypairGenNames,
         "\n", caUris,
-        "\nCRL control:\n", (crlControl == null ? "  null" : crlControl.toString(verbose)),
-        "\nCTLog control:\n", (ctlogControl == null ? "  null" : ctlogControl.toString(verbose)),
+        "\nCRL control:\n", (crlControl == null ? "  -" : crlControl.toString(verbose)),
+        "\nCTLog control:\n", (ctlogControl == null ? "  -" : ctlogControl.toString(verbose)),
         "\nrevoke suspended certificates control: \n",
-        (revokeSuspendedControl == null ? "  null" : revokeSuspendedControl.toString(verbose)),
+        (revokeSuspendedControl == null ? "  -" : revokeSuspendedControl.toString(verbose)),
         "\ncert: \n", X509Util.formatCert(cert, verbose),
         certchainStr.toString());
   } // method toString(boolean, boolean)
@@ -267,15 +207,10 @@ public class CaEntry extends BaseCaInfo {
     return super.equals(obj, ignoreDynamicFields)
         && CompareUtil.equalsObject(cert, obj.cert)
         && CompareUtil.equalsObject(certchain, obj.certchain)
-        && CompareUtil.equalsObject(crlControl, obj.crlControl)
-        && CompareUtil.equalsObject(ctlogControl, obj.ctlogControl)
         && (expirationPeriod == obj.expirationPeriod)
-        && CompareUtil.equalsObject(extraControl, obj.extraControl)
         && ident.equals(obj.ident, ignoreId)
         && (keepExpiredCertDays == obj.keepExpiredCertDays)
         && (numCrls == obj.numCrls)
-        && (permission == obj.permission)
-        && CompareUtil.equalsObject(revokeSuspendedControl, obj.revokeSuspendedControl)
         && CompareUtil.equalsObject(signerConf, obj.signerConf)
         && CompareUtil.equalsObject(validityMode, obj.validityMode);
   }

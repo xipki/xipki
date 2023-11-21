@@ -271,7 +271,7 @@ public class CaActions {
 
       entry.setMaxValidity(Validity.getInstance(maxValidity));
       entry.setKeepExpiredCertDays(keepExpiredCertDays);
-      entry.setPermission(ShellUtil.getPermission(permissions));
+      entry.setPermissions(new Permissions(permissions));
 
       if (extraControl != null) {
         extraControl = extraControl.trim();

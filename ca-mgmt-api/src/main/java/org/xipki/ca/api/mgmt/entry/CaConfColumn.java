@@ -6,12 +6,10 @@ package org.xipki.ca.api.mgmt.entry;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.PermissionConstants;
+import org.xipki.util.Permissions;
 import org.xipki.util.Validity;
-import org.xipki.util.exception.InvalidConfException;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Represent the CONF column in the table CA.
@@ -49,14 +47,14 @@ public class CaConfColumn {
    */
   private Validity maxValidity;
 
-  private Map<String,String> crlControl;
+  private CrlControl crlControl;
 
   /**
    * Certificate Transparency Log Control.
    */
-  private Map<String,String> ctlogControl;
+  private CtlogControl ctlogControl;
 
-  private Map<String,String> revokeSuspendedControl;
+  private RevokeSuspendedControl revokeSuspendedControl;
 
   private List<String> keypairGenNames;
 
@@ -72,7 +70,7 @@ public class CaConfColumn {
 
   private ValidityMode validityMode;
 
-  private int permission;
+  private Permissions permission;
 
   private int numCrls = DEFAULT_numCrls;
 
@@ -87,7 +85,7 @@ public class CaConfColumn {
   /**
    * Extra control.
    */
-  private Map<String, String> extraControl;
+  private ConfPairs extraControl;
 
   public int getVersion() {
     return version;
@@ -145,30 +143,6 @@ public class CaConfColumn {
     this.maxValidity = maxValidity;
   }
 
-  public Map<String, String> getCrlControl() {
-    return crlControl;
-  }
-
-  public void setCrlControl(Map<String, String> crlControl) {
-    this.crlControl = crlControl;
-  }
-
-  public Map<String, String> getCtlogControl() {
-    return ctlogControl;
-  }
-
-  public void setCtlogControl(Map<String, String> ctlogControl) {
-    this.ctlogControl = ctlogControl;
-  }
-
-  public Map<String, String> getRevokeSuspendedControl() {
-    return revokeSuspendedControl;
-  }
-
-  public void setRevokeSuspendedControl(Map<String, String> revokeSuspendedControl) {
-    this.revokeSuspendedControl = revokeSuspendedControl;
-  }
-
   public List<String> getKeypairGenNames() {
     return keypairGenNames;
   }
@@ -201,11 +175,11 @@ public class CaConfColumn {
     this.validityMode = validityMode;
   }
 
-  public int getPermission() {
+  public Permissions getPermission() {
     return permission;
   }
 
-  public void setPermission(int permission) {
+  public void setPermission(Permissions permission) {
     this.permission = permission;
   }
 
@@ -233,11 +207,35 @@ public class CaConfColumn {
     this.keepExpiredCertDays = keepExpiredCertDays;
   }
 
-  public Map<String, String> getExtraControl() {
+  public CrlControl getCrlControl() {
+    return crlControl;
+  }
+
+  public void setCrlControl(CrlControl crlControl) {
+    this.crlControl = crlControl;
+  }
+
+  public CtlogControl getCtlogControl() {
+    return ctlogControl;
+  }
+
+  public void setCtlogControl(CtlogControl ctlogControl) {
+    this.ctlogControl = ctlogControl;
+  }
+
+  public RevokeSuspendedControl getRevokeSuspendedControl() {
+    return revokeSuspendedControl;
+  }
+
+  public void setRevokeSuspendedControl(RevokeSuspendedControl revokeSuspendedControl) {
+    this.revokeSuspendedControl = revokeSuspendedControl;
+  }
+
+  public ConfPairs getExtraControl() {
     return extraControl;
   }
 
-  public void setExtraControl(Map<String, String> extraControl) {
+  public void setExtraControl(ConfPairs extraControl) {
     this.extraControl = extraControl;
   }
 
@@ -249,101 +247,30 @@ public class CaConfColumn {
     return CaJson.parseObject(encoded, CaConfColumn.class);
   }
 
-  public void fillCaEntry(CaEntry entry) throws CaMgmtException {
-    fillBaseCaInfo(entry);
+  public void fillBaseCaInfo(BaseCaInfo baseCaInfo) throws CaMgmtException {
+    baseCaInfo.setCaUris(caUris());
+    baseCaInfo.setExpirationPeriod(expirationPeriod);
+    baseCaInfo.setKeepExpiredCertDays(keepExpiredCertDays);
+    baseCaInfo.setKeypairGenNames(keypairGenNames);
+    baseCaInfo.setMaxValidity(maxValidity);
+    baseCaInfo.setNumCrls(numCrls);
+    baseCaInfo.setSaveCert(saveCert);
+    baseCaInfo.setSnSize(snSize);
+    baseCaInfo.setSaveKeypair(saveKeypair);
+    baseCaInfo.setValidityMode(validityMode());
 
-    entry.setPermission(permission);
-    entry.setCrlControl(crlControl());
-    entry.setCtlogControl(ctlogControl());
-    entry.setExtraControl(extraControl());
-    entry.setRevokeSuspendedControl(revokeSuspendedControl());
+    baseCaInfo.setPermissions(permission);
+    baseCaInfo.setCrlControl(crlControl);
+    baseCaInfo.setCtlogControl(ctlogControl);
+    baseCaInfo.setExtraControl(extraControl);
+    baseCaInfo.setRevokeSuspendedControl(revokeSuspendedControl);
   }
 
-  public void fillCaConf(CaConfType.Ca ca) {
-    CaConfType.CaInfo caInfo = ca.getCaInfo();
-    fillBaseCaInfo(caInfo);
-
-    caInfo.setPermissions(PermissionConstants.permissionToStringList(permission));
-    caInfo.setCrlControl(crlControl);
-    caInfo.setCtlogControl(ctlogControl);
-    caInfo.setExtraControl(extraControl);
-    caInfo.setRevokeSuspendedControl(revokeSuspendedControl);
-  }
-
-  private void fillBaseCaInfo(BaseCaInfo entry) {
-    entry.setCaUris(caUris());
-    entry.setExpirationPeriod(expirationPeriod);
-    entry.setKeepExpiredCertDays(keepExpiredCertDays);
-    entry.setKeypairGenNames(keypairGenNames);
-    entry.setMaxValidity(maxValidity());
-    entry.setNumCrls(numCrls);
-    entry.setSaveCert(saveCert);
-    entry.setSnSize(snSize);
-    entry.setSaveKeypair(saveKeypair);
-    entry.setValidityMode(validityMode());
-  }
-
-  public static CaConfColumn fromCaEntry(CaEntry caEntry) {
-    CaConfColumn cc = fromBaseCaInfo(caEntry);
-
-    cc.setPermission(caEntry.getPermission());
-
-    // CRL Control
-    CrlControl crlControl = caEntry.getCrlControl();
-    if (crlControl != null) {
-      cc.setCrlControl(crlControl.getConfPairs().asMap());
-    }
-
-    // CTLog Control
-    CtlogControl ctlogControl = caEntry.getCtlogControl();
-    if (ctlogControl != null) {
-      cc.setCtlogControl(ctlogControl.getConfPairs().asMap());
-    }
-
-    ConfPairs extraControl = caEntry.getExtraControl();
-    if (extraControl != null) {
-      cc.setExtraControl(extraControl.asMap());
-    }
-
-    RevokeSuspendedControl revokeSuspendedControl = caEntry.getRevokeSuspendedControl();
-    if (revokeSuspendedControl != null) {
-      cc.setRevokeSuspendedControl(revokeSuspendedControl.getConfPairs().asMap());
-    }
-
-    return cc;
-  }
-
-  public static CaConfColumn fromCaInfo(CaConfType.CaInfo caEntry) throws InvalidConfException {
-    CaConfColumn cc = fromBaseCaInfo(caEntry);
-
-    cc.setPermission(PermissionConstants.toIntPermission(caEntry.getPermissions()));
-
-    // CRL Control
-    if (caEntry.getCrlControl() != null) {
-      cc.setCrlControl(new ConfPairs(caEntry.getCrlControl()).asMap());
-    }
-
-    // CTLog Control
-    if (caEntry.getCtlogControl() != null) {
-      cc.setCtlogControl(new ConfPairs(caEntry.getCtlogControl()).asMap());
-    }
-
-    if (caEntry.getExtraControl() != null) {
-      cc.setExtraControl(caEntry.getExtraControl());
-    }
-
-    if (caEntry.getRevokeSuspendedControl() != null) {
-      cc.setRevokeSuspendedControl(new ConfPairs(caEntry.getRevokeSuspendedControl()).asMap());
-    }
-
-    return cc;
-  }
-
-  private static CaConfColumn fromBaseCaInfo(BaseCaInfo caEntry) {
+  public static CaConfColumn fromBaseCaInfo(BaseCaInfo baseCaInfo) {
     CaConfColumn cc = new CaConfColumn();
 
     // CA URIS
-    CaUris caUris = caEntry.getCaUris();
+    CaUris caUris = baseCaInfo.getCaUris();
     if (caUris != null) {
       cc.setCacertUris(caUris.getCacertUris());
       cc.setCrlUris(caUris.getCrlUris());
@@ -351,15 +278,21 @@ public class CaConfColumn {
       cc.setOcspUris(caUris.getOcspUris());
     }
 
-    cc.setKeypairGenNames(caEntry.getKeypairGenNames());
-    cc.setMaxValidity(caEntry.getMaxValidity());
-    cc.setNumCrls(caEntry.getNumCrls());
-    cc.setSaveCert(caEntry.isSaveCert());
-    cc.setSaveKeypair(caEntry.isSaveKeypair());
-    cc.setSnSize(caEntry.getSnSize());
-    cc.setValidityMode(caEntry.getValidityMode());
-    cc.setExpirationPeriod(caEntry.getExpirationPeriod());
-    cc.setKeepExpiredCertDays(caEntry.getKeepExpiredCertDays());
+    cc.setKeypairGenNames(baseCaInfo.getKeypairGenNames());
+    cc.setMaxValidity(baseCaInfo.getMaxValidity());
+    cc.setNumCrls(baseCaInfo.getNumCrls());
+    cc.setSaveCert(baseCaInfo.isSaveCert());
+    cc.setSaveKeypair(baseCaInfo.isSaveKeypair());
+    cc.setSnSize(baseCaInfo.getSnSize());
+    cc.setValidityMode(baseCaInfo.getValidityMode());
+    cc.setExpirationPeriod(baseCaInfo.getExpirationPeriod());
+    cc.setKeepExpiredCertDays(baseCaInfo.getKeepExpiredCertDays());
+
+    cc.setPermission(baseCaInfo.getPermissions());
+    cc.setCtlogControl(baseCaInfo.getCtlogControl());
+    cc.setCrlControl(baseCaInfo.getCrlControl());
+    cc.setRevokeSuspendedControl(baseCaInfo.getRevokeSuspendedControl());
+    cc.setExtraControl(baseCaInfo.getExtraControl());
 
     return cc;
   }
@@ -370,48 +303,6 @@ public class CaConfColumn {
 
   public CaUris caUris() {
     return new CaUris(cacertUris, ocspUris, crlUris, deltaCrlUris);
-  }
-
-  public int snSize() {
-    return (snSize > CaManager.MAX_SERIALNUMBER_SIZE)
-      ? CaManager.MAX_SERIALNUMBER_SIZE
-      : Math.max(snSize, CaManager.MIN_SERIALNUMBER_SIZE);
-  }
-
-  private RevokeSuspendedControl revokeSuspendedControl() {
-     return revokeSuspendedControl == null
-        ? new RevokeSuspendedControl(false)
-        : new RevokeSuspendedControl(new ConfPairs(revokeSuspendedControl));
-  }
-
-  private Validity maxValidity() {
-    return maxValidity;
-  }
-
-  private CrlControl crlControl() throws CaMgmtException {
-    ConfPairs pairs = new ConfPairs(crlControl);
-    try {
-      return new CrlControl(pairs);
-    } catch (InvalidConfException ex) {
-      throw new CaMgmtException("invalid CRL_CONTROL: " + pairs, ex);
-    }
-  }
-
-  private CtlogControl ctlogControl() throws CaMgmtException {
-    if (ctlogControl == null) {
-      return null;
-    }
-
-    ConfPairs pairs = new ConfPairs(ctlogControl);
-    try {
-      return new CtlogControl(pairs);
-    } catch (InvalidConfException ex) {
-      throw new CaMgmtException("invalid CTLOG_CONTROL: " + pairs.getEncoded(), ex);
-    }
-  }
-
-  private ConfPairs extraControl() {
-    return extraControl == null ? null : new ConfPairs(extraControl).unmodifiable();
   }
 
   private ValidityMode validityMode() {
