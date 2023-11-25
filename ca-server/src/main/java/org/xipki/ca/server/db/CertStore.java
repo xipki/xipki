@@ -25,11 +25,11 @@ import org.xipki.ca.server.*;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
+import org.xipki.pki.OperationException;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.*;
-import org.xipki.util.exception.OperationException;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
@@ -43,7 +43,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.xipki.util.exception.ErrorCode.*;
+import static org.xipki.pki.ErrorCode.*;
 
 /**
  * CA cert store.

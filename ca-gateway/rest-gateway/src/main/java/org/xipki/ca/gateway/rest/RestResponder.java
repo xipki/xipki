@@ -24,6 +24,8 @@ import org.xipki.ca.gateway.RequestorAuthenticator;
 import org.xipki.ca.gateway.conf.CaProfileConf;
 import org.xipki.ca.gateway.conf.CaProfilesControl;
 import org.xipki.ca.sdk.*;
+import org.xipki.pki.ErrorCode;
+import org.xipki.pki.OperationException;
 import org.xipki.security.CrlReason;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
@@ -33,8 +35,6 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.*;
 import org.xipki.util.PemEncoder.PemLabel;
-import org.xipki.util.exception.ErrorCode;
-import org.xipki.util.exception.OperationException;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
@@ -48,7 +48,7 @@ import java.util.*;
 import static org.xipki.audit.AuditLevel.ERROR;
 import static org.xipki.audit.AuditLevel.INFO;
 import static org.xipki.audit.AuditStatus.FAILED;
-import static org.xipki.util.exception.ErrorCode.*;
+import static org.xipki.pki.ErrorCode.*;
 
 /**
  * REST API responder.
@@ -130,6 +130,8 @@ public class RestResponder {
 
   private static final String CMD_cacerts = "cacerts";
 
+  private static final String CMD_dh_pop_certs = "dh-pop-certs";
+
   private static final String CMD_revoke_cert = "revoke-cert";
 
   private static final String CMD_unsuspend_cert = "unsuspend-cert";
@@ -184,8 +186,9 @@ public class RestResponder {
   static {
     LOG.info("XiPKI REST-Gateway version {}", StringUtil.getBundleVersion(RestResponder.class));
     knownCommands = CollectionUtil.asUnmodifiableSet(
-        CMD_cacert, CMD_cacerts, CMD_revoke_cert, CMD_unsuspend_cert, CMD_unrevoke_cert, CMD_enroll_cert,
-        CMD_enroll_cross_cert, CMD_enroll_serverkeygen, CMD_enroll_cert_twin, CMD_enroll_serverkeygen_twin, CMD_crl);
+        CMD_cacert, CMD_cacerts, CMD_dh_pop_certs, CMD_revoke_cert, CMD_unsuspend_cert,
+        CMD_unrevoke_cert, CMD_enroll_cert, CMD_enroll_cross_cert, CMD_enroll_serverkeygen,
+        CMD_enroll_cert_twin, CMD_enroll_serverkeygen_twin, CMD_crl);
   }
 
   public RestResponder(SdkClient sdk, SecurityFactory securityFactory,
@@ -297,12 +300,18 @@ public class RestResponder {
       switch (command) {
         case CMD_cacert:
           return toHttpResponse(HttpRespContent.ofOk(CT_pkix_cert, sdk.cacert(caName)));
-        case CMD_cacerts:
+        case CMD_cacerts: {
           byte[][] certsBytes = sdk.cacerts(caName);
           return toHttpResponse(HttpRespContent.ofOk(CT_pem_file,
               StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certsBytes))));
+        }
         case CMD_crl:
           return toHttpResponse(getCrl(caName, httpRetriever));
+        case CMD_dh_pop_certs: {
+          X509Cert[] certs = popControl.getDhCertificates();
+          return toHttpResponse(HttpRespContent.ofOk(CT_pem_file,
+              StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certs))));
+        }
       }
 
       Requestor requestor;
@@ -487,7 +496,7 @@ public class RestResponder {
       String command, String caName, String profile, Requestor requestor, byte[] request,
       XiHttpRequest httpRetriever, AuditEvent event)
       throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
-    if (!requestor.isPermitted(PermissionConstants.ENROLL_CERT)) {
+    if (!requestor.isPermitted(Requestor.Permission.ENROLL_CERT)) {
       throw new OperationException(NOT_PERMITTED, "ENROLL_CERT is not allowed");
     }
 
@@ -532,7 +541,7 @@ public class RestResponder {
       } else if (CT_pkcs10.equalsIgnoreCase(ct)) {
         // The PKCS#10 will only be used for transport of subject and extensions.
         // The associated key will not be used, so the verification of POP is skipped.
-        CertificationRequest csr = X509Util.parseCsrInRequest(request);
+        CertificationRequest csr = GatewayUtil.parseCsrInRequest(request);
         CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
         subject = certTemp.getSubject();
         extensions = X509Util.getExtensions(certTemp);
@@ -546,7 +555,7 @@ public class RestResponder {
             "unsupported media type " + ct, INFO, FAILED);
       }
 
-      CertificationRequest csr = X509Util.parseCsrInRequest(request);
+      CertificationRequest csr = GatewayUtil.parseCsrInRequest(request);
       if (!GatewayUtil.verifyCsr(csr, securityFactory, popControl)) {
         throw new OperationException(BAD_POP);
       }
@@ -645,7 +654,7 @@ public class RestResponder {
       String caName, String profile, Requestor requestor, byte[] request,
       XiHttpRequest httpRetriever, AuditEvent event)
       throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
-    if (!requestor.isPermitted(PermissionConstants.ENROLL_CROSS)) {
+    if (!requestor.isPermitted(Requestor.Permission.ENROLL_CROSS)) {
       throw new OperationException(NOT_PERMITTED, "ENROLL_CROSS is not allowed");
     }
 
@@ -700,7 +709,7 @@ public class RestResponder {
       throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, "PEM CERTIFICATE is not specified", INFO, FAILED);
     }
 
-    CertificationRequest csr = X509Util.parseCsrInRequest(csrBytes);
+    CertificationRequest csr = GatewayUtil.parseCsrInRequest(csrBytes);
     if (!GatewayUtil.verifyCsr(csr, securityFactory, popControl)) {
       throw new OperationException(BAD_POP);
     }
@@ -809,7 +818,8 @@ public class RestResponder {
       String command, Requestor requestor, XiHttpRequest httpRetriever, AuditEvent event)
       throws OperationException, HttpRespAuditException, IOException, SdkErrorResponseException {
     boolean revoke = command.equals(CMD_revoke_cert);
-    int permission = revoke ? PermissionConstants.REVOKE_CERT : PermissionConstants.UNSUSPEND_CERT;
+    Requestor.Permission permission = revoke
+        ? Requestor.Permission.REVOKE_CERT : Requestor.Permission.UNSUSPEND_CERT;
     if (!requestor.isPermitted(permission)) {
       throw new OperationException(NOT_PERMITTED, command + " is not allowed");
     }
@@ -855,8 +865,7 @@ public class RestResponder {
         invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(strInvalidityTime);
       }
 
-      RevokeCertRequestEntry entry = new RevokeCertRequestEntry(serialNumber, reason,
-          invalidityTime == null ? null : invalidityTime.getEpochSecond());
+      RevokeCertRequestEntry entry = new RevokeCertRequestEntry(serialNumber, reason, invalidityTime);
 
       RevokeCertsRequest sdkReq = new RevokeCertsRequest(caSha1, null, null, new RevokeCertRequestEntry[]{entry});
       sdk.revokeCerts(sdkReq);

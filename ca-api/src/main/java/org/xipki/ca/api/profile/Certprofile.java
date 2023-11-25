@@ -10,11 +10,11 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.PublicCaInfo;
+import org.xipki.pki.BadCertTemplateException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.SignAlgo;
 import org.xipki.util.*;
-import org.xipki.util.exception.BadCertTemplateException;
 
 import java.io.Closeable;
 import java.math.BigInteger;

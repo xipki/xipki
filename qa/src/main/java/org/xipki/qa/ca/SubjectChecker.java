@@ -11,12 +11,12 @@ import org.xipki.ca.api.profile.Certprofile.RdnControl;
 import org.xipki.ca.api.profile.Certprofile.StringType;
 import org.xipki.ca.api.profile.Certprofile.SubjectControl;
 import org.xipki.ca.api.profile.TextVadidator;
+import org.xipki.pki.BadCertTemplateException;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.exception.BadCertTemplateException;
 
 import java.util.*;
 

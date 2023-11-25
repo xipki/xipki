@@ -22,28 +22,6 @@ import java.util.Map;
 public class JsonEnDecodeTest {
 
   @Test
-  public void decodeTimestamp() throws AcmeProtocolException {
-    decodeTimestamp("2016-01-01T08:04:01Z", "2016-01-01T12:04:01+04",
-        "2016-01-01T12:04:01+04:00", "2016-01-01T04:04:01-04:00");
-    decodeTimestamp("2016-01-01T08:04:01.99Z", "2016-01-01T12:04:01.99+04",
-        "2016-01-01T12:04:01.99+04:00", "2016-01-01T04:04:01.99-04:00");
-  }
-
-  private static void decodeTimestamp(String timestamp1, String timestamp2, String... timestamps)
-      throws AcmeProtocolException {
-    Instant t1 = AcmeUtils.parseTimestamp(timestamp1);
-    Instant t2 = AcmeUtils.parseTimestamp(timestamp2);
-    Assert.assertEquals("timestamp", t1, t2);
-    System.out.println(t1);
-    if (timestamps != null) {
-      for (String timestamp : timestamps) {
-        Instant t = AcmeUtils.parseTimestamp(timestamp);
-        Assert.assertEquals("timestamp", t1, t);
-      }
-    }
-  }
-
-  @Test
   public void jsonEncodeDecode() {
     AcmeIdentifier id = new AcmeIdentifier("id0", "value0");
     AcmeChallenge ch1 = new AcmeChallenge("http-01", 1, "my-token",

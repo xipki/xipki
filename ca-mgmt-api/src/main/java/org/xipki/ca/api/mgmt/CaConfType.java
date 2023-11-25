@@ -4,7 +4,10 @@
 package org.xipki.ca.api.mgmt;
 
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
-import org.xipki.util.*;
+import org.xipki.util.FileOrBinary;
+import org.xipki.util.FileOrValue;
+import org.xipki.util.StringUtil;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.HashMap;

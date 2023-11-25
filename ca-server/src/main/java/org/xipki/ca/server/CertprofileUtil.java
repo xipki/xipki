@@ -10,12 +10,12 @@ import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.*;
 import org.xipki.ca.api.profile.*;
 import org.xipki.ca.api.profile.Certprofile.*;
+import org.xipki.pki.BadCertTemplateException;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.BaseRequirements;
 import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.exception.BadCertTemplateException;
 
 import java.util.List;
 import java.util.Map;

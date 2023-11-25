@@ -14,6 +14,15 @@ import org.xipki.security.X509Cert;
 
 public interface Requestor {
 
+  enum Permission {
+    ENROLL_CERT,
+    REENROLL_CERT,
+    GEN_KEYPAIR,
+    ENROLL_CROSS,
+    UNSUSPEND_CERT,
+    REVOKE_CERT
+  }
+
   /**
    * Returns the name of this requestor. Will not be used internally for any authentication. Only used
    * for internal logging.
@@ -31,11 +40,11 @@ public interface Requestor {
 
   /**
    * Returns whether the requested permissions is allowed.
-   * @param permissions the permissions. Defined in {@link org.xipki.util.PermissionConstants},
-   *                   can be combined value of multiple permissions.
+   * @param permission the permission.
+   * @p
    * @return true if all requested permissions are allowed, false otherwise.
    */
-  boolean isPermitted(int permissions);
+  boolean isPermitted(Permission permission);
 
   /**
    * Password-based requestor interface. Used for EST, REST and SCEP gateway.

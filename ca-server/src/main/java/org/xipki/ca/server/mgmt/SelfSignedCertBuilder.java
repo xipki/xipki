@@ -18,11 +18,15 @@ import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.IdentifiedCertprofile;
+import org.xipki.pki.BadCertTemplateException;
+import org.xipki.pki.ErrorCode;
+import org.xipki.pki.OperationException;
 import org.xipki.security.*;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
-import org.xipki.util.exception.*;
+import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.exception.ObjectCreationException;
 
 import java.io.IOException;
 import java.math.BigInteger;

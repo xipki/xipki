@@ -3,6 +3,7 @@
 
 package org.xipki.ocsp.server.servlet;
 
+import org.bouncycastle.oer.its.etsi103097.extension.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.license.api.LicenseFactory;
@@ -68,8 +69,8 @@ public class OcspHttpFilter implements XiHttpFilter {
     ocspServer.setConfFile(conf.getServerConf());
 
     try {
-      ocspServer.init();
-    } catch (InvalidConfException | PasswordResolverException ex) {
+      ocspServer.init(true);
+    } catch (Exception ex) {
       LogUtil.error(LOG, ex, "could not start OCSP server");
     }
 

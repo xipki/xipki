@@ -16,13 +16,13 @@ import org.xipki.ca.server.mgmt.CaProfileIdAliases;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
+import org.xipki.pki.OperationException;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
-import org.xipki.util.exception.OperationException;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
@@ -506,7 +506,8 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
   public void changeCa(ChangeCaEntry changeCaEntry,
                        CaConfColumn currentCaConfColumn, SecurityFactory securityFactory)
       throws CaMgmtException {
-    notNulls(changeCaEntry, "changeCaEntry", securityFactory, "securityFactory");
+    notNulls(changeCaEntry, "changeCaEntry", currentCaConfColumn, "currentCaConfColumn",
+        securityFactory, "securityFactory");
 
     byte[] encodedCert = changeCaEntry.getEncodedCert();
     if (encodedCert != null) {
@@ -605,10 +606,15 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
         colStr("SIGNER_CONF", signerConf, false, true),
         colStr("CERT", base64Cert),  colStr("CERTCHAIN", certchainStr));
 
+    SqlColumn colConfColumn;
     try {
-      cols.add(buildChangeCaConfColumn(changeCaEntry, currentCaConfColumn));
+      colConfColumn = buildChangeCaConfColumn(changeCaEntry, currentCaConfColumn);
     } catch (InvalidConfException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
+    }
+
+    if (colConfColumn != null) {
+      cols.add(colConfColumn);
     }
 
     changeIfNotNull("CA", colInt("ID", changeCaEntry.getIdent().getId()),
@@ -618,14 +624,19 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
   private SqlColumn buildChangeCaConfColumn(
       ChangeCaEntry changeCaEntry, CaConfColumn currentCaConfColumn) throws InvalidConfException {
     CaConfColumn newCC = currentCaConfColumn.copy();
-    newCC.setMaxValidity(changeCaEntry.getMaxValidity());
+
+    if (changeCaEntry.getMaxValidity() != null) {
+      newCC.setMaxValidity(changeCaEntry.getMaxValidity());
+    }
 
     String str = changeCaEntry.getExtraControl();
     if (str != null) {
       newCC.setExtraControl(CaManager.NULL.equalsIgnoreCase(str) ? null : new ConfPairs(str));
     }
 
-    newCC.setValidityMode(changeCaEntry.getValidityMode());
+    if (changeCaEntry.getValidityMode() != null) {
+      newCC.setValidityMode(changeCaEntry.getValidityMode());
+    }
 
     CaUris changeUris = changeCaEntry.getCaUris();
     if (changeUris != null) {
@@ -677,14 +688,12 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
       newCC.setCtlogControl(CaManager.NULL.equalsIgnoreCase(str) ? null : new CtlogControl(str));
     }
 
-    Boolean b = changeCaEntry.getSaveCert();
-    if (b != null) {
-      newCC.setSaveCert(b);
+    if (changeCaEntry.getSaveCert() != null) {
+      newCC.setSaveCert(changeCaEntry.getSaveCert());
     }
 
-    b = changeCaEntry.getSaveKeypair();
-    if (b != null) {
-      newCC.setSaveKeypair(b);
+    if (changeCaEntry.getSaveKeypair() != null) {
+      newCC.setSaveKeypair(changeCaEntry.getSaveKeypair());
     }
 
     List<String> list = changeCaEntry.getPermission();
@@ -692,19 +701,16 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
       newCC.setPermission(new Permissions(PermissionConstants.toIntPermission(list)));
     }
 
-    Integer i = changeCaEntry.getNumCrls();
-    if (i != null) {
-      newCC.setNumCrls(i);
+    if (changeCaEntry.getNumCrls() != null) {
+      newCC.setNumCrls(changeCaEntry.getNumCrls());
     }
 
-    i = changeCaEntry.getExpirationPeriod();
-    if (i != null) {
-      newCC.setExpirationPeriod(i);
+    if (changeCaEntry.getExpirationPeriod() != null) {
+      newCC.setExpirationPeriod(changeCaEntry.getExpirationPeriod());
     }
 
-    i = changeCaEntry.getKeepExpiredCertDays();
-    if (i != null) {
-      newCC.setKeepExpiredCertDays(i);
+    if (changeCaEntry.getKeepExpiredCertDays() != null) {
+      newCC.setKeepExpiredCertDays(changeCaEntry.getKeepExpiredCertDays());
     }
 
     str = changeCaEntry.getRevokeSuspendedControl();
@@ -713,14 +719,12 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
     }
 
     String encodedConf = newCC.encode();
-    boolean confIsSensitive = false;
     String encodedOrigConf = currentCaConfColumn.encode();
     if (encodedConf.equals(encodedOrigConf)) {
-      encodedConf = null;
-    } else if (encodedConf.contains("password")) {
-      confIsSensitive = true;
+      return null;
     }
 
+    boolean confIsSensitive = encodedConf.contains("password");
     return colStr("CONF", encodedConf, confIsSensitive, false);
   }
 

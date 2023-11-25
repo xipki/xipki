@@ -20,12 +20,12 @@ import org.xipki.ca.certprofile.xijson.conf.AdditionalInformation;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.CertificatePolicyInformationType;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.PolicyQualifier;
+import org.xipki.pki.BadCertTemplateException;
 import org.xipki.qa.ca.IssuerInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
-import org.xipki.util.exception.BadCertTemplateException;
 
 import java.io.IOException;
 import java.math.BigInteger;

@@ -17,13 +17,13 @@ import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.sdk.CertprofileInfoResponse;
 import org.xipki.ca.sdk.KeyType;
 import org.xipki.ca.server.IdentifiedCertprofile;
+import org.xipki.pki.ErrorCode;
+import org.xipki.pki.OperationException;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.TripleState;
-import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.ObjectCreationException;
-import org.xipki.util.exception.OperationException;
 
 import java.util.*;
 
@@ -162,8 +162,12 @@ class CertprofileManager {
     name = Args.toNonBlankLower(name, "name");
 
     for (String caName : manager.caHasProfiles.keySet()) {
-      if (manager.caHasProfiles.get(caName).contains(name)) {
-        removeCertprofileFromCa(name, caName);
+      Set<CaProfileEntry> caHasProfiles = manager.caHasProfiles.get(caName);
+      for (CaProfileEntry m : caHasProfiles) {
+        if (m.getProfileName().equals(name)) {
+          removeCertprofileFromCa(name, caName);
+          break;
+        }
       }
     }
 

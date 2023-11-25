@@ -22,13 +22,13 @@ import org.xipki.ca.sdk.*;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.pki.ErrorCode;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
-import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.HttpResponse;
@@ -958,7 +958,7 @@ public class AcmeResponder {
         CertificationRequest csr;
         try {
           csrBytes = decodeFast(finalizeOrderReq.getCsr());
-          csr = X509Util.parseCsrInRequest(csrBytes);
+          csr = GatewayUtil.parseCsrInRequest(csrBytes);
         } catch (Exception e) {
           throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badCSR, "could not parse CSR");
         }

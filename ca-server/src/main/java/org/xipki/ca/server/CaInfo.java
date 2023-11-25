@@ -21,10 +21,10 @@ import org.xipki.ca.api.mgmt.entry.CaConfColumn;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
 import org.xipki.ca.server.db.CertStore;
+import org.xipki.pki.ErrorCode;
+import org.xipki.pki.OperationException;
 import org.xipki.security.*;
 import org.xipki.util.*;
-import org.xipki.util.exception.ErrorCode;
-import org.xipki.util.exception.OperationException;
 
 import java.io.IOException;
 import java.math.BigInteger;

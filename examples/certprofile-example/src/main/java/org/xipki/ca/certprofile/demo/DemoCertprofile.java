@@ -15,9 +15,9 @@ import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
+import org.xipki.pki.BadCertTemplateException;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.JSON;
-import org.xipki.util.exception.BadCertTemplateException;
 
 import java.time.Instant;
 import java.util.List;

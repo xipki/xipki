@@ -43,12 +43,12 @@ import org.xipki.ca.sdk.SdkErrorResponseException;
 import org.xipki.cmp.CmpUtil;
 import org.xipki.cmp.ProtectionResult;
 import org.xipki.cmp.ProtectionVerificationResult;
+import org.xipki.pki.ErrorCode;
+import org.xipki.pki.OperationException;
 import org.xipki.security.*;
 import org.xipki.util.*;
 import org.xipki.util.ConcurrentBag.BagEntry;
-import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.InsufficientPermissionException;
-import org.xipki.util.exception.OperationException;
 
 import javax.crypto.*;
 import javax.crypto.spec.GCMParameterSpec;
@@ -676,11 +676,10 @@ public abstract class BaseCmpResponder {
     return failureInfo == null ? PKIFailureInfo.systemFailure : failureInfo;
   }
 
-  protected void checkPermission(Requestor requestor, int requiredPermission)
+  protected void checkPermission(Requestor requestor, Requestor.Permission requiredPermission)
       throws InsufficientPermissionException {
     if (!requestor.isPermitted(requiredPermission)) {
-      throw new InsufficientPermissionException(
-          "Permission " + PermissionConstants.getTextForCode(requiredPermission) + "is not permitted");
+      throw new InsufficientPermissionException(requiredPermission + "is not permitted");
     }
   } // method checkPermission
 

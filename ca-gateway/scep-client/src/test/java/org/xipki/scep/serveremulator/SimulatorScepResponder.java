@@ -13,6 +13,8 @@ import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cms.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.gateway.GatewayUtil;
+import org.xipki.pki.OperationException;
 import org.xipki.scep.message.*;
 import org.xipki.scep.message.EnvelopedDataDecryptor.EnvelopedDataDecryptorInstance;
 import org.xipki.scep.transaction.*;
@@ -21,7 +23,6 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
-import org.xipki.util.exception.OperationException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -196,7 +197,7 @@ public class SimulatorScepResponder {
 
         CertificationRequest csr;
         try {
-          csr = X509Util.parseCsrInRequest(req.getMessageData());
+          csr = GatewayUtil.parseCsrInRequest(req.getMessageData());
         } catch (Exception ex) {
           LOG.warn("tid=" + tid + ": invalid CSR", ex);
           return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
@@ -259,7 +260,7 @@ public class SimulatorScepResponder {
         }
 
         try {
-          csr = X509Util.parseCsrInRequest(req.getMessageData());
+          csr = GatewayUtil.parseCsrInRequest(req.getMessageData());
         } catch (OperationException e) {
           buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
           return rep;

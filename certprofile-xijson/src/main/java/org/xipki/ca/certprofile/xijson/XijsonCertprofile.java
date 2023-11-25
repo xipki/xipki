@@ -25,13 +25,13 @@ import org.xipki.ca.certprofile.xijson.conf.Subject;
 import org.xipki.ca.certprofile.xijson.conf.Subject.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.Subject.ValueType;
 import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
+import org.xipki.pki.BadCertTemplateException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
-import org.xipki.util.exception.BadCertTemplateException;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;

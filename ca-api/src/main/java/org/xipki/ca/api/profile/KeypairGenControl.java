@@ -121,10 +121,6 @@ public abstract class KeypairGenControl {
 
     private final ASN1ObjectIdentifier keyAlgorithmOid;
 
-    public DSAKeypairGenControl(int pLength) {
-      this(pLength, 0, null);
-    }
-
     public DSAKeypairGenControl(int pLength, int qLength, ASN1ObjectIdentifier keyAlgorithmOid) {
       if (pLength < 1024 || pLength % 1024 != 0) {
         throw new IllegalArgumentException("invalid pLength " + pLength);
@@ -157,23 +153,19 @@ public abstract class KeypairGenControl {
 
   public static class EDDSAKeypairGenControl extends KeypairGenControl {
 
-    private final AlgorithmIdentifier keyAlgorithm;
+    private final ASN1ObjectIdentifier keyAlgorithmOid;
 
     public EDDSAKeypairGenControl(ASN1ObjectIdentifier keyAlgorithmOid) {
-      this.keyAlgorithm = new AlgorithmIdentifier(Args.notNull(keyAlgorithmOid, "keyAlgorithmOid"));
+      this.keyAlgorithmOid = Args.notNull(keyAlgorithmOid, "keyAlgorithmOid");
       this.keyspec = EdECConstants.getName(keyAlgorithmOid);
       if (this.keyspec == null) {
         throw new IllegalArgumentException("invalid EdDSA keyAlgorithmOid " + keyAlgorithmOid.getId());
       }
     }
 
-    public AlgorithmIdentifier getKeyAlgorithm() {
-      return keyAlgorithm;
-    }
-
     @Override
     public ASN1ObjectIdentifier getKeyAlgorithmOid() {
-      return keyAlgorithm.getAlgorithm();
+      return keyAlgorithmOid;
     }
 
   } // class EDDSAKeypairGenControl

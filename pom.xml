@@ -30,7 +30,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skipDeploy>false</skipDeploy>
-    <xipki.tools.version>1.0.9</xipki.tools.version>
+    <xipki.tools.version>1.0.10</xipki.tools.version>
     <xipki.commons.version>6.3.2-SNAPSHOT</xipki.commons.version>
     <javax.servlet.version>3.1.0</javax.servlet.version>
     <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
@@ -59,6 +59,7 @@
     <!-- PKI SDK/Client -->
     <module>ocsp-client</module>
     <!-- PKI -->
+    <module>pki-common</module>
     <module>ca-sdk</module>
     <module>ca-api</module>
     <module>ca-mgmt-api</module>

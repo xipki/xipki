@@ -83,6 +83,8 @@ public class OcspServerUtil {
     String name = signerType.getName();
     List<String> succSigAlgos = new LinkedList<>();
     List<String> failSigAlgos = new LinkedList<>();
+
+    Set<String> errorMessages = new HashSet<>();
     for (String sigAlgo : sigAlgos) {
       try {
         ConcurrentContentSigner requestorSigner = securityFactory.createSigner(responderSignerType,
@@ -91,8 +93,20 @@ public class OcspServerUtil {
         succSigAlgos.add(sigAlgo);
       } catch (Exception ex) {
         failSigAlgos.add(sigAlgo);
-        LOG.debug("could not create OCSP responder " + name, ex);
-        //throw new InvalidConfException(ex.getMessage(), ex);
+        String errorMessage = ex.getMessage();
+
+        boolean logExcepion = true;
+        if (errorMessage != null) {
+          if (errorMessages.contains(errorMessage)) {
+            logExcepion = false;
+          } else {
+            errorMessages.add(errorMessage);
+          }
+        }
+
+        if (logExcepion) {
+          LOG.debug("could not create OCSP responder " + name, ex);
+        }
       }
     }
 

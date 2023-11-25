@@ -68,7 +68,7 @@ public class DummyRequestorAuthenticator implements RequestorAuthenticator {
     }
 
     @Override
-    public boolean isPermitted(int permission) {
+    public boolean isPermitted(Permission permission) {
       return true;
     }
   }
@@ -130,7 +130,7 @@ public class DummyRequestorAuthenticator implements RequestorAuthenticator {
     }
 
     @Override
-    public boolean isPermitted(int permission) {
+    public boolean isPermitted(Permission permission) {
       return true;
     }
   }
@@ -176,7 +176,7 @@ public class DummyRequestorAuthenticator implements RequestorAuthenticator {
     }
 
     @Override
-    public boolean isPermitted(int permissions) {
+    public boolean isPermitted(Permission permissions) {
       return true;
     }
 

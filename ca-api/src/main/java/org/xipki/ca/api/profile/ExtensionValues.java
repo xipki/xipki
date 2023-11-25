@@ -56,10 +56,6 @@ public class ExtensionValues {
     return extensions.remove(Args.notNull(type, "type"));
   }
 
-  public boolean containsExtension(ASN1ObjectIdentifier type) {
-    return extensions.containsKey(Args.notNull(type, "type"));
-  }
-
   public int size() {
     return extensions.size();
   }

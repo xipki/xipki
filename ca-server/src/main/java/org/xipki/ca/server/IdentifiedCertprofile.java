@@ -15,6 +15,7 @@ import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
 import org.xipki.ca.api.profile.*;
 import org.xipki.ca.api.profile.Certprofile.*;
+import org.xipki.pki.BadCertTemplateException;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.BaseRequirements;
@@ -27,7 +28,6 @@ import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.Validity;
-import org.xipki.util.exception.BadCertTemplateException;
 
 import java.io.Closeable;
 import java.math.BigInteger;

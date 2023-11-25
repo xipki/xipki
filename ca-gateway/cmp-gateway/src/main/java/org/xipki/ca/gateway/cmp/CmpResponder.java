@@ -18,13 +18,16 @@ import org.xipki.ca.gateway.*;
 import org.xipki.ca.sdk.*;
 import org.xipki.cmp.CmpUtf8Pairs;
 import org.xipki.cmp.CmpUtil;
+import org.xipki.pki.ErrorCode;
+import org.xipki.pki.OperationException;
 import org.xipki.security.CrlReason;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.*;
-import org.xipki.util.exception.ErrorCode;
+import org.xipki.util.DateUtil;
+import org.xipki.util.Hex;
+import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 import org.xipki.util.exception.InsufficientPermissionException;
-import org.xipki.util.exception.OperationException;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -121,14 +124,14 @@ public class CmpResponder extends BaseCmpResponder {
 
       OptionalValidity validity = certTemp.getValidity();
 
-      Long notBefore = null;
-      Long notAfter = null;
+      Instant notBefore = null;
+      Instant notAfter = null;
       if (validity != null) {
         if (validity.getNotBefore() != null) {
-          notBefore = DateUtil.toEpochSecond(validity.getNotBefore().getDate());
+          notBefore = Instant.ofEpochMilli(validity.getNotBefore().getDate().getTime());
         }
         if (validity.getNotAfter() != null) {
-          notAfter = DateUtil.toEpochSecond(validity.getNotAfter().getDate());
+          notAfter = Instant.ofEpochMilli(validity.getNotAfter().getDate().getTime());
         }
       }
 
@@ -193,7 +196,7 @@ public class CmpResponder extends BaseCmpResponder {
           continue;
         }
       } else {
-        checkPermission(requestor, PermissionConstants.GEN_KEYPAIR);
+        checkPermission(requestor, Requestor.Permission.GEN_KEYPAIR);
       }
 
       EnrollCertRequestEntry template = new EnrollCertRequestEntry();
@@ -280,18 +283,18 @@ public class CmpResponder extends BaseCmpResponder {
       }
 
       // NotBefore and NotAfter
-      Long notBefore = null;
-      Long notAfter = null;
+      Instant notBefore = null;
+      Instant notAfter = null;
 
       if (keyvalues != null) {
         String str = keyvalues.value(CmpUtf8Pairs.KEY_NOTBEFORE);
         if (str != null) {
-          notBefore = DateUtil.parseUtcTimeyyyyMMddhhmmss(str).getEpochSecond();
+          notBefore = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
         }
 
         str = keyvalues.value(CmpUtf8Pairs.KEY_NOTAFTER);
         if (str != null) {
-          notAfter = DateUtil.parseUtcTimeyyyyMMddhhmmss(str).getEpochSecond();
+          notAfter = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
         }
       }
 
@@ -368,7 +371,7 @@ public class CmpResponder extends BaseCmpResponder {
       } else {
         CertificationRequest csr;
         try {
-          csr = X509Util.parseCsrInRequest(m.getP10req());
+          csr = GatewayUtil.parseCsrInRequest(m.getP10req());
         } catch (OperationException e) {
           throw new SdkErrorResponseException(ErrorCode.BAD_REQUEST, "error parsing PKCS#10 request");
         }
@@ -505,8 +508,7 @@ public class CmpResponder extends BaseCmpResponder {
         }
         event.addEventData(CaAuditConstants.NAME_reason, reason);
 
-        Long invalidityDateSeconds = invalidityDate == null ? null : invalidityDate.getEpochSecond();
-        revokeEntries.add(new RevokeCertRequestEntry(serialNumber, reason, invalidityDateSeconds));
+        revokeEntries.add(new RevokeCertRequestEntry(serialNumber, reason, invalidityDate));
       } else {
         unrevokeEntries.add(serialNumber);
       }
@@ -594,29 +596,29 @@ public class CmpResponder extends BaseCmpResponder {
     int type = reqBody.getType();
     try {
       if (type == PKIBody.TYPE_INIT_REQ) {
-        checkPermission(requestor, PermissionConstants.ENROLL_CERT);
+        checkPermission(requestor, Requestor.Permission.ENROLL_CERT);
         CertReqMessages cr = CertReqMessages.getInstance(reqBody.getContent());
         CertRepMessage repMessage = processCertReqMessages(
             caName, dfltCertprofileName, groupEnroll, request, requestor, tid, cr, event);
         respBody = new PKIBody(PKIBody.TYPE_INIT_REP, repMessage);
       } else if (type == PKIBody.TYPE_CERT_REQ) {
-        checkPermission(requestor, PermissionConstants.ENROLL_CERT);
+        checkPermission(requestor, Requestor.Permission.ENROLL_CERT);
         CertReqMessages cr = CertReqMessages.getInstance(reqBody.getContent());
         CertRepMessage repMessage = processCertReqMessages(
             caName, dfltCertprofileName, groupEnroll, request, requestor, tid, cr, event);
         respBody = new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
       } else if (type == PKIBody.TYPE_KEY_UPDATE_REQ) {
-        checkPermission(requestor, PermissionConstants.REENROLL_CERT);
+        checkPermission(requestor, Requestor.Permission.REENROLL_CERT);
         CertReqMessages kur = CertReqMessages.getInstance(reqBody.getContent());
         CertRepMessage repMessage = processCertReqMessages(
             caName, dfltCertprofileName, groupEnroll, request, requestor, tid, kur, event);
         respBody = new PKIBody(PKIBody.TYPE_KEY_UPDATE_REP, repMessage);
       } else if (type == PKIBody.TYPE_P10_CERT_REQ) {
-        checkPermission(requestor, PermissionConstants.ENROLL_CERT);
+        checkPermission(requestor, Requestor.Permission.ENROLL_CERT);
         respBody = processP10cr(caName, dfltCertprofileName, requestor, tid, reqHeader,
-            X509Util.parseCsrInRequest(reqBody.getContent()), event);
+            GatewayUtil.parseCsrInRequest(reqBody.getContent()), event);
       } else if (type == PKIBody.TYPE_CROSS_CERT_REQ) {
-        checkPermission(requestor, PermissionConstants.ENROLL_CROSS);
+        checkPermission(requestor, Requestor.Permission.ENROLL_CROSS);
         CertReqMessages cr = CertReqMessages.getInstance(reqBody.getContent());
         CertRepMessage repMessage = processCertReqMessages(
             caName, dfltCertprofileName, groupEnroll, request, requestor, tid, cr, event);
@@ -655,7 +657,7 @@ public class CmpResponder extends BaseCmpResponder {
       return buildErrorMsgPkiBody(rejection, badRequest, "no entry is specified");
     }
 
-    Integer requiredPermission = null;
+    Requestor.Permission requiredPermission = null;
     boolean allRevdetailsOfSameType = true;
 
     for (RevDetails revDetails : revContent) {
@@ -689,16 +691,16 @@ public class CmpResponder extends BaseCmpResponder {
       if (reasonCode == CrlReason.REMOVE_FROM_CRL.getCode()) {
         if (requiredPermission == null) {
           event.addEventType(TYPE_rr_unrevoke);
-          requiredPermission = PermissionConstants.UNSUSPEND_CERT;
-        } else if (requiredPermission != PermissionConstants.UNSUSPEND_CERT) {
+          requiredPermission = Requestor.Permission.UNSUSPEND_CERT;
+        } else if (requiredPermission != Requestor.Permission.UNSUSPEND_CERT) {
           allRevdetailsOfSameType = false;
           break;
         }
       } else {
         if (requiredPermission == null) {
           event.addEventType(TYPE_rr_revoke);
-          requiredPermission = PermissionConstants.REVOKE_CERT;
-        } else if (requiredPermission != PermissionConstants.REVOKE_CERT) {
+          requiredPermission = Requestor.Permission.REVOKE_CERT;
+        } else if (requiredPermission != Requestor.Permission.REVOKE_CERT) {
           allRevdetailsOfSameType = false;
           break;
         }
@@ -721,7 +723,7 @@ public class CmpResponder extends BaseCmpResponder {
       return buildErrorMsgPkiBody(rejection, notAuthorized, null);
     }
 
-    boolean revoke = requiredPermission == PermissionConstants.REVOKE_CERT;
+    boolean revoke = requiredPermission == Requestor.Permission.REVOKE_CERT;
     try {
       return unRevokeCertificates(rr, revoke, event);
     } catch (IOException e) {

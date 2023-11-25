@@ -11,7 +11,10 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.*;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.FileOrBinary;
+import org.xipki.util.StringUtil;
+import org.xipki.util.Validity;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;

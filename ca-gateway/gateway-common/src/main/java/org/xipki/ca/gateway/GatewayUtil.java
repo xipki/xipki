@@ -3,13 +3,17 @@
 
 package org.xipki.ca.gateway;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.crmf.DhSigStatic;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.slf4j.Logger;
 import org.xipki.audit.*;
+import org.xipki.pki.ErrorCode;
+import org.xipki.pki.OperationException;
 import org.xipki.security.*;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 
@@ -92,6 +96,23 @@ public class GatewayUtil {
       } catch (Exception ex) {
         LogUtil.error(log, ex);
       }
+    }
+  }
+
+  public static CertificationRequest parseCsrInRequest(byte[] csrBytes) throws OperationException {
+    try {
+      return CertificationRequest.getInstance(X509Util.toDerEncoded(
+          Args.notNull(csrBytes, "csrBytes")));
+    } catch (Exception ex) {
+      throw new OperationException(ErrorCode.BAD_REQUEST, "invalid CSR: " + ex.getMessage());
+    }
+  }
+
+  public static CertificationRequest parseCsrInRequest(ASN1Encodable p10Asn1) throws OperationException {
+    try {
+      return CertificationRequest.getInstance(p10Asn1);
+    } catch (Exception ex) {
+      throw new OperationException(ErrorCode.BAD_REQUEST, "invalid CSR: " + ex.getMessage());
     }
   }
 

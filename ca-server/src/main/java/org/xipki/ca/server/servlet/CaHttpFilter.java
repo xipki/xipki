@@ -7,11 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.Audits;
 import org.xipki.audit.Audits.AuditConf;
+import org.xipki.ca.api.kpgen.KeypairGeneratorFactory;
 import org.xipki.ca.api.profile.CertprofileFactory;
-import org.xipki.ca.api.profile.CertprofileFactoryRegister;
-import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
 import org.xipki.ca.server.CaServerConf;
 import org.xipki.ca.server.CaServerConf.RemoteMgmt;
+import org.xipki.ca.server.CertPublisherFactoryRegister;
+import org.xipki.ca.server.CertprofileFactoryRegister;
 import org.xipki.ca.server.SdkResponder;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.publisher.OcspCertPublisherFactory;
@@ -27,7 +28,9 @@ import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * CA ServletFilter.
@@ -100,6 +103,23 @@ public class CaHttpFilter implements XiHttpFilter {
 
     // Certprofiles
     caManager.setCertprofileFactoryRegister(initCertprofileFactoryRegister(conf.getCertprofileFactories()));
+
+    // KeypairGen
+    Set<KeypairGeneratorFactory> keypairGeneratorFactories = new HashSet<>();
+    if (conf.getKeypairGeneratorFactories() != null) {
+      for (String className : conf.getKeypairGeneratorFactories()) {
+        try {
+          KeypairGeneratorFactory factory = (KeypairGeneratorFactory)
+              Class.forName(className).getConstructor().newInstance();
+          keypairGeneratorFactories.add(factory);
+        } catch (Exception ex) {
+          LOG.error("error caught while initializing KeypairGeneratorFactory "
+              + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
+        }
+      }
+    }
+
+    caManager.setKeyPairGeneratorFactories(keypairGeneratorFactories);
 
     // Publisher
     CertPublisherFactoryRegister publiserFactoryRegister = new CertPublisherFactoryRegister();

@@ -42,23 +42,23 @@ public class CaEntry extends BaseCaInfo {
 
   }
 
-  private NameId ident;
+  protected NameId ident;
 
-  private String signerConf;
+  protected String signerConf;
 
-  private X509Cert cert;
+  protected X509Cert cert;
 
-  private int pathLenConstraint;
+  protected int pathLenConstraint;
 
   /**
    * certificate chain without the certificate specified in {@code #cert}. The first one issued
    * {@code #cert}, the second one issues the first one, and so on.
    */
-  private List<X509Cert> certchain;
+  protected List<X509Cert> certchain;
 
-  private String subject;
+  protected String subject;
 
-  private String hexSha1OfCert;
+  protected String hexSha1OfCert;
 
   // for deserializer
   private CaEntry() {
@@ -72,7 +72,6 @@ public class CaEntry extends BaseCaInfo {
     CaEntry ret = new CaEntry(ident);
     copyBaseInfoTo(ret);
     ret.pathLenConstraint = pathLenConstraint;
-    ret.revocationInfo = revocationInfo;
     ret.cert = cert;
     ret.certchain = certchain;
     ret.subject = subject;
@@ -134,23 +133,6 @@ public class CaEntry extends BaseCaInfo {
   }
 
   public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
-    String extraCtrlText;
-    if (extraControl == null) {
-      extraCtrlText = "-";
-    } else {
-      extraCtrlText = extraControl.getEncoded();
-      if (!verbose && extraCtrlText.length() > 100) {
-        extraCtrlText = StringUtil.concat(extraCtrlText.substring(0, 97), "...");
-      }
-    }
-
-    String revInfoText = "";
-    if (revocationInfo != null) {
-      revInfoText = StringUtil.concatObjectsCap(30,
-          "\n\treason: ", revocationInfo.getReason().getDescription(),
-          "\n\trevoked at ", revocationInfo.getRevocationTime());
-    }
-
     int certchainSize = certchain == null ? 0 : certchain.size();
     StringBuilder certchainStr = new StringBuilder(20 + certchainSize * 200);
     certchainStr.append("\ncertchain: ");
@@ -166,31 +148,12 @@ public class CaEntry extends BaseCaInfo {
     return StringUtil.concatObjectsCap(1500,
         "id:                   ", ident.getId(),
         "\nname:                 ", ident.getName(),
-        "\nstatus:               ", (status == null ? "-" : status.getStatus()),
-        "\nmax. validity:        ", maxValidity,
-        "\nexpiration period:    ", expirationPeriod, "d",
-        "\nsigner type:          ", signerType,
         "\nsigner conf:          ", (signerConf == null ? "-"
             : SignerEntry.signerConfToString(signerConf, verbose, ignoreSensitiveInfo)),
-        "\nCRL signer name:      ", crlSignerName,
-        "\nsave certificate:     ", saveCert,
-        "\nsave keypair:         ", saveKeypair,
-        "\nvalidity mode:        ", validityMode,
-        "\npermission:           ", permissions,
-        "\nkeep expired certs:   ", (keepExpiredCertDays < 0 ? "forever" : keepExpiredCertDays + " days"),
-        "\nextra control:        ", extraCtrlText,
-        "\nserial number length: ", snSize, " bytes",
-        "\nrevocation:           ", (revocationInfo == null ? "not revoked" : "revoked"), revInfoText,
-        "\nnext CRL number:      ", nextCrlNo,
-        "\nKeyPair generation names: ", keypairGenNames,
-        "\n", caUris,
-        "\nCRL control:\n", (crlControl == null ? "  -" : crlControl.toString(verbose)),
-        "\nCTLog control:\n", (ctlogControl == null ? "  -" : ctlogControl.toString(verbose)),
-        "\nrevoke suspended certificates control: \n",
-        (revokeSuspendedControl == null ? "  -" : revokeSuspendedControl.toString(verbose)),
+        super.toString(verbose),
         "\ncert: \n", X509Util.formatCert(cert, verbose),
         certchainStr.toString());
-  } // method toString(boolean, boolean)
+  }
 
   @Override
   public boolean equals(Object obj) {
@@ -207,12 +170,8 @@ public class CaEntry extends BaseCaInfo {
     return super.equals(obj, ignoreDynamicFields)
         && CompareUtil.equalsObject(cert, obj.cert)
         && CompareUtil.equalsObject(certchain, obj.certchain)
-        && (expirationPeriod == obj.expirationPeriod)
         && ident.equals(obj.ident, ignoreId)
-        && (keepExpiredCertDays == obj.keepExpiredCertDays)
-        && (numCrls == obj.numCrls)
-        && CompareUtil.equalsObject(signerConf, obj.signerConf)
-        && CompareUtil.equalsObject(validityMode, obj.validityMode);
+        && CompareUtil.equalsObject(signerConf, obj.signerConf);
   }
 
   @Override

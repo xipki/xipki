@@ -6,7 +6,6 @@ package org.xipki.ca.api.mgmt.entry;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.Permissions;
 import org.xipki.util.Validity;
 
 import java.util.List;

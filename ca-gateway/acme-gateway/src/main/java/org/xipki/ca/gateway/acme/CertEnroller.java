@@ -8,13 +8,14 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.acme.type.CertReqMeta;
 import org.xipki.ca.gateway.acme.type.OrderStatus;
 import org.xipki.ca.sdk.*;
+import org.xipki.pki.OperationException;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
-import org.xipki.util.exception.OperationException;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -85,14 +86,8 @@ public class CertEnroller implements Runnable {
 
       EnrollCertRequestEntry entry = new EnrollCertRequestEntry();
       CertReqMeta certReqMeta = order.getCertReqMeta();
-
-      if (certReqMeta.getNotBefore() != null) {
-        entry.setNotBefore(certReqMeta.getNotBefore().getEpochSecond());
-      }
-
-      if (certReqMeta.getNotAfter() != null) {
-        entry.setNotAfter(certReqMeta.getNotAfter().getEpochSecond());
-      }
+      entry.setNotBefore(certReqMeta.getNotBefore());
+      entry.setNotAfter(certReqMeta.getNotAfter());
       entry.setCertprofile(certReqMeta.getCertProfile());
 
       if (certReqMeta.getSubject() == null) {
@@ -102,7 +97,7 @@ public class CertEnroller implements Runnable {
 
         CertificationRequest p10Req;
         try {
-          p10Req = X509Util.parseCsrInRequest(csr);
+          p10Req = GatewayUtil.parseCsrInRequest(csr);
           Extensions extensions = X509Util.getExtensions(p10Req.getCertificationRequestInfo());
           if (extensions != null) {
             entry.setExtensions(extensions.getEncoded());

@@ -18,21 +18,21 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.NameId;
+import org.xipki.ca.api.kpgen.KeypairGenerator;
 import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.KeypairGenControl;
 import org.xipki.ca.api.profile.NotAfterMode;
 import org.xipki.ca.server.X509Ca.GrantedCertTemplate;
+import org.xipki.pki.BadCertTemplateException;
+import org.xipki.pki.OperationException;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.KeypairGenerator;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.RSABrokenKey;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
 import org.xipki.util.Validity;
-import org.xipki.util.exception.BadCertTemplateException;
-import org.xipki.util.exception.OperationException;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import static org.xipki.util.exception.ErrorCode.*;
+import static org.xipki.pki.ErrorCode.*;
 
 /**
  * X509CA GrandCertTemplate builder.

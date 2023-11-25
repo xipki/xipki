@@ -4,6 +4,7 @@
 package org.xipki.ca.server;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
@@ -20,6 +21,8 @@ import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.sdk.*;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
+import org.xipki.pki.ErrorCode;
+import org.xipki.pki.OperationException;
 import org.xipki.security.CrlReason;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.TlsHelper;
@@ -27,7 +30,6 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.InsufficientPermissionException;
-import org.xipki.util.exception.OperationException;
 import org.xipki.util.http.XiHttpRequest;
 
 import java.io.IOException;
@@ -38,9 +40,9 @@ import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static org.xipki.ca.api.mgmt.PermissionConstants.*;
 import static org.xipki.ca.sdk.SdkConstants.*;
-import static org.xipki.util.PermissionConstants.*;
-import static org.xipki.util.exception.ErrorCode.*;
+import static org.xipki.pki.ErrorCode.*;
 
 /**
  * SDK responder.
@@ -336,12 +338,8 @@ public class SdkResponder {
 
     for (EnrollCertRequestEntry entry : entries) {
       String profile = entry.getCertprofile();
-
-      Long notBeforeInSec = entry.getNotBefore();
-      Instant notBefore = (notBeforeInSec == null) ? null : Instant.ofEpochSecond(notBeforeInSec);
-
-      Long notAfterInSec = entry.getNotAfter();
-      Instant notAfter = (notAfterInSec == null) ? null : Instant.ofEpochSecond(notAfterInSec);
+      Instant notBefore = entry.getNotBefore();
+      Instant notAfter = entry.getNotAfter();
 
       X500Name subject = null;
       Extensions extensions = null;
@@ -350,7 +348,13 @@ public class SdkResponder {
       if (entry.getP10req() != null) {
         // The PKCS#10 will only be used for transport of public key, subject and extensions.
         // The verification of POP is skipped here.
-        CertificationRequestInfo certTemp = X509Util.parseCsrInRequest(entry.getP10req()).getCertificationRequestInfo();
+        CertificationRequestInfo certTemp;
+        try {
+          certTemp = CertificationRequest.getInstance(X509Util.toDerEncoded(entry.getP10req()))
+                      .getCertificationRequestInfo();
+        } catch (Exception ex) {
+          throw new OperationException(ErrorCode.BAD_REQUEST, "invalid CSR: " + ex.getMessage());
+        }
         subject = certTemp.getSubject();
         publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
         extensions = X509Util.getExtensions(certTemp);
@@ -577,8 +581,7 @@ public class SdkResponder {
         String msg = "Reason removeFromCRL is not permitted";
         errorEntry = new ErrorEntry(BAD_REQUEST, msg);
       } else {
-        Instant invalidityTime = entry.getInvalidityTime() == null
-            ? null : Instant.ofEpochSecond(entry.getInvalidityTime());
+        Instant invalidityTime = entry.getInvalidityTime();
         try {
           ca.revokeCert(requestor, serialNumber, reason, invalidityTime);
         } catch (OperationException e) {
@@ -702,7 +705,10 @@ public class SdkResponder {
 
     BigInteger sn = req.getSerialNumber();
     X509Cert cert = ca.getCert(sn);
-    return cert == null ? null : new PayloadResponse(cert.getEncoded());
+    if (cert == null) {
+      throw new OperationException(UNKNOWN_CERT, "unknown certificate");
+    }
+    return new PayloadResponse(cert.getEncoded());
   }
 
   private SdkResponse getProfileInfo(byte[] request)

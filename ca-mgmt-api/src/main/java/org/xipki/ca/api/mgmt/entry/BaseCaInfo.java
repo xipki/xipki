@@ -6,7 +6,10 @@ package org.xipki.ca.api.mgmt.entry;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.security.CertRevocationInfo;
-import org.xipki.util.*;
+import org.xipki.util.CompareUtil;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.StringUtil;
+import org.xipki.util.Validity;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.util.List;
@@ -19,48 +22,48 @@ import java.util.List;
 
 public abstract class BaseCaInfo extends MgmtEntry {
 
-  protected CaUris caUris;
+  private CaUris caUris;
 
-  protected String crlSignerName;
+  private String crlSignerName;
 
-  protected int expirationPeriod = 365; // days
+  private int expirationPeriod = 365; // days
 
-  protected int keepExpiredCertDays = -1; // keep forever
+  private int keepExpiredCertDays = -1; // keep forever
 
-  protected List<String> keypairGenNames;
+  private List<String> keypairGenNames;
 
-  protected long nextCrlNo;
+  private long nextCrlNo;
 
-  protected Validity maxValidity;
+  private Validity maxValidity;
 
-  protected int numCrls = 30;
+  private int numCrls = 30;
 
-  protected CertRevocationInfo revocationInfo;
+  private CertRevocationInfo revocationInfo;
 
-  protected boolean saveCert = true;
+  private boolean saveCert = true;
 
-  protected boolean saveKeypair = false;
+  private boolean saveKeypair = false;
 
-  protected String signerType;
+  private String signerType;
 
-  protected int snSize = 20;
+  private int snSize = 20;
 
-  protected CaStatus status = CaStatus.active;
+  private CaStatus status = CaStatus.active;
 
-  protected Permissions permissions;
+  private Permissions permissions;
 
-  protected CrlControl crlControl;
+  private CrlControl crlControl;
 
-  protected CtlogControl ctlogControl;
+  private CtlogControl ctlogControl;
 
-  protected RevokeSuspendedControl revokeSuspendedControl;
+  private RevokeSuspendedControl revokeSuspendedControl;
 
-  protected ConfPairs extraControl;
+  private ConfPairs extraControl;
 
   /**
    * Valid values are strict, cutoff and lax. Default is strict
    */
-  protected ValidityMode validityMode = ValidityMode.strict;
+  private ValidityMode validityMode = ValidityMode.strict;
 
   public final CaUris getCaUris() {
     return caUris;
@@ -285,6 +288,47 @@ public abstract class BaseCaInfo extends MgmtEntry {
     dest.ctlogControl = ctlogControl;
     dest.revokeSuspendedControl = revokeSuspendedControl;
     dest.extraControl = extraControl;
+  }
+
+  protected String toString(boolean verbose) {
+    String extraCtrlText;
+    if (extraControl == null) {
+      extraCtrlText = "-";
+    } else {
+      extraCtrlText = extraControl.getEncoded();
+      if (!verbose && extraCtrlText.length() > 100) {
+        extraCtrlText = StringUtil.concat(extraCtrlText.substring(0, 97), "...");
+      }
+    }
+
+    String revInfoText = "";
+    if (revocationInfo != null) {
+      revInfoText = StringUtil.concatObjectsCap(30,
+          "\n\treason: ", revocationInfo.getReason().getDescription(),
+          "\n\trevoked at ", revocationInfo.getRevocationTime());
+    }
+
+    return StringUtil.concatObjectsCap(1500,
+        "\nsigner type:          ", signerType,
+        "\nstatus:               ", (status == null ? "-" : status.getStatus()),
+        "\nmax. validity:        ", maxValidity,
+        "\nexpiration period:    ", expirationPeriod, "d",
+        "\nCRL signer name:      ", (crlSignerName == null ? "-" : crlSignerName),
+        "\nsave certificate:     ", saveCert,
+        "\nsave keypair:         ", saveKeypair,
+        "\nvalidity mode:        ", validityMode,
+        "\npermission:           ", permissions,
+        "\nkeep expired certs:   ", (keepExpiredCertDays < 0 ? "forever" : keepExpiredCertDays + " days"),
+        "\nextra control:        ", extraCtrlText,
+        "\nserial number length: ", snSize, " bytes",
+        "\nrevocation:           ", (revocationInfo == null ? "not revoked" : "revoked"), revInfoText,
+        "\nnext CRL number:      ", nextCrlNo,
+        "\nKeyPair generation names: ", (keypairGenNames == null ? "-" : keypairGenNames),
+        "\n", getCaUris(),
+        "\nCRL control:\n", (crlControl == null ? "  -" : crlControl.toString(verbose)),
+        "\nCTLog control:\n", (ctlogControl == null ? "  -" : ctlogControl.toString(verbose)),
+        "\nrevoke suspended certificates control: \n",
+            (revokeSuspendedControl == null ? "  -" : revokeSuspendedControl.toString(verbose)));
   }
 
 }

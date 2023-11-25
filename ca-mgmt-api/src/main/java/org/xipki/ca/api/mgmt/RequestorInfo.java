@@ -7,7 +7,6 @@ import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.util.Args;
-import org.xipki.util.PermissionConstants;
 import org.xipki.util.exception.InsufficientPermissionException;
 
 /**

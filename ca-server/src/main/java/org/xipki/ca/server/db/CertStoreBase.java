@@ -9,6 +9,8 @@ import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
+import org.xipki.pki.ErrorCode;
+import org.xipki.pki.OperationException;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
@@ -16,8 +18,6 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Hex;
 import org.xipki.util.SqlUtil;
-import org.xipki.util.exception.ErrorCode;
-import org.xipki.util.exception.OperationException;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;

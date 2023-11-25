@@ -27,6 +27,8 @@ import org.xipki.ca.gateway.RequestorAuthenticator;
 import org.xipki.ca.gateway.conf.CaProfileConf;
 import org.xipki.ca.gateway.conf.CaProfilesControl;
 import org.xipki.ca.sdk.*;
+import org.xipki.pki.ErrorCode;
+import org.xipki.pki.OperationException;
 import org.xipki.scep.message.*;
 import org.xipki.scep.transaction.*;
 import org.xipki.scep.util.ScepConstants;
@@ -37,10 +39,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
-import org.xipki.util.PermissionConstants;
 import org.xipki.util.StringUtil;
-import org.xipki.util.exception.ErrorCode;
-import org.xipki.util.exception.OperationException;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpRequest;
@@ -52,7 +51,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Optional;
 
-import static org.xipki.util.exception.ErrorCode.*;
+import static org.xipki.pki.ErrorCode.*;
 
 /**
  * SCEP responder.
@@ -477,7 +476,7 @@ public class ScepResponder {
       switch (mt) {
         case PKCSReq:
         case RenewalReq: {
-          CertificationRequest csr = X509Util.parseCsrInRequest(req.getMessageData());
+          CertificationRequest csr = GatewayUtil.parseCsrInRequest(req.getMessageData());
           X500Name reqSubject = csr.getCertificationRequestInfo().getSubject();
           if (LOG.isInfoEnabled()) {
             LOG.info("tid={}, subject={}", tid, X509Util.x500NameText(reqSubject));
@@ -721,10 +720,9 @@ public class ScepResponder {
 
   private static void checkUserPermission(Requestor requestor, String caName, String certprofile)
       throws OperationException {
-    int permission = PermissionConstants.ENROLL_CERT;
+    Requestor.Permission permission = Requestor.Permission.ENROLL_CERT;
     if (!requestor.isPermitted(permission)) {
-      throw new OperationException(NOT_PERMITTED,
-          PermissionConstants.getTextForCode(permission) + " is not permitted for user " + requestor.getName());
+      throw new OperationException(NOT_PERMITTED, permission + " is not permitted for user " + requestor.getName());
     }
 
     if (!requestor.isCertprofilePermitted(caName, certprofile)) {

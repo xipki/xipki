@@ -177,11 +177,7 @@ public class OcspServerImpl implements OcspServer {
     return initialized.get();
   }
 
-  public void init() throws InvalidConfException, PasswordResolverException {
-    init(true);
-  }
-
-  public void init(boolean force) throws InvalidConfException, PasswordResolverException {
+  public void init(boolean force) throws OcspStoreException, InvalidConfException, PasswordResolverException {
     LOG.info("starting OCSPResponder server ...");
     if (initialized.get()) {
       if (!force) {
@@ -190,17 +186,9 @@ public class OcspServerImpl implements OcspServer {
       }
     }
 
-    try {
-      init0();
-      initialized.set(true);
-      LOG.info("started OCSPResponder server");
-    } catch (InvalidConfException | PasswordResolverException | Error | RuntimeException  ex) {
-      LOG.error("could not start OCSP responder", ex);
-      throw ex;
-    } catch (Throwable th) {
-      LOG.error("could not start OCSP responder", th);
-      throw new IllegalStateException(th);
-    }
+    init0();
+    initialized.set(true);
+    LOG.info("started OCSPResponder server");
   } // method init
 
   private void init0() throws OcspStoreException, InvalidConfException, PasswordResolverException {

@@ -18,11 +18,11 @@ import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
+import org.xipki.pki.OperationException;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
-import org.xipki.util.exception.OperationException;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.xipki.ca.sdk.CaAuditConstants.*;
-import static org.xipki.util.exception.ErrorCode.*;
+import static org.xipki.pki.ErrorCode.*;
 
 /**
  * X509CA CRL module.

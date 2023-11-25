@@ -11,6 +11,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
+import org.xipki.ca.api.mgmt.Permissions;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.mgmt.shell.CaActions.CaAction;
@@ -19,7 +20,6 @@ import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
-import org.xipki.util.Permissions;
 
 import java.util.*;
 

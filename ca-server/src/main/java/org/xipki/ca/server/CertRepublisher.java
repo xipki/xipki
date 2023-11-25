@@ -9,11 +9,11 @@ import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.db.CertStore.SerialWithId;
+import org.xipki.pki.OperationException;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ProcessLog;
-import org.xipki.util.exception.OperationException;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.pki.ErrorCode;
+import org.xipki.pki.OperationException;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
@@ -16,8 +18,6 @@ import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
 import org.xipki.util.SqlUtil;
-import org.xipki.util.exception.ErrorCode;
-import org.xipki.util.exception.OperationException;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;

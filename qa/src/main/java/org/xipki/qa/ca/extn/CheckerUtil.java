@@ -9,10 +9,10 @@ import org.bouncycastle.asn1.x509.*;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameMode;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
+import org.xipki.pki.BadCertTemplateException;
 import org.xipki.security.KeyUsage;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Hex;
-import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;

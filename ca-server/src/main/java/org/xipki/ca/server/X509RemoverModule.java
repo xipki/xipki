@@ -10,11 +10,11 @@ import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.db.CertStore.SerialWithId;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
+import org.xipki.pki.ErrorCode;
+import org.xipki.pki.OperationException;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.exception.ErrorCode;
-import org.xipki.util.exception.OperationException;
 
 import java.io.Closeable;
 import java.math.BigInteger;

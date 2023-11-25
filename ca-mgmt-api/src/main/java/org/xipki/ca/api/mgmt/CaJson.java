@@ -6,8 +6,11 @@ package org.xipki.ca.api.mgmt;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.NumericNode;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
@@ -18,6 +21,8 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.cert.CertificateEncodingException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * JSON util class for CA
@@ -119,6 +124,43 @@ public class CaJson {
 
   }
 
+  private static class PermissionsSerializer extends JsonSerializer<Permissions> {
+
+    @Override
+    public void serialize(Permissions value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
+        throws IOException {
+      jsonGenerator.writeObject(PermissionConstants.permissionToStringList(value.getValue()));
+    }
+
+  }
+
+  private static class PermissionsDeserializer extends JsonDeserializer<Permissions> {
+
+    @Override
+    public Permissions deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
+        throws IOException {
+      TreeNode o = jsonParser.readValueAsTree();
+      if (o instanceof NumericNode) {
+        int intValue = ((NumericNode) o).intValue();
+        return new Permissions(intValue);
+      }
+
+      ArrayNode a = (ArrayNode) o;
+      Set<String> s = new HashSet<>();
+      for (int i = 0; i < a.size(); i++) {
+        JsonNode n = a.get(i);
+        s.add(n.textValue());
+      }
+
+      try {
+        return new Permissions(s);
+      } catch (InvalidConfException e) {
+        throw new IOException(e);
+      }
+    }
+
+  }
+
   private static class XiCaJsonModule extends SimpleModule {
 
     public static final XiCaJsonModule INSTANCE = new XiCaJsonModule();
@@ -134,6 +176,9 @@ public class CaJson {
 
       addSerializer  (RevokeSuspendedControl.class, new RevokeSuspendedControlSerializer());
       addDeserializer(RevokeSuspendedControl.class, new RevokeSuspendedControlDeserializer());
+
+      addSerializer  (Permissions.class, new PermissionsSerializer());
+      addDeserializer(Permissions.class, new PermissionsDeserializer());
     }
 
   }

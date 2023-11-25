@@ -20,6 +20,7 @@ import org.xipki.audit.AuditEvent;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
+import org.xipki.ca.api.kpgen.KeypairGenerator;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
@@ -31,13 +32,13 @@ import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.license.api.CmLicense;
+import org.xipki.pki.BadCertTemplateException;
+import org.xipki.pki.OperationException;
 import org.xipki.security.*;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.ctlog.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
-import org.xipki.util.exception.BadCertTemplateException;
-import org.xipki.util.exception.OperationException;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -47,7 +48,7 @@ import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import static org.xipki.ca.sdk.CaAuditConstants.*;
-import static org.xipki.util.exception.ErrorCode.*;
+import static org.xipki.pki.ErrorCode.*;
 
 /**
  * X509CA.

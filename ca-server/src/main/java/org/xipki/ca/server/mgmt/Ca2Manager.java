@@ -28,15 +28,15 @@ import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.server.*;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.datasource.DataAccessException;
+import org.xipki.pki.ErrorCode;
+import org.xipki.pki.OperationException;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
-import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
-import org.xipki.util.exception.OperationException;
 import org.xipki.util.http.SslContextConf;
 
 import java.io.IOException;

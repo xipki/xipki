@@ -24,6 +24,7 @@ import org.xipki.ca.certprofile.xijson.conf.PolicyMappings;
 import org.xipki.ca.certprofile.xijson.conf.PolicyMappings.PolicyIdMappingType;
 import org.xipki.ca.certprofile.xijson.conf.*;
 import org.xipki.ca.certprofile.xijson.conf.QcStatements.*;
+import org.xipki.pki.BadCertTemplateException;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.ctlog.CtLog.SignedCertificateTimestampList;
@@ -31,7 +32,6 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.Validity;
-import org.xipki.util.exception.BadCertTemplateException;
 
 import java.io.IOException;
 import java.math.BigInteger;

@@ -152,6 +152,11 @@ public class CaServerConf extends ValidableConf {
    */
   private List<String> certprofileFactories;
 
+  /**
+   * list of classes that implement org.xipki.ca.api.kpgen.KeypairGeneratorFactory
+   */
+  private List<String> keypairGeneratorFactories;
+
   private List<String> caConfFiles;
 
   private final Map<String, SslContextConf> sslContextConfMap = new HashMap<>();
@@ -279,6 +284,14 @@ public class CaServerConf extends ValidableConf {
 
   public void setCertprofileFactories(List<String> certprofileFactories) {
     this.certprofileFactories = certprofileFactories;
+  }
+
+  public List<String> getKeypairGeneratorFactories() {
+    return keypairGeneratorFactories;
+  }
+
+  public void setKeypairGeneratorFactories(List<String> keypairGeneratorFactories) {
+    this.keypairGeneratorFactories = keypairGeneratorFactories;
   }
 
   public CtLogConf getCtLog() {

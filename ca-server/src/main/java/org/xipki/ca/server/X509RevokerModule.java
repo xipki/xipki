@@ -13,12 +13,12 @@ import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.db.CertStore.SerialWithId;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
+import org.xipki.pki.ErrorCode;
+import org.xipki.pki.OperationException;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.util.*;
 import org.xipki.util.Validity.Unit;
-import org.xipki.util.exception.ErrorCode;
-import org.xipki.util.exception.OperationException;
 
 import java.io.Closeable;
 import java.math.BigInteger;

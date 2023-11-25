@@ -13,10 +13,10 @@ import org.xipki.audit.Audits;
 import org.xipki.audit.PciAuditEvent;
 import org.xipki.ca.api.DataSourceMap;
 import org.xipki.ca.api.NameId;
+import org.xipki.ca.api.kpgen.KeypairGenerator;
+import org.xipki.ca.api.kpgen.KeypairGeneratorFactory;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.*;
-import org.xipki.ca.api.profile.CertprofileFactoryRegister;
-import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
 import org.xipki.ca.sdk.CaIdentifierRequest;
 import org.xipki.ca.sdk.CertprofileInfoResponse;
 import org.xipki.ca.sdk.X500NameType;
@@ -29,11 +29,11 @@ import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.license.api.CmLicense;
 import org.xipki.password.PasswordResolverException;
+import org.xipki.pki.OperationException;
 import org.xipki.security.*;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.exception.OperationException;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -165,6 +165,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   CertprofileFactoryRegister certprofileFactoryRegister;
 
   CertPublisherFactoryRegister certPublisherFactoryRegister;
+
+  Set<KeypairGeneratorFactory> keypairGeneratorFactories;
 
   CertStore certstore;
 
@@ -316,6 +318,9 @@ public class CaManagerImpl implements CaManager, Closeable {
     if (certPublisherFactoryRegister == null) {
       throw new IllegalStateException("certPublisherFactoryRegister is not set");
     }
+    if (keypairGeneratorFactories == null) {
+      throw new IllegalStateException("keypairGeneratorFactories is not set");
+    }
     if (caServerConf == null) {
       throw new IllegalStateException("caServerConf is not set");
     }
@@ -360,7 +365,7 @@ public class CaManagerImpl implements CaManager, Closeable {
         DataSourceWrapper caconfDatasource = allDataSources.get("caconf");
         caConfStore = new DbCaConfStore(caconfDatasource);
       } else {
-        LOG.info("loading CAConf from files {]", caServerConf.getCaConfFiles());
+        LOG.info("loading CAConf from files {}", caServerConf.getCaConfFiles());
         try {
           caConfStore = new FileCaConfStore(securityFactory, certprofileFactoryRegister, caServerConf.getCaConfFiles());
         } catch (IOException ex) {
@@ -734,7 +739,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       Set<String> caAliasNames = getCaAliasNames();
       Set<String> names = new HashSet<>(getCaNames());
 
-      if (names.size() > 0) {
+      if (!names.isEmpty()) {
         sb.append(" with following CAs: ");
         for (String aliasName : caAliasNames) {
           String name = getCaNameForAlias(aliasName);
@@ -944,13 +949,9 @@ public class CaManagerImpl implements CaManager, Closeable {
     Set<CaProfileEntry> caProfileEntries = caHasProfiles.get(Args.toNonBlankLower(caName, "caName"));
     if (CollectionUtil.isEmpty(caProfileEntries)) {
       return Collections.emptySet();
+    } else {
+      return new HashSet<>(caProfileEntries);
     }
-
-    Set<CaProfileEntry> ret = new HashSet<>();
-    for (CaProfileEntry entry : caProfileEntries) {
-      ret.add(entry);
-    }
-    return ret;
   }
 
   @Override
@@ -1148,6 +1149,10 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   public void setCertprofileFactoryRegister(CertprofileFactoryRegister register) {
     this.certprofileFactoryRegister = register;
+  }
+
+  public void setKeyPairGeneratorFactories(Set<KeypairGeneratorFactory> factories) {
+    this.keypairGeneratorFactories = factories == null ? Collections.emptySet() : factories;
   }
 
   public void setCertPublisherFactoryRegister(CertPublisherFactoryRegister register) {

@@ -35,7 +35,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -49,7 +48,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class DbActions {
 
-  private static void printDbInfo(ConfigurableProperties dbProps) {
+  private static String printDbInfo(ConfigurableProperties dbProps, int scriptFilePathLen) {
     Args.notNull(dbProps, "dbProps");
 
     String schema = dbProps.getProperty("liquibase.schema");
@@ -67,8 +66,7 @@ public class DbActions {
 
     String url = dbProps.getProperty("jdbcUrl");
     if (url != null) {
-      printDbInfo(user, url, schema);
-      return;
+      return printDbInfo(user, url, schema, scriptFilePathLen);
     }
 
     String datasourceClassName = dbProps.getProperty("dataSourceClassName");
@@ -144,17 +142,19 @@ public class DbActions {
 
     url = urlBuilder.toString();
 
-    printDbInfo(user, url, schema);
+    return printDbInfo(user, url, schema, scriptFilePathLen);
   } // method getInstance
 
-  private static void printDbInfo(String username, String url, String schema) {
-    String msg = "--------------------------------------------" +
-        "\n       user: " + username +
-        "\n        URL: " + url;
+  private static String printDbInfo(String username, String url, String schema, int scriptFilePathLen) {
+    String boundary = "-".repeat(2 + Math.max(
+        "Start executing script ".length() + scriptFilePathLen,
+        "script file: ".length() + url.length()));
+    String msg = boundary + "\n       user: " + username + "\n        URL: " + url;
     if (schema != null) {
       msg += "\n     schema: " + schema;
     }
     System.out.println(msg);
+    return boundary;
   }
 
   public abstract static class DbAction extends XiAction {
@@ -370,7 +370,6 @@ public class DbActions {
 
         scriptFile = expandFilepath(scriptFile);
         Path p = Paths.get(scriptFile);
-        String derivedScriptFile = null;
         if (!Files.exists(p)) {
           if (!scriptFile.contains("." + type + ".")) {
             // script file does not exist, try script file with database type identifier
@@ -378,21 +377,17 @@ public class DbActions {
             int idx = fn.lastIndexOf('.');
             fn = fn.substring(0, idx) + "." + type + fn.substring(idx);
             p = Paths.get(p.getParent().toString(), fn);
-            derivedScriptFile = p.toString();
-          }
-        }
 
-        if (!Files.exists(p)) {
-          if (derivedScriptFile != null) {
-            throw new IllegalCmdParamException("Could not find script files " + scriptFile
-                + " and " + derivedScriptFile);
+            if (!Files.exists(p)) {
+              throw new IllegalCmdParamException("Could not find script file " + scriptFile);
+            }
           } else {
             throw new IllegalCmdParamException("Could not find script file " + scriptFile);
           }
         }
 
-        printDbInfo(props);
-        println("script file: " + derivedScriptFile);
+        String boundary = printDbInfo(props, p.toString().length());
+        println("script file: " + p);
         if (!force) {
           if (!confirm("Do you want to execute the SQL script?", 3)) {
             throw new CmdFailure("User cancelled");
@@ -402,6 +397,7 @@ public class DbActions {
         println("Start executing script " + p);
         ScriptRunner.runScript(dataSource, p.toString());
         println("  End executing script " + p);
+        System.out.println(boundary);
         return null;
       }
     }

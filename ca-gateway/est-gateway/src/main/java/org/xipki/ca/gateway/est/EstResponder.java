@@ -29,6 +29,8 @@ import org.xipki.ca.gateway.RequestorAuthenticator;
 import org.xipki.ca.gateway.conf.CaProfileConf;
 import org.xipki.ca.gateway.conf.CaProfilesControl;
 import org.xipki.ca.sdk.*;
+import org.xipki.pki.ErrorCode;
+import org.xipki.pki.OperationException;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
@@ -36,8 +38,6 @@ import org.xipki.security.util.TlsHelper;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.*;
-import org.xipki.util.exception.ErrorCode;
-import org.xipki.util.exception.OperationException;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.XiHttpRequest;
@@ -367,7 +367,7 @@ public class EstResponder {
         throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, AuditLevel.INFO, AuditStatus.FAILED);
       }
 
-      if (!requestor.isPermitted(PermissionConstants.ENROLL_CERT)) {
+      if (!requestor.isPermitted(Requestor.Permission.ENROLL_CERT)) {
         throw new OperationException(ErrorCode.NOT_PERMITTED, "ENROLL_CERT is not allowed");
       }
 
@@ -375,7 +375,7 @@ public class EstResponder {
         throw new OperationException(ErrorCode.NOT_PERMITTED, "certprofile " + profile + " is not allowed");
       }
 
-      CertificationRequest csr = X509Util.parseCsrInRequest(request);
+      CertificationRequest csr = GatewayUtil.parseCsrInRequest(request);
       if (!CMD_serverkeygen.equals(command)) {
         if (!GatewayUtil.verifyCsr(csr, securityFactory, popControl)) {
           throw new OperationException(ErrorCode.BAD_POP);

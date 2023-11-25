@@ -5,6 +5,7 @@ package org.xipki.scep.message;
 
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cms.*;
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.*;
@@ -374,7 +375,8 @@ public class DecodedPkiMessage extends PkiMessage {
 
     try {
       if (MessageType.PKCSReq == messageType || MessageType.RenewalReq == messageType) {
-        ret.setMessageData(X509Util.parseCsrInRequest(encodedMessageData));
+        CertificationRequest csr = CertificationRequest.getInstance(X509Util.toDerEncoded(encodedMessageData));
+        ret.setMessageData(csr);
       } else if (MessageType.CertPoll == messageType) {
         ret.setMessageData(IssuerAndSubject.getInstance(encodedMessageData));
       } else if (MessageType.GetCert == messageType || MessageType.GetCRL == messageType) {
