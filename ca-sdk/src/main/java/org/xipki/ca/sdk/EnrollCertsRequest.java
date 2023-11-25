@@ -93,18 +93,14 @@ public class EnrollCertsRequest extends SdkRequest {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(6);
-      encoder.writeTextString(transactionId);
-      encoder.writeBooleanObj(groupEnroll);
-      encoder.writeBooleanObj(explicitConfirm);
-      encoder.writeIntObj(confirmWaitTimeMs);
-      encoder.writeEnumObj(caCertMode);
-      encoder.writeObjects(entries);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws EncodeException, IOException {
+    encoder.writeArrayStart(6);
+    encoder.writeTextString(transactionId);
+    encoder.writeBooleanObj(groupEnroll);
+    encoder.writeBooleanObj(explicitConfirm);
+    encoder.writeIntObj(confirmWaitTimeMs);
+    encoder.writeEnumObj(caCertMode);
+    encoder.writeObjects(entries);
   }
 
   public static EnrollCertsRequest decode(byte[] encoded) throws DecodeException {
@@ -122,7 +118,7 @@ public class EnrollCertsRequest extends SdkRequest {
       ret.setEntries(EnrollCertRequestEntry.decodeArray(decoder));
       return ret;
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + EnrollCertsRequest.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, EnrollCertsRequest.class), ex);
     }
   }
 

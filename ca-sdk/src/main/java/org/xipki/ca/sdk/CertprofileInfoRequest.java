@@ -7,7 +7,6 @@ import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
 
 import java.io.IOException;
 
@@ -30,13 +29,9 @@ public class CertprofileInfoRequest extends SdkRequest {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(1);
-      encoder.writeTextString(profile);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException {
+    encoder.writeArrayStart(1);
+    encoder.writeTextString(profile);
   }
 
   public static CertprofileInfoRequest decode(byte[] encoded) throws DecodeException {
@@ -44,7 +39,7 @@ public class CertprofileInfoRequest extends SdkRequest {
       assertArrayStart("CertprofileInfoRequest", decoder, 1);
       return new CertprofileInfoRequest(decoder.readTextString());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + CertprofileInfoRequest.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, CertprofileInfoRequest.class), ex);
     }
   }
 

@@ -41,15 +41,11 @@ public class OldCertInfoByIssuerAndSerial extends OldCertInfo {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(3);
-      encoder.writeBoolean(isReusePublicKey());
-      encoder.writeObject(issuer);
-      encoder.writeBigInt(serialNumber);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    encoder.writeArrayStart(3);
+    encoder.writeBoolean(isReusePublicKey());
+    encoder.writeObject(issuer);
+    encoder.writeBigInt(serialNumber);
   }
 
   public static OldCertInfoByIssuerAndSerial decode(CborDecoder decoder) throws DecodeException {
@@ -63,7 +59,7 @@ public class OldCertInfoByIssuerAndSerial extends OldCertInfo {
           X500NameType.decode(decoder),
           decoder.readBigInt());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + OldCertInfoByIssuerAndSerial.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, OldCertInfoByIssuerAndSerial.class), ex);
     }
   }
 

@@ -4,10 +4,13 @@
 package org.xipki.ca.sdk;
 
 import org.bouncycastle.asn1.x500.X500Name;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.pki.ErrorCode;
 import org.xipki.security.KeyCertBytesPair;
+import org.xipki.util.LogUtil;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
-import org.xipki.util.exception.ErrorCode;
 import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.SslContextConf;
@@ -30,6 +33,8 @@ import static org.xipki.ca.sdk.SdkConstants.*;
  */
 
 public class SdkClient {
+
+  private static final Logger LOG = LoggerFactory.getLogger(SdkClient.class);
 
   private static final String CONTENT_TYPE_CBOR = "application/cbor";
 
@@ -63,6 +68,7 @@ public class SdkClient {
         try {
           encodedReq = request.encode();
         } catch (EncodeException e) {
+          LogUtil.warn(LOG, e, e.getMessage());
           throw new SdkErrorResponseException(ErrorCode.CLIENT_REQUEST_ENCODE_ERROR, e.getMessage());
         }
 
@@ -188,7 +194,7 @@ public class SdkClient {
 
   public byte[] currentCrl(String ca, BigInteger crlNumber, Instant thisUpdate, String crlDp)
       throws SdkErrorResponseException {
-    GetCRLRequest req = new GetCRLRequest(crlNumber, thisUpdate == null ? null : thisUpdate.getEpochSecond(), crlDp);
+    GetCRLRequest req = new GetCRLRequest(crlNumber, thisUpdate, crlDp);
     byte[] respBytes = send(ca, CMD_crl, req);
     CrlResponse resp;
     try {

@@ -30,13 +30,10 @@ public class CrlResponse extends SdkResponse {
     return crl;
   }
 
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(1);
-      encoder.writeByteString(crl);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  @Override
+  protected void encode0(CborEncoder encoder) throws EncodeException, IOException {
+    encoder.writeArrayStart(1);
+    encoder.writeByteString(crl);
   }
 
   public static CrlResponse decode(byte[] encoded) throws DecodeException {
@@ -44,7 +41,7 @@ public class CrlResponse extends SdkResponse {
       assertArrayStart("CrlResponse", decoder, 1);
       return new CrlResponse(decoder.readByteString());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + CrlResponse.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, CrlResponse.class), ex);
     }
   }
 

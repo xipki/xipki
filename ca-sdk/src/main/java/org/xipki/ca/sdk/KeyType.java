@@ -4,7 +4,6 @@
 package org.xipki.ca.sdk;
 
 import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncodable;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
@@ -17,7 +16,7 @@ import java.io.IOException;
  * @since 6.0.0
  */
 
-public class KeyType implements CborEncodable {
+public class KeyType extends SdkEncodable {
 
   private final String keyType;
 
@@ -37,14 +36,10 @@ public class KeyType implements CborEncodable {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(2);
-      encoder.writeTextString(keyType);
-      encoder.writeTextStrings(ecCurves);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    encoder.writeArrayStart(2);
+    encoder.writeTextString(keyType);
+    encoder.writeTextStrings(ecCurves);
   }
 
   public static KeyType decode(CborDecoder decoder) throws DecodeException {
@@ -57,7 +52,7 @@ public class KeyType implements CborEncodable {
           decoder.readTextString(),
           decoder.readTextStrings());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + KeyType.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, KeyType.class), ex);
     }
   }
 

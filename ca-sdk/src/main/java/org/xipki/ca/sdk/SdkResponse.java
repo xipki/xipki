@@ -9,6 +9,6 @@ package org.xipki.ca.sdk;
  * @since 6.0.0
  */
 
-public abstract class SdkResponse extends SdkMessage {
+public abstract class SdkResponse extends SdkEncodable {
 
 }

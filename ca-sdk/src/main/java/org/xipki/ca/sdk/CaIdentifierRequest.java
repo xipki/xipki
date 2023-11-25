@@ -75,19 +75,15 @@ public class CaIdentifierRequest extends SdkRequest{
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    encode(encoder, 0);
+  protected void encode0(CborEncoder encoder) throws EncodeException, IOException {
+    encode0(encoder, 0);
   }
 
-  protected void encode(CborEncoder encoder, int subClassFieldSize) throws EncodeException {
-    try {
-      encoder.writeArrayStart(3 + subClassFieldSize);
-      encoder.writeByteString(issuerCertSha1Fp);
-      encoder.writeObject(issuer);
-      encoder.writeByteString(authorityKeyIdentifier);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder, int subClassFieldSize) throws IOException, EncodeException {
+    encoder.writeArrayStart(3 + subClassFieldSize);
+    encoder.writeByteString(issuerCertSha1Fp);
+    encoder.writeObject(issuer);
+    encoder.writeByteString(authorityKeyIdentifier);
   }
 
   public static CaIdentifierRequest decode(byte[] encoded) throws DecodeException {
@@ -98,7 +94,7 @@ public class CaIdentifierRequest extends SdkRequest{
           X500NameType.decode(decoder),
           decoder.readByteString());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + CaIdentifierRequest.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, CaIdentifierRequest.class), ex);
     }
   }
 

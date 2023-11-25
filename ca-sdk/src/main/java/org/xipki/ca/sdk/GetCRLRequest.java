@@ -11,6 +11,7 @@ import org.xipki.util.exception.EncodeException;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.time.Instant;
 
 /**
  *
@@ -29,14 +30,14 @@ public class GetCRLRequest extends SdkRequest {
    * Epoch time in seconds of thisUpdate of the known CRL.
    * If present, returns only CRL with larger thisUpdate.
    */
-  private final Long thisUpdate;
+  private final Instant thisUpdate;
 
   /**
    * Returns CRL published under this CRL distribution point.
    */
   private final String crlDp;
 
-  public GetCRLRequest(BigInteger crlNumber, Long thisUpdate, String crlDp) {
+  public GetCRLRequest(BigInteger crlNumber, Instant thisUpdate, String crlDp) {
     this.crlNumber = crlNumber;
     this.thisUpdate = thisUpdate;
     this.crlDp = crlDp;
@@ -46,7 +47,7 @@ public class GetCRLRequest extends SdkRequest {
     return crlNumber;
   }
 
-  public Long getThisUpdate() {
+  public Instant getThisUpdate() {
     return thisUpdate;
   }
 
@@ -55,15 +56,11 @@ public class GetCRLRequest extends SdkRequest {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(3);
-      encoder.writeBigInt(crlNumber);
-      encoder.writeIntObj(thisUpdate);
-      encoder.writeTextString(crlDp);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    encoder.writeArrayStart(3);
+    encoder.writeBigInt(crlNumber);
+    encoder.writeInstant(thisUpdate);
+    encoder.writeTextString(crlDp);
   }
 
   public static GetCRLRequest decode(byte[] encoded) throws DecodeException {
@@ -71,10 +68,10 @@ public class GetCRLRequest extends SdkRequest {
       assertArrayStart("GetCRLRequest", decoder, 3);
       return new GetCRLRequest(
           decoder.readBigInt(),
-          decoder.readLongObj(),
+          decoder.readInstant(),
           decoder.readTextString());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + GetCRLRequest.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, GetCRLRequest.class), ex);
     }
   }
 

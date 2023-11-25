@@ -7,7 +7,6 @@ import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
 
 import java.io.IOException;
 
@@ -37,14 +36,10 @@ public class CaNameResponse extends SdkResponse {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(2);
-      encoder.writeTextString(name);
-      encoder.writeTextStrings(aliases);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException {
+    encoder.writeArrayStart(2);
+    encoder.writeTextString(name);
+    encoder.writeTextStrings(aliases);
   }
 
   public static CaNameResponse decode(byte[] encoded) throws DecodeException {
@@ -54,7 +49,7 @@ public class CaNameResponse extends SdkResponse {
           decoder.readTextString(),
           decoder.readTextStrings());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + CaNameResponse.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, CaNameResponse.class), ex);
     }
   }
 

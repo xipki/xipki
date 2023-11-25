@@ -31,13 +31,9 @@ public class RevokeCertsResponse extends SdkResponse {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(1);
-      encoder.writeObjects(entries);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    encoder.writeArrayStart(1);
+    encoder.writeObjects(entries);
   }
 
   public static RevokeCertsResponse decode(byte[] encoded) throws DecodeException {
@@ -46,7 +42,7 @@ public class RevokeCertsResponse extends SdkResponse {
       return new RevokeCertsResponse(
           SingleCertSerialEntry.decodeArray(decoder));
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + RevokeCertsResponse.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, RevokeCertsResponse.class), ex);
     }
   }
 

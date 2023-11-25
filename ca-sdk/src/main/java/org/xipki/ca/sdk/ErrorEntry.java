@@ -3,12 +3,11 @@
 
 package org.xipki.ca.sdk;
 
+import org.xipki.pki.ErrorCode;
 import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncodable;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
-import org.xipki.util.exception.ErrorCode;
 
 import java.io.IOException;
 
@@ -18,7 +17,7 @@ import java.io.IOException;
  * @since 6.0.0
  */
 
-public class ErrorEntry implements CborEncodable {
+public class ErrorEntry extends SdkEncodable {
 
   private final int code;
 
@@ -58,14 +57,10 @@ public class ErrorEntry implements CborEncodable {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(2);
-      encoder.writeInt(code);
-      encoder.writeTextString(message);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws EncodeException, IOException {
+    encoder.writeArrayStart(2);
+    encoder.writeInt(code);
+    encoder.writeTextString(message);
   }
 
   public static ErrorEntry decode(CborDecoder decoder) throws DecodeException {
@@ -78,7 +73,7 @@ public class ErrorEntry implements CborEncodable {
           decoder.readInt(),
           decoder.readTextString());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + ErrorEntry.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, ErrorEntry.class), ex);
     }
   }
 

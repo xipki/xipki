@@ -61,16 +61,12 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(4);
-      encoder.writeTextString(transactionId);
-      encoder.writeIntObj(confirmWaitTime);
-      encoder.writeObjects(entries);
-      encoder.writeByteStrings(extraCerts);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws EncodeException, IOException {
+    encoder.writeArrayStart(4);
+    encoder.writeTextString(transactionId);
+    encoder.writeIntObj(confirmWaitTime);
+    encoder.writeObjects(entries);
+    encoder.writeByteStrings(extraCerts);
   }
 
   public static EnrollOrPollCertsResponse decode(byte[] encoded) throws DecodeException {
@@ -83,7 +79,7 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
       ret.setExtraCerts(decoder.readByteStrings());
       return ret;
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + EnrollOrPollCertsResponse.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, EnrollOrPollCertsResponse.class), ex);
     }
   }
 

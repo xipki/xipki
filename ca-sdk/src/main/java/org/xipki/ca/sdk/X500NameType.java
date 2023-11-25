@@ -6,7 +6,6 @@ package org.xipki.ca.sdk;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.util.Hex;
 import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncodable;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
@@ -19,7 +18,7 @@ import java.io.IOException;
  * @since 6.0.0
  */
 
-public class X500NameType implements CborEncodable {
+public class X500NameType extends SdkEncodable {
 
   private X500Name name;
 
@@ -78,14 +77,10 @@ public class X500NameType implements CborEncodable {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(2);
-      encoder.writeTextString(text);
-      encoder.writeByteString(encoded);
-    } catch (IOException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    encoder.writeArrayStart(2);
+    encoder.writeTextString(text);
+    encoder.writeByteString(encoded);
   }
 
   public static X500NameType decode(CborDecoder decoder) throws DecodeException {
@@ -103,7 +98,7 @@ public class X500NameType implements CborEncodable {
         return new X500NameType(encoded);
       }
     } catch (IOException ex) {
-      throw new DecodeException("error decoding " + X500NameType.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, X500NameType.class), ex);
     }
   }
 

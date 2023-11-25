@@ -30,13 +30,9 @@ public class TransactionIdRequest extends SdkRequest {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(1);
-      encoder.writeTextString(tid);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    encoder.writeArrayStart(1);
+    encoder.writeTextString(tid);
   }
 
   public static TransactionIdRequest decode(byte[] encoded) throws DecodeException {
@@ -44,7 +40,7 @@ public class TransactionIdRequest extends SdkRequest {
       assertArrayStart("TransactionIdRequest", decoder, 1);
       return new TransactionIdRequest(decoder.readTextString());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + TransactionIdRequest.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, TransactionIdRequest.class), ex);
     }
   }
 

@@ -31,13 +31,9 @@ public class UnSuspendOrRemoveCertsResponse extends SdkResponse {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(1);
-      encoder.writeObjects(entries);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    encoder.writeArrayStart(1);
+    encoder.writeObjects(entries);
   }
 
   public static UnSuspendOrRemoveCertsResponse decode(byte[] encoded) throws DecodeException {
@@ -46,7 +42,7 @@ public class UnSuspendOrRemoveCertsResponse extends SdkResponse {
       return new UnSuspendOrRemoveCertsResponse(
           SingleCertSerialEntry.decodeArray(decoder));
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + UnSuspendOrRemoveCertsResponse.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, UnSuspendOrRemoveCertsResponse.class), ex);
     }
   }
 

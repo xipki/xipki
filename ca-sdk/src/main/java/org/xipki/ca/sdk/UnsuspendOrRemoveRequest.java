@@ -33,13 +33,9 @@ public class UnsuspendOrRemoveRequest extends CaIdentifierRequest {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    super.encode(encoder, 1);
-    try {
-      encoder.writeBigInts(entries);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error decoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    super.encode0(encoder, 1);
+    encoder.writeBigInts(entries);
   }
 
   public static UnsuspendOrRemoveRequest decode(byte[] encoded) throws DecodeException {
@@ -51,7 +47,7 @@ public class UnsuspendOrRemoveRequest extends CaIdentifierRequest {
           decoder.readByteString(),
           decoder.readBigInts());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + UnsuspendOrRemoveRequest.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, UnsuspendOrRemoveRequest.class), ex);
     }
   }
 

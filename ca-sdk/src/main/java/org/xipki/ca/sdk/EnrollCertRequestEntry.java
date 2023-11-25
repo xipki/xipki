@@ -6,7 +6,6 @@ package org.xipki.ca.sdk;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncodable;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
@@ -21,14 +20,14 @@ import java.time.Instant;
  * @since 6.0.0
  */
 
-public class EnrollCertRequestEntry implements CborEncodable {
+public class EnrollCertRequestEntry extends SdkEncodable {
 
   private BigInteger certReqId;
 
   private String certprofile;
 
   /**
-   * Specifies the PKCS#10 Request. Note that the CA ddoes NOT verify the signature of
+   * Specifies the PKCS#10 Request. Note that the CA does NOT verify the signature of
    * this request. You may also put any dummy value in the signature field.
    * The verification of CSR must be processed by the CA client calling
    * the enrolment service.
@@ -58,12 +57,12 @@ public class EnrollCertRequestEntry implements CborEncodable {
   /**
    * Epoch time in seconds of not-before.
    */
-  private Long notBefore;
+  private Instant notBefore;
 
   /**
    * Epoch time in seconds of not-after.
    */
-  private Long notAfter;
+  private Instant notAfter;
 
   private OldCertInfoByIssuerAndSerial oldCertIsn;
 
@@ -125,28 +124,28 @@ public class EnrollCertRequestEntry implements CborEncodable {
     this.p10req = p10req;
   }
 
-  public Long getNotBefore() {
+  public Instant getNotBefore() {
     return notBefore;
   }
 
-  public void setNotBefore(Long notBefore) {
+  public void setNotBefore(Instant notBefore) {
     this.notBefore = notBefore;
   }
 
   public void notBefore(Instant notBefore) {
-    this.notBefore = notBefore == null ? null : notBefore.getEpochSecond();
+    this.notBefore = notBefore;
   }
 
-  public Long getNotAfter() {
+  public Instant getNotAfter() {
     return notAfter;
   }
 
-  public void setNotAfter(Long notAfter) {
+  public void setNotAfter(Instant notAfter) {
     this.notAfter = notAfter;
   }
 
   public void notAfter(Instant notAfter) {
-    this.notAfter = notAfter == null ? null : notAfter.getEpochSecond();
+    this.notAfter = notAfter;
   }
 
   public OldCertInfoByIssuerAndSerial getOldCertIsn() {
@@ -166,22 +165,18 @@ public class EnrollCertRequestEntry implements CborEncodable {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(10);
-      encoder.writeBigInt(certReqId);
-      encoder.writeTextString(certprofile);
-      encoder.writeByteString(p10req);
-      encoder.writeObject(subject);
-      encoder.writeByteString(subjectPublicKey);
-      encoder.writeByteString(extensions);
-      encoder.writeIntObj(notBefore);
-      encoder.writeIntObj(notAfter);
-      encoder.writeObject(oldCertIsn);
-      encoder.writeObject(oldCertSubject);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws EncodeException, IOException {
+    encoder.writeArrayStart(10);
+    encoder.writeBigInt(certReqId);
+    encoder.writeTextString(certprofile);
+    encoder.writeByteString(p10req);
+    encoder.writeObject(subject);
+    encoder.writeByteString(subjectPublicKey);
+    encoder.writeByteString(extensions);
+    encoder.writeInstant(notBefore);
+    encoder.writeInstant(notAfter);
+    encoder.writeObject(oldCertIsn);
+    encoder.writeObject(oldCertSubject);
   }
 
   public static EnrollCertRequestEntry decode(CborDecoder decoder) throws DecodeException {
@@ -197,13 +192,13 @@ public class EnrollCertRequestEntry implements CborEncodable {
       ret.setSubject(X500NameType.decode(decoder));
       ret.setSubjectPublicKey(decoder.readByteString());
       ret.setExtensions(decoder.readByteString());
-      ret.setNotBefore(decoder.readLongObj());
-      ret.setNotAfter(decoder.readLongObj());
+      ret.setNotBefore(decoder.readInstant());
+      ret.setNotAfter(decoder.readInstant());
       ret.setOldCertIsn(OldCertInfoByIssuerAndSerial.decode(decoder));
       ret.setOldCertSubject(OldCertInfoBySubject.decode(decoder));
       return ret;
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + EnrollCertRequestEntry.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, EnrollCertRequestEntry.class), ex);
     }
   }
 

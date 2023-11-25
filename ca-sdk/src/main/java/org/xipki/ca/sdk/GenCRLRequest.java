@@ -33,13 +33,9 @@ public class GenCRLRequest extends SdkRequest {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(1);
-      encoder.writeTextString(crlDp);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    encoder.writeArrayStart(1);
+    encoder.writeTextString(crlDp);
   }
 
   public static GenCRLRequest decode(byte[] encoded) throws DecodeException {
@@ -48,7 +44,7 @@ public class GenCRLRequest extends SdkRequest {
       return new GenCRLRequest(
           decoder.readTextString());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + GenCRLRequest.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, GenCRLRequest.class), ex);
     }
   }
 

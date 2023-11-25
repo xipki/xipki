@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.exception.ErrorCode;
+import org.xipki.pki.ErrorCode;
 
 /**
  * Exception wraps the error response.

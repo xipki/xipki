@@ -39,14 +39,10 @@ public class PollCertRequest extends CaIdentifierRequest {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      super.encode(encoder, 2);
-      encoder.writeTextString(transactionId);
-      encoder.writeObjects(entries);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    super.encode0(encoder, 2);
+    encoder.writeTextString(transactionId);
+    encoder.writeObjects(entries);
   }
 
   public static PollCertRequest decode(byte[] encoded) throws DecodeException {
@@ -59,7 +55,7 @@ public class PollCertRequest extends CaIdentifierRequest {
           decoder.readTextString(),
           PollCertRequestEntry.decodeArray(decoder));
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + PollCertRequest.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, PollCertRequest.class), ex);
     }
   }
 

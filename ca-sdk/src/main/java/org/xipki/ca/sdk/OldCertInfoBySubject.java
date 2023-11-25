@@ -37,15 +37,11 @@ public class OldCertInfoBySubject extends OldCertInfo {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(3);
-      encoder.writeBoolean(isReusePublicKey());
-      encoder.writeByteString(subject);
-      encoder.writeByteString(san);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    encoder.writeArrayStart(3);
+    encoder.writeBoolean(isReusePublicKey());
+    encoder.writeByteString(subject);
+    encoder.writeByteString(san);
   }
 
   public static OldCertInfoBySubject decode(CborDecoder decoder) throws DecodeException {
@@ -59,7 +55,7 @@ public class OldCertInfoBySubject extends OldCertInfo {
           decoder.readByteString(),
           decoder.readByteString());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + OldCertInfoBySubject.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, OldCertInfoBySubject.class), ex);
     }
   }
 

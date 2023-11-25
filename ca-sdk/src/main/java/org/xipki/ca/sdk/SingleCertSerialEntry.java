@@ -4,7 +4,6 @@
 package org.xipki.ca.sdk;
 
 import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncodable;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
@@ -18,7 +17,7 @@ import java.math.BigInteger;
  * @since 6.0.0
  */
 
-public class SingleCertSerialEntry implements CborEncodable {
+public class SingleCertSerialEntry extends SdkEncodable {
 
   /*
    * Uppercase hex encoded serialNumber.
@@ -41,14 +40,10 @@ public class SingleCertSerialEntry implements CborEncodable {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(2);
-      encoder.writeBigInt(serialNumber);
-      encoder.writeObject(error);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    encoder.writeArrayStart(2);
+    encoder.writeBigInt(serialNumber);
+    encoder.writeObject(error);
   }
 
   public static SingleCertSerialEntry decode(CborDecoder decoder) throws DecodeException {
@@ -61,7 +56,7 @@ public class SingleCertSerialEntry implements CborEncodable {
           decoder.readBigInt(),
           ErrorEntry.decode(decoder));
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + SingleCertSerialEntry.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, SingleCertSerialEntry.class), ex);
     }
   }
 

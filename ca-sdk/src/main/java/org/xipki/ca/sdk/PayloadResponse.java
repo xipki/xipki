@@ -33,13 +33,9 @@ public class PayloadResponse extends SdkResponse {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(1);
-      encoder.writeByteString(payload);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    encoder.writeArrayStart(1);
+    encoder.writeByteString(payload);
   }
 
   public static PayloadResponse decode(byte[] encoded) throws DecodeException {
@@ -47,7 +43,7 @@ public class PayloadResponse extends SdkResponse {
       assertArrayStart("PayloadResponse", decoder, 1);
       return new PayloadResponse(decoder.readByteString());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + PayloadResponse.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, PayloadResponse.class), ex);
     }
   }
 

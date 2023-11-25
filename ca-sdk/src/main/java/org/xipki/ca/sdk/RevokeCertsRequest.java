@@ -31,13 +31,10 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
     return entries;
   }
 
-  public void encode(CborEncoder encoder) throws EncodeException {
-    super.encode(encoder, 1);
-    try {
-      encoder.writeObjects(entries);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  @Override
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    super.encode0(encoder, 1);
+    encoder.writeObjects(entries);
   }
 
   public static RevokeCertsRequest decode(byte[] encoded) throws DecodeException {
@@ -49,7 +46,7 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
           decoder.readByteString(),
           RevokeCertRequestEntry.decodeArray(decoder));
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + RevokeCertsRequest.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, RevokeCertsRequest.class), ex);
     }
   }
 

@@ -4,7 +4,6 @@
 package org.xipki.ca.sdk;
 
 import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncodable;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
@@ -18,7 +17,7 @@ import java.math.BigInteger;
  * @since 6.0.0
  */
 
-public class EnrollOrPullCertResponseEntry implements CborEncodable {
+public class EnrollOrPullCertResponseEntry extends SdkEncodable {
 
   private final BigInteger id;
 
@@ -52,16 +51,12 @@ public class EnrollOrPullCertResponseEntry implements CborEncodable {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(4);
-      encoder.writeBigInt(id);
-      encoder.writeObject(error);
-      encoder.writeByteString(cert);
-      encoder.writeByteString(privateKey);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws EncodeException, IOException {
+    encoder.writeArrayStart(4);
+    encoder.writeBigInt(id);
+    encoder.writeObject(error);
+    encoder.writeByteString(cert);
+    encoder.writeByteString(privateKey);
   }
 
   public static EnrollOrPullCertResponseEntry decode(CborDecoder decoder) throws DecodeException {
@@ -76,7 +71,7 @@ public class EnrollOrPullCertResponseEntry implements CborEncodable {
           decoder.readByteString(),
           decoder.readByteString());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + EnrollOrPullCertResponseEntry.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, EnrollOrPullCertResponseEntry.class), ex);
     }
   }
 

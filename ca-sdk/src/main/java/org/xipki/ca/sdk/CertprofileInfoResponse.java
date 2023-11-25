@@ -44,15 +44,11 @@ public class CertprofileInfoResponse extends SdkResponse {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(3);
-      encoder.writeTextStrings(requiredExtensionTypes);
-      encoder.writeTextStrings(optionalExtensionTypes);
-      encoder.writeObjects(keyTypes);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    encoder.writeArrayStart(3);
+    encoder.writeTextStrings(requiredExtensionTypes);
+    encoder.writeTextStrings(optionalExtensionTypes);
+    encoder.writeObjects(keyTypes);
   }
 
   public static CertprofileInfoResponse decode(byte[] encoded) throws DecodeException {
@@ -63,7 +59,7 @@ public class CertprofileInfoResponse extends SdkResponse {
           decoder.readTextStrings(),
           KeyType.decodeArray(decoder));
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + CertprofileInfoResponse.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, CertprofileInfoResponse.class), ex);
     }
   }
 

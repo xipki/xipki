@@ -41,14 +41,10 @@ public class GetCertRequest extends SdkRequest {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(2);
-      encoder.writeBigInt(serialNumber);
-      encoder.writeObject(issuer);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    encoder.writeArrayStart(2);
+    encoder.writeBigInt(serialNumber);
+    encoder.writeObject(issuer);
   }
 
   public static GetCertRequest decode(byte[] encoded) throws DecodeException {
@@ -58,7 +54,7 @@ public class GetCertRequest extends SdkRequest {
           decoder.readBigInt(),
           X500NameType.decode(decoder));
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + GetCertRequest.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, GetCertRequest.class), ex);
     }
   }
 

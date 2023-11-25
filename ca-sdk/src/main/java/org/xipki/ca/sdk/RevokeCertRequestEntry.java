@@ -5,13 +5,13 @@ package org.xipki.ca.sdk;
 
 import org.xipki.security.CrlReason;
 import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncodable;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.time.Instant;
 
 /**
  *
@@ -19,7 +19,7 @@ import java.math.BigInteger;
  * @since 6.0.0
  */
 
-public class RevokeCertRequestEntry implements CborEncodable {
+public class RevokeCertRequestEntry extends SdkEncodable {
 
   /*
    * Uppercase hex encoded serialNumber.
@@ -31,9 +31,9 @@ public class RevokeCertRequestEntry implements CborEncodable {
   /**
    * Epoch time in seconds of invalidity time.
    */
-  private final Long invalidityTime;
+  private final Instant invalidityTime;
 
-  public RevokeCertRequestEntry(BigInteger serialNumber, CrlReason reason, Long invalidityTime) {
+  public RevokeCertRequestEntry(BigInteger serialNumber, CrlReason reason, Instant invalidityTime) {
     this.serialNumber = serialNumber;
     this.reason = reason;
     this.invalidityTime = invalidityTime;
@@ -47,20 +47,16 @@ public class RevokeCertRequestEntry implements CborEncodable {
     return reason;
   }
 
-  public Long getInvalidityTime() {
+  public Instant getInvalidityTime() {
     return invalidityTime;
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(3);
-      encoder.writeBigInt(serialNumber);
-      encoder.writeEnumObj(reason);
-      encoder.writeIntObj(invalidityTime);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    encoder.writeArrayStart(3);
+    encoder.writeBigInt(serialNumber);
+    encoder.writeEnumObj(reason);
+    encoder.writeInstant(invalidityTime);
   }
 
   public static RevokeCertRequestEntry decode(CborDecoder decoder) throws DecodeException {
@@ -76,9 +72,9 @@ public class RevokeCertRequestEntry implements CborEncodable {
 
       return new RevokeCertRequestEntry(
           serialNumber, reason,
-          decoder.readLongObj());
+          decoder.readInstant());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + RevokeCertRequestEntry.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, RevokeCertRequestEntry.class), ex);
     }
   }
 

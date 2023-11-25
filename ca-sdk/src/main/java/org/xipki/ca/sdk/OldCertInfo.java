@@ -3,15 +3,13 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.CborEncodable;
-
 /**
  *
  * @author Lijun Liao (xipki)
  * @since 6.0.0
  */
 
-public abstract class OldCertInfo implements CborEncodable {
+public abstract class OldCertInfo extends SdkEncodable {
 
   /**
    * Whether to reu-use the public key in the old certificate for the new one.

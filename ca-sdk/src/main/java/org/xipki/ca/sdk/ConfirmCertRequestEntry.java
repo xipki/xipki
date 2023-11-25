@@ -4,10 +4,8 @@
 package org.xipki.ca.sdk;
 
 import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncodable;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -18,7 +16,7 @@ import java.math.BigInteger;
  * @since 6.0.0
  */
 
-public class ConfirmCertRequestEntry implements CborEncodable {
+public class ConfirmCertRequestEntry extends SdkEncodable {
 
   private final boolean accept;
 
@@ -48,15 +46,11 @@ public class ConfirmCertRequestEntry implements CborEncodable {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(3);
-      encoder.writeBoolean(accept);
-      encoder.writeBigInt(certReqId);
-      encoder.writeByteString(certhash);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException {
+    encoder.writeArrayStart(3);
+    encoder.writeBoolean(accept);
+    encoder.writeBigInt(certReqId);
+    encoder.writeByteString(certhash);
   }
 
   public static ConfirmCertRequestEntry decode(CborDecoder decoder) throws DecodeException {
@@ -70,7 +64,7 @@ public class ConfirmCertRequestEntry implements CborEncodable {
           decoder.readBigInt(),
           decoder.readByteString());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + ConfirmCertRequestEntry.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, ConfirmCertRequestEntry.class), ex);
     }
   }
 

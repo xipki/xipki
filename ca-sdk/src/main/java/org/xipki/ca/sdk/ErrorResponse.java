@@ -3,13 +3,13 @@
 
 package org.xipki.ca.sdk;
 
+import org.xipki.pki.ErrorCode;
 import org.xipki.util.Args;
 import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
-import org.xipki.util.exception.ErrorCode;
 
 import java.io.IOException;
 
@@ -60,15 +60,11 @@ public class ErrorResponse extends SdkResponse {
   }
 
   @Override
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(3);
-      encoder.writeTextString(transactionId);
-      encoder.writeInt(code.getCode());
-      encoder.writeTextString(message);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    encoder.writeArrayStart(3);
+    encoder.writeTextString(transactionId);
+    encoder.writeInt(code.getCode());
+    encoder.writeTextString(message);
   }
 
   public static ErrorResponse decode(byte[] encoded) throws DecodeException {
@@ -78,14 +74,10 @@ public class ErrorResponse extends SdkResponse {
       String tid = decoder.readTextString();
       int code = decoder.readInt();
       ErrorCode errorCode = ErrorCode.ofCode(code);
-      if (errorCode == null) {
-        throw new DecodeException("unknown ErrorCode '" + code + "'");
-      }
 
-      return new ErrorResponse(tid, errorCode,
-          decoder.readTextString());
+      return new ErrorResponse(tid, errorCode, decoder.readTextString());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + ErrorResponse.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, ErrorResponse.class), ex);
     }
   }
 

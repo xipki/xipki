@@ -36,14 +36,11 @@ public class ConfirmCertsRequest extends SdkRequest {
     return entries;
   }
 
-  public void encode(CborEncoder encoder) throws EncodeException {
-    try {
-      encoder.writeArrayStart(2);
-      encoder.writeTextString(transactionId);
-      encoder.writeObjects(entries);
-    } catch (IOException | RuntimeException ex) {
-      throw new EncodeException("error encoding " + getClass().getName(), ex);
-    }
+  @Override
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    encoder.writeArrayStart(2);
+    encoder.writeTextString(transactionId);
+    encoder.writeObjects(entries);
   }
 
   public static ConfirmCertsRequest decode(byte[] encoded) throws DecodeException {
@@ -53,7 +50,7 @@ public class ConfirmCertsRequest extends SdkRequest {
           decoder.readTextString(),
           ConfirmCertRequestEntry.decodeArray(decoder));
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException("error decoding " + ConfirmCertsRequest.class.getName(), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, ConfirmCertsRequest.class), ex);
     }
   }
 
