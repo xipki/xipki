@@ -26,10 +26,7 @@ import org.xipki.util.exception.ObjectCreationException;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -41,7 +38,15 @@ import static org.xipki.ca.server.CaUtil.*;
  * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
-public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
+public class DbCaConfStore extends QueryExecutor implements CaConfStore {
+
+  private enum Table {
+    // SMALLINT or INT
+    REQUESTOR,
+    PUBLISHER,
+    PROFILE,
+    CA
+  }
 
   private static final Logger LOG = LoggerFactory.getLogger(DbCaConfStore.class);
 
@@ -59,8 +64,26 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
   private final String sqlSelectSystemEvent;
   private final Map<Table, AtomicLong> cachedIdMap = new HashMap<>();
 
+  private final int dbSchemaVersion;
+
+  private final int maxX500nameLen;
+
   public DbCaConfStore(DataSourceWrapper datasource) throws CaMgmtException {
     super(datasource);
+
+    try {
+      Integer i = datasource.getFirstIntValue(null, "DBSCHEMA", "VALUE2", "NAME='VERSION'");
+      dbSchemaVersion = i == null ? 9 : i;
+
+      i = datasource.getFirstIntValue(null, "DBSCHEMA", "VALUE2", "NAME='X500NAME_MAXLEN'");
+      this.maxX500nameLen = i != null ? i : 350;
+    } catch (DataAccessException ex) {
+      throw new CaMgmtException(ex);
+    }
+
+    if (dbSchemaVersion < 7) {
+      throw new CaMgmtException("DB version < 7 is not supported: " + dbSchemaVersion);
+    }
 
     for (Table m : Table.values()) {
       cachedIdMap.put(m, new AtomicLong(0));
@@ -1089,5 +1112,250 @@ public class DbCaConfStore extends DbCaConfStoreBase implements CaConfStore {
   private static long getLong(ResultRow rs, String label) {
     return rs.getLong(label);
   }
+
+  public int getMaxX500nameLen() {
+    return maxX500nameLen;
+  }
+
+  private PreparedStatement prepareStatement(String sql) throws CaMgmtException {
+    try {
+      return datasource.prepareStatement(sql);
+    } catch (DataAccessException ex) {
+      throw new CaMgmtException(ex);
+    }
+  } // method prepareStatement
+
+  public List<String> namesFromTable(String table) throws CaMgmtException {
+    final String sql = "SELECT NAME FROM " + table;
+    List<ResultRow> rows = execQueryStmt0(sql);
+
+    List<String> names = new LinkedList<>();
+    for (ResultRow rs : rows) {
+      String name = rs.getString("NAME");
+      if (StringUtil.isNotBlank(name)) {
+        names.add(name);
+      }
+    }
+
+    return names;
+  } // method namesFromTable
+
+  public boolean deleteRowWithName(String name, String table) throws CaMgmtException {
+    final String sql = "DELETE FROM " + table + " WHERE NAME=?";
+    int num = execUpdatePrepStmt0(sql, col2Str(name));
+    return num > 0;
+  } // method deleteRowWithName
+
+  private static String str(String sa, String sb) {
+    return (sa != null) ? getRealString(sa) : sb;
+  }
+
+  private int execUpdateStmt0(String sql) throws CaMgmtException {
+    try {
+      return execUpdateStmt(sql);
+    } catch (DataAccessException ex) {
+      throw new CaMgmtException(ex);
+    }
+  }
+
+  private int execUpdatePrepStmt0(String sql, SqlColumn2... params) throws CaMgmtException {
+    try {
+      return execUpdatePrepStmt(sql, params);
+    } catch (DataAccessException ex) {
+      throw new CaMgmtException(ex);
+    }
+  }
+
+  private List<ResultRow> execQueryStmt0(String sql) throws CaMgmtException {
+    try {
+      return execQueryStmt(sql);
+    } catch (DataAccessException ex) {
+      throw new CaMgmtException(ex);
+    }
+  }
+
+  private ResultRow execQuery1PrepStmt0(String sql, SqlColumn2... params) throws CaMgmtException {
+    try {
+      return execQuery1PrepStmt(sql, params);
+    } catch (DataAccessException ex) {
+      throw new CaMgmtException(ex);
+    }
+  }
+
+  private List<ResultRow> execQueryPrepStmt0(String sql, SqlColumn2... params) throws CaMgmtException {
+    try {
+      return execQueryPrepStmt(sql, params);
+    } catch (DataAccessException ex) {
+      throw new CaMgmtException(ex);
+    }
+  }
+
+  private void changeIfNotNull(String tableName, SqlColumn whereColumn, SqlColumn... columns)
+      throws CaMgmtException {
+    StringBuilder buf = new StringBuilder("UPDATE ");
+    buf.append(tableName).append(" SET ");
+    boolean noAction = true;
+    for (SqlColumn col : columns) {
+      if (col.value() != null) {
+        noAction = false;
+        buf.append(col.name()).append("=?,");
+      }
+    }
+
+    if (noAction) {
+      LOG.info("nothing to update");
+      return;
+    }
+
+    buf.deleteCharAt(buf.length() - 1); // delete the last ','
+    buf.append(" WHERE ").append(whereColumn.name()).append("=?");
+
+    final String sql = buf.toString();
+
+    PreparedStatement ps = null;
+    try {
+      ps = prepareStatement(sql);
+
+      Map<String, String> changedColumns = new HashMap<>();
+
+      int index = 1;
+      for (SqlColumn col : columns) {
+        if (col.value() != null) {
+          setColumn(changedColumns, ps, index, col);
+          index++;
+        }
+      }
+      setColumn(null, ps, index, whereColumn);
+
+      if (ps.executeUpdate() == 0) {
+        throw new CaMgmtException("could not update table " + tableName);
+      }
+
+      LOG.info("updated table {} WHERE {}={}: {}", tableName, whereColumn.name(), whereColumn.value(), changedColumns);
+    } catch (SQLException ex) {
+      throw new CaMgmtException(datasource.translate(sql, ex));
+    } finally {
+      datasource.releaseResources(ps, null);
+    }
+  } // method changeIfNotNull
+
+  private void setColumn(Map<String, String> changedColumns, PreparedStatement ps, int index, SqlColumn column)
+      throws SQLException {
+    String name = column.name();
+    ColumnType type = column.type();
+    Object value = column.value();
+
+    boolean sensitive = column.sensitive();
+
+    String valText;
+    if (type == ColumnType.STRING) {
+      String val = getRealString((String) value);
+      ps.setString(index, val);
+
+      valText = val;
+      if (val != null && column.isSignerConf()) {
+        valText = SignerConf.eraseSensitiveData(valText);
+
+        if (valText.length() > 100) {
+          valText = StringUtil.concat(valText.substring(0, 97), "...");
+        }
+      }
+    } else if (type == ColumnType.INT) {
+      if (value == null) {
+        ps.setNull(index, Types.INTEGER);
+        valText = "null";
+      } else {
+        int val = ((Integer) value);
+        ps.setInt(index, val);
+        valText = Integer.toString(val);
+      }
+    } else if (type == ColumnType.LONG) {
+      if (value == null) {
+        ps.setNull(index, Types.BIGINT);
+        valText = "null";
+      } else {
+        long val = ((Long) value);
+        ps.setLong(index, val);
+        valText = Long.toString(val);
+      }
+    } else if (type == ColumnType.BOOL) {
+      if (value == null) {
+        ps.setNull(index, Types.INTEGER);
+        valText = "null";
+      } else {
+        int val = (Boolean) value ? 1 : 0;
+        ps.setInt(index, val);
+        valText = Integer.toString(val);
+      }
+    } else if (type == ColumnType.TIMESTAMP) {
+      if (value == null) {
+        ps.setNull(index, Types.TIMESTAMP);
+        valText = "null";
+      } else {
+        Timestamp val = (Timestamp) value;
+        ps.setTimestamp(index, val);
+        valText = val.toString();
+      }
+    } else {
+      throw new IllegalStateException("should not reach here, unknown type " + column.type());
+    }
+
+    if (changedColumns != null) {
+      changedColumns.put(name, sensitive ? "*****" : valText);
+    }
+  } // method setColumn
+
+  private static String getRealString(String str) {
+    return CaManager.NULL.equalsIgnoreCase(str) ? null : str;
+  }
+
+  private int getNonNullIdForName(String sql, String name) throws CaMgmtException {
+    Integer id = getIdForName(sql, name);
+    if (id != null) {
+      return id;
+    }
+
+    throw new CaMgmtException("Found no entry named " + name);
+  } // method getNonNullIdForName
+
+  private Integer getIdForName(String sql, String name) throws CaMgmtException {
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    try {
+      ps = prepareStatement(sql);
+      ps.setString(1, name);
+      rs = ps.executeQuery();
+      if (!rs.next()) {
+        return null;
+      }
+
+      return rs.getInt("ID");
+    } catch (SQLException ex) {
+      throw new CaMgmtException(datasource.translate(sql, ex));
+    } finally {
+      datasource.releaseResources(ps, rs);
+    }
+  } // method getIdForName
+
+  private Map<Integer, String> getIdNameMap(String tableName) throws CaMgmtException {
+    final String sql = "SELECT ID,NAME FROM " + tableName;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+
+    Map<Integer, String> ret = new HashMap<>();
+    try {
+      ps = prepareStatement(sql);
+      rs = ps.executeQuery();
+      while (rs.next()) {
+        ret.put(rs.getInt("ID"), rs.getString("NAME"));
+      }
+    } catch (SQLException ex) {
+      throw new CaMgmtException(datasource.translate(sql, ex));
+    } finally {
+      datasource.releaseResources(ps, rs);
+    }
+
+    return ret;
+  } // method getIdNameMap
 
 }

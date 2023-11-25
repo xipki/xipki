@@ -25,6 +25,8 @@ import org.xipki.ca.server.*;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
+import org.xipki.password.PasswordResolverException;
+import org.xipki.pki.ErrorCode;
 import org.xipki.pki.OperationException;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
@@ -32,10 +34,16 @@ import org.xipki.util.Base64;
 import org.xipki.util.*;
 
 import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.cert.CRLException;
+import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -52,7 +60,7 @@ import static org.xipki.pki.ErrorCode.*;
  * @since 2.0.0
  */
 
-public class CertStore extends CertStoreBase {
+public class CertStore extends QueryExecutor {
 
   public enum CertStatus {
 
@@ -121,10 +129,68 @@ public class CertStore extends CertStoreBase {
 
   private final long earliestNotBefore;
 
+  private final String SQL_ADD_CERT;
+
+  private static final String SQL_REVOKE_CERT = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
+
+  private static final String SQL_REVOKE_SUSPENDED_CERT = "UPDATE CERT SET LUPDATE=?,RR=? WHERE ID=?";
+
+  private static final String SQL_MAX_CRLNO = "SELECT MAX(CRL_NO) FROM CRL WHERE CA_ID=?";
+
+  private static final String SQL_MAX_FULL_CRLNO = "SELECT MAX(CRL_NO) FROM CRL WHERE CA_ID=? AND DELTACRL = 0";
+
+  private static final String SQL_MAX_THISUPDAATE_CRL =
+      "SELECT MAX(THISUPDATE) FROM CRL WHERE CA_ID=? AND DELTACRL=?";
+
+  private final String SQL_ADD_CRL;
+
+  private static final String SQL_REMOVE_CERT_FOR_ID = "DELETE FROM CERT WHERE ID=?";
+
+  private final int dbSchemaVersion;
+
+  private final int maxX500nameLen;
+
+  private final String keypairEncAlg = "AES/GCM/NoPadding";
+
+  private final int keypairEncAlgId = 1;
+
+  private String keypairEncProvider;
+
+  private String keypairEncKeyId;
+
+  private SecretKey keypairEncKey;
+
+  private final CaConfStore  caConfStore;
+
   public CertStore(DataSourceWrapper datasource, CaConfStore caConfStore,
                    UniqueIdGenerator idGenerator, PasswordResolver passwordResolver)
       throws DataAccessException, CaMgmtException {
-    super(datasource, caConfStore, passwordResolver);
+    super(datasource);
+
+    this.caConfStore = Args.notNull(caConfStore, "caConfStore");
+
+    Map<String, String> caConfDbSchemaInfo = caConfStore.getDbSchemas();
+    String vendor = caConfStore.getDbSchemas().get("VENDOR");
+    if (vendor != null && !vendor.equalsIgnoreCase("XIPKI")) {
+      throw new CaMgmtException("unsupported vendor " + vendor);
+    }
+
+    this.dbSchemaVersion = Integer.parseInt(caConfDbSchemaInfo.get("VERSION"));
+    if (this.dbSchemaVersion < 9) {
+      throw new CaMgmtException("dbSchemaVersion < 9 unsupported: " + dbSchemaVersion);
+    }
+
+    String str = caConfDbSchemaInfo.get("X500NAME_MAXLEN");
+    this.maxX500nameLen = str == null ? 350 : Integer.parseInt(str);
+
+    String addCertSql = "ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,FP_SAN,NBEFORE,NAFTER,REV,PID,CA_ID,RID,EE,TID,SHA1," +
+        "REQ_SUBJECT,CRL_SCOPE,CERT,PRIVATE_KEY";
+    this.SQL_ADD_CERT = SqlUtil.buildInsertSql("CERT", addCertSql);
+
+    this.SQL_ADD_CRL = SqlUtil.buildInsertSql("CRL", "ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE," +
+        "DELTACRL,BASECRL_NO,CRL_SCOPE,SHA1,CRL");
+
+    updateDbInfo(passwordResolver);
 
     this.idGenerator = Args.notNull(idGenerator, "idGenerator");
 
@@ -1108,6 +1174,126 @@ public class CertStore extends CertStoreBase {
 
   private static Long getDateSeconds(Date date) {
     return date == null ? null : DateUtil.toEpochSecond(date);
+  }
+
+  public void updateDbInfo(PasswordResolver passwordResolver) throws DataAccessException, CaMgmtException {
+    // Save keypair control
+    String str = caConfStore.getDbSchemas().get("KEYPAIR_ENC_KEY");
+    if (str == null) {
+      return;
+    }
+
+    try {
+      char[] keyChars = passwordResolver.resolvePassword(str);
+      byte[] encodedEncKey = Hex.decode(keyChars);
+      int n = encodedEncKey.length;
+      if (n != 16 && n != 24 && n != 32) {
+        throw new CaMgmtException("error resolving KEYPAIR_ENC_KEY");
+      }
+      this.keypairEncKey = new SecretKeySpec(encodedEncKey, "AES");
+      this.keypairEncKeyId = Hex.encode(Arrays.copyOf(HashAlgo.SHA1.hash(encodedEncKey), 8));
+    } catch (PasswordResolverException ex) {
+      throw new CaMgmtException("error resolving KEYPAIR_ENC_KEY", ex);
+    }
+
+    try {
+      Cipher.getInstance(keypairEncAlg, "SunJCE");
+      keypairEncProvider = "SunJCE";
+    } catch (NoSuchProviderException | NoSuchAlgorithmException | NoSuchPaddingException ex) {
+      try {
+        Cipher cipher = Cipher.getInstance(keypairEncAlg);
+        keypairEncProvider = cipher.getProvider().getName();
+      } catch (NoSuchAlgorithmException | NoSuchPaddingException ex2) {
+        throw new IllegalStateException("Unsupported cipher " + keypairEncAlg);
+      }
+    }
+  }
+
+  private static CertRevocationInfo buildCertRevInfo(ResultRow rs) {
+    boolean revoked = rs.getBoolean("REV");
+    if (!revoked) {
+      return null;
+    }
+
+    long revTime    = rs.getLong("RT");
+    long revInvTime = rs.getLong("RIT");
+
+    Instant invalidityTime = (revInvTime == 0) ? null : Instant.ofEpochSecond(revInvTime);
+    return new CertRevocationInfo(rs.getInt("RR"), Instant.ofEpochSecond(revTime), invalidityTime);
+  }
+
+  private long getMax(String table, String column) throws OperationException {
+    try {
+      return datasource.getMax(null, table, column);
+    } catch (DataAccessException ex) {
+      throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+    }
+  }
+
+  private int execUpdatePrepStmt0(String sql, SqlColumn2... params) throws OperationException {
+    try {
+      return execUpdatePrepStmt(sql, params);
+    } catch (DataAccessException ex) {
+      throw new OperationException(ErrorCode.DATABASE_FAILURE, ex);
+    }
+  }
+
+  private ResultRow execQuery1PrepStmt0(String sql, SqlColumn2... params) throws OperationException {
+    try {
+      return execQuery1PrepStmt(sql, params);
+    } catch (DataAccessException ex) {
+      throw new OperationException(ErrorCode.DATABASE_FAILURE, ex);
+    }
+  }
+
+  private List<ResultRow> execQueryPrepStmt0(String sql, SqlColumn2... params) throws OperationException {
+    try {
+      return execQueryPrepStmt(sql, params);
+    } catch (DataAccessException ex) {
+      throw new OperationException(ErrorCode.DATABASE_FAILURE, ex);
+    }
+  }
+
+  private PreparedStatement buildPrepStmt0(String sql, SqlColumn2... columns) throws OperationException {
+    try {
+      return buildPrepStmt(sql, columns);
+    } catch (DataAccessException ex) {
+      throw new OperationException(ErrorCode.DATABASE_FAILURE, ex);
+    }
+  }
+
+  private long execQueryLongPrepStmt(String sql, SqlColumn2... params) throws OperationException {
+    PreparedStatement ps = buildPrepStmt0(sql, params);
+    ResultSet rs = null;
+    try {
+      rs = ps.executeQuery();
+      return rs.next() ? rs.getLong(1) : 0;
+    } catch (SQLException ex) {
+      throw new OperationException(ErrorCode.DATABASE_FAILURE, datasource.translate(sql, ex));
+    } finally {
+      datasource.releaseResources(ps, rs);
+    }
+  }
+
+  private PreparedStatement prepareStatement(String sqlQuery) throws OperationException {
+    try {
+      return datasource.prepareStatement(sqlQuery);
+    } catch (DataAccessException ex) {
+      throw new OperationException(ErrorCode.DATABASE_FAILURE, ex);
+    }
+  } // method borrowPrepStatement
+
+  private static String buildArraySql(DataSourceWrapper datasource, String prefix, int num) {
+    String sql = prefix + " IN (?" + ",?".repeat(Math.max(0, num - 1)) + ")";
+    return datasource.buildSelectFirstSql(num, sql);
+  }
+
+  private static X509Cert parseCert(byte[] encodedCert) throws OperationException {
+    try {
+      return X509Util.parseCert(encodedCert);
+    } catch (CertificateException ex) {
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
+    }
   }
 
 }
