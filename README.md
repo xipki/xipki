@@ -43,7 +43,6 @@ JRE/JDK, and the steps to reproduce the bug.
 
 ### Binaries
 The binary `xipki-setup-<version>.zip` can be retrieved using one of the following methods
- - Download the binary `xipki-setup-<version>.zip` from [releases](https://github.com/xipki/xipki/releases).
  - Download the binary from the maven repositories
    - Directly via HTTP download
      - Release version: https://repo.maven.apache.org/maven2/org/xipki/assembly/xipki-setup/ 
@@ -81,7 +80,7 @@ The binary `xipki-setup-<version>.zip` can be retrieved using one of the followi
 
 ## Prepare Keys and certificates for the Communication between XiPKI Components
 
-1. Change the password (`"CHANGEIT"`), and common name (CN) in `xipki-install/setup/keycerts.json` and the XiPKI components.
+1. Change the password (`"CHANGEIT"`), and subject in `xipki-install/setup/keycerts.json` and the XiPKI components.
 2. Generate keys and certificates:  
   `xipki-install/setup/generate-keycerts.sh`.
 3. Copy the keys and certificates to the target components:  
@@ -130,12 +129,11 @@ The binary `xipki-setup-<version>.zip` can be retrieved using one of the followi
 
 * Set the `reverseProxyMode` field in the json configuration file to `APACHE`:
   - CA: `xipki/etc/ca/ca.json`
-  - OCSP: `xipki/etc/ocsp/ocsp.json`
   - HSM Proxy: `xipki/etc/hsmproxy.json`
   - CA Gateway
     - CMP: `xipki/gatway/cmp-gateway.json`
     - EST: `xipki/gatway/est-gateway.json`
-    - REST: `xipki/gatway/restd-gateway.json`
+    - REST: `xipki/gatway/rest-gateway.json`
 
 * configure the proxy to forward the headers via mod_proxy with the following
   configuration
@@ -196,46 +194,9 @@ The binary `xipki-setup-<version>.zip` can be retrieved using one of the followi
 
 As described in the `xipki-install/xipki-mgmt-cli/README.md` file.
 
-## Enroll/Revoke Certificate (in folder `xipki-cli`)
+## Enroll/Revoke Certificate
 
-* Start CLI (not needed for the `*.sh` scripts).
-
-  `bin/karaf`
-
-  You may access the CLI via SSH (details see the last text block in the previous section).
-
-* ACME
-  Use any ACME client.
-
-* EST  
-  Use any EST client.
-
-  The shell script `xipki/client-script/est-client.sh` demonstrates the use of EST API.
-
-  An example script in available under `xipki/client-script/est-client.script`.
-  It can be executed in the CLI as follows:
-  - `source xipki/client-script/est-client.script`
-
-* SCEP  
-  Use any SCEP client. XiPKI provides also a SCEP client.
-
-  An example script in available under `xipki/client-script/scep-client.script`.
-  It can be executed in the CLI as follows:  
-  - `source xipki/client-script/scep-client.script`
-
-* CMP  
-  Use any CMP client. XiPKI provides also a CMP client.
-
-  An example script in available under `xipki/client-script/cmp-client.script`.
-  It can be executed in the CLI as follows:  
-  - `source xipki/client-script/cmp-client.script` (use argument 'help' to print the usage)
-
-* REST API  
-  The shell script `xipki/client-script/rest-client.sh` demonstrates the use of REST API.
-
-  An example script in available under `xipki/client-script/rest-client.script`.
-  It can be executed in the CLI as follows:  
-  - `source xipki/client-script/rest-client.script` (use argument 'help' to print the usage)
+As described in the `xipki-install/xipki-cli/README.md` file.
 
 Management CLI Commands
 -----
@@ -267,7 +228,6 @@ Features
   - Diffie-Hellman Proof-of-Possession Algorithms (RFC 6955)
   - EN 319 411 (eIDAS)
   - EN 319 412 (eIDAS)
-  - Supported databases: DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
   - Direct and indirect CRL
   - FullCRL and DeltaCRL
   - Customized extension to embed certificates in CRL
@@ -275,63 +235,60 @@ Features
   - Support of JSON-based certificate profile
   - API to specify customized publisher, e.g. for LDAP and OCSP responder
   - Support of publisher for OCSP responder
-  - Public key types of certificates
-    - RSA
-    - EC
-    - DSA
-    - Ed25519, Ed448
-    - SM2
-    - X25519, X448
+  - Public key types of certificates: RSA, EC, DSA, Ed25519, Ed448, SM2, X25519, X448
   - Signature algorithms of certificates
+    - DSA with hash algorithms: SHA-1, SHA-2, and SHA-3
+    - ECDSA with hash algorithms: SHA-1, SHA-2, SHA-3, and SHAKE
     - Ed25519, Ed448
-    - SHAKE128withRSAPSS, SHAKE256withRSAPSS, 
-    - SHA3-*withRSA: where * is 224, 256, 384 and 512
-    - SHA3-*withRSAandMGF1: where * is 224, 256, 384 and 512
-    - SHA3-*withECDSA: where * is 224, 256, 384 and 512
-    - SHA3-*withDSA: where * is 224, 256, 384 and 512
-    - SHAKE128withECDSA, SHAKE256withECDSA, 
-    - SHA*withRSA: where * is 1, 224, 256, 384 and 512
-    - SHA*withRSAandMGF1: where * is 1, 224, 256, 384 and 512
-    - SHA*withECDSA: where * is 1, 224, 256, 384 and 512
-    - SHA*withPlainECDSA: where * is 1, 224, 256, 384 and 512
-    - SHA*withDSA: where * is 1, 224, 256, 384 and 512
+    - Plain ECDSA with hash algorithms: SHA-1, and SHA-2
+    - RSA PKCS1v1.5 with hash algorithms: SHA-1, SHA-2, and SHA-3
+    - RSA PSS with hash algorithms: SHA-1, SHA-2, and SHA-3, and SHAKE
     - SM3withSM2
   - Native support of X.509 extensions (other extensions can be supported by
     configuring it as blob)
-    - AdditionalInformation (German national standard CommonPKI)
-    - Admission (German national standard CommonPKI)
-    - AuthorityInformationAccess (RFC 5280)
-    - AuthorityKeyIdentifier (RFC 5280)
-    - BasicConstraints (RFC 5280)
-    - BiometricInfo (RFC 3739)
-    - CertificatePolicies (RFC 5280)
-    - CRLDistributionPoints (RFC 5280)
-    - CT Precertificate SCTs (RFC 6962)
-    - ExtendedKeyUsage (RFC 5280)
-    - FreshestCRL (RFC 5280)
-    - ICRegistrationNumber (GM/T 0015-2012)
-    - IdentityCode (GM/T 0015-2012)
-    - InsuranceNumber (GM/T 0015-2012)
-    - OrganizationCode (GM/T 0015-2012)
-    - TaxationNumber (GM/T 0015-2012)
-    - InhibitAnyPolicy (RFC 5280)
-    - IssuerAltName (RFC 5280)
-    - KeyUsage (RFC 5280)
-    - NameConstraints (RFC 5280)
-    - OcspNoCheck (RFC 6960)
-    - PolicyConstrains (RFC 5280)
-    - PolicyMappings (RFC 5280)
-    - PrivateKeyUsagePeriod (RFC 5280)
-    - QCStatements (RFC 3739, eIDAS standard EN 319 412)
-    - Restriction (German national standard CommonPKI)
-    - SMIMECapabilities (RFC 4262)
-    - SubjectAltName (RFC 5280)
-    - SubjectDirectoryAttributes (RFC 3739)
-    - SubjectInfoAccess (RFC 5280)
-    - SubjectKeyIdentifier (RFC 5280)
-    - TLSFeature (RFC 7633)
-    - ValidityModel (German national standard CommonPKI)
-    - ExtensionSchema (Car Connectivity Consortium)
+    - RFC 3739
+      - BiometricInfo
+      - QCStatements (also in eIDAS standard EN 319 412)
+      - SubjectDirectoryAttributes
+    - RFC 4262
+      - SMIMECapabilities
+    - RFC 5280
+      - AuthorityInformationAccess
+      - AuthorityKeyIdentifier
+      - BasicConstraints
+      - CertificatePolicies
+      - CRLDistributionPoints
+      - ExtendedKeyUsage
+      - FreshestCRL
+      - InhibitAnyPolicy
+      - IssuerAltName
+      - KeyUsage
+      - NameConstraints
+      - PolicyConstrains
+      - PolicyMappings
+      - PrivateKeyUsagePeriod
+      - SubjectAltName
+      - SubjectInfoAccess
+      - SubjectKeyIdentifier
+    - RFC 6960
+      - OcspNoCheck
+    - RFC 6962
+      - CT Precertificate SCTs
+    - RfC 7633
+      - TLSFeature
+    - Car Connectivity Consortium
+      - ExtensionSchema
+    - Common PKI (German national standard)
+      - AdditionalInformation
+      - Admission
+      - Restriction
+      - ValidityModel
+    - GM/T 0015-2012 (Chinese national standard)
+      - ICRegistrationNumber
+      - IdentityCode
+      - InsuranceNumber
+      - OrganizationCode
+      - TaxationNumber
   - Management of multiple CAs in one software instance
     - Support of database cluster
     - Multiple software instances (all can be in active mode) for the same CA
@@ -346,15 +303,15 @@ Features
   - Configurable Length of Nonce (RFC 8954)
   - Support of Common PKI 2.0
   - Management of multiple certificate status sources
-  - Support of certificate status source based on the database of XiPKI CA
-  - Support of certificate status source based on the OCSP database published by XiPKI CA
-  - Support of certificate status source CRL and DeltaCRL
-  - Support of certificate status source published by EJBCA
+  - Support of certificate status sources
+    - Database of XiPKI CA
+    - OCSP database published by XiPKI CA
+    - CRL and DeltaCRL
+    - Database of EJBCA
   - API to support proprietary certificate sources
   - Support of both unsigned and signed OCSP requests
   - Multiple software instances (all can be in active mode) for the same OCSP
     signer and certificate status sources.
-  - Supported databases: DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
   - Database tool (export and import OCSP database) simplifies the switch of
     databases, upgrade of XiPKi and switch from other OCSP system to XiPKI OCSP.
   - High performance
@@ -369,7 +326,7 @@ Features
   - Exporting certificate from token
 
 - CLI (CA/OCSP Client)
-  - Client to enroll, revoke, unrevoke and remove certificates, to generate and download CRLs
+  - Client to enroll, revoke, unrevoke (unsuspend) and remove certificates, to generate and download CRLs
   - Client to send OCSP request
   - Updating certificates in token
   - Generating CSR (PKCS#10 request)
@@ -378,7 +335,7 @@ Features
 - HSM Proxy
   - Provide service to access to the HSM remotely.
 
-- For CA, OCSP Responder, Protocol Gateway, Mgmt CLI, and CLI
+- For CA, OCSP Responder, CA Protocol Gateway, Management Client, Client, and HSM Proxy
   - Support of PKCS#12 and JCEKS keystore
   - Support of PKCS#11 devices, e.g. HSM
   - API to use customized key types, e.g. smart card
@@ -386,8 +343,3 @@ Features
   - Support of PBE (password based encryption) password resolver
      - All passwords can be encrypted by the master password
   - Support of OBF (as in jetty) password resolver
-
-Use OCSP with customized Certificate Status Source (OcspStore)
------
-  - See the example modules
-    - `ocsp-store-example`: implementation of a customized OcspStore.
