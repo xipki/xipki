@@ -1,3 +1,49 @@
+How to Configure Password
+----
+In all XiPKI components, you may configure the password in the following methods:
+- In plaintext, e.g. `password=CHANGEIT`
+
+- In obfuscated format, e.g. `password=OBF:1izy1htq1fnf1ime1im01fnn1hts1j0w`.
+  Use karaf commands `xi:obfuscate` / `xi:deobfuscate`to obfuscate / deobfuscate the password.
+
+- Encrypted with master password, e.g. `password=PBE:AQfQcYk2+tR2nDzR0gCaQXMkmRBgqPIomrt5yfTsJPBqb30sCID5OqHFpH/mEKb3OIIw9Q`.
+  Use karaf commands `xi:pbe-enc` / `xi:pbe-dec` to encrypt / decrypt the password with master password.
+
+  You need to configure the master password callback in the block following block of the file `hsmproxy.json`:
+   ```
+   "password":{
+     ...
+     "masterPasswordCallback":"FILE file=security/masterpassword.secret"
+     ...
+   }
+   ```
+  The following values of masterPasswordCallback are allowed:
+   - `FILE file=<path to the masterpassword>`, e.g. `FILE file=security/masterpassword.secret`,
+      - The file content is either the password itself or its obfuscated format (starting with `OBF:`).
+      - Either absolute path or relative path to the `xipki` folder.
+      - `PBE-GUI quorum=<number>,tries=<number>`, e.g. `PBE-GUI quorum=1,tries=3`
+      - `GUI quorum=<number>,tries=<number>`, e.g. `GUI quorum=1,tries=3`
+      - `OBF OBF:<obfuscated master password>`, e.g. `OBF OBF:1yf01z7o1t331z7e1yf6`.
+      - `<class name implements org.xipki.password.PasswordCallback> [<corresponding configuration>]`
+        e.g. `org.xipki.password.PassThroughPasswordCallback dummy-password`
+        Please refer to https://github.com/xipki/commons/tree/main/password for the source code of
+        `org.xipki.password.{PasswordCallback | PassThroughPasswordCallback}`.
+
+- Use you own password resolver, assumed the password protocol is `ABC`, then the password is
+  `ABC:<data>`. You need to write a Java class implements `org.xipki.password.SinglePasswordResolver` which
+  can resolve password started with `ABC:`.
+  You need to configure the master password callback in the block following block of the file `hsmproxy.json`:
+   ```
+   "password":{
+     ...
+     "singlePasswordResolvers":[
+      "<name of class 1 implementing org.xipki.password.SinglePasswordResolver>",
+      "<name of class 2 implementing org.xipki.password.SinglePasswordResolver>",
+     ],
+     ...
+   }
+   ```
+
 Deployment in Tomcat (8, 9 and 10)
 ----
 1. Copy the war-files in `webapps` for tomcat 8/9 or `webapps-tomcat10on` for tomcat 10+,
