@@ -1,12 +1,11 @@
 # Please adapt me
-SUBJECT="C=DE,O=myorg,CN=OCSP Responder 1"
+SUBJECT="O=myorg,CN=OCSP Responder 1"
 
 # Please adapt me
 P11_LABEL = ocsp1
 SLOT = 0
 
 KEYCERTS_DIR = xipki/ocsp-setup/keycerts
-
 
 printUsage = "false"
 argsValid = "false"

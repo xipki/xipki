@@ -50,7 +50,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 }
 
 ca:enroll-cert --ca rootca1 --csr output/subca1.csr \
-  --out output/subca1.crt --profile subcas
+  --out output/subca1.crt --profile subca
 
 if { $TOKEN_TYPE equals "pkcs12" } then {
   xi:update-cert-p12 --p12 output/subca1.p12 --password CHANGEIT \

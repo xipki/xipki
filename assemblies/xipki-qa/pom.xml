@@ -26,30 +26,6 @@
       <classifier>features</classifier>
       <type>xml</type>
     </dependency>
-    <dependency>
-      <groupId>org.xipki.example</groupId>
-      <artifactId>dummy-ctlog-servlet3</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-    </dependency>
-    <dependency>
-      <groupId>org.xipki.example</groupId>
-      <artifactId>dummy-ctlog-servlet5</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-    </dependency>
-    <dependency>
-      <groupId>org.xipki.example</groupId>
-      <artifactId>dummy-crl-servlet3</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-    </dependency>
-    <dependency>
-      <groupId>org.xipki.example</groupId>
-      <artifactId>dummy-crl-servlet5</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-    </dependency>
   </dependencies>
   <build>
     <resources>
@@ -70,14 +46,8 @@
         <filtering>false</filtering>
         <includes>
           <include>xipki/etc/curl.json</include>
+          <include>etc/**</include>
         </includes>
-      </resource>
-      <resource>
-        <directory>../xipki-cli/src/main/unfiltered</directory>
-        <filtering>false</filtering>
-        <excludes>
-          <exclude>xipki/**</exclude>
-        </excludes>
       </resource>
       <resource>
         <directory>../xipki-mgmt-cli/src/main/filtered</directory>
@@ -86,14 +56,8 @@
       <resource>
         <directory>../xipki-mgmt-cli/src/main/unfiltered</directory>
         <filtering>false</filtering>
-        <excludes>
-          <exclude>xipki/**</exclude>
-        </excludes>
-      </resource>
-      <resource>
-        <directory>../xipki-mgmt-cli/src/main/unfiltered</directory>
-        <filtering>false</filtering>
         <includes>
+          <include>etc/**</include>
           <include>xipki/sql/**</include>
         </includes>
       </resource>

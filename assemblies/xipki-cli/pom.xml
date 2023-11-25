@@ -125,7 +125,6 @@
               <features>
                 <feature>framework</feature>
                 <feature>aries-blueprint</feature>
-                <!--feature>wrap</feature-->
                 <feature>ssh</feature>
                 <feature>jaas</feature>
                 <feature>config</feature>

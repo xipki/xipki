@@ -137,6 +137,8 @@ if { $printUsage equals "true" } then {
   echo "    -l               configure CAs using command 'load-conf'"
 } else {
 
+  xi:rm --recursive --force output
+
   source file:./qa/qa.d/prepare-keys.script
 
   xi:copy-file -f qa/qa.d/template.ca-load.script \
@@ -226,24 +228,24 @@ if { $printUsage equals "true" } then {
 
   # name already exists
   caqa:neg-signer-add --name qa-responder1 --type pkcs12 \
-    --conf password=CHANGEIT,keystore=file:xipki/keycerts/gateway-server.p12,algo=SHA1withECDSA
+    --conf password=CHANGEIT,keystore=file:xipki/keycerts/ca-server.p12,algo=SHA1withECDSA
 
   # password incorrect
   caqa:neg-signer-add --name qa-responder2 --type pkcs12 \
-    --conf password=ERROR,keystore=file:xipki/keycerts/gateway-server.p12,algo=SHA1withECDSA
+    --conf password=ERROR,keystore=file:xipki/keycerts/ca-server.p12,algo=SHA1withECDSA
 
   # invalid algo
   caqa:neg-signer-add --name qa-responder2 --type pkcs12 \
-    --conf password=CHANGEIT,keystore=file:xipki/keycerts/gateway-server.p12,algo=INVALIDALGO
+    --conf password=CHANGEIT,keystore=file:xipki/keycerts/ca-server.p12,algo=INVALIDALGO
 
   caqa:signer-check --name qa-responder1 --type pkcs12 \
-    --conf password=CHANGEIT,keystore=file:xipki/keycerts/cas-server.p12,algo=SHA1withECDSA
+    --conf password=CHANGEIT,keystore=file:xipki/keycerts/ca-server.p12,algo=SHA1withECDSA
 
   ca:signer-up --name qa-responder1 \
-    --conf password=CHANGEIT,keystore=file:xipki/keycerts/gateway-server.p12,algo=SHA256withECDSA
+    --conf password=CHANGEIT,keystore=file:xipki/keycerts/ca-server.p12,algo=SHA256withECDSA
 
   caqa:signer-check --name qa-responder1 --type pkcs12 \
-    --conf password=CHANGEIT,keystore=file:xipki/keycerts/gateway-server.p12,algo=SHA256withECDSA
+    --conf password=CHANGEIT,keystore=file:xipki/keycerts/ca-server.p12,algo=SHA256withECDSA
 
   ca:signer-rm -f qa-responder1
 
@@ -294,6 +296,7 @@ if { $printUsage equals "true" } then {
     --sn-len 20  \
     --signer-type $TOKEN_TYPE \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
+    --crl-uri "http://localhost:8081/crl/?type=crl&name=subca1" \
     --ca-cert-uri http://myorg.org/subca1.der \
     --certchain output/rootca1.crt
 
@@ -321,6 +324,7 @@ if { $printUsage equals "true" } then {
     --signer-type $TOKEN_TYPE \
     --cert output/subca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
+    --crl-uri "http://localhost:8081/crl/?type=crl&name=subca1" \
     --ca-cert-uri http://myorg.org/subca1.der \
     --revoke-suspended-control enabled=true,targetReason=cessationOfOperation,unchangedSince=15d \
     --certchain output/rootca1.crt \

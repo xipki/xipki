@@ -54,8 +54,8 @@ cp $KC_DIR/hsmproxy-client/* \
    $KC_DIR/rest-client/* \
    $KC_DIR/ocsp-client/* \
    $KC_DIR/hsmproxy-server/hsmproxy-server-cert.pem \
-   $KC_DIR/ca-server/ca-server-cert.pem \
-   $KC_DIR/gateway-server/gateway-server-cert.pem \
+   $KC_DIR/ca-server/* \
+   $KC_DIR/gateway-server/*\
    $KC_DIR/ra-sdk-client/ra-sdk-client-cert.pem* \
    $TDIR
 

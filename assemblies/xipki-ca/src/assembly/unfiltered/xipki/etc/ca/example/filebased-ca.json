@@ -52,8 +52,7 @@
 		"password":{
 			"masterPasswordCallback":"FILE file=security/masterpassword.secret"
 		},
-		"signerFactories": [],
-		"keypairGeneratorFactories": []
+		"signerFactories": []
 	},
 	"audit": {
 		// type embed: use the embedded logging

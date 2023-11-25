@@ -4,56 +4,56 @@
 			"name": "ca-server",
 			"certType": "TLS-Server",
 			"keyType": "EC/P-256",
-			"subject": "OU=CA server, CN=localhost",
+			"subject": "O=your org, OU=CA server, CN=localhost",
 			"validity": "20y",
 			"p12Password": "CHANGEIT"
 	  	},{
 			"name": "ca-mgmt-client",
 			"certType": "TLS-Client",
 			"keyType": "EC/P-256",
-			"subject": "CN=CA management client",
+			"subject": "O=your org, CN=CA management client",
 			"validity": "20y",
 			"p12Password": "CHANGEIT"
 	  	},{
 			"name": "ra-sdk-client",
 			"certType": "TLS-Client",
 			"keyType": "EC/P-256",
-			"subject": "CN=RA SDK client",
+			"subject": "O=your org, CN=RA SDK client",
 			"validity": "20y",
 			"p12Password": "CHANGEIT"
 		},{
 			"name": "hsmproxy-server",
 			"certType": "TLS-Server",
 			"keyType": "EC/P-256",
-			"subject": "OU=HSM proxy server, CN=localhost",
+			"subject": "O=your org, OU=HSM proxy server, CN=localhost",
 			"validity": "20y",
 			"p12Password": "CHANGEIT"
 		},{
 			"name": "hsmproxy-client",
 			"certType": "TLS-Client",
 			"keyType": "EC/P-256",
-			"subject": "CN=HSM proxy client",
+			"subject": "O=your org, CN=HSM proxy client",
 			"validity": "20y",
 			"p12Password": "CHANGEIT"
 	  	},{
 			"name": "gateway-server",
 			"certType": "TLS-Server",
 			"keyType": "EC/P-256",
-			"subject": "OU=Gateway server,CN=localhost",
+			"subject": "O=your org, OU=Gateway server,CN=localhost",
 			"validity": "20y",
 			"p12Password": "CHANGEIT"
 	  	},{
 			"name": "cmp-client-ca",
 			"certType": "CA",
 			"keyType": "EC/P-256",
-			"subject": "CN=CMP client CA",
+			"subject": "O=your org, CN=CMP client CA",
 			"validity": "20y",
 			"p12Password": "CHANGEIT"
 	  	},{
 			"name": "cmp-client",
 			"certType": "TLS-Client",
 			"keyType": "EC/P-256",
-			"subject": "CN=CMP client",
+			"subject": "O=your org, CN=CMP client",
 			"validity": "20y",
 			"p12Password": "CHANGEIT",
 			"issuerName": "cmp-client-ca"
@@ -61,14 +61,14 @@
 			"name": "est-client-ca",
 			"certType": "CA",
 			"keyType": "EC/P-256",
-			"subject": "CN=EST client CA",
+			"subject": "O=your org, CN=EST client CA",
 			"validity": "20y",
 			"p12Password": "CHANGEIT"
 	  	},{
 			"name": "est-client",
 			"certType": "TLS-Client",
 			"keyType": "EC/P-256",
-			"subject": "CN=EST client",
+			"subject": "O=your org, CN=EST client",
 			"validity": "20y",
 			"p12Password": "CHANGEIT",
 			"issuerName": "est-client-ca"
@@ -76,14 +76,14 @@
 			"name": "rest-client-ca",
 			"certType": "CA",
 			"keyType": "EC/P-256",
-			"subject": "CN=REST client CA",
+			"subject": "O=your org, CN=REST client CA",
 			"validity": "20y",
 			"p12Password": "CHANGEIT"
 	  	},{
 			"name": "rest-client",
 			"certType": "TLS-Client",
 			"keyType": "EC/P-256",
-			"subject": "CN=REST client",
+			"subject": "O=your org, CN=REST client",
 			"validity": "20y",
 			"p12Password": "CHANGEIT",
 			"issuerName": "rest-client-ca"

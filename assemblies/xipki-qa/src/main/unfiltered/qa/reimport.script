@@ -8,6 +8,7 @@ echo "Sleeping 1 second"
 sleep 1
 
 xi:rm -r -f output/dbexport
+xi:rm -r -f output/dbexport-certstore
 
 ## Export CA
 echo "============================================================================"

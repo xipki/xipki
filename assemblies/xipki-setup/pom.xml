@@ -59,7 +59,7 @@
               <goal>copy</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.directory}/t/setup/lib</outputDirectory>
+              <outputDirectory>${project.build.outputDirectory}/setup/lib</outputDirectory>
               <stripVersion>true</stripVersion>
               <artifactItems>
                 <artifactItem>

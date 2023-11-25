@@ -265,6 +265,7 @@ ca:ca-add \
   --signer-type $TOKEN_TYPE \
   --signer-conf "$CA_SIGNER_CONF" \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
+  --crl-uri "http://localhost:8081/crl/?type=crl&name=subca1" \
   --ca-cert-uri http://myorg.org/subca1.der \
   --save-cert yes \
   --save-keypair yes \

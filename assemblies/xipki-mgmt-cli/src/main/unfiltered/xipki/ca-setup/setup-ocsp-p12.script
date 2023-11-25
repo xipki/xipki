@@ -36,26 +36,29 @@ if { $printUsage equals "true" } then {
 
   echo "# Generate PKCS#12 key and certificate for OCSP Responder"
 
+  OCSP_FILE_PREFIX = ${KEYCERTS_DIR}/ocsp1
+  PASSWORD_P12 = CHANGEIT
+
   if { "$keytype" equals "dsa" } then {
-    xi:dsa-p12 --plen 2048 --password CHANGEIT --out ${KEYCERTS_DIR}/ocsp1.p12
+    xi:dsa-p12 --plen 2048 --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
   } elif { "$keytype" equals "ec" } then {
-    xi:ec-p12 --curve secp256r1 --password CHANGEIT --out ${KEYCERTS_DIR}/ocsp1.p12
+    xi:ec-p12 --curve secp256r1 --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
   } elif { "$keytype" equals "rsa" } then {
-    xi:rsa-p12 --key-size 2048 --password CHANGEIT --out ${KEYCERTS_DIR}/ocsp1.p12
+    xi:rsa-p12 --key-size 2048 --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
   } elif { "$keytype" equals "sm2" } then {
-    xi:sm2-p12 --password CHANGEIT --out ${KEYCERTS_DIR}/ocsp1.p12
+    xi:sm2-p12 --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
   }
 
-  xi:csr-p12 --password CHANGEIT --p12 ${KEYCERTS_DIR}/ocsp1.p12 --out ${KEYCERTS_DIR}/ocsp1.csr \
+  xi:csr-p12 --password ${PASSWORD_P12} --p12 ${OCSP_FILE_PREFIX}.p12 --out ${OCSP_FILE_PREFIX}.csr \
     --subject "${SUBJECT}"
 
-  ca:enroll-cert --ca myca1 --csr ${KEYCERTS_DIR}/ocsp1.csr --out ${KEYCERTS_DIR}/ocsp1.der --profile ocsp
+  ca:enroll-cert --ca myca1 --csr ${OCSP_FILE_PREFIX}.csr --out ${OCSP_FILE_PREFIX}.der --profile ocsp
 
   echo "# Update the certificate in the PKCS#12 file"
-  xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/ocsp1.p12 --password CHANGEIT \
-    --cert ${KEYCERTS_DIR}/ocsp1.der --ca-cert ${CACERT_FILE}
+  xi:update-cert-p12 --p12 ${OCSP_FILE_PREFIX}.p12 --password ${PASSWORD_P12} \
+    --cert ${OCSP_FILE_PREFIX}.der --ca-cert ${CACERT_FILE}
 
   echo "Please"
-  echo "  1. Copy ${KEYCERTS_DIR}/ocsp1.p12 to replace the <tomcat.dir>/xipki/keycerts/ocsp1.p12"
+  echo "  1. Copy ${OCSP_FILE_PREFIX}.p12 to replace the <tomcat.dir>/xipki/keycerts/ocsp1.p12"
   echo "  2. Restart tomcat."
 }
