@@ -27,7 +27,7 @@ Deployment in Tomcat (8, 9 and 10)
     - In `${CATALINA_HOME}/lib`, if an old version of a jar file exists, remove it first.
 3. (Optional) If you use database other than PostgreSQL, MariaDB and MySQL, you need to download
    the JDBC driver to the folder `${CATALINA_HOME}/lib`.
-4. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
+4. (Optional) If you use database other than H2, PostgreSQL, MariaDB and MySQL, you need to overwrite the
    configuration files `ca-db.properties`, `ocsp-db.properties` with those in the corresponding sub
    folder in `${CONTAINER_ROOT}/xipki/etc/ocsp/database`. Adapt the configuration.
 5. (Optional, required only when OCSP cache will be activated) 

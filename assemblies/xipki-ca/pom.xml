@@ -131,6 +131,10 @@
                   <artifactId>postgresql</artifactId>
                 </artifactItem>
                 <artifactItem>
+                  <groupId>com.h2database</groupId>
+                  <artifactId>h2</artifactId>
+                </artifactItem>
+                <artifactItem>
                   <groupId>org.bouncycastle</groupId>
                   <artifactId>bcpkix-jdk18on</artifactId>
                 </artifactItem>

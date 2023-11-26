@@ -16,7 +16,7 @@ Deployment in Tomcat (8, 9 and 10)
    `enroll-cert --ca myca1 --subject "CN=scep responder" --profile scep --key-password CHANGEIT --out output/scep1.der`,
    and then copy the generated file `scep1.p12` to the folder `xipki/keycerts`.
 4. If ACME is supported
-   1. (Optional) If you use database other than PostgreSQL, MariaDB and MySQL, you need to
+   1. (Optional) If you use database other than H2, PostgreSQL, MariaDB and MySQL, you need to
       download the JDBC driver to the folder `${CATALINA_HOME}/lib`.
    2. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
       `acme-db.properties` with the one in the corresponding sub folder in `${CONTAINER_ROOT}/xipki/etc/acme/database`.

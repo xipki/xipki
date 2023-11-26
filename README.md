@@ -137,8 +137,8 @@ using the following methods:
   - `PBE-GUI quorum=<number>,tries=<number>`, e.g. `PBE-GUI quorum=1,tries=3`
   - `GUI quorum=<number>,tries=<number>`, e.g. `GUI quorum=1,tries=3`
   - `OBF OBF:<obfuscated master password>`, e.g. `OBF OBF:1yf01z7o1t331z7e1yf6`.
-  - `<class name implements org.xipki.password.PasswordCallback> [<corresponding configuration>]`
-    e.g. `org.xipki.password.demo.PassThroughPasswordCallback qwert`.
+  - `java:<class name implements org.xipki.password.PasswordCallback> [<corresponding configuration>]`
+    e.g. `java:org.xipki.password.demo.PassThroughPasswordCallback qwert`.
 
 - Use you own password resolver, assumed the password protocol is `ABC`, then the password is
   `ABC:<data>`. You need to write a Java class implements `org.xipki.password.PasswordResolver` which

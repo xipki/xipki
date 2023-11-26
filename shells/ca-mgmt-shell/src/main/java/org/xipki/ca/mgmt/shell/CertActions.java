@@ -464,8 +464,8 @@ public class CertActions {
         return null;
       }
 
-      println("     | serial               | notBefore      | notAfter       | subject");
-      println("-----+----------------------+----------------+----------------+-----------------");
+      println("     |                    serial                |    notBefore   |    notAfter    | subject");
+      println("-----+------------------------------------------+----------------+----------------+-----------------");
       for (int i = 0; i < n; i++) {
         println(format(i + 1, certInfos.get(i)));
       }
@@ -475,7 +475,7 @@ public class CertActions {
 
     private String format(int index, CertListInfo info) {
       return StringUtil.concat(StringUtil.formatAccount(index, 4), " | ",
-          StringUtil.formatText(info.getSerialNumber().toString(16), 20), " | ",
+          StringUtil.formatText(info.getSerialNumber().toString(16), 40), " | ",
           info.getNotBefore(), " | ", info.getNotAfter(), " | ", info.getSubject());
     } // method format
 
