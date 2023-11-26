@@ -220,7 +220,7 @@ public class DbActions {
 
     @Override
     protected DbPortWorker getDbWorker() throws Exception {
-      return new DbPortWorker.ExportCaDb(datasourceFactory, passwordResolver, caConfDbConfFile, dbConfFile,
+      return new DbPortWorker.ExportCaDb(datasourceFactory, caConfDbConfFile, dbConfFile,
           outdir, resume, numCertsInBundle, numCertsPerCommit, readPassword());
     }
 
@@ -250,7 +250,7 @@ public class DbActions {
 
     @Override
     protected DbPortWorker getDbWorker() throws Exception {
-      return new DbPortWorker.ExportCaCertStoreDb(datasourceFactory, passwordResolver, dbConfFile,
+      return new DbPortWorker.ExportCaCertStoreDb(datasourceFactory, dbConfFile,
           outdir, resume, numCertsInBundle, numCertsPerCommit, readPassword());
     }
 
@@ -310,7 +310,7 @@ public class DbActions {
         }
       }
 
-      return new DigestDiffWorker(datasourceFactory, passwordResolver, revokedOnly,
+      return new DigestDiffWorker(datasourceFactory, revokedOnly,
           refDbConf, dbconfFile, reportDir, numCertsPerSelect, numTargetThreads, caCerts);
     } // method getDbPortWorker
 
@@ -340,8 +340,7 @@ public class DbActions {
 
       // only one connection is needed.
       props.setProperty("minimumIdle", "1");
-      try (DataSourceWrapper dataSource =
-               new DataSourceFactory().createDataSource("default", props, passwordResolver)) {
+      try (DataSourceWrapper dataSource = new DataSourceFactory().createDataSource("default", props)) {
         DatabaseType dbType = dataSource.getDatabaseType();
         String type;
         switch (dbType) {
@@ -426,7 +425,7 @@ public class DbActions {
 
     @Override
     protected DbPortWorker getDbWorker() throws Exception {
-      return new DbPortWorker.ExportOcspDb(datasourceFactory, passwordResolver, dbconfFile, outdir,
+      return new DbPortWorker.ExportOcspDb(datasourceFactory, dbconfFile, outdir,
           resume, numCertsInBundle, numCertsPerSelect, readPassword());
     }
 
@@ -456,7 +455,7 @@ public class DbActions {
 
     @Override
     protected DbPortWorker getDbWorker() throws Exception {
-      return new DbPortWorker.ImportCaDb(datasourceFactory, passwordResolver, caconfDbFile, dbConfFile,
+      return new DbPortWorker.ImportCaDb(datasourceFactory, caconfDbFile, dbConfFile,
           resume, indir, numCertsPerCommit, readPassword());
     }
 
@@ -483,7 +482,7 @@ public class DbActions {
 
     @Override
     protected DbPortWorker getDbWorker() throws Exception {
-      return new DbPortWorker.ImportCaCertStoreDb(datasourceFactory, passwordResolver, dbConfFile,
+      return new DbPortWorker.ImportCaCertStoreDb(datasourceFactory, dbConfFile,
           resume, indir, numCertsPerCommit, readPassword());
     }
 
@@ -509,7 +508,7 @@ public class DbActions {
 
     @Override
     protected DbPortWorker getDbWorker() throws Exception {
-      return new DbPortWorker.ImportOcspDb(datasourceFactory, passwordResolver,
+      return new DbPortWorker.ImportOcspDb(datasourceFactory,
           dbconfFile, resume, indir, numCertsPerCommit, readPassword());
     }
 
@@ -541,7 +540,7 @@ public class DbActions {
 
     @Override
     protected DbPortWorker getDbWorker() throws Exception {
-      return new DbPortWorker.ImportOcspFromCaDb(datasourceFactory, passwordResolver, dbconfFile,
+      return new DbPortWorker.ImportOcspFromCaDb(datasourceFactory, dbconfFile,
           publisherName, resume, indir, numCertsPerCommit, readPassword());
     }
 

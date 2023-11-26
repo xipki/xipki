@@ -7,7 +7,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.xipki.ca.api.kpgen.KeypairGenerator;
-import org.xipki.password.PasswordResolver;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.XiSecurityException;
@@ -42,7 +41,7 @@ public class P11KeypairGenerator extends KeypairGenerator {
   }
 
   @Override
-  public void initialize0(ConfPairs conf, PasswordResolver passwordResolver) throws XiSecurityException {
+  public void initialize0(ConfPairs conf) throws XiSecurityException {
     String moduleName = Args.notNull(conf, "conf").value("module");
     String str = conf.value("slot");
     Integer slotIndex = (str == null) ? null : Integer.parseInt(str);

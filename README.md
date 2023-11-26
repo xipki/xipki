@@ -112,6 +112,47 @@ The binary `xipki-setup-<version>.zip` can be retrieved using one of the followi
 ## Install Command Line Interface
    void
 
+## How to Configure Password
+In all XiPKI components (including Tomcat's TLS configuration), you may configure the password
+using the following methods:  
+(In the following examples, assume the password is "CHANGEIT", the master password is "qwert")
+
+- In plaintext, e.g. `password=CHANGEIT`
+
+- In obfuscated format, e.g. `password=OBF:1izy1htq1fnf1ime1im01fnn1hts1j0w`.
+  Use karaf commands `xi:obfuscate` / `xi:deobfuscate`to obfuscate / deobfuscate the password.
+
+- Encrypted with master password, e.g. `password=PBE:AQfQcYk2+tR2nDzR0gCaQXMkmRBgqPIomrt5yfTsJPBqb30sCID5OqHFpH/mEKb3OIIw9Q`.
+  Use karaf commands `xi:pbe-enc` / `xi:pbe-dec` to encrypt / decrypt the password with master password.
+
+  You need to configure the master password callback and iteration count in the file `xipki/secuity/password.cfg`:
+   ```
+   pbeCallback = <master password callback>
+   pbeIterationCount = <number greater than 999>
+   ```
+  The following values of pbeCallback are allowed:
+  - `FILE file=<path to the masterpassword>`, e.g. `FILE file=masterpassword.secret`,
+    - The file content is either the password itself or its obfuscated format (starting with `OBF:`).
+    - Either absolute path or relative path to the parent folder of `password.cfg`.
+  - `PBE-GUI quorum=<number>,tries=<number>`, e.g. `PBE-GUI quorum=1,tries=3`
+  - `GUI quorum=<number>,tries=<number>`, e.g. `GUI quorum=1,tries=3`
+  - `OBF OBF:<obfuscated master password>`, e.g. `OBF OBF:1yf01z7o1t331z7e1yf6`.
+  - `<class name implements org.xipki.password.PasswordCallback> [<corresponding configuration>]`
+    e.g. `org.xipki.password.demo.PassThroughPasswordCallback qwert`.
+
+- Use you own password resolver, assumed the password protocol is `ABC`, then the password is
+  `ABC:<data>`. You need to write a Java class implements `org.xipki.password.PasswordResolver` which
+  can resolve password started with `ABC:`.
+  You need to add the password resolvers in the file `xipki/secuity/password.cfg`:
+   ```
+  passwordResolver.<label> = <class name> [<conf>]
+   ```
+
+### Tomcat
+To use th password protection mechanism described above, in the file `conf/server.xml`, you need to replace
+`org.apache.coyote.http11.Http11NioProtocol` by `org.xipki.tomcat.XiHttp11NioProtocol`,
+and `org.apache.coyote.http11.Http11Nio2Protocol` by `org.xipki.tomcat.XiHttp11Nio2Protocol`.
+
 ## Configure PKCS#11 device (optional)
 
    This step is only required if the real PKCS#11 device instead of the emulator

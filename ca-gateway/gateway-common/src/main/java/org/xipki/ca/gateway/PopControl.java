@@ -7,6 +7,8 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.xipki.ca.gateway.conf.KeystoreConf;
 import org.xipki.ca.gateway.conf.PopControlConf;
+import org.xipki.password.PasswordResolverException;
+import org.xipki.password.Passwords;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.CollectionAlgorithmValidator;
 import org.xipki.security.DHSigStaticKeyCertPair;
@@ -76,8 +78,14 @@ public class PopControl {
       throw new InvalidConfException("password is not defined in conf");
     }
 
+    char[] password;
+    try {
+      password = Passwords.resolvePassword(passwordStr);
+    } catch (PasswordResolverException ex) {
+      throw new InvalidConfException("error resolving password");
+    }
+
     try (InputStream is = getKeyStoreInputStream(keystoreStr)) {
-      char[] password = passwordStr.toCharArray();
       KeyStore ks = KeyUtil.getInKeyStore(type);
       ks.load(is, password);
 

@@ -10,7 +10,6 @@ import org.xipki.ca.api.DataSourceMap;
 import org.xipki.ca.api.kpgen.KeypairGenerator;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.password.PasswordResolver;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.Base64;
 import org.xipki.util.*;
@@ -169,8 +168,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
   }
 
   @Override
-  protected void initialize0(ConfPairs conf, PasswordResolver passwordResolver)
-      throws XiSecurityException {
+  protected void initialize0(ConfPairs conf) throws XiSecurityException {
     Args.notNull(conf, "conf");
 
     String datasourceName = conf.value("datasource");

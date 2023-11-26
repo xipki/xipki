@@ -52,7 +52,7 @@ public class QaFillKeypoolAction extends XiAction {
     }
 
     char[] passwordChars = readPasswordIfNotSet(passwordHint);
-    try (FillKeytool fillKeytool = new FillKeytool(datasourceFactory, passwordResolver, dbconfFile)) {
+    try (FillKeytool fillKeytool = new FillKeytool(datasourceFactory, dbconfFile)) {
       fillKeytool.execute(num, encAlg, passwordChars);
     }
     return null;

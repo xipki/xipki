@@ -345,8 +345,7 @@ public class OcspServerImpl implements OcspServer {
       DataSourceConf cacheSourceConf = cacheType.getDatasource();
       DataSourceWrapper datasource;
       try (InputStream dsStream = getInputStream(cacheSourceConf.getConf())) {
-        datasource = datasourceFactory.createDataSource(cacheSourceConf.getName(),
-                dsStream, securityFactory.getPasswordResolver());
+        datasource = datasourceFactory.createDataSource(cacheSourceConf.getName(), dsStream);
       } catch (IOException ex) {
         throw new InvalidConfException(ex.getMessage(), ex);
       }
@@ -377,7 +376,7 @@ public class OcspServerImpl implements OcspServer {
         String name = m.getName();
         DataSourceWrapper datasource;
         try (InputStream dsStream = getInputStream(m.getConf())) {
-          datasource = datasourceFactory.createDataSource(name, dsStream, securityFactory.getPasswordResolver());
+          datasource = datasourceFactory.createDataSource(name, dsStream);
         } catch (IOException ex) {
           throw new InvalidConfException(ex.getMessage(), ex);
         }

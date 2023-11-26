@@ -9,12 +9,11 @@ import org.xipki.ca.mgmt.db.DbWorker;
 import org.xipki.ca.mgmt.db.port.DbPorter;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.password.PasswordResolver;
-import org.xipki.password.PasswordResolverException;
 import org.xipki.util.Args;
 import org.xipki.util.ConfigurableProperties;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,11 +45,11 @@ public class DigestDiffWorker extends DbWorker {
   private final int numThreads;
 
   public DigestDiffWorker(
-      DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
+      DataSourceFactory datasourceFactory,
       boolean revokedOnly, String refDbConfFile, String targetDbConfFile, String reportDirName,
       int numCertsPerSelect, int numThreads, Set<byte[]> includeCaCerts)
-      throws PasswordResolverException, IOException {
-    super(datasourceFactory, passwordResolver, refDbConfFile);
+      throws InvalidConfException, IOException {
+    super(datasourceFactory, refDbConfFile);
     this.reportDir = reportDirName;
     this.numThreads = Args.positive(numThreads, "numThreads");
     this.numCertsPerSelect = numCertsPerSelect;
@@ -77,7 +76,7 @@ public class DigestDiffWorker extends DbWorker {
 
     ConfigurableProperties props = DbPorter.getDbConfProperties(
         Paths.get(IoUtil.expandFilepath(targetDbConfFile)));
-    this.targetDatasource = datasourceFactory.createDataSource("ds-" + targetDbConfFile, props, passwordResolver);
+    this.targetDatasource = datasourceFactory.createDataSource("ds-" + targetDbConfFile, props);
   } // constructor
 
   @Override

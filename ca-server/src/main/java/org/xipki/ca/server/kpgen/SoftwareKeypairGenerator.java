@@ -11,7 +11,6 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.DSAParameter;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.ca.api.kpgen.KeypairGenerator;
-import org.xipki.password.PasswordResolver;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.DSAParameterCache;
@@ -39,7 +38,7 @@ public class SoftwareKeypairGenerator extends KeypairGenerator {
   }
 
   @Override
-  public void initialize0(ConfPairs conf, PasswordResolver passwordResolver) {
+  public void initialize0(ConfPairs conf) {
   }
 
   @Override

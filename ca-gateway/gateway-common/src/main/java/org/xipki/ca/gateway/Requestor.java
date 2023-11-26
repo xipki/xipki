@@ -41,7 +41,7 @@ public interface Requestor {
   /**
    * Returns whether the requested permissions is allowed.
    * @param permission the permission.
-   * @p
+   *
    * @return true if all requested permissions are allowed, false otherwise.
    */
   boolean isPermitted(Permission permission);

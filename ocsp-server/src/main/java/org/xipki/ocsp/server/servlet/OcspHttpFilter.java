@@ -3,13 +3,11 @@
 
 package org.xipki.ocsp.server.servlet;
 
-import org.bouncycastle.oer.its.etsi103097.extension.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.license.api.LicenseFactory;
 import org.xipki.ocsp.server.OcspConf;
 import org.xipki.ocsp.server.OcspServerImpl;
-import org.xipki.password.PasswordResolverException;
 import org.xipki.security.Securities;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.LogUtil;

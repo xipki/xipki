@@ -9,7 +9,6 @@ import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
-import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.SecurityFactory;
 
@@ -88,8 +87,7 @@ public interface CaConfStore {
       throws CaMgmtException;
 
   RequestorEntryWrapper changeRequestor(
-      NameId nameId, String type, String conf, PasswordResolver passwordResolver)
-      throws CaMgmtException;
+      NameId nameId, String type, String conf) throws CaMgmtException;
 
   SignerEntry changeSigner(
       String name, String type, String conf, String base64Cert, CaManagerImpl signerManager)

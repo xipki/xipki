@@ -12,9 +12,6 @@
 	"security":{
 		"pkcs11Conf":{
 			"file":"security/pkcs11.json"
-		},
-		"password":{
-			"masterPasswordCallback":"FILE file=security/masterpassword.secret"
 		}
 	}
 }

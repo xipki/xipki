@@ -15,7 +15,6 @@ import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
 import org.xipki.ca.server.mgmt.SelfSignedCertBuilder;
-import org.xipki.password.PasswordResolver;
 import org.xipki.pki.OperationException;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
@@ -868,7 +867,7 @@ public class FileCaConfStore implements CaConfStore {
 
   @Override
   public RequestorEntryWrapper changeRequestor(
-      NameId nameId, String type, String conf, PasswordResolver passwordResolver) throws CaMgmtException {
+      NameId nameId, String type, String conf) throws CaMgmtException {
     throw readOnlyException;
   }
 

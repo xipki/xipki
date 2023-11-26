@@ -15,7 +15,6 @@ import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.password.PasswordResolver;
 import org.xipki.pki.OperationException;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
@@ -785,8 +784,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
   } // method changeCertprofile
 
   @Override
-  public RequestorEntryWrapper changeRequestor(
-      NameId nameId, String type, String conf, PasswordResolver passwordResolver)
+  public RequestorEntryWrapper changeRequestor(NameId nameId, String type, String conf)
       throws CaMgmtException {
     Args.notNull(nameId, "nameId");
     RequestorEntryWrapper requestor = new RequestorEntryWrapper();

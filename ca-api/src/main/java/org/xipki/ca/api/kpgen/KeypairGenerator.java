@@ -5,7 +5,6 @@ package org.xipki.ca.api.kpgen;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.xipki.password.PasswordResolver;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.ConfPairs;
@@ -43,12 +42,10 @@ public abstract class KeypairGenerator implements Closeable {
    * Initializes me.
    * @param conf
    *          Configuration. Could be {@code null}.
-   * @param passwordResolver
-   *          Password resolver. Could be {@code null}.
    * @throws XiSecurityException
    *         if error during the initialization occurs.
    */
-  public void initialize(String conf, PasswordResolver passwordResolver) throws XiSecurityException {
+  public void initialize(String conf) throws XiSecurityException {
     ConfPairs pairs = (conf == null) ? null : new ConfPairs(conf);
     if (pairs != null) {
       String str = pairs.value("RSA.E");
@@ -123,10 +120,10 @@ public abstract class KeypairGenerator implements Closeable {
       }
     }
 
-    initialize0(pairs, passwordResolver);
+    initialize0(pairs);
   }
 
-  protected abstract void initialize0(ConfPairs conf, PasswordResolver passwordResolver)
+  protected abstract void initialize0(ConfPairs conf)
       throws XiSecurityException;
 
   public boolean supports(String keyspec) {

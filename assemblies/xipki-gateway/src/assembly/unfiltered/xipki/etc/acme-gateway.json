@@ -62,9 +62,6 @@
 		"keyStrongrandomEnabled":false,
 		"signStrongrandomEnabled":false,
 		"defaultSignerParallelism":10,
-		"password":{
-			"masterPasswordCallback":"FILE file=security/masterpassword.secret"
-		},
 		"signerFactories":[]
 	}
 }

@@ -28,7 +28,6 @@ import org.xipki.datasource.DataSourceConf;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.license.api.CmLicense;
-import org.xipki.password.PasswordResolverException;
 import org.xipki.pki.OperationException;
 import org.xipki.security.*;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
@@ -418,7 +417,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     boolean initSucc = true;
     if (caConfStore.needsCertStore()) {
       try {
-        this.certstore = new CertStore(certstoreDatasource, caConfStore, idGen, securityFactory.getPasswordResolver());
+        this.certstore = new CertStore(certstoreDatasource, caConfStore, idGen);
       } catch (DataAccessException ex) {
         initSucc = false;
         LogUtil.error(LOG, ex, "error constructing CertStore");
@@ -501,14 +500,14 @@ public class CaManagerImpl implements CaManager, Closeable {
   private void addDataSource(String name, FileOrValue conf) throws CaMgmtException {
     DataSourceWrapper datasource;
     try {
-      datasource = datasourceFactory.createDataSource(name, conf, securityFactory.getPasswordResolver());
+      datasource = datasourceFactory.createDataSource(name, conf);
 
       // test the datasource
       Connection conn = datasource.getConnection();
       datasource.returnConnection(conn);
 
       LOG.info("loaded datasource.{}", name);
-    } catch (DataAccessException | PasswordResolverException | IOException | RuntimeException ex) {
+    } catch (DataAccessException | InvalidConfException | IOException | RuntimeException ex) {
       throw new CaMgmtException(
           ex.getClass().getName() + " while parsing datasource " + name + ": " + ex.getMessage(), ex);
     }
@@ -624,7 +623,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     checkModificationOfDbSchema(name);
     caConfStore.addDbSchema(name, value);
     try {
-      certstore.updateDbInfo(securityFactory.getPasswordResolver());
+      certstore.updateDbInfo();
     } catch (DataAccessException ex) {
       throw new CaMgmtException(ex);
     }
@@ -635,7 +634,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     checkModificationOfDbSchema(name);
     caConfStore.changeDbSchema(name, value);
     try {
-      certstore.updateDbInfo(securityFactory.getPasswordResolver());
+      certstore.updateDbInfo();
     } catch (DataAccessException ex) {
       throw new CaMgmtException(ex);
     }
@@ -646,7 +645,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     checkModificationOfDbSchema(name);
     caConfStore.removeDbSchema(name);
     try {
-      certstore.updateDbInfo(securityFactory.getPasswordResolver());
+      certstore.updateDbInfo();
     } catch (DataAccessException ex) {
       throw new CaMgmtException(ex);
     }

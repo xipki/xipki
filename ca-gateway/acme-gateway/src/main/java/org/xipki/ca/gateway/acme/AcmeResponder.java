@@ -288,8 +288,7 @@ public class AcmeResponder {
     try {
       FileOrValue fileOrValue = new FileOrValue();
       fileOrValue.setFile(conf.getDbConf());
-      DataSourceWrapper dataSource0 = new DataSourceFactory().createDataSource(
-          "acme-db", fileOrValue, securityFactory.getPasswordResolver());
+      DataSourceWrapper dataSource0 = new DataSourceFactory().createDataSource("acme-db", fileOrValue);
       repo = new AcmeRepo(new AcmeDataSource(dataSource0), conf.getCacheSize(), conf.getSyncDbSeconds());
     } catch (Exception ex) {
       throw new InvalidConfException("could not initialize database", ex);

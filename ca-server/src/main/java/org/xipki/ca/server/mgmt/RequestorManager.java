@@ -132,8 +132,7 @@ class RequestorManager {
       throw manager.logAndCreateException("unknown requestor " + name);
     }
 
-    RequestorEntryWrapper requestor = manager.caConfStore.changeRequestor(ident, type, conf,
-        manager.securityFactory.getPasswordResolver());
+    RequestorEntryWrapper requestor = manager.caConfStore.changeRequestor(ident, type, conf);
 
     manager.requestorDbEntries.remove(name);
     manager.requestors.remove(name);

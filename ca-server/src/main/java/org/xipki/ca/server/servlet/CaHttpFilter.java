@@ -89,7 +89,7 @@ public class CaHttpFilter implements XiHttpFilter {
       auditConf = new ConfPairs(auditConf).putPair("shard-id", Integer.toString(shardId)).getEncoded();
     }
 
-    Audits.init(auditType, auditConf, securities.getSecurityFactory().getPasswordResolver());
+    Audits.init(auditType, auditConf);
     if (Audits.getAuditService() == null) {
       throw new IllegalStateException("could not init AuditService");
     }

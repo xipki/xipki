@@ -67,7 +67,7 @@ public class ProtocolProxyConfWrapper {
     }
 
     String auditConf = audit.getConf();
-    Audits.init(auditType, auditConf, securities.getSecurityFactory().getPasswordResolver());
+    Audits.init(auditType, auditConf);
     if (Audits.getAuditService() == null) {
       throw new InvalidConfException("could not init AuditService");
     }

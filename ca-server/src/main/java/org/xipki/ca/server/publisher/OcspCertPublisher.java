@@ -17,7 +17,6 @@ import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
@@ -46,8 +45,7 @@ public class OcspCertPublisher extends CertPublisher {
   }
 
   @Override
-  public void initialize(String conf, PasswordResolver passwordResolver, DataSourceMap datasourceConfs)
-      throws CertPublisherException {
+  public void initialize(String conf, DataSourceMap datasourceConfs) throws CertPublisherException {
     Args.notNull(conf, "conf");
 
     ConfPairs pairs = new ConfPairs(conf);

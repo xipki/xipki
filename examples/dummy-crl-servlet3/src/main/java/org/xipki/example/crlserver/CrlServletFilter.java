@@ -8,18 +8,15 @@ import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.password.PasswordResolverException;
-import org.xipki.password.Passwords;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.XipkiBaseDir;
+import org.xipki.util.exception.InvalidConfException;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.sql.Connection;
@@ -38,8 +35,6 @@ public class CrlServletFilter implements Filter {
 
   private static final String DFLT_CA_DB_CFG = "${sys:catalina.home}/xipki/etc/ca/database/ca-db.properties";
 
-  private static final String DFLT_CA_SERVER_CFG = "${sys:catalina.home}/xipki/etc/ca/ca.json";
-
   private DataSourceWrapper dataSource;
 
   private boolean hasSha1Column;
@@ -48,33 +43,10 @@ public class CrlServletFilter implements Filter {
   public void init(FilterConfig filterConfig) throws ServletException {
     XipkiBaseDir.init();
     try {
-      String masterPasswordCallback = null;
-      // read the password resolver configuration
-      try (BufferedReader reader =
-               new BufferedReader(new FileReader(StringUtil.resolveVariables(DFLT_CA_SERVER_CFG)))) {
-        String name = "\"masterPasswordCallback\"";
-        String line;
-        while ((line = reader.readLine()) != null) {
-          if (line.contains(name)) {
-            line = line.trim();
-            if (line.startsWith(name)) {
-              masterPasswordCallback = line.substring(name.length() + 2, line.length() - 1); // 2=":\"".length
-              break;
-            }
-          }
-        }
-      }
-
-      Passwords passwords = new Passwords();
-      Passwords.PasswordConf conf = new Passwords.PasswordConf();
-      conf.setMasterPasswordCallback(masterPasswordCallback);
-      passwords.init(conf);
-
       this.dataSource = new DataSourceFactory().createDataSourceForFile("ca",
-          StringUtil.resolveVariables(DFLT_CA_DB_CFG),
-          passwords.getPasswordResolver());
+          StringUtil.resolveVariables(DFLT_CA_DB_CFG));
       this.hasSha1Column = dataSource.tableHasColumn(null, "CRL", "SHA1");
-    } catch (PasswordResolverException | IOException | DataAccessException ex) {
+    } catch (InvalidConfException | IOException | DataAccessException ex) {
       LOG.error("error initializing datasource", ex);
     }
   } // method init

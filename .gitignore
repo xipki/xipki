@@ -19,6 +19,10 @@ target/
 *.war
 *.ear
 *.db
+*.zip
+*.tar.gz
+*.tar
+*.tgz
 
 ######################
 # Windows

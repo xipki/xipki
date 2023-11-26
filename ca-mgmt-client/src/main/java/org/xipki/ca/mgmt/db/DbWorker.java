@@ -8,10 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.mgmt.db.port.DbPorter;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.password.PasswordResolver;
-import org.xipki.password.PasswordResolverException;
 import org.xipki.util.ConfigurableProperties;
 import org.xipki.util.IoUtil;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -34,10 +33,10 @@ public abstract class DbWorker implements Runnable {
 
   private Exception exception;
 
-  public DbWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String dbConfFile)
-          throws PasswordResolverException, IOException {
+  public DbWorker(DataSourceFactory datasourceFactory, String dbConfFile)
+          throws InvalidConfException, IOException {
     ConfigurableProperties props = DbPorter.getDbConfProperties(Paths.get(IoUtil.expandFilepath(dbConfFile)));
-    this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props, passwordResolver);
+    this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props);
   }
 
   public final Exception exception() {

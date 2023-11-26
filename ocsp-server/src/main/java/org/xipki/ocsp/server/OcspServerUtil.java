@@ -151,8 +151,7 @@ public class OcspServerUtil {
         try {
           Class<?> clazz = Class.forName(className, false, OcspServerUtil.class.getClassLoader());
           store = (OcspStore) clazz.getDeclaredConstructor().newInstance();
-        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException |
-                 InvocationTargetException ex) {
+        } catch (ReflectiveOperationException ex) {
           throw new InvalidConfException("ObjectCreationException of store " + conf.getName() + ":" + ex.getMessage(),
               ex);
         }

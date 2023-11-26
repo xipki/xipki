@@ -24,8 +24,8 @@ import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.server.*;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
+import org.xipki.password.Passwords;
 import org.xipki.pki.ErrorCode;
 import org.xipki.pki.OperationException;
 import org.xipki.security.*;
@@ -162,8 +162,7 @@ public class CertStore extends QueryExecutor {
 
   private final CaConfStore  caConfStore;
 
-  public CertStore(DataSourceWrapper datasource, CaConfStore caConfStore,
-                   UniqueIdGenerator idGenerator, PasswordResolver passwordResolver)
+  public CertStore(DataSourceWrapper datasource, CaConfStore caConfStore, UniqueIdGenerator idGenerator)
       throws DataAccessException, CaMgmtException {
     super(datasource);
 
@@ -190,7 +189,7 @@ public class CertStore extends QueryExecutor {
     this.SQL_ADD_CRL = SqlUtil.buildInsertSql("CRL", "ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE," +
         "DELTACRL,BASECRL_NO,CRL_SCOPE,SHA1,CRL");
 
-    updateDbInfo(passwordResolver);
+    updateDbInfo();
 
     this.idGenerator = Args.notNull(idGenerator, "idGenerator");
 
@@ -1176,7 +1175,7 @@ public class CertStore extends QueryExecutor {
     return date == null ? null : DateUtil.toEpochSecond(date);
   }
 
-  public void updateDbInfo(PasswordResolver passwordResolver) throws DataAccessException, CaMgmtException {
+  public void updateDbInfo() throws DataAccessException, CaMgmtException {
     // Save keypair control
     String str = caConfStore.getDbSchemas().get("KEYPAIR_ENC_KEY");
     if (str == null) {
@@ -1184,7 +1183,7 @@ public class CertStore extends QueryExecutor {
     }
 
     try {
-      char[] keyChars = passwordResolver.resolvePassword(str);
+      char[] keyChars = Passwords.resolvePassword(str);
       byte[] encodedEncKey = Hex.decode(keyChars);
       int n = encodedEncKey.length;
       if (n != 16 && n != 24 && n != 32) {

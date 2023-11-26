@@ -13,8 +13,6 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <reference id="passwordResolver" interface="org.xipki.password.PasswordResolver"/>
-
   <bean id="sslContextConf" class="org.xipki.util.http.SslContextConfWrapper">
     <property name="useSslConf" value="${useSslConf}"/>
     <property name="sslStoreType" value="${ssl.storeType}"/>
@@ -22,7 +20,6 @@
     <property name="sslKeystorePassword" value="${ssl.keystorePassword}"/>
     <property name="sslTrustanchors" value="${ssl.trustanchors}"/>
     <property name="sslHostnameVerifier" value="${ssl.hostnameVerifier}"/>
-    <property name="passwordResolver" ref="passwordResolver"/>
   </bean>
 
   <bean id="caManager" class="org.xipki.ca.mgmt.client.CaMgmtClient">

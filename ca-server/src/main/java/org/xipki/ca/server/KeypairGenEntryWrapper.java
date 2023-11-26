@@ -67,7 +67,7 @@ public class KeypairGenEntryWrapper {
     }
 
     try {
-      generator.initialize(dbEntry.getConf(), securityFactory.getPasswordResolver());
+      generator.initialize(dbEntry.getConf());
     } catch (XiSecurityException ex) {
       throw new ObjectCreationException("error initializing keypair generator " + dbEntry.getName(), ex);
     }

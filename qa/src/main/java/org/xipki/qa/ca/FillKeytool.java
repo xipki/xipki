@@ -15,8 +15,6 @@ import org.bouncycastle.asn1.x509.DSAParameter;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.password.PasswordResolver;
-import org.xipki.password.PasswordResolverException;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
@@ -26,6 +24,7 @@ import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.exception.InvalidConfException;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -68,10 +67,10 @@ public class FillKeytool implements AutoCloseable {
 
   protected final DataSourceWrapper datasource;
 
-  public FillKeytool(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver, String dbConfFile)
-      throws PasswordResolverException, IOException {
+  public FillKeytool(DataSourceFactory datasourceFactory, String dbConfFile)
+      throws InvalidConfException, IOException {
     try (InputStream dbConfStream = Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile)))) {
-      this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, dbConfStream, passwordResolver);
+      this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, dbConfStream);
     }
   }
 
