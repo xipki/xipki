@@ -6,7 +6,7 @@ xi:exec '~/tools/xipki/ca-tomcat/bin/startup.sh'
 sleep 5
 
 echo "#################################################################"
-echo "#                       Prepare environment                    #"
+echo "#                       Prepare environment                     #"
 echo "#################################################################"
 
 ## DBSchema entries
@@ -81,11 +81,11 @@ ca:gen-rootca \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://myorg.org/rootca1.der \
   --crl-uri "http://localhost:8081/crl/?type=crl&name=rootca1" \
-  --crl-control "interval.hours=24,fullcrl.intervals=90,overlap=90d,interval.time=02:00" \
   --validity-mode cutoff \
   --save-cert yes \
   --save-keypair no \
-  --keypair-gen software
+  --keypair-gen software \
+  --crl-control "interval.hours=24,fullcrl.intervals=90,overlap=90d,interval.time=02:00"
 
 ## Remove the profile rootca
 ca:profile-rm -f rootca
@@ -270,9 +270,10 @@ ca:ca-add \
   --save-cert yes \
   --save-keypair yes \
   --keypair-gen software \
-  --revoke-suspended-control enabled=true,targetReason=cessationOfOperation,unchangedSince=15d \
   --cert output/subca1.crt \
   --certchain output/rootca1.crt \
+  --crl-control "interval.hours=24,fullcrl.intervals=7,overlap=3d,interval.time=02:00" \
+  --revoke-suspended-control enabled=true,targetReason=cessationOfOperation,unchangedSince=15d \
   --ctlog-control "enabled=true,sslcontext.name=ctlog1,servers=https://localhost/ctlog/"
 
 ca:caalias-add \
@@ -334,13 +335,13 @@ ca:ca-add \
   --ca-cert-uri http://myorg.org/subcawithcrl1.der \
   --crl-uri "http://localhost:8081/crl/?type=crl&name=subcawithcrl1" \
   --deltacrl-uri "http://localhost:8081/crl/?type=deltacrl&name=subcawithcrl1" \
-  --crl-control "interval.hours=24,fullcrl.intervals=7,overlap=3d,interval.time=02:00" \
   --validity-mode lax \
   --save-cert yes \
   --save-keypair yes \
   --keypair-gen software \
   --cert output/subcawithcrl1.crt \
-  --certchain output/rootca1.crt
+  --certchain output/rootca1.crt \
+  --crl-control "interval.hours=24,fullcrl.intervals=7,overlap=3d,interval.time=02:00"
 
 ca:caalias-add \
   --ca subcawithcrl1 \

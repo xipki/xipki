@@ -174,9 +174,6 @@ ca:load-conf qa/qa.d/subca.json
 
 ca:profile-rm -f rootca
 
-## Restart the CA
-#ca:restart
-
 echo "#################################################################"
 echo "#                       Add subca with CRL                      #"
 echo "#################################################################"
