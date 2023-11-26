@@ -219,7 +219,7 @@ public class UnRevokeCertActions {
       }
 
       if (reqInfo.sources.size() != processedIndex.size()) {
-        Collections.sort(processedIndex, Collections.reverseOrder());
+        processedIndex.sort(Collections.reverseOrder());
         for (Integer index : processedIndex) {
           reqInfo.sources.remove((int) index);
         }

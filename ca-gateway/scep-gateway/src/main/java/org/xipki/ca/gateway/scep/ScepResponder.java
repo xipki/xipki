@@ -597,20 +597,22 @@ public class ScepResponder {
                         sdk.pollCerts(sdkReq));
           break;
         }
-        case GetCert:
+        case GetCert: {
           IssuerAndSerialNumber isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
           BigInteger serial = isn.getSerialNumber().getPositiveValue();
           audit(event, CaAuditConstants.NAME_issuer, "\"" + X509Util.x500NameText(isn.getName()) + "\"");
           audit(event, CaAuditConstants.NAME_serial, LogUtil.formatCsn(serial));
           signedData = getCert(caName, isn.getName(), serial);
           break;
-        case GetCRL:
-          isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
-          serial = isn.getSerialNumber().getPositiveValue();
+        }
+        case GetCRL: {
+          IssuerAndSerialNumber isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
+          BigInteger serial = isn.getSerialNumber().getPositiveValue();
           audit(event, CaAuditConstants.NAME_issuer, "\"" + X509Util.x500NameText(isn.getName()) + "\"");
           audit(event, CaAuditConstants.NAME_serial, LogUtil.formatCsn(serial));
           signedData = getCrl(caName, isn.getName(), serial);
           break;
+        }
         default:
           LOG.error("unknown SCEP messageType '{}'", req.getMessageType());
           throw FailInfoException.BAD_REQUEST;

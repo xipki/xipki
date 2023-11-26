@@ -30,6 +30,7 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.XiHttpRequest;
@@ -273,9 +274,9 @@ public class AcmeResponder {
       this.contactVerifier = new ContactVerifier.DfltContactVerifier();
     } else {
       try {
-        this.contactVerifier = (ContactVerifier) Class.forName(str).getConstructor().newInstance();
-      } catch (Exception e) {
-        throw new RuntimeException("invalid contactVerifier '" + str + "'");
+        this.contactVerifier = ReflectiveUtil.newInstance(str);
+      } catch (ObjectCreationException ex) {
+        throw new InvalidConfException("invalid contactVerifier '" + str + "'", ex);
       }
     }
 

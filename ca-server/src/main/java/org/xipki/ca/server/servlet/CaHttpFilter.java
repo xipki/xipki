@@ -22,6 +22,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpFilter;
 import org.xipki.util.http.XiHttpRequest;
@@ -95,8 +96,7 @@ public class CaHttpFilter implements XiHttpFilter {
     }
 
     LOG.info("Use licenseFactory: {}", licenseFactoryClazz);
-    licenseFactory = (LicenseFactory) Class.forName(licenseFactoryClazz).getDeclaredConstructor().newInstance();
-
+    licenseFactory = ReflectiveUtil.newInstance(licenseFactoryClazz);
     caManager = new CaManagerImpl(licenseFactory.createCmLicense());
     caManager.setSecurityFactory(securities.getSecurityFactory());
     caManager.setP11CryptServiceFactory(securities.getP11CryptServiceFactory());
@@ -109,12 +109,10 @@ public class CaHttpFilter implements XiHttpFilter {
     if (conf.getKeypairGeneratorFactories() != null) {
       for (String className : conf.getKeypairGeneratorFactories()) {
         try {
-          KeypairGeneratorFactory factory = (KeypairGeneratorFactory)
-              Class.forName(className).getConstructor().newInstance();
+          KeypairGeneratorFactory factory = ReflectiveUtil.newInstance(className);
           keypairGeneratorFactories.add(factory);
-        } catch (Exception ex) {
-          LOG.error("error caught while initializing KeypairGeneratorFactory "
-              + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
+        } catch (ObjectCreationException ex) {
+          LOG.error("error creating KeypairGeneratorFactory " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
       }
     }
@@ -122,9 +120,9 @@ public class CaHttpFilter implements XiHttpFilter {
     caManager.setKeyPairGeneratorFactories(keypairGeneratorFactories);
 
     // Publisher
-    CertPublisherFactoryRegister publiserFactoryRegister = new CertPublisherFactoryRegister();
-    publiserFactoryRegister.registFactory(new OcspCertPublisherFactory());
-    caManager.setCertPublisherFactoryRegister(publiserFactoryRegister);
+    CertPublisherFactoryRegister publisherFactoryRegister = new CertPublisherFactoryRegister();
+    publisherFactoryRegister.registFactory(new OcspCertPublisherFactory());
+    caManager.setCertPublisherFactoryRegister(publisherFactoryRegister);
     caManager.setCaServerConf(conf);
 
     caManager.startCaSystem();
@@ -191,22 +189,20 @@ public class CaHttpFilter implements XiHttpFilter {
   private CertprofileFactoryRegister initCertprofileFactoryRegister(List<String> factories) {
     CertprofileFactoryRegister certprofileFactoryRegister = new CertprofileFactoryRegister();
     try {
-      CertprofileFactory certprofileFactory = (CertprofileFactory)
-          Class.forName(XIJSON_CERTFACTORY).getConstructor().newInstance();
+      CertprofileFactory certprofileFactory = ReflectiveUtil.newInstance(XIJSON_CERTFACTORY);
       certprofileFactoryRegister.registFactory(certprofileFactory);
-    } catch (Exception ex) {
-      LOG.warn("error initializing " + XIJSON_CERTFACTORY);
+    } catch (ObjectCreationException ex) {
+      LogUtil.warn(LOG, ex);
     }
 
     // register additional CertprofileFactories
     if (factories != null) {
       for (String className : factories) {
         try {
-          CertprofileFactory factory = (CertprofileFactory) Class.forName(className).getConstructor().newInstance();
+          CertprofileFactory factory = ReflectiveUtil.newInstance(className);
           certprofileFactoryRegister.registFactory(factory);
-        } catch (Exception ex) {
-          LOG.error("error caught while initializing CertprofileFactory "
-              + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
+        } catch (ObjectCreationException ex) {
+          LogUtil.warn(LOG, ex);
         }
       }
     }

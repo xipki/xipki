@@ -115,9 +115,6 @@ public class FillKeytool implements AutoCloseable {
       sql = "DELETE FROM KEYSPEC";
       datasource.createStatement(conn).executeUpdate(sql);
 
-      List<String> keyspecs = new LinkedList<>(Arrays.asList("DSA/1024/160", "DSA/2048/224", "DSA/2048/256",
-          "DSA/3072/256", "RSA/2048", "RSA/3072", "RSA/4096", "ED25519", "ED448", "X25519", "X448"));
-
       // EC
       ASN1ObjectIdentifier[] curves = {
           SECObjectIdentifiers.secp256r1,             SECObjectIdentifiers.secp384r1,
@@ -125,6 +122,9 @@ public class FillKeytool implements AutoCloseable {
           TeleTrusTObjectIdentifiers.brainpoolP384r1, TeleTrusTObjectIdentifiers.brainpoolP512r1,
           GMObjectIdentifiers.sm2p256v1,
       };
+
+      List<String> keyspecs = new LinkedList<>(Arrays.asList("DSA/1024/160", "DSA/2048/224", "DSA/2048/256",
+          "DSA/3072/256", "RSA/2048", "RSA/3072", "RSA/4096", "ED25519", "ED448", "X25519", "X448"));
 
       for (ASN1ObjectIdentifier curve : curves) {
         keyspecs.add("EC/" + curve.getId());

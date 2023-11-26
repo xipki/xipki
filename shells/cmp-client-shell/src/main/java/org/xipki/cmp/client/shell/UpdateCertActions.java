@@ -172,7 +172,7 @@ public class UpdateCertActions {
       ConfPairs conf = new ConfPairs();
       conf.putPair("parallelism", Integer.toString(1));
 
-      if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0) {
+      if (pkcs11ModuleName != null && !pkcs11ModuleName.isEmpty()) {
         conf.putPair("module", pkcs11ModuleName);
       }
 

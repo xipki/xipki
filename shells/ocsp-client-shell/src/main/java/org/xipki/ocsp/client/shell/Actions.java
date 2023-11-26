@@ -617,7 +617,7 @@ public class Actions {
           msg.append("\nExtensions: ");
 
           List<?> extensionOids = basicResp.getExtensionOIDs();
-          if (extensionOids == null || extensionOids.size() == 0) {
+          if (extensionOids == null || extensionOids.isEmpty()) {
             msg.append("-");
           } else {
             int size = extensionOids.size();

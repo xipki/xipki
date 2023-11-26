@@ -118,7 +118,7 @@ class DigestEntry {
       revTime = Long.parseLong(str);
 
       str = encoded.substring(indexes.get(idx) + 1);
-      if (str.length() != 0) {
+      if (!str.isEmpty()) {
         revInvTime = Long.parseLong(str);
       }
     }

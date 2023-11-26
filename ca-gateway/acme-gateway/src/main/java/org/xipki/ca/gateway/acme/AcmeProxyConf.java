@@ -216,7 +216,7 @@ public class AcmeProxyConf extends ProtocolProxyConf {
         throw new InvalidConfException("tokenNumBytes must be not less than 12");
       }
 
-      if (baseUrl == null || baseUrl.length() == 0) {
+      if (baseUrl == null || baseUrl.isEmpty()) {
         throw new InvalidConfException("baseUrl must be present and not blank.");
       }
 

@@ -403,12 +403,11 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileEeComplex
 
-  private static void certprofileConstantExt(String destFilename) throws Exception {
+  private static void certprofileConstantExt(String destFilename) {
     certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.1"));
   }
 
-  private static void certprofileConstantExt(String destFilename, ASN1ObjectIdentifier oidPrefix)
-      throws Exception {
+  private static void certprofileConstantExt(String destFilename, ASN1ObjectIdentifier oidPrefix) {
     X509ProfileType profile = getBaseProfile("certprofile constant-extension", CertLevel.EndEntity,
         "5y", true, false);
 

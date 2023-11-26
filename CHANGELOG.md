@@ -6,6 +6,7 @@ See also <https://github.com/xipki/xipki/releases>
 - Release date: 2023/mm/dd
 - All Components
   - No demo keys and certificates will be delivered.
+  - Simplified password configuration.
 - CA
   - Change the location of file 'calock'.
   - Add configuration of reverseProxyMode.
@@ -21,8 +22,9 @@ See also <https://github.com/xipki/xipki/releases>
 - HSM Proxy
   - New component introduced in this version.
 - Dependencies
-  - ipkics11wrapper: 1.0.7 -> 1.0.8
+  - xipki ipkics11wrapper: 1.0.7 -> 1.0.8
   - xipki commons: 6.3.1 -> 6.3.2
+  - bouncycastle: 1.76 -> 1.77
 
 ## 6.4.0
 - Release date: 2023/10/15

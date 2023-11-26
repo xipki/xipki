@@ -192,7 +192,7 @@ public class SimulatorScepResponder {
     MessageType messageType = req.getMessageType();
 
     switch (messageType) {
-      case PKCSReq:
+      case PKCSReq: {
         boolean selfSigned = req.getSignatureCert().isSelfSigned();
 
         CertificationRequest csr;
@@ -234,9 +234,10 @@ public class SimulatorScepResponder {
         }
 
         return rep;
-      case CertPoll:
+      }
+      case CertPoll: {
         IssuerAndSubject is = IssuerAndSubject.getInstance(req.getMessageData());
-        cert = caEmulator.pollCert(is.getIssuer(), is.getSubject());
+        X509Cert cert = caEmulator.pollCert(is.getIssuer(), is.getSubject());
         if (cert != null) {
           rep.setMessageData(createSignedData(cert));
         } else {
@@ -244,21 +245,24 @@ public class SimulatorScepResponder {
         }
 
         return rep;
-      case GetCert:
+      }
+      case GetCert: {
         IssuerAndSerialNumber isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
-        cert = caEmulator.getCert(isn.getName(), isn.getSerialNumber().getValue());
+        X509Cert cert = caEmulator.getCert(isn.getName(), isn.getSerialNumber().getValue());
         if (cert != null) {
           rep.setMessageData(createSignedData(cert));
         } else {
           buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badCertId);
         }
         return rep;
-      case RenewalReq:
+      }
+      case RenewalReq: {
         if (!caCaps.supportsRenewal()) {
           buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
           return rep;
         }
 
+        CertificationRequest csr;
         try {
           csr = GatewayUtil.parseCsrInRequest(req.getMessageData());
         } catch (OperationException e) {
@@ -266,6 +270,7 @@ public class SimulatorScepResponder {
           return rep;
         }
 
+        X509Cert cert;
         try {
           cert = caEmulator.generateCert(csr);
         } catch (Exception ex) {
@@ -279,8 +284,9 @@ public class SimulatorScepResponder {
           rep.setFailInfo(FailInfo.badCertId);
         }
         return rep;
-      case GetCRL:
-        isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
+      }
+      case GetCRL: {
+        IssuerAndSerialNumber isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
         CertificateList crl;
         try {
           crl = caEmulator.getCrl(isn.getName(), isn.getSerialNumber().getValue());
@@ -294,6 +300,7 @@ public class SimulatorScepResponder {
           buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badCertId);
         }
         return rep;
+      }
       default:
         buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
         return rep;

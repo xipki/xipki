@@ -11,6 +11,7 @@ import org.xipki.ocsp.server.OcspServerImpl;
 import org.xipki.security.Securities;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.LogUtil;
+import org.xipki.util.ReflectiveUtil;
 import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.XiHttpFilter;
@@ -60,7 +61,7 @@ public class OcspHttpFilter implements XiHttpFilter {
     securities.init(conf.getSecurity());
 
     LOG.info("Use licenseFactory: {}", licenseFactoryClazz);
-    licenseFactory = (LicenseFactory) Class.forName(licenseFactoryClazz).getDeclaredConstructor().newInstance();
+    licenseFactory = ReflectiveUtil.newInstance(licenseFactoryClazz);
 
     OcspServerImpl ocspServer = new OcspServerImpl(licenseFactory.createOcspLicense());
     ocspServer.setSecurityFactory(securities.getSecurityFactory());

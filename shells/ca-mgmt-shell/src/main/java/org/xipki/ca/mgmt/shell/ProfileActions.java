@@ -82,7 +82,7 @@ public class ProfileActions {
           String name = entry.getProfileName();
           List<String> aliases = entry.getProfileAliases();
           sb.append("\t").append(name);
-          if (aliases != null && aliases.size() > 0) {
+          if (aliases != null && !aliases.isEmpty()) {
             sb.append(aliases.size() == 1 ? " (alias " : " (aliases ");
             for (String alias : aliases) {
               sb.append(alias + ", ");

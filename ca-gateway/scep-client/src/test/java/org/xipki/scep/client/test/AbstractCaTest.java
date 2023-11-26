@@ -185,7 +185,7 @@ public abstract class AbstractCaTest {
       EnrolmentResponse enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
 
       List<X509Cert> certs = enrolResp.getCertificates();
-      Assert.assertTrue("number of received certificates", certs.size() > 0);
+      Assert.assertTrue("number of received certificates", !certs.isEmpty());
       X509Cert cert = certs.get(0);
       Assert.assertNotNull("enroled certificate", cert);
       enroledCert = cert;
@@ -205,12 +205,12 @@ public abstract class AbstractCaTest {
     EnrolmentResponse enrolResp = client.scepCertPoll(privKey, selfSignedCert, csr, issuerName);
 
     List<X509Cert> certs = enrolResp.getCertificates();
-    Assert.assertTrue("number of received certificates", certs.size() > 0);
+    Assert.assertTrue("number of received certificates", !certs.isEmpty());
     Assert.assertNotNull("enrolled certificate", certs.get(0));
 
     // getCert
     certs = client.scepGetCert(privKey, selfSignedCert, issuerName, enroledCert.getSerialNumber());
-    Assert.assertTrue("number of received certificates", certs.size() > 0);
+    Assert.assertTrue("number of received certificates", !certs.isEmpty());
     Assert.assertNotNull("received certificate", certs.get(0));
 
     // getCRL

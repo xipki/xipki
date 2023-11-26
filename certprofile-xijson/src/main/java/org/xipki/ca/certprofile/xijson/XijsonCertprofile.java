@@ -40,7 +40,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 /**
- * Certprofile configured by JSON.
+ * Certprofile configured in JSON.
  *
  * @author Lijun Liao (xipki)
  * @since 2.0.0

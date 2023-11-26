@@ -188,12 +188,7 @@ class TargetDigestReader implements Closeable {
       arrayBuffer.append(",?".repeat(Math.max(0, numPerSelect - 1)));
       arrayBuffer.append(")");
     } else {
-      String hashOrCertColumn;
-      if (certHashAlgo == HashAlgo.SHA1) {
-        hashOrCertColumn = "SHA1";
-      } else {
-        hashOrCertColumn = "CERT";
-      }
+      String hashOrCertColumn = (certHashAlgo == HashAlgo.SHA1) ? "SHA1" : "CERT";
 
       singleSql = StringUtil.concat("REV,RR,RT,RIT,", hashOrCertColumn,
           " FROM CERT WHERE CA_ID=", Integer.toString(caId), " AND SN=?");

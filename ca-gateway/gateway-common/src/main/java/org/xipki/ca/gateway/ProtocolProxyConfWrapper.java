@@ -13,6 +13,7 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.Securities;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.ReflectiveUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
@@ -77,8 +78,8 @@ public class ProtocolProxyConfWrapper {
       authenticator = null;
     } else {
       try {
-        authenticator = (RequestorAuthenticator) Class.forName(clazz).getConstructor().newInstance();
-      } catch (Exception e) {
+        authenticator = ReflectiveUtil.newInstance(clazz);
+      } catch (ObjectCreationException e) {
         String msg = "could not load RequestorAuthenticator " + clazz;
         LOG.error(msg, e);
         throw new InvalidConfException(msg);

@@ -268,7 +268,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
       extensions.add(new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false, new DEROctetString(nonce)));
     }
 
-    if (prefSigAlgs != null && prefSigAlgs.size() > 0) {
+    if (prefSigAlgs != null && !prefSigAlgs.isEmpty()) {
       ASN1EncodableVector vec = new ASN1EncodableVector();
       for (SignAlgo algId : prefSigAlgs) {
         vec.add(new DERSequence(algId.getAlgorithmIdentifier()));

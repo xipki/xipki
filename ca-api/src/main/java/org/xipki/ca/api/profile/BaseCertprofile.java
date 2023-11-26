@@ -386,7 +386,7 @@ public abstract class BaseCertprofile extends Certprofile {
       case GeneralName.registeredID:
       case GeneralName.directoryName:
         return new GeneralName(tag, requestedName.getName());
-      case GeneralName.otherName:
+      case GeneralName.otherName: {
         ASN1Sequence reqSeq = ASN1Sequence.getInstance(requestedName.getName());
         int size = reqSeq.size();
         if (size != 2) {
@@ -399,7 +399,7 @@ public abstract class BaseCertprofile extends Certprofile {
         }
 
         ASN1Encodable asn1 = reqSeq.getObjectAt(1);
-        if (! (asn1 instanceof ASN1TaggedObject)) {
+        if (!(asn1 instanceof ASN1TaggedObject)) {
           throw new BadCertTemplateException("otherName.value is not tagged Object");
         }
 
@@ -412,10 +412,11 @@ public abstract class BaseCertprofile extends Certprofile {
         vector.add(type);
         vector.add(new DERTaggedObject(true, 0, ASN1TaggedObject.getInstance(asn1).getBaseObject()));
         return new GeneralName(GeneralName.otherName, new DERSequence(vector));
-      case GeneralName.ediPartyName:
-        reqSeq = ASN1Sequence.getInstance(requestedName.getName());
+      }
+      case GeneralName.ediPartyName: {
+        ASN1Sequence reqSeq = ASN1Sequence.getInstance(requestedName.getName());
 
-        size = reqSeq.size();
+        int size = reqSeq.size();
         String nameAssigner = null;
         int idx = 0;
         if (size > 1) {
@@ -426,12 +427,13 @@ public abstract class BaseCertprofile extends Certprofile {
         String partyName = DirectoryString.getInstance(
             ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx)).getBaseObject()).getString();
 
-        vector = new ASN1EncodableVector();
+        ASN1EncodableVector vector = new ASN1EncodableVector();
         if (nameAssigner != null) {
           vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
         }
         vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
         return new GeneralName(GeneralName.ediPartyName, new DERSequence(vector));
+      }
       default:
         throw new IllegalStateException("should not reach here, unknown GeneralName tag " + tag);
     } // end switch (tag)

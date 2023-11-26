@@ -40,7 +40,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 /**
- * Extenions configuration.
+ * Extensions configuration.
  *
  * @author Lijun Liao (xipki)
  */

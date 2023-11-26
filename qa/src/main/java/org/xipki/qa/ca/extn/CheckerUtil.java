@@ -124,7 +124,7 @@ public class CheckerUtil {
       case GeneralName.registeredID:
       case GeneralName.directoryName:
         return new GeneralName(tag, reqName.getName());
-      case GeneralName.otherName:
+      case GeneralName.otherName: {
         ASN1Sequence reqSeq = ASN1Sequence.getInstance(reqName.getName());
         ASN1ObjectIdentifier type = ASN1ObjectIdentifier.getInstance(reqSeq.getObjectAt(0));
         if (mode != null && !mode.getAllowedTypes().contains(type)) {
@@ -144,8 +144,9 @@ public class CheckerUtil {
         vector.add(new DERTaggedObject(true, 0, new DERUTF8String(text)));
 
         return new GeneralName(GeneralName.otherName, new DERSequence(vector));
-      case GeneralName.ediPartyName:
-        reqSeq = ASN1Sequence.getInstance(reqName.getName());
+      }
+      case GeneralName.ediPartyName: {
+        ASN1Sequence reqSeq = ASN1Sequence.getInstance(reqName.getName());
 
         int size = reqSeq.size();
         String nameAssigner = null;
@@ -160,12 +161,13 @@ public class CheckerUtil {
             ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx)).getBaseObject());
         String partyName = ds.getString();
 
-        vector = new ASN1EncodableVector();
+        ASN1EncodableVector vector = new ASN1EncodableVector();
         if (nameAssigner != null) {
           vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
         }
         vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
         return new GeneralName(GeneralName.ediPartyName, new DERSequence(vector));
+      }
       default:
         throw new IllegalStateException("should not reach here, unknown GeneralName tag " + tag);
     } // end switch

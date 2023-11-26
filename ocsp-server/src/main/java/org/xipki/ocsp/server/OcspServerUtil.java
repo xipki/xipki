@@ -22,7 +22,6 @@ import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateException;
@@ -148,13 +147,7 @@ public class OcspServerUtil {
         store = new EjbcaCertStatusStore();
       } else if (type.startsWith("java:")) {
         String className = conf.getSource().getType().substring("java:".length()).trim();
-        try {
-          Class<?> clazz = Class.forName(className, false, OcspServerUtil.class.getClassLoader());
-          store = (OcspStore) clazz.getDeclaredConstructor().newInstance();
-        } catch (ReflectiveOperationException ex) {
-          throw new InvalidConfException("ObjectCreationException of store " + conf.getName() + ":" + ex.getMessage(),
-              ex);
-        }
+        store = ReflectiveUtil.newInstance(className, OcspServerUtil.class.getClassLoader());
       } else {
         throw new ObjectCreationException("unknown OCSP store type " + type);
       }
