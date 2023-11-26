@@ -2,8 +2,11 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
+## 6.5.1
+- Release date: 202x/mm/dd
+
 ## 6.5.0
-- Release date: 2023/mm/dd
+- Release date: 2023/11/26
 - All Components
   - No demo keys and certificates will be delivered.
   - Simplified password configuration.
@@ -22,9 +25,12 @@ See also <https://github.com/xipki/xipki/releases>
 - HSM Proxy
   - New component introduced in this version.
 - Dependencies
-  - xipki ipkics11wrapper: 1.0.7 -> 1.0.8
-  - xipki commons: 6.3.1 -> 6.3.2
-  - bouncycastle: 1.76 -> 1.77
+  - xipki ipkics11wrapper:  1.0.7   -> 1.0.8
+  - xipki commons:          6.3.1   -> 6.3.2
+  - bouncycastle:           1.76    -> 1.77
+  - jdbc driver postgresql: 42.6.0  -> 42.7.0
+  - jdbc driver mariadb:    3.2.0   -> 3.3.0
+  - jdbc driver h2:         2.2.220 -> 2.2.224
 
 ## 6.4.0
 - Release date: 2023/10/15
