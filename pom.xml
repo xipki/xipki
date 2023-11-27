@@ -73,6 +73,7 @@
     <module>shells</module>
     <module>qa</module>
     <module>examples</module>
+    <module>karaf-features</module>
   </modules>
   <scm>
     <connection>scm:git:git@github.com:xipki/xipki.git</connection>

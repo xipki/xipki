@@ -16,7 +16,6 @@
     <skipDeploy>true</skipDeploy>
   </properties>
   <modules>
-    <module>features</module>
     <module>xipki-cli</module>
     <module>xipki-mgmt-cli</module>
     <module>xipki-ocsp</module>
@@ -26,17 +25,4 @@
     <module>xipki-qa</module>
     <module>xipki-setup</module>
   </modules>
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <configuration>
-            <skip>${skipDeploy}</skip>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
 </project>
