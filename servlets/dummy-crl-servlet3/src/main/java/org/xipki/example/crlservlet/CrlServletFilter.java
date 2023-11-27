@@ -1,0 +1,24 @@
+// Copyright (c) 2013-2023 xipki. All rights reserved.
+// License Apache License 2.0
+
+package org.xipki.example.crlservlet;
+
+import org.xipki.example.crlserver.CrlHttpFilter;
+import org.xipki.servlet3.ServletFilter;
+import org.xipki.util.http.XiHttpFilter;
+
+import javax.servlet.FilterConfig;
+
+/**
+ * Dummy CRL ServletFilter.
+ *
+ * @author Lijun Liao (xipki)
+ */
+public class CrlServletFilter extends ServletFilter {
+
+  @Override
+  protected XiHttpFilter initFilter(FilterConfig filterConfig) throws Exception {
+    return new CrlHttpFilter();
+  }
+
+}

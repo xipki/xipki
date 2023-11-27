@@ -16,61 +16,61 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.gateway</groupId>
+      <groupId>org.xipki.servlet</groupId>
       <artifactId>cmp-servlet3</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.xipki.gateway</groupId>
+      <groupId>org.xipki.servlet</groupId>
       <artifactId>cmp-servlet5</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.xipki.gateway</groupId>
+      <groupId>org.xipki.servlet</groupId>
       <artifactId>scep-servlet3</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.xipki.gateway</groupId>
+      <groupId>org.xipki.servlet</groupId>
       <artifactId>scep-servlet5</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.xipki.gateway</groupId>
+      <groupId>org.xipki.servlet</groupId>
       <artifactId>rest-servlet3</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.xipki.gateway</groupId>
+      <groupId>org.xipki.servlet</groupId>
       <artifactId>rest-servlet5</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.xipki.gateway</groupId>
+      <groupId>org.xipki.servlet</groupId>
       <artifactId>est-servlet3</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.xipki.gateway</groupId>
+      <groupId>org.xipki.servlet</groupId>
       <artifactId>est-servlet5</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.xipki.gateway</groupId>
+      <groupId>org.xipki.servlet</groupId>
       <artifactId>acme-servlet3</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.xipki.gateway</groupId>
+      <groupId>org.xipki.servlet</groupId>
       <artifactId>acme-servlet5</artifactId>
       <version>${project.version}</version>
       <type>war</type>
@@ -133,61 +133,61 @@
               <stripVersion>true</stripVersion>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xipki.gateway</groupId>
+                  <groupId>org.xipki.servlet</groupId>
                   <artifactId>cmp-servlet3</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.gateway</groupId>
+                  <groupId>org.xipki.servlet</groupId>
                   <artifactId>cmp-servlet5</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.gateway</groupId>
+                  <groupId>org.xipki.servlet</groupId>
                   <artifactId>rest-servlet3</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.gateway</groupId>
+                  <groupId>org.xipki.servlet</groupId>
                   <artifactId>rest-servlet5</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.gateway</groupId>
+                  <groupId>org.xipki.servlet</groupId>
                   <artifactId>scep-servlet3</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.gateway</groupId>
+                  <groupId>org.xipki.servlet</groupId>
                   <artifactId>scep-servlet5</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.gateway</groupId>
+                  <groupId>org.xipki.servlet</groupId>
                   <artifactId>est-servlet3</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.gateway</groupId>
+                  <groupId>org.xipki.servlet</groupId>
                   <artifactId>est-servlet5</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.gateway</groupId>
+                  <groupId>org.xipki.servlet</groupId>
                   <artifactId>acme-servlet3</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.gateway</groupId>
+                  <groupId>org.xipki.servlet</groupId>
                   <artifactId>acme-servlet5</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>

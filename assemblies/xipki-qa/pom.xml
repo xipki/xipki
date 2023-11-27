@@ -100,13 +100,13 @@
               <stripVersion>true</stripVersion>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xipki.example</groupId>
+                  <groupId>org.xipki.servlet</groupId>
                   <artifactId>dummy-ctlog-servlet3</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.example</groupId>
+                  <groupId>org.xipki.servlet</groupId>
                   <artifactId>dummy-crl-servlet3</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
@@ -125,13 +125,13 @@
               <stripVersion>true</stripVersion>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xipki.example</groupId>
+                  <groupId>org.xipki.servlet</groupId>
                   <artifactId>dummy-ctlog-servlet5</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.example</groupId>
+                  <groupId>org.xipki.servlet</groupId>
                   <artifactId>dummy-crl-servlet5</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>

@@ -19,9 +19,7 @@
     <module>certprofile-example</module>
     <module>ocsp-store-example</module>
     <module>license-example</module>
-    <module>dummy-ctlog-servlet3</module>
-    <module>dummy-ctlog-servlet5</module>
-    <module>dummy-crl-servlet3</module>
-    <module>dummy-crl-servlet5</module>
+    <module>dummy-crl-server</module>
+    <module>dummy-ctlog-server</module>
   </modules>
 </project>

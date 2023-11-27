@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xipki</groupId>
+    <artifactId>xipki-parent</artifactId>
+    <version>6.5.1-SNAPSHOT</version>
+  </parent>
+  <groupId>org.xipki.servlet</groupId>
+  <artifactId>servlet-parent</artifactId>
+  <packaging>pom</packaging>
+  <name>XiPKI :: ${project.artifactId}</name>
+  <properties>
+    <skipDeploy>true</skipDeploy>
+    <log4j.dir>../shared/filtered</log4j.dir>
+  </properties>
+  <modules>
+    <!-- CA -->
+    <module>ca-servlet3</module>
+    <module>ca-servlet5</module>
+    <!-- OCSP -->
+    <module>ocsp-servlet3</module>
+    <module>ocsp-servlet5</module>
+    <!-- HSM Proxy -->
+    <module>hsmproxy-servlet3</module>
+    <module>hsmproxy-servlet5</module>
+    <!-- ACME -->
+    <module>acme-servlet3</module>
+    <module>acme-servlet5</module>
+    <!-- CMP -->
+    <module>cmp-servlet3</module>
+    <module>cmp-servlet5</module>
+    <!-- EST -->
+    <module>est-servlet3</module>
+    <module>est-servlet5</module>
+    <!-- REST -->
+    <module>rest-servlet3</module>
+    <module>rest-servlet5</module>
+    <!-- SCEP -->
+    <module>scep-servlet3</module>
+    <module>scep-servlet5</module>
+    <!-- Example CtLog -->
+    <module>dummy-ctlog-servlet3</module>
+    <module>dummy-ctlog-servlet5</module>
+    <!-- Example CRL Download -->
+    <module>dummy-crl-servlet3</module>
+    <module>dummy-crl-servlet5</module>
+  </modules>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <resources>
+      <resource>
+        <directory>${log4j.dir}</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>log4j2.properties</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.xipki</groupId>
+        <artifactId>ipkcs11wrapper</artifactId>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.xipki.commons</groupId>
+        <artifactId>password</artifactId>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk18on</artifactId>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcutil-jdk18on</artifactId>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcpkix-jdk18on</artifactId>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <scope>provided</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>
