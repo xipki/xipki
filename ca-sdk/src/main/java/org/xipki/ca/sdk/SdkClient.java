@@ -205,11 +205,11 @@ public class SdkClient {
     return resp.getCrl();
   }
 
-  private byte[] enrollCert0(String func, String cmd, String ca, EnrollCertRequestEntry reqEntry)
+  private byte[] enrollCert0(String func, String cmd, String ca, EnrollCertsRequest.Entry reqEntry)
       throws SdkErrorResponseException {
     EnrollCertsRequest req = new EnrollCertsRequest();
     req.setCaCertMode(CertsMode.NONE);
-    req.setEntries(new EnrollCertRequestEntry[]{reqEntry});
+    req.setEntries(new EnrollCertsRequest.Entry[]{reqEntry});
 
     byte[] respBytes = send(ca, cmd, req);
     EnrollOrPollCertsResponse resp;
@@ -219,16 +219,17 @@ public class SdkClient {
       throw new SdkErrorResponseException(ErrorCode.CLIENT_RESPONSE_DECODE_ERROR, e.getMessage());
     }
 
-    EnrollOrPullCertResponseEntry rEntry = resp.getEntries()[0];
+    EnrollOrPollCertsResponse.Entry rEntry = resp.getEntries()[0];
     return Optional.ofNullable(rEntry.getCert()).orElseThrow(() ->
         new SdkErrorResponseException(ErrorCode.SYSTEM_FAILURE, "error " + func));
   }
 
-  private KeyCertBytesPair enrollCertCaGenKeypair0(String func, String cmd, String ca, EnrollCertRequestEntry reqEntry)
+  private KeyCertBytesPair enrollCertCaGenKeypair0(
+      String func, String cmd, String ca, EnrollCertsRequest.Entry reqEntry)
       throws SdkErrorResponseException {
     EnrollCertsRequest req = new EnrollCertsRequest();
     req.setCaCertMode(CertsMode.NONE);
-    req.setEntries(new EnrollCertRequestEntry[]{reqEntry});
+    req.setEntries(new EnrollCertsRequest.Entry[]{reqEntry});
 
     byte[] respBytes = send(ca, cmd, req);
     EnrollOrPollCertsResponse resp;
@@ -238,7 +239,7 @@ public class SdkClient {
       throw new SdkErrorResponseException(ErrorCode.CLIENT_RESPONSE_DECODE_ERROR, e.getMessage());
     }
 
-    EnrollOrPullCertResponseEntry rEntry = resp.getEntries()[0];
+    EnrollOrPollCertsResponse.Entry rEntry = resp.getEntries()[0];
     if (rEntry.getCert() == null || rEntry.getPrivateKey() == null) {
       throw new SdkErrorResponseException(ErrorCode.SYSTEM_FAILURE, "error " + func);
     }
@@ -247,7 +248,7 @@ public class SdkClient {
 
   public byte[] enrollCert(String ca, String certprofile, byte[] p10Req)
       throws SdkErrorResponseException {
-    EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry();
+    EnrollCertsRequest.Entry reqEntry = new EnrollCertsRequest.Entry();
     reqEntry.setP10req(p10Req);
     reqEntry.setCertprofile(certprofile);
     return enrollCert0("enrollCert", CMD_enroll, ca, reqEntry);
@@ -255,7 +256,7 @@ public class SdkClient {
 
   public KeyCertBytesPair enrollCertCaGenKeypair(String ca, String certprofile, String subject)
       throws SdkErrorResponseException {
-    EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry();
+    EnrollCertsRequest.Entry reqEntry = new EnrollCertsRequest.Entry();
     reqEntry.setSubject(new X500NameType(subject));
     reqEntry.setCertprofile(certprofile);
     return enrollCertCaGenKeypair0("enrollCertCaGenKeypair", CMD_enroll, ca, reqEntry);
@@ -264,10 +265,10 @@ public class SdkClient {
   public byte[] reenrollCert(
       String ca, String certprofile, byte[] p10Req, X500Name oldCertIssuer, BigInteger oldCertSerialNumber)
       throws SdkErrorResponseException {
-    EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry();
+    EnrollCertsRequest.Entry reqEntry = new EnrollCertsRequest.Entry();
     reqEntry.setCertprofile(certprofile);
     reqEntry.setP10req(p10Req);
-    reqEntry.setOldCertIsn(new OldCertInfoByIssuerAndSerial(
+    reqEntry.setOldCertIsn(new OldCertInfo.ByIssuerAndSerial(
         false, new X500NameType(oldCertIssuer), oldCertSerialNumber));
     return enrollCert0("reenrollCert", CMD_reenroll, ca, reqEntry);
   }
@@ -275,11 +276,11 @@ public class SdkClient {
   public KeyCertBytesPair reenrollCertCaGenKeypair(
       String ca, String certprofile, X500Name subject, String oldCertIssuer, BigInteger oldCertSerialNumber)
       throws SdkErrorResponseException {
-    EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry();
+    EnrollCertsRequest.Entry reqEntry = new EnrollCertsRequest.Entry();
     reqEntry.setCertprofile(certprofile);
     reqEntry.setSubject(new X500NameType(subject));
     reqEntry.setOldCertIsn(
-        new OldCertInfoByIssuerAndSerial(false, new X500NameType(oldCertIssuer), oldCertSerialNumber));
+        new OldCertInfo.ByIssuerAndSerial(false, new X500NameType(oldCertIssuer), oldCertSerialNumber));
     return enrollCertCaGenKeypair0("reenrollCertCaGenKeypair", CMD_reenroll, ca, reqEntry);
   }
 
@@ -308,7 +309,7 @@ public class SdkClient {
       throw new SdkErrorResponseException(ErrorCode.CLIENT_RESPONSE_DECODE_ERROR, e.getMessage());
     }
 
-    EnrollOrPullCertResponseEntry[] entries = resp.getEntries();
+    EnrollOrPollCertsResponse.Entry[] entries = resp.getEntries();
     int expectedSize = req.getEntries().length;
     int size = entries == null ? 0 : entries.length;
     if (expectedSize != size) {
@@ -345,7 +346,7 @@ public class SdkClient {
     }
   }
 
-  public UnSuspendOrRemoveCertsResponse unsuspendCerts(UnsuspendOrRemoveRequest req)
+  public UnSuspendOrRemoveCertsResponse unsuspendCerts(UnsuspendOrRemoveCertsRequest req)
       throws SdkErrorResponseException {
     byte[] respBytes = send(null, CMD_unsuspend_cert, req);
     try {
@@ -355,7 +356,7 @@ public class SdkClient {
     }
   }
 
-  public UnSuspendOrRemoveCertsResponse removeCerts(UnsuspendOrRemoveRequest req)
+  public UnSuspendOrRemoveCertsResponse removeCerts(UnsuspendOrRemoveCertsRequest req)
       throws SdkErrorResponseException {
     byte[] respBytes = send(null, CMD_remove_cert, req);
     try {

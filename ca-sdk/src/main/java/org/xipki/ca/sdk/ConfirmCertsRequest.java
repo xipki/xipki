@@ -10,6 +10,7 @@ import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 /**
  *
@@ -21,9 +22,9 @@ public class ConfirmCertsRequest extends SdkRequest {
 
   private final String transactionId;
 
-  private final ConfirmCertRequestEntry[] entries;
+  private final Entry[] entries;
 
-  public ConfirmCertsRequest(String transactionId, ConfirmCertRequestEntry[] entries) {
+  public ConfirmCertsRequest(String transactionId, Entry[] entries) {
     this.transactionId = transactionId;
     this.entries = entries;
   }
@@ -32,7 +33,7 @@ public class ConfirmCertsRequest extends SdkRequest {
     return transactionId;
   }
 
-  public ConfirmCertRequestEntry[] getEntries() {
+  public Entry[] getEntries() {
     return entries;
   }
 
@@ -48,10 +49,77 @@ public class ConfirmCertsRequest extends SdkRequest {
       assertArrayStart("ConfirmCertsRequest", decoder, 2);
       return new ConfirmCertsRequest(
           decoder.readTextString(),
-          ConfirmCertRequestEntry.decodeArray(decoder));
+          Entry.decodeArray(decoder));
     } catch (IOException | RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, ConfirmCertsRequest.class), ex);
     }
   }
 
+  public static class Entry extends SdkEncodable {
+
+    private final boolean accept;
+
+    private final BigInteger certReqId;
+
+    /**
+     * certHash.
+     */
+    private final byte[] certhash;
+
+    public Entry(boolean accept, BigInteger certReqId, byte[] certhash) {
+      this.accept = accept;
+      this.certhash = certhash;
+      this.certReqId = certReqId;
+    }
+
+    public BigInteger getCertReqId() {
+      return certReqId;
+    }
+
+    public byte[] getCerthash() {
+      return certhash;
+    }
+
+    public boolean isAccept() {
+      return accept;
+    }
+
+    @Override
+    protected void encode0(CborEncoder encoder) throws IOException {
+      encoder.writeArrayStart(3);
+      encoder.writeBoolean(accept);
+      encoder.writeBigInt(certReqId);
+      encoder.writeByteString(certhash);
+    }
+
+    public static Entry decode(CborDecoder decoder) throws DecodeException {
+      try {
+        if (decoder.readNullOrArrayLength(3)) {
+          return null;
+        }
+
+        return new Entry(
+            decoder.readBoolean(),
+            decoder.readBigInt(),
+            decoder.readByteString());
+      } catch (IOException | RuntimeException ex) {
+        throw new DecodeException(buildDecodeErrMessage(ex, Entry.class), ex);
+      }
+    }
+
+    public static Entry[] decodeArray(CborDecoder decoder) throws DecodeException {
+      Integer arrayLen = decoder.readNullOrArrayLength(Entry[].class);
+      if (arrayLen == null) {
+        return null;
+      }
+
+      Entry[] entries = new Entry[arrayLen];
+      for (int i = 0; i < arrayLen; i++) {
+        entries[i] = Entry.decode(decoder);
+      }
+
+      return entries;
+    }
+
+  }
 }

@@ -10,6 +10,7 @@ import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 /**
  * Response for the operations enrolling certificates and polling certificates.
@@ -24,7 +25,7 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
 
   private Long confirmWaitTime;
 
-  private EnrollOrPullCertResponseEntry[] entries;
+  private Entry[] entries;
 
   private byte[][] extraCerts;
 
@@ -44,11 +45,11 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
     this.confirmWaitTime = confirmWaitTime;
   }
 
-  public EnrollOrPullCertResponseEntry[] getEntries() {
+  public Entry[] getEntries() {
     return entries;
   }
 
-  public void setEntries(EnrollOrPullCertResponseEntry[] entries) {
+  public void setEntries(Entry[] entries) {
     this.entries = entries;
   }
 
@@ -75,7 +76,7 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
       EnrollOrPollCertsResponse ret = new EnrollOrPollCertsResponse();
       ret.setTransactionId(decoder.readTextString());
       ret.setConfirmWaitTime(decoder.readLongObj());
-      ret.setEntries(EnrollOrPullCertResponseEntry.decodeArray(decoder));
+      ret.setEntries(Entry.decodeArray(decoder));
       ret.setExtraCerts(decoder.readByteStrings());
       return ret;
     } catch (IOException | RuntimeException ex) {
@@ -83,4 +84,77 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
     }
   }
 
+  public static class Entry extends SdkEncodable {
+
+    private final BigInteger id;
+
+    private final ErrorEntry error;
+
+    private final byte[] cert;
+
+    private final byte[] privateKey;
+
+    public Entry(BigInteger id, ErrorEntry error, byte[] cert, byte[] privateKey) {
+      this.id = id;
+      this.error = error;
+      this.cert = cert;
+      this.privateKey = privateKey;
+    }
+
+    public BigInteger getId() {
+      return id;
+    }
+
+    public ErrorEntry getError() {
+      return error;
+    }
+
+    public byte[] getCert() {
+      return cert;
+    }
+
+    public byte[] getPrivateKey() {
+      return privateKey;
+    }
+
+    @Override
+    protected void encode0(CborEncoder encoder) throws EncodeException, IOException {
+      encoder.writeArrayStart(4);
+      encoder.writeBigInt(id);
+      encoder.writeObject(error);
+      encoder.writeByteString(cert);
+      encoder.writeByteString(privateKey);
+    }
+
+    public static Entry decode(CborDecoder decoder) throws DecodeException {
+      try {
+        if (decoder.readNullOrArrayLength(4)) {
+          return null;
+        }
+
+        return new Entry(
+            decoder.readBigInt(),
+            ErrorEntry.decode(decoder),
+            decoder.readByteString(),
+            decoder.readByteString());
+      } catch (IOException | RuntimeException ex) {
+        throw new DecodeException(buildDecodeErrMessage(ex, Entry.class), ex);
+      }
+    }
+
+    public static Entry[] decodeArray(CborDecoder decoder) throws DecodeException {
+      Integer arrayLen = decoder.readNullOrArrayLength(Entry[].class);
+      if (arrayLen == null) {
+        return null;
+      }
+
+      Entry[] entries = new Entry[arrayLen];
+      for (int i = 0; i < arrayLen; i++) {
+        entries[i] = Entry.decode(decoder);
+      }
+
+      return entries;
+    }
+
+  }
 }

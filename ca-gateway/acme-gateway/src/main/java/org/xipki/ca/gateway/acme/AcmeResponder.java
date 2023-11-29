@@ -739,11 +739,11 @@ public class AcmeResponder {
           }
         }
 
-        RevokeCertRequestEntry sdkEntry = new RevokeCertRequestEntry(
+        RevokeCertsRequest.Entry sdkEntry = new RevokeCertsRequest.Entry(
             cert.getSerialNumber().getPositiveValue(), reason, null);
 
         RevokeCertsRequest sdkReq = new RevokeCertsRequest(null, new X500NameType(encodedIssuer),
-            null, new RevokeCertRequestEntry[]{sdkEntry});
+            null, new RevokeCertsRequest.Entry[]{sdkEntry});
 
         RevokeCertsResponse sdkResp;
         try {

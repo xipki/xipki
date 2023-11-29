@@ -40,6 +40,7 @@ import org.xipki.util.Base64;
 import org.xipki.util.*;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.HttpResponse;
+import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpRequest;
 
 import java.io.ByteArrayOutputStream;
@@ -68,8 +69,7 @@ public class EstResponder {
 
     private final AuditStatus auditStatus;
 
-    public HttpRespAuditException(int httpStatus, String auditMessage,
-        AuditLevel auditLevel, AuditStatus auditStatus) {
+    public HttpRespAuditException(int httpStatus, String auditMessage, AuditLevel auditLevel, AuditStatus auditStatus) {
       this.httpStatus = httpStatus;
       this.auditMessage = Args.notBlank(auditMessage, "auditMessage");
       this.auditLevel = Args.notNull(auditLevel, "auditLevel");
@@ -158,22 +158,6 @@ public class EstResponder {
 
   private static final String CT_pem_file = "application/x-pem-file";
 
-  private static final int OK = 200;
-
-  private static final int BAD_REQUEST = 400;
-
-  private static final int UNAUTHORIZED = 401;
-
-  private static final int NOT_FOUND = 404;
-
-  private static final int CONFLICT = 409;
-
-  private static final int UNSUPPORTED_MEDIA_TYPE = 415;
-
-  private static final int INTERNAL_SERVER_ERROR = 500;
-
-  private static final int SERVICE_UNAVAILABLE = 503;
-
   private static final Logger LOG = LoggerFactory.getLogger(EstResponder.class);
 
   private final String reverseProxyMode;
@@ -238,7 +222,7 @@ public class EstResponder {
         if (caProfileConf == null) {
           String message = "unknown alias " + alias;
           LOG.warn(message);
-          throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
+          throw new HttpRespAuditException(HttpStatusCode.SC_NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
         }
 
         caName = caProfileConf.getCa();
@@ -249,26 +233,26 @@ public class EstResponder {
       } else {
         String message = "invalid path " + path;
         LOG.error(message);
-        throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.ERROR, AuditStatus.FAILED);
+        throw new HttpRespAuditException(HttpStatusCode.SC_NOT_FOUND, message, AuditLevel.ERROR, AuditStatus.FAILED);
       }
       command = tokens[tokens.length - 1].toLowerCase(Locale.ROOT);
 
       if (StringUtil.isBlank(caName)) {
         String message = "CA is not specified";
         LOG.warn(message);
-        throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
+        throw new HttpRespAuditException(HttpStatusCode.SC_NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
       }
 
       if (StringUtil.isBlank(profile)) {
         String message = "profile is not specified";
         LOG.warn(message);
-        throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
+        throw new HttpRespAuditException(HttpStatusCode.SC_NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
       }
 
       if (StringUtil.isBlank(command)) {
         String message = "command is not specified";
         LOG.warn(message);
-        throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
+        throw new HttpRespAuditException(HttpStatusCode.SC_NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
       }
 
       event.addEventData(CaAuditConstants.NAME_ca, caName);
@@ -277,7 +261,7 @@ public class EstResponder {
       if (!knownCommands.contains(command)) {
         String message = "invalid command '" + command + "'";
         LOG.error(message);
-        throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
+        throw new HttpRespAuditException(HttpStatusCode.SC_NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
       }
 
       switch (command) {
@@ -299,7 +283,8 @@ public class EstResponder {
           if (crlBytes == null) {
             String message = "could not get CRL";
             LOG.warn(message);
-            throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, message, AuditLevel.INFO, AuditStatus.FAILED);
+            throw new HttpRespAuditException(HttpStatusCode.SC_INTERNAL_SERVER_ERROR,
+                message, AuditLevel.INFO, AuditStatus.FAILED);
           }
 
           return toHttpResponse(HttpRespContent.ofOk(CT_pkix_crl, true, crlBytes));
@@ -310,7 +295,7 @@ public class EstResponder {
         case CMD_fullcmc: {
           String message = "supported command '" + command + "'";
           LOG.error(message);
-          throw new HttpRespAuditException(NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
+          throw new HttpRespAuditException(HttpStatusCode.SC_NOT_FOUND, message, AuditLevel.INFO, AuditStatus.FAILED);
         }
       }
 
@@ -338,7 +323,7 @@ public class EstResponder {
         }
 
         if (user == null) {
-          throw new HttpRespAuditException(UNAUTHORIZED, "invalid Authorization information",
+          throw new HttpRespAuditException(HttpStatusCode.SC_UNAUTHORIZED, "invalid Authorization information",
               AuditLevel.INFO, AuditStatus.FAILED);
         }
 
@@ -347,13 +332,13 @@ public class EstResponder {
 
         boolean authorized = requestor0 != null && requestor0.authenticate(password);
         if (!authorized) {
-          throw new HttpRespAuditException(UNAUTHORIZED, "could not authenticate user " + user,
+          throw new HttpRespAuditException(HttpStatusCode.SC_UNAUTHORIZED, "could not authenticate user " + user,
               AuditLevel.INFO, AuditStatus.FAILED);
         }
       } else {
         X509Cert clientCert = Optional.ofNullable(TlsHelper.getTlsClientCert(httpRequest, reverseProxyMode))
             .orElseThrow(() -> new HttpRespAuditException(
-                                UNAUTHORIZED, "no client certificate", AuditLevel.INFO, AuditStatus.FAILED));
+                HttpStatusCode.SC_UNAUTHORIZED, "no client certificate", AuditLevel.INFO, AuditStatus.FAILED));
 
         requestor = Optional.ofNullable(getRequestor(clientCert))
             .orElseThrow(() -> new OperationException(ErrorCode.NOT_PERMITTED, "no requestor specified"));
@@ -364,7 +349,8 @@ public class EstResponder {
       String ct = httpRequest.getHeader("Content-Type");
       if (!CT_pkcs10.equalsIgnoreCase(ct)) {
         String message = "unsupported media type " + ct;
-        throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, AuditLevel.INFO, AuditStatus.FAILED);
+        throw new HttpRespAuditException(HttpStatusCode.SC_UNSUPPORTED_MEDIA_TYPE,
+            message, AuditLevel.INFO, AuditStatus.FAILED);
       }
 
       if (!requestor.isPermitted(Requestor.Permission.ENROLL_CERT)) {
@@ -408,26 +394,26 @@ public class EstResponder {
         case BAD_CERT_TEMPLATE:
         case UNKNOWN_CERT:
         case BAD_POP:
-          sc = BAD_REQUEST;
+          sc = HttpStatusCode.SC_BAD_REQUEST;
           break;
         case CERT_REVOKED:
-          sc = CONFLICT;
+          sc = HttpStatusCode.SC_CONFLICT;
           break;
         case NOT_PERMITTED:
         case UNAUTHORIZED:
-          sc = UNAUTHORIZED;
+          sc = HttpStatusCode.SC_UNAUTHORIZED;
           break;
         case SYSTEM_UNAVAILABLE:
-          sc = SERVICE_UNAVAILABLE;
+          sc = HttpStatusCode.SC_SERVICE_UNAVAILABLE;
           break;
         case PATH_NOT_FOUND:
-          sc = NOT_FOUND;
+          sc = HttpStatusCode.SC_NOT_FOUND;
           break;
         case CRL_FAILURE:
         case DATABASE_FAILURE:
         case SYSTEM_FAILURE:
         default:
-          sc = INTERNAL_SERVER_ERROR;
+          sc = HttpStatusCode.SC_INTERNAL_SERVER_ERROR;
           break;
       } // end switch (code)
 
@@ -455,7 +441,7 @@ public class EstResponder {
       auditLevel = AuditLevel.ERROR;
       auditStatus = AuditStatus.FAILED;
       auditMessage = "internal error";
-      return new HttpResponse(INTERNAL_SERVER_ERROR);
+      return new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     } finally {
       event.setStatus(auditStatus);
       event.setLevel(auditLevel);
@@ -467,8 +453,8 @@ public class EstResponder {
 
   private HttpResponse toHttpResponse(HttpRespContent respContent) {
     return respContent == null
-        ? new HttpResponse(OK)
-        : new HttpResponse(OK, respContent.getContentType(), null,
+        ? new HttpResponse(HttpStatusCode.SC_OK)
+        : new HttpResponse(HttpStatusCode.SC_OK, respContent.getContentType(), null,
               respContent.isBase64(), respContent.getContent());
   }
 
@@ -481,7 +467,7 @@ public class EstResponder {
     X500Name subject = certTemp.getSubject();
 
     BigInteger reqId = BigInteger.ONE;
-    EnrollCertRequestEntry template = new EnrollCertRequestEntry();
+    EnrollCertsRequest.Entry template = new EnrollCertsRequest.Entry();
     template.setCertReqId(reqId);
     template.setCertprofile(profile);
     template.setSubject(new X500NameType(subject));
@@ -494,7 +480,7 @@ public class EstResponder {
     try {
       template.extensions(extensions);
     } catch (IOException e) {
-      throw new HttpRespAuditException(BAD_REQUEST, "could not encode extensions",
+      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, "could not encode extensions",
           AuditLevel.INFO, AuditStatus.FAILED);
     }
 
@@ -502,12 +488,12 @@ public class EstResponder {
       try {
         template.subjectPublicKey(certTemp.getSubjectPublicKeyInfo());
       } catch (IOException e) {
-        throw new HttpRespAuditException(BAD_REQUEST, "could not encode SubjectPublicKeyInfo",
+        throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, "could not encode SubjectPublicKeyInfo",
             AuditLevel.INFO, AuditStatus.FAILED);
       }
     }
 
-    EnrollCertRequestEntry[] templates = new EnrollCertRequestEntry[]{template};
+    EnrollCertsRequest.Entry[] templates = new EnrollCertsRequest.Entry[]{template};
 
     EnrollCertsRequest sdkReq = new EnrollCertsRequest();
     sdkReq.setEntries(templates);
@@ -517,7 +503,7 @@ public class EstResponder {
     EnrollOrPollCertsResponse sdkResp = sdk.enrollCerts(caName, sdkReq);
     checkResponse(1, sdkResp);
 
-    EnrollOrPullCertResponseEntry entry = getEntry(sdkResp.getEntries(), reqId);
+    EnrollOrPollCertsResponse.Entry entry = getEntry(sdkResp.getEntries(), reqId);
     if (!caGenKeyPair) {
       if (CMD_usimpleenroll.equals(command)) {
         return HttpRespContent.ofOk(CT_pkix_cert, true, entry.getCert());
@@ -581,14 +567,14 @@ public class EstResponder {
     X500Name oldSubject = certTemp.getSubject();
 
     BigInteger reqId = BigInteger.ONE;
-    EnrollCertRequestEntry template = new EnrollCertRequestEntry();
+    EnrollCertsRequest.Entry template = new EnrollCertsRequest.Entry();
     template.setCertReqId(reqId);
     template.setCertprofile(profile);
 
     try {
       template.subjectPublicKey(certTemp.getSubjectPublicKeyInfo());
     } catch (IOException e) {
-      throw new HttpRespAuditException(BAD_REQUEST, "could not encode SubjectPublicKeyInfo",
+      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, "could not encode SubjectPublicKeyInfo",
           AuditLevel.INFO, AuditStatus.FAILED);
     }
 
@@ -596,7 +582,7 @@ public class EstResponder {
     Extensions csrExtns = X509Util.getExtensions(certTemp);
     byte[] extnValue = X509Util.getCoreExtValue(csrExtns, Extension.subjectAlternativeName);
 
-    OldCertInfoBySubject oldCertInfo = new OldCertInfoBySubject(false, oldSubject.getEncoded(), extnValue);
+    OldCertInfo.BySubject oldCertInfo = new OldCertInfo.BySubject(false, oldSubject.getEncoded(), extnValue);
 
     template.setOldCertSubject(oldCertInfo);
 
@@ -639,7 +625,7 @@ public class EstResponder {
           newSubjectAlt = GeneralNames.getInstance(obj);
         }
       } else {
-        throw new HttpRespAuditException(BAD_REQUEST, "invalid ChangeSubjectName",
+        throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, "invalid ChangeSubjectName",
             AuditLevel.INFO, AuditStatus.FAILED);
       }
 
@@ -681,10 +667,10 @@ public class EstResponder {
       template.extensions(requestedExtns);
     } catch (IOException e) {
       String message = "could not encode extensions";
-      throw new HttpRespAuditException(BAD_REQUEST, message, AuditLevel.INFO, AuditStatus.FAILED);
+      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, message, AuditLevel.INFO, AuditStatus.FAILED);
     }
 
-    EnrollCertRequestEntry[] templates = new EnrollCertRequestEntry[] {template};
+    EnrollCertsRequest.Entry[] templates = new EnrollCertsRequest.Entry[] {template};
 
     EnrollCertsRequest sdkReq = new EnrollCertsRequest();
     sdkReq.setEntries(templates);
@@ -694,7 +680,7 @@ public class EstResponder {
     EnrollOrPollCertsResponse sdkResp = sdk.reenrollCerts(caName, sdkReq);
     checkResponse(1, sdkResp);
 
-    EnrollOrPullCertResponseEntry entry = getEntry(sdkResp.getEntries(), reqId);
+    EnrollOrPollCertsResponse.Entry entry = getEntry(sdkResp.getEntries(), reqId);
     if (CMD_simplereenroll.equals(command)) {
       return HttpRespContent.ofOk(CT_pkcs7_mime_certyonly, true, buildCertsOnly(entry.getCert()));
     } else { // CMD_usimplereenroll
@@ -738,11 +724,11 @@ public class EstResponder {
 
   private static void checkResponse(int expectedSize, EnrollOrPollCertsResponse resp)
       throws HttpRespAuditException {
-    EnrollOrPullCertResponseEntry[] entries = resp.getEntries();
+    EnrollOrPollCertsResponse.Entry[] entries = resp.getEntries();
     if (entries != null) {
-      for (EnrollOrPullCertResponseEntry entry : entries) {
+      for (EnrollOrPollCertsResponse.Entry entry : entries) {
         if (entry.getError() != null) {
-          throw new HttpRespAuditException(INTERNAL_SERVER_ERROR,
+          throw new HttpRespAuditException(HttpStatusCode.SC_INTERNAL_SERVER_ERROR,
               entry.getError().toString(), AuditLevel.INFO, AuditStatus.FAILED);
         }
       }
@@ -750,21 +736,21 @@ public class EstResponder {
 
     int n = entries == null ? 0 : entries.length;
     if (n != expectedSize) {
-      throw new HttpRespAuditException(INTERNAL_SERVER_ERROR,
+      throw new HttpRespAuditException(HttpStatusCode.SC_INTERNAL_SERVER_ERROR,
           "expected " + expectedSize + " cert, but received " + n, AuditLevel.INFO, AuditStatus.FAILED);
     }
   }
 
-  private static EnrollOrPullCertResponseEntry getEntry(
-      EnrollOrPullCertResponseEntry[] entries, BigInteger certReqId)
+  private static EnrollOrPollCertsResponse.Entry getEntry(
+      EnrollOrPollCertsResponse.Entry[] entries, BigInteger certReqId)
       throws HttpRespAuditException {
-    for (EnrollOrPullCertResponseEntry m : entries) {
+    for (EnrollOrPollCertsResponse.Entry m : entries) {
       if (certReqId.equals(m.getId())) {
         return m;
       }
     }
-    throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, "found no response entry with certReqId " + certReqId,
-        AuditLevel.INFO, AuditStatus.FAILED);
+    throw new HttpRespAuditException(HttpStatusCode.SC_INTERNAL_SERVER_ERROR,
+        "found no response entry with certReqId " + certReqId, AuditLevel.INFO, AuditStatus.FAILED);
   }
 
   private static byte[] buildCertsOnly(byte[]... certsBytes) throws IOException {

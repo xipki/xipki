@@ -200,7 +200,7 @@ public class SdkResponder {
             } else if (CMD_revoke_cert.equals(command)) {
               req = RevokeCertsRequest.decode(requireNonNullRequest(request));
             } else {
-              req = UnsuspendOrRemoveRequest.decode(requireNonNullRequest(request));
+              req = UnsuspendOrRemoveCertsRequest.decode(requireNonNullRequest(request));
             }
             break;
           }
@@ -276,10 +276,10 @@ public class SdkResponder {
           return null;
         case CMD_unsuspend_cert:
           assertPermitted(requestor, UNSUSPEND_CERT);
-          return removeOrUnsuspend(requestor, ca, (UnsuspendOrRemoveRequest) req, true, "-".equals(caName));
+          return removeOrUnsuspend(requestor, ca, (UnsuspendOrRemoveCertsRequest) req, true, "-".equals(caName));
         case CMD_remove_cert:
           assertPermitted(requestor, REMOVE_CERT);
-          return removeOrUnsuspend(requestor, ca, (UnsuspendOrRemoveRequest) req, false, "-".equals(caName));
+          return removeOrUnsuspend(requestor, ca, (UnsuspendOrRemoveCertsRequest) req, false, "-".equals(caName));
         case CMD_gen_crl:
           assertPermitted(requestor, GEN_CRL);
           return genCrl(requestor, ca, requireNonNullRequest(request));
@@ -330,13 +330,13 @@ public class SdkResponder {
   private SdkResponse enroll(X509Ca ca, byte[] request, RequestorInfo requestor, boolean reenroll, boolean crossCert)
       throws OperationException, DecodeException {
     EnrollCertsRequest req = EnrollCertsRequest.decode(request);
-    EnrollCertRequestEntry[] entries = req.getEntries();
+    EnrollCertsRequest.Entry[] entries = req.getEntries();
 
     List<CertTemplateData> certTemplates = new ArrayList<>(entries.length);
 
     Set<String> profiles = new HashSet<>();
 
-    for (EnrollCertRequestEntry entry : entries) {
+    for (EnrollCertsRequest.Entry entry : entries) {
       String profile = entry.getCertprofile();
       Instant notBefore = entry.getNotBefore();
       Instant notAfter = entry.getNotAfter();
@@ -383,8 +383,8 @@ public class SdkResponder {
         if (reenroll) {
           CertWithRevocationInfo oldCert;
 
-          OldCertInfoByIssuerAndSerial ocIsn = entry.getOldCertIsn();
-          OldCertInfoBySubject ocSubject = entry.getOldCertSubject();
+          OldCertInfo.ByIssuerAndSerial ocIsn = entry.getOldCertIsn();
+          OldCertInfo.BySubject ocSubject = entry.getOldCertSubject();
 
           if (ocIsn == null && ocSubject == null) {
             throw new OperationException(BAD_CERT_TEMPLATE,  "Neither oldCertIsn nor oldCertSubject is specified" +
@@ -492,7 +492,7 @@ public class SdkResponder {
       waitForConfirmUtil = Clock.systemUTC().millis() + confirmWaitTimeMs;
     }
 
-    EnrollOrPullCertResponseEntry[] rentries =
+    EnrollOrPollCertsResponse.Entry[] rentries =
         generateCertificates(requestor, ca, certTemplates, req, waitForConfirmUtil);
     if (rentries == null) {
       return new ErrorResponse(req.getTransactionId(), SYSTEM_FAILURE, null);
@@ -528,11 +528,11 @@ public class SdkResponder {
 
     String tid = req.getTransactionId();
 
-    PollCertRequestEntry[] entries = req.getEntries();
-    EnrollOrPullCertResponseEntry[] rentries = new EnrollOrPullCertResponseEntry[entries.length];
+    PollCertRequest.Entry[] entries = req.getEntries();
+    EnrollOrPollCertsResponse.Entry[] rentries = new EnrollOrPollCertsResponse.Entry[entries.length];
 
     for (int i = 0; i < entries.length; i++) {
-      PollCertRequestEntry m = entries[i];
+      PollCertRequest.Entry m = entries[i];
 
       ErrorEntry error = null;
       X500Name subject = null;
@@ -552,7 +552,7 @@ public class SdkResponder {
         }
       }
 
-      rentries[i] = new EnrollOrPullCertResponseEntry(m.getId(), error, certBytes, null);
+      rentries[i] = new EnrollOrPollCertsResponse.Entry(m.getId(), error, certBytes, null);
     }
 
     EnrollOrPollCertsResponse resp = new EnrollOrPollCertsResponse();
@@ -568,10 +568,10 @@ public class SdkResponder {
       assertIssuerMatch(ca, req);
     }
 
-    RevokeCertRequestEntry[] entries = req.getEntries();
+    RevokeCertsRequest.Entry[] entries = req.getEntries();
     SingleCertSerialEntry[] rentries = new SingleCertSerialEntry[entries.length];
     for (int i = 0; i < entries.length; i++) {
-      RevokeCertRequestEntry entry = entries[i];
+      RevokeCertsRequest.Entry entry = entries[i];
 
       BigInteger serialNumber = entry.getSerialNumber();
       CrlReason reason = entry.getReason();
@@ -595,7 +595,7 @@ public class SdkResponder {
   }
 
   private SdkResponse removeOrUnsuspend(RequestorInfo requestor, X509Ca ca,
-                                        UnsuspendOrRemoveRequest req, boolean unsuspend, boolean caReqMatchChecked)
+                                        UnsuspendOrRemoveCertsRequest req, boolean unsuspend, boolean caReqMatchChecked)
       throws OperationException {
     if (!caReqMatchChecked) {
       assertIssuerMatch(ca, req);
@@ -726,7 +726,7 @@ public class SdkResponder {
     }
   }
 
-  private EnrollOrPullCertResponseEntry[] generateCertificates(
+  private EnrollOrPollCertsResponse.Entry[] generateCertificates(
       RequestorInfo requestor, X509Ca ca, List<CertTemplateData> certTemplates,
       EnrollCertsRequest req, long waitForConfirmUtil) {
     String caName = ca.getCaInfo().getIdent().getName();
@@ -738,7 +738,7 @@ public class SdkResponder {
     b = req.getExplicitConfirm();
     boolean explicitConfirm = b != null && b;
 
-    List<EnrollOrPullCertResponseEntry> ret = new ArrayList<>(n);
+    List<EnrollOrPollCertsResponse.Entry> ret = new ArrayList<>(n);
 
     if (groupEnroll) {
       List<CertificateInfo> certInfos = null;
@@ -768,10 +768,10 @@ public class SdkResponder {
             certBytes = certInfo.getCert().getCert().getEncoded();
           }
 
-          ret.add(new EnrollOrPullCertResponseEntry(certReqId, error, certBytes, privateKeyBytes));
+          ret.add(new EnrollOrPollCertsResponse.Entry(certReqId, error, certBytes, privateKeyBytes));
         }
 
-        return ret.toArray(new EnrollOrPullCertResponseEntry[0]);
+        return ret.toArray(new EnrollOrPollCertsResponse.Entry[0]);
       } catch (OperationException ex) {
         if (certInfos != null) {
           for (CertificateInfo certInfo : certInfos) {
@@ -815,10 +815,10 @@ public class SdkResponder {
         error = new ErrorEntry(ex.getErrorCode(), ex.getErrorMessage());
       }
 
-      ret.add(new EnrollOrPullCertResponseEntry(certReqId, error, certBytes, privateKeyBytes));
+      ret.add(new EnrollOrPollCertsResponse.Entry(certReqId, error, certBytes, privateKeyBytes));
     }
 
-    return ret.toArray(new EnrollOrPullCertResponseEntry[0]);
+    return ret.toArray(new EnrollOrPollCertsResponse.Entry[0]);
   } // method generateCertificates
 
   protected SdkResponse confirmCertificates(RequestorInfo requestor, X509Ca ca, byte[] request)
@@ -826,7 +826,7 @@ public class SdkResponder {
     ConfirmCertsRequest req = ConfirmCertsRequest.decode(request);
     String tid = req.getTransactionId();
     boolean successful = true;
-    for (ConfirmCertRequestEntry m : req.getEntries()) {
+    for (ConfirmCertsRequest.Entry m : req.getEntries()) {
       BigInteger certReqId = m.getCertReqId();
       byte[] certHash = m.getCerthash();
       CertificateInfo certInfo = pendingCertPool.removeCertificate(tid, certReqId, certHash);

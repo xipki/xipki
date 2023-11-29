@@ -554,7 +554,7 @@ public class ScepResponder {
 
           Extensions extensions = X509Util.getExtensions(csrReqInfo);
           // need to remove the password
-          EnrollCertRequestEntry template = new EnrollCertRequestEntry();
+          EnrollCertsRequest.Entry template = new EnrollCertsRequest.Entry();
           template.setCertprofile(certprofileName);
           template.setSubject(new X500NameType(csrReqInfo.getSubject()));
 
@@ -573,7 +573,7 @@ public class ScepResponder {
           }
 
           EnrollCertsRequest sdkReq = new EnrollCertsRequest();
-          sdkReq.setEntries(new EnrollCertRequestEntry[]{template});
+          sdkReq.setEntries(new EnrollCertsRequest.Entry[]{template});
           sdkReq.setTransactionId(tid);
           sdkReq.setExplicitConfirm(false);
           CertsMode certsMode = control.isIncludeCertChain() ? CertsMode.CHAIN
@@ -588,10 +588,10 @@ public class ScepResponder {
           IssuerAndSubject is = IssuerAndSubject.getInstance(req.getMessageData());
           audit(event, CaAuditConstants.NAME_issuer, "\"" + X509Util.x500NameText(is.getIssuer()) + "\"");
           audit(event, CaAuditConstants.NAME_subject, "\"" + X509Util.x500NameText(is.getSubject()) + "\"");
-          PollCertRequestEntry template = new PollCertRequestEntry(null, new X500NameType(is.getSubject()));
+          PollCertRequest.Entry template = new PollCertRequest.Entry(null, new X500NameType(is.getSubject()));
 
           PollCertRequest sdkReq = new PollCertRequest(null, new X500NameType(is.getIssuer()),
-              null, req.getTransactionId().getId(), new PollCertRequestEntry[]{template});
+              null, req.getTransactionId().getId(), new PollCertRequest.Entry[]{template});
 
           signedData = buildSignedData(
                         sdk.pollCerts(sdkReq));
@@ -639,13 +639,13 @@ public class ScepResponder {
 
   private SignedData buildSignedData(EnrollOrPollCertsResponse sdkResp)
     throws OperationException {
-    EnrollOrPullCertResponseEntry[] entries = sdkResp.getEntries();
+    EnrollOrPollCertsResponse.Entry[] entries = sdkResp.getEntries();
     int n = entries == null ? 0 : entries.length;
     if (n != 1) {
       throw new OperationException(SYSTEM_FAILURE, "expected 1 cert, but received " + n);
     }
 
-    EnrollOrPullCertResponseEntry entry = entries[0];
+    EnrollOrPollCertsResponse.Entry entry = entries[0];
     byte[] cert = Optional.ofNullable(entry.getCert()).orElseThrow(() ->
         new OperationException(ErrorCode.ofCode(entry.getError().getCode()), "expected 1 cert, but received none"));
 

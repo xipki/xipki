@@ -84,7 +84,7 @@ public class CertEnroller implements Runnable {
         continue;
       }
 
-      EnrollCertRequestEntry entry = new EnrollCertRequestEntry();
+      EnrollCertsRequest.Entry entry = new EnrollCertsRequest.Entry();
       CertReqMeta certReqMeta = order.getCertReqMeta();
       entry.setNotBefore(certReqMeta.getNotBefore());
       entry.setNotAfter(certReqMeta.getNotAfter());
@@ -110,12 +110,12 @@ public class CertEnroller implements Runnable {
 
       EnrollCertsRequest sdkReq = new EnrollCertsRequest();
       sdkReq.setCaCertMode(CertsMode.NONE);
-      sdkReq.setEntries(new EnrollCertRequestEntry[]{entry});
+      sdkReq.setEntries(new EnrollCertsRequest.Entry[]{entry});
 
       LOG.info("start enrolling certificate for order {}", orderIdStr);
       try {
         EnrollOrPollCertsResponse sdkResp = sdk.enrollCerts(certReqMeta.getCa(), sdkReq);
-        EnrollOrPullCertResponseEntry sdkRespEntry = sdkResp.getEntries()[0];
+        EnrollOrPollCertsResponse.Entry sdkRespEntry = sdkResp.getEntries()[0];
         byte[] certBytes = sdkRespEntry.getCert();
         boolean valid = certBytes != null;
         if (valid) {

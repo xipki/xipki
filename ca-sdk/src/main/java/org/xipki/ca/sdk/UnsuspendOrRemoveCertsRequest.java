@@ -18,12 +18,12 @@ import java.math.BigInteger;
  * @since 6.0.0
  */
 
-public class UnsuspendOrRemoveRequest extends CaIdentifierRequest {
+public class UnsuspendOrRemoveCertsRequest extends CaIdentifierRequest {
 
   private final BigInteger[] entries;
 
-  public UnsuspendOrRemoveRequest(byte[] issuerCertSha1Fp, X500NameType issuer,
-                                  byte[] authorityKeyIdentifier, BigInteger[] entries) {
+  public UnsuspendOrRemoveCertsRequest(byte[] issuerCertSha1Fp, X500NameType issuer,
+                                       byte[] authorityKeyIdentifier, BigInteger[] entries) {
     super(issuerCertSha1Fp, issuer, authorityKeyIdentifier);
     this.entries = entries;
   }
@@ -38,16 +38,16 @@ public class UnsuspendOrRemoveRequest extends CaIdentifierRequest {
     encoder.writeBigInts(entries);
   }
 
-  public static UnsuspendOrRemoveRequest decode(byte[] encoded) throws DecodeException {
+  public static UnsuspendOrRemoveCertsRequest decode(byte[] encoded) throws DecodeException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("UnsuspendOrRemoveRequest", decoder, 3 + 1); // 3 fields defined in the pararent class.
-      return new UnsuspendOrRemoveRequest(
+      return new UnsuspendOrRemoveCertsRequest(
           decoder.readByteString(),
           X500NameType.decode(decoder),
           decoder.readByteString(),
           decoder.readBigInts());
     } catch (IOException | RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, UnsuspendOrRemoveRequest.class), ex);
+      throw new DecodeException(buildDecodeErrMessage(ex, UnsuspendOrRemoveCertsRequest.class), ex);
     }
   }
 

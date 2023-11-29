@@ -3,6 +3,8 @@
 
 package org.xipki.ca.sdk;
 
+import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
@@ -10,6 +12,8 @@ import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
 
 import java.io.IOException;
+import java.math.BigInteger;
+import java.time.Instant;
 
 /**
  *
@@ -42,7 +46,7 @@ public class EnrollCertsRequest extends SdkRequest {
    */
   private CertsMode caCertMode;
 
-  private EnrollCertRequestEntry[] entries;
+  private Entry[] entries;
 
   public String getTransactionId() {
     return transactionId;
@@ -84,11 +88,11 @@ public class EnrollCertsRequest extends SdkRequest {
     this.caCertMode = caCertMode;
   }
 
-  public EnrollCertRequestEntry[] getEntries() {
+  public Entry[] getEntries() {
     return entries;
   }
 
-  public void setEntries(EnrollCertRequestEntry[] entries) {
+  public void setEntries(Entry[] entries) {
     this.entries = entries;
   }
 
@@ -115,11 +119,208 @@ public class EnrollCertsRequest extends SdkRequest {
       if (str != null) {
         ret.setCaCertMode(CertsMode.valueOf(str));
       }
-      ret.setEntries(EnrollCertRequestEntry.decodeArray(decoder));
+      ret.setEntries(Entry.decodeArray(decoder));
       return ret;
     } catch (IOException | RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, EnrollCertsRequest.class), ex);
     }
   }
 
+  public static class Entry extends SdkEncodable {
+
+    private BigInteger certReqId;
+
+    private String certprofile;
+
+    /**
+     * Specifies the PKCS#10 Request. Note that the CA does NOT verify the signature of
+     * this request. You may also put any dummy value in the signature field.
+     * The verification of CSR must be processed by the CA client calling
+     * the enrolment service.
+     * <p>
+     * If p10req is set, the {@link #subject}, {@link #subjectPublicKey} and
+     * {@link #extensions} will be ignored.
+     */
+    private byte[] p10req;
+
+    /**
+     * Specifies the Subject. Must be set if p10req is not present, set it to empty string
+     * if empty subject is expected. Must be set if p10req is not present.
+     */
+    private X500NameType subject;
+
+    /**
+     * Specifies the DER-encoded SubjectPublicKeyInfo.
+     * If both this and the p10req is not set, CA will generate the keypair.
+     */
+    private byte[] subjectPublicKey;
+
+    /**
+     * Specifies the additional extensions. Will be considered only if p10req is not present.
+     */
+    private byte[] extensions;
+
+    /**
+     * Epoch time in seconds of not-before.
+     */
+    private Instant notBefore;
+
+    /**
+     * Epoch time in seconds of not-after.
+     */
+    private Instant notAfter;
+
+    private OldCertInfo.ByIssuerAndSerial oldCertIsn;
+
+    private OldCertInfo.BySubject oldCertSubject;
+
+    public BigInteger getCertReqId() {
+      return certReqId;
+    }
+
+    public void setCertReqId(BigInteger certReqId) {
+      this.certReqId = certReqId;
+    }
+
+    public String getCertprofile() {
+      return certprofile;
+    }
+
+    public void setCertprofile(String certprofile) {
+      this.certprofile = certprofile;
+    }
+
+    public byte[] getSubjectPublicKey() {
+      return subjectPublicKey;
+    }
+
+    public void setSubjectPublicKey(byte[] subjectPublicKey) {
+      this.subjectPublicKey = subjectPublicKey;
+    }
+
+    public void subjectPublicKey(SubjectPublicKeyInfo subjectPublicKey) throws IOException {
+      this.subjectPublicKey = subjectPublicKey == null ? null : subjectPublicKey.getEncoded();
+    }
+
+    public X500NameType getSubject() {
+      return subject;
+    }
+
+    public void setSubject(X500NameType subject) {
+      this.subject = subject;
+    }
+
+    public byte[] getExtensions() {
+      return extensions;
+    }
+
+    public void setExtensions(byte[] extensions) {
+      this.extensions = extensions;
+    }
+
+    public void extensions(Extensions extensions) throws IOException {
+      this.extensions = extensions == null ? null : extensions.getEncoded();
+    }
+
+    public byte[] getP10req() {
+      return p10req;
+    }
+
+    public void setP10req(byte[] p10req) {
+      this.p10req = p10req;
+    }
+
+    public Instant getNotBefore() {
+      return notBefore;
+    }
+
+    public void setNotBefore(Instant notBefore) {
+      this.notBefore = notBefore;
+    }
+
+    public void notBefore(Instant notBefore) {
+      this.notBefore = notBefore;
+    }
+
+    public Instant getNotAfter() {
+      return notAfter;
+    }
+
+    public void setNotAfter(Instant notAfter) {
+      this.notAfter = notAfter;
+    }
+
+    public void notAfter(Instant notAfter) {
+      this.notAfter = notAfter;
+    }
+
+    public OldCertInfo.ByIssuerAndSerial getOldCertIsn() {
+      return oldCertIsn;
+    }
+
+    public void setOldCertIsn(OldCertInfo.ByIssuerAndSerial oldCertIsn) {
+      this.oldCertIsn = oldCertIsn;
+    }
+
+    public OldCertInfo.BySubject getOldCertSubject() {
+      return oldCertSubject;
+    }
+
+    public void setOldCertSubject(OldCertInfo.BySubject oldCertSubject) {
+      this.oldCertSubject = oldCertSubject;
+    }
+
+    @Override
+    protected void encode0(CborEncoder encoder) throws EncodeException, IOException {
+      encoder.writeArrayStart(10);
+      encoder.writeBigInt(certReqId);
+      encoder.writeTextString(certprofile);
+      encoder.writeByteString(p10req);
+      encoder.writeObject(subject);
+      encoder.writeByteString(subjectPublicKey);
+      encoder.writeByteString(extensions);
+      encoder.writeInstant(notBefore);
+      encoder.writeInstant(notAfter);
+      encoder.writeObject(oldCertIsn);
+      encoder.writeObject(oldCertSubject);
+    }
+
+    public static Entry decode(CborDecoder decoder) throws DecodeException {
+      try {
+        if (decoder.readNullOrArrayLength(10)) {
+          return null;
+        }
+
+        Entry ret = new Entry();
+        ret.setCertReqId(decoder.readBigInt());
+        ret.setCertprofile(decoder.readTextString());
+        ret.setP10req(decoder.readByteString());
+        ret.setSubject(X500NameType.decode(decoder));
+        ret.setSubjectPublicKey(decoder.readByteString());
+        ret.setExtensions(decoder.readByteString());
+        ret.setNotBefore(decoder.readInstant());
+        ret.setNotAfter(decoder.readInstant());
+        ret.setOldCertIsn(OldCertInfo.ByIssuerAndSerial.decode(decoder));
+        ret.setOldCertSubject(OldCertInfo.BySubject.decode(decoder));
+        return ret;
+      } catch (IOException | RuntimeException ex) {
+        throw new DecodeException(buildDecodeErrMessage(ex, Entry.class), ex);
+      }
+    }
+
+    public static Entry[] decodeArray(CborDecoder decoder) throws DecodeException {
+      Integer arrayLen = decoder.readNullOrArrayLength(Entry[].class);
+      if (arrayLen == null) {
+        return null;
+      }
+
+      Entry[] entries = new Entry[arrayLen];
+      for (int i = 0; i < arrayLen; i++) {
+        entries[i] = Entry.decode(decoder);
+      }
+
+      return entries;
+    }
+
+  }
 }

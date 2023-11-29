@@ -570,7 +570,7 @@ public class RestResponder {
     BigInteger certId = BigInteger.ONE;
     BigInteger certIdEnc = twin ? BigInteger.valueOf(2) : null;
 
-    EnrollCertRequestEntry template = new EnrollCertRequestEntry();
+    EnrollCertsRequest.Entry template = new EnrollCertsRequest.Entry();
     template.setCertReqId(certId);
     template.setCertprofile(profile);
     template.setSubject(new X500NameType(subject));
@@ -594,11 +594,11 @@ public class RestResponder {
       throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, message, INFO, FAILED);
     }
 
-    List<EnrollCertRequestEntry> templates = new ArrayList<>(twin ? 2 : 1);
+    List<EnrollCertsRequest.Entry> templates = new ArrayList<>(twin ? 2 : 1);
     templates.add(template);
 
     if (twin) {
-      template = new EnrollCertRequestEntry();
+      template = new EnrollCertsRequest.Entry();
       template.setCertReqId(certIdEnc);
       template.setCertprofile(profileEnc);
       template.setSubject(new X500NameType(subject));
@@ -619,7 +619,7 @@ public class RestResponder {
     }
 
     EnrollCertsRequest sdkReq = new EnrollCertsRequest();
-    sdkReq.setEntries(templates.toArray(new EnrollCertRequestEntry[0]));
+    sdkReq.setEntries(templates.toArray(new EnrollCertsRequest.Entry[0]));
     sdkReq.setExplicitConfirm(false);
     sdkReq.setGroupEnroll(twin);
     sdkReq.setCaCertMode(CertsMode.NONE);
@@ -627,7 +627,7 @@ public class RestResponder {
     EnrollOrPollCertsResponse sdkResp = sdk.enrollCerts(caName, sdkReq);
     checkResponse(templates.size(), sdkResp);
 
-    EnrollOrPullCertResponseEntry entry = getEntry(sdkResp.getEntries(), certId);
+    EnrollOrPollCertsResponse.Entry entry = getEntry(sdkResp.getEntries(), certId);
     if (!(caGenKeyPair || twin)) {
       return HttpRespContent.ofOk(CT_pkix_cert, entry.getCert());
     }
@@ -731,7 +731,7 @@ public class RestResponder {
       notAfter = targetCertEndDate;
     }
 
-    EnrollCertRequestEntry template = new EnrollCertRequestEntry();
+    EnrollCertsRequest.Entry template = new EnrollCertsRequest.Entry();
     template.setCertReqId(certId);
     template.setCertprofile(profile);
     template.setSubject(new X500NameType(subject));
@@ -755,7 +755,7 @@ public class RestResponder {
       throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, message, INFO, FAILED);
     }
 
-    EnrollCertRequestEntry[] templates = new EnrollCertRequestEntry[]{template};
+    EnrollCertsRequest.Entry[] templates = new EnrollCertsRequest.Entry[]{template};
 
     EnrollCertsRequest sdkReq = new EnrollCertsRequest();
     sdkReq.setEntries(templates);
@@ -766,14 +766,14 @@ public class RestResponder {
     EnrollOrPollCertsResponse sdkResp = sdk.enrollCrossCerts(caName, sdkReq);
     checkResponse(templates.length, sdkResp);
 
-    EnrollOrPullCertResponseEntry entry = getEntry(sdkResp.getEntries(), certId);
+    EnrollOrPollCertsResponse.Entry entry = getEntry(sdkResp.getEntries(), certId);
     return HttpRespContent.ofOk(CT_pkix_cert, entry.getCert());
   }
 
   private static void checkResponse(int expectedSize, EnrollOrPollCertsResponse resp) throws HttpRespAuditException {
-    EnrollOrPullCertResponseEntry[] entries = resp.getEntries();
+    EnrollOrPollCertsResponse.Entry[] entries = resp.getEntries();
     if (entries != null) {
-      for (EnrollOrPullCertResponseEntry entry : entries) {
+      for (EnrollOrPollCertsResponse.Entry entry : entries) {
         if (entry.getError() != null) {
           throw new HttpRespAuditException(HttpStatusCode.SC_INTERNAL_SERVER_ERROR,
               entry.getError().toString(), INFO, FAILED);
@@ -801,10 +801,10 @@ public class RestResponder {
     }
   }
 
-  private static EnrollOrPullCertResponseEntry getEntry(
-      EnrollOrPullCertResponseEntry[] entries, BigInteger certReqId)
+  private static EnrollOrPollCertsResponse.Entry getEntry(
+      EnrollOrPollCertsResponse.Entry[] entries, BigInteger certReqId)
       throws HttpRespAuditException {
-    for (EnrollOrPullCertResponseEntry m : entries) {
+    for (EnrollOrPollCertsResponse.Entry m : entries) {
       if (certReqId.equals(m.getId())) {
         return m;
       }
@@ -847,8 +847,8 @@ public class RestResponder {
     event.addEventData(CaAuditConstants.NAME_serial, LogUtil.formatCsn(serialNumber));
 
     if (!revoke) {
-      UnsuspendOrRemoveRequest sdkReq =
-          new UnsuspendOrRemoveRequest(caSha1, null, null, new BigInteger[]{serialNumber});
+      UnsuspendOrRemoveCertsRequest sdkReq =
+          new UnsuspendOrRemoveCertsRequest(caSha1, null, null, new BigInteger[]{serialNumber});
       sdk.unsuspendCerts(sdkReq);
     } else {
       String strReason = httpRetriever.getParameter(PARAM_reason);
@@ -865,9 +865,9 @@ public class RestResponder {
         invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(strInvalidityTime);
       }
 
-      RevokeCertRequestEntry entry = new RevokeCertRequestEntry(serialNumber, reason, invalidityTime);
+      RevokeCertsRequest.Entry entry = new RevokeCertsRequest.Entry(serialNumber, reason, invalidityTime);
 
-      RevokeCertsRequest sdkReq = new RevokeCertsRequest(caSha1, null, null, new RevokeCertRequestEntry[]{entry});
+      RevokeCertsRequest sdkReq = new RevokeCertsRequest(caSha1, null, null, new RevokeCertsRequest.Entry[]{entry});
       sdk.revokeCerts(sdkReq);
     }
   }
