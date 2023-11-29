@@ -1,13 +1,16 @@
 ## URL pattern: https://<host>:<port>/.well-known/est/<CA-name>/<certprofile-name>
+## URL pattern: https://<host>:<port>/est/<CA-name>/<certprofile-name>
+
 BASE_URL = https://localhost:8445/.well-known/est/myca/tls
 
 ## Short URL is possible
 ##   For all aliases:     https://<host>:<port>/.well-known/est/<alias>
+##                        https://<host>:<port>/est/<alias>
 ##   For alias "default": https://<host>:<port>/.well-known/est
+##                        https://<host>:<port>/est
 ## To use the short URL, you need to configure the "CaProfiles" field
 ## in the EST proxy (acme-proxy.conf) with given alias.
 #
-# BASE_URL = https://localhost:8445/.well-known/est
 
 CT_PKCS10 = "Content-Type: application/pkcs10"
 
@@ -160,4 +163,4 @@ FILE = ${OUT_DIR}/${CMD}
 xi:csr-p12 --p12 ${OUT_DIR}/demo.p12 --password CHANGEIT  --out ${FILE}.csr \
   --subject "CN=${CUR_TIME}-est-${CMD}.myorg.org,O=myorg,C=DE"
 
-xi:curl --base64 --header "${CT_PKCS10}" --out ${FILE}.p7m --data-file ${FILE}.csr "$BASE_URL/${CMD}"
+xi:curl --base64 --header "${CT_PKCS10}" --out ${FILE}.pem --data-file ${FILE}.csr "$BASE_URL/${CMD}"

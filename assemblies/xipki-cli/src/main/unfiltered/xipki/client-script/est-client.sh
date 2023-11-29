@@ -2,15 +2,16 @@
 
 # Please adapt the URL
 ## URL pattern: https://<host>:<port>/.well-known/est/<CA-name>/<certprofile-name>
+##              https://<host>:<port>/est/<CA-name>/<certprofile-name>
 CA_URL=https://localhost:8445/.well-known/est/myca/tls
 
 ## Short URL is possible
 ##   For all aliases:     https://<host>:<port>/.well-known/est/<alias>
+##   For all aliases:     https://<host>:<port>/est/<alias>
 ##   For alias "default": https://<host>:<port>/.well-known/est
+##                        https://<host>:<port>/est
 ## To use the short URL, you need to configure the "CaProfiles" field
 ## in the EST proxy (acme-proxy.conf) with given alias.
-#
-# CA_URL=https://localhost:8445/.well-known/est
 
 echo "CA URL: ${CA_URL}"
 

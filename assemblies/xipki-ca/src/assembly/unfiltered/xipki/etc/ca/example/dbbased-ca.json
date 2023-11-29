@@ -1,6 +1,6 @@
 {
 	"master":true,
-	// If you have more than one instances in master mode, set it to false.
+	// If you have more than one instance in master mode, set it to false.
 	"noLock":true,
 	// To activate the logging of requests and responses, set writer.level to DEBUG
 	// in the file META-INF/classes/log4j2.properties.
