@@ -11,7 +11,6 @@ import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
 import org.xipki.ca.server.mgmt.SelfSignedCertBuilder;

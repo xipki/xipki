@@ -21,8 +21,8 @@ import org.xipki.ca.sdk.CaIdentifierRequest;
 import org.xipki.ca.sdk.CertprofileInfoResponse;
 import org.xipki.ca.sdk.X500NameType;
 import org.xipki.ca.server.*;
-import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.db.DbCaConfStore;
+import org.xipki.ca.server.db.DbCertStore;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.datasource.DataSourceFactory;
@@ -214,8 +214,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   private final String calockFilePath;
 
   static {
-    LOG.info("XiPKI CA version {}", StringUtil.getBundleVersion(
-        X509Ca.class)); // any class in the package org.xipki.ca.server
+    LOG.info("XiPKI CA version {}", StringUtil.getBundleVersion(CaManagerImpl.class));
   }
 
   public CaManagerImpl(CmLicense license) {
@@ -417,7 +416,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     boolean initSucc = true;
     if (caConfStore.needsCertStore()) {
       try {
-        this.certstore = new CertStore(certstoreDatasource, caConfStore, idGen);
+        this.certstore = new DbCertStore(certstoreDatasource, caConfStore, idGen);
       } catch (DataAccessException ex) {
         initSucc = false;
         LogUtil.error(LOG, ex, "error constructing CertStore");

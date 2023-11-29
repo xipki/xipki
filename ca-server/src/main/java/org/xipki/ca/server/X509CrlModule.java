@@ -16,7 +16,6 @@ import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
-import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.pki.OperationException;
 import org.xipki.security.KeyUsage;

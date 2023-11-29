@@ -26,7 +26,6 @@ import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.server.*;
-import org.xipki.ca.server.db.CertStore;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.pki.ErrorCode;
 import org.xipki.pki.OperationException;

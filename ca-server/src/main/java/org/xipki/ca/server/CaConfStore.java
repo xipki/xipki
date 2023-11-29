@@ -6,7 +6,6 @@ package org.xipki.ca.server;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.*;
-import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
 import org.xipki.security.CertRevocationInfo;

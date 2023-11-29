@@ -39,8 +39,6 @@ public class OcspCertPublisher extends CertPublisher {
 
   private boolean publishsGoodCert = true;
 
-  private DataSourceWrapper datasource;
-
   public OcspCertPublisher() {
   }
 

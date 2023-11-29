@@ -60,38 +60,9 @@ import static org.xipki.pki.ErrorCode.*;
  * @since 2.0.0
  */
 
-public class CertStore extends QueryExecutor {
+public class DbCertStore extends QueryExecutor implements CertStore {
 
-  public enum CertStatus {
-
-    UNKNOWN,
-    REVOKED,
-    GOOD
-
-  } // class CertStatus
-
-  public static class SerialWithId {
-
-    private final long id;
-
-    private final BigInteger serial;
-
-    public SerialWithId(long id, BigInteger serial) {
-      this.id = id;
-      this.serial = serial;
-    }
-
-    public BigInteger getSerial() {
-      return serial;
-    }
-
-    public long getId() {
-      return id;
-    }
-
-  }
-
-  private static final Logger LOG = LoggerFactory.getLogger(CertStore.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DbCertStore.class);
 
   private final String sqlCertForId;
 
@@ -162,7 +133,7 @@ public class CertStore extends QueryExecutor {
 
   private final CaConfStore  caConfStore;
 
-  public CertStore(DataSourceWrapper datasource, CaConfStore caConfStore, UniqueIdGenerator idGenerator)
+  public DbCertStore(DataSourceWrapper datasource, CaConfStore caConfStore, UniqueIdGenerator idGenerator)
       throws DataAccessException, CaMgmtException {
     super(datasource);
 
@@ -211,14 +182,17 @@ public class CertStore extends QueryExecutor {
     this.earliestNotBefore = datasource.getMin(null, "CERT", "NBEFORE");
   } // constructor
 
+  @Override
   public void removeCa(String name) throws CaMgmtException {
     removeEntry(name, "CA");
   }
 
+  @Override
   public void removeCertProfile(String name) throws CaMgmtException {
     removeEntry(name, "PROFILE");
   }
 
+  @Override
   public void removeRequestor(String name) throws CaMgmtException {
     removeEntry(name, "REQUESTOR");
   }
@@ -234,10 +208,12 @@ public class CertStore extends QueryExecutor {
     }
   }
 
+  @Override
   public void addCertProfile(NameId ident) throws CaMgmtException {
     addNameId(ident, "PROFILE");
   }
 
+  @Override
   public void addRequestor(NameId ident) throws CaMgmtException {
     addNameId(ident, "REQUESTOR");
   }
@@ -266,6 +242,7 @@ public class CertStore extends QueryExecutor {
     }
   } // method addRequestor
 
+  @Override
   public void addCa(NameId ident, X509Cert caCert, CertRevocationInfo caRevInfo) throws CaMgmtException {
     Args.notNull(ident, "ident");
     Args.notNull(caCert, "caCert");
@@ -325,6 +302,7 @@ public class CertStore extends QueryExecutor {
         " exists, but the name differs (expected " + ident.getName() + ", is " + existingName + ")");
   }
 
+  @Override
   public void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {
     try {
       execUpdatePrepStmt0("UPDATE CA SET REV_INFO=? WHERE NAME=?",
@@ -334,6 +312,7 @@ public class CertStore extends QueryExecutor {
     }
   }
 
+  @Override
   public void unrevokeCa(String caName) throws CaMgmtException {
     try {
       execUpdatePrepStmt0("UPDATE CA SET REV_INFO=? WHERE NAME=?", col2Str(null), col2Str(caName));
@@ -342,6 +321,7 @@ public class CertStore extends QueryExecutor {
     }
   }
 
+  @Override
   public boolean addCert(CertificateInfo certInfo, boolean saveKeypair) {
     if (saveKeypair && certInfo.getPrivateKey() != null) {
       if (keypairEncKey == null) {
@@ -441,10 +421,12 @@ public class CertStore extends QueryExecutor {
     return true;
   } // method addCert
 
+  @Override
   public long getMaxFullCrlNumber(NameId ca) throws OperationException {
     return getMaxCrlNumber(ca, SQL_MAX_FULL_CRLNO);
   }
 
+  @Override
   public long getMaxCrlNumber(NameId ca) throws OperationException {
     return getMaxCrlNumber(ca, SQL_MAX_CRLNO);
   }
@@ -456,12 +438,14 @@ public class CertStore extends QueryExecutor {
     return (maxCrlNumber < 0) ? 0 : maxCrlNumber;
   } // method getMaxCrlNumber
 
+  @Override
   public long getThisUpdateOfCurrentCrl(NameId ca, boolean deltaCrl) throws OperationException {
     Args.notNull(ca, "ca");
 
     return execQueryLongPrepStmt(SQL_MAX_THISUPDAATE_CRL, col2Int(ca.getId()), col2Int(deltaCrl ? 1 : 0));
   } // method getThisUpdateOfCurrentCrl
 
+  @Override
   public void addCrl(NameId ca, X509CRLHolder crl) throws OperationException, CRLException {
     notNulls(ca, "ca", crl, "crl");
 
@@ -505,6 +489,7 @@ public class CertStore extends QueryExecutor {
     execUpdatePrepStmt0(SQL_ADD_CRL, columns.toArray(new SqlColumn2[0]));
   } // method addCrl
 
+  @Override
   public CertWithRevocationInfo revokeCert(
       NameId ca, BigInteger serialNumber, CertRevocationInfo revInfo, boolean force, CaIdNameMap idNameMap)
       throws OperationException {
@@ -554,6 +539,7 @@ public class CertStore extends QueryExecutor {
     return certWithRevInfo;
   } // method revokeCert
 
+  @Override
   public CertWithRevocationInfo revokeSuspendedCert(
       NameId ca, SerialWithId serialNumber, CrlReason reason, CaIdNameMap idNameMap)
       throws OperationException {
@@ -588,6 +574,7 @@ public class CertStore extends QueryExecutor {
     return certWithRevInfo;
   } // method revokeSuspendedCert
 
+  @Override
   public CertWithDbId unsuspendCert(NameId ca, BigInteger serialNumber, boolean force, CaIdNameMap idNamMap)
       throws OperationException {
     notNulls(ca, "ca", serialNumber, "serialNumber");
@@ -627,10 +614,12 @@ public class CertStore extends QueryExecutor {
     return certWithRevInfo.getCert();
   } // method unsuspendCert
 
+  @Override
   public void removeCert(long id) throws OperationException {
     execUpdatePrepStmt0(SQL_REMOVE_CERT_FOR_ID, col2Long(id));
   }
 
+  @Override
   public long getCountOfCerts(NameId ca, boolean onlyRevoked) throws OperationException {
     final String sql = onlyRevoked ? "SELECT COUNT(*) FROM CERT WHERE CA_ID=? AND REV=1"
                     : "SELECT COUNT(*) FROM CERT WHERE CA_ID=?";
@@ -638,6 +627,7 @@ public class CertStore extends QueryExecutor {
     return execQueryLongPrepStmt(sql, col2Int(ca.getId()));
   } // method getCountOfCerts
 
+  @Override
   public long getCountOfCerts(long notBeforeSince) throws OperationException {
     if (notBeforeSince <= earliestNotBefore) {
       final String sql = "SELECT COUNT(*) FROM CERT";
@@ -648,6 +638,7 @@ public class CertStore extends QueryExecutor {
     }
   } // method getCountOfCerts
 
+  @Override
   public List<SerialWithId> getSerialNumbers(NameId ca,  long startId, int numEntries, boolean onlyRevoked)
       throws OperationException {
     notNulls(ca, "ca", numEntries, "numEntries");
@@ -681,6 +672,7 @@ public class CertStore extends QueryExecutor {
     return ret;
   }
 
+  @Override
   public List<SerialWithId> getExpiredUnrevokedSerialNumbers(NameId ca, long expiredAt, int numEntries)
       throws OperationException {
     Args.notNull(ca, "ca");
@@ -695,6 +687,7 @@ public class CertStore extends QueryExecutor {
     return getSerialNumbers0(sql, numEntries, col2Int(ca.getId()), col2Long(expiredAt));
   } // method getExpiredSerialNumbers
 
+  @Override
   public List<SerialWithId> getSuspendedCertSerials(NameId ca, Instant latestLastUpdate, int numEntries)
       throws OperationException {
     Args.notNull(ca, "ca");
@@ -740,6 +733,7 @@ public class CertStore extends QueryExecutor {
     return (b64Crl == null) ? null : Base64.decodeFast(b64Crl);
   } // method getEncodedCrl
 
+  @Override
   public byte[] getEncodedCrl(NameId ca, BigInteger crlNumber) throws OperationException {
     Args.notNull(ca, "ca");
 
@@ -752,6 +746,7 @@ public class CertStore extends QueryExecutor {
     return rs == null ? null : Base64.decodeFast(rs.getString("CRL"));
   } // method getEncodedCrl
 
+  @Override
   public int cleanupCrls(NameId ca, int numCrls) throws OperationException {
     Args.notNull(ca, "ca");
     Args.positive(numCrls, "numCrls");
@@ -778,6 +773,7 @@ public class CertStore extends QueryExecutor {
     return numCrlsToDelete;
   } // method cleanupCrls
 
+  @Override
   public CertificateInfo getCertForId(NameId ca, X509Cert caCert, long certId, CaIdNameMap idNameMap)
       throws OperationException {
     notNulls(ca, "ca", caCert, "caCert", idNameMap, "idNameMap");
@@ -796,6 +792,7 @@ public class CertStore extends QueryExecutor {
     return certInfo;
   } // method getCertForId
 
+  @Override
   public CertWithRevocationInfo getCertWithRevocationInfo(long certId, CaIdNameMap idNameMap)
       throws OperationException {
     ResultRow rs = execQuery1PrepStmt0(sqlCertForId, col2Long(certId));
@@ -805,6 +802,7 @@ public class CertStore extends QueryExecutor {
     return buildCertWithRevInfo(certId, rs, idNameMap);
   }
 
+  @Override
   public CertWithRevocationInfo getCertWithRevocationInfo(int caId, BigInteger serial, CaIdNameMap idNameMap)
       throws OperationException {
     notNulls(serial, "serial", idNameMap, "idNameMap");
@@ -818,6 +816,7 @@ public class CertStore extends QueryExecutor {
     return buildCertWithRevInfo(rs.getLong("ID"), rs, idNameMap);
   } // method getCertWithRevocationInfo
 
+  @Override
   public CertWithRevocationInfo getCertWithRevocationInfoBySubject(
       int caId, X500Name subject, byte[] san, CaIdNameMap idNameMap)
       throws OperationException {
@@ -848,6 +847,7 @@ public class CertStore extends QueryExecutor {
     return ret;
   } // method getCertWithRevocationInfo
 
+  @Override
   public long getCertId(NameId ca, BigInteger serial) throws OperationException {
     notNulls(ca, "ca", serial, "serial");
 
@@ -855,6 +855,7 @@ public class CertStore extends QueryExecutor {
     return (rs == null) ? 0 : rs.getLong("ID");
   }
 
+  @Override
   public CertificateInfo getCertInfo(NameId ca, X509Cert caCert, BigInteger serial, CaIdNameMap idNameMap)
       throws OperationException {
     notNulls(ca, "ca", caCert, "caCert", idNameMap, "idNameMap", serial, "serial");
@@ -883,6 +884,7 @@ public class CertStore extends QueryExecutor {
    * @throws OperationException
    *           If error occurs.
    */
+  @Override
   public X509Cert getCert(X500Name subjectName, String transactionId)
       throws OperationException {
     final String sql = buildSelectFirstSql("CERT FROM CERT WHERE TID=? AND (FP_S=? OR FP_RS=?)");
@@ -898,6 +900,7 @@ public class CertStore extends QueryExecutor {
     return rows == null || rows.isEmpty() ? null : parseCert(Base64.decodeFast(rows.get(0).getString("CERT")));
   } // method getCert
 
+  @Override
   public List<CertListInfo> listCerts(
       NameId ca, X500Name subjectPattern, Instant validFrom, Instant validTo, CertListOrderBy orderBy, int numEntries)
       throws OperationException {
@@ -972,6 +975,7 @@ public class CertStore extends QueryExecutor {
     return ret;
   } // method listCerts
 
+  @Override
   public List<CertRevInfoWithSerial> getRevokedCerts(NameId ca, Instant notExpiredAt, long startId, int numEntries)
       throws OperationException {
     notNulls(ca, "ca", notExpiredAt, "notExpiredAt");
@@ -1000,6 +1004,7 @@ public class CertStore extends QueryExecutor {
     return ret;
   } // method getRevokedCerts
 
+  @Override
   public List<CertRevInfoWithSerial> getCertsForDeltaCrl(NameId ca, BigInteger baseCrlNumber, Instant notExpiredAt)
       throws OperationException {
     notNulls(ca, "ca", notExpiredAt, "notExpiredAt", baseCrlNumber, "baseCrlNumber");
@@ -1154,12 +1159,14 @@ public class CertStore extends QueryExecutor {
     return ret;
   } // method getCertsForDeltaCrl
 
+  @Override
   public CertStatus getCertStatusForSubject(NameId ca, X500Name subject) throws OperationException {
     long subjectFp = X509Util.fpCanonicalizedName(subject);
     ResultRow rs = execQuery1PrepStmt0(sqlCertStatusForSubjectFp, col2Long(subjectFp), col2Int(ca.getId()));
     return (rs == null) ? CertStatus.UNKNOWN : rs.getBoolean("REV") ? CertStatus.REVOKED : CertStatus.GOOD;
   } // method getCertStatusForSubjectFp
 
+  @Override
   public boolean isHealthy() {
     try {
       execUpdateStmt("SELECT ID FROM CA");
@@ -1175,6 +1182,7 @@ public class CertStore extends QueryExecutor {
     return date == null ? null : DateUtil.toEpochSecond(date);
   }
 
+  @Override
   public void updateDbInfo() throws DataAccessException, CaMgmtException {
     // Save keypair control
     String str = caConfStore.getDbSchemas().get("KEYPAIR_ENC_KEY");

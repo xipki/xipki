@@ -29,7 +29,6 @@ import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.sdk.CaAuditConstants;
-import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.license.api.CmLicense;
 import org.xipki.pki.BadCertTemplateException;
