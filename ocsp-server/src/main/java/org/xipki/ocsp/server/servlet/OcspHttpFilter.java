@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.license.api.LicenseFactory;
 import org.xipki.ocsp.server.OcspConf;
-import org.xipki.ocsp.server.OcspServerImpl;
+import org.xipki.ocsp.server.OcspServer;
 import org.xipki.security.Securities;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.LogUtil;
@@ -36,7 +36,7 @@ public class OcspHttpFilter implements XiHttpFilter {
 
   private final LicenseFactory licenseFactory;
 
-  private final OcspServerImpl server;
+  private final OcspServer server;
 
   private final OcspHealthCheckServlet healthServlet;
 
@@ -63,7 +63,7 @@ public class OcspHttpFilter implements XiHttpFilter {
     LOG.info("Use licenseFactory: {}", licenseFactoryClazz);
     licenseFactory = ReflectiveUtil.newInstance(licenseFactoryClazz);
 
-    OcspServerImpl ocspServer = new OcspServerImpl(licenseFactory.createOcspLicense());
+    OcspServer ocspServer = new OcspServer(licenseFactory.createOcspLicense());
     ocspServer.setSecurityFactory(securities.getSecurityFactory());
     ocspServer.setConfFile(conf.getServerConf());
 

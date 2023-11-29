@@ -23,7 +23,7 @@ import java.util.Map;
  * @since 2.2.0
  */
 
-class Template {
+class ResponseTemplate {
 
   private static final Map<HashAlgo, byte[]> extnCerthashPrefixMap = new HashMap<>();
 

@@ -5,10 +5,10 @@ package org.xipki.ocsp.server.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ocsp.api.OcspRespWithCacheInfo;
-import org.xipki.ocsp.api.OcspServer;
-import org.xipki.ocsp.api.Responder;
-import org.xipki.ocsp.api.ResponderAndPath;
+import org.xipki.ocsp.server.OcspRespWithCacheInfo;
+import org.xipki.ocsp.server.OcspServer;
+import org.xipki.ocsp.server.Responder;
+import org.xipki.ocsp.server.ResponderAndPath;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.*;
 import org.xipki.util.http.HttpResponse;

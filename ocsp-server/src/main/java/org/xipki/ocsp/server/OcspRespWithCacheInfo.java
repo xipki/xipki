@@ -1,7 +1,7 @@
 // Copyright (c) 2013-2023 xipki. All rights reserved.
 // License Apache License 2.0
 
-package org.xipki.ocsp.api;
+package org.xipki.ocsp.server;
 
 /**
  * OCSP response with {@link ResponseCacheInfo}.

@@ -4,7 +4,6 @@
 package org.xipki.ocsp.server;
 
 import org.xipki.ocsp.api.OcspStore;
-import org.xipki.ocsp.api.Responder;
 import org.xipki.ocsp.server.OcspServerConf.ResponseOption;
 import org.xipki.util.Args;
 
@@ -17,7 +16,7 @@ import java.util.List;
  * @since 2.0.0
  */
 
-public class ResponderImpl implements Responder {
+public class Responder {
 
   private final ResponderOption responderOption;
 
@@ -29,7 +28,7 @@ public class ResponderImpl implements Responder {
 
   private final List<OcspStore> stores;
 
-  ResponderImpl(
+  Responder(
       ResponderOption responderOption, RequestOption requestOption,
       ResponseOption responseOption, ResponseSigner signer, List<OcspStore> stores) {
     this.responderOption = Args.notNull(responderOption, "responderOption");
@@ -59,17 +58,14 @@ public class ResponderImpl implements Responder {
     return stores;
   }
 
-  @Override
   public int getMaxRequestSize() {
     return requestOption.getMaxRequestSize();
   }
 
-  @Override
   public boolean supportsHttpGet() {
     return requestOption.supportsHttpGet();
   }
 
-  @Override
   public Long getCacheMaxAge() {
     return responseOption.getCacheMaxAge();
   }

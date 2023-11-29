@@ -6,7 +6,6 @@ package org.xipki.ocsp.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.ocsp.api.OcspServer;
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.server.store.CaDbCertStatusStore;

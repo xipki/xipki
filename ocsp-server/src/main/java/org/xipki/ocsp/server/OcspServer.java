@@ -20,10 +20,13 @@ import org.xipki.datasource.DataSourceConf;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.license.api.OcspLicense;
-import org.xipki.ocsp.api.*;
+import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusInfo.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
-import org.xipki.ocsp.api.OcspRespWithCacheInfo.ResponseCacheInfo;
+import org.xipki.ocsp.api.OcspStore;
+import org.xipki.ocsp.api.OcspStoreException;
+import org.xipki.ocsp.api.RequestIssuer;
+import org.xipki.ocsp.server.OcspRespWithCacheInfo.ResponseCacheInfo;
 import org.xipki.ocsp.server.OcspServerConf.EmbedCertsMode;
 import org.xipki.ocsp.server.OcspServerConf.Source;
 import org.xipki.ocsp.server.ResponderOption.OcspMode;
@@ -35,10 +38,7 @@ import org.xipki.security.*;
 import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -58,7 +58,7 @@ import static org.xipki.ocsp.server.OcspServerUtil.*;
  * @since 2.0.0
  */
 
-public class OcspServerImpl implements OcspServer {
+public class OcspServer implements Closeable {
 
   private static class OcspRespControl {
     boolean canCacheInfo;
@@ -82,7 +82,7 @@ public class OcspServerImpl implements OcspServer {
 
   private static final WritableOnlyExtension extension_pkix_ocsp_extendedRevoke;
 
-  private static final Logger LOG = LoggerFactory.getLogger(OcspServerImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OcspServer.class);
 
   private static final Map<OcspResponseStatus, OcspRespWithCacheInfo> unsuccesfulOCSPRespMap;
 
@@ -102,7 +102,7 @@ public class OcspServerImpl implements OcspServer {
 
   private ResponseCacher responseCacher;
 
-  private final Map<String, ResponderImpl> responders = new HashMap<>();
+  private final Map<String, Responder> responders = new HashMap<>();
 
   private final Map<String, ResponseSigner> signers = new HashMap<>();
 
@@ -114,12 +114,12 @@ public class OcspServerImpl implements OcspServer {
 
   private final List<String> servletPaths = new ArrayList<>();
 
-  private final Map<String, ResponderImpl> path2responderMap = new HashMap<>();
+  private final Map<String, Responder> path2responderMap = new HashMap<>();
 
   private final AtomicBoolean initialized = new AtomicBoolean(false);
 
   static {
-    LOG.info("XiPKI OCSP Responder version {}", StringUtil.getBundleVersion(OcspServerImpl.class));
+    LOG.info("XiPKI OCSP Responder version {}", StringUtil.getBundleVersion(OcspServer.class));
 
     unsuccesfulOCSPRespMap = new HashMap<>(10);
     for (OcspResponseStatus status : OcspResponseStatus.values()) {
@@ -146,7 +146,7 @@ public class OcspServerImpl implements OcspServer {
     encodedAcceptableResponses_Basic = Hex.decode("300B06092B0601050507300101");
   } // method static
 
-  public OcspServerImpl(OcspLicense license) {
+  public OcspServer(OcspLicense license) {
     this.datasourceFactory = new DataSourceFactory();
     this.license = Args.notNull(license, "license");
   }
@@ -159,7 +159,6 @@ public class OcspServerImpl implements OcspServer {
     this.confFile = confFile;
   }
 
-  @Override
   public ResponderAndPath getResponderForPath(String path) {
     for (String servletPath : servletPaths) {
       if (path.startsWith(servletPath)) {
@@ -169,7 +168,7 @@ public class OcspServerImpl implements OcspServer {
     return null;
   }
 
-  public ResponderImpl getResponder(String name) {
+  public Responder getResponder(String name) {
     return responders.get(Args.notBlank(name, "name"));
   }
 
@@ -436,7 +435,7 @@ public class OcspServerImpl implements OcspServer {
         }
       }
 
-      ResponderImpl responder = new ResponderImpl(option, requestOptions.get(option.getRequestOptionName()),
+      Responder responder = new Responder(option, requestOptions.get(option.getRequestOptionName()),
               responseOption, signer, statusStores);
       responders.put(name, responder);
     } // end for
@@ -445,7 +444,7 @@ public class OcspServerImpl implements OcspServer {
     List<String> tmpList = new LinkedList<>();
     for (Entry<String, ResponderOption> entry : responderOptions.entrySet()) {
       String name = entry.getKey();
-      ResponderImpl responder = responders.get(name);
+      Responder responder = responders.get(name);
       ResponderOption option = entry.getValue();
       List<String> strs = option.getServletPaths();
       for (String path : strs) {
@@ -477,9 +476,8 @@ public class OcspServerImpl implements OcspServer {
     }
   } // method close
 
-  @Override
   public OcspRespWithCacheInfo answer(Responder responder2, byte[] request, boolean viaGet) {
-    ResponderImpl responder = (ResponderImpl) responder2;
+    Responder responder = (Responder) responder2;
     RequestOption reqOpt = responder.getRequestOption();
 
     int version;
@@ -772,7 +770,7 @@ public class OcspServerImpl implements OcspServer {
   } // method ask
 
   private OcspRespWithCacheInfo processCertReq(
-      AtomicBoolean unknownAsRevoked, CertID certId, OCSPRespBuilder builder, ResponderImpl responder,
+      AtomicBoolean unknownAsRevoked, CertID certId, OCSPRespBuilder builder, Responder responder,
       RequestOption reqOpt, OcspServerConf.ResponseOption repOpt, OcspRespControl repControl) {
     HashAlgo reqHashAlgo = certId.getIssuer().hashAlgorithm();
     if (!reqOpt.allows(reqHashAlgo)) {
@@ -884,13 +882,13 @@ public class OcspServerImpl implements OcspServer {
         break;
       case REVOKED:
         CertRevocationInfo revInfo = certStatusInfo.getRevocationInfo();
-        certStatus = Template.getEncodeRevokedInfo(
+        certStatus = ResponseTemplate.getEncodeRevokedInfo(
             repOpt.isIncludeRevReason() ? revInfo.getReason() : null, revInfo.getRevocationTime());
 
         Instant invalidityDate = revInfo.getInvalidityTime();
         if (repOpt.isIncludeInvalidityDate() && invalidityDate != null
             && !invalidityDate.equals(revInfo.getRevocationTime())) {
-          extensions.add(Template.getInvalidityDateExtension(invalidityDate));
+          extensions.add(ResponseTemplate.getInvalidityDateExtension(invalidityDate));
         }
         break;
       default:
@@ -903,11 +901,11 @@ public class OcspServerImpl implements OcspServer {
 
     byte[] certHash = certStatusInfo.getCertHash();
     if (certHash != null) {
-      extensions.add(Template.getCertHashExtension(certStatusInfo.getCertHashAlgo(), certHash));
+      extensions.add(ResponseTemplate.getCertHashExtension(certStatusInfo.getCertHashAlgo(), certHash));
     }
 
     if (certStatusInfo.getArchiveCutOff() != null) {
-      extensions.add(Template.getArchiveOffExtension(certStatusInfo.getArchiveCutOff()));
+      extensions.add(ResponseTemplate.getArchiveOffExtension(certStatusInfo.getArchiveCutOff()));
     }
 
     if (LOG.isDebugEnabled()) {
@@ -941,9 +939,8 @@ public class OcspServerImpl implements OcspServer {
     return null;
   } // method processCertReq
 
-  @Override
   public boolean healthCheck(Responder responder2) {
-    ResponderImpl responder = (ResponderImpl) responder2;
+    Responder responder = (Responder) responder2;
 
     for (OcspStore store : responder.getStores()) {
       boolean storeHealthy = store.isHealthy();

@@ -5,8 +5,8 @@ package org.xipki.ocsp.server.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ocsp.api.OcspServer;
-import org.xipki.ocsp.api.ResponderAndPath;
+import org.xipki.ocsp.server.OcspServer;
+import org.xipki.ocsp.server.ResponderAndPath;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.http.HttpResponse;
