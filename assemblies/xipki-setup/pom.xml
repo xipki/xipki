@@ -83,7 +83,7 @@
                 <delete dir="${project.build.directory}/t"/>
                 <delete dir="${project.build.directory}/t2"/>
 
-                <copy file="${project.basedir}/../../README.md"
+                <copy file="src/assembly/unfiltered/README.md"
                       todir="${project.build.directory}/t"/>
                 <copy todir="${project.build.directory}/t" >
                   <fileset dir="${project.build.outputDirectory}">

@@ -12,34 +12,16 @@ a highly scalable and high-performance open source PKI (CA and OCSP responder).
 * The Apache Software License, Version 2.0
 
 ## Support
-Just [create issue](https://github.com/xipki/xipki/issues).
+Just [create new issue](https://github.com/xipki/xipki/issues).
 
 For bug-report please upload the test data and log files, describe the version of XiPKI, OS and
 JRE/JDK, and the steps to reproduce the bug.
 
-## Prerequisite
-* OS: Linux, Windows, MacOS
-* JRE / JDK: Java 11+.
-* Database: DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
-* Hardware: Any available hardware (tested on Raspberry Pi 2 Model B with 900MHz quad-core ARM CPU and 1 GB Memory)
-* Servlet Container: Tomcat 8, 9, 10
-
-## Tested PKCS#11 Devices
-* [AWS CloudHSM](https://aws.amazon.com/cloudhsm)
-* [Nitrokey HSM 2](https://www.nitrokey.com/#comparison) / [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick)
-* [nCipher Connect](https://www.ncipher.com/products/general-purpose-hsms/nshield-connect)
-* [nCipher Solo](https://www.ncipher.com/products/general-purpose-hsms/nshield-solo)
-* [Sansec HSM](https://en.sansec.com.cn)
-* [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/)
-* [TASS HSM](https://www.tass.com.cn/portal/list/index/id/15.html)
-* [Thales LUNA](https://cpl.thalesgroup.com/encryption/hardware-security-modules/general-purpose-hsms)
-* [Thales ProtectServer](https://cpl.thalesgroup.com/encryption/hardware-security-modules/protectserver-hsms)
-* [Utimaco Se](https://hsm.utimaco.com/products-hardware-security-modules/general-purpose-hsm/)
+Docker container
+-----
+See discussion in [discussion #205](https://github.com/xipki/xipki/discussions/249).
 
 ## Get Started
-
-### JAVA_HOME
-  Set the environment variable `JAVA_HOME` to the root directory of JRE/JDK installation.
 
 ### Binaries
 The binary `xipki-setup-<version>.zip` can be retrieved using one of the following methods
@@ -65,203 +47,50 @@ The binary `xipki-setup-<version>.zip` can be retrieved using one of the followi
 
       In folder `xipki`
       ```sh
-      mvn clean install -DskipTests -Passembly
+      sh install.sh
       ```
  
       Then you will find the binary `assemblies/xipki-setup/target/xipki-setup-<version>.zip`
 
+### Install and Setup
 
-## Prepare
+Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL.md`-
 
-1. Unpack the binary `xipki-setup-<version>.zip`. To restore the files to a destination 
-   folder, run the script `bin/restore.sh /path/to/destination-dir` (or `bin\restore.bat` in Windows).
+## Features
 
-**In the following sections, we assume the destination directory (`destination-dir`) is `xipki-install`**.
+### Supported Platform
+* OS
+  * Linux, Windows, MacOS
+* JRE / JDK
+  * Java 11+.
+* Database
+  * DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
+* Hardware
+  * Any available hardware (tested on Raspberry Pi 2 Model B with 900MHz quad-core ARM CPU and 1 GB Memory)
+* Servlet Container
+  * Tomcat 8, 9, 10
+* HSM Devices
+  - [AWS CloudHSM](https://aws.amazon.com/cloudhsm)
+  - [Nitrokey HSM 2](https://www.nitrokey.com/#comparison) / [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick)
+  - [nCipher Connect](https://www.ncipher.com/products/general-purpose-hsms/nshield-connect)
+  - [nCipher Solo](https://www.ncipher.com/products/general-purpose-hsms/nshield-solo)
+  - [Sansec HSM](https://en.sansec.com.cn)
+  - [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/)
+  - [TASS HSM](https://www.tass.com.cn/portal/list/index/id/15.html)
+  - [Thales LUNA](https://cpl.thalesgroup.com/encryption/hardware-security-modules/general-purpose-hsms)
+  - [Thales ProtectServer](https://cpl.thalesgroup.com/encryption/hardware-security-modules/protectserver-hsms)
+  - [Utimaco Se](https://hsm.utimaco.com/products-hardware-security-modules/general-purpose-hsm/)
+  - And shall also work on other HSMs with PKCS#11 support.
 
-## Prepare Keys and certificates for the Communication between XiPKI Components
-
-1. Change the password (`"CHANGEIT"`), and subject in `xipki-install/setup/keycerts.json` and the XiPKI components.
-2. Generate keys and certificates:  
-  `xipki-install/setup/generate-keycerts.sh`.
-3. Copy the keys and certificates to the target components:  
-   `xipki-install/setup/provision-keycerts.sh`.
-
-## Install CA Server
-
-1. Unpack tomcat to a new folder
-2. Install CA as described in the `xipki-install/xipki-ca/README.md` file.
-
-## Install OCSP Responder
-
-1. Unpack tomcat to a new folder
-2. Install CA as described in the `xipki-install/xipki-ocsp/README.md` file.
-
-## Install Protocol Gateway
-
-1. Unpack tomcat to a new folder.
-2. Install protocol gateway as described in the `xipki-install/xipki-gateway/README.md` file.
-
-## Install HSM Proxy Server
-
-1. Unpack tomcat to a new folder
-2. Install CA as described in the `xipki-install/xipki-hsmproxy/README.md` file.
-
-## Install Management Command Line Interface
-   void
-
-## Install Command Line Interface
-   void
-
-## How to Configure Password
-In all XiPKI components (including Tomcat's TLS configuration), you may configure the password
-using the following methods:  
-(In the following examples, assume the password is "CHANGEIT", the master password is "qwert")
-
-- In plaintext, e.g. `password=CHANGEIT`
-
-- In obfuscated format, e.g. `password=OBF:1izy1htq1fnf1ime1im01fnn1hts1j0w`.
-  Use karaf commands `xi:obfuscate` / `xi:deobfuscate`to obfuscate / deobfuscate the password.
-
-- Encrypted with master password, e.g. `password=PBE:AQfQcYk2+tR2nDzR0gCaQXMkmRBgqPIomrt5yfTsJPBqb30sCID5OqHFpH/mEKb3OIIw9Q`.
-  Use karaf commands `xi:pbe-enc` / `xi:pbe-dec` to encrypt / decrypt the password with master password.
-
-  You need to configure the master password callback and iteration count in the file `xipki/secuity/password.cfg`:
-   ```
-   pbeCallback = <master password callback>
-   pbeIterationCount = <number greater than 999>
-   ```
-  The following values of pbeCallback are allowed:
-  - `FILE file=<path to the masterpassword>`, e.g. `FILE file=masterpassword.secret`,
-    - The file content is either the password itself or its obfuscated format (starting with `OBF:`).
-    - Either absolute path or relative path to the parent folder of `password.cfg`.
-  - `PBE-GUI quorum=<number>,tries=<number>`, e.g. `PBE-GUI quorum=1,tries=3`
-  - `GUI quorum=<number>,tries=<number>`, e.g. `GUI quorum=1,tries=3`
-  - `OBF OBF:<obfuscated master password>`, e.g. `OBF OBF:1yf01z7o1t331z7e1yf6`.
-  - `java:<class name implements org.xipki.password.PasswordCallback> [<corresponding configuration>]`
-    e.g. `java:org.xipki.password.demo.PassThroughPasswordCallback qwert`.
-
-- Use you own password resolver, assumed the password protocol is `ABC`, then the password is
-  `ABC:<data>`. You need to write a Java class implements `org.xipki.password.PasswordResolver` which
-  can resolve password started with `ABC:`.
-  You need to add the password resolvers in the file `xipki/secuity/password.cfg`:
-   ```
-  passwordResolver.<label> = <class name> [<conf>]
-   ```
-
-### Tomcat
-To use th password protection mechanism described above, in the file `conf/server.xml`, you need to replace
-`org.apache.coyote.http11.Http11NioProtocol` by `org.xipki.tomcat.XiHttp11NioProtocol`,
-and `org.apache.coyote.http11.Http11Nio2Protocol` by `org.xipki.tomcat.XiHttp11Nio2Protocol`.
-
-## Configure PKCS#11 device (optional)
-
-   This step is only required if the real PKCS#11 device instead of the emulator
-   is used. **Note that this step should be applied to all components (tomcat, xipki-mgmt-cli, and xipki-cli)**.
-
-  * Copy the corresponding configuration file in the folder `xipki/security/example/` to `xipki/security/pkcs11.json`,
-    and adapt the PKCS#11 configuration.
-    - For HSM device: `pkcs11-hsm.json`
-    - For HSM proxy client: `pkcs11-hsmproxy.json`
-    - For HSM emulaor: `pkcs11-emulator.json`
-
-## Configure how to handle SSL client certificate behind reverse proxy
-
-### For reverse proxy apache httpd
-
-* Set the `reverseProxyMode` field in the json configuration file to `APACHE`:
-  - CA: `xipki/etc/ca/ca.json`
-  - HSM Proxy: `xipki/etc/hsmproxy.json`
-  - CA Gateway
-    - CMP: `xipki/gatway/cmp-gateway.json`
-    - EST: `xipki/gatway/est-gateway.json`
-    - REST: `xipki/gatway/rest-gateway.json`
-
-* configure the proxy to forward the headers via mod_proxy with the following
-  configuration
-
-   ```sh
-   # Require SSL Client verification
-   SSLVerifyClient		require
-
-   #initialize the special headers to a blank value to avoid http header forgeries 
-   RequestHeader set SSL_CLIENT_VERIFY  "" 
-   RequestHeader set SSL_CLIENT_CERT  "" 
-   
-   <Location / >
-    RequestHeader set SSL_CLIENT_VERIFY "%{SSL_CLIENT_VERIFY}s"
-    RequestHeader set SSL_CLIENT_CERT "%{SSL_CLIENT_CERT}s"
-    ...
-   </Location>
-   ```
-
-  For more details please refer to
-    * [Jetty/Howto/Configure mod proxy](https://wiki.eclipse.org/Jetty/Howto/Configure_mod_proxy)
-    * [Jetty: Tricks to do client certificate authentications behind a reverse proxy](http://www.zeitoun.net/articles/client-certificate-x509-authentication-behind-reverse-proxy/start)
-    * [Apache Module mod_ssl](http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#envvars)
-
-### For reverse proxy apache nginx
-
-* Set the `reverseProxyMode` in the json configuration file (e.g. `ca.json`) to `NGINX`.
-
-* configure the proxy to forward the headers with the following
-  configuration
-
-   ```sh
-   # Require SSL Client verification
-   ssl_verify_client on;
-
-   location / {
-     ...
-     #initialize the special headers to a blank value to avoid http header forgeries 
-     proxy_set_header set SSL_CLIENT_VERIFY  "";
-     proxy_set_header set SSL_CLIENT_CERT  "";
-
-     # if the client certificate verified 
-     # will have the value of 'SUCCESS' and 'NONE' otherwise
-     proxy_set_header SSL_CLIENT_VERIFY $ssl_client_verify;
-    
-     # client certificate
-     proxy_set_header SSL_CLIENT_CERT $ssl_client_escaped_cert;
-     ...
-   }
-   ...
-  ```
-
-  For more details please refer to
-  * [NGINX Reverse Proxy](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/)
-  * [Module ngx_http_ssl_module](http://nginx.org/en/docs/http/ngx_http_ssl_module.html)
-
-## Setup CA Server
-
-As described in the `xipki-install/xipki-mgmt-cli/README.md` file.
-
-## Enroll/Revoke Certificate
-
-As described in the `xipki-install/xipki-cli/README.md` file.
-
-Management CLI Commands
------
-Please refer to [commands.md](commands.md) for more details.
- 
-CLI Commands
------
-Please refer to [commands.md](commands.md) for more details.
-
-Docker container
------
-See discussion in [discussion #205](https://github.com/xipki/xipki/discussions/249).
-
-Features
------
-- CA Protocol Gateway
+### CA Protocol Gateway
   - EST (RFC 7030)
   - SCEP (RFC 8894)
-  - CMP (RFC 4210, 4211, 9045, draft-ietf-lamps-cmp-updates)
+  - CMP (RFC 4210, 4211, 9045, 9480)
   - ACME (RFC 8555, RFC 8737)
     - Challenge types: dns-01, http-01, tls-apln-01
-  - RESTful API
+  - RESTful API (XiPKI own API)
 
-- CA (Certification Authority)
+### CA (Certification Authority)
   - X.509 Certificate v3 (RFC 5280)
   - X.509 CRL v2 (RFC 5280)
   - EdDSA Certificates (RFC 8410, RFC 8032)
@@ -339,7 +168,7 @@ Features
       databases, upgrade of XiPKi and switch from other CA system to XiPKI CA
     - All configuration of CA except those of databases is saved in database
 
-- OCSP Responder
+### OCSP Responder
   - OCSP Responder (RFC 2560 and RFC 6960)
   - Configurable Length of Nonce (RFC 8954)
   - Support of Common PKI 2.0
@@ -358,7 +187,7 @@ Features
   - High performance
   - Support of health check
 
-- Mgmt CLI (Management Client)
+### Mgmt CLI (Management Client)
   - Configuring CA
   - Generating keypairs of RSA, EC and DSA in token
   - Deleting keypairs and certificates from token
@@ -366,21 +195,12 @@ Features
   - Generating CSR (PKCS#10 request)
   - Exporting certificate from token
 
-- CLI (CA/OCSP Client)
+### CLI (CA/OCSP Client)
   - Client to enroll, revoke, unrevoke (unsuspend) and remove certificates, to generate and download CRLs
   - Client to send OCSP request
   - Updating certificates in token
   - Generating CSR (PKCS#10 request)
   - Exporting certificate from token
 
-- HSM Proxy
+### HSM Proxy
   - Provide service to access to the HSM remotely.
-
-- For CA, OCSP Responder, CA Protocol Gateway, Management Client, Client, and HSM Proxy
-  - Support of PKCS#12 and JCEKS keystore
-  - Support of PKCS#11 devices, e.g. HSM
-  - API to use customized key types, e.g. smart card
-  - API to resolve password
-  - Support of PBE (password based encryption) password resolver
-     - All passwords can be encrypted by the master password
-  - Support of OBF (as in jetty) password resolver

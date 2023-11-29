@@ -26,7 +26,7 @@
     <fileSet>
       <directory>src/assembly/unfiltered</directory>
       <includes>
-        <include>README</include>
+        <include>INSTALL.md</include>
         <include>bin/*.bat</include>
       </includes>
       <outputDirectory>.</outputDirectory>
