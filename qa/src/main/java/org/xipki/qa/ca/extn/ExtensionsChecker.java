@@ -16,9 +16,9 @@ import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.certprofile.xijson.DirectoryStringType;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
-import org.xipki.ca.certprofile.xijson.conf.*;
-import org.xipki.ca.certprofile.xijson.conf.SmimeCapabilities.SmimeCapability;
-import org.xipki.ca.certprofile.xijson.conf.SmimeCapabilities.SmimeCapabilityParameter;
+import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
+import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
+import org.xipki.ca.certprofile.xijson.conf.extn.*;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ca.IssuerInfo;
 import org.xipki.security.ObjectIdentifiers;
@@ -152,13 +152,14 @@ public class ExtensionsChecker {
     // SMIMECapabilities
     type = Extn.id_smimeCapabilities;
     if (extensionControls.containsKey(type)) {
-      List<SmimeCapability> list = extensions.get(type.getId()).getSmimeCapabilities().getCapabilities();
+      List<SmimeCapabilities.SmimeCapability> list =
+          extensions.get(type.getId()).getSmimeCapabilities().getCapabilities();
 
       ASN1EncodableVector vec = new ASN1EncodableVector();
-      for (SmimeCapability m : list) {
+      for (SmimeCapabilities.SmimeCapability m : list) {
         ASN1ObjectIdentifier oid = m.getCapabilityId().toXiOid();
         ASN1Encodable params = null;
-        SmimeCapabilityParameter capParam = m.getParameter();
+        SmimeCapabilities.SmimeCapabilityParameter capParam = m.getParameter();
         if (capParam != null) {
           if (capParam.getInteger() != null) {
             params = new ASN1Integer(capParam.getInteger());

@@ -110,11 +110,11 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
       }
     }
 
-    EnrollCertRequestEntry[] entries = new EnrollCertRequestEntry[num];
+    EnrollCertsRequest.Entry[] entries = new EnrollCertsRequest.Entry[num];
 
     for (int i = 0; i < num; i++) {
       long thisIndex = index.getAndIncrement();
-      EnrollCertRequestEntry entry = new EnrollCertRequestEntry();
+      EnrollCertsRequest.Entry entry = new EnrollCertsRequest.Entry();
       entry.setSubject(new X500NameType(benchmarkEntry.getX500Name(thisIndex)));
       if (!caGenKeyPair) {
         entry.setSubjectPublicKey(benchmarkEntry.getSubjectPublicKeyInfo().getEncoded());
@@ -132,14 +132,14 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
 
   private void parseEnrollCertResult(EnrollOrPollCertsResponse response, int numCerts)
       throws Exception {
-    EnrollOrPullCertResponseEntry[] entries = response.getEntries();
+    EnrollOrPollCertsResponse.Entry[] entries = response.getEntries();
     int n = entries == null ? 0 : entries.length;
     if (n != numCerts) {
       throw new Exception("expected " + numCerts + " CertResponse, but returned " + n);
     }
 
     for (int i = 0; i < numCerts; i++) {
-      EnrollOrPullCertResponseEntry certResp = entries[i];
+      EnrollOrPollCertsResponse.Entry certResp = entries[i];
       if (certResp.getError() != null) {
         throw new Exception("CertReqId " + certResp.getId() + ": server returned PKIStatus: " + certResp.getError());
       }

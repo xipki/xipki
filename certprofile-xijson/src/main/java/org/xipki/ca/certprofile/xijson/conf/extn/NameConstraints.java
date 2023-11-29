@@ -1,12 +1,13 @@
 // Copyright (c) 2013-2023 xipki. All rights reserved.
 // License Apache License 2.0
 
-package org.xipki.ca.certprofile.xijson.conf;
+package org.xipki.ca.certprofile.xijson.conf.extn;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralSubtree;
 import org.xipki.ca.api.profile.CertprofileException;
+import org.xipki.ca.certprofile.xijson.conf.GeneralSubtreeType;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;

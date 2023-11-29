@@ -1,7 +1,7 @@
 // Copyright (c) 2013-2023 xipki. All rights reserved.
 // License Apache License 2.0
 
-package org.xipki.ca.certprofile.xijson.conf;
+package org.xipki.ca.certprofile.xijson.conf.extn;
 
 import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
 import org.xipki.util.ValidableConf;

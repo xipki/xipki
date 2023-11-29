@@ -19,11 +19,9 @@ import org.xipki.ca.api.profile.TextVadidator;
 import org.xipki.ca.certprofile.xijson.SubjectDirectoryAttributesControl;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
-import org.xipki.ca.certprofile.xijson.conf.PolicyConstraints;
-import org.xipki.ca.certprofile.xijson.conf.PolicyMappings;
-import org.xipki.ca.certprofile.xijson.conf.PolicyMappings.PolicyIdMappingType;
-import org.xipki.ca.certprofile.xijson.conf.*;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements.*;
+import org.xipki.ca.certprofile.xijson.conf.extn.PolicyConstraints;
+import org.xipki.ca.certprofile.xijson.conf.extn.PolicyMappings;
+import org.xipki.ca.certprofile.xijson.conf.extn.*;
 import org.xipki.pki.BadCertTemplateException;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
@@ -123,7 +121,7 @@ class O2tChecker extends ExtensionChecker {
       isMap.put(issuerDomainPolicy.getId(), subjectDomainPolicy.getId());
     }
 
-    for (PolicyIdMappingType m : conf.getMappings()) {
+    for (PolicyMappings.PolicyIdMappingType m : conf.getMappings()) {
       String expIssuerDomainPolicy = m.getIssuerDomainPolicy().getOid();
       String expSubjectDomainPolicy = m.getSubjectDomainPolicy().getOid();
 
@@ -213,7 +211,7 @@ class O2tChecker extends ExtensionChecker {
 
     for (int i = 0; i < expSize; i++) {
       QCStatement is = QCStatement.getInstance(extValue.getObjectAt(i));
-      QcStatementType exp = qcStatements.getQcStatements().get(i);
+      QcStatements.QcStatementType exp = qcStatements.getQcStatements().get(i);
       if (!is.getStatementId().getId().equals(exp.getStatementId().getOid())) {
         addViolation(failureMsg, "statmentId[" + i + "]",
             is.getStatementId().getId(), exp.getStatementId().getOid());
@@ -232,7 +230,7 @@ class O2tChecker extends ExtensionChecker {
         continue;
       }
 
-      QcStatementValueType expStatementValue = exp.getStatementValue();
+      QcStatements.QcStatementValueType expStatementValue = exp.getStatementValue();
       try {
         if (expStatementValue.getConstant() != null) {
           byte[] expValue = expStatementValue.getConstant().getValue();
@@ -262,7 +260,7 @@ class O2tChecker extends ExtensionChecker {
           }
 
           Set<String> expectedPdsLocations = new HashSet<>();
-          for (PdsLocationType m : expStatementValue.getPdsLocations()) {
+          for (QcStatements.PdsLocationType m : expStatementValue.getPdsLocations()) {
             expectedPdsLocations.add("url=" + m.getUrl() + ",lang=" + m.getLanguage());
           }
 
@@ -278,11 +276,11 @@ class O2tChecker extends ExtensionChecker {
               .append(" are absent but are required; ");
           }
         } else if (expStatementValue.getQcEuLimitValue() != null) {
-          QcEuLimitValueType euLimitConf = expStatementValue.getQcEuLimitValue();
+          QcStatements.QcEuLimitValueType euLimitConf = expStatementValue.getQcEuLimitValue();
           String expCurrency = euLimitConf.getCurrency().toUpperCase();
           int[] expAmountExp = reqQcEuLimits.get(expCurrency);
 
-          Range2Type range = euLimitConf.getAmount();
+          QcStatements.Range2Type range = euLimitConf.getAmount();
           int value;
           if (range.getMin() == range.getMax()) {
             value = range.getMin();

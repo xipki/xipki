@@ -92,7 +92,6 @@ public class CtLogServlet {
             + "cIvRN6IP2aD9mOgaFCfmcYuT3e6r5sJqPoLcPCTWDTciRVW9D0VFqTpFdKVK58x74AbDhaclk7RW"
             + "yV9vhQIDAQAB";
 
-
     public RSACtLogServlet() {
       super(Base64.decode(privateKey), Base64.decode(publicKey));
     }

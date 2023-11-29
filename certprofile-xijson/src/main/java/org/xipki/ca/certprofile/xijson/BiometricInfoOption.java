@@ -5,9 +5,9 @@ package org.xipki.ca.certprofile.xijson;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
-import org.xipki.ca.certprofile.xijson.conf.BiometricInfo;
-import org.xipki.ca.certprofile.xijson.conf.BiometricInfo.BiometricTypeType;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
+import org.xipki.ca.certprofile.xijson.conf.extn.BiometricInfo;
+import org.xipki.ca.certprofile.xijson.conf.extn.BiometricInfo.BiometricTypeType;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.Args;
 import org.xipki.util.TripleState;

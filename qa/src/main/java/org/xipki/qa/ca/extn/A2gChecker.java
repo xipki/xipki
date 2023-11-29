@@ -16,10 +16,8 @@ import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.ca.certprofile.xijson.AdmissionExtension;
 import org.xipki.ca.certprofile.xijson.BiometricInfoOption;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
-import org.xipki.ca.certprofile.xijson.conf.AdditionalInformation;
-import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies;
-import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.CertificatePolicyInformationType;
-import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.PolicyQualifier;
+import org.xipki.ca.certprofile.xijson.conf.extn.AdditionalInformation;
+import org.xipki.ca.certprofile.xijson.conf.extn.CertificatePolicies;
 import org.xipki.pki.BadCertTemplateException;
 import org.xipki.qa.ca.IssuerInfo;
 import org.xipki.security.HashAlgo;
@@ -317,8 +315,9 @@ class A2gChecker extends ExtensionChecker {
       return;
     }
 
-    Map<String, CertificatePolicyInformationType> expPoliciesMap = new HashMap<>();
-    for (CertificatePolicyInformationType cp : caller.getCertificatePolicies().getCertificatePolicyInformations()) {
+    Map<String, CertificatePolicies.CertificatePolicyInformationType> expPoliciesMap = new HashMap<>();
+    for (CertificatePolicies.CertificatePolicyInformationType cp
+        : caller.getCertificatePolicies().getCertificatePolicyInformations()) {
       expPoliciesMap.put(cp.getPolicyIdentifier().getOid(), cp);
     }
     Set<String> expPolicyIds = new HashSet<>(expPoliciesMap.keySet());
@@ -330,13 +329,13 @@ class A2gChecker extends ExtensionChecker {
     for (PolicyInformation isPolicyInformation : isPolicyInformations) {
       ASN1ObjectIdentifier isPolicyId = isPolicyInformation.getPolicyIdentifier();
       expPolicyIds.remove(isPolicyId.getId());
-      CertificatePolicyInformationType expCp = expPoliciesMap.get(isPolicyId.getId());
+      CertificatePolicies.CertificatePolicyInformationType expCp = expPoliciesMap.get(isPolicyId.getId());
       if (expCp == null) {
         failureMsg.append("certificate policy '").append(isPolicyId).append("' is not expected; ");
         continue;
       }
 
-      List<PolicyQualifier> expCpPq = expCp.getPolicyQualifiers();
+      List<CertificatePolicies.PolicyQualifier> expCpPq = expCp.getPolicyQualifiers();
       if (CollectionUtil.isEmpty(expCpPq)) {
         continue;
       }
@@ -361,7 +360,7 @@ class A2gChecker extends ExtensionChecker {
         }
       }
 
-      for (PolicyQualifier qualifierInfo : expCpPq) {
+      for (CertificatePolicies.PolicyQualifier qualifierInfo : expCpPq) {
         String value = qualifierInfo.getValue();
         switch (qualifierInfo.getType()) {
           case cpsUri:
