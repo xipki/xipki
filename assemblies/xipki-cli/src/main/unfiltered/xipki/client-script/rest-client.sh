@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 ocsp=0
 
 if [[ "$1" == "help" ]] ; then

@@ -1,0 +1,66 @@
+{
+	"scep":{
+		"includeCaCert":true,
+		"includeCertChain":false,
+		"includeSignerCert":true,
+		"supportGetCrl":true,
+		"maxSigningTimeBias":300
+	},
+	// To activate the logging of requests and responses, set writer.level to DEBUG
+	// in the file META-INF/classes/log4j2.properties.
+	"logReqResp":true,
+	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
+	"caProfiles": [{
+		"name": "default",
+		"ca": "subcawithcrl",
+		"certprofile": "ocsp"
+	},{
+		"name": "myalias",
+		"ca": "subcawithcrl",
+		"certprofile": "ocsp"
+	}],
+	"pop":{
+		"sigAlgos":[
+			"SHA256withRSA", "SHA256withECDSA", "SHA256withDSA",
+			"SM3withSM2", "ED25519", "ED448", "DHPOP-X25519", "DHPOP-X448"
+		]
+	},
+	"sdkClient":{
+		"serverUrl":"https://localhost:8444/ca/ra/",
+		"ssl":{
+			"storeType":"pkcs12",
+			"keystorePassword":"CHANGEIT",
+			"keystore":{
+				"file":"keycerts/ra-sdk-client.p12"
+			},
+			"trustanchors":[{
+				"file":"keycerts/ca-server-cert.pem"
+			}],
+			// valid values: 'default' for standard verification, 'no_op' for no-operation, or
+			// 'java:'<class implements javax.net.ssl.HostnameVerifier>
+			"hostnameVerifier":"default"
+		}
+	},
+	"audit":{
+		"type":"embed",
+		"conf": "file=${sys:catalina.home}/logs/scep-audit.log"
+	},
+	"signers":{
+		"signers":[{
+			"names":["subcawithcrl"],
+			"signer":{
+				"type":"pkcs12",
+				"conf":"password=CHANGEIT,keystore=file:keycerts/scep-subcawithcrl.p12,algo=SHA256withRSA"
+			}
+		}]
+	},
+	"security":{
+		"keyStrongrandomEnabled":false,
+		"signStrongrandomEnabled":false,
+		"defaultSignerParallelism":10,
+		"pkcs11Conf":{
+			"file":"security/pkcs11.json"
+		},
+		"signerFactories":[]
+	}
+}

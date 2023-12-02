@@ -345,7 +345,7 @@ public class ScepResponder {
   private byte[] getCaCertResp(String caName) throws OperationException, SdkErrorResponseException {
     try {
       ScepSigner signer = Optional.ofNullable(signers.getSigner(caName)).orElseThrow(
-          () -> new OperationException(PATH_NOT_FOUND, "found na signer for CA " + caName));
+          () -> new OperationException(PATH_NOT_FOUND, "found no signer for CA " + caName));
 
       byte[] cacert = Optional.ofNullable(sdk.cacert(caName)).orElseThrow(
           () -> new OperationException(PATH_NOT_FOUND, "unknown CA " + caName));

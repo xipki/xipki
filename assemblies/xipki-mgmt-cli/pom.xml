@@ -36,6 +36,10 @@
       <resource>
         <directory>src/main/unfiltered</directory>
         <filtering>false</filtering>
+        <excludes>
+          <exclude>xipki/sql/ca-init-v7-sql/**</exclude>
+          <exclude>xipki/sql/liquibase/**</exclude>
+        </excludes>
       </resource>
       <resource>
         <directory>../shared/karaf/filtered</directory>

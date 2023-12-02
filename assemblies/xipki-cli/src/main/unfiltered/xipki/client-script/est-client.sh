@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Please adapt the URL
 ## URL pattern: https://<host>:<port>/.well-known/est/<CA-name>/<certprofile-name>
 ##              https://<host>:<port>/est/<CA-name>/<certprofile-name>

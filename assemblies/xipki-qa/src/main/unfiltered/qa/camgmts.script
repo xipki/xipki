@@ -1,111 +1,22 @@
-echo '+++++source qa/camgmt.script    pem sha256 pkcs11 rsa 2048+++++'
-sleep 2
-           source qa/camgmt.script    pem sha256 pkcs11 rsa 2048
+outform = pem
 
-echo '+++++source qa/camgmt.script    der sha256 pkcs11 rsa 2048+++++'
-sleep 2
-           source qa/camgmt.script    der sha256 pkcs11 rsa 2048
+tokentypes = [pkcs11 pkcs12]; each ($tokentypes) {
+  tokentype = $it
 
-echo '+++++source qa/camgmt.script    pem sha256 pkcs12 rsa 2048+++++'
-sleep 2
-           source qa/camgmt.script    pem sha256 pkcs12 rsa 2048
+  keytypes = [rsa ec sm2 dsa]; each ($keytypes) {
+    keytype = $it
 
-echo '+++++source qa/camgmt.script    der sha256 pkcs12 rsa 2048+++++'
-sleep 2
-           source qa/camgmt.script    der sha256 pkcs12 rsa 2048
+    if { "$keytype" equals "sm2" } then {
+      hash = sm3
+    } else {
+      hash = sha256
+    }
 
-echo '+++++source qa/camgmt.script    pem sha256 pkcs11 dsa 2048+++++'
-sleep 2
-           source qa/camgmt.script    pem sha256 pkcs11 dsa 2048
+    echo "+++++source qa/camgmt.script    $outform $hash $tokentype $keytype +++++"
+               source qa/camgmt.script    $outform $hash $tokentype $keytype
 
-echo '+++++source qa/camgmt.script    der sha256 pkcs11 dsa 2048+++++'
-sleep 2
-           source qa/camgmt.script    der sha256 pkcs11 dsa 2048
+    echo "+++++source qa/camgmt.script -l $outform $hash $tokentype $keytype +++++"
+               source qa/camgmt.script -l $outform $hash $tokentype $keytype
+  }
 
-echo '+++++source qa/camgmt.script    pem sha256 pkcs12 dsa 2048+++++'
-sleep 2
-           source qa/camgmt.script    pem sha256 pkcs12 dsa 2048
-
-echo '+++++source qa/camgmt.script    der sha256 pkcs12 dsa 2048+++++'
-sleep 2
-           source qa/camgmt.script    der sha256 pkcs12 dsa 2048
-
-echo '+++++source qa/camgmt.script    pem sha256 pkcs11 ec secp256r1+++++'
-sleep 2
-           source qa/camgmt.script    pem sha256 pkcs11 ec secp256r1
-
-echo '+++++source qa/camgmt.script    der sha256 pkcs11 ec secp256r1+++++'
-sleep 2
-           source qa/camgmt.script    der sha256 pkcs11 ec secp256r1
-
-echo '+++++source qa/camgmt.script    pem sha256 pkcs12 ec secp256r1+++++'
-sleep 2
-           source qa/camgmt.script    pem sha256 pkcs12 ec secp256r1
-
-echo '+++++source qa/camgmt.script    der sha256 pkcs12 ec secp256r1+++++'
-sleep 2
-           source qa/camgmt.script    der sha256 pkcs12 ec secp256r1
-
-echo '+++++source qa/camgmt.script    pem sm3 pkcs12 sm2 secp256r1+++++'
-sleep 2
-           source qa/camgmt.script    pem sm3 pkcs12 sm2 secp256r1
-
-echo '+++++source qa/camgmt.script    der sm3 pkcs12 sm2 secp256r1+++++'
-sleep 2
-           source qa/camgmt.script    der sm3 pkcs12 sm2 secp256r1
-
-echo '+++++source qa/camgmt.script -l pem sha256 pkcs11 rsa 2048+++++'
-sleep 2
-           source qa/camgmt.script -l pem sha256 pkcs11 rsa 2048
-
-echo '+++++source qa/camgmt.script -l der sha256 pkcs11 rsa 2048+++++'
-sleep 2
-           source qa/camgmt.script -l der sha256 pkcs11 rsa 2048
-
-echo '+++++source qa/camgmt.script -l pem sha256 pkcs12 rsa 2048+++++'
-sleep 2
-           source qa/camgmt.script -l pem sha256 pkcs12 rsa 2048
-
-echo '+++++source qa/camgmt.script -l der sha256 pkcs12 rsa 2048+++++'
-sleep 2
-           source qa/camgmt.script -l der sha256 pkcs12 rsa 2048
-
-echo '+++++source qa/camgmt.script -l pem sha256 pkcs11 dsa 2048+++++'
-sleep 2
-           source qa/camgmt.script -l pem sha256 pkcs11 dsa 2048
-
-echo '+++++source qa/camgmt.script -l der sha256 pkcs11 dsa 2048+++++'
-sleep 2
-           source qa/camgmt.script -l der sha256 pkcs11 dsa 2048
-
-echo '+++++source qa/camgmt.script -l pem sha256 pkcs12 dsa 2048+++++'
-sleep 2
-           source qa/camgmt.script -l pem sha256 pkcs12 dsa 2048
-
-echo '+++++source qa/camgmt.script -l der sha256 pkcs12 dsa 2048+++++'
-sleep 2
-           source qa/camgmt.script -l der sha256 pkcs12 dsa 2048
-
-echo '+++++source qa/camgmt.script -l pem sha256 pkcs11 ec secp256r1+++++'
-sleep 2
-           source qa/camgmt.script -l pem sha256 pkcs11 ec secp256r1
-
-echo '+++++source qa/camgmt.script -l der sha256 pkcs11 ec secp256r1+++++'
-sleep 2
-           source qa/camgmt.script -l der sha256 pkcs11 ec secp256r1
-
-echo '+++++source qa/camgmt.script -l pem sha256 pkcs12 ec secp256r1+++++'
-sleep 2
-           source qa/camgmt.script -l pem sha256 pkcs12 ec secp256r1
-
-echo '+++++source qa/camgmt.script -l der sha256 pkcs12 ec secp256r1+++++'
-sleep 2
-           source qa/camgmt.script -l der sha256 pkcs12 ec secp256r1
-
-echo '+++++source qa/camgmt.script -l pem sm3 pkcs12 sm2+++++'
-sleep 2
-           source qa/camgmt.script -l pem sm3 pkcs12 sm2
-
-echo '+++++source qa/camgmt.script -l der sm3 pkcs12 sm2+++++'
-sleep 2
-           source qa/camgmt.script -l der sm3 pkcs12 sm2
+}

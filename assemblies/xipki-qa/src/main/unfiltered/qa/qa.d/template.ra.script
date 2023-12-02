@@ -32,7 +32,7 @@ ca:enroll-cert --ca rootca1 --profile cross \
   --out output/cross1.crt
 
 echo "#################################################################"
-echo "#              Manage certificate with RA Client                #"
+echo "#                Manage certificate over CMP                    #"
 echo "#################################################################"
 
 SIGNER_P12 = xipki/keycerts/cmp-client.p12

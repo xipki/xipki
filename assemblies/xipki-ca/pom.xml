@@ -31,13 +31,6 @@
   <build>
     <resources>
       <resource>
-        <directory>src/assembly/filtered</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </resource>
-      <resource>
         <directory>src/assembly/unfiltered</directory>
         <filtering>false</filtering>
         <includes>
@@ -45,11 +38,10 @@
         </includes>
       </resource>
       <resource>
-        <directory>${shared.dir}/conf</directory>
+        <directory>${shared.dir}</directory>
         <filtering>false</filtering>
         <includes>
-          <include>xipki/**</include>
-          <include>bin/**</include>
+          <include>tomcat*/**</include>
         </includes>
       </resource>
     </resources>
@@ -108,7 +100,7 @@
             </goals>
             <configuration>
               <stripVersion>false</stripVersion>
-              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              <outputDirectory>${project.build.directory}/tomcat/lib</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki.commons</groupId>

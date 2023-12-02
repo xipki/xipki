@@ -14,21 +14,21 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}/bin</directory>
-      <outputDirectory>bin</outputDirectory>
+      <directory>${project.build.directory}</directory>
+      <outputDirectory>.</outputDirectory>
       <includes>
-        <include>*.sh</include>
+        <include>install.sh</include>
+        <include>tomcat/bin/*.sh</include>
       </includes>
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
       <lineEnding>unix</lineEnding>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}/bin</directory>
-      <outputDirectory>bin</outputDirectory>
+      <directory>${project.build.directory}</directory>
+      <outputDirectory>.</outputDirectory>
       <includes>
-        <include>*.bat</include>
-        <include>*.cmd</include>
+        <include>tomcat/bin/*.bat</include>
       </includes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -36,23 +36,36 @@
     </fileSet>
     <fileSet>
       <directory>${project.build.directory}</directory>
+      <outputDirectory>.</outputDirectory>
+      <includes>
+        <include>tomcat/**</include>
+        <include>tomcat8on/**</include>
+        <include>tomcat10on/**</include>
+      </includes>
+      <excludes>
+        <exclude>tomcat/bin/*.sh</exclude>
+        <exclude>tomcat/bin/*.bat</exclude>
+      </excludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}</directory>
       <includes>
         <include>README.md</include>
-        <include>xipki/**</include>
-        <include>lib/**</include>
       </includes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}/xipki/etc/ca/database/mariadb</directory>
-      <outputDirectory>xipki/etc/ca/database</outputDirectory>
-      <fileMode>0644</fileMode>
+      <directory>${project.build.directory}/tomcat/xipki/etc/ca/database/mariadb</directory>
+      <outputDirectory>tomcat/xipki/etc/ca/database</outputDirectory>
       <includes>
         <include>ca-db.properties</include>
         <include>caconf-db.properties</include>
       </includes>
+      <fileMode>0644</fileMode>
     </fileSet>
   </fileSets>
   <files>
@@ -68,25 +81,25 @@
     </file>
     <file>
       <source>${project.build.directory}/webapps/ca-servlet3.war</source>
-      <outputDirectory>webapps</outputDirectory>
+      <outputDirectory>tomcat8on/webapps</outputDirectory>
       <destName>ca.war</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
       <source>${project.build.directory}/webapps/ca-servlet5.war</source>
-      <outputDirectory>webapps-tomcat10on</outputDirectory>
+      <outputDirectory>tomcat10on/webapps</outputDirectory>
       <destName>ca.war</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.build.directory}/xipki/security/example/pkcs11-emulator.json</source>
-      <outputDirectory>xipki/security</outputDirectory>
+      <source>${project.build.directory}/tomcat/xipki/security/example/pkcs11-emulator.json</source>
+      <outputDirectory>tomcat/xipki/security</outputDirectory>
       <destName>pkcs11.json</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.build.directory}/xipki/etc/ca/example/dbbased-ca.json</source>
-      <outputDirectory>xipki/etc/ca</outputDirectory>
+      <source>${project.build.directory}/tomcat/xipki/etc/ca/example/dbbased-ca.json</source>
+      <outputDirectory>tomcat/xipki/etc/ca</outputDirectory>
       <destName>ca.json</destName>
       <fileMode>0644</fileMode>
     </file>

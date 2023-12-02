@@ -91,7 +91,7 @@ public class HsmProxyResponder {
 
         String msg = "module access path: 'https://<host>:<port>/hsmproxy/{}'";
         if ("default".equals(moduleName)) {
-          msg += "or 'https://<host>:<port>/hsmproxy'";
+          msg += " or 'https://<host>:<port>/hsmproxy'";
         }
         LOG.info(msg, moduleName);
       }

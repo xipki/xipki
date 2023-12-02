@@ -1,115 +1,24 @@
-echo '+++++source qa/lifecycle.script    pem sm3 pkcs11 sm2+++++'
-sleep 2
-           source qa/lifecycle.script    pem sm3 pkcs11 sm2
+outform = pem
 
-echo '+++++source qa/lifecycle.script    der sm3 pkcs11 sm2+++++'
-sleep 2
-           source qa/lifecycle.script    der sm3 pkcs11 sm2
+tokentypes = [pkcs11 pkcs12]; each ($tokentypes) {
+  tokentype = $it
 
-echo '+++++source qa/lifecycle.script    pem sm3 pkcs12 sm2+++++'
-sleep 2
-           source qa/lifecycle.script    pem sm3 pkcs12 sm2
+  keytypes = [rsa ec sm2 dsa]; each ($keytypes) {
+    keytype = $it
 
-echo '+++++source qa/lifecycle.script    der sm3 pkcs12 sm2+++++'
-sleep 2
-           source qa/lifecycle.script    der sm3 pkcs12 sm2
+    if { "$keytype" equals "sm2" } then {
+      hash = sm3
+    } else {
+      hash = sha256
+    }
 
-echo '+++++source qa/lifecycle.script    pem sha256 pkcs11 rsa 2048+++++'
-sleep 2
-           source qa/lifecycle.script    pem sha256 pkcs11 rsa 2048
+    echo "+++++source qa/lifecycle.script    $outform $hash $tokentype $keytype +++++"
+               source qa/lifecycle.script    $outform $hash $tokentype $keytype
 
-echo '+++++source qa/lifecycle.script    der sha256 pkcs11 rsa 2048+++++'
-sleep 2
-           source qa/lifecycle.script    der sha256 pkcs11 rsa 2048
+    echo "+++++source qa/lifecycle.script -l $outform $hash $tokentype $keytype +++++"
+               source qa/lifecycle.script -l $outform $hash $tokentype $keytype
+  }
+}
 
 echo '+++++source qa/reimport.script+++++'
-sleep 2
            source qa/reimport.script
-
-echo '+++++source qa/lifecycle.script    pem sha256 pkcs12 rsa 2048+++++'
-sleep 2
-           source qa/lifecycle.script    pem sha256 pkcs12 rsa 2048
-
-echo '+++++source qa/lifecycle.script    der sha256 pkcs12 rsa 2048+++++'
-sleep 2
-           source qa/lifecycle.script    der sha256 pkcs12 rsa 2048
-
-echo '+++++source qa/lifecycle.script    pem sha256 pkcs11 dsa 2048+++++'
-sleep 2
-           source qa/lifecycle.script    pem sha256 pkcs11 dsa 2048
-
-echo '+++++source qa/lifecycle.script    der sha256 pkcs11 dsa 2048+++++'
-sleep 2
-           source qa/lifecycle.script    der sha256 pkcs11 dsa 2048
-
-echo '+++++source qa/lifecycle.script    pem sha256 pkcs12 dsa 2048+++++'
-sleep 2
-           source qa/lifecycle.script    pem sha256 pkcs12 dsa 2048
-
-echo '+++++source qa/lifecycle.script    der sha256 pkcs12 dsa 2048+++++'
-sleep 2
-           source qa/lifecycle.script    der sha256 pkcs12 dsa 2048
-
-echo '+++++source qa/lifecycle.script    pem sha256 pkcs11 ec secp256r1+++++'
-sleep 2
-           source qa/lifecycle.script    pem sha256 pkcs11 ec secp256r1
-
-echo '+++++source qa/lifecycle.script    der sha256 pkcs11 ec secp256r1+++++'
-sleep 2
-           source qa/lifecycle.script    der sha256 pkcs11 ec secp256r1
-
-echo '+++++source qa/lifecycle.script    pem sha256 pkcs12 ec secp256r1+++++'
-sleep 2
-           source qa/lifecycle.script    pem sha256 pkcs12 ec secp256r1
-
-echo '+++++source qa/lifecycle.script    der sha256 pkcs12 ec secp256r1+++++'
-sleep 2
-           source qa/lifecycle.script    der sha256 pkcs12 ec secp256r1
-
-echo '+++++source qa/lifecycle.script -l pem sha256 pkcs11 rsa 2048+++++'
-sleep 2
-           source qa/lifecycle.script -l pem sha256 pkcs11 rsa 2048
-
-echo '+++++source qa/lifecycle.script -l der sha256 pkcs11 rsa 2048+++++'
-sleep 2
-           source qa/lifecycle.script -l der sha256 pkcs11 rsa 2048
-
-echo '+++++source qa/lifecycle.script -l pem sha256 pkcs12 rsa 2048+++++'
-sleep 2
-           source qa/lifecycle.script -l pem sha256 pkcs12 rsa 2048
-
-echo '+++++source qa/lifecycle.script -l der sha256 pkcs12 rsa 2048+++++'
-sleep 2
-           source qa/lifecycle.script -l der sha256 pkcs12 rsa 2048
-
-echo '+++++source qa/lifecycle.script -l pem sha256 pkcs11 dsa 2048+++++'
-sleep 2
-           source qa/lifecycle.script -l pem sha256 pkcs11 dsa 2048
-
-echo '+++++source qa/lifecycle.script -l der sha256 pkcs11 dsa 2048+++++'
-sleep 2
-           source qa/lifecycle.script -l der sha256 pkcs11 dsa 2048
-
-echo '+++++source qa/lifecycle.script -l pem sha256 pkcs12 dsa 2048+++++'
-sleep 2
-           source qa/lifecycle.script -l pem sha256 pkcs12 dsa 2048
-
-echo '+++++source qa/lifecycle.script -l der sha256 pkcs12 dsa 2048+++++'
-sleep 2
-           source qa/lifecycle.script -l der sha256 pkcs12 dsa 2048
-
-echo '+++++source qa/lifecycle.script -l pem sha256 pkcs11 ec secp256r1+++++'
-sleep 2
-           source qa/lifecycle.script -l pem sha256 pkcs11 ec secp256r1
-
-echo '+++++source qa/lifecycle.script -l der sha256 pkcs11 ec secp256r1+++++'
-sleep 2
-           source qa/lifecycle.script -l der sha256 pkcs11 ec secp256r1
-
-echo '+++++source qa/lifecycle.script -l pem sha256 pkcs12 ec secp256r1+++++'
-sleep 2
-           source qa/lifecycle.script -l pem sha256 pkcs12 ec secp256r1
-
-echo '+++++source qa/lifecycle.script -l der sha256 pkcs12 ec secp256r1+++++'
-sleep 2
-           source qa/lifecycle.script -l der sha256 pkcs12 ec secp256r1

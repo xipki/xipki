@@ -33,11 +33,11 @@ public class CrlHttpFilter implements XiHttpFilter {
 
   private static final String DFLT_CA_DB_CFG = "${sys:catalina.home}/xipki/etc/ca/database/ca-db.properties";
 
-  private DataSourceWrapper dataSource;
+  private final DataSourceWrapper dataSource;
 
-  private boolean hasSha1Column;
+  private final boolean hasSha1Column;
 
-  public void init() throws Exception {
+  public CrlHttpFilter() throws Exception {
     XipkiBaseDir.init();
     try {
       this.dataSource = new DataSourceFactory().createDataSourceForFile("ca",

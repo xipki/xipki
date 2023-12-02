@@ -1,0 +1,73 @@
+{
+	"master":true,
+	// If you have more than one instances in master mode, set it to false.
+	"noLock":true,
+	// To activate the logging of requests and responses, set writer.level to DEBUG
+	// in the file META-INF/classes/log4j2.properties.
+	"logReqResp": true,
+	// valid values are NO, APACHE, NGINX, GENERAL
+	//"reverseProxyMode":"GENERAL",
+	// shard id, between 0 and 127. CA systems using same database must have
+	// different shard ids.
+	"shardId":0,
+	"datasources":[{
+		"name":"ca",
+		"conf":{
+			"file":"etc/ca/database/ca-db.properties"
+		}
+	},{
+		"name":"caconf",
+		"conf":{
+			"file":"etc/ca/database/caconf-db.properties"
+		}
+	},{
+		"name":"ocsp",
+		"conf":{
+			"file":"etc/ca/database/ocsp-db.properties"
+		}
+	},{
+		"name":"keypool",
+		"conf":{
+			"file":"etc/ca/database/keypool-db.properties"
+		}
+	}],
+	"remoteMgmt":{
+		"enabled":true,
+		"certs":[
+			{
+				"file":"keycerts/ca-mgmt-client-cert.pem"
+			}
+		]
+	},
+	"certprofileFactories":[
+	],
+	"security":{
+		"keyStrongrandomEnabled":false,
+		"signStrongrandomEnabled":false,
+		"defaultSignerParallelism":32,
+		"pkcs11Conf":{
+			"file":"security/pkcs11.json"
+		},
+		"signerFactories": [],
+		"keypairGeneratorFactories": []
+	},
+	"audit":{
+		// embed: use the embedded slf4j logging
+		// file-mac: audit entries are chained, and each entry is MAC protected, saved in file
+		//   conf: key=<hex-encoded key or its PBE encrypted form>,file=<log file>,
+		// database-mac: audit entries are chained, and each entry is MAC protected, saved in file
+		//   conf: key=<hex-encoded key or its PBE encrypted form>,datasource=<database conf file>
+		// java:<name of class that implements org.xipki.audit.AuditService>
+		"type":"embed",
+		"conf": "file=${sys:catalina.home}/logs/ca-audit.log"
+	},
+	"sslContexts":[{
+		"name":"ctlog1",
+		"trustanchors":[{
+			"file":"keycerts/ca-server-cert.pem"
+		}]
+	}],
+	"ctLog":{
+	    "keydir":"ctlog"
+	}
+}

@@ -67,6 +67,11 @@
                   <artifactId>slf4j-api</artifactId>
                   <version>${slf4j.version}</version>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.slf4j</groupId>
+                  <artifactId>slf4j-simple</artifactId>
+                  <version>${slf4j.version}</version>
+                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>
@@ -83,11 +88,14 @@
                 <delete dir="${project.build.directory}/t"/>
                 <delete dir="${project.build.directory}/t2"/>
 
-                <copy file="src/assembly/unfiltered/README.md"
+                <copy file="../../README.md"
                       todir="${project.build.directory}/t"/>
                 <copy todir="${project.build.directory}/t" >
-                  <fileset dir="${project.build.outputDirectory}">
-                    <include name="setup/**"/>
+                  <fileset dir="${project.build.outputDirectory}/package">
+                  </fileset>
+                </copy>
+                <copy todir="${project.build.directory}/t/setup" >
+                  <fileset dir="${project.build.outputDirectory}/setup">
                   </fileset>
                 </copy>
 
