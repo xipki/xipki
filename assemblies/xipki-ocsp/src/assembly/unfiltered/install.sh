@@ -31,10 +31,36 @@ then
    helpFunction
 fi
 
-echo $tomcatDir
 ## workding dir
-WDIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-#WDIR=`dirname $0`
+#WDIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+WDIR=`dirname $0`
+
+## check the pre-conditions
+if [ ! -d ${WDIR}/tomcat/xipki/keycerts ]; then
+   echo "Generate the key and certificate via ${WDIR}/../setup/generate-keycerts.sh first."
+   exit 1
+fi
+
+echo "Tomcat: $tomcatDir"
+
+## make sure the tomcat is only for HSM proxy
+if [ -f ${tomcatDir}/webapps/ca.war ]; then
+   echo "CA is running in $tomcatDir, please use other tomcat instance."
+   exit 1
+fi
+
+if [ -f ${tomcatDir}/webapps/hsmproxy.war ]; then
+   echo "HSM proxy is running in $tomcatDir, please use other tomcat instance."
+   exit 1
+fi
+
+if [ -f ${tomcatDir}/webapps/acmee.war ] || [ -f ${tomcatDir}/webapps/cmp.war ] \
+  || [ -f ${tomcatDir}/webapps/est.war ] || [ -f ${tomcatDir}/webapps/rest.war ] \
+  || [ -f ${tomcatDir}/webapps/scep.war ]
+then
+   echo "Protocol gateway is running in $tomcatDir, please use other tomcat instance."
+   exit 1
+fi
 
 ## detect the major version of tomcat
 TOMCAT_VERSION=`${tomcatDir}/bin/version.sh | grep "Server number"`

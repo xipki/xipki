@@ -79,7 +79,7 @@ echo "enroll certificate"
 
 openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 
-ä Do not forget the @-symbol of --data-binary.
+# Do not forget the @-symbol of --data-binary.
 
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
@@ -110,7 +110,7 @@ echo "enroll certificate"
 
 openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 
-ä Do not forget the @-symbol of --data-binary.
+# Do not forget the @-symbol of --data-binary.
 
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \

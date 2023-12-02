@@ -17,5 +17,6 @@ Deployment in Tomcat (8, 9 and 10)
       In xipki-mgmt-cli, call `ca:sql --db-conf /path/to/acme-db.properties xipki/sql/acme-init.sql`
    6. Adapt the `acme`-block in the `tomcat/xipki/etc/acme-gateway.json`.
 5. Execute the command  
-   `./install.sh -t <tomcat dir of proocol gaeway server>`
-
+   `./install.sh [OPTION]... -t <tomcat dir of proocol gaeway server>`,  
+   where OPTION specifies which protocols shall be installed. An empty OPTION indicates to install
+   all protocols.

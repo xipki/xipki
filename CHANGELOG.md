@@ -4,6 +4,8 @@ See also <https://github.com/xipki/xipki/releases>
 
 ## 6.5.1
 - Release date: 202x/mm/dd
+- CA, OCSP, Gateway, HSM Proxy
+  - Add script to copy files automatically.
 
 ## 6.5.0
 - Release date: 2023/11/26

@@ -81,7 +81,7 @@ openssl req -new -sha256 -key ${OUT_DIR}/${CN}-key.pem -outform der \
 
 echo "enroll certificate"
 
-ä Do not forget the @-symbol of --data-binary.
+# Do not forget the @-symbol of --data-binary.
 
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
@@ -115,7 +115,7 @@ openssl req -new -sha256 -key ${OUT_DIR}/${CN}-key.pem -outform der \
 
 echo "enroll certificate"
 
-ä Do not forget the @-symbol of --data-binary.
+# Do not forget the @-symbol of --data-binary.
 
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \

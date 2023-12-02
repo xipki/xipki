@@ -12,16 +12,16 @@ fi
 
 LIB_DIR=$WDIR/../xipki-cli/system
 
-CP="$LIB_DIR/org/xipki/commons/security/${xipki.commons.version}/security-${xipki.commons.version}.jar"
-CP="$CP:$LIB_DIR/org/xipki/commons/util/${xipki.commons.version}/util-${xipki.commons.version}.jar"
-CP="$CP:$LIB_DIR/org/xipki/commons/password/${xipki.commons.version}/password-${xipki.commons.version}.jar"
-CP="$CP:$LIB_DIR/org/bouncycastle/bcprov-jdk18on/${bc.version}/bcprov-jdk18on-${bc.version}.jar"
-CP="$CP:$LIB_DIR/org/bouncycastle/bcpkix-jdk18on/${bc.version}/bcpkix-jdk18on-${bc.version}.jar"
-CP="$CP:$LIB_DIR/org/bouncycastle/bcutil-jdk18on/${bc.version}/bcutil-jdk18on-${bc.version}.jar"
-CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-databind/${jackson.version}/jackson-databind-${jackson.version}.jar"
-CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-annotations/${jackson.version}/jackson-annotations-${jackson.version}.jar"
-CP="$CP:$LIB_DIR//com/fasterxml/jackson/core/jackson-core/${jackson.version}/jackson-core-${jackson.version}.jar"
-CP="$CP:$WDIR/lib/slf4j-api.jar:$WDIR/lib/slf4j-simple.jar"
+CP="$LIB_DIR/org/xipki/commons/security/${xipki.commons.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/commons/util/${xipki.commons.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/commons/password/${xipki.commons.version}/*"
+CP="$CP:$LIB_DIR/org/bouncycastle/bcprov-jdk18on/${bc.version}/*"
+CP="$CP:$LIB_DIR/org/bouncycastle/bcpkix-jdk18on/${bc.version}/*"
+CP="$CP:$LIB_DIR/org/bouncycastle/bcutil-jdk18on/${bc.version}/*"
+CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-databind/${jackson.version}/*"
+CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-annotations/${jackson.version}/*"
+CP="$CP:$LIB_DIR//com/fasterxml/jackson/core/jackson-core/${jackson.version}/*"
+CP="$CP:$WDIR/lib/*"
 
 KC_DIR=$WDIR/keycerts
 ## Generate keys

@@ -1,4 +1,9 @@
-### JAVA_HOME
+## Tomcat
+The XiPKI components `xipki-ca`, `xipki-gateway`, `xipki-hsmproxy`, and `xipki-ocsp` shall be 
+installed in different tomcat instances. Do NOT use install more than 1 XiPKI component above
+to one tomcat instance.
+
+## JAVA_HOME
 Set the environment variable `JAVA_HOME` to the root directory of JRE/JDK installation.
 
 ## Prepare Keys and certificates for the Communication between XiPKI Components

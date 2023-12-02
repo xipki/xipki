@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 helpFunction()
 {
    echo ""
@@ -24,3 +26,4 @@ fi
 CLASSPATH="$WDIR/../lib:$WDIR/../lib/*"
 
 $JAVA_EXEC -cp "$CLASSPATH" org.xipki.apppackage.RestorePackage $WDIR/../files "$1"
+

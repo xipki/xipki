@@ -49,10 +49,33 @@ else
   SCEP=1
 fi
 
-echo $tomcatDir
 ## workding dir
-WDIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-#WDIR=`dirname $0`
+#WDIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+WDIR=`dirname $0`
+
+## check the pre-conditions
+if [ ! -d ${WDIR}/tomcat/xipki/keycerts ]; then
+   echo "Generate the key and certificate via ${WDIR}/../setup/generate-keycerts.sh first."
+   exit 1
+fi
+
+echo "Tomcat: $tomcatDir"
+
+## make sure the tomcat is only for HSM proxy
+if [ -f ${tomcatDir}/webapps/ca.war ]; then
+   echo "CA is running in $tomcatDir, please use other tomcat instance."
+   exit 1
+fi
+
+if [ -f ${tomcatDir}/webapps/hsmproxy.war ]; then
+   echo "HSM proxy is running in $tomcatDir, please use other tomcat instance."
+   exit 1
+fi
+
+if [ -f ${tomcatDir}/webapps/ocsp.war ]; then
+   echo "OCSP responder is running in $tomcatDir, please use other tomcat instance."
+   exit 1
+fi
 
 ## detect the major version of tomcat
 TOMCAT_VERSION=`${tomcatDir}/bin/version.sh | grep "Server number"`
@@ -123,16 +146,17 @@ cp -r ${WDIR}/tomcat/* ${tomcatDir}
 cp -r ${WDIR}/${_DIR}/conf ${tomcatDir}/
 
 if [ "$ACME" == "1" ]; then
+  echo "Copying acme.war"
   WAR="${tomcatDir}/webapps/acme"
 
   [ -f ${WAR}.war ] && mv ${WAR}.war ${BDIR}/webapps
   rm -rf "${WAR}"
 
   cp ${WDIR}/${_DIR}/webapps/acme.war ${tomcatDir}/webapps
-
 fi
 
 if [ "$CMP" == "1" ]; then
+  echo "Copying cmp.war"
   WAR="${tomcatDir}/webapps/cmp"
 
   [ -f ${WAR}.war ] && mv ${WAR}.war ${BDIR}/webapps
@@ -142,6 +166,7 @@ if [ "$CMP" == "1" ]; then
 fi
 
 if [ "$EST" == "1" ]; then
+  echo "Copying est.war"
   WAR="${tomcatDir}/webapps/est"
 
   [ -f ${WAR}.war ] && mv ${WAR}.war ${BDIR}/webapps
@@ -151,6 +176,7 @@ if [ "$EST" == "1" ]; then
 fi
 
 if [ "$REST" == "1" ]; then
+  echo "Copying rest.war"
   WAR="${tomcatDir}/webapps/rest"
 
   [ -f ${WAR}.war ] && mv ${WAR}.war ${BDIR}/webapps
@@ -160,6 +186,7 @@ if [ "$REST" == "1" ]; then
 fi
 
 if [ "$SCEP" == "1" ]; then
+  echo "Copying scep.war"
   WAR="${tomcatDir}/webapps/scep"
 
   [ -f ${WAR}.war ] && mv ${WAR}.war ${BDIR}/webapps

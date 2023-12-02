@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 # Please adapt the URL
 BASE_URL="https://localhost:8445/rest/subcawithcrl"
 CACERT="output/subcawithcrl1.der"
