@@ -23,6 +23,8 @@
     <bundle>mvn:org.xipki/pki-common/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-mgmt-client/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-mgmt-db/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/ca-mgmt-db-shell/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/ca-mgmt-shell/${project.version}</bundle>
   </feature>
 </features>

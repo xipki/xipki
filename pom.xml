@@ -65,6 +65,7 @@
     <module>ca-mgmt-api</module>
     <module>ca-server</module>
     <module>ca-gateway</module>
+    <module>ca-mgmt-db</module>
     <module>ca-mgmt-client</module>
     <module>certprofile-xijson</module>
     <module>ocsp-api</module>

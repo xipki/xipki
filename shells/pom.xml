@@ -19,6 +19,7 @@
     <module>cmp-client-shell</module>
     <module>ocsp-client-shell</module>
     <module>scep-client-shell</module>
+    <module>ca-mgmt-db-shell</module>
     <module>ca-mgmt-shell</module>
     <module>qa-shell</module>
   </modules>

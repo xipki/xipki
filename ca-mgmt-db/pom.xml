@@ -8,7 +8,7 @@
     <artifactId>xipki-parent</artifactId>
     <version>6.5.1-SNAPSHOT</version>
   </parent>
-  <artifactId>ca-mgmt-client</artifactId>
+  <artifactId>ca-mgmt-db</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
   <packaging>bundle</packaging>
   <dependencies>
@@ -16,6 +16,14 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>ca-mgmt-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.commons</groupId>
+      <artifactId>datasource</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.lingala.zip4j</groupId>
+      <artifactId>zip4j</artifactId>
     </dependency>
   </dependencies>
 </project>
