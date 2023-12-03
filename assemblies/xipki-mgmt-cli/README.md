@@ -1,7 +1,25 @@
+## How to start XiPKI MGMT CLI
+
+`bin/karaf`
+
+* Note: You may access the CLI via SSH.
+    * Configure karaf to start the SSH server.
+        * Add `"ssh,"` to the field `featuresBoot` in the file `etc/org.apache.karaf.features.cfg`.
+        * Configure the SSH server. See https://karaf.apache.org/manual/latest/security for details.
+    * Start and stop karaf via `bin/start` and `bin/stop`.
+    * Use a SSH client (either `bin/client` or any ssh client) to access the SSH service. Supported authentication
+      methods are
+        * username and password
+        * public key (see Section `Managing authentication by key` at https://karaf.apache.org/manual/latest/security).
+
+## Available Karaf Commands
+
+Please refer to [commands.md](commands.md) for more details.
+
 ## Setup CA Server
 
 * _(If error like "Identity or Certificate with label=mylabel already exists" occurs,
-      you need to comment the line in the file `setup-p11.scrip` which generate the key (e.g. dsa-p11 ec-p11, rsa-p11, sm2-p12)
+      you need to comment the line in the file `setup-p11.script` which generate the key (e.g. dsa-p11 ec-p11, rsa-p11, sm2-p12)
       or delete the existing key using command `delete-key-p11`)_.
 
 * Start Management CLI.
@@ -35,12 +53,3 @@
 
 * Verify the installation, execute the command in the Management CLI:  
   `ca-info myca1`
-
-* Note: You may access the Management CLI via SSH.
-    * Configure karaf to start the SSH server.
-        * Add `"ssh,"` to the field `featuresBoot` in the file `etc/org.apache.karaf.features.cfg`.
-        * Configure the SSH server. See https://karaf.apache.org/manual/latest/security for details.
-    * Use a SSH client (either `bin/client` or any ssh client) to access the SSH service. Supported authentication
-      methods are
-        * username and password
-        * public key (see Section `Managing authentication by key` at https://karaf.apache.org/manual/latest/security).

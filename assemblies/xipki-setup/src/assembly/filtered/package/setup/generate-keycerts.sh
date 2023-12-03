@@ -20,7 +20,7 @@ CP="$CP:$LIB_DIR/org/bouncycastle/bcpkix-jdk18on/${bc.version}/*"
 CP="$CP:$LIB_DIR/org/bouncycastle/bcutil-jdk18on/${bc.version}/*"
 CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-databind/${jackson.version}/*"
 CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-annotations/${jackson.version}/*"
-CP="$CP:$LIB_DIR//com/fasterxml/jackson/core/jackson-core/${jackson.version}/*"
+CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-core/${jackson.version}/*"
 CP="$CP:$WDIR/lib/*"
 
 KC_DIR=$WDIR/keycerts

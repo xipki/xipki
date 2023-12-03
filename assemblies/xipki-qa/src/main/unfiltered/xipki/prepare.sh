@@ -101,9 +101,9 @@ cp $KC_DIR/hsmproxy-client/* \
    $KC_DIR/ra-sdk-client/ra-sdk-client-cert.pem* \
    $TDIR
 
-cp xipki/security/pkcs11.json xipki-ca/tomcat/xipki/security/
-cp xipki/security/pkcs11.json xipki-ocsp/tomcat/xipki/security/
-cp xipki/security/pkcs11.json xipki-gateway/tomcat/xipki/security/
+cp $RDIR/xipki/security/pkcs11.json $RDIR/xipki-ca/tomcat/xipki/security/
+cp $RDIR/xipki/security/pkcs11.json $RDIR/xipki-ocsp/tomcat/xipki/security/
+cp $RDIR/xipki/security/pkcs11.json $RDIR/xipki-gateway/tomcat/xipki/security/
 
 TOMCAT_CA_DIR=~/tools/xipki/ca-tomcat
 TOMCAT_OCSP_DIR=~/tools/xipki/ocsp-tomcat

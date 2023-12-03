@@ -164,12 +164,3 @@ As described in the `xipki-mgmt-cli/README.md` file.
 ## Enroll/Revoke Certificate
 
 As described in the `xipki-cli/README.md` file.
-
-Management CLI Commands
------
-Please refer to [commands.md](commands.md) for more details.
-
-CLI Commands
------
-Please refer to [commands.md](commands.md) for more details.
-
