@@ -17,10 +17,6 @@ Just [create new issue](https://github.com/xipki/xipki/issues).
 For bug-report please upload the test data and log files, describe the version of XiPKI, OS and
 JRE/JDK, and the steps to reproduce the bug.
 
-Docker container
------
-See discussion in [discussion #205](https://github.com/xipki/xipki/discussions/249).
-
 ## Get Started
 
 ### Binaries
@@ -47,7 +43,7 @@ The binary `xipki-setup-<version>.zip` can be retrieved using one of the followi
 
       In folder `xipki`
       ```sh
-      sh install.sh
+      ./install.sh
       ```
  
       Then you will find the binary `assemblies/xipki-setup/target/xipki-setup-<version>.zip`
