@@ -511,11 +511,12 @@ public class QaCaActions {
         throw new CmdFailure("could not find CA '" + caName + "'");
       }
 
-      List<PublisherEntry> entries = caManager.getPublishersForCa(caName);
+      // the server is v6.5.1 or before.
 
+      Set<String> entries = getPublisherNamesForCa(caName);
       String upPublisherName = publisherName.toLowerCase();
-      for (PublisherEntry m : entries) {
-        if (m.getIdent().getName().equals(upPublisherName)) {
+      for (String m : entries) {
+        if (m.equals(upPublisherName)) {
           println(" checked CA publisher CA='" + caName + "', publisher='" + publisherName + "'");
           return null;
         }

@@ -456,13 +456,25 @@ public interface CaManager {
   void addPublisher(PublisherEntry entry) throws CaMgmtException;
 
   /**
+   * Returns names of publishers for the CA {@code caName}.
+   * @param caName
+   *          CA name. Must not be {@code null}.
+   * @return publisher names for the given CA.
+   * @throws CaMgmtException
+   *          if error occurs.
+   */
+  Set<String> getPublisherNamesForCa(String caName) throws CaMgmtException;
+
+  /**
    * Returns publishers for the CA {@code caName}.
    * @param caName
    *          CA name. Must not be {@code null}.
    * @return publishers for the given CA.
    * @throws CaMgmtException
    *          if error occurs.
+   * @deprecated since v6.5.1
    */
+  @Deprecated
   List<PublisherEntry> getPublishersForCa(String caName) throws CaMgmtException;
 
   /**

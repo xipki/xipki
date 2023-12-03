@@ -55,6 +55,8 @@ public enum MgmtAction {
   getKeypairGenNames,
   getPublisher,
   getPublisherNames,
+  getPublisherNamesForCa,
+  @Deprecated
   getPublishersForCa,
   getRequestor,
   getRequestorNames,

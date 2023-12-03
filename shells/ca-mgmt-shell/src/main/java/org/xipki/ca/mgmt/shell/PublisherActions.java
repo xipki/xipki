@@ -71,11 +71,11 @@ public class PublisherActions {
         throw new CmdFailure("could not find CA '" + caName + "'");
       }
 
-      List<PublisherEntry> entries = caManager.getPublishersForCa(caName);
-      if (isNotEmpty(entries)) {
+      Set<String> publisherNames = getPublisherNamesForCa(caName);
+      if (isNotEmpty(publisherNames)) {
         StringBuilder sb = new StringBuilder().append("publishers for CA ").append(caName).append("\n");
-        for (PublisherEntry entry : entries) {
-          sb.append("\t").append(entry.getIdent().getName()).append("\n");
+        for (String entry : publisherNames) {
+          sb.append("\t").append(entry).append("\n");
         }
         println(sb.toString());
       } else {

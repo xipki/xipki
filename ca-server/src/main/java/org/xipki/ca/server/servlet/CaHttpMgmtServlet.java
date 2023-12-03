@@ -312,6 +312,10 @@ class CaHttpMgmtServlet {
           resp = new MgmtResponse.StringSet(caManager.getPublisherNames());
           break;
         }
+        case getPublisherNamesForCa: {
+          resp = new MgmtResponse.StringSet(caManager.getPublisherNamesForCa(getNameFromRequest(requestStream)));
+          break;
+        }
         case getPublishersForCa: {
           resp = new MgmtResponse.GetPublischersForCa(caManager.getPublishersForCa(getNameFromRequest(requestStream)));
           break;

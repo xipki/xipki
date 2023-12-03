@@ -13,8 +13,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.*;
-import org.xipki.ca.api.mgmt.entry.CaEntry;
-import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
+import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.SecurityFactory;
@@ -88,6 +87,23 @@ public class CaActions {
         sb.append("\n");
       }
     } // method printCaNames
+
+    protected Set<String> getPublisherNamesForCa(String caName) throws CaMgmtException {
+      Set<String> publisherNames;
+      try {
+        publisherNames = caManager.getPublisherNamesForCa(caName);
+      } catch (CaMgmtException ex) {
+        // the server is v6.5.1 or before.
+        List<PublisherEntry> publishers = caManager.getPublishersForCa(caName);
+        publisherNames = new HashSet<>();
+        if (publishers != null) {
+          for (PublisherEntry m : publishers) {
+            publisherNames.add(m.getIdent().getName());
+          }
+        }
+      }
+      return publisherNames == null ? Collections.emptySet() : publisherNames;
+    }
 
   } // class CaAction
 
@@ -503,14 +519,45 @@ public class CaActions {
         sb.append("inactive CAs:\n");
         printCaNames(sb, caManager.getInactiveCaNames(), prefix);
       } else {
-        CaEntry entry = Optional.ofNullable(caManager.getCa(name)).orElseThrow(
+        CaEntry caEntry = Optional.ofNullable(caManager.getCa(name)).orElseThrow(
             () -> new CmdFailure("could not find CA '" + name + "'"));
-        if (CaStatus.active == entry.getStatus()) {
-          boolean started = caManager.getSuccessfulCaNames().contains(entry.getIdent().getName());
+        if (CaStatus.active == caEntry.getStatus()) {
+          boolean started = caManager.getSuccessfulCaNames().contains(caEntry.getIdent().getName());
           sb.append("started:              ").append(started).append("\n");
         }
         Set<String> aliases = caManager.getAliasesForCa(name);
-        sb.append("aliases:              ").append(toString(aliases)).append("\n").append(entry.toString(verbose));
+        sb.append("aliases:              ").append(toString(aliases)).append("\n");
+        sb.append(caEntry.toString(verbose));
+
+        Set<String> publisherNames = getPublisherNamesForCa(name);
+        sb.append("\nAssociated publishers:");
+        if (CollectionUtil.isEmpty(publisherNames)) {
+          sb.append(" -");
+        } else {
+          List<String> names = new ArrayList<>(publisherNames);
+          Collections.sort(names);
+          sb.append(" ").append(names);
+        }
+
+        Set<CaProfileEntry> profiles = caManager.getCertprofilesForCa(name);
+        sb.append("\nAssociated certificate profiles:");
+        if (CollectionUtil.isEmpty(profiles)) {
+          sb.append(" -");
+        } else {
+          sb.append(" ").append(profiles).append("");
+        }
+
+        Set<CaHasRequestorEntry> requestors = caManager.getRequestorsForCa(name);
+        sb.append("\nAssociated requestors:");
+        if (CollectionUtil.isEmpty(requestors)) {
+          sb.append(" -");
+        } else {
+          for (CaHasRequestorEntry m : requestors) {
+            sb.append("\n\t").append(m.getRequestorIdent().getName())
+                .append(", permissions=").append(m.getPermissions())
+                .append(", profiles=").append(m.getProfiles());
+          }
+        }
       }
 
       println(sb.toString());

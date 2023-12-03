@@ -1071,6 +1071,15 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
+  public Set<String> getPublisherNamesForCa(String caName) {
+    Set<String> publisherNames = caHasPublishers.get(caName);
+    if (publisherNames == null) {
+      return Collections.emptySet();
+    }
+    return publisherNames;
+  }
+
+  @Override
   public List<PublisherEntry> getPublishersForCa(String caName) {
     return publisherManager.getPublishersForCa(caName);
   }
