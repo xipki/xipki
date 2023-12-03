@@ -2,6 +2,31 @@
 
 set -e
 
+WDIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+#WDIR=`dirname $0`
+echo "working dir: ${WDIR}"
+
+cd ~/tools/xipki/
+echo "change to folder: `pwd`"
+
+rm -rf ca-tomcat ocsp-tomcat gateway-tomcat hsmproxy-tomcat
+
+TOMCAT_BINARY=`compgen -G "apache-tomcat-*.tar.gz"`
+TOMCAT_DIR=`echo $TOMCAT_BINARY | cut -d "." -f -3`
+
+rm -rf $TOMCAT_DIR
+tar xf $TOMCAT_BINARY
+
+rm -rf $TOMCAT_DIR/webapps/*
+
+cp -r $TOMCAT_DIR ca-tomcat
+cp -r $TOMCAT_DIR ocsp-tomcat
+cp -r $TOMCAT_DIR gateway-tomcat
+cp -r $TOMCAT_DIR hsmproxy-tomcat
+
+cd $WDIR
+echo "change to folder: `pwd`"
+
 ## detect the major version of tomcat
 TOMCAT_VERSION=`~/tools/xipki/ca-tomcat/bin/version.sh | grep "Server number"`
 echo "Tomcat ${TOMCAT_VERSION}"
@@ -19,9 +44,6 @@ elif [ "$TOMCAT_VERSION" -lt "10" ]; then
 else
   _DIR=tomcat10on
 fi
-
-WDIR=`dirname $0`
-echo "working dir: ${WDIR}"
 
 # Copy the keys and certificates
 KC_DIR=${WDIR}/setup/keycerts

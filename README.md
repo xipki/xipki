@@ -50,7 +50,7 @@ The binary `xipki-setup-<version>.zip` can be retrieved using one of the followi
 
 ### Install and Setup
 
-Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL.md`-
+Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL.md`.
 
 ## Features
 
@@ -60,7 +60,7 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
 * JRE / JDK
   * Java 11+.
 * Database
-  * DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
+  * DB2, Mar[ocsp-server](ocsp-server)iaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
 * Hardware
   * Any available hardware (tested on Raspberry Pi 2 Model B with 900MHz quad-core ARM CPU and 1 GB Memory)
 * Servlet Container
@@ -68,13 +68,11 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
 * HSM Devices
   - [AWS CloudHSM](https://aws.amazon.com/cloudhsm)
   - [Nitrokey HSM 2](https://www.nitrokey.com/#comparison) / [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick)
-  - [nCipher Connect](https://www.ncipher.com/products/general-purpose-hsms/nshield-connect)
-  - [nCipher Solo](https://www.ncipher.com/products/general-purpose-hsms/nshield-solo)
+  - nCipher [Connect](https://www.ncipher.com/products/general-purpose-hsms/nshield-connect) / [Solo](https://www.ncipher.com/products/general-purpose-hsms/nshield-solo)
   - [Sansec HSM](https://en.sansec.com.cn)
   - [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/)
   - [TASS HSM](https://www.tass.com.cn/portal/list/index/id/15.html)
-  - [Thales LUNA](https://cpl.thalesgroup.com/encryption/hardware-security-modules/general-purpose-hsms)
-  - [Thales ProtectServer](https://cpl.thalesgroup.com/encryption/hardware-security-modules/protectserver-hsms)
+  - Thales [LUNA](https://cpl.thalesgroup.com/encryption/hardware-security-modules/general-purpose-hsms) / [ProtectServer](https://cpl.thalesgroup.com/encryption/hardware-security-modules/protectserver-hsms)
   - [Utimaco Se](https://hsm.utimaco.com/products-hardware-security-modules/general-purpose-hsm/)
   - And shall also work on other HSMs with PKCS#11 support.
 
@@ -92,11 +90,9 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
   - EdDSA Certificates (RFC 8410, RFC 8032)
   - SHAKE Certificates (RFC 8692)
   - Diffie-Hellman Proof-of-Possession Algorithms (RFC 6955)
-  - EN 319 411 (eIDAS)
-  - EN 319 412 (eIDAS)
+  - EN 319 411 and 319 412 (eIDAS)
   - Direct and indirect CRL
   - FullCRL and DeltaCRL
-  - Customized extension to embed certificates in CRL
   - API to specify customized certificate profiles
   - Support of JSON-based certificate profile
   - API to specify customized publisher, e.g. for LDAP and OCSP responder
@@ -110,8 +106,7 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
     - RSA PKCS1v1.5 with hash algorithms: SHA-1, SHA-2, and SHA-3
     - RSA PSS with hash algorithms: SHA-1, SHA-2, and SHA-3, and SHAKE
     - SM3withSM2
-  - Native support of X.509 extensions (other extensions can be supported by
-    configuring it as blob)
+  - Native support of X.509 extensions (other extensions can be supported by configuring it as blob)
     - RFC 3739
       - BiometricInfo
       - QCStatements (also in eIDAS standard EN 319 412)
@@ -119,23 +114,16 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
     - RFC 4262
       - SMIMECapabilities
     - RFC 5280
-      - AuthorityInformationAccess
-      - AuthorityKeyIdentifier
+      - AuthorityInformationAccess, AuthorityKeyIdentifier
       - BasicConstraints
-      - CertificatePolicies
-      - CRLDistributionPoints
+      - CertificatePolicies, CRLDistributionPoints
       - ExtendedKeyUsage
       - FreshestCRL
-      - InhibitAnyPolicy
-      - IssuerAltName
+      - InhibitAnyPolicy, IssuerAltName
       - KeyUsage
       - NameConstraints
-      - PolicyConstrains
-      - PolicyMappings
-      - PrivateKeyUsagePeriod
-      - SubjectAltName
-      - SubjectInfoAccess
-      - SubjectKeyIdentifier
+      - PolicyConstrains, PolicyMappings, PrivateKeyUsagePeriod
+      - SubjectAltName, SubjectInfoAccess, SubjectKeyIdentifier
     - RFC 6960
       - OcspNoCheck
     - RFC 6962
@@ -145,14 +133,11 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
     - Car Connectivity Consortium
       - ExtensionSchema
     - Common PKI (German national standard)
-      - AdditionalInformation
-      - Admission
+      - AdditionalInformation, Admission
       - Restriction
       - ValidityModel
     - GM/T 0015-2012 (Chinese national standard)
-      - ICRegistrationNumber
-      - IdentityCode
-      - InsuranceNumber
+      - ICRegistrationNumber, IdentityCode, InsuranceNumber
       - OrganizationCode
       - TaxationNumber
   - Management of multiple CAs in one software instance
@@ -192,11 +177,11 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
   - Exporting certificate from token
 
 ### CLI (CA/OCSP Client)
-  - Client to enroll, revoke, unrevoke (unsuspend) and remove certificates, to generate and download CRLs
+  - Client to enroll, revoke, and unrevoke (unsuspend) certificates, to download CRLs
   - Client to send OCSP request
   - Updating certificates in token
   - Generating CSR (PKCS#10 request)
   - Exporting certificate from token
 
 ### HSM Proxy
-  - Provide service to access to the HSM remotely.
+  - Provide the access to the HSM remotely.
