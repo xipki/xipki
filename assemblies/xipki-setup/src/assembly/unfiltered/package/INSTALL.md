@@ -11,8 +11,6 @@ Set the environment variable `JAVA_HOME` to the root directory of JRE/JDK instal
 1. Change the password (`"CHANGEIT"`), and subject in `setup/keycerts.json` and the XiPKI components.
 2. Generate keys and certificates:  
    `setup/generate-keycerts.sh`.
-3. Copy the keys and certificates to the target components:  
-   `setup/provision-keycerts.sh`.
 
 ## Install CA Server
 
