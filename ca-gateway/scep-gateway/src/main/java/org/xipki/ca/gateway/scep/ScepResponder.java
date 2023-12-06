@@ -192,8 +192,7 @@ public class ScepResponder {
     }
 
     AuditService auditService = Audits.getAuditService();
-    AuditEvent event = new AuditEvent();
-    event.setApplicationName("scep-gw");
+    AuditEvent event = new AuditEvent("scep-gw");
     event.addEventData("name", caName + "/" + certprofileName);
 
     AuditLevel auditLevel = AuditLevel.INFO;

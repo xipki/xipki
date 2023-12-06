@@ -52,8 +52,7 @@ public abstract class X509CaModule {
 
   protected AuditEvent newAuditEvent(String eventType, RequestorInfo requestor) {
     Args.notNull(eventType, "eventType");
-    AuditEvent event = new AuditEvent();
-    event.setApplicationName(CaAuditConstants.APPNAME);
+    AuditEvent event = new AuditEvent(CaAuditConstants.APPNAME);
     event.setEventData(CaAuditConstants.NAME_ca, caIdent.getName());
     event.setEventType(eventType);
     if (requestor != null) {

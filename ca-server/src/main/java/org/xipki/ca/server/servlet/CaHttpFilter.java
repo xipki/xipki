@@ -85,9 +85,9 @@ public class CaHttpFilter implements XiHttpFilter {
     securities.init(conf.getSecurity());
 
     int shardId = conf.getShardId();
-    String auditConf = audit.getConf();
+    ConfPairs auditConf = audit.getConf();
     if ("file-mac".equals(auditType) || "database-mac".equals(auditType)) {
-      auditConf = new ConfPairs(auditConf).putPair("shard-id", Integer.toString(shardId)).getEncoded();
+      auditConf.putPair("shard-id", Integer.toString(shardId));
     }
 
     Audits.init(auditType, auditConf);

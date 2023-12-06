@@ -67,8 +67,7 @@ public class ProtocolProxyConfWrapper {
       throw new InvalidConfException("could not initialize Securities", ex);
     }
 
-    String auditConf = audit.getConf();
-    Audits.init(auditType, auditConf);
+    Audits.init(auditType, audit.getConf());
     if (Audits.getAuditService() == null) {
       throw new InvalidConfException("could not init AuditService");
     }

@@ -593,8 +593,7 @@ class Ca2Manager {
     profileName = Args.toNonBlankLower(profileName, "profileName");
     Args.notBlank(subject, "subject");
 
-    AuditEvent event = new AuditEvent();
-    event.setApplicationName(CaAuditConstants.APPNAME);
+    AuditEvent event = new AuditEvent(CaAuditConstants.APPNAME);
     event.addEventType("CAMGMT_GEN_KEYCERT");
 
     X509Ca ca = getX509Ca(caName);
@@ -624,8 +623,7 @@ class Ca2Manager {
     profileName = Args.toNonBlankLower(profileName, "profileName");
     Args.notNull(encodedCsr, "encodedCsr");
 
-    AuditEvent event = new AuditEvent();
-    event.setApplicationName(CaAuditConstants.APPNAME);
+    AuditEvent event = new AuditEvent(CaAuditConstants.APPNAME);
     event.addEventType("CAMGMT_GEN_CERT");
 
     X509Ca ca = getX509Ca(caName);

@@ -66,8 +66,7 @@ class CmpHttpServlet {
   private HttpResponse doPost(XiHttpRequest req) throws IOException {
     X509Cert clientCert = TlsHelper.getTlsClientCert(req, reverseProxyMode);
     AuditService auditService = Audits.getAuditService();
-    AuditEvent event = new AuditEvent();
-    event.setApplicationName("cmp-gw");
+    AuditEvent event = new AuditEvent("cmp-gw");
 
     byte[] requestBytes = null;
     byte[] encodedPkiResp = null;

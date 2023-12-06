@@ -1167,12 +1167,10 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   static void auditLogPciEvent(boolean successful, String eventType) {
-    PciAuditEvent event = new PciAuditEvent();
-    event.setUserId("CA-SYSTEM");
-    event.setEventType(eventType);
-    event.setAffectedResource("CORE");
-    event.setStatus((successful ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED).name());
-    event.setLevel(successful ? AuditLevel.INFO : AuditLevel.ERROR);
+    PciAuditEvent event = PciAuditEvent.newPciAuditEvent(
+        "SYSTEM", eventType, "ca",
+        (successful ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED),
+        (successful ? AuditLevel.INFO : AuditLevel.ERROR));
     Audits.getAuditService().logEvent(event);
   }
 

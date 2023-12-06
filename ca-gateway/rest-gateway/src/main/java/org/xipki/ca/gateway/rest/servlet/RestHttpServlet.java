@@ -52,8 +52,7 @@ class RestHttpServlet {
   private HttpResponse service0(XiHttpRequest req, boolean viaPost)
       throws IOException {
     AuditService auditService = Audits.getAuditService();
-    AuditEvent event = new AuditEvent();
-    event.setApplicationName("rest-gw");
+    AuditEvent event = new AuditEvent("rest-gw");
 
     byte[] requestBytes = null;
     HttpResponse httpResp = null;

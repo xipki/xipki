@@ -83,7 +83,7 @@ public class GatewayUtil {
   } // method verifyCsr
 
   public static void auditLogPciEvent(Logger log, String type, boolean successful, String eventType) {
-    PciAuditEvent event = PciAuditEvent.newPciAuditEvent(type, eventType, "CORE",
+    PciAuditEvent event = PciAuditEvent.newPciAuditEvent("SYSTEM", eventType, type,
         successful ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED, successful ? AuditLevel.INFO : AuditLevel.ERROR);
     Audits.getAuditService().logEvent(event);
     logAuditEvent(log, event);

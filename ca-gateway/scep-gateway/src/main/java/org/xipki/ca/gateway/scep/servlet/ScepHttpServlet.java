@@ -50,8 +50,7 @@ class ScepHttpServlet {
     }
   }
 
-  private HttpResponse service0(XiHttpRequest req, boolean viaPost)
-      throws IOException {
+  private HttpResponse service0(XiHttpRequest req, boolean viaPost) throws IOException {
     String path = req.getServletPath();
 
     byte[] requestBytes = null;

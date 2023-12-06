@@ -127,8 +127,7 @@ public class OcspCertPublisher extends CertPublisher {
         messagePrefix, issuer, subjectText, serialText, ex.getMessage());
     LOG.debug("error", ex);
 
-    AuditEvent event = new AuditEvent();
-    event.setApplicationName("CAPublisher");
+    AuditEvent event = new AuditEvent("CAPublisher");
     event.setLevel(AuditLevel.ERROR);
     event.setStatus(AuditStatus.FAILED);
     if (certId != null) {

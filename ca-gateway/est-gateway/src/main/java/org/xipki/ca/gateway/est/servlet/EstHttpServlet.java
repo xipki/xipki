@@ -51,8 +51,7 @@ class EstHttpServlet {
 
   private HttpResponse service0(XiHttpRequest req, boolean viaPost) throws IOException {
     AuditService auditService = Audits.getAuditService();
-    AuditEvent event = new AuditEvent();
-    event.setApplicationName("est-gw");
+    AuditEvent event = new AuditEvent("est-gw");
 
     byte[] requestBytes = null;
     HttpResponse httpResp = null;

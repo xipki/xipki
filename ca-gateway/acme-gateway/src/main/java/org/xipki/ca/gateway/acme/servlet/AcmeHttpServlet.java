@@ -53,8 +53,7 @@ class AcmeHttpServlet {
   private HttpResponse service0(XiHttpRequest req, boolean viaPost)
       throws IOException {
     AuditService auditService = Audits.getAuditService();
-    AuditEvent event = new AuditEvent();
-    event.setApplicationName("acme-gw");
+    AuditEvent event = new AuditEvent("acme-gw");
 
     byte[] requestBytes = null;
     HttpResponse httpResp = null;
