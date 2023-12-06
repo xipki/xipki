@@ -1,6 +1,6 @@
 # Adapt me
-CA_P12 = xipki/ca-setup/keycerts/myca1.p12
-CA_CERT = xipki/ca-setup/keycerts/myca1.pem
+CA_P12 = xipki/ca-setup/keycerts/$[ca.name].p12
+CA_CERT = xipki/ca-setup/keycerts/$[ca.name].pem
 CA_P12_PWD = CHANGEIT
 
 printUsage = "false"
@@ -82,7 +82,7 @@ if { $printUsage equals "true" } then {
   xi:replace --old "REPLACEME-TOKEN_TYPE" --new "pkcs12" ${CONF_FILE}
 
   xi:replace --old "REPLACEME-CA_SIGNERCONF" \
-    --new "algo=${SIG_ALG},password=${CA_P12_PWD},keystore=file:\${basedir}/keycerts/myca1.p12" \
+    --new "algo=${SIG_ALG},password=${CA_P12_PWD},keystore=file:\${basedir}/keycerts/$[ca.name].p12" \
     ${CONF_FILE}
 
   xi:mkdir ${TARGET_DIR}/keycerts

@@ -1,8 +1,8 @@
 # Please adapt me
-SUBJECT="C=DE,O=myorg,CN=SCEP Responder 1"
+SUBJECT="O=${organization},CN=SCEP Responder 1"
 
 KEYCERTS_DIR = xipki/scep-setup/keycerts
-CACERT_FILE = xipki/ca-setup/keycerts/myca1.der
+CACERT_FILE = xipki/ca-setup/keycerts/$[ca.name].der
 
 echo "#################################################################"
 echo "#                 Generate Key, CSR and Certificate             #"
@@ -10,12 +10,12 @@ echo "#################################################################"
 
 echo "# Generate PKCS#12 key and certificate for SCEP Responder"
 
-xi:rsa-p12 --key-size 2048 --password CHANGEIT --out ${KEYCERTS_DIR}/scep1.p12
+xi:rsa-p12 --key-size 2048 --password ${scep.keyPassword} --out ${KEYCERTS_DIR}/scep1.p12
 
 xi:csr-p12 --password CHANGEIT --p12 ${KEYCERTS_DIR}/scep1.p12 --out ${KEYCERTS_DIR}/scep1.csr \
   --subject "${SUBJECT}"
 
-ca:enroll-cert --ca myca1 --csr ${KEYCERTS_DIR}/scep1.csr --out ${KEYCERTS_DIR}/scep1.der --profile scep
+ca:enroll-cert --ca $[ca.name] --csr ${KEYCERTS_DIR}/scep1.csr --out ${KEYCERTS_DIR}/scep1.der --profile scep
 
 echo "# Update the certificate in the PKCS#12 file"
 xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/scep1.p12 --password CHANGEIT \

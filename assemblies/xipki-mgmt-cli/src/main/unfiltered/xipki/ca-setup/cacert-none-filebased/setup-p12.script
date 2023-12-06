@@ -1,10 +1,10 @@
 # Please adapt me
-CA_SUBJECT="C=DE,O=myorg,CN=myca1"
+CA_SUBJECT="O=$[organization],CN=$[ca.name]"
 
 KEYCERTS_DIR = xipki/ca-setup/keycerts
-CA_P12 = ${KEYCERTS_DIR}/myca1.p12
+CA_P12 = ${KEYCERTS_DIR}/$[ca.name].p12
 CA_P12_PWD = CHANGEIT
-CA_CERT = ${KEYCERTS_DIR}/myca1.pem
+CA_CERT = ${KEYCERTS_DIR}/$[ca.name].pem
 
 printUsage = "false"
 argsValid = "false"
@@ -94,7 +94,7 @@ if { $printUsage equals "true" } then {
   xi:replace --old "REPLACEME-TOKEN_TYPE" --new "pkcs12" ${CONF_FILE}
 
   xi:replace --old "REPLACEME-CA_SIGNERCONF" \
-    --new "algo=${SIG_ALG},password=${CA_P12_PWD},keystore=file:\${basedir}/keycerts/myca1.p12" \
+    --new "algo=${SIG_ALG},password=${CA_P12_PWD},keystore=file:\${basedir}/keycerts/$[ca.name].p12" \
     ${CONF_FILE}
 
   xi:mkdir ${TARGET_DIR}/keycerts
@@ -120,7 +120,7 @@ if { $printUsage equals "true" } then {
   xi:exec "${TOMCAT_DIR}/bin/startup.sh"
   sleep 5
 
-  ca:cacert --outform pem --out ${CA_CERT} myca1
+  ca:cacert --outform pem --out ${CA_CERT} $[ca.name]
   echo "# Update the certificate in the p12 file"
   xi:update-cert-p12 --p12 ${CA_P12} --password CHANGEIT --cert ${CA_CERT}
 

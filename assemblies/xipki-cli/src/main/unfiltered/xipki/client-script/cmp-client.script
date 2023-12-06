@@ -1,6 +1,6 @@
 printUsage = "false"
 ocsp = "false"
-CA = "myca"
+CA = "$[ca.alias]"
 
 if { "$1" equals "" } then {
   printUsage = "false"
@@ -19,7 +19,7 @@ if { $printUsage equals "true" } then {
 } else {
 HASH = SHA256
 SIGNER_P12 = xipki/keycerts/cmp-client.p12
-SIGNER_PASSWORD = CHANGEIT
+SIGNER_PASSWORD = ${cmp.client.keyPassword}
 
 echo "#################################################################"
 echo "#                 Manage certificate via CMP                    #"
@@ -139,7 +139,7 @@ if { "$ocsp" equals "true" } then {
 
 echo "=====CMP: Suspend certificate====="
 
-xi:cmp-revoke --ca myca \
+xi:cmp-revoke --ca ${CA} \
   --ca-cert ${CACERT} --cert ${OUT_DIR}/${CN}.der --reason certificateHold \
   --signer-p12 ${SIGNER_P12} --signer-password ${SIGNER_PASSWORD}
 
@@ -150,7 +150,7 @@ if { "$ocsp" equals "true" } then {
 
 echo "=====CMP: Unsuspend certificate====="
 
-xi:cmp-unsuspend --ca myca \
+xi:cmp-unsuspend --ca ${CA} \
   --ca-cert ${CACERT} --cert ${OUT_DIR}/${CN}.der \
   --signer-p12 ${SIGNER_P12} --signer-password ${SIGNER_PASSWORD}
 
@@ -161,7 +161,7 @@ if { "$ocsp" equals "true" } then {
 
 echo "=====CMP: Revocate certificate====="
 
-xi:cmp-revoke --ca myca \
+xi:cmp-revoke --ca ${CA} \
   --ca-cert ${CACERT} --cert ${OUT_DIR}/${CN}.der --reason affiliationChanged \
   --signer-p12 ${SIGNER_P12} --signer-password ${SIGNER_PASSWORD}
 
@@ -171,5 +171,5 @@ if { "$ocsp" equals "true" } then {
 }
 
 #echo "=====CMP: Get CRL===="
-#xi:cmp-get-crl --ca myca --out ${OUT_DIR}/cmp-myca-get.crl
+#xi:cmp-get-crl --ca ${CA} --out ${OUT_DIR}/cmp-get.crl
 }

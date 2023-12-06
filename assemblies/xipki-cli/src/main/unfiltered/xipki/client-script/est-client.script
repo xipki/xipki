@@ -1,7 +1,7 @@
 ## URL pattern: https://<host>:<port>/.well-known/est/<CA-name>/<certprofile-name>
 ## URL pattern: https://<host>:<port>/est/<CA-name>/<certprofile-name>
 
-BASE_URL = https://localhost:8445/.well-known/est/myca/tls
+BASE_URL = https://${gateway.host}:${gateway.https.port}/.well-known/est/$[ca.name]/tls
 
 ## Short URL is possible
 ##   For all aliases:     https://<host>:<port>/.well-known/est/<alias>

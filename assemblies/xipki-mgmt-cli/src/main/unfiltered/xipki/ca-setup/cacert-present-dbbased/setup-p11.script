@@ -1,6 +1,6 @@
 # Please adapt me
 SLOT = 0
-LABEL = myca1
+LABEL = $[ca.name]
 
 printUsage = "false"
 argsValid = "false"

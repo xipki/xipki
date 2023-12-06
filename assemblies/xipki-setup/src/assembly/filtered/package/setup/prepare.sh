@@ -15,6 +15,7 @@ LIB_DIR=$WDIR/../xipki-cli/system
 CP="$LIB_DIR/org/xipki/commons/security/${xipki.commons.version}/*"
 CP="$CP:$LIB_DIR/org/xipki/commons/util/${xipki.commons.version}/*"
 CP="$CP:$LIB_DIR/org/xipki/commons/password/${xipki.commons.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/pki-common/${project.version}/*"
 CP="$CP:$LIB_DIR/org/bouncycastle/bcprov-jdk18on/${bc.version}/*"
 CP="$CP:$LIB_DIR/org/bouncycastle/bcpkix-jdk18on/${bc.version}/*"
 CP="$CP:$LIB_DIR/org/bouncycastle/bcutil-jdk18on/${bc.version}/*"
@@ -23,8 +24,12 @@ CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-annotations/${jackson.versio
 CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-core/${jackson.version}/*"
 CP="$CP:$WDIR/lib/*"
 
-KC_DIR=$WDIR/keycerts
+## Configure XiPKI
+$JAVA_EXEC -cp "$CP" org.xipki.pki.BatchReplace $WDIR/conf.json
+
 ## Generate keys
+KC_DIR=$WDIR/keycerts
+
 $JAVA_EXEC -cp "$CP" org.xipki.security.pkcs12.GenerateCerts $WDIR/keycerts.json $KC_DIR
 
 ## Copying generated keys to the XiPKI components

@@ -3,7 +3,7 @@ TOMCAT_DIR = ~/tools/xipki/ca-tomcat
 XIPKI_BASE = ~/tools/xipki/ca-tomcat/xipki
 
 SLOT = 0
-LABEL = myca1
+LABEL = $[ca.name]
 KEYCERTS_DIR = xipki/ca-setup/keycerts
 
 SQL_FORCE = yes

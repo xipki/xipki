@@ -39,7 +39,7 @@ public class ScepClient extends Client {
       throw new ScepClientException(ex);
     }
     return parseResp(resp);
-  } // method httpGet
+  }
 
   @Override
   protected ScepHttpResponse httpPost(String url, String requestContentType, byte[] request)
@@ -51,7 +51,7 @@ public class ScepClient extends Client {
       throw new ScepClientException(ex);
     }
     return parseResp(resp);
-  } // method httpPost
+  }
 
   private static ScepHttpResponse parseResp(HttpRespContent resp) throws ScepClientException {
     byte[] content = resp.getContent();

@@ -69,8 +69,7 @@ public interface CaManager {
    *          if error occurs.
    *
    */
-  void republishCertificates(String caName, List<String> publisherNames, int numThreads)
-      throws CaMgmtException;
+  void republishCertificates(String caName, List<String> publisherNames, int numThreads) throws CaMgmtException;
 
   /**
    * Removes the CA {@code caName} from the system.
@@ -305,8 +304,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void removeRequestorFromCa(String requestorName, String caName)
-      throws CaMgmtException;
+  void removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException;
 
   /**
    * Adds the requestor {@code requestorName} to the CA {@code caName}.
@@ -317,8 +315,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addRequestorToCa(CaHasRequestorEntry requestor, String caName)
-      throws CaMgmtException;
+  void addRequestorToCa(CaHasRequestorEntry requestor, String caName) throws CaMgmtException;
 
   /**
    * Returns the certificate profile named {@code profileName}.
@@ -443,8 +440,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void changeSigner(String name, String type, String conf, String base64Cert)
-      throws CaMgmtException;
+  void changeSigner(String name, String type, String conf, String base64Cert) throws CaMgmtException;
 
   /**
    * Adds a publisher.
@@ -472,7 +468,7 @@ public interface CaManager {
    * @return publishers for the given CA.
    * @throws CaMgmtException
    *          if error occurs.
-   * @deprecated since v6.5.1
+   * @deprecated since v6.5.2
    */
   @Deprecated
   List<PublisherEntry> getPublishersForCa(String caName) throws CaMgmtException;
@@ -557,8 +553,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void unsuspendCertificate(String caName, BigInteger serialNumber)
-      throws CaMgmtException;
+  void unsuspendCertificate(String caName, BigInteger serialNumber) throws CaMgmtException;
 
   /**
    * Removes a certificate with the serial number {@code serialNumber}, and
@@ -591,8 +586,7 @@ public interface CaManager {
    *          if error occurs.
    */
   X509Cert generateCertificate(String caName, String profileName, byte[] encodedCsr,
-                               Instant notBefore, Instant notAfter)
-      throws CaMgmtException;
+                               Instant notBefore, Instant notAfter) throws CaMgmtException;
 
   /**
    * CA {@code caName} issues a new certificate.
@@ -612,8 +606,7 @@ public interface CaManager {
    *          if error occurs.
    */
   KeyCertBytesPair generateKeyCert(
-      String caName, String profileName, String subject, Instant notBefore, Instant notAfter)
-      throws CaMgmtException;
+      String caName, String profileName, String subject, Instant notBefore, Instant notAfter) throws CaMgmtException;
 
   /**
    * CA {@code caName} issues a new certificate.
@@ -637,8 +630,7 @@ public interface CaManager {
    *          if error occurs.
    */
   X509Cert generateCrossCertificate(String caName, String profileName, byte[] encodedCsr, byte[] encodedTargetCert,
-                                    Instant notBefore, Instant notAfter)
-      throws CaMgmtException;
+                                    Instant notBefore, Instant notAfter) throws CaMgmtException;
 
   /**
    * Generates a self-signed CA certificate.
@@ -660,9 +652,8 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  X509Cert generateRootCa(
-      CaEntry caEntry, String certprofileName, String subject, String serialNumber, Instant notBefore, Instant notAfter)
-      throws CaMgmtException;
+  X509Cert generateRootCa(CaEntry caEntry, String certprofileName, String subject, String serialNumber,
+                          Instant notBefore, Instant notAfter) throws CaMgmtException;
 
   /**
    * Generates a new CRL for CA {@code caName}.

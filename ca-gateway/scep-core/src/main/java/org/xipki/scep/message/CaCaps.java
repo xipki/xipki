@@ -123,13 +123,8 @@ public class CaCaps {
   }
 
   public HashAlgo mostSecureHashAlgo() {
-    if (supportsSHA512()) {
-      return HashAlgo.SHA512;
-    } else if (supportsSHA256()) {
-      return HashAlgo.SHA256;
-    } else {
-      return HashAlgo.SHA1;
-    }
+    return supportsSHA512() ? HashAlgo.SHA512
+        : supportsSHA256() ? HashAlgo.SHA256 : HashAlgo.SHA1;
   }
 
   private void refresh() {
@@ -174,6 +169,6 @@ public class CaCaps {
     }
 
     return ret;
-  } // method getInstance
+  }
 
 }

@@ -33,7 +33,7 @@
 		]
 	},
 	"sdkClient":{
-		"serverUrl":"https://localhost:8444/ca/ra/",
+		"serverUrl":"https://$[ca.host]:$[ca.https.port]/ca/ra/",
 		"ssl":{
 			"storeType":"pkcs12",
 			"keystorePassword":"CHANGEIT",
@@ -57,7 +57,7 @@
 			"names":["myca"],
 			"signer":{
 				"type":"pkcs12",
-				"conf":"password=CHANGEIT,keystore=file:keycerts/scep1.p12,algo=SHA256withRSA"
+				"conf":"password=$[scep.keyPassword],keystore=file:keycerts/scep1.p12,algo=SHA256withRSA"
 			}
 		}]
 	},

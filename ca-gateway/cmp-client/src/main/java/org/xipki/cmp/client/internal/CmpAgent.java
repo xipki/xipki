@@ -15,6 +15,7 @@ import org.bouncycastle.asn1.pkcs.*;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.cmp.*;
@@ -60,14 +61,10 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
+import java.security.*;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.InvalidKeySpecException;
 import java.time.Instant;
 import java.util.*;
 import java.util.Map.Entry;
@@ -652,8 +649,7 @@ class CmpAgent {
 
   private PKIMessage buildCertConfirmRequest(
       Requestor requestor, Responder responder, ASN1OctetString tid,
-      CertificateConfirmationContentBuilder certConfirmBuilder)
-      throws CmpClientException {
+      CertificateConfirmationContentBuilder certConfirmBuilder) throws CmpClientException {
     PKIHeader header = buildPkiHeader(requestor, responder, implicitConfirm, tid, null, (InfoTypeAndValue[]) null);
     CertificateConfirmationContent certConfirm;
     try {
@@ -707,8 +703,7 @@ class CmpAgent {
   } // method buildRevokeCertRequest
 
   private PKIMessage buildUnrevokeCertRequest(
-      Requestor requestor, Responder responder, UnrevokeCertRequest request, int reasonCode)
-      throws CmpClientException {
+      Requestor requestor, Responder responder, UnrevokeCertRequest request, int reasonCode) throws CmpClientException {
     PKIHeader header = buildPkiHeader(requestor, responder);
 
     List<UnrevokeCertRequest.Entry> requestEntries = request.getRequestEntries();
@@ -771,7 +766,6 @@ class CmpAgent {
     CertReqMsg[] certReqMsgs = new CertReqMsg[reqEntries.size()];
 
     ASN1EncodableVector vec = new ASN1EncodableVector();
-
     for (int i = 0; i < reqEntries.size(); i++) {
       EnrollCertRequest.Entry reqEntry = reqEntries.get(i);
 
@@ -832,7 +826,8 @@ class CmpAgent {
 
   private static byte[] decrypt(EncryptedKey ek, char[] password) throws XiSecurityException {
     ASN1Encodable ekValue = ek.getValue();
-    return (ekValue instanceof EnvelopedData) ? decrypt((EnvelopedData) ekValue, password)
+    return (ekValue instanceof EnvelopedData)
+        ? decrypt((EnvelopedData) ekValue, password)
         : decrypt((EncryptedValue) ekValue, password);
   }
 
@@ -878,15 +873,15 @@ class CmpAgent {
       cipher.init(Cipher.DECRYPT_MODE, key, gcmParamSpec);
 
       return cipher.doFinal(ev.getEncValue().getOctets());
-    } catch (IllegalBlockSizeException | BadPaddingException | NoSuchAlgorithmException | InvalidKeySpecException
-             | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException ex) {
+    } catch (GeneralSecurityException ex) {
       throw new XiSecurityException("Error while decrypting the EncryptedValue", ex);
     }
   } // method decrypt
 
   private static byte[] decrypt(EncryptedKey ek, PrivateKey decKey) throws XiSecurityException {
     ASN1Encodable ekValue = ek.getValue();
-    return (ekValue instanceof EnvelopedData) ? decrypt((EnvelopedData) ekValue, decKey)
+    return (ekValue instanceof EnvelopedData)
+        ? decrypt((EnvelopedData) ekValue, decKey)
         : decrypt((EncryptedValue) ekValue, decKey);
   }
 
@@ -1048,8 +1043,7 @@ class CmpAgent {
 
       byte[] encValue = ev.getEncValue().getOctets();
       return dataCipher.doFinal(encValue);
-    } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
-             | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
+    } catch (GeneralSecurityException ex) {
       throw new XiSecurityException("Error while decrypting the EncryptedValue", ex);
     }
   } // method decrypt

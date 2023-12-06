@@ -97,9 +97,8 @@ public class NextCaMessage {
   private static String getSignatureAlgorithm(PrivateKey key, HashAlgo hashAlgo) {
     if ("RSA".equalsIgnoreCase(key.getAlgorithm())) {
       return hashAlgo.getJceName() + "withRSA";
-    } else {
-      throw new UnsupportedOperationException("getSignatureAlgorithm() for non-RSA is not supported yet.");
     }
+    throw new UnsupportedOperationException("getSignatureAlgorithm() for non-RSA is not supported yet.");
   }
 
 }

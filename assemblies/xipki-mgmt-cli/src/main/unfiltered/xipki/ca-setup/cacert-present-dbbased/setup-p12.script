@@ -1,7 +1,7 @@
 KEYCERTS_DIR = xipki/ca-setup/keycerts
-CA_P12 = ${KEYCERTS_DIR}/myca1.p12
+CA_P12 = ${KEYCERTS_DIR}/$[ca.name].p12
 CA_P12_PWD = CHANGEIT
-CA_CERT = ${KEYCERTS_DIR}/myca1.pem
+CA_CERT = ${KEYCERTS_DIR}/$[ca.name].pem
 
 printUsage = "false"
 argsValid = "false"

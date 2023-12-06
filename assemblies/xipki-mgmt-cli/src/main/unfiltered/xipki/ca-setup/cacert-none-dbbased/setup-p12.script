@@ -1,10 +1,10 @@
 # Please adapt me
-CA_SUBJECT="C=DE,O=myorg,CN=myca1"
+CA_SUBJECT="O=$[organization],CN=$[ca.name]"
 
 KEYCERTS_DIR = xipki/ca-setup/keycerts
-CA_P12 = ${KEYCERTS_DIR}/myca1.p12
+CA_P12 = ${KEYCERTS_DIR}/$[ca.name].p12
 CA_P12_PWD = CHANGEIT
-CA_CERT = ${KEYCERTS_DIR}/myca1.pem
+CA_CERT = ${KEYCERTS_DIR}/$[ca.name].pem
 
 printUsage = "false"
 argsValid = "false"
@@ -114,7 +114,7 @@ if { $printUsage equals "true" } then {
 
   ca:load-conf ${CONF_FILE}
 
-  ca:cacert --outform pem --out ${CA_CERT} myca1
+  ca:cacert --outform pem --out ${CA_CERT} $[ca.name]
 
   echo "# Update the certificate in the p12 file"
   xi:update-cert-p12 --p12 ${CA_P12} --password CHANGEIT --cert ${CA_CERT}

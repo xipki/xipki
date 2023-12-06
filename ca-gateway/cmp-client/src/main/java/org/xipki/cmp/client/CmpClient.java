@@ -161,8 +161,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  X509CRLHolder downloadCrl(String caName, ReqRespDebug debug)
-      throws CmpClientException, PkiErrorException;
+  X509CRLHolder downloadCrl(String caName, ReqRespDebug debug) throws CmpClientException, PkiErrorException;
 
   /**
    * Unsuspends a certificate.

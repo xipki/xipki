@@ -3,9 +3,9 @@ source qa/setenv.script
 xi:rm -r -f output
 
 echo "Restart Gateway (tomcat) server!"
-xi:exec '~/tools/xipki/gateway-tomcat/bin/shutdown.sh'
+xi:exec '/tmp/xipki/gateway-tomcat/bin/shutdown.sh'
 sleep 1
-xi:exec '~/tools/xipki/gateway-tomcat/bin/startup.sh'
+xi:exec '/tmp/xipki/gateway-tomcat/bin/startup.sh'
 
 echo "#################################################################"
 CA_TYPE=DSA

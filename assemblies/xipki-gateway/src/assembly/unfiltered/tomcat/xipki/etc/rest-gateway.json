@@ -26,7 +26,7 @@
 		]
 	},
 	"sdkClient":{
-		"serverUrl":"https://localhost:8444/ca/ra/",
+		"serverUrl":"https://$[ca.host]:$[ca.https.port]/ca/ra/",
 		"ssl":{
 			"storeType":"pkcs12",
 			"keystorePassword":"CHANGEIT",

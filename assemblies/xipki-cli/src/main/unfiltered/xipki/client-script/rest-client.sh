@@ -20,7 +20,7 @@ fi
 ## profile parameter shall be specified. e.g.
 ## https://localhost:8445/rest/myca/enroll-cert?profile=smime
 #
-CA_URL="https://localhost:8445/rest/myca"
+CA_URL="https://$[gateway.host]:$[gateway.https.port]/rest/$[ca.alias]"
 echo "CA URL: ${CA_URL}"
 
 ## Short URL is possible (without the "profile" parameter)
@@ -30,7 +30,7 @@ echo "CA URL: ${CA_URL}"
 ## To use the short URL, you need to configure the "CaProfiles" field
 ## in the REST proxy (rest-proxy.conf) with given alias.
 
-OCSP_URL="http://localhost:8080/ocsp/"
+OCSP_URL="http://$[ocsp.host]:$[ocsp.http.port]/ocsp/"
 
 echo "OCSP URL: ${OCSP_URL}"
 
@@ -45,7 +45,7 @@ OPTS="--insecure --user user1:password1"
 #OPTS="--insecure --cert ${DIR}/../keycerts/rest-client-cert.pem --key ${DIR}/../keycerts/rest-client-key.pem"
 
 # Use TLS client certificate to authorize in Mac
-#OPTS="--insecure --cert-type PKCS#12 --cert ${DIR}/../keycerts/rest-client.p12:CHANGEIT"
+#OPTS="--insecure --cert-type PKCS#12 --cert ${DIR}/../keycerts/rest-client.p12:${rest.client.keyPassword}"
 
 CUR_TIME=`date +%Y%m%d-%H%M%S`
 

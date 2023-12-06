@@ -30,7 +30,7 @@ public class RestHttpFilter implements XiHttpFilter {
 
   private static final String DFLT_CFG = "etc/rest-gateway.json";
 
-  private RestHttpServlet servlet;
+  private final RestHttpServlet servlet;
 
   private ProtocolProxyConfWrapper conf;
 
@@ -56,7 +56,7 @@ public class RestHttpFilter implements XiHttpFilter {
       servlet = new RestHttpServlet(conf.isLogReqResp(), responder);
       succ = true;
     } finally {
-      GatewayUtil.auditLogPciEvent(LOG, "REST-Gateway", true, "START");
+      GatewayUtil.auditLogPciEvent(LOG, "REST-Gateway", succ, "START");
     }
   }
 

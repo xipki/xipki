@@ -65,14 +65,14 @@
 		}
 	}],
 	"cas":[{
-		"name":"myca1",
+		"name":"$[ca.name]",
 		"aliases":[
-			"myca"
+			"$[ca.alias]"
 		],
 		"caInfo":{
 			"caUris":{
 				"crlUris":[
-					"http://ca.myorg.org/crl/myca1"
+					"http://ca.myorg.org/crl/$[ca.name]"
 				],
 				"ocspUris":[
 					"http://localhost:8080/ocsp/"
@@ -87,7 +87,7 @@
 			},
 			"expirationPeriod":365,
 			"cert":{
-				"file":"xipki/ca-setup/keycerts/myca1.pem"
+				"file":"xipki/ca-setup/keycerts/$[ca.name].pem"
 			},
 			"certchain":[],
 			"keepExpiredCertDays":-1,

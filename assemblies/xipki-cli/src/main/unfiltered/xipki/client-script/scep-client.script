@@ -1,8 +1,8 @@
 HASH = SHA256
 
 ## URL pattern: https://<host>:<port>/scep/<CA-name>/<certprofile-name>/pkiclient.exe
-URL = http://localhost:8082/scep/myca/tls/pkiclient.exe
-SMIME_URL = http://localhost:8082/scep/myca/smime/pkiclient.exe
+URL = http://localhost:8082/scep/$[ca.alias]/tls/pkiclient.exe
+SMIME_URL = http://localhost:8082/scep/$[ca.alias]/smime/pkiclient.exe
 
 ## Short URL is possible
 ##   For all aliases:     https://<host>:<port>/scep/<alias>/pkiclient.exe
@@ -88,7 +88,7 @@ xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
 
 echo "# Get CRL"
 xi:scep-get-crl --url ${URL} --ca-cert ${CACERT} --cert ${OUT_DIR}/${CN}.der \
-  --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT --out ${OUT_DIR}/myca1-scep.crl
+  --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT --out ${OUT_DIR}/scep.crl
 
 echo "# Renewal"
 xi:rsa-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}-2.p12" --subject "CN=dummy"

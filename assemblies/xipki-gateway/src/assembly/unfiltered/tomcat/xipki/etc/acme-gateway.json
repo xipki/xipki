@@ -1,6 +1,6 @@
 {
 	"acme": {
-		"baseUrl": "https://real.host.name:8445/acme/", // TODO: adapt it with the real host name
+		"baseUrl": "https://$[gateway.host]:$[gateway.https.port]/acme/", // TODO: adapt it with the real host name
 		"nonceNumBytes": 16,
 		"tokenNumBytes": 16,
 		"cacheSize": 1000,
@@ -39,7 +39,7 @@
 		]
 	},
 	"sdkClient":{
-		"serverUrl":"https://localhost:8444/ca/ra/",
+		"serverUrl":"https://$[ca.host]:$[ca.https.port]/ca/ra/",
 		"ssl":{
 			"storeType":"pkcs12",
 			"keystorePassword":"CHANGEIT",

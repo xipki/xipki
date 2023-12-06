@@ -1,12 +1,12 @@
 # Please adapt me
-CA_SUBJECT="C=DE,O=myorg,CN=myca1"
+CA_SUBJECT="O=$[organization],CN=$[ca.name]"
 
 # Please adapt me
 SLOT = 0
-LABEL = myca1
+LABEL = $[ca.name]
 
 KEYCERTS_DIR = xipki/ca-setup/keycerts
-CA_CERT = ${KEYCERTS_DIR}/myca1.pem
+CA_CERT = ${KEYCERTS_DIR}/$[ca.name].pem
 
 printUsage = "false"
 argsValid = "false"
@@ -115,7 +115,7 @@ if { $printUsage equals "true" } then {
 
   ca:load-conf ${CONF_FILE}
 
-  ca:cacert --outform pem --out ${CA_CERT} myca1
+  ca:cacert --outform pem --out ${CA_CERT} $[ca.name]
 
   ca:ca-info
 

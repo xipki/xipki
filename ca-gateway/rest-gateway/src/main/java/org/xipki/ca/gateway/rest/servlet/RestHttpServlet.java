@@ -78,6 +78,6 @@ class RestHttpServlet {
       auditService.logEvent(event);
       GatewayUtil.logAuditEvent(LOG, event);
     }
-  } // method service0
+  }
 
 }

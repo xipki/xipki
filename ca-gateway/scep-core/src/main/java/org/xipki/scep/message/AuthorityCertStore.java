@@ -75,6 +75,6 @@ public class AuthorityCertStore {
     }
 
     return new AuthorityCertStore(caCert, signatureCert, encryptionCert);
-  } // method getInstance
+  }
 
 }

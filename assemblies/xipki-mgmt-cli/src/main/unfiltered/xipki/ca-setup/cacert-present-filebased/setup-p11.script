@@ -1,7 +1,7 @@
 # Please adapt me
 SLOT = 0
-LABEL = myca1
-CA_CERT = xipki/ca-setup/keycerts/myca1.pem
+LABEL = $[ca.name]
+CA_CERT = xipki/ca-setup/keycerts/$[ca.name].pem
 
 printUsage = "false"
 argsValid = "false"
@@ -63,7 +63,7 @@ if { $printUsage equals "true" } then {
   echo "#                  Configure ca-conf.json                       #"
   echo "#################################################################"
 
-  CERT_P12 = ${TARGET_DIR}/keycerts/myca1.pem
+  CERT_P12 = ${TARGET_DIR}/keycerts/$[ca.name].pem
 
   if { $KEY_TYPE equals "rsa" } then {
     SIG_ALG = SHA256WITHRSA

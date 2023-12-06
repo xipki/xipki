@@ -60,7 +60,7 @@ public final class EnrolmentResponse {
     } catch (CertificateException ex) {
       throw new ScepClientException(ex.getMessage(), ex);
     }
-  } // constructor
+  }
 
   /**
    * Returns true for a pending response, false otherwise.

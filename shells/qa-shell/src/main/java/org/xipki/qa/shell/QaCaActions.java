@@ -511,8 +511,6 @@ public class QaCaActions {
         throw new CmdFailure("could not find CA '" + caName + "'");
       }
 
-      // the server is v6.5.1 or before.
-
       Set<String> entries = getPublisherNamesForCa(caName);
       String upPublisherName = publisherName.toLowerCase();
       for (String m : entries) {

@@ -3,9 +3,7 @@
 
 package org.xipki.cmp;
 
-import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.bouncycastle.asn1.cmp.PKIStatus;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 import java.math.BigInteger;
@@ -51,23 +49,16 @@ public class CmpFailureUtil {
     STATUS_TEXT_MAP.put(PKIStatus.REVOCATION_WARNING, "revocationWarning");
     STATUS_TEXT_MAP.put(PKIStatus.REVOCATION_NOTIFICATION, "revocationNotification");
     STATUS_TEXT_MAP.put(PKIStatus.KEY_UPDATE_WARNING, "keyUpdateWarning");
-  } // method static
+  }
 
   private CmpFailureUtil() {
   }
-
-  public static String formatPkiStatusInfo(org.bouncycastle.asn1.cmp.PKIStatusInfo pkiStatusInfo) {
-    int status = Args.notNull(pkiStatusInfo, "pkiStatusInfo").getStatus().intValue();
-    PKIFreeText text = pkiStatusInfo.getStatusString();
-    String statusMessage = (text == null) ? null : text.getStringAtUTF8(0).getString();
-    return formatPkiStatusInfo(status, pkiStatusInfo.getFailInfo().intValue(), statusMessage);
-  } // method formatPkiStatusInfo
 
   public static String formatPkiStatusInfo(int status, int failureInfo, String statusMessage) {
     return StringUtil.concatObjectsCap(200, "PKIStatusInfo {status = ", status,
       " (", STATUS_TEXT_MAP.get(status), "), ", "failureInfo = ", failureInfo,
       " (", getFailureInfoText(failureInfo), "), ", "statusMessage = ", statusMessage, "}");
-  } // method formatPkiStatusInfo
+  }
 
   public static String getFailureInfoText(int failureInfo) {
     BigInteger bi = BigInteger.valueOf(failureInfo);
@@ -81,6 +72,6 @@ public class CmpFailureUtil {
     }
 
     return (sb.length() < 3) ? "" : sb.substring(2);
-  } // method getFailureInfoText
+  }
 
 }

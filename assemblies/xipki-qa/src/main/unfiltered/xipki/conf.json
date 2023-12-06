@@ -1,0 +1,65 @@
+{
+  "prefix": "$[",
+  "suffix": "]",
+  "basedir": "..",
+  "sections" : [
+    {
+      "description": "XiPKI Configuration",
+      "files": [
+        "xipki-ca/tomcat10on/conf/server.xml",
+        "xipki-ca/tomcat8on/conf/server.xml",
+        "xipki-hsmproxy/tomcat10on/conf/server.xml",
+        "xipki-hsmproxy/tomcat8on/conf/server.xml",
+        "xipki-gateway/tomcat10on/conf/server.xml",
+        "xipki-gateway/tomcat8on/conf/server.xml",
+        "xipki-ocsp/tomcat10on/conf/server.xml",
+        "xipki-ocsp/tomcat8on/conf/server.xml",
+        "xipki-gateway/tomcat/xipki/etc/acme-gateway.json",
+        "xipki-gateway/tomcat/xipki/etc/cmp-gateway.json",
+        "xipki-gateway/tomcat/xipki/etc/est-gateway.json",
+        "xipki-gateway/tomcat/xipki/etc/rest-gateway.json",
+        "xipki-gateway/tomcat/xipki/etc/scep-gateway.json",
+        "xipki/etc/curl.json",
+        "etc/org.xipki.ca.mgmt.client.cfg"
+      ],
+      "replacements": {
+        // OCSP
+        "ocsp.keyPassword": "CHANGEIT",
+        "ocsp.shutdown.port": "8005",
+        "ocsp.http.port": "8080",
+        "ocsp.host": "localhost",
+        // CA
+        "ca.https.keyPassword": "CHANGEIT",
+        "ca.shutdown.port": "8006",
+        "ca.https.port": "8444",
+        "ca.host": "localhost",
+        "ca.name": "myca1",
+        "ca.alias": "myca",
+        // Gateway
+        "gateway.https.keyPassword": "CHANGEIT",
+        "gateway.shutdown.port": "8007",
+        "gateway.http.port": "8082",
+        "gateway.https.port": "8445",
+        "gateway.host": "localhost",
+        "ra.sdk.keyPassword": "CHANGEIT",
+        // Gateway.SCEP
+        "scep.keyPassword": "CHANGEIT",
+        // HSM proxy
+        "hsmproxy.https.keyPassword": "CHANGEIT",
+        "hsmproxy.shutdown.port": "8008",
+        "hsmproxy.https.port": "8446",
+        "hsmproxy.host": "localhost",
+        "hsmproxy.clien.keyPassword": "CHANGEIT",
+        // CLI
+        "cmp.client.ca.keyPassword": "CHANGEIT",
+        "cmp.client.keyPassword": "CHANGEIT",
+        "est.client.ca.keyPassword": "CHANGEIT",
+        "est.client.keyPassword": "CHANGEIT",
+        "rest.client.ca.keyPassword": "CHANGEIT",
+        "rest.client.keyPassword": "CHANGEIT",
+        // MGMT CLI
+        "ca.mgmt.client.keyPassword": "CHANGEIT"
+      }
+    }
+  ]
+}

@@ -15,7 +15,7 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>${shared.dir}/conf/xipki</directory>
+      <directory>${shared.dir}/tomcat/xipki</directory>
       <outputDirectory>xipki</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>

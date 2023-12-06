@@ -7,7 +7,7 @@
         "keystore": {
           "file":"xipki/keycerts/cmp-client.p12"
         },
-        "keystorePassword":  "CHANGEIT",
+        "keystorePassword":  "$[cmp.client.keyPassword]",
         // Valid values are 'no_op', 'default' or java:<class name>. Default to 'default'
         "hostnameVerifier":"default",
         "trustanchors":[{
@@ -21,7 +21,7 @@
         "keystore": {
           "file":"xipki/keycerts/est-client.p12"
         },
-        "keystorePassword":  "CHANGEIT",
+        "keystorePassword":  "$[est.client.keyPassword]",
         // Valid values are 'no_op', 'default' or java:<class name>. Default to 'default'
         "hostnameVerifier":"default",
         "trustanchors":[{
@@ -35,7 +35,7 @@
         "keystore": {
           "file":"xipki/keycerts/rest-client.p12"
         },
-        "keystorePassword":  "CHANGEIT",
+        "keystorePassword":  "$[rest.client.keyPassword]",
         // Valid values are 'no_op', 'default' or java:<class name>. Default to 'default'
         "hostnameVerifier":"default",
         "trustanchors":[{

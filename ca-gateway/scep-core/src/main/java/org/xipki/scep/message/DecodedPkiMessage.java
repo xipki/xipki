@@ -374,17 +374,23 @@ public class DecodedPkiMessage extends PkiMessage {
     ret.setDecryptionSuccessful(true);
 
     try {
-      if (MessageType.PKCSReq == messageType || MessageType.RenewalReq == messageType) {
-        CertificationRequest csr = CertificationRequest.getInstance(X509Util.toDerEncoded(encodedMessageData));
-        ret.setMessageData(csr);
-      } else if (MessageType.CertPoll == messageType) {
-        ret.setMessageData(IssuerAndSubject.getInstance(encodedMessageData));
-      } else if (MessageType.GetCert == messageType || MessageType.GetCRL == messageType) {
-        ret.setMessageData(IssuerAndSerialNumber.getInstance(encodedMessageData));
-      } else if (MessageType.CertRep == messageType) {
-        ret.setMessageData(ContentInfo.getInstance(encodedMessageData));
-      } else {
-        throw new RuntimeException("should not reach here, unknown messageType " + messageType);
+      switch (messageType) {
+        case PKCSReq:
+        case RenewalReq:
+          ret.setMessageData(CertificationRequest.getInstance(X509Util.toDerEncoded(encodedMessageData)));
+          break;
+        case CertPoll:
+          ret.setMessageData(IssuerAndSubject.getInstance(encodedMessageData));
+          break;
+        case GetCert:
+        case GetCRL:
+          ret.setMessageData(IssuerAndSerialNumber.getInstance(encodedMessageData));
+          break;
+        case CertRep:
+          ret.setMessageData(ContentInfo.getInstance(encodedMessageData));
+          break;
+        default:
+          throw new RuntimeException("should not reach here, unknown messageType " + messageType);
       }
     } catch (Exception ex) {
       final String msg = "could not parse the messageData";
@@ -411,12 +417,8 @@ public class DecodedPkiMessage extends PkiMessage {
   private static Integer getIntegerPrintStringAttrValue(AttributeTable attrs, ASN1ObjectIdentifier type)
       throws MessageDecodingException {
     String str = getPrintableStringAttrValue(attrs, type);
-    if (str == null) {
-      return null;
-    }
-
     try {
-      return Integer.parseInt(str);
+      return str == null ? null : Integer.parseInt(str);
     } catch (NumberFormatException ex) {
       throw new MessageDecodingException("invalid integer '" + str + "'");
     }

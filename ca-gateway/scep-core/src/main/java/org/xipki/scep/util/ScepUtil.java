@@ -126,7 +126,6 @@ public class ScepUtil {
   } // method addCmsCertSet
 
   public static Instant getTime(Object obj) {
-
     if (obj instanceof byte[]) {
       byte[] encoded = (byte[]) obj;
       int tag = encoded[0] & 0xFF;

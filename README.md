@@ -60,7 +60,7 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
 * JRE / JDK
   * Java 11+.
 * Database
-  * DB2, Mar[ocsp-server](ocsp-server)iaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
+  * DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
 * Hardware
   * Any available hardware (tested on Raspberry Pi 2 Model B with 900MHz quad-core ARM CPU and 1 GB Memory)
 * Servlet Container

@@ -67,7 +67,7 @@ public class CmpUtil {
       signer.requiteSigner(signer0);
     }
     return signedMessage.toASN1Structure();
-  } // method addProtection
+  }
 
   public static PKIMessage addProtection(
       PKIMessage pkiMessage, char[] password, PBMParameter pbmParameter, GeneralName signerName, byte[] senderKid)
@@ -80,7 +80,7 @@ public class CmpUtil {
     } catch (CRMFException ex) {
       throw new CMPException(ex.getMessage(), ex);
     }
-  } // method addProtection
+  }
 
   private static ProtectedPKIMessageBuilder newProtectedPKIMessageBuilder(PKIMessage pkiMessage,
       GeneralName sender, byte[] senderKid) {

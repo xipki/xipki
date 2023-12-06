@@ -273,8 +273,7 @@ public class PkiMessage {
   } // method encode
 
   // TODO: use password based encryption for not-encryptable public key.
-  private CMSEnvelopedData encrypt(X509Cert recipient, ASN1ObjectIdentifier encAlgId)
-      throws MessageEncodingException {
+  private CMSEnvelopedData encrypt(X509Cert recipient, ASN1ObjectIdentifier encAlgId) throws MessageEncodingException {
     Args.notNull(recipient, "recipient");
     Args.notNull(encAlgId, "encAlgId");
 
@@ -297,7 +296,7 @@ public class PkiMessage {
     } catch (CMSException ex) {
       throw new MessageEncodingException(ex);
     }
-  } // method encrypt
+  }
 
   private static void addAttribute(ASN1EncodableVector vector, ASN1ObjectIdentifier attrType, ASN1Encodable attrValue) {
     vector.add(new Attribute(attrType, new DERSet(attrValue)));

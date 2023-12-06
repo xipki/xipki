@@ -5,7 +5,7 @@ set -e
 # Please adapt the URL
 ## URL pattern: https://<host>:<port>/.well-known/est/<CA-name>/<certprofile-name>
 ##              https://<host>:<port>/est/<CA-name>/<certprofile-name>
-CA_URL=https://localhost:8445/.well-known/est/myca/tls
+CA_URL=https://${gateway.host}:${gateway.https.port}/.well-known/est/$[ca.alias]/tls
 
 ## Short URL is possible
 ##   For all aliases:     https://<host>:<port>/.well-known/est/<alias>
@@ -30,7 +30,7 @@ OPTS="--insecure --user user1:password1"
 #OPTS="--insecure --cert ${DIR}/../keycerts/est-client-cert.pem --key ${DIR}/../keycerts/est-client-key.pem"
 
 # Use TLS client certificate to authorize in Mac
-#OPTS="--insecure --cert-type PKCS#12 --cert ${DIR}/../keycerts/est-client.p12:CHANGEIT"
+#OPTS="--insecure --cert-type PKCS#12 --cert ${DIR}/../keycerts/est-client.p12:${est.client.keyPassword}"
 
 CUR_TIME=`date +%Y%m%d-%H%M%S`
 

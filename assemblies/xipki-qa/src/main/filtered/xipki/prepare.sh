@@ -2,17 +2,74 @@
 
 set -e
 
+TOMCAT8_VERSION=8.5.96
+TOMCAT9_VERSION=9.0.83
+TOMCAT10_VERSION=10.1.16
+TOMCAT11_VERSION=11.0.0-M14
+
+helpFunction()
+{
+   echo ""
+   echo "Usage: $0 -t <tomcat major version 8, 9, 10 or 11>"
+   exit 1 # Exit script after printing help
+}
+
+while getopts "t:" opt
+do
+   case "$opt" in
+      t ) TOMCAT_MAJOR_VERSION="$OPTARG" ;;
+      ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
+   esac
+done
+
+if [ -z "$TOMCAT_MAJOR_VERSION" ]
+then
+   echo "Please specify the -t parameter";
+   helpFunction
+fi
+
+if [ "$TOMCAT_MAJOR_VERSION" -eq "8" ]; then
+  _DIR=tomcat8on
+  TOMCAT_VERSION=$TOMCAT8_VERSION
+elif [ "$TOMCAT_MAJOR_VERSION" -eq "9" ]; then
+  _DIR=tomcat8on
+  TOMCAT_VERSION=$TOMCAT9_VERSION
+elif [ "$TOMCAT_MAJOR_VERSION" -eq "10" ]; then
+  _DIR=tomcat10on
+  TOMCAT_VERSION=$TOMCAT10_VERSION
+elif [ "$TOMCAT_MAJOR_VERSION" -eq "11" ]; then
+  _DIR=tomcat10on
+  TOMCAT_VERSION=$TOMCAT11_VERSION
+else
+  echo "Unsupported tomcat major version ${TOMCAT_MAJOR_VERSION}"
+  exit 1
+fi
+
+echo "Tomcat ${TOMCAT_VERSION}"
+TOMCAT_DIR=apache-tomcat-${TOMCAT_VERSION}
+TOMCAT_BINARY=${TOMCAT_DIR}.tar.gz
+
 WDIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 #WDIR=`dirname $0`
 echo "working dir: ${WDIR}"
 
-cd ~/tools/xipki/
+# Test base dir
+TBDIR=/tmp/xipki
+
+mkdir -p $TBDIR
+cd $TBDIR
 echo "change to folder: `pwd`"
 
-rm -rf ca-tomcat ocsp-tomcat gateway-tomcat hsmproxy-tomcat
+## download tar.gz file if not available
+if [ -f ${TOMCAT_BINARY} ]; then
+  echo "Use local ${TOMCAT_BINARY}"
+else
+  echo "Download ${TOMCAT_BINARY}"
+  # For QA only, no-check-certificate is fine.
+  wget --no-check-certificate https://dlcdn.apache.org/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/v${TOMCAT_VERSION}/bin/${TOMCAT_BINARY}
+fi
 
-TOMCAT_BINARY=`compgen -G "apache-tomcat-*.tar.gz"`
-TOMCAT_DIR=`echo $TOMCAT_BINARY | cut -d "." -f -3`
+rm -rf ca-tomcat ocsp-tomcat gateway-tomcat hsmproxy-tomcat
 
 rm -rf $TOMCAT_DIR
 tar xf $TOMCAT_BINARY
@@ -23,27 +80,31 @@ cp -r $TOMCAT_DIR ca-tomcat
 cp -r $TOMCAT_DIR ocsp-tomcat
 cp -r $TOMCAT_DIR gateway-tomcat
 cp -r $TOMCAT_DIR hsmproxy-tomcat
+rm -rf $TOMCAT_DIR
 
 cd $WDIR
 echo "change to folder: `pwd`"
 
-## detect the major version of tomcat
-TOMCAT_VERSION=`~/tools/xipki/ca-tomcat/bin/version.sh | grep "Server number"`
-echo "Tomcat ${TOMCAT_VERSION}"
-
-TOMCAT_VERSION=`cut -d ":" -f2- <<< "${TOMCAT_VERSION}"`
-TOMCAT_VERSION=`cut -d "." -f1  <<< "${TOMCAT_VERSION}"`
-## Remove leading and trailing spaces and tabs
-TOMCAT_VERSION=`awk '{$1=$1};1'  <<< "${TOMCAT_VERSION}"`
-
-if [ "$TOMCAT_VERSION" -lt "8" ]; then
-  echo "Unsupported tomcat major version ${TOMCAT_VERSION}"
-  exit 1
-elif [ "$TOMCAT_VERSION" -lt "10" ]; then
-  _DIR=tomcat8on
+echo "configure XiPKI components"
+if [ "x$JAVA_HOME" = "x" ]; then
+	JAVA_EXEC=java
 else
-  _DIR=tomcat10on
+	JAVA_EXEC=$JAVA_HOME/bin/java
 fi
+
+LIB_DIR=$WDIR/../system
+
+CP="$CP:$LIB_DIR/org/xipki/commons/util/${xipki.commons.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/commons/password/${xipki.commons.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/pki-common/${project.version}/*"
+CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-databind/${jackson.version}/*"
+CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-annotations/${jackson.version}/*"
+CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-core/${jackson.version}/*"
+CP="$CP:$WDIR/lib/*"
+
+## Configure XiPKI
+$JAVA_EXEC -cp "$CP" org.xipki.pki.BatchReplace $WDIR/conf.json
+
 
 # Copy the keys and certificates
 KC_DIR=${WDIR}/setup/keycerts
@@ -105,13 +166,12 @@ cp $RDIR/xipki/security/pkcs11.json $RDIR/xipki-ca/tomcat/xipki/security/
 cp $RDIR/xipki/security/pkcs11.json $RDIR/xipki-ocsp/tomcat/xipki/security/
 cp $RDIR/xipki/security/pkcs11.json $RDIR/xipki-gateway/tomcat/xipki/security/
 
-TOMCAT_CA_DIR=~/tools/xipki/ca-tomcat
-TOMCAT_OCSP_DIR=~/tools/xipki/ocsp-tomcat
-TOMCAT_GATEWAY_DIR=~/tools/xipki/gateway-tomcat
-TOMCAT_HSMPROXY_DIR=~/tools/xipki/hsmproxy-tomcat
+TOMCAT_CA_DIR=$TBDIR/ca-tomcat
+TOMCAT_OCSP_DIR=$TBDIR/ocsp-tomcat
+TOMCAT_GATEWAY_DIR=$TBDIR/gateway-tomcat
+TOMCAT_HSMPROXY_DIR=$TBDIR/hsmproxy-tomcat
 
 ## CA
-
 TOMCAT_DIR=${TOMCAT_CA_DIR}
 echo "tomcat dir: ${TOMCAT_DIR}"
 

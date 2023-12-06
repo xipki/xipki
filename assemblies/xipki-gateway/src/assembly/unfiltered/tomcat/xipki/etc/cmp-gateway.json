@@ -35,7 +35,7 @@
 		]
 	},
 	"sdkClient":{
-		"serverUrl":"https://localhost:8444/ca/ra/",
+		"serverUrl":"https://$[ca.host]:$[ca.https.port]/ca/ra/",
 		"ssl":{
 			"storeType":"pkcs12",
 			"keystorePassword":"CHANGEIT",
@@ -57,7 +57,7 @@
 	"signers":{
 		"default":{
 			"type":"pkcs12",
-			"conf":"password=CHANGEIT,keystore=file:keycerts/gateway-server.p12,algo=SHA256withECDSA"
+			"conf":"password=$[gateway.https.keyPassword],keystore=file:keycerts/gateway-server.p12,algo=SHA256withECDSA"
 		}
 	},
 	"security":{

@@ -86,7 +86,7 @@ public class GatewayUtil {
     PciAuditEvent event = PciAuditEvent.newPciAuditEvent(type, eventType, "CORE",
         successful ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED, successful ? AuditLevel.INFO : AuditLevel.ERROR);
     Audits.getAuditService().logEvent(event);
-   logAuditEvent(log, event);
+    logAuditEvent(log, event);
   }
 
   public static void closeAudits(Logger log) {

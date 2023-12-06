@@ -188,6 +188,6 @@ public class CmpUtf8Pairs {
     }
 
     return newS.toString();
-  } // method decodeNameOrValue
+  }
 
 }

@@ -19,7 +19,7 @@
      define subcomponents such as "Valves" at this level.
      Documentation at /docs/config/server.html
  -->
-<Server port="8006" shutdown="SHUTDOWN">
+<Server port="$[ca.shutdown.port]" shutdown="SHUTDOWN">
   <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
   <!-- Security listener. Documentation at /docs/config/listeners.html
   <Listener className="org.apache.catalina.security.SecurityListener" />
@@ -98,7 +98,7 @@
         </SSLHostConfig>
     </Connector>
     -->
-    <Connector port="8444" protocol="org.xipki.tomcat.XiHttp11Nio2Protocol"
+    <Connector port="$[ca.https.port]" protocol="org.xipki.tomcat.XiHttp11Nio2Protocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
                connectionTimeout="4000">
       <SSLHostConfig
@@ -110,7 +110,7 @@
               truststoreType="PKCS12">
         <Certificate
                 certificateKeystoreFile="${XIPKI_BASE}/keycerts/ca-server.p12"
-                certificateKeystorePassword="CHANGEIT"
+                certificateKeystorePassword="$[ca.https.keyPassword]"
                 certificateKeystoreType="PKCS12"/>
       </SSLHostConfig>
     </Connector>

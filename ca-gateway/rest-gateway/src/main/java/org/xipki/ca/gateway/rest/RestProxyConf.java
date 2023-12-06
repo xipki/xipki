@@ -22,8 +22,7 @@ public class RestProxyConf extends ProtocolProxyConf {
 
   private String reverseProxyMode;
 
-  public static RestProxyConf readConfFromFile(String fileName)
-      throws IOException, InvalidConfException {
+  public static RestProxyConf readConfFromFile(String fileName) throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");
     RestProxyConf conf = JSON.parseObject(new File(fileName), RestProxyConf.class);
     conf.validate();

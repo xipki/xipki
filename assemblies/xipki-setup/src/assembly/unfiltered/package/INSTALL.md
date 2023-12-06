@@ -6,11 +6,16 @@ to one tomcat instance.
 ## JAVA_HOME
 Set the environment variable `JAVA_HOME` to the root directory of JRE/JDK installation.
 
-## Prepare Keys and certificates for the Communication between XiPKI Components
-
-1. Change the password (`"CHANGEIT"`), and subject in `setup/keycerts.json` and the XiPKI components.
-2. Generate keys and certificates:  
-   `setup/generate-keycerts.sh`.
+## Prepare Tomcat Configuration, Keys and certificates for the Communication between XiPKI Components
+1. (Optional) Only if you use existing Keys and Certificates
+   Copy the file `setup/keycerts.json` and folder `setup/keycerts` from old XiPKI folder to `setup`.
+   Make sure the file `setup/keycerts.json` in the old XiPKI folder is the same as the new one.
+2. Adapt the file `setup/conf.json`
+   - all passwords shall be changed
+   - organization, ca.name, ca.alias should be changed
+   - others: changed if differs from your settings.
+3. Execute:  
+    `setup/prepare.sh`
 
 ## Install CA Server
 

@@ -56,7 +56,7 @@
 		"type":"pkcs12",
 		"algorithms":["SHA256withECDSA","SHA256withRSA","ED25519","ED449","SM3withSM2","SHA256withDSA"],
 		"caCerts":[],
-		"key":"password=CHANGEIT,keystore=file:keycerts/ocsp1.p12"
+		"key":"password=${ocsp.keyPassword},keystore=file:keycerts/ocsp1.p12"
 	}],
 	"stores":[{
 		"name":"store1",

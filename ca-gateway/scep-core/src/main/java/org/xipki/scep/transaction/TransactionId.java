@@ -45,8 +45,7 @@ public class TransactionId {
     return new TransactionId(bytes);
   }
 
-  public static TransactionId sha1TransactionId(SubjectPublicKeyInfo spki)
-      throws InvalidKeySpecException {
+  public static TransactionId sha1TransactionId(SubjectPublicKeyInfo spki) throws InvalidKeySpecException {
     Args.notNull(spki, "spki");
 
     byte[] encoded;

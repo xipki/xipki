@@ -802,8 +802,7 @@ public class RestResponder {
   }
 
   private static EnrollOrPollCertsResponse.Entry getEntry(
-      EnrollOrPollCertsResponse.Entry[] entries, BigInteger certReqId)
-      throws HttpRespAuditException {
+      EnrollOrPollCertsResponse.Entry[] entries, BigInteger certReqId) throws HttpRespAuditException {
     for (EnrollOrPollCertsResponse.Entry m : entries) {
       if (certReqId.equals(m.getId())) {
         return m;
@@ -816,7 +815,7 @@ public class RestResponder {
 
   private void unRevoke(
       String command, Requestor requestor, XiHttpRequest httpRetriever, AuditEvent event)
-      throws OperationException, HttpRespAuditException, IOException, SdkErrorResponseException {
+      throws OperationException, HttpRespAuditException, SdkErrorResponseException {
     boolean revoke = command.equals(CMD_revoke_cert);
     Requestor.Permission permission = revoke
         ? Requestor.Permission.REVOKE_CERT : Requestor.Permission.UNSUSPEND_CERT;
@@ -873,7 +872,7 @@ public class RestResponder {
   }
 
   private HttpRespContent getCrl(String caName, XiHttpRequest httpRetriever)
-      throws HttpRespAuditException, IOException, SdkErrorResponseException {
+      throws HttpRespAuditException, SdkErrorResponseException {
     String strCrlNumber = httpRetriever.getParameter(PARAM_crl_number);
     BigInteger crlNumber = null;
     if (StringUtil.isNotBlank(strCrlNumber)) {
