@@ -11,7 +11,7 @@ xi:mkdir $OUT_DIR
 
 xi:copy-file output/scep-ocsp1.p12 output/scep-ocsp1-2.p12 output/scep-ocsp2.p12 $OUT_DIR/
 
-xi:csr-p12 --hash $STDHASH --p12 $OUT_DIR/scep-ocsp1.p12 --password CHANGEIT \
+xi:csr-p12 --p12 $OUT_DIR/scep-ocsp1.p12 --password CHANGEIT \
   --challenge-password user1:password1 \
   --outform $OUTFORM \
   --out $OUT_DIR/scep-ocsp1.csr
@@ -66,7 +66,6 @@ xi:scep-get-crl \
 ## Renewal
 
 xi:csr-p12 \
-  --hash $STDHASH \
   --p12 $OUT_DIR/scep-ocsp1-2.p12 \
   --password CHANGEIT \
   --subject "CN=scep-ocsp1-2,O=myorg,C=DE" \
@@ -92,7 +91,7 @@ xi:update-cert-p12 \
 
 ## Renewal with different CommonName
 
-xi:csr-p12 --hash $STDHASH \
+xi:csr-p12 \
   --p12 $OUT_DIR/scep-ocsp2.p12 --password CHANGEIT \
   --subject "CN=scep-ocsp2,O=myorg,C=DE" \
   --outform $OUTFORM \

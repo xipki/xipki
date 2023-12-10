@@ -3,12 +3,12 @@
 
 package org.xipki.scep.client;
 
-import org.xipki.util.http.HttpRespContent;
-import org.xipki.util.http.XiHttpClient;
+import org.xipki.util.Curl;
+import org.xipki.util.DefaultCurl;
+import org.xipki.util.http.HttpStatusCode;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSocketFactory;
-import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A concrete SCEP client.
@@ -18,24 +18,23 @@ import java.io.IOException;
 
 public class ScepClient extends Client {
 
-  private final XiHttpClient httpClient;
+  private final Curl curl;
 
   public ScepClient(CaIdentifier caId, CaCertValidator caCertValidator) {
-    this(caId, caCertValidator, null, null);
+    this(caId, caCertValidator, null);
   }
 
-  public ScepClient(CaIdentifier caId, CaCertValidator caCertValidator,
-                    SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
+  public ScepClient(CaIdentifier caId, CaCertValidator caCertValidator, Curl curl) {
     super(caId, caCertValidator);
-    this.httpClient = new XiHttpClient(sslSocketFactory, hostnameVerifier);
+    this.curl = curl == null ? new DefaultCurl() : curl;
   }
 
   @Override
   protected ScepHttpResponse httpGet(String url) throws ScepClientException {
-    HttpRespContent resp;
+    Curl.CurlResult resp;
     try {
-      resp = httpClient.httpGet(url);
-    } catch (IOException ex) {
+      resp = curl.curlGet(url, false, null, null);
+    } catch (Exception ex) {
       throw new ScepClientException(ex);
     }
     return parseResp(resp);
@@ -44,26 +43,33 @@ public class ScepClient extends Client {
   @Override
   protected ScepHttpResponse httpPost(String url, String requestContentType, byte[] request)
       throws ScepClientException {
-    HttpRespContent resp;
+    Curl.CurlResult resp;
     try {
-      resp = httpClient.httpPost(url, requestContentType, request);
-    } catch (IOException ex) {
+      Map<String, String> headers = null;
+      if (requestContentType != null) {
+        headers = new HashMap<>();
+        headers.put("content-type", requestContentType);
+      }
+
+      resp = curl.curlPost(url, false, headers, null, request);
+    } catch (Exception ex) {
       throw new ScepClientException(ex);
     }
     return parseResp(resp);
   }
 
-  private static ScepHttpResponse parseResp(HttpRespContent resp) throws ScepClientException {
-    byte[] content = resp.getContent();
-    if (!resp.isOK()) {
-      String msg = "server returned status code " + resp.getStatusCode();
-      if (content != null && content.length != 0) {
-        msg += ", message: " + new String(content);
+  private static ScepHttpResponse parseResp(Curl.CurlResult resp) throws ScepClientException {
+    int statusCode = resp.getStatusCode();
+    if (statusCode != HttpStatusCode.SC_OK) {
+      String msg = "server returned status code " + statusCode;
+      byte[] errorContent = resp.getErrorContent();
+      if (errorContent != null && errorContent.length != 0) {
+        msg += ", message: " + new String(errorContent);
       }
       throw new ScepClientException(msg);
     }
 
-    return new ScepHttpResponse(resp.getContentType(), content);
+    return new ScepHttpResponse(resp.getContentType(), resp.getContent());
   }
 
 }

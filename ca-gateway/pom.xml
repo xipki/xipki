@@ -13,20 +13,11 @@
   <packaging>pom</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <modules>
-    <module>gateway-common</module>
-    <!-- ACME -->
-    <module>acme-gateway</module>
-    <!-- CMP -->
     <module>cmp-core</module>
     <module>cmp-client</module>
-    <module>cmp-gateway</module>
-    <!-- EST -->
-    <module>est-gateway</module>
-    <!-- REST -->
-    <module>rest-gateway</module>
-    <!-- SCEP -->
     <module>scep-core</module>
     <module>scep-client</module>
-    <module>scep-gateway</module>
+    <module>gateway-api</module>
+    <module>gateway</module>
   </modules>
 </project>

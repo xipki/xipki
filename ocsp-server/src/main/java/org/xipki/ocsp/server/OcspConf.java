@@ -29,7 +29,7 @@ public class OcspConf extends ValidableConf {
 
   public static OcspConf readConfFromFile(String fileName) throws IOException, InvalidConfException {
     notBlank(fileName, "fileName");
-    OcspConf conf = JSON.parseObject(Paths.get(IoUtil.expandFilepath(fileName, true)), OcspConf.class);
+    OcspConf conf = JSON.parseConf(Paths.get(IoUtil.expandFilepath(fileName, true)), OcspConf.class);
     conf.validate();
     return conf;
   }

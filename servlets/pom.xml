@@ -26,21 +26,9 @@
     <!-- HSM Proxy -->
     <module>hsmproxy-servlet3</module>
     <module>hsmproxy-servlet5</module>
-    <!-- ACME -->
-    <module>acme-servlet3</module>
-    <module>acme-servlet5</module>
-    <!-- CMP -->
-    <module>cmp-servlet3</module>
-    <module>cmp-servlet5</module>
-    <!-- EST -->
-    <module>est-servlet3</module>
-    <module>est-servlet5</module>
-    <!-- REST -->
-    <module>rest-servlet3</module>
-    <module>rest-servlet5</module>
-    <!-- SCEP -->
-    <module>scep-servlet3</module>
-    <module>scep-servlet5</module>
+    <!-- Gateway -->
+    <module>gateway-servlet3</module>
+    <module>gateway-servlet5</module>
     <!-- Example CtLog -->
     <module>dummy-ctlog-servlet3</module>
     <module>dummy-ctlog-servlet5</module>

@@ -1,24 +1,23 @@
 HASH = SHA256
 
-## URL pattern: https://<host>:<port>/scep/<CA-name>/<certprofile-name>/pkiclient.exe
-URL = http://localhost:8082/scep/$[ca.alias]/tls/pkiclient.exe
-SMIME_URL = http://localhost:8082/scep/$[ca.alias]/smime/pkiclient.exe
+## URL pattern: https://<host>:<port>/gw/scep/<CA-name>/<certprofile-name>/pkiclient.exe
+URL = https://$[gateway.host]:$[gateway.https.port]/gw/scep/$[ca.alias]/tls/pkiclient.exe
+SMIME_URL = https://$[gateway.host]:$[gateway.https.port]/gw/scep/$[ca.alias]/smime/pkiclient.exe
 
 ## Short URL is possible
-##   For all aliases:     https://<host>:<port>/scep/<alias>/pkiclient.exe
-##   For alias "default": https://<host>:<port>/scep/pkiclient.exe
+##   For all aliases:     https://<host>:<port>/gw/scep/<alias>/pkiclient.exe
+##   For alias "default": https://<host>:<port>/gw/scep/pkiclient.exe
 ## To use the short URL, you need to configure the "CaProfiles" field
 ## in the SCEP proxy (scep-proxy.conf) with given alias.
 #
-# URL = http://localhost:8082/scep/pkiclient.exe
-# SMIME_URL = http://localhost:8082/scep/smime/pkiclient.exe
+# URL = https://$[gateway.host]:$[gateway.https.port]/gw/scep/pkiclient.exe
+# SMIME_URL = https://$[gateway.host]:$[gateway.https.port]/gw/scep/smime/pkiclient.exe
 
 echo "#################################################################"
 echo "#               Enroll Certificate via SCEP                     #"
 echo "#################################################################"
 
 CUR_TIME = $(date '+%Y%m%d-%H%M%S')
-
 OUT_DIR=output/scep-${CUR_TIME}
 
 CACERT = ${OUT_DIR}/cacert.der
@@ -37,7 +36,7 @@ CN = scep-smime-${CUR_TIME}
 xi:rsa-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}.p12" \
   --subject "C=DE,O=myorg,E=info@myorg.com,CN=${CN}"
 
-xi:csr-p12  --hash ${HASH} --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
+xi:csr-p12  --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
   --challenge-password user1:password1 \
   --out ${OUT_DIR}/${CN}.csr
 
@@ -60,7 +59,7 @@ CN = scep-tls-${CUR_TIME}
 xi:rsa-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}.p12" \
   --subject "C=DE,O=myorg,CN=${CN}.myorg.org"
 
-xi:csr-p12  --hash ${HASH} --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
+xi:csr-p12  --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
   --challenge-password user1:password1 \
   --subject "C=DE,O=myorg,CN=${CN}.myorg.org" --out ${OUT_DIR}/${CN}.csr
 
@@ -93,7 +92,7 @@ xi:scep-get-crl --url ${URL} --ca-cert ${CACERT} --cert ${OUT_DIR}/${CN}.der \
 echo "# Renewal"
 xi:rsa-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}-2.p12" --subject "CN=dummy"
 
-xi:csr-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-2.p12 --password CHANGEIT \
+xi:csr-p12 --p12 ${OUT_DIR}/${CN}-2.p12 --password CHANGEIT \
   --subject "C=DE,O=myorg,CN=${CN}-2.myorg.org" --out ${OUT_DIR}/${CN}-2.csr
 
 echo "# Enroll certificate via Renewal, hence signed by the old key ${CN}.p12"
@@ -108,7 +107,7 @@ xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}-2.p12 --password CHANGEIT \
 echo "# Renewal with different CommonName"
 xi:rsa-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}-3.p12" --subject "CN=dummy"
 
-xi:csr-p12 --hash ${HASH} --p12 ${OUT_DIR}/${CN}-3.p12 --password CHANGEIT \
+xi:csr-p12 --p12 ${OUT_DIR}/${CN}-3.p12 --password CHANGEIT \
   --subject "C=DE,O=myorg,CN=${CN}-3.myorg.org" --out ${OUT_DIR}/${CN}-3.csr
 
 echo "# Enroll certificate via Renewal, hence signed by the old key ${CN}.p12"

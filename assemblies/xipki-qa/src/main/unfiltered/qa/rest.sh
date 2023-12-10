@@ -3,7 +3,7 @@
 set -e
 
 # Please adapt the URL
-BASE_URL="https://localhost:8445/rest/subcawithcrl"
+BASE_URL="https://localhost:8445/gw/rest/subcawithcrl"
 CACERT="output/subcawithcrl1.der"
 
 echo "base url: ${BASE_URL}"

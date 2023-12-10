@@ -1160,6 +1160,6 @@ class CmpAgent {
       throw new CmpClientException("could not encoded AuthorityKeyIdentifier", ex);
     }
     return new Extensions(new Extension(Extension.authorityKeyIdentifier, false, encodedAki));
-  } // method getCertTempExtensions
+  }
 
 }

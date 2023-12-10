@@ -16,7 +16,7 @@
     <fileSet>
       <directory>src/assembly/unfiltered</directory>
       <includes>
-        <include>bin/*.sh</include>
+        <include>*.sh</include>
       </includes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0755</fileMode>
@@ -27,12 +27,10 @@
       <directory>src/assembly/unfiltered</directory>
       <includes>
         <include>INSTALL.md</include>
-        <include>bin/*.bat</include>
       </includes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
-      <lineEnding>dos</lineEnding>
     </fileSet>
     <fileSet>
       <directory>${project.build.directory}/t2</directory>

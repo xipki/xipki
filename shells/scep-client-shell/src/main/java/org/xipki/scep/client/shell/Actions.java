@@ -6,6 +6,7 @@ package org.xipki.scep.client.shell;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.apache.karaf.shell.support.completers.StringsCompleter;
@@ -22,6 +23,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.shell.XiAction;
+import org.xipki.util.Curl;
 import org.xipki.util.StringUtil;
 
 import java.io.File;
@@ -106,6 +108,9 @@ public class Actions {
     @Option(name = "--password", description = "password of the PKCS#12 keystore file, as plaintext or PBE-encrypted.")
     private String passwordHint;
 
+    @Reference
+    private Curl curl;
+
     private ScepClient scepClient;
     private PrivateKey identityKey;
     private X509Cert identityCert;
@@ -114,7 +119,7 @@ public class Actions {
       if (scepClient == null) {
         X509Cert caCert = X509Util.parseCert(new File(caCertFile));
         CaCertValidator caCertValidator = new CaCertValidator.PreprovisionedCaCertValidator(caCert);
-        scepClient = new ScepClient(new CaIdentifier(url, caId), caCertValidator);
+        scepClient = new ScepClient(new CaIdentifier(url, caId), caCertValidator, curl);
       }
       return scepClient;
     }
@@ -234,12 +239,15 @@ public class Actions {
     @Completion(FileCompleter.class)
     protected String outFile;
 
+    @Reference
+    private Curl curl;
+
     @Override
     protected Object execute0() throws Exception {
       CaIdentifier tmpCaId = new CaIdentifier(url, caId);
       CaCertValidator caCertValidator = cert -> true;
 
-      ScepClient client = new ScepClient(tmpCaId, caCertValidator);
+      ScepClient client = new ScepClient(tmpCaId, caCertValidator, curl);
       client.init();
       X509Cert caCert = client.getCaCert();
       if (caCert == null) {

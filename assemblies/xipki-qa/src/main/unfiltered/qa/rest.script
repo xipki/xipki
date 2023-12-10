@@ -1,15 +1,14 @@
-BASE_URL = https://localhost:8445/rest/subcawithcrl
+BASE_URL = https://localhost:8445/gw/rest/subcawithcrl
 CERTPROFILE = "?profile=tls"
 OUT_DIR = output/rest-raw
 source file:./qa/rest0.script
 
-BASE_URL = https://localhost:8445/rest/myalias
+BASE_URL = https://localhost:8445/gw/rest/myalias
 CERTPROFILE = ""
 OUT_DIR = output/rest-alias
 source file:./qa/rest0.script
 
-BASE_URL = https://localhost:8445/rest
+BASE_URL = https://localhost:8445/gw/rest
 CERTPROFILE = ""
 OUT_DIR = output/rest-none
 source file:./qa/rest0.script
-

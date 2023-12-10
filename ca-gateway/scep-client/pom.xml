@@ -21,8 +21,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>gateway-common</artifactId>
+      <groupId>org.xipki</groupId>
+      <artifactId>pki-common</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

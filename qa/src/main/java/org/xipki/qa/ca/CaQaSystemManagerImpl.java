@@ -62,7 +62,7 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
 
     QaconfType qaConf;
     try {
-      qaConf = JSON.parseObject(new File(confFile), QaconfType.class);
+      qaConf = JSON.parseConf(new File(confFile), QaconfType.class);
     } catch (Exception ex) {
       final String message = "could not parse the QA configuration";
       LogUtil.error(LOG, ex, message);

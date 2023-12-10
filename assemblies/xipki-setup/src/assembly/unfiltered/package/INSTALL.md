@@ -15,7 +15,7 @@ Set the environment variable `JAVA_HOME` to the root directory of JRE/JDK instal
    - organization, ca.name, ca.alias should be changed
    - others: changed if differs from your settings.
 3. Execute:  
-    `setup/prepare.sh`
+    `./prepare.sh`
 
 ## Install CA Server
 

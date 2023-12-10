@@ -43,21 +43,18 @@ fi
 
 echo "Tomcat: $tomcatDir"
 
-## make sure the tomcat is only for HSM proxy
+## make sure the tomcat is only for OCSP
 if [ -f ${tomcatDir}/webapps/ca.war ]; then
    echo "CA is running in $tomcatDir, please use other tomcat instance."
    exit 1
 fi
 
-if [ -f ${tomcatDir}/webapps/hsmproxy.war ]; then
+if [ -f ${tomcatDir}/webapps/hp.war ]; then
    echo "HSM proxy is running in $tomcatDir, please use other tomcat instance."
    exit 1
 fi
 
-if [ -f ${tomcatDir}/webapps/acmee.war ] || [ -f ${tomcatDir}/webapps/cmp.war ] \
-  || [ -f ${tomcatDir}/webapps/est.war ] || [ -f ${tomcatDir}/webapps/rest.war ] \
-  || [ -f ${tomcatDir}/webapps/scep.war ]
-then
+if [ -f ${tomcatDir}/webapps/gw.war ]; then
    echo "Protocol gateway is running in $tomcatDir, please use other tomcat instance."
    exit 1
 fi
@@ -83,7 +80,7 @@ mkdir ${BDIR}/bin
 mkdir ${BDIR}/lib
 mkdir ${BDIR}/conf
 mkdir ${BDIR}/webapps
-echo "back up dir: $BDIR"
+echo "backup dir: $BDIR"
 
 SRC="${tomcatDir}/xipki"
 [ -d $SRC ] && cp -r $SRC ${BDIR}

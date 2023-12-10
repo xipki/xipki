@@ -1,0 +1,28 @@
+echo "+----------------------------------------------------------------------+"
+echo "| This script demonstrates the setup of CAs with all the combinations: |"
+echo "|     key-type x caconf-store-type x token-type x CAcert-presence      |"
+echo "|  - key-type:          rsa, ec, dsa, sm2, ed25519, ed448              |"
+echo "|  - caconf-store-type: dbbased (database), filebased (file)           |"
+echo "|  - token-type:        p11, p12                                       |"
+echo "|  - CAcert-presence:   none, present                                  |"
+echo "+----------------------------------------------------------------------+"
+
+keytypes = [ed448 ed25519 sm2 ec rsa dsa]; each ($keytypes) {
+  keytype = $it
+
+  storetypes = [dbbased filebased]; each ($storetypes) {
+    storetype = $it
+
+    tokentypes = [p12 p11]; each ($tokentypes) {
+      tokentype = $it
+
+      // Ed448 not supported in PKCS#1 devices
+      if { "$keytype" equals "ed448" && "$tokentype" equals "p11" } then {
+        echo "Skipping ed448 in p11 device."
+        continue;
+      }
+
+      source xipki/ca-setup/demo/doDemo.script
+    }
+  }
+}

@@ -23,15 +23,6 @@ if { "$1" equals "" } then {
     KEYSPEC =$5
   }
 
-  if { "$HASH" equals "sm3" } then {
-    STDHASH = sha256
-  } elif { "$HASH" equals "shake128" } then {
-    STDHASH = sha256
-  } elif { "$HASH" equals "shake256" } then {
-    STDHASH = sha512
-  } else {
-    STDHASH = "$HASH"
-  }
 
   list = [pkcs11 pkcs12]; each ($list) {
     if { "$TOKEN_TYPE" equals $it } then {
@@ -149,11 +140,7 @@ if { $printUsage equals "true" } then {
 
   dsaPlain = ""
 
-  gm = ""
-
-  if { "$SIG_TYPE" equals "sm2" } then {
-    gm = "--gm"
-  } elif { "$SIG_TYPE" equals "plainec" } then {
+  if { "$SIG_TYPE" equals "plainec" } then {
     dsaPlain = "--dsa-plain"
   }
 
@@ -172,12 +159,6 @@ if { $printUsage equals "true" } then {
     qa/qa.d/ca-load.script
 
   xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
-    qa/qa.d/ca.script
-
-  xi:replace --old "REPLACEME-GM" --new "${gm}" \
-    qa/qa.d/ca-load.script
-
-  xi:replace --old "REPLACEME-GM" --new "${gm}" \
     qa/qa.d/ca.script
 
   if { "$1" equals "-l" } then {

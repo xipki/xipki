@@ -1,0 +1,50 @@
+{
+	"protocols": {
+		"acme": $[gateway.acme.enabled],
+		"cmp": $[gateway.cmp.enabled],
+		"est": $[gateway.est.enabled],
+		"rest": $[gateway.rest.enabled],
+		"scep": $[gateway.scep.enabled]
+	},
+	// To activate the logging of requests and responses, set writer.level to DEBUG
+	// in the file META-INF/classes/log4j2.properties.
+	"logReqResp":true,
+	// valid values are NO, APACHE, NGINX, GENERAL
+	//"reverseProxyMode":"GENERAL",
+	"pop":{
+		"sigAlgos":[
+			"SHA256withRSA", "SHA256withECDSA", "SHA256withDSA",
+			"SM3withSM2", "ED25519", "ED448", "DHPOP-X25519", "DHPOP-X448"
+		]
+	},
+	"sdkClient":{
+		"serverUrl":"https://$[ca.host]:$[ca.https.port]/ca/ra/",
+		"ssl":{
+			"storeType":"pkcs12",
+			"keystorePassword":"$[ra.sdk.keyPassword]",
+			"keystore":{
+				"file":"keycerts/ra-sdk-client.p12"
+			},
+			"trustanchors": [{
+				"file":"keycerts/ca-server-cert.pem"
+			}],
+			// valid values: 'default' for standard verification, 'no_op' for no-operation, or
+			// 'java:'<class implements javax.net.ssl.HostnameVerifier>
+			"hostnameVerifier":"default"
+		}
+	},
+	"audit":{
+		"type":"embed",
+		"conf": "file=${sys:catalina.home}/logs/gateway-audit.log"
+	},
+	"security":{
+		"keyStrongrandomEnabled":false,
+		"signStrongrandomEnabled":false,
+		"defaultSignerParallelism":10,
+		// pkcs11Conf if signes.signer.type is pkcs11
+		//"pkcs11Conf":{
+		//	"file":"security/pkcs11.json"
+		//},
+		"signerFactories":[]
+	}
+}

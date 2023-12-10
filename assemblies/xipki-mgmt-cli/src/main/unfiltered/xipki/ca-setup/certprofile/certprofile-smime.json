@@ -26,6 +26,16 @@
 		}
 	},{
 		"algorithms":[{
+			"oid":"1.3.101.112",
+			"description":"Ed25519"
+		}]
+	},{
+		"algorithms":[{
+			"oid":"1.3.101.113",
+			"description":"Ed448"
+		}]
+	},{
+		"algorithms":[{
 			"oid":"1.2.840.10040.4.1",
 			"description":"DSA"
 		}],
@@ -73,7 +83,8 @@
 			"type":{
 				"oid":"2.5.4.6",
 				"description":"c"
-			}
+			},
+			"minOccurs":0
 		},{
 			"type":{
 				"oid":"2.5.4.10",

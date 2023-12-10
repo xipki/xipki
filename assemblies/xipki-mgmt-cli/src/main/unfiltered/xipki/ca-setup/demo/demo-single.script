@@ -1,0 +1,10 @@
+# Configure me: valid values are ec, rsa, dsa, sm2, ed25519 and ed448
+keytype = ec
+
+# Configure me: valid values are dbbased and filebased
+storetype = dbbased
+
+# Configure me: valid values are p11 (not for ed448) and p12
+tokentype = p12
+
+source xipki/ca-setup/demo/doDemo.script

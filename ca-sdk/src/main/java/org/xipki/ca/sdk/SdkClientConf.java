@@ -46,7 +46,7 @@ public class SdkClientConf {
   }
 
   public static SdkClientConf decode(byte[] encoded) throws InvalidConfException {
-    SdkClientConf conf = JSON.parseObject(encoded, SdkClientConf.class);
+    SdkClientConf conf = JSON.parseConf(encoded, SdkClientConf.class);
     conf.validate();
     return conf;
   }

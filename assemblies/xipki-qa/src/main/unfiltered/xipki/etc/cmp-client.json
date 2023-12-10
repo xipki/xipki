@@ -1,7 +1,7 @@
 {
 	"sendRequestorCert":true,
 	"responder":{
-		"url":"http://localhost:8082/cmp/",
+		"url":"http://localhost:8082/gw/cmp/",
 		"pbmMac":{
 			"macAlgos":["HMAC-SHA256"],
 			"owfAlgos":["SHA256"]

@@ -8,7 +8,6 @@ xi:mkdir error-output
 
 echo "========================================================"
 echo "HASH:       $HASH"
-echo "STDHASH:    $STDHASH"
 echo "TOKEN_TYPE: $TOKEN_TYPE"
 echo "SIG_TYPE:   $SIG_TYPE"
 echo "KEYSPEC:    $KEYSPEC"

@@ -1,13 +1,13 @@
 ## URL pattern: https://<host>:<port>/.well-known/est/<CA-name>/<certprofile-name>
-## URL pattern: https://<host>:<port>/est/<CA-name>/<certprofile-name>
+## URL pattern: https://<host>:<port>/gw/est/<CA-name>/<certprofile-name>
 
-BASE_URL = https://${gateway.host}:${gateway.https.port}/.well-known/est/$[ca.name]/tls
+BASE_URL = https://$[gateway.host]:$[gateway.https.port]/.well-known/est/$[ca.name]/tls
 
 ## Short URL is possible
 ##   For all aliases:     https://<host>:<port>/.well-known/est/<alias>
-##                        https://<host>:<port>/est/<alias>
+##                        https://<host>:<port>/gw/est/<alias>
 ##   For alias "default": https://<host>:<port>/.well-known/est
-##                        https://<host>:<port>/est
+##                        https://<host>:<port>/gw/est
 ## To use the short URL, you need to configure the "CaProfiles" field
 ## in the EST proxy (acme-proxy.conf) with given alias.
 #

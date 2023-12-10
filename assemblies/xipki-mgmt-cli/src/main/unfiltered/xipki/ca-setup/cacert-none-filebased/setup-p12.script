@@ -24,7 +24,7 @@ if { "$1" equals "" } then {
   if { "$TOMCAT_DIR" equals "" } then {
     errMsg = "TOMCAT_DIR is not specified"
   } else {
-    list = [rsa ec dsa sm2 ed25519]; each ($list) {
+    list = [rsa ec dsa sm2 ed25519 ed448]; each ($list) {
       if { "$KEY_TYPE" equals $it } then {
         argsValid = "true"
         break
@@ -49,7 +49,7 @@ if { $printUsage equals "true" } then {
   echo "Usage: "
   echo ""
   echo "source ${THIS_DIR}/setup-p11.script <key type> <tomcat dir> [<xipki dir>]"
-  echo "    key type:  rsa, ec, dsa, sm2, ed25519"
+  echo "    key type:  rsa, ec, dsa, sm2, ed25519, ed448"
   echo "    xipki dir: optional, required if is not <tomcat dir>/xipki"
 } else {
   if { "$XIPKI_DIR" equals "" } then {
@@ -75,6 +75,9 @@ if { $printUsage equals "true" } then {
   } elif { $KEY_TYPE equals "ed25519" } then {
     SIG_ALG = ED25519
     xi:ec-p12 --password ${CA_P12_PWD} --out ${CA_P12} --curve ed25519
+  } elif { $KEY_TYPE equals "ed448" } then {
+    SIG_ALG = ED448
+    xi:ec-p12 --password ${CA_P12_PWD} --out ${CA_P12} --curve ed448
   } elif { $KEY_TYPE equals "dsa" } then {
     SIG_ALG = SHA256WITHDSA
     xi:dsa-p12 --password ${CA_P12_PWD} --out ${CA_P12} --plen  2048

@@ -99,7 +99,7 @@ public class EnrollCertRequest {
 
     requestEntries.add(requestEntry);
     return true;
-  } // method addRequestEntry
+  }
 
   public List<Entry> getRequestEntries() {
     return Collections.unmodifiableList(requestEntries);

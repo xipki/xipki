@@ -1,15 +1,11 @@
 {
-	// To activate the logging of requests and responses, set writer.level to DEBUG
-	// in the file META-INF/classes/log4j2.properties.
-	"logReqResp":true,
-	// valid values are NO, APACHE, NGINX, GENERAL
-	//"reverseProxyMode":"GENERAL",
 	// WARNING: Replace the dummy authenticator with your own.
-	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
+	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator"
 	// When "caProfiles" is configured, short URL is possible
 	//   For all aliases:     https://<host>:<port>/.well-known/est/<alias>
 	//   For alias "default": https://<host>:<port>/.well-known/est
 	//
+	//,
 	//"caProfiles": [{
 	//	"name": "default",
 	//	"ca": "subca",
@@ -18,37 +14,5 @@
 	//	"name": "myalias",
 	//	"ca": "subca",
 	//	"certprofile": "tls"
-	//}],
-	"pop":{
-		"sigAlgos":[
-			"SHA256withRSA", "SHA256withECDSA", "SHA256withDSA",
-			"SM3withSM2", "ED25519", "ED448", "DHPOP-X25519", "DHPOP-X448"
-		]
-	},
-	"sdkClient":{
-		"serverUrl":"https://$[ca.host]:$[ca.https.port]/ca/ra/",
-		"ssl":{
-			"storeType":"pkcs12",
-			"keystorePassword":"CHANGEIT",
-			"keystore":{
-				"file":"keycerts/ra-sdk-client.p12"
-			},
-			"trustanchors": [{
-				"file":"keycerts/ca-server-cert.pem"
-			}],
-			// valid values: 'default' for standard verification, 'no_op' for no-operation, or
-			// 'java:'<class implements javax.net.ssl.HostnameVerifier>
-			"hostnameVerifier":"default"
-		}
-	},
-	"audit":{
-		"type":"embed",
-		"conf": "file=${sys:catalina.home}/logs/est-audit.log"
-	},
-	"security":{
-		"keyStrongrandomEnabled":false,
-		"signStrongrandomEnabled":false,
-		"defaultSignerParallelism":10,
-		"signerFactories":[]
-	}
+	//}]
 }

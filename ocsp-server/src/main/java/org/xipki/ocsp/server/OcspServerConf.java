@@ -806,7 +806,7 @@ public class OcspServerConf extends ValidableConf {
   public static OcspServerConf readConfFromFile(String fileName)
       throws IOException, InvalidConfException {
     notBlank(fileName, "fileName");
-    OcspServerConf conf = JSON.parseObject(Paths.get(fileName), OcspServerConf.class);
+    OcspServerConf conf = JSON.parseConf(Paths.get(fileName), OcspServerConf.class);
     conf.validate();
     return conf;
   }

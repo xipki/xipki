@@ -103,19 +103,19 @@ public class OcspServerUtil {
         }
 
         if (logExcepion) {
-          LOG.debug("could not create OCSP responder " + name, ex);
+          LogUtil.warn(LOG, ex, "error creating signer group " + name);
         }
       }
     }
 
     if (singleSigners.isEmpty()) {
-      throw new InvalidConfException("could not create any signer for OCSP responder " + name);
+      throw new InvalidConfException("could not create any signer group " + name);
     } else {
-      LOG.info("Create signers of sign algorithms {} for the OCSP responder {}", succSigAlgos, name);
+      LOG.info("Create signers of sign algorithms {} for the signer group {}", succSigAlgos, name);
     }
 
     if (!failSigAlgos.isEmpty()) {
-      LOG.info("ignore sign algorithms {} for the OCSP responder {}", failSigAlgos, name);
+      LOG.info("ignore sign algorithms {} for the signer group {}", failSigAlgos, name);
     }
 
     try {
@@ -259,7 +259,7 @@ public class OcspServerUtil {
 
   static OcspServerConf parseConf(String confFilename) throws InvalidConfException {
     try {
-      OcspServerConf root = JSON.parseObject(
+      OcspServerConf root = JSON.parseConf(
           Paths.get(IoUtil.expandFilepath(confFilename, true)), OcspServerConf.class);
       root.validate();
       return root;

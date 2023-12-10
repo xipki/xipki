@@ -90,12 +90,18 @@
 
                 <copy file="../../README.md"
                       todir="${project.build.directory}/t"/>
+                <copy file="../../CHANGELOG.md"
+                      todir="${project.build.directory}/t"/>
                 <copy todir="${project.build.directory}/t" >
                   <fileset dir="${project.build.outputDirectory}/package">
                   </fileset>
                 </copy>
                 <copy todir="${project.build.directory}/t/setup" >
                   <fileset dir="${project.build.outputDirectory}/setup">
+                  </fileset>
+                </copy>
+                <copy todir="${project.build.directory}/t/license" >
+                  <fileset dir="${project.build.outputDirectory}/license">
                   </fileset>
                 </copy>
 

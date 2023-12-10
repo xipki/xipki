@@ -41,7 +41,7 @@ public class HsmProxyServletFilter implements XiHttpFilter {
 
     public static P11ProxyConf readConfFromFile(String fileName) throws IOException, InvalidConfException {
       try (InputStream is = Files.newInputStream(Paths.get(fileName))) {
-        P11ProxyConf conf = JSON.parseObject(is, P11ProxyConf.class);
+        P11ProxyConf conf = JSON.parseConf(is, P11ProxyConf.class);
         conf.validate();
         return conf;
       }

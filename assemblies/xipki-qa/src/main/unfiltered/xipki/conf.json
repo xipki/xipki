@@ -14,13 +14,24 @@
         "xipki-gateway/tomcat8on/conf/server.xml",
         "xipki-ocsp/tomcat10on/conf/server.xml",
         "xipki-ocsp/tomcat8on/conf/server.xml",
+        "xipki-gateway/tomcat/xipki/etc/gateway.json",
         "xipki-gateway/tomcat/xipki/etc/acme-gateway.json",
         "xipki-gateway/tomcat/xipki/etc/cmp-gateway.json",
         "xipki-gateway/tomcat/xipki/etc/est-gateway.json",
         "xipki-gateway/tomcat/xipki/etc/rest-gateway.json",
         "xipki-gateway/tomcat/xipki/etc/scep-gateway.json",
         "xipki/etc/curl.json",
-        "etc/org.xipki.ca.mgmt.client.cfg"
+        "etc/org.xipki.ca.mgmt.client.cfg",
+        "xipki-hsmproxy/tomcat/xipki/security/example/pkcs11-hsmproxy.json",
+        "xipki-hsmproxy/tomcat/xipki/security/pkcs11.json",
+        "xipki-ca/tomcat/xipki/security/example/pkcs11-hsmproxy.json",
+        "xipki-ca/tomcat/xipki/security/pkcs11.json",
+        "xipki-ocsp/tomcat/xipki/security/example/pkcs11-hsmproxy.json",
+        "xipki-ocsp/tomcat/xipki/security/pkcs11.json",
+        "xipki-gateway/tomcat/xipki/security/example/pkcs11-hsmproxy.json",
+        "xipki-gateway/tomcat/xipki/security/pkcs11.json",
+        "xipki/security/example/pkcs11-hsmproxy.json",
+        "xipki/security/pkcs11.json"
       ],
       "replacements": {
         // OCSP
@@ -36,6 +47,11 @@
         "ca.name": "myca1",
         "ca.alias": "myca",
         // Gateway
+        "gateway.acme.enabled": "false",
+        "gateway.cmp.enabled": "true",
+        "gateway.est.enabled": "true",
+        "gateway.rest.enabled": "true",
+        "gateway.scep.enabled": "true",
         "gateway.https.keyPassword": "CHANGEIT",
         "gateway.shutdown.port": "8007",
         "gateway.http.port": "8082",
@@ -49,7 +65,7 @@
         "hsmproxy.shutdown.port": "8008",
         "hsmproxy.https.port": "8446",
         "hsmproxy.host": "localhost",
-        "hsmproxy.clien.keyPassword": "CHANGEIT",
+        "hsmproxy.client.keyPassword": "CHANGEIT",
         // CLI
         "cmp.client.ca.keyPassword": "CHANGEIT",
         "cmp.client.keyPassword": "CHANGEIT",

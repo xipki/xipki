@@ -63,7 +63,7 @@
 			"keyType": "EC/P-256",
 			"subject": "O=$[organization], CN=EST client CA",
 			"validity": "20y",
-			"p12Password": "est.client.ca.keyPassword"
+			"p12Password": "$[est.client.ca.keyPassword]"
 	  	},{
 			"name": "est-client",
 			"certType": "TLS-Client",

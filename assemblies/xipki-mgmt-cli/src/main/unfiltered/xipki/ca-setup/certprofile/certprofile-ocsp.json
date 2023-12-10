@@ -83,7 +83,8 @@
 			"type":{
 				"oid":"2.5.4.6",
 				"description":"c"
-			}
+			},
+			"minOccurs":0
 		},{
 			"type":{
 				"oid":"2.5.4.10",

@@ -5,27 +5,15 @@ set -e
 helpFunction()
 {
    echo ""
-   echo "Usage: $0 [OPTION]... -t <dir of destination tomcat>"
-   echo "OPTIONS"
-   echo -e "\t-a protocol ACME"
-   echo -e "\t-c: protocol CMP"
-   echo -e "\t-e: protocol EST"
-   echo -e "\t-r: protocol REST"
-   echo -e "\t-s: protocol SCEP"
-   echo -e "\tno option: all protocols"
+   echo "Usage: $0 -t <dir of destination tomcat>"
    exit 1 # Exit script after printing help
 }
 
 #while getopts "a:b:" opt
-while getopts "t:acers" opt
+while getopts "t:" opt
 do
    case "$opt" in
       t ) tomcatDir="$OPTARG" ;;
-      a ) ACME=1 ;;
-      c ) CMP=1 ;;
-      e ) EST=1 ;;
-      r ) REST=1 ;;
-      s ) SCEp=1 ;;
       ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
    esac
 done
@@ -36,17 +24,6 @@ if [ -z "$tomcatDir" ]
 then
    echo "Some or all of the parameters are empty";
    helpFunction
-fi
-
-if [ "$ACME" == "1" ] || [ "$CMP" == "1" ] || [ "$EST" == "1" ] || [ "$REST" == "1" ] || [ "$SCEP" == "1" ]
-then
-  DUMMY=0
-else
-  ACME=1
-  CMP=1
-  EST=1
-  REST=1
-  SCEP=1
 fi
 
 ## workding dir
@@ -61,13 +38,13 @@ fi
 
 echo "Tomcat: $tomcatDir"
 
-## make sure the tomcat is only for HSM proxy
+## make sure the tomcat is only for Gateway
 if [ -f ${tomcatDir}/webapps/ca.war ]; then
    echo "CA is running in $tomcatDir, please use other tomcat instance."
    exit 1
 fi
 
-if [ -f ${tomcatDir}/webapps/hsmproxy.war ]; then
+if [ -f ${tomcatDir}/webapps/hp.war ]; then
    echo "HSM proxy is running in $tomcatDir, please use other tomcat instance."
    exit 1
 fi
@@ -98,7 +75,7 @@ mkdir ${BDIR}/bin
 mkdir ${BDIR}/lib
 mkdir ${BDIR}/conf
 mkdir ${BDIR}/webapps
-echo "back up dir: $BDIR"
+echo "backup dir: $BDIR"
 
 SRC="${tomcatDir}/xipki"
 [ -d $SRC ] && cp -r $SRC ${BDIR}
@@ -145,52 +122,20 @@ fi
 cp -r ${WDIR}/tomcat/* ${tomcatDir}
 cp -r ${WDIR}/${_DIR}/conf ${tomcatDir}/
 
-if [ "$ACME" == "1" ]; then
-  echo "Copying acme.war"
-  WAR="${tomcatDir}/webapps/acme"
+wars=(
+    gw
+    acme
+    cmp
+    est
+    rest
+    scep
+)
 
-  [ -f ${WAR}.war ] && mv ${WAR}.war ${BDIR}/webapps
-  rm -rf "${WAR}"
+for i in "${wars[@]}"; do
+  war="${tomcatDir}/webapps/${i}"
+  [ -f ${war}.war ] && mv ${war}.war ${BDIR}/webapps
+  rm -rf "${war}"
+done
 
-  cp ${WDIR}/${_DIR}/webapps/acme.war ${tomcatDir}/webapps
-fi
-
-if [ "$CMP" == "1" ]; then
-  echo "Copying cmp.war"
-  WAR="${tomcatDir}/webapps/cmp"
-
-  [ -f ${WAR}.war ] && mv ${WAR}.war ${BDIR}/webapps
-  rm -rf "${WAR}"
-
-  cp ${WDIR}/${_DIR}/webapps/cmp.war ${tomcatDir}/webapps
-fi
-
-if [ "$EST" == "1" ]; then
-  echo "Copying est.war"
-  WAR="${tomcatDir}/webapps/est"
-
-  [ -f ${WAR}.war ] && mv ${WAR}.war ${BDIR}/webapps
-  rm -rf "${WAR}"
-
-  cp ${WDIR}/${_DIR}/webapps/est.war ${tomcatDir}/webapps
-fi
-
-if [ "$REST" == "1" ]; then
-  echo "Copying rest.war"
-  WAR="${tomcatDir}/webapps/rest"
-
-  [ -f ${WAR}.war ] && mv ${WAR}.war ${BDIR}/webapps
-  rm -rf "${WAR}"
-
-  cp ${WDIR}/${_DIR}/webapps/rest.war ${tomcatDir}/webapps
-fi
-
-if [ "$SCEP" == "1" ]; then
-  echo "Copying scep.war"
-  WAR="${tomcatDir}/webapps/scep"
-
-  [ -f ${WAR}.war ] && mv ${WAR}.war ${BDIR}/webapps
-  rm -rf "${WAR}"
-
-  cp ${WDIR}/${_DIR}/webapps/scep.war ${tomcatDir}/webapps
-fi
+echo "Copying gw.war"
+cp ${WDIR}/${_DIR}/webapps/gw.war ${tomcatDir}/webapps

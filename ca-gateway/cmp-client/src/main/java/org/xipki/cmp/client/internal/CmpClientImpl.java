@@ -137,7 +137,7 @@ public final class CmpClientImpl implements CmpClient {
   private static CmpClientConf parse(File configFile) throws CmpClientException {
     CmpClientConf conf;
     try {
-      conf = JSON.parseObject(configFile, CmpClientConf.class);
+      conf = JSON.parseConf(configFile, CmpClientConf.class);
       conf.validate();
     } catch (InvalidConfException | IOException | RuntimeException ex) {
       throw new CmpClientException("parsing profile failed, message: " + ex.getMessage(), ex);

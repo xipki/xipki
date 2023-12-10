@@ -1,11 +1,11 @@
 # Please adapt me
-SUBJECT="O=${organization},CN=OCSP Responder 1"
+SUBJECT="O=$[organization],CN=OCSP Responder 1"
 
 # Please adapt me
 P11_LABEL = ocsp1
 SLOT = 0
 
-KEYCERTS_DIR = xipki/ocsp-setup/keycerts
+OCSP_KEYCERTS_DIR = xipki/ocsp-setup/keycerts
 
 printUsage = "false"
 argsValid = "false"
@@ -18,20 +18,26 @@ if { "$1" equals "" } then {
   printUsage = "true"
   argsValid = "true"
 } else {
-  list = [rsa dsa ec sm2]; each ($list) {
-    if { "$1" equals $it } then {
+  keytype = $1
+  list = [rsa dsa ec sm2 ed25519]; each ($list) {
+    if { "$keytype" equals $it } then {
       argsValid = "true"
-      keytype = "$1"
       break
     }
   }
 }
 
+ if { "$argsValid" equals "false" } then {
+   printUsage = "true"
+ }
+
+ echo "key type: $keytype"
+
 if { $printUsage equals "true" } then {
   echo "Usage: "
   echo ""
   echo "source file:./xipki/ocsp/setup-ocsp-p11.script <key type>"
-  echo "    key type:  rsa, ec, dsa, sm2"
+  echo "    key type:  rsa, ec, dsa, sm2, ed25519"
 } else {
   echo "#################################################################"
   echo "#                 Generate Key, CSR and Certificate             #"
@@ -45,15 +51,20 @@ if { $printUsage equals "true" } then {
     xi:rsa-p11 --key-size 2048 --slot ${SLOT} --label ${P11_LABEL}
   } elif { "$keytype" equals "sm2" } then {
     xi:sm2-p11 --slot ${SLOT} --label ${P11_LABEL}
+  } elif { "$keytype" equals "ed25519" } then {
+    xi:ec-p11 --curve ed25519 --slot ${SLOT} --label ${P11_LABEL}
   }
 
-  xi:csr-p11 --slot ${SLOT} --label ${P11_LABEL} --out ${KEYCERTS_DIR}/${P11_LABEL}.csr --subject "${SUBJECT}"
+  xi:csr-p11 --slot ${SLOT} --label ${P11_LABEL} --out ${OCSP_KEYCERTS_DIR}/${P11_LABEL}.csr --subject "${SUBJECT}"
 
-  ca:enroll-cert --ca myca1 --csr ${KEYCERTS_DIR}/${P11_LABEL}.csr --out ${KEYCERTS_DIR}/${P11_LABEL}.der --profile ocsp
+  ca:enroll-cert --ca myca1 --csr ${OCSP_KEYCERTS_DIR}/${P11_LABEL}.csr \
+      --out ${OCSP_KEYCERTS_DIR}/${P11_LABEL}.crt --profile ocsp
 
   echo "Please"
-  echo "  1. Modify <tomcat.dir>/xipki/etc/ocsp/ocsp-responder.json"
-  echo "     - replace signer\'s type \'pkcs12\' with \'pkcs11\'"
-  echo "     - replace signer\'s key \'password=...,keystore=...\' with \'slot=${SLOT},key-label=${P11_LABEL}\'"
-  echo "  2. Restart tomcat."
+  echo "  1. Copy ${OCSP_KEYCERTS_DIR}/${P11_LABEL}.crt to replace"
+  echo "     the folder <OCSP\'s tomcat.dir>/xipki/keycerts/"
+  echo "  2. Modify the signers field in <OCSP\'s tomcat.dir>/xipki/etc/ocsp/ocsp-responder.json"
+  echo "     - Unncomment the pkcs11 part, and comment the pkcs12 part"
+  echo "     - Change signer conf to \'slot=${SLOT},key-label=${P11_LABEL}\'"
+  echo "  3. Restart OCSP\'s tomcat."
 }

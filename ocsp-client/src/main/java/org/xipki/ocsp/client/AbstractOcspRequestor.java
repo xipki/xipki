@@ -324,7 +324,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             }
 
             try {
-              signer = getSecurityFactory().createSigner(signerType, new SignerConf(signerConf), cert);
+              signer = getSecurityFactory().createSigner(signerType,
+                  new SignerConf(new ConfPairs(signerConf)), cert);
             } catch (Exception ex) {
               throw new OcspRequestorException("could not create signer: " + ex.getMessage());
             }

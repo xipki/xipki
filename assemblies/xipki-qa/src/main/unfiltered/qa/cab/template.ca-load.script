@@ -20,9 +20,6 @@ xi:copy-file -f qa/cab/template.rootca.json qa/cab/rootca.json
 xi:replace --old "REPLACEME-SUBJECT" --new "C=DE,O=myorg,CN=rootca1" \
   qa/cab/rootca.json
 
-xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
-  qa/cab/rootca.json
-
 xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
   qa/cab/rootca.json
 
@@ -30,9 +27,6 @@ xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
   qa/cab/rootca.json
 
 xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
-  qa/cab/rootca.json
-
-xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
   qa/cab/rootca.json
 
 ca:load-conf qa/cab/rootca.json
@@ -46,12 +40,12 @@ if { $TOKEN_TYPE equals "pkcs12" } then {
 
 ## Generate keys and CSR for subca1
 if { $TOKEN_TYPE equals "pkcs11" } then {
-  xi:csr-p11 --hash $HASH REPLACEME-RSAPSS \
+  xi:csr-p11 REPLACEME-RSAPSS \
     --slot $SLOT --label subca1 \
     --out output/subca1.csr \
     --subject "C=DE,O=myorg,CN=subca1"
 } else {
-  xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
+  xi:csr-p12 REPLACEME-RSAPSS \
     --p12 output/subca1.p12 --password CHANGEIT \
     --out output/subca1.csr \
     --subject "C=DE,O=myorg,CN=subca1"
@@ -78,9 +72,6 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 
 xi:copy-file -f qa/cab/template.subca.json qa/cab/subca.json
 
-xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
-  qa/cab/subca.json
-
 xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
   qa/cab/subca.json
 
@@ -88,9 +79,6 @@ xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
   qa/cab/subca.json
 
 xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
-  qa/cab/subca.json
-
-xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
   qa/cab/subca.json
 
 ca:load-conf qa/cab/subca.json

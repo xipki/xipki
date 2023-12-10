@@ -34,7 +34,7 @@ echo "=====EST /${CMD}====="
 
 FILE = $OUT_DIR/${CMD}
 
-xi:csr-p12 --hash $HASH REPLACEME-GM REPLACEME-RSAPSS \
+xi:csr-p12 REPLACEME-RSAPSS \
   --p12 output/tls1.p12 --password CHANGEIT --out ${FILE}.csr \
   --subject "CN=est-${CMD}.myorg.org,O=myorg,C=DE"
 
@@ -51,7 +51,7 @@ OLD_FILE = ${FILE}
 
 FILE = $OUT_DIR/${CMD}
 
-xi:csr-p12 --hash $HASH REPLACEME-GM REPLACEME-RSAPSS \
+xi:csr-p12 REPLACEME-RSAPSS \
   --p12 output/tls1.p12 --password CHANGEIT --out ${FILE}.csr \
   --subject "CN=est-${CMD}.myorg.org,O=myorg,C=DE" \
   --old-cert ${OLD_FILE}.crt
@@ -67,7 +67,7 @@ echo "=====EST /${CMD}====="
 
 FILE = $OUT_DIR/${CMD}
 
-xi:csr-p12 --hash $HASH REPLACEME-GM \
+xi:csr-p12 \
   --p12 output/tls1.p12 --password CHANGEIT --out ${FILE}.csr \
   --subject "CN=est-tls-${CMD}.myorg.org,O=myorg,C=DE"
 
@@ -115,7 +115,7 @@ echo "=====EST /${CMD}====="
 
 FILE = $OUT_DIR/${CMD}
 
-xi:csr-p12 --hash $HASH REPLACEME-GM REPLACEME-RSAPSS \
+xi:csr-p12 REPLACEME-RSAPSS \
   --p12 output/tls1.p12 --password CHANGEIT --out ${FILE}.csr \
   --subject "CN=est-${CMD}.myorg.org,O=myorg,C=DE"
 
@@ -132,7 +132,7 @@ OLD_FILE = ${FILE}
 
 FILE = $OUT_DIR/${CMD}
 
-xi:csr-p12 --hash $HASH REPLACEME-GM REPLACEME-RSAPSS \
+xi:csr-p12 REPLACEME-RSAPSS \
   --p12 output/tls1.p12 --password CHANGEIT --out ${FILE}.csr \
   --subject "CN=est-${CMD}.myorg.org,O=myorg,C=DE" \
   --old-cert ${OLD_FILE}.crt
@@ -148,7 +148,7 @@ echo "=====EST /${CMD}====="
 
 FILE = $OUT_DIR/${CMD}
 
-xi:csr-p12 --hash $HASH REPLACEME-GM \
+xi:csr-p12 \
   --p12 output/tls1.p12 --password CHANGEIT --out ${FILE}.csr \
   --subject "CN=est-tls-${CMD}.myorg.org,O=myorg,C=DE"
 

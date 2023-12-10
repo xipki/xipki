@@ -1,8 +1,8 @@
 # Please adapt me
-SUBJECT="O=${organization},CN=OCSP Responder 1"
+SUBJECT="O=$[organization],CN=OCSP Responder 1"
 
-KEYCERTS_DIR = xipki/ocsp-setup/keycerts
-CACERT_FILE = xipki/ca-setup/keycerts/$[ca.name].der
+OCSP_KEYCERTS_DIR = xipki/ocsp-setup/keycerts
+CACERT_FILE = xipki/ca-setup/keycerts/$[ca.name].pem
 
 printUsage = "false"
 argsValid = "false"
@@ -15,20 +15,26 @@ if { "$1" equals "" } then {
   printUsage = "true"
   argsValid = "true"
 } else {
-  list = [rsa dsa ec sm2]; each ($list) {
-    if { "$1" equals $it } then {
+  keytype = $1
+  list = [rsa dsa ec sm2 ed25519 ed448]; each ($list) {
+    if { "$keytype" equals $it } then {
       argsValid = "true"
-      keytype = "$1"
       break
     }
   }
 }
 
+if { "$argsValid" equals "false" } then {
+  printUsage = "true"
+}
+
+echo "key type: $keytype"
+
 if { $printUsage equals "true" } then {
   echo "Usage: "
   echo ""
   echo "source file:./xipki/ocsp/setup-ocsp-p12.script <key type>"
-  echo "    key type:  rsa, ec, dsa, sm2"
+  echo "    key type:  rsa, ec, dsa, sm2, ed25519, ed448"
 } else {
   echo "#################################################################"
   echo "#                 Generate Key, CSR and Certificate             #"
@@ -36,8 +42,8 @@ if { $printUsage equals "true" } then {
 
   echo "# Generate PKCS#12 key and certificate for OCSP Responder"
 
-  OCSP_FILE_PREFIX = ${KEYCERTS_DIR}/ocsp1
-  PASSWORD_P12 = ${ocsp.password}
+  OCSP_FILE_PREFIX = ${OCSP_KEYCERTS_DIR}/ocsp1
+  PASSWORD_P12 = $[ocsp.keyPassword]
 
   if { "$keytype" equals "dsa" } then {
     xi:dsa-p12 --plen 2048 --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
@@ -47,18 +53,25 @@ if { $printUsage equals "true" } then {
     xi:rsa-p12 --key-size 2048 --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
   } elif { "$keytype" equals "sm2" } then {
     xi:sm2-p12 --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
+  } elif { "$keytype" equals "ec" } then {
+    xi:ec-p12 --curve secp256r1 --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
+  } elif { "$keytype" equals "ed25519" } then {
+    xi:ec-p12 --curve ed25519 --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
+  } elif { "$keytype" equals "ed448" } then {
+    xi:ec-p12 --curve ed448 --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
   }
 
   xi:csr-p12 --password ${PASSWORD_P12} --p12 ${OCSP_FILE_PREFIX}.p12 --out ${OCSP_FILE_PREFIX}.csr \
     --subject "${SUBJECT}"
 
-  ca:enroll-cert --ca myca1 --csr ${OCSP_FILE_PREFIX}.csr --out ${OCSP_FILE_PREFIX}.der --profile ocsp
+  ca:enroll-cert --ca myca1 --csr ${OCSP_FILE_PREFIX}.csr --out ${OCSP_FILE_PREFIX}.crt --profile ocsp
 
   echo "# Update the certificate in the PKCS#12 file"
   xi:update-cert-p12 --p12 ${OCSP_FILE_PREFIX}.p12 --password ${PASSWORD_P12} \
-    --cert ${OCSP_FILE_PREFIX}.der --ca-cert ${CACERT_FILE}
+    --cert ${OCSP_FILE_PREFIX}.crt --ca-cert ${CACERT_FILE}
 
   echo "Please"
-  echo "  1. Copy ${OCSP_FILE_PREFIX}.p12 to replace the <tomcat.dir>/xipki/keycerts/ocsp1.p12"
-  echo "  2. Restart tomcat."
+  echo "  1. Copy ${OCSP_FILE_PREFIX}.p12 to replace"
+  echo "     the <OCSP\'s tomcat.dir>/xipki/keycerts/ocsp1.p12"
+  echo "  2. Restart OCSP\'s tomcat."
 }

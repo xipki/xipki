@@ -71,7 +71,6 @@ if { $printUsage equals "true" } then {
   echo "    keyspec:         keysize for signature types rsa, rsaPSS and DSA,"
   echo "                     curve name for signature types ec"
 } else {
-  STDHASH = $HASH
   source file:./qa/qa.d/prepare-keys.script
 
   echo "Restart Gateway (tomcat) server!"

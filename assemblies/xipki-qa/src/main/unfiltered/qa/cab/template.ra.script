@@ -6,7 +6,7 @@ SIGNER_P12 = xipki/keycerts/cmp-client.p12
 
 # Certificate cab-domain-validated1
 
-xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
+xi:csr-p12 REPLACEME-RSAPSS \
   --p12 output/cab-domain-validated1.p12 --password CHANGEIT \
   --subject "C=DE,CN=abc.domain-validated.myorg.org" \
   --out output/cab-domain-validated1.csr
@@ -23,7 +23,7 @@ xi:update-cert-p12 --p12 output/cab-domain-validated1.p12 --password CHANGEIT \
 
 # Certificate cab-domain-validated2 (wildcard domain)
 
-xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
+xi:csr-p12 REPLACEME-RSAPSS \
   --p12 output/cab-domain-validated2.p12 --password CHANGEIT \
   --subject "C=DE,CN=*.domain-validated.myorg.org" \
   --out output/cab-domain-validated2.csr
@@ -40,7 +40,7 @@ xi:update-cert-p12 --p12 output/cab-domain-validated2.p12 --password CHANGEIT \
 
 # Certificate cab-org-validated1
 
-xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
+xi:csr-p12 REPLACEME-RSAPSS \
   --p12 output/cab-org-validated1.p12 --password CHANGEIT \
   --subject "C=DE,L=Frankfurt,O=myorg.org,CN=abc.org-validated.myorg.org" \
   --out output/cab-org-validated1.csr
@@ -57,7 +57,7 @@ xi:update-cert-p12 --p12 output/cab-org-validated1.p12 --password CHANGEIT \
 
 # Certificate cab-org-validated2 (wildcard domain)
 
-xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
+xi:csr-p12 REPLACEME-RSAPSS \
   --p12 output/cab-org-validated2.p12 --password CHANGEIT \
   --subject "C=DE,L=Frankfurt,O=myorg.org,CN=*.org-validated.myorg.org" \
   --out output/cab-org-validated2.csr
@@ -73,7 +73,7 @@ xi:update-cert-p12 --p12 output/cab-org-validated2.p12 --password CHANGEIT \
 
 # Certificate cab-individual-validated1
 
-xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
+xi:csr-p12 REPLACEME-RSAPSS \
   --p12 output/cab-individual-validated1.p12 --password CHANGEIT \
   --subject "C=DE,L=Frankfurt,surName=mysurname,givenName=alice,CN=abc.individual-validated.myorg.org" \
   --out output/cab-individual-validated1.csr
@@ -89,7 +89,7 @@ xi:update-cert-p12 --p12 output/cab-individual-validated1.p12 --password CHANGEI
 
 # Certificate cab-individual-validated2 (wildcard domain)
 
-xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
+xi:csr-p12 REPLACEME-RSAPSS \
   --p12 output/cab-individual-validated2.p12 --password CHANGEIT \
   --subject "C=DE,L=Frankfurt,surName=mysurname,givenName=alice,CN=*.individual-validated.myorg.org" \
   --out output/cab-individual-validated2.csr

@@ -88,7 +88,7 @@ echo "#################################################################"
 echo "#             Manage certificate with REST Client               #"
 echo "#################################################################"
 
-BASE_URL = https://localhost:8445/rest/subca
+BASE_URL = https://localhost:8445/gw/rest/subca
 
 echo "Sleeping 1 second"
 sleep 1

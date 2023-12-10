@@ -1,0 +1,19 @@
+{
+  "hostConfs": [
+    {
+      "urlPattern": ["*:*/gw/rest", "*:*/rest"],
+      "sslContext": {
+        "storeType": "PKCS12",
+        "keystore": {
+          "file": "xipki/keycerts/rest-client.p12"
+        },
+        "keystorePassword": "$[rest.client.keyPassword]",
+        // Valid values are 'no_op', 'default' or java:<class name>. Default to 'default'
+        "hostnameVerifier": "default",
+        "trustanchors": [{
+          "file": "xipki/keycerts/gateway-server-cert.pem"
+        }]
+      }
+    }
+  ]
+}

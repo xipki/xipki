@@ -5,13 +5,13 @@
 		"type":"hsmproxy",
 		"nativeLibraries":[
 			{
-				"path":"https://localhost:8446/hsmproxy",
+				"path":"https://$[hsmproxy.host]:$[hsmproxy.https.port]/hp",
 				"properties": {
 					"ssl.storeType": "PKCS12",
 					"ssl.keystore": "keycerts/hsmproxy-client.p12",
-					"ssl.keystorePassword": "CHANGEIT",
-					"ssl.truststore": "keycerts/hsmproxy-server-cert.p12",
-					"ssl.truststorePassword": "CHANGEIT",
+					"ssl.keystorePassword": "$[hsmproxy.client.keyPassword]",
+					// ",;:" separated certificate files.
+					"ssl.trustcerts": "keycerts/hsmproxy-server-cert.pem",
 					// hostnameVerifier: no_op, default or java:class-name
 					"ssl.hostnameVerifier": "default"
 				}

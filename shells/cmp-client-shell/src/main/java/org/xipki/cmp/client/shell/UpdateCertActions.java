@@ -154,7 +154,7 @@ public class UpdateCertActions {
         }
 
         SignerConf signerConf = getPkcs11SignerConf(moduleName, Integer.parseInt(slotIndex), keyLabel,
-            keyIdBytes, getHashAlgo(hashAlgo), getSignatureAlgoControl());
+            keyIdBytes, null, getSignatureAlgoControl());
         signer = securityFactory.createSigner("PKCS11", signerConf, (X509Cert[]) null);
       }
       return signer;
@@ -163,8 +163,6 @@ public class UpdateCertActions {
     public static SignerConf getPkcs11SignerConf(
         String pkcs11ModuleName, int slotIndex, String keyLabel, byte[] keyId,
         HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl) {
-      Args.notNull(hashAlgo, "hashAlgo");
-
       if (keyId == null && keyLabel == null) {
         throw new IllegalArgumentException("at least one of keyId and keyLabel may not be null");
       }
@@ -217,7 +215,7 @@ public class UpdateCertActions {
         ConfPairs conf = new ConfPairs("password", new String(password))
             .putPair("parallelism", Integer.toString(1))
             .putPair("keystore", "file:" + p12File);
-        SignerConf signerConf = new SignerConf(conf.getEncoded(), getHashAlgo(hashAlgo), getSignatureAlgoControl());
+        SignerConf signerConf = new SignerConf(conf.getEncoded(), null, getSignatureAlgoControl());
         signer = securityFactory.createSigner("PKCS12", signerConf, (X509Cert[]) null);
       }
       return signer;
@@ -301,9 +299,6 @@ public class UpdateCertActions {
 
   public abstract static class UpdateCertAction extends UpdateAction {
 
-    @Option(name = "--hash", description = "hash algorithm name for the POP computation")
-    protected String hashAlgo = "SHA256";
-
     @Option(name = "--outform", description = "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
     private String outform = "der";
@@ -320,15 +315,11 @@ public class UpdateCertActions {
             + "(only applied to DSA and ECDSA key)")
     private Boolean dsaPlain = Boolean.FALSE;
 
-    @Option(name = "--gm", description = "whether to use the chinese GM algorithm for the POP computation\n"
-            + "(only applied to EC key with GM curves)")
-    private Boolean gm = Boolean.FALSE;
-
     @Option(name = "--embeds-publickey", description = "whether to embed the public key in the request")
     private Boolean embedsPulibcKey = Boolean.FALSE;
 
     protected SignatureAlgoControl getSignatureAlgoControl() {
-      return new SignatureAlgoControl(rsaPss, dsaPlain, gm);
+      return new SignatureAlgoControl(rsaPss, dsaPlain);
     }
 
     /**

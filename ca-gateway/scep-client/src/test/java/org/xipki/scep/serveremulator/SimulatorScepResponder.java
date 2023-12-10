@@ -3,6 +3,7 @@
 
 package org.xipki.scep.serveremulator;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
@@ -13,7 +14,7 @@ import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cms.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.gateway.GatewayUtil;
+import org.xipki.pki.ErrorCode;
 import org.xipki.pki.OperationException;
 import org.xipki.scep.message.*;
 import org.xipki.scep.message.EnvelopedDataDecryptor.EnvelopedDataDecryptorInstance;
@@ -197,7 +198,7 @@ public class SimulatorScepResponder {
 
         CertificationRequest csr;
         try {
-          csr = GatewayUtil.parseCsrInRequest(req.getMessageData());
+          csr = parseCsrInRequest(req.getMessageData());
         } catch (Exception ex) {
           LOG.warn("tid=" + tid + ": invalid CSR", ex);
           return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
@@ -264,7 +265,7 @@ public class SimulatorScepResponder {
 
         CertificationRequest csr;
         try {
-          csr = GatewayUtil.parseCsrInRequest(req.getMessageData());
+          csr = parseCsrInRequest(req.getMessageData());
         } catch (OperationException e) {
           buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
           return rep;
@@ -367,6 +368,14 @@ public class SimulatorScepResponder {
     message.setPkiStatus(status);
     message.setFailInfo(failInfo);
     return message;
+  }
+
+  private static CertificationRequest parseCsrInRequest(ASN1Encodable p10Asn1) throws OperationException {
+    try {
+      return CertificationRequest.getInstance(p10Asn1);
+    } catch (Exception ex) {
+      throw new OperationException(ErrorCode.BAD_REQUEST, "invalid CSR: " + ex.getMessage());
+    }
   }
 
 }

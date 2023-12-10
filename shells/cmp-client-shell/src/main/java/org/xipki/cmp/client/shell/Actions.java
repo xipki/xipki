@@ -73,7 +73,7 @@ public class Actions {
 
         SignerConf sc;
         if (signerP12SigAlgo == null) {
-          sc = new SignerConf(cp.getEncoded(), HashAlgo.SHA256, new SignatureAlgoControl());
+          sc = new SignerConf(cp.getEncoded(), new SignatureAlgoControl());
         } else {
           cp.putPair("algo", signerP12SigAlgo);
           sc = new SignerConf(cp.getEncoded());
@@ -115,6 +115,10 @@ public class Actions {
     private String respout;
 
     protected static HashAlgo getHashAlgo(String algoStr) throws ObjectCreationException {
+      if (StringUtil.isBlank(algoStr)) {
+        return null;
+      }
+
       try {
         return HashAlgo.getInstance(algoStr);
       } catch (NoSuchAlgorithmException ex) {

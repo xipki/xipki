@@ -504,7 +504,7 @@ public class DbCertStatusStore extends OcspStore {
     if (sourceConf != null) {
       Object objValue = sourceConf.get("caCerts");
       if (objValue != null) {
-        caCerts = JSON.parseObject(JSON.toJSONBytes(objValue), OcspServerConf.CaCerts.class);
+        caCerts = JSON.parseConf(JSON.toJSONBytes(objValue), OcspServerConf.CaCerts.class);
       }
     }
 

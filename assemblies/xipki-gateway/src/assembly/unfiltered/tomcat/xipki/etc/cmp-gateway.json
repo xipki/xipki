@@ -21,53 +21,12 @@
 		"responsePbmOwf":"SHA256",
 		"responsePbmIterationCount":10240
 	},
-	// To activate the logging of requests and responses, set writer.level to DEBUG
-	// in the file META-INF/classes/log4j2.properties.
-	"logReqResp":true,
-	// valid values are NO, APACHE, NGINX, GENERAL
-	//"reverseProxyMode":"GENERAL",
 	// WARNING: Replace the dummy authenticator with your own.
 	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
-	"pop":{
-		"sigAlgos":[
-			"SHA256withRSA", "SHA256withECDSA", "SHA256withDSA",
-			"SM3withSM2", "ED25519", "ED448", "DHPOP-X25519", "DHPOP-X448"
-		]
-	},
-	"sdkClient":{
-		"serverUrl":"https://$[ca.host]:$[ca.https.port]/ca/ra/",
-		"ssl":{
-			"storeType":"pkcs12",
-			"keystorePassword":"CHANGEIT",
-			"keystore":{
-				"file":"keycerts/ra-sdk-client.p12"
-			},
-			"trustanchors": [{
-				"file":"keycerts/ca-server-cert.pem"
-			}],
-			// valid values: 'default' for standard verification, 'no_op' for no-operation, or
-			// 'java:'<class implements javax.net.ssl.HostnameVerifier>
-			"hostnameVerifier":"default"
-		}
-	},
-	"audit":{
-		"type":"embed",
-		"conf": "file=${sys:catalina.home}/logs/cmp-audit.log"
-	},
 	"signers":{
 		"default":{
 			"type":"pkcs12",
 			"conf":"password=$[gateway.https.keyPassword],keystore=file:keycerts/gateway-server.p12,algo=SHA256withECDSA"
 		}
-	},
-	"security":{
-		"keyStrongrandomEnabled":false,
-		"signStrongrandomEnabled":false,
-		"defaultSignerParallelism":10,
-		// pkcs11Conf if signes.signer.type is pkcs11
-		//"pkcs11Conf":{
-		//	"file":"security/pkcs11.json"
-		//},
-		"signerFactories":[]
 	}
 }

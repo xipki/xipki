@@ -1,7 +1,7 @@
 {
 	"sendRequestorCert":true,
 	"responder":{
-		"url":"http://$[gateway.host]:$[gateway.http.port]/cmp/",
+		"url":"http://$[gateway.host]:$[gateway.http.port]/gw/cmp/",
 		"pbmMac": {
 			"macAlgos":["HMAC-SHA256"],
 			"owfAlgos":["SHA256"]

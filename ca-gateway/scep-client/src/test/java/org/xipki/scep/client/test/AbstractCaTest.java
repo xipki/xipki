@@ -24,6 +24,7 @@ import org.xipki.scep.serveremulator.ScepServerContainer;
 import org.xipki.scep.transaction.CaCapability;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.security.X509Cert;
+import org.xipki.util.DefaultCurl;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -114,7 +115,7 @@ public abstract class AbstractCaTest {
   private void doTest(KeyPair keypair) throws Exception {
     CaIdentifier caId = new CaIdentifier("http://localhost:" + port + "/scep/pkiclient.exe", null);
     CaCertValidator caCertValidator = new CaCertValidator.PreprovisionedCaCertValidator(scepServer.getCaCert());
-    ScepClient client = new ScepClient(caId, caCertValidator);
+    ScepClient client = new ScepClient(caId, caCertValidator, new DefaultCurl());
 
     client.refresh();
 

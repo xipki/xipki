@@ -71,10 +71,10 @@ public class MyUtil {
   } // method issueSubCaCert
 
   public static PKCS10CertificationRequest generateRequest(
-      PrivateKey privatekey, SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
+      PrivateKey privateKey, SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
       String challengePassword, List<Extension> extensions)
       throws OperatorCreationException {
-    Args.notNull(privatekey, "privatekey");
+    Args.notNull(privateKey, "privateKey");
     Args.notNull(subjectPublicKeyInfo, "subjectPublicKeyInfo");
     Args.notNull(subjectDn, "subjectDn");
 
@@ -98,12 +98,12 @@ public class MyUtil {
 
     String sigAlgName;
     try {
-      sigAlgName = ScepUtil.getSignatureAlgName(privatekey, HashAlgo.SHA1);
+      sigAlgName = ScepUtil.getSignatureAlgName(privateKey, HashAlgo.SHA1);
     } catch (NoSuchAlgorithmException ex) {
       throw new OperatorCreationException(ex.getMessage(), ex);
     }
 
-    ContentSigner contentSigner = new JcaContentSignerBuilder(sigAlgName).setProvider("BC").build(privatekey);
+    ContentSigner contentSigner = new JcaContentSignerBuilder(sigAlgName).setProvider("BC").build(privateKey);
     return csrBuilder.build(contentSigner);
   } // method generateRequest
 

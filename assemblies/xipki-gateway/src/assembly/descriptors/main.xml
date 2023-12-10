@@ -8,12 +8,6 @@
   </formats>
   <fileSets>
     <fileSet>
-      <directory>${shared.dir}/license</directory>
-      <outputDirectory>license</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
       <directory>${project.build.directory}</directory>
       <outputDirectory>.</outputDirectory>
       <includes>
@@ -69,73 +63,20 @@
   </fileSets>
   <files>
     <file>
-      <source>../../CHANGELOG.md</source>
-      <outputDirectory>.</outputDirectory>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
       <source>README.md</source>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.build.directory}/webapps/acme-servlet3.war</source>
+      <source>${project.build.directory}/webapps/gateway-servlet3.war</source>
       <outputDirectory>tomcat8on/webapps</outputDirectory>
-      <destName>acme.war</destName>
+      <destName>gw.war</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.build.directory}/webapps/acme-servlet5.war</source>
+      <source>${project.build.directory}/webapps/gateway-servlet5.war</source>
       <outputDirectory>tomcat10on/webapps</outputDirectory>
-      <destName>acme.war</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${project.build.directory}/webapps/cmp-servlet3.war</source>
-      <outputDirectory>tomcat8on/webapps</outputDirectory>
-      <destName>cmp.war</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${project.build.directory}/webapps/cmp-servlet5.war</source>
-      <outputDirectory>tomcat10on/webapps</outputDirectory>
-      <destName>cmp.war</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${project.build.directory}/webapps/est-servlet3.war</source>
-      <outputDirectory>tomcat8on/webapps</outputDirectory>
-      <destName>est.war</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${project.build.directory}/webapps/est-servlet5.war</source>
-      <outputDirectory>tomcat10on/webapps</outputDirectory>
-      <destName>est.war</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${project.build.directory}/webapps/rest-servlet3.war</source>
-      <outputDirectory>tomcat8on/webapps</outputDirectory>
-      <destName>rest.war</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${project.build.directory}/webapps/rest-servlet5.war</source>
-      <outputDirectory>tomcat10on/webapps</outputDirectory>
-      <destName>rest.war</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${project.build.directory}/webapps/scep-servlet3.war</source>
-      <outputDirectory>tomcat8on/webapps</outputDirectory>
-      <destName>scep.war</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${project.build.directory}/webapps/scep-servlet5.war</source>
-      <outputDirectory>tomcat10on/webapps</outputDirectory>
-      <destName>scep.war</destName>
+      <destName>gw.war</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>

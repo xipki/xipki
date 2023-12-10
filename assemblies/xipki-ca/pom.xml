@@ -159,7 +159,7 @@
               </descriptors>
               <appendAssemblyId>false</appendAssemblyId>
               <!-- Don't install/publish the result -->
-              <attach>false</attach>
+              <!--attach>false</attach-->
             </configuration>
           </execution>
         </executions>

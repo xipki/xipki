@@ -98,7 +98,7 @@
         </SSLHostConfig>
     </Connector>
     -->
-    <Connector port="(ca.https.port)" protocol="org.xipki.tomcat.XiHttp11Nio2Protocol"
+    <Connector port="$[ca.https.port]" protocol="org.xipki.tomcat.XiHttp11Nio2Protocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
                connectionTimeout="4000">
       <SSLHostConfig

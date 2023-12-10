@@ -8,12 +8,6 @@
   </formats>
   <fileSets>
     <fileSet>
-      <directory>${shared.dir}/license</directory>
-      <outputDirectory>license</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
       <directory>${project.build.directory}</directory>
       <outputDirectory>.</outputDirectory>
       <includes>
@@ -61,11 +55,6 @@
   </fileSets>
   <files>
     <file>
-      <source>../../CHANGELOG.md</source>
-      <outputDirectory>.</outputDirectory>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
       <source>README.md</source>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
@@ -73,13 +62,13 @@
     <file>
       <source>${project.build.directory}/webapps/hsmproxy-servlet3.war</source>
       <outputDirectory>tomcat8on/webapps</outputDirectory>
-      <destName>hsmproxy.war</destName>
+      <destName>hp.war</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
       <source>${project.build.directory}/webapps/hsmproxy-servlet5.war</source>
       <outputDirectory>tomcat10on/webapps</outputDirectory>
-      <destName>hsmproxy.war</destName>
+      <destName>hp.war</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>

@@ -1,0 +1,105 @@
+{
+	"master":true,
+	// If you have more than one instances in master mode, set it to false.
+	"noLock":true,
+	// To activate the logging of requests and responses, set writer.level to DEBUG
+	// in the file META-INF/classes/log4j2.properties.
+	"logReqResp":true,
+	// valid values are NO, APACHE, NGINX, GENERAL
+	//"reverseProxyMode":"GENERAL",
+	// shard id, between 0 and 127. CA systems using same database must have
+	// different shard ids.
+	"shardId":0,
+	"caConfFiles": [
+		"etc/ca/ca-conf/ca-conf.json"
+	],
+	"datasources":[{
+		"name":"ca",
+		"conf":{
+			"file":"etc/ca/database/ca-db.properties"
+		}
+	},{
+		"name":"ocsp",
+		"conf":{
+			"file":"etc/ca/database/ocsp-db.properties"
+		}
+	}
+	//,{
+	//	"name":"keypool",
+	//	"conf":{
+	//		"file":"etc/ca/database/keypool-db.properties"
+	//	}
+	//}
+	],
+	"remoteMgmt":{
+		"enabled":true,
+		"certs":[
+			{
+				"file":"keycerts/ca-mgmt-client-cert.pem"
+			}
+		]
+	},
+	"certprofileFactories":[
+	],
+	"security":{
+		"keyStrongrandomEnabled":false,
+		"signStrongrandomEnabled":false,
+		"defaultSignerParallelism":100,
+		"pkcs11Conf":{
+			"file":"security/pkcs11.json"
+		},
+		"signerFactories": []
+	},
+	"audit": {
+		// type embed: use the embedded logging
+		// "conf":
+		// {
+		//    "size": "<integer><unit>",
+		//    "file": "<audit log file>"
+		// }
+		// The size unit is kb, mb and gb.
+		// If not present, file is set to logs/audit.log, and size to 10mb.
+
+		// type noop: no logging.
+		//  conf: n/a
+
+		// type file-mac: audit entries are chained, and each entry is MAC protected, saved in file
+		// "conf":
+		// {
+		//    "enc-interval": "<integer>",
+		//    "keyid": "<key-id>",
+		//    "password": "<password or its PBE encrypted form>",
+		//    "file": "<audit log file>"
+		//  }
+
+		// type database-mac: audit entries are chained, and each entry is MAC protected, saved in database
+		// "conf":
+		// {
+		//    "enc-interval": "<integer>",
+		//    "keyid": "<key-id>",
+		//    "password": "<password or its PBE encrypted form>",
+		//    "datasource": "<database conf file>"
+		//  }
+
+		// For types file-mac and database-mac, the enc-interval specifies the number of audit entries between writting
+		// an encrypted entry containing the last audit id.
+		// "conf":
+		// {
+		//   ... key value pairs ...
+		// }
+
+		// java:<name of class that implements org.xipki.audit.AuditService>
+		// conf: custom defined.
+
+		"type":"embed",
+		"conf":{
+			"file":"${sys:catalina.home}/logs/ca-audit.log"
+		}
+	}
+	//,"sslContexts":[{
+	//	"name":"ctlog1",
+	//	"trustanchors": [{
+	//		"file":"keycerts/ctlog-ca-cert.pem"
+	//	}]
+	//}]
+}
