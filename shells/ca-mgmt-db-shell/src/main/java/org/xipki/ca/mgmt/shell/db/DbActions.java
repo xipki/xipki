@@ -369,19 +369,18 @@ public class DbActions {
 
         scriptFile = expandFilepath(scriptFile);
         Path p = Paths.get(scriptFile);
-        if (!Files.exists(p)) {
-          if (!scriptFile.contains("." + type + ".")) {
-            // script file does not exist, try script file with database type identifier
-            String fn = p.getFileName().toString();
-            int idx = fn.lastIndexOf('.');
-            fn = fn.substring(0, idx) + "." + type + fn.substring(idx);
-            p = Paths.get(p.getParent().toString(), fn);
 
+        if (!Files.exists(p)) {
+          String fileName = p.getFileName().toString();
+          int idx = fileName.lastIndexOf('.');
+          fileName = fileName.substring(0, idx) + "." + type + fileName.substring(idx);
+          Path parentP = p.getParent();
+          p = parentP == null ? Paths.get(fileName) : Paths.get(parentP.toString(), fileName);
+          if (!Files.exists(p)) {
+            p = parentP == null ? Paths.get(type, fileName) : Paths.get(parentP.toString(), type, fileName);
             if (!Files.exists(p)) {
               throw new IllegalCmdParamException("Could not find script file " + scriptFile);
             }
-          } else {
-            throw new IllegalCmdParamException("Could not find script file " + scriptFile);
           }
         }
 
