@@ -2,10 +2,16 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 6.5.1
+## 6.5.2
 - Release date: 2023/mm/dd
 - All Components
   - Add script to customize host and port of tomcat instances, passwords, etc.
+  - Audit: use Map<String, String> instead String to configure audit.
+- Gateway
+  - Merge gateway wars to gateway.war.
+- MGMT-CLI (Management Client)
+  - Add demo scripts.
+  - Command ca:ca-info: prints also the associated publishers, profiles and requestors.
 
 ## 6.5.1
 - Release date: 2023/12/02
