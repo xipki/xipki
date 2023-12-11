@@ -18,7 +18,7 @@ fi
 # Please adapt the URL
 ## URL pattern: https://<host>:<port>/gw/rest/<CA-name>. To enroll certificate, the
 ## profile parameter shall be specified. e.g.
-## https://$[gateway.host]:$[gateway.https.port]co/gw/rest/$[ca.alias]/enroll-cert?profile=smime
+## https://$[gateway.host]:$[gateway.https.port]/gw/rest/$[ca.alias]/enroll-cert?profile=smime
 #
 CA_URL="https://$[gateway.host]:$[gateway.https.port]/gw/rest/$[ca.alias]"
 echo "CA URL: ${CA_URL}"
