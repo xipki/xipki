@@ -7,6 +7,9 @@ echo "|  - token-type:        p11, p12                                       |"
 echo "|  - CAcert-presence:   none, present                                  |"
 echo "+----------------------------------------------------------------------+"
 
+## Adapt me, HSM device capabilities
+hsm_keytypes = [ed25519 sm2 ec rsa dsa]
+
 keytypes = [ed448 ed25519 sm2 ec rsa dsa]; each ($keytypes) {
   keytype = $it
 
@@ -16,10 +19,20 @@ keytypes = [ed448 ed25519 sm2 ec rsa dsa]; each ($keytypes) {
     tokentypes = [p12 p11]; each ($tokentypes) {
       tokentype = $it
 
-      // Ed448 not supported in PKCS#1 devices
-      if { "$keytype" equals "ed448" && "$tokentype" equals "p11" } then {
-        echo "Skipping ed448 in p11 device."
-        continue;
+      if { "$tokentype" equals "p11" } then {
+        supported = "false"
+        each ($hsm_keytypes) {
+          hsm_keytype = $it
+          if { "$keytype" equals "$hsm_keytype" } then {
+            supported = "true"
+            break
+          }
+        }
+
+        if { "$supported" equals "false" } then {
+          echo "$keytype is not supported in the p11 device, skipping it"
+          continue
+        }
       }
 
       source xipki/ca-setup/demo/doDemo.script
