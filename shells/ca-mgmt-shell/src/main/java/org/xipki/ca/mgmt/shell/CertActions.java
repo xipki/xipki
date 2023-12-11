@@ -464,8 +464,9 @@ public class CertActions {
         return null;
       }
 
-      println("     |                    serial                |    notBefore   |    notAfter    | subject");
-      println("-----+------------------------------------------+----------------+----------------+-----------------");
+      println("     |                    serial                |    notBefore   |    notAfter    |         subject");
+      println("-----+------------------------------------------+----------------+----------------+" +
+          "---------------------------");
       for (int i = 0; i < n; i++) {
         println(format(i + 1, certInfos.get(i)));
       }
