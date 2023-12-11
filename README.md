@@ -64,7 +64,7 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
 * Hardware
   * Any available hardware (tested on Raspberry Pi 2 Model B with 900MHz quad-core ARM CPU and 1 GB Memory)
 * Servlet Container
-  * Tomcat 8, 9, 10
+  * Tomcat 8, 9, 10, 11
 * HSM Devices
   - [AWS CloudHSM](https://aws.amazon.com/cloudhsm)
   - [Nitrokey HSM 2](https://www.nitrokey.com/#comparison) / [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick)

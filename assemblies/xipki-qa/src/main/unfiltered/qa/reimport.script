@@ -106,8 +106,8 @@ ca:import-ca-certstore --in-dir output/dbexport-certstore/ca --password CHANGEIT
   --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties
 
 ## Restart the CA
-xi:exec '/tmp/xipki/ca-tomcat/bin/shutdown.sh'
-xi:exec '/tmp/xipki/ca-tomcat/bin/startup.sh'
+xi:exec $[tomcat.java.home] '/tmp/xipki/ca-tomcat/bin/shutdown.sh'
+xi:exec $[tomcat.java.home] '/tmp/xipki/ca-tomcat/bin/startup.sh'
 
 echo "Sleeping 2 seconds"
 sleep 2

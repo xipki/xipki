@@ -76,6 +76,24 @@
         // MGMT CLI
         "ca.mgmt.client.keyPassword": "CHANGEIT"
       }
+    },
+    {
+      "description": "tomcat.java.home",
+      "files": [
+        "qa/cab/lifecycle.script",
+        "qa/cab/template.ca-load.script",
+        "qa/eddsa/lifecycle.script",
+        "qa/eddsa/template.ca-load.script",
+        "qa/lifecycle.script",
+        "qa/no-caconf-db/test.script",
+        "qa/qa.d/scep-server.script",
+        "qa/qa.d/template.ca-load.script",
+        "qa/qa.d/template.ca.script",
+        "qa/reimport.script"
+      ],
+      "replacements": {
+        "tomcat.java.home": "--env JAVA_HOME=/tmp/jdk-tomcat"
+      }
     }
   ]
 }

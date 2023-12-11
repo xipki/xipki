@@ -78,8 +78,8 @@ if { $printUsage equals "true" } then {
     qa/eddsa/ca-load.script
 
   echo "Restart Gateway (tomcat) server!"
-  xi:exec '/tmp/xipki/gateway-tomcat/bin/shutdown.sh'
-  xi:exec '/tmp/xipki/gateway-tomcat/bin/startup.sh'
+  xi:exec $[tomcat.java.home] '/tmp/xipki/gateway-tomcat/bin/shutdown.sh'
+  xi:exec $[tomcat.java.home] '/tmp/xipki/gateway-tomcat/bin/startup.sh'
   sleep 5
 
   source file:./qa/eddsa/ca-load.script
