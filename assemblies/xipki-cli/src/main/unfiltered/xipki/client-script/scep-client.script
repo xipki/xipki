@@ -36,18 +36,18 @@ CN = scep-smime-${CUR_TIME}
 xi:rsa-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}.p12" \
   --subject "C=DE,O=myorg,E=info@myorg.com,CN=${CN}"
 
-xi:csr-p12  --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
-  --challenge-password user1:password1 \
-  --out ${OUT_DIR}/${CN}.csr
+xi:csr-p12 --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
+    -challenge-password user1:password1 \
+    -out ${OUT_DIR}/${CN}.csr
 
 echo "# Enroll certificate via PKCSReq"
 xi:scep-enroll --method pkcs --url ${SMIME_URL} --ca-cert ${CACERT} \
-  --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
-  --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der
+    -p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
+    -csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der
 
 echo "# Update the certificate in PKCS#12 file"
 xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
-  --cert ${OUT_DIR}/${CN}.der --ca-cert ${CACERT}
+    -cert ${OUT_DIR}/${CN}.der --ca-cert ${CACERT}
 
 # Enroll certificate of profile tls
 
@@ -57,9 +57,9 @@ CN = scep-tls-${CUR_TIME}
 
 # Must use the same CN as in the CSR
 xi:rsa-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}.p12" \
-  --subject "C=DE,O=myorg,CN=${CN}.myorg.org"
+    -subject "C=DE,O=myorg,CN=${CN}.myorg.org"
 
-xi:csr-p12  --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
+xi:csr-p12 --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
   --challenge-password user1:password1 \
   --subject "C=DE,O=myorg,CN=${CN}.myorg.org" --out ${OUT_DIR}/${CN}.csr
 
