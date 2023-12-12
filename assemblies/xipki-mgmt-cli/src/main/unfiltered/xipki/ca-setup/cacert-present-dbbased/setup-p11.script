@@ -20,20 +20,14 @@ if { "$1" equals "" } then {
   if { "$TOMCAT_DIR" equals "" } then {
     errMsg = "TOMCAT_DIR is not specified"
   } else {
-    list = [rsa ec dsa sm2 ed25519]; each ($list) {
-      if { "$KEY_TYPE" equals $it } then {
-        argsValid = "true"
-        break
-      }
-    }
-
+    argsValid = $([rsa ec dsa sm2 ed25519] contains $KEY_TYPE)
     if { "$argsValid" equals "false" } then {
       errMsg = "invalid KEY_TYPE $KEY_TYPE"
     }
   }
 }
 
-if { $argsValid equals "false" } then {
+if { "$argsValid" equals "false" } then {
   echo "$errMsg"
   echo ""
   printUsage = "true"
@@ -41,7 +35,7 @@ if { $argsValid equals "false" } then {
 
 THIS_DIR = xipki/ca-setup/cacert-present-dbbased
 
-if { $printUsage equals "true" } then {
+if { "$printUsage" equals "true" } then {
   echo "Usage: "
   echo ""
   echo "source ${THIS_DIR}/setup-p11.script <key type> <tomcat dir> [<xipki dir>]"

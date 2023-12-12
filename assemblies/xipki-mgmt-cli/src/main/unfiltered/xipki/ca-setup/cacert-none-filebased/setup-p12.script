@@ -24,20 +24,14 @@ if { "$1" equals "" } then {
   if { "$TOMCAT_DIR" equals "" } then {
     errMsg = "TOMCAT_DIR is not specified"
   } else {
-    list = [rsa ec dsa sm2 ed25519 ed448]; each ($list) {
-      if { "$KEY_TYPE" equals $it } then {
-        argsValid = "true"
-        break
-      }
-    }
-
+    argsValid = $([rsa ec dsa sm2 ed25519 ed448] contains $KEY_TYPE)
     if { "$argsValid" equals "false" } then {
       errMsg = "invalid KEY_TYPE $KEY_TYPE"
     }
   }
 }
 
-if { $argsValid equals "false" } then {
+if { "$argsValid" equals "false" } then {
   echo "$errMsg"
   echo ""
   printUsage = "true"
@@ -45,7 +39,7 @@ if { $argsValid equals "false" } then {
 
 THIS_DIR = xipki/ca-setup/cacert-none-filebased
 
-if { $printUsage equals "true" } then {
+if { "$printUsage" equals "true" } then {
   echo "Usage: "
   echo ""
   echo "source ${THIS_DIR}/setup-p11.script <key type> <tomcat dir> [<xipki dir>]"
@@ -101,8 +95,10 @@ if { $printUsage equals "true" } then {
     ${CONF_FILE}
 
   xi:mkdir ${TARGET_DIR}/keycerts
-  xi:copy-file ${CA_P12} ${TARGET_DIR}/keycerts
-  xi:copy-file xipki/keycerts/ra-sdk-client-cert.pem ${TARGET_DIR}/keycerts
+  xi:copy-file ${CA_P12} \
+    xipki/keycerts/ra-sdk-client-cert.pem \
+    ${TARGET_DIR}/keycerts
+
   xi:copy-dir xipki/ca-setup/certprofile ${TARGET_DIR}/certprofile
 
   xi:rm -r ${XIPKI_DIR}/etc/ca/ca-conf

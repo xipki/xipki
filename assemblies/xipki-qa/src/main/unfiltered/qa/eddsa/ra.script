@@ -5,15 +5,14 @@ echo "#################################################################"
 list = [ "2" "3" "4" ]
 each ($list) {
   xi:ec-p12 --curve ed25519 --password CHANGEIT --out output/ed25519-${it}.p12
-  xi:ec-p12 --curve x25519   --password CHANGEIT --out output/x25519-${it}.p12
+  xi:ec-p12 --curve x25519  --password CHANGEIT --out output/x25519-${it}.p12
   xi:ec-p12 --curve ed448   --password CHANGEIT --out output/ed448-${it}.p12
-  xi:ec-p12 --curve x448     --password CHANGEIT --out output/x448-${it}.p12
+  xi:ec-p12 --curve x448    --password CHANGEIT --out output/x448-${it}.p12
 }
 
 # Enroll Certificate (CA generate keypair)
 
-list = [ ed25519 ed448 x25519 x448 ]
-each ($list) {
+list = [ ed25519 ed448 x25519 x448 ]; each ($list) {
   type = $it
 
   xi:cmp-enroll-serverkeygen --ca subca \
@@ -21,7 +20,6 @@ each ($list) {
     --cert-out output/${type}-1.crt --profile ${type} \
     --subject "C=DE,CN=${type}-1.myorg.org" \
     --signer-password CHANGEIT --signer-p12 xipki/keycerts/cmp-client.p12
-
 
   xi:update-cert-p12 --p12 output/${type}-1.p12 --password CHANGEIT \
     --cert output/${type}-1.crt \
@@ -31,8 +29,7 @@ each ($list) {
 
 # Certificate (via CMP)
 
-list = [ ed25519 ed448 x25519 x448 ]
-each ($list) {
+list = [ ed25519 ed448 x25519 x448 ]; each ($list) {
   type = $it
 
   xi:cmp-enroll-p12 --ca subca \
@@ -49,8 +46,7 @@ each ($list) {
 
 # Certificate (via CSR)
 
-list = [ ed25519 ed448 ]
-each ($list) {
+list = [ ed25519 ed448 ]; each ($list) {
   type = $it
 
   xi:csr-p12 \
@@ -59,8 +55,7 @@ each ($list) {
     --out output/${type}-3.csr
 }
 
-list = [ x25519 x448 ]
-each ($list) {
+list = [ x25519 x448 ]; each ($list) {
   type = $it
 
   xi:csr-p12 \
@@ -70,8 +65,7 @@ each ($list) {
     --out output/${type}-3.csr
 }
 
-list = [ ed25519 ed448 x25519 x448 ]
-each ($list) {
+list = [ ed25519 ed448 x25519 x448 ]; each ($list) {
   type = $it
 
   xi:cmp-csr-enroll --ca subca --csr output/${type}-3.csr \
@@ -97,8 +91,7 @@ echo "REST DH POP certificates"
 
 xi:curl --out output/dhpop-certs.pem $BASE_URL/dh-pop-certs
 
-list = [ ed25519 ed448 ]
-each ($list) {
+list = [ ed25519 ed448 ]; each ($list) {
   type = $it
 
   xi:csr-p12 \
@@ -107,8 +100,7 @@ each ($list) {
     --out output/${type}-4.csr
 }
 
-list = [ x25519 x448 ]
-each ($list) {
+list = [ x25519 x448 ]; each ($list) {
   type = $it
 
   xi:csr-p12 \
@@ -118,8 +110,7 @@ each ($list) {
     --out output/${type}-4.csr
 }
 
-list = [ ed25519 ed448 x25519 x448 ]
-each ($list) {
+list = [ ed25519 ed448 x25519 x448 ]; each ($list) {
   type = $it
 
   xi:curl --out output/${type}-4.crt \

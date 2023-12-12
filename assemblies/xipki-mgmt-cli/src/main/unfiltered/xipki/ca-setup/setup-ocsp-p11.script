@@ -19,21 +19,16 @@ if { "$1" equals "" } then {
   argsValid = "true"
 } else {
   keytype = $1
-  list = [rsa dsa ec sm2 ed25519]; each ($list) {
-    if { "$keytype" equals $it } then {
-      argsValid = "true"
-      break
-    }
-  }
+  argsValid = $([rsa ec dsa sm2 ed25519] contains $keytype)
 }
 
- if { "$argsValid" equals "false" } then {
-   printUsage = "true"
- }
+if { "$argsValid" equals "false" } then {
+  printUsage = "true"
+}
 
- echo "key type: $keytype"
+echo "key type: $keytype"
 
-if { $printUsage equals "true" } then {
+if { "$printUsage" equals "true" } then {
   echo "Usage: "
   echo ""
   echo "source file:./xipki/ocsp/setup-ocsp-p11.script <key type>"

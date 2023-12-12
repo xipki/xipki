@@ -11,22 +11,17 @@ if { "$1" equals "" } then {
     printUsage = "true"
     argsValid = "true"
   } else {
-    list = [enroll ocsp]; each ($list) {
-      if { "$action" equals $it } then {
-        argsValid = "true"
-        break
-      }
-    }
+    argsValid = $([enroll ocsp] contains $action)
   }
 }
 
-if { $argsValid equals "false" } then {
+if { "$argsValid" equals "false" } then {
   echo "invalid arguments $args"
   echo ""
   printUsage = "true"
 }
 
-if { $printUsage equals "true" } then {
+if { "$printUsage" equals "true" } then {
   echo "Usage: "
   echo ""
   echo "source file:./qa/benchmark.script <test type> [<durataion> [<threads>]]"

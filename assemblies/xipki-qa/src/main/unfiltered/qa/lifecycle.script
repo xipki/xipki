@@ -23,93 +23,46 @@ if { "$1" equals "" } then {
     KEYSPEC = $5
   }
 
-  list = [pkcs11 pkcs12]; each ($list) {
-    if { "$TOKEN_TYPE" equals $it } then {
-      argsValid = "true"
-      break
-    }
-  }
+  argsValid = $([pkcs11 pkcs12] contains $TOKEN_TYPE)
 
   if { "$argsValid" equals "false" } then {
     errMsg = "invalid TOKEN_TYPE $TOKEN_TYPE"
   } else {
-    argsValid = "false"
-
-    list = [rsa rsapss ec plainec dsa sm2]; each ($list) {
-      if { "$SIG_TYPE" equals $it } then {
-        argsValid = "true"
-        break
-      }
+    argsValid = $([rsa rsapss ec plainec dsa sm2] contains $SIG_TYPE)
+    if { "$argsValid" equals "false" } then {
+      errMsg = "invalid SIG_TYPE $SIG_TYPE"
     }
   }
 
-  if { "$argsValid" equals "false" } then {
-    errMsg = "invalid SIG_TYPE $SIG_TYPE"
-  } else {
+  if { "$argsValid" equals "true" } then {
     argsValid = "false"
-
     if { "$SIG_TYPE" equals "plainec" } then {
-      list = [sha1 sha256 sha384 sha512]; each ($list) {
-        if { "$HASH" equals $it } then {
-          argsValid = "true"
-          break
-        }
-      }
-
-      if { "$argsValid" equals "false" } then {
-        errMsg = "invalid combination $HASH and $SIG_TYPE"
-      }
+      argsValid = $([sha1 sha256 sha384 sha512] contains $HASH)
     } elif { "$SIG_TYPE" equals "sm2" } then {
-      list = [sm3]; each ($list) {
-        if { "$HASH" equals $it } then {
-          argsValid = "true"
-          break
-        }
-      }
-
-      if { "$argsValid" equals "false" } then {
-        errMsg = "invalid combination $HASH and $SIG_TYPE"
-      }
+      argsValid = $([sm3] contains $HASH)
     } elif { "$SIG_TYPE" equals "rsa" } then {
-      list = [sha1 sha256 sha384 sha512 sha3-224 sha3-256 sha3-384 sha3-512]; each ($list) {
-        if { "$HASH" equals $it } then {
-          argsValid = "true"
-          break
-        }
-      }
+      argsValid = $([sha1 sha256 sha384 sha512 sha3-224 sha3-256 sha3-384 sha3-512] contains $HASH)
     } elif { "$SIG_TYPE" equals "dsa" } then {
-      list = [sha1 sha256 sha384 sha512 sha3-224 sha3-256 sha3-384 sha3-512]; each ($list) {
-        if { "$HASH" equals $it } then {
-          argsValid = "true"
-          break
-        }
-      }
+      argsValid = $([sha1 sha256 sha384 sha512 sha3-224 sha3-256 sha3-384 sha3-512] contains $HASH)
     } else {
-    # ec and rsapss
-      list = [sha1 sha256 sha384 sha512 sha3-224 sha3-256 sha3-384 sha3-512 shake128 shake256]; each ($list) {
-        if { "$HASH" equals $it } then {
-          argsValid = "true"
-          break
-        }
-      }
+      # ec and rsapss
+      argsValid = $([sha1 sha256 sha384 sha512 sha3-224 sha3-256 sha3-384 sha3-512 shake128 shake256] contains $HASH)
     }
 
     if { "$argsValid" equals "false" } then {
-      if { "$errMsg" equals ""} then {
-        errMsg = "invalid HASH $HASH"
-      }
+      errMsg = "invalid HASH $HASH"
     }
 
   }
 }
 
-if { $argsValid equals "false" } then {
+if { "$argsValid" equals "false" } then {
   echo "$errMsg"
   echo ""
   printUsage = "true"
 }
 
-if { $printUsage equals "true" } then {
+if { "$printUsage" equals "true" } then {
   echo "Usage: "
   echo ""
   echo "source file:./qa/lifecycle.script [option] <outform> <hash algo> <token type> <signature type> [<keyspec>]"
@@ -163,12 +116,8 @@ if { $printUsage equals "true" } then {
   }
 
   xi:replace --old "REPLACEME-DSAPLAIN" --new "${dsaPlain}" \
-    qa/qa.d/ca-load.script
-
-  xi:replace --old "REPLACEME-DSAPLAIN" --new "${dsaPlain}" \
-    qa/qa.d/ca.script
-
-  xi:replace --old "REPLACEME-DSAPLAIN" --new "${dsaPlain}" \
+    qa/qa.d/ca-load.script \
+    qa/qa.d/ca.script \
     qa/qa.d/ra.script
 
   rsaPss = ""
@@ -177,18 +126,10 @@ if { $printUsage equals "true" } then {
   }
 
   xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
-    qa/qa.d/ca-load.script
-
-  xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
-    qa/rest0.script
-
-  xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
-    qa/est0.script
-
-  xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
-    qa/qa.d/ca.script
-
-  xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
+    qa/qa.d/ca-load.script \
+    qa/rest0.script \
+    qa/est0.script \
+    qa/qa.d/ca.script \
     qa/qa.d/ra.script
 
   if { "$1" equals "-l" } then {

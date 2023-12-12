@@ -1,3 +1,5 @@
+WAIT_TOMCAT_START_TIME = 3
+
 echo "+---------------------------------------------------------------+"
 echo "|  - key-type:          $keytype"
 echo "|  - caconf-store-type: $storetype"
@@ -66,6 +68,9 @@ xi:exec "${GW_TOMCAT_DIR}/bin/shutdown.sh"
 xi:exec "${GW_TOMCAT_DIR}/bin/startup.sh"
 
 // copy the key and certificate
+xi:rm --force xipki/ocsp-setup/keycerts/ocsp1.crt \
+  xipki/ocsp-setup/keycerts/ocsp1.p12
+
 if { "$tokentype" equals "p11" } then {
   xi:delete-key-p11 --slot 0 --label ocsp1 --force
   source xipki/ca-setup/setup-ocsp-p11.script $keytype
@@ -93,7 +98,7 @@ each ($ocspdbtypes) {
         ${CA_TOMCAT_DIR}/xipki/etc/ca/ca.json
     xi:exec "${CA_TOMCAT_DIR}/bin/shutdown.sh"
     xi:exec "${CA_TOMCAT_DIR}/bin/startup.sh"
-    sleep 5
+    sleep $WAIT_TOMCAT_START_TIME
 
     echo "Add OCSP publisher to CA"
     ca:publisher-add --name ocsp-publisher --type ocsp  --conf datasource=ocsp,publish.goodcerts=true
@@ -117,7 +122,7 @@ each ($ocspdbtypes) {
   echo "start OCSP server"
   xi:exec "${OCSP_TOMCAT_DIR}/bin/shutdown.sh"
   xi:exec "${OCSP_TOMCAT_DIR}/bin/startup.sh"
-  sleep 5
+  sleep $WAIT_TOMCAT_START_TIME
 
   OUT_ROOT = demo-rest
   xi:rm --force --recursive $OUT_ROOT

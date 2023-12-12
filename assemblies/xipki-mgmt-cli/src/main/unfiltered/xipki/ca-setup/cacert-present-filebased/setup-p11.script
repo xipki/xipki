@@ -21,13 +21,7 @@ if { "$1" equals "" } then {
   if { "$TOMCAT_DIR" equals "" } then {
     errMsg = "TOMCAT_DIR is not specified"
   } else {
-    list = [rsa ec dsa sm2 ed25519]; each ($list) {
-      if { "$KEY_TYPE" equals $it } then {
-        argsValid = "true"
-        break
-      }
-    }
-
+    argsValid = $([rsa ec dsa sm2 ed25519] contains $KEY_TYPE)
     if { "$argsValid" equals "false" } then {
       errMsg = "invalid KEY_TYPE $KEY_TYPE"
     }
@@ -91,8 +85,10 @@ if { $printUsage equals "true" } then {
     --new "algo=${SIG_ALG},slot=${SLOT},key-label=${LABEL}" ${CONF_FILE}
 
   xi:mkdir ${TARGET_DIR}/keycerts
-  xi:copy-file ${CA_CERT} ${TARGET_DIR}/keycerts
-  xi:copy-file xipki/keycerts/ra-sdk-client-cert.pem ${TARGET_DIR}/keycerts
+  xi:copy-file ${CA_CERT} \
+    xipki/keycerts/ra-sdk-client-cert.pem \
+    ${TARGET_DIR}/keycerts
+
   xi:copy-dir xipki/ca-setup/certprofile ${TARGET_DIR}/certprofile
 
   xi:rm -r ${XIPKI_DIR}/etc/ca/ca-conf

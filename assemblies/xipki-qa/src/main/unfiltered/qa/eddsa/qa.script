@@ -6,8 +6,7 @@ caqa:init
 
 echo "Generate missing CSR files"
 
-list = [ ed25519 ed448 ]
-each ($list) {
+list = [ ed25519 ed448 ]; each ($list) {
   type = $it
 
   xi:csr-p12 \
@@ -21,8 +20,7 @@ each ($list) {
     --out output/${type}-2.csr
  }
 
-list = [ x25519 x448 ]
-each ($list) {
+list = [ x25519 x448 ]; each ($list) {
   type = $it
 
   xi:csr-p12 \
@@ -42,8 +40,7 @@ caqa:check-cert --issuer rootca --profile subca \
   --csr output/subca1.csr --cert output/subca1.crt
 
 #####
-list = [ ed25519 ed448 x25519 x448 ]
-each ($list) {
+list = [ ed25519 ed448 x25519 x448 ]; each ($list) {
  type = $it
 
  caqa:check-cert --issuer ed-subca --profile ${type} \

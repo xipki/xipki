@@ -13,39 +13,18 @@ if { "$1" equals "" } then {
   TOKEN_TYPE = $2
   SIG_TYPE = $3
   KEYSPEC = $4
-
-  list = [pkcs11 pkcs12]; each ($list) {
-    if { "$TOKEN_TYPE" equals $it } then {
-      argsValid = "true"
-      break
-    }
-  }
+  argsValid = $([pkcs11 pkcs12] contains $TOKEN_TYPE)
 
   if { "$argsValid" equals "false" } then {
     errMsg = "invalid TOKEN_TYPE $TOKEN_TYPE"
   } else {
-    argsValid = "false"
-
-    list = [rsa rsapss ec dsa]; each ($list) {
-      if { "$SIG_TYPE" equals $it } then {
-        argsValid = "true"
-        break
-      }
-    }
+    argsValid = $([rsa rsapss ec dsa] contains $SIG_TYPE)
   }
 
   if { "$argsValid" equals "false" } then {
     errMsg = "invalid SIG_TYPE $SIG_TYPE"
   } else {
-    argsValid = "false"
-
-    list = [sha256 sha384 sha512]; each ($list) {
-      if { "$HASH" equals $it } then {
-        argsValid = "true"
-        break
-      }
-    }
-
+    argsValid = $([sha256 sha384 sha512] contains $HASH)
     if { "$argsValid" equals "false" } then {
       if { "$errMsg" equals ""} then {
         errMsg = "invalid HASH $HASH"
@@ -90,9 +69,7 @@ if { $printUsage equals "true" } then {
   }
 
   xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
-    qa/cab/ca-load.script
-
-  xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
+    qa/cab/ca-load.script \
     qa/cab/ra.script
 
   xi:exec $[tomcat.java.home] '/tmp/xipki/ca-tomcat/bin/shutdown.sh'
