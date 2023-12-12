@@ -54,12 +54,14 @@
 	"audit":{
 		// embed: use the embedded slf4j logging
 		// file-mac: audit entries are chained, and each entry is MAC protected, saved in file
-		//   conf: key=<hex-encoded key or its PBE encrypted form>,file=<log file>,
+		//	 conf: key=<hex-encoded key or its PBE encrypted form>,file=<log file>,
 		// database-mac: audit entries are chained, and each entry is MAC protected, saved in file
-		//   conf: key=<hex-encoded key or its PBE encrypted form>,datasource=<database conf file>
+		//	 conf: key=<hex-encoded key or its PBE encrypted form>,datasource=<database conf file>
 		// java:<name of class that implements org.xipki.audit.AuditService>
 		"type":"embed",
-		"conf": "file=${sys:catalina.home}/logs/ca-audit.log"
+		"conf":{
+			"file":"${sys:catalina.home}/logs/ca-audit.log"
+		}
 	},
 	"sslContexts":[{
 		"name":"ctlog1",
@@ -68,6 +70,6 @@
 		}]
 	}],
 	"ctLog":{
-	    "keydir":"ctlog"
+		"keydir":"ctlog"
 	}
 }

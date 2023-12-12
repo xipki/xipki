@@ -1,5 +1,5 @@
 {
-    "basedir":"APP_DIR",
+	"basedir":"APP_DIR",
 	"properties":{
 		"ca.signerConf":"REPLACEME-CA_SIGNERCONF",
 		"keycerts.dir":"xipki/keycerts",

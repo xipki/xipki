@@ -13,13 +13,15 @@
 		}
 	}],
 	"publishers":[
-//	      {
-//	        "name":"ocsp-publisher",
-//	        "type":"ocsp",
-//	        "conf":{
-//	            "value":"datasource=ocsp,publish.goodcerts=true"
-//	        }
-//        }
+	/*
+		{
+			"name":"ocsp-publisher",
+			"type":"ocsp",
+			"conf":{
+				"value":"datasource=ocsp,publish.goodcerts=true"
+			}
+		}
+		*/
 	],
 	"profiles":[{
 		"name":"scep",
@@ -114,7 +116,7 @@
 			"tls-sm2-enc"
 		],
 		"publishers":[
-//	        "ocsp-publisher"
+			// "ocsp-publisher"
 		],
 		"requestors":[{
 			"requestorName":"requestor1",

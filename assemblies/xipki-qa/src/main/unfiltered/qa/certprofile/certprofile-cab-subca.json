@@ -9,7 +9,16 @@
 	"maxSize":4500,
 	"validity":"8y",
 	"notBeforeTime":"current",
-	"signatureAlgorithms":["SHA512withRSA","SHA384withRSA","SHA256withRSA","SHA512withDSA","SHA384withDSA","SHA256withDSA","SHA512withECDSA","SHA384withECDSA","SHA256withECDSA","SHA512withRSAandMGF1","SHA384withRSAandMGF1","SHA256withRSAandMGF1"],
+	"signatureAlgorithms":[
+		// RSA
+		"SHA512withRSA","SHA384withRSA","SHA256withRSA",
+		// DSA
+		"SHA512withDSA","SHA384withDSA","SHA256withDSA",
+		// ECDSA
+		"SHA512withECDSA","SHA384withECDSA","SHA256withECDSA",
+		// RSA-PSS
+		"SHA512withRSAandMGF1","SHA384withRSAandMGF1","SHA256withRSAandMGF1"
+	],
 	"keyAlgorithms":[{
 		"algorithms":[{
 			"oid":"1.2.840.113549.1.1.1",

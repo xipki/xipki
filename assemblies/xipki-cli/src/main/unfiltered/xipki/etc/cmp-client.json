@@ -18,8 +18,10 @@
 		// valid values: 'default' for standard verification, 'no_op' for no-operation, or
 		// 'java:'<class implements javax.net.ssl.HostnameVerifier>
 		"hostnameVerifier":"default",
-		"trustanchors":[{
-			"file":"xipki/keycerts/gateway-server-cert.pem"
-		}]
+		"trustanchors":[
+			{
+				"file":"xipki/keycerts/gateway-server-cert.pem"
+			}
+		]
 	}
 }

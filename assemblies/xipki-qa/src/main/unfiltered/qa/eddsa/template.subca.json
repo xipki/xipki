@@ -1,5 +1,5 @@
 {
-    "basedir":"APP_DIR",
+	"basedir":"APP_DIR",
 	"properties":{
 		"token.type":"REPLACEME-TOKEN_TYPE",
 		"ca.signerConf": "REPLACEME-CA_SIGNERCONF"

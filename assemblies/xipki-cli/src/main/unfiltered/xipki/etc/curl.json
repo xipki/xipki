@@ -1,56 +1,64 @@
 {
-  "hostConfs": [
-    {
-      "urlPattern": ["*:*/gw/cmp","*:*/cmp"],
-      "sslContext": {
-        "storeType": "PKCS12",
-        "keystore": {
-          "file": "xipki/keycerts/cmp-client.p12"
-        },
-        "keystorePassword": "$[cmp.client.keyPassword]",
-        // Valid values are 'no_op', 'default' or java:<class name>. Default to 'default'
-        "hostnameVerifier": "default",
-        "trustanchors":[{
-          "file": "xipki/keycerts/gateway-server-cert.pem"
-        }]
-      }
-    }, {
-      "urlPattern": ["*:*/.well-known/est", "*:*/gw/est", "*:*/est"],
-      "sslContext": {
-        "storeType": "PKCS12",
-        "keystore": {
-          "file": "xipki/keycerts/est-client.p12"
-        },
-        "keystorePassword": "$[est.client.keyPassword]",
-        // Valid values are 'no_op', 'default' or java:<class name>. Default to 'default'
-        "hostnameVerifier": "default",
-        "trustanchors": [{
-          "file": "xipki/keycerts/gateway-server-cert.pem"
-        }]
-      }
-    }, {
-      "urlPattern": ["*:*/gw/rest", "*:*/rest"],
-      "sslContext": {
-        "storeType": "PKCS12",
-        "keystore": {
-          "file": "xipki/keycerts/rest-client.p12"
-        },
-        "keystorePassword":  "$[rest.client.keyPassword]",
-        // Valid values are 'no_op', 'default' or java:<class name>. Default to 'default'
-        "hostnameVerifier":"default",
-        "trustanchors": [{
-          "file": "xipki/keycerts/gateway-server-cert.pem"
-        }]
-      }
-    }, {
-      "urlPattern": ["*:*/gw/scep", "*:*/scep"],
-      "sslContext": {
-        // Valid values are 'no_op', 'default' or java:<class name>. Default to 'default'
-        "hostnameVerifier": "default",
-        "trustanchors":[{
-          "file": "xipki/keycerts/gateway-server-cert.pem"
-        }]
-      }
-    }
-  ]
+	"hostConfs": [
+		{
+			"urlPattern": ["*:*/gw/cmp","*:*/cmp"],
+			"sslContext": {
+				"storeType": "PKCS12",
+				"keystore": {
+					"file": "xipki/keycerts/cmp-client.p12"
+				},
+				"keystorePassword": "$[cmp.client.keyPassword]",
+				// Valid values are 'no_op', 'default' or java:<class name>. Default to 'default'
+				"hostnameVerifier": "default",
+				"trustanchors":[
+					{
+						"file": "xipki/keycerts/gateway-server-cert.pem"
+					}
+				]
+			}
+		}, {
+			"urlPattern": ["*:*/.well-known/est", "*:*/gw/est", "*:*/est"],
+			"sslContext": {
+				"storeType": "PKCS12",
+				"keystore": {
+					"file": "xipki/keycerts/est-client.p12"
+				},
+				"keystorePassword": "$[est.client.keyPassword]",
+				// Valid values are 'no_op', 'default' or java:<class name>. Default to 'default'
+				"hostnameVerifier": "default",
+				"trustanchors": [
+					{
+						"file": "xipki/keycerts/gateway-server-cert.pem"
+					}
+				]
+			}
+		}, {
+			"urlPattern": ["*:*/gw/rest", "*:*/rest"],
+			"sslContext": {
+				"storeType": "PKCS12",
+				"keystore": {
+					"file": "xipki/keycerts/rest-client.p12"
+				},
+				"keystorePassword":	"$[rest.client.keyPassword]",
+				// Valid values are 'no_op', 'default' or java:<class name>. Default to 'default'
+				"hostnameVerifier":"default",
+				"trustanchors": [
+					{
+						"file": "xipki/keycerts/gateway-server-cert.pem"
+					}
+				]
+			}
+		}, {
+			"urlPattern": ["*:*/gw/scep", "*:*/scep"],
+			"sslContext": {
+				// Valid values are 'no_op', 'default' or java:<class name>. Default to 'default'
+				"hostnameVerifier": "default",
+				"trustanchors":[
+					{
+						"file": "xipki/keycerts/gateway-server-cert.pem"
+					}
+				]
+			}
+		}
+	]
 }
