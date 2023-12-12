@@ -60,12 +60,8 @@ if { "$printUsage" equals "true" } then {
     xipki/etc/ocsp/ocsp-responder.json
 
   xi:replace --old "REPLACEME-TOKENTYPE" --new "PKCS12" \
-    xipki/etc/ocsp/ocsp-responder.json
-
-  xi:replace --old "REPLACEME-TOKENKEY" --new "password=CHANGEIT,keystore=file:keycerts/ocsp99.p12" \
-    xipki/etc/ocsp/ocsp-responder.json
-
-  xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
+    --old "REPLACEME-TOKENKEY" --new "password=CHANGEIT,keystore=file:keycerts/ocsp99.p12" \
+    --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
     xipki/etc/ocsp/ocsp-responder.json
 
   xi:copy-file -f qa/eddsa/template.ca-load.script \

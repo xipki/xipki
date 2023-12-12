@@ -19,12 +19,8 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 xi:copy-file -f qa/eddsa/template.rootca.json qa/eddsa/rootca.json
 
 xi:replace --old "REPLACEME-SUBJECT" --new "C=DE,O=myorg,CN=rootca1" \
-  qa/eddsa/rootca.json
-
-xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
-  qa/eddsa/rootca.json
-
-xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
+  --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
+  --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
   qa/eddsa/rootca.json
 
 ca:load-conf qa/eddsa/rootca.json
@@ -71,9 +67,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 xi:copy-file -f qa/eddsa/template.subca.json qa/eddsa/subca.json
 
 xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
-  qa/eddsa/subca.json
-
-xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
+  --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
   qa/eddsa/subca.json
 
 ca:load-conf qa/eddsa/subca.json

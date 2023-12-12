@@ -77,12 +77,10 @@ if { $printUsage equals "true" } then {
 
   xi:copy-file -f ${THIS_DIR}/template.ca-conf.json ${CONF_FILE}
 
-  xi:replace --old "REPLACEME-SUBJECT" --new "${CA_SUBJECT}" ${CONF_FILE}
-
-  xi:replace --old "REPLACEME-TOKEN_TYPE" --new "pkcs11" ${CONF_FILE}
-
-  xi:replace --old "REPLACEME-CA_SIGNERCONF" \
-    --new "algo=${SIG_ALG},slot=${SLOT},key-label=${LABEL}" ${CONF_FILE}
+  xi:replace --old "REPLACEME-SUBJECT" --new "${CA_SUBJECT}" \
+    --old "REPLACEME-TOKEN_TYPE" --new "pkcs11" \
+    --old "REPLACEME-CA_SIGNERCONF" --new "algo=${SIG_ALG},slot=${SLOT},key-label=${LABEL}" \
+    ${CONF_FILE}
 
   xi:mkdir ${TARGET_DIR}/keycerts
   xi:copy-file ${CA_CERT} \

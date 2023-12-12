@@ -18,15 +18,9 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 xi:copy-file -f qa/cab/template.rootca.json qa/cab/rootca.json
 
 xi:replace --old "REPLACEME-SUBJECT" --new "C=DE,O=myorg,CN=rootca1" \
-  qa/cab/rootca.json
-
-xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
-  qa/cab/rootca.json
-
-xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
-  qa/cab/rootca.json
-
-xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
+  --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
+  --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
+  --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
   qa/cab/rootca.json
 
 ca:load-conf qa/cab/rootca.json
@@ -73,12 +67,8 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 xi:copy-file -f qa/cab/template.subca.json qa/cab/subca.json
 
 xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
-  qa/cab/subca.json
-
-xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
-  qa/cab/subca.json
-
-xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
+  --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
+  --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
   qa/cab/subca.json
 
 ca:load-conf qa/cab/subca.json

@@ -87,12 +87,8 @@ if { "$printUsage" equals "true" } then {
     xipki/etc/ocsp/ocsp-responder.json
 
   xi:replace --old "REPLACEME-TOKENTYPE" --new "$TOKEN_TYPE" \
-    xipki/etc/ocsp/ocsp-responder.json
-
-  xi:replace --old "REPLACEME-TOKENKEY" --new "$OCSP_KEYCONF" \
-    xipki/etc/ocsp/ocsp-responder.json
-
-  xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
+    --old "REPLACEME-TOKENKEY" --new "$OCSP_KEYCONF" \
+    --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
     xipki/etc/ocsp/ocsp-responder.json
 
   ## Prepare scripts

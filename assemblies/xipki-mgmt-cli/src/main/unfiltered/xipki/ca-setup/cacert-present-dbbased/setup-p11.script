@@ -67,10 +67,8 @@ if { "$printUsage" equals "true" } then {
 
   xi:copy-file -f ${THIS_DIR}/template.ca-conf.json ${CONF_FILE}
 
-  xi:replace --old "REPLACEME-TOKEN_TYPE" --new "PKCS11" ${CONF_FILE}
-
-  xi:replace --old "REPLACEME-CA_SIGNERCONF" \
-    --new "algo=${SIG_ALG},slot=${SLOT},key-label=${LABEL}" \
+  xi:replace --old "REPLACEME-TOKEN_TYPE" --new "PKCS11" \
+    --old "REPLACEME-CA_SIGNERCONF" --new "algo=${SIG_ALG},slot=${SLOT},key-label=${LABEL}" \
     ${CONF_FILE}
 
   ## init databases
