@@ -118,9 +118,11 @@
 	,
 	"sslContexts":[{
 		"name":"ctlog1",
-		"trustanchors": [{
-			"file":"keycerts/ctlog-ca-cert.pem"
-		}]
+		"trustanchors": [
+			{
+				"file":"keycerts/ctlog-ca-cert.pem"
+			}
+		]
 	}]
 	*/
 }
