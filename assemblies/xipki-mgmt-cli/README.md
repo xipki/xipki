@@ -27,20 +27,21 @@ Please refer to [commands.md](commands.md) for more details.
   `bin/karaf`
 
 * Setup CA (MGMT-CLI shall be on the same machine as the tomcat CA server)  
-    `source xipki/ca-setup/<folder>/setup-{p11|p12}.script {rsa|ec|dsa|sm2|eddsa} <tomcat-dir> [<xipki-dir>]`,  
+  Edit (e.g. subject and password) and execcute the script file `xipki/ca-setup/<folder>/setup-{p11|p12}.script` 
+  `source <script-file> {rsa|ec|dsa|sm2|eddsa} <tomcat-dir> [<xipki-dir>]`,  
   `xipki-dir` is optional and has default value `<tomca-dir>/xipki`.
   And `<folder>` is:
-    * If the CA configuration is saved in the database (2 database instances are needed, 
+  * If the CA configuration is saved in the database (2 database instances are needed, 
       as specified in `caconf-db.properties` and `ca-db.properties`):
-      * In case of using new keys and certificates, in the Management CLI:  
+      * In case of using new keys and certificates:  
         `cacert-none-dbbased`
-      * In case of using existing keys and certificates, in the Management CLI:  
+      * In case of using existing keys and certificates:  
         `cacert-present-dbbased`
   * If the CA configuration is read from configuration files (CA itself is not configurable, only 1
     database instance is needed, as specified in `ca-db.properties`):
-      * In case of using new keys and certificates, in the Management CLI:  
+      * In case of using new keys and certificates:  
         `cacert-none-filebased`
-      * In case of using existing keys and certificates, in the Management CLI:  
+      * In case of using existing keys and certificates:  
         `cacert-present-filebased`
 
 * (Optional) Generate Key and Certificate for OCSP Responder
@@ -52,4 +53,4 @@ Please refer to [commands.md](commands.md) for more details.
       `source xipki/ca-setup/setup-scep-p12.script`.
 
 * Verify the installation, execute the command in the Management CLI:  
-  `ca-info myca1`
+  `ca-info <ca-name>`
