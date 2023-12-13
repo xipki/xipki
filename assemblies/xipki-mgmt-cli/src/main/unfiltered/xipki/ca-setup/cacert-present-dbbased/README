@@ -1,1 +1,1 @@
-Scripts to setup CA using present CA key and certificate pair
+Scripts to setup CA using present CA key and certificate pair, and the CA configuration is stored in database.

@@ -17,7 +17,7 @@
 			"name":"ocsp-publisher",
 			"type":"ocsp",
 			"conf":{
-					"value":"datasource=ocsp,publish.goodcerts=true"
+				"value":"datasource=ocsp,publish.goodcerts=true"
 			}
 		}
 		*/
@@ -121,26 +121,15 @@
 			"status":"active",
 			"validityMode":"cutoff"
 		},
-		"profiles":[
-			"ocsp",
-			"scep",
-			"smime",
-			"tls",
-			"tls-c",
-			"tls-sm2",
-			"tls-sm2-enc"
+		"profiles":["ocsp", "scep", "smime", "tls", "tls-c", "tls-sm2", "tls-sm2-enc"
 		],
 		"publishers":[
 			// "ocsp-publisher"
 		],
 		"requestors":[{
 			"requestorName":"requestor1",
-			"permissions":[
-				"all"
-			],
-			"profiles":[
-				"all"
-			]
+			"permissions":["all"],
+			"profiles":["all"]
 		}]
 	}]
 }

@@ -2,17 +2,12 @@ printUsage = "false"
 
 argsValid = "false"
 
-if { "$1" equals "" } then {
+if { "$1" equals "" | "$1" equals "help" } then {
   printUsage = "true"
   argsValid = "true"
 } else {
   action = $1
-  if { "$action" equals "help" } then {
-    printUsage = "true"
-    argsValid = "true"
-  } else {
-    argsValid = $([enroll ocsp] contains $action)
-  }
+  argsValid = $([enroll ocsp] contains $action)
 }
 
 if { "$argsValid" equals "false" } then {

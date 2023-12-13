@@ -2,10 +2,7 @@ printUsage = "false"
 argsValid = "false"
 errMsg = ""
 
-if { "$1" equals "" } then {
-  printUsage = "true"
-  argsValid = "true"
-} elif { "$1" equals "help" } then {
+if { "$1" equals "" | "$1" equals "help" } then {
   printUsage = "true"
   argsValid = "true"
 } else {

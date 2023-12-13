@@ -4,23 +4,11 @@ SUBJECT="O=$[organization],CN=OCSP Responder 1"
 OCSP_KEYCERTS_DIR = xipki/ocsp-setup/keycerts
 CACERT_FILE = xipki/ca-setup/keycerts/$[ca.name].pem
 
-printUsage = "false"
-argsValid = "false"
-keytype = ""
-
-if { "$1" equals "" } then {
+if { "$1" equals "" | "$1" equals "help" } then {
   printUsage = "true"
-  argsValid = "true"
-} elif { "$1" equals "help" } then {
-  printUsage = "true"
-  argsValid = "true"
 } else {
   keytype = $1
-  argsValid = $([rsa ec dsa sm2 ed25519 ed448] contains $keytype)
-}
-
-if { "$argsValid" equals "false" } then {
-  printUsage = "true"
+  printUsage = "$([rsa ec dsa sm2 ed25519 ed448] contains $keytype)" equals "false"
 }
 
 echo "key type: $keytype"

@@ -3,35 +3,24 @@ CA_P12 = ${KEYCERTS_DIR}/$[ca.name].p12
 CA_P12_PWD = CHANGEIT
 CA_CERT = ${KEYCERTS_DIR}/$[ca.name].pem
 
-printUsage = "false"
-argsValid = "false"
-errMsg = ""
-
-if { "$1" equals "" } then {
+if { "$1" equals "" | "$1" equals "help" } then {
   printUsage = "true"
-  argsValid = "true"
-} elif { "$1" equals "help" } then {
-  printUsage = "true"
-  argsValid = "true"
 } else {
   KEY_TYPE = $1
   TOMCAT_DIR = $2
   XIPKI_DIR = $3
 
+  printUsage = "false"
   if { "$TOMCAT_DIR" equals "" } then {
-    errMsg = "TOMCAT_DIR is not specified"
+    echo "TOMCAT_DIR is not specified"
+    printUsage = "true"
   } else {
     argsValid = $([rsa ec dsa sm2 ed25519 ed448] contains $KEY_TYPE)
     if { "$argsValid" equals "false" } then {
-      errMsg = "invalid KEY_TYPE $KEY_TYPE"
+      echo "invalid KEY_TYPE $KEY_TYPE"
+      printUsage = "true"
     }
   }
-}
-
-if { "$argsValid" equals "false" } then {
-  echo "$errMsg"
-  echo ""
-  printUsage = "true"
 }
 
 THIS_DIR = xipki/ca-setup/cacert-present-dbbased
@@ -69,7 +58,8 @@ if { "$printUsage" equals "true" } then {
 
   xi:copy-file -f ${THIS_DIR}/template.ca-conf.json ${CONF_FILE}
 
-  xi:replace --old "REPLACEME-TOKEN_TYPE" --new "PKCS12" \
+  xi:replace \
+    --old "REPLACEME-TOKEN_TYPE"    --new "PKCS12" \
     --old "REPLACEME-CA_SIGNERCONF" \
     --new "algo=${SIG_ALG},password=${CA_P12_PWD},keystore=file:${CA_P12}" \
     ${CONF_FILE}
@@ -80,7 +70,7 @@ if { "$printUsage" equals "true" } then {
   echo "#################################################################"
   echo "#                      Configure ca.json                        #"
   echo "#################################################################"
-  xi:copy-file -f ${THIS_DIR}/../dbbased-ca.json ${XIPKI_DIR}/etc/ca/ca.json
+  xi:copy-file -f ${XIPKI_DIR}/etc/ca/example/dbbased-ca.json ${XIPKI_DIR}/etc/ca/ca.json
 
   echo "#################################################################"
   echo "#                       Startup Tomcat                          #"

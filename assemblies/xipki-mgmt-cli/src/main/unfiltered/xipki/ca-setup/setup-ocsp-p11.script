@@ -7,23 +7,11 @@ SLOT = 0
 
 OCSP_KEYCERTS_DIR = xipki/ocsp-setup/keycerts
 
-printUsage = "false"
-argsValid = "false"
-keytype = ""
-
-if { "$1" equals "" } then {
+if { "$1" equals "" | "$1" equals "help" } then {
   printUsage = "true"
-  argsValid = "true"
-} elif { "$1" equals "help" } then {
-  printUsage = "true"
-  argsValid = "true"
 } else {
   keytype = $1
-  argsValid = $([rsa ec dsa sm2 ed25519] contains $keytype)
-}
-
-if { "$argsValid" equals "false" } then {
-  printUsage = "true"
+  printUsage = "$([rsa ec dsa sm2 ed25519] contains $keytype)" equals "false"
 }
 
 echo "key type: $keytype"

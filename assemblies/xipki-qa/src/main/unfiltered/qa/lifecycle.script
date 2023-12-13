@@ -1,11 +1,10 @@
+WAIT_TOMCAT_START_TIME = 3
+
 printUsage = "false"
 argsValid = "false"
 errMsg = ""
 
-if { "$1" equals "" } then {
-  printUsage = "true"
-  argsValid = "true"
-} elif { "$1" equals "help" } then {
+if { "$1" equals "" | "$1" equals "help" } then {
   printUsage = "true"
   argsValid = "true"
 } else {
@@ -199,7 +198,7 @@ if { "$printUsage" equals "true" } then {
   echo "Restart ocsp (tomcat) server!"
   xi:exec $[tomcat.java.home] '/tmp/xipki/ocsp-tomcat/bin/shutdown.sh'
   xi:exec $[tomcat.java.home] '/tmp/xipki/ocsp-tomcat/bin/startup.sh'
-  sleep 5
+  sleep 3
 
   source file:./qa/ocsp.script
 
