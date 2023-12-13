@@ -11,7 +11,7 @@
   <groupId>org.xipki</groupId>
   <artifactId>xipki-parent</artifactId>
   <packaging>pom</packaging>
-  <version>6.5.2-SNAPSHOT</version>
+  <version>6.5.2</version>
   <name>XiPKI :: ${project.artifactId}</name>
   <description>XiPKI Parent</description>
   <url>http://xipki.org</url>
@@ -31,7 +31,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skipDeploy>false</skipDeploy>
     <xipki.tools.version>1.0.11</xipki.tools.version>
-    <xipki.commons.version>6.3.3-SNAPSHOT</xipki.commons.version>
+    <xipki.commons.version>6.3.3</xipki.commons.version>
     <javax.servlet.version>3.1.0</javax.servlet.version>
     <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
     <karaf.version>4.4.4</karaf.version>

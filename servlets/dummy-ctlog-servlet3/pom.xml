@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.servlet</groupId>
     <artifactId>servlet-parent</artifactId>
-    <version>6.5.2-SNAPSHOT</version>
+    <version>6.5.2</version>
   </parent>
   <artifactId>dummy-ctlog-servlet3</artifactId>
   <packaging>war</packaging>
