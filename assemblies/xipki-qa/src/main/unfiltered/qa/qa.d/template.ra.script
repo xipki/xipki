@@ -77,6 +77,11 @@ xi:update-cert-p12 --p12 output/ocsp2.p12 --password CHANGEIT \
   --cert output/ocsp2.crt --ca-cert output/subcawithcrl1.crt \
   --ca-cert output/rootca1.crt
 
+# CMP update
+xi:cmp-update-p12  --ca subcawithcrl --p12 output/ocsp2.p12 --password CHANGEIT \
+   --out output/ocsp2-updated.crt --oldcert output/ocsp2.crt \
+   --signer-password CHANGEIT --signer-p12 ${SIGNER_P12}
+
 # CMP: Enroll (CA generate key pair) via CRMF
 CN = cmp-crmf-ca-genkey-tls
 

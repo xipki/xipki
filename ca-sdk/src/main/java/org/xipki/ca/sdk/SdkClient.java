@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.pki.ErrorCode;
 import org.xipki.security.KeyCertBytesPair;
 import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
 import org.xipki.util.exception.ObjectCreationException;
@@ -285,14 +286,25 @@ public class SdkClient {
   }
 
   public EnrollOrPollCertsResponse enrollCerts(String ca, EnrollCertsRequest req) throws SdkErrorResponseException {
+    checkEnrollCertsRequest(req);
     byte[] respBytes = send(ca, CMD_enroll, req);
     return checkEnrollResp(respBytes, req);
   }
 
   public EnrollOrPollCertsResponse enrollCrossCerts(String ca, EnrollCertsRequest req)
       throws SdkErrorResponseException {
+    checkEnrollCertsRequest(req);
     byte[] respBytes = send(ca, CMD_enroll_cross, req);
     return checkEnrollResp(respBytes, req);
+  }
+
+  private static void checkEnrollCertsRequest(EnrollCertsRequest req) throws SdkErrorResponseException {
+    for (EnrollCertsRequest.Entry m : req.getEntries()) {
+      String profile = m.getCertprofile();
+      if (StringUtil.isBlank(profile)) {
+        throw new SdkErrorResponseException(ErrorCode.UNKNOWN_CERT_PROFILE, "cert profile not set");
+      }
+    }
   }
 
   public EnrollOrPollCertsResponse reenrollCerts(String ca, EnrollCertsRequest req) throws SdkErrorResponseException {

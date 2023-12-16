@@ -4,6 +4,8 @@ See also <https://github.com/xipki/xipki/releases>
 
 ## 6.5.3
 - Release date: 202y/mm/dd
+- Gateway
+  - Bugfix: fixed bug "Cannot update an existing certificate over CMP"
 
 ## 6.5.2
 - Release date: 2023/12/13

@@ -223,7 +223,9 @@ public class CmpResponder extends BaseCmpResponder {
         }
       }
 
-      template.setSubject(new X500NameType(subject));
+      if (subject != null) {
+        template.setSubject(new X500NameType(subject));
+      }
 
       if (oldCertInfo != null) {
         template.setOldCertIsn(oldCertInfo);
@@ -363,10 +365,10 @@ public class CmpResponder extends BaseCmpResponder {
 
     for (EnrollCertsRequest.Entry m : templates) {
       event.addEventData(CaAuditConstants.NAME_certprofile, m.getCertprofile());
-      X500Name subject;
+      X500Name subject = null;
       if (m.getSubject() != null) {
         subject = m.getSubject().toX500Name();
-      } else {
+      } else if (m.getP10req() != null) {
         CertificationRequest csr;
         try {
           csr = GatewayUtil.parseCsrInRequest(m.getP10req());
@@ -375,7 +377,9 @@ public class CmpResponder extends BaseCmpResponder {
         }
         subject = csr.getCertificationRequestInfo().getSubject();
       }
-      event.addEventData(CaAuditConstants.NAME_req_subject, "\"" + X509Util.x500NameText(subject) + "\"");
+      if (subject != null) {
+        event.addEventData(CaAuditConstants.NAME_req_subject, "\"" + X509Util.x500NameText(subject) + "\"");
+      }
     }
 
     EnrollOrPollCertsResponse resp;
@@ -514,14 +518,15 @@ public class CmpResponder extends BaseCmpResponder {
 
     SingleCertSerialEntry[] respEntries;
 
+    X500NameType issuerType = new X500NameType(issuer);
     if (revoke) {
       RevokeCertsRequest req = new RevokeCertsRequest(
-          null, new X500NameType(issuer), aki, revokeEntries.toArray(new RevokeCertsRequest.Entry[0]));
+          null, issuerType, aki, revokeEntries.toArray(new RevokeCertsRequest.Entry[0]));
       RevokeCertsResponse resp = sdk.revokeCerts(req);
       respEntries = resp.getEntries();
     } else {
       UnsuspendOrRemoveCertsRequest req = new UnsuspendOrRemoveCertsRequest(
-          null, new X500NameType(issuer), aki, unrevokeEntries.toArray(new BigInteger[0]));
+          null, issuerType, aki, unrevokeEntries.toArray(new BigInteger[0]));
       UnSuspendOrRemoveCertsResponse resp = sdk.unsuspendCerts(req);
       respEntries = resp.getEntries();
     }

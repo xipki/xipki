@@ -387,7 +387,7 @@ public class SdkResponder {
           OldCertInfo.BySubject ocSubject = entry.getOldCertSubject();
 
           if (ocIsn == null && ocSubject == null) {
-            throw new OperationException(BAD_CERT_TEMPLATE,  "Neither oldCertIsn nor oldCertSubject is specified" +
+            throw new OperationException(BAD_CERT_TEMPLATE, "Neither oldCertIsn nor oldCertSubject is specified" +
                 " in reenroll_cert command, but exactly one of them is permitted");
           } else if (ocIsn != null && ocSubject != null) {
             throw new OperationException(BAD_CERT_TEMPLATE, "Both oldCertIsn and oldCertSubject are specified" +
@@ -399,11 +399,16 @@ public class SdkResponder {
 
           if (ocIsn != null) {
             reusePublicKey = ocIsn.isReusePublicKey();
-            X500Name issuer = X500Name.getInstance(ocIsn.getIssuer());
+            X500Name issuer;
+            try {
+              issuer = ocIsn.getIssuer().toX500Name();
+            } catch (IOException ex) {
+              throw new OperationException(BAD_CERT_TEMPLATE, "Invalid oldIsn.issuer: " + ex.getMessage());
+            }
             BigInteger serialNumber = ocIsn.getSerialNumber();
 
             text = "certificate with the issuer '" + X509Util.x500NameText(issuer) +
-                    "' and serial number " + serialNumber;
+                "' and serial number " + serialNumber;
 
             oldCert = ca.getCertWithRevocationInfo(serialNumber);
           } else {
@@ -457,6 +462,10 @@ public class SdkResponder {
 
           extensions = new Extensions(extns.values().toArray(new Extension[0]));
         }
+      }
+
+      if (profile == null) {
+        throw new OperationException(UNKNOWN_CERT_PROFILE, "cert profile is not set");
       }
 
       profiles.add(profile);
