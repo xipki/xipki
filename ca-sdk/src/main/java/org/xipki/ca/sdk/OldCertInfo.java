@@ -3,8 +3,8 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
+import org.xipki.util.Args;
+import org.xipki.util.cbor.*;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
 
@@ -17,22 +17,74 @@ import java.math.BigInteger;
  * @since 6.0.0
  */
 
-public abstract class OldCertInfo extends SdkEncodable {
+public class OldCertInfo extends SdkEncodable {
 
   /**
    * Whether to reu-use the public key in the old certificate for the new one.
    */
   private final boolean reusePublicKey;
 
-  public OldCertInfo(boolean reusePublicKey) {
+  private final ByIssuerAndSerial isn;
+
+  private final BySubject subject;
+
+  public OldCertInfo(boolean reusePublicKey, ByIssuerAndSerial isn) {
     this.reusePublicKey = reusePublicKey;
+    this.isn = Args.notNull(isn, "isn");
+    this.subject = null;
+  }
+
+  public OldCertInfo(boolean reusePublicKey, BySubject subject) {
+    this.reusePublicKey = reusePublicKey;
+    this.isn = null;
+    this.subject = Args.notNull(subject, "subject");
   }
 
   public boolean isReusePublicKey() {
     return reusePublicKey;
   }
 
-  public static class ByIssuerAndSerial extends OldCertInfo {
+  public ByIssuerAndSerial getIsn() {
+    return isn;
+  }
+
+  public BySubject getSubject() {
+    return subject;
+  }
+
+  @Override
+  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+    encoder.writeArrayStart(3);
+    encoder.writeBoolean(isReusePublicKey());
+    encoder.writeObject(isn);
+    encoder.writeObject(subject);
+  }
+
+  public static OldCertInfo decode(CborDecoder decoder) throws DecodeException {
+    try {
+      if (decoder.readNullOrArrayLength(3)) {
+        return null;
+      }
+
+      boolean usePublicKey = decoder.readBoolean();
+      ByIssuerAndSerial isn = ByIssuerAndSerial.decode(decoder);
+      BySubject subject = BySubject.decode(decoder);
+
+      if ((isn == null) == (subject == null)) {
+        throw new DecodeException("exactly one of isn and subject shall be non-null");
+      }
+
+      if (isn != null) {
+        return new OldCertInfo(usePublicKey, isn);
+      } else {
+        return new OldCertInfo(usePublicKey, subject);
+      }
+    } catch (IOException | RuntimeException ex) {
+      throw new DecodeException(buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
+    }
+  }
+
+  public static class ByIssuerAndSerial extends SdkEncodable {
 
     private final X500NameType issuer;
 
@@ -41,8 +93,7 @@ public abstract class OldCertInfo extends SdkEncodable {
      */
     private final BigInteger serialNumber;
 
-    public ByIssuerAndSerial(boolean reusePublicKey, X500NameType issuer, BigInteger serialNumber) {
-      super(reusePublicKey);
+    public ByIssuerAndSerial(X500NameType issuer, BigInteger serialNumber) {
       this.issuer = issuer;
       this.serialNumber = serialNumber;
     }
@@ -57,37 +108,33 @@ public abstract class OldCertInfo extends SdkEncodable {
 
     @Override
     protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
-      encoder.writeArrayStart(3);
-      encoder.writeBoolean(isReusePublicKey());
+      encoder.writeArrayStart(2);
       encoder.writeObject(issuer);
       encoder.writeBigInt(serialNumber);
     }
 
     public static ByIssuerAndSerial decode(CborDecoder decoder) throws DecodeException {
       try {
-        if (decoder.readNullOrArrayLength(3)) {
+        if (decoder.readNullOrArrayLength(2)) {
           return null;
         }
 
         return new ByIssuerAndSerial(
-            decoder.readBoolean(),
             X500NameType.decode(decoder),
             decoder.readBigInt());
       } catch (IOException | RuntimeException ex) {
         throw new DecodeException(buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
       }
     }
-
   }
 
-  public static class BySubject extends OldCertInfo {
+  public static class BySubject extends SdkEncodable {
 
     private final byte[] subject;
 
     private final byte[] san;
 
-    public BySubject(boolean reusePublicKey, byte[] subject, byte[] san) {
-      super(reusePublicKey);
+    public BySubject(byte[] subject, byte[] san) {
       this.subject = subject;
       this.san = san;
     }
@@ -102,20 +149,18 @@ public abstract class OldCertInfo extends SdkEncodable {
 
     @Override
     protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
-      encoder.writeArrayStart(3);
-      encoder.writeBoolean(isReusePublicKey());
+      encoder.writeArrayStart(2);
       encoder.writeByteString(subject);
       encoder.writeByteString(san);
     }
 
     public static BySubject decode(CborDecoder decoder) throws DecodeException {
       try {
-        if (decoder.readNullOrArrayLength(3)) {
+        if (decoder.readNullOrArrayLength(2)) {
           return null;
         }
 
         return new BySubject(
-            decoder.readBoolean(),
             decoder.readByteString(),
             decoder.readByteString());
       } catch (IOException | RuntimeException ex) {

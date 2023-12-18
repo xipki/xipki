@@ -4,6 +4,7 @@
 package org.xipki.ca.sdk;
 
 import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.util.Args;
 import org.xipki.util.Hex;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
@@ -27,7 +28,7 @@ public class X500NameType extends SdkEncodable {
   private final byte[] encoded;
 
   public X500NameType(String text) {
-    this.text = text;
+    this.text = Args.notBlank(text, "text");
     this.encoded = null;
   }
 
@@ -64,10 +65,6 @@ public class X500NameType extends SdkEncodable {
       return name;
     }
 
-    if (text == null && encoded == null) {
-      return null;
-    }
-
     try {
       name = (encoded != null) ? X500Name.getInstance(encoded) : new X500Name(text);
       return name;
@@ -79,7 +76,7 @@ public class X500NameType extends SdkEncodable {
   @Override
   protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
     encoder.writeArrayStart(2);
-    encoder.writeTextString(text);
+    encoder.writeTextString(encoded == null ? text : null);
     encoder.writeByteString(encoded);
   }
 
@@ -91,6 +88,9 @@ public class X500NameType extends SdkEncodable {
 
       String text = decoder.readTextString();
       byte[] encoded = decoder.readByteString();
+      if ((text == null) == (encoded == null)) {
+        throw new DecodeException("exactly one of text and encoded shall be non-null");
+      }
 
       if (text != null) {
         return new X500NameType(text);

@@ -383,22 +383,18 @@ public class SdkResponder {
         if (reenroll) {
           CertWithRevocationInfo oldCert;
 
-          OldCertInfo.ByIssuerAndSerial ocIsn = entry.getOldCertIsn();
-          OldCertInfo.BySubject ocSubject = entry.getOldCertSubject();
+          OldCertInfo oldCertInfo = entry.getOldCertInfo();
 
-          if (ocIsn == null && ocSubject == null) {
+          if (oldCertInfo == null) {
             throw new OperationException(BAD_CERT_TEMPLATE, "Neither oldCertIsn nor oldCertSubject is specified" +
-                " in reenroll_cert command, but exactly one of them is permitted");
-          } else if (ocIsn != null && ocSubject != null) {
-            throw new OperationException(BAD_CERT_TEMPLATE, "Both oldCertIsn and oldCertSubject are specified" +
                 " in reenroll_cert command, but exactly one of them is permitted");
           }
 
-          boolean reusePublicKey;
+          boolean reusePublicKey = oldCertInfo.isReusePublicKey();
           String text;
 
-          if (ocIsn != null) {
-            reusePublicKey = ocIsn.isReusePublicKey();
+          if (oldCertInfo.getIsn() != null) {
+            OldCertInfo.ByIssuerAndSerial ocIsn = oldCertInfo.getIsn();
             X500Name issuer;
             try {
               issuer = ocIsn.getIssuer().toX500Name();
@@ -412,7 +408,7 @@ public class SdkResponder {
 
             oldCert = ca.getCertWithRevocationInfo(serialNumber);
           } else {
-            reusePublicKey = ocSubject.isReusePublicKey();
+            OldCertInfo.BySubject ocSubject = oldCertInfo.getSubject();
             X500Name oldSubject = X500Name.getInstance(ocSubject.getSubject());
             String subjectText = X509Util.x500NameText(oldSubject);
             text = "certificate with subject '" + subjectText + "'";

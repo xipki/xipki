@@ -144,8 +144,8 @@ public class EnrollCertsRequest extends SdkRequest {
     private byte[] p10req;
 
     /**
-     * Specifies the Subject. Must be set if p10req is not present, set it to empty string
-     * if empty subject is expected. Must be set if p10req is not present.
+     * Specifies the Subject. If not for re-enroll, subject must be set if p10req is not present,
+     * set it to empty string if empty subject is expected. Must be set if p10req is not present.
      */
     private X500NameType subject;
 
@@ -170,9 +170,7 @@ public class EnrollCertsRequest extends SdkRequest {
      */
     private Instant notAfter;
 
-    private OldCertInfo.ByIssuerAndSerial oldCertIsn;
-
-    private OldCertInfo.BySubject oldCertSubject;
+    private OldCertInfo oldCertInfo;
 
     public BigInteger getCertReqId() {
       return certReqId;
@@ -254,20 +252,12 @@ public class EnrollCertsRequest extends SdkRequest {
       this.notAfter = notAfter;
     }
 
-    public OldCertInfo.ByIssuerAndSerial getOldCertIsn() {
-      return oldCertIsn;
+    public OldCertInfo getOldCertInfo() {
+      return oldCertInfo;
     }
 
-    public void setOldCertIsn(OldCertInfo.ByIssuerAndSerial oldCertIsn) {
-      this.oldCertIsn = oldCertIsn;
-    }
-
-    public OldCertInfo.BySubject getOldCertSubject() {
-      return oldCertSubject;
-    }
-
-    public void setOldCertSubject(OldCertInfo.BySubject oldCertSubject) {
-      this.oldCertSubject = oldCertSubject;
+    public void setOldCertInfo(OldCertInfo oldCertInfo) {
+      this.oldCertInfo = oldCertInfo;
     }
 
     @Override
@@ -281,8 +271,7 @@ public class EnrollCertsRequest extends SdkRequest {
       encoder.writeByteString(extensions);
       encoder.writeInstant(notBefore);
       encoder.writeInstant(notAfter);
-      encoder.writeObject(oldCertIsn);
-      encoder.writeObject(oldCertSubject);
+      encoder.writeObject(oldCertInfo);
     }
 
     public static Entry decode(CborDecoder decoder) throws DecodeException {
@@ -300,8 +289,7 @@ public class EnrollCertsRequest extends SdkRequest {
         ret.setExtensions(decoder.readByteString());
         ret.setNotBefore(decoder.readInstant());
         ret.setNotAfter(decoder.readInstant());
-        ret.setOldCertIsn(OldCertInfo.ByIssuerAndSerial.decode(decoder));
-        ret.setOldCertSubject(OldCertInfo.BySubject.decode(decoder));
+        ret.setOldCertInfo(OldCertInfo.decode(decoder));
         return ret;
       } catch (IOException | RuntimeException ex) {
         throw new DecodeException(buildDecodeErrMessage(ex, Entry.class), ex);
