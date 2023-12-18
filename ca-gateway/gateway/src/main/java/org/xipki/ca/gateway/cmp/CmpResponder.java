@@ -133,7 +133,7 @@ public class CmpResponder extends BaseCmpResponder {
         }
       }
 
-      OldCertInfo.ByIssuerAndSerial oldCertInfo = null;
+      OldCertInfo oldCertInfo = null;
 
       if (reenroll) {
         // The regCtl-oldCertID will be ignored by calling
@@ -170,9 +170,10 @@ public class CmpResponder extends BaseCmpResponder {
           continue;
         }
 
-        oldCertInfo = new OldCertInfo.ByIssuerAndSerial(false,
-            new X500NameType(oldCertId.getIssuer().getName().toASN1Primitive().getEncoded()),
-            oldCertId.getSerialNumber().getValue());
+        oldCertInfo = new OldCertInfo(false,
+            new OldCertInfo.ByIssuerAndSerial(
+                new X500NameType(oldCertId.getIssuer().getName().toASN1Primitive().getEncoded()),
+              oldCertId.getSerialNumber().getValue()));
       } // end if(reenroll)
 
       String certprofileName = certprofileNames[i];
@@ -228,7 +229,7 @@ public class CmpResponder extends BaseCmpResponder {
       }
 
       if (oldCertInfo != null) {
-        template.setOldCertIsn(oldCertInfo);
+        template.setOldCertInfo(oldCertInfo);
       }
 
       certTemplateDatas.add(template);

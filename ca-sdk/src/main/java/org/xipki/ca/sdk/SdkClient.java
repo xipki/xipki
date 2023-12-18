@@ -269,8 +269,9 @@ public class SdkClient {
     EnrollCertsRequest.Entry reqEntry = new EnrollCertsRequest.Entry();
     reqEntry.setCertprofile(certprofile);
     reqEntry.setP10req(p10Req);
-    reqEntry.setOldCertIsn(new OldCertInfo.ByIssuerAndSerial(
-        false, new X500NameType(oldCertIssuer), oldCertSerialNumber));
+    OldCertInfo oldCertInfo = new OldCertInfo(false, new OldCertInfo.ByIssuerAndSerial(
+        new X500NameType(oldCertIssuer), oldCertSerialNumber));
+    reqEntry.setOldCertInfo(oldCertInfo);
     return enrollCert0("reenrollCert", CMD_reenroll, ca, reqEntry);
   }
 
@@ -280,8 +281,9 @@ public class SdkClient {
     EnrollCertsRequest.Entry reqEntry = new EnrollCertsRequest.Entry();
     reqEntry.setCertprofile(certprofile);
     reqEntry.setSubject(new X500NameType(subject));
-    reqEntry.setOldCertIsn(
-        new OldCertInfo.ByIssuerAndSerial(false, new X500NameType(oldCertIssuer), oldCertSerialNumber));
+    OldCertInfo oldCertInfo = new OldCertInfo(false, new OldCertInfo.ByIssuerAndSerial(
+        new X500NameType(oldCertIssuer), oldCertSerialNumber));
+    reqEntry.setOldCertInfo(oldCertInfo);
     return enrollCertCaGenKeypair0("reenrollCertCaGenKeypair", CMD_reenroll, ca, reqEntry);
   }
 

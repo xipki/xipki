@@ -581,9 +581,10 @@ public class EstResponder {
     Extensions csrExtns = X509Util.getExtensions(certTemp);
     byte[] extnValue = X509Util.getCoreExtValue(csrExtns, Extension.subjectAlternativeName);
 
-    OldCertInfo.BySubject oldCertInfo = new OldCertInfo.BySubject(false, oldSubject.getEncoded(), extnValue);
+    OldCertInfo oldCertInfo = new OldCertInfo(false,
+        new OldCertInfo.BySubject(oldSubject.getEncoded(), extnValue));
 
-    template.setOldCertSubject(oldCertInfo);
+    template.setOldCertInfo(oldCertInfo);
 
     Attribute attr = X509Util.getAttribute(certTemp, ObjectIdentifiers.CMC.id_cmc_changeSubjectName);
     Extensions requestedExtns = csrExtns;
