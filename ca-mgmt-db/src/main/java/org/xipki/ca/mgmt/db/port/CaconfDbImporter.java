@@ -53,6 +53,17 @@ class CaconfDbImporter extends DbPorter {
   public void importToDb() throws Exception {
     System.out.println("importing CA configuration to database");
     try {
+      boolean emptyDb =
+             datasource.getCount(connection, "SIGNER")      == 0
+          && datasource.getCount(connection, "REQUESTOR")   <= 1
+          && datasource.getCount(connection, "PUBLISHER")   == 0
+          && datasource.getCount(connection, "PROFILE")     == 0
+          && datasource.getCount(connection, "KEYPAIR_GEN") <= 1;
+
+      if (!emptyDb) {
+        throw new Exception("Database for caconf is not empty");
+      }
+
       importDbSchema(caconf.getDbSchemas());
       importSigner(caconf.getSigners());
       importRequestor(caconf.getRequestors());
