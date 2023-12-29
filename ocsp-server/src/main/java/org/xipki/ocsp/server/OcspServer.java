@@ -33,7 +33,6 @@ import org.xipki.ocsp.server.ResponderOption.OcspMode;
 import org.xipki.ocsp.server.store.IssuerEntry;
 import org.xipki.ocsp.server.store.ResponseCacher;
 import org.xipki.ocsp.server.type.*;
-import org.xipki.password.PasswordResolverException;
 import org.xipki.security.*;
 import org.xipki.util.*;
 import org.xipki.util.exception.InvalidConfException;
@@ -176,7 +175,7 @@ public class OcspServer implements Closeable {
     return initialized.get();
   }
 
-  public void init(boolean force) throws OcspStoreException, InvalidConfException, PasswordResolverException {
+  public void init(boolean force) throws OcspStoreException, InvalidConfException {
     LOG.info("starting OCSPResponder server ...");
     if (initialized.get()) {
       if (!force) {
@@ -190,7 +189,7 @@ public class OcspServer implements Closeable {
     LOG.info("started OCSPResponder server");
   } // method init
 
-  private void init0() throws OcspStoreException, InvalidConfException, PasswordResolverException {
+  private void init0() throws OcspStoreException, InvalidConfException {
     if (confFile == null) {
       throw new IllegalStateException("confFile is not set");
     }
@@ -384,28 +383,7 @@ public class OcspServer implements Closeable {
     } // end if
 
     // responders
-    Map<String, ResponderOption> responderOptions = new HashMap<>();
-
-    for (OcspServerConf.Responder m : conf.getResponders()) {
-      ResponderOption option = new ResponderOption(m);
-
-      String optName = option.getSignerName();
-      if (!signers.containsKey(optName)) {
-        throw new InvalidConfException("no signer named '" + optName + "' is defined");
-      }
-
-      String reqOptName = option.getRequestOptionName();
-      if (!requestOptions.containsKey(reqOptName)) {
-        throw new InvalidConfException("no requestOption named '" + reqOptName + "' is defined");
-      }
-
-      String respOptName = option.getResponseOptionName();
-      if (!responseOptions.containsKey(respOptName)) {
-        throw new InvalidConfException("no responseOption named '" + respOptName + "' is defined");
-      }
-
-      responderOptions.put(m.getName(), option);
-    } // end for
+    Map<String, ResponderOption> responderOptions = getResponderOptionMap(conf);
 
     // stores
     for (OcspServerConf.Store m : conf.getStores()) {
@@ -460,6 +438,32 @@ public class OcspServer implements Closeable {
     this.servletPaths.addAll(tmpList);
   } // method init0
 
+  private Map<String, ResponderOption> getResponderOptionMap(OcspServerConf conf) throws InvalidConfException {
+    Map<String, ResponderOption> responderOptions = new HashMap<>();
+
+    for (OcspServerConf.Responder m : conf.getResponders()) {
+      ResponderOption option = new ResponderOption(m);
+
+      String optName = option.getSignerName();
+      if (!signers.containsKey(optName)) {
+        throw new InvalidConfException("no signer named '" + optName + "' is defined");
+      }
+
+      String reqOptName = option.getRequestOptionName();
+      if (!requestOptions.containsKey(reqOptName)) {
+        throw new InvalidConfException("no requestOption named '" + reqOptName + "' is defined");
+      }
+
+      String respOptName = option.getResponseOptionName();
+      if (!responseOptions.containsKey(respOptName)) {
+        throw new InvalidConfException("no responseOption named '" + respOptName + "' is defined");
+      }
+
+      responderOptions.put(m.getName(), option);
+    } // end for
+    return responderOptions;
+  }
+
   @Override
   public void close() {
     LOG.info("stopped OCSP Responder");
@@ -476,8 +480,7 @@ public class OcspServer implements Closeable {
     }
   } // method close
 
-  public OcspRespWithCacheInfo answer(Responder responder2, byte[] request, boolean viaGet) {
-    Responder responder = (Responder) responder2;
+  public OcspRespWithCacheInfo answer(Responder responder, byte[] request, boolean viaGet) {
     RequestOption reqOpt = responder.getRequestOption();
 
     int version;
@@ -939,9 +942,7 @@ public class OcspServer implements Closeable {
     return null;
   } // method processCertReq
 
-  public boolean healthCheck(Responder responder2) {
-    Responder responder = (Responder) responder2;
-
+  public boolean healthCheck(Responder responder) {
     for (OcspStore store : responder.getStores()) {
       boolean storeHealthy = store.isHealthy();
       if (!storeHealthy) {

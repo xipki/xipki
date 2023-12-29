@@ -30,13 +30,13 @@ class DigestDiffReporter implements Closeable {
 
   private final String reportDirname;
 
-  private final BufferedWriter goodWriter;
+  private final SynchronizedWriter goodWriter;
 
   private final BufferedWriter diffWriter;
 
-  private final BufferedWriter missingWriter;
+  private final SynchronizedWriter missingWriter;
 
-  private final BufferedWriter unexpectedWriter;
+  private final SynchronizedWriter unexpectedWriter;
 
   private final BufferedWriter errorWriter;
 
@@ -52,8 +52,7 @@ class DigestDiffReporter implements Closeable {
 
   private final AtomicInteger numError = new AtomicInteger(0);
 
-  public DigestDiffReporter(String reportDirname, byte[] caCertBytes)
-      throws IOException {
+  public DigestDiffReporter(String reportDirname, byte[] caCertBytes) throws IOException {
     this.reportDirname = Args.notBlank(reportDirname, "reportDirname");
     File dir = new File(reportDirname);
     IoUtil.mkdirs(dir);
@@ -61,10 +60,10 @@ class DigestDiffReporter implements Closeable {
 
     String dirPath = dir.getPath();
 
-    this.missingWriter = Files.newBufferedWriter(Paths.get(dirPath, "missing"));
-    this.unexpectedWriter = Files.newBufferedWriter(Paths.get(dirPath, "unexpected"));
-    this.diffWriter = Files.newBufferedWriter(Paths.get(dirPath, "diff"));
-    this.goodWriter = Files.newBufferedWriter(Paths.get(dirPath, "good"));
+    this.missingWriter    = new SynchronizedWriter(Files.newBufferedWriter(Paths.get(dirPath, "missing")));
+    this.unexpectedWriter = new SynchronizedWriter(Files.newBufferedWriter(Paths.get(dirPath, "unexpected")));
+    this.goodWriter       = new SynchronizedWriter(Files.newBufferedWriter(Paths.get(dirPath, "good")));
+    this.diffWriter  = Files.newBufferedWriter(Paths.get(dirPath, "diff"));
     this.errorWriter = Files.newBufferedWriter(Paths.get(dirPath, "error"));
 
     start();
@@ -80,17 +79,17 @@ class DigestDiffReporter implements Closeable {
 
   public void addMissing(BigInteger serialNumber) throws IOException {
     numMissing.incrementAndGet();
-    writeSerialNumberLine(missingWriter, serialNumber);
+    missingWriter.writeSerialNumber(serialNumber);
   }
 
   public void addGood(BigInteger serialNumber) throws IOException {
     numGood.incrementAndGet();
-    writeSerialNumberLine(goodWriter, serialNumber);
+    goodWriter.writeSerialNumber(serialNumber);
   }
 
   public void addUnexpected(BigInteger serialNumber) throws IOException {
     numUnexpected.incrementAndGet();
-    writeSerialNumberLine(unexpectedWriter, serialNumber);
+    unexpectedWriter.writeSerialNumber(serialNumber);
   }
 
   public void addDiff(DigestEntry refCert, DigestEntry targetCert) throws IOException {
@@ -151,21 +150,31 @@ class DigestDiffReporter implements Closeable {
     }
   } // method close
 
-  private static void writeSerialNumberLine(BufferedWriter writer, BigInteger serialNumber)
-      throws IOException {
-    synchronized (writer) {
-      writer.write(StringUtil.concat(serialNumber.toString(16), "\n"));
-    }
-  } // method writeSerialNumberLine
-
-  private static void closeWriter(Writer... writers) {
-    for (Writer writer : writers) {
+  private static void closeWriter(Closeable... closeables) {
+    for (Closeable cloz : closeables) {
       try {
-        writer.close();
+        cloz.close();
       } catch (Exception ex) {
-        LogUtil.warn(LOG, ex, "could not close writer " + writer);
+        LogUtil.warn(LOG, ex, "could not close closable " + cloz);
       }
     }
   } // method closeWriter
+
+  private static class SynchronizedWriter implements Closeable {
+    private final BufferedWriter underlying;
+
+    public SynchronizedWriter(BufferedWriter underlying) {
+      this.underlying = underlying;
+    }
+
+    public synchronized void writeSerialNumber(BigInteger serialNumber) throws IOException {
+      underlying.write(StringUtil.concat(serialNumber.toString(16), "\n"));
+    }
+
+    @Override
+    public synchronized void close() throws IOException {
+      underlying.close();
+    }
+  }
 
 }

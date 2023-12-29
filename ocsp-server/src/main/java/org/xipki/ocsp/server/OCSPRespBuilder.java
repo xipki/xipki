@@ -135,7 +135,7 @@ public class OCSPRespBuilder {
     offset += arraycopy(responseTypeBasic, out, offset);
 
     // OCSPResponse.[0]responseBytes.responseType
-    offset += ASN1Type.writeHeader((byte) 0x04, basicResponseLen, out, offset); // OCET STRING
+    offset += ASN1Type.writeHeader((byte) 0x04, basicResponseLen, out, offset); // OCTET STRING
 
     // BasicOCSPResponse
     offset += ASN1Type.writeHeader((byte) 0x30, basicResponseBodyLen, out, offset);

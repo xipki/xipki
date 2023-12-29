@@ -241,7 +241,7 @@ public class HsmProxyResponder {
         case destroyObjectsByHandle: {
           LongArrayMessage req = LongArrayMessage.decode(reqDecoder);
           long[] failedHandles = slot.destroyObjectsByHandle(req.getValue());
-          return failedHandles == null ? NULL_MESSAGE :  new LongArrayMessage(failedHandles);
+          return failedHandles == null ? NULL_MESSAGE : new LongArrayMessage(failedHandles);
         }
         case destroyObjectsByIdLabel: {
           IdLabelMessage req = IdLabelMessage.decode(reqDecoder);

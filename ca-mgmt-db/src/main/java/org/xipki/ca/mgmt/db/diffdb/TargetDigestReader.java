@@ -185,8 +185,6 @@ class TargetDigestReader implements Closeable {
     if (dbType == DbType.XIPKI_OCSP_v4) {
       singleSql = StringUtil.concat("REV,RR,RT,RIT,HASH FROM CERT WHERE IID=", Integer.toString(caId), " AND SN=?");
       arrayBuffer.append("SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=").append(caId).append(" AND SN IN (?");
-      arrayBuffer.append(",?".repeat(Math.max(0, numPerSelect - 1)));
-      arrayBuffer.append(")");
     } else {
       String hashOrCertColumn = (certHashAlgo == HashAlgo.SHA1) ? "SHA1" : "CERT";
 
@@ -195,10 +193,10 @@ class TargetDigestReader implements Closeable {
 
       arrayBuffer.append("SN,REV,RR,RT,RIT,").append(hashOrCertColumn)
           .append(" FROM CERT WHERE CA_ID=").append(caId).append(" AND SN IN (?");
-
-      arrayBuffer.append(",?".repeat(Math.max(0, numPerSelect - 1)));
-      arrayBuffer.append(")");
     }
+
+    arrayBuffer.append(",?".repeat(Math.max(0, numPerSelect - 1)));
+    arrayBuffer.append(")");
 
     singleCertSql = datasource.buildSelectFirstSql(1, singleSql);
     inArrayCertsSql = datasource.buildSelectFirstSql(numPerSelect, arrayBuffer.toString());

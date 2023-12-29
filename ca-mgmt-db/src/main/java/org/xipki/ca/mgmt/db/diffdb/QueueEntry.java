@@ -44,15 +44,15 @@ interface QueueEntry {
       return exception;
     }
 
-    public void addEntry(IdentifiedDigestEntry entry) {
+    void addEntry(IdentifiedDigestEntry entry) {
       entries.add(entry);
     }
 
-    public long getStartId() {
+    long getStartId() {
       return startId;
     }
 
-    public List<IdentifiedDigestEntry> getEntries() {
+    List<IdentifiedDigestEntry> getEntries() {
       return entries;
     }
 

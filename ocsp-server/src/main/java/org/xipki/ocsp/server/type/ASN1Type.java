@@ -73,10 +73,18 @@ public abstract class ASN1Type {
     // yyyyMMddhhmmssZ
     // year
     int year = offsetTime.getYear();
-    out[idx++] = (byte) (0x30 + year / 1000);
-    out[idx++] = (byte) (0x30 + year / 100 % 10);
-    out[idx++] = (byte) (0x30 + year / 10 % 10);
-    out[idx++] = (byte) (0x30 + year % 10);
+    out[idx + 3] = (byte) (0x30 + year % 10);
+
+    year /= 10;
+    out[idx + 2] = (byte) (0x30 + year % 10);
+
+    year /= 10;
+    out[idx + 1] = (byte) (0x30 + year % 10);
+
+    year /= 10;
+    out[idx] = (byte) (0x30 + year);
+
+    idx += 4;
     // month
     int month = offsetTime.getMonthValue();
     out[idx++] = (byte) (0x30 + month / 10);

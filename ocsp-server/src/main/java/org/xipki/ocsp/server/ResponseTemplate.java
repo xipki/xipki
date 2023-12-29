@@ -29,7 +29,7 @@ class ResponseTemplate {
 
   private static final byte[] extnInvalidityDate;
 
-  private static final byte[] extnArchiveCutof;
+  private static final byte[] extnArchiveCutoff;
 
   private static final byte[] revokedInfoNoReasonPrefix = new byte[]{(byte) 0xA1, 0x11};
 
@@ -61,8 +61,8 @@ class ResponseTemplate {
     extension.write(extnInvalidityDate, 0);
 
     extension = new ExtendedExtension(OID.ID_PKIX_OCSP_ARCHIVE_CUTOFF, false, new byte[17]);
-    extnArchiveCutof = new byte[extension.getEncodedLength()];
-    extension.write(extnArchiveCutof, 0);
+    extnArchiveCutoff = new byte[extension.getEncodedLength()];
+    extension.write(extnArchiveCutoff, 0);
   } // method static
 
   public static WritableOnlyExtension getCertHashExtension(HashAlgo hashAlgo, byte[] certHash) {
@@ -87,9 +87,9 @@ class ResponseTemplate {
   } // method getInvalidityDateExtension
 
   public static WritableOnlyExtension getArchiveOffExtension(Instant archiveCutoff) {
-    int len = extnArchiveCutof.length;
+    int len = extnArchiveCutoff.length;
     byte[] encoded = new byte[len];
-    System.arraycopy(extnArchiveCutof, 0, encoded, 0, len - 17);
+    System.arraycopy(extnArchiveCutoff, 0, encoded, 0, len - 17);
     ASN1Type.writeGeneralizedTime(archiveCutoff, encoded, len - 17);
     return new WritableOnlyExtension(encoded);
   } // method getArchiveOffExtension

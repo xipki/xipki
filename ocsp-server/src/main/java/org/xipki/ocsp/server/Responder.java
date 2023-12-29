@@ -38,7 +38,7 @@ public class Responder {
     this.stores = Args.notEmpty(stores, "stores");
   }
 
-  public ResponderOption getResponderOption() {
+  ResponderOption getResponderOption() {
     return responderOption;
   }
 
@@ -50,7 +50,7 @@ public class Responder {
     return responseOption;
   }
 
-  public ResponseSigner getSigner() {
+  ResponseSigner getSigner() {
     return signer;
   }
 
