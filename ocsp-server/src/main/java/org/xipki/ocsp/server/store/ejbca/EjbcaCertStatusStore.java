@@ -334,13 +334,9 @@ public class EjbcaCertStatusStore extends OcspStore {
       }
 
       if (replaced) {
-        CertRevocationInfo newRevInfo;
-        if (caRevInfo.getReason() == CrlReason.CA_COMPROMISE) {
-          newRevInfo = caRevInfo;
-        } else {
-          newRevInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
-                        caRevInfo.getRevocationTime(), caRevInfo.getInvalidityTime());
-        }
+        CertRevocationInfo newRevInfo = (caRevInfo.getReason() == CrlReason.CA_COMPROMISE) ? caRevInfo
+            : new CertRevocationInfo(CrlReason.CA_COMPROMISE,
+                  caRevInfo.getRevocationTime(), caRevInfo.getInvalidityTime());
         certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
             certStatusInfo.getCertHashAlgo(), certStatusInfo.getCertHash(),
             certStatusInfo.getThisUpdate(), certStatusInfo.getNextUpdate(),
@@ -406,8 +402,7 @@ public class EjbcaCertStatusStore extends OcspStore {
    * @param datasource DataSource.
    */
   @Override
-  public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource)
-      throws OcspStoreException {
+  public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource) throws OcspStoreException {
     if (includeCrlId) {
       throw new OcspStoreException("includeCrlId must not be true");
     }
@@ -494,8 +489,7 @@ public class EjbcaCertStatusStore extends OcspStore {
     return initializationFailed;
   }
 
-  private static Set<X509Cert> parseCerts(Collection<String> certFiles)
-      throws OcspStoreException {
+  private static Set<X509Cert> parseCerts(Collection<String> certFiles) throws OcspStoreException {
     Set<X509Cert> certs = new HashSet<>(certFiles.size());
     for (String certFile : certFiles) {
       try {
@@ -525,11 +519,7 @@ public class EjbcaCertStatusStore extends OcspStore {
     int startIndex = index + valueStartTag.length();
 
     index = caData.indexOf(valueEndTag, startIndex);
-    if (index == -1) {
-      return null;
-    }
-
-    return caData.substring(startIndex, index);
+    return (index == -1) ? null : caData.substring(startIndex, index);
   } // method extractTextFromCaData
 
 }

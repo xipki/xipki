@@ -21,6 +21,48 @@ public class CmpFailureUtil {
 
   private static final Map<Integer, String> STATUS_TEXT_MAP = new HashMap<>();
 
+
+  /**
+   * <pre>
+   * PKIFailureInfo ::= BIT STRING {
+   * badAlg               (0),
+   *   -- unrecognized or unsupported Algorithm Identifier
+   * badMessageCheck      (1), -- integrity check failed (e.g., signature did not verify)
+   * badRequest           (2),
+   *   -- transaction not permitted or supported
+   * badTime              (3), -- messageTime was not sufficiently close to the system time, as defined by local policy
+   * badCertId            (4), -- no certificate could be found matching the provided criteria
+   * badDataFormat        (5),
+   *   -- the data submitted has the wrong format
+   * wrongAuthority       (6), -- the authority indicated in the request is different from the one creating the response token
+   * incorrectData        (7), -- the requester's data is incorrect (for notary services)
+   * missingTimeStamp     (8), -- when the timestamp is missing but should be there (by policy)
+   * badPOP               (9)  -- the proof-of-possession failed
+   * certRevoked         (10),
+   * certConfirmed       (11),
+   * wrongIntegrity      (12),
+   * badRecipientNonce   (13),
+   * timeNotAvailable    (14),
+   *   -- the TSA's time source is not available
+   * unacceptedPolicy    (15),
+   *   -- the requested TSA policy is not supported by the TSA
+   * unacceptedExtension (16),
+   *   -- the requested extension is not supported by the TSA
+   * addInfoNotAvailable (17)
+   *   -- the additional information requested could not be understood
+   *   -- or is not available
+   * badSenderNonce      (18),
+   * badCertTemplate     (19),
+   * signerNotTrusted    (20),
+   * transactionIdInUse  (21),
+   * unsupportedVersion  (22),
+   * notAuthorized       (23),
+   * systemUnavail       (24),
+   * systemFailure       (25),
+   *   -- the request cannot be handled due to system failure
+   * duplicateCertReq    (26)
+   * </pre>
+   */
   private static final String[] FAILUREINFO_TEXTS = new String[] {
     // 0 - 3
     "incorrectData", "wrongAuthority", "badDataFormat", "badCertId",

@@ -30,6 +30,8 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.StringUtil;
+import org.xipki.util.exception.DecodeException;
+import org.xipki.util.exception.EncodeException;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -387,7 +389,7 @@ public abstract class Client {
       SignAlgo signatureAlgorithm = SignAlgo.getInstance(identityKey, hashAlgo, null);
       return request.encode(identityKey, signatureAlgorithm, identityCert,
           new X509Cert[]{identityCert}, authorityCertStore.getEncryptionCert(), encAlgId);
-    } catch (MessageEncodingException | NoSuchAlgorithmException ex) {
+    } catch (EncodeException | NoSuchAlgorithmException ex) {
       throw new ScepClientException(ex);
     }
   }
@@ -412,7 +414,7 @@ public abstract class Client {
     DecodedNextCaMessage resp;
     try {
       resp = DecodedNextCaMessage.decode(cmsSignedData, responseSignerCerts);
-    } catch (MessageDecodingException ex) {
+    } catch (DecodeException ex) {
       throw new ScepClientException("could not decode response: " + ex.getMessage(), ex);
     }
 
@@ -455,7 +457,7 @@ public abstract class Client {
     DecodedPkiMessage resp;
     try {
       resp = DecodedPkiMessage.decode(pkiMessage, recipientKey, recipientCert, responseSignerCerts);
-    } catch (MessageDecodingException ex) {
+    } catch (DecodeException ex) {
       throw new ScepClientException(ex);
     }
 

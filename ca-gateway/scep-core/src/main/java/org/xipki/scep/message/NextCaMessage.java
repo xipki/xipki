@@ -16,6 +16,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.exception.EncodeException;
 
 import java.io.IOException;
 import java.security.PrivateKey;
@@ -53,8 +54,7 @@ public class NextCaMessage {
     this.raCerts = CollectionUtil.isEmpty(raCerts) ? null : List.copyOf(raCerts);
   }
 
-  public ContentInfo encode(PrivateKey signingKey, X509Cert signerCert, X509Cert[] cmsCertSet)
-      throws MessageEncodingException {
+  public ContentInfo encode(PrivateKey signingKey, X509Cert signerCert, X509Cert[] cmsCertSet) throws EncodeException {
     Args.notNull(signingKey, "signingKey");
     Args.notNull(signerCert, "signerCert");
 
@@ -90,7 +90,7 @@ public class NextCaMessage {
       ScepUtil.addCmsCertSet(generator, cmsCertSet);
       return generator.generate(cmsContent, true).toASN1Structure();
     } catch (CMSException | CertificateEncodingException | IOException | OperatorCreationException ex) {
-      throw new MessageEncodingException(ex);
+      throw new EncodeException(ex);
     }
   } // method encode
 

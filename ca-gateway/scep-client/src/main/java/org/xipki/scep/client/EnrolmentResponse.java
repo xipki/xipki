@@ -32,8 +32,7 @@ public final class EnrolmentResponse {
   private List<X509Cert> certificates;
 
   public EnrolmentResponse(PkiMessage pkcsRep) throws ScepClientException {
-    Args.notNull(pkcsRep, "pkcsRep");
-    MessageType messageType = pkcsRep.getMessageType();
+    MessageType messageType = Args.notNull(pkcsRep, "pkcsRep").getMessageType();
     if (MessageType.CertRep != messageType) {
       throw new ScepClientException("messageType must not be other than CertRep: " + messageType);
     }
@@ -48,8 +47,7 @@ public final class EnrolmentResponse {
       throw new ScepClientException("pkcsRep is not a ContentInfo");
     }
 
-    ContentInfo ci = (ContentInfo) messageData;
-    SignedData sd = SignedData.getInstance(ci.getContent());
+    SignedData sd = SignedData.getInstance(((ContentInfo) messageData).getContent());
     ASN1Set asn1Certs = sd.getCertificates();
     if (asn1Certs == null || asn1Certs.size() == 0) {
       throw new ScepClientException("no certificate is embedded in pkcsRep");
@@ -58,7 +56,7 @@ public final class EnrolmentResponse {
     try {
       this.certificates = Collections.unmodifiableList(ScepUtil.getCertsFromSignedData(sd));
     } catch (CertificateException ex) {
-      throw new ScepClientException(ex.getMessage(), ex);
+      throw new ScepClientException(ex);
     }
   }
 

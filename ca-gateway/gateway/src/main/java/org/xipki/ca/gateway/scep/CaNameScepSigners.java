@@ -6,11 +6,8 @@ package org.xipki.ca.gateway.scep;
 import org.xipki.ca.gateway.CaNameSigners;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.exception.InvalidConfException;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -31,27 +28,6 @@ public class CaNameScepSigners {
     this.signers = new HashMap<>();
     for (String name : signers.signerNames()) {
       this.signers.put(name, new ScepSigner(signers.getSigner(name)));
-    }
-  }
-
-  public CaNameScepSigners(ScepSigner defaultSigner, Map<String, ScepSigner> signers)
-      throws InvalidConfException {
-    if (defaultSigner == null && CollectionUtil.isEmpty(signers)) {
-      throw new InvalidConfException("At least one of defaultSigner and signers must be set");
-    }
-
-    this.defaultSigner = defaultSigner;
-    if (signers == null) {
-      this.signers = null;
-    } else {
-      this.signers = new HashMap<>(signers.size() * 3 / 2);
-      for (Map.Entry<String, ScepSigner> m : signers.entrySet()) {
-        String name = m.getKey().toLowerCase(Locale.ROOT);
-        if (this.signers.containsKey(name)) {
-          throw new InvalidConfException("at least two signers for the CA " + name + " are set");
-        }
-        this.signers.put(m.getKey().toLowerCase(Locale.ROOT), m.getValue());
-      }
     }
   }
 

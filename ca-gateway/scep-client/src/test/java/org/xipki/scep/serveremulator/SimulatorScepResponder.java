@@ -24,6 +24,7 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
+import org.xipki.util.exception.DecodeException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -80,7 +81,7 @@ public class SimulatorScepResponder {
   }
 
   public ContentInfo servicePkiOperation(CMSSignedData requestContent)
-      throws MessageDecodingException, CaException, NoSuchAlgorithmException {
+      throws DecodeException, CaException, NoSuchAlgorithmException {
     Args.notNull(requestContent, "requestContent");
     PrivateKey recipientKey = (raEmulator != null) ? raEmulator.getRaKey() : caEmulator.getCaKey();
     X509Cert recipientCert = (raEmulator != null) ? raEmulator.getRaCert() : caEmulator.getCaCert();

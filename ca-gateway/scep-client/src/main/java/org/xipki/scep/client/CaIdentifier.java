@@ -11,6 +11,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * CA identifier.
@@ -53,30 +54,20 @@ public class CaIdentifier {
   }
 
   public String buildGetUrl(Operation operation, String message) {
-    Args.notNull(operation, "operation");
-    StringBuilder ub = new StringBuilder(url);
-    ub.append('?').append("operation=").append(operation.getCode());
-
-    if (StringUtil.isNotBlank(message)) {
-      String urlMessage;
-      urlMessage = URLEncoder.encode(message, StandardCharsets.UTF_8);
-      ub.append("&message=").append(urlMessage);
-    }
-    return ub.toString();
+    String str = url + "?operation=" + Args.notNull(operation, "operation").getCode();
+    return StringUtil.isBlank(message) ? str
+        : str + "&message=" + URLEncoder.encode(message, StandardCharsets.UTF_8);
   }
 
   public String buildPostUrl(Operation operation) {
-    Args.notNull(operation, "operation");
-    return url + "?operation=" + operation.getCode();
+    return url + "?operation=" + Args.notNull(operation, "operation").getCode();
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("URL: ").append(url);
-    if (StringUtil.isNotBlank(profile)) {
-      sb.append(", CA-Ident: ").append(profile);
-    }
-    return sb.toString();
+    return StringUtil.isBlank(profile)
+        ? "URL: " + url
+        : "URL: " + url + ", CA-Ident: " + profile;
   }
 
   @Override
@@ -90,15 +81,7 @@ public class CaIdentifier {
     }
 
     CaIdentifier objB = (CaIdentifier) object;
-    if (!url.equals(objB.url)) {
-      return false;
-    }
-
-    if (profile == null) {
-      return objB.profile == null;
-    } else {
-      return profile.equals(objB.profile);
-    }
+    return url.equals(objB.url) && Objects.equals(profile, objB.profile);
   }
 
   @Override

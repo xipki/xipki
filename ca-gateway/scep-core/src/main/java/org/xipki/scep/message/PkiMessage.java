@@ -19,6 +19,7 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.exception.EncodeException;
 
 import java.io.IOException;
 import java.security.PrivateKey;
@@ -204,21 +205,19 @@ public class PkiMessage {
 
   public ContentInfo encode(
       PrivateKey signerKey, SignAlgo signatureAlgorithm, X509Cert signerCert,
-      X509Cert[] signerCertSet, X509Cert recipientCert, ASN1ObjectIdentifier encAlgId)
-      throws MessageEncodingException {
+      X509Cert[] signerCertSet, X509Cert recipientCert, ASN1ObjectIdentifier encAlgId) throws EncodeException {
     Args.notNull(signerKey, "signerKey");
     ContentSigner signer;
     try {
       signer = new JcaContentSignerBuilder(signatureAlgorithm.getJceName()).build(signerKey);
     } catch (OperatorCreationException ex) {
-      throw new MessageEncodingException(ex);
+      throw new EncodeException(ex);
     }
     return encode(signer, signerCert, signerCertSet, recipientCert, encAlgId);
   } // method encode
 
   public ContentInfo encode(ContentSigner signer, X509Cert signerCert, X509Cert[] cmsCertSet,
-                            X509Cert recipientCert, ASN1ObjectIdentifier encAlgId)
-      throws MessageEncodingException {
+                            X509Cert recipientCert, ASN1ObjectIdentifier encAlgId) throws EncodeException {
     Args.notNull(signer, "signer");
     Args.notNull(signerCert, "signerCert");
     if (messageData != null) {
@@ -235,7 +234,7 @@ public class PkiMessage {
       try {
         encoded = envelopedData.getEncoded();
       } catch (IOException ex) {
-        throw new MessageEncodingException(ex);
+        throw new EncodeException(ex);
       }
       content = new CMSProcessableByteArray(CMSObjectIdentifiers.envelopedData, encoded);
     }
@@ -261,19 +260,19 @@ public class PkiMessage {
       try {
         signerInfo = signerInfoBuilder.build(signer, signerCert.toBcCert());
       } catch (Exception ex) {
-        throw new MessageEncodingException(ex);
+        throw new EncodeException(ex);
       }
 
       generator.addSignerInfoGenerator(signerInfo);
 
       return generator.generate(content, true).toASN1Structure();
     } catch (Exception ex) {
-      throw new MessageEncodingException(ex);
+      throw new EncodeException(ex);
     }
   } // method encode
 
   // TODO: use password based encryption for not-encryptable public key.
-  private CMSEnvelopedData encrypt(X509Cert recipient, ASN1ObjectIdentifier encAlgId) throws MessageEncodingException {
+  private CMSEnvelopedData encrypt(X509Cert recipient, ASN1ObjectIdentifier encAlgId) throws EncodeException {
     Args.notNull(recipient, "recipient");
     Args.notNull(encAlgId, "encAlgId");
 
@@ -281,7 +280,7 @@ public class PkiMessage {
     try {
       messageDataBytes = messageData.toASN1Primitive().getEncoded();
     } catch (IOException ex) {
-      throw new MessageEncodingException(ex);
+      throw new EncodeException(ex);
     }
 
     CMSEnvelopedDataGenerator edGenerator = new CMSEnvelopedDataGenerator();
@@ -294,7 +293,7 @@ public class PkiMessage {
     try {
       return edGenerator.generate(envelopable, new JceCMSContentEncryptorBuilder(encAlgId).build());
     } catch (CMSException ex) {
-      throw new MessageEncodingException(ex);
+      throw new EncodeException(ex);
     }
   }
 

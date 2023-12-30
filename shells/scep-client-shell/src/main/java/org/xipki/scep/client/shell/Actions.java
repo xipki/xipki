@@ -80,7 +80,7 @@ public class Actions {
 
       List<X509Cert> certs = resp.getCertificates();
       if (certs == null || certs.isEmpty()) {
-        throw new CmdFailure("received no certficate from server");
+        throw new CmdFailure("received no certificate from server");
       }
 
       saveVerbose("saved certificate to file", outputFile, encodeCert(certs.get(0).getEncoded(), outform));

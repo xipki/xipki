@@ -149,16 +149,15 @@ public class CmpUtf8Pairs {
   }
 
   private static String encodeNameOrValue(String str) {
-    String tmpStr = str;
-    if (tmpStr.contains("%")) {
-      tmpStr = tmpStr.replaceAll("%", "%25");
+    if (str.contains("%")) {
+      str = str.replaceAll("%", "%25");
     }
 
-    if (tmpStr.contains("?")) {
-      tmpStr = tmpStr.replaceAll("\\?", "%3f");
+    if (str.contains("?")) {
+      str = str.replaceAll("\\?", "%3f");
     }
 
-    return tmpStr;
+    return str;
   }
 
   private static String decodeNameOrValue(String str) {

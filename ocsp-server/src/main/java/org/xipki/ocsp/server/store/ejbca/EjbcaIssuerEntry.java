@@ -46,8 +46,7 @@ class EjbcaIssuerEntry {
     this.issuerHashMap = getIssuerHashAndKeys(encodedCert);
   }
 
-  private static Map<HashAlgo, byte[]> getIssuerHashAndKeys(byte[] encodedCert)
-      throws CertificateEncodingException {
+  private static Map<HashAlgo, byte[]> getIssuerHashAndKeys(byte[] encodedCert) throws CertificateEncodingException {
     byte[] encodedName;
     byte[] encodedKey;
     try {
@@ -88,11 +87,8 @@ class EjbcaIssuerEntry {
 
   public boolean matchHash(RequestIssuer reqIssuer) {
     byte[] issuerHash = issuerHashMap.get(reqIssuer.hashAlgorithm());
-    if (issuerHash == null) {
-      return false;
-    }
-
-    return CompareUtil.areEqual(issuerHash, 0, reqIssuer.getData(), reqIssuer.getNameHashFrom(), issuerHash.length);
+    return issuerHash != null &&
+        CompareUtil.areEqual(issuerHash, 0, reqIssuer.getData(), reqIssuer.getNameHashFrom(), issuerHash.length);
   }
 
   public void setRevocationInfo(Instant revocationTime) {

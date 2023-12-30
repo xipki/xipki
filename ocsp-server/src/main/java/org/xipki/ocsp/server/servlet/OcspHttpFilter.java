@@ -103,12 +103,8 @@ public class OcspHttpFilter implements XiHttpFilter {
     String requestUri = req.getRequestURI();
     String contextPath = req.getContextPath();
 
-    String path;
-    if (requestUri.length() == contextPath.length()) {
-      path = "/";
-    } else {
-      path = requestUri.substring(contextPath.length());
-    }
+    String path = (requestUri.length() == contextPath.length()) ? "/"
+        : requestUri.substring(contextPath.length());
 
     if (path.startsWith("/health/")) {
       String servletPath = path.substring(7); // 7 = "/health".length()

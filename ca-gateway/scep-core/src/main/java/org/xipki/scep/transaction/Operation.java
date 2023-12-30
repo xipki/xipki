@@ -28,14 +28,4 @@ public enum Operation {
     return code;
   }
 
-  public static Operation forValue(String code) {
-    Args.notBlank(code, "code");
-    for (Operation m : values()) {
-      if (code.equalsIgnoreCase(m.code)) {
-        return m;
-      }
-    }
-    throw new IllegalArgumentException("invalid Operation " + code);
-  }
-
 }

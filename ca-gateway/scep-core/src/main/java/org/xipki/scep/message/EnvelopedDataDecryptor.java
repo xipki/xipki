@@ -7,6 +7,7 @@ import org.bouncycastle.cms.*;
 import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
+import org.xipki.util.exception.DecodeException;
 
 import java.security.PrivateKey;
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public final class EnvelopedDataDecryptor {
     this.decryptors = Collections.singletonList(Args.notNull(decryptor, "decryptor"));
   }
 
-  public byte[] decrypt(CMSEnvelopedData envData) throws MessageDecodingException {
+  public byte[] decrypt(CMSEnvelopedData envData) throws DecodeException {
     Args.notNull(envData, "envData");
     final RecipientInformationStore recipientInfos = envData.getRecipientInfos();
     RecipientInformation recipientInfo = null;
@@ -70,13 +71,13 @@ public final class EnvelopedDataDecryptor {
     }
 
     if (recipientInfo == null) {
-      throw new MessageDecodingException("missing expected key transfer recipient");
+      throw new DecodeException("missing expected key transfer recipient");
     }
 
     try {
       return recipientInfo.getContent(decryptor.getRecipient());
     } catch (CMSException ex) {
-      throw new MessageDecodingException("could not decrypt the envelopedData");
+      throw new DecodeException("could not decrypt the envelopedData");
     }
   }
 

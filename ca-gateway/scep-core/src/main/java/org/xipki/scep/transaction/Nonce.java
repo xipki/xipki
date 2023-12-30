@@ -4,8 +4,8 @@
 package org.xipki.scep.transaction;
 
 import org.xipki.util.Args;
+import org.xipki.util.RandomUtil;
 
-import java.security.SecureRandom;
 import java.util.Arrays;
 
 /**
@@ -15,8 +15,6 @@ import java.util.Arrays;
  */
 
 public class Nonce {
-
-  private static final SecureRandom RANDOM = new SecureRandom();
 
   private static final int NONCE_LEN = 16;
 
@@ -39,9 +37,7 @@ public class Nonce {
   }
 
   public static Nonce randomNonce() {
-    byte[] bytes = new byte[NONCE_LEN];
-    RANDOM.nextBytes(bytes);
-    return new Nonce(bytes, false);
+    return new Nonce(RandomUtil.nextBytes(NONCE_LEN), false);
   }
 
 }

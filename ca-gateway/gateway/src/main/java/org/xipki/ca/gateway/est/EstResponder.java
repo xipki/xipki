@@ -201,8 +201,7 @@ public class EstResponder {
     return authenticator.getCertRequestor(cert);
   }
 
-  public HttpResponse service(
-      String path, byte[] request, XiHttpRequest httpRequest, AuditEvent event) {
+  public HttpResponse service(String path, byte[] request, XiHttpRequest httpRequest, AuditEvent event) {
     AuditLevel auditLevel = AuditLevel.INFO;
     AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
     String auditMessage = null;
@@ -367,12 +366,9 @@ public class EstResponder {
         }
       }
 
-      HttpRespContent respContent;
-      if (CMD_simplereenroll.equals(command) || CMD_usimplereenroll.equals(command)) {
-        respContent = reenrollCert(command, caName, profile, csr, event);
-      } else {
-        respContent = enrollCert(command, caName, profile, csr, event);
-      }
+      HttpRespContent respContent = CMD_simplereenroll.equals(command) || CMD_usimplereenroll.equals(command)
+          ? reenrollCert(command, caName, profile, csr, event)
+          :   enrollCert(command, caName, profile, csr, event);
 
       return toHttpResponse(respContent);
     } catch (OperationException ex) {
@@ -419,10 +415,9 @@ public class EstResponder {
       event.setStatus(AuditStatus.FAILED);
       event.addEventData(CaAuditConstants.NAME_message, code.name());
 
-      if (code == ErrorCode.DATABASE_FAILURE || code == ErrorCode.SYSTEM_FAILURE) {
-        auditMessage = code.name();
-      } else {
-        auditMessage = code.name() + ": " + ex.getErrorMessage();
+      auditMessage = code.name();
+      if (code != ErrorCode.DATABASE_FAILURE && code != ErrorCode.SYSTEM_FAILURE) {
+        auditMessage += ": " + ex.getErrorMessage();
       }
 
       return new HttpResponse(sc);
@@ -688,8 +683,7 @@ public class EstResponder {
     }
   } // method reenrollCert
 
-  private HttpRespContent getCsrAttrs(String caName, String profile)
-      throws IOException, SdkErrorResponseException {
+  private HttpRespContent getCsrAttrs(String caName, String profile) throws IOException, SdkErrorResponseException {
     CertprofileInfoResponse sdkResp = sdk.profileInfo(caName, profile);
     ASN1EncodableVector csrAttrs = new ASN1EncodableVector();
 
@@ -718,12 +712,10 @@ public class EstResponder {
       }
     }
 
-    ASN1Sequence seq = new DERSequence(csrAttrs);
-    return HttpRespContent.ofOk(CT_csrattrs, true, seq.getEncoded("DER"));
+    return HttpRespContent.ofOk(CT_csrattrs, true, new DERSequence(csrAttrs).getEncoded("DER"));
   }
 
-  private static void checkResponse(int expectedSize, EnrollOrPollCertsResponse resp)
-      throws HttpRespAuditException {
+  private static void checkResponse(int expectedSize, EnrollOrPollCertsResponse resp) throws HttpRespAuditException {
     EnrollOrPollCertsResponse.Entry[] entries = resp.getEntries();
     if (entries != null) {
       for (EnrollOrPollCertsResponse.Entry entry : entries) {
@@ -742,8 +734,7 @@ public class EstResponder {
   }
 
   private static EnrollOrPollCertsResponse.Entry getEntry(
-      EnrollOrPollCertsResponse.Entry[] entries, BigInteger certReqId)
-      throws HttpRespAuditException {
+      EnrollOrPollCertsResponse.Entry[] entries, BigInteger certReqId) throws HttpRespAuditException {
     for (EnrollOrPollCertsResponse.Entry m : entries) {
       if (certReqId.equals(m.getId())) {
         return m;

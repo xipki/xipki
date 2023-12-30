@@ -40,6 +40,8 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.exception.DecodeException;
+import org.xipki.util.exception.EncodeException;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpRequest;
@@ -228,7 +230,7 @@ public class ScepResponder {
         ContentInfo ci;
         try {
           ci = servicePkiOperation(signer, caName, reqMessage, certprofileName, event);
-        } catch (MessageDecodingException ex) {
+        } catch (DecodeException ex) {
           final String msg = "could not decrypt and/or verify the request";
           LogUtil.error(LOG, ex, msg);
           auditMessage = msg;
@@ -316,9 +318,7 @@ public class ScepResponder {
   private static void audit(AuditService auditService, AuditEvent event,
                             AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage) {
     AuditLevel curLevel = event.getLevel();
-    if (curLevel == null) {
-      event.setLevel(auditLevel);
-    } else if (curLevel.getValue() > auditLevel.getValue()) {
+    if (curLevel == null || curLevel.getValue() > auditLevel.getValue()) {
       event.setLevel(auditLevel);
     }
 
@@ -360,7 +360,7 @@ public class ScepResponder {
 
   private ContentInfo servicePkiOperation(
       ScepSigner signer, String caName, CMSSignedData requestContent, String certprofileName, AuditEvent event)
-      throws MessageDecodingException, OperationException, SdkErrorResponseException {
+      throws DecodeException, OperationException, SdkErrorResponseException {
     DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, signer.getDecryptor(), null);
     PkiMessage rep = servicePkiOperation0(caName, requestContent, req, certprofileName, event);
     audit(event, NAME_pki_status, rep.getPkiStatus().toString());
@@ -512,8 +512,7 @@ public class ScepResponder {
             Requestor.PasswordRequestor requestor0 = getRequestor(user);
             requestor = requestor0;
 
-            boolean authorized =
-                requestor0 != null && requestor0.authenticate(password.getBytes(StandardCharsets.UTF_8));
+            boolean authorized = requestor0 != null && requestor0.authenticate(password.getBytes(StandardCharsets.UTF_8));
             if (!authorized) {
               LOG.warn("tid={}: could not authenticate user {}", tid, user);
               throw FailInfoException.BAD_REQUEST;
@@ -574,8 +573,7 @@ public class ScepResponder {
               : control.isIncludeCaCert() ? CertsMode.CERT : CertsMode.NONE;
           sdkReq.setCaCertMode(certsMode);
 
-          signedData = buildSignedData(
-                          sdk.enrollCerts(caName, sdkReq));
+          signedData = buildSignedData(sdk.enrollCerts(caName, sdkReq));
           break;
         }
         case CertPoll: {
@@ -587,8 +585,7 @@ public class ScepResponder {
           PollCertRequest sdkReq = new PollCertRequest(null, new X500NameType(is.getIssuer()),
               null, req.getTransactionId().getId(), new PollCertRequest.Entry[]{template});
 
-          signedData = buildSignedData(
-                        sdk.pollCerts(sdkReq));
+          signedData = buildSignedData(sdk.pollCerts(sdkReq));
           break;
         }
         case GetCert: {
@@ -623,16 +620,14 @@ public class ScepResponder {
 
   private SignedData getCert(String caName, X500Name issuer, BigInteger serialNumber)
       throws FailInfoException, OperationException, SdkErrorResponseException {
-    byte[] encodedCert = sdk.getCert(caName, issuer, serialNumber);
-    if (encodedCert == null) {
-      throw FailInfoException.BAD_CERTID;
-    }
+    byte[] encodedCert = Optional.ofNullable(
+        sdk.getCert(caName, issuer, serialNumber)).orElseThrow(
+            () -> FailInfoException.BAD_CERTID);
 
     return buildSignedData(encodedCert, null);
   } // method getCert
 
-  private SignedData buildSignedData(EnrollOrPollCertsResponse sdkResp)
-    throws OperationException {
+  private SignedData buildSignedData(EnrollOrPollCertsResponse sdkResp) throws OperationException {
     EnrollOrPollCertsResponse.Entry[] entries = sdkResp.getEntries();
     int n = entries == null ? 0 : entries.length;
     if (n != 1) {
@@ -646,8 +641,7 @@ public class ScepResponder {
     return buildSignedData(cert, sdkResp.getExtraCerts());
   }
 
-  private SignedData buildSignedData(byte[] cert, byte[][] extraCerts)
-      throws OperationException {
+  private SignedData buildSignedData(byte[] cert, byte[][] extraCerts) throws OperationException {
     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
     try {
       cmsSignedDataGen.addCertificate(new X509CertificateHolder(Certificate.getInstance(cert)));
@@ -687,8 +681,8 @@ public class ScepResponder {
     return SignedData.getInstance(signedData.toASN1Structure().getContent());
   } // method getCrl
 
-  private ContentInfo encodeResponse(
-      ScepSigner signer, PkiMessage response, DecodedPkiMessage request) throws OperationException {
+  private ContentInfo encodeResponse(ScepSigner signer, PkiMessage response, DecodedPkiMessage request)
+      throws OperationException {
     Args.notNull(response, "response");
     Args.notNull(request, "request");
 
@@ -707,7 +701,7 @@ public class ScepResponder {
 
       ci = response.encode(signer.getKey(), signatureAlgorithm, signer.getCert(), cmsCertSet,
           request.getSignatureCert(), request.getContentEncryptionAlgorithm());
-    } catch (MessageEncodingException | NoSuchAlgorithmException ex) {
+    } catch (EncodeException | NoSuchAlgorithmException ex) {
       LogUtil.error(LOG, ex, "could not encode response");
       throw new OperationException(SYSTEM_FAILURE, ex);
     }
@@ -733,7 +727,7 @@ public class ScepResponder {
 
   private static PkiMessage fail(PkiMessage rep, FailInfo failInfo) {
     rep.setPkiStatus(PkiStatus.FAILURE);
-    rep.setFailInfo(FailInfo.badMessageCheck);
+    rep.setFailInfo(failInfo);
     return rep;
   }
 

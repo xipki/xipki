@@ -11,7 +11,6 @@ import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.scep.message.CaCaps;
-import org.xipki.scep.message.MessageDecodingException;
 import org.xipki.scep.message.NextCaMessage;
 import org.xipki.scep.transaction.Operation;
 import org.xipki.scep.util.ScepConstants;
@@ -19,6 +18,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
+import org.xipki.util.exception.DecodeException;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -89,7 +89,7 @@ public class ScepServlet extends HttpServlet {
         ContentInfo ci;
         try {
           ci = responder.servicePkiOperation(reqMessage);
-        } catch (MessageDecodingException ex) {
+        } catch (DecodeException ex) {
           auditMessage = "could not decrypt and/or verify the request";
           resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
           return;

@@ -21,6 +21,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
+import org.xipki.util.exception.DecodeException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -28,6 +29,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Decoded {@link NextCaMessage}.
@@ -104,13 +106,13 @@ public class DecodedNextCaMessage {
 
   @SuppressWarnings("unchecked")
   public static DecodedNextCaMessage decode(CMSSignedData pkiMessage, CollectionStore<X509CertificateHolder> certStore)
-      throws MessageDecodingException {
+      throws DecodeException {
     Args.notNull(pkiMessage, "pkiMessage");
 
     SignerInformationStore signerStore = pkiMessage.getSignerInfos();
     Collection<SignerInformation> signerInfos = signerStore.getSigners();
     if (signerInfos.size() != 1) {
-      throw new MessageDecodingException("number of signerInfos is not 1, but " + signerInfos.size());
+      throw new DecodeException("number of signerInfos is not 1, but " + signerInfos.size());
     }
 
     SignerInformation signerInfo = signerInfos.iterator().next();
@@ -127,13 +129,11 @@ public class DecodedNextCaMessage {
     }
 
     if (signedDataCerts == null || signedDataCerts.size() != 1) {
-      throw new MessageDecodingException("could not find embedded certificate to verify the signature");
+      throw new DecodeException("could not find embedded certificate to verify the signature");
     }
 
-    AttributeTable signedAttrs = signerInfo.getSignedAttributes();
-    if (signedAttrs == null) {
-      throw new MessageDecodingException("missing signed attributes");
-    }
+    AttributeTable signedAttrs = Optional.ofNullable(signerInfo.getSignedAttributes()).orElseThrow(
+        () -> new DecodeException("missing signed attributes"));
 
     Instant signingTime = null;
     // signingTime

@@ -25,6 +25,7 @@ import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.exception.DecodeException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -129,7 +130,7 @@ public class DecodedPkiMessage extends PkiMessage {
 
   public static DecodedPkiMessage decode(CMSSignedData pkiMessage, PrivateKey recipientKey,
                                          X509Cert recipientCert, CollectionStore<X509CertificateHolder> certStore)
-      throws MessageDecodingException {
+      throws DecodeException {
     EnvelopedDataDecryptorInstance decInstance = new EnvelopedDataDecryptorInstance(recipientCert, recipientKey);
     return decode(pkiMessage, new EnvelopedDataDecryptor(decInstance), certStore);
   }
@@ -137,13 +138,13 @@ public class DecodedPkiMessage extends PkiMessage {
   @SuppressWarnings("unchecked")
   public static DecodedPkiMessage decode(
       CMSSignedData pkiMessage, EnvelopedDataDecryptor recipient, CollectionStore<X509CertificateHolder> certStore)
-      throws MessageDecodingException {
+      throws DecodeException {
     Args.notNull(recipient, "recipient");
 
     SignerInformationStore signerStore = Args.notNull(pkiMessage, "pkiMessage").getSignerInfos();
     Collection<SignerInformation> signerInfos = signerStore.getSigners();
     if (signerInfos.size() != 1) {
-      throw new MessageDecodingException("number of signerInfos is not 1, but " + signerInfos.size());
+      throw new DecodeException("number of signerInfos is not 1, but " + signerInfos.size());
     }
 
     SignerInformation signerInfo = signerInfos.iterator().next();
@@ -155,11 +156,11 @@ public class DecodedPkiMessage extends PkiMessage {
     }
 
     if (signedDataCerts == null || signedDataCerts.size() != 1) {
-      throw new MessageDecodingException("could not find embedded certificate to verify the signature");
+      throw new DecodeException("could not find embedded certificate to verify the signature");
     }
 
     AttributeTable signedAttrs = Optional.ofNullable(signerInfo.getSignedAttributes()).orElseThrow(
-        () -> new MessageDecodingException("missing SCEP attributes"));
+        () -> new DecodeException("missing SCEP attributes"));
 
     // signingTime
     ASN1Encodable attrValue = ScepUtil.getFirstAttrValue(signedAttrs, CMSAttributes.signingTime);
@@ -168,28 +169,24 @@ public class DecodedPkiMessage extends PkiMessage {
     // transactionId
     String str = getPrintableStringAttrValue(signedAttrs, ID_TRANSACTION_ID);
     if (StringUtil.isBlank(str)) {
-      throw new MessageDecodingException("missing required SCEP attribute transactionId");
+      throw new DecodeException("missing required SCEP attribute transactionId");
     }
     TransactionId tid = new TransactionId(str);
 
     // messageType
-    Integer intValue = getIntegerPrintStringAttrValue(signedAttrs, ID_MESSAGE_TYPE);
-    if (intValue == null) {
-      throw new MessageDecodingException("tid " + tid.getId() + ": missing required SCEP attribute messageType");
-    }
+    int iValue = Optional.ofNullable(getIntegerPrintStringAttrValue(signedAttrs, ID_MESSAGE_TYPE)).orElseThrow(
+      () -> new DecodeException("tid " + tid.getId() + ": missing required SCEP attribute messageType"));
 
     MessageType messageType;
     try {
-      messageType = MessageType.forValue(intValue);
+      messageType = MessageType.forValue(iValue);
     } catch (IllegalArgumentException ex) {
-      throw new MessageDecodingException("tid " + tid.getId() + ": invalid messageType '" + intValue + "'");
+      throw new DecodeException("tid " + tid.getId() + ": invalid messageType '" + iValue + "'");
     }
 
     // senderNonce
-    Nonce senderNonce = getNonceAttrValue(signedAttrs, ID_SENDER_NONCE);
-    if (senderNonce == null) {
-      throw new MessageDecodingException("tid " + tid.getId() + ": missing required SCEP attribute senderNonce");
-    }
+    Nonce senderNonce = Optional.ofNullable(getNonceAttrValue(signedAttrs, ID_SENDER_NONCE)).orElseThrow(
+        () -> new DecodeException("tid " + tid.getId() + ": missing required SCEP attribute senderNonce"));
 
     DecodedPkiMessage ret = new DecodedPkiMessage(tid, messageType, senderNonce);
     if (signingTime != null) {
@@ -199,7 +196,7 @@ public class DecodedPkiMessage extends PkiMessage {
     Nonce recipientNonce = null;
     try {
       recipientNonce = getNonceAttrValue(signedAttrs, ID_RECIPIENT_NONCE);
-    } catch (MessageDecodingException ex) {
+    } catch (DecodeException ex) {
       ret.setFailureMessage("could not parse recipientNonce: " + ex.getMessage());
     }
 
@@ -210,10 +207,11 @@ public class DecodedPkiMessage extends PkiMessage {
     PkiStatus pkiStatus = null;
     FailInfo failInfo;
     if (MessageType.CertRep == messageType) {
+      Integer intValue;
       // pkiStatus
       try {
         intValue = getIntegerPrintStringAttrValue(signedAttrs, ID_PKI_STATUS);
-      } catch (MessageDecodingException ex) {
+      } catch (DecodeException ex) {
         ret.setFailureMessage("could not parse pkiStatus: " + ex.getMessage());
         return ret;
       }
@@ -235,7 +233,7 @@ public class DecodedPkiMessage extends PkiMessage {
       if (pkiStatus == PkiStatus.FAILURE) {
         try {
           intValue = getIntegerPrintStringAttrValue(signedAttrs, ID_FAILINFO);
-        } catch (MessageDecodingException ex) {
+        } catch (DecodeException ex) {
           ret.setFailureMessage("could not parse failInfo: " + ex.getMessage());
           return ret;
         }
@@ -260,7 +258,7 @@ public class DecodedPkiMessage extends PkiMessage {
           if (value instanceof ASN1UTF8String) {
             ret.setFailInfoText(((ASN1UTF8String) value).getString());
           } else {
-            throw new MessageDecodingException("the value of attribute failInfoText is not UTF8String");
+            throw new DecodeException("the value of attribute failInfoText is not UTF8String");
           }
         }
       } // end if(pkiStatus == PkiStatus.FAILURE)
@@ -362,7 +360,7 @@ public class DecodedPkiMessage extends PkiMessage {
     byte[] encodedMessageData;
     try {
       encodedMessageData = recipient.decrypt(envData);
-    } catch (MessageDecodingException ex) {
+    } catch (DecodeException ex) {
       final String msg = "could not create the CMSEnvelopedData";
       LogUtil.error(LOG, ex);
       ret.setFailureMessage(msg + ": " + ex.getMessage());
@@ -403,35 +401,35 @@ public class DecodedPkiMessage extends PkiMessage {
   } // method decode
 
   private static String getPrintableStringAttrValue(AttributeTable attrs, ASN1ObjectIdentifier type)
-      throws MessageDecodingException {
+      throws DecodeException {
     ASN1Encodable value = ScepUtil.getFirstAttrValue(attrs, type);
     if (value instanceof ASN1PrintableString) {
       return ((ASN1PrintableString) value).getString();
     } else if (value != null) {
-      throw new MessageDecodingException("the value of attribute " + type.getId() + " is not PrintableString");
+      throw new DecodeException("the value of attribute " + type.getId() + " is not PrintableString");
     } else {
       return null;
     }
   }
 
   private static Integer getIntegerPrintStringAttrValue(AttributeTable attrs, ASN1ObjectIdentifier type)
-      throws MessageDecodingException {
+      throws DecodeException {
     String str = getPrintableStringAttrValue(attrs, type);
     try {
       return str == null ? null : Integer.parseInt(str);
     } catch (NumberFormatException ex) {
-      throw new MessageDecodingException("invalid integer '" + str + "'");
+      throw new DecodeException("invalid integer '" + str + "'");
     }
   }
 
   private static Nonce getNonceAttrValue(AttributeTable attrs, ASN1ObjectIdentifier type)
-      throws MessageDecodingException {
+      throws DecodeException {
     ASN1Encodable value = ScepUtil.getFirstAttrValue(attrs, type);
     if (value instanceof ASN1OctetString) {
       byte[] bytes = ((ASN1OctetString) value).getOctets();
       return new Nonce(bytes);
     } else if (value != null) {
-      throw new MessageDecodingException("the value of attribute " + type.getId() + " is not OctetString");
+      throw new DecodeException("the value of attribute " + type.getId() + " is not OctetString");
     } else {
       return null;
     }

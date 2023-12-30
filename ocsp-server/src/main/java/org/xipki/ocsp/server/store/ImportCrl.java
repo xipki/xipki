@@ -60,23 +60,11 @@ class ImportCrl {
     private long invalidityTime;
 
     boolean isDifferent(RevokedCert revokedCert, int crlId) {
-      if (this.crlId != crlId) {
-        return true;
-      }
-
-      if (revoked) {
-        if (revocationReason != revokedCert.getReason()) {
-          return true;
-        }
-
-        if (revocationTime != revokedCert.getRevocationDate()) {
-          return true;
-        }
-
-        return invalidityTime != revokedCert.getInvalidityDate();
-      } else {
-        return true;
-      }
+      return this.crlId != crlId
+          || !revoked
+          || revocationReason != revokedCert.getReason()
+          || revocationTime != revokedCert.getRevocationDate()
+          || invalidityTime != revokedCert.getInvalidityDate();
     }
 
   } // class CertInfo
@@ -392,13 +380,10 @@ class ImportCrl {
         }
       }
 
-      releaseResources(psDeleteCert, null);
-      releaseResources(psInsertCert, null);
-      releaseResources(psInsertCertRev, null);
-      releaseResources(psSelectIdCert, null);
-      releaseResources(psUpdateCert, null);
-      releaseResources(psUpdateCertRev, null);
-      releaseResources(psUpdateCertLastupdate, null);
+      for (PreparedStatement ps : new PreparedStatement[]{psDeleteCert, psInsertCert, psInsertCertRev,
+            psSelectIdCert, psUpdateCert, psUpdateCertRev, psUpdateCertLastupdate}) {
+        releaseResources(ps, null);
+      }
 
       if (conn != null) {
         datasource.returnConnection(conn);
@@ -660,8 +645,7 @@ class ImportCrl {
    * @throws DataAccessException
    *         If database exception occurs.
    */
-  private void deleteCa(Connection conn, CrlDirInfo crlDirInfo, CertWrapper caCert)
-      throws DataAccessException {
+  private void deleteCa(Connection conn, CrlDirInfo crlDirInfo, CertWrapper caCert) throws DataAccessException {
     Integer issuerId = datasource.getFirstIntValue(conn, "ISSUER", "ID", "S1C='" + caCert.base64Sha1Fp + "'");
     if (issuerId == null) {
       LOG.info("No issuer for CRL {} in the folder {} found in database",
@@ -684,8 +668,7 @@ class ImportCrl {
    * @throws DataAccessException
    *         If database exception occurs.
    */
-  private void importCa(Connection conn, CrlDirInfo crlDirInfo, CertWrapper caCert)
-      throws DataAccessException {
+  private void importCa(Connection conn, CrlDirInfo crlDirInfo, CertWrapper caCert) throws DataAccessException {
     CertRevocationInfo revInfo = crlDirInfo.revocationinfo;
 
     Integer issuerId = datasource.getFirstIntValue(conn, "ISSUER", "ID", "S1C='" + caCert.base64Sha1Fp + "'");
