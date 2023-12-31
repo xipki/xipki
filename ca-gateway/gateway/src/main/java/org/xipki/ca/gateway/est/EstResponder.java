@@ -3,7 +3,13 @@
 
 package org.xipki.ca.gateway.est;
 
-import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.SignedData;
@@ -28,7 +34,16 @@ import org.xipki.ca.gateway.api.Requestor;
 import org.xipki.ca.gateway.api.RequestorAuthenticator;
 import org.xipki.ca.gateway.conf.CaProfileConf;
 import org.xipki.ca.gateway.conf.CaProfilesControl;
-import org.xipki.ca.sdk.*;
+import org.xipki.ca.sdk.CaAuditConstants;
+import org.xipki.ca.sdk.CertprofileInfoResponse;
+import org.xipki.ca.sdk.CertsMode;
+import org.xipki.ca.sdk.EnrollCertsRequest;
+import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
+import org.xipki.ca.sdk.KeyType;
+import org.xipki.ca.sdk.OldCertInfo;
+import org.xipki.ca.sdk.SdkClient;
+import org.xipki.ca.sdk.SdkErrorResponseException;
+import org.xipki.ca.sdk.X500NameType;
 import org.xipki.pki.ErrorCode;
 import org.xipki.pki.OperationException;
 import org.xipki.security.ObjectIdentifiers;
@@ -36,8 +51,12 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.TlsHelper;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
-import org.xipki.util.*;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.LogUtil;
+import org.xipki.util.PemEncoder;
+import org.xipki.util.StringUtil;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
@@ -48,7 +67,12 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * EST responder.

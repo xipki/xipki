@@ -3,7 +3,13 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1StreamParser;
+import org.bouncycastle.asn1.DERBitString;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.xipki.util.Base64;
 import org.xipki.util.StringUtil;
 import org.xipki.util.ValidableConf;

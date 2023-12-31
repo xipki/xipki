@@ -4,7 +4,13 @@
 package org.xipki.ocsp.server;
 
 import org.bouncycastle.cert.ocsp.OCSPException;
-import org.xipki.ocsp.server.type.*;
+import org.xipki.ocsp.server.type.ASN1Type;
+import org.xipki.ocsp.server.type.CertID;
+import org.xipki.ocsp.server.type.Extensions;
+import org.xipki.ocsp.server.type.ResponderID;
+import org.xipki.ocsp.server.type.ResponseData;
+import org.xipki.ocsp.server.type.SingleResponse;
+import org.xipki.ocsp.server.type.TaggedCertSequence;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.XiContentSigner;

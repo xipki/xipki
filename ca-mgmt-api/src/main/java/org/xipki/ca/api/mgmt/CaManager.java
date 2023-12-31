@@ -5,7 +5,14 @@ package org.xipki.ca.api.mgmt;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CRLHolder;
-import org.xipki.ca.api.mgmt.entry.*;
+import org.xipki.ca.api.mgmt.entry.CaEntry;
+import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
+import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
+import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
+import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
+import org.xipki.ca.api.mgmt.entry.PublisherEntry;
+import org.xipki.ca.api.mgmt.entry.RequestorEntry;
+import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.KeyCertBytesPair;

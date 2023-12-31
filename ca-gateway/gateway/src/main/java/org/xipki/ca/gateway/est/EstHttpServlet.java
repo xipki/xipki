@@ -5,7 +5,11 @@ package org.xipki.ca.gateway.est;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.*;
+import org.xipki.audit.AuditEvent;
+import org.xipki.audit.AuditLevel;
+import org.xipki.audit.AuditService;
+import org.xipki.audit.AuditStatus;
+import org.xipki.audit.Audits;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;

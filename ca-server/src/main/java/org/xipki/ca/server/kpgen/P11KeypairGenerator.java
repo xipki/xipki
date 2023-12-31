@@ -10,7 +10,11 @@ import org.xipki.ca.api.kpgen.KeypairGenerator;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.pkcs11.*;
+import org.xipki.security.pkcs11.P11CryptService;
+import org.xipki.security.pkcs11.P11CryptServiceFactory;
+import org.xipki.security.pkcs11.P11Module;
+import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.security.pkcs11.P11SlotId;
 import org.xipki.security.util.DSAParameterCache;
 import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
@@ -21,7 +25,13 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.*;
+import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKF_GENERATE_KEY_PAIR;
+import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_DSA_KEY_PAIR_GEN;
+import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN;
+import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_EC_KEY_PAIR_GEN;
+import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN;
+import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN;
+import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN;
 
 /**
  * PKCS#11 {@link P11KeypairGenerator}.

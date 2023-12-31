@@ -5,9 +5,7 @@ package org.xipki.ca.gateway.est;
 
 import org.xipki.ca.gateway.conf.CaProfileConf;
 import org.xipki.ca.gateway.conf.CaProfilesControl;
-import org.xipki.ca.gateway.conf.GatewayConf;
 import org.xipki.ca.gateway.conf.ProtocolConf;
-import org.xipki.security.util.TlsHelper;
 import org.xipki.util.Args;
 import org.xipki.util.JSON;
 import org.xipki.util.exception.InvalidConfException;

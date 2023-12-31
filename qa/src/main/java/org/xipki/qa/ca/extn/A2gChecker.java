@@ -3,10 +3,35 @@
 
 package org.xipki.qa.ca.extn;
 
-import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1IA5String;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1PrintableString;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1String;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.ASN1UTF8String;
+import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
+import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.CRLDistPoint;
+import org.bouncycastle.asn1.x509.DistributionPoint;
+import org.bouncycastle.asn1.x509.DistributionPointName;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
+import org.bouncycastle.asn1.x509.PolicyInformation;
+import org.bouncycastle.asn1.x509.PolicyQualifierId;
+import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
+import org.bouncycastle.asn1.x509.UserNotice;
+import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x509.qualified.BiometricData;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.xipki.ca.api.profile.Certprofile.AuthorityInfoAccessControl;
@@ -23,14 +48,31 @@ import org.xipki.qa.ca.IssuerInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.*;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.CompareUtil;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.Hex;
+import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
+import org.xipki.util.TripleState;
 
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import static org.xipki.qa.ca.extn.CheckerUtil.*;
+import static org.xipki.qa.ca.extn.CheckerUtil.addViolation;
+import static org.xipki.qa.ca.extn.CheckerUtil.checkAia;
+import static org.xipki.qa.ca.extn.CheckerUtil.getExtKeyUsage;
+import static org.xipki.qa.ca.extn.CheckerUtil.hex;
+import static org.xipki.qa.ca.extn.CheckerUtil.strInBnotInA;
 
 /**
  * Checker for extensions whose name is from A to G.

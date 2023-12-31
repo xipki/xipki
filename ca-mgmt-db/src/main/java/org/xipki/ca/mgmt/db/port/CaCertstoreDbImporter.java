@@ -5,7 +5,11 @@ package org.xipki.ca.mgmt.db.port;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +20,13 @@ import org.xipki.security.FpIdCalculator;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.*;
+import org.xipki.util.Args;
+import org.xipki.util.Base64;
+import org.xipki.util.DateUtil;
+import org.xipki.util.IoUtil;
+import org.xipki.util.ProcessLog;
+import org.xipki.util.SqlUtil;
+import org.xipki.util.StringUtil;
 
 import java.io.File;
 import java.math.BigInteger;

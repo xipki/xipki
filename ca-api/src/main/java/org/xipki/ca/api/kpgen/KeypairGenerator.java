@@ -13,7 +13,11 @@ import org.xipki.util.StringUtil;
 import java.io.Closeable;
 import java.math.BigInteger;
 import java.security.spec.RSAKeyGenParameterSpec;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 /**
  * Keypair generator.

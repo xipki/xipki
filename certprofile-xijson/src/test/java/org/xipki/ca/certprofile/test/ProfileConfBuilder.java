@@ -16,14 +16,21 @@ import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
 import org.xipki.ca.api.profile.Certprofile.X509CertVersion;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
-import org.xipki.ca.certprofile.xijson.conf.*;
+import org.xipki.ca.certprofile.xijson.conf.AlgorithmType;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
+import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
+import org.xipki.ca.certprofile.xijson.conf.GeneralNameType;
+import org.xipki.ca.certprofile.xijson.conf.KeyParametersType;
 import org.xipki.ca.certprofile.xijson.conf.KeyParametersType.DsaParametersType;
 import org.xipki.ca.certprofile.xijson.conf.KeyParametersType.EcParametersType;
 import org.xipki.ca.certprofile.xijson.conf.KeyParametersType.RsaParametersType;
+import org.xipki.ca.certprofile.xijson.conf.KeypairGenerationType;
 import org.xipki.ca.certprofile.xijson.conf.KeypairGenerationType.KeyType;
+import org.xipki.ca.certprofile.xijson.conf.Subject;
 import org.xipki.ca.certprofile.xijson.conf.Subject.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.Subject.ValueType;
+import org.xipki.ca.certprofile.xijson.conf.SubjectToSubjectAltNameType;
+import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
@@ -39,7 +46,11 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Builder to create xijson configuration.

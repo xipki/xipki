@@ -18,13 +18,24 @@ import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.NotAfterMode;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.security.ObjectIdentifiers;
-import org.xipki.util.*;
+import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.JSON;
+import org.xipki.util.TripleState;
+import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Root configuration of the xijson Certprofile.

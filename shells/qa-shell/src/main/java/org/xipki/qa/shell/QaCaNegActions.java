@@ -5,11 +5,16 @@ package org.xipki.qa.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.mgmt.shell.*;
+import org.xipki.ca.mgmt.shell.CaActions;
 import org.xipki.ca.mgmt.shell.CertActions.EnrollCert;
 import org.xipki.ca.mgmt.shell.CertActions.RevokeCert;
 import org.xipki.ca.mgmt.shell.CertActions.RmCert;
 import org.xipki.ca.mgmt.shell.CertActions.UnsuspendCert;
+import org.xipki.ca.mgmt.shell.MiscActions;
+import org.xipki.ca.mgmt.shell.ProfileActions;
+import org.xipki.ca.mgmt.shell.PublisherActions;
+import org.xipki.ca.mgmt.shell.RequestorActions;
+import org.xipki.ca.mgmt.shell.SignerActions;
 import org.xipki.shell.CmdFailure;
 
 /**

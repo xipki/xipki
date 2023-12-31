@@ -3,7 +3,11 @@
 
 package org.xipki.ca.certprofile.xijson.conf.extn;
 
-import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERTaggedObject;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;

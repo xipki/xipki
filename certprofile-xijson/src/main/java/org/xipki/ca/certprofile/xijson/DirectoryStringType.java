@@ -3,7 +3,11 @@
 
 package org.xipki.ca.certprofile.xijson;
 
-import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.DERBMPString;
+import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.DERT61String;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.xipki.util.Args;
 
 /**

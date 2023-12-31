@@ -7,7 +7,11 @@ import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
 import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Extension KeyUsage.

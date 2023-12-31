@@ -45,7 +45,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import static org.xipki.pki.ErrorCode.*;
+import static org.xipki.pki.ErrorCode.ALREADY_ISSUED;
+import static org.xipki.pki.ErrorCode.BAD_CERT_TEMPLATE;
+import static org.xipki.pki.ErrorCode.NOT_PERMITTED;
+import static org.xipki.pki.ErrorCode.SYSTEM_FAILURE;
+import static org.xipki.pki.ErrorCode.UNKNOWN_CERT_PROFILE;
 
 /**
  * X509CA GrandCertTemplate builder.

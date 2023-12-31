@@ -3,9 +3,31 @@
 
 package org.xipki.scep.message;
 
-import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.cms.*;
-import org.bouncycastle.cms.*;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
+import org.bouncycastle.cms.CMSAbsentContent;
+import org.bouncycastle.cms.CMSEnvelopedData;
+import org.bouncycastle.cms.CMSEnvelopedDataGenerator;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSProcessableByteArray;
+import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.bouncycastle.cms.CMSTypedData;
+import org.bouncycastle.cms.DefaultSignedAttributeTableGenerator;
+import org.bouncycastle.cms.KeyTransRecipientInfoGenerator;
+import org.bouncycastle.cms.RecipientInfoGenerator;
+import org.bouncycastle.cms.SignerInfoGenerator;
+import org.bouncycastle.cms.SimpleAttributeTableGenerator;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
 import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder;
 import org.bouncycastle.operator.ContentSigner;
@@ -13,7 +35,11 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JceAsymmetricKeyWrapper;
-import org.xipki.scep.transaction.*;
+import org.xipki.scep.transaction.FailInfo;
+import org.xipki.scep.transaction.MessageType;
+import org.xipki.scep.transaction.Nonce;
+import org.xipki.scep.transaction.PkiStatus;
+import org.xipki.scep.transaction.TransactionId;
 import org.xipki.scep.util.ScepUtil;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
@@ -28,7 +54,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import static org.xipki.scep.util.ScepConstants.*;
+import static org.xipki.scep.util.ScepConstants.ID_FAILINFO;
+import static org.xipki.scep.util.ScepConstants.ID_MESSAGE_TYPE;
+import static org.xipki.scep.util.ScepConstants.ID_PKI_STATUS;
+import static org.xipki.scep.util.ScepConstants.ID_RECIPIENT_NONCE;
+import static org.xipki.scep.util.ScepConstants.ID_SCEP_FAILINFOTEXT;
+import static org.xipki.scep.util.ScepConstants.ID_SENDER_NONCE;
+import static org.xipki.scep.util.ScepConstants.ID_TRANSACTION_ID;
 
 /**
  * SCEP PKI-Message.

@@ -11,9 +11,23 @@ import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
 
-import static org.xipki.scep.transaction.CaCapability.*;
+import static org.xipki.scep.transaction.CaCapability.AES;
+import static org.xipki.scep.transaction.CaCapability.DES3;
+import static org.xipki.scep.transaction.CaCapability.GetNextCACert;
+import static org.xipki.scep.transaction.CaCapability.POSTPKIOperation;
+import static org.xipki.scep.transaction.CaCapability.Renewal;
+import static org.xipki.scep.transaction.CaCapability.SCEPStandard;
+import static org.xipki.scep.transaction.CaCapability.SHA1;
+import static org.xipki.scep.transaction.CaCapability.SHA256;
+import static org.xipki.scep.transaction.CaCapability.SHA512;
 
 /**
  * CA caps.

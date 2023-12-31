@@ -5,7 +5,15 @@ package org.xipki.ca.server;
 
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.entry.*;
+import org.xipki.ca.api.mgmt.entry.CaConfColumn;
+import org.xipki.ca.api.mgmt.entry.CaEntry;
+import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
+import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
+import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
+import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
+import org.xipki.ca.api.mgmt.entry.PublisherEntry;
+import org.xipki.ca.api.mgmt.entry.RequestorEntry;
+import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
 import org.xipki.security.CertRevocationInfo;

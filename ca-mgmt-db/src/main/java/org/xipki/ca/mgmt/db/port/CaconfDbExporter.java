@@ -4,7 +4,15 @@
 package org.xipki.ca.mgmt.db.port;
 
 import org.xipki.ca.api.CaUris;
-import org.xipki.ca.api.mgmt.*;
+import org.xipki.ca.api.mgmt.CaConfType;
+import org.xipki.ca.api.mgmt.CaJson;
+import org.xipki.ca.api.mgmt.CaStatus;
+import org.xipki.ca.api.mgmt.CrlControl;
+import org.xipki.ca.api.mgmt.CtlogControl;
+import org.xipki.ca.api.mgmt.PermissionConstants;
+import org.xipki.ca.api.mgmt.Permissions;
+import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
+import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.ca.api.mgmt.entry.CaConfColumn;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
@@ -25,7 +33,12 @@ import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**

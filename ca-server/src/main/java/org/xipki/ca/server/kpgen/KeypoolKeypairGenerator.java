@@ -11,10 +11,17 @@ import org.xipki.ca.api.kpgen.KeypairGenerator;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.XiSecurityException;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
-import org.xipki.util.*;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 
-import javax.crypto.*;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -26,7 +33,11 @@ import java.security.spec.KeySpec;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Keypool based keypair generator.

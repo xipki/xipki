@@ -4,7 +4,8 @@
 package org.xipki.ca.sdk;
 
 import org.xipki.util.Args;
-import org.xipki.util.cbor.*;
+import org.xipki.util.cbor.CborDecoder;
+import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
 

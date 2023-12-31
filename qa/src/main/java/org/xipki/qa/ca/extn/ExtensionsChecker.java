@@ -3,7 +3,18 @@
 
 package org.xipki.qa.ca.extn;
 
-import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1String;
+import org.bouncycastle.asn1.DERBMPString;
+import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERT61String;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
@@ -18,7 +29,17 @@ import org.xipki.ca.certprofile.xijson.DirectoryStringType;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
-import org.xipki.ca.certprofile.xijson.conf.extn.*;
+import org.xipki.ca.certprofile.xijson.conf.extn.AdditionalInformation;
+import org.xipki.ca.certprofile.xijson.conf.extn.CCCSimpleExtensionSchema;
+import org.xipki.ca.certprofile.xijson.conf.extn.CertificatePolicies;
+import org.xipki.ca.certprofile.xijson.conf.extn.InhibitAnyPolicy;
+import org.xipki.ca.certprofile.xijson.conf.extn.NameConstraints;
+import org.xipki.ca.certprofile.xijson.conf.extn.PolicyConstraints;
+import org.xipki.ca.certprofile.xijson.conf.extn.PolicyMappings;
+import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements;
+import org.xipki.ca.certprofile.xijson.conf.extn.Restriction;
+import org.xipki.ca.certprofile.xijson.conf.extn.SmimeCapabilities;
+import org.xipki.ca.certprofile.xijson.conf.extn.TlsFeature;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ca.IssuerInfo;
 import org.xipki.security.ObjectIdentifiers;
@@ -28,10 +49,19 @@ import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import static org.xipki.qa.ca.extn.CheckerUtil.*;
+import static org.xipki.qa.ca.extn.CheckerUtil.addIfNotIn;
+import static org.xipki.qa.ca.extn.CheckerUtil.addViolation;
+import static org.xipki.qa.ca.extn.CheckerUtil.buildConstantExtesions;
+import static org.xipki.qa.ca.extn.CheckerUtil.hex;
+import static org.xipki.qa.ca.extn.CheckerUtil.readAsn1Encodable;
 
 /**
  * Extensions checker.

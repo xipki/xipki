@@ -5,15 +5,29 @@ package org.xipki.ca.server.mgmt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.mgmt.*;
+import org.xipki.ca.api.mgmt.CaConf;
+import org.xipki.ca.api.mgmt.CaConfType;
 import org.xipki.ca.api.mgmt.CaConfType.NameTypeConf;
-import org.xipki.ca.api.mgmt.entry.*;
+import org.xipki.ca.api.mgmt.CaJson;
+import org.xipki.ca.api.mgmt.CaMgmtException;
+import org.xipki.ca.api.mgmt.CaProfileEntry;
+import org.xipki.ca.api.mgmt.entry.CaEntry;
+import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
+import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
+import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
+import org.xipki.ca.api.mgmt.entry.PublisherEntry;
+import org.xipki.ca.api.mgmt.entry.RequestorEntry;
+import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
-import org.xipki.util.*;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.FileOrBinary;
+import org.xipki.util.FileOrValue;
+import org.xipki.util.LogUtil;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
 
@@ -21,12 +35,18 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static org.xipki.ca.server.CaUtil.*;
+import static org.xipki.ca.server.CaUtil.createFileOrBase64Value;
+import static org.xipki.ca.server.CaUtil.createFileOrBinary;
+import static org.xipki.ca.server.CaUtil.createFileOrValue;
 
 /**
  * Load / export CA configuration.

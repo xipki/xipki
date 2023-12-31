@@ -13,7 +13,11 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.http.*;
+import org.xipki.util.http.HttpResponse;
+import org.xipki.util.http.HttpStatusCode;
+import org.xipki.util.http.XiHttpFilter;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
 
 import java.io.IOException;
 import java.security.MessageDigest;

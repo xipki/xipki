@@ -3,8 +3,6 @@
 
 package org.xipki.scep.transaction;
 
-import org.xipki.util.Args;
-
 /**
  * Operation enum.
  *

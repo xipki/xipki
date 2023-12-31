@@ -14,9 +14,20 @@ import org.xipki.ocsp.server.store.DbCertStatusStore;
 import org.xipki.ocsp.server.store.ejbca.EjbcaCertStatusStore;
 import org.xipki.ocsp.server.type.ExtendedExtension;
 import org.xipki.ocsp.server.type.OID;
-import org.xipki.security.*;
+import org.xipki.security.CertpathValidationModel;
+import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.SecurityFactory;
+import org.xipki.security.SignerConf;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.*;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.FileOrBinary;
+import org.xipki.util.IoUtil;
+import org.xipki.util.JSON;
+import org.xipki.util.LogUtil;
+import org.xipki.util.ReflectiveUtil;
+import org.xipki.util.StringUtil;
+import org.xipki.util.Validity;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.exception.ObjectCreationException;
 
@@ -25,7 +36,13 @@ import java.nio.file.Paths;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateException;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Utility functions for {@link OcspServer}.

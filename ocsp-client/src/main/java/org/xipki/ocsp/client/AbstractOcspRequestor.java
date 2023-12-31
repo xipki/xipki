@@ -3,7 +3,12 @@
 
 package org.xipki.ocsp.client;
 
-import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.ocsp.CertID;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.ocsp.OCSPRequest;
@@ -12,11 +17,29 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.TBSCertificate;
-import org.bouncycastle.cert.ocsp.*;
-import org.xipki.security.*;
+import org.bouncycastle.cert.ocsp.BasicOCSPResp;
+import org.bouncycastle.cert.ocsp.CertificateID;
+import org.bouncycastle.cert.ocsp.OCSPException;
+import org.bouncycastle.cert.ocsp.OCSPResp;
+import org.bouncycastle.cert.ocsp.SingleResp;
+import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.NoIdleSignerException;
+import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.SecurityFactory;
+import org.xipki.security.SignAlgo;
+import org.xipki.security.SignerConf;
+import org.xipki.security.X509Cert;
+import org.xipki.security.XiContentSigner;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.*;
+import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.ConcurrentBag;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.LogUtil;
+import org.xipki.util.ReqRespDebug;
 import org.xipki.util.ReqRespDebug.ReqRespPair;
+import org.xipki.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;

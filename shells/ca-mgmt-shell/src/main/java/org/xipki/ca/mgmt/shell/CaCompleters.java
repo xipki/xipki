@@ -5,14 +5,22 @@ package org.xipki.ca.mgmt.shell;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.api.mgmt.*;
+import org.xipki.ca.api.mgmt.CaManager;
+import org.xipki.ca.api.mgmt.CaMgmtException;
+import org.xipki.ca.api.mgmt.CertListOrderBy;
+import org.xipki.ca.api.mgmt.RequestorInfo;
+import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.security.CrlReason;
 import org.xipki.security.X509Cert;
 import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.EnumCompleter;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Completers for the CA actions.

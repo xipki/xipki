@@ -5,7 +5,11 @@ package org.xipki.ca.gateway.acme;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.gateway.acme.type.*;
+import org.xipki.ca.gateway.acme.type.AccountStatus;
+import org.xipki.ca.gateway.acme.type.AuthzStatus;
+import org.xipki.ca.gateway.acme.type.CertReqMeta;
+import org.xipki.ca.gateway.acme.type.ChallengeStatus;
+import org.xipki.ca.gateway.acme.type.OrderStatus;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.util.X509Util;

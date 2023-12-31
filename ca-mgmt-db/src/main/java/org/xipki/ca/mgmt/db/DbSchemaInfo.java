@@ -10,7 +10,11 @@ import org.xipki.util.Args;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Database Schema Information. It contains the content of the table DBSCHEMA.

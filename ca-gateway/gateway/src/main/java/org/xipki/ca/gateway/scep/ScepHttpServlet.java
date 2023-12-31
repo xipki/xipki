@@ -5,7 +5,11 @@ package org.xipki.ca.gateway.scep;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.*;
+import org.xipki.util.Args;
+import org.xipki.util.Base64;
+import org.xipki.util.HttpConstants;
+import org.xipki.util.IoUtil;
+import org.xipki.util.LogUtil;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpRequest;

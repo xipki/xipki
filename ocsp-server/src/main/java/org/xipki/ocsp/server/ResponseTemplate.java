@@ -7,7 +7,11 @@ import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.util.Arrays;
-import org.xipki.ocsp.server.type.*;
+import org.xipki.ocsp.server.type.ASN1Type;
+import org.xipki.ocsp.server.type.ExtendedExtension;
+import org.xipki.ocsp.server.type.Extension;
+import org.xipki.ocsp.server.type.OID;
+import org.xipki.ocsp.server.type.WritableOnlyExtension;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 

@@ -5,7 +5,12 @@ package org.xipki.ocsp.server.store.ejbca;
 
 import org.xipki.ocsp.api.RequestIssuer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * IssuerStore for the EJBCA database.

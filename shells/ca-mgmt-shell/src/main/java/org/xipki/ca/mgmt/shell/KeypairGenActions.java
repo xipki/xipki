@@ -17,7 +17,11 @@ import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Actions to manage Keypair generation entries.

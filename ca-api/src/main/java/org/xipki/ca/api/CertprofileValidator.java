@@ -10,22 +10,38 @@ import org.bouncycastle.asn1.x509.CertificatePolicies;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.ca.api.profile.Certprofile;
-import org.xipki.ca.api.profile.Certprofile.*;
+import org.xipki.ca.api.profile.Certprofile.AuthorityInfoAccessControl;
+import org.xipki.ca.api.profile.Certprofile.CertDomain;
+import org.xipki.ca.api.profile.Certprofile.CertLevel;
+import org.xipki.ca.api.profile.Certprofile.CrlDistributionPointsControl;
+import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
+import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
+import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
+import org.xipki.ca.api.profile.Certprofile.RdnControl;
+import org.xipki.ca.api.profile.Certprofile.SubjectControl;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionSpec;
 import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
-import org.xipki.security.*;
+import org.xipki.security.EdECConstants;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.KeyUsage;
+import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.XKU;
+import org.xipki.security.SignAlgo;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.TripleState;
 import org.xipki.util.Validity;
 import org.xipki.util.Validity.Unit;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * CertProfile with identifier.

@@ -3,19 +3,39 @@
 
 package org.xipki.scep.message;
 
-import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.cms.*;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1PrintableString;
+import org.bouncycastle.asn1.ASN1UTF8String;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cms.*;
+import org.bouncycastle.cms.CMSEnvelopedData;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.CMSTypedData;
+import org.bouncycastle.cms.SignerId;
+import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.cms.SignerInformationVerifier;
 import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.CollectionStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.scep.message.EnvelopedDataDecryptor.EnvelopedDataDecryptorInstance;
-import org.xipki.scep.transaction.*;
+import org.xipki.scep.transaction.FailInfo;
+import org.xipki.scep.transaction.MessageType;
+import org.xipki.scep.transaction.Nonce;
+import org.xipki.scep.transaction.PkiStatus;
+import org.xipki.scep.transaction.TransactionId;
 import org.xipki.scep.util.ScepUtil;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
@@ -35,7 +55,13 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.xipki.scep.util.ScepConstants.*;
+import static org.xipki.scep.util.ScepConstants.ID_FAILINFO;
+import static org.xipki.scep.util.ScepConstants.ID_MESSAGE_TYPE;
+import static org.xipki.scep.util.ScepConstants.ID_PKI_STATUS;
+import static org.xipki.scep.util.ScepConstants.ID_RECIPIENT_NONCE;
+import static org.xipki.scep.util.ScepConstants.ID_SCEP_FAILINFOTEXT;
+import static org.xipki.scep.util.ScepConstants.ID_SENDER_NONCE;
+import static org.xipki.scep.util.ScepConstants.ID_TRANSACTION_ID;
 
 /**
  * Decoded {@link PkiMessage}.

@@ -4,7 +4,11 @@
 package org.xipki.ca.gateway.acme;
 
 import org.xipki.ca.gateway.acme.msg.OrderResponse;
-import org.xipki.ca.gateway.acme.type.*;
+import org.xipki.ca.gateway.acme.type.AuthzStatus;
+import org.xipki.ca.gateway.acme.type.CertReqMeta;
+import org.xipki.ca.gateway.acme.type.ChallengeStatus;
+import org.xipki.ca.gateway.acme.type.Identifier;
+import org.xipki.ca.gateway.acme.type.OrderStatus;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.Args;
 import org.xipki.util.Base64Url;

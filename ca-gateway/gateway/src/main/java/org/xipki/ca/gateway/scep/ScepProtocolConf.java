@@ -3,7 +3,10 @@
 
 package org.xipki.ca.gateway.scep;
 
-import org.xipki.ca.gateway.conf.*;
+import org.xipki.ca.gateway.conf.CaNameSignersConf;
+import org.xipki.ca.gateway.conf.CaProfileConf;
+import org.xipki.ca.gateway.conf.CaProfilesControl;
+import org.xipki.ca.gateway.conf.ProtocolConf;
 import org.xipki.util.Args;
 import org.xipki.util.JSON;
 import org.xipki.util.exception.InvalidConfException;

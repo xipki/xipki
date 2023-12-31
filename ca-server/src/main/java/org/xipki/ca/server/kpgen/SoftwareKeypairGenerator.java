@@ -20,7 +20,11 @@ import org.xipki.util.ConfPairs;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.SecureRandom;
-import java.security.interfaces.*;
+import java.security.interfaces.DSAPrivateKey;
+import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.spec.DSAParameterSpec;
 import java.util.Locale;
 

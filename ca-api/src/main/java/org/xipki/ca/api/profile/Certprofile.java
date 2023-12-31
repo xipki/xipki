@@ -3,7 +3,13 @@
 
 package org.xipki.ca.api.profile;
 
-import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DERBMPString;
+import org.bouncycastle.asn1.DERIA5String;
+import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.DERT61String;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertificatePolicies;
 import org.bouncycastle.asn1.x509.Extension;
@@ -14,13 +20,25 @@ import org.xipki.pki.BadCertTemplateException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.SignAlgo;
-import org.xipki.util.*;
+import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.StringUtil;
+import org.xipki.util.TripleState;
+import org.xipki.util.Validity;
 
 import java.io.Closeable;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Defines how the certificate looks like. All Certprofile classes must extend this class.

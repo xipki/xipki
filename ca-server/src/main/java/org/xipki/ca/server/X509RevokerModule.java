@@ -16,7 +16,11 @@ import org.xipki.pki.ErrorCode;
 import org.xipki.pki.OperationException;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
-import org.xipki.util.*;
+import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.DateUtil;
+import org.xipki.util.LogUtil;
+import org.xipki.util.Validity;
 import org.xipki.util.Validity.Unit;
 
 import java.io.Closeable;
@@ -29,7 +33,13 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static org.xipki.ca.sdk.CaAuditConstants.*;
+import static org.xipki.ca.sdk.CaAuditConstants.NAME_invalidity_time;
+import static org.xipki.ca.sdk.CaAuditConstants.NAME_reason;
+import static org.xipki.ca.sdk.CaAuditConstants.NAME_serial;
+import static org.xipki.ca.sdk.CaAuditConstants.TYPE_revoke_ca;
+import static org.xipki.ca.sdk.CaAuditConstants.TYPE_revoke_suspendedCert;
+import static org.xipki.ca.sdk.CaAuditConstants.TYPE_suspend_ca;
+import static org.xipki.ca.sdk.CaAuditConstants.TYPE_unsuspend_ca;
 
 /**
  * X509CA revoker module.

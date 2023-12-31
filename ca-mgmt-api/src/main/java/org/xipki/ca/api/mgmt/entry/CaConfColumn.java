@@ -4,7 +4,13 @@
 package org.xipki.ca.api.mgmt.entry;
 
 import org.xipki.ca.api.CaUris;
-import org.xipki.ca.api.mgmt.*;
+import org.xipki.ca.api.mgmt.CaJson;
+import org.xipki.ca.api.mgmt.CaMgmtException;
+import org.xipki.ca.api.mgmt.CrlControl;
+import org.xipki.ca.api.mgmt.CtlogControl;
+import org.xipki.ca.api.mgmt.Permissions;
+import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
+import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.Validity;
 

@@ -9,7 +9,11 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.cmp.PkiStatusInfo;
-import org.xipki.cmp.client.*;
+import org.xipki.cmp.client.CertIdOrError;
+import org.xipki.cmp.client.CmpClientException;
+import org.xipki.cmp.client.Requestor;
+import org.xipki.cmp.client.RevokeCertRequest;
+import org.xipki.cmp.client.UnrevokeCertRequest;
 import org.xipki.security.CrlReason;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
@@ -25,7 +29,11 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * CMP client actions to revoke, unrevoke and remove certificates.

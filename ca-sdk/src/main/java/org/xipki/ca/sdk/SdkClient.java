@@ -24,7 +24,25 @@ import java.math.BigInteger;
 import java.time.Instant;
 import java.util.Optional;
 
-import static org.xipki.ca.sdk.SdkConstants.*;
+import static org.xipki.ca.sdk.SdkConstants.CMD_cacert;
+import static org.xipki.ca.sdk.SdkConstants.CMD_cacert2;
+import static org.xipki.ca.sdk.SdkConstants.CMD_cacerts;
+import static org.xipki.ca.sdk.SdkConstants.CMD_cacerts2;
+import static org.xipki.ca.sdk.SdkConstants.CMD_caname;
+import static org.xipki.ca.sdk.SdkConstants.CMD_confirm_enroll;
+import static org.xipki.ca.sdk.SdkConstants.CMD_crl;
+import static org.xipki.ca.sdk.SdkConstants.CMD_enroll;
+import static org.xipki.ca.sdk.SdkConstants.CMD_enroll_cross;
+import static org.xipki.ca.sdk.SdkConstants.CMD_gen_crl;
+import static org.xipki.ca.sdk.SdkConstants.CMD_get_cert;
+import static org.xipki.ca.sdk.SdkConstants.CMD_health;
+import static org.xipki.ca.sdk.SdkConstants.CMD_poll_cert;
+import static org.xipki.ca.sdk.SdkConstants.CMD_profileinfo;
+import static org.xipki.ca.sdk.SdkConstants.CMD_reenroll;
+import static org.xipki.ca.sdk.SdkConstants.CMD_remove_cert;
+import static org.xipki.ca.sdk.SdkConstants.CMD_revoke_cert;
+import static org.xipki.ca.sdk.SdkConstants.CMD_revoke_pending_cert;
+import static org.xipki.ca.sdk.SdkConstants.CMD_unsuspend_cert;
 
 /**
  * API client.

@@ -10,9 +10,13 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
 import org.xipki.ca.certprofile.xijson.DirectoryStringType;
-import org.xipki.ca.certprofile.xijson.conf.*;
+import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
+import org.xipki.ca.certprofile.xijson.conf.GeneralNameType;
+import org.xipki.ca.certprofile.xijson.conf.Subject;
 import org.xipki.ca.certprofile.xijson.conf.Subject.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.Subject.ValueType;
+import org.xipki.ca.certprofile.xijson.conf.SubjectToSubjectAltNameType;
+import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.ca.certprofile.xijson.conf.extn.AdmissionSyntax;
 import org.xipki.ca.certprofile.xijson.conf.extn.AdmissionSyntax.AdmissionsType;
 import org.xipki.ca.certprofile.xijson.conf.extn.AdmissionSyntax.NamingAuthorityType;
@@ -26,7 +30,11 @@ import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.TlsExtensionType;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Demo the creation of xijson configuration for complex certificates.
