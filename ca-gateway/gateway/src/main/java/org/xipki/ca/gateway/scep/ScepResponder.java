@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2023 xipki. All rights reserved.
+// Copyright (c) 2013-2024 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.gateway.scep;
@@ -539,7 +539,8 @@ public class ScepResponder {
             Requestor.PasswordRequestor requestor0 = getRequestor(user);
             requestor = requestor0;
 
-            boolean authorized = requestor0 != null && requestor0.authenticate(password.getBytes(StandardCharsets.UTF_8));
+            boolean authorized =
+                requestor0 != null && requestor0.authenticate(password.getBytes(StandardCharsets.UTF_8));
             if (!authorized) {
               LOG.warn("tid={}: could not authenticate user {}", tid, user);
               throw FailInfoException.BAD_REQUEST;

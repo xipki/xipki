@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2023 xipki. All rights reserved.
+// Copyright (c) 2013-2024 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.cmp;
@@ -21,7 +21,6 @@ public class CmpFailureUtil {
 
   private static final Map<Integer, String> STATUS_TEXT_MAP = new HashMap<>();
 
-
   /**
    * <pre>
    * PKIFailureInfo ::= BIT STRING {
@@ -34,7 +33,8 @@ public class CmpFailureUtil {
    * badCertId            (4), -- no certificate could be found matching the provided criteria
    * badDataFormat        (5),
    *   -- the data submitted has the wrong format
-   * wrongAuthority       (6), -- the authority indicated in the request is different from the one creating the response token
+   * wrongAuthority       (6), -- the authority indicated in the request is different from the one creating the
+   *                           -- response token
    * incorrectData        (7), -- the requester's data is incorrect (for notary services)
    * missingTimeStamp     (8), -- when the timestamp is missing but should be there (by policy)
    * badPOP               (9)  -- the proof-of-possession failed
