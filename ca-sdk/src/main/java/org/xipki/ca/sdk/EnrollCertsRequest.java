@@ -8,6 +8,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
+import org.xipki.util.cbor.CborType;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
 
@@ -262,7 +263,7 @@ public class EnrollCertsRequest extends SdkRequest {
 
     @Override
     protected void encode0(CborEncoder encoder) throws EncodeException, IOException {
-      encoder.writeArrayStart(10);
+      encoder.writeArrayStart(9);
       encoder.writeBigInt(certReqId);
       encoder.writeTextString(certprofile);
       encoder.writeByteString(p10req);
@@ -276,7 +277,7 @@ public class EnrollCertsRequest extends SdkRequest {
 
     public static Entry decode(CborDecoder decoder) throws DecodeException {
       try {
-        if (decoder.readNullOrArrayLength(10)) {
+        if (decoder.readNullOrArrayLength(9)) {
           return null;
         }
 

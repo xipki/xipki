@@ -20,24 +20,35 @@ import java.math.BigInteger;
 
 public class OldCertInfo extends SdkEncodable {
 
+  private static final long TAG_ISN = 1;
+
+  private static final long TAG_SUBJECT = 2;
+
+  private static final long TAG_FSN = 3;
+
   /**
    * Whether to reu-use the public key in the old certificate for the new one.
    */
   private final boolean reusePublicKey;
 
-  private final ByIssuerAndSerial isn;
+  private ByIssuerAndSerial isn;
 
-  private final BySubject subject;
+  private BySha1FpAndSerial fsn;
+
+  private BySubject subject;
 
   public OldCertInfo(boolean reusePublicKey, ByIssuerAndSerial isn) {
     this.reusePublicKey = reusePublicKey;
     this.isn = Args.notNull(isn, "isn");
-    this.subject = null;
+  }
+
+  public OldCertInfo(boolean reusePublicKey, BySha1FpAndSerial fsn) {
+    this.reusePublicKey = reusePublicKey;
+    this.fsn = Args.notNull(fsn, "fsn");
   }
 
   public OldCertInfo(boolean reusePublicKey, BySubject subject) {
     this.reusePublicKey = reusePublicKey;
-    this.isn = null;
     this.subject = Args.notNull(subject, "subject");
   }
 
@@ -53,32 +64,43 @@ public class OldCertInfo extends SdkEncodable {
     return subject;
   }
 
+  public BySha1FpAndSerial getFsn() {
+    return fsn;
+  }
+
   @Override
   protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
-    encoder.writeArrayStart(3);
+    encoder.writeArrayStart(2);
     encoder.writeBoolean(isReusePublicKey());
-    encoder.writeObject(isn);
-    encoder.writeObject(subject);
+    if (isn != null) {
+      encoder.writeTag(TAG_ISN);
+      encoder.writeObject(isn);
+    } else if (subject != null) {
+      encoder.writeTag(TAG_SUBJECT);
+      encoder.writeObject(subject);
+    } else {
+      encoder.writeTag(TAG_FSN);
+      encoder.writeObject(fsn);
+    }
   }
 
   public static OldCertInfo decode(CborDecoder decoder) throws DecodeException {
     try {
-      if (decoder.readNullOrArrayLength(3)) {
+      if (decoder.readNullOrArrayLength(2)) {
         return null;
       }
 
       boolean usePublicKey = decoder.readBoolean();
-      ByIssuerAndSerial isn = ByIssuerAndSerial.decode(decoder);
-      BySubject subject = BySubject.decode(decoder);
-
-      if ((isn == null) == (subject == null)) {
-        throw new DecodeException("exactly one of isn and subject shall be non-null");
-      }
-
-      if (isn != null) {
+      long tag = decoder.readTag();
+      if (tag == TAG_ISN) {
+        ByIssuerAndSerial isn = ByIssuerAndSerial.decode(decoder);
         return new OldCertInfo(usePublicKey, isn);
-      } else {
+      } else if (tag == TAG_SUBJECT) {
+        BySubject subject = BySubject.decode(decoder);
         return new OldCertInfo(usePublicKey, subject);
+      } else { // if (tag == TAG_FSN) {
+        BySha1FpAndSerial fsn = BySha1FpAndSerial.decode(decoder);
+        return new OldCertInfo(usePublicKey, fsn);
       }
     } catch (IOException | RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
@@ -122,6 +144,50 @@ public class OldCertInfo extends SdkEncodable {
 
         return new ByIssuerAndSerial(
             X500NameType.decode(decoder),
+            decoder.readBigInt());
+      } catch (IOException | RuntimeException ex) {
+        throw new DecodeException(buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
+      }
+    }
+  }
+
+  public static class BySha1FpAndSerial extends SdkEncodable {
+
+    private final byte[] caCertSha1;
+
+    /**
+     * Uppercase hex encoded serialNumber.
+     */
+    private final BigInteger serialNumber;
+
+    public BySha1FpAndSerial(byte[] caCertSha1, BigInteger serialNumber) {
+      this.caCertSha1 = caCertSha1;
+      this.serialNumber = serialNumber;
+    }
+
+    public byte[] getCaCertSha1() {
+      return caCertSha1;
+    }
+
+    public BigInteger getSerialNumber() {
+      return serialNumber;
+    }
+
+    @Override
+    protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+      encoder.writeArrayStart(2);
+      encoder.writeByteString(caCertSha1);
+      encoder.writeBigInt(serialNumber);
+    }
+
+    public static BySha1FpAndSerial decode(CborDecoder decoder) throws DecodeException {
+      try {
+        if (decoder.readNullOrArrayLength(2)) {
+          return null;
+        }
+
+        return new BySha1FpAndSerial(
+            decoder.readByteString(),
             decoder.readBigInt());
       } catch (IOException | RuntimeException ex) {
         throw new DecodeException(buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);

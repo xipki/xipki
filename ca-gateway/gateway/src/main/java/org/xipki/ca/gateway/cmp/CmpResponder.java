@@ -238,7 +238,7 @@ public class CmpResponder extends BaseCmpResponder {
         oldCertInfo = new OldCertInfo(false,
             new OldCertInfo.ByIssuerAndSerial(
                 new X500NameType(oldCertId.getIssuer().getName().toASN1Primitive().getEncoded()),
-              oldCertId.getSerialNumber().getValue()));
+                oldCertId.getSerialNumber().getValue()));
       } // end if(reenroll)
 
       String certprofileName = certprofileNames[i];

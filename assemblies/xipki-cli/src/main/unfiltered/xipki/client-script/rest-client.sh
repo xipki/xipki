@@ -82,7 +82,6 @@ openssl req -new -sha256 -key ${OUT_DIR}/${CN}-key.pem -outform der \
 echo "enroll certificate"
 
 # Do not forget the @-symbol of --data-binary.
-
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
     --data-binary "@${OUT_DIR}/${CN}.csr" \
@@ -100,6 +99,19 @@ curl ${OPTS} \
     --output ${OUT_DIR}/${CN}.pem \
     "${CA_URL}/enroll-serverkeygen?profile=tls"
 
+# rekey certificate tls (CA generate keypair)
+SERIAL=0X`openssl x509 -serial -noout -in ${OUT_DIR}/${CN}.pem | cut -d '=' -f 2`
+
+REKEY.CN=tls-genkey-rekey-${CUR_TIME}
+
+echo "rekey certificate (CA generate keypair)"
+
+curl ${OPTS} \
+    --header "Content-Type: text/plain; encoding=utf-8" \
+    --data-ascii "subject=C=DE,O=example,CN=${REKEY.CN}.example.org" \
+    --output ${OUT_DIR}/${REKEY.CN}.pem \
+    "${CA_URL}/rekey-serverkeygen?ca-sha1=${CA_SHA1FP}&oldcert-serial=${SERIAL}"
+
 # enroll certificate tls
 CN=tls-${CUR_TIME}
 
@@ -116,7 +128,6 @@ openssl req -new -sha256 -key ${OUT_DIR}/${CN}-key.pem -outform der \
 echo "enroll certificate"
 
 # Do not forget the @-symbol of --data-binary.
-
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
     --data-binary "@${OUT_DIR}/${CN}.csr" \
@@ -125,6 +136,28 @@ curl ${OPTS} \
 
 # get the serial number
 SERIAL=0X`openssl x509 -inform der -serial -noout -in ${OUT_DIR}/${CN}.der | cut -d '=' -f 2`
+
+# rekey certificate tls
+REKEY.CN=tls-rekey-${CUR_TIME}
+
+echo "generate RSA keypair"
+
+openssl genrsa -out ${OUT_DIR}/${REKEY.CN}-key.pem 2048
+
+echo "generate CSR"
+
+openssl req -new -sha256 -key ${OUT_DIR}/${REKEY.CN}-key.pem -outform der \
+    -out ${OUT_DIR}/${REKEY.CN}.csr \
+    -subj "/C=DE/O=myorg/CN=${REKEY.CN}.example.org"
+
+echo "rekey certificate"
+
+# Do not forget the @-symbol of --data-binary.
+curl ${OPTS} \
+    --header "Content-Type: application/pkcs10" \
+    --data-binary "@${OUT_DIR}/${REKEY.CN}.csr" \
+    --output ${OUT_DIR}/${REKEY.CN}.der \
+    "${CA_URL}/rekey-cert?ca-sha1=${CA_SHA1FP}&oldcert-serial=${SERIAL}"
 
 # The PEM file will be used by "openssl ocsp"
 openssl x509 -inform der -in ${OUT_DIR}/${CN}.der -out ${OUT_DIR}/${CN}.pem

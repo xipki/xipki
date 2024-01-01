@@ -80,6 +80,17 @@ if { $printUsage equals "true" } then {
     --header "Content-Type: text/plain; encoding=utf-8" \
     "$BASE_URL/enroll-serverkeygen?profile=tls"
 
+  echo "=====REST: Rekey (CA generates keypair)====="
+  xi:export-keycert-pem ${OUT_DIR}/${CN}.pem ${OUT_DIR}/${CN}.key ${OUT_DIR}/${CN}.crt
+  SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${CN}.crt)
+
+  REKEY.CN = rest-tls-genkey-rekey-${CUR_TIME}
+
+  xi:curl --out ${OUT_DIR}/${REKEY.CN}.pem \
+    --data "subject=C=DE,O=myorg,CN=${REKEY.CN}.myorg.org" \
+    --header "Content-Type: text/plain; encoding=utf-8" \
+    "$BASE_URL/rekey-serverkeygen?ca-sha1=${CA_SHA1FP}&oldcert-serial=${SERIAL}"
+
   echo "=====REST: Enroll====="
 
   CN = rest-tls-${CUR_TIME}
@@ -96,12 +107,26 @@ if { $printUsage equals "true" } then {
 
   SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${CN}.der)
 
+  echo "=====REST: Rekey ====="
+
+  REKEY.CN = rest-tls-rekey-${CUR_TIME}
+
+  xi:rsa-p12 --password CHANGEIT --out ${OUT_DIR}/${REKEY.CN}.p12 --subject "CN=${REKEY.CN}"
+
+  xi:csr-p12 --p12 ${OUT_DIR}/${REKEY.CN}.p12 --password CHANGEIT \
+    --subject "C=DE,O=myorg,CN=${REKEY.CN}.myorg.org" \
+    --out ${OUT_DIR}/${REKEY.CN}.csr
+
+  xi:curl --out ${OUT_DIR}/${REKEY.CN}.der --data-file ${OUT_DIR}/${REKEY.CN}.csr \
+    --header "Content-Type: application/pkcs10" \
+    "$BASE_URL/rekey-cert?ca-sha1=${CA_SHA1FP}&oldcert-serial=${SERIAL}"
+
+  echo "=====REST: Suspend====="
+
   if { "$ocsp" equals "true" } then {
     echo "Current OCSP status"
     xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
- }
-
-  echo "=====REST: Suspend====="
+  }
 
   xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
 

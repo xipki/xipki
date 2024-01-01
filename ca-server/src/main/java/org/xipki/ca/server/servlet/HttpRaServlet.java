@@ -53,12 +53,14 @@ class HttpRaServlet {
   }
 
   private HttpResponse service0(XiHttpRequest req, boolean post) throws IOException {
+    byte[] reqBody  = null;
+    byte[] respBody = null;
     try {
       String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
-      byte[] requestBytes = post ? IoUtil.readAllBytesAndClose(req.getInputStream()) : null;
+      reqBody = post ? IoUtil.readAllBytesAndClose(req.getInputStream()) : null;
 
-      SdkResponse response = responder.service(path, requestBytes, req);
-      byte[] respBody = response == null ? null : response.encode();
+      SdkResponse response = responder.service(path, reqBody, req);
+      respBody = response == null ? null : response.encode();
       int httpStatus = HttpStatusCode.SC_OK;
       if (response instanceof ErrorResponse) {
         ErrorCode errCode = ((ErrorResponse) response).getCode();
@@ -90,12 +92,6 @@ class HttpRaServlet {
             break;
         }
       }
-
-      if (logReqResp && LOG.isDebugEnabled()) {
-        String respBodyStr = respBody == null ? null : Base64.encodeToString(respBody, true);
-        LOG.debug("HTTP RA path: {}\nResponse:\n{}", req.getRequestURI(), respBodyStr);
-      }
-
       return new HttpResponse(httpStatus, "application/cbor", null, respBody);
     } catch (EncodeException ex) {
       LOG.error("Error encoding SdkResponse", ex);
@@ -103,6 +99,12 @@ class HttpRaServlet {
     } catch (RuntimeException ex) {
       LOG.error("RuntimeException thrown, this should not happen!", ex);
       return new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
+    } finally {
+      if (logReqResp && LOG.isDebugEnabled()) {
+        String  reqBodyStr =  reqBody == null ? null : Base64.encodeToString( reqBody, true);
+        String respBodyStr = respBody == null ? null : Base64.encodeToString(respBody, true);
+        LOG.debug("HTTP RA path: {}\nRequest:\n{}\nResponse:\n{}", req.getRequestURI(), reqBodyStr, respBodyStr);
+      }
     }
   }
 

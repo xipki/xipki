@@ -8,6 +8,7 @@ import org.xipki.util.Args;
 import org.xipki.util.Hex;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
+import org.xipki.util.cbor.CborType;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
 
@@ -20,6 +21,10 @@ import java.io.IOException;
  */
 
 public class X500NameType extends SdkEncodable {
+
+  private static final long TAG_ENCODED = 1;
+
+  private static final long TAG_TEXT = 2;
 
   private X500Name name;
 
@@ -69,33 +74,34 @@ public class X500NameType extends SdkEncodable {
       name = (encoded != null) ? X500Name.getInstance(encoded) : new X500Name(text);
       return name;
     } catch (Exception e) {
-      throw new IOException("error parsing X500Name " + (text != null ? text : "0x" + Hex.encode(encoded)));
+      throw new IOException("error parsing X500Name " + (encoded == null ? text : "0x" + Hex.encode(encoded)));
     }
   }
 
   @Override
   protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
-    encoder.writeArrayStart(2);
-    encoder.writeTextString(encoded == null ? text : null);
-    encoder.writeByteString(encoded);
+    if (encoded != null) {
+      encoder.writeTag(TAG_ENCODED);
+      encoder.writeByteString(encoded);
+    } else {
+      encoder.writeTag(TAG_TEXT);
+      encoder.writeTextString(text);
+    }
   }
 
   public static X500NameType decode(CborDecoder decoder) throws DecodeException {
     try {
-      if (decoder.readNullOrArrayLength(2)) {
+      CborType type = decoder.peekType();
+      if (CborDecoder.isNull(type)) {
+        decoder.readNull();
         return null;
       }
 
-      String text = decoder.readTextString();
-      byte[] encoded = decoder.readByteString();
-      if ((text == null) == (encoded == null)) {
-        throw new DecodeException("exactly one of text and encoded shall be non-null");
-      }
-
-      if (text != null) {
-        return new X500NameType(text);
+      long tag = decoder.readTag();
+      if (tag == TAG_ENCODED) {
+        return new X500NameType(decoder.readByteString());
       } else {
-        return new X500NameType(encoded);
+        return new X500NameType(decoder.readTextString());
       }
     } catch (IOException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, X500NameType.class), ex);

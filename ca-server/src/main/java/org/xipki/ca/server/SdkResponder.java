@@ -190,8 +190,6 @@ public class SdkResponder {
 
   public SdkResponse service(String path, byte[] request, XiHttpRequest httpRequest) {
     try {
-      TlsHelper.getTlsClientCert(httpRequest, reverseProxyMode);
-
       SdkResponse resp = service0(path, request, httpRequest);
       if (resp instanceof ErrorResponse) {
         LOG.warn("returned ErrorResponse: {}", resp);
@@ -450,8 +448,6 @@ public class SdkResponder {
         }
 
         if (reenroll) {
-          CertWithRevocationInfo oldCert;
-
           OldCertInfo oldCertInfo = entry.getOldCertInfo();
 
           if (oldCertInfo == null) {
@@ -461,20 +457,32 @@ public class SdkResponder {
 
           boolean reusePublicKey = oldCertInfo.isReusePublicKey();
           String text;
+          CertWithRevocationInfo oldCert;
 
           if (oldCertInfo.getIsn() != null) {
             OldCertInfo.ByIssuerAndSerial ocIsn = oldCertInfo.getIsn();
-            X500Name issuer;
+            String issuer;
             try {
-              issuer = ocIsn.getIssuer().toX500Name();
+              issuer = X509Util.x500NameText(ocIsn.getIssuer().toX500Name());
             } catch (IOException ex) {
               throw new OperationException(BAD_CERT_TEMPLATE, "Invalid oldIsn.issuer: " + ex.getMessage());
             }
+            if (!issuer.equals(ca.getCaCert().getSubjectText())) {
+              throw new OperationException(UNKNOWN_CERT, "unknown issuer " + issuer);
+            }
+
             BigInteger serialNumber = ocIsn.getSerialNumber();
+            text = "certificate with the issuer '" + issuer + "' and serial number " + serialNumber;
+            oldCert = ca.getCertWithRevocationInfo(serialNumber);
+          } else if (oldCertInfo.getFsn() != null) {
+            OldCertInfo.BySha1FpAndSerial ocFsn = oldCertInfo.getFsn();
+            String sha1Fp = Hex.encode(ocFsn.getCaCertSha1());
+            if (!sha1Fp.equalsIgnoreCase(ca.getHexSha1OfCert())) {
+              throw new OperationException(UNKNOWN_CERT, "unknown issuer sha1fp" + sha1Fp);
+            }
 
-            text = "certificate with the issuer '" + X509Util.x500NameText(issuer) +
-                "' and serial number " + serialNumber;
-
+            BigInteger serialNumber = ocFsn.getSerialNumber();
+            text = "certificate with the issuer (sha1fp) '" + sha1Fp + "' and serial number " + serialNumber;
             oldCert = ca.getCertWithRevocationInfo(serialNumber);
           } else {
             OldCertInfo.BySubject ocSubject = oldCertInfo.getSubject();

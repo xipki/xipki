@@ -15,6 +15,11 @@ xi:csr-p12 REPLACEME-RSAPSS \
   --subject "CN=rest-tls1.myorg.org,O=myorg,C=DE" \
   --out $OUT_DIR/rest-tls1.csr
 
+xi:csr-p12 REPLACEME-RSAPSS \
+  --p12 output/rest-tls-rekey1.p12 --password CHANGEIT \
+  --subject "CN=rest-tls-rekey1.myorg.org,O=myorg,C=DE" \
+  --out $OUT_DIR/rest-tls-rekey1.csr
+
 echo "REST cacert"
 
 xi:curl \
@@ -35,6 +40,16 @@ xi:curl \
   --header "Content-Type: text/plain; charset=utf-8" \
   "$BASE_URL/enroll-serverkeygen${CERTPROFILE}"
 
+echo "REST rekey (CA generate keypair)"
+xi:export-keycert-pem $OUT_DIR/rest-tls-genkey1.pem $OUT_DIR/rest-tls-genkey1.key $OUT_DIR/rest-tls-genkey1.crt
+SERIAL = $(xi:cert-info --serial --hex --in $OUT_DIR/rest-tls-genkey1.crt)
+
+xi:curl \
+  --out $OUT_DIR/rest-tls-genkey-rekey1.pem \
+  --data "subject=CN=rest-tls-genkey-rekey1.myorg.org,O=myorg,C=DE" \
+  --header "Content-Type: text/plain; charset=utf-8" \
+  "$BASE_URL/rekey-serverkeygen?ca-sha1=${CA_SHA1FP}&oldcert-serial=${SERIAL}"
+
 echo "REST enroll"
 
 xi:curl \
@@ -44,6 +59,14 @@ xi:curl \
   "$BASE_URL/enroll-cert${CERTPROFILE}"
 
 SERIAL = $(xi:cert-info --serial --hex --in $OUT_DIR/rest-tls1.der)
+
+echo "REST rekey"
+
+xi:curl \
+  --out $OUT_DIR/rest-tls-rekey1.der \
+  --data-file $OUT_DIR/rest-tls-rekey1.csr \
+  --header "Content-Type: application/pkcs10" \
+  "$BASE_URL/rekey-cert?ca-sha1=${CA_SHA1FP}&oldcert-serial=${SERIAL}"
 
 echo "REST revoke (suspend) "
 

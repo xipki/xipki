@@ -21,6 +21,7 @@ JRE/JDK, and the steps to reproduce the bug.
 
 ### Binaries
 The binary `xipki-setup-<version>.zip` can be retrieved using one of the following methods
+ - Download the binary from https://github.com/xipki/xipki/releases
  - Download the binary from the maven repositories
    - Directly via HTTP download
      - Release version: https://repo.maven.apache.org/maven2/org/xipki/assembly/xipki-setup/ 
