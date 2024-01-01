@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki</groupId>
     <artifactId>xipki-parent</artifactId>
-    <version>6.5.3</version>
+    <version>6.5.4-SNAPSHOT</version>
   </parent>
   <artifactId>ca-mgmt-db</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
