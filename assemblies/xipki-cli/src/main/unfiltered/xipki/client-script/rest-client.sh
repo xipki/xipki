@@ -102,14 +102,14 @@ curl ${OPTS} \
 # rekey certificate tls (CA generate keypair)
 SERIAL=0X`openssl x509 -serial -noout -in ${OUT_DIR}/${CN}.pem | cut -d '=' -f 2`
 
-REKEY.CN=tls-genkey-rekey-${CUR_TIME}
+REKEY_CN=tls-genkey-rekey-${CUR_TIME}
 
 echo "rekey certificate (CA generate keypair)"
 
 curl ${OPTS} \
     --header "Content-Type: text/plain; encoding=utf-8" \
-    --data-ascii "subject=C=DE,O=example,CN=${REKEY.CN}.example.org" \
-    --output ${OUT_DIR}/${REKEY.CN}.pem \
+    --data-ascii "subject=C=DE,O=example,CN=${REKEY_CN}.example.org" \
+    --output ${OUT_DIR}/${REKEY_CN}.pem \
     "${CA_URL}/rekey-serverkeygen?ca-sha1=${CA_SHA1FP}&oldcert-serial=${SERIAL}"
 
 # enroll certificate tls
@@ -138,25 +138,25 @@ curl ${OPTS} \
 SERIAL=0X`openssl x509 -inform der -serial -noout -in ${OUT_DIR}/${CN}.der | cut -d '=' -f 2`
 
 # rekey certificate tls
-REKEY.CN=tls-rekey-${CUR_TIME}
+REKEY_CN=tls-rekey-${CUR_TIME}
 
 echo "generate RSA keypair"
 
-openssl genrsa -out ${OUT_DIR}/${REKEY.CN}-key.pem 2048
+openssl genrsa -out ${OUT_DIR}/${REKEY_CN}-key.pem 2048
 
 echo "generate CSR"
 
-openssl req -new -sha256 -key ${OUT_DIR}/${REKEY.CN}-key.pem -outform der \
-    -out ${OUT_DIR}/${REKEY.CN}.csr \
-    -subj "/C=DE/O=myorg/CN=${REKEY.CN}.example.org"
+openssl req -new -sha256 -key ${OUT_DIR}/${REKEY_CN}-key.pem -outform der \
+    -out ${OUT_DIR}/${REKEY_CN}.csr \
+    -subj "/C=DE/O=myorg/CN=${REKEY_CN}.example.org"
 
 echo "rekey certificate"
 
 # Do not forget the @-symbol of --data-binary.
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
-    --data-binary "@${OUT_DIR}/${REKEY.CN}.csr" \
-    --output ${OUT_DIR}/${REKEY.CN}.der \
+    --data-binary "@${OUT_DIR}/${REKEY_CN}.csr" \
+    --output ${OUT_DIR}/${REKEY_CN}.der \
     "${CA_URL}/rekey-cert?ca-sha1=${CA_SHA1FP}&oldcert-serial=${SERIAL}"
 
 # The PEM file will be used by "openssl ocsp"

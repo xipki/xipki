@@ -6,9 +6,10 @@ See also <https://github.com/xipki/xipki/releases>
 - Release date: 202y/mm/dd
 
 ## 6.5.3
-- Release date: 2023/12/31
+- Release date: 2024/01/01
 - Gateway
   - Bugfix: fixed bug "Cannot update an existing certificate over CMP"
+  - Add new REST APIs to re-key certificates.
 - MGMT-CLI (Management Client)
   - Check whether database for caconf is empty before importing.
 

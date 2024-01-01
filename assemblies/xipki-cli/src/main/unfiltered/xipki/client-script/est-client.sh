@@ -80,7 +80,6 @@ echo "enroll certificate"
 openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 
 # Do not forget the @-symbol of --data-binary.
-
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
     --header "Content-Transfer-Encoding: base64" \
@@ -111,7 +110,6 @@ echo "enroll certificate"
 openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 
 # Do not forget the @-symbol of --data-binary.
-
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
     --header "Content-Transfer-Encoding: base64" \
@@ -139,8 +137,7 @@ echo "enroll certificate"
 
 openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 
-ä Do not forget the @-symbol of --data-binary.
-
+# Do not forget the @-symbol of --data-binary.
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
     --header "Content-Transfer-Encoding: base64" \
@@ -196,8 +193,7 @@ echo "enroll certificate"
 
 openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 
-ä Do not forget the @-symbol of --data-binary.
-
+# Do not forget the @-symbol of --data-binary.
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
     --header "Content-Transfer-Encoding: base64" \
@@ -229,8 +225,7 @@ echo "enroll certificate"
 
 openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 
-ä Do not forget the @-symbol of --data-binary.
-
+# Do not forget the @-symbol of --data-binary.
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
     --header "Content-Transfer-Encoding: base64" \
@@ -260,8 +255,7 @@ echo "enroll certificate"
 
 openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 
-ä Do not forget the @-symbol of --data-binary.
-
+# Do not forget the @-symbol of --data-binary.
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
     --header "Content-Transfer-Encoding: base64" \
@@ -269,9 +263,8 @@ curl ${OPTS} \
     --output ${FILE}.pem \
     "${CA_URL}/${CMD}"
 
-echo "extract private key"
-openssl pkey -in ${FILE}.pem -out ${FILE}-key.pem
-
 echo "extract certificate"
 openssl x509 -in ${FILE}.pem -out ${FILE}-cert.pem
 
+echo "extract private key"
+openssl pkey -in ${FILE}.pem -out ${FILE}-key.pem

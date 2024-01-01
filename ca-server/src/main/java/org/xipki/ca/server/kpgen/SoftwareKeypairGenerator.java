@@ -115,7 +115,7 @@ public class SoftwareKeypairGenerator extends KeypairGenerator {
 
         byte[] publicKey = new ASN1Integer(((DSAPublicKey) kp.getPublic()).getY()).getEncoded();
 
-        // DSA private keys are represented as BER-encoded ASN.1 type INTEGER.
+        // DSA private keys are represented as BER-encoded ASN.1 type INTEGER. RFC 5958s
         DSAPrivateKey priv = (DSAPrivateKey) kp.getPrivate();
         return new PrivateKeyInfo(algId, new ASN1Integer(priv.getX()), null, publicKey);
       }
