@@ -53,8 +53,7 @@ public class RestHttpServlet {
     }
   }
 
-  private HttpResponse service0(XiHttpRequest req, boolean viaPost)
-      throws IOException {
+  private HttpResponse service0(XiHttpRequest req, boolean viaPost) throws IOException {
     AuditService auditService = Audits.getAuditService();
     AuditEvent event = new AuditEvent("rest-gw");
 

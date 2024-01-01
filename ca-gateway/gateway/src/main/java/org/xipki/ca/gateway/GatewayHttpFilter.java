@@ -156,6 +156,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
       SdkClient sdkClient = gSdkClient;
       if (pconf.getSdkClient() != null) {
         sdkClient = new SdkClient(pconf.getSdkClient());
+        sdkClient.setLogReqResp(logReqResp);
       }
 
       PopControl popControl = gPopControl;
@@ -184,6 +185,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
       SdkClient sdkClient = gSdkClient;
       if (pconf.getSdkClient() != null) {
         sdkClient = new SdkClient(pconf.getSdkClient());
+        sdkClient.setLogReqResp(logReqResp);
       }
 
       PopControl popControl = gPopControl;
@@ -216,6 +218,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
       SdkClient sdkClient = gSdkClient;
       if (pconf.getSdkClient() != null) {
         sdkClient = new SdkClient(pconf.getSdkClient());
+        sdkClient.setLogReqResp(logReqResp);
       }
 
       PopControl popControl = gPopControl;
@@ -247,6 +250,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
       SdkClient sdkClient = gSdkClient;
       if (pconf.getSdkClient() != null) {
         sdkClient = new SdkClient(pconf.getSdkClient());
+        sdkClient.setLogReqResp(logReqResp);
       }
 
       PopControl popControl = gPopControl;
@@ -278,6 +282,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
       SdkClient sdkClient = gSdkClient;
       if (pconf.getSdkClient() != null) {
         sdkClient = new SdkClient(pconf.getSdkClient());
+        sdkClient.setLogReqResp(logReqResp);
       }
 
       PopControl popControl = gPopControl;

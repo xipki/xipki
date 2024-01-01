@@ -61,6 +61,8 @@ public class SdkClient {
 
   private final XiHttpClient client;
 
+  private boolean logReqResp = false;
+
   public SdkClient(SdkClientConf conf) throws ObjectCreationException {
     this.serverUrl = conf.getServerUrl();
     SslContextConf sdkSslConf = SslContextConf.ofSslConf(conf.getSsl());
@@ -72,18 +74,20 @@ public class SdkClient {
     this.client = new XiHttpClient(sslSocketFactory, hostnameVerifier);
   }
 
-  public byte[] send(String ca, String command, SdkRequest request)
-      throws SdkErrorResponseException {
+  public void setLogReqResp(boolean logReqResp) {
+    this.logReqResp = logReqResp;
+  }
+
+  public byte[] send(String ca, String command, SdkRequest request) throws SdkErrorResponseException {
     String ct = request == null ? null : CONTENT_TYPE_CBOR;
-    HttpRespContent resp;
+    HttpRespContent resp = null;
 
     String prefix = ca == null ? serverUrl + "-/" : serverUrl + ca + "/";
+    boolean viaPost = request != null;
 
+    byte[] encodedReq = null;
     try {
-      if (request == null) {
-        resp = client.httpGet(prefix + command);
-      } else {
-        byte[] encodedReq;
+      if (viaPost) {
         try {
           encodedReq = request.encode();
         } catch (EncodeException e) {
@@ -92,9 +96,16 @@ public class SdkClient {
         }
 
         resp = client.httpPost(prefix + command, ct, encodedReq, CONTENT_TYPE_CBOR);
+      } else {
+        resp = client.httpGet(prefix + command);
       }
     } catch (IOException ex) {
       throw new SdkErrorResponseException(ErrorCode.SYSTEM_UNAVAILABLE, "IO error sending request to the CA");
+    } finally {
+      if (logReqResp && LOG.isDebugEnabled()) {
+        LogUtil.logReqResp("SDK Gateway", LOG, logReqResp, viaPost, command,
+            encodedReq, resp == null ? null : resp.getContent());
+      }
     }
 
     if (resp.isOK()) {
