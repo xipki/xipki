@@ -114,8 +114,11 @@ public abstract class BaseCertprofile extends Certprofile {
   private SubjectInfo doGetSubject(X500Name requestedSubject, SubjectPublicKeyInfo publicKeyInfo)
           throws CertprofileException, BadCertTemplateException {
     Args.notNull(requestedSubject, "requestedSubject");
-
     verifySubjectDnOccurrence(requestedSubject);
+
+    if (getCertLevel() == CertLevel.CROSS) {
+      return new SubjectInfo(requestedSubject, null);
+    }
 
     RDN[] requestedRdns = requestedSubject.getRDNs();
     SubjectControl scontrol = getSubjectControl();

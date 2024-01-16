@@ -286,10 +286,6 @@ class GrandCertTemplateBuilder {
     X500Name grantedSubject;
     if (forCrossCert) {
       // For cross certificate, the original requested certificate must be used.
-      if (!X509Util.canonicalizeName(subjectInfo.getGrantedSubject())
-          .equals(X509Util.canonicalizeName(requestedSubject))) {
-        throw new OperationException(BAD_CERT_TEMPLATE, "subject did not match the certificate profile");
-      }
       grantedSubject = requestedSubject;
     } else {
       grantedSubject = subjectInfo.getGrantedSubject();
