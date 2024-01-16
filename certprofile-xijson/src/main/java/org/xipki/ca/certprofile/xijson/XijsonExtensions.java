@@ -9,6 +9,7 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.DERIA5String;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x500.RDN;
@@ -19,6 +20,7 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
+import org.bouncycastle.util.Pack;
 import org.xipki.ca.api.profile.BaseCertprofile;
 import org.xipki.ca.api.profile.Certprofile.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.Certprofile.CrlDistributionPointsControl;
@@ -43,6 +45,7 @@ import org.xipki.ca.certprofile.xijson.conf.extn.AuthorityInfoAccess;
 import org.xipki.ca.certprofile.xijson.conf.extn.AuthorityKeyIdentifier;
 import org.xipki.ca.certprofile.xijson.conf.extn.BasicConstraints;
 import org.xipki.ca.certprofile.xijson.conf.extn.BiometricInfo;
+import org.xipki.ca.certprofile.xijson.conf.extn.CCCInstanceCAExtensionSchema;
 import org.xipki.ca.certprofile.xijson.conf.extn.CCCSimpleExtensionSchema;
 import org.xipki.ca.certprofile.xijson.conf.extn.CertificatePolicies;
 import org.xipki.ca.certprofile.xijson.conf.extn.CrlDistributionPoints;
@@ -823,18 +826,34 @@ public class XijsonExtensions {
         Extn.id_ccc_VehicleOEM_Sig_Cert,  Extn.id_ccc_Device_Enc_Cert,      Extn.id_ccc_Vehicle_Intermediate_Cert,
         Extn.id_ccc_VehicleOEM_CA_Cert_J, Extn.id_ccc_VehicleOEM_CA_Cert_M);
 
-    if (!simpleSchemaTypes.contains(type)) {
+    boolean isInstanceCAExtensionSchema = Extn.id_ccc_Instance_CA_Cert_E.equals(type);
+    if (!isInstanceCAExtensionSchema && !simpleSchemaTypes.contains(type)) {
       return;
     }
 
-    CCCSimpleExtensionSchema schema = ex.getCccExtensionSchema();
+    CCCSimpleExtensionSchema schema = isInstanceCAExtensionSchema
+        ? ex.getCccInstanceCAExtensionSchema() : ex.getCccExtensionSchema();
+
     if (schema == null) {
-      throw new CertprofileException("ccExtensionSchema is not set for " + type);
+      throw new CertprofileException(
+          (isInstanceCAExtensionSchema ? "cccInstanceCAExtensionSchema" : "ccExtensionSchema") +
+          " is not set for " + type);
     }
 
     this.cccExtensionSchemaType = type;
-    this.cccExtensionSchemaValue = new ExtensionValue(ex.critical(),
-        new DERSequence(new ASN1Integer(schema.getVersion())));
+
+    ASN1EncodableVector vec = new ASN1EncodableVector();
+    vec.add(new ASN1Integer(schema.getVersion()));
+    if (isInstanceCAExtensionSchema) {
+      CCCInstanceCAExtensionSchema schema1 = (CCCInstanceCAExtensionSchema) schema;
+      byte[] bytes = Pack.longToBigEndian(schema1.getAppletVersion());
+      vec.add(new DEROctetString(Arrays.copyOfRange(bytes, 4, 8)));
+      if (schema1.getPlatformInformation() != null) {
+        vec.add(new DEROctetString(schema1.getPlatformInformation()));
+      }
+    }
+
+    this.cccExtensionSchemaValue = new ExtensionValue(ex.critical(), new DERSequence(vec));
   }
 
   private static List<ASN1ObjectIdentifier> toOidList(List<DescribableOid> oidWithDescTypes) {

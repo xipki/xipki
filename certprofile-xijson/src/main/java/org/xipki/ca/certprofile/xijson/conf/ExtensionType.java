@@ -11,6 +11,7 @@ import org.xipki.ca.certprofile.xijson.conf.extn.AuthorityInfoAccess;
 import org.xipki.ca.certprofile.xijson.conf.extn.AuthorityKeyIdentifier;
 import org.xipki.ca.certprofile.xijson.conf.extn.BasicConstraints;
 import org.xipki.ca.certprofile.xijson.conf.extn.BiometricInfo;
+import org.xipki.ca.certprofile.xijson.conf.extn.CCCInstanceCAExtensionSchema;
 import org.xipki.ca.certprofile.xijson.conf.extn.CCCSimpleExtensionSchema;
 import org.xipki.ca.certprofile.xijson.conf.extn.CertificatePolicies;
 import org.xipki.ca.certprofile.xijson.conf.extn.CrlDistributionPoints;
@@ -118,6 +119,8 @@ public class ExtensionType extends ValidableConf {
   private ValidityModel validityModel;
 
   private CCCSimpleExtensionSchema cccExtensionSchema;
+
+  private CCCInstanceCAExtensionSchema cccInstanceCAExtensionSchema;
 
   private Object custom;
 
@@ -408,6 +411,14 @@ public class ExtensionType extends ValidableConf {
     this.cccExtensionSchema = cccExtensionSchema;
   }
 
+  public CCCInstanceCAExtensionSchema getCccInstanceCAExtensionSchema() {
+    return cccInstanceCAExtensionSchema;
+  }
+
+  public void setCccInstanceCAExtensionSchema(CCCInstanceCAExtensionSchema cccInstanceCAExtensionSchema) {
+    this.cccInstanceCAExtensionSchema = cccInstanceCAExtensionSchema;
+  }
+
   public Object getCustom() {
     return custom;
   }
@@ -423,7 +434,7 @@ public class ExtensionType extends ValidableConf {
     validate(basicConstraints, biometricInfo, certificatePolicies, constant, extendedKeyUsage, inhibitAnyPolicy);
     validate(keyUsage, nameConstraints, policyMappings, privateKeyUsagePeriod, policyConstraints, qcStatements);
     validate(restriction, smimeCapabilities, subjectAltName, subjectDirectoryAttributs, subjectInfoAccess);
-    validate(subjectKeyIdentifier, tlsFeature, validityModel, cccExtensionSchema);
+    validate(subjectKeyIdentifier, tlsFeature, validityModel, cccExtensionSchema, cccInstanceCAExtensionSchema);
   } // method validate
 
 }
