@@ -2,10 +2,10 @@
 
 set -e
 
-TOMCAT8_VERSION=8.5.96
-TOMCAT9_VERSION=9.0.83
-TOMCAT10_VERSION=10.1.16
-TOMCAT11_VERSION=11.0.0-M14
+TOMCAT8_VERSION=8.5.98
+TOMCAT9_VERSION=9.0.85
+TOMCAT10_VERSION=10.1.18
+TOMCAT11_VERSION=11.0.0-M16
 
 helpFunction()
 {
@@ -54,7 +54,7 @@ WDIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 echo "working dir: ${WDIR}"
 
 # Test base dir
-TBDIR=/tmp/xipki
+TBDIR=/var/tmp/xipki
 
 mkdir -p $TBDIR
 cd $TBDIR
