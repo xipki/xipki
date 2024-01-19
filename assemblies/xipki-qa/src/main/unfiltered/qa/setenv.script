@@ -1,5 +1,5 @@
-CA_XIPKI_DIR=/tmp/xipki/ca-tomcat/xipki
-OCSP_XIPKI_DIR=/tmp/xipki/ocsp-tomcat/xipki
-GATEWAY_TOMCAT_DIR=/tmp/xipki/gateway-tomcat
+CA_XIPKI_DIR=/var/tmp/xipki/ca-tomcat/xipki
+OCSP_XIPKI_DIR=/var/tmp/xipki/ocsp-tomcat/xipki
+GATEWAY_TOMCAT_DIR=/var/tmp/xipki/gateway-tomcat
 GATEWAY_XIPKI_DIR=${GATEWAY_TOMCAT_DIR}/xipki
 

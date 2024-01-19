@@ -1,8 +1,8 @@
 source file:./qa/cab/initdb.script
 
 echo "Restart CA (tomcat) server!"
-xi:exec $[tomcat.java.home] '/tmp/xipki/ca-tomcat/bin/shutdown.sh'
-xi:exec $[tomcat.java.home] '/tmp/xipki/ca-tomcat/bin/startup.sh'
+xi:exec $[tomcat.java.home] '/var/tmp/xipki/ca-tomcat/bin/shutdown.sh'
+xi:exec $[tomcat.java.home] '/var/tmp/xipki/ca-tomcat/bin/startup.sh'
 sleep 5
 
 echo "#################################################################"

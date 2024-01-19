@@ -50,8 +50,8 @@ if { $printUsage equals "true" } then {
   source file:./qa/qa.d/prepare-keys.script
 
   echo "Restart Gateway (tomcat) server!"
-  xi:exec $[tomcat.java.home] '/tmp/xipki/gateway-tomcat/bin/shutdown.sh'
-  xi:exec $[tomcat.java.home] '/tmp/xipki/gateway-tomcat/bin/startup.sh'
+  xi:exec $[tomcat.java.home] '/var/tmp/xipki/gateway-tomcat/bin/shutdown.sh'
+  xi:exec $[tomcat.java.home] '/var/tmp/xipki/gateway-tomcat/bin/startup.sh'
   sleep 5
 
   xi:copy-file -f qa/cab/template.ca-load.script \
@@ -69,10 +69,10 @@ if { $printUsage equals "true" } then {
     qa/cab/ca-load.script \
     qa/cab/ra.script
 
-  xi:exec $[tomcat.java.home] '/tmp/xipki/ca-tomcat/bin/shutdown.sh'
+  xi:exec $[tomcat.java.home] '/var/tmp/xipki/ca-tomcat/bin/shutdown.sh'
   sleep 2
 
-  xi:exec $[tomcat.java.home] '/tmp/xipki/ca-tomcat/bin/startup.sh'
+  xi:exec $[tomcat.java.home] '/var/tmp/xipki/ca-tomcat/bin/startup.sh'
   sleep 5
 
   source file:./qa/cab/ca-load.script
