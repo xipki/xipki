@@ -363,21 +363,23 @@ public class IdentifiedCertprofile implements Closeable {
     }
 
     // Authority key identifier
-    extType = Extension.authorityKeyIdentifier;
-    extControl = controls.remove(extType);
-    if (extControl != null) {
-      AuthorityKeyIdentifier value = null;
-      if (certprofile.useIssuerAndSerialInAki()) {
-        GeneralNames x509CaIssuer = new GeneralNames(new GeneralName(publicCaInfo.getIssuer()));
-        value = new AuthorityKeyIdentifier(x509CaIssuer, publicCaInfo.getSerialNumber());
-      } else {
-        byte[] ikiValue = publicCaInfo.getSubjectKeyIdentifer();
-        if (ikiValue != null) {
+    byte[] ikiValue = publicCaInfo.getSubjectKeyIdentifer();
+
+    if (ikiValue != null) {
+      extType = Extension.authorityKeyIdentifier;
+      extControl = controls.remove(extType);
+
+      if (extControl != null) {
+        AuthorityKeyIdentifier value;
+        if (certprofile.useIssuerAndSerialInAki()) {
+          GeneralNames x509CaIssuer = new GeneralNames(new GeneralName(publicCaInfo.getIssuer()));
+          value = new AuthorityKeyIdentifier(ikiValue, x509CaIssuer, publicCaInfo.getSerialNumber());
+        } else {
           value = new AuthorityKeyIdentifier(ikiValue);
         }
-      }
 
-      addExtension(values, extType, value, extControl);
+        addExtension(values, extType, value, extControl);
+      }
     }
 
     // IssuerAltName

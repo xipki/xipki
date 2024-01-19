@@ -163,6 +163,14 @@ class A2gChecker extends ExtensionChecker {
     BigInteger authorityCertSerialNumber = asn1.getAuthorityCertSerialNumber();
     GeneralNames authorityCertIssuer = asn1.getAuthorityCertIssuer();
 
+    if (keyIdentifier == null) {
+      failureMsg.append("keyIdentifier is 'absent', but expected 'present'; ");
+    } else {
+      if (!Arrays.equals(issuerInfo.getSubjectKeyIdentifier(), keyIdentifier)) {
+        addViolation(failureMsg, "keyIdentifier", hex(keyIdentifier), hex(issuerInfo.getSubjectKeyIdentifier()));
+      }
+    }
+
     if (getCertprofile().useIssuerAndSerialInAki()) {
       if (authorityCertIssuer == null) {
         failureMsg.append("authorityCertIssuer is 'absent', but expected 'present'; ");
@@ -200,29 +208,7 @@ class A2gChecker extends ExtensionChecker {
           addViolation(failureMsg, "authorityCertSerialNumber", authorityCertSerialNumber, issuerSn);
         }
       }
-
-      if (keyIdentifier != null) {
-        failureMsg.append("keyIdentifier is 'present', but expected 'absent'; ");
-      }
-
-    } else {
-      if (keyIdentifier == null) {
-        failureMsg.append("keyIdentifier is 'absent', but expected 'present'; ");
-      } else {
-        if (!Arrays.equals(issuerInfo.getSubjectKeyIdentifier(), keyIdentifier)) {
-          addViolation(failureMsg, "keyIdentifier", hex(keyIdentifier), hex(issuerInfo.getSubjectKeyIdentifier()));
-        }
-      }
-
-      if (authorityCertIssuer != null) {
-        failureMsg.append("authorityCertIssuer is 'present', but expected 'absent'; ");
-      }
-
-      if (authorityCertSerialNumber != null) {
-        failureMsg.append("authorityCertSerialNumber is 'present', but expected 'absent'; ");
-      }
     }
-
   } // method checkExtnAuthorityKeyId
 
   void checkExtnBasicConstraints(StringBuilder failureMsg, byte[] extnValue) {
