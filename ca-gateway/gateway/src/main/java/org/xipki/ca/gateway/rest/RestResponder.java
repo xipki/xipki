@@ -559,7 +559,7 @@ public class RestResponder {
     Instant notAfter = (strNotAfter == null) ? null : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotAfter);
 
     X500Name subject = null;
-    Extensions extensions = null;
+    Extensions extensions;
     SubjectPublicKeyInfo subjectPublicKeyInfo = null;
 
     String ct = httpRetriever.getHeader("Content-Type");

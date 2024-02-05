@@ -92,7 +92,7 @@
 				"qa/reimport.script"
 			],
 			"replacements": {
-				"tomcat.java.home": "--env JAVA_HOME=/var/tmp/jdk-tomcat"
+				"tomcat.java.home": "--env JAVA_HOME=~/test/xipki/jdk-tomcat"
 			}
 		}
 	]

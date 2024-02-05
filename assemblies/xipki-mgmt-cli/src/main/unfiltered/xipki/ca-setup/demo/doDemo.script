@@ -7,9 +7,9 @@ echo "|  - token-type:        $tokentype"
 echo "|  - CAcert-presence:   none"
 echo "+---------------------------------------------------------------+"
 
-CA_TOMCAT_DIR = /var/tmp/xipki/ca-tomcat
-OCSP_TOMCAT_DIR = /var/tmp/xipki/ocsp-tomcat
-GW_TOMCAT_DIR = /var/tmp/xipki/gateway-tomcat
+CA_TOMCAT_DIR = ~/test/xipki/ca-tomcat
+OCSP_TOMCAT_DIR = ~/test/xipki/ocsp-tomcat
+GW_TOMCAT_DIR = ~/test/xipki/gateway-tomcat
 
 XIPKI_BASE = ${CA_TOMCAT_DIR}/xipki
 

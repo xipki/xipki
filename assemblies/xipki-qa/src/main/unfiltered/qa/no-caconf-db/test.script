@@ -1,9 +1,9 @@
 SRC_DIR = qa/no-caconf-db
-CA_DIR = /var/tmp/xipki/ca-tomcat/xipki/etc/ca
+CA_DIR = ~/test/xipki/ca-tomcat/xipki/etc/ca
 
 echo "Shutdown tomcat for CA server"
 
-xi:exec $[tomcat.java.home] '/var/tmp/xipki/ca-tomcat/bin/shutdown.sh'
+xi:exec $[tomcat.java.home] '~/test/xipki/ca-tomcat/bin/shutdown.sh'
 
 // initialize database
 ca:sql --force --db-conf "$CA_DIR/database/ca-db.properties" \
@@ -28,7 +28,7 @@ xi:copy-file -f $SRC_DIR/ca-rootca.json \
     $CA_DIR/ca.json
 
 echo "Start tomcat for CA server"
-xi:exec $[tomcat.java.home] '/var/tmp/xipki/ca-tomcat/bin/startup.sh'
+xi:exec $[tomcat.java.home] '~/test/xipki/ca-tomcat/bin/startup.sh'
 sleep 5
 
 ca:enroll-cert --ca rootca1 --csr $SRC_DIR/csr/subca1.csr \
@@ -42,9 +42,9 @@ xi:copy-file -f $SRC_DIR/ca.json \
 
 echo "Re-start tomcat for CA server"
 
-xi:exec $[tomcat.java.home] '/var/tmp/xipki/ca-tomcat/bin/shutdown.sh'
+xi:exec $[tomcat.java.home] '~/test/xipki/ca-tomcat/bin/shutdown.sh'
 sleep 2
-xi:exec $[tomcat.java.home] '/var/tmp/xipki/ca-tomcat/bin/startup.sh'
+xi:exec $[tomcat.java.home] '~/test/xipki/ca-tomcat/bin/startup.sh'
 sleep 3
 
 echo "Test CA"
