@@ -46,7 +46,7 @@
     <!-- only for runtime -->
     <log4j.version>2.22.1</log4j.version>
     <jdbc.mariadb.version>3.3.0</jdbc.mariadb.version>
-    <jdbc.postgresql.version>42.7.0</jdbc.postgresql.version>
+    <jdbc.postgresql.version>42.7.2</jdbc.postgresql.version>
     <jdbc.h2.version>2.2.224</jdbc.h2.version>
     <!-- Only for test purpose -->
     <junit.version>4.13.1</junit.version>
