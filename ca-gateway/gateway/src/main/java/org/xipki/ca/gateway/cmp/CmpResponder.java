@@ -235,7 +235,8 @@ public class CmpResponder extends BaseCmpResponder {
           continue;
         }
 
-        oldCertInfo = new OldCertInfo(false,
+        boolean reuseOldPublicKey = publicKey == null;
+        oldCertInfo = new OldCertInfo(reuseOldPublicKey,
             new OldCertInfo.ByIssuerAndSerial(
                 new X500NameType(oldCertId.getIssuer().getName().toASN1Primitive().getEncoded()),
                 oldCertId.getSerialNumber().getValue()));
