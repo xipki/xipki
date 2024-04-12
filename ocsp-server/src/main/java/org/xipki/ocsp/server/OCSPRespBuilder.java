@@ -14,7 +14,6 @@ import org.xipki.ocsp.server.type.TaggedCertSequence;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.XiContentSigner;
-import org.xipki.util.ConcurrentBag;
 import org.xipki.util.Hex;
 
 import java.io.IOException;
@@ -79,14 +78,13 @@ public class OCSPRespBuilder {
     byte[] tbs = new byte[responseData.getEncodedLength()];
     responseData.write(tbs, 0);
 
-    ConcurrentBag.BagEntry<XiContentSigner> signer0 = signer.borrowSigner();
+    XiContentSigner signer0 = signer.borrowSigner();
 
     byte[] signature;
     byte[] sigAlgId;
 
     try {
-      XiContentSigner csigner0 = signer0.value();
-      OutputStream sigOut = csigner0.getOutputStream();
+      OutputStream sigOut = signer0.getOutputStream();
       try {
         sigOut.write(tbs);
         sigOut.close();
@@ -94,8 +92,8 @@ public class OCSPRespBuilder {
         throw new OCSPException("exception signing TBSRequest: " + ex.getMessage(), ex);
       }
 
-      signature = csigner0.getSignature();
-      sigAlgId = csigner0.getEncodedAlgorithmIdentifier();
+      signature = signer0.getSignature();
+      sigAlgId = signer0.getEncodedAlgorithmIdentifier();
     } finally {
       signer.requiteSigner(signer0);
     }

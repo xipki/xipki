@@ -42,7 +42,6 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
-import org.xipki.util.ConcurrentBag;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.DateUtil;
 import org.xipki.util.Hex;
@@ -362,10 +361,10 @@ public class UpdateCertActions {
       ConcurrentContentSigner signer = getSigner();
 
       ProofOfPossessionSigningKeyBuilder popBuilder = new ProofOfPossessionSigningKeyBuilder(certRequest);
-      ConcurrentBag.BagEntry<XiContentSigner> signer0 = signer.borrowSigner();
+      XiContentSigner signer0 = signer.borrowSigner();
       POPOSigningKey popSk;
       try {
-        popSk = popBuilder.build(signer0.value());
+        popSk = popBuilder.build(signer0);
       } finally {
         signer.requiteSigner(signer0);
       }

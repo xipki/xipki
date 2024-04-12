@@ -34,7 +34,6 @@ import org.xipki.security.XiContentSigner;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConcurrentBag;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ReqRespDebug;
@@ -362,7 +361,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
           certChain[i] = certChain0[i].toBcCert().toASN1Structure();
         }
 
-        ConcurrentBag.BagEntry<XiContentSigner> signer0;
+        XiContentSigner signer0;
         try {
           signer0 = signer.borrowSigner();
         } catch (NoIdleSignerException ex) {
@@ -370,7 +369,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         }
 
         try {
-          return reqBuilder.build(signer0.value(), certChain);
+          return reqBuilder.build(signer0, certChain);
         } finally {
           signer.requiteSigner(signer0);
         }

@@ -33,7 +33,6 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConcurrentBag;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
@@ -214,10 +213,10 @@ public class SelfSignedCertBuilder {
           null, publicKeyInfo, publicCaInfo, null, notBefore, notAfter);
       CaUtil.addExtensions(extensionTuples, certBuilder);
 
-      ConcurrentBag.BagEntry<XiContentSigner> signer0 = signer.borrowSigner();
+      XiContentSigner signer0 = signer.borrowSigner();
       X509CertificateHolder certHolder;
       try {
-        certHolder = certBuilder.build(signer0.value());
+        certHolder = certBuilder.build(signer0);
       } finally {
         signer.requiteSigner(signer0);
       }

@@ -18,8 +18,6 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
-import org.xipki.util.ConcurrentBag;
-import org.xipki.util.ConcurrentBag.BagEntry;
 import org.xipki.util.LogUtil;
 import org.xipki.util.SqlUtil;
 import org.xipki.util.StringUtil;
@@ -66,8 +64,6 @@ public class ResponseCacher implements Closeable {
       "ID,IID,IDENT,GENERATED_AT,NEXT_UPDATE,RESP");
 
   private static final String SQL_UPDATE_RESP = "UPDATE OCSP SET GENERATED_AT=?,NEXT_UPDATE=?,RESP=? WHERE ID=?";
-
-  private final ConcurrentBag<Digest> idDigesters;
 
   private class IssuerUpdater implements Runnable {
 
@@ -149,11 +145,6 @@ public class ResponseCacher implements Closeable {
     this.sqlSelectOcsp = datasource.buildSelectFirstSql(1,
         "IID,IDENT,GENERATED_AT,NEXT_UPDATE,RESP FROM OCSP WHERE ID=?");
     this.onService = new AtomicBoolean(false);
-
-    this.idDigesters = new ConcurrentBag<>();
-    for (int i = 0; i < 20; i++) {
-      idDigesters.add(new BagEntry<>(HashAlgo.SHA1.createDigest()));
-    }
   }
 
   public boolean isOnService() {
@@ -487,32 +478,12 @@ public class ResponseCacher implements Closeable {
   }
 
   private long deriveId(int issuerId, byte[] identBytes) {
-    BagEntry<Digest> digest0 = null;
-    try {
-      digest0 = idDigesters.borrow(2, TimeUnit.SECONDS);
-    } catch (InterruptedException ex) {
-      // do nothing
-    }
-
-    boolean newDigest = (digest0 == null);
-    if (newDigest) {
-      digest0 = new BagEntry<>(HashAlgo.SHA1.createDigest());
-    }
-
     byte[] hash = new byte[20];
-    try {
-      Digest digest = digest0.value();
-      digest.reset();
-      digest.update(int2Bytes(issuerId), 0, 2);
-      digest.update(identBytes, 0, identBytes.length);
-      digest.doFinal(hash, 0);
-    } finally {
-      if (newDigest) {
-        idDigesters.add(digest0);
-      } else {
-        idDigesters.requite(digest0);
-      }
-    }
+    Digest digest = HashAlgo.SHA1.createDigest();
+    digest.reset();
+    digest.update(int2Bytes(issuerId), 0, 2);
+    digest.update(identBytes, 0, identBytes.length);
+    digest.doFinal(hash, 0);
 
     return (0x7FL & hash[0]) << 56 // ignore the first bit
         | (0xFFL & hash[1]) << 48 | (0xFFL & hash[2]) << 40 | (0xFFL & hash[3]) << 32

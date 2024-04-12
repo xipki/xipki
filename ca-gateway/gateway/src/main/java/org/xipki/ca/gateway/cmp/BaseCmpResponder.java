@@ -90,15 +90,12 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
-import org.xipki.util.ConcurrentBag;
-import org.xipki.util.ConcurrentBag.BagEntry;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.exception.InsufficientPermissionException;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
@@ -116,7 +113,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Base CMP responder.
@@ -161,15 +157,7 @@ public abstract class BaseCmpResponder {
 
   private static final AlgorithmIdentifier prf_hmacWithSHA256 = SignAlgo.HMAC_SHA256.getAlgorithmIdentifier();
 
-  private static final ConcurrentBag<Cipher> aesGcm_ciphers;
-
-  private static final ConcurrentBag<SecretKeyFactory> pbkdf2_kdfs;
-
   private static final Map<ErrorCode, Integer> errorCodeToPkiFailureMap = new HashMap<>(20);
-
-  private static final boolean aesGcm_ciphers_initialized;
-
-  private static final boolean pbkdf2_kdfs_initialized;
 
   protected final SecurityFactory securityFactory;
 
@@ -188,47 +176,6 @@ public abstract class BaseCmpResponder {
   private final KeyGenerator aesKeyGen;
 
   static {
-    String oid = NISTObjectIdentifiers.id_aes128_GCM.getId();
-    aesGcm_ciphers = new ConcurrentBag<>();
-    for (int i = 0; i < 64; i++) {
-      Cipher cipher;
-      try {
-        cipher = Cipher.getInstance(oid);
-      } catch (NoSuchAlgorithmException | NoSuchPaddingException ex) {
-        LogUtil.error(LOG, ex, "could not get Cipher of " + oid);
-        break;
-      }
-      aesGcm_ciphers.add(new BagEntry<>(cipher));
-    }
-    int size = aesGcm_ciphers.size();
-    aesGcm_ciphers_initialized = size > 0;
-    if (aesGcm_ciphers_initialized) {
-      LOG.info("initialized {} AES GCM Cipher instances", size);
-    } else {
-      LOG.error("could not initialize any AES GCM Cipher instance");
-    }
-
-    oid = PKCSObjectIdentifiers.id_PBKDF2.getId();
-    pbkdf2_kdfs = new ConcurrentBag<>();
-    for (int i = 0; i < 64; i++) {
-      SecretKeyFactory keyFact;
-      try {
-        keyFact = SecretKeyFactory.getInstance(oid);
-      } catch (NoSuchAlgorithmException ex) {
-        LogUtil.error(LOG, ex, "could not get SecretKeyFactory of " + oid);
-        break;
-      }
-      pbkdf2_kdfs.add(new BagEntry<>(keyFact));
-    }
-
-    size = pbkdf2_kdfs.size();
-    pbkdf2_kdfs_initialized = size > 0;
-    if (pbkdf2_kdfs_initialized) {
-      LOG.info("initialized {} PBKDF2 SecretKeyFactory instances", size);
-    } else {
-      LOG.error("could not initialize any PBKDF2 SecretKeyFactory instance");
-    }
-
     errorCodeToPkiFailureMap.put(ErrorCode.ALREADY_ISSUED,       PKIFailureInfo.badRequest);
     errorCodeToPkiFailureMap.put(ErrorCode.BAD_CERT_TEMPLATE,    PKIFailureInfo.badCertTemplate);
     errorCodeToPkiFailureMap.put(ErrorCode.BAD_REQUEST,          PKIFailureInfo.badRequest);
@@ -857,30 +804,15 @@ public abstract class BaseCmpResponder {
         ASN1ObjectIdentifier symmAlgOid = NISTObjectIdentifiers.id_aes128_GCM;
         byte[] nonce = randomBytes(aesGcmNonceLen);
 
-        BagEntry<Cipher> cipher0 = null;
-        if (aesGcm_ciphers_initialized) {
-          try {
-            cipher0 = aesGcm_ciphers.borrow(5, TimeUnit.SECONDS);
-          } catch (InterruptedException ex) {
-          }
-        }
+        Cipher dataCipher = Cipher.getInstance(symmAlgOid.getId());
 
-        Cipher dataCipher = (cipher0 != null) ? cipher0.value() : Cipher.getInstance(symmAlgOid.getId());
-
-        byte[] encValue;
         try {
-          try {
-            dataCipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(symmKeyBytes, "AES"),
-                new GCMParameterSpec(aesGcmTagByteLen << 3, nonce));
-          } catch (InvalidKeyException | InvalidAlgorithmParameterException ex) {
-            throw new IllegalStateException(ex);
-          }
-          encValue = dataCipher.doFinal(privKey.getEncoded());
-        } finally {
-          if (cipher0 != null) {
-            aesGcm_ciphers.requite(cipher0);
-          }
+          dataCipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(symmKeyBytes, "AES"),
+              new GCMParameterSpec(aesGcmTagByteLen << 3, nonce));
+        } catch (InvalidKeyException | InvalidAlgorithmParameterException ex) {
+          throw new IllegalStateException(ex);
         }
+        byte[] encValue = dataCipher.doFinal(privKey.getEncoded());
 
         GCMParameters params = new GCMParameters(nonce, aesGcmTagByteLen);
         AlgorithmIdentifier symmAlg = new AlgorithmIdentifier(symmAlgOid, params);
@@ -901,49 +833,18 @@ public abstract class BaseCmpResponder {
         // use password of the requestor to encrypt the private key
         byte[] pbkdfSalt = randomBytes(keysizeBits / 8);
 
-        BagEntry<SecretKeyFactory> keyFact0 = null;
-        if (pbkdf2_kdfs_initialized) {
-          try {
-            keyFact0 = pbkdf2_kdfs.borrow(5, TimeUnit.SECONDS);
-          } catch (InterruptedException ex) {
-          }
-        }
+        SecretKeyFactory keyFact = SecretKeyFactory.getInstance(PKCSObjectIdentifiers.id_PBKDF2.getId());
 
-        SecretKeyFactory keyFact = (keyFact0 != null) ? keyFact0.value()
-            : SecretKeyFactory.getInstance(PKCSObjectIdentifiers.id_PBKDF2.getId());
-
-        SecretKey key;
-        try {
-          key = keyFact.generateSecret(new PBKDF2KeySpec(passwordRequestor.getPassword(), pbkdfSalt,
-                  iterCount, keysizeBits, prf_hmacWithSHA256));
-          key = new SecretKeySpec(key.getEncoded(), "AES");
-        } finally {
-          if (keyFact0 != null) {
-            pbkdf2_kdfs.requite(keyFact0);
-          }
-        }
+        SecretKey key = keyFact.generateSecret(new PBKDF2KeySpec(passwordRequestor.getPassword(), pbkdfSalt,
+            iterCount, keysizeBits, prf_hmacWithSHA256));
+        key = new SecretKeySpec(key.getEncoded(), "AES");
 
         GCMParameterSpec gcmParamSpec = new GCMParameterSpec(tagByteLen * 8, nonce);
 
-        BagEntry<Cipher> cipher0 = null;
-        if (aesGcm_ciphers_initialized) {
-          try {
-            cipher0 = aesGcm_ciphers.borrow(5, TimeUnit.SECONDS);
-          } catch (InterruptedException ex) {
-          }
-        }
+        Cipher dataCipher = Cipher.getInstance(encAlgOid.getId());
 
-        Cipher dataCipher = (cipher0 != null) ? cipher0.value() : Cipher.getInstance(encAlgOid.getId());
-
-        byte[] encValue;
-        try {
-          dataCipher.init(Cipher.ENCRYPT_MODE, key, gcmParamSpec);
-          encValue = dataCipher.doFinal(privKey.getEncoded());
-        } finally {
-          if (cipher0 != null) {
-            aesGcm_ciphers.requite(cipher0);
-          }
-        }
+        dataCipher.init(Cipher.ENCRYPT_MODE, key, gcmParamSpec);
+        byte[] encValue = dataCipher.doFinal(privKey.getEncoded());
 
         AlgorithmIdentifier symmAlg = new AlgorithmIdentifier(PKCSObjectIdentifiers.id_PBES2,
             new PBES2Parameters(

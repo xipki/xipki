@@ -35,7 +35,6 @@ import org.xipki.security.XiContentSigner;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConcurrentBag;
 import org.xipki.util.DateUtil;
 import org.xipki.util.HourMinute;
 import org.xipki.util.LogUtil;
@@ -597,7 +596,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       ConcurrentContentSigner concurrentSigner = (crlSigner == null)
           ? caInfo.getSigner(null) : crlSigner.signer();
 
-      ConcurrentBag.BagEntry<XiContentSigner> signer0;
+      XiContentSigner signer0;
       try {
         signer0 = concurrentSigner.borrowSigner();
       } catch (NoIdleSignerException ex) {
@@ -606,7 +605,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
 
       X509CRLHolder crl;
       try {
-        crl = crlBuilder.build(signer0.value());
+        crl = crlBuilder.build(signer0);
       } finally {
         concurrentSigner.requiteSigner(signer0);
       }

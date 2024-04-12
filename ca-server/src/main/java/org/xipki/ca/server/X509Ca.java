@@ -50,7 +50,6 @@ import org.xipki.security.ctlog.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConcurrentBag;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.DateUtil;
 import org.xipki.util.LogUtil;
@@ -611,7 +610,7 @@ public class X509Ca extends X509CaModule implements Closeable {
       if (addCtlog) {
         certBuilder.addExtension(Extn.id_precertificate, true, DERNull.INSTANCE);
 
-        ConcurrentBag.BagEntry<XiContentSigner> signer0;
+        XiContentSigner signer0;
         try {
           signer0 = gct.signer.borrowSigner();
         } catch (NoIdleSignerException ex) {
@@ -620,7 +619,7 @@ public class X509Ca extends X509CaModule implements Closeable {
 
         X509CertificateHolder precert;
         try {
-          precert = certBuilder.build(signer0.value());
+          precert = certBuilder.build(signer0);
         } finally {
           // returns the signer after the signing so that it can be used by others
           gct.signer.requiteSigner(signer0);
@@ -644,7 +643,7 @@ public class X509Ca extends X509CaModule implements Closeable {
         certBuilder.addExtension(new Extension(Extn.id_SCTs, extnSctCtrl.isCritical(), extnValue));
       }
 
-      ConcurrentBag.BagEntry<XiContentSigner> signer0;
+      XiContentSigner signer0;
       try {
         signer0 = gct.signer.borrowSigner();
       } catch (NoIdleSignerException ex) {
@@ -653,7 +652,7 @@ public class X509Ca extends X509CaModule implements Closeable {
 
       X509CertificateHolder bcCert;
       try {
-        bcCert = certBuilder.build(signer0.value());
+        bcCert = certBuilder.build(signer0);
       } finally {
         gct.signer.requiteSigner(signer0);
       }

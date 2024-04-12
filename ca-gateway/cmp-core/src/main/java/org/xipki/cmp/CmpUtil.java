@@ -29,7 +29,6 @@ import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.XiContentSigner;
 import org.xipki.util.Args;
-import org.xipki.util.ConcurrentBag;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -72,10 +71,10 @@ public class CmpUtil {
       builder.addCMPCertificate(signerCert);
     }
 
-    ConcurrentBag.BagEntry<XiContentSigner> signer0 = signer.borrowSigner();
+    XiContentSigner signer0 = signer.borrowSigner();
     ProtectedPKIMessage signedMessage;
     try {
-      signedMessage = builder.build(signer0.value());
+      signedMessage = builder.build(signer0);
     } finally {
       signer.requiteSigner(signer0);
     }
