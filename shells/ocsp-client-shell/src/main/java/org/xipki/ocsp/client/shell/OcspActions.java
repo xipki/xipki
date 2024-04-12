@@ -83,7 +83,7 @@ import java.util.StringTokenizer;
  *
  * @author Lijun Liao (xipki)
  */
-public class Actions {
+public class OcspActions {
 
   public abstract static class BaseOcspStatusAction extends CommonOcspStatusAction {
 

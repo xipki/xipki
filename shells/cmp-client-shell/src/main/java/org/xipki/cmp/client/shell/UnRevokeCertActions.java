@@ -142,7 +142,7 @@ public class UnRevokeCertActions {
 
   } // class CmpUnsuspend
 
-  public abstract static class UnRevokeCertAction extends Actions.AuthClientAction {
+  public abstract static class UnRevokeCertAction extends CmpActions.AuthClientAction {
 
     @Option(name = "--ca-cert", required = true, description = "certificate file")
     @Completion(FileCompleter.class)

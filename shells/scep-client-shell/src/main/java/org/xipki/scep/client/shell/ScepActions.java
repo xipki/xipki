@@ -45,7 +45,7 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 
-public class Actions {
+public class ScepActions {
 
   @Command(scope = "xi", name = "scep-certpoll", description = "poll certificate")
   @Service

@@ -55,7 +55,7 @@ public class CrlActions {
 
   } // class CmpGetCrl
 
-  public abstract static class CrlAction extends Actions.ClientAction {
+  public abstract static class CrlAction extends CmpActions.ClientAction {
 
     @Option(name = "--outform", description = "output format of the CRL")
     @Completion(Completers.DerPemCompleter.class)

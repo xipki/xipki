@@ -44,7 +44,7 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  *
  */
-public class Actions {
+public class CmpActions {
 
   public abstract static class AuthClientAction extends ClientAction {
 

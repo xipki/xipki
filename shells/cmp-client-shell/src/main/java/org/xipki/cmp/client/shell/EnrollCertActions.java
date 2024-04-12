@@ -97,7 +97,7 @@ public class EnrollCertActions {
 
   @Command(scope = "xi", name = "cmp-csr-enroll", description = "enroll certificate via CSR")
   @Service
-  public static class CmpCsrEnroll extends Actions.AuthClientAction {
+  public static class CmpCsrEnroll extends CmpActions.AuthClientAction {
 
     @Option(name = "--csr", required = true, description = "CSR file")
     @Completion(FileCompleter.class)
@@ -364,7 +364,7 @@ public class EnrollCertActions {
 
   } // class CmpEnrollP12
 
-  public abstract static class EnrollAction extends Actions.AuthClientAction {
+  public abstract static class EnrollAction extends CmpActions.AuthClientAction {
 
     @Reference
     protected SecurityFactory securityFactory;

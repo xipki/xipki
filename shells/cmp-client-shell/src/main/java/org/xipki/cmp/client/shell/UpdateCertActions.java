@@ -244,7 +244,7 @@ public class UpdateCertActions {
 
   }
 
-  public abstract static class UpdateAction extends Actions.AuthClientAction {
+  public abstract static class UpdateAction extends CmpActions.AuthClientAction {
 
     @Reference
     protected SecurityFactory securityFactory;
