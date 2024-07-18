@@ -52,7 +52,6 @@ public class P11KeypairGenerator extends KeypairGenerator {
 
   @Override
   public void initialize0(ConfPairs conf) throws XiSecurityException {
-    String moduleName = Args.notNull(conf, "conf").value("module");
     String str = conf.value("slot");
     Integer slotIndex = (str == null) ? null : Integer.parseInt(str);
 
@@ -64,7 +63,7 @@ public class P11KeypairGenerator extends KeypairGenerator {
     }
 
     try {
-      P11CryptService p11Service = this.cryptServiceFactory.getP11CryptService(moduleName);
+      P11CryptService p11Service = this.cryptServiceFactory.getP11CryptService();
       P11Module module = p11Service.getModule();
       P11SlotId p11SlotId = (slotId != null) ? module.getSlotIdForId(slotId)
           : module.getSlotIdForIndex(slotIndex);

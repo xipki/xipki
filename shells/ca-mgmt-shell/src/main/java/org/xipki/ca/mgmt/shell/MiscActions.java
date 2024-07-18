@@ -240,16 +240,13 @@ public class MiscActions {
     @Option(name = "--verbose", aliases = "-v", description = "show object information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
-    @Option(name = "--module", description = "name of the PKCS#11 module.")
-    private String moduleName = "default";
-
     @Option(name = "--slot", description = "slot index")
     private Integer slotIndex;
 
     @Override
     protected Object execute0() throws Exception {
       try {
-        println(caManager.getTokenInfoP11(moduleName, slotIndex, verbose));
+        println(caManager.getTokenInfoP11(slotIndex, verbose));
         return null;
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not get token-info-p11, error: " + ex.getMessage(), ex);

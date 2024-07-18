@@ -353,8 +353,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose) throws CaMgmtException {
-    return signerManager.getTokenInfoP11(moduleName, slotIndex, verbose);
+  public String getTokenInfoP11(Integer slotIndex, boolean verbose) throws CaMgmtException {
+    return signerManager.getTokenInfoP11(slotIndex, verbose);
   }
 
   private void init() throws CaMgmtException {

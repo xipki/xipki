@@ -144,17 +144,16 @@ class SignerManager {
     }
   } // method createSigner
 
-  String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose) throws CaMgmtException {
+  String getTokenInfoP11(Integer slotIndex, boolean verbose) throws CaMgmtException {
     StringBuilder sb = new StringBuilder();
     final String NL = "\n";
     try {
-      P11CryptService p11Service = manager.p11CryptServiceFactory.getP11CryptService(moduleName);
+      P11CryptService p11Service = manager.p11CryptServiceFactory.getP11CryptService();
       if (p11Service == null) {
-        throw new CaMgmtException("undefined module " + moduleName);
+        throw new CaMgmtException("error getting P11CryptService");
       }
 
       P11Module module = p11Service.getModule();
-      sb.append("module: ").append(moduleName).append(NL);
       sb.append(module.getDescription()).append(NL);
 
       List<P11SlotId> slots = module.getSlotIds();

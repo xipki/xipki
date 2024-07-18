@@ -1,5 +1,5 @@
 ## Tomcat
-The XiPKI components `xipki-ca`, `xipki-gateway`, `xipki-hsmproxy`, and `xipki-ocsp` shall be 
+The XiPKI components `xipki-ca`, `xipki-gateway`, and `xipki-ocsp` shall be 
 installed in different tomcat instances. Do NOT use install more than 1 XiPKI component above
 to one tomcat instance.
 
@@ -31,11 +31,6 @@ Set the environment variable `JAVA_HOME` to the root directory of JRE/JDK instal
 
 1. Unpack tomcat to a new folder.
 2. Install protocol gateway as described in the `xipki-gateway/README.md` file.
-
-## Install HSM Proxy Server
-
-1. Unpack tomcat to a new folder
-2. Install CA as described in the `xipki-hsmproxy/README.md` file.
 
 ## Install Management Command Line Interface
 void
@@ -92,7 +87,6 @@ is used. **Note that this step should be applied to all components (tomcat, xipk
 * Copy the corresponding configuration file in the folder `xipki/security/example/` to `xipki/security/pkcs11.json`,
   and adapt the PKCS#11 configuration.
     - For HSM device: `pkcs11-hsm.json`
-    - For HSM proxy client: `pkcs11-hsmproxy.json`
     - For HSM emulaor: `pkcs11-emulator.json`
 
 ## Configure how to handle SSL client certificate behind reverse proxy
@@ -101,7 +95,6 @@ is used. **Note that this step should be applied to all components (tomcat, xipk
 
 * Set the `reverseProxyMode` field in the json configuration file to `APACHE`:
     - CA: `xipki/etc/ca/ca.json`
-    - HSM Proxy: `xipki/etc/hsmproxy.json`
     - CA Gateway
         - CMP: `xipki/gatway/cmp-gateway.json`
         - EST: `xipki/gatway/est-gateway.json`

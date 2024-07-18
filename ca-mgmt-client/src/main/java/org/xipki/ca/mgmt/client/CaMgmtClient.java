@@ -752,8 +752,8 @@ public class CaMgmtClient implements CaManager {
   }
 
   @Override
-  public String getTokenInfoP11(String module, Integer slotIndex, boolean verbose) throws CaMgmtException {
-    MgmtRequest.TokenInfoP11 req = new MgmtRequest.TokenInfoP11(module, slotIndex, verbose);
+  public String getTokenInfoP11(Integer slotIndex, boolean verbose) throws CaMgmtException {
+    MgmtRequest.TokenInfoP11 req = new MgmtRequest.TokenInfoP11(slotIndex, verbose);
     byte[] respBytes = transmit(MgmtAction.tokenInfoP11, req);
     return parse(respBytes, MgmtResponse.StringResponse.class).getResult();
   }

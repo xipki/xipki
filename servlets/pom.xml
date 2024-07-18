@@ -23,9 +23,6 @@
     <!-- OCSP -->
     <module>ocsp-servlet3</module>
     <module>ocsp-servlet5</module>
-    <!-- HSM Proxy -->
-    <module>hsmproxy-servlet3</module>
-    <module>hsmproxy-servlet5</module>
     <!-- Gateway -->
     <module>gateway-servlet3</module>
     <module>gateway-servlet5</module>

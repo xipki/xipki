@@ -41,9 +41,8 @@ TDIR=$WDIR/xipki-ca/tomcat/xipki/keycerts
 
 mkdir -p $TDIR
 
-cp $KC_DIR/hsmproxy-client/* \
+cp \ 
    $KC_DIR/ca-server/* \
-   $KC_DIR/hsmproxy-server/*-cert.pem \
    $KC_DIR/ca-mgmt-client/*-cert.pem \
    $KS_DIR/ca-client-certstore.p12 \
    $TDIR
@@ -55,10 +54,6 @@ TDIR=$WDIR/xipki-ocsp/tomcat/xipki/keycerts
 
 mkdir -p $TDIR
 
-cp $KC_DIR/hsmproxy-client/* \
-   $KC_DIR/hsmproxy-server/*-cert.pem \
-   $TDIR
-
 # Gateway
 echo "Copying generated keys to the XiPKI component xipki-gateway"
 
@@ -66,27 +61,14 @@ TDIR=$WDIR/xipki-gateway/tomcat/xipki/keycerts
 
 mkdir -p $TDIR
 
-cp $KC_DIR/hsmproxy-client/* \
+cp \
    $KC_DIR/gateway-server/* \
    $KC_DIR/ra-sdk-client/* \
    $KC_DIR/cmp-client/*-cert.pem \
    $KC_DIR/est-client/*-cert.pem \
    $KC_DIR/rest-client/*-cert.pem \
-   $KC_DIR/hsmproxy-server/hsmproxy-server-cert.pem \
    $KC_DIR/ca-server/ca-server-cert.pem \
    $KS_DIR/gateway-client-ca-certstore.p12 \
-   $TDIR
-
-# HSM proxy
-echo "Copying generated keys to the XiPKI component xipki-hsmproxy"
-
-TDIR=$WDIR/xipki-hsmproxy/tomcat/xipki/keycerts
-
-mkdir -p $TDIR
-
-cp $KC_DIR/hsmproxy-server/* \
-   $KC_DIR/hsmproxy-client/*-cert.pem \
-   $KS_DIR/hsmproxy-client-certstore.p12 \
    $TDIR
 
 # xipki-cli
@@ -95,11 +77,10 @@ TDIR=$WDIR/xipki-cli/xipki/keycerts
 
 mkdir -p $TDIR
 
-cp $KC_DIR/hsmproxy-client/* \
+cp \
    $KC_DIR/cmp-client/* \
    $KC_DIR/est-client/* \
    $KC_DIR/rest-client/* \
-   $KC_DIR/hsmproxy-server/hsmproxy-server-cert.pem \
    $KC_DIR/gateway-server/gateway-server-cert.pem \
    $TDIR
 
@@ -109,11 +90,10 @@ TDIR=$WDIR/xipki-mgmt-cli/xipki/keycerts
 
 mkdir -p $TDIR
 
-cp $KC_DIR/hsmproxy-client/* \
+cp \
    $KC_DIR/rest-client/* \
    $KC_DIR/ca-mgmt-client/*.p12 \
    $KC_DIR/ca-mgmt-client/*-cert.pem \
-   $KC_DIR/hsmproxy-server/hsmproxy-server-cert.pem \
    $KC_DIR/ca-server/ca-server-cert.pem \
    $KC_DIR/gateway-server/gateway-server-cert.pem \
    $KC_DIR/ra-sdk-client/ra-sdk-client-cert.pem* \

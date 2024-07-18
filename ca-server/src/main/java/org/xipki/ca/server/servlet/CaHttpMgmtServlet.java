@@ -469,7 +469,7 @@ class CaHttpMgmtServlet {
         }
         case tokenInfoP11: {
           MgmtRequest.TokenInfoP11 req = parse(requestStream, MgmtRequest.TokenInfoP11.class);
-          String info = caManager.getTokenInfoP11(req.getModuleName(), req.getSlotIndex(), req.isVerbose());
+          String info = caManager.getTokenInfoP11(req.getSlotIndex(), req.isVerbose());
           resp = new MgmtResponse.StringResponse(info);
           break;
         }
