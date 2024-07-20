@@ -42,12 +42,6 @@ caqa:check-cert --issuer subcawithcrl --profile multi-valued-rdn \
 caqa:check-cert --issuer subcawithcrl --profile max-time \
   --csr output/max-time1.csr --cert output/max-time1.crt
 
-caqa:check-cert --issuer subcawithcrl --profile gmt0015 \
-  --csr output/gmt0015_1.csr --cert output/gmt0015_1.crt
-
-caqa:check-cert --issuer subcawithcrl --profile gmt0015 \
-  --csr output/gmt0015_2.csr --cert output/gmt0015_2.crt
-
 ## subca
 
 caqa:check-cert --issuer subca --profile smime \

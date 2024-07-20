@@ -48,7 +48,6 @@ public class ProfileConfDemo extends ProfileConfBuilder {
       certprofileTls("certprofile-tls.json", null, false);
       certprofileTlsC("certprofile-tls-c.json");
       certprofileMaxTime("certprofile-max-time.json");
-      certprofileGmt0015("certprofile-gmt0015.json");
 
       certprofileTls("certprofile-tls-rsa.json", KeypairGenerationType.KeyType.RSA, false);
       certprofileTls("certprofile-tls-dsa.json", KeypairGenerationType.KeyType.DSA, false);
@@ -489,52 +488,4 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileMaxTime
 
-  private static void certprofileGmt0015(String destFilename) {
-    String desc = "certprofile GMT 0015";
-    X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", false);
-
-    // Subject
-    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn(DN.CN),
-        rdn01(Extn.id_GMT_0015_ICRegistrationNumber), rdn01(Extn.id_GMT_0015_IdentityCode),
-        rdn01(Extn.id_GMT_0015_InsuranceNumber),      rdn01(Extn.id_GMT_0015_OrganizationCode),
-        rdn01(Extn.id_GMT_0015_TaxationNumber));
-
-    // Extensions
-    // Extensions - controls
-    List<ExtensionType> list = profile.getExtensions();
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
-    list.add(createExtension(Extension.freshestCRL, false, false));
-
-    // Extensions - basicConstraints
-    list.add(createExtension(Extension.basicConstraints, true, true));
-
-    // Extensions - AuthorityInfoAccess
-    list.add(createExtension(Extension.authorityInfoAccess, true, false));
-    last(list).setAuthorityInfoAccess(createAuthorityInfoAccess());
-
-    // Extensions - AuthorityKeyIdentifier
-    list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-
-    // Extensions - keyUsage
-    list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment}, null));
-
-    // Extensions - extendedKeyUsage
-    list.add(createExtension(Extension.extendedKeyUsage, true, false));
-    last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}, null));
-
-    // Extension id_GMT_0015_ICRegistrationNumber
-    ASN1ObjectIdentifier[] gmtOids = new ASN1ObjectIdentifier[] {
-        Extn.id_GMT_0015_ICRegistrationNumber, Extn.id_GMT_0015_IdentityCode,  Extn.id_GMT_0015_InsuranceNumber,
-        Extn.id_GMT_0015_OrganizationCode,     Extn.id_GMT_0015_TaxationNumber};
-    for (ASN1ObjectIdentifier m : gmtOids) {
-      list.add(createExtension(m, true, false));
-      last(list).setInRequest(TripleState.required);
-    }
-
-    marshall(profile, destFilename, true);
-  } // method certprofileGmt0015
 }

@@ -37,7 +37,6 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.util.CollectionUtil;
 import org.xipki.util.IoUtil;
 import org.xipki.util.JSON;
 import org.xipki.util.StringUtil;
@@ -50,7 +49,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Builder to create xijson configuration.
@@ -61,14 +59,6 @@ import java.util.Set;
 public class ProfileConfBuilder extends ExtensionConfBuilder {
 
   protected static final String REGEX_FQDN = ":FQDN";
-
-  protected static final Set<ASN1ObjectIdentifier> NOT_IN_SUBJECT_RDNS;
-
-  static {
-    NOT_IN_SUBJECT_RDNS = CollectionUtil.asUnmodifiableSet(
-        Extn.id_GMT_0015_ICRegistrationNumber, Extn.id_GMT_0015_IdentityCode,   Extn.id_GMT_0015_InsuranceNumber,
-        Extn.id_GMT_0015_OrganizationCode,     Extn.id_GMT_0015_TaxationNumber, Extn.id_extension_admission);
-  } // method static
 
   protected static void marshall(X509ProfileType profile, String filename, boolean validate) {
     try {
@@ -198,10 +188,6 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
 
     if (value != null) {
       ret.setValue(value);
-    }
-
-    if (NOT_IN_SUBJECT_RDNS.contains(type)) {
-      ret.setNotInSubject(Boolean.TRUE);
     }
 
     return ret;

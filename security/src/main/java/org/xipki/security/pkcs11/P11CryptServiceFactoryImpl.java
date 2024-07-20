@@ -6,7 +6,6 @@ package org.xipki.security.pkcs11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pkcs11.wrapper.TokenException;
-import org.xipki.security.XiSecurityException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.JSON;
 import org.xipki.util.StringUtil;
@@ -14,12 +13,6 @@ import org.xipki.util.exception.InvalidConfException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * An implementation of {@link P11CryptServiceFactory}.

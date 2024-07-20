@@ -50,11 +50,11 @@ public class SubjectDnSpec {
 
   private static final Range RANGE_255 = new Range(1, 255);
 
-  private static final Range RANGE_POSTAL_CODE = new Range(1, 40);
+  //private static final Range RANGE_POSTAL_CODE = new Range(1, 40);
 
   private static final Range RANGE_COUNTRY_NAME = new Range(2, 2);
 
-  private static final Range RANGE_POSTAL_ADDRESS = new Range(0, 30);
+  //private static final Range RANGE_POSTAL_ADDRESS = new Range(0, 30);
 
   private static final Range RANGE_GENDER = new Range(1, 1);
 
@@ -188,8 +188,8 @@ public class SubjectDnSpec {
     conf(ids, DN.emailAddress, RANGE_255, IA5_STRING_ONLY);
 
     // DATE_OF_BIRTH
-    conf(ids, DN.dateOfBirth, RANGE_DATE_OF_BIRTH, null);
-    PATTERNS.put(DN.dateOfBirth, TextVadidator.DATE_OF_BIRTH);
+    //conf(ids, DN.dateOfBirth, RANGE_DATE_OF_BIRTH, null);
+    //PATTERNS.put(DN.dateOfBirth, TextVadidator.DATE_OF_BIRTH);
 
     // domainComponent
     conf(ids, DN.DC, null, IA5_STRING_ONLY);
@@ -232,10 +232,10 @@ public class SubjectDnSpec {
     conf(ids, DN.organizationIdentifier, RANGE_64, DIRECTORY_STRINGS);
 
     // NIF
-    conf(ids, DN.NIF, RANGE_64, DIRECTORY_STRINGS);
+    //conf(ids, DN.NIF, RANGE_64, DIRECTORY_STRINGS);
 
     // CIF
-    conf(ids, DN.CIF, RANGE_64, DIRECTORY_STRINGS);
+    //conf(ids, DN.CIF, RANGE_64, DIRECTORY_STRINGS);
 
     // organizationalUnitName
     conf(ids, DN.OU, RANGE_64, DIRECTORY_STRINGS);
@@ -244,10 +244,10 @@ public class SubjectDnSpec {
     conf(ids, DN.placeOfBirth, RANGE_128, DIRECTORY_STRINGS);
 
     // postalAddress
-    conf(ids, DN.postalAddress, RANGE_POSTAL_ADDRESS, DIRECTORY_STRINGS);
+    //conf(ids, DN.postalAddress, RANGE_POSTAL_ADDRESS, DIRECTORY_STRINGS);
 
     // postalCode
-    conf(ids, DN.postalCode, RANGE_POSTAL_CODE, DIRECTORY_STRINGS);
+    //conf(ids, DN.postalCode, RANGE_POSTAL_CODE, DIRECTORY_STRINGS);
 
     // pseudonym
     conf(ids, DN.pseudonym, RANGE_64, DIRECTORY_STRINGS);
@@ -271,7 +271,7 @@ public class SubjectDnSpec {
     conf(ids, DN.surname, RANGE_64, DIRECTORY_STRINGS);
 
     // title
-    conf(ids, DN.T, RANGE_64,DIRECTORY_STRINGS);
+    conf(ids, DN.T, RANGE_64, DIRECTORY_STRINGS);
 
     // telefonNumber
     conf(ids, DN.telephoneNumber, null, DIRECTORY_STRINGS);

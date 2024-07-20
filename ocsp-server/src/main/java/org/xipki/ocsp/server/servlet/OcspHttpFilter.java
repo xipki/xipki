@@ -10,7 +10,6 @@ import org.xipki.ocsp.server.OcspServer;
 import org.xipki.security.Securities;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ReflectiveUtil;
 import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.XiHttpFilter;

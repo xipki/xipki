@@ -26,7 +26,6 @@ public class CaEnrollBenchEntry {
     GIVENNAME,
     SURNAME,
     STREET,
-    POSTALCODE,
     O,
     OU,
     CN;
@@ -63,9 +62,6 @@ public class CaEnrollBenchEntry {
           break;
         case STREET:
           this.subjectRdnForIncrement = ObjectIdentifiers.DN.street;
-          break;
-        case POSTALCODE:
-          this.subjectRdnForIncrement = ObjectIdentifiers.DN.postalCode;
           break;
         case O:
           this.subjectRdnForIncrement = ObjectIdentifiers.DN.O;

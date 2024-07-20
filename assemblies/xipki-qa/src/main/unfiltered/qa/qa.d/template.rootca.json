@@ -171,12 +171,6 @@
 			"file":"${profiles.dir}/certprofile-tls-c.json"
 		}
 	},{
-		"name":"gmt0015",
-		"type":"xijson",
-		"conf":{
-			"file":"${profiles.dir}/certprofile-gmt0015.json"
-		}
-	},{
 		"name":"max-time",
 		"type":"xijson",
 		"conf":{

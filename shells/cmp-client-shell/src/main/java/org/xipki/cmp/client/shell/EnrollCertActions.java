@@ -10,15 +10,12 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.apache.karaf.shell.support.completers.StringsCompleter;
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
 import org.bouncycastle.asn1.crmf.OptionalValidity;
@@ -26,7 +23,6 @@ import org.bouncycastle.asn1.crmf.POPOSigningKey;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
@@ -76,9 +72,7 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -425,12 +419,6 @@ public class EnrollCertActions {
     @Option(name = "--biometric-uri", description = "Biometric source data URI")
     private String biometricUri;
 
-    @Option(name = "--dateOfBirth", description = "Date of birth YYYYMMdd in subject")
-    private String dateOfBirth;
-
-    @Option(name = "--postalAddress", multiValued = true, description = "postal address in subject")
-    private List<String> postalAddress;
-
     @Option(name = "--extensions-file", description = "File containing the DER-encoded Extension.s")
     @Completion(FileCompleter.class)
     private String extensionsFile;
@@ -463,42 +451,6 @@ public class EnrollCertActions {
       }
 
       X500Name subjectDn = new X500Name(subject);
-      List<RDN> list = new LinkedList<>();
-
-      if (StringUtil.isNotBlank(dateOfBirth)) {
-        ASN1ObjectIdentifier id = ObjectIdentifiers.DN.dateOfBirth;
-        RDN[] rdns = subjectDn.getRDNs(id);
-
-        if (rdns == null || rdns.length == 0) {
-          Instant date = DateUtil.parseUtcTimeyyyyMMdd(dateOfBirth).plus(12, ChronoUnit.HOURS);
-          ASN1Encodable atvValue = new DERGeneralizedTime(DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z");
-          RDN rdn = new RDN(id, atvValue);
-          list.add(rdn);
-        }
-      }
-
-      if (CollectionUtil.isNotEmpty(postalAddress)) {
-        ASN1ObjectIdentifier id = ObjectIdentifiers.DN.postalAddress;
-        RDN[] rdns = subjectDn.getRDNs(id);
-
-        if (rdns == null || rdns.length == 0) {
-          ASN1EncodableVector vec = new ASN1EncodableVector();
-          for (String m : postalAddress) {
-            vec.add(new DERUTF8String(m));
-          }
-
-          if (vec.size() > 0) {
-            ASN1Sequence atvValue = new DERSequence(vec);
-            RDN rdn = new RDN(id, atvValue);
-            list.add(rdn);
-          }
-        }
-      }
-
-      if (!list.isEmpty()) {
-        Collections.addAll(list, subjectDn.getRDNs());
-        subjectDn = new X500Name(list.toArray(new RDN[0]));
-      }
 
       CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
       certTemplateBuilder.setSubject(subjectDn);

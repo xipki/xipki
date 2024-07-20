@@ -174,39 +174,21 @@ public abstract class BaseCertprofile extends Certprofile {
           }
         } else {
           ASN1Encodable rdnValue = thisRdns[0].getFirst().getValue();
-          if (ObjectIdentifiers.DN.dateOfBirth.equals(type)) {
-            rdn = createDateOfBirthRdn(type, rdnValue);
-          } else if (ObjectIdentifiers.DN.postalAddress.equals(type)) {
-            rdn = createPostalAddressRdn(type, rdnValue, control);
-          } else {
-            String value = X509Util.rdnValueToString(rdnValue);
-            rdn = createSubjectRdn(value, type, control);
-          }
+          String value = X509Util.rdnValueToString(rdnValue);
+          rdn = createSubjectRdn(value, type, control);
         }
 
         rdns.add(rdn);
       } else {
         // cvalue must be null here.
-        if (ObjectIdentifiers.DN.dateOfBirth.equals(type)) {
-          for (int i = 0; i < len; i++) {
-            RDN rdn = createDateOfBirthRdn(type, thisRdns[i].getFirst().getValue());
-            rdns.add(rdn);
-          }
-        } else if (ObjectIdentifiers.DN.postalAddress.equals(type)) {
-          for (int i = 0; i < len; i++) {
-            RDN rdn = createPostalAddressRdn(type, thisRdns[i].getFirst().getValue(), control);
-            rdns.add(rdn);
-          }
-        } else {
-          String[] values = new String[len];
-          for (int i = 0; i < len; i++) {
-            values[i] = X509Util.rdnValueToString(thisRdns[i].getFirst().getValue());
-          }
+        String[] values = new String[len];
+        for (int i = 0; i < len; i++) {
+          values[i] = X509Util.rdnValueToString(thisRdns[i].getFirst().getValue());
+        }
 
-          for (String value : values) {
-            rdns.add(createSubjectRdn(value, type, control));
-          }
-        } // if
+        for (String value : values) {
+          rdns.add(createSubjectRdn(value, type, control));
+        }
       } // if
     } // for
 

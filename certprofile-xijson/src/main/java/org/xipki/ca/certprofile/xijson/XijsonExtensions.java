@@ -9,7 +9,6 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x500.RDN;
@@ -20,7 +19,6 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
-import org.bouncycastle.util.Pack;
 import org.xipki.ca.api.profile.BaseCertprofile;
 import org.xipki.ca.api.profile.Certprofile.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.Certprofile.CrlDistributionPointsControl;
@@ -39,14 +37,10 @@ import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.GeneralNameType;
 import org.xipki.ca.certprofile.xijson.conf.SubjectToSubjectAltNameType;
 import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
-import org.xipki.ca.certprofile.xijson.conf.extn.AdditionalInformation;
-import org.xipki.ca.certprofile.xijson.conf.extn.AdmissionSyntax;
 import org.xipki.ca.certprofile.xijson.conf.extn.AuthorityInfoAccess;
 import org.xipki.ca.certprofile.xijson.conf.extn.AuthorityKeyIdentifier;
 import org.xipki.ca.certprofile.xijson.conf.extn.BasicConstraints;
 import org.xipki.ca.certprofile.xijson.conf.extn.BiometricInfo;
-import org.xipki.ca.certprofile.xijson.conf.extn.CCCInstanceCAExtensionSchema;
-import org.xipki.ca.certprofile.xijson.conf.extn.CCCSimpleExtensionSchema;
 import org.xipki.ca.certprofile.xijson.conf.extn.CertificatePolicies;
 import org.xipki.ca.certprofile.xijson.conf.extn.CrlDistributionPoints;
 import org.xipki.ca.certprofile.xijson.conf.extn.ExtendedKeyUsage;
@@ -62,7 +56,6 @@ import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements.QcEuLimitValueType
 import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements.QcStatementType;
 import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements.QcStatementValueType;
 import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements.Range2Type;
-import org.xipki.ca.certprofile.xijson.conf.extn.Restriction;
 import org.xipki.ca.certprofile.xijson.conf.extn.SmimeCapabilities;
 import org.xipki.ca.certprofile.xijson.conf.extn.SmimeCapabilities.SmimeCapability;
 import org.xipki.ca.certprofile.xijson.conf.extn.SmimeCapabilities.SmimeCapabilityParameter;
@@ -70,7 +63,6 @@ import org.xipki.ca.certprofile.xijson.conf.extn.SubjectDirectoryAttributs;
 import org.xipki.ca.certprofile.xijson.conf.extn.SubjectInfoAccess;
 import org.xipki.ca.certprofile.xijson.conf.extn.SubjectInfoAccess.Access;
 import org.xipki.ca.certprofile.xijson.conf.extn.TlsFeature;
-import org.xipki.ca.certprofile.xijson.conf.extn.ValidityModel;
 import org.xipki.pki.BadCertTemplateException;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
@@ -102,10 +94,6 @@ import java.util.Set;
  */
 
 public class XijsonExtensions {
-
-  private ExtensionValue additionalInformation;
-
-  private AdmissionExtension.AdmissionSyntaxOption admission;
 
   private AuthorityInfoAccessControl aiaControl;
 
@@ -151,8 +139,6 @@ public class XijsonExtensions {
 
   private List<QcStatementOption> qcStatementsOption;
 
-  private ExtensionValue restriction;
-
   private ExtensionValue smimeCapabilities;
 
   private ExtensionValue tlsFeature;
@@ -160,10 +146,6 @@ public class XijsonExtensions {
   private ExtensionValue validityModel;
 
   private SubjectDirectoryAttributesControl subjectDirAttrsControl;
-
-  private ASN1ObjectIdentifier cccExtensionSchemaType;
-
-  private ExtensionValue cccExtensionSchemaValue;
 
   XijsonExtensions(XijsonCertprofile certProfile, X509ProfileType conf, SubjectControl subjectControl)
       throws CertprofileException {
@@ -178,12 +160,6 @@ public class XijsonExtensions {
 
     // SubjectToSubjectAltName
     initSubjectToSubjectAltNames(conf.getSubjectToSubjectAltNames());
-
-    // AdditionalInformation
-    initAdditionalInformation(extnIds, extensions);
-
-    // Admission
-    initAdmission(extnIds, extensions);
 
     // AuthorityInfoAccess
     initAuthorityInfoAccess(extnIds, extensions);
@@ -233,9 +209,6 @@ public class XijsonExtensions {
     // QCStatements
     initQcStatements(extnIds, extensions);
 
-    // Restriction
-    initRestriction(extnIds, extensions);
-
     // SMIMECapabilities
     initSmimeCapabilities(extnIds, extensions);
 
@@ -248,17 +221,8 @@ public class XijsonExtensions {
     // TlsFeature
     initTlsFeature(extnIds, extensions);
 
-    // validityModel
-    initValidityModel(extnIds, extensions);
-
     // SubjectDirectoryAttributes
     initSubjectDirAttrs(extnIds, extensions);
-
-    // Extensions defined in Chinese Standard GMT 0015
-    initGmt0015Extensions(extnIds);
-
-    // CCC
-    initCCCExtensionSchemas(extnIds, extensions);
 
     // constant extensions
     this.constantExtensions = conf.buildConstantExtesions();
@@ -365,36 +329,6 @@ public class XijsonExtensions {
       subjectToSubjectAltNameModes.put(new ASN1ObjectIdentifier(m.getSource().getOid()), targetTag);
     }
   } // method initSubjectToSubjectAltNames
-
-  private void initAdditionalInformation(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extn.id_extension_additionalInformation;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      AdditionalInformation extConf = getExtension(type, extensions).getAdditionalInformation();
-      if (extConf != null) {
-        additionalInformation = new ExtensionValue(critical(type),
-            extConf.getType().createDirectoryString(extConf.getText()));
-      }
-    }
-  } // method initAdditionalInformation
-
-  private void initAdmission(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
-      throws CertprofileException {
-    ASN1ObjectIdentifier type = Extn.id_extension_admission;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-
-      ExtensionType extn = getExtension(type, extensions);
-      AdmissionSyntax extConf = extn.getAdmissionSyntax();
-      if (extConf != null) {
-        this.admission = extConf.toXiAdmissionSyntax(critical(type));
-        if (!extn.permittedInRequest() && this.admission.isInputFromRequestRequired()) {
-          throw new CertprofileException("Extension " + ObjectIdentifiers.getName(type)
-            + " should be permitted in request");
-        }
-      }
-    }
-  } // method initAdmission
 
   private void initAuthorityInfoAccess(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
     ASN1ObjectIdentifier type = Extension.authorityInfoAccess;
@@ -658,17 +592,6 @@ public class XijsonExtensions {
     qcStatementsOption = null;
   } // method initQcStatements
 
-  private void initRestriction(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extn.id_extension_restriction;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      Restriction extConf = getExtension(type, extensions).getRestriction();
-      if (extConf != null) {
-        restriction = new ExtensionValue(critical(type), extConf.getType().createDirectoryString(extConf.getText()));
-      }
-    }
-  } // method initRestriction
-
   private void initSmimeCapabilities(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
       throws CertprofileException {
     ASN1ObjectIdentifier type = Extn.id_smimeCapabilities;
@@ -760,28 +683,6 @@ public class XijsonExtensions {
     tlsFeature = new ExtensionValue(critical(type), new DERSequence(vec));
   } // method initTlsFeature
 
-  /**
-   * See <a href="https://www.hrz.tu-darmstadt.de/itsicherheit/object_identifier/oids_der_informatik__cdc/index.de.jsp#validity_models">Validity Model</a>
-   * for details.
-   * <pre>
-   * SEQUENCE {
-   *    validityModelId OBJECT IDENTIFIER,
-   *    validityModelInfo ANY DEFINED BY validityModelId OPTIONAL
-   *  }
-   * </pre>
-   */
-  private void initValidityModel(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extn.id_extension_validityModel;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      ValidityModel extConf = getExtension(type, extensions).getValidityModel();
-      if (extConf != null) {
-        ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(extConf.getModelId().getOid());
-        validityModel = new ExtensionValue(critical(type), new DERSequence(oid));
-      }
-    }
-  } // method initValidityModel
-
   private void initSubjectDirAttrs(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
     ASN1ObjectIdentifier type = Extension.subjectDirectoryAttributes;
     if (extensionControls.containsKey(type)) {
@@ -792,69 +693,6 @@ public class XijsonExtensions {
       }
     }
   } // method initSubjectDirAttrs
-
-  private void initGmt0015Extensions(Set<ASN1ObjectIdentifier> extnIds) {
-    Arrays.asList(Extn.id_GMT_0015_ICRegistrationNumber,   Extn.id_GMT_0015_IdentityCode,
-        Extn.id_GMT_0015_InsuranceNumber, Extn.id_GMT_0015_OrganizationCode, Extn.id_GMT_0015_TaxationNumber)
-        .forEach(extnIds::remove);
-  } // method initGmt0015Extensions
-
-  private void initCCCExtensionSchemas(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
-      throws CertprofileException {
-    ASN1ObjectIdentifier type = null;
-    for (ASN1ObjectIdentifier m : extnIds) {
-      if (m.on(Extn.id_ccc_extn)) {
-        if (type != null) {
-          throw new CertprofileException("Maximal one CCC Extension is allowed, but configured at least 2.");
-        }
-        type = m;
-      }
-    }
-
-    if (type == null) {
-      return;
-    }
-
-    extnIds.remove(type);
-    ExtensionType ex = extensions.get(type.getId());
-    if (!ex.critical()) {
-      throw new CertprofileException("CCC Extension must be set to critical, but configured non-critical.");
-    }
-
-    List<ASN1ObjectIdentifier> simpleSchemaTypes = Arrays.asList(
-        Extn.id_ccc_Vehicle_Cert_K,       Extn.id_ccc_External_CA_Cert_F,   Extn.id_ccc_VehicleOEM_Enc_Cert,
-        Extn.id_ccc_VehicleOEM_Sig_Cert,  Extn.id_ccc_Device_Enc_Cert,      Extn.id_ccc_Vehicle_Intermediate_Cert,
-        Extn.id_ccc_VehicleOEM_CA_Cert_J, Extn.id_ccc_VehicleOEM_CA_Cert_M);
-
-    boolean isInstanceCAExtensionSchema = Extn.id_ccc_Instance_CA_Cert_E.equals(type);
-    if (!isInstanceCAExtensionSchema && !simpleSchemaTypes.contains(type)) {
-      return;
-    }
-
-    CCCSimpleExtensionSchema schema = isInstanceCAExtensionSchema
-        ? ex.getCccInstanceCAExtensionSchema() : ex.getCccExtensionSchema();
-
-    if (schema == null) {
-      throw new CertprofileException(
-          (isInstanceCAExtensionSchema ? "cccInstanceCAExtensionSchema" : "ccExtensionSchema") +
-          " is not set for " + type);
-    }
-
-    this.cccExtensionSchemaType = type;
-
-    ASN1EncodableVector vec = new ASN1EncodableVector();
-    vec.add(new ASN1Integer(schema.getVersion()));
-    if (isInstanceCAExtensionSchema) {
-      CCCInstanceCAExtensionSchema schema1 = (CCCInstanceCAExtensionSchema) schema;
-      byte[] bytes = Pack.longToBigEndian(schema1.getAppletVersion());
-      vec.add(new DEROctetString(Arrays.copyOfRange(bytes, 4, 8)));
-      if (schema1.getPlatformInformation() != null) {
-        vec.add(new DEROctetString(schema1.getPlatformInformation()));
-      }
-    }
-
-    this.cccExtensionSchemaValue = new ExtensionValue(ex.critical(), new DERSequence(vec));
-  }
 
   private static List<ASN1ObjectIdentifier> toOidList(List<DescribableOid> oidWithDescTypes) {
     if (CollectionUtil.isEmpty(oidWithDescTypes)) {
@@ -935,14 +773,6 @@ public class XijsonExtensions {
 
     return grantedNames.isEmpty() ? null : new GeneralNames(grantedNames.toArray(new GeneralName[0]));
   } // method createRequestedSubjectAltNames
-
-  public ExtensionValue getAdditionalInformation() {
-    return additionalInformation;
-  }
-
-  public AdmissionExtension.AdmissionSyntaxOption getAdmission() {
-    return admission;
-  }
 
   public AuthorityInfoAccessControl getAiaControl() {
     return aiaControl;
@@ -1032,10 +862,6 @@ public class XijsonExtensions {
     return qcStatementsOption;
   }
 
-  public ExtensionValue getRestriction() {
-    return restriction;
-  }
-
   public ExtensionValue getSmimeCapabilities() {
     return smimeCapabilities;
   }
@@ -1050,14 +876,6 @@ public class XijsonExtensions {
 
   public SubjectDirectoryAttributesControl getSubjectDirAttrsControl() {
     return subjectDirAttrsControl;
-  }
-
-  public ASN1ObjectIdentifier getCccExtensionSchemaType() {
-    return cccExtensionSchemaType;
-  }
-
-  public ExtensionValue getCccExtensionSchemaValue() {
-    return cccExtensionSchemaValue;
   }
 
   private static ExtensionType getExtension(
