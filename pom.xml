@@ -35,9 +35,9 @@
     <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
     <karaf.version>4.4.4</karaf.version>
     <karaf.bc.version>1.75</karaf.bc.version>
-    <bc.version>1.77</bc.version>
+    <bc.version>1.78.1</bc.version>
     <slf4j.version>1.7.36</slf4j.version>
-    <pkcs11wrapper.version>1.0.8</pkcs11wrapper.version>
+    <pkcs11wrapper.version>1.0.9</pkcs11wrapper.version>
     <hikaricp.version>4.0.3</hikaricp.version>
     <jackson.version>2.16.1</jackson.version>
     <zip4j.version>2.11.5</zip4j.version>
