@@ -16,14 +16,24 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.commons</groupId>
+      <groupId>org.xipki.servlet</groupId>
       <artifactId>servlet3-common</artifactId>
-      <version>${xipki.commons.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki.example</groupId>
       <artifactId>dummy-ctlog-server</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.servlet</groupId>
+      <artifactId>servlet3-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

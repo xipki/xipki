@@ -18,8 +18,7 @@ public class CaServletFilter extends ServletFilter {
 
   @Override
   protected XiHttpFilter initFilter(FilterConfig filterConfig) throws Exception {
-    String licenseFactoryClazz = filterConfig.getInitParameter("licenseFactory");
-    return new CaHttpFilter(licenseFactoryClazz);
+    return new CaHttpFilter();
   }
 
 }

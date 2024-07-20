@@ -18,21 +18,13 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.commons</groupId>
-      <artifactId>audit</artifactId>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ca-sdk</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.commons</groupId>
-      <artifactId>datasource</artifactId>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>license-api</artifactId>
+      <artifactId>datasource</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

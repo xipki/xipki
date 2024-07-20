@@ -31,7 +31,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skipDeploy>false</skipDeploy>
     <xipki.tools.version>1.0.11</xipki.tools.version>
-    <xipki.commons.version>6.3.5-SNAPSHOT</xipki.commons.version>
     <javax.servlet.version>3.1.0</javax.servlet.version>
     <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
     <karaf.version>4.4.4</karaf.version>
@@ -55,7 +54,9 @@
   </properties>
   <modules>
     <!-- Base components -->
-    <module>license-api</module>
+    <module>util</module>
+    <module>datasource</module>
+    <module>security</module>
     <!-- PKI SDK/Client -->
     <module>ocsp-client</module>
     <!-- PKI -->
@@ -74,6 +75,8 @@
     <module>qa</module>
     <module>examples</module>
     <module>karaf-features</module>
+    <module>servlets</module>
+    <module>assemblies</module>
   </modules>
   <scm>
     <connection>scm:git:git@github.com:xipki/xipki.git</connection>
@@ -238,51 +241,6 @@
   </build>
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.xipki.commons</groupId>
-        <artifactId>audit</artifactId>
-        <version>${xipki.commons.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.commons</groupId>
-        <artifactId>audit-extra</artifactId>
-        <version>${xipki.commons.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.commons</groupId>
-        <artifactId>datasource</artifactId>
-        <version>${xipki.commons.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.commons</groupId>
-        <artifactId>password</artifactId>
-        <version>${xipki.commons.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.commons</groupId>
-        <artifactId>security</artifactId>
-        <version>${xipki.commons.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.commons</groupId>
-        <artifactId>util</artifactId>
-        <version>${xipki.commons.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.commons</groupId>
-        <artifactId>xipki-tomcat-password</artifactId>
-        <version>${xipki.commons.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.commons</groupId>
-        <artifactId>shell-base</artifactId>
-        <version>${xipki.commons.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.commons</groupId>
-        <artifactId>security-shell</artifactId>
-        <version>${xipki.commons.version}</version>
-      </dependency>
       <dependency>
         <groupId>org.xipki</groupId>
         <artifactId>ipkcs11wrapper</artifactId>

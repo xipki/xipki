@@ -21,8 +21,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.commons</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>shell-base</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

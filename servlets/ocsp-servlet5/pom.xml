@@ -16,9 +16,9 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.commons</groupId>
+      <groupId>org.xipki.servlet</groupId>
       <artifactId>servlet5-common</artifactId>
-      <version>${xipki.commons.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
@@ -26,10 +26,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.example</groupId>
-      <artifactId>license-example</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

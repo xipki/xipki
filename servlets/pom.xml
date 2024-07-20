@@ -17,6 +17,8 @@
     <log4j.dir>../shared/filtered</log4j.dir>
   </properties>
   <modules>
+    <module>servlet3-common</module>
+    <module>servlet5-common</module>
     <!-- CA -->
     <module>ca-servlet3</module>
     <module>ca-servlet5</module>
@@ -53,22 +55,7 @@
   </build>
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki</groupId>
-        <artifactId>ipkcs11wrapper</artifactId>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.commons</groupId>
-        <artifactId>password</artifactId>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
+      <!--dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-jdk18on</artifactId>
         <scope>provided</scope>
@@ -87,12 +74,12 @@
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
         <scope>provided</scope>
-      </dependency>
-      <dependency>
+      </dependency-->
+      <!--dependency>
         <groupId>jakarta.servlet</groupId>
         <artifactId>jakarta.servlet-api</artifactId>
         <scope>provided</scope>
-      </dependency>
+      </dependency-->
     </dependencies>
   </dependencyManagement>
 </project>

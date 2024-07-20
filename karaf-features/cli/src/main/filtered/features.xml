@@ -10,14 +10,13 @@
     <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
     <bundle>mvn:org.xipki/ipkcs11wrapper/${pkcs11wrapper.version}</bundle>
-    <bundle>mvn:org.xipki.commons/password/${xipki.commons.version}</bundle>
-    <bundle>mvn:org.xipki.commons/util/${xipki.commons.version}</bundle>
-    <bundle>mvn:org.xipki.commons/security/${xipki.commons.version}</bundle>
+    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security/${project.version}</bundle>
     <bundle>mvn:org.xipki/pki-common/${project.version}</bundle>
     <bundle>mvn:org.xipki.gateway/cmp-core/${project.version}</bundle>
     <bundle>mvn:org.xipki.gateway/cmp-client/${project.version}</bundle>
-    <bundle>mvn:org.xipki.commons/shell-base/${xipki.commons.version}</bundle>
-    <bundle>mvn:org.xipki.commons/security-shell/${xipki.commons.version}</bundle>
+    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/security-shell/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/cmp-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-scep-client" version="${project.version}"
@@ -29,11 +28,10 @@
     <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
     <bundle>mvn:org.xipki/ipkcs11wrapper/${pkcs11wrapper.version}</bundle>
-    <bundle>mvn:org.xipki.commons/password/${xipki.commons.version}</bundle>
-    <bundle>mvn:org.xipki.commons/util/${xipki.commons.version}</bundle>
-    <bundle>mvn:org.xipki.commons/security/${xipki.commons.version}</bundle>
-    <bundle>mvn:org.xipki.commons/shell-base/${xipki.commons.version}</bundle>
-    <bundle>mvn:org.xipki.commons/security-shell/${xipki.commons.version}</bundle>
+    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/security-shell/${project.version}</bundle>
     <bundle>mvn:org.xipki/pki-common/${project.version}</bundle>
     <bundle>mvn:org.xipki.gateway/scep-core/${project.version}</bundle>
     <bundle>mvn:org.xipki.gateway/scep-client/${project.version}</bundle>
@@ -47,11 +45,10 @@
     <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
     <bundle>mvn:org.xipki/ipkcs11wrapper/${pkcs11wrapper.version}</bundle>
-    <bundle>mvn:org.xipki.commons/password/${xipki.commons.version}</bundle>
-    <bundle>mvn:org.xipki.commons/util/${xipki.commons.version}</bundle>
-    <bundle>mvn:org.xipki.commons/security/${xipki.commons.version}</bundle>
-    <bundle>mvn:org.xipki.commons/shell-base/${xipki.commons.version}</bundle>
-    <bundle>mvn:org.xipki.commons/security-shell/${xipki.commons.version}</bundle>
+    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/security-shell/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/ocsp-client-shell/${project.version}</bundle>
   </feature>
