@@ -7,16 +7,10 @@ if { "$1" equals "" | "$1" equals "help" } then {
   argsValid = "true"
 } else {
   HASH = $1
-  TOKEN_TYPE = $2
-  SIG_TYPE = $3
-  KEYSPEC = $4
-  argsValid = $([pkcs12] contains $TOKEN_TYPE)
+  SIG_TYPE = $2
+  KEYSPEC = $3
 
-  if { "$argsValid" equals "false" } then {
-    errMsg = "invalid TOKEN_TYPE $TOKEN_TYPE"
-  } else {
-    argsValid = $([rsa rsapss ec dsa] contains $SIG_TYPE)
-  }
+  argsValid = $([rsa rsapss ec dsa] contains $SIG_TYPE)
 
   if { "$argsValid" equals "false" } then {
     errMsg = "invalid SIG_TYPE $SIG_TYPE"
@@ -40,9 +34,8 @@ if { $argsValid equals "false" } then {
 if { $printUsage equals "true" } then {
   echo "Usage: "
   echo ""
-  echo "source file:./qa/cab/lifecycle.script <hash algo> <token type> <signature type> [<keyspec>]"
+  echo "source file:./qa/cab/lifecycle.script <hash algo> <signature type> [<keyspec>]"
   echo "    hash algo:       sha256, sha384, sha512"
-  echo "    token type:      pkcs12"
   echo "    signature type:  rsa, rsapss, ec, dsa"
   echo "    keyspec:         keysize for signature types rsa, rsaPSS and DSA,"
   echo "                     curve name for signature types ec"

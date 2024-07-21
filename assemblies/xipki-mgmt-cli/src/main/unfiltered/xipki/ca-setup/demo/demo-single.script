@@ -4,7 +4,4 @@ keytype = ec
 # Configure me: valid values are dbbased and filebased
 storetype = dbbased
 
-# Configure me: valid values are p12
-tokentype = p12
-
 source xipki/ca-setup/demo/doDemo.script

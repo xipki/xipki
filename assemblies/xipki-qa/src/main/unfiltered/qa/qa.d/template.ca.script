@@ -55,9 +55,7 @@ ca:profile-add \
 
 ## Generate selfsigned rootca
 
-if { $TOKEN_TYPE equals "pkcs12" } then {
-  CA_SIGNER_CONF = "algo=$SIGALGO,keystore=file:output/rootca1.p12,password=CHANGEIT"
-}
+CA_SIGNER_CONF = "algo=$SIGALGO,keystore=file:output/rootca1.p12,password=CHANGEIT"
 
 ca:gen-rootca \
   --name rootca1 \
@@ -70,7 +68,7 @@ ca:gen-rootca \
   --sn-len 20 \
   --next-crl-no 2 \
   --max-validity 10y \
-  --signer-type $TOKEN_TYPE \
+  --signer-type pkcs12 \
   --signer-conf "$CA_SIGNER_CONF" \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://myorg.org/rootca1.der \
@@ -85,12 +83,10 @@ ca:gen-rootca \
 ca:profile-rm -f rootca
 
 ## Update the certificate in the device
-if { $TOKEN_TYPE equals "pkcs12" } then {
-  xi:update-cert-p12 \
-    --p12 output/rootca1.p12 \
-    --password CHANGEIT \
-    --cert output/rootca1.crt
-}
+xi:update-cert-p12 \
+  --p12 output/rootca1.p12 \
+  --password CHANGEIT \
+  --cert output/rootca1.crt
 
 ca:caalias-add \
   --ca rootca1 \
@@ -117,14 +113,12 @@ ca:careq-add \
   --ca rootca1
 
 ## Generate keys and CSR for subca1
-if { $TOKEN_TYPE equals "pkcs12" } then {
-  xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
-    --p12 output/subca1.p12 \
-    --password CHANGEIT \
-    --outform $OUTFORM \
-    --out output/subca1.csr \
-    --subject "CN=subca1,O=myorg,C=DE"
-}
+xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+  --p12 output/subca1.p12 \
+  --password CHANGEIT \
+  --outform $OUTFORM \
+  --out output/subca1.csr \
+  --subject "CN=subca1,O=myorg,C=DE"
 
 ca:enroll-cert \
   --ca rootca1 \
@@ -133,32 +127,28 @@ ca:enroll-cert \
   --out output/subca1.crt \
   --profile subca
 
-if { $TOKEN_TYPE equals "pkcs12" } then {
-  xi:update-cert-p12 \
-    --p12 output/subca1.p12 \
-    --password CHANGEIT \
-    --cert output/subca1.crt \
-    --ca-cert output/rootca1.crt
-}
+xi:update-cert-p12 \
+  --p12 output/subca1.p12 \
+  --password CHANGEIT \
+  --cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
 
 ## Generate keys and CSR for subcawithcrl1
-if { $TOKEN_TYPE equals "pkcs12" } then {
-  xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
-    --p12 output/subcawithcrl1.p12 \
-    --password CHANGEIT \
-    --outform $OUTFORM \
-    --out output/subcawithcrl1.csr \
-    --subject "CN=subcawithcrl1, O=myorg, C=DE" \
-    --subject-alt-name "[1]info@myorg.org" \
-    --subject-alt-name "[2]myorg.org" \
-    --subject-alt-name "[5]edi-nameAssigner-1=edi-partyName1" \
-    --subject-alt-name "[6]http://myorg.org/abc" \
-    --subject-alt-name "[7]192.168.0.1" \
-    --subject-alt-name "[8]1.2.3.4" \
-    --subject-alt-name "[0]2.5.4.10=long organization name" \
-    --subject-info-access "1.3.6.1.5.5.7.48.5=[6]http://myorg.org/abc" \
-    --keyusage cRLSign
-}
+xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+  --p12 output/subcawithcrl1.p12 \
+  --password CHANGEIT \
+  --outform $OUTFORM \
+  --out output/subcawithcrl1.csr \
+  --subject "CN=subcawithcrl1, O=myorg, C=DE" \
+  --subject-alt-name "[1]info@myorg.org" \
+  --subject-alt-name "[2]myorg.org" \
+  --subject-alt-name "[5]edi-nameAssigner-1=edi-partyName1" \
+  --subject-alt-name "[6]http://myorg.org/abc" \
+  --subject-alt-name "[7]192.168.0.1" \
+  --subject-alt-name "[8]1.2.3.4" \
+  --subject-alt-name "[0]2.5.4.10=long organization name" \
+  --subject-info-access "1.3.6.1.5.5.7.48.5=[6]http://myorg.org/abc" \
+  --keyusage cRLSign
 
 ca:enroll-cert \
   --ca rootca1 \
@@ -167,23 +157,19 @@ ca:enroll-cert \
   --out output/subcawithcrl1.crt \
   --profile subca-complex
 
-if { $TOKEN_TYPE equals "pkcs12" } then {
-  xi:update-cert-p12 \
-    --p12 output/subcawithcrl1.p12 \
-    --password CHANGEIT \
-    --cert output/subcawithcrl1.crt \
-    --ca-cert output/rootca1.crt
-}
+xi:update-cert-p12 \
+  --p12 output/subcawithcrl1.p12 \
+  --password CHANGEIT \
+  --cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
 
 ## Generate keys and CSR for OCSPResponder
-if { $TOKEN_TYPE equals "pkcs12" } then {
-  xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
-    --p12 output/ocsp99.p12 \
-    --password CHANGEIT \
-    --outform $OUTFORM \
-    --out output/ocsp99.csr \
-    --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=myorg,C=DE"
-}
+xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+  --p12 output/ocsp99.p12 \
+  --password CHANGEIT \
+  --outform $OUTFORM \
+  --out output/ocsp99.csr \
+  --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=myorg,C=DE"
 
 ca:enroll-cert \
   --ca rootca1 \
@@ -192,13 +178,11 @@ ca:enroll-cert \
   --out output/ocsp99.crt \
   --profile ocsp
 
-if { $TOKEN_TYPE equals "pkcs12" } then {
-  xi:update-cert-p12 \
-    --p12 output/ocsp99.p12 \
-    --password CHANGEIT \
-    --cert output/ocsp99.crt \
-    --ca-cert output/rootca1.crt
-}
+xi:update-cert-p12 \
+  --p12 output/ocsp99.p12 \
+  --password CHANGEIT \
+  --cert output/ocsp99.crt \
+  --ca-cert output/rootca1.crt
 
 ca:caprofile-rm -f \
   --ca rootca1 \
@@ -209,9 +193,7 @@ echo "#                   Add subca with OCSP & CRL                   #"
 echo "#################################################################"
 ## Add CA
 
-if { $TOKEN_TYPE equals "pkcs12" } then {
-  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subca1.p12,algo=$SIGALGO"
-}
+CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subca1.p12,algo=$SIGALGO"
 
 ca:ca-add \
   --name subca1 \
@@ -219,7 +201,7 @@ ca:ca-add \
   --sn-len 20 \
   --next-crl-no 2 \
   --max-validity 5y \
-  --signer-type $TOKEN_TYPE \
+  --signer-type pkcs12 \
   --signer-conf "$CA_SIGNER_CONF" \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --crl-uri "http://localhost:8081/crl/?type=crl&name=subca1" \
@@ -274,9 +256,7 @@ echo "#                       Add subca with CRL                      #"
 echo "#################################################################"
 ## Add CA
 
-if { $TOKEN_TYPE equals "pkcs12" } then {
-  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subcawithcrl1.p12,algo=$SIGALGO"
-}
+CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subcawithcrl1.p12,algo=$SIGALGO"
 
 ca:ca-add \
   --name subcawithcrl1 \
@@ -284,7 +264,7 @@ ca:ca-add \
   --sn-len 20 \
   --next-crl-no 2 \
   --max-validity 8000y \
-  --signer-type $TOKEN_TYPE \
+  --signer-type pkcs12 \
   --signer-conf "$CA_SIGNER_CONF" \
   --ocsp-uri http://localhost:8080/ocsp/responder2 \
   --ca-cert-uri http://myorg.org/subcawithcrl1.der \

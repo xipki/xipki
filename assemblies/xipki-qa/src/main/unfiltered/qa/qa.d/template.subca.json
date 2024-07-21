@@ -1,7 +1,6 @@
 {
 	"basedir":"APP_DIR",
 	"properties":{
-		"token.type":"REPLACEME-TOKEN_TYPE",
 		"ca.signerConf": "REPLACEME-CA_SIGNERCONF"
 	},
 	"cas":[{
@@ -51,7 +50,7 @@
 			},
 			"saveCert":true,
 			"saveKeypair":false,
-			"signerType":"${token.type}",
+			"signerType":"pkcs12",
 			"signerConf":{
 				"value":"${ca.signerConf}"
 			},

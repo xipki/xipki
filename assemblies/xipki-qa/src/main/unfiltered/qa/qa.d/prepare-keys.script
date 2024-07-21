@@ -8,7 +8,6 @@ xi:mkdir error-output
 
 echo "========================================================"
 echo "HASH:       $HASH"
-echo "TOKEN_TYPE: $TOKEN_TYPE"
 echo "SIG_TYPE:   $SIG_TYPE"
 echo "KEYSPEC:    $KEYSPEC"
 echo "========================================================"
@@ -60,20 +59,16 @@ if { "$KEYSPEC" equals "" } then {
 
 list = [ rootca1 subca1 subcawithcrl1 ocsp99 ]
 
-if { $TOKEN_TYPE equals "pkcs12" } then {
+OCSP_KEYCONF = "password=CHANGEIT,keystore=file:keycerts/ocsp99.p12"
 
-  OCSP_KEYCONF = "password=CHANGEIT,keystore=file:keycerts/ocsp99.p12"
-
-  each ($list) {
-    if { $KEY_TYPE equals "rsa" } then {
-      xi:rsa-p12 --password CHANGEIT --key-size $KEYSPEC --out output/${it}.p12
-    } elif { $KEY_TYPE equals "dsa" } then {
-      xi:dsa-p12 --password CHANGEIT --plen $KEYSPEC --out output/${it}.p12
-    } elif { $KEY_TYPE equals "ec" } then {
-      xi:ec-p12 --curve $KEYSPEC --password CHANGEIT --out output/${it}.p12
-    } elif { $KEY_TYPE equals "sm2" } then {
-      xi:sm2-p12 --password CHANGEIT --out output/${it}.p12
-    }
+each ($list) {
+  if { $KEY_TYPE equals "rsa" } then {
+    xi:rsa-p12 --password CHANGEIT --key-size $KEYSPEC --out output/${it}.p12
+  } elif { $KEY_TYPE equals "dsa" } then {
+    xi:dsa-p12 --password CHANGEIT --plen $KEYSPEC --out output/${it}.p12
+  } elif { $KEY_TYPE equals "ec" } then {
+    xi:ec-p12 --curve $KEYSPEC --password CHANGEIT --out output/${it}.p12
+  } elif { $KEY_TYPE equals "sm2" } then {
+    xi:sm2-p12 --password CHANGEIT --out output/${it}.p12
   }
-
 }
