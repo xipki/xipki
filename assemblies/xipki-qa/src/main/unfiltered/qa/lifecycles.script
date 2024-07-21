@@ -1,6 +1,6 @@
 outform = pem
 
-tokentypes = [pkcs11 pkcs12]; each ($tokentypes) {
+tokentypes = [pkcs12]; each ($tokentypes) {
   tokentype = $it
 
   keytypes = [rsa ec sm2 dsa]; each ($keytypes) {

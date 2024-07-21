@@ -467,12 +467,6 @@ class CaHttpMgmtServlet {
               req.getInvalidityTime());
           break;
         }
-        case tokenInfoP11: {
-          MgmtRequest.TokenInfoP11 req = parse(requestStream, MgmtRequest.TokenInfoP11.class);
-          String info = caManager.getTokenInfoP11(req.getSlotIndex(), req.isVerbose());
-          resp = new MgmtResponse.StringResponse(info);
-          break;
-        }
         case unlockCa: {
           caManager.unlockCa();
           break;

@@ -6,10 +6,7 @@
 	"security":{
 		"keyStrongrandomEnabled":false,
 		"signStrongrandomEnabled":false,
-		"defaultSignerParallelism":32,
-		"pkcs11Conf":{
-			"file":"security/pkcs11.json"
-		}
+		"defaultSignerParallelism":32
 	}
 }
 

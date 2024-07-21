@@ -102,7 +102,6 @@ public class CaHttpFilter implements XiHttpFilter {
 
     caManager = new CaManagerImpl();
     caManager.setSecurityFactory(securities.getSecurityFactory());
-    caManager.setP11CryptServiceFactory(securities.getP11CryptServiceFactory());
 
     // Certprofiles
     caManager.setCertprofileFactoryRegister(initCertprofileFactoryRegister(conf.getCertprofileFactories()));

@@ -14,7 +14,7 @@ import org.xipki.util.Args;
  * @since 2.0.0
  */
 
-class QcStatementOption {
+public class QcStatementOption {
 
   private final QCStatement statement;
 

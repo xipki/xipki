@@ -103,9 +103,6 @@ for X in $SRC; do [[ -e $X ]] && mv "$X" "${BDIR}/lib"; done
 SRC="${tomcatDir}/lib/xipki-tomcat-password-*.jar"
 for X in $SRC; do [[ -e $X ]] && mv "$X" ${BDIR}/lib; done
 
-SRC="${tomcatDir}/lib/*pkcs11wrapper-*.jar"
-for X in $SRC; do [[ -e $X ]] && mv "$X" ${BDIR}/lib; done
-
 SRC="${tomcatDir}/lib/bc*-jdk*.jar"
 for X in $SRC; do [[ -e $X ]] && mv "$X" ${BDIR}/lib; done
 

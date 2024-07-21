@@ -40,39 +40,27 @@
 				"xipki-ocsp/tomcat/xipki/etc/ocsp/example/ejbca-store/ocsp-responder.json",
 				"xipki-ocsp/tomcat/xipki/etc/ocsp/example/xipki-ca-db-store/ocsp-responder.json",
 				"xipki-ocsp/tomcat/xipki/etc/ocsp/example/xipki-db-store/ocsp-responder.json",
-				// PKCS11
-				"xipki-ca/tomcat/xipki/security/pkcs11.json",
-				"xipki-ocsp/tomcat/xipki/security/pkcs11.json",
-				"xipki-gateway/tomcat/xipki/security/pkcs11.json",
-				"xipki-cli/xipki/security/pkcs11.json",
-				"xipki-mgmt-cli/xipki/security/pkcs11.json",
 
 				// MGMT CLI
 				"xipki-mgmt-cli/etc/org.xipki.ca.mgmt.client.cfg",
 				"xipki-mgmt-cli/xipki/ca-setup/demo/doDemo.script",
 				"xipki-mgmt-cli/xipki/etc/curl.json",
 
-				"xipki-mgmt-cli/xipki/ca-setup/cacert-present-dbbased/setup-p11.script",
 				"xipki-mgmt-cli/xipki/ca-setup/cacert-present-dbbased/setup-p12.script",
 				"xipki-mgmt-cli/xipki/ca-setup/cacert-present-dbbased/template.ca-conf.json",
 
-				"xipki-mgmt-cli/xipki/ca-setup/cacert-present-filebased/setup-p11.script",
 				"xipki-mgmt-cli/xipki/ca-setup/cacert-present-filebased/setup-p12.script",
 				"xipki-mgmt-cli/xipki/ca-setup/cacert-present-filebased/template.ca-conf.json",
 
-				"xipki-mgmt-cli/xipki/ca-setup/cacert-none-dbbased/setup-p11.script",
 				"xipki-mgmt-cli/xipki/ca-setup/cacert-none-dbbased/setup-p12.script",
 				"xipki-mgmt-cli/xipki/ca-setup/cacert-none-dbbased/template.ca-conf.json",
 
-				"xipki-mgmt-cli/xipki/ca-setup/cacert-none-filebased/setup-p11.script",
 				"xipki-mgmt-cli/xipki/ca-setup/cacert-none-filebased/setup-p12.script",
 				"xipki-mgmt-cli/xipki/ca-setup/cacert-none-filebased/template.ca-conf.json", 
 
-				"xipki-mgmt-cli/xipki/ca-setup/setup-ocsp-p11.script",
 				"xipki-mgmt-cli/xipki/ca-setup/setup-ocsp-p12.script",
 				"xipki-mgmt-cli/xipki/ca-setup/setup-scep-p12.script",
 
-				"xipki-mgmt-cli/xipki/ca-setup/demo/ocsp-responder-p11-cadb.json",
 				"xipki-mgmt-cli/xipki/ca-setup/demo/rest-client.script",
 
 				// CLI

@@ -76,16 +76,6 @@ using the following methods:
 
 ### Tomcat
 
-## Configure PKCS#11 device (optional)
-
-This step is only required if the real PKCS#11 device instead of the emulator
-is used. **Note that this step should be applied to all components (tomcat, xipki-mgmt-cli, and xipki-cli)**.
-
-* Copy the corresponding configuration file in the folder `xipki/security/example/` to `xipki/security/pkcs11.json`,
-  and adapt the PKCS#11 configuration.
-    - For HSM device: `pkcs11-hsm.json`
-    - For HSM emulaor: `pkcs11-emulator.json`
-
 ## Configure how to handle SSL client certificate behind reverse proxy
 
 ### For reverse proxy apache httpd

@@ -59,7 +59,6 @@ import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.DateUtil;
-import org.xipki.util.Hex;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ReqRespDebug;
 import org.xipki.util.StringUtil;
@@ -252,70 +251,6 @@ public class EnrollCertActions {
     } // method getPassword
 
   } // class CmpEnrollCagenkey
-
-  @Command(scope = "xi", name = "cmp-enroll-p11", description = "enroll certificate (PKCS#11 token)")
-  @Service
-  public static class CmpEnrollP11 extends EnrollCertAction {
-
-    @Option(name = "--slot", required = true, description = "slot index")
-    private String slotIndex = "0";
-
-    @Option(name = "--key-id",
-        description = "id of the private key in the PKCS#11 device\neither keyId or keyLabel must be specified")
-    private String keyId;
-
-    @Option(name = "--key-label",
-        description = "label of the private key in the PKCS#11 device\neither keyId or keyLabel must be specified")
-    private String keyLabel;
-
-    @Option(name = "--module", description = "name of the PKCS#11 module")
-    private String moduleName = "default";
-
-    private ConcurrentContentSigner signer;
-
-    @Override
-    protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
-      if (signer == null) {
-        byte[] keyIdBytes = null;
-        if (keyId != null) {
-          keyIdBytes = Hex.decode(keyId);
-        }
-
-        SignerConf signerConf = getPkcs11SignerConf(moduleName, Integer.parseInt(slotIndex), keyLabel,
-            keyIdBytes, null, getSignatureAlgoControl());
-        signer = securityFactory.createSigner("PKCS11", signerConf, (X509Cert[]) null);
-      }
-      return signer;
-    } // method getSigner
-
-    public static SignerConf getPkcs11SignerConf(
-        String pkcs11ModuleName, int slotIndex, String keyLabel, byte[] keyId,
-        HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl) {
-      if (keyId == null && keyLabel == null) {
-        throw new IllegalArgumentException("at least one of keyId and keyLabel may not be null");
-      }
-
-      ConfPairs conf = new ConfPairs();
-      conf.putPair("parallelism", Integer.toString(1));
-
-      if (pkcs11ModuleName != null && !pkcs11ModuleName.isEmpty()) {
-        conf.putPair("module", pkcs11ModuleName);
-      }
-
-      conf.putPair("slot", Integer.toString(slotIndex));
-
-      if (keyId != null) {
-        conf.putPair("key-id", Hex.encode(keyId));
-      }
-
-      if (keyLabel != null) {
-        conf.putPair("key-label", keyLabel);
-      }
-
-      return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
-    } // method getPkcs11SignerConf
-
-  } // class CmpEnrollP11
 
   @Command(scope = "xi", name = "cmp-enroll-p12", description = "enroll certificate (PKCS#12 keystore)")
   @Service

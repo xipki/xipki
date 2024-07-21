@@ -8,7 +8,7 @@ if { "$1" equals "" | "$1" equals "help" } then {
 } else {
   TOKEN_TYPE = $1
   KEYSPEC = $2
-  argsValid = $([pkcs11 pkcs12] contains $TOKEN_TYPE)
+  argsValid = $([pkcs12] contains $TOKEN_TYPE)
 
   if { "$argsValid" equals "false" } then {
     errMsg = "invalid TOKEN_TYPE $TOKEN_TYPE"
@@ -40,7 +40,7 @@ if { "$printUsage" equals "true" } then {
   echo "Usage: "
   echo ""
   echo "source file:./qa/eddsa/lifecycle.script <token type> <keyspec>"
-  echo "    token type:      pkcs11, pkcs12"
+  echo "    token type:      pkcs12"
   echo "    keyspec:         25519, 448"
 } else {
   echo "========================================================"

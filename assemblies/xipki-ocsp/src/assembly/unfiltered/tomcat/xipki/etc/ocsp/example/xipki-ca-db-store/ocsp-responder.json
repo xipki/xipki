@@ -55,16 +55,8 @@
 		"name":"signer1",
 		"algorithms":["SHA256withECDSA","SHA256withRSA","ED25519","ED448","SM3withSM2","SHA256withDSA"],
 		"caCerts":[],
-		// For PKCS#12: only need to configure the key (certificate is in the p12 file)
 		"type":"pkcs12",
 		"key":"password=$[ocsp.keyPassword],keystore=file:keycerts/ocsp1.p12"
-		// For PKCS#11, chnge 'type' to 'pkcs12', replace 'key' field with the following line
-		// and add a new field 'cert'
-		// "type":"pkcs11",
-		// "key": "slot=<slot index>,key-label=<key label>",
-		// "cert": {
-		// 	"file": "keycerts/ocsp1.crt"
-		// }
 	}],
 	"stores":[{
 		"name":"store1",

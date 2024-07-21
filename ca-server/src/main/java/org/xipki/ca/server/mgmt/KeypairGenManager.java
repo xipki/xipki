@@ -164,7 +164,7 @@ class KeypairGenManager {
     ret.setDbEntry(entry);
 
     try {
-      ret.init(manager.securityFactory, manager.p11CryptServiceFactory, manager.keypairGeneratorFactories,
+      ret.init(manager.securityFactory, manager.keypairGeneratorFactories,
           manager.shardId, manager.getDataSourceMap());
     } catch (ObjectCreationException ex) {
       final String message = "error createKeypairGen";

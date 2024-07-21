@@ -7,7 +7,6 @@
       <cm:property name="key.strongrandom.enabled" value="false"/>
       <cm:property name="sign.strongrandom.enabled" value="false"/>
       <cm:property name="defaultSignerParallelism" value="32"/>
-      <cm:property name="pkcs11.confFile" value="xipki/security/pkcs11.json"/>
     </cm:default-properties>
   </cm:property-placeholder>
 
@@ -41,55 +40,5 @@
   <!-- PKCS#12 -->
   <service ref="pkcs12SignerFactory"
       interface="org.xipki.security.SignerFactory"/>
-
-  <bean id="p11ModuleFactoryRegister"
-       class="org.xipki.security.pkcs11.P11ModuleFactoryRegisterImpl"
-       destroy-method="close">
-  </bean>
-
-  <!-- PKCS#11 -->
-  <service ref="p11ModuleFactoryRegister"
-       interface="org.xipki.security.pkcs11.P11ModuleFactoryRegister"/>
-  <reference-list id="p11ModuleFactories"
-       interface="org.xipki.security.pkcs11.P11ModuleFactory"
-       availability="optional">
-    <reference-listener ref="p11ModuleFactoryRegister" bind-method="registFactory"
-         unbind-method="unregistFactory"/>
-  </reference-list>
-
-  <bean id="p11CryptServiceFactory"
-      class="org.xipki.security.pkcs11.P11CryptServiceFactoryImpl"
-      destroy-method="close">
-    <argument ref="p11ModuleFactoryRegister"/>
-    <property name="pkcs11ConfFile" value="${pkcs11.confFile}"/>
-  </bean>
-
-  <service ref="p11CryptServiceFactory"
-      interface="org.xipki.security.pkcs11.P11CryptServiceFactory"/>
-
-  <bean id="pkcs11SignerFactory"
-      class="org.xipki.security.pkcs11.P11SignerFactory">
-    <property name="securityFactory" ref="securityFactory"/>
-    <property name="p11CryptServiceFactory" ref="p11CryptServiceFactory"/>
-  </bean>
-
-  <service ref="pkcs11SignerFactory"
-      interface="org.xipki.security.SignerFactory"/>
-
-  <!-- PKCS#11 Native -->
-  <bean id="nativeP11ModuleFactory"
-      class="org.xipki.security.pkcs11.NativeP11ModuleFactory">
-  </bean>
-
-  <service ref="nativeP11ModuleFactory"
-      interface="org.xipki.security.pkcs11.P11ModuleFactory"/>
-
-  <!-- PKCS#11 Emulator -->
-  <bean id="emulatorP11ModuleFactory"
-      class="org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory">
-  </bean>
-
-  <service ref="emulatorP11ModuleFactory"
-      interface="org.xipki.security.pkcs11.P11ModuleFactory"/>
 
 </blueprint>

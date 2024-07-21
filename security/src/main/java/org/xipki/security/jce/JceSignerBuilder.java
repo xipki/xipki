@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Builder of {@link ConcurrentContentSigner} for PKCS#11 token.
+ * Builder of {@link ConcurrentContentSigner} for JCE token.
  *
  * @author Lijun Liao (xipki)
  * @since 2.0.0

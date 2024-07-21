@@ -110,10 +110,6 @@
               <outputDirectory>${project.build.directory}/tomcat/lib</outputDirectory>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>ipkcs11wrapper</artifactId>
-                </artifactItem>
-                <artifactItem>
                   <groupId>org.bouncycastle</groupId>
                   <artifactId>bcpkix-jdk18on</artifactId>
                 </artifactItem>

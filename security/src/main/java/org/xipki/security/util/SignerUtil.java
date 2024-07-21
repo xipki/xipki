@@ -15,7 +15,6 @@ import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
-import org.xipki.pkcs11.wrapper.Functions;
 import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
@@ -31,7 +30,6 @@ import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,24 +73,6 @@ public class SignerUtil {
     return new PSSSigner(new RSABlindedEngine(), hashAlgo.createDigest(), hashAlgo.createDigest(), hashAlgo.getLength(),
         org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT);
   } // method createPSSRSASigner
-
-  public static byte[] dsaSigPlainToX962(byte[] signature) throws XiSecurityException {
-    byte[] x962Sig = Functions.dsaSigPlainToX962(Args.notNull(signature, "signature"));
-    if (Arrays.equals(x962Sig, signature)) {
-      throw new XiSecurityException("signature is not correctly encoded.");
-    }
-    return x962Sig;
-  }
-
-  public static byte[] dsaSigX962ToPlain(byte[] x962Signature, int orderBitLen)
-      throws XiSecurityException {
-    byte[] plainSig = Functions.dsaSigX962ToPlain(
-                          Args.notNull(x962Signature, "x962Signature"), (orderBitLen + 7) / 8);
-    if (Arrays.equals(x962Signature, plainSig)) {
-      throw new XiSecurityException("x962Signature is not correctly encoded.");
-    }
-    return plainSig;
-  }
 
   public static byte[] dsaSigToPlain(BigInteger sigR, BigInteger sigS, int orderBitLen) throws XiSecurityException {
     final int blockSize = (orderBitLen + 7) / 8;

@@ -751,13 +751,6 @@ public class CaMgmtClient implements CaManager {
     return parse(respBytes, MgmtResponse.StringSet.class).getResult();
   }
 
-  @Override
-  public String getTokenInfoP11(Integer slotIndex, boolean verbose) throws CaMgmtException {
-    MgmtRequest.TokenInfoP11 req = new MgmtRequest.TokenInfoP11(slotIndex, verbose);
-    byte[] respBytes = transmit(MgmtAction.tokenInfoP11, req);
-    return parse(respBytes, MgmtResponse.StringResponse.class).getResult();
-  }
-
   private X509Cert parseCert(byte[] certBytes) throws CaMgmtException {
     try {
       return X509Util.parseCert(certBytes);

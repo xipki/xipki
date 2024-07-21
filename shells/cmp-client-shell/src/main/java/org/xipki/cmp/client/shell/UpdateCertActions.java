@@ -32,7 +32,6 @@ import org.xipki.cmp.client.EnrollCertResult;
 import org.xipki.cmp.client.EnrollCertResult.CertifiedKeyPairOrError;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
@@ -44,7 +43,6 @@ import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.DateUtil;
-import org.xipki.util.Hex;
 import org.xipki.util.ReqRespDebug;
 import org.xipki.util.StringUtil;
 import org.xipki.util.exception.ObjectCreationException;
@@ -145,70 +143,6 @@ public class UpdateCertActions {
       return pwdInChar;
     }
   } // class CmpUpdateCagenkey
-
-  @Command(scope = "xi", name = "cmp-update-p11", description = "update certificate (PKCS#11 token)")
-  @Service
-  public static class CmpUpdateP11 extends UpdateCertAction {
-
-    @Option(name = "--slot", required = true, description = "slot index")
-    private String slotIndex = "0";
-
-    @Option(name = "--key-id", description = "id of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    private String keyId;
-
-    @Option(name = "--key-label", description = "label of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    private String keyLabel;
-
-    @Option(name = "--module", description = "name of the PKCS#11 module")
-    private String moduleName = "default";
-
-    private ConcurrentContentSigner signer;
-
-    @Override
-    protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
-      if (signer == null) {
-        byte[] keyIdBytes = null;
-        if (keyId != null) {
-          keyIdBytes = Hex.decode(keyId);
-        }
-
-        SignerConf signerConf = getPkcs11SignerConf(moduleName, Integer.parseInt(slotIndex), keyLabel,
-            keyIdBytes, null, getSignatureAlgoControl());
-        signer = securityFactory.createSigner("PKCS11", signerConf, (X509Cert[]) null);
-      }
-      return signer;
-    } // method getSigner
-
-    public static SignerConf getPkcs11SignerConf(
-        String pkcs11ModuleName, int slotIndex, String keyLabel, byte[] keyId,
-        HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl) {
-      if (keyId == null && keyLabel == null) {
-        throw new IllegalArgumentException("at least one of keyId and keyLabel may not be null");
-      }
-
-      ConfPairs conf = new ConfPairs();
-      conf.putPair("parallelism", Integer.toString(1));
-
-      if (pkcs11ModuleName != null && !pkcs11ModuleName.isEmpty()) {
-        conf.putPair("module", pkcs11ModuleName);
-      }
-
-      conf.putPair("slot", Integer.toString(slotIndex));
-
-      if (keyId != null) {
-        conf.putPair("key-id", Hex.encode(keyId));
-      }
-
-      if (keyLabel != null) {
-        conf.putPair("key-label", keyLabel);
-      }
-
-      return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
-    } // method getPkcs11SignerConf
-
-  } // class CmpUpdateP11
 
   @Command(scope = "xi", name = "cmp-update-p12", description = "update certificate (PKCS#12 keystore)")
   @Service
