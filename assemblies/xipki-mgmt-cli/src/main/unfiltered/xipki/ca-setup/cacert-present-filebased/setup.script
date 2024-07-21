@@ -15,7 +15,7 @@ if { "$1" equals "" | "$1" equals "help" } then {
     echo "TOMCAT_DIR is not specified"
     printUsage = "true"
   } else {
-    argsValid = $([rsa ec dsa sm2 ed25519 ed448] contains $KEY_TYPE)
+    argsValid = $([rsa ec sm2 ed25519 ed448] contains $KEY_TYPE)
     if { "$argsValid" equals "false" } then {
       echo "invalid KEY_TYPE $KEY_TYPE"
       printUsage = "true"
@@ -29,7 +29,7 @@ if { "$printUsage" equals "true" } then {
   echo "Usage: "
   echo ""
   echo "source ${THIS_DIR}/setup-p12.script <key type> <tomcat dir> [<xipki dir>]"
-  echo "    key type:  rsa, ec, dsa, sm2, ed25519, ed448"
+  echo "    key type:  rsa, ec, sm2, ed25519, ed448"
   echo "    xipki dir: optional, required if is not <tomcat dir>/xipki"
 } else {
   if { "$XIPKI_DIR" equals "" } then {
@@ -54,8 +54,6 @@ if { "$printUsage" equals "true" } then {
     SIG_ALG = ED25519
   } elif { $KEY_TYPE equals "ed448" } then {
     SIG_ALG = ED448
-  } elif { $KEY_TYPE equals "dsa" } then {
-    SIG_ALG = SHA256WITHDSA
   } else {
     SIG_ALG = SM3WITHSM2
   }

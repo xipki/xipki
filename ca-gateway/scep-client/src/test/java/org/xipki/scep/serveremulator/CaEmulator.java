@@ -20,7 +20,6 @@ import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
-import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.jce.X509KeyUsage;
 import org.bouncycastle.operator.ContentSigner;
@@ -28,7 +27,6 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
-import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
@@ -48,7 +46,6 @@ import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
@@ -221,8 +218,6 @@ public class CaEmulator {
     if (builder == null) {
       if ("RSA".equals(keyAlg)) {
         builder = new BcRSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
-      } else if ("DSA".equals(keyAlg)) {
-        builder = new BcDSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
       } else if ("ECDSA".equals(keyAlg)) {
         builder = new BcECContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
       } else {
@@ -253,8 +248,6 @@ public class CaEmulator {
     String algorithm;
     if (PKCSObjectIdentifiers.rsaEncryption.equals(aid)) {
       algorithm = "RSA";
-    } else if (X9ObjectIdentifiers.id_dsa.equals(aid)) {
-      algorithm = "DSA";
     } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(aid)) {
       algorithm = "EC";
     } else {
@@ -279,8 +272,6 @@ public class CaEmulator {
       return new RSAKeyParameters(false, rsaKey.getModulus(), rsaKey.getPublicExponent());
     } else if (key instanceof ECPublicKey) {
       return ECUtil.generatePublicKeyParameter(key);
-    } else if (key instanceof DSAPublicKey) {
-      return DSAUtil.generatePublicKeyParameter(key);
     } else {
       throw new InvalidKeyException("unknown key " + key.getClass().getName());
     }

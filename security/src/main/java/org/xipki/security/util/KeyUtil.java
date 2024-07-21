@@ -4,14 +4,10 @@
 package org.xipki.security.util;
 
 import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -19,7 +15,6 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X962Parameters;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.params.DSAParameters;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.crypto.params.Ed448PublicKeyParameters;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
@@ -29,7 +24,6 @@ import org.bouncycastle.crypto.params.X448PublicKeyParameters;
 import org.bouncycastle.crypto.util.PrivateKeyFactory;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
-import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.util.BigIntegers;
 import org.bouncycastle.util.encoders.Hex;
@@ -53,16 +47,12 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.interfaces.DSAPrivateKey;
-import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.DSAParameterSpec;
-import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
@@ -153,32 +143,6 @@ public class KeyUtil {
             priv.getPrimeExponentP(), priv.getPrimeExponentQ(),  priv.getCrtCoefficient()));
   }
 
-  public static KeyPair generateDSAKeypair(int plength, int qlength, SecureRandom random)
-      throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-    DSAParameterSpec dsaParamSpec = DSAParameterCache.getDSAParameterSpec(plength, qlength, random);
-    KeyPairGenerator kpGen = getKeyPairGenerator("DSA");
-    kpGen.initialize(dsaParamSpec, random);
-    return kpGen.generateKeyPair();
-  }
-
-  public static KeyPair generateDSAKeypair(DSAParameters dsaParams, SecureRandom random)
-      throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-    DSAParameterSpec dsaParamSpec = new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(), dsaParams.getG());
-    return generateDSAKeypair(dsaParamSpec, random);
-  }
-
-  public static KeyPair generateDSAKeypair(DSAParameterSpec dsaParamSpec, SecureRandom random)
-      throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-    KeyPairGenerator kpGen = getKeyPairGenerator("DSA");
-    kpGen.initialize(dsaParamSpec, random);
-    return kpGen.generateKeyPair();
-  }
-
-  public static DSAPublicKey generateDSAPublicKey(DSAPublicKeySpec keySpec) throws InvalidKeySpecException {
-    Args.notNull(keySpec, "keySpec");
-    return (DSAPublicKey) getKeyFactory("DSA").generatePublic(keySpec);
-  }
-
   public static KeyPair generateEdECKeypair(ASN1ObjectIdentifier curveId, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException {
     String algorithm = EdECConstants.getName(Args.notNull(curveId, "curveId"));
@@ -244,7 +208,6 @@ public class KeyUtil {
   private static KeyFactory getKeyFactory(AlgorithmIdentifier algIdentifier) throws InvalidKeySpecException {
     ASN1ObjectIdentifier oid = algIdentifier.getAlgorithm();
     String algorithm = PKCSObjectIdentifiers.rsaEncryption.equals(oid) ? "RSA"
-        : X9ObjectIdentifiers.id_dsa.equals(oid) ? "DSA"
         : X9ObjectIdentifiers.id_ecPublicKey.equals(oid) ? "EC"
         : EdECConstants.getName(oid);
 
@@ -260,7 +223,7 @@ public class KeyUtil {
     }
 
     try {
-      if ("RSA".equalsIgnoreCase(algorithm) || "DSA".equalsIgnoreCase(algorithm)) {
+      if ("RSA".equalsIgnoreCase(algorithm)) {
         return KeyFactory.getInstance(algorithm);
       } else {
         return KeyFactory.getInstance(algorithm, "BC");
@@ -272,7 +235,7 @@ public class KeyUtil {
 
   private static KeyPairGenerator getKeyPairGenerator(String algorithm)
       throws NoSuchAlgorithmException, NoSuchProviderException {
-    if ("RSA".equalsIgnoreCase(algorithm) || "DSA".equalsIgnoreCase(algorithm)) {
+    if ("RSA".equalsIgnoreCase(algorithm)) {
       return KeyPairGenerator.getInstance(algorithm);
     } else {
       if ("ECDSA".equalsIgnoreCase(algorithm)) {
@@ -319,8 +282,6 @@ public class KeyUtil {
       return new RSAKeyParameters(true, rsaKey.getModulus(), rsaKey.getPrivateExponent());
     } else if (key instanceof ECPrivateKey) {
       return ECUtil.generatePrivateKeyParameter(key);
-    } else if (key instanceof DSAPrivateKey) {
-      return DSAUtil.generatePrivateKeyParameter(key);
     } else if (key instanceof XDHKey || key instanceof EdDSAKey) {
       try {
         return PrivateKeyFactory.createKey(key.getEncoded());
@@ -340,8 +301,6 @@ public class KeyUtil {
       return new RSAKeyParameters(false, rsaKey.getModulus(), rsaKey.getPublicExponent());
     } else if (key instanceof ECPublicKey) {
       return ECUtil.generatePublicKeyParameter(key);
-    } else if (key instanceof DSAPublicKey) {
-      return DSAUtil.generatePublicKeyParameter(key);
     } else if (key instanceof XDHKey || key instanceof EdDSAKey) {
       byte[] encoded = key.getEncoded();
       String algorithm = key.getAlgorithm().toUpperCase();
@@ -365,21 +324,7 @@ public class KeyUtil {
   public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(PublicKey publicKey) throws InvalidKeyException {
     Args.notNull(publicKey, "publicKey");
 
-    if (publicKey instanceof DSAPublicKey) {
-      DSAPublicKey dsaPubKey = (DSAPublicKey) publicKey;
-      ASN1EncodableVector vec = new ASN1EncodableVector();
-      vec.add(new ASN1Integer(dsaPubKey.getParams().getP()));
-      vec.add(new ASN1Integer(dsaPubKey.getParams().getQ()));
-      vec.add(new ASN1Integer(dsaPubKey.getParams().getG()));
-      ASN1Sequence dssParams = new DERSequence(vec);
-
-      try {
-        return new SubjectPublicKeyInfo(
-            new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, dssParams), new ASN1Integer(dsaPubKey.getY()));
-      } catch (IOException ex) {
-        throw new InvalidKeyException(ex.getMessage(), ex);
-      }
-    } else if (publicKey instanceof RSAPublicKey) {
+    if (publicKey instanceof RSAPublicKey) {
       RSAPublicKey rsaPubKey = (RSAPublicKey) publicKey;
       try {
         return new SubjectPublicKeyInfo(

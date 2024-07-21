@@ -122,12 +122,6 @@
 			"file":"${profiles.dir}/certprofile-tls-enc.json"
 		}
 	},{
-		"name":"tls-dsa",
-		"type":"xijson",
-		"conf":{
-			"file":"${profiles.dir}/certprofile-tls-dsa.json"
-		}
-	},{
 		"name":"tls-ec",
 		"type":"xijson",
 		"conf":{

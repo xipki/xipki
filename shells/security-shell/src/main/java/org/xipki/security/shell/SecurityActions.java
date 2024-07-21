@@ -399,11 +399,8 @@ public class SecurityActions {
                     + "(only applied to RSA key)")
     private Boolean rsaPss = Boolean.FALSE;
 
-    @Option(name = "--dsa-plain", description = "whether to use the Plain DSA for the POP computation")
-    private Boolean dsaPlain = Boolean.FALSE;
-
     protected SignatureAlgoControl getSignatureAlgoControl() {
-      return new SignatureAlgoControl(rsaPss, dsaPlain);
+      return new SignatureAlgoControl(rsaPss);
     }
   }
 

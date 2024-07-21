@@ -239,7 +239,6 @@ class GrandCertTemplateBuilder {
           publicKeyData = sk.getPublicKey().getBytes();
           break;
         }
-        case "DSA":
         case "ED25519":
         case "ED448":
         case "X25519":

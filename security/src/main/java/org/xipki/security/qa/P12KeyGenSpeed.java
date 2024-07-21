@@ -25,24 +25,6 @@ import java.security.SecureRandom;
 
 public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
 
-  public static class DSA extends P12KeyGenSpeed {
-    private final int plength;
-    private final int qlength;
-
-    public DSA(int plength, int qlength, SecurityFactory securityFactory) {
-      super("PKCS#12 DSA key generation\nplength: " + plength + "\nqlength: " + qlength, securityFactory);
-
-      this.plength = plength;
-      this.qlength = qlength;
-    }
-
-    @Override
-    protected void generateKeypair(SecureRandom random) throws Exception {
-      KeyUtil.generateDSAKeypair(plength, qlength, random);
-    }
-
-  } // class DSA
-
   public static class EC extends P12KeyGenSpeed {
 
     private final ASN1ObjectIdentifier curveOid;

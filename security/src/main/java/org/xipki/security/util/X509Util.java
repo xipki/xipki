@@ -33,7 +33,6 @@ import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.DSAParameter;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
@@ -647,20 +646,6 @@ public class X509Util {
       } else {
         AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(algOid, DERNull.INSTANCE);
         return new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
-      }
-    } else if (X9ObjectIdentifiers.id_dsa.equals(algOid)) {
-      if (keyParameters == null) {
-        return publicKeyInfo;
-      } else if (DERNull.INSTANCE.equals(keyParameters)) {
-        AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(algOid);
-        return new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
-      } else {
-        try {
-          DSAParameter.getInstance(keyParameters);
-        } catch (IllegalArgumentException ex) {
-          throw new InvalidKeySpecException("keyParameters is not null and Dss-Parms");
-        }
-        return publicKeyInfo;
       }
     } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(algOid)
         || algOid.getId().equals("1.3.132.1.12")) { // id-ECDH

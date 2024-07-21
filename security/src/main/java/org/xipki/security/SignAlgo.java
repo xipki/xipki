@@ -22,7 +22,6 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Signature;
-import java.security.interfaces.DSAKey;
 import java.security.interfaces.ECKey;
 import java.security.interfaces.RSAKey;
 import java.util.HashMap;
@@ -31,23 +30,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.bouncycastle.asn1.bsi.BSIObjectIdentifiers.ecdsa_plain_SHA1;
-import static org.bouncycastle.asn1.bsi.BSIObjectIdentifiers.ecdsa_plain_SHA224;
-import static org.bouncycastle.asn1.bsi.BSIObjectIdentifiers.ecdsa_plain_SHA256;
-import static org.bouncycastle.asn1.bsi.BSIObjectIdentifiers.ecdsa_plain_SHA384;
-import static org.bouncycastle.asn1.bsi.BSIObjectIdentifiers.ecdsa_plain_SHA512;
 import static org.bouncycastle.asn1.cms.CMSObjectIdentifiers.id_RSASSA_PSS_SHAKE128;
 import static org.bouncycastle.asn1.cms.CMSObjectIdentifiers.id_RSASSA_PSS_SHAKE256;
 import static org.bouncycastle.asn1.cms.CMSObjectIdentifiers.id_ecdsa_with_shake128;
 import static org.bouncycastle.asn1.cms.CMSObjectIdentifiers.id_ecdsa_with_shake256;
-import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.dsa_with_sha224;
-import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.dsa_with_sha256;
-import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.dsa_with_sha384;
-import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.dsa_with_sha512;
-import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.id_dsa_with_sha3_224;
-import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.id_dsa_with_sha3_256;
-import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.id_dsa_with_sha3_384;
-import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.id_dsa_with_sha3_512;
 import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.id_ecdsa_with_sha3_224;
 import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.id_ecdsa_with_sha3_256;
 import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.id_ecdsa_with_sha3_384;
@@ -76,7 +62,6 @@ import static org.bouncycastle.asn1.x9.X9ObjectIdentifiers.ecdsa_with_SHA224;
 import static org.bouncycastle.asn1.x9.X9ObjectIdentifiers.ecdsa_with_SHA256;
 import static org.bouncycastle.asn1.x9.X9ObjectIdentifiers.ecdsa_with_SHA384;
 import static org.bouncycastle.asn1.x9.X9ObjectIdentifiers.ecdsa_with_SHA512;
-import static org.bouncycastle.asn1.x9.X9ObjectIdentifiers.id_dsa_with_sha1;
 import static org.xipki.security.HashAlgo.SHA1;
 import static org.xipki.security.HashAlgo.SHA224;
 import static org.xipki.security.HashAlgo.SHA256;
@@ -128,18 +113,6 @@ public enum SignAlgo {
   RSAPSS_SHAKE128("SHAKE128WITHRSAPSS", 0x1A, id_RSASSA_PSS_SHAKE128, SHAKE128, false),
   RSAPSS_SHAKE256("SHAKE256WITHRSAPSS", 0x1B, id_RSASSA_PSS_SHAKE256, SHAKE256, false),
 
-  // DSA
-  DSA_SHA1("SHA1WITHDSA",     0x21, id_dsa_with_sha1, SHA1, false),
-  DSA_SHA224("SHA224WITHDSA", 0x22, dsa_with_sha224, SHA224, false),
-  DSA_SHA256("SHA256WITHDSA", 0x23, dsa_with_sha256, SHA256, false),
-  DSA_SHA384("SHA384WITHDSA", 0x24, dsa_with_sha384, SHA384, false),
-  DSA_SHA512("SHA512WITHDSA", 0x25, dsa_with_sha512, SHA512, false),
-
-  DSA_SHA3_224("SHA3-224WITHDSA", 0x26, id_dsa_with_sha3_224, SHA3_224, false),
-  DSA_SHA3_256("SHA3-256WITHDSA", 0x27, id_dsa_with_sha3_256, SHA3_256, false),
-  DSA_SHA3_384("SHA3-384WITHDSA", 0x28, id_dsa_with_sha3_384, SHA3_384, false),
-  DSA_SHA3_512("SHA3-512WITHDSA", 0x29, id_dsa_with_sha3_512, SHA3_512, false),
-
   // ECDSA
   ECDSA_SHA1("SHA1WITHECDSA",     0x31, ecdsa_with_SHA1,   SHA1,   false),
   ECDSA_SHA224("SHA224WITHECDSA", 0x32, ecdsa_with_SHA224, SHA224, false),
@@ -158,13 +131,6 @@ public enum SignAlgo {
   // ECDSA with SHAKE
   ECDSA_SHAKE128("SHAKE128WITHECDSA", 0x3B, id_ecdsa_with_shake128, SHAKE128, false),
   ECDSA_SHAKE256("SHAKE256WITHECDSA", 0x3C, id_ecdsa_with_shake256, SHAKE256, false),
-
-  // Plain ECDSA
-  PLAINECDSA_SHA1("SHA1WITHPLAINECDSA",     0x41, ecdsa_plain_SHA1,   SHA1,   false),
-  PLAINECDSA_SHA224("SHA224WITHPLAINECDSA", 0x42, ecdsa_plain_SHA224, SHA224, false),
-  PLAINECDSA_SHA256("SHA256WITHPLAINECDSA", 0x43, ecdsa_plain_SHA256, SHA256, false),
-  PLAINECDSA_SHA384("SHA384WITHPLAINECDSA", 0x44, ecdsa_plain_SHA384, SHA384, false),
-  PLAINECDSA_SHA512("SHA512WITHPLAINECDSA", 0x45, ecdsa_plain_SHA512, SHA512, false),
 
   // EdDSA
   ED25519("ED25519", 0x46, EdECConstants.id_ED25519, null, false),
@@ -327,12 +293,6 @@ public enum SignAlgo {
     return Signature.getInstance(jceName, provider);
   }
 
-  public boolean isDSASigAlgo() {
-    return this == DSA_SHA1
-        || this == DSA_SHA224   || this == DSA_SHA256   || this == DSA_SHA384   || this == DSA_SHA512
-        || this == DSA_SHA3_224 || this == DSA_SHA3_256 || this == DSA_SHA3_384 || this == DSA_SHA3_512;
-  } // method isDSASigAlg
-
   public boolean isECDSASigAlgo() {
     return this == ECDSA_SHA1     || this == ECDSA_SHAKE128 || this == ECDSA_SHAKE256
         || this == ECDSA_SHA224   || this == ECDSA_SHA256   || this == ECDSA_SHA384   || this == ECDSA_SHA512
@@ -342,11 +302,6 @@ public enum SignAlgo {
   public boolean isEDDSASigAlgo() {
     return this == ED448 || this == ED25519;
   } // method isEDDSASigAlg
-
-  public boolean isPlainECDSASigAlgo() {
-    return this == PLAINECDSA_SHA1   || this == PLAINECDSA_SHA224 || this == PLAINECDSA_SHA256
-        || this == PLAINECDSA_SHA384 || this == PLAINECDSA_SHA512;
-  } // method isPlainECDSASigAlg
 
   public boolean isSM2SigAlgo() {
     ASN1ObjectIdentifier oid = Args.notNull(algId, "algId").getAlgorithm();
@@ -481,15 +436,7 @@ public enum SignAlgo {
         }
       }
 
-      boolean dsaPlain = algoControl != null && algoControl.isDsaPlain();
-      return getECSigAlgo(hashAlgo, dsaPlain);
-    } else if (key instanceof DSAKey) {
-      if (hashAlgo == null) {
-        int keySize = ((DSAKey) key).getParams().getP().bitLength();
-        hashAlgo = keySize > 3084 ? SHA512 :
-            keySize > 2048 ? SHA384 : SHA256;
-      }
-      return getDSASigAlgo(hashAlgo);
+      return getECSigAlgo(hashAlgo);
     } else if (key instanceof EdDSAKey) {
       String keyAlgo = key.getAlgorithm().toUpperCase();
       if (keyAlgo.equals(EdECConstants.ED25519)) {
@@ -534,89 +481,39 @@ public enum SignAlgo {
     }
   } // method getRSAInstance
 
-  private static SignAlgo getDSASigAlgo(HashAlgo hashAlgo) throws NoSuchAlgorithmException {
-    Args.notNull(hashAlgo, "hashAlgo");
-    switch (hashAlgo) {
-      case SHAKE128:
-        return RSAPSS_SHAKE128;
-      case SHAKE256:
-        return RSAPSS_SHAKE256;
-      case SHA1:
-        return DSA_SHA1;
-      case SHA224:
-        return DSA_SHA224;
-      case SHA256:
-        return DSA_SHA256;
-      case SHA384:
-        return DSA_SHA384;
-      case SHA512:
-        return DSA_SHA512;
-      case SHA3_224:
-        return DSA_SHA3_224;
-      case SHA3_256:
-        return DSA_SHA3_256;
-      case SHA3_384:
-        return DSA_SHA3_384;
-      case SHA3_512:
-        return DSA_SHA3_512;
-      default:
-        throw new NoSuchAlgorithmException("unsupported hash " + hashAlgo + " for DSA");
-    }
-  } // method getDSASigAlgo
-
-  private static SignAlgo getECSigAlgo(HashAlgo hashAlgo, boolean plainSignature)
+  private static SignAlgo getECSigAlgo(HashAlgo hashAlgo)
       throws NoSuchAlgorithmException {
     Args.notNull(hashAlgo, "hashAlgo");
-    if (hashAlgo == SM3 && plainSignature) {
-      throw new IllegalArgumentException("plainSignature cannot be both true");
-    }
 
     if (hashAlgo == SM3) {
       return SM2_SM3;
     }
 
-    if (plainSignature) {
-      switch (hashAlgo) {
-        case SHA1:
-          return PLAINECDSA_SHA1;
-        case SHA224:
-          return PLAINECDSA_SHA224;
-        case SHA256:
-          return PLAINECDSA_SHA256;
-        case SHA384:
-          return PLAINECDSA_SHA384;
-        case SHA512:
-          return PLAINECDSA_SHA512;
-        default:
-          throw new NoSuchAlgorithmException("unsupported hash " + hashAlgo + " for PlainECDSA");
-      }
-    } else {
-      switch (hashAlgo) {
-        case SHA1:
-          return ECDSA_SHA1;
-        case SHA224:
-          return ECDSA_SHA224;
-        case SHA256:
-          return ECDSA_SHA256;
-        case SHA384:
-          return ECDSA_SHA384;
-        case SHA512:
-          return ECDSA_SHA512;
-        case SHA3_224:
-          return ECDSA_SHA3_224;
-        case SHA3_256:
-          return ECDSA_SHA3_256;
-        case SHA3_384:
-          return ECDSA_SHA3_384;
-        case SHA3_512:
-          return ECDSA_SHA3_512;
-        case SHAKE128:
-          return ECDSA_SHAKE128;
-        case SHAKE256:
-          return ECDSA_SHAKE256;
-        default:
-          throw new NoSuchAlgorithmException("unsupported hash " + hashAlgo + " for ECDSA");
-      }
+    switch (hashAlgo) {
+      case SHA1:
+        return ECDSA_SHA1;
+      case SHA224:
+        return ECDSA_SHA224;
+      case SHA256:
+        return ECDSA_SHA256;
+      case SHA384:
+        return ECDSA_SHA384;
+      case SHA512:
+        return ECDSA_SHA512;
+      case SHA3_224:
+        return ECDSA_SHA3_224;
+      case SHA3_256:
+        return ECDSA_SHA3_256;
+      case SHA3_384:
+        return ECDSA_SHA3_384;
+      case SHA3_512:
+        return ECDSA_SHA3_512;
+      case SHAKE128:
+        return ECDSA_SHAKE128;
+      case SHAKE256:
+        return ECDSA_SHAKE256;
+      default:
+        throw new NoSuchAlgorithmException("unsupported hash " + hashAlgo + " for ECDSA");
     }
   } // method getECDSASigAlgo
 

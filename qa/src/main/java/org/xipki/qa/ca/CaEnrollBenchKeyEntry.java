@@ -3,12 +3,8 @@
 
 package org.xipki.qa.ca;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -21,12 +17,9 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.SecureRandom;
-import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
@@ -84,63 +77,6 @@ public abstract class CaEnrollBenchKeyEntry {
     }
 
   } // class RSAKeyEntry
-
-  public static final class DSAKeyEntry extends CaEnrollBenchKeyEntry {
-
-    private SubjectPublicKeyInfo spki;
-
-    private int plength;
-
-    public DSAKeyEntry(int plength, boolean reuse) throws Exception {
-      if (!reuse) {
-        this.plength = plength;
-        return;
-      }
-
-      if (plength % 1024 != 0) {
-        throw new IllegalArgumentException("invalid DSA pLength " + plength);
-      }
-
-      int qlength = (plength >= 2048) ? 256 : 160;
-      KeyPair kp = KeyUtil.generateDSAKeypair(plength, qlength, new SecureRandom());
-      DSAPublicKey pk = (DSAPublicKey) kp.getPublic();
-
-      this.spki = buildSpki(pk.getParams().getP(), pk.getParams().getQ(), pk.getParams().getG(), pk.getY());
-    }
-
-    private static BigInteger base64ToInt(String base64Str) {
-      return new BigInteger(1, Base64.decode(base64Str));
-    }
-
-    private void init(String p, String q, String g, String y) throws IOException {
-      this.spki = buildSpki(base64ToInt(p), base64ToInt(q), base64ToInt(g), base64ToInt(y));
-    }
-
-    private static SubjectPublicKeyInfo buildSpki(BigInteger p, BigInteger q, BigInteger g, BigInteger y)
-        throws IOException {
-      ASN1EncodableVector vec = new ASN1EncodableVector();
-      vec.add(new ASN1Integer(p));
-      vec.add(new ASN1Integer(q));
-      vec.add(new ASN1Integer(g));
-      ASN1Sequence dssParams = new DERSequence(vec);
-      AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, dssParams);
-      return new SubjectPublicKeyInfo(algId, new ASN1Integer(y));
-    }
-
-    @Override
-    public SubjectPublicKeyInfo getSubjectPublicKeyInfo() throws Exception {
-      if (spki != null) {
-        return spki;
-      }
-
-      int qlength = (plength >= 2048) ? 256 : 160;
-      KeyPair kp = KeyUtil.generateDSAKeypair(plength, qlength, new SecureRandom());
-      DSAPublicKey pk = (DSAPublicKey) kp.getPublic();
-
-      return buildSpki(pk.getParams().getP(), pk.getParams().getQ(), pk.getParams().getG(), pk.getY());
-    }
-
-  } // class DSAKeyEntry
 
   public static final class ECKeyEntry extends CaEnrollBenchKeyEntry {
 

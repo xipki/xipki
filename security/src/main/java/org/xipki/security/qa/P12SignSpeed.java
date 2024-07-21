@@ -72,28 +72,6 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
 
   } // class AESGmac
 
-  public static class DSA extends P12SignSpeed {
-
-    public DSA(SecurityFactory securityFactory, String signatureAlgorithm, int threads, int plength, int qlength)
-        throws Exception {
-      super(securityFactory, signatureAlgorithm,
-          generateKeystore(plength, qlength), "PKCS#12 DSA signature creation\nplength: " + plength
-              + "\nqlength: " + qlength, threads);
-    }
-
-    private static byte[] generateKeystore(int plength, int qlength) throws Exception {
-      byte[] keystoreBytes = getPrecomputedDSAKeystore(plength, qlength);
-      if (keystoreBytes == null) {
-        KeystoreGenerationParameters params = new KeystoreGenerationParameters(PASSWORD.toCharArray());
-        params.setRandom(new SecureRandom());
-        KeyStoreWrapper identity = new P12KeyGenerator().generateDSAKeypair(plength, qlength, params, null);
-        keystoreBytes = identity.keystore();
-      }
-      return keystoreBytes;
-    }
-
-  } // class DSA
-
   public static class EC extends P12SignSpeed {
 
     public EC(SecurityFactory securityFactory, String signatureAlgorithm, int threads, ASN1ObjectIdentifier curveOid)
@@ -262,10 +240,6 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
 
   protected static byte[] getPrecomputedRSAKeystore(int keysize, BigInteger publicExponent) throws IOException {
     return getPrecomputedKeystore("rsa-" + keysize + "-0x" + publicExponent.toString(16) + ".p12");
-  }
-
-  protected static byte[] getPrecomputedDSAKeystore(int plength, int qlength) throws IOException {
-    return getPrecomputedKeystore("dsa-" + plength + "-" + qlength + ".p12");
   }
 
   protected static byte[] getPrecomputedECKeystore(ASN1ObjectIdentifier curveOid) throws IOException {

@@ -50,7 +50,6 @@ public class ProfileConfDemo extends ProfileConfBuilder {
       certprofileMaxTime("certprofile-max-time.json");
 
       certprofileTls("certprofile-tls-rsa.json", KeypairGenerationType.KeyType.RSA, false);
-      certprofileTls("certprofile-tls-dsa.json", KeypairGenerationType.KeyType.DSA, false);
       certprofileTls("certprofile-tls-ec.json", KeypairGenerationType.KeyType.EC, false);
       certprofileTls("certprofile-tls-sm2.json", KeypairGenerationType.KeyType.EC, true);
 
@@ -338,11 +337,6 @@ public class ProfileConfDemo extends ProfileConfBuilder {
       Map<String, String> parameters = new HashMap<>();
 
       switch (kpgKeyType) {
-        case DSA:
-          algo = createOidType(X9ObjectIdentifiers.id_dsa, "OID");
-          parameters.put("plength", "2048");
-          parameters.put("qlength", "256");
-          break;
         case RSA:
           algo = createOidType(PKCSObjectIdentifiers.rsaEncryption, "RSA");
           parameters.put("keysize", "2048");

@@ -42,7 +42,6 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.cert.Certificate;
-import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -113,13 +112,6 @@ public class P12KeyGenerator {
     return generateIdentity(kp, params, selfSignedCertSubject);
   }
 
-  public static KeyStoreWrapper generateDSAKeypair(
-      int plength, int qlength, KeystoreGenerationParameters params, String selfSignedCertSubject)
-      throws Exception {
-    KeyPairWithSubjectPublicKeyInfo kp = genDSAKeypair(plength, qlength, params.getRandom());
-    return generateIdentity(kp, params, selfSignedCertSubject);
-  }
-
   public static KeyStoreWrapper generateECKeypair(
       ASN1ObjectIdentifier curveOid, KeystoreGenerationParameters params, String selfSignedCertSubject)
       throws Exception {
@@ -177,13 +169,6 @@ public class P12KeyGenerator {
     SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo(
         new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE),
         new RSAPublicKey(rsaPubKey.getModulus(), rsaPubKey.getPublicExponent()));
-    return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
-  }
-
-  public static KeyPairWithSubjectPublicKeyInfo genDSAKeypair(int plength, int qlength, SecureRandom random)
-      throws Exception {
-    KeyPair kp = KeyUtil.generateDSAKeypair(plength, qlength, random);
-    SubjectPublicKeyInfo spki = KeyUtil.createSubjectPublicKeyInfo(kp.getPublic());
     return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
   }
 
@@ -258,8 +243,6 @@ public class P12KeyGenerator {
     SignAlgo algo;
     if (key instanceof RSAPrivateKey) {
       algo = SignAlgo.RSAPSS_SHA256;
-    } else if (key instanceof DSAPrivateKey) {
-      algo = SignAlgo.DSA_SHA256;
     } else if (key instanceof ECPrivateKey) {
       if (GMUtil.isSm2primev2Curve(((ECPublicKey) publicKey).getParams().getCurve())) {
         algo = SignAlgo.SM2_SM3;

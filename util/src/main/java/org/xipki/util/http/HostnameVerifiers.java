@@ -17,7 +17,7 @@ import javax.net.ssl.SSLSession;
  */
 public class HostnameVerifiers {
 
-  public static final NoopHostnameVerifier NO_OP = new NoopHostnameVerifier();
+  private static final NoopHostnameVerifier NO_OP = new NoopHostnameVerifier();
 
   private static class NoopHostnameVerifier implements HostnameVerifier {
 

@@ -27,7 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
@@ -106,8 +105,7 @@ public class P12SignerFactory implements SignerFactory {
             type, keystoreStream, password, keyLabel, password, certificateChain);
         PublicKey publicKey = keypairWithCert.getPublicKey();
         ASN1ObjectIdentifier xdhCurveOid = null;
-        if (!(publicKey instanceof RSAPublicKey || publicKey instanceof ECPublicKey
-            || publicKey instanceof DSAPublicKey)) {
+        if (!(publicKey instanceof RSAPublicKey || publicKey instanceof ECPublicKey)) {
           SubjectPublicKeyInfo spki = keypairWithCert.getCertificateChain()[0].getSubjectPublicKeyInfo();
           xdhCurveOid = spki.getAlgorithm().getAlgorithm();
           if (!EdECConstants.isMontgomeryCurve(xdhCurveOid)) {

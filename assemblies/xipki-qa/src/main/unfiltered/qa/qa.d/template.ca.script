@@ -17,7 +17,7 @@ ca:dbschema-add --name KEYPAIR_ENC_KEY --value 00112233445566778899AABBCCDDEEFF
 list = [ cross subca subca-complex ocsp scep multiple-ous multi-valued-rdn \
   qc ee-complex smime smime-legacy tls tls-enc tls-c max-time fixed-partial-subject \
   constant-ext \
-  tls-dsa tls-ec tls-ed25519 tls-rsa tls-sm2 tls-sm2-enc]
+  tls-ec tls-ed25519 tls-rsa tls-sm2 tls-sm2-enc]
 
 each ($list) {
   ca:profile-add --name ${it} \
@@ -35,7 +35,7 @@ ca:publisher-add \
 ca:keypairgen-add \
   --name keypool \
   --type keypool \
-  --conf datasource=keypool,password=CHANGEIT,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448
+  --conf datasource=keypool,password=CHANGEIT,keyspecs=RSA:EC:SM2:ED25519:ED448:X25519:X448
 
 # CMP Requestors
 ca:requestor-add \
@@ -113,7 +113,7 @@ ca:careq-add \
   --ca rootca1
 
 ## Generate keys and CSR for subca1
-xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+xi:csr-p12 REPLACEME-RSAPSS \
   --p12 output/subca1.p12 \
   --password CHANGEIT \
   --outform $OUTFORM \
@@ -134,7 +134,7 @@ xi:update-cert-p12 \
   --ca-cert output/rootca1.crt
 
 ## Generate keys and CSR for subcawithcrl1
-xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+xi:csr-p12 REPLACEME-RSAPSS \
   --p12 output/subcawithcrl1.p12 \
   --password CHANGEIT \
   --outform $OUTFORM \
@@ -164,7 +164,7 @@ xi:update-cert-p12 \
   --ca-cert output/rootca1.crt
 
 ## Generate keys and CSR for OCSPResponder
-xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+xi:csr-p12 REPLACEME-RSAPSS \
   --p12 output/ocsp99.p12 \
   --password CHANGEIT \
   --outform $OUTFORM \
@@ -230,7 +230,6 @@ ca:caprofile-add \
   --profile tls:tls-alias1,tls-alias2 \
   --profile tls-c \
   --profile fixed-partial-subject \
-  --profile tls-dsa \
   --profile tls-ec \
   --profile tls-ed25519 \
   --profile tls-rsa \

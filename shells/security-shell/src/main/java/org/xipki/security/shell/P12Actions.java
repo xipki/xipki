@@ -282,36 +282,6 @@ public class P12Actions {
 
   } // class CsrP12
 
-  @Command(scope = "xi", name = "dsa-p12", description = "generate RSA keypair in PKCS#12 keystore")
-  @Service
-  public static class DsaP12 extends P12KeyGenAction {
-
-    @Option(name = "--subject", aliases = "-s", description = "subject of the self-signed certificate")
-    private String subject;
-
-    @Option(name = "--plen", description = "bit length of the prime")
-    private Integer plen = 2048;
-
-    @Option(name = "--qlen", description = "bit length of the sub-prime")
-    private Integer qlen;
-
-    @Override
-    protected Object execute0() throws Exception {
-      if (plen % 1024 != 0) {
-        throw new IllegalCmdParamException("plen is not multiple of 1024: " + plen);
-      }
-
-      if (qlen == null) {
-        qlen = (plen <= 1024) ? 160 : ((plen <= 2048) ? 224 : 256);
-      }
-
-      saveKey(new P12KeyGenerator().generateDSAKeypair(plen, qlen, getKeyGenParameters(), subject));
-
-      return null;
-    } // method execute0
-
-  } // class DsaP12
-
   @Command(scope = "xi", name = "ec-p12", description = "generate EC keypair in PKCS#12 keystore")
   @Service
   public static class EcP12 extends P12KeyGenAction {

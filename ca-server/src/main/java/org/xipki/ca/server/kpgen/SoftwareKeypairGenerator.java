@@ -3,29 +3,23 @@
 
 package org.xipki.ca.server.kpgen;
 
-import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.DSAParameter;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.ca.api.kpgen.KeypairGenerator;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.DSAParameterCache;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.ConfPairs;
 
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.SecureRandom;
-import java.security.interfaces.DSAPrivateKey;
-import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateCrtKey;
-import java.security.spec.DSAParameterSpec;
 import java.util.Locale;
 
 /**
@@ -104,20 +98,6 @@ public class SoftwareKeypairGenerator extends KeypairGenerator {
             new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveOid),
             new org.bouncycastle.asn1.sec.ECPrivateKey(
                 orderBitLength, priv.getS(), new DERBitString(publicKey), null));
-      }
-      case "DSA": {
-        int pLength = Integer.parseInt(tokens[1]);
-        int qLength = Integer.parseInt(tokens[2]);
-        DSAParameterSpec spec = DSAParameterCache.getDSAParameterSpec(pLength, qLength, null);
-        KeyPair kp = KeyUtil.generateDSAKeypair(spec, random);
-        DSAParameter parameter = new DSAParameter(spec.getP(), spec.getQ(), spec.getG());
-        AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, parameter);
-
-        byte[] publicKey = new ASN1Integer(((DSAPublicKey) kp.getPublic()).getY()).getEncoded();
-
-        // DSA private keys are represented as BER-encoded ASN.1 type INTEGER. RFC 5958s
-        DSAPrivateKey priv = (DSAPrivateKey) kp.getPrivate();
-        return new PrivateKeyInfo(algId, new ASN1Integer(priv.getX()), null, publicKey);
       }
       case "ED25519":
       case "ED448":

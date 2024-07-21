@@ -27,14 +27,6 @@ if { $SIG_TYPE equals "rsa" } then {
   KEY_TYPE = "ec"
   KEY_DIR = "ec"
   SIGALGO = "${HASH}withECDSA"
-} elif { $SIG_TYPE equals "plainec" } then {
-  KEY_TYPE = "ec"
-  KEY_DIR = "ec"
-  SIGALGO = "${HASH}withPlainECDSA"
-} elif { $SIG_TYPE equals "dsa" } then {
-  KEY_TYPE = "dsa"
-  KEY_DIR = "dsa"
-  SIGALGO = "${HASH}withDSA"
 } elif { $SIG_TYPE equals "sm2" } then {
   KEY_TYPE = "sm2"
   KEY_DIR = "sm2"
@@ -52,8 +44,6 @@ if { "$KEYSPEC" equals "" } then {
     KEYSPEC = "2048"
   } elif { $KEY_TYPE equals "ec" } then {
     KEYSPEC = "secp256r1"
-  } elif { $KEY_TYPE equals "dsa" } then {
-    KEYSPEC = "2048"
   }
 }
 
@@ -64,8 +54,6 @@ OCSP_KEYCONF = "password=CHANGEIT,keystore=file:keycerts/ocsp99.p12"
 each ($list) {
   if { $KEY_TYPE equals "rsa" } then {
     xi:rsa-p12 --password CHANGEIT --key-size $KEYSPEC --out output/${it}.p12
-  } elif { $KEY_TYPE equals "dsa" } then {
-    xi:dsa-p12 --password CHANGEIT --plen $KEYSPEC --out output/${it}.p12
   } elif { $KEY_TYPE equals "ec" } then {
     xi:ec-p12 --curve $KEYSPEC --password CHANGEIT --out output/${it}.p12
   } elif { $KEY_TYPE equals "sm2" } then {

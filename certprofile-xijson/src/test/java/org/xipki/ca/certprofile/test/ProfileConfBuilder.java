@@ -21,7 +21,6 @@ import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.GeneralNameType;
 import org.xipki.ca.certprofile.xijson.conf.KeyParametersType;
-import org.xipki.ca.certprofile.xijson.conf.KeyParametersType.DsaParametersType;
 import org.xipki.ca.certprofile.xijson.conf.KeyParametersType.EcParametersType;
 import org.xipki.ca.certprofile.xijson.conf.KeyParametersType.RsaParametersType;
 import org.xipki.ca.certprofile.xijson.conf.KeypairGenerationType;
@@ -376,17 +375,6 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     // RSA
     List<AlgorithmType> list = new LinkedList<>(createRSAKeyAlgorithms());
 
-    // DSA
-    list.add(new AlgorithmType());
-    last(list).getAlgorithms().add(createOidType(X9ObjectIdentifiers.id_dsa, "DSA"));
-    last(list).setParameters(new KeyParametersType());
-
-    DsaParametersType dsaParams = new DsaParametersType();
-    last(list).getParameters().setDsa(dsaParams);
-
-    dsaParams.setP(Arrays.asList(2048, 3072));
-    dsaParams.setQ(Arrays.asList(224, 256));
-
     // EC
     list.add(new AlgorithmType());
 
@@ -415,17 +403,6 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
       ASN1ObjectIdentifier[] curveIds, CertLevel certLevel, boolean withEddsa) {
     // RSA
     List<AlgorithmType> list = new LinkedList<>(createRSAKeyAlgorithms());
-
-    // DSA
-    list.add(new AlgorithmType());
-    last(list).getAlgorithms().add(createOidType(X9ObjectIdentifiers.id_dsa, "DSA"));
-    last(list).setParameters(new KeyParametersType());
-
-    DsaParametersType dsaParams = new DsaParametersType();
-    last(list).getParameters().setDsa(dsaParams);
-
-    dsaParams.setP(Arrays.asList(1024, 2048, 3072));
-    dsaParams.setQ(Arrays.asList(160, 224, 256));
 
     // EC
     list.add(new AlgorithmType());

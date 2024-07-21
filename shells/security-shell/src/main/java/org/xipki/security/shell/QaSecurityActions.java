@@ -39,25 +39,6 @@ public class QaSecurityActions {
 
   private static class KeyControl {
 
-    public static class DSA extends KeyControl {
-      private final int plen;
-      private final int qlen;
-
-      public DSA(int plen, int qlen) {
-        this.plen = plen;
-        this.qlen = qlen;
-      }
-
-      public int plen() {
-        return plen;
-      }
-
-      public int qlen() {
-        return qlen;
-      }
-
-    } // class KeyControl
-
     public static class EC extends KeyControl {
       private final String curveName;
 
@@ -159,43 +140,6 @@ public class QaSecurityActions {
 
   } // class BatchSpeedAction
 
-  @Command(scope = "xi", name = "bspeed-dsa-gen-p12",
-      description = "performance test of PKCS#12 DSA key generation (batch)")
-  @Service
-  public static class BspeedDsaGenP12 extends BatchSpeedActionQa {
-
-    private final Queue<KeyControl.DSA> queue = getKeyControlDSA();
-
-    @Override
-    protected BenchmarkExecutor nextTester() throws Exception {
-      KeyControl.DSA control = queue.poll();
-      return (control == null) ? null : new P12KeyGenSpeed.DSA(control.plen(), control.qlen(), securityFactory);
-    }
-
-  } // class BspeedDsaGenP12
-
-  @Command(scope = "xi", name = "bspeed-dsa-sign-p12",
-      description = "performance test of PKCS#12 DSA signature creation")
-  @Service
-  public static class BspeedDsaSignP12 extends BSpeedP12SignActionQa {
-
-    private final Queue<KeyControl.DSA> queue = getKeyControlDSA();
-
-    @Override
-    protected BenchmarkExecutor nextTester() throws Exception {
-      KeyControl.DSA control = queue.poll();
-      if (control == null) {
-        return null;
-      }
-      if (control.plen() == 1024) {
-        signAlgo = "SHA1withDSA";
-      }
-
-      return new P12SignSpeed.DSA(securityFactory, signAlgo, getNumThreads(), control.plen(), control.qlen());
-    }
-
-  } // class BspeedDsaSignP12
-
   @Command(scope = "xi", name = "bspeed-ec-gen-p12",
       description = "performance test of PKCS#12 EC key generation (batch)")
   @Service
@@ -295,51 +239,6 @@ public class QaSecurityActions {
     }
 
   } // class BSpeedP12SignAction
-
-  @Command(scope = "xi", name = "speed-dsa-gen-p12", description = "performance test of PKCS#12 DSA key generation")
-  @Service
-  public static class SpeedDsaGenP12 extends SingleSpeedActionQa {
-
-    @Option(name = "--plen", description = "bit length of the prime")
-    private Integer plen = 2048;
-
-    @Option(name = "--qlen", description = "bit length of the sub-prime")
-    private Integer qlen;
-
-    @Override
-    protected BenchmarkExecutor getTester() throws Exception {
-      if (qlen == null) {
-        qlen = (plen >= 2048) ? 256 : 160;
-      }
-      return new P12KeyGenSpeed.DSA(plen, qlen, securityFactory);
-    }
-
-  } // class SpeedDsaGenP12
-
-  @Command(scope = "xi", name = "speed-dsa-sign-p12",
-      description = "performance test of PKCS#12 DSA signature creation")
-  @Service
-  public static class SpeedDsaSignP12 extends SpeedP12SignActionQa {
-
-    @Option(name = "--plen", description = "bit length of the prime")
-    private Integer plen = 2048;
-
-    @Option(name = "--qlen", description = "bit length of the sub-prime")
-    private Integer qlen;
-
-    @Option(name = "--sig-algo", required = true, description = "signature algorithm")
-    @Completion(QaCompleters.DSASigAlgCompleter.class)
-    private String signAlgo;
-
-    @Override
-    protected BenchmarkExecutor getTester() throws Exception {
-      if (qlen == null) {
-        qlen = (plen >= 2048) ? 256 : 160;
-      }
-      return new P12SignSpeed.DSA(securityFactory, signAlgo, getNumThreads(), plen, qlen);
-    }
-
-  } // class SpeedDsaSignP12
 
   @Command(scope = "xi", name = "speed-ec-gen-p12", description = "performance test of PKCS#12 EC key generation")
   @Service
@@ -518,15 +417,6 @@ public class QaSecurityActions {
     }
     return curveOid;
   } // method getCurveOid
-
-  private static Queue<KeyControl.DSA> getKeyControlDSA() {
-    Queue<KeyControl.DSA> queue = new LinkedList<>();
-    queue.add(new KeyControl.DSA(1024, 160));
-    queue.add(new KeyControl.DSA(2048, 224));
-    queue.add(new KeyControl.DSA(2048, 256));
-    queue.add(new KeyControl.DSA(3072, 256));
-    return queue;
-  }
 
   private static Queue<KeyControl.RSA> getKeyControlRSA() {
     Queue<KeyControl.RSA> queue = new LinkedList<>();

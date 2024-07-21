@@ -26,7 +26,7 @@ ca:cacert --out output/rootca1.crt rootca1
 xi:update-cert-p12 --p12 output/rootca1.p12 --password CHANGEIT --cert output/rootca1.crt
 
 ## Generate keys and CSR for subca1
-xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+xi:csr-p12 REPLACEME-RSAPSS \
   --p12 output/subca1.p12 --password CHANGEIT \
   --outform $OUTFORM \
   --out output/subca1.csr \
@@ -40,7 +40,7 @@ xi:update-cert-p12 --p12 output/subca1.p12 --password CHANGEIT \
   --cert output/subca1.crt --ca-cert output/rootca1.crt
 
 ## Generate keys and CSR for subcawithcrl
-xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+xi:csr-p12 REPLACEME-RSAPSS \
   --p12 output/subcawithcrl1.p12 --password CHANGEIT \
   --outform $OUTFORM \
   --out output/subcawithcrl1.csr \
@@ -64,7 +64,7 @@ xi:update-cert-p12 --p12 output/subcawithcrl1.p12 --password CHANGEIT \
   --cert output/subcawithcrl1.crt --ca-cert output/rootca1.crt
 
 ## Generate keys and CSR for OCSPResponder
-xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+xi:csr-p12 REPLACEME-RSAPSS \
   --p12 output/ocsp99.p12 --password CHANGEIT \
   --outform $OUTFORM \
   --out output/ocsp99.csr \

@@ -266,15 +266,11 @@ public class UpdateCertActions {
             + "(only applied to RSA key)")
     private Boolean rsaPss = Boolean.FALSE;
 
-    @Option(name = "--dsa-plain", description = "whether to use the Plain DSA for the POP computation\n"
-            + "(only applied to DSA and ECDSA key)")
-    private Boolean dsaPlain = Boolean.FALSE;
-
     @Option(name = "--embeds-publickey", description = "whether to embed the public key in the request")
     private Boolean embedsPulibcKey = Boolean.FALSE;
 
     protected SignatureAlgoControl getSignatureAlgoControl() {
-      return new SignatureAlgoControl(rsaPss, dsaPlain);
+      return new SignatureAlgoControl(rsaPss);
     }
 
     /**

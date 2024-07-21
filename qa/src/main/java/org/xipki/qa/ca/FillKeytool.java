@@ -3,7 +3,6 @@
 
 package org.xipki.qa.ca;
 
-import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
@@ -11,14 +10,12 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.DSAParameter;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.security.util.DSAParameterCache;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
@@ -41,12 +38,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.SecureRandom;
-import java.security.interfaces.DSAPrivateKey;
-import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateCrtKey;
-import java.security.spec.DSAParameterSpec;
 import java.security.spec.KeySpec;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -132,8 +126,8 @@ public class FillKeytool implements AutoCloseable {
           GMObjectIdentifiers.sm2p256v1,
       };
 
-      List<String> keyspecs = new LinkedList<>(Arrays.asList("DSA/1024/160", "DSA/2048/224", "DSA/2048/256",
-          "DSA/3072/256", "RSA/2048", "RSA/3072", "RSA/4096", "ED25519", "ED448", "X25519", "X448"));
+      List<String> keyspecs = new LinkedList<>(Arrays.asList(
+          "RSA/2048", "RSA/3072", "RSA/4096", "ED25519", "ED448", "X25519", "X448"));
 
       for (ASN1ObjectIdentifier curve : curves) {
         keyspecs.add("EC/" + curve.getId());
@@ -274,20 +268,6 @@ public class FillKeytool implements AutoCloseable {
             new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveOid),
             new org.bouncycastle.asn1.sec.ECPrivateKey(
                 orderBitLength, priv.getS(), new DERBitString(publicKey), null));
-      }
-      case "DSA": {
-        int pLength = Integer.parseInt(tokens[1]);
-        int qLength = Integer.parseInt(tokens[2]);
-        DSAParameterSpec spec = DSAParameterCache.getDSAParameterSpec(pLength, qLength, null);
-        KeyPair kp = KeyUtil.generateDSAKeypair(spec, random);
-        DSAParameter parameter = new DSAParameter(spec.getP(), spec.getQ(), spec.getG());
-        AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, parameter);
-
-        byte[] publicKey = new ASN1Integer(((DSAPublicKey) kp.getPublic()).getY()).getEncoded();
-
-        // DSA private keys are represented as BER-encoded ASN.1 type INTEGER.
-        DSAPrivateKey priv = (DSAPrivateKey) kp.getPrivate();
-        return new PrivateKeyInfo(algId, new ASN1Integer(priv.getX()), null, publicKey);
       }
       case "ED25519":
       case "ED448":

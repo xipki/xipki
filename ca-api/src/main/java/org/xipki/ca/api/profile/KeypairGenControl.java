@@ -113,44 +113,6 @@ public abstract class KeypairGenControl {
 
   } // class ECKeypairGenControl
 
-  public static class DSAKeypairGenControl extends KeypairGenControl {
-
-    private final int plength;
-
-    private final int qlength;
-
-    private final ASN1ObjectIdentifier keyAlgorithmOid;
-
-    public DSAKeypairGenControl(int pLength, int qLength, ASN1ObjectIdentifier keyAlgorithmOid) {
-      if (pLength < 1024 || pLength % 1024 != 0) {
-        throw new IllegalArgumentException("invalid pLength " + pLength);
-      }
-
-      if (qLength == 0) {
-        qLength = pLength < 2048 ? 160 : pLength < 3072 ? 224 : 256;
-      }
-
-      this.plength = pLength;
-      this.qlength = qLength;
-      this.keyAlgorithmOid = (keyAlgorithmOid != null) ? keyAlgorithmOid : X9ObjectIdentifiers.id_dsa;
-      keyspec = "DSA/" + pLength + "/" + qLength;
-    }
-
-    public int getPlength() {
-      return plength;
-    }
-
-    public int getQlength() {
-      return qlength;
-    }
-
-    @Override
-    public ASN1ObjectIdentifier getKeyAlgorithmOid() {
-      return keyAlgorithmOid;
-    }
-
-  } // class DSAKeypairGenControl
-
   public static class EDDSAKeypairGenControl extends KeypairGenControl {
 
     private final ASN1ObjectIdentifier keyAlgorithmOid;

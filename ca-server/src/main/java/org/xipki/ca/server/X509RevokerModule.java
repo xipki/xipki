@@ -93,8 +93,8 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
 
   private ScheduledFuture<?> suspendedCertsRevoker;
 
-  public X509RevokerModule(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore,
-      X509PublisherModule publisherModule) {
+  X509RevokerModule(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore,
+                    X509PublisherModule publisherModule) {
     super(caInfo);
 
     this.caIdNameMap = caManager.idNameMap();

@@ -1,4 +1,4 @@
-# Configure me: valid values are ec, rsa, dsa, sm2, ed25519 and ed448
+# Configure me: valid values are ec, rsa, sm2, ed25519 and ed448
 keytype = ec
 
 # Configure me: valid values are dbbased and filebased

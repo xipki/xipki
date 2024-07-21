@@ -12,7 +12,6 @@ import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
-import org.xipki.security.DSAPlainDigestSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 
@@ -51,7 +50,6 @@ public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProvi
     HashAlgo hashAlgo = signAlgo.getHashAlgo();
 
     return (SignAlgo.SM2_SM3 == signAlgo) ? new SM2Signer()
-        : signAlgo.isPlainECDSASigAlgo()  ? new DSAPlainDigestSigner(new ECDSASigner(), hashAlgo.createDigest())
         : new DSADigestSigner(new ECDSASigner(), hashAlgo.createDigest());
   } // method createSigner
 

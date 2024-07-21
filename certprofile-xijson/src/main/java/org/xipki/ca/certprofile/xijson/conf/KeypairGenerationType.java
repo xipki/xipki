@@ -23,10 +23,6 @@ public class KeypairGenerationType extends ValidableConf {
 
   public static final String PARAM_curve = "curve";
 
-  public static final String PARAM_plength = "plength";
-
-  public static final String PARAM_qlength = "qlength";
-
   private Boolean inheritCA;
 
   private Boolean forbidden;
@@ -47,12 +43,6 @@ public class KeypairGenerationType extends ValidableConf {
    *   <li>For EC key
    *     <ul>
    *       <li>curve (required)</li>
-   *     </ul>
-   *   </li>
-   *   <li>For DSA key
-   *     <ul>
-   *       <li>plength (required)</li>
-   *       <li>qlength (optional)</li>
    *     </ul>
    *   </li>
    *   <li>For Edwards and Montgomery key
@@ -133,12 +123,6 @@ public class KeypairGenerationType extends ValidableConf {
           throw new InvalidConfException("parameters " + PARAM_keysize + " may not be null");
         }
         break;
-      case DSA:
-        notNull(parameters, "parameters");
-        if (!parameters.containsKey(PARAM_plength)) {
-          throw new InvalidConfException("parameters " + PARAM_plength + " may not be null");
-        }
-        break;
       case EC:
         notNull(parameters, "parameters");
         if (!parameters.containsKey(PARAM_curve)) {
@@ -173,7 +157,6 @@ public class KeypairGenerationType extends ValidableConf {
   public enum KeyType {
     RSA,
     EC,
-    DSA,
     ED25519,
     ED448,
     X25519,

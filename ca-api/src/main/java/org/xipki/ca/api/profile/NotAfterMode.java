@@ -3,8 +3,6 @@
 
 package org.xipki.ca.api.profile;
 
-import org.xipki.util.Args;
-
 /**
  * How CA assigns the notAfter field in the certificate if the requested notAfter is
  * after CA's validity.

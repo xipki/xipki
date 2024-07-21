@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.AllowAllParametersOption;
-import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
 import org.xipki.pki.BadCertTemplateException;
@@ -143,27 +142,6 @@ public class PublicKeyChecker {
 
       int modulusLength = modulus.getPositiveValue().bitLength();
       if ((rsaOption.allowsModulusLength(modulusLength))) {
-        return;
-      }
-    } else if (keyParamsOption instanceof DSAParametersOption) {
-      DSAParametersOption dsaOption = (DSAParametersOption) keyParamsOption;
-      ASN1Encodable params = publicKey.getAlgorithm().getParameters();
-      if (params == null) {
-        throw new BadCertTemplateException("null Dss-Parms is not permitted");
-      }
-
-      int plength;
-      int qlength;
-
-      try {
-        ASN1Sequence seq = ASN1Sequence.getInstance(params);
-        plength = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue().bitLength();
-        qlength = ASN1Integer.getInstance(seq.getObjectAt(1)).getPositiveValue().bitLength();
-      } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException ex) {
-        throw new BadCertTemplateException("illegal Dss-Parms");
-      }
-
-      if (dsaOption.allowsPlength(plength) && dsaOption.allowsQlength(qlength)) {
         return;
       }
     } else {
