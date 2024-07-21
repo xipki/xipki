@@ -53,7 +53,7 @@ public class CheckerUtil {
     set.add(oid);
   }
 
-  static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(Map<String, ExtensionType> extensions)
+  static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtensions(Map<String, ExtensionType> extensions)
       throws CertprofileException {
     if (extensions == null) {
       return null;

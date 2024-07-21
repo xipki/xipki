@@ -20,7 +20,7 @@ import java.util.Set;
  * @since 2.0.0
  */
 
-class IssuerStore {
+public class IssuerStore {
 
   private List<IssuerEntry> issuers = new ArrayList<>();
 
