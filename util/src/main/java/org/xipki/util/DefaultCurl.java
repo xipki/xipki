@@ -174,7 +174,7 @@ public class DefaultCurl implements Curl {
 
   private SslContextConf sslContextConf;
 
-  private Map<UrlPattern, SslContextConf> sslContextConfs = new HashMap<>();
+  private final Map<UrlPattern, SslContextConf> sslContextConfs = new HashMap<>();
 
   private UrlPattern[] urlPatterns;
 

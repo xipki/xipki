@@ -25,8 +25,6 @@ public class DateUtil {
 
   private static final DateTimeFormatter SDF1 = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
-  private static final DateTimeFormatter SDF2 = DateTimeFormatter.ofPattern("yyyyMMdd");
-
   private DateUtil() {
   }
 
@@ -85,33 +83,8 @@ public class DateUtil {
     }
   } // method parseUtcTimeyyyyMMddhhmmss
 
-  public static Instant parseUtcTimeyyyyMMdd(String utcTime) {
-    String coreUtcTime = utcTime;
-    if (StringUtil.isNotBlank(utcTime)) {
-      char ch = utcTime.charAt(utcTime.length() - 1);
-      if (ch == 'z' || ch == 'Z') {
-        coreUtcTime = utcTime.substring(0, utcTime.length() - 1);
-      }
-    }
-
-    if (coreUtcTime == null || coreUtcTime.length() != 8) {
-      throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
-    }
-
-    try {
-      LocalDateTime localDate = LocalDateTime.parse(coreUtcTime + "000000", SDF1);
-      return localDate.atZone(ZONE_UTC).toInstant();
-    } catch (DateTimeParseException ex) {
-      throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': " + ex.getMessage());
-    }
-  } // method parseUtcTimeyyyyMMdd
-
   public static String toUtcTimeyyyyMMddhhmmss(Instant time) {
     return SDF1.format(time.atZone(ZONE_UTC));
-  }
-
-  public static String toUtcTimeyyyyMMdd(Instant time) {
-    return SDF2.format(time.atZone(ZONE_UTC));
   }
 
   public static Instant getLastMsOfDay(ZonedDateTime cal) {

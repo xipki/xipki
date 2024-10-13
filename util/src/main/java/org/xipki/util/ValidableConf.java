@@ -69,12 +69,6 @@ public abstract class ValidableConf {
     }
   }
 
-  protected static void _null(Object value, String name) throws InvalidConfException {
-    if (value != null) {
-      throw new InvalidConfException(name + " may not be non-null");
-    }
-  }
-
   protected void exactOne(Object value1, String name1, Object value2, String name2)
       throws InvalidConfException {
     if (value1 == null && value2 == null) {
