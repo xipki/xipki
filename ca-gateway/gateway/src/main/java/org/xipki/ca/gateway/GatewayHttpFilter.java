@@ -25,10 +25,6 @@ import org.xipki.ca.gateway.est.EstResponder;
 import org.xipki.ca.gateway.rest.RestHttpServlet;
 import org.xipki.ca.gateway.rest.RestProtocolConf;
 import org.xipki.ca.gateway.rest.RestResponder;
-import org.xipki.ca.gateway.scep.CaNameScepSigners;
-import org.xipki.ca.gateway.scep.ScepHttpServlet;
-import org.xipki.ca.gateway.scep.ScepProtocolConf;
-import org.xipki.ca.gateway.scep.ScepResponder;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.Securities;
@@ -65,7 +61,6 @@ public class GatewayHttpFilter implements XiHttpFilter {
   private static final String CMP_CFG = "etc/cmp-gateway.json";
   private static final String EST_CFG = "etc/est-gateway.json";
   private static final String REST_CFG = "etc/rest-gateway.json";
-  private static final String SCEP_CFG = "etc/scep-gateway.json";
 
   private AcmeHttpServlet acmeServlet;
 
@@ -74,8 +69,6 @@ public class GatewayHttpFilter implements XiHttpFilter {
   private EstHttpServlet estServlet;
 
   private RestHttpServlet restServlet;
-
-  private ScepHttpServlet scepServlet;
 
   private Securities securities;
 
@@ -137,11 +130,6 @@ public class GatewayHttpFilter implements XiHttpFilter {
       initRest(gLogReqResp, gSdkClient, gPopControl, reverseProxyMode);
     }
 
-    enabled = protocols.isScep();
-    LOG.info("SCEP is " + (enabled ? "enabled" : "disabled"));
-    if (enabled) {
-      initScep(gLogReqResp, gSdkClient, gPopControl);
-    }
     GatewayUtil.auditLogPciEvent(LOG, "Gateway", true, "START");
   }
 
@@ -271,40 +259,6 @@ public class GatewayHttpFilter implements XiHttpFilter {
     }
   }
 
-  private void initScep(boolean gLogReqResp, SdkClient gSdkClient, PopControl gPopControl) {
-    try {
-      ScepProtocolConf pconf = ScepProtocolConf.readConfFromFile(IoUtil.expandFilepath(SCEP_CFG, true));
-      boolean logReqResp = gLogReqResp;
-      if (pconf.getLogReqResp() != null) {
-        logReqResp = pconf.getLogReqResp();
-      }
-
-      SdkClient sdkClient = gSdkClient;
-      if (pconf.getSdkClient() != null) {
-        sdkClient = new SdkClient(pconf.getSdkClient());
-        sdkClient.setLogReqResp(logReqResp);
-      }
-
-      PopControl popControl = gPopControl;
-      if (pconf.getPop() != null) {
-        popControl = new PopControl(pconf.getPop());
-      }
-
-      RequestorAuthenticator authenticator = newAuthenticator(pconf.getAuthenticator());
-      CaProfilesControl caProfilesControl = new CaProfilesControl(pconf.getCaProfiles());
-      CaNameScepSigners signers = new CaNameScepSigners(
-          newCaSigners(securities, pconf.getSigners()));
-
-      ScepResponder responder = new ScepResponder(pconf.getScep(), sdkClient,
-          securities.getSecurityFactory(), signers, authenticator, popControl, caProfilesControl);
-
-      scepServlet = new ScepHttpServlet(logReqResp, responder);
-      LOG.info("started SCEP gateway");
-    } catch (Throwable ex) {
-      LogUtil.error(LOG, ex, "error starting SCEP gateway");
-    }
-  }
-
   @Override
   public void destroy() {
     try {
@@ -347,13 +301,6 @@ public class GatewayHttpFilter implements XiHttpFilter {
       if (restServlet != null) {
         req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/rest".length()
         restServlet.service(req, resp);
-      } else {
-        resp.sendError(HttpStatusCode.SC_FORBIDDEN);
-      }
-    } else if (path.startsWith("/scep/")) {
-      if (scepServlet != null) {
-        req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/scep".length()
-        scepServlet.service(req, resp);
       } else {
         resp.sendError(HttpStatusCode.SC_FORBIDDEN);
       }

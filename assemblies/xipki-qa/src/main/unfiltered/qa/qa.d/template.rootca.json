@@ -62,12 +62,6 @@
 			"file":"${profiles.dir}/certprofile-ocsp.json"
 		}
 	},{
-		"name":"scep",
-		"type":"xijson",
-		"conf":{
-			"file":"${profiles.dir}/certprofile-scep.json"
-		}
-	},{
 		"name":"multiple-ous",
 		"type":"xijson",
 		"conf":{

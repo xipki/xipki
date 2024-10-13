@@ -53,7 +53,6 @@
 		},
 		"profiles":[
 			"ocsp",
-			"scep",
 			"multiple-ous",
 			"multi-valued-rdn",
 			"max-time",

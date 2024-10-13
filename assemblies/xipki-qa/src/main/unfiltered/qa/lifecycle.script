@@ -108,8 +108,6 @@ if { "$printUsage" equals "true" } then {
     source file:./qa/qa.d/ca.script
   }
 
-  source file:./qa/qa.d/scep-server.script
-
   echo "#################################################################"
   echo "#                  CA certificate commands                      #"
   echo "#################################################################"

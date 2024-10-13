@@ -189,26 +189,3 @@ CMP Client Commands
 
      update certificate (PKCS#12 token)
 
-SCEP Client Commands
------
-
-   * `xi:scep-cacert`
-
-     get CA certificate
-
-
-   * `xi:scep-certpoll`
-
-     poll certificate
-
-   * `xi:scep-enroll`
-
-     enroll certificate
-
-   * `xi:scep-get-cert`
-
-     download certificate
-
-   * `xi:scep-get-crl`
-
-     download CRL

@@ -40,12 +40,6 @@
       <artifactId>cmp-core</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- SCEP -->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>scep-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <!-- For all components -->
     <dependency>
       <groupId>junit</groupId>

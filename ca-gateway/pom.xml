@@ -15,8 +15,6 @@
   <modules>
     <module>cmp-core</module>
     <module>cmp-client</module>
-    <module>scep-core</module>
-    <module>scep-client</module>
     <module>gateway-api</module>
     <module>gateway</module>
   </modules>

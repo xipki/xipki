@@ -125,7 +125,6 @@ wars=(
     cmp
     est
     rest
-    scep
 )
 
 for i in "${wars[@]}"; do

@@ -47,7 +47,7 @@ public interface Requestor {
   boolean isPermitted(Permission permission);
 
   /**
-   * Password-based requestor interface. Used for EST, REST and SCEP gateway.
+   * Password-based requestor interface. Used for EST and REST gateway.
    *
    * @author Lijun Liao (xipki)
    * @since 6.4.0
