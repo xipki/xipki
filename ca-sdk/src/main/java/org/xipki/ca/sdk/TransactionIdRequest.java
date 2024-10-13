@@ -3,7 +3,6 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
@@ -36,7 +35,7 @@ public class TransactionIdRequest extends SdkRequest {
   }
 
   public static TransactionIdRequest decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+    try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("TransactionIdRequest", decoder, 1);
       return new TransactionIdRequest(decoder.readTextString());
     } catch (IOException | RuntimeException ex) {

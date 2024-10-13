@@ -26,7 +26,7 @@ public class CaAuditConstants {
 
   public static final String NAME_expired_at = "expired_at";
 
-  public static final String NAME_invalidity_time = "invalidity_time";
+  public static final String NAME_revocation_time = "revocation_time";
 
   public static final String NAME_issuer = "issuer";
 

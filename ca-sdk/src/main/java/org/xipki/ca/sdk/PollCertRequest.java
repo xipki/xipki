@@ -3,7 +3,6 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
@@ -47,7 +46,7 @@ public class PollCertRequest extends CaIdentifierRequest {
   }
 
   public static PollCertRequest decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+    try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("PollCertRequest", decoder, 5);
       return new PollCertRequest(
           decoder.readByteString(),
@@ -62,9 +61,6 @@ public class PollCertRequest extends CaIdentifierRequest {
 
   public static class Entry extends SdkEncodable {
 
-    /*
-     * In SCEP: this field is null.
-     */
     private final BigInteger id;
 
     private final X500NameType subject;
