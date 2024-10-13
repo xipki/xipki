@@ -42,7 +42,6 @@ public class ProfileConfDemo extends ProfileConfBuilder {
       certprofileCross("certprofile-cross.json");
       certprofileSubCa("certprofile-subca.json");
       certprofileOcsp("certprofile-ocsp.json");
-      certprofileScep("certprofile-scep.json");
       certprofileSmime("certprofile-smime.json", false);
       certprofileSmime("certprofile-smime-legacy.json", true);
       certprofileTls("certprofile-tls.json", null, false);
@@ -183,39 +182,6 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
     marshall(profile, destFilename, true);
   } // method certprofileOcsp
-
-  private static void certprofileScep(String destFilename) {
-    X509ProfileType profile = getBaseProfile("certprofile scep", CertLevel.EndEntity, "5y");
-
-    profile.setKeyAlgorithms(createRSAKeyAlgorithms());
-
-    // Subject
-    addRdns(profile, rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn01(DN.SN), rdn(DN.CN));
-
-    // Extensions
-    List<ExtensionType> list = profile.getExtensions();
-
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
-    list.add(createExtension(Extension.freshestCRL, false, false));
-
-    // Extensions - basicConstraints
-    list.add(createExtension(Extension.basicConstraints, true, true));
-
-    // Extensions - AuthorityInfoAccess
-    list.add(createExtension(Extension.authorityInfoAccess, true, false));
-    last(list).setAuthorityInfoAccess(createAuthorityInfoAccess());
-
-    // Extensions - AuthorityKeyIdentifier
-    list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-
-    // Extensions - keyUsage
-    list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.keyEncipherment}, null));
-
-    marshall(profile, destFilename, true);
-  } // method certprofileScep
 
   private static void certprofileSmime(String destFilename, boolean legacy) {
     String desc = legacy ? "certprofile s/mime legacy" : "certprofile s/mime";
