@@ -66,20 +66,9 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
   * Any available hardware (tested on Raspberry Pi 2 Model B with 900MHz quad-core ARM CPU and 1 GB Memory)
 * Servlet Container
   * Tomcat 8, 9, 10, 11
-* HSM Devices
-  - [AWS CloudHSM](https://aws.amazon.com/cloudhsm)
-  - [Nitrokey HSM 2](https://www.nitrokey.com/#comparison) / [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick)
-  - nCipher [Connect](https://www.ncipher.com/products/general-purpose-hsms/nshield-connect) / [Solo](https://www.ncipher.com/products/general-purpose-hsms/nshield-solo)
-  - [Sansec HSM](https://en.sansec.com.cn)
-  - [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/)
-  - [TASS HSM](https://www.tass.com.cn/portal/list/index/id/15.html)
-  - Thales [LUNA](https://cpl.thalesgroup.com/encryption/hardware-security-modules/general-purpose-hsms) / [ProtectServer](https://cpl.thalesgroup.com/encryption/hardware-security-modules/protectserver-hsms)
-  - [Utimaco Se](https://hsm.utimaco.com/products-hardware-security-modules/general-purpose-hsm/)
-  - And shall also work on other HSMs with PKCS#11 support.
 
 ### CA Protocol Gateway
   - EST (RFC 7030)
-  - SCEP (RFC 8894)
   - CMP (RFC 4210, 4211, 9045, 9480)
   - ACME (RFC 8555, RFC 8737)
     - Challenge types: dns-01, http-01, tls-apln-01
@@ -155,7 +144,6 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
     - Database of XiPKI CA
     - OCSP database published by XiPKI CA
     - CRL and DeltaCRL
-    - Database of EJBCA
   - API to support proprietary certificate sources
   - Support of both unsigned and signed OCSP requests
   - Multiple software instances (all can be in active mode) for the same OCSP
@@ -179,6 +167,3 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
   - Updating certificates in token
   - Generating CSR (PKCS#10 request)
   - Exporting certificate from token
-
-### HSM Proxy
-  - Provide the access to the HSM remotely.

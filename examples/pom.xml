@@ -16,8 +16,6 @@
     <skipDeploy>true</skipDeploy>
   </properties>
   <modules>
-    <module>certprofile-example</module>
-    <module>ocsp-store-example</module>
     <module>dummy-crl-server</module>
     <module>dummy-ctlog-server</module>
   </modules>

@@ -43,7 +43,6 @@ import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
 import org.xipki.ca.api.profile.TextVadidator;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.KeypairGenerationType;
 import org.xipki.ca.certprofile.xijson.conf.KeypairGenerationType.KeyType;
 import org.xipki.ca.certprofile.xijson.conf.Subject;
@@ -134,11 +133,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     notAfterMode = null;
     version = null;
     extensions = null;
-    extraReset();
   } // method reset
-
-  protected void extraReset() {
-  }
 
   @Override
   public void initialize(String data) throws CertprofileException {
@@ -324,19 +319,6 @@ public class XijsonCertprofile extends BaseCertprofile {
     // Extensions
     this.extensions = new XijsonExtensions(this, conf, subjectControl);
   } // method initialize0
-
-  /**
-   * Process the extension.
-   *
-   * @param extn
-   *          Configuration of the extension
-   * @return whether the extension is processed
-   * @throws CertprofileException
-   *           If initialization of the extra extension failed.
-   */
-  protected boolean initExtraExtension(ExtensionType extn) throws CertprofileException {
-    return false;
-  }
 
   @Override
   public boolean hasNoWellDefinedExpirationDate() {
@@ -788,23 +770,8 @@ public class XijsonCertprofile extends BaseCertprofile {
       }
     }
 
-    ExtensionValues extraExtensions = getExtraExtensions(extensionControls, requestedSubject,
-        grantedSubject, requestedExtensions, notBefore, notAfter, caInfo);
-    if (extraExtensions != null) {
-      for (ASN1ObjectIdentifier m : extraExtensions.getExtensionTypes()) {
-        values.addExtension(m, extraExtensions.getExtensionValue(m));
-      }
-    }
     return values;
   } // method getExtensions
-
-  protected ExtensionValues getExtraExtensions(
-      Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurrences, X500Name requestedSubject,
-      X500Name grantedSubject, Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
-      Instant notBefore, Instant notAfter, PublicCaInfo caInfo)
-      throws CertprofileException, BadCertTemplateException {
-    return null;
-  } // method getExtraExtensions
 
   @Override
   public Set<KeyUsageControl> getKeyUsage() {

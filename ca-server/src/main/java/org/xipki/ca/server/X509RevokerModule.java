@@ -33,8 +33,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static org.xipki.ca.sdk.CaAuditConstants.NAME_invalidity_time;
 import static org.xipki.ca.sdk.CaAuditConstants.NAME_reason;
+import static org.xipki.ca.sdk.CaAuditConstants.NAME_revocation_time;
 import static org.xipki.ca.sdk.CaAuditConstants.NAME_serial;
 import static org.xipki.ca.sdk.CaAuditConstants.TYPE_revoke_ca;
 import static org.xipki.ca.sdk.CaAuditConstants.TYPE_revoke_suspendedCert;
@@ -167,21 +167,23 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
   } // method unsuspendCert
 
   private CertWithRevocationInfo revokeCertificate0(
-      BigInteger serialNumber, CrlReason reason, Instant invalidityTime, boolean force, AuditEvent event)
+      BigInteger serialNumber, CrlReason reason, Instant revocationTime, boolean force, AuditEvent event)
       throws OperationException {
     String hexSerial = LogUtil.formatCsn(serialNumber);
     event.addEventData(NAME_serial, hexSerial);
     event.addEventData(NAME_reason, reason.getDescription());
-    if (invalidityTime != null) {
-      event.addEventData(NAME_invalidity_time, DateUtil.toUtcTimeyyyyMMddhhmmss(invalidityTime));
+    if (revocationTime == null) {
+      revocationTime = Instant.now();
     }
 
-    LOG.info("     START revokeCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}",
-        caIdent.getName(), hexSerial, reason.getDescription(), invalidityTime);
+    event.addEventData(NAME_revocation_time, DateUtil.toUtcTimeyyyyMMddhhmmss(revocationTime));
+
+    LOG.info("     START revokeCertificate: ca={}, serialNumber={}, reason={}, revocationTime={}",
+        caIdent.getName(), hexSerial, reason.getDescription(), revocationTime);
 
     CertWithRevocationInfo revokedCert;
 
-    CertRevocationInfo revInfo = new CertRevocationInfo(reason, Instant.now(), invalidityTime);
+    CertRevocationInfo revInfo = new CertRevocationInfo(reason, revocationTime);
     revokedCert = certstore.revokeCert(caIdent, serialNumber, revInfo, force, caIdNameMap);
     if (revokedCert == null) {
       return null;
@@ -190,8 +192,8 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     publisherModule.publishCertRevoked(revokedCert);
 
     if (LOG.isInfoEnabled()) {
-      LOG.info("SUCCESSFUL revokeCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={},"
-          + " revocationResult=REVOKED", caIdent.getName(), hexSerial, reason.getDescription(), invalidityTime);
+      LOG.info("SUCCESSFUL revokeCertificate: ca={}, serialNumber={}, reason={}, revocationTime={},"
+          + " revocationResult=REVOKED", caIdent.getName(), hexSerial, reason.getDescription(), revocationTime);
     }
 
     return revokedCert;
@@ -265,7 +267,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
       boolean successful = true;
       try {
         CertWithRevocationInfo ret = revokeCertificate0(caInfo.getSerialNumber(),
-            revocationInfo.getReason(), revocationInfo.getInvalidityTime(), true, event);
+            revocationInfo.getReason(), revocationInfo.getRevocationTime(), true, event);
         successful = (ret != null);
       } finally {
         finish(event, successful);

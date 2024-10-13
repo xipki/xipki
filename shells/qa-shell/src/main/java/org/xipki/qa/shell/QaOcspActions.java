@@ -27,7 +27,6 @@ import org.xipki.qa.ocsp.OcspError;
 import org.xipki.qa.ocsp.OcspQa;
 import org.xipki.qa.ocsp.OcspResponseOption;
 import org.xipki.security.CrlReason;
-import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
@@ -123,15 +122,6 @@ public class QaOcspActions {
     @Completion(QaCompleters.OccurrenceCompleter.class)
     private String nextUpdateOccurrenceText = TripleState.optional.name();
 
-    @Option(name = "--exp-certhash", description = "occurrence of certHash, "
-            + "will be set to forbidden for status unknown and issuerUnknown")
-    @Completion(QaCompleters.OccurrenceCompleter.class)
-    private String certhashOccurrenceText = TripleState.optional.name();
-
-    @Option(name = "--exp-certhash-alg", description = "occurrence of certHash")
-    @Completion(Completers.HashAlgCompleter.class)
-    private String certhashAlg;
-
     @Option(name = "--exp-nonce", description = "occurrence of nonce")
     @Completion(QaCompleters.OccurrenceCompleter.class)
     private String nonceOccurrenceText = TripleState.optional.name();
@@ -142,15 +132,12 @@ public class QaOcspActions {
     @Reference
     private OcspRequestor requestor;
 
-    private TripleState expectedCerthashOccurrence;
-
     private TripleState expectedNextUpdateOccurrence;
 
     private TripleState expectedNonceOccurrence;
 
     @Override
     protected final Object execute0() throws Exception {
-      expectedCerthashOccurrence = TripleState.valueOf(certhashOccurrenceText);
       expectedNextUpdateOccurrence = TripleState.valueOf(nextUpdateOccurrenceText);
       expectedNonceOccurrence = TripleState.valueOf(nonceOccurrenceText);
 
@@ -414,14 +401,10 @@ public class QaOcspActions {
       // analyze the result
       OcspResponseOption responseOption = new OcspResponseOption();
       responseOption.setNextUpdateOccurrence(expectedNextUpdateOccurrence);
-      responseOption.setCerthashOccurrence(expectedCerthashOccurrence);
       responseOption.setNonceOccurrence(expectedNonceOccurrence);
       responseOption.setRespIssuer(respIssuer);
       if(isNotBlank(sigAlgo)) {
         responseOption.setSignatureAlg(SignAlgo.getInstance(sigAlgo));
-      }
-      if (isNotBlank(certhashAlg)) {
-        responseOption.setCerthashAlg(HashAlgo.getInstance(certhashAlg));
       }
 
       ValidationResult ret = ocspQa.checkOcsp(response, issuerHash, serialNumber, null,
@@ -580,15 +563,6 @@ public class QaOcspActions {
     @Completion(QaCompleters.OccurrenceCompleter.class)
     private String nextUpdateOccurrenceText = TripleState.optional.name();
 
-    @Option(name = "--exp-certhash", description = "occurrence of certHash, "
-            + "will be set to forbidden for status unknown and issuerUnknown")
-    @Completion(QaCompleters.OccurrenceCompleter.class)
-    private String certhashOccurrenceText = TripleState.optional.name();
-
-    @Option(name = "--exp-certhash-alg", description = "occurrence of certHash")
-    @Completion(Completers.HashAlgCompleter.class)
-    private String certhashAlg;
-
     @Option(name = "--exp-nonce", description = "occurrence of nonce")
     @Completion(QaCompleters.OccurrenceCompleter.class)
     private String nonceOccurrenceText = TripleState.optional.name();
@@ -605,8 +579,6 @@ public class QaOcspActions {
     private Map<BigInteger, Instant> expectedRevTimes;
 
     private TripleState expectedNextUpdateOccurrence;
-
-    private TripleState expectedCerthashOccurrence;
 
     private TripleState expectedNonceOccurrence;
 
@@ -659,7 +631,6 @@ public class QaOcspActions {
         }
       }
 
-      expectedCerthashOccurrence = TripleState.valueOf(certhashOccurrenceText);
       expectedNextUpdateOccurrence = TripleState.valueOf(nextUpdateOccurrenceText);
       expectedNonceOccurrence = TripleState.valueOf(nonceOccurrenceText);
     } // method checkParameters
@@ -671,15 +642,10 @@ public class QaOcspActions {
         throws Exception {
       OcspResponseOption responseOption = new OcspResponseOption();
       responseOption.setNextUpdateOccurrence(expectedNextUpdateOccurrence);
-      responseOption.setCerthashOccurrence(expectedCerthashOccurrence);
       responseOption.setNonceOccurrence(expectedNonceOccurrence);
       responseOption.setRespIssuer(respIssuer);
       if (isNotBlank(sigAlgo)) {
         responseOption.setSignatureAlg(SignAlgo.getInstance(sigAlgo));
-      }
-
-      if (isNotBlank(certhashAlg)) {
-        responseOption.setCerthashAlg(HashAlgo.getInstance(certhashAlg));
       }
 
       if (ocspQa == null) {

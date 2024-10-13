@@ -33,14 +33,14 @@
     <xipki.tools.version>1.0.11</xipki.tools.version>
     <javax.servlet.version>3.1.0</javax.servlet.version>
     <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
-    <karaf.version>4.4.4</karaf.version>
-    <karaf.bc.version>1.75</karaf.bc.version>
+    <karaf.version>4.4.6</karaf.version>
+    <karaf.bc.version>1.77</karaf.bc.version>
     <bc.version>1.78.1</bc.version>
     <slf4j.version>1.7.36</slf4j.version>
     <hikaricp.version>4.0.3</hikaricp.version>
     <jackson.version>2.16.1</jackson.version>
     <zip4j.version>2.11.5</zip4j.version>
-    <dnsjava.version>3.5.3</dnsjava.version>
+    <dnsjava.version>3.6.2</dnsjava.version>
     <!-- only for runtime -->
     <log4j.version>2.22.1</log4j.version>
     <jdbc.mariadb.version>3.3.0</jdbc.mariadb.version>

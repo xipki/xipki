@@ -44,9 +44,11 @@ public class CtlogHttpFilter implements XiHttpFilter {
     }
 
     String path = req.getServletPath();
-    if (path.startsWith("/ctlogrsa/ct/v1/add-pre-chain/")) {
+    if (path.startsWith("/ctlogrsa/ct/v1/add-pre-chain/")
+        || path.equals("/ctlogrsa/ct/v1/add-pre-chain")) {
       rsa.doPost(req).fillResponse(resp);
-    } else if (path.startsWith("/ctlogec/ct/v1/add-pre-chain/")) {
+    } else if (path.startsWith("/ctlogec/ct/v1/add-pre-chain/")
+        || path.equals("/ctlogec/ct/v1/add-pre-chainC")) {
       ec.doPost(req).fillResponse(resp);
     } else {
       LOG.warn("unknown servlet path {}", path);

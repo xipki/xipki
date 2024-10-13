@@ -63,7 +63,7 @@ public class CtLogClient {
     ((DefaultCurl) this.curl).setSslContextConf(sslContextConf);
     this.addPreChainUrls = new ArrayList<>(serverUrls.size());
     for (String m : serverUrls) {
-      String addPreChainUrl = m.endsWith("/") ? m + "ct/v1/add-pre-chain" : m + "/ct/v1/add-pre-chain";
+      String addPreChainUrl = m.endsWith("/") ? m + "ct/v1/add-pre-chain/" : m + "/ct/v1/add-pre-chain/";
       this.addPreChainUrls.add(addPreChainUrl);
     }
   } // constructor

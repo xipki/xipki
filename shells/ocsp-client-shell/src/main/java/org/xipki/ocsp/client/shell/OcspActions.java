@@ -389,9 +389,6 @@ public class OcspActions {
     @Option(name = "--http-get", description = "use HTTP GET for small request")
     protected Boolean useHttpGetForSmallRequest = Boolean.FALSE;
 
-    @Option(name = "--sign", description = "sign request")
-    protected Boolean signRequest = Boolean.FALSE;
-
     protected RequestOptions getRequestOptions() throws Exception {
       RequestOptions options = new RequestOptions();
       options.setUseNonce(usenonce);
@@ -400,7 +397,6 @@ public class OcspActions {
       }
       options.setAllowNoNonceInResponse(allowNoNonceInResponse);
       options.setHashAlgorithm(HashAlgo.getInstance(hashAlgo));
-      options.setSignRequest(signRequest);
       options.setUseHttpGetForRequest(useHttpGetForSmallRequest);
 
       if (isNotEmpty(prefSigAlgs)) {

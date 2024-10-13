@@ -39,9 +39,6 @@ public class ObjectIdentifiers {
 
   private static final ASN1ObjectIdentifier id_microsoft = id_pen.branch("311");
 
-  // CCC: Car Connectivity Consortium
-  private static final ASN1ObjectIdentifier id_ccc = id_pen.branch("41577");
-
   public static final class CMP {
     public static final ASN1ObjectIdentifier id_it_certProfile = new ASN1ObjectIdentifier("1.3.6.1.5.5.7.4.21");
   }
@@ -57,9 +54,9 @@ public class ObjectIdentifiers {
     // deprecated id_xipki_ext_cmpRequestExtensions := id_xipki_ext {2}
     // deprecated id_xipki_ext_authorizationTemplate := id_xipki_ext {3}
 
-    private static final ASN1ObjectIdentifier id_xipki_cmp = id_xipki.branch("2");
+    //private static final ASN1ObjectIdentifier id_xipki_cmp = id_xipki.branch("2");
 
-    public static final ASN1ObjectIdentifier id_xipki_cmp_cmpGenmsg = id_xipki_cmp.branch("1");
+    //public static final ASN1ObjectIdentifier id_xipki_cmp_cmpGenmsg = id_xipki_cmp.branch("1");
 
     // deprecated id_xipki_cmp_cacerts = id_xipki_cmp {2};
 
@@ -751,7 +748,7 @@ public class ObjectIdentifiers {
       oidNameMap.put(EdECConstants.id_X25519, EdECConstants.X25519);
       oidNameMap.put(EdECConstants.id_X448, EdECConstants.X448);
 
-      oidNameMap.put(Xipki.id_xipki_cmp_cmpGenmsg, "XIPKI CMP GenMsg");
+      //oidNameMap.put(Xipki.id_xipki_cmp_cmpGenmsg, "XIPKI CMP GenMsg");
       oidNameMap.put(BaseRequirements.id_domain_validated, "Domain Validated");
       oidNameMap.put(BaseRequirements.id_organization_validated, "Organization Validated");
       oidNameMap.put(BaseRequirements.id_individual_validated, "Individual Validated");

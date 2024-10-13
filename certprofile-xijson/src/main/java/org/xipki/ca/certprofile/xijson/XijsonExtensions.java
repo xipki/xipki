@@ -289,16 +289,6 @@ public class XijsonExtensions {
         Extension.freshestCRL,               Extension.subjectKeyIdentifier, Extension.subjectInfoAccess,
         Extn.id_extension_pkix_ocsp_nocheck, Extn.id_SCTs).forEach(extnIds::remove);
 
-    // to avoid race conflict.
-    Set<ASN1ObjectIdentifier> copyOfExtnIds = new HashSet<>(extnIds);
-    for (ASN1ObjectIdentifier extnId : copyOfExtnIds) {
-      ExtensionType extn = getExtension(extnId, extensions);
-      boolean processed = certProfile.initExtraExtension(extn);
-      if (processed) {
-        extnIds.remove(extnId);
-      }
-    }
-
     if (!extnIds.isEmpty()) {
       throw new CertprofileException("Cannot process the extensions: " + extnIds);
     }

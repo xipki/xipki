@@ -23,39 +23,27 @@ public class CertRevocationInfo {
 
   private Instant revocationTime;
 
-  private Instant invalidityTime;
-
   // For the deserialization only
   @SuppressWarnings("unused")
   private CertRevocationInfo() {
   }
 
   public CertRevocationInfo(CrlReason reason) {
-    this(reason, Instant.now(), null);
+    this(reason, Instant.now());
   }
 
   public CertRevocationInfo(CrlReason reason, Instant revocationTime) {
-    this(reason, revocationTime, null);
-  }
-
-  public CertRevocationInfo(CrlReason reason, Instant revocationTime, Instant invalidityTime) {
     this.reason = Args.notNull(reason, "reason");
     this.revocationTime = Args.notNull(revocationTime, "revocationTime");
-    this.invalidityTime = invalidityTime;
   }
 
   public CertRevocationInfo(int reasonCode) {
-    this(reasonCode, Instant.now(), null);
+    this(reasonCode, Instant.now());
   }
 
   public CertRevocationInfo(int reasonCode, Instant revocationTime) {
-    this(reasonCode, revocationTime, null);
-  }
-
-  public CertRevocationInfo(int reasonCode, Instant revocationTime, Instant invalidityTime) {
     this.revocationTime = Args.notNull(revocationTime, "revocationTime");
     this.reason = CrlReason.forReasonCode(reasonCode);
-    this.invalidityTime = invalidityTime;
   }
 
   public void setReason(CrlReason reason) {
@@ -81,51 +69,29 @@ public class CertRevocationInfo {
     return revocationTime;
   }
 
-  /**
-   * Get the invalidity time.
-   * @return invalidity time, may be null
-   */
-  public Instant getInvalidityTime() {
-    return invalidityTime;
-  }
-
-  public void setInvalidityTime(Instant invalidityTime) {
-    this.invalidityTime = invalidityTime;
-  }
-
   @Override
   public String toString() {
-    return StringUtil.concatObjects("reason: ", reason, "\nrevocationTime: ", revocationTime,
-        "\ninvalidityTime: ", invalidityTime);
+    return StringUtil.concatObjects("reason: ", reason, "\nrevocationTime: ", revocationTime);
   }
 
   public static CertRevocationInfo fromEncoded(String encoded) {
     ConfPairs pairs = new ConfPairs(encoded);
     CrlReason reason = CrlReason.forNameOrText(pairs.value("reason"));
     Instant revocationTime = Instant.ofEpochSecond(Long.parseLong(pairs.value("revocationTime")));
-    String str = pairs.value("invalidityTime");
-    Instant invalidityTime = null;
-    if (str != null) {
-      invalidityTime = Instant.ofEpochSecond(Long.parseLong(pairs.value("invalidityTime")));
-    }
 
-    return new CertRevocationInfo(reason, revocationTime, invalidityTime);
+    return new CertRevocationInfo(reason, revocationTime);
   }
 
   public String encode() {
     ConfPairs pairs = new ConfPairs()
         .putPair("reason", reason.getDescription())
         .putPair("revocationTime", Long.toString(revocationTime.getEpochSecond()));
-    if (invalidityTime != null) {
-      pairs.putPair("invalidityTime", Long.toString(invalidityTime.getEpochSecond()));
-    }
     return pairs.getEncoded();
   }
 
   @Override
   public int hashCode() {
-    return reason.hashCode() + 31 * revocationTime.hashCode()
-        + (invalidityTime == null ? 0 : 31 * 31 * invalidityTime.hashCode());
+    return reason.hashCode() + 31 * revocationTime.hashCode();
   }
 
   @Override
@@ -140,8 +106,7 @@ public class CertRevocationInfo {
 
     CertRevocationInfo other = (CertRevocationInfo) obj;
     return reason == other.reason
-        && CompareUtil.equalsObject(revocationTime, other.revocationTime)
-        && CompareUtil.equalsObject(invalidityTime, other.invalidityTime);
+        && CompareUtil.equalsObject(revocationTime, other.revocationTime);
   }
 
 }
