@@ -21,7 +21,6 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
-import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.JSON;
 import org.xipki.util.LogUtil;
@@ -37,7 +36,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -83,17 +81,9 @@ public class DbCertStatusStore extends OcspStore {
 
   private String sqlCsNoRit;
 
-  private String sqlCs;
-
-  private String sqlCsNoRitWithCertHash;
-
-  private String sqlCsWithCertHash;
-
   private IssuerFilter issuerFilter;
 
   private final IssuerStore issuerStore = new IssuerStore();
-
-  private HashAlgo certHashAlgo;
 
   private boolean initialized;
 
@@ -271,8 +261,8 @@ public class DbCertStatusStore extends OcspStore {
   } // method updateCrls
 
   @Override
-  protected CertStatusInfo getCertStatus0(Instant time, RequestIssuer reqIssuer, BigInteger serialNumber,
-                                          boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
+  protected CertStatusInfo getCertStatus0(
+      Instant time, RequestIssuer reqIssuer, BigInteger serialNumber, boolean inheritCaRevocation)
       throws OcspStoreException {
     if (serialNumber.signum() != 1) { // non-positive serial number
       return CertStatusInfo.getUnknownCertStatusInfo(Instant.now(), null);
@@ -302,22 +292,16 @@ public class DbCertStatusStore extends OcspStore {
         }
       }
 
-      if (includeCertHash) {
-        sql = includeRit ? sqlCsWithCertHash : sqlCsNoRitWithCertHash;
-      } else {
-        sql = includeRit ? sqlCs : sqlCsNoRit;
-      }
+      sql = sqlCsNoRit;
 
       ResultSet rs = null;
       CertStatusInfo certStatusInfo;
 
       boolean unknown = true;
       boolean ignore = false;
-      String b64CertHash = null;
       boolean revoked = false;
       int reason = 0;
       long revTime = 0;
-      long invalTime = 0;
       int crlId = 0;
 
       PreparedStatement ps = datasource.prepareStatement(sql);
@@ -347,17 +331,10 @@ public class DbCertStatusStore extends OcspStore {
           }
 
           if (!ignore) {
-            if (includeCertHash) {
-              b64CertHash = rs.getString("HASH");
-            }
-
             revoked = rs.getBoolean("REV");
             if (revoked) {
               reason = rs.getInt("RR");
               revTime = rs.getLong("RT");
-              if (includeRit) {
-                invalTime = rs.getLong("RIT");
-              }
             }
           }
         } // end if (rs.next())
@@ -397,33 +374,12 @@ public class DbCertStatusStore extends OcspStore {
       } else if (ignore) {
         certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, nextUpdate);
       } else {
-        byte[] certHash = (b64CertHash == null) ? null : Base64.decodeFast(b64CertHash);
         if (revoked) {
-          Instant invTime = (invalTime == 0 || invalTime == revTime) ? null : Instant.ofEpochSecond(invalTime);
-          CertRevocationInfo revInfo = new CertRevocationInfo(reason, Instant.ofEpochSecond(revTime), invTime);
+          CertRevocationInfo revInfo = new CertRevocationInfo(reason, Instant.ofEpochSecond(revTime));
           certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
-              certHashAlgo, certHash, thisUpdate, nextUpdate, null);
+              thisUpdate, nextUpdate, null);
         } else {
-          certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, certHash, thisUpdate, nextUpdate, null);
-        }
-      }
-
-      if (includeCrlId && crlInfo != null) {
-        certStatusInfo.setCrlId(crlInfo.getCrlId());
-      }
-
-      if (includeArchiveCutoff) {
-        if (retentionInterval != 0) {
-          Instant date;
-
-          if (retentionInterval < 0) {
-            date = issuer.getNotBefore(); // expired certificate remains in status store forever
-          } else {
-            Instant t1 = Instant.now().minus(retentionInterval, ChronoUnit.DAYS);
-            date = issuer.getNotBefore().isBefore(t1) ? issuer.getNotBefore() : t1;
-          }
-
-          certStatusInfo.setArchiveCutOff(date);
+          certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(thisUpdate, nextUpdate, null);
         }
       }
 
@@ -449,11 +405,9 @@ public class DbCertStatusStore extends OcspStore {
       if (replaced) {
         CertRevocationInfo newRevInfo = (caRevInfo.getReason() == CrlReason.CA_COMPROMISE)
             ? caRevInfo
-            : new CertRevocationInfo(CrlReason.CA_COMPROMISE, caRevInfo.getRevocationTime(),
-                  caRevInfo.getInvalidityTime());
+            : new CertRevocationInfo(CrlReason.CA_COMPROMISE, caRevInfo.getRevocationTime());
 
         certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
-            certStatusInfo.getCertHashAlgo(), certStatusInfo.getCertHash(),
             certStatusInfo.getThisUpdate(), certStatusInfo.getNextUpdate(), certStatusInfo.getCertprofile());
       }
       return certStatusInfo;
@@ -523,21 +477,8 @@ public class DbCertStatusStore extends OcspStore {
 
     this.datasource = Args.notNull(datasource, "datasource");
 
-    sqlCs = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,RIT,CRL_ID FROM CERT WHERE IID=? AND SN=?");
     sqlCsNoRit = datasource.buildSelectFirstSql(1,
         "NBEFORE,NAFTER,REV,RR,RT,CRL_ID FROM CERT WHERE IID=? AND SN=?");
-
-    sqlCsWithCertHash = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,RIT,HASH,CRL_ID FROM CERT WHERE IID=? AND SN=?");
-    sqlCsNoRitWithCertHash = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,HASH,CRL_ID FROM CERT WHERE IID=? AND SN=?");
-
-    try {
-      this.certHashAlgo = getCertHashAlgo(datasource);
-    } catch (NoSuchAlgorithmException | DataAccessException ex) {
-      throw new OcspStoreException("Could not retrieve the certhash's algorithm from the database", ex);
-    }
 
     Set<X509Cert> includeIssuers = null;
     Set<X509Cert> excludeIssuers = null;

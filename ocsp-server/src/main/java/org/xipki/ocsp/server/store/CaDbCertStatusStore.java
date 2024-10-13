@@ -32,7 +32,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -73,17 +72,9 @@ public class CaDbCertStatusStore extends OcspStore {
 
   private String sqlCsNoRit;
 
-  private String sqlCs;
-
-  private String sqlCsNoRitWithCertHash;
-
-  private String sqlCsWithCertHash;
-
   private IssuerFilter issuerFilter;
 
   private final IssuerStore issuerStore = new IssuerStore();
-
-  private HashAlgo certHashAlgo;
 
   private boolean initialized;
 
@@ -214,8 +205,7 @@ public class CaDbCertStatusStore extends OcspStore {
 
   @Override
   protected CertStatusInfo getCertStatus0(
-      Instant time, RequestIssuer reqIssuer, BigInteger serialNumber,
-      boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
+      Instant time, RequestIssuer reqIssuer, BigInteger serialNumber, boolean inheritCaRevocation)
       throws OcspStoreException {
     if (serialNumber.signum() != 1) { // non-positive serial number
       return CertStatusInfo.getUnknownCertStatusInfo(Instant.now(), null);
@@ -233,23 +223,16 @@ public class CaDbCertStatusStore extends OcspStore {
         return null;
       }
 
-      if (includeCertHash) {
-        sql = includeRit ? sqlCsWithCertHash : sqlCsNoRitWithCertHash;
-      } else {
-        sql = includeRit ? sqlCs : sqlCsNoRit;
-      }
+      sql = sqlCsNoRit;
 
       Instant thisUpdate = Instant.now();
-
       ResultSet rs = null;
 
       boolean unknown = true;
       boolean ignore = false;
-      String b64CertHash = null;
       boolean revoked = false;
       int reason = 0;
       long revTime = 0;
-      long invalTime = 0;
 
       PreparedStatement ps = datasource.prepareStatement(sql);
 
@@ -277,17 +260,10 @@ public class CaDbCertStatusStore extends OcspStore {
           }
 
           if (!ignore) {
-            if (includeCertHash) {
-              b64CertHash = rs.getString("SHA1");
-            }
-
             revoked = rs.getBoolean("REV");
             if (revoked) {
               reason = rs.getInt("RR");
               revTime = rs.getLong("RT");
-              if (includeRit) {
-                invalTime = rs.getLong("RIT");
-              }
             }
           }
         } // end if (rs.next())
@@ -303,29 +279,12 @@ public class CaDbCertStatusStore extends OcspStore {
       } else if (ignore) {
         certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, null);
       } else {
-        byte[] certHash = (b64CertHash == null) ? null : Base64.decodeFast(b64CertHash);
         if (revoked) {
-          Instant invTime = (invalTime == 0 || invalTime == revTime) ? null : Instant.ofEpochSecond(invalTime);
-          CertRevocationInfo revInfo = new CertRevocationInfo(reason, Instant.ofEpochSecond(revTime), invTime);
+          CertRevocationInfo revInfo = new CertRevocationInfo(reason, Instant.ofEpochSecond(revTime));
           certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
-              certHashAlgo, certHash, thisUpdate, null, null);
+              thisUpdate, null, null);
         } else {
-          certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, certHash, thisUpdate, null, null);
-        }
-      }
-
-      if (includeArchiveCutoff) {
-        if (retentionInterval != 0) {
-          Instant date;
-          // expired certificate remains in status store forever.
-          if (retentionInterval < 0) {
-            date = issuer.getNotBefore();
-          } else {
-            Instant t1 = Instant.now().minus(retentionInterval, ChronoUnit.DAYS);
-            date = issuer.getNotBefore().isAfter(t1) ? issuer.getNotBefore() : t1;
-          }
-
-          certStatusInfo.setArchiveCutOff(date);
+          certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(thisUpdate, null, null);
         }
       }
 
@@ -354,10 +313,9 @@ public class CaDbCertStatusStore extends OcspStore {
           newRevInfo = caRevInfo;
         } else {
           newRevInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
-              caRevInfo.getRevocationTime(), caRevInfo.getInvalidityTime());
+              caRevInfo.getRevocationTime());
         }
         certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
-            certStatusInfo.getCertHashAlgo(), certStatusInfo.getCertHash(),
             certStatusInfo.getThisUpdate(), certStatusInfo.getNextUpdate(),
             certStatusInfo.getCertprofile());
       }
@@ -428,15 +386,7 @@ public class CaDbCertStatusStore extends OcspStore {
 
     this.datasource = Args.notNull(datasource, "datasource");
 
-    sqlCs = datasource.buildSelectFirstSql(1, "NBEFORE,NAFTER,REV,RR,RT,RIT FROM CERT WHERE CA_ID=? AND SN=?");
     sqlCsNoRit = datasource.buildSelectFirstSql(1, "NBEFORE,NAFTER,REV,RR,RT FROM CERT WHERE CA_ID=? AND SN=?");
-
-    sqlCsWithCertHash = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,RIT,SHA1 FROM CERT WHERE CA_ID=? AND SN=?");
-    sqlCsNoRitWithCertHash = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,SHA1 FROM CERT WHERE CA_ID=? AND SN=?");
-
-    this.certHashAlgo = HashAlgo.SHA1;
 
     Set<X509Cert> includeIssuers = null;
     Set<X509Cert> excludeIssuers = null;

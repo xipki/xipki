@@ -27,12 +27,6 @@ public abstract class OcspStore implements Closeable {
 
   protected UnknownCertBehaviour unknownCertBehaviour = UnknownCertBehaviour.unknown;
 
-  protected int retentionInterval;
-
-  protected boolean includeArchiveCutoff;
-
-  protected boolean includeCrlId;
-
   protected boolean ignoreExpiredCert;
 
   protected boolean ignoreNotYetValidCert;
@@ -81,10 +75,6 @@ public abstract class OcspStore implements Closeable {
    *          Requested issuer
    * @param serialNumber
    *          Serial number of the target certificate. Must not be {@code null}.
-   * @param includeCertHash
-   *          Whether to include the hash of target certificate in the response.
-   * @param includeRit
-   *          Whether to include the revocation invalidity time in the response.
    * @param inheritCaRevocation
    *          Whether to inherit CA revocation
    * @return the certificate status.
@@ -92,11 +82,11 @@ public abstract class OcspStore implements Closeable {
    *           If OCSP store failed to retrieve the status.
    */
   public final CertStatusInfo getCertStatus(
-      Instant time, RequestIssuer reqIssuer, BigInteger serialNumber, boolean includeCertHash,
-      boolean includeRit, boolean inheritCaRevocation)
+      Instant time, RequestIssuer reqIssuer, BigInteger serialNumber,
+      boolean inheritCaRevocation)
       throws OcspStoreException {
-    CertStatusInfo info = getCertStatus0(time, reqIssuer, serialNumber,
-        includeCertHash, includeRit, inheritCaRevocation);
+    CertStatusInfo info =
+        getCertStatus0(time, reqIssuer, serialNumber, inheritCaRevocation);
 
     if (info == null) {
       return null;
@@ -130,10 +120,6 @@ public abstract class OcspStore implements Closeable {
    *          Requested issuer
    * @param serialNumber
    *          Serial number of the target certificate. Must not be {@code null}.
-   * @param includeCertHash
-   *          Whether to include the hash of target certificate in the response.
-   * @param includeRit
-   *          Whether to include the revocation invalidity time in the response.
    * @param inheritCaRevocation
    *          Whether to inherit CA revocation
    * @return the certificate status.
@@ -142,7 +128,7 @@ public abstract class OcspStore implements Closeable {
    */
   protected abstract CertStatusInfo getCertStatus0(
       Instant time, RequestIssuer reqIssuer, BigInteger serialNumber,
-      boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
+      boolean inheritCaRevocation)
       throws OcspStoreException;
 
   /**
@@ -174,30 +160,6 @@ public abstract class OcspStore implements Closeable {
 
   public void setUnknownCertBehaviour(UnknownCertBehaviour unknownCertBehaviour) {
     this.unknownCertBehaviour = unknownCertBehaviour;
-  }
-
-  public boolean isIncludeArchiveCutoff() {
-    return includeArchiveCutoff;
-  }
-
-  public void setIncludeArchiveCutoff(boolean includeArchiveCutoff) {
-    this.includeArchiveCutoff = includeArchiveCutoff;
-  }
-
-  public int getRetentionInterval() {
-    return retentionInterval;
-  }
-
-  public void setRetentionInterval(int retentionInterval) {
-    this.retentionInterval = retentionInterval;
-  }
-
-  public boolean isIncludeCrlId() {
-    return includeCrlId;
-  }
-
-  public void setIncludeCrlId(boolean includeCrlId) {
-    this.includeCrlId = includeCrlId;
   }
 
   public boolean isIgnoreExpiredCert() {

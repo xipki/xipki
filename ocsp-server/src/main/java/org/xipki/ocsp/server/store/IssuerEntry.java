@@ -99,7 +99,7 @@ public class IssuerEntry {
 
   public void setRevocationInfo(Instant revocationTime) {
     this.revocationInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
-        Args.notNull(revocationTime, "revocationTime"), null);
+        Args.notNull(revocationTime, "revocationTime"));
   }
 
   public CertRevocationInfo getRevocationInfo() {
