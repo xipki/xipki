@@ -48,6 +48,17 @@
 					}
 				]
 			}
+		}, {
+			"urlPattern": ["*:*/gw/scep", "*:*/scep"],
+			"sslContext": {
+				// Valid values are 'no_op', 'default' or java:<class name>. Default to 'default'
+				"hostnameVerifier": "default",
+				"trustanchors":[
+					{
+						"file": "xipki/keycerts/gateway-server-cert.pem"
+					}
+				]
+			}
 		}
 	]
 }

@@ -30,6 +30,13 @@
 			"file":"certprofile/certprofile-rootca.json"
 		}
 	},{
+		"id":2,
+		"name":"scep",
+		"type":"xijson",
+		"conf":{
+			"file":"certprofile/certprofile-scep.json"
+		}
+	},{
 		"id":3,
 		"name":"ocsp",
 		"type":"xijson",
@@ -114,7 +121,7 @@
 			"status":"active",
 			"validityMode":"cutoff"
 		},
-		"profiles":["ocsp", "smime", "tls", "tls-c", "tls-sm2", "tls-sm2-enc"
+		"profiles":["ocsp", "scep", "smime", "tls", "tls-c", "tls-sm2", "tls-sm2-enc"
 		],
 		"publishers":[
 			// "ocsp-publisher"

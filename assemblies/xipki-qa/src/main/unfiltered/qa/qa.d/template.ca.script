@@ -14,7 +14,7 @@ ca:dbschema-add --name KEYPAIR_ENC_KEY --value 00112233445566778899AABBCCDDEEFF
 
 ## Certificate Profiles
 
-list = [ cross subca subca-complex ocsp multiple-ous multi-valued-rdn \
+list = [ cross subca subca-complex ocsp scep multiple-ous multi-valued-rdn \
   qc ee-complex smime smime-legacy tls tls-enc tls-c max-time fixed-partial-subject \
   constant-ext \
   tls-ec tls-ed25519 tls-rsa tls-sm2 tls-sm2-enc]
@@ -287,6 +287,7 @@ ca:caprofile-add \
   --profile ocsp \
   --profile tls \
   --profile tls-enc \
+  --profile scep \
   --profile multiple-ous \
   --profile multi-valued-rdn \
   --profile max-time \

@@ -1,0 +1,36 @@
+# Please adapt me
+SUBJECT="CN=SCEP Responder 1,O=myorg,C=DE"
+
+KEYCERTS_DIR = output/camgmt
+CACERT_FILE = output/subcawithcrl1.crt
+
+echo "#################################################################"
+echo "#                 Generate Key, CSR and Certificate             #"
+echo "#################################################################"
+
+echo "# Generate PKCS#12 key and certificate for SCEP Responder"
+
+xi:rsa-p12 --key-size 2048 --password CHANGEIT \
+  --out ${KEYCERTS_DIR}/scep-subcawithcrl.p12
+
+xi:csr-p12 --password CHANGEIT \
+  --p12 ${KEYCERTS_DIR}/scep-subcawithcrl.p12 \
+  --out ${KEYCERTS_DIR}/scep-subcawithcrl.csr \
+  --subject "${SUBJECT}"
+
+ca:enroll-cert --ca subcawithcrl1 --profile scep \
+  --csr ${KEYCERTS_DIR}/scep-subcawithcrl.csr \
+  --out ${KEYCERTS_DIR}/scep-subcawithcrl.der
+
+echo "# Update the certificate in the PKCS#12 file"
+xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/scep-subcawithcrl.p12 --password CHANGEIT \
+  --cert ${KEYCERTS_DIR}/scep-subcawithcrl.der --ca-cert ${CACERT_FILE}
+
+xi:copy-file -f ${KEYCERTS_DIR}/scep-subcawithcrl.p12 \
+  ${GATEWAY_XIPKI_DIR}/keycerts/scep-subcawithcrl.p12
+
+echo "restart gateway tomcat!"
+xi:exec $[tomcat.java.home] '~/test/xipki/gateway-tomcat/bin/shutdown.sh'
+xi:exec $[tomcat.java.home] '~/test/xipki/gateway-tomcat/bin/startup.sh'
+sleep 3
+

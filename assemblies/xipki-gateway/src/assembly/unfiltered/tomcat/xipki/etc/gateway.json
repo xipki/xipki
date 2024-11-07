@@ -3,7 +3,8 @@
 		"acme": $[gateway.acme.enabled],
 		"cmp": $[gateway.cmp.enabled],
 		"est": $[gateway.est.enabled],
-		"rest": $[gateway.rest.enabled]
+		"rest": $[gateway.rest.enabled],
+		"scep": $[gateway.scep.enabled]
 	},
 	// To activate the logging of requests and responses, set writer.level to DEBUG
 	// in the file META-INF/classes/log4j2.properties.

@@ -30,6 +30,13 @@ Please refer to [commands.md](commands.md) for more details.
   It can be executed in the CLI as follows:
     - `source xipki/client-script/est-client.script`
 
+* SCEP  
+  Use any SCEP client. XiPKI provides also a SCEP client.
+
+  An example script in available under `xipki/client-script/scep-client.script`.
+  It can be executed in the CLI as follows:
+    - `source xipki/client-script/scep-client.script`
+
 * CMP  
   Use any CMP client. XiPKI provides also a CMP client.
 

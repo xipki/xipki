@@ -32,6 +32,8 @@ public class GatewayConf extends ValidableConf {
 
     private boolean rest;
 
+    private boolean scep;
+
     public boolean isAcme() {
       return acme;
     }
@@ -64,6 +66,13 @@ public class GatewayConf extends ValidableConf {
       this.rest = rest;
     }
 
+    public boolean isScep() {
+      return scep;
+    }
+
+    public void setScep(boolean scep) {
+      this.scep = scep;
+    }
   }
 
   private SupportedProtocols protocols;

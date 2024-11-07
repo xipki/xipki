@@ -18,6 +18,23 @@
     <bundle>mvn:org.xipki.shell/security-shell/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/cmp-client-shell/${project.version}</bundle>
   </feature>
+  <feature name="xipki-scep-client" version="${project.version}"
+      description="SCEP client shell">
+    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${jackson.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
+    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/security-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki/pki-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki.gateway/scep-core/${project.version}</bundle>
+    <bundle>mvn:org.xipki.gateway/scep-client/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/scep-client-shell/${project.version}</bundle>
+  </feature>
   <feature name="xipki-ocsp-client" version="${project.version}" description="OCSP client shell">
     <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>

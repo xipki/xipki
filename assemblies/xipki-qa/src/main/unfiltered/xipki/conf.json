@@ -17,9 +17,9 @@
 				"xipki-gateway/tomcat/xipki/etc/cmp-gateway.json",
 				"xipki-gateway/tomcat/xipki/etc/est-gateway.json",
 				"xipki-gateway/tomcat/xipki/etc/rest-gateway.json",
+				"xipki-gateway/tomcat/xipki/etc/scep-gateway.json",
 				"xipki/etc/curl.json",
-				"etc/org.xipki.ca.mgmt.client.cfg",
-				"xipki/tomcat-files/xipki-gateway/tomcat/xipki/etc/gateway.json"
+				"etc/org.xipki.ca.mgmt.client.cfg"
 			],
 			"replacements": {
 				// OCSP
@@ -39,12 +39,15 @@
 				"gateway.cmp.enabled": "true",
 				"gateway.est.enabled": "true",
 				"gateway.rest.enabled": "true",
+				"gateway.scep.enabled": "true",
 				"gateway.https.keyPassword": "CHANGEIT",
 				"gateway.shutdown.port": "8007",
 				"gateway.http.port": "8082",
 				"gateway.https.port": "8445",
 				"gateway.host": "localhost",
 				"ra.sdk.keyPassword": "CHANGEIT",
+				// Gateway.SCEP
+				"scep.keyPassword": "CHANGEIT",
 				// CLI
 				"cmp.client.ca.keyPassword": "CHANGEIT",
 				"cmp.client.keyPassword": "CHANGEIT",
@@ -53,9 +56,7 @@
 				"rest.client.ca.keyPassword": "CHANGEIT",
 				"rest.client.keyPassword": "CHANGEIT",
 				// MGMT CLI
-				"ca.mgmt.client.keyPassword": "CHANGEIT",
-				// DH POP
-				"dhpop.keyPassword": "CHANGEIT"
+				"ca.mgmt.client.keyPassword": "CHANGEIT"
 			}
 		},
 		{
@@ -67,6 +68,7 @@
 				"qa/eddsa/template.ca-load.script",
 				"qa/lifecycle.script",
 				"qa/no-caconf-db/test.script",
+				"qa/qa.d/scep-server.script",
 				"qa/qa.d/template.ca-load.script",
 				"qa/qa.d/template.ca.script",
 				"qa/reimport.script"

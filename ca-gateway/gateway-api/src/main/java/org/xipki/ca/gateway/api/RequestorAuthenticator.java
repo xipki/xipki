@@ -21,7 +21,7 @@ public interface RequestorAuthenticator {
   Requestor.SimplePasswordRequestor getSimplePasswordRequestorByKeyId(byte[] keyId);
 
   /**
-   * Return the password-based requestor for given user. Used for EST and REST gateway.
+   * Return the password-based requestor for given user. Used for EST, REST and SCEP gateway.
    * @param user the user
    * @return the requestor.
    */
@@ -29,7 +29,7 @@ public interface RequestorAuthenticator {
 
   /**
    * Return the certificate-based requestor for given client certificate.
-   * Used for CMP, EST and REST gateway.
+   * Used for CMP, EST, REST and SCEP gateway.
    * @param cert the client certificate
    * @return the requestor.
    */

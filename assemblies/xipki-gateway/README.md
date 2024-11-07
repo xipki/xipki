@@ -1,5 +1,10 @@
 Deployment in Tomcat (8, 9 and 10)
 ----
+1. (Optiona) If SCEP is supported:  
+   You need to have a SCEP server certificate with private key. For the demo you may generate this
+   certificate in the `xipki-mgmt-cli` via the command:  
+   `ca:enroll-cert --ca myca1 --subject "CN=scep responder" --profile scep --key-password CHANGEIT --out output/scep1.der`,
+   and then copy the generated file `scep1.p12` to the folder `xipki/keycerts`.
 2. (Optional) If ACME is supported (The server URL is https://<host>:<HTTPS-port>/acme/ or http://<host>:<HTTP-port>/acme/.):  
    1. (Optional) If you use database other than H2, PostgreSQL, MariaDB and MySQL:
       Download the JDBC driver to the folder `tomcat/lib`.  

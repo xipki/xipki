@@ -44,5 +44,9 @@ Please refer to [commands.md](commands.md) for more details.
     * If you wish to generate the signing key and certificate for the OCSP responder, in the Management CLI:  
       `source xipki/ca-setup/setup-ocsp-p12.script`.
 
+* (Optional) Generate Key and Certificate for SCEP Gateway
+    * If you wish to generate the signing key and certificate for the SCEP gateway, in the Management CLI:  
+      `source xipki/ca-setup/setup-scep-p12.script`.
+
 * Verify the installation, execute the command in the Management CLI:  
   `ca-info <ca-name>`
