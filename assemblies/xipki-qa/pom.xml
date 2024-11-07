@@ -15,7 +15,7 @@
     <app.name>QA</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <patchkaraf.repos>mvn:org.xipki.feature/qa/${project.version}/xml/features</patchkaraf.repos>
-    <patchkaraf.features>(-jaas,-ssh,-config,aries-blueprint),xipki-cmp-client,xipki-ocsp-client,xipki-ca-mgmt,xipki-qa</patchkaraf.features>
+    <patchkaraf.features>(-jaas,-ssh,-config,aries-blueprint),xipki-cmp-client,xipki-scep-client,xipki-ocsp-client,xipki-ca-mgmt,xipki-qa</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
@@ -255,6 +255,7 @@
                 <!-- project-core features -->
                 <feature>xipki-cmp-client</feature>
                 <feature>xipki-ocsp-client</feature>
+                <feature>xipki-scep-client</feature>
                 <feature>xipki-ca-mgmt</feature>
                 <feature>xipki-qa</feature>
               </features>
