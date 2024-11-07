@@ -3,7 +3,6 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
@@ -39,7 +38,7 @@ public class PayloadResponse extends SdkResponse {
   }
 
   public static PayloadResponse decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+    try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("PayloadResponse", decoder, 1);
       return new PayloadResponse(decoder.readByteString());
     } catch (IOException | RuntimeException ex) {

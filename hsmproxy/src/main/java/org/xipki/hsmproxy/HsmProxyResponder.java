@@ -50,7 +50,6 @@ import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
-import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.ByteArrayCborEncoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
@@ -230,7 +229,7 @@ public class HsmProxyResponder {
     Args.notNull(module, "module");
     Args.notNull(reqBytes, "reqBytes");
 
-    try (CborDecoder reqDecoder = new ByteArrayCborDecoder(reqBytes)) {
+    try (CborDecoder reqDecoder = new CborDecoder(reqBytes)) {
       if (reqDecoder.readNullOrArrayLength(2)) {
         return new ErrorResponse(badRequest, "request shall not be a CBOR null.");
       }

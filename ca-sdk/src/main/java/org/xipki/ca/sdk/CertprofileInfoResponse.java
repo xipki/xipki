@@ -3,7 +3,6 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
@@ -52,7 +51,7 @@ public class CertprofileInfoResponse extends SdkResponse {
   }
 
   public static CertprofileInfoResponse decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+    try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("CertprofileInfoResponse", decoder, 3);
       return new CertprofileInfoResponse(
           decoder.readTextStrings(),

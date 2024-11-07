@@ -5,10 +5,8 @@ package org.xipki.ca.sdk;
 
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.cbor.CborType;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
 
@@ -109,7 +107,7 @@ public class EnrollCertsRequest extends SdkRequest {
   }
 
   public static EnrollCertsRequest decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+    try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("EnrollCertsRequest", decoder, 6);
       EnrollCertsRequest ret = new EnrollCertsRequest();
       ret.setTransactionId(decoder.readTextString());
