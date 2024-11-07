@@ -71,7 +71,7 @@ public abstract class KeypairGenerator implements Closeable {
     }
 
     if (tokens == null) {
-      tokens = new HashSet<>(Arrays.asList("RSA", "EC", "ED25519", "ED448", "X25519", "X448"));
+      tokens = new HashSet<>(Arrays.asList("RSA", "EC", "DSA", "ED25519", "ED448", "X25519", "X448"));
     }
 
     for (String token : tokens) {
@@ -81,6 +81,12 @@ public abstract class KeypairGenerator implements Closeable {
             for (int i = 2; i < 9; i++) {
               keyspecs.add("RSA/" + (i * 1024));
             }
+            break;
+          case "DSA":
+            keyspecs.add("DSA/1024/160");
+            keyspecs.add("DSA/2048/224");
+            keyspecs.add("DSA/2048/256");
+            keyspecs.add("DSA/3072/256");
             break;
           case "EC":
             List<String> curveNames = AlgorithmUtil.getECCurveNames();
@@ -104,6 +110,11 @@ public abstract class KeypairGenerator implements Closeable {
             } else if (token.startsWith("RSA/")) {
               int keysize = Integer.parseInt(token.substring(4));
               keyspecs.add("RSA/" + keysize);
+            } else if (token.startsWith("DSA/")) {
+              String[] strs = token.substring(4).split("/");
+              int pSize = Integer.parseInt(strs[0]);
+              int qSize = Integer.parseInt(strs[1]);
+              keyspecs.add("DSA/" + pSize + "/" + qSize);
             } else {
               keyspecs.add(token);
             }
@@ -130,6 +141,7 @@ public abstract class KeypairGenerator implements Closeable {
    *         Key specification. It has the following format:
    *         <ul>
    *         <li>RSA:   'RSA/'&lt;bit-length&gt; or 'RSA/'&lt;bit-length&gt;</li>
+   *         <li>DSA:   'DSA/'&lt;bit-length of P&gt;'/'&lt;bit-length of Q&gt;</li>
    *         <li>EC:    'EC/'&lt;curve OID&gt;</li>
    *         <li>EdDSA: 'ED25519' or 'ED448'</li>
    *         <li>XDH:   'X25519' or 'X448'</li>

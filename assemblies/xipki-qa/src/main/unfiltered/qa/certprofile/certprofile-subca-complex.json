@@ -13,6 +13,9 @@
 		// RSA
 		"SHA3-512withRSA","SHA3-384withRSA","SHA3-256withRSA","SHA3-224withRSA",
 		"SHA512withRSA","SHA384withRSA","SHA256withRSA","SHA1withRSA",
+		// DSA
+		"SHA3-512withDSA","SHA3-384withDSA","SHA3-256withDSA","SHA3-224withDSA",
+		"SHA512withDSA","SHA384withDSA","SHA256withDSA","SHA1withDSA",
 		// ECDSA
 		"SHA3-512withECDSA","SHA3-384withECDSA","SHA3-256withECDSA","SHA3-224withECDSA",
 		"SHA512withECDSA","SHA384withECDSA","SHA256withECDSA","SHA1withECDSA",
@@ -21,6 +24,8 @@
 		"SHA3-512withRSAandMGF1","SHA3-384withRSAandMGF1","SHA3-256withRSAandMGF1","SHA3-224withRSAandMGF1",
 		"SHA512withRSAandMGF1","SHA384withRSAandMGF1","SHA256withRSAandMGF1","SHA1withRSAandMGF1",
 		"SHAKE128withRSAPSS","SHAKE256withRSAPSS",
+		// Plain ECDSA
+		"SHA512withPlainECDSA","SHA384withPlainECDSA","SHA256withPlainECDSA","SHA1withPlainECDSA",
 		// SM2
 		"SM3withSM2",
 		// Edwards
@@ -34,6 +39,17 @@
 		"parameters":{
 			"rsa":{
 				"modulus":[2048,3072,4096]
+			}
+		}
+	},{
+		"algorithms":[{
+			"oid":"1.2.840.10040.4.1",
+			"description":"DSA"
+		}],
+		"parameters":{
+			"dsa":{
+				"p":[1024,2048,3072],
+				"q":[160,224,256]
 			}
 		}
 	},{

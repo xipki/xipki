@@ -22,6 +22,7 @@ import org.xipki.ca.api.profile.Certprofile.SubjectControl;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionSpec;
 import org.xipki.ca.api.profile.KeyParametersOption;
+import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
 import org.xipki.security.EdECConstants;
@@ -318,6 +319,18 @@ public class CertprofileValidator {
             }
           } else {
             msg.append("unpermitted EC curves are configured, ");
+          }
+        } else if (m.equals(X9ObjectIdentifiers.id_dsa)) {
+          if (opt instanceof DSAParametersOption) {
+            DSAParametersOption dsaOpt = (DSAParametersOption) opt;
+            if (dsaOpt.allowsPlength(2048 - 1)) {
+              msg.append("minimum L (2048) not satisfied, ");
+            }
+            if (dsaOpt.allowsQlength(224 - 1)) {
+              msg.append("minimum N (224) not satisfied, ");
+            }
+          } else {
+            msg.append("unpermitted DSA (p,q) are configured, ");
           }
         } else {
           msg.append("keyAlgorithm ").append(m.getId()).append(" is not permitted, ");

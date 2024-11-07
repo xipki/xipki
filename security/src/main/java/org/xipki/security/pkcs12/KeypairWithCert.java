@@ -24,6 +24,7 @@ import java.security.cert.CertPathBuilderException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.Arrays;
@@ -138,8 +139,8 @@ public class KeypairWithCert {
 
       PrivateKey key = (PrivateKey) keystore.getKey(tmpKeyname, keyPassword);
 
-      if (!(key instanceof RSAPrivateKey || key instanceof ECPrivateKey
-          || key instanceof EdDSAKey || key instanceof XDHKey)) {
+      if (!(key instanceof RSAPrivateKey || key instanceof DSAPrivateKey
+          || key instanceof ECPrivateKey || key instanceof EdDSAKey || key instanceof XDHKey)) {
         throw new XiSecurityException("unsupported key " + key.getClass().getName());
       }
 

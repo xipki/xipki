@@ -229,6 +229,11 @@ public class XijsonCertprofile extends BaseCertprofile {
       } else if (keyType == KeyType.EC) {
         ASN1ObjectIdentifier curveOid = new ASN1ObjectIdentifier(params.get(KeypairGenerationType.PARAM_curve));
         this.keypairGenControl = new KeypairGenControl.ECKeypairGenControl(curveOid, keyAlgOid);
+      } else if (keyType == KeyType.DSA) {
+        int plen = Integer.parseInt(params.get(KeypairGenerationType.PARAM_plength));
+        String tmp = params.get(KeypairGenerationType.PARAM_qlength);
+        int qlen = tmp == null ? 0 : Integer.parseInt(tmp);
+        this.keypairGenControl = new KeypairGenControl.DSAKeypairGenControl(plen, qlen, keyAlgOid);
       } else if (keyType == KeyType.ED25519 || keyType == KeyType.ED448
           || keyType == KeyType.X25519 || keyType == KeyType.X448) {
         this.keypairGenControl = new KeypairGenControl.EDDSAKeypairGenControl(keyAlgOid);

@@ -163,6 +163,7 @@ public class GenerateCerts {
     // RSA: RSA/<key size>
     // EC: EC/<curve name>, curve names are P256, P384, P521, BP256, BP384 and BP512.
     // ED25519, ED448
+    // DSA: DSA/2048, DSA/3072
     private String keyType;
     // CA, TLS-SERVER, TLS-CLIENT, TLSs
     private String certType;
@@ -401,6 +402,14 @@ public class GenerateCerts {
       return P12KeyGenerator.genEdECKeypair(EdECConstants.id_ED25519, null);
     } else if ("ED448".equals(keyType)) {
       return P12KeyGenerator.genEdECKeypair(EdECConstants.id_ED448, null);
+    } else if (keyType.startsWith("DSA")) {
+      int plength = Integer.parseUnsignedInt(keyType, "DSA/".length(), keyType.length(), 10);
+      if (plength == 2048 || plength == 3072) {
+        int qlength = 256;
+        return P12KeyGenerator.genDSAKeypair(plength, qlength, null);
+      } else {
+        throw new InvalidConfException("invalid keyType '" + keyType + "'");
+      }
     } else {
       throw new InvalidConfException("invalid keyType '" + keyType + "'");
     }

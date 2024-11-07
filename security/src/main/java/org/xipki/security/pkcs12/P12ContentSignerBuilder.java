@@ -8,14 +8,17 @@ import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.signers.DSADigestSigner;
+import org.bouncycastle.crypto.signers.DSASigner;
 import org.bouncycastle.crypto.signers.ECDSASigner;
 import org.bouncycastle.crypto.signers.RSADigestSigner;
 import org.bouncycastle.crypto.signers.SM2Signer;
+import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.DSAPlainDigestSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.SignatureSigner;
@@ -37,6 +40,7 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.EllipticCurve;
@@ -78,6 +82,24 @@ public class P12ContentSignerBuilder {
 
   } // class RSAContentSignerBuilder
 
+  private static class DSAContentSignerBuilder extends BcContentSignerBuilder {
+
+    private final SignAlgo signAlgo;
+
+    private DSAContentSignerBuilder(SignAlgo signAlgo) {
+      super(signAlgo.getAlgorithmIdentifier(), signAlgo.getHashAlgo().getAlgorithmIdentifier());
+      this.signAlgo = signAlgo;
+    }
+
+    protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
+        throws OperatorCreationException {
+      signAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
+      Digest dig = signAlgo.getHashAlgo().createDigest();
+      return new DSADigestSigner(new DSASigner(), dig);
+    }
+
+  } // class DSAContentSignerBuilder
+
   private static class ECDSAContentSignerBuilder extends BcContentSignerBuilder {
 
     private final SignAlgo signAlgo;
@@ -92,7 +114,11 @@ public class P12ContentSignerBuilder {
       signAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
 
       Digest dig = signAlgo.getHashAlgo().createDigest();
-      return new DSADigestSigner(new ECDSASigner(), dig);
+      ECDSASigner dsaSigner = new ECDSASigner();
+
+      return signAlgo.isPlainECDSASigAlgo()
+          ? new DSAPlainDigestSigner(dsaSigner, dig)
+          : new DSADigestSigner(dsaSigner, dig);
     }
 
   } // class ECDSAContentSignerBuilder
@@ -222,6 +248,8 @@ public class P12ContentSignerBuilder {
       // Currently, the provider SunEC is much slower (5x) than BC,
       // so we do not use the Signature variant.
       return null;
+    } else if (signAlgo.isDSASigAlgo()) {
+      return "SUN";
     } else if (signAlgo.isEDDSASigAlgo()) {
       return "BC";
     } else {
@@ -251,6 +279,13 @@ public class P12ContentSignerBuilder {
         }
         keyparam = SignerUtil.generateRSAPrivateKeyParameter((RSAPrivateKey) key);
         signerBuilder = new RSAContentSignerBuilder(signAlgo);
+      } else if (key instanceof DSAPrivateKey) {
+        if (!signAlgo.isDSASigAlgo()) {
+          throw new NoSuchAlgorithmException(
+              "the given algorithm is not a valid DSA signature algorithm " + signAlgo);
+        }
+        keyparam = DSAUtil.generatePrivateKeyParameter(key);
+        signerBuilder = new DSAContentSignerBuilder(signAlgo);
       } else if (key instanceof ECPrivateKey) {
         keyparam = ECUtil.generatePrivateKeyParameter(key);
         EllipticCurve curve = ((ECPrivateKey) key).getParams().getCurve();

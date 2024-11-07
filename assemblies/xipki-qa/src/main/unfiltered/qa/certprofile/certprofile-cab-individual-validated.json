@@ -16,6 +16,8 @@
 	"signatureAlgorithms":[
 		// RSA
 		"SHA512withRSA","SHA384withRSA","SHA256withRSA",
+		// DSA
+		"SHA512withDSA","SHA384withDSA","SHA256withDSA",
 		// ECDSA
 		"SHA512withECDSA","SHA384withECDSA","SHA256withECDSA",
 		// RSA-PSS
@@ -29,6 +31,17 @@
 		"parameters":{
 			"rsa":{
 				"modulus":[2048,3072,4096]
+			}
+		}
+	},{
+		"algorithms":[{
+			"oid":"1.2.840.10040.4.1",
+			"description":"DSA"
+		}],
+		"parameters":{
+			"dsa":{
+				"p":[1024,2048,3072],
+				"q":[160,224,256]
 			}
 		}
 	},{

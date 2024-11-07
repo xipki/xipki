@@ -14,6 +14,7 @@ import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
+import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
 import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
@@ -24,6 +25,7 @@ import org.xipki.security.bc.XiRSAContentVerifierProviderBuilder;
 import org.xipki.security.bc.XiXDHContentVerifierProvider;
 import org.xipki.util.Args;
 
+import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateCrtKey;
@@ -72,6 +74,32 @@ public class SignerUtil {
         org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT);
   } // method createPSSRSASigner
 
+  public static byte[] dsaSigToPlain(BigInteger sigR, BigInteger sigS, int orderBitLen) throws XiSecurityException {
+    final int blockSize = (orderBitLen + 7) / 8;
+    int bitLenOfR = Args.notNull(sigR, "sigR").bitLength();
+    int bitLenOfS = Args.notNull(sigS, "sigS").bitLength();
+    int bitLen = Math.max(bitLenOfR, bitLenOfS);
+    if ((bitLen + 7) / 8 > blockSize) {
+      throw new XiSecurityException("signature is too large");
+    }
+
+    byte[] plainSignature = new byte[2 * blockSize];
+    bigIntToBytes(sigR, plainSignature, 0, blockSize);
+    bigIntToBytes(sigS, plainSignature, blockSize, blockSize);
+    return plainSignature;
+  } // method dsaSigToPlain
+
+  private static void bigIntToBytes(BigInteger num, byte[] dest, int destPos, int length) {
+    byte[] bytes = num.toByteArray();
+    if (bytes.length == length) {
+      System.arraycopy(bytes, 0, dest, destPos, length);
+    } else if (bytes.length < length) {
+      System.arraycopy(bytes, 0, dest, destPos + length - bytes.length, bytes.length);
+    } else {
+      System.arraycopy(bytes, bytes.length - length, dest, destPos, length);
+    }
+  } // method bigIntToBytes
+
   public static ContentVerifierProvider getContentVerifierProvider(
       PublicKey publicKey, DHSigStaticKeyCertPair ownerKeyAndCert) throws InvalidKeyException {
     String keyAlg = Args.notNull(publicKey, "publicKey").getAlgorithm().toUpperCase();
@@ -90,6 +118,9 @@ public class SignerUtil {
       switch (keyAlg) {
         case "RSA":
           builder = new XiRSAContentVerifierProviderBuilder();
+          break;
+        case "DSA":
+          builder = new BcDSAContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
           break;
         case "EC":
         case "ECDSA":

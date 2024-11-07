@@ -18,15 +18,19 @@ if { "$1" equals "" | "$1" equals "help" } then {
     KEYSPEC =$4
   }
 
-  argsValid = $([rsa rsapss ec sm2] contains $SIG_TYPE)
+  argsValid = $([rsa rsapss ec plainec dsa sm2] contains $SIG_TYPE)
   if { "$argsValid" equals "false" } then {
     errMsg = "invalid SIG_TYPE $SIG_TYPE"
   }
 
   if { "$argsValid" equals "true" } then {
-    if { "$SIG_TYPE" equals "sm2" } then {
+    if { "$SIG_TYPE" equals "plainec" } then {
+      argsValid = $([sha1 sha256 sha384 sha512] contains $HASH)
+    } elif { "$SIG_TYPE" equals "sm2" } then {
       argsValid = $([sm3] contains $HASH)
     } elif { "$SIG_TYPE" equals "rsa" } then {
+      argsValid = $([sha1 sha256 sha384 sha512 sha3-224 sha3-256 sha3-384 sha3-512] contains $HASH)
+    } elif { "$SIG_TYPE" equals "dsa" } then {
       argsValid = $([sha1 sha256 sha384 sha512 sha3-224 sha3-256 sha3-384 sha3-512] contains $HASH)
     } else {
       # ec and rsapss
@@ -57,9 +61,10 @@ if { "$printUsage" equals "true" } then {
   echo "                     sha3-224, sha3-256, sha3-384, sha3-512"
   echo "                     shake128, shake256 (for signature types rsapss and ec)"
   echo "                     sm3 (for signature type sm2)"
-  echo "    signature type:  rsa, rsapss, ec, sm2"
-  echo "    keyspec:         keysize for signature types rsa, and rsapss,"
-  echo "                     curve name for signature types ec"
+  echo "                     The sha3 algorithms are not for plainec."
+  echo "    signature type:  rsa, rsapss, ec, plainec, dsa, sm2"
+  echo "    keyspec:         keysize for signature types rsa, rsapss and dsa,"
+  echo "                     curve name for signature types ec and plainec"
   echo "options"
   echo "    -l               configure CAs using command 'load-conf'"
 } else {
@@ -71,6 +76,16 @@ if { "$printUsage" equals "true" } then {
     qa/qa.d/ca-load.script
 
   xi:copy-file -f qa/qa.d/template.ca.script \
+    qa/qa.d/ca.script
+
+  dsaPlain = ""
+
+  if { "$SIG_TYPE" equals "plainec" } then {
+    dsaPlain = "--dsa-plain"
+  }
+
+  xi:replace --old "REPLACEME-DSAPLAIN" --new "${dsaPlain}" \
+    qa/qa.d/ca-load.script \
     qa/qa.d/ca.script
 
   rsaPss = ""
@@ -196,7 +211,7 @@ if { "$printUsage" equals "true" } then {
     --permission all \
     --max-validity 5y \
     --sn-len 20  \
-    --signer-type pkcs12 \
+    --signer-type $TOKEN_TYPE \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --crl-uri "http://localhost:8081/crl/?type=crl&name=subca1" \
     --ca-cert-uri http://myorg.org/subca1.der \
@@ -206,7 +221,7 @@ if { "$printUsage" equals "true" } then {
     --permission all \
     --sn-len 20  \
     --max-validity 10y \
-    --signer-type pkcs12 \
+    --signer-type $TOKEN_TYPE \
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://myorg.org/rootca1.der \
@@ -223,7 +238,7 @@ if { "$printUsage" equals "true" } then {
     --permission all \
     --sn-len 20 \
     --max-validity 5y \
-    --signer-type pkcs12 \
+    --signer-type $TOKEN_TYPE \
     --cert output/subca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --crl-uri "http://localhost:8081/crl/?type=crl&name=subca1" \
@@ -245,7 +260,7 @@ if { "$printUsage" equals "true" } then {
     --permission revoke_cert \
     --max-validity 8y \
     --sn-len 20  \
-    --signer-type pkcs12 \
+    --signer-type $TOKEN_TYPE \
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
     --ca-cert-uri http://myorg.org/rootca1-2.der \
@@ -271,7 +286,7 @@ if { "$printUsage" equals "true" } then {
     --sn-len 20  \
     --next-crl-no 2 \
     --max-validity 10y \
-    --signer-type pkcs12 \
+    --signer-type $TOKEN_TYPE \
     --signer-conf $CA_SIGNER_CONF_RCA \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://myorg.org/rootca1.der \
@@ -287,7 +302,7 @@ if { "$printUsage" equals "true" } then {
     --sn-len 20  \
     --next-crl-no 2 \
     --max-validity 10y \
-    --signer-type pkcs12 \
+    --signer-type $TOKEN_TYPE \
     --signer-conf $CA_SIGNER_CONF_RCA \
     --cert output/subca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
@@ -302,7 +317,7 @@ if { "$printUsage" equals "true" } then {
     --sn-len 20  \
     --next-crl-no 2 \
     --max-validity 10y \
-    --signer-type pkcs12 \
+    --signer-type $TOKEN_TYPE \
     --signer-conf $CA_SIGNER_CONF_RCA \
     --cert output/subca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
@@ -318,7 +333,7 @@ if { "$printUsage" equals "true" } then {
     --sn-len 21  \
     --next-crl-no 2 \
     --max-validity 10y \
-    --signer-type pkcs12 \
+    --signer-type $TOKEN_TYPE \
     --signer-conf $CA_SIGNER_CONF_RCA \
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
@@ -333,7 +348,7 @@ if { "$printUsage" equals "true" } then {
     --sn-len 20  \
     --next-crl-no 2 \
     --max-validity 10y \
-    --signer-type pkcs12 \
+    --signer-type $TOKEN_TYPE \
     --signer-conf $CA_SIGNER_CONF_RCA \
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \

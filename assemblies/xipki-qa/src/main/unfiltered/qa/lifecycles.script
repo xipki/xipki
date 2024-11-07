@@ -1,6 +1,6 @@
 outform = pem
 
-keytypes = [rsa ec sm2]; each ($keytypes) {
+keytypes = [rsa ec sm2 dsa]; each ($keytypes) {
   keytype = $it
 
   if { "$keytype" equals "sm2" } then {

@@ -41,6 +41,7 @@ import org.xipki.qa.ValidationResult;
 import org.xipki.qa.ca.CaEnrollBenchEntry;
 import org.xipki.qa.ca.CaEnrollBenchEntry.RandomDn;
 import org.xipki.qa.ca.CaEnrollBenchKeyEntry;
+import org.xipki.qa.ca.CaEnrollBenchKeyEntry.DSAKeyEntry;
 import org.xipki.qa.ca.CaEnrollBenchKeyEntry.ECKeyEntry;
 import org.xipki.qa.ca.CaEnrollBenchKeyEntry.RSAKeyEntry;
 import org.xipki.qa.ca.CaEnrollBenchmark;
@@ -288,11 +289,11 @@ public class QaCaActions {
   @Service
   public static class BenchmarkEnroll extends AbstractBenchmarkEnroll {
 
-    @Completion(value = StringsCompleter.class, values = {"RSA", "EC"})
+    @Completion(value = StringsCompleter.class, values = {"RSA", "EC", "DSA"})
     @Option(name = "--key-type", description = "key type to be requested")
     private String keyType = "RSA";
 
-    @Option(name = "--key-size", description = "modulus length of RSA key")
+    @Option(name = "--key-size", description = "modulus length of RSA key or p length of DSA key")
     private Integer keysize = 2048;
 
     @Option(name = "--curve", description = "EC curve name or OID of EC key")
@@ -330,6 +331,8 @@ public class QaCaActions {
         keyEntry = new ECKeyEntry(curveOid, !newKey);
       } else if ("RSA".equalsIgnoreCase(keyType)) {
         keyEntry = new RSAKeyEntry(keysize, !newKey);
+      } else if ("DSA".equalsIgnoreCase(keyType)) {
+        keyEntry = new DSAKeyEntry(keysize, !newKey);
       } else {
         throw new IllegalCmdParamException("invalid keyType " + keyType);
       }

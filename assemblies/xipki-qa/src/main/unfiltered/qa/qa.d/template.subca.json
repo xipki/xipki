@@ -67,7 +67,7 @@
 			"tls:tls-alias1,tls-alias2",
 			"tls-c",
 			"fixed-partial-subject",
-                        "tls-ec", "tls-ed25519", "tls-rsa", "tls-sm2"
+			"tls-dsa", "tls-ec", "tls-ed25519", "tls-rsa", "tls-sm2"
 		],
 		"publishers":[
 			"ocsp-publisher"

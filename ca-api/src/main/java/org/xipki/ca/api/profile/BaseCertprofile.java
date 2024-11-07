@@ -26,6 +26,7 @@ import org.bouncycastle.math.ec.ECCurve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.profile.KeyParametersOption.AllowAllParametersOption;
+import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
 import org.xipki.pki.BadCertTemplateException;
@@ -47,6 +48,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -305,6 +307,31 @@ public abstract class BaseCertprofile extends Certprofile {
 
       int modulusLength = modulus.getPositiveValue().bitLength();
       if ((rsaOption.allowsModulusLength(modulusLength))) {
+        return publicKey;
+      }
+    } else if (keyParamsOption instanceof DSAParametersOption) {
+      DSAParametersOption dsaOption = (DSAParametersOption) keyParamsOption;
+      ASN1Encodable params = Optional.ofNullable(publicKey.getAlgorithm().getParameters())
+          .orElseThrow(() -> new BadCertTemplateException("null Dss-Params is not permitted"));
+
+      int plength;
+      int qlength;
+      try {
+        ASN1Sequence seq = ASN1Sequence.getInstance(params);
+        ASN1Integer rsaP = ASN1Integer.getInstance(seq.getObjectAt(0));
+        ASN1Integer rsaQ = ASN1Integer.getInstance(seq.getObjectAt(1));
+        plength = rsaP.getPositiveValue().bitLength();
+        qlength = rsaQ.getPositiveValue().bitLength();
+      } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException ex) {
+        throw new BadCertTemplateException("illegal Dss-Params");
+      }
+
+      boolean match = dsaOption.allowsPlength(plength);
+      if (match) {
+        match = dsaOption.allowsQlength(qlength);
+      }
+
+      if (match) {
         return publicKey;
       }
     } else {

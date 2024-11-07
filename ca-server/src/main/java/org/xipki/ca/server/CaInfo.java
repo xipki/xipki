@@ -3,7 +3,10 @@
 
 package org.xipki.ca.server;
 
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -142,6 +145,11 @@ public class CaInfo {
     } else if (caKeyAlgOid.equals(X9ObjectIdentifiers.id_ecPublicKey)) {
       ASN1ObjectIdentifier curveOid = ASN1ObjectIdentifier.getInstance(caKeyAlgId.getParameters());
       caKeyspec = "EC/" + curveOid.getId();
+    } else if (caKeyAlgOid.equals(X9ObjectIdentifiers.id_dsa)) {
+      ASN1Sequence seq = DERSequence.getInstance(caKeyAlgId.getParameters());
+      BigInteger p = ASN1Integer.getInstance(seq.getObjectAt(0)).getValue();
+      BigInteger q = ASN1Integer.getInstance(seq.getObjectAt(1)).getValue();
+      caKeyspec = "DSA/" + p.bitLength() + "/" + q.bitLength();
     } else if (caKeyAlgOid.equals(EdECConstants.id_ED25519)) {
       caKeyspec = "ED25519";
     } else if (caKeyAlgOid.equals(EdECConstants.id_ED448)) {

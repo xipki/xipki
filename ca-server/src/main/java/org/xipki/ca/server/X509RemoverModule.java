@@ -81,8 +81,8 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
 
   private ScheduledFuture<?> expiredCertsRemover;
 
-  X509RemoverModule(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore,
-                    X509PublisherModule publisherModule) {
+  public X509RemoverModule(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore,
+                           X509PublisherModule publisherModule) {
     super(caInfo);
 
     this.caIdNameMap = caManager.idNameMap();

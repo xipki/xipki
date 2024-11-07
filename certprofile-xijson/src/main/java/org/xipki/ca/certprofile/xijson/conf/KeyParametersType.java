@@ -23,6 +23,58 @@ import java.util.List;
 
 public class KeyParametersType extends ValidableConf {
 
+  public static class DsaParametersType extends ValidableConf {
+
+    private List<Integer> p;
+
+    private List<Integer> q;
+
+    public List<Integer> getP() {
+      return p;
+    }
+
+    public void setP(List<Integer> p) {
+      this.p = p;
+    }
+
+    public List<Integer> getQ() {
+      return q;
+    }
+
+    public void setQ(List<Integer> q) {
+      this.q = q;
+    }
+
+    @Deprecated
+    public void setPlengths(List<Range> plengths) {
+      if (CollectionUtil.isNotEmpty(plengths)) {
+        this.p = new LinkedList<>();
+        for (Range r : plengths) {
+          for (int i = r.getMin(); i < r.getMax(); i++) {
+            this.p.add(i);
+          }
+        }
+      }
+    }
+
+    @Deprecated
+    public void setQlengths(List<Range> qlengths) {
+      if (CollectionUtil.isNotEmpty(qlengths)) {
+        this.q = new LinkedList<>();
+        for (Range r : qlengths) {
+          for (int i = r.getMin(); i < r.getMax(); i++) {
+            this.q.add(i);
+          }
+        }
+      }
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+    }
+
+  } // class DsaParametersType
+
   public static class EcParametersType extends ValidableConf {
 
     private List<DescribableOid> curves;
@@ -87,9 +139,19 @@ public class KeyParametersType extends ValidableConf {
     }
   } // class RsaParametersType
 
+  private DsaParametersType dsa;
+
   private EcParametersType ec;
 
   private RsaParametersType rsa;
+
+  public DsaParametersType getDsa() {
+    return dsa;
+  }
+
+  public void setDsa(DsaParametersType dsa) {
+    this.dsa = dsa;
+  }
 
   public EcParametersType getEc() {
     return ec;
@@ -123,6 +185,11 @@ public class KeyParametersType extends ValidableConf {
       KeyParametersOption.RSAParametersOption option = new KeyParametersOption.RSAParametersOption();
       option.setModulusLengths(rsa.getModulus());
       return option;
+    } else if (dsa != null) {
+      KeyParametersOption.DSAParametersOption option = new KeyParametersOption.DSAParametersOption();
+      option.setPlengths(dsa.getP());
+      option.setQlengths(dsa.getQ());
+      return option;
     } else {
       return KeyParametersOption.ALLOW_ALL;
     }
@@ -142,7 +209,7 @@ public class KeyParametersType extends ValidableConf {
 
   @Override
   public void validate() throws InvalidConfException {
-    validate(ec, rsa);
+    validate(dsa, ec, rsa);
   } // method validate
 
 }

@@ -37,6 +37,7 @@ if { "$printUsage" equals "true" } then {
   echo "    keyspec:         25519, 448"
 } else {
   echo "========================================================"
+  echo "TOKEN_TYPE: $TOKEN_TYPE"
   echo "KEYSPEC:    $KEYSPEC"
   echo "SIGALGO:    $SIGALGO"
   echo "========================================================"

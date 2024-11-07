@@ -10,7 +10,7 @@ if { "$1" equals "" | "$1" equals "help" } then {
   SIG_TYPE = $2
   KEYSPEC = $3
 
-  argsValid = $([rsa rsapss ec] contains $SIG_TYPE)
+  argsValid = $([rsa rsapss ec dsa] contains $SIG_TYPE)
 
   if { "$argsValid" equals "false" } then {
     errMsg = "invalid SIG_TYPE $SIG_TYPE"
@@ -36,8 +36,8 @@ if { $printUsage equals "true" } then {
   echo ""
   echo "source file:./qa/cab/lifecycle.script <hash algo> <signature type> [<keyspec>]"
   echo "    hash algo:       sha256, sha384, sha512"
-  echo "    signature type:  rsa, rsapss, ec"
-  echo "    keyspec:         keysize for signature types rsa, and rsapss,"
+  echo "    signature type:  rsa, rsapss, ec, dsa"
+  echo "    keyspec:         keysize for signature types rsa, rsaPSS and DSA,"
   echo "                     curve name for signature types ec"
 } else {
   source file:./qa/qa.d/prepare-keys.script

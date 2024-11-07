@@ -40,6 +40,33 @@ public class KeyParametersOption {
 
   } // class RSAParametersOption
 
+  public static class DSAParametersOption extends KeyParametersOption {
+
+    private Set<Integer> plengths;
+
+    private Set<Integer> qlengths;
+
+    public DSAParametersOption() {
+    }
+
+    public void setPlengths(Collection<Integer> plengths) {
+      this.plengths = CollectionUtil.isEmpty(plengths) ? null : new HashSet<>(plengths);
+    }
+
+    public void setQlengths(Collection<Integer> qlengths) {
+      this.qlengths = CollectionUtil.isEmpty(qlengths) ? null : new HashSet<>(qlengths);
+    }
+
+    public boolean allowsPlength(int plength) {
+      return plengths == null || plengths.contains(plength);
+    }
+
+    public boolean allowsQlength(int qlength) {
+      return qlengths == null || qlengths.contains(qlength);
+    }
+
+  } // class DSAParametersOption
+
   public static class ECParamatersOption extends KeyParametersOption {
 
     private Set<ASN1ObjectIdentifier> curveOids;

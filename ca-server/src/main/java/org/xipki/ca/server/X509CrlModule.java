@@ -200,8 +200,8 @@ public class X509CrlModule extends X509CaModule implements Closeable {
 
   private final X509PublisherModule publisher;
 
-  X509CrlModule(CaManagerImpl caManager, CaInfo caInfo,
-                CertStore certstore, X509PublisherModule publisher)
+  public X509CrlModule(CaManagerImpl caManager, CaInfo caInfo,
+                       CertStore certstore, X509PublisherModule publisher)
       throws OperationException {
     super(caInfo);
 

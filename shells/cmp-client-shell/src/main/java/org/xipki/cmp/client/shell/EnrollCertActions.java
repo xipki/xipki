@@ -579,8 +579,12 @@ public class EnrollCertActions {
             + "(only applied to RSA key)")
     private Boolean rsaPss = Boolean.FALSE;
 
+    @Option(name = "--dsa-plain", description = "whether to use the Plain DSA for the POP computation\n"
+            + "(only applied to DSA and ECDSA key)")
+    private Boolean dsaPlain = Boolean.FALSE;
+
     protected SignatureAlgoControl getSignatureAlgoControl() {
-      return new SignatureAlgoControl(rsaPss);
+      return new SignatureAlgoControl(rsaPss, dsaPlain);
     }
 
     protected abstract ConcurrentContentSigner getSigner()
