@@ -300,7 +300,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
 
     // Extensions - tlsFeature
-    list.add(createExtension(Extn.id_pe_tlsfeature, true, false));
+    list.add(createExtension(Extn.id_pe_tlsfeature, true, true));
     last(list).setTlsFeature(
         createTlsFeature(TlsExtensionType.STATUS_REQUEST, TlsExtensionType.CLIENT_CERTIFICATE_URL));
 
@@ -504,7 +504,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
 
     // Extensions - tlsFeature
-    list.add(createExtension(Extn.id_pe_tlsfeature, true, false));
+    list.add(createExtension(Extn.id_pe_tlsfeature, true, true));
     last(list).setTlsFeature(createTlsFeature(
         TlsExtensionType.STATUS_REQUEST, TlsExtensionType.CLIENT_CERTIFICATE_URL));
 

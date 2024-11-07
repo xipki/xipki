@@ -81,4 +81,14 @@ public enum KeyUsage {
     throw new IllegalArgumentException("invalid KeyUsage(bit) " + bit);
   }
 
+  public static KeyUsage getKeyUsageFromBcUsage(int bcUsage) {
+    for (KeyUsage ku : KeyUsage.values()) {
+      if (ku.bcUsage == bcUsage) {
+        return ku;
+      }
+    }
+
+    throw new IllegalArgumentException("invalid KeyUsage(bcUsage) " + bcUsage);
+  }
+
 }

@@ -132,7 +132,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
 
   private final String SQL_ADD_CERT;
 
-  private static final String SQL_REVOKE_CERT = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RR=? WHERE ID=?";
+  private static final String SQL_REVOKE_CERT = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
 
   private static final String SQL_REVOKE_SUSPENDED_CERT = "UPDATE CERT SET LUPDATE=?,RR=? WHERE ID=?";
 
@@ -194,13 +194,13 @@ public class DbCertStore extends QueryExecutor implements CertStore {
 
     this.idGenerator = Args.notNull(idGenerator, "idGenerator");
 
-    this.sqlCertForId = buildSelectFirstSql("PID,RID,REV,RR,RT,CERT FROM CERT WHERE ID=?");
-    this.sqlCertWithRevInfo = buildSelectFirstSql("ID,REV,RR,RT,PID,CERT FROM CERT WHERE CA_ID=? AND SN=?");
+    this.sqlCertForId = buildSelectFirstSql("PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE ID=?");
+    this.sqlCertWithRevInfo = buildSelectFirstSql("ID,REV,RR,RT,RIT,PID,CERT FROM CERT WHERE CA_ID=? AND SN=?");
     this.sqlCertWithRevInfoBySubjectAndSan = buildSelectFirstSql("NBEFORE DESC",
-        "ID,NBEFORE,REV,RR,RT,PID,CERT FROM CERT WHERE CA_ID=? AND FP_S=? AND FP_SAN=?");
+        "ID,NBEFORE,REV,RR,RT,RIT,PID,CERT FROM CERT WHERE CA_ID=? AND FP_S=? AND FP_SAN=?");
 
     this.sqlCertIdByCaSn = buildSelectFirstSql("ID FROM CERT WHERE CA_ID=? AND SN=?");
-    this.sqlCertInfo = buildSelectFirstSql("PID,RID,REV,RR,RT,CERT FROM CERT WHERE CA_ID=? AND SN=?");
+    this.sqlCertInfo = buildSelectFirstSql("PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE CA_ID=? AND SN=?");
     this.sqlCertStatusForSubjectFp = buildSelectFirstSql("REV FROM CERT WHERE FP_S=? AND CA_ID=?");
     this.sqlCrl = buildSelectFirstSql("THISUPDATE DESC", "THISUPDATE,CRL FROM CRL WHERE CA_ID=?");
     this.sqlCrlWithNo = buildSelectFirstSql("THISUPDATE DESC",
@@ -541,6 +541,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
               + currentReason.getDescription());
         } else {
           revInfo.setRevocationTime(currentRevInfo.getRevocationTime());
+          revInfo.setInvalidityTime(currentRevInfo.getInvalidityTime());
         }
       } else if (!force) {
         throw new OperationException(CERT_REVOKED,
@@ -548,10 +549,15 @@ public class DbCertStore extends QueryExecutor implements CertStore {
       }
     }
 
+    Long invTimeSeconds = null;
+    if (revInfo.getInvalidityTime() != null) {
+      invTimeSeconds = revInfo.getInvalidityTime().getEpochSecond();
+    }
+
     int count = execUpdatePrepStmt0(SQL_REVOKE_CERT,
         col2Long(Instant.now().getEpochSecond()), col2Bool(true),
         col2Long(revInfo.getRevocationTime().getEpochSecond()), // revTimeSeconds
-        col2Int(revInfo.getReason().getCode()),
+        col2Long(invTimeSeconds), col2Int(revInfo.getReason().getCode()),
         col2Long(certWithRevInfo.getCert().getCertId())); // certId
     if (count != 1) {
       String message = (count > 1) ? count + " rows modified, but exactly one is expected"
@@ -624,9 +630,9 @@ public class DbCertStore extends QueryExecutor implements CertStore {
     }
 
     SqlColumn2 nullInt = new SqlColumn2(ColumnType.INT, null);
-    int count = execUpdatePrepStmt0("UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RR=? WHERE ID=?",
+    int count = execUpdatePrepStmt0("UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?",
         col2Long(Instant.now().getEpochSecond()), // currentTimeSeconds
-        col2Bool(false), nullInt, nullInt,
+        col2Bool(false), nullInt, nullInt, nullInt,
         col2Long(certWithRevInfo.getCert().getCertId())); // certId
 
     if (count != 1) {
@@ -1007,7 +1013,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
 
     String sql = cacheSqlRevokedCerts.get(numEntries);
     if (sql == null) {
-      String coreSql = "ID,SN,RR,RT FROM CERT WHERE ID>? AND CA_ID=? AND REV=1 AND NAFTER>?";
+      String coreSql = "ID,SN,RR,RT,RIT FROM CERT WHERE ID>? AND CA_ID=? AND REV=1 AND NAFTER>?";
       sql = datasource.buildSelectFirstSql(numEntries, "ID ASC", coreSql);
       cacheSqlRevokedCerts.put(numEntries, sql);
     }
@@ -1017,9 +1023,11 @@ public class DbCertStore extends QueryExecutor implements CertStore {
 
     List<CertRevInfoWithSerial> ret = new LinkedList<>();
     for (ResultRow rs : rows) {
+      long revInvalidityTime = rs.getLong("RIT");
+      Instant invalidityTime = (revInvalidityTime == 0) ? null : Instant.ofEpochSecond(revInvalidityTime);
       CertRevInfoWithSerial revInfo = new CertRevInfoWithSerial(rs.getLong("ID"),
           new BigInteger(rs.getString("SN"), 16), rs.getInt("RR"), // revReason
-          Instant.ofEpochSecond(rs.getLong("RT")));
+          Instant.ofEpochSecond(rs.getLong("RT")), invalidityTime);
       ret.add(revInfo);
     }
 
@@ -1080,7 +1088,8 @@ public class DbCertStore extends QueryExecutor implements CertStore {
             while (rs.next()) {
               ret.add(new CertRevInfoWithSerial(0L, new BigInteger(rs.getString("SN"), 16),
                   CrlReason.REMOVE_FROM_CRL, // reason
-                  Instant.ofEpochSecond(rs.getLong("LUPDATE")))); //revocationTime,
+                  Instant.ofEpochSecond(rs.getLong("LUPDATE")), //revocationTime,
+                  null)); // invalidityTime
             }
           } finally {
             datasource.releaseResources(null, rs);
@@ -1105,7 +1114,8 @@ public class DbCertStore extends QueryExecutor implements CertStore {
           try {
             if (rs.next()) {
               ret.add(new CertRevInfoWithSerial(0L, sn, CrlReason.REMOVE_FROM_CRL,
-                  Instant.ofEpochSecond(rs.getLong("LUPDATE")))); //revocationTime,
+                  Instant.ofEpochSecond(rs.getLong("LUPDATE")), //revocationTime,
+                  null)); // invalidityTime
             }
           } finally {
             datasource.releaseResources(null, rs);
@@ -1122,7 +1132,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
     // we check all revoked certificates with LUPDATE field (last update) > THISUPDATE - 1.
     final int numEntries = 1000;
 
-    String coreSql = "ID,SN,RR,RT FROM CERT WHERE ID>? AND CA_ID=? AND REV=1 AND NAFTER>? AND LUPDATE>?";
+    String coreSql = "ID,SN,RR,RT,RIT FROM CERT WHERE ID>? AND CA_ID=? AND REV=1 AND NAFTER>? AND LUPDATE>?";
     String sql = datasource.buildSelectFirstSql(numEntries, "ID ASC", coreSql);
     ps = prepareStatement(sql);
     long startId = 1;
@@ -1155,8 +1165,10 @@ public class DbCertStore extends QueryExecutor implements CertStore {
               continue;
             }
 
+            long revInvalidityTime = rs.getLong("RIT");
+            Instant invalidityTime = (revInvalidityTime == 0) ? null : Instant.ofEpochSecond(revInvalidityTime);
             CertRevInfoWithSerial revInfo = new CertRevInfoWithSerial(id, sn,
-                rs.getInt("RR"), Instant.ofEpochSecond(rs.getLong("RT")));
+                rs.getInt("RR"), Instant.ofEpochSecond(rs.getLong("RT")), invalidityTime);
             ret.add(revInfo);
           }
 
@@ -1240,9 +1252,11 @@ public class DbCertStore extends QueryExecutor implements CertStore {
       return null;
     }
 
-    long revTime = rs.getLong("RT");
+    long revTime    = rs.getLong("RT");
+    long revInvTime = rs.getLong("RIT");
 
-    return new CertRevocationInfo(rs.getInt("RR"), Instant.ofEpochSecond(revTime));
+    Instant invalidityTime = (revInvTime == 0) ? null : Instant.ofEpochSecond(revInvTime);
+    return new CertRevocationInfo(rs.getInt("RR"), Instant.ofEpochSecond(revTime), invalidityTime);
   }
 
   private long getMax(String table, String column) throws OperationException {

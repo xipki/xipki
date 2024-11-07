@@ -35,6 +35,8 @@ if { $SIG_TYPE equals "rsa" } then {
 
 CMP_SIGALGO = "SHA256withECDSA"
 
+xi:copy-dir qa/p12/shared output
+
 xi:copy-dir qa/p12/${KEY_DIR} output
 
 if { "$KEYSPEC" equals "" } then {

@@ -28,7 +28,9 @@
 			// in case of ignore and forbidded, maxLen and minLen will be ignored.
 			"occurrence":"optional"
 		},
+		"signatureRequired":false,
 		"supportsHttpGet":true,
+		"validateSignature":false,
 		"versions":["v1"]
 	}],
 	"responders":[{
@@ -44,6 +46,8 @@
 	"responseOptions":[{
 		"name":"response1",
 		"embedCertsMode":"SIGNER",
+		"includeCerthash":false,
+		"includeInvalidityDate":false,
 		"includeRevReason":true,
 		"responderIdByName":true
 	}],
@@ -58,6 +62,9 @@
 		"name":"store1",
 		"ignoreExpiredCert":true,
 		"ignoreNotYetValidCert":true,
+		"includeArchiveCutoff":false,
+		"includeCrlId":false,
+		"retentionInterval":-1,
 		"minNextUpdatePeriod":"1d",
 		"unknownCertBehaviour":"good",
 		"updateInterval":"10m",

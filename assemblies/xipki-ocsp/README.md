@@ -1,7 +1,7 @@
 Deployment in Tomcat (8, 9 and 10)
 ----
 1. (Optional) If you use OCSP store type other than `xipki-ca-db`, 
-   (namely `xipki-db`, and `crl`):  
+   (namely `xipki-db`, `ejbca-db`, and `crl`):  
    Overwrite the `ocsp-responder.json` in `tomcat/xipki/etc/ocsp/` from the sub-folder in 
    `tomca/xipki/etc/ocsp/example`.
 2. Adapt the configuration file `tomcat/xipki/etc/ocsp-responder.json`.

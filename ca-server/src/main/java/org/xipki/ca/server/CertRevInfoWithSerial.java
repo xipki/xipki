@@ -26,17 +26,20 @@ public class CertRevInfoWithSerial implements Comparable<CertRevInfoWithSerial> 
 
   private Instant revocationTime;
 
+  private final Instant invalidityTime;
+
   public CertRevInfoWithSerial(long id, BigInteger serial, CrlReason reason,
-                               Instant revocationTime) {
+                               Instant revocationTime, Instant invalidityTime) {
     this.reason = Args.notNull(reason, "reason");
     this.revocationTime = Args.notNull(revocationTime, "revocationTime");
+    this.invalidityTime = invalidityTime;
     this.id = id;
     this.serial = Args.notNull(serial, "serial");
   } // method constructor
 
   public CertRevInfoWithSerial(long id, BigInteger serial, int reasonCode,
-                               Instant revocationTime) {
-    this(id, serial, CrlReason.forReasonCode(reasonCode), revocationTime);
+                               Instant revocationTime, Instant invalidityTime) {
+    this(id, serial, CrlReason.forReasonCode(reasonCode), revocationTime, invalidityTime);
   } // method constructor
 
   public BigInteger getSerial() {
@@ -60,6 +63,14 @@ public class CertRevInfoWithSerial implements Comparable<CertRevInfoWithSerial> 
       revocationTime = Instant.now();
     }
     return revocationTime;
+  }
+
+  /**
+   * Get the invalidity time.
+   * @return invalidity time, may be null
+   */
+  public Instant getInvalidityTime() {
+    return invalidityTime;
   }
 
   @Override

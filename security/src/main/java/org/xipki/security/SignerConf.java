@@ -65,6 +65,10 @@ public class SignerConf {
     confPairs.putPair(name, value);
   }
 
+  public void removeConfEntry(String name) {
+    confPairs.removePair(name);
+  }
+
   public String getConfValue(String name) {
     return confPairs.value(name);
   }

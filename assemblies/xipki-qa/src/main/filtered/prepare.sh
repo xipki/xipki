@@ -45,7 +45,7 @@ WDIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 echo "working dir: ${WDIR}"
 
 # Test base dir
-TBDIR=~/test/xipki
+TBDIR=~/test/pqtrust/pki
 
 mkdir -p $TBDIR
 cd $TBDIR

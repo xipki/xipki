@@ -492,18 +492,43 @@ public class X509CrlModule extends X509CaModule implements Closeable {
           }
 
           Instant revocationTime = revInfo.getRevocationTime();
+          Instant invalidityTime = revInfo.getInvalidityTime();
+
+          switch (crlControl.getInvalidityDateMode()) {
+            case forbidden:
+              invalidityTime = null;
+              break;
+            case optional:
+              break;
+            case required:
+              if (invalidityTime == null) {
+                invalidityTime = revocationTime;
+              }
+              break;
+            default:
+              throw new IllegalStateException("unknown TripleState " + crlControl.getInvalidityDateMode());
+          }
 
           BigInteger serial = revInfo.getSerial();
           LOG.debug("added cert ca={} serial={} to CRL", caIdent, serial);
 
           if (!indirectCrl || !isFirstCrlEntry) {
-            crlBuilder.addCRLEntry(serial, Date.from(revocationTime), reason.getCode());
+            if (invalidityTime != null) {
+              crlBuilder.addCRLEntry(serial, Date.from(revocationTime),
+                  reason.getCode(), Date.from(invalidityTime));
+            } else {
+              crlBuilder.addCRLEntry(serial, Date.from(revocationTime), reason.getCode());
+            }
             continue;
           }
 
           List<Extension> extensions = new ArrayList<>(3);
           if (reason != CrlReason.UNSPECIFIED) {
             Extension ext = createReasonExtension(reason.getCode());
+            extensions.add(ext);
+          }
+          if (invalidityTime != null) {
+            Extension ext = createInvalidityDateExtension(invalidityTime);
             extensions.add(ext);
           }
 

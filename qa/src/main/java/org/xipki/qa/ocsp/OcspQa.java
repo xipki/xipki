@@ -3,6 +3,10 @@
 
 package org.xipki.qa.ocsp;
 
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
+import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.ocsp.ResponderID;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -34,6 +38,7 @@ import org.xipki.util.DateUtil;
 import org.xipki.util.TripleState;
 
 import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.time.Instant;
@@ -291,7 +296,8 @@ public class OcspQa {
       }
 
       List<ValidationIssue> issues = checkSingleCert(i, singleResp, issuerHash, expectedStatus,
-          encodedCert, expectedRevTime, extendedRevoke, responseOption.getNextUpdateOccurrence());
+          encodedCert, expectedRevTime, extendedRevoke, responseOption.getNextUpdateOccurrence(),
+          responseOption.getCerthashOccurrence(), responseOption.getCerthashAlg());
       resultIssues.addAll(issues);
     } // end for
 
@@ -300,7 +306,12 @@ public class OcspQa {
 
   private List<ValidationIssue> checkSingleCert(int index, SingleResp singleResp,
       IssuerHash issuerHash, OcspCertStatus expectedStatus, byte[] encodedCert,
-      Instant expectedRevTime, boolean extendedRevoke, TripleState nextupdateOccurrence) {
+      Instant expectedRevTime, boolean extendedRevoke, TripleState nextupdateOccurrence,
+      TripleState certhashOccurrence, HashAlgo certhashAlg) {
+    if (expectedStatus == OcspCertStatus.unknown || expectedStatus == OcspCertStatus.issuerUnknown) {
+      certhashOccurrence = TripleState.forbidden;
+    }
+
     List<ValidationIssue> issues = new LinkedList<>();
 
     // issuer hash
@@ -404,6 +415,48 @@ public class OcspQa {
     Instant nextUpdate = (d == null) ? null : d.toInstant();
     issue = checkOccurrence("OCSP.RESPONSE." + index + ".NEXTUPDATE", nextUpdate, nextupdateOccurrence);
     issues.add(issue);
+
+    Extension extension = singleResp.getExtension(ISISMTTObjectIdentifiers.id_isismtt_at_certHash);
+    issue = checkOccurrence("OCSP.RESPONSE." + index + ".CERTHASH", extension, certhashOccurrence);
+    issues.add(issue);
+
+    if (extension != null) {
+      ASN1Encodable extensionValue = extension.getParsedValue();
+      CertHash certHash = CertHash.getInstance(extensionValue);
+      ASN1ObjectIdentifier hashAlgOid = certHash.getHashAlgorithm().getAlgorithm();
+      if (certhashAlg != null) {
+        // certHash algorithm
+        issue = new ValidationIssue("OCSP.RESPONSE." + index + ".CHASH.ALG", "certhash algorithm");
+        issues.add(issue);
+
+        try {
+          HashAlgo is = HashAlgo.getInstance(certHash.getHashAlgorithm());
+          if (is != certhashAlg) {
+            issue.setFailureMessage("is '" + is + "', but expected '" + certhashAlg + "'");
+          }
+        } catch (NoSuchAlgorithmException ex) {
+          issue.setFailureMessage(ex.getMessage());
+        }
+      }
+
+      byte[] hashValue = certHash.getCertificateHash();
+      if (encodedCert != null) {
+        encodedCert = X509Util.toDerEncoded(encodedCert);
+
+        issue = new ValidationIssue("OCSP.RESPONSE." + index + ".CHASH.VALIDITY", "certhash validity");
+        issues.add(issue);
+
+        try {
+          MessageDigest md = MessageDigest.getInstance(hashAlgOid.getId());
+          byte[] expectedHashValue = md.digest(encodedCert);
+          if (!Arrays.equals(expectedHashValue, hashValue)) {
+            issue.setFailureMessage("certhash does not match the requested certificate");
+          }
+        } catch (NoSuchAlgorithmException ex) {
+          issue.setFailureMessage("NoSuchAlgorithm " + hashAlgOid.getId());
+        }
+      } // end if(encodedCert != null)
+    } // end if (extension != null)
 
     return issues;
   } // method checkSingleCert

@@ -102,7 +102,7 @@ class OcspStoreQueryExecutor {
   } // class IssuerStore
 
   private static final String SQL_ADD_REVOKED_CERT =
-      SqlUtil.buildInsertSql("CERT", "ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,HASH,SUBJECT,RT,RR");
+      SqlUtil.buildInsertSql("CERT", "ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,HASH,SUBJECT,RT,RIT,RR");
 
   private static final String SQL_ADD_CERT =
       SqlUtil.buildInsertSql("CERT", "ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,HASH,SUBJECT");
@@ -235,6 +235,11 @@ class OcspStoreQueryExecutor {
       if (revoked) {
         long revTime = revInfo.getRevocationTime().getEpochSecond();
         ps.setLong(idx++, revTime);
+        if (revInfo.getInvalidityTime() != null) {
+          ps.setLong(idx++, revInfo.getInvalidityTime().getEpochSecond());
+        } else {
+          ps.setNull(idx++, Types.BIGINT);
+        }
         int reasonCode = (revInfo.getReason() == null) ? 0 : revInfo.getReason().getCode();
         ps.setInt(idx, reasonCode);
       }
@@ -265,7 +270,7 @@ class OcspStoreQueryExecutor {
       throws DataAccessException {
     boolean revoked = (revInfo != null);
 
-    final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RR=? WHERE ID=?";
+    final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
 
     PreparedStatement ps = datasource.prepareStatement(sql);
 
@@ -276,6 +281,11 @@ class OcspStoreQueryExecutor {
       if (revoked) {
         long revTime = revInfo.getRevocationTime().getEpochSecond();
         ps.setLong(idx++, revTime);
+        if (revInfo.getInvalidityTime() != null) {
+          ps.setLong(idx++, revInfo.getInvalidityTime().getEpochSecond());
+        } else {
+          ps.setNull(idx++, Types.INTEGER);
+        }
         ps.setInt(idx++, revInfo.getReason().getCode());
       } else {
         ps.setNull(idx++, Types.INTEGER); // rev_time
@@ -313,13 +323,14 @@ class OcspStoreQueryExecutor {
     }
 
     if (publishGoodCerts) {
-      final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RR=? WHERE ID=?";
+      final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
       PreparedStatement ps = datasource.prepareStatement(sql);
 
       try {
         int idx = 1;
         ps.setLong(idx++, Instant.now().getEpochSecond());
         setBoolean(ps, idx++, false);
+        ps.setNull(idx++, Types.INTEGER);
         ps.setNull(idx++, Types.INTEGER);
         ps.setNull(idx++, Types.INTEGER);
         ps.setLong(idx, certRegisteredId);

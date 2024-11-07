@@ -7,6 +7,7 @@ import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.HourMinute;
 import org.xipki.util.StringUtil;
+import org.xipki.util.TripleState;
 import org.xipki.util.Validity;
 import org.xipki.util.exception.InvalidConfException;
 
@@ -67,6 +68,10 @@ import java.util.List;
  * # Default is false
  * exclude.reason=&lt;'true'|'false'&gt;
  *
+ * # How the CRL entry extension invalidityDate is considered in CRL
+ * # Default is optional
+ * invalidity.date=&lt;'required'|'optional'|'forbidden'&gt;
+ *
  * # Whether to include the expired certificates
  * # Default is false
  * include.expiredcerts=&lt;'true'|'false'&gt;
@@ -109,6 +114,8 @@ public class CrlControl {
 
   public static final String KEY_INCLUDE_EXPIREDCERTS = "include.expiredcerts";
 
+  public static final String KEY_INVALIDITY_DATE = "invalidity.date";
+
   private final int fullCrlIntervals;
 
   private final int deltaCrlIntervals;
@@ -125,6 +132,8 @@ public class CrlControl {
 
   private final boolean includeExpiredCerts;
 
+  private TripleState invalidityDateMode = TripleState.optional;
+
   public CrlControl(String conf) throws InvalidConfException {
     this(toConfPairs(conf));
   }
@@ -139,6 +148,11 @@ public class CrlControl {
 
   public CrlControl(ConfPairs props) throws InvalidConfException {
     Args.notNull(props, "props");
+
+    String str = props.value(KEY_INVALIDITY_DATE);
+    if (str != null) {
+      this.invalidityDateMode = TripleState.valueOf(str);
+    }
 
     this.excludeReason = getBoolean(props, KEY_EXCLUDE_REASON, false);
     this.includeExpiredCerts = getBoolean(props, KEY_INCLUDE_EXPIREDCERTS, false);
@@ -172,7 +186,7 @@ public class CrlControl {
       this.overlap = ov;
     }
 
-    String str = props.value(KEY_INTERVAL_TIME);
+    str = props.value(KEY_INTERVAL_TIME);
 
     HourMinute hm;
     if (str == null) {
@@ -219,6 +233,7 @@ public class CrlControl {
         .putPair(KEY_FULLCRL_INTERVALS, Integer.toString(fullCrlIntervals))
         .putPair(KEY_INTERVAL_HOURS, Integer.toString(intervalHours))
         .putPair(KEY_INTERVAL_TIME, intervalDayTime.toString())
+        .putPair(KEY_INVALIDITY_DATE, invalidityDateMode.name())
         .putPair(KEY_OVERLAP, overlap.toString());
   } // method getConf
 
@@ -236,6 +251,7 @@ public class CrlControl {
         "\n  use extended nextUpdate: ", extendedNextUpdate,
         "\n  exclude reason:          ", excludeReason,
         "\n  include expired certs:   ", includeExpiredCerts,
+        "\n  invalidity date mode:    ", invalidityDateMode,
         "\n  intervalDayTime:         ", "generate CRL at " + intervalDayTime, " UTC",
         (verbose ? "\n  encoded:                 " : ""), (verbose ? getConf() : ""));
   } // method toString(boolean)
@@ -266,6 +282,10 @@ public class CrlControl {
 
   public boolean isIncludeExpiredcerts() {
     return includeExpiredCerts;
+  }
+
+  public TripleState getInvalidityDateMode() {
+    return invalidityDateMode;
   }
 
   public int getIntervalHours() {
@@ -320,6 +340,7 @@ public class CrlControl {
             && includeExpiredCerts == obj2.includeExpiredCerts
             && intervalDayTime.equals(obj2.intervalDayTime)
             && intervalHours == obj2.intervalHours
+            && invalidityDateMode.equals(obj2.invalidityDateMode)
             && overlap.equals(obj2.overlap);
   } // method equals
 

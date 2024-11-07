@@ -636,6 +636,9 @@ public class CaActions {
     @Option(name = "--rev-date", description = "revocation date, UTC time of format yyyyMMddHHmmss")
     private String revocationDateS;
 
+    @Option(name = "--inv-date", description = "invalidity date, UTC time of format yyyyMMddHHmmss")
+    private String invalidityDateS;
+
     @Override
     protected Object execute0() throws Exception {
       CrlReason crlReason = CrlReason.forNameOrText(reason);
@@ -651,8 +654,13 @@ public class CaActions {
       Instant revocationDate = isNotBlank(revocationDateS)
           ? DateUtil.parseUtcTimeyyyyMMddhhmmss(revocationDateS) : Instant.now();
 
+      Instant invalidityDate = null;
+      if (isNotBlank(invalidityDateS)) {
+        invalidityDate = DateUtil.parseUtcTimeyyyyMMddhhmmss(invalidityDateS);
+      }
+
       try {
-        caManager.revokeCa(caName, new CertRevocationInfo(crlReason, revocationDate));
+        caManager.revokeCa(caName, new CertRevocationInfo(crlReason, revocationDate, invalidityDate));
         println("revoked CA " + caName);
         return null;
       } catch (CaMgmtException ex) {
@@ -666,7 +674,7 @@ public class CaActions {
   @Service
   public static class CaUnrevoke extends CaAction {
 
-    @Argument(name = "name", required = true, description = "CA name")
+    @Argument(index = 0, name = "name", required = true, description = "CA name")
     @Completion(CaCompleters.CaNameCompleter.class)
     private String caName;
 

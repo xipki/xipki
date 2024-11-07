@@ -30,6 +30,14 @@
 	}],
 	"requestOptions":[{
 		"name":"request1",
+		/*
+		"certpathValidation":{
+			"trustanchors":[{
+				"file":"keycerts/ocsp-server-cert.pem"
+			}],
+			"validationModel":"PKIX"
+		},
+		*/
 		"hashAlgorithms":["SHA1","SHA256","SHA384","SHA512"],
 		"maxRequestListCount":10,
 		"maxRequestSize":4096,
@@ -40,7 +48,9 @@
 			// in case of ignore and forbidded, maxLen and minLen will be ignored.
 			"occurrence":"optional"
 		},
+		"signatureRequired":false,
 		"supportsHttpGet":true,
+		"validateSignature":false,
 		"versions":["v1"]
 	}],
 	"responders":[{
@@ -74,11 +84,15 @@
 	"responseOptions":[{
 		"name":"response1",
 		"embedCertsMode":"SIGNER",
+		"includeCerthash":true,
+		"includeInvalidityDate":false,
 		"includeRevReason":true,
 		"responderIdByName":true
 	},{
 		"name":"response2",
 		"embedCertsMode":"SIGNER_AND_CA",
+		"includeCerthash":false,
+		"includeInvalidityDate":false,
 		"includeRevReason":true,
 		"responderIdByName":true
 	}],
@@ -96,6 +110,9 @@
 		"name":"dbstore1",
 		"ignoreExpiredCert":true,
 		"ignoreNotYetValidCert":true,
+		"includeArchiveCutoff":true,
+		"includeCrlId":false,
+		"retentionInterval":-1,
 		"minNextUpdatePeriod":"1d",
 		"updateInterval":"10m",
 		"source":{
@@ -115,6 +132,9 @@
 		"name":"crlstore1",
 		"ignoreExpiredCert":true,
 		"ignoreNotYetValidCert":true,
+		"includeArchiveCutoff":false,
+		"includeCrlId":true,
+		"retentionInterval":0,
 		"minNextUpdatePeriod":"1d",
 		"updateInterval":"10m",
 		"source":{
@@ -132,6 +152,9 @@
 		"name":"dbstore3",
 		"ignoreExpiredCert":true,
 		"ignoreNotYetValidCert":true,
+		"includeArchiveCutoff":true,
+		"includeCrlId":false,
+		"retentionInterval":-1,
 		"minNextUpdatePeriod":"12h",
 		"updateInterval":"10m",
 		"source":{
