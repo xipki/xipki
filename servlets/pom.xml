@@ -18,23 +18,17 @@
   </properties>
   <modules>
     <!-- CA -->
-    <module>ca-servlet3</module>
-    <module>ca-servlet5</module>
+    <module>ca-servlet</module>
     <!-- OCSP -->
-    <module>ocsp-servlet3</module>
-    <module>ocsp-servlet5</module>
+    <module>ocsp-servlet</module>
     <!-- HSM Proxy -->
-    <module>hsmproxy-servlet3</module>
-    <module>hsmproxy-servlet5</module>
+    <module>hsmproxy-servlet</module>
     <!-- Gateway -->
-    <module>gateway-servlet3</module>
-    <module>gateway-servlet5</module>
+    <module>gateway-servlet</module>
     <!-- Example CtLog -->
-    <module>dummy-ctlog-servlet3</module>
-    <module>dummy-ctlog-servlet5</module>
+    <module>dummy-ctlog-servlet</module>
     <!-- Example CRL Download -->
-    <module>dummy-crl-servlet3</module>
-    <module>dummy-crl-servlet5</module>
+    <module>dummy-crl-servlet</module>
   </modules>
   <dependencies>
     <dependency>

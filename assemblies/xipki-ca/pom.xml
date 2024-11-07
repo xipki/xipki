@@ -17,13 +17,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xipki.servlet</groupId>
-      <artifactId>ca-servlet3</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-    </dependency>
-    <dependency>
-      <groupId>org.xipki.servlet</groupId>
-      <artifactId>ca-servlet5</artifactId>
+      <artifactId>ca-servlet</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
@@ -78,13 +72,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki.servlet</groupId>
-                  <artifactId>ca-servlet3</artifactId>
-                  <version>${project.version}</version>
-                  <type>war</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.servlet</groupId>
-                  <artifactId>ca-servlet5</artifactId>
+                  <artifactId>ca-servlet</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>

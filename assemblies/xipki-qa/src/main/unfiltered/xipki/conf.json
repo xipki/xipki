@@ -6,14 +6,10 @@
 		{
 			"description": "XiPKI Configuration",
 			"files": [
-				"xipki-ca/tomcat10on/conf/server.xml",
-				"xipki-ca/tomcat8on/conf/server.xml",
-				"xipki-hsmproxy/tomcat10on/conf/server.xml",
-				"xipki-hsmproxy/tomcat8on/conf/server.xml",
-				"xipki-gateway/tomcat10on/conf/server.xml",
-				"xipki-gateway/tomcat8on/conf/server.xml",
-				"xipki-ocsp/tomcat10on/conf/server.xml",
-				"xipki-ocsp/tomcat8on/conf/server.xml",
+				"xipki-ca/tomcat/conf/server.xml",
+				"xipki-hsmproxy/tomcat/conf/server.xml",
+				"xipki-gateway/tomcat/conf/server.xml",
+				"xipki-ocsp/tomcat/conf/server.xml",
 				"xipki-gateway/tomcat/xipki/etc/gateway.json",
 				"xipki-gateway/tomcat/xipki/etc/acme-gateway.json",
 				"xipki-gateway/tomcat/xipki/etc/cmp-gateway.json",

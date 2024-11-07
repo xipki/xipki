@@ -90,7 +90,7 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>copy-servlet3-war</id>
+            <id>copy-servlet-war</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>copy</goal>
@@ -101,38 +101,13 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki.servlet</groupId>
-                  <artifactId>dummy-ctlog-servlet3</artifactId>
+                  <artifactId>dummy-ctlog-servlet</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki.servlet</groupId>
-                  <artifactId>dummy-crl-servlet3</artifactId>
-                  <version>${project.version}</version>
-                  <type>war</type>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-servlet5-war</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/webapps-tomcat10on</outputDirectory>
-              <stripVersion>true</stripVersion>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki.servlet</groupId>
-                  <artifactId>dummy-ctlog-servlet5</artifactId>
-                  <version>${project.version}</version>
-                  <type>war</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.servlet</groupId>
-                  <artifactId>dummy-crl-servlet5</artifactId>
+                  <artifactId>dummy-crl-servlet</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>

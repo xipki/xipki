@@ -17,13 +17,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xipki.servlet</groupId>
-      <artifactId>gateway-servlet3</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-    </dependency>
-    <dependency>
-      <groupId>org.xipki.servlet</groupId>
-      <artifactId>gateway-servlet5</artifactId>
+      <artifactId>gateway-servlet</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
@@ -85,13 +79,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki.servlet</groupId>
-                  <artifactId>gateway-servlet3</artifactId>
-                  <version>${project.version}</version>
-                  <type>war</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.servlet</groupId>
-                  <artifactId>gateway-servlet5</artifactId>
+                  <artifactId>gateway-servlet</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>

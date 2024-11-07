@@ -33,8 +33,6 @@
       <outputDirectory>.</outputDirectory>
       <includes>
         <include>tomcat/**</include>
-        <include>tomcat8on/**</include>
-        <include>tomcat10on/**</include>
       </includes>
       <excludes>
         <exclude>tomcat/bin/*.sh</exclude>
@@ -68,14 +66,8 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.build.directory}/webapps/gateway-servlet3.war</source>
-      <outputDirectory>tomcat8on/webapps</outputDirectory>
-      <destName>gw.war</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${project.build.directory}/webapps/gateway-servlet5.war</source>
-      <outputDirectory>tomcat10on/webapps</outputDirectory>
+      <source>${project.build.directory}/webapps/gateway-servlet.war</source>
+      <outputDirectory>tomcat/webapps</outputDirectory>
       <destName>gw.war</destName>
       <fileMode>0644</fileMode>
     </file>

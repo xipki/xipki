@@ -21,11 +21,9 @@
 			"files": [
 				"setup/keycerts.json",
 				// CA
-				"xipki-ca/tomcat8on/conf/server.xml",
-				"xipki-ca/tomcat10on/conf/server.xml",
+				"xipki-ca/tomcat/conf/server.xml",
 				// Gateway
-				"xipki-gateway/tomcat8on/conf/server.xml",
-				"xipki-gateway/tomcat10on/conf/server.xml",
+				"xipki-gateway/tomcat/conf/server.xml",
 				"xipki-gateway/tomcat/xipki/etc/gateway.json",
 				"xipki-gateway/tomcat/xipki/etc/acme-gateway.json",
 				"xipki-gateway/tomcat/xipki/etc/cmp-gateway.json",
@@ -33,16 +31,14 @@
 				"xipki-gateway/tomcat/xipki/etc/rest-gateway.json",
 				"xipki-gateway/tomcat/xipki/etc/scep-gateway.json",
 				// OCSP
-				"xipki-ocsp/tomcat8on/conf/server.xml",
-				"xipki-ocsp/tomcat10on/conf/server.xml",
+				"xipki-ocsp/tomcat/conf/server.xml",
 				"xipki-ocsp/tomcat/xipki/etc/ocsp/ocsp-responder.json",
 				"xipki-ocsp/tomcat/xipki/etc/ocsp/example/crl-store/ocsp-responder.json",
 				"xipki-ocsp/tomcat/xipki/etc/ocsp/example/ejbca-store/ocsp-responder.json",
 				"xipki-ocsp/tomcat/xipki/etc/ocsp/example/xipki-ca-db-store/ocsp-responder.json",
 				"xipki-ocsp/tomcat/xipki/etc/ocsp/example/xipki-db-store/ocsp-responder.json",
 				// HSM proxy
-				"xipki-hsmproxy/tomcat8on/conf/server.xml",
-				"xipki-hsmproxy/tomcat10on/conf/server.xml",
+				"xipki-hsmproxy/tomcat/conf/server.xml",
 				"xipki-hsmproxy/tomcat/xipki/security/example/pkcs11-hsmproxy.json",
 				"xipki-hsmproxy/tomcat/xipki/security/pkcs11.json",
 				"xipki-ca/tomcat/xipki/security/example/pkcs11-hsmproxy.json",

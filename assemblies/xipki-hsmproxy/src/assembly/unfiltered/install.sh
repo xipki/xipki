@@ -68,7 +68,7 @@ TOMCAT_VERSION=`cut -d "." -f1  <<< "${TOMCAT_VERSION}"`
 ## Remove leading and trailing spaces and tabs
 TOMCAT_VERSION=`awk '{$1=$1};1'  <<< "${TOMCAT_VERSION}"`
 
-if [ "$TOMCAT_VERSION" -lt "8" ]; then
+if [ "$TOMCAT_VERSION" -lt "10" ]; then
   echo "Unsupported tomcat major version ${TOMCAT_VERSION}"
   exit 1
 fi
@@ -122,11 +122,7 @@ WAR="${tomcatDir}/webapps/hsmproxy"
 [ -f ${WAR}.war ] && mv ${WAR}.war ${BDIR}/webapps
 rm -rf "${WAR}"
 
-if [ "$TOMCAT_VERSION" -lt "10" ]; then
-  _DIR=tomcat8on
-else
-  _DIR=tomcat10on
-fi
+_DIR=tomcat
 
 cp -r ${WDIR}/tomcat/* ${tomcatDir}
 cp -r ${WDIR}/${_DIR}/* ${tomcatDir}

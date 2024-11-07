@@ -63,7 +63,7 @@ TOMCAT_VERSION=`cut -d "." -f1  <<< "${TOMCAT_VERSION}"`
 ## Remove leading and trailing spaces and tabs
 TOMCAT_VERSION=`awk '{$1=$1};1'  <<< "${TOMCAT_VERSION}"`
 
-if [ "$TOMCAT_VERSION" -lt "8" ]; then
+if [ "$TOMCAT_VERSION" -lt "10" ]; then
   echo "Unsupported tomcat major version ${TOMCAT_VERSION}"
   exit 1
 fi
@@ -113,11 +113,7 @@ for X in $SRC; do [[ -e $X ]] && mv "$X" ${BDIR}/lib; done
 SRC="${tomcatDir}/lib/mariadb-java-*.jar"
 for X in $SRC; do [[ -e $X ]] && mv "$X" ${BDIR}/lib; done
 
-if [ "$TOMCAT_VERSION" -lt "10" ]; then
-  _DIR=tomcat8on
-else
-  _DIR=tomcat10on
-fi
+_DIR=tomcat
 
 cp -r ${WDIR}/tomcat/* ${tomcatDir}
 cp -r ${WDIR}/${_DIR}/conf ${tomcatDir}/

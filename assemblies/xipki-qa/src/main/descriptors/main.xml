@@ -175,26 +175,14 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.build.directory}/webapps/dummy-ctlog-servlet3.war</source>
-      <outputDirectory>xipki/tomcat-files/xipki-ca/tomcat8on/webapps</outputDirectory>
+      <source>${project.build.directory}/webapps/dummy-ctlog-servlet.war</source>
+      <outputDirectory>xipki/tomcat-files/xipki-ca/tomcat/webapps</outputDirectory>
       <destName>ctlog.war</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.build.directory}/webapps-tomcat10on/dummy-ctlog-servlet5.war</source>
-      <outputDirectory>xipki/tomcat-files/xipki-ca/tomcat10on/webapps</outputDirectory>
-      <destName>ctlog.war</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${project.build.directory}/webapps/dummy-crl-servlet3.war</source>
-      <outputDirectory>xipki/tomcat-files/xipki-ca/tomcat8on/webapps</outputDirectory>
-      <destName>crl.war</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${project.build.directory}/webapps-tomcat10on/dummy-crl-servlet5.war</source>
-      <outputDirectory>xipki/tomcat-files/xipki-ca/tomcat10on/webapps</outputDirectory>
+      <source>${project.build.directory}/webapps/dummy-crl-servlet.war</source>
+      <outputDirectory>xipki/tomcat-files/xipki-ca/tomcat/webapps</outputDirectory>
       <destName>crl.war</destName>
       <fileMode>0644</fileMode>
     </file>

@@ -2,15 +2,10 @@
 
 set -e
 
-TOMCAT8_VERSION=8.5.98
-TOMCAT9_VERSION=9.0.85
-TOMCAT10_VERSION=10.1.18
-TOMCAT11_VERSION=11.0.0-M16
-
 helpFunction()
 {
    echo ""
-   echo "Usage: $0 -t <tomcat major version 8, 9, 10 or 11>"
+   echo "Usage: $0 -t <tomcat major version 10 or 11>"
    exit 1 # Exit script after printing help
 }
 
@@ -28,22 +23,18 @@ then
    helpFunction
 fi
 
-if [ "$TOMCAT_MAJOR_VERSION" -eq "8" ]; then
-  _DIR=tomcat8on
-  TOMCAT_VERSION=$TOMCAT8_VERSION
-elif [ "$TOMCAT_MAJOR_VERSION" -eq "9" ]; then
-  _DIR=tomcat8on
-  TOMCAT_VERSION=$TOMCAT9_VERSION
-elif [ "$TOMCAT_MAJOR_VERSION" -eq "10" ]; then
-  _DIR=tomcat10on
-  TOMCAT_VERSION=$TOMCAT10_VERSION
-elif [ "$TOMCAT_MAJOR_VERSION" -eq "11" ]; then
-  _DIR=tomcat10on
-  TOMCAT_VERSION=$TOMCAT11_VERSION
-else
+_DIR=tomcat
+if [ "$TOMCAT_MAJOR_VERSION" -lt "10" ]; then
   echo "Unsupported tomcat major version ${TOMCAT_MAJOR_VERSION}"
   exit 1
 fi
+
+if ls $TBDIR/apache-tomcat-${TOMCAT_MAJOR_VERSION}*.tar.gz  &> /dev/null; then
+  TOMCAT_VERSION=$(ls $TBDIR/apache-tomcat-${TOMCAT_MAJOR_VERSION}.*.tar.gz | tail -n 1 | cut -d "-" -f 3 | cut -d "." -f 1-3)
+else
+  TOMCAT_VERSION=`curl --silent http://dlcdn.apache.org/tomcat/tomcat-$TOMCAT_MAJOR_VERSION/ | grep v$TOMCAT_MAJOR_VERSION | tail -n 1 | awk '{split($5,c,">v") ; split(c[2],d,"/") ; print d[1]}'`
+fi
+
 
 echo "Tomcat ${TOMCAT_VERSION}"
 TOMCAT_DIR=apache-tomcat-${TOMCAT_VERSION}
