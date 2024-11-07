@@ -10,7 +10,6 @@ import org.xipki.util.Args;
 import org.xipki.util.DateUtil;
 import org.xipki.util.exception.DecodeException;
 
-import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,20 +24,8 @@ import java.util.List;
 /**
  * Provides a decoder capable of handling CBOR encoded data from a {@link InputStream}.
  */
-public class CborDecoder implements AutoCloseable
-{
+public class CborDecoder implements AutoCloseable {
     protected final PushbackInputStream m_is;
-
-
-    public CborDecoder(byte[] bytes) {
-        this(bytes, 0, bytes.length);
-    }
-
-    public CborDecoder(byte[] bytes, int offset, int length) {
-        this(new ByteArrayInputStream(bytes,
-            Args.min(offset, "offset", 0),
-            Args.min(length, "length", 0)));
-    }
 
     /**
      * Creates a new {@link CborDecoder} instance.
