@@ -632,10 +632,7 @@ public class AcmeResponder {
       }
     }
 
-    HttpResponse verifyRes = verifySignature((String) protected_.get("alg"), pubKey, body);
-    if (verifyRes != null) {
-      return verifyRes;
-    }
+    verifySignature((String) protected_.get("alg"), pubKey, body);
 
     switch (command) {
       case CMD_newAccount: {
@@ -664,10 +661,7 @@ public class AcmeResponder {
         AcmeAccount newAccount = repo.newAcmeAccount();
         List<String> contacts = reqPayload.getContact();
         if (contacts != null && !contacts.isEmpty()) {
-          HttpResponse verifyErrorResp = verifyContacts(contacts);
-          if (verifyErrorResp != null) {
-            return verifyErrorResp;
-          }
+          verifyContacts(contacts);
           newAccount.setContact(contacts);
         }
         newAccount.setExternalAccountBinding(reqPayload.getExternalAccountBinding());
@@ -720,10 +714,7 @@ public class AcmeResponder {
           throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badPublicKey, null);
         }
 
-        verifyRes = verifySignature((String) protected_.get("alg"), newPubKey, reqPayload);
-        if (verifyRes != null) {
-          return verifyRes;
-        }
+        verifySignature((String) protected_.get("alg"), newPubKey, reqPayload);
 
         account.setJwk(newJwk);
 
@@ -747,11 +738,7 @@ public class AcmeResponder {
         // 7.3.2.  Account Update
         List<String> contacts = reqPayload.getContact();
         if (contacts != null && !contacts.isEmpty()) {
-          HttpResponse errResp = verifyContacts(contacts);
-          if (errResp != null) {
-            return errResp;
-          }
-
+          verifyContacts(contacts);
           account.setContact(contacts);
         }
 
@@ -1243,7 +1230,7 @@ public class AcmeResponder {
     return toHttpResponse(HttpRespContent.of(statusCode, CT_PROBLEM_JSON, bytes));
   }
 
-  private HttpResponse verifySignature(String sigAlg, PublicKey pubKey, JoseMessage joseMessage)
+  private void verifySignature(String sigAlg, PublicKey pubKey, JoseMessage joseMessage)
       throws AcmeProtocolException {
     sigAlg = sigAlg.toUpperCase(Locale.ROOT);
     SignAlgo signAlgo = joseAlgMap.get(sigAlg);
@@ -1262,7 +1249,6 @@ public class AcmeResponder {
       if (!sigValid) {
         throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "signature is not valid");
       }
-      return null;
     } catch (NoSuchAlgorithmException e) {
       throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badSignatureAlgorithm, e.getMessage());
     } catch (InvalidKeyException e) {
@@ -1272,7 +1258,7 @@ public class AcmeResponder {
     }
   }
 
-  private HttpResponse verifyContacts(List<String> contacts) throws AcmeProtocolException {
+  private void verifyContacts(List<String> contacts) throws AcmeProtocolException {
     if (contacts == null || contacts.isEmpty()) {
       throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.invalidContact, "no contact is specified");
     }
@@ -1287,7 +1273,6 @@ public class AcmeResponder {
             "invalid contact '" + contact + "'");
       }
     }
-    return null;
   }
 
   private String rndToken() {

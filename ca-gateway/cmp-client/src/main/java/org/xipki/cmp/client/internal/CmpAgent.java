@@ -491,6 +491,11 @@ class CmpAgent {
         return new ProtectionVerificationResult(null, ProtectionResult.SIGNATURE_INVALID);
       }
 
+      if (protectionAlgo == null) {
+        LOG.warn("tid={}: unknown response protection algorithm", tid);
+        return new ProtectionVerificationResult(null, ProtectionResult.SIGNATURE_INVALID);
+      }
+
       if (!sigResponder.getSigAlgoValidator().isAlgorithmPermitted(protectionAlgo)) {
         LOG.warn("tid={}: response protected by untrusted protection algorithm '{}'", tid, protectionAlgo.getJceName());
         return new ProtectionVerificationResult(null, ProtectionResult.SIGNATURE_INVALID);

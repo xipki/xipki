@@ -569,6 +569,12 @@ public abstract class BaseCmpResponder {
         LogUtil.warn(LOG, ex);
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
       }
+
+      if (macAlg == null) {
+        LOG.error("macAlg unknown");
+        return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
+      }
+
       if (!cmpControl.isRequestPbmMacPermitted(macAlg)) {
         LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.mac: {})", macAlg.getJceName());
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
@@ -724,6 +730,11 @@ public abstract class BaseCmpResponder {
       popAlg = SignAlgo.getInstance(popSign.getAlgorithmIdentifier());
     } catch (NoSuchAlgorithmException ex) {
       LogUtil.error(LOG, ex, "Cannot parse POP signature algorithm");
+      return false;
+    }
+
+    if (popAlg == null) {
+      LOG.error("POP signature algorithm unknown");
       return false;
     }
 

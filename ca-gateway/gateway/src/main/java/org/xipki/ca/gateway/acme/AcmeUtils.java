@@ -208,11 +208,12 @@ final class AcmeUtils {
         }
     }
 
-    public static Integer getInt(Map<String, Object> map, String name) {
+    public static int getInt(Map<String, Object> map, String name) {
         Object obj = map.get(name);
         if (obj == null) {
-            return null;
+            throw new IllegalStateException("value of " + name + " is not specified");
         }
+
         if (obj instanceof Long){
             long l = (long) obj;
             if (l > Integer.MAX_VALUE || l < Integer.MIN_VALUE) {

@@ -122,8 +122,7 @@ public abstract class ExtensionSpec {
           Extension.policyMappings,
           Extension.nameConstraints,
           Extension.policyConstraints,
-          Extension.inhibitAnyPolicy,
-          ObjectIdentifiers.Extn.id_pe_tlsfeature)));
+          Extension.inhibitAnyPolicy)));
 
     private static final Set<ASN1ObjectIdentifier> NON_CRITICAL_ONLY_EXTENSIONS =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
@@ -134,6 +133,7 @@ public abstract class ExtensionSpec {
             Extension.freshestCRL,
             Extension.authorityInfoAccess,
             Extension.subjectInfoAccess,
+            ObjectIdentifiers.Extn.id_pe_tlsfeature,
             Extn.id_SCTs,
             Extn.id_GMT_0015_ICRegistrationNumber,
             Extn.id_GMT_0015_IdentityCode,

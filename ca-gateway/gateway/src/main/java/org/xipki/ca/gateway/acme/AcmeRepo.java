@@ -325,7 +325,16 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
     // from cache
     for (Long id : orderCache.keySnapshot()) {
       AcmeOrder order = orderCache.get(id);
-      for (AcmeAuthz authz : order.getAuthzs()) {
+      if (order == null) {
+        continue;
+      }
+
+      List<AcmeAuthz> authzs = order.getAuthzs();
+      if (authzs == null) {
+        continue;
+      }
+
+      for (AcmeAuthz authz : authzs) {
         for (AcmeChallenge challenge : authz.getChallenges()) {
           ChallId challId = new ChallId(order.getId(), authz.getSubId(), challenge.getSubId());
           boolean addMe = challenge.getStatus() == ChallengeStatus.processing
@@ -353,6 +362,10 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
     // from cache
     for (Long id : orderCache.keySnapshot()) {
       AcmeOrder order = orderCache.get(id);
+      if (order == null) {
+        continue;
+      }
+
       order.updateStatus();
 
       if (order.getStatus() == OrderStatus.processing) {
