@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.license.api.OcspLicense;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusInfo.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
@@ -130,6 +131,8 @@ public class OcspServer implements Closeable {
 
   private boolean master;
 
+  private final OcspLicense license;
+
   private UnknownIssuerBehaviour unknownIssuerBehaviour = UnknownIssuerBehaviour.unknown;
 
   private ResponseCacher responseCacher;
@@ -178,8 +181,9 @@ public class OcspServer implements Closeable {
     encodedAcceptableResponses_Basic = Hex.decode("300B06092B0601050507300101");
   } // method static
 
-  public OcspServer() {
+  public OcspServer(OcspLicense license) {
     this.datasourceFactory = new DataSourceFactory();
+    this.license = Args.notNull(license, "license");
   }
 
   public void setSecurityFactory(SecurityFactory securityFactory) {
@@ -551,6 +555,33 @@ public class OcspServer implements Closeable {
         return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
       }
 
+      //-----begin license -----
+      if (!license.isValid()) {
+        LOG.error("License not valid, need new license");
+        return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);
+      }
+
+      if (!license.grantAllCAs()) {
+        for (CertID cid : requestList) {
+          for (OcspStore store : responder.getStores()) {
+            X509Cert caCert = store.getIssuerCert(cid.getIssuer());
+            if (caCert == null) {
+              continue;
+            }
+
+            String issuerSubject = caCert.getSubjectText();
+            boolean granted = license.grant(issuerSubject);
+            if (!granted) {
+              LOG.error("Not granted for CA {}, need new license", issuerSubject);
+              return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);
+            }
+          }
+        }
+      }
+
+      license.regulateSpeed();
+      //-----end license-----
+
       OcspRespControl repControl = new OcspRespControl();
       repControl.canCacheInfo = true;
 
@@ -684,7 +715,12 @@ public class OcspServer implements Closeable {
           OcspRespWithCacheInfo cachedResp = responseCacher.getOcspResponse(
               cacheDbIssuer.getId(), cacheDbSerialNumber, cacheDbSigAlg);
           if (cachedResp != null) {
-            return cachedResp;
+            if (license.grant(cacheDbIssuer.getCert().getSubjectText())) {
+              return cachedResp;
+            } else {
+              LOG.error("Not granted, new license needed");
+              return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
+            }
           }
         } else if (master) {
           // store the issuer certificate in cache database.

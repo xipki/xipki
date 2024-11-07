@@ -19,7 +19,8 @@ public class OcspServletFilter extends ServletFilter {
 
   @Override
   protected XiHttpFilter initFilter(FilterConfig filterConfig) throws Exception {
-    return new OcspHttpFilter();
+    String licenseFactoryClazz = filterConfig.getInitParameter("licenseFactory");
+    return new OcspHttpFilter(licenseFactoryClazz);
   }
 
 }

@@ -34,6 +34,7 @@ import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
+import org.xipki.license.api.CmLicense;
 import org.xipki.pki.BadCertTemplateException;
 import org.xipki.pki.OperationException;
 import org.xipki.security.CertRevocationInfo;
@@ -357,6 +358,13 @@ public class X509Ca extends X509CaModule implements Closeable {
       throws OperationExceptionWithIndex {
     Args.notEmpty(certTemplates, "certTemplates");
 
+    CmLicense license = caManager.getLicense();
+    if (!license.isValid()) {
+      LOG.error("License not valid yet or expired, need new license");
+      throw new OperationExceptionWithIndex(0, // we have to specify an index, use 0.
+          new OperationException( SYSTEM_FAILURE, "License not valid yet or expired"));
+    }
+
     final int n = certTemplates.size();
     List<GrantedCertTemplate> gcts = new ArrayList<>(n);
 
@@ -417,6 +425,29 @@ public class X509Ca extends X509CaModule implements Closeable {
 
       boolean successful = false;
       try {
+        //-----begin license-----
+        // check CA
+        String caSubject = caInfo.getCert().getSubjectText();
+        if (!(license.grantAllCAs() || license.grant(caSubject))) {
+          LOG.error("Not granted for CA {}, need new license", caSubject);
+          throw new OperationException(SYSTEM_FAILURE, "new license needed");
+        }
+
+        // check number of certificate
+        long maxNumOfCerts = license.getMaxNumberOfCerts();
+        if (maxNumOfCerts >= 0) {
+          long numOfCerts = certstore.getCountOfCerts(0);
+          if (numOfCerts >= maxNumOfCerts) {
+            LOG.error("Maximal {} certificates is allowed, {} already issued, need new license",
+                maxNumOfCerts, numOfCerts);
+            throw new OperationException(SYSTEM_FAILURE, "new license needed");
+          }
+        }
+
+        // regulate speed
+        license.regulateSpeed();
+        //-----end license-----
+
         CertificateInfo certInfo = generateCert(requestor, i, gct, transactionId, event);
         successful = true;
         certInfos.add(certInfo);

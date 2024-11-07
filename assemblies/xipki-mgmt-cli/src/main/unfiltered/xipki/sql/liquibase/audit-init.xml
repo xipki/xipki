@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ Maximal column size: 4k
+  - DB2: PAGESIZE 4 k
+-->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+  logicalFilePath="audit-init.xml">
+  <changeSet author="xipki" id="1">
+    <!-- table DBSCHEMA -->
+    <createTable tableName="DBSCHEMA" remarks="database schema information">
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="VALUE2" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="VENDOR"/>
+      <column name="VALUE2" value="XIPKI"/>
+    </insert>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="VERSION"/>
+      <column name="VALUE2" value="1"/>
+    </insert>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="MAX_MESSAGE_LEN"/>
+      <!-- MUST match the column definition of AUDIT.MESSAGE-->
+      <column name="VALUE2" value="1000"/>
+    </insert>
+    <!-- table AUDIT -->
+    <createTable tableName="AUDIT">
+      <column name="SHARD_ID" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="ID" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="TIME" type="CHAR(23)"
+          remarks="Logging time e.g. 2022.03.06-10:18:35.483">
+        <constraints nullable="false"/>
+      </column>
+      <column name="LEVEL" type="VARCHAR(5)"
+              remarks="DEBUG,INFO,ERROR">
+        <constraints nullable="false"/>
+      </column>
+      <column name="EVENT_TYPE" type="SMALLINT"
+              remarks="1 for AuditEvent, 2 for PCIAuditEvent">
+        <constraints nullable="false"/>
+      </column>
+      <column name="PREVIOUS_ID" type="BIGINT"
+              remarks="ID of the previous audit entry. 0 if none.">
+        <constraints nullable="false"/>
+      </column>
+      <column name="MESSAGE" type="varchar(1000)"
+          remarks="log message">
+        <constraints nullable="false"/>
+      </column>
+      <column name="TAG" type="VARCHAR(100)"
+          remarks="[algo]:[keyId]:[base64(tag)]">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <!-- table INTEGRITY -->
+    <createTable tableName="INTEGRITY">
+      <column name="ID" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="TEXT" type="VARCHAR(1000)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <insert tableName="INTEGRITY">
+      <column name="ID" value="1"/>
+      <column name="TEXT" value=""/>
+    </insert>
+  </changeSet>
+</databaseChangeLog>

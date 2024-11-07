@@ -98,10 +98,9 @@
         </SSLHostConfig>
     </Connector>
     -->
-    <Connector port="$[ca.https.port]" protocol="org.apache.coyote.http11.Http11NioProtocol"
+    <Connector port="$[ca.https.port]" protocol="org.xipki.tomcat.XiHttp11Nio2Protocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
                connectionTimeout="4000">
-      <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" />
       <SSLHostConfig
               certificateVerification="required"
               protocols="TLSv1.2+TLSv1.3"

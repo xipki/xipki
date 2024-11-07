@@ -19,6 +19,10 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xipki.commons</groupId>
+      <artifactId>audit</artifactId>
+    </dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>gateway-api</artifactId>
       <version>${project.version}</version>
@@ -30,9 +34,9 @@
       <version>${dnsjava.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki</groupId>
+      <groupId>org.xipki.commons</groupId>
       <artifactId>datasource</artifactId>
-      <version>${project.version}</version>
+      <version>${xipki.commons.version}</version>
     </dependency>
     <!-- CMP -->
     <dependency>

@@ -16,9 +16,9 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.servlet</groupId>
+      <groupId>org.xipki.commons</groupId>
       <artifactId>servlet3-common</artifactId>
-      <version>${project.version}</version>
+      <version>${xipki.commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
@@ -26,9 +26,10 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.servlet</groupId>
-      <artifactId>servlet3-common</artifactId>
+      <groupId>org.xipki.example</groupId>
+      <artifactId>license-example</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

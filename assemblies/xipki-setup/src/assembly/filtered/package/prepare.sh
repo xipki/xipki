@@ -12,8 +12,9 @@ fi
 
 LIB_DIR=$WDIR/xipki-cli/system
 
-CP="$LIB_DIR/org/xipki/security/${project.version}/*"
-CP="$CP:$LIB_DIR/org/xipki/util/${project.version}/*"
+CP="$LIB_DIR/org/xipki/commons/security/${xipki.commons.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/commons/util/${xipki.commons.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/commons/password/${xipki.commons.version}/*"
 CP="$CP:$LIB_DIR/org/bouncycastle/bcprov-jdk18on/${bc.version}/*"
 CP="$CP:$LIB_DIR/org/bouncycastle/bcpkix-jdk18on/${bc.version}/*"
 CP="$CP:$LIB_DIR/org/bouncycastle/bcutil-jdk18on/${bc.version}/*"
@@ -40,7 +41,8 @@ TDIR=$WDIR/xipki-ca/tomcat/xipki/keycerts
 
 mkdir -p $TDIR
 
-cp $KC_DIR/ca-server/* \
+cp \ 
+   $KC_DIR/ca-server/* \
    $KC_DIR/ca-mgmt-client/*-cert.pem \
    $KS_DIR/ca-client-certstore.p12 \
    $TDIR
@@ -59,7 +61,8 @@ TDIR=$WDIR/xipki-gateway/tomcat/xipki/keycerts
 
 mkdir -p $TDIR
 
-cp $KC_DIR/gateway-server/* \
+cp \
+   $KC_DIR/gateway-server/* \
    $KC_DIR/ra-sdk-client/* \
    $KC_DIR/cmp-client/*-cert.pem \
    $KC_DIR/est-client/*-cert.pem \
@@ -74,7 +77,8 @@ TDIR=$WDIR/xipki-cli/xipki/keycerts
 
 mkdir -p $TDIR
 
-cp $KC_DIR/cmp-client/* \
+cp \
+   $KC_DIR/cmp-client/* \
    $KC_DIR/est-client/* \
    $KC_DIR/rest-client/* \
    $KC_DIR/gateway-server/gateway-server-cert.pem \
@@ -86,7 +90,8 @@ TDIR=$WDIR/xipki-mgmt-cli/xipki/keycerts
 
 mkdir -p $TDIR
 
-cp $KC_DIR/rest-client/* \
+cp \
+   $KC_DIR/rest-client/* \
    $KC_DIR/ca-mgmt-client/*.p12 \
    $KC_DIR/ca-mgmt-client/*-cert.pem \
    $KC_DIR/ca-server/ca-server-cert.pem \

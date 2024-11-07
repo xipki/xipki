@@ -103,8 +103,16 @@
               <outputDirectory>${project.build.directory}/tomcat/lib</outputDirectory>
               <artifactItems>
                 <artifactItem>
+                  <groupId>org.xipki.commons</groupId>
+                  <artifactId>xipki-tomcat-password</artifactId>
+                </artifactItem>
+                <artifactItem>
                   <groupId>org.xipki</groupId>
                   <artifactId>ipkcs11wrapper</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.commons</groupId>
+                  <artifactId>password</artifactId>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.mariadb.jdbc</groupId>

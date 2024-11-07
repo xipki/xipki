@@ -16,6 +16,7 @@ import org.xipki.ca.server.CertprofileFactoryRegister;
 import org.xipki.ca.server.SdkResponder;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.publisher.OcspCertPublisherFactory;
+import org.xipki.license.api.LicenseFactory;
 import org.xipki.security.Securities;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
@@ -55,6 +56,8 @@ public class CaHttpFilter implements XiHttpFilter {
 
   private final Securities securities;
 
+  private final LicenseFactory licenseFactory;
+
   private final CaManagerImpl caManager;
 
   private SdkResponder responder;
@@ -65,7 +68,7 @@ public class CaHttpFilter implements XiHttpFilter {
 
   private CaHttpMgmtServlet mgmtServlet;
 
-  public CaHttpFilter() throws Exception {
+  public CaHttpFilter(String licenseFactoryClazz) throws Exception {
     XipkiBaseDir.init();
 
     CaServerConf conf;
@@ -100,7 +103,9 @@ public class CaHttpFilter implements XiHttpFilter {
       throw new IllegalStateException("could not init AuditService");
     }
 
-    caManager = new CaManagerImpl();
+    LOG.info("Use licenseFactory: {}", licenseFactoryClazz);
+    licenseFactory = ReflectiveUtil.newInstance(licenseFactoryClazz);
+    caManager = new CaManagerImpl(licenseFactory.createCmLicense());
     caManager.setSecurityFactory(securities.getSecurityFactory());
     caManager.setP11CryptServiceFactory(securities.getP11CryptServiceFactory());
 
@@ -170,6 +175,10 @@ public class CaHttpFilter implements XiHttpFilter {
 
     if (caManager != null) {
       caManager.close();
+    }
+
+    if (licenseFactory != null) {
+      licenseFactory.close();
     }
 
     if (responder != null) {

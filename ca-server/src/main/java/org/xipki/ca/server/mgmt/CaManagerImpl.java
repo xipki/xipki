@@ -58,6 +58,7 @@ import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.license.api.CmLicense;
 import org.xipki.pki.OperationException;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
@@ -228,6 +229,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   CaConfStore caConfStore;
 
+  private final CmLicense license;
+
   private DataSourceWrapper certstoreDatasource;
 
   private final String lockInstanceId;
@@ -268,7 +271,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     LOG.info("XiPKI CA version {}", StringUtil.getBundleVersion(CaManagerImpl.class));
   }
 
-  public CaManagerImpl() {
+  public CaManagerImpl(CmLicense license) {
+    this.license = Args.notNull(license, "license");
     this.datasourceFactory = new DataSourceFactory();
     this.calockFilePath = IoUtil.expandFilepath("calock", true);
     String calockId = null;
@@ -1386,6 +1390,10 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   public CtLogPublicKeyFinder getCtLogPublicKeyFinder() {
     return ctLogPublicKeyFinder;
+  }
+
+  public CmLicense getLicense() {
+    return license;
   }
 
   public X509Ca getCa(CaIdentifierRequest req) {

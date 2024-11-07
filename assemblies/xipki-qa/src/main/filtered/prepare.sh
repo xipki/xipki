@@ -110,8 +110,8 @@ fi
 LIB_DIR=$WDIR/system
 XDIR=${WDIR}/xipki
 
-CP="$CP:$LIB_DIR/org/xipki/util/${project.version}/*"
-CP="$CP:$LIB_DIR/org/xipki/password/${project.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/commons/util/${xipki.commons.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/commons/password/${xipki.commons.version}/*"
 CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-databind/${jackson.version}/*"
 CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-annotations/${jackson.version}/*"
 CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-core/${jackson.version}/*"

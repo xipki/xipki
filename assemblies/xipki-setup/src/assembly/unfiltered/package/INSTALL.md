@@ -75,6 +75,9 @@ using the following methods:
    ```
 
 ### Tomcat
+To use th password protection mechanism described above, in the file `conf/server.xml`, you need to replace
+`org.apache.coyote.http11.Http11NioProtocol` by `org.xipki.tomcat.XiHttp11NioProtocol`,
+and `org.apache.coyote.http11.Http11Nio2Protocol` by `org.xipki.tomcat.XiHttp11Nio2Protocol`.
 
 ## Configure PKCS#11 device (optional)
 
