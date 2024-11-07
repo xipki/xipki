@@ -3,9 +3,12 @@ echo "| This script demonstrates the setup of CAs with all the combinations: |"
 echo "|     key-type x caconf-store-type x token-type x CAcert-presence      |"
 echo "|  - key-type:          rsa, ec, dsa, sm2, ed25519, ed448              |"
 echo "|  - caconf-store-type: dbbased (database), filebased (file)           |"
-echo "|  - token-type:        p12                                            |"
+echo "|  - token-type:        p11, p12                                       |"
 echo "|  - CAcert-presence:   none, present                                  |"
 echo "+----------------------------------------------------------------------+"
+
+## Adapt me, HSM device capabilities
+hsm_keytypes = [ed25519 sm2 ec rsa dsa]
 
 keytypes = [ed448 ed25519 sm2 ec rsa dsa]; each ($keytypes) {
   keytype = $it
@@ -13,8 +16,24 @@ keytypes = [ed448 ed25519 sm2 ec rsa dsa]; each ($keytypes) {
   storetypes = [dbbased filebased]; each ($storetypes) {
     storetype = $it
 
-    tokentypes = [p12]; each ($tokentypes) {
+    tokentypes = [p12 p11]; each ($tokentypes) {
       tokentype = $it
+
+      if { "$tokentype" equals "p11" } then {
+        supported = "false"
+        each ($hsm_keytypes) {
+          hsm_keytype = $it
+          if { "$keytype" equals "$hsm_keytype" } then {
+            supported = "true"
+            break
+          }
+        }
+
+        if { "$supported" equals "false" } then {
+          echo "$keytype is not supported in the p11 device, skipping it"
+          continue
+        }
+      }
 
       source xipki/ca-setup/demo/doDemo.script
     }

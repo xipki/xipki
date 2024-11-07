@@ -19,7 +19,11 @@
 				"xipki-gateway/tomcat/xipki/etc/rest-gateway.json",
 				"xipki-gateway/tomcat/xipki/etc/scep-gateway.json",
 				"xipki/etc/curl.json",
-				"etc/org.xipki.ca.mgmt.client.cfg"
+				"etc/org.xipki.ca.mgmt.client.cfg",
+				"xipki-ca/tomcat/xipki/security/pkcs11.json",
+				"xipki-ocsp/tomcat/xipki/security/pkcs11.json",
+				"xipki-gateway/tomcat/xipki/security/pkcs11.json",
+				"xipki/security/pkcs11.json"
 			],
 			"replacements": {
 				// OCSP

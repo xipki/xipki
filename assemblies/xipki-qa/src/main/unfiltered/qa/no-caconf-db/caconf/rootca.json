@@ -3,6 +3,13 @@
 		"KEYPAIR_ENC_KEY":"00112233445566778899AABBCCDDEEFF"
 	},
 	"signers":[],
+	"keypairGens":[{
+		"name":"pkcs11",
+		"type":"pkcs11",
+		"conf":{
+			"value":"slot=0,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448"
+		}
+	}],
 	"requestors":[{
 		"id": 2,
 		"name":"requestor1",

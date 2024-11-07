@@ -64,6 +64,7 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.KeyCertBytesPair;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
+import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.FileOrValue;
@@ -223,6 +224,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   SecurityFactory securityFactory;
 
+  P11CryptServiceFactory p11CryptServiceFactory;
+
   CaConfStore caConfStore;
 
   private DataSourceWrapper certstoreDatasource;
@@ -318,6 +321,14 @@ public class CaManagerImpl implements CaManager, Closeable {
     this.securityFactory = securityFactory;
   }
 
+  public P11CryptServiceFactory getP11CryptServiceFactory() {
+    return p11CryptServiceFactory;
+  }
+
+  public void setP11CryptServiceFactory(P11CryptServiceFactory p11CryptServiceFactory) {
+    this.p11CryptServiceFactory = p11CryptServiceFactory;
+  }
+
   public boolean isMasterMode() {
     return masterMode;
   }
@@ -335,6 +346,11 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public Set<String> getSupportedPublisherTypes() {
     return certPublisherFactoryRegister.getSupportedTypes();
+  }
+
+  @Override
+  public String getTokenInfoP11(Integer slotIndex, boolean verbose) throws CaMgmtException {
+    return signerManager.getTokenInfoP11(slotIndex, verbose);
   }
 
   private void init() throws CaMgmtException {

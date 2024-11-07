@@ -33,8 +33,8 @@ import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.util.BigIntegers;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.pkcs11.wrapper.Functions;
 import org.xipki.security.EdECConstants;
-import org.xipki.security.Functions;
 import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.StringUtil;
@@ -496,7 +496,7 @@ public class KeyUtil {
         Functions.getEcParams(paramSpec.getOrder(), paramSpec.getGenerator().getAffineX())).orElseThrow(
         () -> new IllegalArgumentException("unknown paramSpec"));
 
-    return ASN1ObjectIdentifier.getInstance(ecParams);
+    return new ASN1ObjectIdentifier(Functions.decodeOid(ecParams));
   }
 
   public static byte[] getUncompressedEncodedECPoint(ECPoint point, int fieldBitSize) {

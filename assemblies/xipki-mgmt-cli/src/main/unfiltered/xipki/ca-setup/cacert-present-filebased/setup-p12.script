@@ -28,7 +28,7 @@ THIS_DIR = xipki/ca-setup/cacert-none-filebased
 if { "$printUsage" equals "true" } then {
   echo "Usage: "
   echo ""
-  echo "source ${THIS_DIR}/setup-p12.script <key type> <tomcat dir> [<xipki dir>]"
+  echo "source ${THIS_DIR}/setup-p11.script <key type> <tomcat dir> [<xipki dir>]"
   echo "    key type:  rsa, ec, dsa, sm2, ed25519, ed448"
   echo "    xipki dir: optional, required if is not <tomcat dir>/xipki"
 } else {

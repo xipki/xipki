@@ -9,7 +9,9 @@ echo "#################################################################"
 echo "#                        Load rootca.json                       #"
 echo "#################################################################"
 
-if { $TOKEN_TYPE equals "pkcs12" } then {
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rootca1"
+} else {
   CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/rootca1.p12,algo=$SIGALGO"
 }
 
@@ -31,7 +33,12 @@ if { $TOKEN_TYPE equals "pkcs12" } then {
 }
 
 ## Generate keys and CSR for subca1
-if { $TOKEN_TYPE equals "pkcs12" } then {
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  xi:csr-p11 REPLACEME-RSAPSS \
+    --slot $SLOT --label subca1 \
+    --out output/subca1.csr \
+    --subject "C=DE,O=myorg,CN=subca1"
+} else {
   xi:csr-p12 REPLACEME-RSAPSS \
     --p12 output/subca1.p12 --password CHANGEIT \
     --out output/subca1.csr \
@@ -51,7 +58,9 @@ echo "#                             Add subca                         #"
 echo "#################################################################"
 ## Add CA
 
-if { $TOKEN_TYPE equals "pkcs12" } then {
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subca1"
+} else {
   CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subca1.p12,algo=$SIGALGO"
 }
 

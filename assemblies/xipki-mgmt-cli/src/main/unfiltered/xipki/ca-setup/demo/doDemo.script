@@ -29,6 +29,9 @@ xi:copy-file --force $CA_TOMCAT_DIR/xipki/etc/ca/database/ocsp-db.properties \
     $OCSP_TOMCAT_DIR/xipki/etc/ocsp/database/
 
 echo "Delete keys and certificates"
+if { "$tokentype" equals "p11" } then {
+  xi:delete-key-p11 --force --slot $SLOT --label $LABEL
+}
 
 xi:rm --force --recursive $CA_KEYCERTS_DIR
 
@@ -68,7 +71,11 @@ xi:exec "${GW_TOMCAT_DIR}/bin/startup.sh"
 xi:rm --force xipki/ocsp-setup/keycerts/ocsp1.crt \
   xipki/ocsp-setup/keycerts/ocsp1.p12
 
-if { "$tokentype" equals "p12" } then {
+if { "$tokentype" equals "p11" } then {
+  xi:delete-key-p11 --slot 0 --label ocsp1 --force
+  source xipki/ca-setup/setup-ocsp-p11.script $keytype
+  xi:copy-file --force xipki/ocsp-setup/keycerts/ocsp1.crt ${OCSP_TOMCAT_DIR}/xipki/keycerts/
+} else {
   source xipki/ca-setup/setup-ocsp-p12.script $keytype
   xi:copy-file --force xipki/ocsp-setup/keycerts/ocsp1.p12 ${OCSP_TOMCAT_DIR}/xipki/keycerts/
 }
@@ -100,7 +107,9 @@ each ($ocspdbtypes) {
   }
 
   echo "Copy the ocsp-responder configuration file"
-  if { "$tokentype" equals "p12" } then {
+  if { "$tokentype" equals "p11" } then {
+    OCSP_CONF_FILE = xipki/ca-setup/demo/ocsp-responder-p11-${ocspdbtype}.json
+  } else {
     if { "$ocspdbtype" equals "ocspdb" } then {
       OCSP_CONF_FILE = ${OCSP_TOMCAT_DIR}/xipki/etc/ocsp/example/xipki-db-store/ocsp-responder.json
     } else {

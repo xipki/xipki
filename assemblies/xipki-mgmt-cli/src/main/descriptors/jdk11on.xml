@@ -144,6 +144,12 @@
   </fileSets>
   <files>
     <file>
+      <source>${shared.dir}/tomcat/xipki/security/example/pkcs11-emulator.json</source>
+      <outputDirectory>xipki/security</outputDirectory>
+      <destName>pkcs11.json</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>../xipki-cli/src/main/unfiltered/xipki/client-script/rest-client.script</source>
       <outputDirectory>xipki/ca-setup/demo</outputDirectory>
       <fileMode>0644</fileMode>

@@ -5,9 +5,11 @@ package org.xipki.security.shell;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.security.SignAlgo;
+import org.xipki.security.pkcs11.P11Slot.P11KeyUsage;
 import org.xipki.shell.EnumCompleter;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -32,6 +34,28 @@ public class SecurityCompleters {
       setTokens("PKCS12", "JCEKS", "PEM");
     }
   } // class KeystoreTypeCompleter
+
+  @Service
+  public static class P11KeyUsageCompleter extends EnumCompleter {
+
+    public P11KeyUsageCompleter() {
+      Set<String> names = new HashSet<>();
+      for (P11KeyUsage usage : P11KeyUsage.values()) {
+        names.add(usage.name());
+      }
+      setTokens(names);
+    }
+
+    public static Set<P11KeyUsage> parseUsages(List<String> usageTexts) {
+      Set<P11KeyUsage> usages = new HashSet<>();
+      for (String usageText : usageTexts) {
+        P11KeyUsage usage = P11KeyUsage.valueOf(usageText.toUpperCase());
+        usages.add(usage);
+      }
+      return usages;
+    }
+
+  } // class P11KeyUsageCompleter
 
   @Service
   public static class SecretKeyTypeCompleter extends EnumCompleter {

@@ -143,6 +143,8 @@ public class XijsonExtensions {
 
   private ExtensionValue tlsFeature;
 
+  private ExtensionValue validityModel;
+
   private SubjectDirectoryAttributesControl subjectDirAttrsControl;
 
   XijsonExtensions(XijsonCertprofile certProfile, X509ProfileType conf, SubjectControl subjectControl)
@@ -866,6 +868,10 @@ public class XijsonExtensions {
 
   public ExtensionValue getTlsFeature() {
     return tlsFeature;
+  }
+
+  public ExtensionValue getValidityModel() {
+    return validityModel;
   }
 
   public SubjectDirectoryAttributesControl getSubjectDirAttrsControl() {

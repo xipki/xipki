@@ -20,7 +20,7 @@ if { "$1" equals "" | "$1" equals "help" } then {
     KEYSPEC =$5
   }
 
-  argsValid = $([pkcs12] contains $TOKEN_TYPE)
+  argsValid = $([pkcs11 pkcs12] contains $TOKEN_TYPE)
 
   if { "$argsValid" equals "false" } then {
     errMsg = "invalid TOKEN_TYPE $TOKEN_TYPE"
@@ -70,7 +70,7 @@ if { "$printUsage" equals "true" } then {
   echo "                     shake128, shake256 (for signature types rsapss and ec)"
   echo "                     sm3 (for signature type sm2)"
   echo "                     The sha3 algorithms are not for plainec."
-  echo "    token type:      pkcs12"
+  echo "    token type:      pkcs11, pkcs12"
   echo "    signature type:  rsa, rsapss, ec, plainec, dsa, sm2"
   echo "    keyspec:         keysize for signature types rsa, rsapss and dsa,"
   echo "                     curve name for signature types ec and plainec"
@@ -281,7 +281,9 @@ if { "$printUsage" equals "true" } then {
 
   # The CA named rootca2 exists. No new CA with the same name is allowed
 
-  if { $TOKEN_TYPE equals "pkcs12" } then {
+  if { $TOKEN_TYPE equals "pkcs11" } then {
+    CA_SIGNER_CONF_RCA = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=rootca1"
+  } else {
     CA_SIGNER_CONF_RCA = "password=CHANGEIT,keystore=file:output/rootca1.p12,algo=$CA_SIGNER_ALGO"
   }
 

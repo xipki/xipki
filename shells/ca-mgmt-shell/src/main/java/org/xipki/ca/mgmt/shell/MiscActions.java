@@ -233,4 +233,26 @@ public class MiscActions {
 
   } // class Unlock
 
+  @Command(scope = "ca", name = "ca-token-info-p11", description = "list objects in PKCS#11 device of the CA")
+  @Service
+  public static class CaTokenInfoP11 extends CaAction {
+
+    @Option(name = "--verbose", aliases = "-v", description = "show object information verbosely")
+    private Boolean verbose = Boolean.FALSE;
+
+    @Option(name = "--slot", description = "slot index")
+    private Integer slotIndex;
+
+    @Override
+    protected Object execute0() throws Exception {
+      try {
+        println(caManager.getTokenInfoP11(slotIndex, verbose));
+        return null;
+      } catch (CaMgmtException ex) {
+        throw new CmdFailure("could not get token-info-p11, error: " + ex.getMessage(), ex);
+      }
+    } // method execute0
+
+  }
+
 }

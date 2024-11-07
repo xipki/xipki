@@ -812,4 +812,6 @@ public interface CaManager {
    */
   Set<String> getSupportedPublisherTypes() throws CaMgmtException;
 
+  String getTokenInfoP11(Integer slotIndex, boolean verbose) throws CaMgmtException;
+
 }

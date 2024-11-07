@@ -116,17 +116,37 @@ Security Commands
 
      convert keystore
 
+   * `xi:csr-p11`
+
+     generate CSR with PKCS#11 device
+
    * `xi:csr-p12`
 
      generate CSR with PKCS#12 keystore
+
+   * `xi:delete-key-p11`
+
+     delete key and cert in PKCS#11 device
+
+   * `xi:delete-objects-p11`
+
+     delete objects in PKCS#11 device
 
    * `xi:deobfuscate`
 
      deobfuscate password
 
+   * `xi:dsa-p11`
+
+     generate DSA keypair in PKCS#11 device
+
    * `xi:dsa-p12`
 
      generate RSA keypair in PKCS#12 keystore
+
+   * `xi:ec-p11`
+
+     generate EC keypair in PKCS#11 device
 
    * `xi:ec-p12`
 
@@ -148,6 +168,14 @@ Security Commands
 
      import certificates to a keystore
 
+   * `xi:import-secretkey-p11`
+
+     import secret key with given value in PKCS#11 device
+
+   * `xi:object-exists-p11`
+
+     return whether objects exist in PKCS#11 device
+
    * `xi:obfuscate`
 
      obfuscate password
@@ -164,17 +192,33 @@ Security Commands
 
      export PKCS#12 key store, like the 'openssl pkcs12' command
 
+   * `xi:rsa-p11`
+
+     generate RSA keypair in PKCS#11 device
+
    * `xi:rsa-p12`
 
      generate RSA keypair in PKCS#12 keystore
+
+   * `xi:secretkey-p11`
+
+     generate secret key in PKCS#11 device
 
    * `xi:secretkey-p12`
 
      generate secret key in JCEKS (not PKCS#12) keystore
 
+   * `xi:sm2-p11`
+
+     generate SM2 keypair in PKCS#11 device
+
    * `xi:sm2-p12`
 
      generate SM2 keypair in PKCS#12 keystore
+
+   * `xi:token-info-p11`
+
+     list objects in PKCS#11 device
 
    * `xi:update-cert-p12`
 
@@ -445,6 +489,10 @@ CA Management Commands
    * `ca:signer-up`
 
      update signer
+
+   * `ca:ca-token-info-p11`
+
+     list objects in PKCS#11 device of the CA
 
    * `ca:unsuspend-cert`
 

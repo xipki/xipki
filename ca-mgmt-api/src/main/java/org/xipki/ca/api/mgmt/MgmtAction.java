@@ -89,6 +89,7 @@ public enum MgmtAction {
   @Deprecated
   revokeCertficate,
   revokeCertificate,
+  tokenInfoP11,
   unlockCa,
   unrevokeCa,
   unsuspendCertificate;

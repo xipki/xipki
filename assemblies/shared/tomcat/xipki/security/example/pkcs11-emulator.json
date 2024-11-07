@@ -1,0 +1,31 @@
+{
+	"readonly":false,
+	"type":"emulator",
+	"user":"CKU_USER",
+	"includeSlots":[
+		{
+			"index":0
+		}
+	],
+	"maxMessageSize":16384,
+	"nativeLibraries":[
+		{
+			"path":"~/.xipki/pkcs11-emulator"
+		}
+	],
+	"newObjectConf":{
+		"idLength":8,
+		"ignoreLabel":false
+	},
+	"passwordSets":[
+		{
+			"password": "123456",
+			"slots":[
+				{
+					"index":0
+				}
+			]
+		}
+	]
+}
+

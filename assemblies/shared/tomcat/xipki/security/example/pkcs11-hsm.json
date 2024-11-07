@@ -1,0 +1,42 @@
+{
+	"readonly":false,
+	"type":"native",
+	"user":"CKU_USER",
+	"numSessions": 100,
+	"maxMessageSize":16384,
+	"newSessionTimeout":30000,
+	"includeSlots":[
+		{
+			"index":0
+		}
+	],
+	"nativeLibraries":[
+		{
+			"operationSystems":[
+				"nix", "nux", "aix", "mac"
+			],
+			"path":"/usr/local/lib/softhsm/libsofthsm2.so"
+		},
+		{
+			"operationSystems":[
+				"windows"
+			],
+			"path":"C:\\...\\libsofthsm2.dll"
+		}
+	],
+	"newObjectConf":{
+		"idLength":8,
+		"ignoreLabel":false
+	},
+	"passwordSets":[
+		{
+			"password": "123456",
+			"slots":[
+				{
+					"index":0
+				}
+			]
+		}
+	]
+}
+

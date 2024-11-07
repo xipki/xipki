@@ -18,12 +18,16 @@ Please refer to [commands.md](commands.md) for more details.
 
 ## Setup CA Server
 
+* _(If error like "Identity or Certificate with label=mylabel already exists" occurs,
+      you need to comment the line in the file `setup-p11.script` which generate the key (e.g. dsa-p11 ec-p11, rsa-p11, sm2-p12)
+      or delete the existing key using command `delete-key-p11`)_.
+
 * Start Management CLI.
 
   `bin/karaf`
 
 * Setup CA (MGMT-CLI shall be on the same machine as the tomcat CA server)  
-  Edit (e.g. subject and password) and execcute the script file `xipki/ca-setup/<folder>/setup-p12.script` 
+  Edit (e.g. subject and password) and execcute the script file `xipki/ca-setup/<folder>/setup-{p11|p12}.script` 
   `source <script-file> {rsa|ec|dsa|sm2|eddsa} <tomcat-dir> [<xipki-dir>]`,  
   `xipki-dir` is optional and has default value `<tomca-dir>/xipki`.
   And `<folder>` is:
@@ -42,7 +46,7 @@ Please refer to [commands.md](commands.md) for more details.
 
 * (Optional) Generate Key and Certificate for OCSP Responder
     * If you wish to generate the signing key and certificate for the OCSP responder, in the Management CLI:  
-      `source xipki/ca-setup/setup-ocsp-p12.script`.
+      `source xipki/ca-setup/setup-ocsp-{p11|p12}.script`.
 
 * (Optional) Generate Key and Certificate for SCEP Gateway
     * If you wish to generate the signing key and certificate for the SCEP gateway, in the Management CLI:  

@@ -12,6 +12,7 @@
     <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle>mvn:net.lingala.zip4j/zip4j/${zip4j.version}</bundle>
     <bundle>mvn:org.osgi/org.osgi.service.jdbc/1.0.0</bundle>
+    <bundle>mvn:org.xipki/ipkcs11wrapper/${pkcs11wrapper.version}</bundle>
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
     <bundle>mvn:org.xipki/datasource/${project.version}</bundle>

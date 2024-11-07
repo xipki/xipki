@@ -60,7 +60,26 @@ if { "$KEYSPEC" equals "" } then {
 
 list = [ rootca1 subca1 subcawithcrl1 ocsp99 ]
 
-if { $TOKEN_TYPE equals "pkcs12" } then {
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  SLOT = "0"
+
+  OCSP_KEYCONF = "slot=$SLOT,key-label=ocsp99"
+
+  each ($list) {
+    xi:delete-key-p11 --force --slot $SLOT --label ${it}
+
+    if { $KEY_TYPE equals "rsa" } then {
+      xi:rsa-p11 --key-size $KEYSPEC --slot $SLOT --label ${it}
+    } elif { $KEY_TYPE equals "ec" } then {
+      xi:ec-p11 --curve $KEYSPEC --slot $SLOT --label ${it}
+    } elif { $KEY_TYPE equals "dsa" } then {
+      xi:dsa-p11 --plen $KEYSPEC --slot $SLOT --label ${it}
+    } elif { $KEY_TYPE equals "sm2" } then {
+      xi:sm2-p11 --slot $SLOT --label ${it}
+    }
+  }
+
+} elif { $TOKEN_TYPE equals "pkcs12" } then {
 
   OCSP_KEYCONF = "password=CHANGEIT,keystore=file:keycerts/ocsp99.p12"
 

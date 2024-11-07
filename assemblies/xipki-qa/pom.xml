@@ -311,6 +311,22 @@
                   <arg value="--value-file"/>
                   <arg file="../xipki-cli/src/main/patchkaraf/org.ops4j.pax.logging.cfg.patch"/>
                 </java>
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchAppend">
+                  <arg value="--backup"/>
+                  <arg value="no"/>
+                  <arg value="--file"/>
+                  <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin/setenv"/>
+                  <arg value="--value"/>
+                  <arg value="export JAVA_OPTS=&quot;&#36;{JAVA_OPTS} --add-exports=jdk.crypto.cryptoki/sun.security.pkcs11.wrapper=ALL-UNNAMED&quot;"/>
+                </java>
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchAppend">
+                  <arg value="--backup"/>
+                  <arg value="no"/>
+                  <arg value="--file"/>
+                  <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin/setenv.bat"/>
+                  <arg value="--value"/>
+                  <arg value="set JAVA_OPTS=%JAVA_OPTS% --add-exports=jdk.crypto.cryptoki/sun.security.pkcs11.wrapper=ALL-UNNAMED"/>
+                </java>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin/inc"
                   token="-Dcom.sun.management.jmxremote"
