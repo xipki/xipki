@@ -510,6 +510,7 @@ class O2tChecker extends ExtensionChecker {
 
     SubjectDirectoryAttributes requested = SubjectDirectoryAttributes.getInstance(extInRequest);
     Vector<?> reqSubDirAttrs = requested.getAttributes();
+    ASN1GeneralizedTime expDateOfBirth = null;
     String expPlaceOfBirth = null;
     String expGender = null;
     Set<String> expCountryOfCitizenshipList = new HashSet<>();

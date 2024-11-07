@@ -55,7 +55,7 @@ import java.util.Set;
 
 import static org.xipki.qa.ca.extn.CheckerUtil.addIfNotIn;
 import static org.xipki.qa.ca.extn.CheckerUtil.addViolation;
-import static org.xipki.qa.ca.extn.CheckerUtil.buildConstantExtensions;
+import static org.xipki.qa.ca.extn.CheckerUtil.buildConstantExtesions;
 import static org.xipki.qa.ca.extn.CheckerUtil.hex;
 import static org.xipki.qa.ca.extn.CheckerUtil.readAsn1Encodable;
 
@@ -179,7 +179,7 @@ public class ExtensionsChecker {
     }
 
     // constant extensions
-    this.constantExtensions = buildConstantExtensions(extensions);
+    this.constantExtensions = buildConstantExtesions(extensions);
 
     this.a2gChecker = new A2gChecker(this);
     this.h2nChecker = new H2nChecker(this);

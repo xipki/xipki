@@ -87,7 +87,9 @@ public class X509Ca extends X509CaModule implements Closeable {
   static class GrantedCertTemplate {
 
     private final BigInteger certId;
+
     private final boolean batch;
+
     private final ConcurrentContentSigner signer;
     private final Extensions extensions;
     private final IdentifiedCertprofile certprofile;
@@ -101,12 +103,10 @@ public class X509Ca extends X509CaModule implements Closeable {
     private X500Name grantedSubject;
     private String grantedSubjectText;
 
-    GrantedCertTemplate(
-        boolean batch, BigInteger certId, Extensions extensions,
-        IdentifiedCertprofile certprofile,
-        Instant grantedNotBefore, Instant grantedNotAfter,
-        X500Name requestedSubject, SubjectPublicKeyInfo grantedPublicKey,
-        PrivateKeyInfo privateKey, ConcurrentContentSigner signer, String warning) {
+    GrantedCertTemplate(boolean batch, BigInteger certId, Extensions extensions, IdentifiedCertprofile certprofile,
+                        Instant grantedNotBefore, Instant grantedNotAfter,
+                        X500Name requestedSubject, SubjectPublicKeyInfo grantedPublicKey,
+                        PrivateKeyInfo privateKey, ConcurrentContentSigner signer, String warning) {
       this.batch = batch;
       this.certId = certId == null ? BigInteger.ZERO : certId;
       this.extensions = extensions;
