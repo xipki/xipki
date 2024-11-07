@@ -5,10 +5,14 @@ package org.xipki.ca.certprofile.xijson.conf;
 
 import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
+import org.xipki.ca.certprofile.xijson.conf.extn.AdditionalInformation;
+import org.xipki.ca.certprofile.xijson.conf.extn.AdmissionSyntax;
 import org.xipki.ca.certprofile.xijson.conf.extn.AuthorityInfoAccess;
 import org.xipki.ca.certprofile.xijson.conf.extn.AuthorityKeyIdentifier;
 import org.xipki.ca.certprofile.xijson.conf.extn.BasicConstraints;
 import org.xipki.ca.certprofile.xijson.conf.extn.BiometricInfo;
+import org.xipki.ca.certprofile.xijson.conf.extn.CCCInstanceCAExtensionSchema;
+import org.xipki.ca.certprofile.xijson.conf.extn.CCCSimpleExtensionSchema;
 import org.xipki.ca.certprofile.xijson.conf.extn.CertificatePolicies;
 import org.xipki.ca.certprofile.xijson.conf.extn.CrlDistributionPoints;
 import org.xipki.ca.certprofile.xijson.conf.extn.ExtendedKeyUsage;
@@ -19,10 +23,12 @@ import org.xipki.ca.certprofile.xijson.conf.extn.PolicyConstraints;
 import org.xipki.ca.certprofile.xijson.conf.extn.PolicyMappings;
 import org.xipki.ca.certprofile.xijson.conf.extn.PrivateKeyUsagePeriod;
 import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements;
+import org.xipki.ca.certprofile.xijson.conf.extn.Restriction;
 import org.xipki.ca.certprofile.xijson.conf.extn.SmimeCapabilities;
 import org.xipki.ca.certprofile.xijson.conf.extn.SubjectDirectoryAttributs;
 import org.xipki.ca.certprofile.xijson.conf.extn.SubjectInfoAccess;
 import org.xipki.ca.certprofile.xijson.conf.extn.TlsFeature;
+import org.xipki.ca.certprofile.xijson.conf.extn.ValidityModel;
 import org.xipki.util.TripleState;
 import org.xipki.util.ValidableConf;
 import org.xipki.util.exception.InvalidConfException;
@@ -50,6 +56,10 @@ public class ExtensionType extends ValidableConf {
   private Boolean permittedInRequest;
 
   private TripleState inRequest;
+
+  private AdditionalInformation additionalInformation;
+
+  private AdmissionSyntax admissionSyntax;
 
   private AuthorityInfoAccess authorityInfoAccess;
 
@@ -94,6 +104,8 @@ public class ExtensionType extends ValidableConf {
 
   private QcStatements qcStatements;
 
+  private Restriction restriction;
+
   private SmimeCapabilities smimeCapabilities;
 
   private GeneralNameType subjectAltName;
@@ -103,6 +115,12 @@ public class ExtensionType extends ValidableConf {
   private SubjectInfoAccess subjectInfoAccess;
 
   private TlsFeature tlsFeature;
+
+  private ValidityModel validityModel;
+
+  private CCCSimpleExtensionSchema cccExtensionSchema;
+
+  private CCCInstanceCAExtensionSchema cccInstanceCAExtensionSchema;
 
   private Object custom;
 
@@ -165,6 +183,22 @@ public class ExtensionType extends ValidableConf {
 
   public void setInRequest(TripleState inRequest) {
     this.inRequest = inRequest;
+  }
+
+  public AdditionalInformation getAdditionalInformation() {
+    return additionalInformation;
+  }
+
+  public void setAdditionalInformation(AdditionalInformation additionalInformation) {
+    this.additionalInformation = additionalInformation;
+  }
+
+  public AdmissionSyntax getAdmissionSyntax() {
+    return admissionSyntax;
+  }
+
+  public void setAdmissionSyntax(AdmissionSyntax admissionSyntax) {
+    this.admissionSyntax = admissionSyntax;
   }
 
   public AuthorityInfoAccess getAuthorityInfoAccess() {
@@ -313,6 +347,14 @@ public class ExtensionType extends ValidableConf {
     this.qcStatements = qcStatements;
   }
 
+  public Restriction getRestriction() {
+    return restriction;
+  }
+
+  public void setRestriction(Restriction restriction) {
+    this.restriction = restriction;
+  }
+
   public SmimeCapabilities getSmimeCapabilities() {
     return smimeCapabilities;
   }
@@ -353,6 +395,30 @@ public class ExtensionType extends ValidableConf {
     this.tlsFeature = tlsFeature;
   }
 
+  public ValidityModel getValidityModel() {
+    return validityModel;
+  }
+
+  public void setValidityModel(ValidityModel validityModel) {
+    this.validityModel = validityModel;
+  }
+
+  public CCCSimpleExtensionSchema getCccExtensionSchema() {
+    return cccExtensionSchema;
+  }
+
+  public void setCccExtensionSchema(CCCSimpleExtensionSchema cccExtensionSchema) {
+    this.cccExtensionSchema = cccExtensionSchema;
+  }
+
+  public CCCInstanceCAExtensionSchema getCccInstanceCAExtensionSchema() {
+    return cccInstanceCAExtensionSchema;
+  }
+
+  public void setCccInstanceCAExtensionSchema(CCCInstanceCAExtensionSchema cccInstanceCAExtensionSchema) {
+    this.cccInstanceCAExtensionSchema = cccInstanceCAExtensionSchema;
+  }
+
   public Object getCustom() {
     return custom;
   }
@@ -364,13 +430,11 @@ public class ExtensionType extends ValidableConf {
   @Override
   public void validate() throws InvalidConfException {
     notNull(type, "type");
-    validate(type, authorityInfoAccess, authorityKeyIdentifier);
-    validate(basicConstraints, biometricInfo, certificatePolicies,
-        constant, extendedKeyUsage, inhibitAnyPolicy);
-    validate(keyUsage, nameConstraints, policyMappings,
-        privateKeyUsagePeriod, policyConstraints, qcStatements);
-    validate(smimeCapabilities, subjectAltName, subjectDirectoryAttributs, subjectInfoAccess);
-    validate(subjectKeyIdentifier, tlsFeature);
+    validate(type, additionalInformation, admissionSyntax, authorityInfoAccess, authorityKeyIdentifier);
+    validate(basicConstraints, biometricInfo, certificatePolicies, constant, extendedKeyUsage, inhibitAnyPolicy);
+    validate(keyUsage, nameConstraints, policyMappings, privateKeyUsagePeriod, policyConstraints, qcStatements);
+    validate(restriction, smimeCapabilities, subjectAltName, subjectDirectoryAttributs, subjectInfoAccess);
+    validate(subjectKeyIdentifier, tlsFeature, validityModel, cccExtensionSchema, cccInstanceCAExtensionSchema);
   } // method validate
 
 }

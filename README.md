@@ -137,6 +137,10 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
       - AdditionalInformation, Admission
       - Restriction
       - ValidityModel
+    - GM/T 0015-2012 (Chinese national standard)
+      - ICRegistrationNumber, IdentityCode, InsuranceNumber
+      - OrganizationCode
+      - TaxationNumber
   - Management of multiple CAs in one software instance
     - Support of database cluster
     - Multiple software instances (all can be in active mode) for the same CA

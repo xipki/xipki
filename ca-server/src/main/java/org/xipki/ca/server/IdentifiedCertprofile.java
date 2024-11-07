@@ -200,6 +200,14 @@ public class IdentifiedCertprofile implements Closeable {
           }
         }
 
+        // subject:postalCode
+        if (containsRdn(subject, DN.postalCode)) {
+          if (!containsRdn(subject, DN.O) && !containsRdn(subject, DN.givenName) && !containsRdn(subject, DN.surname)) {
+            throw new BadCertTemplateException("subject:postalCode is prohibited if the "
+                + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
+          }
+        }
+
         // subject:countryCode
         if (!containsRdn(subject, DN.C)) {
           if (containsRdn(subject, DN.O) || containsRdn(subject, DN.givenName) || containsRdn(subject, DN.surname)) {
@@ -210,7 +218,7 @@ public class IdentifiedCertprofile implements Closeable {
 
         if (BaseRequirements.id_domain_validated.equals(policyId)) {
           ASN1ObjectIdentifier[] excludeSubjectFields = new ASN1ObjectIdentifier[] {
-              DN.O, DN.givenName, DN.surname, DN.street, DN.localityName, DN.ST};
+              DN.O, DN.givenName, DN.surname, DN.street, DN.localityName, DN.ST, DN.postalCode};
           for (ASN1ObjectIdentifier m : excludeSubjectFields) {
             if (containsRdn(subject, m)) {
               throw new BadCertTemplateException("subject " + ObjectIdentifiers.getName(m)

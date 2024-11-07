@@ -8,6 +8,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
+import org.xipki.util.cbor.CborType;
 import org.xipki.util.exception.DecodeException;
 import org.xipki.util.exception.EncodeException;
 

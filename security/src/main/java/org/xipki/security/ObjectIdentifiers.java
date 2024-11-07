@@ -158,7 +158,7 @@ public class ObjectIdentifiers {
     /**
      * postalCode - DirectoryString(SIZE(1..40)
      */
-    //public static final ASN1ObjectIdentifier postalCode = new ASN1ObjectIdentifier("2.5.4.17");
+    public static final ASN1ObjectIdentifier postalCode = new ASN1ObjectIdentifier("2.5.4.17");
 
     /**
      * dnQualifier - DirectoryString(SIZE(1..64)
@@ -173,7 +173,7 @@ public class ObjectIdentifiers {
     /**
      * RFC 3039 DateOfBirth - GeneralizedTime - YYYYMMDD000000Z.
      */
-    //public static final ASN1ObjectIdentifier dateOfBirth = new ASN1ObjectIdentifier("1.3.6.1.5.5.7.9.1");
+    public static final ASN1ObjectIdentifier dateOfBirth = new ASN1ObjectIdentifier("1.3.6.1.5.5.7.9.1");
 
     /**
      * RFC 3039 PlaceOfBirth - DirectoryString(SIZE(1..128)
@@ -204,7 +204,7 @@ public class ObjectIdentifiers {
      * RFC 3039 PostalAddress - SEQUENCE SIZE (1..6) OF
      * DirectoryString(SIZE(1..30))
      */
-    //public static final ASN1ObjectIdentifier postalAddress = new ASN1ObjectIdentifier("2.5.4.16");
+    public static final ASN1ObjectIdentifier postalAddress = new ASN1ObjectIdentifier("2.5.4.16");
 
     /**
      * RFC 2256 dmdName.
@@ -258,12 +258,12 @@ public class ObjectIdentifiers {
     /**
      * NIF, Tax ID number, for individuals (Spain).
      */
-    //public static final ASN1ObjectIdentifier NIF = id_pen.branch("18838.1.1");
+    public static final ASN1ObjectIdentifier NIF = id_pen.branch("18838.1.1");
 
     /**
      * CIF, Tax ID code, for companies (Spain).
      */
-    //public static final ASN1ObjectIdentifier CIF = id_pen.branch("4710.1.3.2");
+    public static final ASN1ObjectIdentifier CIF = id_pen.branch("4710.1.3.2");
 
     /**
      * jurisdictionOfIncorporationLocalityName.
@@ -508,15 +508,15 @@ public class ObjectIdentifiers {
 
     public static final ASN1ObjectIdentifier id_extension_pkix_ocsp_nocheck = id_pkix.branch("48.1.5");
 
-    // public static final ASN1ObjectIdentifier id_extension_restriction = new ASN1ObjectIdentifier("1.3.36.8.3.8");
+    public static final ASN1ObjectIdentifier id_extension_restriction = new ASN1ObjectIdentifier("1.3.36.8.3.8");
 
-    //public static final ASN1ObjectIdentifier id_extension_additionalInformation =
-    //    new ASN1ObjectIdentifier("1.3.36.8.3.15");
+    public static final ASN1ObjectIdentifier id_extension_additionalInformation =
+        new ASN1ObjectIdentifier("1.3.36.8.3.15");
 
-    //public static final ASN1ObjectIdentifier id_extension_validityModel =
-    //    new ASN1ObjectIdentifier("1.3.6.1.4.1.8301.3.5");
+    public static final ASN1ObjectIdentifier id_extension_validityModel =
+        new ASN1ObjectIdentifier("1.3.6.1.4.1.8301.3.5");
 
-    // public static final ASN1ObjectIdentifier id_extension_admission = new ASN1ObjectIdentifier("1.3.36.8.3.3");
+    public static final ASN1ObjectIdentifier id_extension_admission = new ASN1ObjectIdentifier("1.3.36.8.3.3");
 
     private static final ASN1ObjectIdentifier id_ad = id_pkix.branch("48");
 
@@ -550,22 +550,22 @@ public class ObjectIdentifiers {
     // RFC 4262: SMIMECapatibilities
     public static final ASN1ObjectIdentifier id_smimeCapabilities = new ASN1ObjectIdentifier("1.2.840.113549.1.9.15");
 
-    //private static final ASN1ObjectIdentifier id_GMT_0015 = new ASN1ObjectIdentifier("1.2.156.10260.4.1");
+    private static final ASN1ObjectIdentifier id_GMT_0015 = new ASN1ObjectIdentifier("1.2.156.10260.4.1");
 
     // GMT 0015-2012 SM2-Based Certificate
-    //public static final ASN1ObjectIdentifier id_GMT_0015_IdentityCode = id_GMT_0015.branch("1");
+    public static final ASN1ObjectIdentifier id_GMT_0015_IdentityCode = id_GMT_0015.branch("1");
 
     // GMT 0015-2012 SM2-Based Certificate
-    //public static final ASN1ObjectIdentifier id_GMT_0015_InsuranceNumber = id_GMT_0015.branch("2");
+    public static final ASN1ObjectIdentifier id_GMT_0015_InsuranceNumber = id_GMT_0015.branch("2");
 
     // GMT 0015-2012 SM2-Based Certificate
-    //public static final ASN1ObjectIdentifier id_GMT_0015_ICRegistrationNumber = id_GMT_0015.branch("3");
+    public static final ASN1ObjectIdentifier id_GMT_0015_ICRegistrationNumber = id_GMT_0015.branch("3");
 
     // GMT 0015-2012 SM2-Based Certificate
-    //public static final ASN1ObjectIdentifier id_GMT_0015_OrganizationCode = id_GMT_0015.branch("4");
+    public static final ASN1ObjectIdentifier id_GMT_0015_OrganizationCode = id_GMT_0015.branch("4");
 
     // GMT 0015-2012 SM2-Based Certificate
-    //public static final ASN1ObjectIdentifier id_GMT_0015_TaxationNumber = id_GMT_0015.branch("5");
+    public static final ASN1ObjectIdentifier id_GMT_0015_TaxationNumber = id_GMT_0015.branch("5");
 
     // Certificate Transparency (RFC 6962)
     public static final ASN1ObjectIdentifier id_precertificate = new ASN1ObjectIdentifier("1.3.6.1.4.1.11129.2.4.3");
@@ -574,17 +574,17 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier id_SCTs = new ASN1ObjectIdentifier("1.3.6.1.4.1.11129.2.4.2");
 
     // CCC: Car Connectivity Consortium
-    //public static final ASN1ObjectIdentifier id_ccc_extn = id_ccc.branch("5");
-    //public static final ASN1ObjectIdentifier id_ccc_Vehicle_Cert_K = id_ccc_extn.branch("1");
-    //public static final ASN1ObjectIdentifier id_ccc_External_CA_Cert_F = id_ccc_extn.branch("2");
-    //public static final ASN1ObjectIdentifier id_ccc_Instance_CA_Cert_E = id_ccc_extn.branch("3");
-    //public static final ASN1ObjectIdentifier id_ccc_Endpoint_Cert_H = id_ccc_extn.branch("4");
-    //public static final ASN1ObjectIdentifier id_ccc_VehicleOEM_Enc_Cert = id_ccc_extn.branch("5");
-    //public static final ASN1ObjectIdentifier id_ccc_VehicleOEM_Sig_Cert = id_ccc_extn.branch("6");
-    //public static final ASN1ObjectIdentifier id_ccc_Device_Enc_Cert = id_ccc_extn.branch("7");
-    //public static final ASN1ObjectIdentifier id_ccc_Vehicle_Intermediate_Cert = id_ccc_extn.branch("8");
-    //public static final ASN1ObjectIdentifier id_ccc_VehicleOEM_CA_Cert_J = id_ccc_extn.branch("9");
-    //public static final ASN1ObjectIdentifier id_ccc_VehicleOEM_CA_Cert_M = id_ccc_extn.branch("10");
+    public static final ASN1ObjectIdentifier id_ccc_extn = id_ccc.branch("5");
+    public static final ASN1ObjectIdentifier id_ccc_Vehicle_Cert_K = id_ccc_extn.branch("1");
+    public static final ASN1ObjectIdentifier id_ccc_External_CA_Cert_F = id_ccc_extn.branch("2");
+    public static final ASN1ObjectIdentifier id_ccc_Instance_CA_Cert_E = id_ccc_extn.branch("3");
+    public static final ASN1ObjectIdentifier id_ccc_Endpoint_Cert_H = id_ccc_extn.branch("4");
+    public static final ASN1ObjectIdentifier id_ccc_VehicleOEM_Enc_Cert = id_ccc_extn.branch("5");
+    public static final ASN1ObjectIdentifier id_ccc_VehicleOEM_Sig_Cert = id_ccc_extn.branch("6");
+    public static final ASN1ObjectIdentifier id_ccc_Device_Enc_Cert = id_ccc_extn.branch("7");
+    public static final ASN1ObjectIdentifier id_ccc_Vehicle_Intermediate_Cert = id_ccc_extn.branch("8");
+    public static final ASN1ObjectIdentifier id_ccc_VehicleOEM_CA_Cert_J = id_ccc_extn.branch("9");
+    public static final ASN1ObjectIdentifier id_ccc_VehicleOEM_CA_Cert_M = id_ccc_extn.branch("10");
   }
 
   public static final class Secg {
@@ -609,7 +609,7 @@ public class ObjectIdentifiers {
 
       oidNameMap.put(DN.countryOfCitizenship, "countryOfCitizenship");
       oidNameMap.put(DN.countryOfResidence, "countryOfResidence");
-      //oidNameMap.put(DN.dateOfBirth, "dateOfBirth");
+      oidNameMap.put(DN.dateOfBirth, "dateOfBirth");
       oidNameMap.put(DN.dmdName, "dmdName");
       oidNameMap.put(DN.emailAddress, "emailAddress");
       oidNameMap.put(DN.gender, "gender");
@@ -619,8 +619,8 @@ public class ObjectIdentifiers {
       oidNameMap.put(DN.pseudonym, "pseudonym");
       oidNameMap.put(DN.unstructuredName, "unstructuredName");
       oidNameMap.put(DN.unstructuredAddress, "unstructuredAddress");
-      //oidNameMap.put(DN.NIF, "NIF, Tax ID number, for individuals (Spain)");
-      //oidNameMap.put(DN.CIF, "CIF, Tax ID code, for companies (Spain)");
+      oidNameMap.put(DN.NIF, "NIF, Tax ID number, for individuals (Spain)");
+      oidNameMap.put(DN.CIF, "CIF, Tax ID code, for companies (Spain)");
       oidNameMap.put(DN.jurisdictionOfIncorporationCountryName, "jurisdictionOfIncorporationCountryName");
       oidNameMap.put(DN.jurisdictionOfIncorporationStateOrProvinceName,
           "jurisdictionOfIncorporationStateOrProvinceName");
@@ -629,10 +629,10 @@ public class ObjectIdentifiers {
       oidNameMap.put(Extn.id_pkix_ocsp_extendedRevoke, "pkix-ocsp-extendedRevoke");
       oidNameMap.put(Extn.id_pkix_ocsp_prefSigAlgs, "pkix-ocsp-prefSigAlgs");
       oidNameMap.put(Extn.id_extension_pkix_ocsp_nocheck, "pkix-ocsp-nocheck");
-      //oidNameMap.put(Extn.id_extension_restriction, "restriction");
-      //oidNameMap.put(Extn.id_extension_additionalInformation, "additionalInformation");
-      //oidNameMap.put(Extn.id_extension_admission, "admission");
-      //oidNameMap.put(Extn.id_extension_validityModel, "validityModel");
+      oidNameMap.put(Extn.id_extension_restriction, "restriction");
+      oidNameMap.put(Extn.id_extension_additionalInformation, "additionalInformation");
+      oidNameMap.put(Extn.id_extension_admission, "admission");
+      oidNameMap.put(Extn.id_extension_validityModel, "validityModel");
       oidNameMap.put(Extn.id_ad_caRepository, "ad-caRepository");
       oidNameMap.put(Extn.id_ad_timeStamping, "ad-timeStamping");
 
@@ -644,16 +644,13 @@ public class ObjectIdentifiers {
       oidNameMap.put(Extn.id_etsi_qcs_QcSSCD, "etsi-qcs-QcSSCD");
       oidNameMap.put(Extn.id_pe_tlsfeature, "tlsFeature");
       oidNameMap.put(Extn.id_smimeCapabilities, "SMIMECapatibilities");
-      /*
       oidNameMap.put(Extn.id_GMT_0015_ICRegistrationNumber, "GMT 0015 ICRegistrationNumber");
       oidNameMap.put(Extn.id_GMT_0015_IdentityCode, "GMT 0015 IdentityCode");
       oidNameMap.put(Extn.id_GMT_0015_InsuranceNumber, "GMT 0015 InsuranceNumber");
       oidNameMap.put(Extn.id_GMT_0015_OrganizationCode, "GMT 0015 OrganizationCode");
       oidNameMap.put(Extn.id_GMT_0015_TaxationNumber, "GMT 0015 TaxationNumber");
-       */
       oidNameMap.put(Extn.id_precertificate, "CT Precertificate Indication");
       oidNameMap.put(Extn.id_SCTs, "CT Precertificate SCTs");
-      /*
       // CCC
       oidNameMap.put(Extn.id_ccc_Vehicle_Cert_K, "CCC Vehicle Certificate [K]");
       oidNameMap.put(Extn.id_ccc_External_CA_Cert_F, "CCC External CA Certificate [F]");
@@ -665,7 +662,7 @@ public class ObjectIdentifiers {
       oidNameMap.put(Extn.id_ccc_Vehicle_Intermediate_Cert, "CCC Vehicle Intermediate Certificate");
       oidNameMap.put(Extn.id_ccc_VehicleOEM_CA_Cert_J, "CCC Vehicle OEM CA Certificate [J]");
       oidNameMap.put(Extn.id_ccc_VehicleOEM_CA_Cert_M, "CCC Vehicle OEM CA Certificate [M]");
-      */
+
       oidNameMap.put(Extension.auditIdentity, "auditIdentity");
       oidNameMap.put(Extension.authorityInfoAccess, "authorityInfoAccess");
       oidNameMap.put(Extension.authorityKeyIdentifier, "authorityKeyIdentifier");

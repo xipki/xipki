@@ -8,6 +8,7 @@ import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DERBMPString;
 import org.bouncycastle.asn1.DERPrintableString;
@@ -28,12 +29,15 @@ import org.xipki.ca.certprofile.xijson.DirectoryStringType;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
+import org.xipki.ca.certprofile.xijson.conf.extn.AdditionalInformation;
+import org.xipki.ca.certprofile.xijson.conf.extn.CCCSimpleExtensionSchema;
 import org.xipki.ca.certprofile.xijson.conf.extn.CertificatePolicies;
 import org.xipki.ca.certprofile.xijson.conf.extn.InhibitAnyPolicy;
 import org.xipki.ca.certprofile.xijson.conf.extn.NameConstraints;
 import org.xipki.ca.certprofile.xijson.conf.extn.PolicyConstraints;
 import org.xipki.ca.certprofile.xijson.conf.extn.PolicyMappings;
 import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements;
+import org.xipki.ca.certprofile.xijson.conf.extn.Restriction;
 import org.xipki.ca.certprofile.xijson.conf.extn.SmimeCapabilities;
 import org.xipki.ca.certprofile.xijson.conf.extn.TlsFeature;
 import org.xipki.qa.ValidationIssue;
@@ -80,6 +84,10 @@ public class ExtensionsChecker {
 
   private InhibitAnyPolicy inhibitAnyPolicy;
 
+  private Restriction restriction;
+
+  private AdditionalInformation additionalInformation;
+
   private ASN1ObjectIdentifier validityModelId;
 
   private QcStatements qcStatements;
@@ -88,6 +96,10 @@ public class ExtensionsChecker {
 
   private QaExtensionValue smimeCapabilities;
 
+  private ASN1ObjectIdentifier cccExtensionSchemaType;
+
+  private byte[] cccExtensionSchemaValue;
+
   private final Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
 
   private final XijsonCertprofile certprofile;
@@ -95,6 +107,7 @@ public class ExtensionsChecker {
   private final A2gChecker a2gChecker;
   private final H2nChecker h2nChecker;
   private final O2tChecker o2tChecker;
+  private final U2zChecker u2zChecker;
 
   public ExtensionsChecker(X509ProfileType conf, XijsonCertprofile certprofile)
       throws CertprofileException {
@@ -134,6 +147,24 @@ public class ExtensionsChecker {
     type = Extension.inhibitAnyPolicy;
     if (extensionControls.containsKey(type)) {
       this.inhibitAnyPolicy = extensions.get(type.getId()).getInhibitAnyPolicy();
+    }
+
+    // restriction
+    type = Extn.id_extension_restriction;
+    if (extensionControls.containsKey(type)) {
+      this.restriction = extensions.get(type.getId()).getRestriction();
+    }
+
+    // additionalInformation
+    type = Extn.id_extension_additionalInformation;
+    if (extensionControls.containsKey(type)) {
+      this.additionalInformation = extensions.get(type.getId()).getAdditionalInformation();
+    }
+
+    // validityModel
+    type = Extn.id_extension_validityModel;
+    if (extensionControls.containsKey(type)) {
+      this.validityModelId = extensions.get(type.getId()).getValidityModel().getModelId().toXiOid();
     }
 
     // QCStatements
@@ -178,13 +209,68 @@ public class ExtensionsChecker {
       }
     }
 
+    // CCC
+    initCCCExtensionSchemas(extensions);
+
     // constant extensions
     this.constantExtensions = buildConstantExtesions(extensions);
 
     this.a2gChecker = new A2gChecker(this);
     this.h2nChecker = new H2nChecker(this);
     this.o2tChecker = new O2tChecker(this);
+    this.u2zChecker = new U2zChecker(this);
   } // constructor
+
+  private void initCCCExtensionSchemas(Map<String, ExtensionType> extensions)
+      throws CertprofileException {
+    Set<String> extnIds = extensions.keySet();
+    ASN1ObjectIdentifier type = null;
+    for (String m : extnIds) {
+      ASN1ObjectIdentifier mOid = new ASN1ObjectIdentifier(m);
+      if (mOid.on(Extn.id_ccc_extn)) {
+        if (type != null) {
+          throw new CertprofileException("Maximal one CCC Extension is allowed, but configured at least 2.");
+        }
+        type = mOid;
+      }
+    }
+
+    if (type == null) {
+      return;
+    }
+
+    ExtensionType ex = extensions.get(type.getId());
+    if (!ex.critical()) {
+      throw new CertprofileException("CCC Extension must be set to critical, but configured non-critical.");
+    }
+
+    List<ASN1ObjectIdentifier> simpleSchemaTypes = Arrays.asList(
+        Extn.id_ccc_Vehicle_Cert_K,
+        Extn.id_ccc_External_CA_Cert_F,
+        Extn.id_ccc_VehicleOEM_Enc_Cert,
+        Extn.id_ccc_VehicleOEM_Sig_Cert,
+        Extn.id_ccc_Device_Enc_Cert,
+        Extn.id_ccc_Vehicle_Intermediate_Cert,
+        Extn.id_ccc_VehicleOEM_CA_Cert_J,
+        Extn.id_ccc_VehicleOEM_CA_Cert_M);
+
+    if (!simpleSchemaTypes.contains(type)) {
+      return;
+    }
+
+    CCCSimpleExtensionSchema schema = ex.getCccExtensionSchema();
+    if (schema == null) {
+      throw new CertprofileException("ccExtensionSchema is not set for " + type);
+    }
+
+    ASN1Sequence seq = new DERSequence(new ASN1Integer(schema.getVersion()));
+    this.cccExtensionSchemaType = type;
+    try {
+      this.cccExtensionSchemaValue = seq.getEncoded();
+    } catch (IOException e) {
+      throw new CertprofileException("error encoding CCC extensionSchemaValue");
+    }
+  }
 
   CertificatePolicies getCertificatePolicies() {
     return certificatePolicies;
@@ -204,6 +290,14 @@ public class ExtensionsChecker {
 
   InhibitAnyPolicy getInhibitAnyPolicy() {
     return inhibitAnyPolicy;
+  }
+
+  Restriction getRestriction() {
+    return restriction;
+  }
+
+  AdditionalInformation getAdditionalInformation() {
+    return additionalInformation;
   }
 
   ASN1ObjectIdentifier getValidityModelId() {
@@ -314,8 +408,16 @@ public class ExtensionsChecker {
           a2gChecker.checkExtnAuthorityInfoAccess(failureMsg, extnValue, issuerInfo);
         } else if (Extension.subjectInfoAccess.equals(oid)) {
           o2tChecker.checkExtnSubjectInfoAccess(failureMsg, extnValue, requestedExtns, extnControl);
+        } else if (Extn.id_extension_admission.equals(oid)) {
+          a2gChecker.checkExtnAdmission(failureMsg, extnValue, requestedExtns, requestedSubject, extnControl);
         } else if (Extn.id_extension_pkix_ocsp_nocheck.equals(oid)) {
           o2tChecker.checkExtnOcspNocheck(failureMsg, extnValue);
+        } else if (Extn.id_extension_restriction.equals(oid)) {
+          o2tChecker.checkExtnRestriction(failureMsg, extnValue, requestedExtns, extnControl);
+        } else if (Extn.id_extension_additionalInformation.equals(oid)) {
+          a2gChecker.checkExtnAdditionalInformation(failureMsg, extnValue, requestedExtns, extnControl);
+        } else if (Extn.id_extension_validityModel.equals(oid)) {
+          u2zChecker.checkExtnValidityModel(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extension.privateKeyUsagePeriod.equals(oid)) {
           o2tChecker.checkExtnPrivateKeyUsagePeriod(
               failureMsg, extnValue, jceCert.getNotBefore(), jceCert.getNotAfter());
@@ -329,6 +431,18 @@ public class ExtensionsChecker {
           o2tChecker.checkSmimeCapabilities(failureMsg, extnValue, extnControl);
         } else if (Extn.id_SCTs.equals(oid)) {
           o2tChecker.checkScts(failureMsg, extnValue, extnControl);
+        } else if (Extn.id_GMT_0015_ICRegistrationNumber.equals(oid)
+            || Extn.id_GMT_0015_InsuranceNumber.equals(oid)
+            || Extn.id_GMT_0015_OrganizationCode.equals(oid)
+            || Extn.id_GMT_0015_TaxationNumber.equals(oid)
+            || Extn.id_GMT_0015_IdentityCode.equals(oid)) {
+          a2gChecker.checkExtnGmt0015(failureMsg, extnValue, requestedExtns, extnControl, oid, requestedSubject);
+        } else if (oid.equals(cccExtensionSchemaType)) {
+          byte[] expected = cccExtensionSchemaValue;
+          if (!Arrays.equals(cccExtensionSchemaValue, extnValue)) {
+            addViolation(failureMsg, "extension value", hex(extnValue),
+                (expected == null) ? "not present" : hex(expected));
+          }
         } else {
           byte[] expected = getExpectedExtValue(oid, requestedExtns, extnControl);
           if (!Arrays.equals(expected, extnValue)) {
@@ -341,7 +455,7 @@ public class ExtensionsChecker {
           issue.setFailureMessage(failureMsg.toString());
         }
 
-      } catch (IllegalArgumentException | ClassCastException | ArrayIndexOutOfBoundsException ex) {
+      } catch (IllegalArgumentException | ClassCastException | IOException | ArrayIndexOutOfBoundsException ex) {
         LOG.debug("extension value does not have correct syntax", ex);
         issue.setFailureMessage("extension value does not have correct syntax");
       }
@@ -519,6 +633,14 @@ public class ExtensionsChecker {
       }
     }
 
+    // Admission
+    type = Extn.id_extension_admission;
+    if (extensionControls.containsKey(type)) {
+      if (certprofile.extensions().getAdmission() != null) {
+        addIfNotIn(types, type);
+      }
+    }
+
     // ocsp-nocheck
     type = Extn.id_extension_pkix_ocsp_nocheck;
     if (extensionControls.containsKey(type)) {
@@ -535,7 +657,7 @@ public class ExtensionsChecker {
     }
 
     return types;
-  } // method getExtensionTypes
+  } // method getExensionTypes
 
   private ValidationIssue createExtensionIssue(ASN1ObjectIdentifier extId) {
     String extName = ObjectIdentifiers.getName(extId);

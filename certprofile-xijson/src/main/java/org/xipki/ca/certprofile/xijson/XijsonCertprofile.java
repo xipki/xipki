@@ -10,6 +10,9 @@ import org.bouncycastle.asn1.ASN1IA5String;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1PrintableString;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1String;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.ASN1UTF8String;
 import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
@@ -43,6 +46,7 @@ import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
 import org.xipki.ca.api.profile.TextVadidator;
+import org.xipki.ca.certprofile.xijson.AdmissionExtension.AdmissionSyntaxOption;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.KeypairGenerationType;
 import org.xipki.ca.certprofile.xijson.conf.KeypairGenerationType.KeyType;
@@ -56,8 +60,10 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.SignAlgo;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.ConfPairs;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.TripleState;
@@ -488,7 +494,9 @@ public class XijsonCertprofile extends BaseCertprofile {
         ASN1ObjectIdentifier attrType = attr.getAttrType();
         ASN1Encodable attrVal = attr.getAttributeValues()[0];
 
-        if (ObjectIdentifiers.DN.placeOfBirth.equals(attrType)) {
+        if (ObjectIdentifiers.DN.dateOfBirth.equals(attrType)) {
+          dateOfBirth = ASN1GeneralizedTime.getInstance(attrVal);
+        } else if (ObjectIdentifiers.DN.placeOfBirth.equals(attrType)) {
           placeOfBirth = DirectoryString.getInstance(attrVal).getString();
         } else if (ObjectIdentifiers.DN.gender.equals(attrType)) {
           gender = ASN1PrintableString.getInstance(attrVal).getString();
@@ -506,7 +514,16 @@ public class XijsonCertprofile extends BaseCertprofile {
 
       Vector<Attribute> attrs = new Vector<>();
       for (ASN1ObjectIdentifier attrType : subjectDirAttrsControl.getTypes()) {
-        if (ObjectIdentifiers.DN.placeOfBirth.equals(attrType)) {
+        if (ObjectIdentifiers.DN.dateOfBirth.equals(attrType)) {
+          if (dateOfBirth != null) {
+            String timeStirng = dateOfBirth.getTimeString();
+            if (!TextVadidator.DATE_OF_BIRTH.isValid(timeStirng)) {
+              throw new BadCertTemplateException("invalid dateOfBirth " + timeStirng);
+            }
+            attrs.add(new Attribute(attrType, new DERSet(dateOfBirth)));
+            continue;
+          }
+        } else if (ObjectIdentifiers.DN.placeOfBirth.equals(attrType)) {
           if (placeOfBirth != null) {
             attrs.add(new Attribute(attrType, new DERSet(new DERUTF8String(placeOfBirth))));
             continue;
@@ -604,8 +621,66 @@ public class XijsonCertprofile extends BaseCertprofile {
     // Subject Information Access
     // processed by the CA
 
+    // Admission
+    type = Extn.id_extension_admission;
+    RDN[] admissionRdns = requestedSubject.getRDNs(type);
+    if (admissionRdns != null && admissionRdns.length == 0) {
+      admissionRdns = null;
+    }
+
+    AdmissionSyntaxOption admission = extensions.getAdmission();
+    if (occurrences.contains(type) && admission != null) {
+      if (admission.isInputFromRequestRequired()) {
+        if (admissionRdns == null) {
+          throw new BadCertTemplateException("admission required in the request but not present");
+        }
+        List<List<String>> reqRegNumsList = new LinkedList<>();
+        for (RDN m : admissionRdns) {
+          String str = X509Util.rdnValueToString(m.getFirst().getValue());
+          ConfPairs pairs = new ConfPairs(str);
+          for (String name : pairs.names()) {
+            if ("registrationNumber".equalsIgnoreCase(name)) {
+              reqRegNumsList.add(StringUtil.split(pairs.value(name), " ,;:"));
+            }
+          }
+        }
+        values.addExtension(type, admission.getExtensionValue(reqRegNumsList));
+        occurrences.remove(type);
+      } else {
+        values.addExtension(type, admission.getExtensionValue(null));
+        occurrences.remove(type);
+      }
+    }
+
     // OCSP Nocheck
     // processed by the CA
+
+    // restriction
+    type = Extn.id_extension_restriction;
+    ExtensionValue restriction = extensions.getRestriction();
+    if (restriction != null) {
+      if (occurrences.remove(type)) {
+        values.addExtension(type, restriction);
+      }
+    }
+
+    // AdditionalInformation
+    type = Extn.id_extension_additionalInformation;
+    ExtensionValue additionalInformation = extensions.getAdditionalInformation();
+    if (additionalInformation != null) {
+      if (occurrences.remove(type)) {
+        values.addExtension(type, additionalInformation);
+      }
+    }
+
+    // ValidityModel
+    type = Extn.id_extension_validityModel;
+    ExtensionValue validityModel = extensions.getValidityModel();
+    if (validityModel != null) {
+      if (occurrences.remove(type)) {
+        values.addExtension(type, validityModel);
+      }
+    }
 
     // PrivateKeyUsagePeriod
     type = Extension.privateKeyUsagePeriod;
@@ -774,6 +849,107 @@ public class XijsonCertprofile extends BaseCertprofile {
     if (smimeCapabilities != null) {
       if (occurrences.remove(type)) {
         values.addExtension(type, smimeCapabilities);
+      }
+    }
+
+    // GMT 0015
+    /*
+     * In the standard it is not specified whether IMPLICIT or EXPLICIT should
+     * be applied. The EXPLICIT is used here first.
+     *
+     * IdentityCode ::= CHOICE {
+     *     residenterCardNumber      [0] PrintableString OPTIONAL
+     *     militaryofficerCardNumber [1] UTF8String OPTIONAL
+     *     passportNumber            [2] PrintableString OPTIONAL
+     */
+    type = Extn.id_GMT_0015_IdentityCode;
+    if (occurrences.contains(type)) {
+      int tag = -1;
+      String extnStr = null;
+
+      extension = requestedExtensions == null ? null : requestedExtensions.get(type);
+      if (extension != null) {
+        // extract from extension
+        ASN1Encodable reqExtnValue = extension.getParsedValue();
+        if (reqExtnValue instanceof ASN1TaggedObject) {
+          ASN1TaggedObject tagged = (ASN1TaggedObject) reqExtnValue;
+          tag = tagged.getTagNo();
+          // we allow the EXPLICIT in request
+          if (tagged.isExplicit()) {
+            extnStr = ((ASN1String) tagged.getBaseObject()).getString();
+          } else {
+            // we also allow the IMPLICIT in request
+            if (tag == 0 || tag == 2) {
+              extnStr = ASN1PrintableString.getInstance(tagged, false).getString();
+            } else if (tag == 1) {
+              extnStr = ASN1UTF8String.getInstance(tagged, false).getString();
+            }
+          }
+        }
+      } else {
+        // extract from the subject
+        RDN[] rdns = requestedSubject.getRDNs(type);
+        if (rdns != null && rdns.length > 0) {
+          String str = X509Util.rdnValueToString(rdns[0].getFirst().getValue());
+          // [tag]value where tag is only one digit 0, 1 or 2
+          if (str.length() > 3 && str.charAt(0) == '[' && str.charAt(2) == ']') {
+            tag = Integer.parseInt(str.substring(1, 2));
+            extnStr = str.substring(3);
+          }
+        }
+      }
+
+      if (StringUtil.isNotBlank(extnStr)) {
+        final boolean explicit = true;
+        ASN1Encodable extnValue = null;
+        if (tag == 0 || tag == 2) {
+          extnValue = new DERTaggedObject(explicit, tag, new DERPrintableString(extnStr));
+        } else if (tag == 1) {
+          extnValue = new DERTaggedObject(explicit, tag, new DERUTF8String(extnStr));
+        }
+
+        if (extnValue != null) {
+          occurrences.remove(type);
+          values.addExtension(type, new ExtensionValue(extensionControls.get(type).isCritical(), extnValue));
+        }
+      }
+    }
+
+    // CCC
+    type = extensions.getCccExtensionSchemaType();
+    if (type != null && occurrences.remove(type)) {
+      values.addExtension(type, extensions.getCccExtensionSchemaValue());
+    }
+
+    // GMT 0015
+    // InsuranceNumber ::= PrintableString
+    // ICRegistrationNumber ::= PrintableString
+    // OrganizationCode ::= PrintableString
+    // TaxationNumber ::= PrintableString
+    ASN1ObjectIdentifier[] gmtOids = new ASN1ObjectIdentifier[] {
+        Extn.id_GMT_0015_InsuranceNumber,  Extn.id_GMT_0015_ICRegistrationNumber,
+        Extn.id_GMT_0015_OrganizationCode, Extn.id_GMT_0015_TaxationNumber};
+    for (ASN1ObjectIdentifier m : gmtOids) {
+      if (occurrences.contains(m)) {
+        String extnStr = null;
+
+        extension = requestedExtensions == null ? null : requestedExtensions.get(m);
+        if (extension != null) {
+          // extract from the extension
+          extnStr = ((ASN1String) extension.getParsedValue()).getString();
+        } else {
+          // extract from the subject
+          RDN[] rdns = requestedSubject.getRDNs(m);
+          if (rdns != null && rdns.length > 0) {
+            extnStr = X509Util.rdnValueToString(rdns[0].getFirst().getValue());
+          }
+        }
+
+        if (StringUtil.isNotBlank(extnStr)) {
+          occurrences.remove(m);
+          ASN1Encodable extnValue = new DERPrintableString(extnStr);
+          values.addExtension(m, new ExtensionValue(extensionControls.get(m).isCritical(), extnValue));
+        }
       }
     }
 

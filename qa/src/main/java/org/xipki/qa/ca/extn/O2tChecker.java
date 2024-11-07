@@ -33,12 +33,14 @@ import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameMode;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
 import org.xipki.ca.api.profile.CertprofileException;
+import org.xipki.ca.api.profile.TextVadidator;
 import org.xipki.ca.certprofile.xijson.SubjectDirectoryAttributesControl;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
 import org.xipki.ca.certprofile.xijson.conf.extn.PolicyConstraints;
 import org.xipki.ca.certprofile.xijson.conf.extn.PolicyMappings;
 import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements;
+import org.xipki.ca.certprofile.xijson.conf.extn.Restriction;
 import org.xipki.ca.certprofile.xijson.conf.extn.TlsFeature;
 import org.xipki.pki.BadCertTemplateException;
 import org.xipki.security.ObjectIdentifiers;
@@ -358,6 +360,13 @@ class O2tChecker extends ExtensionChecker {
     }
   } // method checkExtnQcStatements
 
+  void checkExtnRestriction(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns, ExtensionControl extnControl) {
+    Restriction restriction = caller.getRestriction();
+    caller.checkDirectoryString(Extn.id_extension_restriction,
+        restriction.getType(), restriction.getText(), failureMsg, extnValue, requestedExtns, extnControl);
+  } // method checkExtnRestriction
+
   void checkSmimeCapabilities(StringBuilder failureMsg, byte[] extnValue, ExtensionControl extnControl) {
     byte[] expected = caller.getSmimeCapabilities().getValue();
     if (!Arrays.equals(expected, extnValue)) {
@@ -522,7 +531,9 @@ class O2tChecker extends ExtensionChecker {
       ASN1ObjectIdentifier attrType = attr.getAttrType();
       ASN1Encodable attrVal = attr.getAttributeValues()[0];
 
-      if (ObjectIdentifiers.DN.placeOfBirth.equals(attrType)) {
+      if (ObjectIdentifiers.DN.dateOfBirth.equals(attrType)) {
+        expDateOfBirth = ASN1GeneralizedTime.getInstance(attrVal);
+      } else if (ObjectIdentifiers.DN.placeOfBirth.equals(attrType)) {
         expPlaceOfBirth = DirectoryString.getInstance(attrVal).getString();
       } else if (ObjectIdentifiers.DN.gender.equals(attrType)) {
         expGender = ASN1PrintableString.getInstance(attrVal).getString();
@@ -540,6 +551,7 @@ class O2tChecker extends ExtensionChecker {
 
     SubjectDirectoryAttributes ext = SubjectDirectoryAttributes.getInstance(extnValue);
     Vector<?> subDirAttrs = ext.getAttributes();
+    ASN1GeneralizedTime dateOfBirth = null;
     String placeOfBirth = null;
     String gender = null;
     Set<String> countryOfCitizenshipList = new HashSet<>();
@@ -564,7 +576,9 @@ class O2tChecker extends ExtensionChecker {
 
       ASN1Encodable attrVal = attrs[0];
 
-      if (ObjectIdentifiers.DN.placeOfBirth.equals(attrType)) {
+      if (ObjectIdentifiers.DN.dateOfBirth.equals(attrType)) {
+        dateOfBirth = ASN1GeneralizedTime.getInstance(attrVal);
+      } else if (ObjectIdentifiers.DN.placeOfBirth.equals(attrType)) {
         placeOfBirth = DirectoryString.getInstance(attrVal).getString();
       } else if (ObjectIdentifiers.DN.gender.equals(attrType)) {
         gender = ASN1PrintableString.getInstance(attrVal).getString();
@@ -578,6 +592,10 @@ class O2tChecker extends ExtensionChecker {
         Set<ASN1Encodable> otherAttrVals = otherAttrs.computeIfAbsent(attrType, k -> new HashSet<>());
         otherAttrVals.add(attrVal);
       }
+    }
+
+    if (dateOfBirth != null) {
+      attrTypes.remove(ObjectIdentifiers.DN.dateOfBirth);
     }
 
     if (placeOfBirth != null) {
@@ -604,6 +622,18 @@ class O2tChecker extends ExtensionChecker {
         attrTypeTexts.add(oid.getId());
       }
       failureMsg.append("required attributes of types ").append(attrTypeTexts).append(" are not present; ");
+    }
+
+    if (dateOfBirth != null) {
+      String timeStirng = dateOfBirth.getTimeString();
+      if (!TextVadidator.DATE_OF_BIRTH.isValid(timeStirng)) {
+        failureMsg.append("invalid dateOfBirth: ").append(timeStirng).append("; ");
+      }
+
+      String exp = (expDateOfBirth == null) ? null : expDateOfBirth.getTimeString();
+      if (!timeStirng.equalsIgnoreCase(exp)) {
+        addViolation(failureMsg, "dateOfBirth", timeStirng, exp);
+      }
     }
 
     if (gender != null) {

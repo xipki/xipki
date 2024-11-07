@@ -89,6 +89,9 @@
 		"name":"max-time",
 		"file":"qa/certprofile/certprofile-max-time.json"
 	},{
+		"name":"gmt0015",
+		"file":"qa/certprofile/certprofile-gmt0015.json"
+	},{
 		"name":"fixed-partial-subject",
 		"file":"qa/certprofile/certprofile-fixed-partial-subject.json"
 	},{

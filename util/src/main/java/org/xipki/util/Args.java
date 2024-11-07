@@ -3,6 +3,7 @@
 
 package org.xipki.util;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.List;

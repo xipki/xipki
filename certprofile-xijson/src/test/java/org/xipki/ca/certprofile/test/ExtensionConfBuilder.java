@@ -20,12 +20,14 @@ import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
+import org.xipki.ca.certprofile.xijson.DirectoryStringType;
 import org.xipki.ca.certprofile.xijson.conf.ConstantExtnValue;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableBinary;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.GeneralSubtreeType;
+import org.xipki.ca.certprofile.xijson.conf.extn.AdditionalInformation;
 import org.xipki.ca.certprofile.xijson.conf.extn.AuthorityInfoAccess;
 import org.xipki.ca.certprofile.xijson.conf.extn.AuthorityKeyIdentifier;
 import org.xipki.ca.certprofile.xijson.conf.extn.BasicConstraints;
@@ -49,10 +51,12 @@ import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements.QcEuLimitValueType
 import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements.QcStatementType;
 import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements.QcStatementValueType;
 import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements.Range2Type;
+import org.xipki.ca.certprofile.xijson.conf.extn.Restriction;
 import org.xipki.ca.certprofile.xijson.conf.extn.SmimeCapabilities;
 import org.xipki.ca.certprofile.xijson.conf.extn.SmimeCapabilities.SmimeCapability;
 import org.xipki.ca.certprofile.xijson.conf.extn.SmimeCapabilities.SmimeCapabilityParameter;
 import org.xipki.ca.certprofile.xijson.conf.extn.TlsFeature;
+import org.xipki.ca.certprofile.xijson.conf.extn.ValidityModel;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
@@ -91,7 +95,11 @@ public class ExtensionConfBuilder {
   static {
     REQUIRED_REQUEST_EXTENSIONS = CollectionUtil.asUnmodifiableSet(
         Extension.subjectAlternativeName,      Extension.subjectDirectoryAttributes,
-        Extension.subjectInfoAccess,           Extension.biometricInfo);
+        Extension.subjectInfoAccess,           Extension.biometricInfo,
+        Extn.id_extension_admission,           Extn.id_extension_additionalInformation,
+        Extn.id_GMT_0015_ICRegistrationNumber, Extn.id_GMT_0015_IdentityCode,
+        Extn.id_GMT_0015_InsuranceNumber,      Extn.id_GMT_0015_OrganizationCode,
+        Extn.id_GMT_0015_TaxationNumber);
 
     OPTIONAL_REQUEST_EXTENSIONS = CollectionUtil.asUnmodifiableSet(
         Extension.keyUsage, Extension.extendedKeyUsage, Extension.qCStatements);
@@ -260,6 +268,20 @@ public class ExtensionConfBuilder {
     return type;
   } // method createSingleExtKeyUsage
 
+  public static Restriction createRestriction(DirectoryStringType type, String text) {
+    Restriction extValue = new Restriction();
+    extValue.setType(type);
+    extValue.setText(text);
+    return extValue;
+  } // method createRestriction
+
+  public static AdditionalInformation createAdditionalInformation(DirectoryStringType type, String text) {
+    AdditionalInformation extValue = new AdditionalInformation();
+    extValue.setType(type);
+    extValue.setText(text);
+    return extValue;
+  } // method createAdditionalInformation
+
   public static PrivateKeyUsagePeriod createPrivateKeyUsagePeriod(String validity) {
     PrivateKeyUsagePeriod extValue = new PrivateKeyUsagePeriod();
     extValue.setValidity(validity);
@@ -382,6 +404,12 @@ public class ExtensionConfBuilder {
     extValue.setIncludeSourceDataUri(TripleState.required);
     return extValue;
   } // method createBiometricInfo
+
+  public static ValidityModel createValidityModel(DescribableOid modelId) {
+    ValidityModel extValue = new ValidityModel();
+    extValue.setModelId(modelId);
+    return extValue;
+  } // method createValidityModel
 
   public static CertificatePolicies createCertificatePolicies(Map<ASN1ObjectIdentifier, String> policies) {
     if (policies == null || policies.isEmpty()) {

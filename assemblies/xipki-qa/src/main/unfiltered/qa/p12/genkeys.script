@@ -15,7 +15,7 @@ xi:rsa-p12 --password CHANGEIT --out p12/shared/scep-ocsp2.p12
 list = [ cross1 ocsp1 ocsp2 multiple-ous1 multiple-ous2 multi-valued-rdn1 qc1 \
   ee-complex1 ee-complex2 smime1 smime-legacy1 tls1 tls-neg \
   tls2 rest-tls1 rest-tls-rekey1 tls-c1 tls-c2 max-time1 fixed-partial-subject1 fixed-partial-subject2 \
-  constant-ext1 \
+  constant-ext1 gmt0015_1 gmt0015_2 \
   cab-domain-validated1 cab-domain-validated2 cab-org-validated1 cab-org-validated2 \
   cab-individual-validated1 cab-individual-validated2 ]
 

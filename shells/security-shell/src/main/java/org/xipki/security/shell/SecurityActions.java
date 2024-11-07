@@ -16,16 +16,19 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.CertificateList;
@@ -95,6 +98,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -460,6 +464,12 @@ public class SecurityActions {
             + "if not set, use the subject in the signer's certificate ")
     private String subject;
 
+    @Option(name = "--dateOfBirth", description = "Date of birth YYYYMMdd in subject")
+    private String dateOfBirth;
+
+    @Option(name = "--postalAddress", multiValued = true, description = "postal address in subject")
+    private List<String> postalAddress;
+
     @Option(name = "--outform", description = "output format of the CSR")
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
@@ -692,6 +702,14 @@ public class SecurityActions {
 
       X500Name newSubjectDn = null;
       if (subject == null) {
+        if (StringUtil.isNotBlank(dateOfBirth)) {
+          throw new IllegalCmdParamException("dateOfBirth cannot be set if subject is not set");
+        }
+
+        if (CollectionUtil.isNotEmpty(postalAddress)) {
+          throw new IllegalCmdParamException("postalAddress cannot be set if subject is not set");
+        }
+
         if (!updateOldCert) {
           X509Cert signerCert = signer.getCertificate();
           if (signerCert == null) {
@@ -701,6 +719,40 @@ public class SecurityActions {
         }
       } else {
         newSubjectDn = getSubject(subject);
+
+        List<RDN> list = new LinkedList<>();
+
+        if (StringUtil.isNotBlank(dateOfBirth)) {
+          ASN1ObjectIdentifier id = ObjectIdentifiers.DN.dateOfBirth;
+          RDN[] rdns = newSubjectDn.getRDNs(id);
+
+          if (rdns == null || rdns.length == 0) {
+            Instant date = DateUtil.parseUtcTimeyyyyMMdd(dateOfBirth);
+            date = date.plus(12, ChronoUnit.HOURS);
+            list.add(new RDN(id, new DERGeneralizedTime(DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z")));
+          }
+        }
+
+        if (CollectionUtil.isNotEmpty(postalAddress)) {
+          ASN1ObjectIdentifier id = ObjectIdentifiers.DN.postalAddress;
+          RDN[] rdns = newSubjectDn.getRDNs(id);
+
+          if (rdns == null || rdns.length == 0) {
+            ASN1EncodableVector vec = new ASN1EncodableVector();
+            for (String m : postalAddress) {
+              vec.add(new DERUTF8String(m));
+            }
+
+            if (vec.size() > 0) {
+              list.add(new RDN(id, new DERSequence(vec)));
+            }
+          }
+        }
+
+        if (!list.isEmpty()) {
+          Collections.addAll(list, newSubjectDn.getRDNs());
+          newSubjectDn = new X500Name(list.toArray(new RDN[0]));
+        }
       }
 
       // SubjectAltNames

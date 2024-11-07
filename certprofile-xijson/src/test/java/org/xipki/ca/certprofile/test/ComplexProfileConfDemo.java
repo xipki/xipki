@@ -4,9 +4,12 @@
 package org.xipki.ca.certprofile.test;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
+import org.xipki.ca.certprofile.xijson.DirectoryStringType;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.GeneralNameType;
 import org.xipki.ca.certprofile.xijson.conf.Subject;
@@ -14,6 +17,11 @@ import org.xipki.ca.certprofile.xijson.conf.Subject.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.Subject.ValueType;
 import org.xipki.ca.certprofile.xijson.conf.SubjectToSubjectAltNameType;
 import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
+import org.xipki.ca.certprofile.xijson.conf.extn.AdmissionSyntax;
+import org.xipki.ca.certprofile.xijson.conf.extn.AdmissionSyntax.AdmissionsType;
+import org.xipki.ca.certprofile.xijson.conf.extn.AdmissionSyntax.NamingAuthorityType;
+import org.xipki.ca.certprofile.xijson.conf.extn.AdmissionSyntax.ProfessionInfoType;
+import org.xipki.ca.certprofile.xijson.conf.extn.AdmissionSyntax.RegistrationNumber;
 import org.xipki.ca.certprofile.xijson.conf.extn.PolicyMappings;
 import org.xipki.ca.certprofile.xijson.conf.extn.SubjectInfoAccess;
 import org.xipki.security.KeyUsage;
@@ -264,9 +272,10 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
         "5y", true, false);
 
     // Subject
-    addRdns(profile, rdn(DN.CN), rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn01(DN.SN),
-        rdn(DN.userid), rdn(DN.jurisdictionOfIncorporationCountryName),
-        rdn(DN.jurisdictionOfIncorporationLocalityName), rdn(DN.jurisdictionOfIncorporationStateOrProvinceName));
+    addRdns(profile, rdn(DN.CN), rdn(DN.C), rdn(DN.O), rdn01(DN.OU), rdn01(DN.SN), rdn01(DN.dateOfBirth),
+        rdn01(DN.postalAddress), rdn(DN.userid), rdn(DN.jurisdictionOfIncorporationCountryName),
+        rdn(DN.jurisdictionOfIncorporationLocalityName), rdn(DN.jurisdictionOfIncorporationStateOrProvinceName),
+        rdn(Extn.id_extension_admission, 0, 99));
 
     // Extensions
     // Extensions - general
@@ -303,6 +312,56 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     list.add(createExtension(Extn.id_pe_tlsfeature, true, true));
     last(list).setTlsFeature(
         createTlsFeature(TlsExtensionType.STATUS_REQUEST, TlsExtensionType.CLIENT_CERTIFICATE_URL));
+
+    // Extension - Admission
+    list.add(createExtension(Extn.id_extension_admission, true, false));
+    AdmissionSyntax admissionSyntax = new AdmissionSyntax();
+    last(list).setAdmissionSyntax(admissionSyntax);
+
+    admissionSyntax.setAdmissionAuthority(
+        new GeneralName(new X500Name("C=DE,CN=admissionAuthority level 1")).getEncoded());
+    AdmissionsType admissions = new AdmissionsType();
+    admissions.setAdmissionAuthority(
+        new GeneralName(new X500Name("C=DE,CN=admissionAuthority level 2")).getEncoded());
+
+    NamingAuthorityType namingAuthorityL2 = new NamingAuthorityType();
+    namingAuthorityL2.setOid(createOidType(new ASN1ObjectIdentifier("1.2.3.4.5")));
+    namingAuthorityL2.setUrl("http://naming-authority-level2.myorg.org");
+    namingAuthorityL2.setText("namingAuthrityText level 2");
+    admissions.setNamingAuthority(namingAuthorityL2);
+
+    admissionSyntax.getContentsOfAdmissions().add(admissions);
+
+    ProfessionInfoType pi = new ProfessionInfoType();
+    admissions.getProfessionInfos().add(pi);
+
+    pi.getProfessionOids().add(createOidType(new ASN1ObjectIdentifier("1.2.3.4"), "demo oid"));
+    pi.getProfessionItems().add("demo item");
+
+    NamingAuthorityType namingAuthorityL3 = new NamingAuthorityType();
+    namingAuthorityL3.setOid(createOidType(new ASN1ObjectIdentifier("1.2.3.4.5")));
+    namingAuthorityL3.setUrl("http://naming-authority-level3.myorg.org");
+    namingAuthorityL3.setText("namingAuthrityText level 3");
+    pi.setNamingAuthority(namingAuthorityL3);
+    pi.setAddProfessionInfo(new byte[]{1, 2, 3, 4});
+
+    RegistrationNumber regNum = new RegistrationNumber();
+    pi.setRegistrationNumber(regNum);
+    regNum.setRegex("a*b");
+
+    // restriction
+    list.add(createExtension(Extn.id_extension_restriction, true, false));
+    last(list).setRestriction(createRestriction(DirectoryStringType.utf8String, "demo restriction"));
+
+    // additionalInformation
+    list.add(createExtension(Extn.id_extension_additionalInformation, true, false));
+    last(list).setAdditionalInformation(createAdditionalInformation(DirectoryStringType.utf8String,
+        "demo additional information"));
+
+    // validationModel
+    list.add(createExtension(Extn.id_extension_validityModel, true, false));
+    last(list).setValidityModel(
+        createValidityModel(createOidType(new ASN1ObjectIdentifier("1.3.6.1.4.1.8301.3.5.1"), "chain")));
 
     // privateKeyUsagePeriod
     list.add(createExtension(Extension.privateKeyUsagePeriod, true, false));

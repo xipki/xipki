@@ -134,7 +134,12 @@ public abstract class ExtensionSpec {
             Extension.freshestCRL,
             Extension.authorityInfoAccess,
             Extension.subjectInfoAccess,
-            Extn.id_SCTs)));
+            Extn.id_SCTs,
+            Extn.id_GMT_0015_ICRegistrationNumber,
+            Extn.id_GMT_0015_IdentityCode,
+            Extn.id_GMT_0015_InsuranceNumber,
+            Extn.id_GMT_0015_OrganizationCode,
+            Extn.id_GMT_0015_TaxationNumber)));
 
     private static final Set<ASN1ObjectIdentifier> NON_REQUEST_EXTENSIONS =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(

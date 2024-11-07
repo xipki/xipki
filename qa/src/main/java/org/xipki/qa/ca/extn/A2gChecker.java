@@ -6,8 +6,15 @@ package org.xipki.qa.ca.extn;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1IA5String;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1PrintableString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1String;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.ASN1UTF8String;
+import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
@@ -31,15 +38,25 @@ import org.xipki.ca.api.profile.Certprofile.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
+import org.xipki.ca.certprofile.xijson.AdmissionExtension;
 import org.xipki.ca.certprofile.xijson.BiometricInfoOption;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
+import org.xipki.ca.certprofile.xijson.conf.extn.AdditionalInformation;
 import org.xipki.ca.certprofile.xijson.conf.extn.CertificatePolicies;
+import org.xipki.pki.BadCertTemplateException;
 import org.xipki.qa.ca.IssuerInfo;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.ObjectIdentifiers.Extn;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.CompareUtil;
+import org.xipki.util.ConfPairs;
 import org.xipki.util.Hex;
+import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 import org.xipki.util.TripleState;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -67,6 +84,60 @@ class A2gChecker extends ExtensionChecker {
   A2gChecker(ExtensionsChecker parent) {
     super(parent);
   }
+
+  void checkExtnAdditionalInformation(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns, ExtensionControl extControl) {
+    AdditionalInformation additionalInformation = caller.getAdditionalInformation();
+    caller.checkDirectoryString(Extn.id_extension_additionalInformation,
+        additionalInformation.getType(), additionalInformation.getText(),
+        failureMsg, extnValue, requestedExtns, extControl);
+  }
+
+  void checkExtnAdmission(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns, X500Name requestedSubject,
+      ExtensionControl extnControl) {
+    AdmissionExtension.AdmissionSyntaxOption conf = getCertprofile().extensions().getAdmission();
+
+    ASN1ObjectIdentifier type = Extn.id_extension_admission;
+    if (conf == null) {
+      caller.checkConstantExtnValue(type, failureMsg, extnValue, requestedExtns, extnControl);
+      return;
+    }
+
+    List<List<String>> reqRegNumsList = null;
+    if (requestedSubject != null && conf.isInputFromRequestRequired()) {
+
+      RDN[] admissionRdns = requestedSubject.getRDNs(type);
+      if (admissionRdns == null || admissionRdns.length == 0) {
+        failureMsg.append("no subject RDN Admission is contained in the request;");
+        return;
+      }
+
+      reqRegNumsList = new LinkedList<>();
+      for (RDN m : admissionRdns) {
+        String str = X509Util.rdnValueToString(m.getFirst().getValue());
+        ConfPairs pairs = new ConfPairs(str);
+        for (String name : pairs.names()) {
+          if ("registrationNumber".equalsIgnoreCase(name)) {
+            reqRegNumsList.add(StringUtil.split(pairs.value(name), " ,;:"));
+          }
+        }
+      }
+    }
+
+    try {
+      byte[] expected = conf.getExtensionValue(reqRegNumsList).getValue().toASN1Primitive().getEncoded();
+      if (!Arrays.equals(expected, extnValue)) {
+        addViolation(failureMsg, "extension valus", hex(extnValue), hex(expected));
+      }
+    } catch (IOException ex) {
+      LogUtil.error(log, ex);
+      failureMsg.append("IOException while computing the expected extension value;");
+    } catch (BadCertTemplateException ex) {
+      LogUtil.error(log, ex);
+      failureMsg.append("BadCertTemplateException while computing the expected extension value;");
+    }
+  } // method checkExtnAdmission
 
   void checkExtnAuthorityInfoAccess(StringBuilder failureMsg, byte[] extnValue, IssuerInfo issuerInfo) {
     AuthorityInfoAccessControl aiaControl = getCertprofile().getAiaControl();
@@ -456,4 +527,96 @@ class A2gChecker extends ExtensionChecker {
     }
   } // method checkExtnExtendedKeyUsage
 
+  void checkExtnGmt0015(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns,
+      ExtensionControl extnControl, ASN1ObjectIdentifier oid, X500Name requestedSubject)
+      throws IOException {
+    if (Extn.id_GMT_0015_ICRegistrationNumber.equals(oid)
+        || Extn.id_GMT_0015_InsuranceNumber.equals(oid)
+        || Extn.id_GMT_0015_OrganizationCode.equals(oid)
+        || Extn.id_GMT_0015_TaxationNumber.equals(oid)) {
+      String expStr = null;
+      Extension extension = requestedExtns == null ? null : requestedExtns.getExtension(oid);
+      if (extension != null) {
+        // extract from the extension
+        expStr = ((ASN1String) extension.getParsedValue()).getString();
+      } else {
+        // extract from the subject
+        RDN[] rdns = requestedSubject.getRDNs(oid);
+        if (rdns != null && rdns.length > 0) {
+          expStr = X509Util.rdnValueToString(rdns[0].getFirst().getValue());
+        }
+      }
+
+      String isStr = null;
+      try {
+        isStr = ASN1PrintableString.getInstance(extnValue).getString();
+      } catch (Exception ex) {
+        failureMsg.append("exension value is not of type PrintableString; ");
+      }
+
+      if (isStr != null) {
+        if (!CompareUtil.equalsObject(expStr, isStr)) {
+          addViolation(failureMsg, "extension value", isStr, expStr);
+        }
+      }
+    } else if (Extn.id_GMT_0015_IdentityCode.equals(oid)) {
+      int tag = -1;
+      String extnStr = null;
+
+      Extension extension = requestedExtns == null ? null : requestedExtns.getExtension(oid);
+
+      if (extension != null) {
+        // extract from extension
+        ASN1Encodable reqExtnValue = extension.getParsedValue();
+        if (reqExtnValue instanceof ASN1TaggedObject) {
+          ASN1TaggedObject tagged = (ASN1TaggedObject) reqExtnValue;
+          tag = tagged.getTagNo();
+          // we allow the EXPLICIT in request
+          if (tagged.isExplicit()) {
+            extnStr = ((ASN1String) tagged.getExplicitBaseObject()).getString();
+          } else {
+            // we also allow the IMPLICIT in request
+            if (tag == 0 || tag == 2) {
+              extnStr = ASN1PrintableString.getInstance(tagged, false).getString();
+            } else if (tag == 1) {
+              extnStr = ASN1UTF8String.getInstance(tagged, false).getString();
+            }
+          }
+        }
+      } else {
+        String str;
+        // extract from the subject
+        RDN[] rdns = requestedSubject.getRDNs(oid);
+        if (rdns != null && rdns.length > 0) {
+          str = X509Util.rdnValueToString(rdns[0].getFirst().getValue());
+        } else {
+          str = "";
+        }
+
+        // [tag]value where tag is only one digit 0, 1 or 2
+        if (str.length() > 3 && str.charAt(0) == '[' && str.charAt(2) == ']') {
+          tag = Integer.parseInt(str.substring(1, 2));
+          extnStr = str.substring(3);
+        }
+      }
+
+      byte[] expected = null;
+      if (StringUtil.isNotBlank(extnStr)) {
+        final boolean explicit = true;
+        if (tag == 0 || tag == 2) {
+          expected = new DERTaggedObject(explicit, tag, new DERPrintableString(extnStr)).getEncoded();
+        } else if (tag == 1) {
+          expected = new DERTaggedObject(explicit, tag, new DERUTF8String(extnStr)).getEncoded();
+        }
+      }
+
+      if (!Arrays.equals(expected, extnValue)) {
+        addViolation(failureMsg, "extension value", hex(extnValue),
+            (expected == null) ? "not present" : hex(expected));
+      }
+    } else {
+      throw new IllegalArgumentException("unknown extension type " + oid.getId());
+    }
+  }
 }

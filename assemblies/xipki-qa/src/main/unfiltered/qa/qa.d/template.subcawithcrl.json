@@ -59,6 +59,7 @@
 			"multi-valued-rdn",
 			"max-time",
 			"tls", "tls-enc",
+			"gmt0015",
 			"tls-sm2", "tls-sm2-enc"
 		],
 		"requestors":[{
