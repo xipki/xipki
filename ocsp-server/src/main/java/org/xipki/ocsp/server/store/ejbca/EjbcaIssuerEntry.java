@@ -1,7 +1,7 @@
 // Copyright (c) 2013-2024 xipki. All rights reserved.
 // License Apache License 2.0
 
-package org.xipki.ocsp.server.store;
+package org.xipki.ocsp.server.store.ejbca;
 
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.ocsp.api.RequestIssuer;
@@ -20,15 +20,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Issuer entry.
+ * IssuerEntry for the EJBCA database.
  *
  * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 
-public class IssuerEntry {
+class EjbcaIssuerEntry {
 
-  private final int id;
+  private final String id;
 
   private final Map<HashAlgo, byte[]> issuerHashMap;
 
@@ -36,19 +36,17 @@ public class IssuerEntry {
 
   private final X509Cert cert;
 
-  private int crlId;
-
   private CertRevocationInfo revocationInfo;
 
-  public IssuerEntry(int id, X509Cert cert) throws CertificateEncodingException {
-    this.id = id;
+  public EjbcaIssuerEntry(X509Cert cert) throws CertificateEncodingException {
     this.cert = Args.notNull(cert, "cert");
     this.notBefore = cert.getNotBefore();
-    this.issuerHashMap = getIssuerHashAndKeys(cert.getEncoded());
+    byte[] encodedCert = cert.getEncoded();
+    this.id = HashAlgo.SHA1.hexHash(encodedCert);
+    this.issuerHashMap = getIssuerHashAndKeys(encodedCert);
   }
 
-  private static Map<HashAlgo, byte[]> getIssuerHashAndKeys(byte[] encodedCert)
-      throws CertificateEncodingException {
+  private static Map<HashAlgo, byte[]> getIssuerHashAndKeys(byte[] encodedCert) throws CertificateEncodingException {
     byte[] encodedName;
     byte[] encodedKey;
     try {
@@ -78,7 +76,7 @@ public class IssuerEntry {
     return hashes;
   } // method getIssuerHashAndKeys
 
-  public int getId() {
+  public String getId() {
     return id;
   }
 
@@ -89,12 +87,8 @@ public class IssuerEntry {
 
   public boolean matchHash(RequestIssuer reqIssuer) {
     byte[] issuerHash = issuerHashMap.get(reqIssuer.hashAlgorithm());
-    if (issuerHash == null) {
-      return false;
-    }
-
-    return CompareUtil.areEqual(issuerHash, 0, reqIssuer.getData(),
-        reqIssuer.getNameHashFrom(), issuerHash.length);
+    return issuerHash != null &&
+        CompareUtil.areEqual(issuerHash, 0, reqIssuer.getData(), reqIssuer.getNameHashFrom(), issuerHash.length);
   }
 
   public void setRevocationInfo(Instant revocationTime) {
@@ -106,14 +100,6 @@ public class IssuerEntry {
     return revocationInfo;
   }
 
-  public int getCrlId() {
-    return crlId;
-  }
-
-  public void setCrlId(int crlId) {
-    this.crlId = crlId;
-  }
-
   public Instant getNotBefore() {
     return notBefore;
   }
@@ -121,5 +107,25 @@ public class IssuerEntry {
   public X509Cert getCert() {
     return cert;
   }
+
+  @Override
+  public int hashCode() {
+    return id.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+
+    if (!(obj instanceof EjbcaIssuerEntry)) {
+      return false;
+    }
+
+    EjbcaIssuerEntry other = (EjbcaIssuerEntry) obj;
+    return id.equals(other.id) && CompareUtil.equalsObject(revocationInfo, other.revocationInfo);
+    // The comparison of id implies the comparison of issuerHashMap, notBefore and cert.
+  } // method equals
 
 }

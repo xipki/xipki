@@ -74,11 +74,14 @@ class ImportCrl {
 
     private long revocationTime;
 
+    private long invalidityTime;
+
     boolean isDifferent(RevokedCert revokedCert, int crlId) {
       return this.crlId != crlId
           || !revoked
           || revocationReason != revokedCert.getReason()
-          || revocationTime != revokedCert.getRevocationDate();
+          || revocationTime != revokedCert.getRevocationDate()
+          || invalidityTime != revokedCert.getInvalidityDate();
     }
 
   } // class CertInfo
@@ -162,15 +165,17 @@ class ImportCrl {
 
   private static final String KEY_CA_REVOCATION_TIME = "ca.revocation.time";
 
+  private static final String KEY_CA_INVALIDITY_TIME = "ca.invalidity.time";
+
   private static final String SQL_UPDATE_CRL_INFO = "UPDATE CRL_INFO SET INFO=? WHERE ID=?";
 
   private static final String SQL_INSERT_CRL_INFO = SqlUtil.buildInsertSql("CRL_INFO", "ID,NAME,INFO");
 
   private static final String SQL_UPDATE_CERT_REV
-      = "UPDATE CERT SET REV=?,RR=?,RT=?,LUPDATE=?,CRL_ID=? WHERE ID=?";
+      = "UPDATE CERT SET REV=?,RR=?,RT=?,RIT=?,LUPDATE=?,CRL_ID=? WHERE ID=?";
 
   private static final String SQL_INSERT_CERT_REV = SqlUtil.buildInsertSql("CERT",
-      "ID,IID,SN,REV,RR,RT,LUPDATE,CRL_ID");
+      "ID,IID,SN,REV,RR,RT,RIT,LUPDATE,CRL_ID");
 
   private static final String SQL_DELETE_CERT = "DELETE FROM CERT WHERE IID=? AND SN=?";
 
@@ -180,9 +185,9 @@ class ImportCrl {
       = "UPDATE CERT SET LUPDATE=?,NBEFORE=?,NAFTER=?,CRL_ID=?,HASH=? WHERE ID=?";
 
   private static final String SQL_INSERT_CERT = SqlUtil.buildInsertSql("CERT",
-      "ID,IID,SN,REV,RR,RT,LUPDATE,NBEFORE,NAFTER,CRL_ID,HASH");
+      "ID,IID,SN,REV,RR,RT,RIT,LUPDATE,NBEFORE,NAFTER,CRL_ID,HASH");
 
-  private static final String CORE_SQL_SELECT_ID_CERT = "ID,REV,RR,RT,CRL_ID FROM CERT WHERE IID=? AND SN=?";
+  private static final String CORE_SQL_SELECT_ID_CERT = "ID,REV,RR,RT,RIT,CRL_ID FROM CERT WHERE IID=? AND SN=?";
 
   private final String basedir;
 
@@ -212,8 +217,7 @@ class ImportCrl {
 
   private final AtomicInteger cachedIssuerId = new AtomicInteger(0);
 
-  public ImportCrl(DataSourceWrapper datasource, String basedir,
-                   int sqlBatchCommit, boolean ignoreExpiredCrls)
+  public ImportCrl(DataSourceWrapper datasource, String basedir, int sqlBatchCommit, boolean ignoreExpiredCrls)
       throws DataAccessException, NoSuchAlgorithmException {
     this.sqlBatchCommit = Args.min(sqlBatchCommit, "sqlBatchCommit", 1);
     this.ignoreExpiredCrls = ignoreExpiredCrls;
@@ -287,7 +291,14 @@ class ImportCrl {
         String str = props.getProperty(KEY_CA_REVOCATION_TIME);
         if (StringUtil.isNotBlank(str)) {
           Instant revocationTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
-          caRevInfo = new CertRevocationInfo(CrlReason.UNSPECIFIED, revocationTime);
+          Instant invalidityTime = null;
+
+          str = props.getProperty(KEY_CA_INVALIDITY_TIME);
+          if (StringUtil.isNotBlank(str)) {
+            invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
+          }
+
+          caRevInfo = new CertRevocationInfo(CrlReason.UNSPECIFIED, revocationTime, invalidityTime);
         }
       }
 
@@ -793,7 +804,8 @@ class ImportCrl {
 
         RevokedCert revCert = revokedCertList.next();
         BigInteger serial = revCert.getSerialNumber();
-        long rt = Math.min(revCert.getReason(), revCert.getInvalidityDate());
+        long rt = revCert.getRevocationDate();
+        long rit = revCert.getInvalidityDate();
         int reason = revCert.getReason();
         X500Name issuer = revCert.getCertificateIssuer();
         if (issuer != null && !issuer.equals(caCert.subject)) {
@@ -830,6 +842,11 @@ class ImportCrl {
             ps.setInt(offset++, 1);
             ps.setInt(offset++, reason);
             ps.setLong(offset++, rt);
+            if (rit != 0) {
+              ps.setLong(offset++, rit);
+            } else {
+              ps.setNull(offset++, Types.BIGINT);
+            }
             ps.setLong(offset++, updateTimeSec);
             ps.setInt(offset, crlInfoId);
           } else {
@@ -841,6 +858,11 @@ class ImportCrl {
               ps.setInt(offset++, 1);
               ps.setInt(offset++, reason);
               ps.setLong(offset++, rt);
+              if (rit != 0) {
+                ps.setLong(offset++, rit);
+              } else {
+                ps.setNull(offset++, Types.BIGINT);
+              }
               ps.setLong(offset++, updateTimeSec);
               ps.setInt(offset++, crlInfoId);
               ps.setLong(offset, existingCertInfo.id);
@@ -965,6 +987,7 @@ class ImportCrl {
       CertInfo ci = new CertInfo();
       ci.crlId = rs.getInt("CRL_ID");
       ci.id = rs.getLong("ID");
+      ci.invalidityTime = rs.getLong("RIT");
       ci.revocationReason = rs.getInt("RR");
       ci.revocationTime = rs.getLong("RT");
       ci.revoked = rs.getBoolean("REV");

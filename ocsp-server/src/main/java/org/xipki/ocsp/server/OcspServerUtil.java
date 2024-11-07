@@ -11,13 +11,16 @@ import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.server.store.CaDbCertStatusStore;
 import org.xipki.ocsp.server.store.CrlDbCertStatusStore;
 import org.xipki.ocsp.server.store.DbCertStatusStore;
+import org.xipki.ocsp.server.store.ejbca.EjbcaCertStatusStore;
 import org.xipki.ocsp.server.type.ExtendedExtension;
 import org.xipki.ocsp.server.type.OID;
+import org.xipki.security.CertpathValidationModel;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.IoUtil;
 import org.xipki.util.JSON;
@@ -32,6 +35,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -56,6 +60,8 @@ public class OcspServerUtil {
   private static final String STORE_TYPE_XIPKI_CA_DB = "xipki-ca-db";
 
   private static final String STORE_TYPE_CRL = "crl";
+
+  private static final String STORE_TYPE_EJBCA_DB = "ejbca-db";
 
   static ResponseSigner initSigner(OcspServerConf.Signer signerType, SecurityFactory securityFactory)
       throws InvalidConfException {
@@ -153,6 +159,8 @@ public class OcspServerUtil {
         store = new CrlDbCertStatusStore();
       } else if (STORE_TYPE_XIPKI_CA_DB.equals(type)) {
         store = new CaDbCertStatusStore();
+      } else if (STORE_TYPE_EJBCA_DB.equals(type)) {
+        store = new EjbcaCertStatusStore();
       } else if (type.startsWith("java:")) {
         String className = conf.getSource().getType().substring("java:".length()).trim();
         store = ReflectiveUtil.newInstance(className, OcspServerUtil.class.getClassLoader());
@@ -164,7 +172,13 @@ public class OcspServerUtil {
     }
 
     store.setName(conf.getName());
+    Integer interval = conf.getRetentionInterval();
+    int retentionInterval = (interval == null) ? -1 : interval;
+    store.setRetentionInterval(retentionInterval);
     store.setUnknownCertBehaviour(conf.getUnknownCertBehaviour());
+
+    store.setIncludeArchiveCutoff(getBoolean(conf.getIncludeArchiveCutoff(), true));
+    store.setIncludeCrlId(getBoolean(conf.getIncludeCrlId(), true));
 
     store.setIgnoreExpiredCert(getBoolean(conf.getIgnoreExpiredCert(), true));
     store.setIgnoreNotYetValidCert(getBoolean(conf.getIgnoreNotYetValidCert(), true));
@@ -198,6 +212,51 @@ public class OcspServerUtil {
 
     return store;
   } // method newStore
+
+  static boolean canBuildCertpath(X509Cert[] certsInReq, RequestOption requestOption, Instant referenceTime) {
+    X509Cert target = certsInReq[0];
+
+    Set<X509Cert> trustanchors = requestOption.getTrustanchors();
+    Set<X509Cert> certstore = new HashSet<>(trustanchors);
+
+    Set<X509Cert> configuredCerts = requestOption.getCerts();
+    if (CollectionUtil.isNotEmpty(configuredCerts)) {
+      certstore.addAll(requestOption.getCerts());
+    }
+
+    X509Cert[] certpath;
+    try {
+      certpath = X509Util.buildCertPath(target, certstore);
+    } catch (CertPathBuilderException ex) {
+      LogUtil.warn(LOG, ex);
+      return false;
+    }
+
+    CertpathValidationModel model = requestOption.getCertpathValidationModel();
+
+    if (model == null || model == CertpathValidationModel.PKIX) {
+      for (X509Cert m : certpath) {
+        if (m.getNotBefore().isAfter(referenceTime) || m.getNotAfter().isBefore(referenceTime)) {
+          return false;
+        }
+      }
+    } else if (model == CertpathValidationModel.CHAIN) {
+      // do nothing
+    } else {
+      throw new IllegalStateException("invalid CertpathValidationModel " + model.name());
+    }
+
+    for (int i = certpath.length - 1; i >= 0; i--) {
+      X509Cert targetCert = certpath[i];
+      for (X509Cert m : trustanchors) {
+        if (m.equals(targetCert)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  } // method canBuildCertpath
 
   private static boolean getBoolean(Boolean bo, boolean defaultValue) {
     return (bo == null) ? defaultValue : bo;

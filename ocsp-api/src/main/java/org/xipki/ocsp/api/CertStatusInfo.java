@@ -3,7 +3,9 @@
 
 package org.xipki.ocsp.api;
 
+import org.bouncycastle.asn1.ocsp.CrlID;
 import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.HashAlgo;
 import org.xipki.util.Args;
 
 import java.time.Instant;
@@ -46,11 +48,19 @@ public class CertStatusInfo {
 
   private CertRevocationInfo revocationInfo;
 
+  private HashAlgo certHashAlgo;
+
+  private byte[] certHash;
+
   private Instant thisUpdate;
 
   private Instant nextUpdate;
 
   private String certprofile;
+
+  private CrlID crlId;
+
+  private Instant archiveCutOff;
 
   private CertStatusInfo(CertStatus certStatus, Instant thisUpdate, Instant nextUpdate, String certprofile) {
     this.certStatus = Args.notNull(certStatus, "certStatus");
@@ -87,12 +97,36 @@ public class CertStatusInfo {
     return revocationInfo;
   }
 
+  public HashAlgo getCertHashAlgo() {
+    return certHashAlgo;
+  }
+
+  public byte[] getCertHash() {
+    return certHash;
+  }
+
   public String getCertprofile() {
     return certprofile;
   }
 
   public void setCertprofile(String certprofile) {
     this.certprofile = certprofile;
+  }
+
+  public CrlID getCrlId() {
+    return crlId;
+  }
+
+  public void setCrlId(CrlID crlId) {
+    this.crlId = crlId;
+  }
+
+  public Instant getArchiveCutOff() {
+    return archiveCutOff;
+  }
+
+  public void setArchiveCutOff(Instant archiveCutOff) {
+    this.archiveCutOff = archiveCutOff;
   }
 
   public static CertStatusInfo getCrlExpiredStatusInfo() {
@@ -112,8 +146,11 @@ public class CertStatusInfo {
   }
 
   public static CertStatusInfo getGoodCertStatusInfo(
-      Instant thisUpdate, Instant nextUpdate, String certprofile) {
-    return new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate, certprofile);
+      HashAlgo certHashAlgo, byte[] certHash, Instant thisUpdate, Instant nextUpdate, String certprofile) {
+    CertStatusInfo ret = new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate, certprofile);
+    ret.certHashAlgo = certHashAlgo;
+    ret.certHash = certHash;
+    return ret;
   } // method getGoodCertStatusInfo
 
   public static CertStatusInfo getGoodCertStatusInfo(Instant thisUpdate, Instant nextUpdate) {
@@ -121,10 +158,13 @@ public class CertStatusInfo {
   }
 
   public static CertStatusInfo getRevokedCertStatusInfo(
-      CertRevocationInfo revocationInfo, Instant thisUpdate, Instant nextUpdate, String certprofile) {
+      CertRevocationInfo revocationInfo, HashAlgo certHashAlgo, byte[] certHash,
+      Instant thisUpdate, Instant nextUpdate, String certprofile) {
     Args.notNull(revocationInfo, "revocationInfo");
     CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate, certprofile);
     ret.revocationInfo = revocationInfo;
+    ret.certHashAlgo = certHashAlgo;
+    ret.certHash = certHash;
     return ret;
   } // method getRevokedCertStatusInfo
 

@@ -1,7 +1,7 @@
 // Copyright (c) 2013-2024 xipki. All rights reserved.
 // License Apache License 2.0
 
-package org.xipki.ocsp.server.store;
+package org.xipki.ocsp.server.store.ejbca;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,21 +21,26 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
-import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.Hex;
 import org.xipki.util.JSON;
 import org.xipki.util.LogUtil;
 import org.xipki.util.RandomUtil;
+import org.xipki.util.StringUtil;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,13 +49,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * OcspStore for XiPKI OCSP database.
+ * OcspStore for the EJBCA database.
  *
  * @author Lijun Liao (xipki)
  * @since 2.0.0
  */
 
-public class CaDbCertStatusStore extends OcspStore {
+public class EjbcaCertStatusStore extends OcspStore {
 
   private class StoreUpdateService implements Runnable {
 
@@ -61,31 +66,29 @@ public class CaDbCertStatusStore extends OcspStore {
 
   } // class StoreUpdateService
 
-  private DataSourceWrapper datasource;
+  private static final Logger LOG = LoggerFactory.getLogger(EjbcaCertStatusStore.class);
 
-  private static final Logger LOG = LoggerFactory.getLogger(CaDbCertStatusStore.class);
+  private final HashAlgo certHashAlgo = HashAlgo.SHA1;
 
   private final StoreUpdateService storeUpdateService = new StoreUpdateService();
 
-  private final Object lock = new Object();
-
   private final AtomicBoolean storeUpdateInProcess = new AtomicBoolean(false);
 
-  private String sqlCsNoRit;
+  private final Object lock = new Object();
+
+  private DataSourceWrapper datasource;
 
   private String sqlCs;
-
-  private String sqlCsNoRitWithCertHash;
 
   private String sqlCsWithCertHash;
 
   private IssuerFilter issuerFilter;
 
-  private final IssuerStore issuerStore = new IssuerStore();
-
-  private HashAlgo certHashAlgo;
+  private EjbcaIssuerStore issuerStore;
 
   private boolean initialized;
+
+  private boolean initializationFailed;
 
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
@@ -98,115 +101,109 @@ public class CaDbCertStatusStore extends OcspStore {
       return;
     }
 
+    final String sql = "SELECT data FROM CAData";
+
     synchronized (lock) {
       storeUpdateInProcess.set(true);
       try {
-        if (initialized) {
-          final String sql = "SELECT ID,REV_INFO,CERT FROM CA";
-          PreparedStatement ps = preparedStatement(sql);
-          ResultSet rs = null;
-
-          try {
-            Map<Integer, SimpleIssuerEntry> newIssuers = new HashMap<>();
-
-            rs = ps.executeQuery();
-            while (rs.next()) {
-              byte[] certBytes = Base64.decode(rs.getString("CERT"));
-              if (!issuerFilter.includeAll()) {
-                String sha1Fp = HashAlgo.SHA1.base64Hash(certBytes);
-                if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
-                  continue;
-                }
-              }
-
-              int id = rs.getInt("ID");
-              Instant revTime = null;
-              String str = rs.getString("REV_INFO");
-              if (str != null) {
-                CertRevocationInfo revInfo = CertRevocationInfo.fromEncoded(str);
-                revTime = revInfo.getRevocationTime();
-              }
-              SimpleIssuerEntry issuerEntry = new SimpleIssuerEntry(id, revTime);
-              newIssuers.put(id, issuerEntry);
-            }
-
-            // no change in the issuerStore
-            Set<Integer> newIds = newIssuers.keySet();
-            Set<Integer> ids = issuerStore.getIds();
-
-            boolean issuersUnchanged = (ids.size() == newIds.size())
-                && ids.containsAll(newIds) && newIds.containsAll(ids);
-
-            if (issuersUnchanged) {
-              for (Integer id : newIds) {
-                IssuerEntry entry = issuerStore.getIssuerForId(id);
-                SimpleIssuerEntry newEntry = newIssuers.get(id);
-                if (!newEntry.match(entry)) {
-                  issuersUnchanged = false;
-                  break;
-                }
-              }
-            }
-
-            if (issuersUnchanged) {
-              return;
-            }
-          } finally {
-            releaseDbResources(ps, rs);
-          }
-        } // end if(initialized)
-
-        final String sql = "SELECT ID,REV_INFO,CERT FROM CA";
         PreparedStatement ps = preparedStatement(sql);
-
         ResultSet rs = null;
+
         try {
+          Map<String, EjbcaIssuerEntry> newIssuers = new HashMap<>();
+
           rs = ps.executeQuery();
-          List<IssuerEntry> caInfos = new LinkedList<>();
           while (rs.next()) {
-            byte[] certBytes = Base64.decode(rs.getString("CERT"));
-            String sha1Fp = HashAlgo.SHA1.base64Hash(certBytes);
+            String caData = rs.getString("data");
+
+            String str = extractTextFromCaData(caData, "catype", "int");
+            if (!"1".equals(str)) {
+              // not X.509CA
+              continue;
+            }
+
+            String b64Cert = extractTextFromCaData(caData, "certificatechain", "string");
+            if (b64Cert == null) {
+              // not an X.509CA
+              continue;
+            }
+
+            X509Cert cert = X509Util.parseCert(StringUtil.toUtf8Bytes(b64Cert.trim()));
+            EjbcaIssuerEntry issuerEntry = new EjbcaIssuerEntry(cert);
+            String sha1Fp = issuerEntry.getId();
+
             if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
               continue;
             }
 
-            X509Cert cert = X509Util.parseCert(certBytes);
-
-            IssuerEntry caInfoEntry = new IssuerEntry(rs.getInt("ID"), cert);
-            RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1, caInfoEntry.getEncodedHash(HashAlgo.SHA1));
-            for (IssuerEntry existingIssuer : caInfos) {
-              if (existingIssuer.matchHash(reqIssuer)) {
+            RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1, issuerEntry.getEncodedHash(HashAlgo.SHA1));
+            for (EjbcaIssuerEntry m : newIssuers.values()) {
+              if (m.matchHash(reqIssuer)) {
                 throw new Exception("found at least two issuers with the same subject and key");
               }
             }
 
-            String str = rs.getString("REV_INFO");
-            if (str != null) {
-              CertRevocationInfo revInfo = CertRevocationInfo.fromEncoded(str);
-              caInfoEntry.setRevocationInfo(revInfo.getRevocationTime());
+            // extract the revocation time of CA
+            str = extractTextFromCaData(caData, "revokationreason", "int");
+            if (str != null && !"-1".contentEquals(str)) {
+              // CA is revoked
+              str = extractTextFromCaData(caData, "revokationdate", "long");
+
+              Instant revTime = (str == null || "-1".contentEquals(str))
+                  ? Instant.now() : Instant.ofEpochMilli(Long.parseLong(str));
+              issuerEntry.setRevocationInfo(revTime);
             }
 
-            caInfos.add(caInfoEntry);
-          } // end while (rs.next())
+            newIssuers.put(sha1Fp, issuerEntry);
+          }
 
-          this.issuerStore.setIssuers(caInfos);
+          // no change in the issuerStore
+          Set<String> newIds = newIssuers.keySet();
+          Set<String> ids = (issuerStore != null) ? issuerStore.getIds() : Collections.emptySet();
+
+          boolean issuersUnchanged = (ids.size() == newIds.size())
+              && ids.containsAll(newIds) && newIds.containsAll(ids);
+
+          if (issuersUnchanged) {
+            for (String id : newIds) {
+              EjbcaIssuerEntry entry = issuerStore.getIssuerForId(id);
+              EjbcaIssuerEntry newEntry = newIssuers.get(id);
+              if (!newEntry.equals(entry)) {
+                issuersUnchanged = false;
+                break;
+              }
+            }
+          }
+
+          if (issuersUnchanged) {
+            return;
+          }
+
+          initialized = false;
+          this.issuerStore = new EjbcaIssuerStore(newIssuers.values());
+
           if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
-            for (IssuerEntry m : caInfos) {
-              sb.append(overviewString(m.getCert())).append("\n");
+            for (Map.Entry<String, EjbcaIssuerEntry> m : newIssuers.entrySet()) {
+              sb.append(overviewString(m.getValue().getCert())).append("\n");
             }
             if (sb.length() > 1) {
               sb.deleteCharAt(sb.length() - 1);
             }
             LOG.info("Updated store {} with issuers {}", name, sb);
           }
+
+          LOG.info("Updated issuers of store {}", name);
+          initializationFailed = false;
+          initialized = true;
         } finally {
           releaseDbResources(ps, rs);
         }
       } catch (Throwable th) {
         LogUtil.error(LOG, th, "error while executing updateIssuerStore()");
-      } finally {
+        initializationFailed = true;
         initialized = true;
+      } finally {
         storeUpdateInProcess.set(false);
       }
     } // end lock
@@ -217,6 +214,10 @@ public class CaDbCertStatusStore extends OcspStore {
       Instant time, RequestIssuer reqIssuer, BigInteger serialNumber,
       boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
       throws OcspStoreException {
+    if (includeRit) {
+      throw new OcspStoreException("EJBCA store does not support includeRit");
+    }
+
     if (serialNumber.signum() != 1) { // non-positive serial number
       return CertStatusInfo.getUnknownCertStatusInfo(Instant.now(), null);
     }
@@ -225,19 +226,17 @@ public class CaDbCertStatusStore extends OcspStore {
       throw new OcspStoreException("initialization of CertStore is still in process");
     }
 
-    String sql;
+    if (initializationFailed) {
+      throw new OcspStoreException("initialization of CertStore failed");
+    }
 
     try {
-      IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
+      EjbcaIssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
       if (issuer == null) {
         return null;
       }
 
-      if (includeCertHash) {
-        sql = includeRit ? sqlCsWithCertHash : sqlCsNoRitWithCertHash;
-      } else {
-        sql = includeRit ? sqlCs : sqlCsNoRit;
-      }
+      String sql = includeCertHash ? sqlCsWithCertHash : sqlCs;
 
       Instant thisUpdate = Instant.now();
 
@@ -245,49 +244,47 @@ public class CaDbCertStatusStore extends OcspStore {
 
       boolean unknown = true;
       boolean ignore = false;
-      String b64CertHash = null;
+      String hexCertHash = null;
       boolean revoked = false;
       int reason = 0;
       long revTime = 0;
-      long invalTime = 0;
 
       PreparedStatement ps = datasource.prepareStatement(sql);
 
       try {
-        ps.setInt(1, issuer.getId());
-        ps.setString(2, serialNumber.toString(16));
+        ps.setString(1, issuer.getId());
+        // decimal serial number
+        ps.setString(2, serialNumber.toString());
         rs = ps.executeQuery();
 
         if (rs.next()) {
           unknown = false;
 
-          long timeInSec = time.getEpochSecond();
+          long timeInMs = time.toEpochMilli();
           if (ignoreNotYetValidCert) {
-            long notBeforeInSec = rs.getLong("NBEFORE");
-            if (notBeforeInSec != 0 && timeInSec < notBeforeInSec) {
+            long notBefore = rs.getLong("notBefore");
+            if (timeInMs < notBefore) {
               ignore = true;
             }
           }
 
           if (!ignore && ignoreExpiredCert) {
-            long notAfterInSec = rs.getLong("NAFTER");
-            if (notAfterInSec != 0 && timeInSec > notAfterInSec) {
+            long notAfterInSec = rs.getLong("expireDate");
+            if (timeInMs > notAfterInSec) {
               ignore = true;
             }
           }
 
           if (!ignore) {
             if (includeCertHash) {
-              b64CertHash = rs.getString("SHA1");
+              hexCertHash = rs.getString("fingerprint");
             }
 
-            revoked = rs.getBoolean("REV");
+            int status = rs.getInt("status");
+            revoked = status == 40;
             if (revoked) {
-              reason = rs.getInt("RR");
-              revTime = rs.getLong("RT");
-              if (includeRit) {
-                invalTime = rs.getLong("RIT");
-              }
+              reason = rs.getInt("revocationReason");
+              revTime = rs.getLong("revocationDate") / 1000;
             }
           }
         } // end if (rs.next())
@@ -303,21 +300,21 @@ public class CaDbCertStatusStore extends OcspStore {
       } else if (ignore) {
         certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, null);
       } else {
-        byte[] certHash = (b64CertHash == null) ? null : Base64.decodeFast(b64CertHash);
+        byte[] certHash = (hexCertHash == null) ? null : Hex.decode(hexCertHash);
         if (revoked) {
-          Instant invTime = (invalTime == 0 || invalTime == revTime) ? null : Instant.ofEpochSecond(invalTime);
-          CertRevocationInfo revInfo = new CertRevocationInfo(reason, Instant.ofEpochSecond(revTime), invTime);
+          CertRevocationInfo revInfo = new CertRevocationInfo(reason, Instant.ofEpochSecond(revTime), null);
           certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
               certHashAlgo, certHash, thisUpdate, null, null);
         } else {
-          certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, certHash, thisUpdate, null, null);
+          certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo,
+              certHash, thisUpdate, null, null);
         }
       }
 
       if (includeArchiveCutoff) {
         if (retentionInterval != 0) {
           Instant date;
-          // expired certificate remains in status store forever.
+          // expired certificate remains in status store forever
           if (retentionInterval < 0) {
             date = issuer.getNotBefore();
           } else {
@@ -349,13 +346,9 @@ public class CaDbCertStatusStore extends OcspStore {
       }
 
       if (replaced) {
-        CertRevocationInfo newRevInfo;
-        if (caRevInfo.getReason() == CrlReason.CA_COMPROMISE) {
-          newRevInfo = caRevInfo;
-        } else {
-          newRevInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
-              caRevInfo.getRevocationTime(), caRevInfo.getInvalidityTime());
-        }
+        CertRevocationInfo newRevInfo = (caRevInfo.getReason() == CrlReason.CA_COMPROMISE) ? caRevInfo
+            : new CertRevocationInfo(CrlReason.CA_COMPROMISE,
+                  caRevInfo.getRevocationTime(), caRevInfo.getInvalidityTime());
         certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
             certStatusInfo.getCertHashAlgo(), certStatusInfo.getCertHash(),
             certStatusInfo.getThisUpdate(), certStatusInfo.getNextUpdate(),
@@ -383,7 +376,11 @@ public class CaDbCertStatusStore extends OcspStore {
       return false;
     }
 
-    final String sql = "SELECT ID FROM CA";
+    if (isInitializationFailed()) {
+      return false;
+    }
+
+    final String sql = "SELECT cAId FROM CAData";
 
     try {
       PreparedStatement ps = preparedStatement(sql);
@@ -418,6 +415,10 @@ public class CaDbCertStatusStore extends OcspStore {
    */
   @Override
   public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource) throws OcspStoreException {
+    if (includeCrlId) {
+      throw new OcspStoreException("includeCrlId must not be true");
+    }
+
     OcspServerConf.CaCerts caCerts = null;
     if (sourceConf != null) {
       Object objValue = sourceConf.get("caCerts");
@@ -428,26 +429,22 @@ public class CaDbCertStatusStore extends OcspStore {
 
     this.datasource = Args.notNull(datasource, "datasource");
 
-    sqlCs = datasource.buildSelectFirstSql(1, "NBEFORE,NAFTER,REV,RR,RT,RIT FROM CERT WHERE CA_ID=? AND SN=?");
-    sqlCsNoRit = datasource.buildSelectFirstSql(1, "NBEFORE,NAFTER,REV,RR,RT FROM CERT WHERE CA_ID=? AND SN=?");
+    String coreSql = "notBefore,expireDate,status,revocationReason,revocationDate"
+        + " FROM CertificateData WHERE cAFingerprint=? AND serialNumber=?";
+    sqlCs = datasource.buildSelectFirstSql(1, coreSql);
 
-    sqlCsWithCertHash = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,RIT,SHA1 FROM CERT WHERE CA_ID=? AND SN=?");
-    sqlCsNoRitWithCertHash = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,SHA1 FROM CERT WHERE CA_ID=? AND SN=?");
-
-    this.certHashAlgo = HashAlgo.SHA1;
+    sqlCsWithCertHash = datasource.buildSelectFirstSql(1, "fingerprint," + coreSql);
 
     Set<X509Cert> includeIssuers = null;
     Set<X509Cert> excludeIssuers = null;
 
     if (caCerts != null) {
       if (CollectionUtil.isNotEmpty(caCerts.getIncludes())) {
-        includeIssuers = DbCertStatusStore.parseCerts(caCerts.getIncludes());
+        includeIssuers = parseCerts(caCerts.getIncludes());
       }
 
       if (CollectionUtil.isNotEmpty(caCerts.getExcludes())) {
-        excludeIssuers = DbCertStatusStore.parseCerts(caCerts.getExcludes());
+        excludeIssuers = parseCerts(caCerts.getExcludes());
       }
     }
 
@@ -483,7 +480,7 @@ public class CaDbCertStatusStore extends OcspStore {
     if (datasource != null) {
       datasource.close();
     }
-  } // method close
+  }
 
   @Override
   public boolean knowsIssuer(RequestIssuer reqIssuer) {
@@ -492,12 +489,49 @@ public class CaDbCertStatusStore extends OcspStore {
 
   @Override
   public X509Cert getIssuerCert(RequestIssuer reqIssuer) {
-    IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
+    EjbcaIssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
     return (issuer == null) ? null : issuer.getCert();
-  } // method getIssuerCert
+  }
 
   protected boolean isInitialized() {
     return initialized;
   }
+
+  protected boolean isInitializationFailed() {
+    return initializationFailed;
+  }
+
+  private static Set<X509Cert> parseCerts(Collection<String> certFiles) throws OcspStoreException {
+    Set<X509Cert> certs = new HashSet<>(certFiles.size());
+    for (String certFile : certFiles) {
+      try {
+        certs.add(X509Util.parseCert(new File(certFile)));
+      } catch (CertificateException | IOException ex) {
+        throw new OcspStoreException("could not parse X.509 certificate from file "
+            + certFile + ": " + ex.getMessage(), ex);
+      }
+    }
+    return certs;
+  } // method parseCerts
+
+  private static String extractTextFromCaData(String caData, String key, String valueType) {
+    String keyTag = "<string>" + key + "</string>";
+    int index = caData.indexOf(keyTag);
+    if (index == -1) {
+      return null;
+    }
+
+    String valueStartTag = "<" + valueType + ">";
+    String valueEndTag = "</" + valueType + ">";
+
+    index = caData.indexOf(valueStartTag, index + keyTag.length());
+    if (index == -1) {
+      return null;
+    }
+    int startIndex = index + valueStartTag.length();
+
+    index = caData.indexOf(valueEndTag, startIndex);
+    return (index == -1) ? null : caData.substring(startIndex, index);
+  } // method extractTextFromCaData
 
 }

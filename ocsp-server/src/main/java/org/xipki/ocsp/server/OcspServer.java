@@ -7,9 +7,13 @@ import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
+import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.bouncycastle.asn1.ocsp.OCSPResponse;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.ocsp.OCSPException;
+import org.bouncycastle.cert.ocsp.OCSPReq;
+import org.bouncycastle.operator.ContentVerifierProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataSourceConf;
@@ -61,6 +65,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.InvalidKeyException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -74,6 +79,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static org.xipki.ocsp.server.OcspServerUtil.canBuildCertpath;
 import static org.xipki.ocsp.server.OcspServerUtil.initSigner;
 import static org.xipki.ocsp.server.OcspServerUtil.newStore;
 import static org.xipki.ocsp.server.OcspServerUtil.parseConf;
@@ -218,6 +224,9 @@ public class OcspServer implements Closeable {
   private void init0() throws OcspStoreException, InvalidConfException {
     if (confFile == null) {
       throw new IllegalStateException("confFile is not set");
+    }
+    if (datasourceFactory == null) {
+      throw new IllegalStateException("datasourceFactory is not set");
     }
     if (securityFactory == null) {
       throw new IllegalStateException("securityFactory is not set");
@@ -525,7 +534,14 @@ public class OcspServer implements Closeable {
     OcspServerConf.ResponseOption repOpt = responder.getResponseOption();
 
     try {
-      OcspRequest req = OcspRequest.getInstance(request);
+      Object reqOrErrorResp = checkSignature(request, reqOpt);
+      if (reqOrErrorResp instanceof OcspRespWithCacheInfo) {
+        // error
+        return (OcspRespWithCacheInfo) reqOrErrorResp;
+      }
+
+      OcspRequest req = (OcspRequest) reqOrErrorResp;
+
       List<CertID> requestList = req.getRequestList();
       int requestsSize = requestList.size();
       if (requestsSize > reqOpt.getMaxRequestListCount()) {
@@ -779,6 +795,7 @@ public class OcspServer implements Closeable {
 
       try {
         certStatusInfo = store.getCertStatus(now, certId.getIssuer(), serial,
+            repOpt.isIncludeCerthash(), repOpt.isIncludeInvalidityDate(),
             responder.getResponderOption().isInheritCaRevocation());
 
         if (certStatusInfo != null) {
@@ -870,6 +887,12 @@ public class OcspServer implements Closeable {
         CertRevocationInfo revInfo = certStatusInfo.getRevocationInfo();
         certStatus = ResponseTemplate.getEncodeRevokedInfo(
             repOpt.isIncludeRevReason() ? revInfo.getReason() : null, revInfo.getRevocationTime());
+
+        Instant invalidityDate = revInfo.getInvalidityTime();
+        if (repOpt.isIncludeInvalidityDate() && invalidityDate != null
+            && !invalidityDate.equals(revInfo.getRevocationTime())) {
+          extensions.add(ResponseTemplate.getInvalidityDateExtension(invalidityDate));
+        }
         break;
       default:
         throw new IllegalStateException("unknown CertificateStatus:" + certStatusInfo.getCertStatus());
@@ -877,6 +900,15 @@ public class OcspServer implements Closeable {
 
     if (responder.getResponderOption().getMode() != OcspMode.RFC2560) {
       repControl.includeExtendedRevokeExtension = true;
+    }
+
+    byte[] certHash = certStatusInfo.getCertHash();
+    if (certHash != null) {
+      extensions.add(ResponseTemplate.getCertHashExtension(certStatusInfo.getCertHashAlgo(), certHash));
+    }
+
+    if (certStatusInfo.getArchiveCutOff() != null) {
+      extensions.add(ResponseTemplate.getArchiveOffExtension(certStatusInfo.getArchiveCutOff()));
     }
 
     if (LOG.isDebugEnabled()) {
@@ -890,7 +922,11 @@ public class OcspServer implements Closeable {
           ", serialNumber: ", LogUtil.formatCsn(certId.getSerialNumber()),
           ", certStatus: ", certStatusText, ", thisUpdate: ", thisUpdate,
           ", nextUpdate: ", nextUpdate);
-      LOG.debug(msg);
+      if (certHash == null) {
+        LOG.debug(msg);
+      } else {
+        LOG.debug(msg + ", certHash: " + Hex.encode(certHash));
+      }
     }
 
     if (CollectionUtil.isEmpty(extensions)) {
@@ -916,6 +952,72 @@ public class OcspServer implements Closeable {
 
     return responder.getSigner().isHealthy();
   } // method healthCheck
+
+  private Object checkSignature(byte[] request, RequestOption requestOption)
+      throws OCSPException {
+    OCSPRequest req;
+    try {
+      if (!requestOption.isValidateSignature()) {
+        return OcspRequest.getInstance(request);
+      }
+
+      if (!OcspRequest.containsSignature(request)) {
+        if (requestOption.isSignatureRequired()) {
+          LOG.warn("signature in request required");
+          return unsuccesfulOCSPRespMap.get(OcspResponseStatus.sigRequired);
+        } else {
+          return OcspRequest.getInstance(request);
+        }
+      }
+
+      try {
+        req = OCSPRequest.getInstance(request);
+      } catch (IllegalArgumentException ex) {
+        throw new EncodingException("could not parse OCSP request", ex);
+      }
+    } catch (EncodingException ex) {
+      return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
+    }
+
+    OCSPReq ocspReq = new OCSPReq(req);
+    X509CertificateHolder[] bcCerts = ocspReq.getCerts();
+    if (bcCerts == null || bcCerts.length < 1) {
+      LOG.warn("no certificate found in request to verify the signature");
+      return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
+    }
+
+    X509Cert[] certs = new X509Cert[bcCerts.length];
+    for (int i = 0; i < certs.length; i++) {
+      certs[i] = new X509Cert(bcCerts[i]);
+    }
+
+    ContentVerifierProvider cvp;
+    try {
+      cvp = securityFactory.getContentVerifierProvider(certs[0]);
+    } catch (InvalidKeyException ex) {
+      String message = ex.getMessage();
+      LOG.warn("securityFactory.getContentVerifierProvider, InvalidKeyException: {}", message);
+      return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
+    }
+
+    if (!ocspReq.isSignatureValid(cvp)) {
+      LOG.warn("request signature is invalid");
+      return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
+    }
+
+    // validate the certPath
+    Instant referenceTime = Instant.now();
+    if (canBuildCertpath(certs, requestOption, referenceTime)) {
+      try {
+        return OcspRequest.getInstance(req);
+      } catch (EncodingException ex) {
+        return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
+      }
+    }
+
+    LOG.warn("could not build certpath for the request's signer certificate");
+    return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
+  } // method checkSignature
 
   private static InputStream getInputStream(FileOrValue conf) throws IOException {
     return (conf.getFile() != null)

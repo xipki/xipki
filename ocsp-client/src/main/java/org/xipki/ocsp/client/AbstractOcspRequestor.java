@@ -13,6 +13,7 @@ import org.bouncycastle.asn1.ocsp.CertID;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.bouncycastle.asn1.ocsp.Request;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.TBSCertificate;
@@ -21,22 +22,30 @@ import org.bouncycastle.cert.ocsp.CertificateID;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.SingleResp;
+import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
+import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
+import org.xipki.security.XiContentSigner;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.ConfPairs;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ReqRespDebug;
 import org.xipki.util.ReqRespDebug.ReqRespPair;
 import org.xipki.util.StringUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
 import java.security.SecureRandom;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -50,6 +59,18 @@ import java.util.List;
  */
 
 public abstract class AbstractOcspRequestor implements OcspRequestor {
+
+  private SecurityFactory securityFactory;
+
+  private final Object signerLock = new Object();
+
+  private ConcurrentContentSigner signer;
+
+  private String signerType;
+
+  private String signerConf;
+
+  private String signerCertFile;
 
   private final SecureRandom random = new SecureRandom();
 
@@ -303,7 +324,58 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         reqBuilder.addRequest(certId);
       }
 
-      return reqBuilder.build();
+      if (requestOptions.isSignRequest()) {
+        synchronized (signerLock) {
+          if (signer == null) {
+            if (StringUtil.isBlank(signerType)) {
+              throw new OcspRequestorException("signerType is not configured");
+            }
+
+            if (StringUtil.isBlank(signerConf)) {
+              throw new OcspRequestorException("signerConf is not configured");
+            }
+
+            X509Cert cert = null;
+            if (StringUtil.isNotBlank(signerCertFile)) {
+              try {
+                cert = X509Util.parseCert(new File(signerCertFile));
+              } catch (CertificateException ex) {
+                throw new OcspRequestorException(
+                    "could not parse certificate " + signerCertFile + ": " + ex.getMessage());
+              }
+            }
+
+            try {
+              signer = getSecurityFactory().createSigner(signerType,
+                  new SignerConf(new ConfPairs(signerConf)), cert);
+            } catch (Exception ex) {
+              throw new OcspRequestorException("could not create signer: " + ex.getMessage());
+            }
+          } // end if
+        } // end synchronized
+
+        reqBuilder.setRequestorName(signer.getCertificate().getSubject());
+        X509Cert[] certChain0 = signer.getCertificateChain();
+        Certificate[] certChain = new Certificate[certChain0.length];
+        for (int i = 0; i < certChain.length; i++) {
+          certChain[i] = certChain0[i].toBcCert().toASN1Structure();
+        }
+
+        XiContentSigner signer0;
+        try {
+          signer0 = signer.borrowSigner();
+        } catch (NoIdleSignerException ex) {
+          throw new OcspRequestorException("NoIdleSignerException: " + ex.getMessage());
+        }
+
+        try {
+          return reqBuilder.build(signer0, certChain);
+        } finally {
+          signer.requiteSigner(signer0);
+        }
+      } else {
+        return reqBuilder.build();
+      } // end if
     } catch (OCSPException | IOException ex) {
       throw new OcspRequestorException(ex.getMessage(), ex);
     }
@@ -313,6 +385,43 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     byte[] nonce = new byte[nonceLen];
     random.nextBytes(nonce);
     return nonce;
+  }
+
+  public String getSignerConf() {
+    return signerConf;
+  }
+
+  public void setSignerConf(String signerConf) {
+    this.signer = null;
+    this.signerConf = signerConf;
+  }
+
+  public String getSignerCertFile() {
+    return signerCertFile;
+  }
+
+  public void setSignerCertFile(String signerCertFile) {
+    if (StringUtil.isNotBlank(signerCertFile)) {
+      this.signer = null;
+      this.signerCertFile = signerCertFile;
+    }
+  }
+
+  public String getSignerType() {
+    return signerType;
+  }
+
+  public void setSignerType(String signerType) {
+    this.signer = null;
+    this.signerType = signerType;
+  }
+
+  public SecurityFactory getSecurityFactory() {
+    return securityFactory;
+  }
+
+  public void setSecurityFactory(SecurityFactory securityFactory) {
+    this.securityFactory = securityFactory;
   }
 
 }

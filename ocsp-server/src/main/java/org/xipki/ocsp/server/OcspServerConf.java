@@ -6,6 +6,7 @@ package org.xipki.ocsp.server;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
+import org.xipki.security.CertpathValidationModel;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.JSON;
 import org.xipki.util.ValidableConf;
@@ -31,6 +32,35 @@ public class OcspServerConf extends ValidableConf {
     SIGNER,
     SIGNER_AND_CA
   } // class EmbedCertsMode
+
+  public static class CertCollection extends ValidableConf {
+
+    private String dir;
+
+    private FileOrBinary[] certs;
+
+    public String getDir() {
+      return dir;
+    }
+
+    public void setDir(String value) {
+      this.dir = value;
+    }
+
+    public FileOrBinary[] getCerts() {
+      return certs;
+    }
+
+    public void setCerts(FileOrBinary[] certs) {
+      this.certs = certs;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+      exactOne(certs, "certs", dir, "dir");
+    }
+
+  } // class CertCollection
 
   public static class Nonce extends ValidableConf {
 
@@ -99,7 +129,13 @@ public class OcspServerConf extends ValidableConf {
 
     private Nonce nonce;
 
+    private boolean signatureRequired;
+
+    private boolean validateSignature;
+
     private List<String> hashAlgorithms;
+
+    private CertpathValidation certpathValidation;
 
     private String name;
 
@@ -143,6 +179,22 @@ public class OcspServerConf extends ValidableConf {
       this.nonce = nonce;
     }
 
+    public boolean isSignatureRequired() {
+      return signatureRequired;
+    }
+
+    public void setSignatureRequired(boolean signatureRequired) {
+      this.signatureRequired = signatureRequired;
+    }
+
+    public boolean isValidateSignature() {
+      return validateSignature;
+    }
+
+    public void setValidateSignature(boolean validateSignature) {
+      this.validateSignature = validateSignature;
+    }
+
     public List<String> getHashAlgorithms() {
       if (hashAlgorithms == null) {
         hashAlgorithms = new LinkedList<>();
@@ -152,6 +204,14 @@ public class OcspServerConf extends ValidableConf {
 
     public void setHashAlgorithms(List<String> hashAlgorithms) {
       this.hashAlgorithms = hashAlgorithms;
+    }
+
+    public CertpathValidation getCertpathValidation() {
+      return certpathValidation;
+    }
+
+    public void setCertpathValidation(CertpathValidation certpathValidation) {
+      this.certpathValidation = certpathValidation;
     }
 
     public String getName() {
@@ -166,10 +226,51 @@ public class OcspServerConf extends ValidableConf {
     public void validate() throws InvalidConfException {
       notEmpty(versions, "versions");
       notNull(nonce, "nonce");
-      validate(nonce);
+      validate(nonce, certpathValidation);
     }
 
   } // class RequestOption
+
+  public static class CertpathValidation extends ValidableConf {
+
+    private CertpathValidationModel validationModel;
+
+    private CertCollection trustanchors;
+
+    private CertCollection certs;
+
+    public CertpathValidationModel getValidationModel() {
+      return validationModel;
+    }
+
+    public void setValidationModel(CertpathValidationModel validationModel) {
+      this.validationModel = validationModel;
+    }
+
+    public CertCollection getTrustanchors() {
+      return trustanchors;
+    }
+
+    public void setTrustanchors(CertCollection trustanchors) {
+      this.trustanchors = trustanchors;
+    }
+
+    public CertCollection getCerts() {
+      return certs;
+    }
+
+    public void setCerts(CertCollection certs) {
+      this.certs = certs;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+      notNull(validationModel, "validationModel");
+      notNull(trustanchors, "trustanchors");
+      validate(trustanchors, certs);
+    }
+
+  } // class CertpathValidation
 
   public static class Responder extends ValidableConf {
 
@@ -319,9 +420,13 @@ public class OcspServerConf extends ValidableConf {
 
     private boolean responderIdByName = true;
 
+    private boolean includeInvalidityDate = false;
+
     private boolean includeRevReason = false;
 
     private EmbedCertsMode embedCertsMode = EmbedCertsMode.SIGNER;
+
+    private boolean includeCerthash = false;
 
     private Long cacheMaxAge;
 
@@ -333,6 +438,14 @@ public class OcspServerConf extends ValidableConf {
 
     public void setResponderIdByName(boolean responderIdByName) {
       this.responderIdByName = responderIdByName;
+    }
+
+    public boolean isIncludeInvalidityDate() {
+      return includeInvalidityDate;
+    }
+
+    public void setIncludeInvalidityDate(boolean includeInvalidityDate) {
+      this.includeInvalidityDate = includeInvalidityDate;
     }
 
     public boolean isIncludeRevReason() {
@@ -349,6 +462,14 @@ public class OcspServerConf extends ValidableConf {
 
     public void setEmbedCertsMode(EmbedCertsMode embedCertsMode) {
       this.embedCertsMode = embedCertsMode;
+    }
+
+    public boolean isIncludeCerthash() {
+      return includeCerthash;
+    }
+
+    public void setIncludeCerthash(boolean includeCerthash) {
+      this.includeCerthash = includeCerthash;
     }
 
     public Long getCacheMaxAge() {
@@ -465,7 +586,13 @@ public class OcspServerConf extends ValidableConf {
 
     private Boolean ignoreNotYetValidCert;
 
+    private Integer retentionInterval;
+
     private UnknownCertBehaviour unknownCertBehaviour;
+
+    private Boolean includeArchiveCutoff;
+
+    private Boolean includeCrlId;
 
     private String minNextUpdatePeriod;
 
@@ -497,6 +624,14 @@ public class OcspServerConf extends ValidableConf {
       this.ignoreNotYetValidCert = ignoreNotYetValidCert;
     }
 
+    public Integer getRetentionInterval() {
+      return retentionInterval;
+    }
+
+    public void setRetentionInterval(Integer retentionInterval) {
+      this.retentionInterval = retentionInterval;
+    }
+
     public UnknownCertBehaviour getUnknownCertBehaviour() {
       return unknownCertBehaviour;
     }
@@ -519,6 +654,22 @@ public class OcspServerConf extends ValidableConf {
 
     public void setMaxNextUpdatePeriod(String maxNextUpdatePeriod) {
       this.maxNextUpdatePeriod = maxNextUpdatePeriod;
+    }
+
+    public Boolean getIncludeArchiveCutoff() {
+      return includeArchiveCutoff;
+    }
+
+    public void setIncludeArchiveCutoff(Boolean includeArchiveCutoff) {
+      this.includeArchiveCutoff = includeArchiveCutoff;
+    }
+
+    public Boolean getIncludeCrlId() {
+      return includeCrlId;
+    }
+
+    public void setIncludeCrlId(Boolean includeCrlId) {
+      this.includeCrlId = includeCrlId;
     }
 
     public String getName() {

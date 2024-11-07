@@ -19,6 +19,8 @@ import java.util.List;
 
 public class RequestOptions {
 
+  private boolean signRequest;
+
   private boolean useNonce = true;
 
   private int nonceLen = 8;
@@ -72,6 +74,14 @@ public class RequestOptions {
 
   public void setUseHttpGetForRequest(boolean useHttpGetForRequest) {
     this.useHttpGetForRequest = useHttpGetForRequest;
+  }
+
+  public boolean isSignRequest() {
+    return signRequest;
+  }
+
+  public void setSignRequest(boolean signRequest) {
+    this.signRequest = signRequest;
   }
 
   public boolean isAllowNoNonceInResponse() {
