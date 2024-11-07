@@ -120,6 +120,11 @@
                 <move file="${project.build.directory}/t/xipki-gateway-${project.version}"
                       tofile="${project.build.directory}/t/xipki-gateway"/>
 
+                <unzip src="../xipki-hsmproxy/target/xipki-hsmproxy-${project.version}.zip"
+                       dest="${project.build.directory}/t"/>
+                <move file="${project.build.directory}/t/xipki-hsmproxy-${project.version}"
+                      tofile="${project.build.directory}/t/xipki-hsmproxy"/>
+
                 <untar src="../xipki-cli/target/xipki-cli-${project.version}.tar.gz"
                        dest="${project.build.directory}/t" compression="gzip"/>
                 <move file="${project.build.directory}/t/xipki-cli-${project.version}"

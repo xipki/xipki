@@ -1,0 +1,22 @@
+{
+	"modules":[{
+		"name":"default",
+		"readonly":false,
+		"type":"hsmproxy",
+		"nativeLibraries":[
+			{
+				"path":"https://$[hsmproxy.host]:$[hsmproxy.https.port]/hp",
+				"properties": {
+					"ssl.storeType": "PKCS12",
+					"ssl.keystore": "keycerts/hsmproxy-client.p12",
+					"ssl.keystorePassword": "$[hsmproxy.client.keyPassword]",
+					// ",;:" separated certificate files.
+					"ssl.trustcerts": "keycerts/hsmproxy-server-cert.pem",
+					// hostnameVerifier: no_op, default or java:class-name
+					"ssl.hostnameVerifier": "default"
+				}
+			}
+		]
+	}]
+}
+

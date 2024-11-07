@@ -22,6 +22,20 @@
 			"validity": "20y",
 			"p12Password": "$[ra.sdk.keyPassword]"
 		},{
+			"name": "hsmproxy-server",
+			"certType": "TLS-Server",
+			"keyType": "EC/P-256",
+			"subject": "O=$[organization], OU=HSM proxy server, CN=$[hsmproxy.host]",
+			"validity": "20y",
+			"p12Password": "$[hsmproxy.https.keyPassword]"
+		},{
+			"name": "hsmproxy-client",
+			"certType": "TLS-Client",
+			"keyType": "EC/P-256",
+			"subject": "O=$[organization], CN=HSM proxy client",
+			"validity": "20y",
+			"p12Password": "$[hsmproxy.https.keyPassword]"
+	  	},{
 			"name": "gateway-server",
 			"certType": "TLS-Server",
 			"keyType": "EC/P-256",
@@ -85,6 +99,11 @@
 			"name": "ca-client",
 			"p12Password":"CHANGEIT",
 			"keyCertNames": ["ca-mgmt-client", "ra-sdk-client"]
+		},
+		{
+			"name": "hsmproxy-client",
+			"p12Password":"CHANGEIT",
+			"keyCertNames": ["hsmproxy-client"]
 		}
 	]
 }

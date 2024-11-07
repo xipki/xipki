@@ -40,11 +40,20 @@
 				"xipki-ocsp/tomcat/xipki/etc/ocsp/example/ejbca-store/ocsp-responder.json",
 				"xipki-ocsp/tomcat/xipki/etc/ocsp/example/xipki-ca-db-store/ocsp-responder.json",
 				"xipki-ocsp/tomcat/xipki/etc/ocsp/example/xipki-db-store/ocsp-responder.json",
-				// PKCS11
+				// HSM proxy
+				"xipki-hsmproxy/tomcat8on/conf/server.xml",
+				"xipki-hsmproxy/tomcat10on/conf/server.xml",
+				"xipki-hsmproxy/tomcat/xipki/security/example/pkcs11-hsmproxy.json",
+				"xipki-hsmproxy/tomcat/xipki/security/pkcs11.json",
+				"xipki-ca/tomcat/xipki/security/example/pkcs11-hsmproxy.json",
 				"xipki-ca/tomcat/xipki/security/pkcs11.json",
+				"xipki-ocsp/tomcat/xipki/security/example/pkcs11-hsmproxy.json",
 				"xipki-ocsp/tomcat/xipki/security/pkcs11.json",
+				"xipki-gateway/tomcat/xipki/security/example/pkcs11-hsmproxy.json",
 				"xipki-gateway/tomcat/xipki/security/pkcs11.json",
+				"xipki-cli/xipki/security/example/pkcs11-hsmproxy.json",
 				"xipki-cli/xipki/security/pkcs11.json",
+				"xipki-mgmt-cli/xipki/security/example/pkcs11-hsmproxy.json",
 				"xipki-mgmt-cli/xipki/security/pkcs11.json",
 
 				// MGMT CLI
@@ -109,6 +118,13 @@
 				"ra.sdk.keyPassword": "changeit-rasdk",
 				// Gateway.SCEP
 				"scep.keyPassword": "changeit-scep",
+				// HSM proxy
+				"hsmproxy.https.keyPassword": "changeit-hsmproxy",
+				"hsmproxy.shutdown.port": "8008",
+				"hsmproxy.https.port": "8446",
+				"hsmproxy.host": "localhost",
+				"hsmproxy.client.keyPassword": "changeit-hsmproxy",
+				// CLI
 				"cmp.client.ca.keyPassword": "changeit-cmpclientca",
 				"cmp.client.keyPassword": "changeit-cmpclient",
 				"est.client.ca.keyPassword": "changeit-estclientca",

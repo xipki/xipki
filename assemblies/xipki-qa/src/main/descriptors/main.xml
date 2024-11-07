@@ -150,6 +150,11 @@
       <directory>${project.build.directory}/xipki-gateway-${project.version}/</directory>
       <outputDirectory>xipki-gateway</outputDirectory>
     </fileSet>
+    <!-- Copy xipki-hsmproxy -->
+    <fileSet>
+      <directory>${project.build.directory}/xipki-hsmproxy-${project.version}/</directory>
+      <outputDirectory>xipki-hsmproxy</outputDirectory>
+    </fileSet>
   </fileSets>
   <files>
     <file>
