@@ -8,6 +8,8 @@ xi:mkdir error-output
 
 list = [ rootca1 subca1 ]
 
-each ($list) {
-  xi:ec-p12 --curve Ed${KEYSPEC} --password CHANGEIT --out output/${it}.p12
+if { $TOKEN_TYPE equals "pkcs12" } then {
+  each ($list) {
+    xi:ec-p12 --curve Ed${KEYSPEC} --password CHANGEIT --out output/${it}.p12
+  }
 }

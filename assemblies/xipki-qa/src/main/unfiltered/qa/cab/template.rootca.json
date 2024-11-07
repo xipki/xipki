@@ -4,7 +4,8 @@
 		"ca.signerConf":"REPLACEME-CA_SIGNERCONF",
 		"keycerts.dir":"xipki/keycerts",
 		"output.dir":"output",
-		"profiles.dir":"qa/certprofile"
+		"profiles.dir":"qa/certprofile",
+		"token.type":"REPLACEME-TOKEN_TYPE"
 	},
 	"signers":[],
 	"requestors":[{
@@ -82,7 +83,7 @@
 			"permissions":["all"],
 			"saveCert":true,
 			"saveKeypair":false,
-			"signerType":"pkcs12",
+			"signerType":"${token.type}",
 			"signerConf":{
 				"value":"${ca.signerConf}"
 			},

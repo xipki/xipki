@@ -1,8 +1,9 @@
 echo "+----------------------------------------------------------------------+"
 echo "| This script demonstrates the setup of CAs with all the combinations: |"
-echo "|     key-type x caconf-store-type x CAcert-presence                   |"
+echo "|     key-type x caconf-store-type x token-type x CAcert-presence      |"
 echo "|  - key-type:          rsa, ec, dsa, sm2, ed25519, ed448              |"
 echo "|  - caconf-store-type: dbbased (database), filebased (file)           |"
+echo "|  - token-type:        p12                                            |"
 echo "|  - CAcert-presence:   none, present                                  |"
 echo "+----------------------------------------------------------------------+"
 
@@ -12,6 +13,10 @@ keytypes = [ed448 ed25519 sm2 ec rsa dsa]; each ($keytypes) {
   storetypes = [dbbased filebased]; each ($storetypes) {
     storetype = $it
 
-    source xipki/ca-setup/demo/doDemo.script
+    tokentypes = [p12]; each ($tokentypes) {
+      tokentype = $it
+
+      source xipki/ca-setup/demo/doDemo.script
+    }
   }
 }

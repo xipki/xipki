@@ -9,18 +9,26 @@ if { "$1" equals "" | "$1" equals "help" } then {
   if { "$1" equals "-l" } then {
     OUTFORM = $2
     HASH = $3
-    SIG_TYPE = $4
-    KEYSPEC =$5
+    TOKEN_TYPE = $4
+    SIG_TYPE = $5
+    KEYSPEC =$6
   } else {
     OUTFORM = $1
     HASH = $2
-    SIG_TYPE = $3
-    KEYSPEC =$4
+    TOKEN_TYPE = $3
+    SIG_TYPE = $4
+    KEYSPEC =$5
   }
 
-  argsValid = $([rsa rsapss ec plainec dsa sm2] contains $SIG_TYPE)
+  argsValid = $([pkcs12] contains $TOKEN_TYPE)
+
   if { "$argsValid" equals "false" } then {
-    errMsg = "invalid SIG_TYPE $SIG_TYPE"
+    errMsg = "invalid TOKEN_TYPE $TOKEN_TYPE"
+  } else {
+    argsValid = $([rsa rsapss ec plainec dsa sm2] contains $SIG_TYPE)
+    if { "$argsValid" equals "false" } then {
+      errMsg = "invalid SIG_TYPE $SIG_TYPE"
+    }
   }
 
   if { "$argsValid" equals "true" } then {
@@ -55,13 +63,14 @@ if { "$argsValid" equals "false" } then {
 if { "$printUsage" equals "true" } then {
   echo "Usage: "
   echo ""
-  echo "source file:./qa/camgmt-qa.script [option] <outform> <hash algo> <signature type> [<keyspec>]"
+  echo "source file:./qa/camgmt-qa.script [option] <outform> <hash algo> <token type> <signature type> [<keyspec>]"
   echo "    outform:         Output format of the certificates, CRLs and CSRs"
   echo "    hash algo:       sha1, sha224, sha256, sha384, sha512"
   echo "                     sha3-224, sha3-256, sha3-384, sha3-512"
   echo "                     shake128, shake256 (for signature types rsapss and ec)"
   echo "                     sm3 (for signature type sm2)"
   echo "                     The sha3 algorithms are not for plainec."
+  echo "    token type:      pkcs12"
   echo "    signature type:  rsa, rsapss, ec, plainec, dsa, sm2"
   echo "    keyspec:         keysize for signature types rsa, rsapss and dsa,"
   echo "                     curve name for signature types ec and plainec"
@@ -272,7 +281,9 @@ if { "$printUsage" equals "true" } then {
 
   # The CA named rootca2 exists. No new CA with the same name is allowed
 
-  CA_SIGNER_CONF_RCA = "password=CHANGEIT,keystore=file:output/rootca1.p12,algo=$CA_SIGNER_ALGO"
+  if { $TOKEN_TYPE equals "pkcs12" } then {
+    CA_SIGNER_CONF_RCA = "password=CHANGEIT,keystore=file:output/rootca1.p12,algo=$CA_SIGNER_ALGO"
+  }
 
   echo "neg-gen-rootca: CA named rootca1 already exists"
 

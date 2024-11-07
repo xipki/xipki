@@ -98,7 +98,7 @@
 	}],
 	"signers":[{
 		"name":"signer1",
-		"type":"pkcs12",
+		"type":"REPLACEME-TOKENTYPE",
 		"algorithms":["REPLACEME-SIGALGO"],
 		"caCerts":[],
 		"cert": {

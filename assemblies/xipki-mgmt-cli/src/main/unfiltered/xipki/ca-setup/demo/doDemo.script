@@ -3,6 +3,7 @@ WAIT_TOMCAT_START_TIME = 3
 echo "+---------------------------------------------------------------+"
 echo "|  - key-type:          $keytype"
 echo "|  - caconf-store-type: $storetype"
+echo "|  - token-type:        $tokentype"
 echo "|  - CAcert-presence:   none"
 echo "+---------------------------------------------------------------+"
 
@@ -36,12 +37,13 @@ if { "$storetype" equals "filebased" } then {
   xi:rm --force --recursive ${XIPKI_BASE}/etc/ca/ca-conf
 }
 
-source xipki/ca-setup/cacert-none-${storetype}/setup.script \
+source xipki/ca-setup/cacert-none-${storetype}/setup-${tokentype}.script \
     $keytype $CA_TOMCAT_DIR $XIPKI_BASE
 
 echo "+---------------------------------------------------------------+"
 echo "|  - key-type:          $keytype"
 echo "|  - caconf-store-type: $storetype"
+echo "|  - token-type:        $tokentype"
 echo "|  - CAcert-presence:   present"
 echo "+---------------------------------------------------------------+"
 
@@ -50,7 +52,7 @@ if { "$storetype" equals "filebased" } then {
   xi:rm --force --recursive ${XIPKI_BASE}/etc/ca/ca-conf
 }
 
-source xipki/ca-setup/cacert-present-${storetype}/setup.script \
+source xipki/ca-setup/cacert-present-${storetype}/setup-${tokentype}.script \
     $keytype $CA_TOMCAT_DIR $XIPKI_BASE
 
 ca:gen-crl --ca $[ca.name]
@@ -66,8 +68,10 @@ xi:exec "${GW_TOMCAT_DIR}/bin/startup.sh"
 xi:rm --force xipki/ocsp-setup/keycerts/ocsp1.crt \
   xipki/ocsp-setup/keycerts/ocsp1.p12
 
-source xipki/ca-setup/setup-ocsp-p12.script $keytype
-xi:copy-file --force xipki/ocsp-setup/keycerts/ocsp1.p12 ${OCSP_TOMCAT_DIR}/xipki/keycerts/
+if { "$tokentype" equals "p12" } then {
+  source xipki/ca-setup/setup-ocsp-p12.script $keytype
+  xi:copy-file --force xipki/ocsp-setup/keycerts/ocsp1.p12 ${OCSP_TOMCAT_DIR}/xipki/keycerts/
+}
 
 if { "$storetype" equals "filebased" } then {
   ocspdbtypes = [cadb]
@@ -96,10 +100,12 @@ each ($ocspdbtypes) {
   }
 
   echo "Copy the ocsp-responder configuration file"
-  if { "$ocspdbtype" equals "ocspdb" } then {
-    OCSP_CONF_FILE = ${OCSP_TOMCAT_DIR}/xipki/etc/ocsp/example/xipki-db-store/ocsp-responder.json
-  } else {
-    OCSP_CONF_FILE = ${OCSP_TOMCAT_DIR}/xipki/etc/ocsp/example/xipki-ca-db-store/ocsp-responder.json
+  if { "$tokentype" equals "p12" } then {
+    if { "$ocspdbtype" equals "ocspdb" } then {
+      OCSP_CONF_FILE = ${OCSP_TOMCAT_DIR}/xipki/etc/ocsp/example/xipki-db-store/ocsp-responder.json
+    } else {
+      OCSP_CONF_FILE = ${OCSP_TOMCAT_DIR}/xipki/etc/ocsp/example/xipki-ca-db-store/ocsp-responder.json
+    }
   }
 
   xi:copy-file --force $OCSP_CONF_FILE ${OCSP_TOMCAT_DIR}/xipki/etc/ocsp/ocsp-responder.json

@@ -9,11 +9,14 @@ echo "#################################################################"
 echo "#                        Load rootca.json                       #"
 echo "#################################################################"
 
-CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/rootca1.p12,algo=$SIGALGO"
+if { $TOKEN_TYPE equals "pkcs12" } then {
+  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/rootca1.p12,algo=$SIGALGO"
+}
 
 xi:copy-file -f qa/cab/template.rootca.json qa/cab/rootca.json
 
 xi:replace --old "REPLACEME-SUBJECT" --new "C=DE,O=myorg,CN=rootca1" \
+  --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
   --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
   --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
   qa/cab/rootca.json
@@ -23,30 +26,38 @@ ca:load-conf qa/cab/rootca.json
 ca:cacert --out output/rootca1.crt rootca1
 
 ## Update the certificate in the device
-xi:update-cert-p12 --p12 output/rootca1.p12 --password CHANGEIT --cert output/rootca1.crt
+if { $TOKEN_TYPE equals "pkcs12" } then {
+  xi:update-cert-p12 --p12 output/rootca1.p12 --password CHANGEIT --cert output/rootca1.crt
+}
 
 ## Generate keys and CSR for subca1
-xi:csr-p12 REPLACEME-RSAPSS \
-  --p12 output/subca1.p12 --password CHANGEIT \
-  --out output/subca1.csr \
-  --subject "C=DE,O=myorg,CN=subca1"
+if { $TOKEN_TYPE equals "pkcs12" } then {
+  xi:csr-p12 REPLACEME-RSAPSS \
+    --p12 output/subca1.p12 --password CHANGEIT \
+    --out output/subca1.csr \
+    --subject "C=DE,O=myorg,CN=subca1"
+}
 
 ca:enroll-cert --ca rootca1 --csr output/subca1.csr \
   --out output/subca1.crt --profile cab-subca
 
-xi:update-cert-p12 --p12 output/subca1.p12 --password CHANGEIT \
-  --cert output/subca1.crt --ca-cert output/rootca1.crt
+if { $TOKEN_TYPE equals "pkcs12" } then {
+  xi:update-cert-p12 --p12 output/subca1.p12 --password CHANGEIT \
+    --cert output/subca1.crt --ca-cert output/rootca1.crt
+}
 
 echo "#################################################################"
 echo "#                             Add subca                         #"
 echo "#################################################################"
 ## Add CA
 
-CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subca1.p12,algo=$SIGALGO"
+if { $TOKEN_TYPE equals "pkcs12" } then {
+  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subca1.p12,algo=$SIGALGO"
+}
 
 xi:copy-file -f qa/cab/template.subca.json qa/cab/subca.json
 
-xi:replace \
+xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
   --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
   --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
   qa/cab/subca.json

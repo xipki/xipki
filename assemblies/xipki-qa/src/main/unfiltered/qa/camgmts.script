@@ -1,17 +1,22 @@
 outform = pem
 
-keytypes = [rsa ec sm2 dsa]; each ($keytypes) {
-  keytype = $it
+tokentypes = [pkcs12]; each ($tokentypes) {
+  tokentype = $it
 
-  if { "$keytype" equals "sm2" } then {
-    hash = sm3
-  } else {
-    hash = sha256
+  keytypes = [rsa ec sm2 dsa]; each ($keytypes) {
+    keytype = $it
+
+    if { "$keytype" equals "sm2" } then {
+      hash = sm3
+    } else {
+      hash = sha256
+    }
+
+    echo "+++++source qa/camgmt.script    $outform $hash $tokentype $keytype +++++"
+               source qa/camgmt.script    $outform $hash $tokentype $keytype
+
+    echo "+++++source qa/camgmt.script -l $outform $hash $tokentype $keytype +++++"
+               source qa/camgmt.script -l $outform $hash $tokentype $keytype
   }
 
-  echo "+++++source qa/camgmt.script    $outform $hash $keytype +++++"
-             source qa/camgmt.script    $outform $hash $keytype
-
-  echo "+++++source qa/camgmt.script -l $outform $hash $keytype +++++"
-             source qa/camgmt.script -l $outform $hash $keytype
 }

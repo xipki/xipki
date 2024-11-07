@@ -6,20 +6,26 @@ if { "$1" equals "" | "$1" equals "help" } then {
   printUsage = "true"
   argsValid = "true"
 } else {
-  KEYSPEC = $1
-
-  argsValid = "false"
-
-  if { "$KEYSPEC" equals "25519" } then {
-    argsValid = "true"
-    SIGALGO = "Ed25519"
-  } elif { "$KEYSPEC" equals "448" } then {
-    argsValid = "true"
-    SIGALGO = "Ed448"
-  }
+  TOKEN_TYPE = $1
+  KEYSPEC = $2
+  argsValid = $([pkcs12] contains $TOKEN_TYPE)
 
   if { "$argsValid" equals "false" } then {
-    errMsg = "invalid KEYSPEC $KEYSPEC"
+    errMsg = "invalid TOKEN_TYPE $TOKEN_TYPE"
+  } else {
+    argsValid = "false"
+
+    if { "$KEYSPEC" equals "25519" } then {
+      argsValid = "true"
+      SIGALGO = "Ed25519"
+    } elif { "$KEYSPEC" equals "448" } then {
+      argsValid = "true"
+      SIGALGO = "Ed448"
+    }
+
+    if { "$argsValid" equals "false" } then {
+      errMsg = "invalid KEYSPEC $KEYSPEC"
+    }
   }
 
 }
@@ -33,7 +39,8 @@ if { "$argsValid" equals "false" } then {
 if { "$printUsage" equals "true" } then {
   echo "Usage: "
   echo ""
-  echo "source file:./qa/eddsa/lifecycle.script <keyspec>"
+  echo "source file:./qa/eddsa/lifecycle.script <token type> <keyspec>"
+  echo "    token type:      pkcs12"
   echo "    keyspec:         25519, 448"
 } else {
   echo "========================================================"
@@ -49,7 +56,7 @@ if { "$printUsage" equals "true" } then {
     xipki/etc/ocsp/template.ocsp-responder.json \
     xipki/etc/ocsp/ocsp-responder.json
 
-  xi:replace \
+  xi:replace --old "REPLACEME-TOKENTYPE" --new "PKCS12" \
     --old "REPLACEME-TOKENKEY" --new "password=CHANGEIT,keystore=file:keycerts/ocsp99.p12" \
     --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
     xipki/etc/ocsp/ocsp-responder.json

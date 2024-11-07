@@ -96,7 +96,7 @@
 			"permissions":["all"],
 			"saveCert":true,
 			"saveKeypair":false,
-			"signerType":"pkcs12",
+			"signerType":"REPLACEME-TOKEN_TYPE",
 			"signerConf":{
 				"value":"REPLACEME-CA_SIGNERCONF"
 			},

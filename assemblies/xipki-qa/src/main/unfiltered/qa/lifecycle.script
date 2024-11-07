@@ -11,18 +11,26 @@ if { "$1" equals "" | "$1" equals "help" } then {
   if { "$1" equals "-l" } then {
     OUTFORM = $2
     HASH = $3
-    SIG_TYPE = $4
-    KEYSPEC = $5
+    TOKEN_TYPE = $4
+    SIG_TYPE = $5
+    KEYSPEC = $6
   } else {
     OUTFORM = $1
     HASH = $2
-    SIG_TYPE = $3
-    KEYSPEC = $4
+    TOKEN_TYPE = $3
+    SIG_TYPE = $4
+    KEYSPEC = $5
   }
 
-  argsValid = $([rsa rsapss ec plainec dsa sm2] contains $SIG_TYPE)
+  argsValid = $([pkcs12] contains $TOKEN_TYPE)
+
   if { "$argsValid" equals "false" } then {
-    errMsg = "invalid SIG_TYPE $SIG_TYPE"
+    errMsg = "invalid TOKEN_TYPE $TOKEN_TYPE"
+  } else {
+    argsValid = $([rsa rsapss ec plainec dsa sm2] contains $SIG_TYPE)
+    if { "$argsValid" equals "false" } then {
+      errMsg = "invalid SIG_TYPE $SIG_TYPE"
+    }
   }
 
   if { "$argsValid" equals "true" } then {
@@ -56,13 +64,14 @@ if { "$argsValid" equals "false" } then {
 if { "$printUsage" equals "true" } then {
   echo "Usage: "
   echo ""
-  echo "source file:./qa/lifecycle.script [option] <outform> <hash algo> <signature type> [<keyspec>]"
+  echo "source file:./qa/lifecycle.script [option] <outform> <hash algo> <token type> <signature type> [<keyspec>]"
   echo "    outform:         Output format of the certificates, CRLs and CSRs"
   echo "    hash algo:       sha1, sha224, sha256, sha384, sha512"
   echo "                     sha3-224, sha3-256, sha3-384, sha3-512"
   echo "                     shake128, shake256 (for signature types rsapss and ec)"
   echo "                     sm3 (for signature type sm2)"
   echo "                     The sha3 algorithms are not for plainec."
+  echo "    token type:      pkcs12"
   echo "    signature type:  rsa, rsapss, ec, plainec, dsa, sm2"
   echo "    keyspec:         keysize for signature types rsa, rsapss and dsa,"
   echo "                     curve name for signature types ec and plainec"
@@ -76,7 +85,7 @@ if { "$printUsage" equals "true" } then {
     xipki/etc/ocsp/template.ocsp-responder.json \
     xipki/etc/ocsp/ocsp-responder.json
 
-  xi:replace \
+  xi:replace --old "REPLACEME-TOKENTYPE" --new "$TOKEN_TYPE" \
     --old "REPLACEME-TOKENKEY" --new "$OCSP_KEYCONF" \
     --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
     xipki/etc/ocsp/ocsp-responder.json
@@ -157,8 +166,10 @@ if { "$printUsage" equals "true" } then {
   xi:copy-file -f output/ocsp99.crt \
       ${OCSP_XIPKI_DIR}/keycerts/ocsp.crt
 
-  xi:copy-file -f output/ocsp99.p12 \
-    ${OCSP_XIPKI_DIR}/keycerts/ocsp99.p12
+  if { "$TOKEN_TYPE" equals "pkcs12" } then {
+    xi:copy-file -f output/ocsp99.p12 \
+      ${OCSP_XIPKI_DIR}/keycerts/ocsp99.p12
+  }
 
   xi:rm -r -f ${OCSP_XIPKI_DIR}/crls/example-crls
 
