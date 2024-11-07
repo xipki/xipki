@@ -697,7 +697,7 @@ public class Actions {
       System.out.write(IoUtil.readAllBytes(process.getInputStream()));
       if (status != 0) {
         System.err.write(IoUtil.readAllBytes(process.getErrorStream()));
-        if (ignoreError == null || !ignoreError){
+        if (ignoreError == null || !ignoreError.booleanValue()){
           throw new Exception("process exited with status " + status);
         }
       }

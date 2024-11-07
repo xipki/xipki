@@ -777,7 +777,7 @@ public class CborDecoder implements AutoCloseable {
         }
 
         BigInteger[] ret = new BigInteger[arrayLen];
-        for (int i = 0; i < arrayLen; i++) {
+        for (int i = 0; i < arrayLen.intValue(); i++) {
             ret[i] = readBigInt();
         }
 

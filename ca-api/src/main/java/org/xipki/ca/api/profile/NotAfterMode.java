@@ -20,6 +20,18 @@ public enum NotAfterMode {
 
   STRICT,
   CUTOFF,
-  BY_CA
+  BY_CA;
+
+  public static NotAfterMode forName(String text) {
+    Args.notNull(text, "text");
+
+    for (NotAfterMode value : values()) {
+      if (value.name().equalsIgnoreCase(text)) {
+        return value;
+      }
+    }
+
+    throw new IllegalArgumentException("invalid NotAfterMode " + text);
+  }
 
 }
