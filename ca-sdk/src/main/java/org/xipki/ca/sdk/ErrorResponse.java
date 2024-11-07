@@ -5,6 +5,7 @@ package org.xipki.ca.sdk;
 
 import org.xipki.pki.ErrorCode;
 import org.xipki.util.Args;
+import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
@@ -67,7 +68,7 @@ public class ErrorResponse extends SdkResponse {
   }
 
   public static ErrorResponse decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new CborDecoder(encoded)) {
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("ErrorResponse", decoder, 3);
 
       String tid = decoder.readTextString();

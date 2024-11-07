@@ -3,6 +3,7 @@
 
 package org.xipki.ca.sdk;
 
+import org.xipki.util.cbor.ByteArrayCborDecoder;
 import org.xipki.util.cbor.CborDecoder;
 import org.xipki.util.cbor.CborEncoder;
 import org.xipki.util.exception.DecodeException;
@@ -36,7 +37,7 @@ public class UnSuspendOrRemoveCertsResponse extends SdkResponse {
   }
 
   public static UnSuspendOrRemoveCertsResponse decode(byte[] encoded) throws DecodeException {
-    try (CborDecoder decoder = new CborDecoder(encoded)) {
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("UnSuspendOrRemoveCertsResponse", decoder, 1);
       return new UnSuspendOrRemoveCertsResponse(
           SingleCertSerialEntry.decodeArray(decoder));
