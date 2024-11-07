@@ -84,6 +84,10 @@ public class CollectionUtil {
     return (set == null) ? Collections.emptySet() : Collections.unmodifiableSet(set);
   }
 
+  public static <T> Collection<T> unmodifiableCollection(Collection<? extends T> col) {
+    return (col == null) ? Collections.emptySet() : Collections.unmodifiableCollection(col);
+  }
+
   public static <T> List<T> unmodifiableList(List<? extends T> list) {
     return (list == null) ? Collections.emptyList() : Collections.unmodifiableList(list);
   }
@@ -99,6 +103,13 @@ public class CollectionUtil {
       return Collections.emptySet();
     }
     return new HashSet<>(Arrays.asList(list));
+  }
+
+  public static <T> Set<T> listToSet(List<? extends T> list) {
+    if (list == null) {
+      return Collections.emptySet();
+    }
+    return new HashSet<>(list);
   }
 
   public static <T extends Comparable<? super T>> List<T> sort(Collection<T> col) {

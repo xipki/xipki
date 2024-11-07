@@ -8,6 +8,7 @@ import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Utility class to validate the parameters.
@@ -135,6 +136,14 @@ public class Args {
   }
 
   public static <T> Collection<T> notEmpty(Collection<T> argument, String name) {
+    Objects.requireNonNull(argument, name + " may not be null");
+    if (argument.isEmpty()) {
+      throw new IllegalArgumentException(name + " may not be empty");
+    }
+    return argument;
+  }
+
+  public static <T> Set<T> notEmpty(Set<T> argument, String name) {
     Objects.requireNonNull(argument, name + " may not be null");
     if (argument.isEmpty()) {
       throw new IllegalArgumentException(name + " may not be empty");
