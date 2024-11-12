@@ -25,11 +25,5 @@
       <artifactId>ocsp-server</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xipki.example</groupId>
-      <artifactId>license-example</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
   </dependencies>
 </project>

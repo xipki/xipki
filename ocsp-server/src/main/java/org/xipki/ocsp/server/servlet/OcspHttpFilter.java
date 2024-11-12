@@ -5,13 +5,11 @@ package org.xipki.ocsp.server.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.license.api.LicenseFactory;
 import org.xipki.ocsp.server.OcspConf;
 import org.xipki.ocsp.server.OcspServer;
 import org.xipki.security.Securities;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ReflectiveUtil;
 import org.xipki.util.XipkiBaseDir;
 import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.XiHttpFilter;
@@ -34,15 +32,13 @@ public class OcspHttpFilter implements XiHttpFilter {
 
   private final Securities securities;
 
-  private final LicenseFactory licenseFactory;
-
   private final OcspServer server;
 
   private final OcspHealthCheckServlet healthServlet;
 
   private final HttpOcspServlet ocspServlet;
 
-  public OcspHttpFilter(String licenseFactoryClazz) throws Exception {
+  public OcspHttpFilter() throws Exception {
     XipkiBaseDir.init();
 
     OcspConf conf;
@@ -60,10 +56,7 @@ public class OcspHttpFilter implements XiHttpFilter {
     securities = new Securities();
     securities.init(conf.getSecurity());
 
-    LOG.info("Use licenseFactory: {}", licenseFactoryClazz);
-    licenseFactory = ReflectiveUtil.newInstance(licenseFactoryClazz);
-
-    OcspServer ocspServer = new OcspServer(licenseFactory.createOcspLicense());
+    OcspServer ocspServer = new OcspServer();
     ocspServer.setSecurityFactory(securities.getSecurityFactory());
     ocspServer.setConfFile(conf.getServerConf());
 
@@ -86,10 +79,6 @@ public class OcspHttpFilter implements XiHttpFilter {
 
     if (server != null) {
       server.close();
-    }
-
-    if (licenseFactory != null) {
-      licenseFactory.close();
     }
   }
 

@@ -7,10 +7,6 @@
   <filter>
     <filter-name>ocsp-filter</filter-name>
     <filter-class>org.xipki.ocsp.servlet.OcspServletFilter</filter-class>
-    <init-param>
-      <param-name>licenseFactory</param-name>
-      <param-value>org.xipki.license.example.ExampleLicenseFactory</param-value>
-    </init-param>
   </filter>
   <filter-mapping>
     <filter-name>ocsp-filter</filter-name>

@@ -62,7 +62,6 @@
     <module>security</module>
     <module>xipki-tomcat-password</module>
     <module>servlet-common</module>
-    <module>license-api</module>
     <!-- PKI SDK/Client -->
     <module>ocsp-client</module>
     <!-- PKI -->
