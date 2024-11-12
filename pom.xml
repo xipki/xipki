@@ -80,6 +80,7 @@
     <module>shells</module>
     <module>qa</module>
     <module>examples</module>
+    <module>servlets</module>
     <module>karaf-features</module>
   </modules>
   <scm>
@@ -347,7 +348,6 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <modules>
-        <module>servlets</module>
         <module>assemblies</module>
       </modules>
     </profile>
