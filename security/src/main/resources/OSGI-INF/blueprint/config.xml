@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
+
+  <cm:property-placeholder persistent-id="org.xipki.security">
+    <cm:default-properties>
+      <cm:property name="key.strongrandom.enabled" value="false"/>
+      <cm:property name="sign.strongrandom.enabled" value="false"/>
+      <cm:property name="defaultSignerParallelism" value="32"/>
+      <cm:property name="pkcs11.confFile" value="xipki/security/pkcs11.json"/>
+    </cm:default-properties>
+  </cm:property-placeholder>
+
+  <bean id="providers" class="org.xipki.security.Providers"
+      init-method="init" destroy-method="close"/>
+
+  <bean id="signerFactoryRegister"
+       class="org.xipki.security.SignerFactoryRegisterImpl">
+  </bean>
+
+  <service ref="signerFactoryRegister" interface="org.xipki.security.SignerFactoryRegister"/>
+  <reference-list id="signerFactories" interface="org.xipki.security.SignerFactory"
+       availability="optional">
+    <reference-listener ref="signerFactoryRegister" bind-method="registFactory"
+         unbind-method="unregistFactory"/>
+  </reference-list>
+
+  <bean id="securityFactory" class="org.xipki.security.SecurityFactoryImpl">
+    <property name="strongRandom4KeyEnabled" value="${key.strongrandom.enabled}"/>
+    <property name="strongRandom4SignEnabled" value="${sign.strongrandom.enabled}"/>
+    <property name="defaultSignerParallelism" value="${defaultSignerParallelism}"/>
+    <property name="signerFactoryRegister" ref="signerFactoryRegister"/>
+  </bean>
+  <service ref="securityFactory" interface="org.xipki.security.SecurityFactory"/>
+
+  <bean id="pkcs12SignerFactory"
+      class="org.xipki.security.pkcs12.P12SignerFactory">
+    <property name="securityFactory" ref="securityFactory"/>
+  </bean>
+
+  <!-- PKCS#12 -->
+  <service ref="pkcs12SignerFactory"
+      interface="org.xipki.security.SignerFactory"/>
+
+  <bean id="p11ModuleFactoryRegister"
+       class="org.xipki.security.pkcs11.P11ModuleFactoryRegisterImpl"
+       destroy-method="close">
+  </bean>
+
+  <!-- PKCS#11 -->
+  <service ref="p11ModuleFactoryRegister"
+       interface="org.xipki.security.pkcs11.P11ModuleFactoryRegister"/>
+  <reference-list id="p11ModuleFactories"
+       interface="org.xipki.security.pkcs11.P11ModuleFactory"
+       availability="optional">
+    <reference-listener ref="p11ModuleFactoryRegister" bind-method="registFactory"
+         unbind-method="unregistFactory"/>
+  </reference-list>
+
+  <bean id="p11CryptServiceFactory"
+      class="org.xipki.security.pkcs11.P11CryptServiceFactoryImpl"
+      destroy-method="close">
+    <argument ref="p11ModuleFactoryRegister"/>
+    <property name="pkcs11ConfFile" value="${pkcs11.confFile}"/>
+  </bean>
+
+  <service ref="p11CryptServiceFactory"
+      interface="org.xipki.security.pkcs11.P11CryptServiceFactory"/>
+
+  <bean id="pkcs11SignerFactory"
+      class="org.xipki.security.pkcs11.P11SignerFactory">
+    <property name="securityFactory" ref="securityFactory"/>
+    <property name="p11CryptServiceFactory" ref="p11CryptServiceFactory"/>
+  </bean>
+
+  <service ref="pkcs11SignerFactory"
+      interface="org.xipki.security.SignerFactory"/>
+
+  <!-- PKCS#11 Native -->
+  <bean id="nativeP11ModuleFactory"
+      class="org.xipki.security.pkcs11.NativeP11ModuleFactory">
+  </bean>
+
+  <service ref="nativeP11ModuleFactory"
+      interface="org.xipki.security.pkcs11.P11ModuleFactory"/>
+
+  <!-- PKCS#11 Emulator -->
+  <bean id="emulatorP11ModuleFactory"
+      class="org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory">
+  </bean>
+
+  <service ref="emulatorP11ModuleFactory"
+      interface="org.xipki.security.pkcs11.P11ModuleFactory"/>
+
+  <!-- PKCS#11 HSM Proxy -->
+  <bean id="hsmProxyP11ModuleFactory"
+        class="org.xipki.security.pkcs11.hsmproxy.HsmProxyP11ModuleFactory">
+  </bean>
+
+  <service ref="hsmProxyP11ModuleFactory"
+           interface="org.xipki.security.pkcs11.P11ModuleFactory"/>
+
+</blueprint>

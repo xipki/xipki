@@ -12,9 +12,9 @@ fi
 
 LIB_DIR=$WDIR/xipki-cli/system
 
-CP="$LIB_DIR/org/xipki/commons/security/${xipki.commons.version}/*"
-CP="$CP:$LIB_DIR/org/xipki/commons/util/${xipki.commons.version}/*"
-CP="$CP:$LIB_DIR/org/xipki/commons/password/${xipki.commons.version}/*"
+CP="$LIB_DIR/org/xipki/security/${project.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/util/${project.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/password/${project.version}/*"
 CP="$CP:$LIB_DIR/org/bouncycastle/bcprov-jdk18on/${bc.version}/*"
 CP="$CP:$LIB_DIR/org/bouncycastle/bcpkix-jdk18on/${bc.version}/*"
 CP="$CP:$LIB_DIR/org/bouncycastle/bcutil-jdk18on/${bc.version}/*"

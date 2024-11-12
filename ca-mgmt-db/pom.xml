@@ -18,8 +18,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.commons</groupId>
+      <groupId>org.xipki</groupId>
       <artifactId>datasource</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>net.lingala.zip4j</groupId>

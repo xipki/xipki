@@ -13,13 +13,15 @@
   <name>XiPKI :: example :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.commons</groupId>
+      <groupId>org.xipki</groupId>
       <artifactId>password</artifactId>
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.xipki.commons</groupId>
+      <groupId>org.xipki</groupId>
       <artifactId>datasource</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

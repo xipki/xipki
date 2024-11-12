@@ -29,12 +29,16 @@ if [ "$TOMCAT_MAJOR_VERSION" -lt "10" ]; then
   exit 1
 fi
 
+# Test base dir
+TBDIR=~/test/xipki
+
+mkdir -p $TBDIR
+
 if ls $TBDIR/apache-tomcat-${TOMCAT_MAJOR_VERSION}*.tar.gz  &> /dev/null; then
   TOMCAT_VERSION=$(ls $TBDIR/apache-tomcat-${TOMCAT_MAJOR_VERSION}.*.tar.gz | tail -n 1 | cut -d "-" -f 3 | cut -d "." -f 1-3)
 else
   TOMCAT_VERSION=`curl --silent http://dlcdn.apache.org/tomcat/tomcat-$TOMCAT_MAJOR_VERSION/ | grep v$TOMCAT_MAJOR_VERSION | tail -n 1 | awk '{split($5,c,">v") ; split(c[2],d,"/") ; print d[1]}'`
 fi
-
 
 echo "Tomcat ${TOMCAT_VERSION}"
 TOMCAT_DIR=apache-tomcat-${TOMCAT_VERSION}
@@ -44,10 +48,6 @@ WDIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 #WDIR=`dirname $0`
 echo "working dir: ${WDIR}"
 
-# Test base dir
-TBDIR=~/test/xipki
-
-mkdir -p $TBDIR
 cd $TBDIR
 echo "change to folder: `pwd`"
 
@@ -86,8 +86,8 @@ fi
 LIB_DIR=$WDIR/system
 XDIR=${WDIR}/xipki
 
-CP="$CP:$LIB_DIR/org/xipki/commons/util/${xipki.commons.version}/*"
-CP="$CP:$LIB_DIR/org/xipki/commons/password/${xipki.commons.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/util/${project.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/password/${project.version}/*"
 CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-databind/${jackson.version}/*"
 CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-annotations/${jackson.version}/*"
 CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-core/${jackson.version}/*"
