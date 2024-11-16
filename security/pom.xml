@@ -19,7 +19,7 @@
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpkix-jdk18on</artifactId>
+      <artifactId>bcpkix-lts8on</artifactId>
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>

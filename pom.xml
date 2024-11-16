@@ -35,7 +35,7 @@
     <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
     <karaf.version>4.4.6</karaf.version>
     <karaf.bc.version>1.77</karaf.bc.version>
-    <bc.version>1.78.1</bc.version>
+    <bc.version>2.73.7</bc.version>
     <slf4j.version>1.7.36</slf4j.version>
     <pkcs11wrapper.version>1.0.9</pkcs11wrapper.version>
     <hikaricp.version>4.0.3</hikaricp.version>
@@ -253,17 +253,17 @@
       </dependency>
       <dependency>
         <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk18on</artifactId>
+        <artifactId>bcprov-lts8on</artifactId>
         <version>${bc.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bouncycastle</groupId>
-        <artifactId>bcpkix-jdk18on</artifactId>
+        <artifactId>bcpkix-lts8on</artifactId>
         <version>${bc.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bouncycastle</groupId>
-        <artifactId>bcutil-jdk18on</artifactId>
+        <artifactId>bcutil-lts8on</artifactId>
         <version>${bc.version}</version>
       </dependency>
       <dependency>

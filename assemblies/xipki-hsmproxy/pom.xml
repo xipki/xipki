@@ -113,15 +113,15 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>
-                  <artifactId>bcpkix-jdk18on</artifactId>
+                  <artifactId>bcpkix-lts8on</artifactId>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>
-                  <artifactId>bcprov-jdk18on</artifactId>
+                  <artifactId>bcprov-lts8on</artifactId>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>
-                  <artifactId>bcutil-jdk18on</artifactId>
+                  <artifactId>bcutil-lts8on</artifactId>
                 </artifactItem>
               </artifactItems>
             </configuration>

@@ -3,9 +3,9 @@
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
   <feature name="xipki-cmp-client" version="${project.version}" description="CA client">
-    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcutil-lts8on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-lts8on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-lts8on/${bc.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
@@ -22,9 +22,9 @@
   </feature>
   <feature name="xipki-scep-client" version="${project.version}"
       description="SCEP client shell">
-    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcutil-lts8on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-lts8on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-lts8on/${bc.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
@@ -40,9 +40,9 @@
     <bundle>mvn:org.xipki.shell/scep-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocsp-client" version="${project.version}" description="OCSP client shell">
-    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcutil-lts8on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-lts8on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-lts8on/${bc.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>

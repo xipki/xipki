@@ -219,15 +219,15 @@
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
                   token="bcutil-jdk18on/${karaf.bc.version}"
-                  value="bcutil-jdk18on/${bc.version}"/>
+                  value="bcutil-lts8on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
                   token="bcprov-jdk18on/${karaf.bc.version}"
-                  value="bcprov-jdk18on/${bc.version}"/>
+                  value="bcprov-lts8on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
                   token="bcpkix-jdk18on/${karaf.bc.version}"
-                  value="bcpkix-jdk18on/${bc.version}"/>
+                  value="bcpkix-lts8on/${bc.version}"/>
               </target>
             </configuration>
             <goals>

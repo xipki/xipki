@@ -3,9 +3,9 @@
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
   <feature name="xipki-ca-mgmt" version="${project.version}" description="CA management shell">
-    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcutil-lts8on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-lts8on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-lts8on/${bc.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
