@@ -11,28 +11,50 @@ package org.xipki.util.cbor;
 import org.xipki.util.Args;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
-public class ByteArrayCborEncoder extends CborEncoder {
+public class ByteArrayCborEncoder extends CborEncoder implements AutoCloseable {
 
-    /**
-     * Creates a new {@link ByteArrayCborEncoder} instance with default initial size 32.
-     *
-     */
-    public ByteArrayCborEncoder() {
-        this(32);
-    }
+  private final ByteArrayOutputStream m_os;
 
-    /**
-     * Creates a new {@link ByteArrayCborEncoder} instance.
-     * @param size the initial size.
-     *
-     */
-    public ByteArrayCborEncoder(int size) {
-        super(new ByteArrayOutputStream(Args.min(size, "size", 1)));
-    }
+  /**
+   * Creates a new {@link ByteArrayCborEncoder} instance with default initial size 32.
+   *
+   */
+  public ByteArrayCborEncoder() {
+    this(32);
+  }
 
-    public byte[] toByteArray() {
-        return ((ByteArrayOutputStream) m_os).toByteArray();
-    }
+  /**
+   * Creates a new {@link ByteArrayCborEncoder} instance.
+   * @param size the initial size.
+   *
+   */
+  public ByteArrayCborEncoder(int size) {
+    this.m_os = new ByteArrayOutputStream(Args.min(size, "size", 1));
+  }
 
+  public byte[] toByteArray() {
+    return m_os.toByteArray();
+  }
+
+  @Override
+  protected void write(byte b) throws IOException {
+    m_os.write(b);
+  }
+
+  @Override
+  protected void write(int b) throws IOException {
+    m_os.write(b);
+  }
+
+  @Override
+  protected void write(byte[] bytes, int off, int len) throws IOException {
+    m_os.write(bytes, off, len);
+  }
+
+  @Override
+  public void close() throws IOException {
+    m_os.close();
+  }
 }

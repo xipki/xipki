@@ -234,12 +234,7 @@ public class HsmProxyResponder {
         return new ErrorResponse(badRequest, "request shall not be a CBOR null.");
       }
 
-      Long id;
-      try {
-        id = reqDecoder.readLongObj();
-      } catch (IOException e) {
-        return new ErrorResponse(badRequest, e.getMessage());
-      }
+      Long id = reqDecoder.readLongObj();
 
       // actions do not need slot.
       if (action == ProxyAction.moduleCaps) {

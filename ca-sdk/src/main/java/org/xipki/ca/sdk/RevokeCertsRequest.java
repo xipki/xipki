@@ -47,7 +47,7 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
           X500NameType.decode(decoder),
           decoder.readByteString(),
           Entry.decodeArray(decoder));
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, RevokeCertsRequest.class), ex);
     }
   }
@@ -106,19 +106,13 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
         return new Entry(
             serialNumber, reason,
             decoder.readInstant());
-      } catch (IOException | RuntimeException ex) {
+      } catch (RuntimeException ex) {
         throw new DecodeException(buildDecodeErrMessage(ex, Entry.class), ex);
       }
     }
 
     public static Entry[] decodeArray(CborDecoder decoder) throws DecodeException {
-      Integer arrayLen;
-      try {
-        arrayLen = decoder.readNullOrArrayLength();
-      } catch (IOException ex) {
-        throw new DecodeException("error decoding " + Entry[].class.getName(), ex);
-      }
-
+      Integer arrayLen = decoder.readNullOrArrayLength();
       if (arrayLen == null) {
         return null;
       }

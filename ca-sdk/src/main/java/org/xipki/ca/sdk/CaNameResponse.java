@@ -47,7 +47,7 @@ public class CaNameResponse extends SdkResponse {
       return new CaNameResponse(
           decoder.readTextString(),
           decoder.readTextStrings());
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, CaNameResponse.class), ex);
     }
   }

@@ -40,7 +40,7 @@ public class RevokeCertsResponse extends SdkResponse {
       assertArrayStart("RevokeCertsResponse", decoder, 1);
       return new RevokeCertsResponse(
           SingleCertSerialEntry.decodeArray(decoder));
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, RevokeCertsResponse.class), ex);
     }
   }

@@ -38,7 +38,7 @@ public class CertChainResponse extends SdkResponse {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("CertChainResponse", decoder, 1);
       return new CertChainResponse(decoder.readByteStrings());
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, CertChainResponse.class), ex);
     }
   }

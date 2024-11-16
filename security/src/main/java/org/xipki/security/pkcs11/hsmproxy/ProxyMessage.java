@@ -106,39 +106,35 @@ public abstract class ProxyMessage implements CborEncodable {
   }
 
   private static P11Slot.P11NewKeyControl decodeNewKeyControl(CborDecoder decoder) throws DecodeException {
-    try {
-      if (decoder.readNullOrArrayLength(5)) {
-        return null;
-      }
-
-      byte[] id = decoder.readByteString();
-      String label = decoder.readTextString();
-      P11Slot.P11NewKeyControl control = new P11Slot.P11NewKeyControl(id, label);
-      control.setSensitive(decoder.readBooleanObj());
-      control.setExtractable(decoder.readBooleanObj());
-
-      // usages
-      Integer usagesLen = decoder.readNullOrArrayLength();
-      if (usagesLen != null) {
-        Set<P11Slot.P11KeyUsage> usages = new HashSet<>(usagesLen * 5 / 4);
-        for (int i = 0; i < usagesLen; i++) {
-          String usageText = decoder.readTextString();
-          P11Slot.P11KeyUsage usage;
-          try {
-            usage = P11Slot.P11KeyUsage.valueOf(usageText);
-          } catch (IllegalArgumentException e) {
-            throw new DecodeException("unknown P11KeyUsage " + usageText);
-          }
-          usages.add(usage);
-        }
-
-        control.setUsages(usages);
-      }
-
-      return control;
-    } catch (IOException ex) {
-      throw new DecodeException("IO error", ex);
+    if (decoder.readNullOrArrayLength(5)) {
+      return null;
     }
+
+    byte[] id = decoder.readByteString();
+    String label = decoder.readTextString();
+    P11Slot.P11NewKeyControl control = new P11Slot.P11NewKeyControl(id, label);
+    control.setSensitive(decoder.readBooleanObj());
+    control.setExtractable(decoder.readBooleanObj());
+
+    // usages
+    Integer usagesLen = decoder.readNullOrArrayLength();
+    if (usagesLen != null) {
+      Set<P11Slot.P11KeyUsage> usages = new HashSet<>(usagesLen * 5 / 4);
+      for (int i = 0; i < usagesLen; i++) {
+        String usageText = decoder.readTextString();
+        P11Slot.P11KeyUsage usage;
+        try {
+          usage = P11Slot.P11KeyUsage.valueOf(usageText);
+        } catch (IllegalArgumentException e) {
+          throw new DecodeException("unknown P11KeyUsage " + usageText);
+        }
+        usages.add(usage);
+      }
+
+      control.setUsages(usages);
+    }
+
+    return control;
   }
 
   private static void writeKeyId(CborEncoder encoder, PKCS11KeyId keyId) throws IOException {
@@ -152,33 +148,25 @@ public abstract class ProxyMessage implements CborEncodable {
   }
 
   private static PKCS11KeyId decodeKeyId(CborDecoder decoder) throws DecodeException {
-    try {
-      if (decoder.readNullOrArrayLength(6)) {
-        return null;
-      }
-
-      long handle = decoder.readLong();
-      long objectCLass = decoder.readLong();
-      long keyType = decoder.readLong();
-      byte[] id = decoder.readByteString();
-      String label = decoder.readTextString();
-      Long publicKeyHandle = decoder.readLongObj();
-
-      PKCS11KeyId keyId = new PKCS11KeyId(handle, objectCLass, keyType, id, label);
-      keyId.setPublicKeyHandle(publicKeyHandle);
-      return keyId;
-    } catch (IOException ex) {
-      throw new DecodeException("IO error decoding PKCS11KeyId", ex);
+    if (decoder.readNullOrArrayLength(6)) {
+      return null;
     }
+
+    long handle = decoder.readLong();
+    long objectCLass = decoder.readLong();
+    long keyType = decoder.readLong();
+    byte[] id = decoder.readByteString();
+    String label = decoder.readTextString();
+    Long publicKeyHandle = decoder.readLongObj();
+
+    PKCS11KeyId keyId = new PKCS11KeyId(handle, objectCLass, keyType, id, label);
+    keyId.setPublicKeyHandle(publicKeyHandle);
+    return keyId;
   }
 
   private static void assertArraySize(CborDecoder decoder, int arraySize, String name) throws DecodeException {
-    try {
-      if (decoder.readNullOrArrayLength(arraySize)) {
-        throw new DecodeException(name + " shall not be null");
-      }
-    } catch (IOException ex) {
-      throw new DecodeException("IO error reading arrayLength of " + name);
+    if (decoder.readNullOrArrayLength(arraySize)) {
+      throw new DecodeException(name + " shall not be null");
     }
   }
 
@@ -203,13 +191,9 @@ public abstract class ProxyMessage implements CborEncodable {
     }
 
     public static BooleanMessage decode(CborDecoder decoder) throws DecodeException {
-      try {
-        boolean b = Optional.ofNullable(decoder.readBooleanObj()).orElseThrow(
-            () -> new DecodeException("BooleanMessage shall not be null"));
-        return new BooleanMessage(b);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding BooleanMessage", ex);
-      }
+      boolean b = Optional.ofNullable(decoder.readBooleanObj()).orElseThrow(
+          () -> new DecodeException("BooleanMessage shall not be null"));
+      return new BooleanMessage(b);
     }
 
   }
@@ -235,14 +219,10 @@ public abstract class ProxyMessage implements CborEncodable {
     }
 
     public static ByteArrayMessage decode(CborDecoder decoder) throws DecodeException {
-      try {
-        byte[] b = Optional.ofNullable(decoder.readByteString()).orElseThrow(
-            () -> new DecodeException("ByteArrayMessage shall not be null"));
+      byte[] b = Optional.ofNullable(decoder.readByteString()).orElseThrow(
+          () -> new DecodeException("ByteArrayMessage shall not be null"));
 
-        return new ByteArrayMessage(b);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding ByteArrayMessage", ex);
-      }
+      return new ByteArrayMessage(b);
     }
 
   }
@@ -280,13 +260,9 @@ public abstract class ProxyMessage implements CborEncodable {
 
     public static DigestSecretKeyRequest decode(CborDecoder decoder) throws DecodeException {
       assertArraySize(decoder, NUM_FIELDS, "DigestSecretKeyRequest");
-      try {
-        long mechanism = decoder.readLong();
-        long objectHandle = decoder.readLong();
-        return new DigestSecretKeyRequest(mechanism, objectHandle);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding DigestSecretKeyRequest", ex);
-      }
+      long mechanism = decoder.readLong();
+      long objectHandle = decoder.readLong();
+      return new DigestSecretKeyRequest(mechanism, objectHandle);
     }
 
   }
@@ -367,15 +343,11 @@ public abstract class ProxyMessage implements CborEncodable {
 
     public static ErrorResponse decode(CborDecoder decoder) throws DecodeException {
       assertArraySize(decoder, NUM_FIELDS, "ErrorResponnse");
-      try {
-        int code = decoder.readInt();
-        ProxyErrorCode errorCode = Optional.ofNullable(ProxyErrorCode.ofCode(code)).orElseThrow(
-            () -> new DecodeException("unknown error code " + code));
-        String detail = decoder.readTextString();
-        return new ErrorResponse(errorCode, detail);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding ErrorResponse", ex);
-      }
+      int code = decoder.readInt();
+      ProxyErrorCode errorCode = Optional.ofNullable(ProxyErrorCode.ofCode(code)).orElseThrow(
+          () -> new DecodeException("unknown error code " + code));
+      String detail = decoder.readTextString();
+      return new ErrorResponse(errorCode, detail);
     }
 
   }
@@ -421,14 +393,10 @@ public abstract class ProxyMessage implements CborEncodable {
 
     public static GenerateDSAKeyPairByKeysizeRequest decode(CborDecoder decoder) throws DecodeException {
       assertArraySize(decoder, NUM_FIELDS, "GenerateDSAKeyPairByKeysizeRequest");
-      try {
-        int plength = decoder.readInt();
-        int qlength = decoder.readInt();
-        P11Slot.P11NewKeyControl control = decodeNewKeyControl(decoder);
-        return new GenerateDSAKeyPairByKeysizeRequest(plength, qlength, control);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding GenerateDSAKeyPairByKeysizeRequest", ex);
-      }
+      int plength = decoder.readInt();
+      int qlength = decoder.readInt();
+      P11Slot.P11NewKeyControl control = decodeNewKeyControl(decoder);
+      return new GenerateDSAKeyPairByKeysizeRequest(plength, qlength, control);
     }
 
   }
@@ -474,14 +442,10 @@ public abstract class ProxyMessage implements CborEncodable {
 
     public static GenerateDSAKeyPairOtfRequest decode(CborDecoder decoder) throws DecodeException {
       assertArraySize(decoder, NUM_FIELDS, "GenerateDSAKeyPairOtfRequest");
-      try {
-        BigInteger p = decoder.readBigInt();
-        BigInteger q = decoder.readBigInt();
-        BigInteger g = decoder.readBigInt();
-        return new GenerateDSAKeyPairOtfRequest(p, q, g);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding GenerateDSAKeyPairOtfRequest", ex);
-      }
+      BigInteger p = decoder.readBigInt();
+      BigInteger q = decoder.readBigInt();
+      BigInteger g = decoder.readBigInt();
+      return new GenerateDSAKeyPairOtfRequest(p, q, g);
     }
 
   }
@@ -515,15 +479,11 @@ public abstract class ProxyMessage implements CborEncodable {
 
     public static GenerateDSAKeyPairRequest decode(CborDecoder decoder) throws DecodeException {
       assertArraySize(decoder, NUM_FIELDS, "GenerateDSAKeyPairRequest");
-      try {
-        BigInteger p = decoder.readBigInt();
-        BigInteger q = decoder.readBigInt();
-        BigInteger g = decoder.readBigInt();
-        P11Slot.P11NewKeyControl control = decodeNewKeyControl(decoder);
-        return new GenerateDSAKeyPairRequest(p, q, g, control);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding GenerateDSAKeyPairRequest", ex);
-      }
+      BigInteger p = decoder.readBigInt();
+      BigInteger q = decoder.readBigInt();
+      BigInteger g = decoder.readBigInt();
+      P11Slot.P11NewKeyControl control = decodeNewKeyControl(decoder);
+      return new GenerateDSAKeyPairRequest(p, q, g, control);
     }
 
   }
@@ -634,13 +594,9 @@ public abstract class ProxyMessage implements CborEncodable {
 
     public static GenerateRSAKeyPairOtfRequest decode(CborDecoder decoder) throws DecodeException {
       assertArraySize(decoder, NUM_FIELDS, "GenerateRSAKeyPairOtfRequest");
-      try {
-        int keysize = decoder.readInt();
-        BigInteger publicExponent = decoder.readBigInt();
-        return new GenerateRSAKeyPairOtfRequest(keysize, publicExponent);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding GenerateRSAKeyPairOtfRequest", ex);
-      }
+      int keysize = decoder.readInt();
+      BigInteger publicExponent = decoder.readBigInt();
+      return new GenerateRSAKeyPairOtfRequest(keysize, publicExponent);
     }
 
   }
@@ -673,14 +629,10 @@ public abstract class ProxyMessage implements CborEncodable {
 
     public static GenerateRSAKeyPairRequest decode(CborDecoder decoder) throws DecodeException {
       assertArraySize(decoder, NUM_FIELDS, "GenerateRSAKeyPairRequest");
-      try {
-        int keysize = decoder.readInt();
-        BigInteger publicExponent = decoder.readBigInt();
-        P11Slot.P11NewKeyControl control = decodeNewKeyControl(decoder);
-        return new GenerateRSAKeyPairRequest(keysize, publicExponent, control);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding GenerateRSAKeyPairRequest", ex);
-      }
+      int keysize = decoder.readInt();
+      BigInteger publicExponent = decoder.readBigInt();
+      P11Slot.P11NewKeyControl control = decodeNewKeyControl(decoder);
+      return new GenerateRSAKeyPairRequest(keysize, publicExponent, control);
     }
 
   }
@@ -723,14 +675,10 @@ public abstract class ProxyMessage implements CborEncodable {
 
     public static GenerateSecretKeyRequest decode(CborDecoder decoder) throws DecodeException {
       assertArraySize(decoder, NUM_FIELDS, "GenerateSecretKeyRequest");
-      try {
-        long keyType = decoder.readLong();
-        Integer keySize = decoder.readIntObj();
-        P11Slot.P11NewKeyControl control = decodeNewKeyControl(decoder);
-        return new GenerateSecretKeyRequest(keyType, keySize, control);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding GenerateSecretKeyRequest", ex);
-      }
+      long keyType = decoder.readLong();
+      Integer keySize = decoder.readIntObj();
+      P11Slot.P11NewKeyControl control = decodeNewKeyControl(decoder);
+      return new GenerateSecretKeyRequest(keyType, keySize, control);
     }
 
   }
@@ -799,30 +747,26 @@ public abstract class ProxyMessage implements CborEncodable {
     }
 
     public static GetMechanismInfosResponse decode(CborDecoder decoder) throws DecodeException {
-      try {
-        Integer mapLen = decoder.readNullOrMapLength();
-        if (mapLen == null) {
-          throw new DecodeException("GetMechanismInfosResponse shall not be null");
-        }
-
-        Map<Long, MechanismInfo> map = new HashMap<>(mapLen * 5 / 4);
-        for (int i = 0; i < mapLen; i++) {
-          long code = decoder.readLong();
-          boolean isNull = decoder.readNullOrArrayLength(3);
-          if (isNull) {
-            map.put(code, null);
-          } else {
-            long minSize = decoder.readLong();
-            long maxSize = decoder.readLong();
-            long flags = decoder.readLong();
-            map.put(code, new MechanismInfo(minSize, maxSize, flags));
-          }
-        }
-
-        return new GetMechanismInfosResponse(map);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding GetMechanismInfosResponse", ex);
+      Integer mapLen = decoder.readNullOrMapLength();
+      if (mapLen == null) {
+        throw new DecodeException("GetMechanismInfosResponse shall not be null");
       }
+
+      Map<Long, MechanismInfo> map = new HashMap<>(mapLen * 5 / 4);
+      for (int i = 0; i < mapLen; i++) {
+        long code = decoder.readLong();
+        boolean isNull = decoder.readNullOrArrayLength(3);
+        if (isNull) {
+          map.put(code, null);
+        } else {
+          long minSize = decoder.readLong();
+          long maxSize = decoder.readLong();
+          long flags = decoder.readLong();
+          map.put(code, new MechanismInfo(minSize, maxSize, flags));
+        }
+      }
+
+      return new GetMechanismInfosResponse(map);
     }
 
   }
@@ -860,13 +804,9 @@ public abstract class ProxyMessage implements CborEncodable {
 
     public static IdLabelMessage decode(CborDecoder decoder) throws DecodeException {
       assertArraySize(decoder, NUM_FIELDS, "IdLabelMessage");
-      try {
-        byte[] id = decoder.readByteString();
-        String label = decoder.readTextString();
-        return new IdLabelMessage(id, label);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding IdLabelMessage", ex);
-      }
+      byte[] id = decoder.readByteString();
+      String label = decoder.readTextString();
+      return new IdLabelMessage(id, label);
     }
 
   }
@@ -908,14 +848,10 @@ public abstract class ProxyMessage implements CborEncodable {
 
     public static ImportSecretKeyRequest decode(CborDecoder decoder) throws DecodeException {
       assertArraySize(decoder, NUM_FIELDS, "ImportSecretKeyRequest");
-      try {
-        long keyType = decoder.readLong();
-        byte[] keyValue = decoder.readByteString();
-        P11Slot.P11NewKeyControl control = decodeNewKeyControl(decoder);
-        return new ImportSecretKeyRequest(keyType, keyValue, control);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding ImportSecretKeyRequest", ex);
-      }
+      long keyType = decoder.readLong();
+      byte[] keyValue = decoder.readByteString();
+      P11Slot.P11NewKeyControl control = decodeNewKeyControl(decoder);
+      return new ImportSecretKeyRequest(keyType, keyValue, control);
     }
 
   }
@@ -941,13 +877,9 @@ public abstract class ProxyMessage implements CborEncodable {
     }
 
     public static IntMessage decode(CborDecoder decoder) throws DecodeException {
-      try {
-        int b = Optional.ofNullable(decoder.readIntObj()).orElseThrow(
-            () -> new DecodeException("IntMessage shall not be null"));
-        return new IntMessage(b);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding IntMessage", ex);
-      }
+      int b = Optional.ofNullable(decoder.readIntObj()).orElseThrow(
+          () -> new DecodeException("IntMessage shall not be null"));
+      return new IntMessage(b);
     }
 
   }
@@ -1012,13 +944,9 @@ public abstract class ProxyMessage implements CborEncodable {
     }
 
     public static LongArrayMessage decode(CborDecoder decoder) throws DecodeException {
-      try {
-        long[] value = Optional.ofNullable(decoder.readLongs()).orElseThrow(
-            () -> new DecodeException("LongMessage shall not be null"));
-        return new LongArrayMessage(value);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding LongArrayMessage", ex);
-      }
+      long[] value = Optional.ofNullable(decoder.readLongs()).orElseThrow(
+          () -> new DecodeException("LongMessage shall not be null"));
+      return new LongArrayMessage(value);
     }
 
   }
@@ -1044,13 +972,9 @@ public abstract class ProxyMessage implements CborEncodable {
     }
 
     public static LongMessage decode(CborDecoder decoder) throws DecodeException {
-      try {
-        long b = Optional.ofNullable(decoder.readLongObj()).orElseThrow(
-            () -> new DecodeException("LongMessage shall not be null"));
-        return new LongMessage(b);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding LongMessage", ex);
-      }
+      long b = Optional.ofNullable(decoder.readLongObj()).orElseThrow(
+          () -> new DecodeException("LongMessage shall not be null"));
+      return new LongMessage(b);
     }
 
   }
@@ -1120,25 +1044,21 @@ public abstract class ProxyMessage implements CborEncodable {
 
     public static ModuleCapsResponse decode(CborDecoder decoder) throws DecodeException {
       assertArraySize(decoder, NUM_FIELDS, "ModuleCapsResponse");
-      try {
-        boolean readOnly = decoder.readBoolean();
-        int maxMessageSize = decoder.readInt();
-        P11ModuleConf.P11NewObjectConf newObjectConf;
-        if (decoder.readNullOrArrayLength(2)) {
-          newObjectConf = null;
-        } else {
-          newObjectConf = new P11ModuleConf.P11NewObjectConf();
-          newObjectConf.setIgnoreLabel(decoder.readBoolean());
-          newObjectConf.setIdLength(decoder.readInt());
-        }
-
-        List<Long> secretKeyTypes = decoder.readLongList();
-        List<Long> keyPairTypes = decoder.readLongList();
-
-        return new ModuleCapsResponse(readOnly, maxMessageSize, newObjectConf, secretKeyTypes, keyPairTypes);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding ModuleCapsResponse", ex);
+      boolean readOnly = decoder.readBoolean();
+      int maxMessageSize = decoder.readInt();
+      P11ModuleConf.P11NewObjectConf newObjectConf;
+      if (decoder.readNullOrArrayLength(2)) {
+        newObjectConf = null;
+      } else {
+        newObjectConf = new P11ModuleConf.P11NewObjectConf();
+        newObjectConf.setIgnoreLabel(decoder.readBoolean());
+        newObjectConf.setIdLength(decoder.readInt());
       }
+
+      List<Long> secretKeyTypes = decoder.readLongList();
+      List<Long> keyPairTypes = decoder.readLongList();
+
+      return new ModuleCapsResponse(readOnly, maxMessageSize, newObjectConf, secretKeyTypes, keyPairTypes);
     }
 
   } // class ServerCaps
@@ -1263,13 +1183,9 @@ public abstract class ProxyMessage implements CborEncodable {
 
     public static ShowDetailsRequest decode(CborDecoder decoder) throws DecodeException {
       assertArraySize(decoder, NUM_FIELDS, "ShowDetailsRequest");
-      try {
-        Long objectHandle = decoder.readLongObj();
-        boolean verbose = decoder.readBoolean();
-        return new ShowDetailsRequest(objectHandle, verbose);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding P11KeyResponse", ex);
-      }
+      Long objectHandle = decoder.readLongObj();
+      boolean verbose = decoder.readBoolean();
+      return new ShowDetailsRequest(objectHandle, verbose);
     }
 
   }
@@ -1335,16 +1251,12 @@ public abstract class ProxyMessage implements CborEncodable {
 
     public static SignRequest decode(CborDecoder decoder) throws DecodeException {
       assertArraySize(decoder, NUM_FIELDS, "SignRequest");
-      try {
-        long handle = decoder.readLong();
-        long mechanism = decoder.readLong();
-        P11Params params = decodeP11Params(decoder);
-        ExtraParams extraParams = decodeExtraParams(decoder);
-        byte[] content = decoder.readByteString();
-        return new SignRequest(handle, mechanism, params, extraParams, content);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding SignRequest", ex);
-      }
+      long handle = decoder.readLong();
+      long mechanism = decoder.readLong();
+      P11Params params = decodeP11Params(decoder);
+      ExtraParams extraParams = decodeExtraParams(decoder);
+      byte[] content = decoder.readByteString();
+      return new SignRequest(handle, mechanism, params, extraParams, content);
     }
 
     private static void writeExtraParams(CborEncoder encoder, ExtraParams params) throws IOException {
@@ -1357,15 +1269,11 @@ public abstract class ProxyMessage implements CborEncodable {
     }
 
     private static ExtraParams decodeExtraParams(CborDecoder decoder) throws DecodeException {
-      try {
-        if (decoder.readNullOrArrayLength(1)) {
-          return null;
-        }
-
-        return new ExtraParams().ecOrderBitSize(decoder.readInt());
-      } catch (IOException ex) {
-        throw new DecodeException("IO error", ex);
+      if (decoder.readNullOrArrayLength(1)) {
+        return null;
       }
+
+      return new ExtraParams().ecOrderBitSize(decoder.readInt());
     }
 
     protected static void writeP11Params(CborEncoder encoder, P11Params params)
@@ -1393,26 +1301,22 @@ public abstract class ProxyMessage implements CborEncodable {
     }
 
     public static P11Params decodeP11Params(CborDecoder decoder) throws DecodeException {
-      try {
-        Long tag = decoder.readTagObj();
-        if (tag == null) {
-          return null;
-        }
+      Long tag = decoder.readTagObj();
+      if (tag == null) {
+        return null;
+      }
 
-        if (TAG_P11ByteArrayParams == tag) {
-          assertArraySize(decoder, 1, "P11ByteArrayParams");
-          return new P11Params.P11ByteArrayParams(decoder.readByteString());
-        } else if (TAG_P11RSAPkcsPssParams == tag) {
-          assertArraySize(decoder, 3, "P11RSAPkcsPssParams");
-          long hashAlgorithm = decoder.readLong();
-          long maskGenerationFunction = decoder.readLong();
-          int saltLength = decoder.readInt();
-          return new P11Params.P11RSAPkcsPssParams(hashAlgorithm, maskGenerationFunction, saltLength);
-        } else {
-          throw new DecodeException("unknown tag " + tag);
-        }
-      } catch (IOException ex) {
-        throw new DecodeException("IO error", ex);
+      if (TAG_P11ByteArrayParams == tag) {
+        assertArraySize(decoder, 1, "P11ByteArrayParams");
+        return new P11Params.P11ByteArrayParams(decoder.readByteString());
+      } else if (TAG_P11RSAPkcsPssParams == tag) {
+        assertArraySize(decoder, 3, "P11RSAPkcsPssParams");
+        long hashAlgorithm = decoder.readLong();
+        long maskGenerationFunction = decoder.readLong();
+        int saltLength = decoder.readInt();
+        return new P11Params.P11RSAPkcsPssParams(hashAlgorithm, maskGenerationFunction, saltLength);
+      } else {
+        throw new DecodeException("unknown tag " + tag);
       }
     }
 
@@ -1444,22 +1348,18 @@ public abstract class ProxyMessage implements CborEncodable {
     }
 
     public static SlotIdsResponse decode(CborDecoder decoder) throws DecodeException {
-      try {
-        int arrayLen = Optional.ofNullable(decoder.readNullOrArrayLength()).orElseThrow(
-            () -> new DecodeException("SlotIdsResponse shall not be null"));
+      int arrayLen = Optional.ofNullable(decoder.readNullOrArrayLength()).orElseThrow(
+          () -> new DecodeException("SlotIdsResponse shall not be null"));
 
-        List<P11SlotId> list = new ArrayList<>(arrayLen);
-        for (int i = 0; i < arrayLen; i++) {
-          assertArraySize(decoder, 2, "P11SlotId");
-          int index = decoder.readInt();
-          long id = decoder.readLong();
-          list.add(new P11SlotId(index, id));
-        }
-
-        return new SlotIdsResponse(list);
-      } catch (IOException ex) {
-        throw new DecodeException("IO error decoding SlotIdsResponse", ex);
+      List<P11SlotId> list = new ArrayList<>(arrayLen);
+      for (int i = 0; i < arrayLen; i++) {
+        assertArraySize(decoder, 2, "P11SlotId");
+        int index = decoder.readInt();
+        long id = decoder.readLong();
+        list.add(new P11SlotId(index, id));
       }
+
+      return new SlotIdsResponse(list);
     }
   }
 }

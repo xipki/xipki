@@ -90,21 +90,17 @@ public class X500NameType extends SdkEncodable {
   }
 
   public static X500NameType decode(CborDecoder decoder) throws DecodeException {
-    try {
-      CborType type = decoder.peekType();
-      if (CborDecoder.isNull(type)) {
-        decoder.readNull();
-        return null;
-      }
+    CborType type = decoder.peekType();
+    if (CborDecoder.isNull(type)) {
+      decoder.readNull();
+      return null;
+    }
 
-      long tag = decoder.readTag();
-      if (tag == TAG_ENCODED) {
-        return new X500NameType(decoder.readByteString());
-      } else {
-        return new X500NameType(decoder.readTextString());
-      }
-    } catch (IOException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, X500NameType.class), ex);
+    long tag = decoder.readTag();
+    if (tag == TAG_ENCODED) {
+      return new X500NameType(decoder.readByteString());
+    } else {
+      return new X500NameType(decoder.readTextString());
     }
   }
 

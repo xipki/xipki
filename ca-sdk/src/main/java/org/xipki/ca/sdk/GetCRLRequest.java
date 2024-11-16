@@ -69,7 +69,7 @@ public class GetCRLRequest extends SdkRequest {
           decoder.readBigInt(),
           decoder.readInstant(),
           decoder.readTextString());
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, GetCRLRequest.class), ex);
     }
   }

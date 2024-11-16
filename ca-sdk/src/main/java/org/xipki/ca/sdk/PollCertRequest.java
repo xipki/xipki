@@ -54,7 +54,7 @@ public class PollCertRequest extends CaIdentifierRequest {
           decoder.readByteString(),
           decoder.readTextString(),
           Entry.decodeArray(decoder));
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, PollCertRequest.class), ex);
     }
   }
@@ -97,13 +97,13 @@ public class PollCertRequest extends CaIdentifierRequest {
         return new Entry(
             decoder.readBigInt(),
             X500NameType.decode(decoder));
-      } catch (IOException | RuntimeException ex) {
+      } catch (RuntimeException ex) {
         throw new DecodeException(buildDecodeErrMessage(ex, Entry.class), ex);
       }
     }
 
     public static Entry[] decodeArray(CborDecoder decoder) throws DecodeException {
-      Integer arrayLen = decoder.readNullOrArrayLength(Entry[].class);
+      Integer arrayLen = decoder.readNullOrArrayLength();
       if (arrayLen == null) {
         return null;
       }

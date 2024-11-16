@@ -41,7 +41,7 @@ public class PayloadResponse extends SdkResponse {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("PayloadResponse", decoder, 1);
       return new PayloadResponse(decoder.readByteString());
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, PayloadResponse.class), ex);
     }
   }

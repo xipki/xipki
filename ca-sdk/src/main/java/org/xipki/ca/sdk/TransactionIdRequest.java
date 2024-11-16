@@ -38,7 +38,7 @@ public class TransactionIdRequest extends SdkRequest {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("TransactionIdRequest", decoder, 1);
       return new TransactionIdRequest(decoder.readTextString());
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, TransactionIdRequest.class), ex);
     }
   }

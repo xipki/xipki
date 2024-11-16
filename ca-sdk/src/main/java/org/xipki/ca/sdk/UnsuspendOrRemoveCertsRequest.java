@@ -45,7 +45,7 @@ public class UnsuspendOrRemoveCertsRequest extends CaIdentifierRequest {
           X500NameType.decode(decoder),
           decoder.readByteString(),
           decoder.readBigInts());
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, UnsuspendOrRemoveCertsRequest.class), ex);
     }
   }

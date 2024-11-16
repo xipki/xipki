@@ -92,7 +92,7 @@ public class CaIdentifierRequest extends SdkRequest{
           decoder.readByteString(),
           X500NameType.decode(decoder),
           decoder.readByteString());
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, CaIdentifierRequest.class), ex);
     }
   }

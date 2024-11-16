@@ -57,7 +57,7 @@ public class CertprofileInfoResponse extends SdkResponse {
           decoder.readTextStrings(),
           decoder.readTextStrings(),
           KeyType.decodeArray(decoder));
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, CertprofileInfoResponse.class), ex);
     }
   }

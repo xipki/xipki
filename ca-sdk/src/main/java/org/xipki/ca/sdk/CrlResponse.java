@@ -39,7 +39,7 @@ public class CrlResponse extends SdkResponse {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("CrlResponse", decoder, 1);
       return new CrlResponse(decoder.readByteString());
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, CrlResponse.class), ex);
     }
   }

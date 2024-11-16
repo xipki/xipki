@@ -55,13 +55,13 @@ public class SingleCertSerialEntry extends SdkEncodable {
       return new SingleCertSerialEntry(
           decoder.readBigInt(),
           ErrorEntry.decode(decoder));
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, SingleCertSerialEntry.class), ex);
     }
   }
 
   public static SingleCertSerialEntry[] decodeArray(CborDecoder decoder) throws DecodeException {
-    Integer arrayLen = decoder.readNullOrArrayLength(SingleCertSerialEntry[].class);
+    Integer arrayLen = decoder.readNullOrArrayLength();
     if (arrayLen == null) {
       return null;
     }

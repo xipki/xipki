@@ -37,7 +37,7 @@ public class CertprofileInfoRequest extends SdkRequest {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("CertprofileInfoRequest", decoder, 1);
       return new CertprofileInfoRequest(decoder.readTextString());
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, CertprofileInfoRequest.class), ex);
     }
   }

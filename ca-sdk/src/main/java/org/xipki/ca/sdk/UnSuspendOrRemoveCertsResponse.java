@@ -40,7 +40,7 @@ public class UnSuspendOrRemoveCertsResponse extends SdkResponse {
       assertArrayStart("UnSuspendOrRemoveCertsResponse", decoder, 1);
       return new UnSuspendOrRemoveCertsResponse(
           SingleCertSerialEntry.decodeArray(decoder));
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, UnSuspendOrRemoveCertsResponse.class), ex);
     }
   }

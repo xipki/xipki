@@ -120,7 +120,7 @@ public class EnrollCertsRequest extends SdkRequest {
       }
       ret.setEntries(Entry.decodeArray(decoder));
       return ret;
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, EnrollCertsRequest.class), ex);
     }
   }
@@ -290,13 +290,13 @@ public class EnrollCertsRequest extends SdkRequest {
         ret.setNotAfter(decoder.readInstant());
         ret.setOldCertInfo(OldCertInfo.decode(decoder));
         return ret;
-      } catch (IOException | RuntimeException ex) {
+      } catch (RuntimeException ex) {
         throw new DecodeException(buildDecodeErrMessage(ex, Entry.class), ex);
       }
     }
 
     public static Entry[] decodeArray(CborDecoder decoder) throws DecodeException {
-      Integer arrayLen = decoder.readNullOrArrayLength(Entry[].class);
+      Integer arrayLen = decoder.readNullOrArrayLength();
       if (arrayLen == null) {
         return null;
       }

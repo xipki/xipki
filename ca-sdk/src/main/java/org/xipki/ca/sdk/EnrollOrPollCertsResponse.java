@@ -78,7 +78,7 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
       ret.setEntries(Entry.decodeArray(decoder));
       ret.setExtraCerts(decoder.readByteStrings());
       return ret;
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, EnrollOrPollCertsResponse.class), ex);
     }
   }
@@ -136,13 +136,13 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
             ErrorEntry.decode(decoder),
             decoder.readByteString(),
             decoder.readByteString());
-      } catch (IOException | RuntimeException ex) {
+      } catch (RuntimeException ex) {
         throw new DecodeException(buildDecodeErrMessage(ex, Entry.class), ex);
       }
     }
 
     public static Entry[] decodeArray(CborDecoder decoder) throws DecodeException {
-      Integer arrayLen = decoder.readNullOrArrayLength(Entry[].class);
+      Integer arrayLen = decoder.readNullOrArrayLength();
       if (arrayLen == null) {
         return null;
       }

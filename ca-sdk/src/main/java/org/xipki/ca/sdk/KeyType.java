@@ -51,13 +51,13 @@ public class KeyType extends SdkEncodable {
       return new KeyType(
           decoder.readTextString(),
           decoder.readTextStrings());
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, KeyType.class), ex);
     }
   }
 
   public static KeyType[] decodeArray(CborDecoder decoder) throws DecodeException {
-    Integer arrayLen = decoder.readNullOrArrayLength(KeyType[].class);
+    Integer arrayLen = decoder.readNullOrArrayLength();
     if (arrayLen == null) {
       return null;
     }

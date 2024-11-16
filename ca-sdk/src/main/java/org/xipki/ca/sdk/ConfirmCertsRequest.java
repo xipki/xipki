@@ -49,7 +49,7 @@ public class ConfirmCertsRequest extends SdkRequest {
       return new ConfirmCertsRequest(
           decoder.readTextString(),
           Entry.decodeArray(decoder));
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, ConfirmCertsRequest.class), ex);
     }
   }
@@ -101,13 +101,13 @@ public class ConfirmCertsRequest extends SdkRequest {
             decoder.readBoolean(),
             decoder.readBigInt(),
             decoder.readByteString());
-      } catch (IOException | RuntimeException ex) {
+      } catch (RuntimeException ex) {
         throw new DecodeException(buildDecodeErrMessage(ex, Entry.class), ex);
       }
     }
 
     public static Entry[] decodeArray(CborDecoder decoder) throws DecodeException {
-      Integer arrayLen = decoder.readNullOrArrayLength(Entry[].class);
+      Integer arrayLen = decoder.readNullOrArrayLength();
       if (arrayLen == null) {
         return null;
       }

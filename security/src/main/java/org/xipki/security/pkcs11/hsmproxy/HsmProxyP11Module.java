@@ -351,8 +351,6 @@ class HsmProxyP11Module extends P11Module {
 
         errorResp = ErrorResponse.decode(decoder);
       }
-    } catch (IOException ex) {
-      throw new TokenException("IO error decoding response", ex);
     } catch (DecodeException ex) {
       throw new TokenException("DecodeException decoding response", ex);
     }

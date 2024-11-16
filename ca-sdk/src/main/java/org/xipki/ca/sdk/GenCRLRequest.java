@@ -42,7 +42,7 @@ public class GenCRLRequest extends SdkRequest {
       assertArrayStart("GenCRLRequest", decoder, 1);
       return new GenCRLRequest(
           decoder.readTextString());
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, GenCRLRequest.class), ex);
     }
   }

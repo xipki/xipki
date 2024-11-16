@@ -72,7 +72,7 @@ public class ErrorEntry extends SdkEncodable {
       return new ErrorEntry(
           decoder.readInt(),
           decoder.readTextString());
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, ErrorEntry.class), ex);
     }
   }

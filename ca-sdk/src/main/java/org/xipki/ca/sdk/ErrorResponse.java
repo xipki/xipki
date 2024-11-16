@@ -75,7 +75,7 @@ public class ErrorResponse extends SdkResponse {
       ErrorCode errorCode = ErrorCode.ofCode(code);
 
       return new ErrorResponse(tid, errorCode, decoder.readTextString());
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, ErrorResponse.class), ex);
     }
   }

@@ -52,7 +52,7 @@ public class GetCertRequest extends SdkRequest {
       return new GetCertRequest(
           decoder.readBigInt(),
           X500NameType.decode(decoder));
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, GetCertRequest.class), ex);
     }
   }

@@ -102,7 +102,7 @@ public class OldCertInfo extends SdkEncodable {
         BySha1FpAndSerial fsn = BySha1FpAndSerial.decode(decoder);
         return new OldCertInfo(usePublicKey, fsn);
       }
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new DecodeException(buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
     }
   }
@@ -145,7 +145,7 @@ public class OldCertInfo extends SdkEncodable {
         return new ByIssuerAndSerial(
             X500NameType.decode(decoder),
             decoder.readBigInt());
-      } catch (IOException | RuntimeException ex) {
+      } catch (RuntimeException ex) {
         throw new DecodeException(buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
       }
     }
@@ -189,7 +189,7 @@ public class OldCertInfo extends SdkEncodable {
         return new BySha1FpAndSerial(
             decoder.readByteString(),
             decoder.readBigInt());
-      } catch (IOException | RuntimeException ex) {
+      } catch (RuntimeException ex) {
         throw new DecodeException(buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
       }
     }
@@ -230,7 +230,7 @@ public class OldCertInfo extends SdkEncodable {
         return new BySubject(
             decoder.readByteString(),
             decoder.readByteString());
-      } catch (IOException | RuntimeException ex) {
+      } catch (RuntimeException ex) {
         throw new DecodeException(buildDecodeErrMessage(ex, BySubject.class), ex);
       }
     }
