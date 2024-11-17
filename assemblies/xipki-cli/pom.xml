@@ -147,7 +147,7 @@
               <target>
                 <!-- Fix bug introduced from karaf 4.3.8 and 4.4.2: remove this block if no exception
                   presented in the log file-->
-                <java failonerror="true" classname="org.xipki.tools.patchkaraf.PatchAppend">
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchAppend">
                   <arg value="--backup"/>
                   <arg value="no"/>
                   <arg value="--file"/>
@@ -155,7 +155,7 @@
                   <arg value="--value"/>
                   <arg value="mvn\:org.osgi/org.osgi.service.metatype/${osgi.metatype.version} = 9"/>
                 </java>
-                <java failonerror="true" classname="org.xipki.tools.patchkaraf.PatchFeature">
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
                   <arg value="--backup"/>
                   <arg value="no"/>
                   <arg value="--file"/>
@@ -165,19 +165,19 @@
                   <arg value="--features"/>
                   <arg value="${patchkaraf.features}"/>
                 </java>
-                <java failonerror="true" classname="org.xipki.tools.patchkaraf.PatchPaxUrlMvn">
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchPaxUrlMvn">
                   <arg value="--backup"/>
                   <arg value="no"/>
                   <arg value="--file"/>
                   <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.ops4j.pax.url.mvn.cfg"/>
                 </java>
-                <java failonerror="true" classname="org.xipki.tools.patchkaraf.PatchPaxLogging">
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchPaxLogging">
                   <arg value="--backup"/>
                   <arg value="no"/>
                   <arg value="--file"/>
                   <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.ops4j.pax.logging.cfg"/>
                 </java>
-                <java failonerror="true" classname="org.xipki.tools.patchkaraf.PatchAppend">
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchAppend">
                   <arg value="--backup"/>
                   <arg value="no"/>
                   <arg value="--file"/>

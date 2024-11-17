@@ -16,9 +16,9 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xipki</groupId>
-      <artifactId>tools</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xipki.tools</groupId>
+      <artifactId>app-package</artifactId>
+      <version>${xipki.tools.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -135,7 +135,7 @@
                 <move file="${project.build.directory}/t/xipki-mgmt-cli-${project.version}"
                       tofile="${project.build.directory}/t/xipki-mgmt-cli"/>
 
-                <java failonerror="true" classname="org.xipki.tools.apppackage.CompressPackage">
+                <java failonerror="true" classname="org.xipki.apppackage.CompressPackage">
                   <arg value="${project.basedir}/src/assembly/descriptors/package-conf.properties"/>
                   <arg value="${project.build.directory}/t"/>
                   <arg value="${project.build.directory}/t2"/>
