@@ -118,7 +118,7 @@
             </goals>
             <configuration>
               <stripVersion>false</stripVersion>
-              <outputDirectory>${project.build.directory}/jdk11on/system/org/osgi/org.osgi.service.metatype/${osgi.metatype.version}</outputDirectory>
+              <outputDirectory>${project.build.directory}/jars/system/org/osgi/org.osgi.service.metatype/${osgi.metatype.version}</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.osgi</groupId>
@@ -141,7 +141,7 @@
               <goal>features-add-to-repository</goal>
             </goals>
             <configuration>
-              <repository>${project.build.directory}/jdk11on/system</repository>
+              <repository>${project.build.directory}/jars/system</repository>
               <descriptors>
                 <descriptor>mvn:org.xipki.feature/mgmt-cli/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
@@ -241,14 +241,14 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
-            <id>jdk11on</id>
+            <id>main</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>src/main/descriptors/jdk11on.xml</descriptor>
+                <descriptor>src/main/descriptors/main.xml</descriptor>
               </descriptors>
               <appendAssemblyId>false</appendAssemblyId>
               <tarLongFileMode>posix</tarLongFileMode>

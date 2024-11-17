@@ -155,7 +155,7 @@
         <version>3.6.0</version>
         <executions>
           <execution>
-            <id>jdk11on</id>
+            <id>main</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>

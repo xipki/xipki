@@ -2,7 +2,7 @@
 <assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
-  <id>jdk11on</id>
+  <id>main</id>
   <includeBaseDirectory>true</includeBaseDirectory>
   <formats>
     <format>tar.gz</format>
@@ -24,7 +24,7 @@
       <fileMode>0644</fileMode>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}/jdk11on</directory>
+      <directory>${project.build.directory}/jars</directory>
       <outputDirectory>.</outputDirectory>
       <excludes>
         <exclude>system/org/apache/karaf/features/**</exclude>
