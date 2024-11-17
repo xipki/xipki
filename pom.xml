@@ -30,7 +30,6 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skipDeploy>false</skipDeploy>
-    <xipki.tools.version>1.0.12</xipki.tools.version>
     <javax.servlet.version>3.1.0</javax.servlet.version>
     <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
     <karaf.version>4.4.6</karaf.version>
@@ -54,6 +53,7 @@
   </properties>
   <modules>
     <!-- Base components -->
+    <module>tools</module>
     <module>password</module>
     <module>util</module>
     <module>audit</module>
@@ -191,14 +191,9 @@
           <version>1.8</version>
           <dependencies>
             <dependency>
-              <groupId>org.xipki.tools</groupId>
-              <artifactId>patch-karaf</artifactId>
-              <version>${xipki.tools.version}</version>
-            </dependency>
-            <dependency>
-              <groupId>org.xipki.tools</groupId>
-              <artifactId>app-package</artifactId>
-              <version>${xipki.tools.version}</version>
+              <groupId>org.xipki</groupId>
+              <artifactId>tools</artifactId>
+              <version>${project.version}</version>
             </dependency>
           </dependencies>
         </plugin>
