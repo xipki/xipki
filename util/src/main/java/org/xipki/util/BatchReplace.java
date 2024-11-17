@@ -10,6 +10,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,17 +23,80 @@ import java.util.Set;
 
 public class BatchReplace {
 
+  public static class Includes {
+    private Set<String> suffixes;
+    private Set<String> dirs;
+
+    public Set<String> getSuffixes() {
+      return suffixes;
+    }
+
+    public void setSuffixes(Set<String> suffixes) {
+      this.suffixes = suffixes;
+    }
+
+    public Set<String> getDirs() {
+      return dirs;
+    }
+
+    public void setDirs(Set<String> dirs) {
+      this.dirs = dirs;
+    }
+  }
+
+  public static class Excludes {
+    private Set<String> dirs;
+    private Set<String> files;
+
+    public Set<String> getDirs() {
+      return dirs;
+    }
+
+    public void setDirs(Set<String> dirs) {
+      this.dirs = dirs;
+    }
+
+    public Set<String> getFiles() {
+      return files;
+    }
+
+    public void setFiles(Set<String> files) {
+      this.files = files;
+    }
+  }
+
   private static class Section {
     private String description;
-    private Set<String> files;
+    private Includes includes;
+    private Excludes excludes;
     private Map<String, String> replacements;
 
     public void setDescription(String description) {
       this.description = description;
     }
 
-    public void setFiles(Set<String> files) {
-      this.files = files;
+    public String getDescription() {
+      return description;
+    }
+
+    public Includes getIncludes() {
+      return includes;
+    }
+
+    public void setIncludes(Includes includes) {
+      this.includes = includes;
+    }
+
+    public Excludes getExcludes() {
+      return excludes;
+    }
+
+    public void setExcludes(Excludes excludes) {
+      this.excludes = excludes;
+    }
+
+    public Map<String, String> getReplacements() {
+      return replacements;
     }
 
     public void setReplacements(Map<String, String> replacements) {
@@ -84,13 +149,46 @@ public class BatchReplace {
 
       for (Section section : conf.sections) {
         System.out.println("Processing section '" + section.description + "'");
-        for (String filename : section.files) {
-          System.out.println("    File " + filename);
-          File file = new File(filename);
-          if (!file.isAbsolute()) {
-            file = new File(basedir, filename);
-          }
-          replaceFile(file, section.replacements, prefix, suffix);
+
+        if (section.includes == null) {
+          continue;
+        }
+
+        Set<String> includeSuffixes = section.includes.suffixes;
+        if (includeSuffixes == null || includeSuffixes.isEmpty()) {
+          continue;
+        }
+
+        Set<String> includeDirs = section.includes.dirs;
+        if (includeDirs == null || includeDirs.isEmpty()) {
+          continue;
+        } else {
+          includeDirs = toCanonicalPaths(basedir, includeDirs);
+        }
+
+        Set<String> excludeDirs = section.excludes == null ? null : section.excludes.dirs;
+        if (excludeDirs == null) {
+          excludeDirs = Collections.emptySet();
+        } else {
+          excludeDirs = toCanonicalPaths(basedir, excludeDirs);
+        }
+
+        Set<String> excludesFiles = section.excludes == null ? null : section.excludes.files;
+        if (excludesFiles == null) {
+          excludesFiles = Collections.emptySet();
+        } else {
+          excludesFiles = toCanonicalPaths(basedir, excludesFiles);
+        }
+
+        String basedirPath = basedir.getCanonicalPath();
+        if (!basedirPath.endsWith(File.separator)) {
+          basedirPath += File.separator;
+        }
+
+        for (String dirName : includeDirs) {
+          File dir = new File(dirName);
+          replaceDir(basedirPath, dir, includeSuffixes, excludeDirs, excludesFiles,
+              section.replacements, prefix, suffix);
         }
       }
     } catch (Exception ex) {
@@ -99,7 +197,56 @@ public class BatchReplace {
     }
   }
 
-  private static void replaceFile(File file, Map<String, String> replacements, String prefix, String suffix)
+  private static Set<String> toCanonicalPaths(File base, Set<String> subPaths) throws IOException {
+    String basePath = base.getPath();
+    if (!basePath.endsWith("/")) {
+      basePath += "/";
+    }
+
+    Set<String> ret = new HashSet<>(subPaths.size());
+    for (String m : subPaths) {
+      ret.add(new File(basePath + m).getCanonicalPath());
+    }
+    return ret;
+  }
+
+  private static void replaceDir(
+      String baseDirPath, File dir, Set<String> includeSuffixes,
+      Set<String> excludeDirs, Set<String> excludeFiles,
+      Map<String, String> replacements, String prefix, String suffix)
+      throws IOException {
+    File[] files = dir.listFiles();
+    if (files == null) {
+      return;
+    }
+
+    for (File f : files) {
+      if (f.isFile()) {
+        String path = f.getPath();
+        if (endsWith(path, includeSuffixes) && !excludeFiles.contains(path)) {
+          replaceFile(baseDirPath, f, replacements, prefix, suffix);
+        }
+      } else if (f.isDirectory()) {
+        if (!excludeDirs.contains(f.getPath())) {
+          replaceDir(baseDirPath, f, includeSuffixes, excludeDirs, excludeFiles,
+              replacements, prefix, suffix);
+        }
+      }
+    }
+  }
+
+  private static boolean endsWith(String path, Set<String> suffixes) {
+    for (String suffix : suffixes) {
+      if (path.endsWith(suffix)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static void replaceFile(
+      String baseDirPath, File file, Map<String, String> replacements,
+      String prefix, String suffix)
       throws IOException {
     StringBuilder target = new StringBuilder();
     boolean changed = false;
@@ -124,6 +271,7 @@ public class BatchReplace {
     }
 
     if (changed) {
+      System.out.println("    Changed the file " + file.getPath().substring(baseDirPath.length()));
       try (OutputStream out = new FileOutputStream(file)) {
         out.write(target.toString().getBytes(StandardCharsets.UTF_8));
       }

@@ -5,9 +5,14 @@
 	"sections" : [
 		{
 			"description": "Gateway Supported Protocols",
-			"files": [
-				"xipki-gateway/tomcat/xipki/etc/gateway.json"
-			],
+			"includes": {
+				"dirs": [
+					"xipki-gateway/tomcat/xipki/etc/"
+				],
+				"suffixes": [
+					"gateway.json"
+				]
+			},
 			"replacements": {
 				"gateway.acme.enabled": "false",
 				"gateway.cmp.enabled": "true",
@@ -18,78 +23,20 @@
 		},
 		{
 			"description": "XiPKI Configuration",
-			"files": [
-				"setup/keycerts.json",
-				// CA
-				"xipki-ca/tomcat/conf/server.xml",
-				// Gateway
-				"xipki-gateway/tomcat/conf/server.xml",
-				"xipki-gateway/tomcat/xipki/etc/gateway.json",
-				"xipki-gateway/tomcat/xipki/etc/acme-gateway.json",
-				"xipki-gateway/tomcat/xipki/etc/cmp-gateway.json",
-				"xipki-gateway/tomcat/xipki/etc/est-gateway.json",
-				"xipki-gateway/tomcat/xipki/etc/rest-gateway.json",
-				"xipki-gateway/tomcat/xipki/etc/scep-gateway.json",
-				// OCSP
-				"xipki-ocsp/tomcat/conf/server.xml",
-				"xipki-ocsp/tomcat/xipki/etc/ocsp/ocsp-responder.json",
-				"xipki-ocsp/tomcat/xipki/etc/ocsp/example/crl-store/ocsp-responder.json",
-				"xipki-ocsp/tomcat/xipki/etc/ocsp/example/ejbca-store/ocsp-responder.json",
-				"xipki-ocsp/tomcat/xipki/etc/ocsp/example/xipki-ca-db-store/ocsp-responder.json",
-				"xipki-ocsp/tomcat/xipki/etc/ocsp/example/xipki-db-store/ocsp-responder.json",
-				// HSM proxy
-				"xipki-hsmproxy/tomcat/conf/server.xml",
-				"xipki-hsmproxy/tomcat/xipki/security/example/pkcs11-hsmproxy.json",
-				"xipki-hsmproxy/tomcat/xipki/security/pkcs11.json",
-				"xipki-ca/tomcat/xipki/security/example/pkcs11-hsmproxy.json",
-				"xipki-ca/tomcat/xipki/security/pkcs11.json",
-				"xipki-ocsp/tomcat/xipki/security/example/pkcs11-hsmproxy.json",
-				"xipki-ocsp/tomcat/xipki/security/pkcs11.json",
-				"xipki-gateway/tomcat/xipki/security/example/pkcs11-hsmproxy.json",
-				"xipki-gateway/tomcat/xipki/security/pkcs11.json",
-				"xipki-cli/xipki/security/example/pkcs11-hsmproxy.json",
-				"xipki-cli/xipki/security/pkcs11.json",
-				"xipki-mgmt-cli/xipki/security/example/pkcs11-hsmproxy.json",
-				"xipki-mgmt-cli/xipki/security/pkcs11.json",
-
-				// MGMT CLI
-				"xipki-mgmt-cli/etc/org.xipki.ca.mgmt.client.cfg",
-				"xipki-mgmt-cli/xipki/ca-setup/demo/doDemo.script",
-				"xipki-mgmt-cli/xipki/etc/curl.json",
-
-				"xipki-mgmt-cli/xipki/ca-setup/cacert-present-dbbased/setup-p11.script",
-				"xipki-mgmt-cli/xipki/ca-setup/cacert-present-dbbased/setup-p12.script",
-				"xipki-mgmt-cli/xipki/ca-setup/cacert-present-dbbased/template.ca-conf.json",
-
-				"xipki-mgmt-cli/xipki/ca-setup/cacert-present-filebased/setup-p11.script",
-				"xipki-mgmt-cli/xipki/ca-setup/cacert-present-filebased/setup-p12.script",
-				"xipki-mgmt-cli/xipki/ca-setup/cacert-present-filebased/template.ca-conf.json",
-
-				"xipki-mgmt-cli/xipki/ca-setup/cacert-none-dbbased/setup-p11.script",
-				"xipki-mgmt-cli/xipki/ca-setup/cacert-none-dbbased/setup-p12.script",
-				"xipki-mgmt-cli/xipki/ca-setup/cacert-none-dbbased/template.ca-conf.json",
-
-				"xipki-mgmt-cli/xipki/ca-setup/cacert-none-filebased/setup-p11.script",
-				"xipki-mgmt-cli/xipki/ca-setup/cacert-none-filebased/setup-p12.script",
-				"xipki-mgmt-cli/xipki/ca-setup/cacert-none-filebased/template.ca-conf.json", 
-
-				"xipki-mgmt-cli/xipki/ca-setup/setup-ocsp-p11.script",
-				"xipki-mgmt-cli/xipki/ca-setup/setup-ocsp-p12.script",
-				"xipki-mgmt-cli/xipki/ca-setup/setup-scep-p12.script",
-
-				"xipki-mgmt-cli/xipki/ca-setup/demo/ocsp-responder-p11-cadb.json",
-				"xipki-mgmt-cli/xipki/ca-setup/demo/rest-client.script",
-
-				// CLI
-				"xipki-cli/xipki/etc/cmp-client.json",
-				"xipki-cli/xipki/etc/curl.json",
-				"xipki-cli/xipki/client-script/cmp-client.script",
-				"xipki-cli/xipki/client-script/est-client.script",
-				"xipki-cli/xipki/client-script/est-client.sh",
-				"xipki-cli/xipki/client-script/rest-client.script",
-				"xipki-cli/xipki/client-script/rest-client.sh",
-				"xipki-cli/xipki/client-script/scep-client.script"
-			],
+			"includes": {
+				"dirs": [
+					"setup/",
+					"xipki-ca/",
+					"xipki-gateway/",
+					"xipki-ocsp/",
+					"xipki-hsmproxy/",
+					"xipki-cli/",
+					"xipki-mgmt-cli/"
+				],
+				"suffixes": [
+					".json", ".xml", ".cfg", ".script", ".properties", ".sh"
+				]
+			},
 			"replacements": {
 				// General
 				"organization": "myorg",
