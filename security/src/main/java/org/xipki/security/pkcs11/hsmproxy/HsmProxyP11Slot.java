@@ -148,7 +148,7 @@ class HsmProxyP11Slot extends P11Slot {
   }
 
   @Override
-  public int destroyObjectsByIdLabel(byte[] id, String label) throws TokenException {
+  public int destroyObjectsByIdLabel(byte[] id, String label) {
     try {
       return ((IntMessage) send(ProxyAction.destroyObjectsByIdLabel, new IdLabelMessage(id, label))).getValue();
     } catch (TokenException e) {

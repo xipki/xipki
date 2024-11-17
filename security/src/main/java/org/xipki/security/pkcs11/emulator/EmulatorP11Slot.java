@@ -1261,7 +1261,7 @@ class EmulatorP11Slot extends P11Slot {
         nameLen = Math.max(nameLen, name.length());
       }
 
-      String text = "";
+      StringBuilder text = new StringBuilder();
 
       for (String name : properties.stringPropertyNames()) {
         if (name.equals(PROP_SHA1SUM) || name.equals("handle")) {
@@ -1301,9 +1301,10 @@ class EmulatorP11Slot extends P11Slot {
             valueText = value;
         }
 
-        text += "  " + nameText + valueText + "\n";
+        text.append("  ").append(nameText).append(valueText).append("\n");
       }
-      stream.write(text.getBytes(StandardCharsets.UTF_8));
+
+      stream.write(text.toString().getBytes(StandardCharsets.UTF_8));
     } else {
       stream.write("\nList of objects:\n".getBytes(StandardCharsets.UTF_8));
 
