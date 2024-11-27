@@ -11,9 +11,6 @@
   <artifactId>scep-client</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
   <packaging>bundle</packaging>
-  <properties>
-    <jetty.version>9.4.55.v20240627</jetty.version>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
