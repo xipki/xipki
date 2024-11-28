@@ -74,6 +74,46 @@ public class IoUtil {
   }
 
   /**
+   * Read exactly number of bytes from the input stream.
+   * The specified stream remains open after this method returns.
+   * @param in the input stream.
+   * @param len length of bytes to read from the input stream in.
+   * @return the bytes read from in.
+   * @throws IOException if error occurs while reading the bytes or
+   *         not enough bytes are available..
+   */
+  public static byte[] readExactBytes(InputStream in, int len)
+      throws IOException {
+    byte[] ret = new byte[len];
+    readExactBytes(in, ret, 0, len);
+    return ret;
+  }
+
+  /**
+   * Read exactly number of bytes from the input stream.
+   * The specified stream remains open after this method returns.
+   * @param in the input stream.
+   * @param out to which the bytes is written.
+   * @param off off set out to which the byts is written to.
+   * @param len length of bytes to read from the input stream in.
+   * @throws IOException if error occurs while reading the bytes or
+   *         not enough bytes are available..
+   */
+  public static void readExactBytes(InputStream in, byte[] out, int off, int len)
+      throws IOException {
+    int offAfter = off + len;
+    int read;
+    while (off < offAfter && (read = in.read(out, off, offAfter - off)) != -1) {
+      off += read;
+    }
+
+    if (off < offAfter) {
+      throw new IOException(
+          "in reaches end, but still expected " + (offAfter - off) + " bytes");
+    }
+  }
+
+  /**
    * Read all bytes from the input stream and close the stream.
    * The specified stream is closed after this method returns.
    * @param in the input stream.
