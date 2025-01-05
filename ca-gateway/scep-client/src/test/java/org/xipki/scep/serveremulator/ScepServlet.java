@@ -18,7 +18,6 @@ import org.xipki.scep.util.ScepConstants;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
-import org.xipki.util.ConfPairs;
 import org.xipki.util.IoUtil;
 import org.xipki.util.exception.DecodeException;
 

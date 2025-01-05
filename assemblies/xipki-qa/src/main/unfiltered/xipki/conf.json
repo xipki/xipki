@@ -5,30 +5,24 @@
 	"sections" : [
 		{
 			"description": "XiPKI Configuration",
-			"files": [
-				"xipki-ca/tomcat/conf/server.xml",
-				"xipki-hsmproxy/tomcat/conf/server.xml",
-				"xipki-gateway/tomcat/conf/server.xml",
-				"xipki-ocsp/tomcat/conf/server.xml",
-				"xipki-gateway/tomcat/xipki/etc/gateway.json",
-				"xipki-gateway/tomcat/xipki/etc/acme-gateway.json",
-				"xipki-gateway/tomcat/xipki/etc/cmp-gateway.json",
-				"xipki-gateway/tomcat/xipki/etc/est-gateway.json",
-				"xipki-gateway/tomcat/xipki/etc/rest-gateway.json",
-				"xipki-gateway/tomcat/xipki/etc/scep-gateway.json",
-				"xipki/etc/curl.json",
-				"etc/org.xipki.ca.mgmt.client.cfg",
-				"xipki-hsmproxy/tomcat/xipki/security/example/pkcs11-hsmproxy.json",
-				"xipki-hsmproxy/tomcat/xipki/security/pkcs11.json",
-				"xipki-ca/tomcat/xipki/security/example/pkcs11-hsmproxy.json",
-				"xipki-ca/tomcat/xipki/security/pkcs11.json",
-				"xipki-ocsp/tomcat/xipki/security/example/pkcs11-hsmproxy.json",
-				"xipki-ocsp/tomcat/xipki/security/pkcs11.json",
-				"xipki-gateway/tomcat/xipki/security/example/pkcs11-hsmproxy.json",
-				"xipki-gateway/tomcat/xipki/security/pkcs11.json",
-				"xipki/security/example/pkcs11-hsmproxy.json",
-				"xipki/security/pkcs11.json"
-			],
+			"includes": {
+				"dirs": [
+					"xipki-ca/",
+					"xipki-hsmproxy/",
+					"xipki-gateway/",
+					"xipki-ocsp/",
+					"xipki/",
+					"etc/"
+				],
+				"suffixes": [
+					"server.xml",
+					"gateway.json",
+					"curl.json",
+					"org.xipki.ca.mgmt.client.cfg",
+					"pkcs11-hsmproxy.json",
+					"pkcs11.json"
+				]
+			},
 			"replacements": {
 				// OCSP
 				"ocsp.keyPassword": "CHANGEIT",
@@ -75,18 +69,20 @@
 		},
 		{
 			"description": "tomcat.java.home",
-			"files": [
-				"qa/cab/lifecycle.script",
-				"qa/cab/template.ca-load.script",
-				"qa/eddsa/lifecycle.script",
-				"qa/eddsa/template.ca-load.script",
-				"qa/lifecycle.script",
-				"qa/no-caconf-db/test.script",
-				"qa/qa.d/scep-server.script",
-				"qa/qa.d/template.ca-load.script",
-				"qa/qa.d/template.ca.script",
-				"qa/reimport.script"
-			],
+			"includes": {
+				"dirs": [
+					"qa/"
+				],
+				"suffixes": [
+					"lifecycle.script",
+					"template.ca-load.script",
+					"test.script",
+					"scep-server.script",
+					"template.ca-load.script",
+					"template.ca.script",
+					"reimport.script"
+				]
+			},
 			"replacements": {
 				"tomcat.java.home": "--env JAVA_HOME=~/test/xipki/jdk-tomcat"
 			}
