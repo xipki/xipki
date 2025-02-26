@@ -39,7 +39,7 @@ import java.util.Map;
 /**
  * This is just an example that demonstrates how to use the custom OcspStore.
  *
- * <p>To use this store, configure the store in the <tt>ocsp-responder.json</tt> file as follows
+ * <p>To use this store, configure the store in the ocsp-responder.json file as follows
  * <pre>
  *      "source":{
  *           "type":"java:org.xipki.ocsp.server.store.example.DummyStore",
