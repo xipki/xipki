@@ -443,7 +443,7 @@ public abstract class BaseCertprofile extends Certprofile {
 
         ASN1EncodableVector vector = new ASN1EncodableVector();
         vector.add(type);
-        vector.add(new DERTaggedObject(true, 0, ASN1TaggedObject.getInstance(asn1).getObject()));
+        vector.add(new DERTaggedObject(true, 0, ASN1TaggedObject.getInstance(asn1).getBaseObject()));
         return new GeneralName(GeneralName.otherName, new DERSequence(vector));
       case GeneralName.ediPartyName:
         reqSeq = ASN1Sequence.getInstance(requestedName.getName());
@@ -453,12 +453,12 @@ public abstract class BaseCertprofile extends Certprofile {
         int idx = 0;
         if (size > 1) {
           DirectoryString ds = DirectoryString.getInstance(
-              ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++)).getObject());
+              ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++)).getBaseObject());
           nameAssigner = ds.getString();
         }
 
         DirectoryString ds = DirectoryString.getInstance(
-            ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx)).getObject());
+            ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx)).getBaseObject());
         String partyName = ds.getString();
 
         vector = new ASN1EncodableVector();

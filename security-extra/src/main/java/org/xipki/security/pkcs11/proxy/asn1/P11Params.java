@@ -54,10 +54,9 @@ public class P11Params extends ProxyMessage {
     this.p11Params = Args.notNull(p11Params, "p11Params");
   }
 
-  private P11Params(ASN1TaggedObject taggedObject)
-      throws BadAsn1ObjectException {
+  private P11Params(ASN1TaggedObject taggedObject) {
     this.tagNo = taggedObject.getTagNo();
-    this.p11Params = taggedObject.getObject();
+    this.p11Params = taggedObject.getBaseObject();
   }
 
   public static P11Params getInstance(Object obj)

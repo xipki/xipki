@@ -40,6 +40,7 @@ import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.Validity;
 
 import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
@@ -897,7 +898,7 @@ public class XijsonCertprofile extends BaseCertprofile {
           tag = tagged.getTagNo();
           // we allow the EXPLICIT in request
           if (tagged.isExplicit()) {
-            extnStr = ((ASN1String) tagged.getObject()).getString();
+            extnStr = ((ASN1String) tagged.getBaseObject()).getString();
           } else {
             // we also allow the IMPLICIT in request
             if (tag == 0 || tag == 2) {

@@ -115,17 +115,17 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>
-                  <artifactId>bcpkix-jdk15on</artifactId>
+                  <artifactId>bcpkix-jdk18on</artifactId>
                   <version>${bc.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>
-                  <artifactId>bcprov-jdk15on</artifactId>
+                  <artifactId>bcprov-jdk18on</artifactId>
                   <version>${bc.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>
-                  <artifactId>bcutil-jdk15on</artifactId>
+                  <artifactId>bcutil-jdk18on</artifactId>
                   <version>${bc.version}</version>
                 </artifactItem>
               </artifactItems>

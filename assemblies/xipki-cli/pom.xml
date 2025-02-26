@@ -132,6 +132,7 @@
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
+        <version>${karaf.version}</version>
         <extensions>true</extensions>
         <executions>
           <execution>
@@ -145,8 +146,10 @@
               <descriptors>
                 <descriptor>mvn:org.xipki.feature/cli/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
+                <descriptor>mvn:org.apache.karaf.features/framework/${karaf.version}/xml/features</descriptor>
               </descriptors>
               <features>
+                <feature>framework</feature>
                 <feature>aries-blueprint</feature>
                 <feature>wrap</feature>
                 <!-- project-core features -->
@@ -159,6 +162,14 @@
               </features>
             </configuration>
           </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
+        <version>${jdk11on.karaf.version}</version>
+        <extensions>true</extensions>
+        <executions>
           <execution>
             <id>add-features-to-repo-jdk11on</id>
             <phase>generate-resources</phase>
@@ -170,8 +181,10 @@
               <descriptors>
                 <descriptor>mvn:org.xipki.feature/cli/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${jdk11on.karaf.version}/xml/features</descriptor>
+                <descriptor>mvn:org.apache.karaf.features/framework/${jdk11on.karaf.version}/xml/features</descriptor>
               </descriptors>
               <features>
+                <feature>framework</feature>
                 <feature>aries-blueprint</feature>
                 <feature>wrap</feature>
                 <!-- project-core features -->
@@ -236,15 +249,15 @@
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
                   token="bcutil-jdk15on/${karaf.bc.version}"
-                  value="bcutil-jdk15on/${bc.version}"/>
+                  value="bcutil-jdk18on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
                   token="bcprov-jdk15on/${karaf.bc.version}"
-                  value="bcprov-jdk15on/${bc.version}"/>
+                  value="bcprov-jdk18on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
                   token="bcpkix-jdk15on/${karaf.bc.version}"
-                  value="bcpkix-jdk15on/${bc.version}"/>
+                  value="bcpkix-jdk18on/${bc.version}"/>
                 <!-- jdk11on.jdk.version -->
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
                   <arg value="--backup"/>
@@ -303,15 +316,15 @@
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/system/org/apache/karaf/features/standard/${jdk11on.karaf.version}/standard-${jdk11on.karaf.version}-features.xml"
                   token="bcutil-jdk15on/${jdk15on.karaf.bc.version}"
-                  value="bcutil-jdk15on/${bc.version}"/>
+                  value="bcutil-jdk18on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/system/org/apache/karaf/features/standard/${jdk11on.karaf.version}/standard-${jdk11on.karaf.version}-features.xml"
                   token="bcprov-jdk15on/${jdk15on.karaf.bc.version}"
-                  value="bcprov-jdk15on/${bc.version}"/>
+                  value="bcprov-jdk18on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/system/org/apache/karaf/features/standard/${jdk11on.karaf.version}/standard-${jdk11on.karaf.version}-features.xml"
                   token="bcpkix-jdk15on/${jdk15on.karaf.bc.version}"
-                  value="bcpkix-jdk15on/${bc.version}"/>
+                  value="bcpkix-jdk18on/${bc.version}"/>
               </target>
             </configuration>
             <goals>

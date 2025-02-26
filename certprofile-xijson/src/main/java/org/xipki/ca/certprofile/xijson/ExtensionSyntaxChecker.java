@@ -76,7 +76,7 @@ public class ExtensionSyntaxChecker {
       extnValue = getParsedImplicitValue(name, taggedExtnValue, syntax.type());
     } else {
       if (extnTag != null && extnTag.isExplicit()) {
-        extnValue = taggedExtnValue.getObject();
+        extnValue = taggedExtnValue.getBaseObject();
       }
 
       try {
@@ -174,7 +174,7 @@ public class ExtensionSyntaxChecker {
         if (tag != null) {
           if (syntaxTag != null && (syntaxTag.getValue() == tag.getValue())) {
             if (syntaxTag.isExplicit() && tag.isExplicit()) {
-              obj = ((ASN1TaggedObject) obj).getObject();
+              obj = ((ASN1TaggedObject) obj).getBaseObject();
               FieldType expectedType = getFieldType(obj);
               if ((syntaxType == expectedType)
                   || (syntaxType == FieldType.SEQUENCE_OF && expectedType == FieldType.SEQUENCE)
@@ -188,10 +188,10 @@ public class ExtensionSyntaxChecker {
               // 1. [t] IMPLICIT SEQUENCE { type } is wired the same as [t] EXPLICIT type
               // 2. [t] IMPLICIT      SET { type } is wired the same as [t] EXPLICIT type
               if (syntaxType == FieldType.SEQUENCE || syntaxType == FieldType.SEQUENCE_OF) {
-                obj = new DERSequence(((ASN1TaggedObject) obj).getObject());
+                obj = new DERSequence(((ASN1TaggedObject) obj).getBaseObject());
                 matchIndex = j;
               } else if (syntaxType == FieldType.SET || syntaxType == FieldType.SET_OF) {
-                obj = new DERSet(((ASN1TaggedObject) obj).getObject());
+                obj = new DERSet(((ASN1TaggedObject) obj).getBaseObject());
                 matchIndex = j;
               }
             }
@@ -281,10 +281,10 @@ public class ExtensionSyntaxChecker {
             // 2. [t] IMPLICIT      SET { type } is wired the same as [t] EXPLICIT type
             FieldType type = m.type();
             if (type == FieldType.SEQUENCE || type == FieldType.SEQUENCE_OF) {
-              obj = new DERSequence(((ASN1TaggedObject) obj).getObject());
+              obj = new DERSequence(((ASN1TaggedObject) obj).getBaseObject());
               syntax = m;
             } else if (type == FieldType.SET || type == FieldType.SET_OF) {
-              obj = new DERSet(((ASN1TaggedObject) obj).getObject());
+              obj = new DERSet(((ASN1TaggedObject) obj).getBaseObject());
               syntax = m;
             }
           } else {
@@ -299,7 +299,7 @@ public class ExtensionSyntaxChecker {
 
       if (syntax != null) {
         if (syntax.getTag().isExplicit()) {
-          obj = taggedObj.getObject();
+          obj = taggedObj.getBaseObject();
           FieldType expectedType = getFieldType(obj);
           FieldType syntaxType = syntax.type();
 
@@ -426,8 +426,8 @@ public class ExtensionSyntaxChecker {
         case Name:
           return X500Name.getInstance(taggedObject, false);
         case NULL:
-          if (!(taggedObject.getObject() instanceof ASN1OctetString
-              && ((ASN1OctetString) taggedObject.getObject()).getOctets().length == 0)) {
+          if (!(taggedObject.getBaseObject() instanceof ASN1OctetString
+              && ((ASN1OctetString) taggedObject.getBaseObject()).getOctets().length == 0)) {
             throw new BadCertTemplateException("invalid " + name);
           }
           return DERNull.INSTANCE;
@@ -438,7 +438,7 @@ public class ExtensionSyntaxChecker {
         case PrintableString:
           return DERPrintableString.getInstance(taggedObject, false);
         case RAW:
-          return taggedObject.getObject();
+          return taggedObject.getBaseObject();
         case SEQUENCE:
         case SEQUENCE_OF:
           return ASN1Sequence.getInstance(taggedObject, false);

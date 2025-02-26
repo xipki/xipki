@@ -582,7 +582,7 @@ class A2gChecker extends ExtensionChecker {
           tag = tagged.getTagNo();
           // we allow the EXPLICIT in request
           if (tagged.isExplicit()) {
-            extnStr = ((ASN1String) tagged.getObject()).getString();
+            extnStr = ((ASN1String) tagged.getBaseObject()).getString();
           } else {
             // we also allow the IMPLICIT in request
             if (tag == 0 || tag == 2) {

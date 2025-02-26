@@ -3,9 +3,6 @@
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
   <repository>mvn:org.xipki.feature/cli/${project.version}/xml/features</repository>
-  <feature name="netty-tcnative" version="${netty-tcnative.version}" description="netty-tcnative">
-    <bundle>mvn:io.netty/netty-tcnative-boringssl-static/${netty-tcnative.version}</bundle>
-  </feature>
   <feature name="xipki-qa" version="${project.version}" description="QA">
     <feature>xipki-camgmt</feature>
     <feature>xipki-ocspclient</feature>
@@ -14,13 +11,10 @@
     <bundle>mvn:io.netty/netty-codec/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-codec-http/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-resolver/${netty.version}</bundle>
+    <bundle>mvn:io.netty/netty-transport-native-unix-common/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-transport/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-buffer/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-handler/${netty.version}</bundle>
-    <bundle>mvn:io.netty/netty-tcnative-classes/${netty-tcnative.version}</bundle>
-    <bundle>mvn:io.netty/netty-transport-classes-epoll/${netty.version}</bundle>
-    <bundle>mvn:io.netty/netty-transport-native-unix-common/${netty.version}</bundle>
-    <bundle>mvn:io.netty/netty-transport-native-epoll/${netty.version}/jar/linux-x86_64</bundle>
     <bundle>mvn:org.xipki/certprofile-xijson/${project.version}</bundle>
     <bundle>mvn:org.xipki/qa/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/qa-shell/${project.version}</bundle>

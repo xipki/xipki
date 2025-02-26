@@ -362,7 +362,7 @@ class CmpAgentUtil {
           ASN1TaggedObject to = (ASN1TaggedObject) params.getObjectAt(i);
           int tag = to.getTagNo();
           if (tag == 0) { // KDF
-            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
+            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getBaseObject());
             if (ObjectIdentifiers.Misc.id_iso18033_kdf2.equals(algId.getAlgorithm())) {
               AlgorithmIdentifier hashAlgorithm =
                   AlgorithmIdentifier.getInstance(algId.getParameters());
@@ -375,13 +375,13 @@ class CmpAgentUtil {
                   "unsupported KeyDerivationFunction " + algId.getAlgorithm().getId());
             }
           } else if (tag == 1) { // SymmetricEncryption
-            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
+            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getBaseObject());
             if (!ObjectIdentifiers.Secg.id_aes128_cbc_in_ecies.equals(algId.getAlgorithm())) {
               throw new XiSecurityException("unsupported SymmetricEncryption "
                   + algId.getAlgorithm().getId());
             }
           } else if (tag == 2) { // MessageAuthenticationCode
-            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
+            AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getBaseObject());
             if (ObjectIdentifiers.Secg.id_hmac_full_ecies.equals(algId.getAlgorithm())) {
               AlgorithmIdentifier hashAlgorithm =
                   AlgorithmIdentifier.getInstance(algId.getParameters());
@@ -593,7 +593,7 @@ class CmpAgentUtil {
   static CaConf.CaInfo retrieveCaInfo(VerifiedPkiMessage response, String caName)
       throws CmpClientException, PkiErrorException {
     ASN1Encodable itvValue = extractXipkiActionRepContent(response);
-    DERUTF8String utf8Str = DERUTF8String.getInstance(itvValue);
+    ASN1UTF8String utf8Str = DERUTF8String.getInstance(itvValue);
     String systemInfoStr = utf8Str.getString();
 
     LOG.debug("CAInfo for CA {}: {}", caName, systemInfoStr);

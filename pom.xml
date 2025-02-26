@@ -31,23 +31,24 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <xipki.tools.version>1.0.5</xipki.tools.version>
     <servlet.version>3.1.0</servlet.version>
-    <karaf.version>4.2.15</karaf.version>
-    <jdk11on.karaf.version>4.3.6</jdk11on.karaf.version>
+    <karaf.version>4.2.16</karaf.version>
+    <jdk11on.karaf.version>4.3.10</jdk11on.karaf.version>
     <karaf.bc.version>1.69</karaf.bc.version>
     <jdk11on.karaf.bc.version>1.69</jdk11on.karaf.bc.version>
-    <bc.version>1.70</bc.version>
+    <bc.version>1.80</bc.version>
     <slf4j.version>1.7.32</slf4j.version>
-    <pkcs11-wrapper.version>1.4.9</pkcs11-wrapper.version>
+    <pkcs11-wrapper.version>1.4.10</pkcs11-wrapper.version>
     <hikaricp.version>4.0.3</hikaricp.version>
-    <fastjson.version>1.2.79</fastjson.version>
+    <fastjson.version>1.2.83</fastjson.version>
     <liquibase.version>4.7.1</liquibase.version>
     <!-- only for runtime -->
-    <tinylog.version>2.3.2</tinylog.version>
-    <jdbc.mariadb.version>2.7.5</jdbc.mariadb.version>
-    <jdbc.postgresql.version>42.2.24</jdbc.postgresql.version>
-    <jdbc.h2.version>1.4.200</jdbc.h2.version>
+    <tinylog.version>2.7.0</tinylog.version>
+    <jdbc.mariadb.version>3.5.2</jdbc.mariadb.version>
+    <jdbc.postgresql.version>42.7.5</jdbc.postgresql.version>
+    <jdbc.h2.version>2.3.232</jdbc.h2.version>
     <!-- Only for test purpose -->
     <junit.version>4.13.1</junit.version>
+    <netty.version>4.1.118.Final</netty.version>
   </properties>
   <modules>
     <!-- Base components -->
@@ -295,12 +296,17 @@
     <dependencies>
       <dependency>
         <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk15on</artifactId>
+        <artifactId>bcutil-jdk18on</artifactId>
         <version>${bc.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bouncycastle</groupId>
-        <artifactId>bcpkix-jdk15on</artifactId>
+        <artifactId>bcprov-jdk18on</artifactId>
+        <version>${bc.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcpkix-jdk18on</artifactId>
         <version>${bc.version}</version>
       </dependency>
       <dependency>
