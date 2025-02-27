@@ -33,8 +33,10 @@
     <servlet.version>3.1.0</servlet.version>
     <karaf.version>4.2.16</karaf.version>
     <jdk11on.karaf.version>4.3.10</jdk11on.karaf.version>
+    <karaf.bc.suffix>jdk15on</karaf.bc.suffix>
     <karaf.bc.version>1.69</karaf.bc.version>
-    <jdk11on.karaf.bc.version>1.69</jdk11on.karaf.bc.version>
+    <jdk11on.karaf.bc.suffix>jdk18on</jdk11on.karaf.bc.suffix>
+    <jdk11on.karaf.bc.version>1.75</jdk11on.karaf.bc.version>
     <bc.version>1.80</bc.version>
     <slf4j.version>1.7.32</slf4j.version>
     <pkcs11-wrapper.version>1.4.10</pkcs11-wrapper.version>

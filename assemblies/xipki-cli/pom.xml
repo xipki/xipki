@@ -14,6 +14,7 @@
   <properties>
     <app.name>cli</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
+    <patchkaraf.repos.jdk8>mvn:org.xipki.feature/cli-jdk8/${project.version}/xml/features</patchkaraf.repos.jdk8>
     <patchkaraf.repos>mvn:org.xipki.feature/cli/${project.version}/xml/features</patchkaraf.repos>
     <patchkaraf.features>(-jaas,-ssh,-config,aries-blueprint,wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,xipki-ocspmgmt</patchkaraf.features>
   </properties>
@@ -144,7 +145,7 @@
             <configuration>
               <repository>${project.build.directory}/jdk8/system</repository>
               <descriptors>
-                <descriptor>mvn:org.xipki.feature/cli/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:org.xipki.feature/cli-jdk8/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/framework/${karaf.version}/xml/features</descriptor>
               </descriptors>
@@ -214,7 +215,7 @@
                   <arg value="--file"/>
                   <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"/>
                   <arg value="--repos"/>
-                  <arg value="${patchkaraf.repos}"/>
+                  <arg value="${patchkaraf.repos.jdk8}"/>
                   <arg value="--features"/>
                   <arg value="${patchkaraf.features}"/>
                 </java>
@@ -248,16 +249,16 @@
                   value="org.xml.sax.helpers, sun.misc, com.ibm.db2.jcc, org.h2.jdbcx, org.hsqldb.jdbc, org.mariadb.jdbc, com.mysql.jdbc.jdbc2.optional, oracle.jdbc.pool, org.postgresql.ds"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
-                  token="bcutil-jdk15on/${karaf.bc.version}"
-                  value="bcutil-jdk18on/${bc.version}"/>
+                  token="bcutil-${karaf.bc.suffix}/${karaf.bc.version}"
+                  value="bcutil-jdk18on/${bc.version}.osgir6"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
-                  token="bcprov-jdk15on/${karaf.bc.version}"
-                  value="bcprov-jdk18on/${bc.version}"/>
+                  token="bcprov-${karaf.bc.suffix}/${karaf.bc.version}"
+                  value="bcprov-jdk18on/${bc.version}.osgir6"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
-                  token="bcpkix-jdk15on/${karaf.bc.version}"
-                  value="bcpkix-jdk18on/${bc.version}"/>
+                  token="bcpkix-${karaf.bc.suffix}/${karaf.bc.version}"
+                  value="bcpkix-jdk18on/${bc.version}.osgir6"/>
                 <!-- jdk11on.jdk.version -->
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
                   <arg value="--backup"/>
@@ -315,15 +316,15 @@
                   value="java.applet, sun.misc, com.ibm.db2.jcc, org.h2.jdbcx, org.hsqldb.jdbc, org.mariadb.jdbc, com.mysql.jdbc.jdbc2.optional, oracle.jdbc.pool, org.postgresql.ds,"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/system/org/apache/karaf/features/standard/${jdk11on.karaf.version}/standard-${jdk11on.karaf.version}-features.xml"
-                  token="bcutil-jdk15on/${jdk15on.karaf.bc.version}"
+                  token="bcutil-${jdk11on.karaf.bc.suffix}/${jdk11on.karaf.bc.version}"
                   value="bcutil-jdk18on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/system/org/apache/karaf/features/standard/${jdk11on.karaf.version}/standard-${jdk11on.karaf.version}-features.xml"
-                  token="bcprov-jdk15on/${jdk15on.karaf.bc.version}"
+                  token="bcprov-${jdk11on.karaf.bc.suffix}/${jdk11on.karaf.bc.version}"
                   value="bcprov-jdk18on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/system/org/apache/karaf/features/standard/${jdk11on.karaf.version}/standard-${jdk11on.karaf.version}-features.xml"
-                  token="bcpkix-jdk15on/${jdk15on.karaf.bc.version}"
+                  token="bcpkix-${jdk11on.karaf.bc.suffix}/${jdk11on.karaf.bc.version}"
                   value="bcpkix-jdk18on/${bc.version}"/>
               </target>
             </configuration>

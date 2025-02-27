@@ -13,6 +13,7 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <packaging>pom</packaging>
   <modules>
+    <module>cli-jdk8</module>
     <module>cli</module>
     <module>qa</module>
   </modules>

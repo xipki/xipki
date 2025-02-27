@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="pki-${project.version}"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
+  <feature name="xipki-security" version="${project.version}" description="security shell">
+    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki/password/${project.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
+    <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
+    <bundle>mvn:org.xipki/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security-extra/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/security-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-caclient" version="${project.version}" description="CA client">
+    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki/password/${project.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
+    <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
+    <bundle>mvn:org.xipki/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security-extra/${project.version}</bundle>
+    <bundle>mvn:org.xipki/cmpclient/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/cmpclient-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-scepclient" version="${project.version}"
+      description="SCEP client shell">
+    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki/password/${project.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
+    <bundle>mvn:org.xipki/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security-extra/${project.version}</bundle>
+    <bundle>mvn:org.xipki/scep-client/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/scep-client-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-ocspclient" version="${project.version}" description="OCSP client shell">
+    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki/password/${project.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
+    <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
+    <bundle>mvn:org.xipki/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security-extra/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ocsp-client/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/ocsp-client-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-camgmt" version="${project.version}" description="CA management shell">
+    <bundle>mvn:org.osgi/org.osgi.service.jdbc/1.0.0</bundle>
+    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki/password/${project.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
+    <bundle>mvn:org.xipki/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security-extra/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
+    <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
+    <bundle>mvn:org.xipki/datasource/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-mgmt-client/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/ca-mgmt-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-ocspmgmt" version="${project.version}" description="OCSP management">
+    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki/password/${project.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}.osgir6</bundle>
+    <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
+    <bundle>mvn:org.xipki/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security-extra/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ocsp-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ocsp-mgmt-client/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/ocsp-mgmt-shell/${project.version}</bundle>
+  </feature>
+</features>
