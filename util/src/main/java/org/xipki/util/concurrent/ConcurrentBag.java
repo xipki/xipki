@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static java.lang.Thread.yield;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.locks.LockSupport.parkNanos;
@@ -194,7 +193,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
       } else if ((i & 0x100) == 0x100) {
         parkNanos(MICROSECONDS.toNanos(10));
       } else {
-        yield();
+        Thread.yield();
       }
     }
 
@@ -217,7 +216,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
 
     // spin until a thread takes it or none are waiting
     while (waiters.get() > 0 && !handoffQueue.offer(bagEntry)) {
-      yield();
+      Thread.yield();
     }
   }
 
@@ -310,7 +309,7 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
     if (bagEntry.compareAndSet(STATE_RESERVED, STATE_NOT_IN_USE)) {
       // spin until a thread takes it or none are waiting
       while (waiters.get() > 0 && !handoffQueue.offer(bagEntry)) {
-        yield();
+        Thread.yield();
       }
     } else {
       LOG.warn("Attempt to relinquish an object to the bag that was not reserved: {}", bagEntry);
