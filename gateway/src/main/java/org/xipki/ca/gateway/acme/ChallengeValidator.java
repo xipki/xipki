@@ -210,16 +210,18 @@ public class ChallengeValidator implements Runnable {
           }
 
           LOG.debug("dns-01: host='{}'", identifier.getValue());
+
+          String acmeDomain = "_acme-challenge." + host;
           Record[] records = null;
           try {
-            records = new Lookup(host, Type.TXT).run();
+            records = new Lookup(acmeDomain, Type.TXT).run();
           } catch (TextParseException ex) {
             String message =  "error while validating challenge " + challId +
                               " for identifier " + identifier;
             LogUtil.error(LOG, ex, message);
           }
 
-          String expectedName = "_acme-challenge." + host + ".";
+          String expectedName = acmeDomain + ".";
           if (records != null) {
             for (Record record : records) {
               TXTRecord txt = (TXTRecord) record;
